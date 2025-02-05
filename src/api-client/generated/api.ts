@@ -922,25 +922,6 @@ export interface FindRollenResponse {
 /**
  * 
  * @export
- * @interface FindSchulstrukturknotenResponse
- */
-export interface FindSchulstrukturknotenResponse {
-    /**
-     * 
-     * @type {Array<OrganisationResponseLegacy>}
-     * @memberof FindSchulstrukturknotenResponse
-     */
-    'moeglicheSsks': Array<OrganisationResponseLegacy>;
-    /**
-     * 
-     * @type {number}
-     * @memberof FindSchulstrukturknotenResponse
-     */
-    'total': number;
-}
-/**
- * 
- * @export
  * @enum {string}
  */
 
@@ -2385,7 +2366,7 @@ export interface PersonenkontextWorkflowResponse {
      * @type {string}
      * @memberof PersonenkontextWorkflowResponse
      */
-    'selectedRolle': string | null;
+    'selectedRollen': string | null;
     /**
      * Indicates whether the commit action can be performed.
      * @type {boolean}
@@ -9399,69 +9380,15 @@ export const PersonenkontextApiAxiosParamCreator = function (configuration?: Con
         },
         /**
          * 
-         * @param {string} rolleId RolleId used to filter for schulstrukturknoten in personenkontext.
-         * @param {string} [sskName] Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.
-         * @param {number} [limit] The limit of items for the request.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        dbiamPersonenkontextWorkflowControllerFindSchulstrukturknoten: async (rolleId: string, sskName?: string, limit?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'rolleId' is not null or undefined
-            assertParamExists('dbiamPersonenkontextWorkflowControllerFindSchulstrukturknoten', 'rolleId', rolleId)
-            const localVarPath = `/api/personenkontext-workflow/schulstrukturknoten`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication bearer required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            // authentication oauth2 required
-            // oauth required
-            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
-
-            if (rolleId !== undefined) {
-                localVarQueryParameter['rolleId'] = rolleId;
-            }
-
-            if (sskName !== undefined) {
-                localVarQueryParameter['sskName'] = sskName;
-            }
-
-            if (limit !== undefined) {
-                localVarQueryParameter['limit'] = limit;
-            }
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
          * @param {string} [organisationId] ID of the organisation to filter the rollen later
-         * @param {string} [rolleId] ID of the rolle.
+         * @param {Array<string>} [rolleIds] IDs of the rollen.
          * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
          * @param {string} [organisationName] Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.
          * @param {number} [limit] The limit of items for the request.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        dbiamPersonenkontextWorkflowControllerProcessStep: async (organisationId?: string, rolleId?: string, rolleName?: string, organisationName?: string, limit?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        dbiamPersonenkontextWorkflowControllerProcessStep: async (organisationId?: string, rolleIds?: Array<string>, rolleName?: string, organisationName?: string, limit?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/personenkontext-workflow/step`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -9486,8 +9413,8 @@ export const PersonenkontextApiAxiosParamCreator = function (configuration?: Con
                 localVarQueryParameter['organisationId'] = organisationId;
             }
 
-            if (rolleId !== undefined) {
-                localVarQueryParameter['rolleId'] = rolleId;
+            if (rolleIds) {
+                localVarQueryParameter['rolleIds'] = rolleIds;
             }
 
             if (rolleName !== undefined) {
@@ -9547,28 +9474,16 @@ export const PersonenkontextApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @param {string} rolleId RolleId used to filter for schulstrukturknoten in personenkontext.
-         * @param {string} [sskName] Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.
-         * @param {number} [limit] The limit of items for the request.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async dbiamPersonenkontextWorkflowControllerFindSchulstrukturknoten(rolleId: string, sskName?: string, limit?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FindSchulstrukturknotenResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.dbiamPersonenkontextWorkflowControllerFindSchulstrukturknoten(rolleId, sskName, limit, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * 
          * @param {string} [organisationId] ID of the organisation to filter the rollen later
-         * @param {string} [rolleId] ID of the rolle.
+         * @param {Array<string>} [rolleIds] IDs of the rollen.
          * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
          * @param {string} [organisationName] Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.
          * @param {number} [limit] The limit of items for the request.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async dbiamPersonenkontextWorkflowControllerProcessStep(organisationId?: string, rolleId?: string, rolleName?: string, organisationName?: string, limit?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonenkontextWorkflowResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.dbiamPersonenkontextWorkflowControllerProcessStep(organisationId, rolleId, rolleName, organisationName, limit, options);
+        async dbiamPersonenkontextWorkflowControllerProcessStep(organisationId?: string, rolleIds?: Array<string>, rolleName?: string, organisationName?: string, limit?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonenkontextWorkflowResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dbiamPersonenkontextWorkflowControllerProcessStep(organisationId, rolleIds, rolleName, organisationName, limit, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -9603,27 +9518,16 @@ export const PersonenkontextApiFactory = function (configuration?: Configuration
         },
         /**
          * 
-         * @param {string} rolleId RolleId used to filter for schulstrukturknoten in personenkontext.
-         * @param {string} [sskName] Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.
-         * @param {number} [limit] The limit of items for the request.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        dbiamPersonenkontextWorkflowControllerFindSchulstrukturknoten(rolleId: string, sskName?: string, limit?: number, options?: any): AxiosPromise<FindSchulstrukturknotenResponse> {
-            return localVarFp.dbiamPersonenkontextWorkflowControllerFindSchulstrukturknoten(rolleId, sskName, limit, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
          * @param {string} [organisationId] ID of the organisation to filter the rollen later
-         * @param {string} [rolleId] ID of the rolle.
+         * @param {Array<string>} [rolleIds] IDs of the rollen.
          * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
          * @param {string} [organisationName] Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.
          * @param {number} [limit] The limit of items for the request.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        dbiamPersonenkontextWorkflowControllerProcessStep(organisationId?: string, rolleId?: string, rolleName?: string, organisationName?: string, limit?: number, options?: any): AxiosPromise<PersonenkontextWorkflowResponse> {
-            return localVarFp.dbiamPersonenkontextWorkflowControllerProcessStep(organisationId, rolleId, rolleName, organisationName, limit, options).then((request) => request(axios, basePath));
+        dbiamPersonenkontextWorkflowControllerProcessStep(organisationId?: string, rolleIds?: Array<string>, rolleName?: string, organisationName?: string, limit?: number, options?: any): AxiosPromise<PersonenkontextWorkflowResponse> {
+            return localVarFp.dbiamPersonenkontextWorkflowControllerProcessStep(organisationId, rolleIds, rolleName, organisationName, limit, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -9656,19 +9560,8 @@ export interface PersonenkontextApiInterface {
 
     /**
      * 
-     * @param {string} rolleId RolleId used to filter for schulstrukturknoten in personenkontext.
-     * @param {string} [sskName] Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.
-     * @param {number} [limit] The limit of items for the request.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof PersonenkontextApiInterface
-     */
-    dbiamPersonenkontextWorkflowControllerFindSchulstrukturknoten(rolleId: string, sskName?: string, limit?: number, options?: AxiosRequestConfig): AxiosPromise<FindSchulstrukturknotenResponse>;
-
-    /**
-     * 
      * @param {string} [organisationId] ID of the organisation to filter the rollen later
-     * @param {string} [rolleId] ID of the rolle.
+     * @param {Array<string>} [rolleIds] IDs of the rollen.
      * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
      * @param {string} [organisationName] Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.
      * @param {number} [limit] The limit of items for the request.
@@ -9676,7 +9569,7 @@ export interface PersonenkontextApiInterface {
      * @throws {RequiredError}
      * @memberof PersonenkontextApiInterface
      */
-    dbiamPersonenkontextWorkflowControllerProcessStep(organisationId?: string, rolleId?: string, rolleName?: string, organisationName?: string, limit?: number, options?: AxiosRequestConfig): AxiosPromise<PersonenkontextWorkflowResponse>;
+    dbiamPersonenkontextWorkflowControllerProcessStep(organisationId?: string, rolleIds?: Array<string>, rolleName?: string, organisationName?: string, limit?: number, options?: AxiosRequestConfig): AxiosPromise<PersonenkontextWorkflowResponse>;
 
 }
 
@@ -9713,21 +9606,8 @@ export class PersonenkontextApi extends BaseAPI implements PersonenkontextApiInt
 
     /**
      * 
-     * @param {string} rolleId RolleId used to filter for schulstrukturknoten in personenkontext.
-     * @param {string} [sskName] Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.
-     * @param {number} [limit] The limit of items for the request.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof PersonenkontextApi
-     */
-    public dbiamPersonenkontextWorkflowControllerFindSchulstrukturknoten(rolleId: string, sskName?: string, limit?: number, options?: AxiosRequestConfig) {
-        return PersonenkontextApiFp(this.configuration).dbiamPersonenkontextWorkflowControllerFindSchulstrukturknoten(rolleId, sskName, limit, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
      * @param {string} [organisationId] ID of the organisation to filter the rollen later
-     * @param {string} [rolleId] ID of the rolle.
+     * @param {Array<string>} [rolleIds] IDs of the rollen.
      * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
      * @param {string} [organisationName] Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.
      * @param {number} [limit] The limit of items for the request.
@@ -9735,8 +9615,8 @@ export class PersonenkontextApi extends BaseAPI implements PersonenkontextApiInt
      * @throws {RequiredError}
      * @memberof PersonenkontextApi
      */
-    public dbiamPersonenkontextWorkflowControllerProcessStep(organisationId?: string, rolleId?: string, rolleName?: string, organisationName?: string, limit?: number, options?: AxiosRequestConfig) {
-        return PersonenkontextApiFp(this.configuration).dbiamPersonenkontextWorkflowControllerProcessStep(organisationId, rolleId, rolleName, organisationName, limit, options).then((request) => request(this.axios, this.basePath));
+    public dbiamPersonenkontextWorkflowControllerProcessStep(organisationId?: string, rolleIds?: Array<string>, rolleName?: string, organisationName?: string, limit?: number, options?: AxiosRequestConfig) {
+        return PersonenkontextApiFp(this.configuration).dbiamPersonenkontextWorkflowControllerProcessStep(organisationId, rolleIds, rolleName, organisationName, limit, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

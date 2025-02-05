@@ -20,6 +20,7 @@
   import FormRow from '@/components/form/FormRow.vue';
   import {
     usePersonenkontextStore,
+    type DbiamCreatePersonenkontextBodyParams,
     type DBiamPersonenkontextResponse,
     type PersonenkontextStore,
   } from '@/stores/PersonenkontextStore';
@@ -54,13 +55,17 @@
 
   const selectedOrgaCache: Ref<string | undefined> = ref(undefined);
   const selectedKlasseCache: Ref<string | undefined> = ref(undefined);
-  const selectedRolleCache: Ref<string | undefined> = ref(undefined);
+  const selectedRolleCache: Ref<string[] | undefined> = ref(undefined);
 
-  function isKopersRolle(selectedRolleId: string | undefined): boolean {
-    const rolle: TranslatedRolleWithAttrs | undefined = rollen.value?.find(
-      (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
+  function isKopersRolle(selectedRolleIds: string[] | undefined): boolean {
+    if (!selectedRolleIds || selectedRolleIds.length === 0) return false;
+
+    return (
+      rollen.value?.some(
+        (r: TranslatedRolleWithAttrs) =>
+          selectedRolleIds.includes(r.value) && r.merkmale?.has(RollenMerkmal.KopersPflicht),
+      ) || false
     );
-    return !!rolle && !!rolle.merkmale && rolle.merkmale.has(RollenMerkmal.KopersPflicht);
   }
 
   // Define a method to check if the selected Rolle is of type "Lern"
@@ -92,8 +97,8 @@
       }),
       selectedKopersNr: string()
         .matches(NO_LEADING_TRAILING_SPACES, t('admin.person.rules.kopersNr.noLeadingTrailingSpaces'))
-        .when('selectedRolle', {
-          is: (selectedRolleId: string) => isKopersRolle(selectedRolleId) && !hasNoKopersNr.value,
+        .when('selectedRollen', {
+          is: (selectedRolleIds: string[]) => isKopersRolle(selectedRolleIds) && !hasNoKopersNr.value,
           then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
             schema.required(t('admin.person.rules.kopersNr.required')),
         }),
@@ -102,8 +107,8 @@
         .test('isValidDate', t('admin.befristung.rules.invalidDateNotAllowed'), isValidDate)
         .matches(DDMMYYYY, t('admin.befristung.rules.format'))
         .when(['selectedRolle', 'selectedBefristungOption'], {
-          is: (selectedRolleId: string, selectedBefristungOption: string | undefined) =>
-            isBefristungspflichtRolle(selectedRolleId) && selectedBefristungOption === undefined,
+          is: (selectedRolleIds: string[], selectedBefristungOption: string | undefined) =>
+            isBefristungspflichtRolle(selectedRolleIds) && selectedBefristungOption === undefined,
           then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
             schema.required(t('admin.befristung.rules.required')),
         }),
@@ -120,10 +125,10 @@
   });
 
   type PersonCreationForm = {
-    selectedRolle: string;
+    selectedOrganisation: string;
+    selectedRollen: string[];
     selectedVorname: string;
     selectedFamilienname: string;
-    selectedOrganisation: string;
     selectedKlasse: string;
     selectedBefristung: Date;
     selectedBefristungOption: string;
@@ -134,14 +139,14 @@
     validationSchema,
   });
 
-  const [selectedRolle, selectedRolleProps]: [
+  const [selectedOrganisation, selectedOrganisationProps]: [
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = formContext.defineField('selectedRolle', vuetifyConfig);
-  const [selectedKopersNr, selectedKopersNrProps]: [
-    Ref<string | undefined | null>,
+  ] = formContext.defineField('selectedOrganisation', vuetifyConfig);
+  const [selectedRollen, selectedRollenProps]: [
+    Ref<string[] | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = formContext.defineField('selectedKopersNr', vuetifyConfig);
+  ] = formContext.defineField('selectedRollen', vuetifyConfig);
   const [selectedVorname, selectedVornameProps]: [
     Ref<string>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
@@ -150,10 +155,6 @@
     Ref<string>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = formContext.defineField('selectedFamilienname', vuetifyConfig);
-  const [selectedOrganisation, selectedOrganisationProps]: [
-    Ref<string | undefined>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = formContext.defineField('selectedOrganisation', vuetifyConfig);
   const [selectedKlasse, selectedKlasseProps]: [
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
@@ -166,6 +167,10 @@
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = formContext.defineField('selectedBefristungOption', vuetifyConfig);
+  const [selectedKopersNr, selectedKopersNrProps]: [
+    Ref<string | undefined | null>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = formContext.defineField('selectedKopersNr', vuetifyConfig);
 
   const {
     handleBefristungUpdate,
@@ -177,7 +182,7 @@
     selectedBefristung,
     selectedBefristungOption,
     calculatedBefristung,
-    selectedRolle,
+    selectedRollen,
   });
 
   setupWatchers();
@@ -257,7 +262,7 @@
   function isFormDirty(): boolean {
     return (
       formContext.isFieldDirty('selectedOrganisation') ||
-      formContext.isFieldDirty('selectedRolle') ||
+      formContext.isFieldDirty('selectedRollen') ||
       formContext.isFieldDirty('selectedKlasse') ||
       formContext.isFieldDirty('selectedKopersNr') ||
       formContext.isFieldDirty('selectedVorname') ||
@@ -288,8 +293,8 @@
   }
 
   function handleFieldReset(field: string): void {
-    if (field === 'selectedRolle') {
-      selectedRolle.value = undefined;
+    if (field === 'selectedRollen') {
+      selectedRollen.value = undefined;
     } else if (field === 'selectedKlasse') {
       selectedKlasse.value = undefined;
     }
@@ -308,25 +313,28 @@
       vorname: selectedVorname.value as string,
       personalnummer: selectedKopersNr.value as string,
       befristung: formattedBefristung,
-      createPersonenkontexte: [
-        {
-          organisationId: selectedOrganisation.value as string,
-          rolleId: selectedRolle.value ?? '',
-        },
-      ],
+      createPersonenkontexte:
+        selectedRollen.value?.map(
+          (rolleId: string) =>
+            ({
+              organisationId: selectedOrganisation.value as string,
+              rolleId,
+            }) as DbiamCreatePersonenkontextBodyParams,
+        ) || [],
     };
 
-    if (selectedKlasse.value) {
+    if (selectedKlasse.value && selectedRollen.value && selectedRollen.value.length > 0) {
       selectedKlasseCache.value = JSON.parse(JSON.stringify(selectedKlasse.value));
-      bodyParams.createPersonenkontexte.push({
-        organisationId: selectedKlasse.value,
-        rolleId: selectedRolle.value ?? '',
-      });
+      for (const rolleId of selectedRollen.value)
+        bodyParams.createPersonenkontexte.push({
+          organisationId: selectedKlasse.value,
+          rolleId: rolleId,
+        });
     }
     // We save a copy of the selected values because they are not available anymore since we reset the form right after submitting
     // This will then be used to display the organisation again in the success template after receiving the orga ID and rolle ID back from the BE.
     selectedOrgaCache.value = JSON.parse(JSON.stringify(selectedOrganisation.value));
-    selectedRolleCache.value = JSON.parse(JSON.stringify(selectedRolle.value));
+    selectedRolleCache.value = JSON.parse(JSON.stringify(selectedRollen.value));
     await personenkontextStore.createPersonWithKontexte(bodyParams);
     formContext.resetForm();
     hasNoKopersNr.value = false;
@@ -370,7 +378,7 @@
 
   // Computed property to check if the second radio button should be disabled
   const isUnbefristetButtonDisabled: ComputedRef<boolean> = computed(() => {
-    return isBefristungspflichtRolle(selectedRolle.value);
+    return isBefristungspflichtRolle(selectedRollen.value);
   });
 
   function handleConfirmUnsavedChanges(): void {
@@ -473,19 +481,19 @@
               :rollen="rollen"
               :klassen="klassen"
               :selectedOrganisationProps="selectedOrganisationProps"
-              :selectedRolleProps="selectedRolleProps"
+              :selectedRollenProps="selectedRollenProps"
               :selectedKlasseProps="selectedKlasseProps"
               :befristungInputProps="{
                 befristungProps: selectedBefristungProps,
                 befristungOptionProps: selectedBefristungOptionProps,
                 isUnbefristetDisabled: isUnbefristetButtonDisabled,
-                isBefristungRequired: isBefristungspflichtRolle(selectedRolle),
+                isBefristungRequired: isBefristungspflichtRolle(selectedRollen),
                 nextSchuljahresende: getNextSchuljahresende(),
                 befristung: selectedBefristung,
                 befristungOption: selectedBefristungOption,
               }"
               v-model:selectedOrganisation="selectedOrganisation"
-              v-model:selectedRolle="selectedRolle"
+              v-model:selectedRollen="selectedRollen"
               v-model:selectedKlasse="selectedKlasse"
               @update:canCommit="canCommit = $event"
               @update:befristung="handleBefristungUpdate"
@@ -538,7 +546,7 @@
                 ></v-text-field>
               </FormRow>
               <KopersInput
-                v-if="isKopersRolle(selectedRolle) && selectedOrganisation"
+                v-if="isKopersRolle(selectedRollen) && selectedOrganisation"
                 :hasNoKopersNr="hasNoKopersNr"
                 v-model:selectedKopersNr="selectedKopersNr"
                 :selectedKopersNrProps="selectedKopersNrProps"

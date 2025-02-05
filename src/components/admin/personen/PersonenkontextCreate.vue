@@ -35,14 +35,14 @@
     organisationen: TranslatedObject[] | undefined;
     rollen: TranslatedRolleWithAttrs[] | undefined;
     selectedOrganisation: string | undefined;
-    selectedRolle: string | undefined;
     showHeadline: boolean;
     selectedOrganisationProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     klassen?: TranslatedObject[] | undefined;
+    selectedRolle?: string | undefined;
     selectedRollen?: string[] | undefined;
     selectedKlasse?: string | undefined;
     selectedKlasseProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
-    selectedRolleProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
+    selectedRolleProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedRollenProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     isModifyRolleDialog?: boolean;
     befristungInputProps?: BefristungProps;
@@ -56,6 +56,7 @@
     (e: 'update:calculatedBefristungOption', value: string | undefined): void;
     (event: 'update:selectedOrganisation', value: string | undefined): void;
     (event: 'update:selectedRolle', value: string | undefined): void;
+    (event: 'update:selectedRollen', value: string[] | undefined): void;
     (event: 'update:selectedKlasse', value: string | undefined): void;
     (event: 'update:canCommit', value: boolean): void;
     (event: 'fieldReset', field: 'selectedOrganisation' | 'selectedRolle' | 'selectedKlasse'): void;
@@ -147,26 +148,50 @@
     emits('update:selectedOrganisation', newValue);
   });
 
-  watch(selectedRolle, async (newValue: string | undefined, oldValue: string | undefined) => {
-    if (newValue && newValue !== oldValue) {
-      // Call fetch with an empty string to get the initial organizations for the selected role without any filter
-      await personenkontextStore.processWorkflowStep({
-        organisationId: selectedOrganisation.value,
-        rolleId: newValue,
-        limit: 25,
-      });
-      canCommit.value = personenkontextStore.workflowStepResponse?.canCommit ?? false;
-      emits('update:canCommit', canCommit.value);
-    }
-    if (!newValue) {
-      // Set canCommit to false and reset Klasse
-      emits('update:canCommit', false);
-      selectedKlasse.value = undefined;
-      emits('fieldReset', 'selectedKlasse');
-    }
-    // Emit the new selected value to the parent
-    emits('update:selectedRolle', newValue);
-  });
+  watch(
+    () => (props.allowMultipleRollen ? selectedRollen.value : selectedRolle.value),
+    async (newValue: string | string[] | undefined, oldValue: string | string[] | undefined) => {
+      if (props.allowMultipleRollen) {
+        // Multiple rollen selected
+        const newRoles: string[] | undefined = newValue as string[] | undefined;
+        if (newRoles && newRoles.length > 0) {
+          await personenkontextStore.processWorkflowStep({
+            organisationId: selectedOrganisation.value,
+            rollenIds: newRoles,
+            limit: 25,
+          });
+          canCommit.value = personenkontextStore.workflowStepResponse?.canCommit ?? false;
+          emits('update:canCommit', canCommit.value);
+          emits('update:selectedRollen', newRoles);
+        } else {
+          // No roles selected, reset values
+          emits('update:canCommit', false);
+          selectedKlasse.value = undefined;
+          emits('fieldReset', 'selectedKlasse');
+        }
+      } else {
+        // Single rolle selected
+        const newRole: string | undefined = newValue as string | undefined;
+        if (newRole && newRole !== oldValue) {
+          await personenkontextStore.processWorkflowStep({
+            organisationId: selectedOrganisation.value,
+            rollenIds: [newRole], // Wrap single role in an array
+            limit: 25,
+          });
+          canCommit.value = personenkontextStore.workflowStepResponse?.canCommit ?? false;
+          emits('update:canCommit', canCommit.value);
+        }
+        if (!newRole) {
+          // Reset when no role is selected
+          emits('update:canCommit', false);
+          selectedKlasse.value = undefined;
+          emits('fieldReset', 'selectedKlasse');
+        }
+        emits('update:selectedRolle', newRole); // Emit selected single role
+      }
+    },
+    { deep: true },
+  );
 
   watch(selectedKlasse, (newValue: string | undefined) => {
     emits('update:selectedKlasse', newValue);
@@ -341,7 +366,9 @@
       </v-row>
       <!-- Rollenzuordnung -->
       <FormRow
-        :errorLabel="selectedRolleProps['error']"
+        :errorLabel="
+          allowMultipleRollen ? (selectedRollenProps?.['error'] ?? false) : (selectedRolleProps?.['error'] ?? false)
+        "
         labelForId="rolle-select"
         :isRequired="true"
         :label="$t('admin.rolle.rolle')"
@@ -357,6 +384,7 @@
           :items="rollen"
           item-value="value"
           item-text="title"
+          :multiple="allowMultipleRollen"
           :no-data-text="$t('noDataFound')"
           :placeholder="$t('admin.rolle.selectRolle')"
           required="true"
