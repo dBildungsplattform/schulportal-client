@@ -75,6 +75,7 @@
   import type { TranslatedObject } from '@/types';
   import { DIN_91379A, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
   import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
+  import { isKopersRolle } from '@/utils/validationPersonenkontext';
   import BefristungInput from '@/components/admin/personen/BefristungInput.vue';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
@@ -523,14 +524,6 @@
       (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
     );
     return !!rolle && rolle.rollenart === RollenArt.Lern;
-  }
-
-  // Used for the form
-  function isKopersRolle(selectedRolleId: string | undefined): boolean {
-    const rolle: TranslatedRolleWithAttrs | undefined = rollen.value?.find(
-      (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
-    );
-    return !!rolle && !!rolle.merkmale && rolle.merkmale.has(RollenMerkmal.KopersPflicht);
   }
 
   const hasKopersNummer: ComputedRef<boolean> = computed(() => {
@@ -1821,6 +1814,7 @@
                   @onClearPassword="password = ''"
                   @onResetPassword="resetPassword(currentPersonId)"
                   :password="password"
+                  ref="password-reset"
                   :testId="'password-reset'"
                 >
                 </PasswordReset>
@@ -2437,7 +2431,7 @@
               @submit="onSubmitChangeBefristung"
             >
               <BefristungInput
-                ref="befristung"
+                ref="befristung-input-wrapper"
                 :befristungProps="selectedChangeBefristungProps"
                 :befristungOptionProps="selectedChangeBefristungOptionProps"
                 :isUnbefristetDisabled="isBefristungspflichtRolle([changeBefristungRolle as string])"
@@ -2862,6 +2856,7 @@
                   @onClearPassword="password = ''"
                   @onResetPassword="resetDevicePassword(currentPersonId)"
                   :password="devicePassword"
+                  ref="device-password-reset"
                   :testId="'device-password'"
                 >
                 </PasswordReset>
@@ -2927,10 +2922,7 @@
         <v-card-text>
           <v-container>
             <v-row class="text-body bold px-md-16">
-              <v-col
-                offset="1"
-                cols="10"
-              >
+              <v-col class="text-center">
                 <span>{{ $t('person.addZuordnungSuccess') }}</span>
               </v-col>
             </v-row>
@@ -2946,6 +2938,7 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary"
+                data-testId="close-zuordnung-create-success-button"
                 @click.stop="closeCreateSuccessDialog"
               >
                 {{ $t('close') }}
@@ -3115,6 +3108,7 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary"
+                data-testid="confirm-zuordnung-dialog-addition"
                 @click.stop="confirmDialogAddition"
               >
                 {{ $t('yes') }}

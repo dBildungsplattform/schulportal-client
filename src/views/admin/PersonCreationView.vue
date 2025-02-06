@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { usePersonStore, type CreatePersonBodyParams, type PersonStore } from '@/stores/PersonStore';
-  import { RollenArt, RollenMerkmal } from '@/stores/RolleStore';
+  import { RollenArt } from '@/stores/RolleStore';
   import { type ComputedRef, computed, onMounted, onUnmounted, type Ref, ref, watch } from 'vue';
   import {
     onBeforeRouteLeave,
@@ -36,6 +36,7 @@
   import { type TranslatedObject } from '@/types.d';
   import { getNextSchuljahresende, formatDateToISO, notInPast, isValidDate } from '@/utils/date';
   import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
+  import { isKopersRolle } from '@/utils/validationPersonenkontext';
 
   const router: Router = useRouter();
   const personStore: PersonStore = usePersonStore();
@@ -56,17 +57,6 @@
   const selectedRolleCache: Ref<string[] | undefined> = ref(undefined);
 
   const filteredRollen: Ref<TranslatedRolleWithAttrs[] | undefined> = ref<TranslatedRolleWithAttrs[] | undefined>([]);
-
-  function isKopersRolle(selectedRolleIds: string[] | undefined): boolean {
-    if (!selectedRolleIds || selectedRolleIds.length === 0) return false;
-
-    return (
-      filteredRollen.value?.some(
-        (r: TranslatedRolleWithAttrs) =>
-          selectedRolleIds.includes(r.value) && r.merkmale?.has(RollenMerkmal.KopersPflicht),
-      ) || false
-    );
-  }
 
   // Define a method to check if the selected Rolle is of type "Lern"
   function isLernRolle(selectedRolleIds?: string[]): boolean | undefined {
@@ -101,7 +91,8 @@
       selectedKopersNr: string()
         .matches(NO_LEADING_TRAILING_SPACES, t('admin.person.rules.kopersNr.noLeadingTrailingSpaces'))
         .when('selectedRollen', {
-          is: (selectedRolleIds: string[]) => isKopersRolle(selectedRolleIds) && !hasNoKopersNr.value,
+          is: (selectedRolleIds: string[]) =>
+            isKopersRolle(selectedRolleIds, filteredRollen.value) && !hasNoKopersNr.value,
           then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
             schema.required(t('admin.person.rules.kopersNr.required')),
         }),
@@ -582,7 +573,7 @@
                 ></v-text-field>
               </FormRow>
               <KopersInput
-                v-if="isKopersRolle(selectedRollen) && selectedOrganisation"
+                v-if="isKopersRolle(selectedRollen, filteredRollen) && selectedOrganisation"
                 :hasNoKopersNr="hasNoKopersNr"
                 v-model:selectedKopersNr="selectedKopersNr"
                 :selectedKopersNrProps="selectedKopersNrProps"
@@ -651,14 +642,14 @@
               }}</span></v-col
             >
           </v-row>
-          <v-row v-if="isKopersRolle(schuleZuordnungFromCreatedKontext.map((kontext) => kontext.rolleId))">
+          <v-row v-if="isKopersRolle(schuleZuordnungFromCreatedKontext.map((kontext) => kontext.rolleId), filteredRollen)">
             <v-col
-              :class="`${isKopersRolle(schuleZuordnungFromCreatedKontext.map((kontext) => kontext.rolleId)) && personenkontextStore.createdPersonWithKontext.person.personalnummer ? 'text-body bold text-right' : 'text-body bold text-right text-red'}`"
+              :class="`${isKopersRolle(schuleZuordnungFromCreatedKontext.map((kontext) => kontext.rolleId), filteredRollen) && personenkontextStore.createdPersonWithKontext.person.personalnummer ? 'text-body bold text-right' : 'text-body bold text-right text-red'}`"
             >
               {{ $t('person.kopersNr') }}:
             </v-col>
             <v-col
-              :class="`${isKopersRolle(schuleZuordnungFromCreatedKontext.map((kontext) => kontext.rolleId)) && personenkontextStore.createdPersonWithKontext.person.personalnummer ? 'text-body' : 'text-body text-red'}`"
+              :class="`${isKopersRolle(schuleZuordnungFromCreatedKontext.map((kontext) => kontext.rolleId), filteredRollen) && personenkontextStore.createdPersonWithKontext.person.personalnummer ? 'text-body' : 'text-body text-red'}`"
               ><span data-testid="created-person-kopersNr">{{
                 personenkontextStore.createdPersonWithKontext.person.personalnummer
                   ? personenkontextStore.createdPersonWithKontext.person.personalnummer
