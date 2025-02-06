@@ -11,7 +11,7 @@
   } from 'vue-router';
   import { type Composer, useI18n } from 'vue-i18n';
   import { useForm, type TypedSchema, type BaseFieldProps, type FormContext } from 'vee-validate';
-  import { object, string, StringSchema, type AnyObject } from 'yup';
+  import { array, object, string, StringSchema, type AnyObject } from 'yup';
   import { toTypedSchema } from '@vee-validate/yup';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
@@ -69,16 +69,20 @@
   }
 
   // Define a method to check if the selected Rolle is of type "Lern"
-  function isLernRolle(selectedRolleId: string): boolean {
-    const rolle: TranslatedRolleWithAttrs | undefined = rollen.value?.find(
-      (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
-    );
-    return !!rolle && rolle.rollenart === RollenArt.Lern;
+  function isLernRolle(selectedRolleIds: string[]): boolean {
+    if (!rollen.value) return false;
+
+    return selectedRolleIds.some((rolleId: string) => {
+      const rolle: TranslatedRolleWithAttrs | undefined = rollen.value?.find(
+        (r: TranslatedRolleWithAttrs) => r.value === rolleId,
+      );
+      return !!rolle && rolle.rollenart === RollenArt.Lern;
+    });
   }
 
   const validationSchema: TypedSchema = toTypedSchema(
     object({
-      selectedRolle: string().required(t('admin.rolle.rules.rolle.required')),
+      selectedRollen: array().of(string().required(t('admin.rolle.rules.rolle.required'))),
       selectedVorname: string()
         .matches(DIN_91379A, t('admin.person.rules.vorname.matches'))
         .matches(NO_LEADING_TRAILING_SPACES, t('admin.person.rules.vorname.noLeadingTrailingSpaces'))
@@ -90,8 +94,8 @@
         .min(2, t('admin.person.rules.familienname.min'))
         .required(t('admin.person.rules.familienname.required')),
       selectedOrganisation: string().required(t('admin.organisation.rules.organisation.required')),
-      selectedKlasse: string().when('selectedRolle', {
-        is: (selectedRolleId: string) => isLernRolle(selectedRolleId),
+      selectedKlasse: string().when('selectedRollen', {
+        is: (selectedRolleIds: string[]) => isLernRolle(selectedRolleIds),
         then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
           schema.required(t('admin.klasse.rules.klasse.required')),
       }),
@@ -192,50 +196,62 @@
 
   const klassen: ComputedRef<TranslatedObject[] | undefined> = useKlassen();
 
-  const klasseZuordnungFromCreatedKontext: ComputedRef<DBiamPersonenkontextResponse | undefined> = computed(() => {
-    return personenkontextStore.createdPersonWithKontext?.dBiamPersonenkontextResponses.find(
+  // Extract the created Klassenzuordnungen from the response after submission
+  const klasseZuordnungFromCreatedKontext: ComputedRef<DBiamPersonenkontextResponse[]> = computed(() => {
+    if (!personenkontextStore.createdPersonWithKontext) return [];
+
+    return personenkontextStore.createdPersonWithKontext.dBiamPersonenkontextResponses.filter(
       (kontext: DBiamPersonenkontextResponse) =>
-        kontext.organisationId === selectedKlasseCache.value && kontext.rolleId === selectedRolleCache.value,
+        kontext.organisationId === selectedKlasseCache.value && selectedRolleCache.value?.includes(kontext.rolleId),
     );
   });
 
-  const schuleZuordnungFromCreatedKontext: ComputedRef<DBiamPersonenkontextResponse | undefined> = computed(() => {
-    return personenkontextStore.createdPersonWithKontext?.dBiamPersonenkontextResponses.find(
+  // Extract the created Schulenzuordnung from the response after submission
+  const schuleZuordnungFromCreatedKontext: ComputedRef<DBiamPersonenkontextResponse[]> = computed(() => {
+    if (!personenkontextStore.createdPersonWithKontext) return [];
+
+    return personenkontextStore.createdPersonWithKontext.dBiamPersonenkontextResponses.filter(
       (kontext: DBiamPersonenkontextResponse) =>
-        kontext.organisationId === selectedOrgaCache.value && kontext.rolleId === selectedRolleCache.value,
+        kontext.organisationId === selectedOrgaCache.value && selectedRolleCache.value?.includes(kontext.rolleId),
     );
   });
 
-  const translatedOrganisationsname: ComputedRef<string | undefined> = computed(() => {
-    if (!schuleZuordnungFromCreatedKontext.value) return;
+  // We extract the first Organisation since all of the Kontexte have the same one
+  const translatedOrganisationsname: ComputedRef<string> = computed(() => {
+    if (!schuleZuordnungFromCreatedKontext.value.length) return '';
+
     return (
       organisationen.value?.find(
         (organisation: TranslatedObject) =>
-          organisation.value === schuleZuordnungFromCreatedKontext.value?.organisationId,
+          organisation.value === schuleZuordnungFromCreatedKontext.value[0]?.organisationId,
       )?.title || ''
     );
   });
 
-  const translatedRollenname: ComputedRef<string | undefined> = computed(() => {
-    if (!schuleZuordnungFromCreatedKontext.value) return;
-    return (
-      rollen.value?.find((rolle: TranslatedObject) => rolle.value === schuleZuordnungFromCreatedKontext.value?.rolleId)
-        ?.title || ''
+  // Extract all the Rollennamen
+  const translatedRollenname: ComputedRef<string[]> = computed(() => {
+    if (!schuleZuordnungFromCreatedKontext.value.length) return [];
+
+    return schuleZuordnungFromCreatedKontext.value.map(
+      (kontext: DBiamPersonenkontextResponse) =>
+        rollen.value?.find((rolle: TranslatedObject) => rolle.value === kontext.rolleId)?.title || '',
     );
   });
 
-  const translatedKlassenname: ComputedRef<string | undefined> = computed(() => {
-    if (!klasseZuordnungFromCreatedKontext.value) return;
+  // We extract the first Klasse since all of the Kontexte have the same one
+  const translatedKlassenname: ComputedRef<string> = computed(() => {
+    if (!klasseZuordnungFromCreatedKontext.value.length) return '';
+
     return (
       klassen.value?.find(
-        (klasse: TranslatedObject) => klasse.value === klasseZuordnungFromCreatedKontext.value?.organisationId,
+        (klasse: TranslatedObject) => klasse.value === klasseZuordnungFromCreatedKontext.value[0]?.organisationId,
       )?.title || ''
     );
   });
 
   // Converts the ISO UTC formatted Befristung to the german local format, also ISO.
   const translatedBefristung: ComputedRef<string> = computed(() => {
-    const ISOFormattedDate: string | undefined = schuleZuordnungFromCreatedKontext.value?.befristung;
+    const ISOFormattedDate: string | undefined = schuleZuordnungFromCreatedKontext.value[0]?.befristung;
 
     if (!ISOFormattedDate) {
       return t('admin.befristung.unlimitedLower');
@@ -615,14 +631,14 @@
               }}</span></v-col
             >
           </v-row>
-          <v-row v-if="isKopersRolle(schuleZuordnungFromCreatedKontext?.rolleId)">
+          <v-row v-if="isKopersRolle(schuleZuordnungFromCreatedKontext.map((kontext) => kontext.rolleId))">
             <v-col
-              :class="`${isKopersRolle(schuleZuordnungFromCreatedKontext?.rolleId) && personenkontextStore.createdPersonWithKontext.person.personalnummer ? 'text-body bold text-right' : 'text-body bold text-right text-red'}`"
+              :class="`${isKopersRolle(schuleZuordnungFromCreatedKontext.map((kontext) => kontext.rolleId)) && personenkontextStore.createdPersonWithKontext.person.personalnummer ? 'text-body bold text-right' : 'text-body bold text-right text-red'}`"
             >
               {{ $t('person.kopersNr') }}:
             </v-col>
             <v-col
-              :class="`${isKopersRolle(schuleZuordnungFromCreatedKontext?.rolleId) && personenkontextStore.createdPersonWithKontext.person.personalnummer ? 'text-body' : 'text-body text-red'}`"
+              :class="`${isKopersRolle(schuleZuordnungFromCreatedKontext.map((kontext) => kontext.rolleId)) && personenkontextStore.createdPersonWithKontext.person.personalnummer ? 'text-body' : 'text-body text-red'}`"
               ><span data-testid="created-person-kopersNr">{{
                 personenkontextStore.createdPersonWithKontext.person.personalnummer
                   ? personenkontextStore.createdPersonWithKontext.person.personalnummer
@@ -664,7 +680,7 @@
               ><span data-testid="created-person-befristung">{{ translatedBefristung }}</span></v-col
             >
           </v-row>
-          <v-row v-if="isLernRolle(klasseZuordnungFromCreatedKontext?.rolleId as string)">
+          <v-row v-if="isLernRolle(klasseZuordnungFromCreatedKontext.map((kontext) => kontext.rolleId))">
             <v-col class="text-body bold text-right"> {{ $t('admin.klasse.klasse') }}: </v-col>
             <v-col class="text-body"
               ><span data-testid="created-person-klasse">{{

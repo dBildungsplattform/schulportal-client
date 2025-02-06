@@ -374,6 +374,28 @@
         :label="$t('admin.rolle.rolle')"
       >
         <v-autocomplete
+          v-if="allowMultipleRollen"
+          autocomplete="off"
+          clearable
+          @clear="clearSelectedRolle"
+          data-testid="rollen-select"
+          density="compact"
+          id="rollen-select"
+          ref="rollen-select"
+          :items="rollen"
+          item-value="value"
+          item-text="title"
+          :multiple="allowMultipleRollen"
+          :no-data-text="$t('noDataFound')"
+          :placeholder="$t('admin.rolle.selectRolle')"
+          required="true"
+          variant="outlined"
+          v-bind="selectedRollenProps"
+          v-model="selectedRollen"
+          v-model:search="searchInputRolle"
+        ></v-autocomplete>
+        <v-autocomplete
+          v-else-if="!allowMultipleRollen"
           autocomplete="off"
           clearable
           @clear="clearSelectedRolle"
@@ -384,7 +406,6 @@
           :items="rollen"
           item-value="value"
           item-text="title"
-          :multiple="allowMultipleRollen"
           :no-data-text="$t('noDataFound')"
           :placeholder="$t('admin.rolle.selectRolle')"
           required="true"
