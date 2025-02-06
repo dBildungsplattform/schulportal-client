@@ -194,7 +194,6 @@
         const selectedRollenart: RollenArt | undefined = rollen.value?.find((rolle: TranslatedRolleWithAttrs) =>
           newSelectedRollen.includes(rolle.value),
         )?.rollenart;
-
         // Update filteredRollen based on selected rollen and their rollenart
         filteredRollen.value = rollen.value?.filter(
           (rolle: TranslatedRolleWithAttrs) => rolle.rollenart === selectedRollenart,
@@ -576,6 +575,7 @@
                 v-if="isKopersRolle(selectedRollen, filteredRollen) && selectedOrganisation"
                 :hasNoKopersNr="hasNoKopersNr"
                 v-model:selectedKopersNr="selectedKopersNr"
+                ref="kopers-input"
                 :selectedKopersNrProps="selectedKopersNrProps"
                 @update:selectedKopersNr="(value?: string | null) => (selectedKopersNr = value)"
                 @update:hasNoKopersNr="(value: boolean | undefined) => (hasNoKopersNr = value)"

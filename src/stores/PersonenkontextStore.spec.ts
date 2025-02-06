@@ -168,7 +168,7 @@ describe('PersonenkontextStore', () => {
     });
 
     it('should get step with parameters', async () => {
-      mockadapter.onGet('/api/personenkontext-workflow/step?organisationId=1&rolleId=1').replyOnce(200, mockResponse);
+      mockadapter.onGet('/api/personenkontext-workflow/step?organisationId=1&rolleIds=1').replyOnce(200, mockResponse);
       const getPersonenkontextWorkFlowStep: Promise<PersonenkontextWorkflowResponse> =
         personenkontextStore.processWorkflowStep({ organisationId: '1', rollenIds: ['1'] });
       expect(personenkontextStore.loading).toBe(true);
