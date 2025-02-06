@@ -66,20 +66,13 @@
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
 
   const translatedOrgName: ComputedRef<string | undefined> = computed(() => {
-    if (!rolleStore.currentRolle?.administeredBySchulstrukturknoten) {
-      return '---';
-    }
     return organisationStore.currentOrganisation?.kennung
       ? `${organisationStore.currentOrganisation.kennung} (${organisationStore.currentOrganisation.name})`
       : organisationStore.currentOrganisation?.name;
   });
 
   const translatedRollenart: ComputedRef<string> = computed(() => {
-    if (!rolleStore.currentRolle?.rollenart) {
-      return '---';
-    }
-
-    return t(`admin.rolle.mappingFrontBackEnd.rollenarten.${rolleStore.currentRolle.rollenart}`);
+    return t(`admin.rolle.mappingFrontBackEnd.rollenarten.${rolleStore.currentRolle?.rollenart}`);
   });
 
   const translatedProviderNames: ComputedRef<TranslatedObject[]> = computed(() => {
