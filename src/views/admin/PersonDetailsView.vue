@@ -2317,7 +2317,7 @@
                   @fieldReset="handleFieldReset"
                 />
                 <KopersInput
-                  v-if="!hasKopersNummer && isKopersRolle(selectedRolle) && selectedOrganisation"
+                  v-if="!hasKopersNummer && isKopersRolle([selectedRolle as string], filteredRollen) && selectedOrganisation"
                   :hasNoKopersNr="hasNoKopersNr"
                   v-model:selectedKopersNr="selectedKopersNr"
                   :selectedKopersNrProps="selectedKopersNrProps"

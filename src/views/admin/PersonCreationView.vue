@@ -505,7 +505,7 @@
               :showHeadline="true"
               :organisationen="organisationen"
               ref="personenkontext-create"
-              :rollen="filteredRollen.length === 0 ? rollen : filteredRollen"
+              :rollen="(filteredRollen?.length ?? 0) === 0 ? rollen : filteredRollen"
               :klassen="klassen"
               :selectedOrganisationProps="selectedOrganisationProps"
               :selectedRollenProps="selectedRollenProps"

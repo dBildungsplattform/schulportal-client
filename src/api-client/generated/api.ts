@@ -2362,11 +2362,11 @@ export interface PersonenkontextWorkflowResponse {
      */
     'selectedOrganisation': string | null;
     /**
-     * Selected rolle.
-     * @type {string}
+     * Selected rollen.
+     * @type {Array<string>}
      * @memberof PersonenkontextWorkflowResponse
      */
-    'selectedRollen': string | null;
+    'selectedRollen': Array<string> | null;
     /**
      * Indicates whether the commit action can be performed.
      * @type {boolean}
@@ -3477,44 +3477,6 @@ export const AuthApiAxiosParamCreator = function (configuration?: Configuration)
     return {
         /**
          * 
-         * @summary External Data about logged in user.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        authenticationControllerGetExternalData: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/auth/externaldata`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication bearer required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            // authentication oauth2 required
-            // oauth required
-            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
          * @summary Info about logged in user.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -3680,16 +3642,6 @@ export const AuthApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
-         * @summary External Data about logged in user.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async authenticationControllerGetExternalData(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserExeternalDataResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.authenticationControllerGetExternalData(options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * 
          * @summary Info about logged in user.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -3743,15 +3695,6 @@ export const AuthApiFactory = function (configuration?: Configuration, basePath?
     return {
         /**
          * 
-         * @summary External Data about logged in user.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        authenticationControllerGetExternalData(options?: any): AxiosPromise<UserExeternalDataResponse> {
-            return localVarFp.authenticationControllerGetExternalData(options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
          * @summary Info about logged in user.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -3800,15 +3743,6 @@ export const AuthApiFactory = function (configuration?: Configuration, basePath?
 export interface AuthApiInterface {
     /**
      * 
-     * @summary External Data about logged in user.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof AuthApiInterface
-     */
-    authenticationControllerGetExternalData(options?: AxiosRequestConfig): AxiosPromise<UserExeternalDataResponse>;
-
-    /**
-     * 
      * @summary Info about logged in user.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -3855,17 +3789,6 @@ export interface AuthApiInterface {
  * @extends {BaseAPI}
  */
 export class AuthApi extends BaseAPI implements AuthApiInterface {
-    /**
-     * 
-     * @summary External Data about logged in user.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof AuthApi
-     */
-    public authenticationControllerGetExternalData(options?: AxiosRequestConfig) {
-        return AuthApiFp(this.configuration).authenticationControllerGetExternalData(options).then((request) => request(this.axios, this.basePath));
-    }
-
     /**
      * 
      * @summary Info about logged in user.
@@ -6109,6 +6032,121 @@ export class ImportApi extends BaseAPI implements ImportApiInterface {
      */
     public importControllerUploadFile(organisationId: string, rolleId: string, file: File, options?: AxiosRequestConfig) {
         return ImportApiFp(this.configuration).importControllerUploadFile(organisationId, rolleId, file, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
+ * KeycloakinternalApi - axios parameter creator
+ * @export
+ */
+export const KeycloakinternalApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @summary External Data about requested in user.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        keycloakInternalControllerGetExternalData: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/keycloakinternal/externaldata`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * KeycloakinternalApi - functional programming interface
+ * @export
+ */
+export const KeycloakinternalApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = KeycloakinternalApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @summary External Data about requested in user.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async keycloakInternalControllerGetExternalData(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserExeternalDataResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.keycloakInternalControllerGetExternalData(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * KeycloakinternalApi - factory interface
+ * @export
+ */
+export const KeycloakinternalApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = KeycloakinternalApiFp(configuration)
+    return {
+        /**
+         * 
+         * @summary External Data about requested in user.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        keycloakInternalControllerGetExternalData(options?: any): AxiosPromise<UserExeternalDataResponse> {
+            return localVarFp.keycloakInternalControllerGetExternalData(options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * KeycloakinternalApi - interface
+ * @export
+ * @interface KeycloakinternalApi
+ */
+export interface KeycloakinternalApiInterface {
+    /**
+     * 
+     * @summary External Data about requested in user.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof KeycloakinternalApiInterface
+     */
+    keycloakInternalControllerGetExternalData(options?: AxiosRequestConfig): AxiosPromise<UserExeternalDataResponse>;
+
+}
+
+/**
+ * KeycloakinternalApi - object-oriented interface
+ * @export
+ * @class KeycloakinternalApi
+ * @extends {BaseAPI}
+ */
+export class KeycloakinternalApi extends BaseAPI implements KeycloakinternalApiInterface {
+    /**
+     * 
+     * @summary External Data about requested in user.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof KeycloakinternalApi
+     */
+    public keycloakInternalControllerGetExternalData(options?: AxiosRequestConfig) {
+        return KeycloakinternalApiFp(this.configuration).keycloakInternalControllerGetExternalData(options).then((request) => request(this.axios, this.basePath));
     }
 }
 
