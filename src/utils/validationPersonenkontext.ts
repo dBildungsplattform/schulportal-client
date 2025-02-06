@@ -65,7 +65,7 @@ const bestfristungSchema = (t: (key: string) => string): StringSchema =>
     .matches(DDMMYYYY, t('admin.befristung.rules.format')) // Ensure the date matches the DDMMYYYY format
     .when(['selectedRolle', 'selectedBefristungOption'], {
       is: (selectedRolleId: string, selectedBefristungOption: string | undefined) =>
-        isBefristungspflichtRolle(selectedRolleId) && selectedBefristungOption === undefined, // Conditional required
+        isBefristungspflichtRolle([selectedRolleId]) && selectedBefristungOption === undefined, // Conditional required
       then: (schema: Schema) => schema.required(t('admin.befristung.rules.required')),
     });
 

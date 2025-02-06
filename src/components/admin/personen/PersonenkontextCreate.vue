@@ -59,7 +59,7 @@
     (event: 'update:selectedRollen', value: string[] | undefined): void;
     (event: 'update:selectedKlasse', value: string | undefined): void;
     (event: 'update:canCommit', value: boolean): void;
-    (event: 'fieldReset', field: 'selectedOrganisation' | 'selectedRolle' | 'selectedKlasse'): void;
+    (event: 'fieldReset', field: 'selectedOrganisation' | 'selectedRolle' | 'selectedKlasse' | 'selectedRollen'): void;
   };
   const emits: Emits = defineEmits<Emits>();
 
@@ -83,11 +83,17 @@
     return props.klassen?.find((klasse: TranslatedObject | undefined) => klasse?.value === selectedKlasse.value)?.title;
   });
 
-  function isLernRolle(selectedRolleId: string | undefined): boolean {
-    const rolle: TranslatedRolleWithAttrs | undefined = props.rollen?.find(
-      (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
+  function isLernRolle(selectedRolleIds: string | string[] | undefined): boolean {
+    if (!selectedRolleIds) return false;
+
+    // Ensure we always work with an array
+    const rolleIdsArray: string[] = Array.isArray(selectedRolleIds) ? selectedRolleIds : [selectedRolleIds];
+
+    return rolleIdsArray.some((rolleId: string) =>
+      props.rollen?.some(
+        (rolle: TranslatedRolleWithAttrs) => rolle.value === rolleId && rolle.rollenart === RollenArt.Lern,
+      ),
     );
-    return !!rolle && rolle.rollenart === RollenArt.Lern;
   }
 
   // Watcher for selectedOrganisation to fetch roles and classes
@@ -162,13 +168,14 @@
           });
           canCommit.value = personenkontextStore.workflowStepResponse?.canCommit ?? false;
           emits('update:canCommit', canCommit.value);
-          emits('update:selectedRollen', newRoles);
         } else {
           // No roles selected, reset values
-          emits('update:canCommit', false);
           selectedKlasse.value = undefined;
           emits('fieldReset', 'selectedKlasse');
+          emits('fieldReset', 'selectedRollen');
+          emits('update:canCommit', false);
         }
+        emits('update:selectedRollen', newRoles);
       } else {
         // Single rolle selected
         const newRole: string | undefined = newValue as string | undefined;
@@ -301,6 +308,10 @@
     emits('fieldReset', 'selectedRolle');
   }
 
+  function clearSelectedRollen(): void {
+    emits('fieldReset', 'selectedRollen');
+  }
+
   watch(
     () => props.organisationen,
     async (newOrganisations: TranslatedObject[] | undefined, _oldOrganisations: TranslatedObject[] | undefined) => {
@@ -377,7 +388,7 @@
           v-if="allowMultipleRollen"
           autocomplete="off"
           clearable
-          @clear="clearSelectedRolle"
+          @clear="clearSelectedRollen"
           data-testid="rollen-select"
           density="compact"
           id="rollen-select"
@@ -418,7 +429,11 @@
 
       <!-- Klasse zuordnen -->
       <FormRow
-        v-if="isLernRolle(selectedRolle) && selectedOrganisation"
+        v-if="
+          allowMultipleRollen
+            ? isLernRolle(selectedRollen) && selectedOrganisation
+            : isLernRolle(selectedRolle) && selectedOrganisation
+        "
         :errorLabel="selectedKlasseProps?.['error'] || false"
         :isRequired="true"
         labelForId="klasse-select"

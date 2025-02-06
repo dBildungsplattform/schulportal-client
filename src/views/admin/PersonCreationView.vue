@@ -51,17 +51,17 @@
 
   const calculatedBefristung: Ref<string | undefined> = ref('');
 
-  const rollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
-
   const selectedOrgaCache: Ref<string | undefined> = ref(undefined);
   const selectedKlasseCache: Ref<string | undefined> = ref(undefined);
   const selectedRolleCache: Ref<string[] | undefined> = ref(undefined);
+
+  const filteredRollen: Ref<TranslatedRolleWithAttrs[] | undefined> = ref<TranslatedRolleWithAttrs[] | undefined>([]);
 
   function isKopersRolle(selectedRolleIds: string[] | undefined): boolean {
     if (!selectedRolleIds || selectedRolleIds.length === 0) return false;
 
     return (
-      rollen.value?.some(
+      filteredRollen.value?.some(
         (r: TranslatedRolleWithAttrs) =>
           selectedRolleIds.includes(r.value) && r.merkmale?.has(RollenMerkmal.KopersPflicht),
       ) || false
@@ -69,20 +69,19 @@
   }
 
   // Define a method to check if the selected Rolle is of type "Lern"
-  function isLernRolle(selectedRolleIds: string[]): boolean {
-    if (!rollen.value) return false;
+  function isLernRolle(selectedRolleIds?: string[]): boolean | undefined {
+    if (!Array.isArray(selectedRolleIds)) return false;
 
-    return selectedRolleIds.some((rolleId: string) => {
-      const rolle: TranslatedRolleWithAttrs | undefined = rollen.value?.find(
-        (r: TranslatedRolleWithAttrs) => r.value === rolleId,
-      );
-      return !!rolle && rolle.rollenart === RollenArt.Lern;
-    });
+    return filteredRollen.value?.some(
+      (rolle: TranslatedRolleWithAttrs) => selectedRolleIds.includes(rolle.value) && rolle.rollenart === RollenArt.Lern,
+    );
   }
 
   const validationSchema: TypedSchema = toTypedSchema(
     object({
-      selectedRollen: array().of(string().required(t('admin.rolle.rules.rolle.required'))),
+      selectedRollen: array()
+        .of(string().required(t('admin.rolle.rules.rolle.required')))
+        .min(1, t('admin.rolle.rules.rolle.required')),
       selectedVorname: string()
         .matches(DIN_91379A, t('admin.person.rules.vorname.matches'))
         .matches(NO_LEADING_TRAILING_SPACES, t('admin.person.rules.vorname.noLeadingTrailingSpaces'))
@@ -192,9 +191,30 @@
   setupWatchers();
   setupRolleWatcher();
 
+  const rollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
   const organisationen: ComputedRef<TranslatedObject[] | undefined> = useOrganisationen();
-
   const klassen: ComputedRef<TranslatedObject[] | undefined> = useKlassen();
+
+  // Watch the selectedRollen and update filteredRollen accordingly
+  watch(
+    selectedRollen,
+    (newSelectedRollen: string[] | undefined) => {
+      if (newSelectedRollen && newSelectedRollen.length > 0) {
+        const selectedRollenart: RollenArt | undefined = rollen.value?.find((rolle: TranslatedRolleWithAttrs) =>
+          newSelectedRollen.includes(rolle.value),
+        )?.rollenart;
+
+        // Update filteredRollen based on selected rollen and their rollenart
+        filteredRollen.value = rollen.value?.filter(
+          (rolle: TranslatedRolleWithAttrs) => rolle.rollenart === selectedRollenart,
+        );
+      } else if (newSelectedRollen && newSelectedRollen.length === 0) {
+        // If selectedRollen is empty, display all rollen
+        filteredRollen.value = [];
+      }
+    },
+    { immediate: true },
+  );
 
   // Extract the created Klassenzuordnungen from the response after submission
   const klasseZuordnungFromCreatedKontext: ComputedRef<DBiamPersonenkontextResponse[]> = computed(() => {
@@ -494,7 +514,7 @@
               :showHeadline="true"
               :organisationen="organisationen"
               ref="personenkontext-create"
-              :rollen="rollen"
+              :rollen="filteredRollen.length === 0 ? rollen : filteredRollen"
               :klassen="klassen"
               :selectedOrganisationProps="selectedOrganisationProps"
               :selectedRollenProps="selectedRollenProps"
@@ -671,7 +691,7 @@
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.rolle.rolle') }}: </v-col>
             <v-col class="text-body"
-              ><span data-testid="created-person-rolle">{{ translatedRollenname }}</span></v-col
+              ><span data-testid="created-person-rolle">{{ translatedRollenname.join(', ') }}</span></v-col
             >
           </v-row>
           <v-row>
