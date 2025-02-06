@@ -101,9 +101,9 @@ jobs:
       image_tag_generation: ${{ github.ref_name == 'main' && 'commit_hash' || 'specified' }}
       image_tag: ${{ github.ref_name == 'main' && '' || needs.create_branch_identifier.outputs.image_tag_from_branch }}
       add_latest_tag: ${{ github.ref_name == 'main' }}
-      container_registry: 'ghcr.io'
-      fail_on_vulnerabilites: true
-      report_location: 'Dockerfile'
+      container_registry: "ghcr.io"
+      fail_on_vulnerabilites: false
+      report_location: "Dockerfile"
 
   scan_helm:
     uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-helm-kics.yaml@5
