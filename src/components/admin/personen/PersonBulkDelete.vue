@@ -20,16 +20,16 @@
     personIDs: string[];
   };
 
-  type Emits = (event: 'update:isDialogVisible', isDialogVisible: boolean) => void;
+  type Emits = (event: 'update:dialogExit', finished: boolean) => void;
 
   const props: Props = defineProps<Props>();
   const emit: Emits = defineEmits<Emits>();
   const showDeletePersonDialog: Ref<boolean> = ref(props.isDialogVisible);
 
-  async function closeDeltePersonDialog(): Promise<void> {
+  async function closeDeltePersonDialog(finished: boolean): Promise<void> {
     progress.value = 0;
     showDeletePersonDialog.value = false;
-    emit('update:isDialogVisible', false);
+    emit('update:dialogExit', finished);
   }
 
   async function handleDeletePerson(personIDs: string[]): Promise<void> {
@@ -61,9 +61,7 @@
   >
     <LayoutCard
       data-testid="person-delete-layout-card"
-      :closable="true"
       :header="$t('admin.person.deletePerson')"
-      @onCloseClicked="closeDeltePersonDialog()"
     >
       <v-container
         class="mt-4"
@@ -141,7 +139,7 @@
             <v-btn
               :block="mdAndDown"
               class="secondary"
-              @click="closeDeltePersonDialog"
+              @click="closeDeltePersonDialog(false)"
               data-testid="person-delete-discard-button"
             >
               {{ $t('cancel') }}
@@ -176,7 +174,7 @@
             <v-btn
               :block="mdAndDown"
               class="primary"
-              @click="closeDeltePersonDialog"
+              @click="closeDeltePersonDialog(true)"
               data-testid="person-delete-close-button"
             >
               {{ $t('close') }}

@@ -38,6 +38,7 @@
   const hasAutoSelectedOrganisation: Ref<boolean> = ref(false);
 
   const selectedPersonIds: Ref<string[]> = ref<string[]>([]);
+  const resultTableRef: Ref = ref(null);
 
   type ReadonlyHeaders = VDataTableServer['headers'];
   const headers: ReadonlyHeaders = [
@@ -443,11 +444,14 @@
     selectedOption.value = null;
   };
 
-  const handleBulkDeleteDialog = (isDialogVisible: boolean): void => {
-    benutzerDeleteDialogVisible.value = isDialogVisible;
+  const handleBulkDeleteDialog = (finished: boolean): void => {
+    benutzerDeleteDialogVisible.value = false;
     selectedOption.value = null;
-    selectedPersonIds.value = [];
-    getPaginatedPersonenWithLimit(searchFilterStore.personenPerPage);
+    if (finished) {
+      selectedPersonIds.value = [];
+      resultTableRef.value.resetSelection();
+      getPaginatedPersonenWithLimit(searchFilterStore.personenPerPage);
+    }
   };
 
   function handleSelectedRows(selectedItems: TableItem[]): void {
@@ -771,7 +775,7 @@
             :is-loading="personStore.loading"
             :is-dialog-visible="benutzerDeleteDialogVisible"
             :personIDs="selectedPersonIds"
-            @update:isDialogVisible="handleBulkDeleteDialog($event)"
+            @update:dialogExit="handleBulkDeleteDialog($event)"
           >
           </PersonBulkDelete>
         </v-col>
@@ -795,6 +799,7 @@
       <ResultTable
         :currentPage="searchFilterStore.personenPage"
         data-testid="person-table"
+        ref="resultTableRef"
         :items="personStore.personenWithUebersicht || []"
         :itemsPerPage="searchFilterStore.personenPerPage"
         :loading="personStore.loading"
