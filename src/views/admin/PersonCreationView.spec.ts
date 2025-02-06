@@ -266,7 +266,7 @@ describe('PersonCreationView', () => {
         },
       ],
       selectedOrganisation: null,
-      selectedRolle: null,
+      selectedRollen: null,
       canCommit: true,
     };
 
@@ -346,7 +346,7 @@ describe('PersonCreationView', () => {
         },
       ],
       selectedOrganisation: null,
-      selectedRolle: null,
+      selectedRollen: null,
       canCommit: true,
     };
 
