@@ -26,8 +26,10 @@
   const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
   const canCommit: Ref<boolean> = ref(false);
   const hasAutoselectedSchule: Ref<boolean> = ref(false);
+
   const searchInputOrganisation: Ref<string> = ref('');
   const searchInputRolle: Ref<string> = ref('');
+  const searchInputRollen: Ref<string> = ref('');
 
   let isSearching: boolean = false;
 
@@ -243,30 +245,34 @@
     }
   });
 
-  watch(searchInputRolle, async (newValue: string, oldValue: string) => {
-    clearTimeout(timerId.value);
-    // If the oldValue (What has been in the searchValue beforing losing focus) is equal to the selected Rolle.title then do nothing
-    if (oldValue === selectedRolleTitle.value) return;
-    // If searchValue is empty, fetch all roles for the organisationId
-    if (newValue === '' && !selectedRolle.value) {
-      timerId.value = setTimeout(() => {
-        personenkontextStore.processWorkflowStep({
-          organisationId: selectedOrganisation.value,
-          limit: 25,
-        });
-      }, 500);
-      // Else fetch the Rollen that correspond to the orgaId
-      // (This stops an extra request being made once a value is selected since we check if model !== searchValue)
-    } else if (newValue && newValue !== selectedRolleTitle.value) {
-      timerId.value = setTimeout(() => {
-        personenkontextStore.processWorkflowStep({
-          organisationId: selectedOrganisation.value,
-          rolleName: newValue,
-          limit: 25,
-        });
-      }, 500);
-    }
-  });
+  watch(
+    props.allowMultipleRollen ? searchInputRollen : searchInputRolle,
+    async (newValue: string, oldValue: string) => {
+      clearTimeout(timerId.value);
+      // If the oldValue (What has been in the searchValue beforing losing focus) is equal to the selected Rolle.title then do nothing
+      if (oldValue === selectedRolleTitle.value) return;
+      // If searchValue is empty, fetch all roles for the organisationId
+      if (newValue === '' && !selectedRolle.value) {
+        timerId.value = setTimeout(() => {
+          personenkontextStore.processWorkflowStep({
+            organisationId: selectedOrganisation.value,
+            limit: 25,
+          });
+        }, 500);
+        // Else fetch the Rollen that correspond to the orgaId
+        // (This stops an extra request being made once a value is selected since we check if model !== searchValue)
+      } else if (newValue && newValue !== selectedRolleTitle.value) {
+        timerId.value = setTimeout(() => {
+          personenkontextStore.processWorkflowStep({
+            organisationId: selectedOrganisation.value,
+            rolleName: newValue,
+            rollenIds: selectedRollen.value,
+            limit: 25,
+          });
+        }, 500);
+      }
+    },
+  );
 
   function updateKlassenSearch(searchValue: string): void {
     clearTimeout(timerId.value);
