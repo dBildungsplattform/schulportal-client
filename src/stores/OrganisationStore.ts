@@ -318,6 +318,7 @@ export const useOrganisationStore: StoreDefinition<
         this.totalPaginatedKlassen = +response.headers['x-paging-pagetotal'];
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+        return await Promise.reject(this.errorCode);
       } finally {
         this.loadingKlassen = false;
       }
