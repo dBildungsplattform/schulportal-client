@@ -458,11 +458,11 @@
         ></v-autocomplete>
       </FormRow>
       <!-- Befristung -->
-      <v-row v-if="selectedOrganisation && selectedRolle && showHeadline">
+      <v-row v-if="selectedOrganisation && (allowMultipleRollen ? selectedRollen : selectedRolle) && showHeadline">
         <h3 class="headline-3">3. {{ $t('admin.befristung.assignBefristung') }}</h3>
       </v-row>
       <BefristungInput
-        v-if="selectedOrganisation && selectedRolle && !isModifyRolleDialog"
+        v-if="selectedOrganisation && (allowMultipleRollen ? selectedRollen : selectedRolle) && !isModifyRolleDialog"
         :befristungProps="befristungInputProps?.befristungProps"
         :befristungOptionProps="befristungInputProps?.befristungOptionProps"
         :isUnbefristetDisabled="befristungInputProps?.isUnbefristetDisabled"
