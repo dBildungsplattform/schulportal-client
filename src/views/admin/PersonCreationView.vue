@@ -364,6 +364,7 @@
     await personenkontextStore.createPersonWithKontexte(bodyParams);
     formContext.resetForm();
     hasNoKopersNr.value = false;
+    filteredRollen.value = [];
   }
 
   watch(hasNoKopersNr, async (newValue: boolean | undefined) => {

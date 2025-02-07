@@ -103,7 +103,9 @@
     // Reset the selectedRolle field only if oldValue was not undefined
     if (oldValue !== undefined) {
       selectedRolle.value = undefined;
+      selectedRollen.value = undefined;
       emits('fieldReset', 'selectedRolle');
+      emits('fieldReset', 'selectedRollen');
     }
     if (newValue && newValue !== oldValue) {
       // Fetch the roles after selecting the organization
@@ -464,11 +466,21 @@
         ></v-autocomplete>
       </FormRow>
       <!-- Befristung -->
-      <v-row v-if="selectedOrganisation && (allowMultipleRollen ? selectedRollen : selectedRolle) && showHeadline">
+      <v-row
+        v-if="
+          selectedOrganisation &&
+          (allowMultipleRollen ? (selectedRollen?.length ?? 0) > 0 : selectedRolle) &&
+          showHeadline
+        "
+      >
         <h3 class="headline-3">3. {{ $t('admin.befristung.assignBefristung') }}</h3>
       </v-row>
       <BefristungInput
-        v-if="selectedOrganisation && (allowMultipleRollen ? selectedRollen : selectedRolle) && !isModifyRolleDialog"
+        v-if="
+          selectedOrganisation &&
+          (allowMultipleRollen ? (selectedRollen?.length ?? 0) > 0 : selectedRolle) &&
+          !isModifyRolleDialog
+        "
         :befristungProps="befristungInputProps?.befristungProps"
         :befristungOptionProps="befristungInputProps?.befristungOptionProps"
         :isUnbefristetDisabled="befristungInputProps?.isUnbefristetDisabled"
