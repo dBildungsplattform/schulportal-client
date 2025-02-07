@@ -57,12 +57,15 @@
   const selectedRolleCache: Ref<string[] | undefined> = ref(undefined);
 
   const filteredRollen: Ref<TranslatedRolleWithAttrs[] | undefined> = ref<TranslatedRolleWithAttrs[] | undefined>([]);
+  const filteredRollenCache: Ref<TranslatedRolleWithAttrs[] | undefined> = ref<TranslatedRolleWithAttrs[] | undefined>(
+    [],
+  );
 
   // Define a method to check if the selected Rolle is of type "Lern"
   function isLernRolle(selectedRolleIds?: string[]): boolean | undefined {
     if (!Array.isArray(selectedRolleIds)) return false;
 
-    return filteredRollen.value?.some(
+    return filteredRollenCache.value?.some(
       (rolle: TranslatedRolleWithAttrs) => selectedRolleIds.includes(rolle.value) && rolle.rollenart === RollenArt.Lern,
     );
   }
@@ -364,6 +367,7 @@
     await personenkontextStore.createPersonWithKontexte(bodyParams);
     formContext.resetForm();
     hasNoKopersNr.value = false;
+    filteredRollenCache.value = filteredRollen.value;
     filteredRollen.value = [];
   }
 
@@ -643,14 +647,35 @@
               }}</span></v-col
             >
           </v-row>
-          <v-row v-if="isKopersRolle(schuleZuordnungFromCreatedKontext.map((kontext) => kontext.rolleId), filteredRollen)">
+          <v-row
+            v-if="
+              isKopersRolle(
+                schuleZuordnungFromCreatedKontext.map((kontext) => kontext.rolleId),
+                filteredRollen,
+              )
+            "
+          >
             <v-col
-              :class="`${isKopersRolle(schuleZuordnungFromCreatedKontext.map((kontext) => kontext.rolleId), filteredRollen) && personenkontextStore.createdPersonWithKontext.person.personalnummer ? 'text-body bold text-right' : 'text-body bold text-right text-red'}`"
+              :class="`${
+                isKopersRolle(
+                  schuleZuordnungFromCreatedKontext.map((kontext) => kontext.rolleId),
+                  filteredRollen,
+                ) && personenkontextStore.createdPersonWithKontext.person.personalnummer
+                  ? 'text-body bold text-right'
+                  : 'text-body bold text-right text-red'
+              }`"
             >
               {{ $t('person.kopersNr') }}:
             </v-col>
             <v-col
-              :class="`${isKopersRolle(schuleZuordnungFromCreatedKontext.map((kontext) => kontext.rolleId), filteredRollen) && personenkontextStore.createdPersonWithKontext.person.personalnummer ? 'text-body' : 'text-body text-red'}`"
+              :class="`${
+                isKopersRolle(
+                  schuleZuordnungFromCreatedKontext.map((kontext) => kontext.rolleId),
+                  filteredRollen,
+                ) && personenkontextStore.createdPersonWithKontext.person.personalnummer
+                  ? 'text-body'
+                  : 'text-body text-red'
+              }`"
               ><span data-testid="created-person-kopersNr">{{
                 personenkontextStore.createdPersonWithKontext.person.personalnummer
                   ? personenkontextStore.createdPersonWithKontext.person.personalnummer
