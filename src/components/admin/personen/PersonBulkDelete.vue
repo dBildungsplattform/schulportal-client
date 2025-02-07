@@ -26,7 +26,7 @@
   const emit: Emits = defineEmits<Emits>();
   const showDeletePersonDialog: Ref<boolean> = ref(props.isDialogVisible);
 
-  async function closeDeltePersonDialog(finished: boolean): Promise<void> {
+  async function closeDeletePersonDialog(finished: boolean): Promise<void> {
     progress.value = 0;
     showDeletePersonDialog.value = false;
     emit('update:dialogExit', finished);
@@ -64,7 +64,7 @@
       :header="$t('admin.person.deletePerson')"
     >
       <v-container
-        class="mt-4"
+        class="mt-8"
         v-if="progress == 0"
       >
         <v-row class="text-body bold justify-center">
@@ -139,7 +139,7 @@
             <v-btn
               :block="mdAndDown"
               class="secondary"
-              @click="closeDeltePersonDialog(false)"
+              @click="closeDeletePersonDialog(false)"
               data-testid="person-delete-discard-button"
             >
               {{ $t('cancel') }}
@@ -174,7 +174,7 @@
             <v-btn
               :block="mdAndDown"
               class="primary"
-              @click="closeDeltePersonDialog(true)"
+              @click="closeDeletePersonDialog(true)"
               data-testid="person-delete-close-button"
             >
               {{ $t('close') }}
