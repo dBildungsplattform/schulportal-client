@@ -163,11 +163,11 @@
     async (newValue: string | string[] | undefined, oldValue: string | string[] | undefined) => {
       if (props.allowMultipleRollen) {
         // Multiple rollen selected
-        const newRoles: string[] | undefined = newValue as string[] | undefined;
-        if (newRoles && newRoles.length > 0) {
+        const newRollen: string[] | undefined = newValue as string[] | undefined;
+        if (newRollen && newRollen.length > 0) {
           await personenkontextStore.processWorkflowStep({
             organisationId: selectedOrganisation.value,
-            rollenIds: newRoles,
+            rollenIds: newRollen,
             limit: 25,
           });
           canCommit.value = personenkontextStore.workflowStepResponse?.canCommit ?? false;
@@ -179,26 +179,26 @@
           emits('fieldReset', 'selectedRollen');
           emits('update:canCommit', false);
         }
-        emits('update:selectedRollen', newRoles);
+        emits('update:selectedRollen', newRollen);
       } else {
         // Single rolle selected
-        const newRole: string | undefined = newValue as string | undefined;
-        if (newRole && newRole !== oldValue) {
+        const newRolle: string | undefined = newValue as string | undefined;
+        if (newRolle && newRolle !== oldValue) {
           await personenkontextStore.processWorkflowStep({
             organisationId: selectedOrganisation.value,
-            rollenIds: [newRole], // Wrap single role in an array
+            rollenIds: [newRolle], // Wrap single rolle in an array
             limit: 25,
           });
           canCommit.value = personenkontextStore.workflowStepResponse?.canCommit ?? false;
           emits('update:canCommit', canCommit.value);
         }
-        if (!newRole) {
-          // Reset when no role is selected
+        if (!newRolle) {
+          // Reset when no rolle is selected
           emits('update:canCommit', false);
           selectedKlasse.value = undefined;
           emits('fieldReset', 'selectedKlasse');
         }
-        emits('update:selectedRolle', newRole); // Emit selected single role
+        emits('update:selectedRolle', newRolle); // Emit selected single rolle
       }
     },
     { deep: true },
