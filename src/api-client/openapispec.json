@@ -3529,7 +3529,7 @@
                         }
                     },
                     {
-                        "name": "rolleIds",
+                        "name": "rollenIds",
                         "required": false,
                         "in": "query",
                         "description": "IDs of the rollen.",

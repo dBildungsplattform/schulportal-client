@@ -9419,14 +9419,14 @@ export const PersonenkontextApiAxiosParamCreator = function (configuration?: Con
         /**
          * 
          * @param {string} [organisationId] ID of the organisation to filter the rollen later
-         * @param {Array<string>} [rolleIds] IDs of the rollen.
+         * @param {Array<string>} [rollenIds] IDs of the rollen.
          * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
          * @param {string} [organisationName] Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.
          * @param {number} [limit] The limit of items for the request.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        dbiamPersonenkontextWorkflowControllerProcessStep: async (organisationId?: string, rolleIds?: Array<string>, rolleName?: string, organisationName?: string, limit?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        dbiamPersonenkontextWorkflowControllerProcessStep: async (organisationId?: string, rollenIds?: Array<string>, rolleName?: string, organisationName?: string, limit?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/personenkontext-workflow/step`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -9451,8 +9451,8 @@ export const PersonenkontextApiAxiosParamCreator = function (configuration?: Con
                 localVarQueryParameter['organisationId'] = organisationId;
             }
 
-            if (rolleIds) {
-                localVarQueryParameter['rolleIds'] = rolleIds;
+            if (rollenIds) {
+                localVarQueryParameter['rollenIds'] = rollenIds;
             }
 
             if (rolleName !== undefined) {
@@ -9513,15 +9513,15 @@ export const PersonenkontextApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @param {string} [organisationId] ID of the organisation to filter the rollen later
-         * @param {Array<string>} [rolleIds] IDs of the rollen.
+         * @param {Array<string>} [rollenIds] IDs of the rollen.
          * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
          * @param {string} [organisationName] Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.
          * @param {number} [limit] The limit of items for the request.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async dbiamPersonenkontextWorkflowControllerProcessStep(organisationId?: string, rolleIds?: Array<string>, rolleName?: string, organisationName?: string, limit?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonenkontextWorkflowResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.dbiamPersonenkontextWorkflowControllerProcessStep(organisationId, rolleIds, rolleName, organisationName, limit, options);
+        async dbiamPersonenkontextWorkflowControllerProcessStep(organisationId?: string, rollenIds?: Array<string>, rolleName?: string, organisationName?: string, limit?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonenkontextWorkflowResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dbiamPersonenkontextWorkflowControllerProcessStep(organisationId, rollenIds, rolleName, organisationName, limit, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -9557,15 +9557,15 @@ export const PersonenkontextApiFactory = function (configuration?: Configuration
         /**
          * 
          * @param {string} [organisationId] ID of the organisation to filter the rollen later
-         * @param {Array<string>} [rolleIds] IDs of the rollen.
+         * @param {Array<string>} [rollenIds] IDs of the rollen.
          * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
          * @param {string} [organisationName] Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.
          * @param {number} [limit] The limit of items for the request.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        dbiamPersonenkontextWorkflowControllerProcessStep(organisationId?: string, rolleIds?: Array<string>, rolleName?: string, organisationName?: string, limit?: number, options?: any): AxiosPromise<PersonenkontextWorkflowResponse> {
-            return localVarFp.dbiamPersonenkontextWorkflowControllerProcessStep(organisationId, rolleIds, rolleName, organisationName, limit, options).then((request) => request(axios, basePath));
+        dbiamPersonenkontextWorkflowControllerProcessStep(organisationId?: string, rollenIds?: Array<string>, rolleName?: string, organisationName?: string, limit?: number, options?: any): AxiosPromise<PersonenkontextWorkflowResponse> {
+            return localVarFp.dbiamPersonenkontextWorkflowControllerProcessStep(organisationId, rollenIds, rolleName, organisationName, limit, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -9599,7 +9599,7 @@ export interface PersonenkontextApiInterface {
     /**
      * 
      * @param {string} [organisationId] ID of the organisation to filter the rollen later
-     * @param {Array<string>} [rolleIds] IDs of the rollen.
+     * @param {Array<string>} [rollenIds] IDs of the rollen.
      * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
      * @param {string} [organisationName] Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.
      * @param {number} [limit] The limit of items for the request.
@@ -9607,7 +9607,7 @@ export interface PersonenkontextApiInterface {
      * @throws {RequiredError}
      * @memberof PersonenkontextApiInterface
      */
-    dbiamPersonenkontextWorkflowControllerProcessStep(organisationId?: string, rolleIds?: Array<string>, rolleName?: string, organisationName?: string, limit?: number, options?: AxiosRequestConfig): AxiosPromise<PersonenkontextWorkflowResponse>;
+    dbiamPersonenkontextWorkflowControllerProcessStep(organisationId?: string, rollenIds?: Array<string>, rolleName?: string, organisationName?: string, limit?: number, options?: AxiosRequestConfig): AxiosPromise<PersonenkontextWorkflowResponse>;
 
 }
 
@@ -9645,7 +9645,7 @@ export class PersonenkontextApi extends BaseAPI implements PersonenkontextApiInt
     /**
      * 
      * @param {string} [organisationId] ID of the organisation to filter the rollen later
-     * @param {Array<string>} [rolleIds] IDs of the rollen.
+     * @param {Array<string>} [rollenIds] IDs of the rollen.
      * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
      * @param {string} [organisationName] Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.
      * @param {number} [limit] The limit of items for the request.
@@ -9653,8 +9653,8 @@ export class PersonenkontextApi extends BaseAPI implements PersonenkontextApiInt
      * @throws {RequiredError}
      * @memberof PersonenkontextApi
      */
-    public dbiamPersonenkontextWorkflowControllerProcessStep(organisationId?: string, rolleIds?: Array<string>, rolleName?: string, organisationName?: string, limit?: number, options?: AxiosRequestConfig) {
-        return PersonenkontextApiFp(this.configuration).dbiamPersonenkontextWorkflowControllerProcessStep(organisationId, rolleIds, rolleName, organisationName, limit, options).then((request) => request(this.axios, this.basePath));
+    public dbiamPersonenkontextWorkflowControllerProcessStep(organisationId?: string, rollenIds?: Array<string>, rolleName?: string, organisationName?: string, limit?: number, options?: AxiosRequestConfig) {
+        return PersonenkontextApiFp(this.configuration).dbiamPersonenkontextWorkflowControllerProcessStep(organisationId, rollenIds, rolleName, organisationName, limit, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
