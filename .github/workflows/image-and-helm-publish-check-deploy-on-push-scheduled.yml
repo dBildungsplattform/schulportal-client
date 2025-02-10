@@ -102,7 +102,7 @@ jobs:
       image_tag: ${{ github.ref_name == 'main' && '' || needs.create_branch_identifier.outputs.image_tag_from_branch }}
       add_latest_tag: ${{ github.ref_name == 'main' }}
       container_registry: 'ghcr.io'
-      fail_on_vulnerabilites: true
+      fail_on_vulnerabilites: true 
       report_location: 'Dockerfile'
 
   scan_helm:
