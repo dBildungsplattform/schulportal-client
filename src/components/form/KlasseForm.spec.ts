@@ -79,6 +79,7 @@ describe('Schule searchInput', () => {
       wrapper!.setProps({
         schulen: [schule],
       });
+      organisationStore.autoselectedSchule = { id: schule.value, name: 'schule', typ: OrganisationsTyp.Schule };
       await nextTick();
     });
 

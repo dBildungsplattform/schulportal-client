@@ -1,25 +1,30 @@
 <script setup lang="ts">
-  import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
-  import { computed, onBeforeMount, onUnmounted, ref, type ComputedRef, type Ref } from 'vue';
-  import {
-    type Router,
-    useRouter,
-    type RouteLocationNormalizedLoaded,
-    useRoute,
-    onBeforeRouteLeave,
-    type RouteLocationNormalized,
-    type NavigationGuardNext,
-  } from 'vue-router';
-  import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import SpshAlert from '@/components/alert/SpshAlert.vue';
-  import { type Composer, useI18n } from 'vue-i18n';
-  import { useDisplay } from 'vuetify';
-  import { type BaseFieldProps, type TypedSchema, useForm } from 'vee-validate';
-  import KlasseForm from '@/components/form/KlasseForm.vue';
-  import SuccessTemplate from '@/components/admin/klassen/SuccessTemplate.vue';
   import KlasseDelete from '@/components/admin/klassen/KlasseDelete.vue';
-  import { getValidationSchema, getVuetifyConfig } from '@/utils/validationKlasse';
+  import SuccessTemplate from '@/components/admin/klassen/SuccessTemplate.vue';
+  import SpshAlert from '@/components/alert/SpshAlert.vue';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import KlasseForm from '@/components/form/KlasseForm.vue';
+  import {
+    OrganisationsTyp,
+    useOrganisationStore,
+    type Organisation,
+    type OrganisationStore,
+  } from '@/stores/OrganisationStore';
   import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
+  import { getValidationSchema, getVuetifyConfig } from '@/utils/validationKlasse';
+  import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
+  import { computed, onBeforeMount, onUnmounted, ref, watch, type ComputedRef, type Ref } from 'vue';
+  import { useI18n, type Composer } from 'vue-i18n';
+  import {
+    onBeforeRouteLeave,
+    useRoute,
+    useRouter,
+    type NavigationGuardNext,
+    type RouteLocationNormalized,
+    type RouteLocationNormalizedLoaded,
+    type Router,
+  } from 'vue-router';
+  import { useDisplay } from 'vuetify';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
@@ -42,6 +47,18 @@
     return organisationStore.currentOrganisation.kennung
       ? `${organisationStore.currentOrganisation.kennung} (${organisationStore.currentOrganisation.name})`
       : organisationStore.currentOrganisation.name;
+  });
+  const errorTitle: ComputedRef<string> = computed(() => {
+    if (!organisationStore.errorCode) return '';
+    return organisationStore.errorCode === 'UNSPECIFIED_ERROR'
+      ? t('admin.klasse.loadingErrorTitle')
+      : t(`admin.klasse.title.${organisationStore.errorCode}`);
+  });
+  const errorText: ComputedRef<string> = computed(() => {
+    if (!organisationStore.errorCode) return '';
+    return organisationStore.errorCode === 'UNSPECIFIED_ERROR'
+      ? t('admin.klasse.loadingErrorText')
+      : t(`admin.klasse.errors.${organisationStore.errorCode}`);
   });
 
   const validationSchema: TypedSchema = getValidationSchema(t);
@@ -151,21 +168,25 @@
       : navigateToKlasseManagement;
   });
 
+  watch(
+    () => organisationStore.currentKlasse,
+    async (newKlasse: Organisation | null) => {
+      if (!newKlasse) return;
+      if (newKlasse.administriertVon) {
+        await organisationStore.getOrganisationById(newKlasse.administriertVon, OrganisationsTyp.Schule);
+      }
+    },
+    { immediate: true },
+  );
+
   onBeforeMount(async () => {
     organisationStore.errorCode = '';
     organisationStore.updatedOrganisation = null;
     // Retrieves the Klasse using the Id in the route since that's all we have
     await organisationStore.getOrganisationById(currentOrganisationId, OrganisationsTyp.Klasse);
     // Retrieves the parent Organisation of the Klasse using the same endpoint but with a different parameter
-    if (organisationStore.currentKlasse?.administriertVon) {
-      await organisationStore.getOrganisationById(
-        organisationStore.currentKlasse.administriertVon,
-        OrganisationsTyp.Schule,
-      );
-    }
 
     // Set the initial values using the computed properties
-    setFieldValue('selectedSchule', translatedSchulname.value || '');
     setFieldValue('selectedKlassenname', organisationStore.currentKlasse?.name || '');
 
     /* listen for browser changes and prevent them when form is dirty */
@@ -206,6 +227,7 @@
         <v-container>
           <div v-if="organisationStore.currentOrganisation">
             <KlasseForm
+              :readonlyDefault="organisationStore.currentOrganisation"
               :errorCode="organisationStore.errorCode"
               :isEditActive="isEditActive"
               :isLoading="organisationStore.loading"
@@ -224,18 +246,10 @@
               <!-- Error Message Display -->
               <SpshAlert
                 :model-value="!!organisationStore.errorCode"
-                :title="
-                  organisationStore.errorCode === 'UNSPECIFIED_ERROR'
-                    ? $t('admin.klasse.loadingErrorTitle')
-                    : $t(`admin.klasse.title.${organisationStore.errorCode}`)
-                "
+                :title="errorTitle"
                 :type="'error'"
                 :closable="false"
-                :text="
-                  organisationStore.errorCode === 'UNSPECIFIED_ERROR'
-                    ? $t('admin.klasse.loadingErrorText')
-                    : $t(`admin.klasse.errors.${organisationStore.errorCode}`)
-                "
+                :text="errorText"
                 :showButton="true"
                 :buttonText="alertButtonText"
                 :buttonAction="alertButtonAction"

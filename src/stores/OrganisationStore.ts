@@ -247,12 +247,12 @@ export const useOrganisationStore: StoreDefinition<
 
       this.allKlassen = this.allKlassen.map((klasse: Organisation) => ({
         ...klasse,
-        schuleDetails: schulenMap.get(klasse.administriertVon || '') || '---',
+        schuleDetails: schulenMap.get(klasse.administriertVon ?? '') ?? '---',
       }));
 
       this.klassen = this.klassen.map((klasse: Organisation) => ({
         ...klasse,
-        schuleDetails: schulenMap.get(klasse.administriertVon || '') || '---',
+        schuleDetails: schulenMap.get(klasse.administriertVon ?? '') ?? '---',
       }));
     },
 
@@ -548,6 +548,7 @@ export const useOrganisationStore: StoreDefinition<
         this.schulenFilter.loading = false;
       }
     },
+
     resetSchulFilter(): void {
       this.schulenFilter = {
         filterResult: [],

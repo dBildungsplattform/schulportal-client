@@ -46,7 +46,7 @@
   });
 
   const [selectedSchule, selectedSchuleProps]: [
-    Ref<string>,
+    Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedSchule', vuetifyConfig);
   const [selectedKlassenname, selectedKlassennameProps]: [
@@ -153,10 +153,13 @@
     resetForm();
   });
 
-  watch(organisationStore.schulenFilter.selectedItems, (newSelection: Array<Organisation>) => {
-    if (newSelection.length === 1) selectedSchule.value = newSelection[0]!.id;
-    else selectedSchule.value = '';
-  });
+  watch(
+    () => organisationStore.schulenFilter.selectedItems,
+    (newSelection: Array<Organisation>) => {
+      if (newSelection.length === 1) selectedSchule.value = newSelection[0]!.id;
+      else selectedSchule.value = undefined;
+    },
+  );
 
   onMounted(async () => {
     await initStores();

@@ -3,6 +3,7 @@
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
   import { RollenSystemRecht } from '@/stores/RolleStore';
+  import type { TranslatedObject } from '@/types';
   import { type BaseFieldProps } from 'vee-validate';
   import { defineProps, watch, type ModelRef } from 'vue';
   import SchulenFilter from '../filter/SchulenFilter.vue';
@@ -11,8 +12,9 @@
 
   type Props = {
     errorCode?: string;
-    schulen?: Array<{ value: string; title: string }>;
+    schulen?: Array<TranslatedObject>;
     readonly?: boolean;
+    readonlyDefault?: Organisation;
     selectedSchuleProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedKlassennameProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     showUnsavedChangesDialog?: boolean;
@@ -32,9 +34,7 @@
   watch(
     () => organisationStore.schulenFilter.selectedItems,
     (newSchulen: Array<Organisation>) => {
-      if (newSchulen.length === 1) {
-        selectedSchuleId.value = newSchulen[0]!.id;
-      }
+      selectedSchuleId.value = newSchulen.length === 1 ? newSchulen[0]!.id : '';
     },
   );
 </script>
@@ -66,12 +66,15 @@
         :isRequired="true"
         :label="$t('admin.schule.schule')"
       >
-        <SchulenFilter
-          :multiple="false"
-          :readonly
-          :systemrechte-for-search="[RollenSystemRecht.KlassenVerwalten]"
-          :selected-schule-props="selectedSchuleProps"
-        ></SchulenFilter>
+        <div class="pb-sm-4">
+          <SchulenFilter
+            :multiple="false"
+            :readonly
+            :readonlyDefault
+            :systemrechte-for-search="[RollenSystemRecht.KlassenVerwalten]"
+            :selected-schule-props="selectedSchuleProps"
+          ></SchulenFilter>
+        </div>
       </FormRow>
 
       <!-- Klassenname eingeben -->
