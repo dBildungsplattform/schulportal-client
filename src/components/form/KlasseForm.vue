@@ -36,16 +36,16 @@
   const props: Props = defineProps<Props>();
   // derive this from props by checking id against props.schulen
   const hasAutoselected: ComputedRef<boolean> = computed(() => props.autoselectedSchuleId !== null);
-  const selectedSchuleId: ModelRef<string | undefined, string> = defineModel('selectedSchule');
+  const selectedSchule: ModelRef<string | undefined, string> = defineModel('selectedSchule');
   const selectedSchuleTitle: ComputedRef<string> = computed(() => {
-    return props.schulen?.find((schule: TranslatedObject) => schule.value === selectedSchuleId.value)?.title || '';
+    return props.schulen?.find((schule: TranslatedObject) => schule.value === selectedSchule.value)?.title || '';
   });
   const selectedKlassenname: ModelRef<string | undefined, string> = defineModel('selectedKlassenname');
 
   watch(
     () => props.autoselectedSchuleId,
     (newId: string | null) => {
-      selectedSchuleId.value = newId || undefined;
+      selectedSchule.value = newId || undefined;
     },
   );
 
@@ -63,8 +63,8 @@
     if (newValue) {
       organisationFilter.searchString = newValue;
     }
-    if (selectedSchuleId.value) {
-      organisationFilter.organisationIds = [selectedSchuleId.value];
+    if (selectedSchule.value) {
+      organisationFilter.organisationIds = [selectedSchule.value];
     }
 
     timerId.value = setTimeout(async () => {
@@ -102,7 +102,7 @@
       >
         <v-autocomplete
           autocomplete="off"
-          :class="['filter-dropdown mb-4', { selected: selectedSchuleId }]"
+          :class="['filter-dropdown mb-4', { selected: selectedSchule }]"
           clearable
           data-testid="schule-select"
           density="compact"
@@ -117,7 +117,7 @@
           required="true"
           variant="outlined"
           v-bind="selectedSchuleProps"
-          v-model="selectedSchuleId"
+          v-model="selectedSchule"
           v-model:search="searchInputSchule"
           hide-details
         ></v-autocomplete>

@@ -83,7 +83,7 @@
   }): { props: { error: boolean; 'error-messages': Array<string> } } => getVuetifyConfig(state);
 
   type KlasseCreationForm = {
-    selectedSchuleId: string;
+    selectedSchule: string | undefined;
     selectedKlassenname: string;
   };
 
@@ -92,10 +92,10 @@
     validationSchema,
   });
 
-  const [selectedSchuleId, selectedSchuleProps]: [
+  const [selectedSchule, selectedSchuleProps]: [
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedSchuleId', vuetifyConfig);
+  ] = defineField('selectedSchule', vuetifyConfig);
   const [selectedKlassenname, selectedKlassennameProps]: [
     Ref<string>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
@@ -114,10 +114,10 @@
   watch(
     autoselectedSchuleId,
     (newAutoSelectedOrgId: string | null) => {
-      const selectedSchule: TranslatedObject | undefined = filteredSchulen.value?.find(
+      const newSelectedSchule: TranslatedObject | undefined = filteredSchulen.value?.find(
         (schule: TranslatedObject) => schule.value === newAutoSelectedOrgId,
       );
-      selectedSchuleId.value = selectedSchule?.value;
+      selectedSchule.value = newSelectedSchule?.value;
     },
     { immediate: true },
   );
@@ -130,7 +130,7 @@
   );
 
   function isFormDirty(): boolean {
-    const schuleDirty: boolean = hasAutoselectedSchule.value ? false : isFieldDirty('selectedSchuleId');
+    const schuleDirty: boolean = hasAutoselectedSchule.value ? false : isFieldDirty('selectedSchule');
     return schuleDirty || isFieldDirty('selectedKlassenname');
   }
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
@@ -199,8 +199,8 @@
       undefined,
       OrganisationsTyp.Klasse,
       undefined,
-      selectedSchuleId.value,
-      selectedSchuleId.value,
+      selectedSchule.value,
+      selectedSchule.value,
     );
     resetForm();
   });
@@ -248,7 +248,7 @@
           :onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
           :onSubmit="onSubmit"
           ref="klasse-creation-form"
-          v-model:selectedSchule="selectedSchuleId"
+          v-model:selectedSchule="selectedSchule"
           v-model:selectedKlassenname="selectedKlassenname"
         >
           <!-- Error Message Display if error on submit -->

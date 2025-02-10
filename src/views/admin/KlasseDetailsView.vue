@@ -51,7 +51,7 @@
   }): { props: { error: boolean; 'error-messages': Array<string> } } => getVuetifyConfig(state);
 
   type KlasseEditForm = {
-    selectedSchuleId: string;
+    selectedSchule: string;
     selectedKlassenname: string;
   };
 
@@ -60,10 +60,10 @@
     validationSchema,
   });
 
-  const [selectedSchuleId, selectedSchuleProps]: [
+  const [selectedSchule, selectedSchuleProps]: [
     Ref<string>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedSchuleId', vuetifyConfig);
+  ] = defineField('selectedSchule', vuetifyConfig);
   const [selectedKlassenname, selectedKlassennameProps]: [
     Ref<string>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
@@ -121,7 +121,7 @@
   };
 
   const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
-    if (selectedSchuleId.value && selectedKlassenname.value) {
+    if (selectedSchule.value && selectedKlassenname.value) {
       if (organisationStore.currentOrganisation) {
         await organisationStore.updateOrganisationById(currentKlasseId, selectedKlassenname.value);
       }
@@ -165,7 +165,7 @@
     }
 
     // Set the initial values using the computed properties
-    setFieldValue('selectedSchuleId', translatedSchulname.value || '');
+    setFieldValue('selectedSchule', translatedSchulname.value || '');
     setFieldValue('selectedKlassenname', organisationStore.currentKlasse?.name || '');
 
     /* listen for browser changes and prevent them when form is dirty */
@@ -219,7 +219,7 @@
               :onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
               :onSubmit="onSubmit"
               ref="klasse-creation-form"
-              v-model:selectedSchule="selectedSchuleId"
+              v-model:selectedSchule="selectedSchule"
               v-model:selectedKlassenname="selectedKlassenname"
             >
               <!-- Error Message Display -->
@@ -265,7 +265,7 @@
                       :klassenname="organisationStore.currentKlasse?.name || ''"
                       :klassenId="organisationStore.currentKlasse?.id || ''"
                       ref="klasse-delete"
-                      :schulname="selectedSchuleId || ''"
+                      :schulname="selectedSchule || ''"
                       :isLoading="organisationStore.loading"
                       :useIconActivator="false"
                       @onDeleteKlasse="deleteKlasseById(currentKlasseId)"

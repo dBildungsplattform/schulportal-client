@@ -11,7 +11,7 @@ type ValidationSchema = {
 export const getValidationSchema = (t: (key: string) => string): TypedSchema<ValidationSchema> => {
   return toTypedSchema(
     object({
-      selectedSchuleId: string().required(t('admin.klasse.rules.schule.required')),
+      selectedSchule: string().required(t('admin.klasse.rules.schule.required')),
       selectedKlassenname: string()
         .matches(DIN_91379A_EXT, t('admin.klasse.rules.klassenname.matches')) // Generic validation for class name format
         .matches(HAS_LETTER_OR_NUMBER, t('admin.klasse.rules.klassenname.mustContainLetterOrNumber')) // Specific error for no letters/numbers
