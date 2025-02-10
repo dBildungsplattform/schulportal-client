@@ -52,27 +52,24 @@
     { immediate: true },
   );
 
-  // is set if user has KLASSE_VERWALTEN at exactly one schule
   const autoselectedSchuleId: ComputedRef<string | null> = computed(() => {
-    if (!authStore.currentUser?.personenkontexte) return null;
-    const pksWithKlasseVerwaltenPermission: Array<PersonenkontextRolleFieldsResponse> =
-      authStore.currentUser.personenkontexte.filter(
-        (personenkontextRolleFieldsResponse: PersonenkontextRolleFieldsResponse) =>
-          personenkontextRolleFieldsResponse.rolle.systemrechte.includes(RollenSystemRecht.KlassenVerwalten),
-      );
-    if (pksWithKlasseVerwaltenPermission.length > 1) return null;
-    const schulenWithKlasseVerwaltenPermission: Array<PersonenkontextRolleFieldsResponse> =
-      pksWithKlasseVerwaltenPermission.filter((personenkontext: PersonenkontextRolleFieldsResponse) => {
+    const { currentUser }: AuthStore = authStore;
+    if (!currentUser?.personenkontexte) return null;
+    // Find all contexts where the user has KlassenVerwalten
+    const schuleIdsWithKlasseVerwaltenPermission: Array<string> = currentUser.personenkontexte.reduce(
+      (acc: Array<string>, personenkontext: PersonenkontextRolleFieldsResponse) => {
+        if (!personenkontext.rolle.systemrechte.includes(RollenSystemRecht.KlassenVerwalten)) return acc;
         const schulZuordnung: DBiamPersonenzuordnungResponse | undefined =
           personStore.personenuebersicht?.zuordnungen.find(
             (z: DBiamPersonenzuordnungResponse) =>
               z.sskId === personenkontext.organisationsId && z.typ === OrganisationsTyp.Schule,
           );
-        return schulZuordnung !== undefined;
-      });
-    if (schulenWithKlasseVerwaltenPermission.length === 1)
-      return schulenWithKlasseVerwaltenPermission[0]!.organisationsId;
-    return null;
+        if (schulZuordnung) acc.push(personenkontext.organisationsId);
+        return acc;
+      },
+      [],
+    );
+    return schuleIdsWithKlasseVerwaltenPermission.length === 1 ? schuleIdsWithKlasseVerwaltenPermission[0]! : null;
   });
   const hasAutoselectedSchule: ComputedRef<boolean> = computed(() => autoselectedSchuleId.value !== null);
 
