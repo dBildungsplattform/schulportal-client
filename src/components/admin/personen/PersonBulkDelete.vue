@@ -64,7 +64,7 @@
       :header="$t('admin.person.deletePerson')"
     >
       <v-container
-        class="mt-8"
+        class="mt-8 mb-4"
         v-if="progress == 0"
       >
         <v-row class="text-body bold justify-center">
@@ -73,57 +73,56 @@
           </span>
         </v-row>
       </v-container>
-      <v-container>
+
+      <v-container
+        v-if="progress > 0"
+        class="mt-4"
+      >
         <!-- Progress Bar -->
-        <div
-          v-if="progress > 0"
-          class="mt-4"
+        <v-container
+          v-if="successMessage"
+          data-testid="person-delete-success-text"
         >
-          <v-container
-            v-if="successMessage"
-            data-testid="person-delete-success-text"
-          >
-            <v-row justify="center">
-              <v-col cols="auto">
-                <v-icon
-                  small
-                  color="#1EAE9C"
-                  icon="mdi-check-circle"
-                ></v-icon>
-              </v-col>
-            </v-row>
-            <p class="mt-2 text-center">
-              {{ successMessage }}
-            </p>
-          </v-container>
-          <v-row
-            v-if="progress < 100"
-            align="center"
-            justify="center"
-          >
+          <v-row justify="center">
             <v-col cols="auto">
               <v-icon
-                aria-hidden="true"
-                class="mr-2"
-                icon="mdi-alert-circle-outline"
-                size="small"
+                small
+                color="#1EAE9C"
+                icon="mdi-check-circle"
               ></v-icon>
-              <span class="subtitle-2">
-                {{ $t('admin.doNotCloseBrowserNotice') }}
-              </span>
             </v-col>
           </v-row>
-          <v-progress-linear
-            class="mt-5"
-            :modelValue="progress"
-            color="primary"
-            height="25"
-          >
-            <template v-slot:default="{ value }">
-              <strong class="text-white">{{ Math.ceil(value) }}%</strong>
-            </template>
-          </v-progress-linear>
-        </div>
+          <p class="mt-2 text-center">
+            {{ successMessage }}
+          </p>
+        </v-container>
+        <v-row
+          v-if="progress < 100"
+          align="center"
+          justify="center"
+        >
+          <v-col cols="auto">
+            <v-icon
+              aria-hidden="true"
+              class="mr-2"
+              icon="mdi-alert-circle-outline"
+              size="small"
+            ></v-icon>
+            <span class="subtitle-2">
+              {{ $t('admin.doNotCloseBrowserNotice') }}
+            </span>
+          </v-col>
+        </v-row>
+        <v-progress-linear
+          class="mt-5"
+          :modelValue="progress"
+          color="primary"
+          height="25"
+        >
+          <template v-slot:default="{ value }">
+            <strong class="text-white">{{ Math.ceil(value) }}%</strong>
+          </template>
+        </v-progress-linear>
       </v-container>
 
       <v-card-actions class="justify-center">
