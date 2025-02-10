@@ -4,14 +4,13 @@
   import {
     OrganisationsTyp,
     useOrganisationStore,
-    type Organisation,
     type OrganisationenFilter,
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
   import { RollenSystemRecht } from '@/stores/RolleStore';
   import type { TranslatedObject } from '@/types';
   import { type BaseFieldProps } from 'vee-validate';
-  import { computed, defineProps, ref, watch, type ComputedRef, type ModelRef, type Ref } from 'vue';
+  import { computed, ref, watch, type ComputedRef, type ModelRef, type Ref } from 'vue';
 
   const searchInputSchule: Ref<string> = ref('');
   const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
@@ -26,6 +25,7 @@
     selectedKlassennameProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     showUnsavedChangesDialog?: boolean;
     isEditActive?: boolean;
+    autoselectedSchuleId: string | null;
     isLoading: boolean;
     onHandleConfirmUnsavedChanges: () => void;
     onHandleDiscard: () => void;
@@ -34,25 +34,25 @@
   };
 
   const props: Props = defineProps<Props>();
+  // derive this from props by checking id against props.schulen
+  const hasAutoselected: ComputedRef<boolean> = computed(() => props.autoselectedSchuleId !== null);
   const selectedSchuleId: ModelRef<string | undefined, string> = defineModel('selectedSchule');
   const selectedSchuleTitle: ComputedRef<string> = computed(() => {
     return props.schulen?.find((schule: TranslatedObject) => schule.value === selectedSchuleId.value)?.title || '';
   });
   const selectedKlassenname: ModelRef<string | undefined, string> = defineModel('selectedKlassenname');
 
-  // Watcher to auto-select if there is only one schule
   watch(
-    () => organisationStore.autoselectedSchule,
-    (newValue: Organisation | null) => {
-      selectedSchuleId.value = newValue ? organisationStore.autoselectedSchule?.id : undefined;
+    () => props.autoselectedSchuleId,
+    (newId: string | null) => {
+      selectedSchuleId.value = newId || undefined;
     },
-    { immediate: true },
   );
 
   // Watcher to detect when the search input for Organisationen is triggered.
   watch(searchInputSchule, async (newValue: string | undefined) => {
     clearTimeout(timerId.value);
-    if (organisationStore.autoselectedSchule) return;
+    if (hasAutoselected.value) return;
     if (newValue !== '' && newValue === selectedSchuleTitle.value) return;
 
     const organisationFilter: OrganisationenFilter = {
@@ -102,11 +102,11 @@
       >
         <v-autocomplete
           autocomplete="off"
-          :class="[{ 'filter-dropdown mb-4': organisationStore.autoselectedSchule }, { selected: selectedSchuleId }]"
+          :class="['filter-dropdown mb-4', { selected: selectedSchuleId }]"
           clearable
           data-testid="schule-select"
           density="compact"
-          :disabled="!!organisationStore.autoselectedSchule || readonly"
+          :disabled="hasAutoselected || readonly"
           id="schule-select"
           :items="schulen"
           item-value="value"

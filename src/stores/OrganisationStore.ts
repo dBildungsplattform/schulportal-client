@@ -63,7 +63,6 @@ type OrganisationState = {
     schulen: Array<Organisation>;
     loading: boolean;
   };
-  autoselectedSchule: Organisation | null;
   allSchulen: Array<Organisation>;
   currentOrganisation: Organisation | null;
   currentKlasse: Organisation | null;
@@ -101,7 +100,6 @@ type OrganisationGetters = {};
 type OrganisationActions = {
   getAllOrganisationen: (filter?: OrganisationenFilter) => Promise<void>;
   getFilteredSchulen(filter?: OrganisationenFilter): Promise<void>;
-  getAutoselectedSchule(): Promise<void>;
   getFilteredKlassen(filter?: OrganisationenFilter): Promise<void>;
   getKlassenByOrganisationId: (filter?: OrganisationenFilter) => Promise<void>;
   getOrganisationById: (organisationId: string, organisationsTyp: OrganisationsTyp) => Promise<Organisation>;
@@ -143,7 +141,6 @@ export const useOrganisationStore: StoreDefinition<
         schulen: [],
         loading: false,
       },
-      autoselectedSchule: null,
       allSchulen: [],
       currentOrganisation: null,
       currentKlasse: null,
@@ -272,29 +269,6 @@ export const useOrganisationStore: StoreDefinition<
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
         this.filteredSchulen.loading = false;
-      }
-    },
-
-    async getAutoselectedSchule() {
-      this.loading = true;
-      try {
-        const response: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations(
-          undefined,
-          2,
-          undefined,
-          undefined,
-          undefined,
-          OrganisationsTyp.Schule,
-          [RollenSystemRecht.KlassenVerwalten],
-          undefined,
-          undefined,
-          undefined,
-        );
-        this.autoselectedSchule = response.data.length === 1 ? (response.data[0] ?? null) : null;
-      } catch (error: unknown) {
-        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
-      } finally {
-        this.loading = false;
       }
     },
 

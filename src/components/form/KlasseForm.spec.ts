@@ -49,6 +49,7 @@ beforeEach(() => {
       onHandleDiscard: () => '',
       onShowDialogChange: (value: boolean | undefined) => value,
       onSubmit: () => '',
+      autoselectedSchuleId: null,
       schulen: translatedSchulen,
     },
     global: {
@@ -82,8 +83,8 @@ describe('Schule searchInput', () => {
   describe('when schule is autoselected', async () => {
     const schule: TranslatedObject = translatedSchulen[0]!;
     beforeEach(async () => {
-      organisationStore.autoselectedSchule = schulen[0]!;
       wrapper!.setProps({
+        autoselectedSchuleId: schule.value,
         schulen: [schule],
       });
       await nextTick();
@@ -104,7 +105,7 @@ describe('Schule searchInput', () => {
       expect(inputElement!.hasAttribute('disabled')).toBeTruthy();
       expect(wrapper?.find('[data-testid="schule-select"]').text()).toContain(schule.title);
 
-      organisationStore.autoselectedSchule = null;
+      wrapper?.setProps({ autoselectedSchuleId: null });
       await nextTick();
 
       inputElement = document.querySelector('#schule-select');
@@ -124,7 +125,7 @@ describe('Schule searchInput', () => {
     });
 
     test.each([
-      ['selected schule', schule.title],
+      ['already selected schule', schule.title],
       ['empty string', ''],
     ])('does nothing, if searching for %s', async (_label: string, searchInput: string) => {
       schuleAutoComplete?.vm.$emit('update:search', searchInput);

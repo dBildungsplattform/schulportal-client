@@ -1,19 +1,22 @@
 <script setup lang="ts">
+  import type { DBiamPersonenzuordnungResponse, PersonenkontextRolleFieldsResponse } from '@/api-client/generated';
   import SuccessTemplate from '@/components/admin/klassen/SuccessTemplate.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import KlasseForm from '@/components/form/KlasseForm.vue';
+  import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import {
     OrganisationsTyp,
     useOrganisationStore,
     type Organisation,
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
+  import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
   import { RollenSystemRecht } from '@/stores/RolleStore';
   import { type TranslatedObject } from '@/types.d';
   import { getValidationSchema, getVuetifyConfig } from '@/utils/validationKlasse';
   import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
-  import { computed, onMounted, onUnmounted, ref, type ComputedRef, type Ref } from 'vue';
+  import { computed, onMounted, onUnmounted, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import {
     onBeforeRouteLeave,
@@ -25,9 +28,53 @@
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const router: Router = useRouter();
+  const authStore: AuthStore = useAuthStore();
+  const personStore: PersonStore = usePersonStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
+  // get personenuebersicht for the current user, if we don't have it
+  watch(
+    () => ({
+      uebersicht: personStore.personenuebersicht,
+      currentUser: authStore.currentUser,
+    }),
+    async ({
+      uebersicht,
+      currentUser,
+    }: {
+      uebersicht: PersonStore['personenuebersicht'];
+      currentUser: AuthStore['currentUser'];
+    }) => {
+      if (!(currentUser && currentUser.personId)) return;
+      if (uebersicht && uebersicht.personId === currentUser.personId) return;
 
-  const hasAutoselectedSchule: ComputedRef<boolean> = computed(() => organisationStore.autoselectedSchule !== null);
+      await personStore.getPersonenuebersichtById(currentUser.personId);
+    },
+    { immediate: true },
+  );
+
+  // is set if user has KLASSE_VERWALTEN at exactly one schule
+  const autoselectedSchuleId: ComputedRef<string | null> = computed(() => {
+    if (!authStore.currentUser?.personenkontexte) return null;
+    const pksWithKlasseVerwaltenPermission: Array<PersonenkontextRolleFieldsResponse> =
+      authStore.currentUser.personenkontexte.filter(
+        (personenkontextRolleFieldsResponse: PersonenkontextRolleFieldsResponse) =>
+          personenkontextRolleFieldsResponse.rolle.systemrechte.includes(RollenSystemRecht.KlassenVerwalten),
+      );
+    if (pksWithKlasseVerwaltenPermission.length > 1) return null;
+    const schulenWithKlasseVerwaltenPermission: Array<PersonenkontextRolleFieldsResponse> =
+      pksWithKlasseVerwaltenPermission.filter((personenkontext: PersonenkontextRolleFieldsResponse) => {
+        const schulZuordnung: DBiamPersonenzuordnungResponse | undefined =
+          personStore.personenuebersicht?.zuordnungen.find(
+            (z: DBiamPersonenzuordnungResponse) =>
+              z.sskId === personenkontext.organisationsId && z.typ === OrganisationsTyp.Schule,
+          );
+        return schulZuordnung !== undefined;
+      });
+    if (schulenWithKlasseVerwaltenPermission.length === 1)
+      return schulenWithKlasseVerwaltenPermission[0]!.organisationsId;
+    return null;
+  });
+  const hasAutoselectedSchule: ComputedRef<boolean> = computed(() => autoselectedSchuleId.value !== null);
 
   const validationSchema: TypedSchema = getValidationSchema(t);
 
@@ -36,7 +83,7 @@
   }): { props: { error: boolean; 'error-messages': Array<string> } } => getVuetifyConfig(state);
 
   type KlasseCreationForm = {
-    selectedSchule: string;
+    selectedSchuleId: string;
     selectedKlassenname: string;
   };
 
@@ -45,10 +92,10 @@
     validationSchema,
   });
 
-  const [selectedSchule, selectedSchuleProps]: [
-    Ref<string>,
+  const [selectedSchuleId, selectedSchuleProps]: [
+    Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedSchule', vuetifyConfig);
+  ] = defineField('selectedSchuleId', vuetifyConfig);
   const [selectedKlassenname, selectedKlassennameProps]: [
     Ref<string>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
@@ -64,6 +111,17 @@
       .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
   });
 
+  watch(
+    autoselectedSchuleId,
+    (newAutoSelectedOrgId: string | null) => {
+      const selectedSchule: TranslatedObject | undefined = filteredSchulen.value?.find(
+        (schule: TranslatedObject) => schule.value === newAutoSelectedOrgId,
+      );
+      selectedSchuleId.value = selectedSchule?.value;
+    },
+    { immediate: true },
+  );
+
   const translatedSchulname: ComputedRef<string> = computed(
     () =>
       filteredSchulen.value?.find(
@@ -72,7 +130,7 @@
   );
 
   function isFormDirty(): boolean {
-    const schuleDirty: boolean = hasAutoselectedSchule.value ? false : isFieldDirty('selectedSchule');
+    const schuleDirty: boolean = hasAutoselectedSchule.value ? false : isFieldDirty('selectedSchuleId');
     return schuleDirty || isFieldDirty('selectedKlassenname');
   }
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
@@ -86,16 +144,12 @@
   }
 
   async function initStores(): Promise<void> {
-    await Promise.all([
-      // make sure we can determine if autoselection is required
-      organisationStore.getAutoselectedSchule(),
-      // initial options for autocomplete
-      organisationStore.getFilteredSchulen({
-        includeTyp: OrganisationsTyp.Schule,
-        systemrechte: [RollenSystemRecht.KlassenVerwalten],
-        limit: 25,
-      }),
-    ]);
+    // initial options for autocomplete
+    await organisationStore.getFilteredSchulen({
+      includeTyp: OrganisationsTyp.Schule,
+      systemrechte: [RollenSystemRecht.KlassenVerwalten],
+      limit: 25,
+    });
     organisationStore.createdKlasse = null;
     organisationStore.errorCode = '';
   }
@@ -145,8 +199,8 @@
       undefined,
       OrganisationsTyp.Klasse,
       undefined,
-      selectedSchule.value,
-      selectedSchule.value,
+      selectedSchuleId.value,
+      selectedSchuleId.value,
     );
     resetForm();
   });
@@ -180,6 +234,7 @@
       <!-- The form to create a new Klasse -->
       <template v-if="!organisationStore.createdKlasse">
         <KlasseForm
+          :autoselected-schule-id="autoselectedSchuleId"
           :errorCode="organisationStore.errorCode"
           :schulen="filteredSchulen"
           :isEditActive="true"
@@ -193,7 +248,7 @@
           :onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
           :onSubmit="onSubmit"
           ref="klasse-creation-form"
-          v-model:selectedSchule="selectedSchule"
+          v-model:selectedSchule="selectedSchuleId"
           v-model:selectedKlassenname="selectedKlassenname"
         >
           <!-- Error Message Display if error on submit -->

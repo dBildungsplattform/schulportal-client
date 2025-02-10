@@ -30,7 +30,7 @@
   const organisationStore: OrganisationStore = useOrganisationStore();
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
 
-  const currentOrganisationId: string = route.params['id'] as string;
+  const currentKlasseId: string = route.params['id'] as string;
   const isEditActive: Ref<boolean> = ref(false);
 
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
@@ -51,7 +51,7 @@
   }): { props: { error: boolean; 'error-messages': Array<string> } } => getVuetifyConfig(state);
 
   type KlasseEditForm = {
-    selectedSchule: string;
+    selectedSchuleId: string;
     selectedKlassenname: string;
   };
 
@@ -60,10 +60,10 @@
     validationSchema,
   });
 
-  const [selectedSchule, selectedSchuleProps]: [
+  const [selectedSchuleId, selectedSchuleProps]: [
     Ref<string>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedSchule', vuetifyConfig);
+  ] = defineField('selectedSchuleId', vuetifyConfig);
   const [selectedKlassenname, selectedKlassennameProps]: [
     Ref<string>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
@@ -121,9 +121,9 @@
   };
 
   const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
-    if (selectedSchule.value && selectedKlassenname.value) {
+    if (selectedSchuleId.value && selectedKlassenname.value) {
       if (organisationStore.currentOrganisation) {
-        await organisationStore.updateOrganisationById(currentOrganisationId, selectedKlassenname.value);
+        await organisationStore.updateOrganisationById(currentKlasseId, selectedKlassenname.value);
       }
       resetForm();
     }
@@ -155,7 +155,7 @@
     organisationStore.errorCode = '';
     organisationStore.updatedOrganisation = null;
     // Retrieves the Klasse using the Id in the route since that's all we have
-    await organisationStore.getOrganisationById(currentOrganisationId, OrganisationsTyp.Klasse);
+    await organisationStore.getOrganisationById(currentKlasseId, OrganisationsTyp.Klasse);
     // Retrieves the parent Organisation of the Klasse using the same endpoint but with a different parameter
     if (organisationStore.currentKlasse?.administriertVon) {
       await organisationStore.getOrganisationById(
@@ -165,7 +165,7 @@
     }
 
     // Set the initial values using the computed properties
-    setFieldValue('selectedSchule', translatedSchulname.value || '');
+    setFieldValue('selectedSchuleId', translatedSchulname.value || '');
     setFieldValue('selectedKlassenname', organisationStore.currentKlasse?.name || '');
 
     /* listen for browser changes and prevent them when form is dirty */
@@ -206,6 +206,7 @@
         <v-container>
           <div v-if="organisationStore.currentOrganisation">
             <KlasseForm
+              :autoselectedSchuleId="organisationStore.currentOrganisation.id"
               :errorCode="organisationStore.errorCode"
               :isEditActive="isEditActive"
               :isLoading="organisationStore.loading"
@@ -218,7 +219,7 @@
               :onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
               :onSubmit="onSubmit"
               ref="klasse-creation-form"
-              v-model:selectedSchule="selectedSchule"
+              v-model:selectedSchule="selectedSchuleId"
               v-model:selectedKlassenname="selectedKlassenname"
             >
               <!-- Error Message Display -->
@@ -264,10 +265,10 @@
                       :klassenname="organisationStore.currentKlasse?.name || ''"
                       :klassenId="organisationStore.currentKlasse?.id || ''"
                       ref="klasse-delete"
-                      :schulname="selectedSchule || ''"
+                      :schulname="selectedSchuleId || ''"
                       :isLoading="organisationStore.loading"
                       :useIconActivator="false"
-                      @onDeleteKlasse="deleteKlasseById(currentOrganisationId)"
+                      @onDeleteKlasse="deleteKlasseById(currentKlasseId)"
                     >
                     </KlasseDelete>
                   </div>
