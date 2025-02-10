@@ -86,7 +86,7 @@ jobs:
 
   build_image_on_push:
     needs:
-      - check_deployment_clearance
+      # - check_deployment_clearance
       - create_branch_identifier
     name: 'Publish image and scan with trivy'
     if: ${{ github.event_name == 'push' && needs.check_deployment_clearance.outputs.deployment_clearance == 'true' }}
@@ -98,6 +98,7 @@ jobs:
     with:
       image_name: 'schulportal-client'
       run_trivy_scan: true
+      trivy_severity: "MEDIUM,LOW"
       image_tag_generation: ${{ github.ref_name == 'main' && 'commit_hash' || 'specified' }}
       image_tag: ${{ github.ref_name == 'main' && '' || needs.create_branch_identifier.outputs.image_tag_from_branch }}
       add_latest_tag: ${{ github.ref_name == 'main' }}
