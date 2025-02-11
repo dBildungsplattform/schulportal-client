@@ -221,7 +221,7 @@ jobs:
       severity: 'MEDIUM'
 
   trivy_scan_rocketchat_notification:
-    if: failure()
+    # if: failure()
     name: Send Notification to Rocket Chat
     needs:
       - scheduled_trivy_scan
