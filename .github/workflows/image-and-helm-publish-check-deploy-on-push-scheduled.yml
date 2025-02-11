@@ -224,7 +224,7 @@ jobs:
     if: failure()
     name: Send Notification to Rocket Chat
     needs:
-      - scheduled_trivy_scan:
+      - scheduled_trivy_scan
     uses: RocketChat/Rocket.Chat.GitHub.Action.Notification@1.1.1
     with:
       type: ${{ job.status }}
