@@ -210,12 +210,25 @@ jobs:
   # Scheduled
   scheduled_trivy_scan:
     name: 'Scheduled trivy scan of latest image'
-    if: ${{ github.event_name == 'schedule' }}
+    # if: ${{ github.event_name == 'schedule' }}
     permissions:
       packages: read
       security-events: write
-    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-trivy.yaml@7
-    with:
-      image_ref: 'ghcr.io/${{ github.repository_owner }}/schulportal-client:latest'
-      fail_on_vulnerabilites: false
-      report_location: 'Dockerfile'
+    steps:
+    - uses: actions/upload-artifact@v4
+      uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-trivy.yaml@DBP-1264-improve-pipeline
+      with:
+        image_ref: 'ghcr.io/${{ github.repository_owner }}/schulportal-client:latest'
+        fail_on_vulnerabilites: true
+        report_location: 'Dockerfile'
+
+    - name: Send Notification to Rocket Chat
+      uses: RocketChat/Rocket.Chat.GitHub.Action.Notification@1.1.1
+      if: failure()
+      with:
+        type: ${{ job.status }}
+        job_name: 'Daily nightly Image Check failed - CVEs found'
+        url: ${{ secrets.RC_WEBHOOK_SPSH_DEVELOPER_CHANNEL }}
+        channel: '#SPSH-Developer'
+        username: CVE Info
+        severity: 'MEDIUM'
