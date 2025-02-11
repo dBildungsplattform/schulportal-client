@@ -95,15 +95,6 @@
     organisationStore.errorCode = '';
   }
 
-  onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
-    if (isFormDirty()) {
-      showUnsavedChangesDialog.value = true;
-      blockedNext = next;
-    } else {
-      next();
-    }
-  });
-
   const handleCreateAnotherKlasse = async (): Promise<void> => {
     resetForm();
     await initStores();
@@ -154,6 +145,16 @@
 
   onUnmounted(() => {
     window.removeEventListener('beforeunload', preventNavigation);
+  });
+
+  onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
+    if (isFormDirty()) {
+      console.log("hamid")
+      showUnsavedChangesDialog.value = true;
+      blockedNext = next;
+    } else {
+      next();
+    }
   });
 </script>
 
