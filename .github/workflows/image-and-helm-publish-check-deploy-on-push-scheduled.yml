@@ -221,6 +221,9 @@ jobs:
       severity: 'MEDIUM'
 
   trivy_scan_rocketchat_notification:
+    if: failure()
+    needs:
+    - scheduled_trivy_scan
     runs-on: 'ubuntu-latest'
     steps:
     - name: Send Notification to Rocket Chat
