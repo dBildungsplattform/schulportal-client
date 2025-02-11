@@ -220,7 +220,7 @@ jobs:
       report_location: 'Dockerfile'
       # set back empty after testing
       severity: 'MEDIUM'
-      ignorefile: '.trivyignore'
+      trivyignores: '.trivyignore'
 
   trivy_scan_rocketchat_notification:
     if: failure()
