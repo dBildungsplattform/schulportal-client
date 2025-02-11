@@ -4,10 +4,10 @@ import { getResponseErrorCode } from '@/utils/errorHandlers';
 import {
   OrganisationenApiFactory,
   OrganisationsTyp,
+  RollenSystemRecht,
   TraegerschaftTyp,
   type OrganisationenApiInterface,
   type CreateOrganisationBodyParams,
-  type RollenSystemRecht,
   type OrganisationByNameBodyParams,
   type ParentOrganisationenResponse,
   type OrganisationRootChildrenResponse,
@@ -55,10 +55,19 @@ export type SchuleTableItem = {
   updatedAt?: string;
 };
 
+export type AutoCompleteStore<T> = {
+  selectedItems: Array<T>;
+  filterResult: Array<T>;
+  total: number;
+  loading: boolean;
+};
+
 type OrganisationState = {
   allOrganisationen: Array<Organisation>;
   allKlassen: Array<Organisation>;
   allSchulen: Array<Organisation>;
+  schulenFilter: AutoCompleteStore<Organisation>;
+  autoselectedSchule: Organisation | null;
   currentOrganisation: Organisation | null;
   currentKlasse: Organisation | null;
   updatedOrganisation: Organisation | null;
@@ -95,6 +104,7 @@ type OrganisationGetters = {};
 type OrganisationActions = {
   getAllOrganisationen: (filter?: OrganisationenFilter) => Promise<void>;
   getFilteredKlassen(filter?: OrganisationenFilter): Promise<void>;
+  getAutoselectedSchule: () => Promise<void>;
   getKlassenByOrganisationId: (filter?: OrganisationenFilter) => Promise<void>;
   getOrganisationById: (organisationId: string, organisationsTyp: OrganisationsTyp) => Promise<Organisation>;
   getLockingOrganisationById: (organisationId: string) => Promise<void>;
@@ -114,6 +124,8 @@ type OrganisationActions = {
   getSchultraeger: () => Promise<void>;
   fetchSchuleDetailsForKlassen: (filterActive: boolean) => Promise<void>;
   setItsLearningForSchule: (organisationId: string) => Promise<void>;
+  loadSchulenForFilter(filter?: OrganisationenFilter): Promise<void>;
+  resetSchulFilter(): void;
 };
 
 export { OrganisationsTyp };
@@ -131,6 +143,13 @@ export const useOrganisationStore: StoreDefinition<
       allOrganisationen: [],
       allKlassen: [],
       allSchulen: [],
+      schulenFilter: {
+        selectedItems: [],
+        filterResult: [],
+        total: 0,
+        loading: false,
+      },
+      autoselectedSchule: null,
       currentOrganisation: null,
       currentKlasse: null,
       updatedOrganisation: null,
@@ -260,6 +279,32 @@ export const useOrganisationStore: StoreDefinition<
         return await Promise.reject(this.errorCode);
       } finally {
         this.loadingKlassen = false;
+      }
+    },
+    async getAutoselectedSchule() {
+      this.errorCode = '';
+      this.loading = true;
+      try {
+        const response: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations(
+          0,
+          2,
+          undefined,
+          undefined,
+          undefined,
+          OrganisationsTyp.Schule,
+          [RollenSystemRecht.KlassenVerwalten],
+          undefined,
+          undefined,
+          undefined,
+        );
+        this.autoselectedSchule = response.data.length === 1 ? (response.data[0] ?? null) : null;
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.i18nKey || 'ORGANISATION_SPECIFICATION_ERROR';
+        }
+      } finally {
+        this.schulenFilter.loading = false;
       }
     },
 
@@ -443,6 +488,42 @@ export const useOrganisationStore: StoreDefinition<
       } finally {
         this.loading = false;
       }
+    },
+
+    async loadSchulenForFilter(filter?: OrganisationenFilter): Promise<void> {
+      this.errorCode = '';
+      this.schulenFilter.loading = true;
+      try {
+        const response: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations(
+          filter?.offset,
+          filter?.limit,
+          undefined,
+          undefined,
+          filter?.searchString,
+          filter?.includeTyp,
+          filter?.systemrechte,
+          filter?.excludeTyp,
+          filter?.administriertVon,
+          filter?.organisationIds,
+        );
+        this.schulenFilter.filterResult = response.data;
+        this.schulenFilter.total = +response.headers['x-paging-total'];
+      } catch (error: unknown) {
+        this.errorCode = 'UNSPECIFIED_ERROR';
+        if (isAxiosError(error)) {
+          this.errorCode = error.response?.data.i18nKey || 'ORGANISATION_SPECIFICATION_ERROR';
+        }
+      } finally {
+        this.schulenFilter.loading = false;
+      }
+    },
+    resetSchulFilter(): void {
+      this.schulenFilter = {
+        filterResult: [],
+        selectedItems: [],
+        loading: false,
+        total: 0,
+      };
     },
   },
 });
