@@ -220,15 +220,12 @@ jobs:
       report_location: 'Dockerfile'
       severity: 'MEDIUM'
 
-  # trivy_scan_rocketchat_notification:
-  #   # if: failure()
-  #   name: Send Notification to Rocket Chat
-  #   # needs:
-  #   #   - scheduled_trivy_scan
-  #   uses: RocketChat/Rocket.Chat.GitHub.Action.Notification@1.1.1
-  #   with:
-  #     type: ${{ job.status }}
-  #     job_name: 'Daily nightly Image Check failed - CVEs found'
-  #     url: ${{ secrets.RC_WEBHOOK_SPSH_DEVELOPER_CHANNEL }}
-  #     channel: '#SPSH-Developer'
-  #     username: "CVE Info"
+  trivy_scan_rocketchat_notification:
+    name: Send Notification to Rocket Chat
+    uses: RocketChat/Rocket.Chat.GitHub.Action.Notification@1.1.1
+    with:
+      type: ${{ job.status }}
+      job_name: 'Daily nightly Image Check failed - CVEs found'
+      url: ${{ secrets.RC_WEBHOOK_SPSH_DEVELOPER_CHANNEL }}
+      channel: '#SPSH-Developer'
+      username: "CVE Info"
