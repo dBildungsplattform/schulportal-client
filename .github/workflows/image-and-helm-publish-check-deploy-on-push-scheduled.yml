@@ -218,7 +218,9 @@ jobs:
       image_ref: 'ghcr.io/${{ github.repository_owner }}/schulportal-client:latest'
       fail_on_vulnerabilites: true
       report_location: 'Dockerfile'
-      severity: 'HIGH'
+      # set back empty after testing
+      severity: 'MEDIUM'
+      ignorefile: '.trivyignore'
 
   trivy_scan_rocketchat_notification:
     if: failure()
@@ -232,5 +234,5 @@ jobs:
         type: ${{ job.status }}
         job_name: 'Daily nightly Image Check failed - CVEs found'
         url: ${{ secrets.RC_WEBHOOK_SPSH_DEVELOPER_CHANNEL }}
-        channel: '#SPSH-Developer'
-        username: "CVE Info"
+        # channel: '#SPSH-Developer'
+        # username: "CVE Info"
