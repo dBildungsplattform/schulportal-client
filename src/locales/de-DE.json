@@ -169,7 +169,9 @@
       "creationErrorTitle": "Fehler beim Anlegen des Benutzers",
       "deletePerson": "Benutzer löschen",
       "deletePersonConfirmation": "Wollen Sie den Benutzer {firstname} {lastname} sofort und endgültig löschen?",
+      "deletePersonBulkConfirmation": "Möchten Sie wirklich alle Benutzer sofort und endgültig löschen?",
       "deletePersonSuccessMessage": "{firstname} {lastname} wurde erfolgreich gelöscht.",
+      "deletePersonBulkSuccessMessage": "Die Benutzer wurden erfolgreich gelöscht.",
       "devicePassword": {
         "createDevicePassword": "Inbetriebnahme-Passwort erzeugen",
         "createPassword": "Passwort erzeugen",
