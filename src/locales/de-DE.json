@@ -505,10 +505,24 @@
       "showAll": "Alle Schulen anzeigen"
     },
     "schultraeger": {
+      "addNew": "Neuen Schultraeger hinzufügen",
+      "assignSchultraegerform": "Neuen Schulträgerform zuordnen",
+      "create": "Schulträger anlegen",
+      "createNew": "Neuen Schulträger anlegen",
+      "discard": "Schulträger verwerfen",
+      "enterschultraegername": "Schulträgername eingeben",
       "errors": {
         "TRAEGER_IN_TRAEGER": "Ein Schulträger darf nur einem anderen Schulträger zugeordnet werden."
       },
-      "management": "Schulträgerverwaltung"
+      "management": "Schulträgerverwaltung",
+      "rules":{
+        "schultraegername": {
+          "matches": "Der Schulträgername darf keine ungültigen Zeichen beinhalten.",
+          "noLeadingTrailingSpaces": "Der Schulträgername darf nicht mit Leerzeichen beginnen oder enden.",
+          "required": "Der Schulträgername muss angegeben werden."
+        }
+      },
+      "schultraegername": "Schulträgername"
     },
     "serviceProvider": {
       "assignServiceProvider": "Angebote zuordnen",

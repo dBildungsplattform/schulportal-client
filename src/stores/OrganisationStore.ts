@@ -64,6 +64,7 @@ type OrganisationState = {
   updatedOrganisation: Organisation | null;
   createdKlasse: Organisation | null;
   createdSchule: Organisation | null;
+  createdSchultraeger: Organisation | null;
   lockingOrganisation: Organisation | null;
   totalKlassen: number;
   totalSchulen: number;
@@ -136,6 +137,7 @@ export const useOrganisationStore: StoreDefinition<
       updatedOrganisation: null,
       createdKlasse: null,
       createdSchule: null,
+      createdSchultraeger: null,
       lockingOrganisation: null,
       totalKlassen: 0,
       totalSchulen: 0,
@@ -378,6 +380,8 @@ export const useOrganisationStore: StoreDefinition<
           this.createdKlasse = data;
         } else if (typ === OrganisationsTyp.Schule) {
           this.createdSchule = data;
+        } else if (typ === OrganisationsTyp.Traeger) {
+          this.createdSchultraeger = data;
         }
         return data;
       } catch (error: unknown) {
