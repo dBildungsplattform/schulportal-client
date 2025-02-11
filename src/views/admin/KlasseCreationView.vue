@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import SuccessTemplate from '@/components/admin/klassen/SuccessTemplate.vue';
+  import KlasseSuccessTemplate from '@/components/admin/klassen/KlasseSuccessTemplate.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import KlasseForm from '@/components/form/KlasseForm.vue';
@@ -207,7 +207,7 @@
 
       <!-- Result template on success after submit -->
       <template v-if="organisationStore.createdKlasse && !organisationStore.errorCode">
-        <SuccessTemplate
+        <KlasseSuccessTemplate
           :successMessage="$t('admin.klasse.klasseAddedSuccessfully')"
           :followingDataCreated="$t('admin.followingDataCreated')"
           :createdData="[

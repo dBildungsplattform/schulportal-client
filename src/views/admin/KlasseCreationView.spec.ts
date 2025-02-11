@@ -1,7 +1,7 @@
 import type { OrganisationResponse } from '@/api-client/generated';
 import routes from '@/router/routes';
 import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
-import { VueWrapper, mount } from '@vue/test-utils';
+import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import { beforeEach, describe, expect, test, vi, type MockInstance } from 'vitest';
 import { nextTick } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
@@ -79,6 +79,34 @@ describe('KlasseCreationView', () => {
     await wrapper?.find('[data-testid="close-layout-card-button"]').trigger('click');
     expect(push).toHaveBeenCalledTimes(1);
   });
+
+  test('it cancels editing', async () => {
+    const push: MockInstance = vi.spyOn(router, 'push');
+    organisationStore.createdKlasse = null;
+    organisationStore.errorCode = '';
+
+    await wrapper?.find('[data-testid="klasse-form-discard-button"]').trigger('click');
+    await flushPromises();
+
+    expect(document.querySelector('[data-testid="unsaved-changes-warning-text"]')).toBeNull();
+    expect(push).toHaveBeenCalledTimes(1);
+  });
+
+  // test('it does not cancel editing because of unsaved changes', async () => {
+  //   organisationStore.createdKlasse = null;
+  //   organisationStore.errorCode = '';
+
+  //   await wrapper?.findComponent({ ref: 'klasse-creation-form' }).findComponent({ ref: 'schule-select' }).setValue('1');
+  //   await flushPromises();
+
+  //   await wrapper?.findComponent({ ref: 'klasse-creation-form' }).findComponent({ ref: 'klassenname-input' }).setValue('1b');
+  //   await flushPromises();
+
+  //   await wrapper?.find('[data-testid="klasse-form-discard-button"]').trigger('click');
+  //   await flushPromises();
+
+  //   expect(document.querySelector('[data-testid="unsaved-changes-warning-text"]')).not.toBeNull();
+  // });
 
   test('it fills form and triggers submit', async () => {
     const schuleSelect: VueWrapper | undefined = wrapper

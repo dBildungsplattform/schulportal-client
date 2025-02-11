@@ -37,7 +37,7 @@
   } from '@/utils/validationRolle';
   import RolleDelete from '@/components/admin/rollen/RolleDelete.vue';
   import { type TranslatedObject } from '@/types.d';
-  import SuccessTemplate from '@/components/admin/rollen/SuccessTemplate.vue';
+  import RolleSuccessTemplate from '@/components/admin/rollen/RolleSuccessTemplate.vue';
   import { isHiddenSystemrecht } from '@/utils/systemrechte';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
@@ -434,7 +434,7 @@
                 >
                   <v-btn
                     class="secondary"
-                    data-testid="rolle-edit-cancel"
+                    data-testid="rolle-edit-cancel-button"
                     @click="handleCancel"
                     :block="mdAndDown"
                   >
@@ -466,7 +466,7 @@
       </template>
       <!-- Result template on success after submit  -->
       <template v-if="rolleStore.updatedRolle && !rolleStore.errorCode">
-        <SuccessTemplate
+        <RolleSuccessTemplate
           :successMessage="$t('admin.rolle.rolleUpdatedSuccessfully')"
           :followingRolleDataCreated="$t('admin.followingDataCreated')"
           :createdRolleData="[
@@ -484,7 +484,7 @@
             {
               label: $t('admin.rolle.systemrechte'),
               value: translatedUpdatedSystemrecht,
-              testId: 'updated-rolle-systemrecht',
+              testId: 'updated-rolle-systemrechte',
             },
           ]"
           :backButtonText="$t('nav.backToDetails')"
