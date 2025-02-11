@@ -210,7 +210,6 @@ jobs:
   # Scheduled
   scheduled_trivy_scan:
     name: 'Scheduled trivy scan of latest image'
-    # if: ${{ github.event_name == 'schedule' }}
     permissions:
       packages: read
       security-events: write
@@ -224,7 +223,6 @@ jobs:
     name: Send Notification to Rocket Chat
     needs:
       - scheduled_trivy_scan:
-  # if: ${{ github.event_name == 'schedule' }}
     uses: RocketChat/Rocket.Chat.GitHub.Action.Notification@1.1.1
     if: failure()
     with:
