@@ -35,6 +35,7 @@ beforeEach(() => {
   authStore = useAuthStore();
 
   authStore.hasPersonenBulkPermission = true;
+  authStore.hasPersonenLoeschenPermission = true;
 
   organisationStore.klassen = [
     {
@@ -202,6 +203,7 @@ beforeEach(() => {
         personenkontextStore,
         rolleStore,
         searchFilterStore,
+        authStore,
       },
     },
   });
@@ -427,5 +429,77 @@ describe('PersonManagementView', () => {
     await nextTick();
 
     expect(wrapper?.findComponent({ ref: 'personenkontext-create' }));
+  });
+
+  test('it checks a checkbox in the table, selects the delete person option and triggers dialog', async () => {
+    authStore.hasPersonenLoeschenPermission = true;
+    // Find the first checkbox in the table
+    const checkbox: DOMWrapper<Element> | undefined = wrapper?.find(
+      '[data-testid="person-table"] .v-selection-control',
+    );
+
+    // Initial state check (optional)
+    expect(checkbox?.classes()).not.toContain('v-selection-control--selected');
+
+    // Trigger the checkbox click
+    await checkbox?.trigger('click');
+    await nextTick();
+
+    const benutzerEditSelect: VueWrapper | undefined = wrapper?.findComponent({ ref: 'benutzer-bulk-edit-select' });
+
+    // eslint-disable-next-line @typescript-eslint/dot-notation
+    const hasDeletePersonOption: boolean = (benutzerEditSelect?.props() as { items: { value: string }[] }).items.some(
+      (item: { value: string }) => item.value === 'DELETE_PERSON',
+    );
+    expect(hasDeletePersonOption).toBe(true);
+
+    benutzerEditSelect?.setValue('DELETE_PERSON');
+
+    benutzerEditSelect?.vm.$emit('input', 'DELETE_PERSON');
+    await nextTick();
+
+    expect(document.body.querySelector('[data-testid="person-delete-layout-card"]')).not.toBeNull();
+  });
+
+  test('person delete isnt shown if user has no permission', async () => {
+    authStore.hasPersonenLoeschenPermission = false;
+
+    wrapper = mount(PersonManagementView, {
+      attachTo: document.getElementById('app') || '',
+      global: {
+        components: {
+          PersonManagementView,
+        },
+        mocks: {
+          route: {
+            fullPath: 'full/path',
+          },
+        },
+        provide: {
+          organisationStore,
+          personStore,
+          personenkontextStore,
+          rolleStore,
+          searchFilterStore,
+          authStore,
+        },
+      },
+    });
+
+    // Find the first checkbox in the table
+    const checkbox: DOMWrapper<Element> | undefined = wrapper.find('[data-testid="person-table"] .v-selection-control');
+    // Initial state check (optional)
+    expect(checkbox.classes()).not.toContain('v-selection-control--selected');
+
+    // Trigger the checkbox click
+    await checkbox.trigger('click');
+    await nextTick();
+
+    const benutzerEditSelect: VueWrapper | undefined = wrapper.findComponent({ ref: 'benutzer-bulk-edit-select' });
+
+    // eslint-disable-next-line @typescript-eslint/dot-notation
+    (benutzerEditSelect.props() as { items: { value: string }[] })['items'].forEach((item: { value: string }) => {
+      expect(item.value).not.toBe('DELETE_PERSON');
+    });
   });
 });

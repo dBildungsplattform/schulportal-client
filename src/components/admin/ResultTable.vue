@@ -43,6 +43,14 @@
 
   const emit: Emits = defineEmits<Emits>();
 
+  const resetSelection = (): void => {
+    selectedItems.value = [];
+  };
+
+  defineExpose({
+    resetSelection,
+  });
+
   function handleKeyDown(event: KeyboardEvent): void {
     // Check if the pressed key is Enter
     if (event.key === 'Enter') {
