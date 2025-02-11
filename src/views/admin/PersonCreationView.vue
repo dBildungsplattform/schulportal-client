@@ -651,7 +651,7 @@
             v-if="
               isKopersRolle(
                 schuleZuordnungFromCreatedKontext.map((kontext) => kontext.rolleId),
-                filteredRollen,
+                filteredRollenCache,
               )
             "
           >
@@ -659,7 +659,7 @@
               :class="`${
                 isKopersRolle(
                   schuleZuordnungFromCreatedKontext.map((kontext) => kontext.rolleId),
-                  filteredRollen,
+                  filteredRollenCache,
                 ) && personenkontextStore.createdPersonWithKontext.person.personalnummer
                   ? 'text-body bold text-right'
                   : 'text-body bold text-right text-red'
@@ -671,7 +671,7 @@
               :class="`${
                 isKopersRolle(
                   schuleZuordnungFromCreatedKontext.map((kontext) => kontext.rolleId),
-                  filteredRollen,
+                  filteredRollenCache,
                 ) && personenkontextStore.createdPersonWithKontext.person.personalnummer
                   ? 'text-body'
                   : 'text-body text-red'
