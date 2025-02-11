@@ -82,7 +82,7 @@ jobs:
       node_version: '18'
     permissions:
       contents: read
-    secrets: inherit
+    secrets: inherit 
 
   # check with limit-secertity-true 
   build_image_on_push:
