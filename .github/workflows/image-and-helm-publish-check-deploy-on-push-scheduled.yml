@@ -213,22 +213,22 @@ jobs:
     permissions:
       packages: read
       security-events: write
-    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-trivy.yaml@7
+    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-trivy.yaml@DBP-1264-improve-pipeline
     with:
       image_ref: 'ghcr.io/${{ github.repository_owner }}/schulportal-client:latest'
       fail_on_vulnerabilites: true
       report_location: 'Dockerfile'
+      severity: 'MEDIUM'
 
-  # trivy_scan_rocketchat_notification:
-  #   name: Send Notification to Rocket Chat
-  #   needs:
-  #     - scheduled_trivy_scan:
-  #   uses: RocketChat/Rocket.Chat.GitHub.Action.Notification@1.1.1
-  #   if: failure()
-  #   with:
-  #     type: ${{ job.status }}
-  #     job_name: 'Daily nightly Image Check failed - CVEs found'
-  #     url: ${{ secrets.RC_WEBHOOK_SPSH_DEVELOPER_CHANNEL }}
-  #     channel: '#SPSH-Developer'
-  #     username: "CVE Info"
-  #     severity: 'MEDIUM'
+  trivy_scan_rocketchat_notification:
+    if: failure()
+    name: Send Notification to Rocket Chat
+    needs:
+      - scheduled_trivy_scan:
+    uses: RocketChat/Rocket.Chat.GitHub.Action.Notification@1.1.1
+    with:
+      type: ${{ job.status }}
+      job_name: 'Daily nightly Image Check failed - CVEs found'
+      url: ${{ secrets.RC_WEBHOOK_SPSH_DEVELOPER_CHANNEL }}
+      channel: '#SPSH-Developer'
+      username: "CVE Info"
