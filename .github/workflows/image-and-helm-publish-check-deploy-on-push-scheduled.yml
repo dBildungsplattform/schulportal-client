@@ -215,8 +215,7 @@ jobs:
       packages: read
       security-events: write
     steps:
-    - uses: actions/upload-artifact@v4
-      uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-trivy.yaml@DBP-1264-improve-pipeline
+    - uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-trivy.yaml@DBP-1264-improve-pipeline
       with:
         image_ref: 'ghcr.io/${{ github.repository_owner }}/schulportal-client:latest'
         fail_on_vulnerabilites: true
