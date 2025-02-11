@@ -214,14 +214,17 @@ jobs:
     permissions:
       packages: read
       security-events: write
-    steps:
-    - uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-trivy.yaml@DBP-1264-improve-pipeline
-      with:
-        image_ref: 'ghcr.io/${{ github.repository_owner }}/schulportal-client:latest'
-        fail_on_vulnerabilites: true
-        report_location: 'Dockerfile'
+    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-trivy.yaml@7
+    with:
+      image_ref: 'ghcr.io/${{ github.repository_owner }}/schulportal-client:latest'
+      fail_on_vulnerabilites: true
+      report_location: 'Dockerfile'
 
-    - name: Send Notification to Rocket Chat
+  trivy_scan_rocketchat_notification:
+      name: Send Notification to Rocket Chat
+      needs:
+      -   scheduled_trivy_scan:
+    # if: ${{ github.event_name == 'schedule' }}
       uses: RocketChat/Rocket.Chat.GitHub.Action.Notification@1.1.1
       if: failure()
       with:
