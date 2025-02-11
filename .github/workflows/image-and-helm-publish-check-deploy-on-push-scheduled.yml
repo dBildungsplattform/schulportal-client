@@ -84,6 +84,7 @@ jobs:
       contents: read
     secrets: inherit
 
+  # check with limit-secertity-true
   build_image_on_push:
     needs:
       - check_deployment_clearance
