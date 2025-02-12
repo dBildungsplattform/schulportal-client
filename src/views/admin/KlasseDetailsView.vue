@@ -179,6 +179,14 @@
     { immediate: true },
   );
 
+  watch(
+    () => organisationStore.currentOrganisation,
+    (org: Organisation | null) => {
+      if (org) setFieldValue('selectedSchule', org.id);
+    },
+    { immediate: true },
+  );
+
   onBeforeMount(async () => {
     organisationStore.errorCode = '';
     organisationStore.updatedOrganisation = null;
@@ -227,7 +235,6 @@
         <v-container>
           <div v-if="organisationStore.currentOrganisation">
             <KlasseForm
-              :readonlyDefault="organisationStore.currentOrganisation"
               :errorCode="organisationStore.errorCode"
               :isEditActive="isEditActive"
               :isLoading="organisationStore.loading"

@@ -14,7 +14,6 @@
     errorCode?: string;
     schulen?: Array<TranslatedObject>;
     readonly?: boolean;
-    readonlyDefault?: Organisation;
     selectedSchuleProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedKlassennameProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     showUnsavedChangesDialog?: boolean;
@@ -36,6 +35,7 @@
     (newSchulen: Array<Organisation>) => {
       selectedSchuleId.value = newSchulen.length === 1 ? newSchulen[0]!.id : '';
     },
+    { immediate: true },
   );
 </script>
 
@@ -70,7 +70,6 @@
           <SchulenFilter
             :multiple="false"
             :readonly
-            :readonlyDefault
             :systemrechte-for-search="[RollenSystemRecht.KlassenVerwalten]"
             :selected-schule-props="selectedSchuleProps"
           ></SchulenFilter>

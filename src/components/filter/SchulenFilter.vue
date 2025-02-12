@@ -18,7 +18,6 @@
     systemrechteForSearch?: Array<RollenSystemRecht>;
     multiple: boolean;
     readonly?: boolean;
-    readonlyDefault?: Organisation;
     selectedSchuleProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
   };
   type Emits = {
@@ -49,7 +48,7 @@
     })),
   );
   const hasSelectedSchule: ComputedRef<boolean> = computed(
-    () => hasAutoselectedSchule.value || props.readonly || selectedSchulen.value.length > 0,
+    () => hasAutoselectedSchule.value || selectedSchulen.value.length > 0,
   );
 
   const updateSearchString = (searchString: string | undefined): void => {
@@ -75,12 +74,6 @@
   watch(
     () => organisationStore.schulenFilter.selectedItems,
     (newSelectedSchulen: Array<Organisation>) => {
-      if (props.readonly) {
-        if (props.readonlyDefault) {
-          selectedSchulenIds.value = props.readonlyDefault.id;
-          return;
-        }
-      }
       if (props.multiple) {
         selectedSchulenIds.value = newSelectedSchulen.map((schule: Organisation) => schule.id);
       } else if (newSelectedSchulen.length === 1) selectedSchulenIds.value = newSelectedSchulen[0]!.id;
@@ -88,29 +81,17 @@
     },
   );
 
-  watch(
-    () => props.readonlyDefault,
-    (defaultSchule: Organisation | undefined) => {
-      if (!props.readonly || !defaultSchule) return;
-      selectedSchulenIds.value = defaultSchule.id;
-      schulenFilter.organisationIds = [defaultSchule.id];
-      organisationStore.schulenFilter.selectedItems = [defaultSchule];
-    },
-    { immediate: true },
-  );
-
   watch(selectedSchulenIds, (newIds: Array<string> | string | undefined) => {
-    if (props.readonly) return;
     if (Array.isArray(newIds)) {
       schulenFilter.organisationIds = newIds;
       // TODO: measure performance impact
       organisationStore.schulenFilter.selectedItems = newIds.reduce(
-        (tempSelection: Array<Organisation>, schuleId: string) => {
+        (newSelection: Array<Organisation>, schuleId: string) => {
           const matchedSchule: Organisation | undefined = organisationStore.schulenFilter.filterResult.find(
             (schule: Organisation) => schule.id === schuleId,
           );
-          if (matchedSchule) tempSelection.push(matchedSchule);
-          return tempSelection;
+          if (matchedSchule) newSelection.push(matchedSchule);
+          return newSelection;
         },
         [] as Array<Organisation>,
       );
