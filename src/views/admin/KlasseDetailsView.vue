@@ -30,7 +30,7 @@
   const organisationStore: OrganisationStore = useOrganisationStore();
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
 
-  const currentOrganisationId: string = route.params['id'] as string;
+  const currentKlasseId: string = route.params['id'] as string;
   const isEditActive: Ref<boolean> = ref(false);
 
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
@@ -123,7 +123,7 @@
   const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
     if (selectedSchule.value && selectedKlassenname.value) {
       if (organisationStore.currentOrganisation) {
-        await organisationStore.updateOrganisationById(currentOrganisationId, selectedKlassenname.value);
+        await organisationStore.updateOrganisationById(currentKlasseId, selectedKlassenname.value);
       }
       resetForm();
     }
@@ -155,7 +155,7 @@
     organisationStore.errorCode = '';
     organisationStore.updatedOrganisation = null;
     // Retrieves the Klasse using the Id in the route since that's all we have
-    await organisationStore.getOrganisationById(currentOrganisationId, OrganisationsTyp.Klasse);
+    await organisationStore.getOrganisationById(currentKlasseId, OrganisationsTyp.Klasse);
     // Retrieves the parent Organisation of the Klasse using the same endpoint but with a different parameter
     if (organisationStore.currentKlasse?.administriertVon) {
       await organisationStore.getOrganisationById(
@@ -206,6 +206,7 @@
         <v-container>
           <div v-if="organisationStore.currentOrganisation">
             <KlasseForm
+              :autoselectedSchuleId="organisationStore.currentOrganisation.id"
               :errorCode="organisationStore.errorCode"
               :isEditActive="isEditActive"
               :isLoading="organisationStore.loading"
@@ -267,7 +268,7 @@
                       :schulname="selectedSchule || ''"
                       :isLoading="organisationStore.loading"
                       :useIconActivator="false"
-                      @onDeleteKlasse="deleteKlasseById(currentOrganisationId)"
+                      @onDeleteKlasse="deleteKlasseById(currentKlasseId)"
                     >
                     </KlasseDelete>
                   </div>

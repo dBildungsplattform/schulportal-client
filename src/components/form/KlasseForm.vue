@@ -10,12 +10,10 @@
   import { RollenSystemRecht } from '@/stores/RolleStore';
   import type { TranslatedObject } from '@/types';
   import { type BaseFieldProps } from 'vee-validate';
-  import { computed, defineProps, ref, watch, type ComputedRef, type ModelRef, type Ref } from 'vue';
+  import { computed, ref, watch, type ComputedRef, type ModelRef, type Ref } from 'vue';
 
-  const hasAutoselectedSchule: Ref<boolean> = ref(false);
   const searchInputSchule: Ref<string> = ref('');
   const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
-  let isSearching: boolean = false;
 
   const organisationStore: OrganisationStore = useOrganisationStore();
 
@@ -27,6 +25,7 @@
     selectedKlassennameProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     showUnsavedChangesDialog?: boolean;
     isEditActive?: boolean;
+    autoselectedSchuleId: string | null;
     isLoading: boolean;
     onHandleConfirmUnsavedChanges: () => void;
     onHandleDiscard: () => void;
@@ -35,30 +34,25 @@
   };
 
   const props: Props = defineProps<Props>();
-
-  const selectedSchuleId: ModelRef<string | undefined, string> = defineModel('selectedSchule');
+  // derive this from props by checking id against props.schulen
+  const hasAutoselected: ComputedRef<boolean> = computed(() => props.autoselectedSchuleId !== null);
+  const selectedSchule: ModelRef<string | undefined, string> = defineModel('selectedSchule');
+  const selectedSchuleTitle: ComputedRef<string> = computed(() => {
+    return props.schulen?.find((schule: TranslatedObject) => schule.value === selectedSchule.value)?.title || '';
+  });
   const selectedKlassenname: ModelRef<string | undefined, string> = defineModel('selectedKlassenname');
 
-  // Watcher for schulen to auto-select if there is only one
   watch(
-    () => props.schulen,
-    (newSchulen: TranslatedObject[] | undefined) => {
-      if (!isSearching && newSchulen && newSchulen.length === 1) {
-        hasAutoselectedSchule.value = true;
-        selectedSchuleId.value = newSchulen[0]?.value || '';
-      }
+    () => props.autoselectedSchuleId,
+    (newId: string | null) => {
+      selectedSchule.value = newId || undefined;
     },
-    { immediate: true },
   );
-
-  const selectedSchuleTitle: ComputedRef<string> = computed(() => {
-    return props.schulen?.find((schule: TranslatedObject) => schule.value === selectedSchuleId.value)?.title || '';
-  });
 
   // Watcher to detect when the search input for Organisationen is triggered.
   watch(searchInputSchule, async (newValue: string | undefined) => {
     clearTimeout(timerId.value);
-    isSearching = !!newValue;
+    if (hasAutoselected.value) return;
     if (newValue !== '' && newValue === selectedSchuleTitle.value) return;
 
     const organisationFilter: OrganisationenFilter = {
@@ -69,12 +63,12 @@
     if (newValue) {
       organisationFilter.searchString = newValue;
     }
-    if (selectedSchuleId.value) {
-      organisationFilter.organisationIds = [selectedSchuleId.value];
+    if (selectedSchule.value) {
+      organisationFilter.organisationIds = [selectedSchule.value];
     }
 
     timerId.value = setTimeout(async () => {
-      await organisationStore.getAllOrganisationen(organisationFilter);
+      await organisationStore.getFilteredSchulen(organisationFilter);
     }, 500);
   });
 </script>
@@ -108,11 +102,11 @@
       >
         <v-autocomplete
           autocomplete="off"
-          :class="[{ 'filter-dropdown mb-4': hasAutoselectedSchule }, { selected: selectedSchuleId }]"
+          :class="['filter-dropdown mb-4', { selected: selectedSchule }]"
           clearable
           data-testid="schule-select"
           density="compact"
-          :disabled="hasAutoselectedSchule || readonly"
+          :disabled="hasAutoselected || readonly"
           id="schule-select"
           :items="schulen"
           item-value="value"
@@ -123,7 +117,7 @@
           required="true"
           variant="outlined"
           v-bind="selectedSchuleProps"
-          v-model="selectedSchuleId"
+          v-model="selectedSchule"
           v-model:search="searchInputSchule"
           hide-details
         ></v-autocomplete>

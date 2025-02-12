@@ -202,7 +202,7 @@
     isChangeKlasseFormActive.value = false;
   };
 
-  const prepareChangeBerfristung = (): void => {
+  const prepareChangeBefristung = (): void => {
     pendingChangeBefristung.value = true;
     isChangeBefristungActive.value = false;
   };
@@ -1225,7 +1225,7 @@
       .map((zuordnung: Zuordnung | undefined) => (zuordnung === currentZuordnung ? newZuordnung.value : zuordnung))
       .filter((zuordnung: Zuordnung | undefined): zuordnung is Zuordnung => zuordnung !== undefined);
 
-    prepareChangeBerfristung();
+    prepareChangeBefristung();
   };
 
   const cancelAddition = (): void => {

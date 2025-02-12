@@ -1,29 +1,36 @@
 import {
   OrganisationsTyp,
   useOrganisationStore,
+  type Organisation,
   type OrganisationStore,
   type OrganisationenFilter,
 } from '@/stores/OrganisationStore';
 import { RollenSystemRecht } from '@/stores/RolleStore';
 import { type TranslatedObject } from '@/types.d';
 import { VueWrapper, mount } from '@vue/test-utils';
-import { expect, test, type Mock } from 'vitest';
+import { expect, test, type MockInstance } from 'vitest';
 import { nextTick } from 'vue';
 import KlasseForm from './KlasseForm.vue';
 
 let wrapper: VueWrapper | null = null;
 const organisationStore: OrganisationStore = useOrganisationStore();
 
-const schulen: Array<TranslatedObject> = [
+const schulen: Array<Organisation> = [
   {
-    title: 'Albert-Gymnasium',
-    value: '9356495',
+    id: '9356495',
+    name: 'Albert-Gymnasium',
+    typ: OrganisationsTyp.Schule,
   },
   {
-    title: 'Hohver-Gymnasium',
-    value: '8456571',
+    id: '8456571',
+    name: 'Hohver-Gymnasium',
+    typ: OrganisationsTyp.Schule,
   },
 ];
+const translatedSchulen: Array<TranslatedObject> = schulen.map((schule: Organisation) => ({
+  title: schule.name,
+  value: schule.id,
+}));
 
 vi.useFakeTimers();
 
@@ -42,7 +49,8 @@ beforeEach(() => {
       onHandleDiscard: () => '',
       onShowDialogChange: (value: boolean | undefined) => value,
       onSubmit: () => '',
-      schulen,
+      autoselectedSchuleId: null,
+      schulen: translatedSchulen,
     },
     global: {
       components: {
@@ -65,18 +73,18 @@ describe('Schule searchInput', () => {
     systemrechte: [RollenSystemRecht.KlassenVerwalten],
     limit: 25,
   };
-  const spy: Mock<OrganisationStore['getAllOrganisationen']> = vi.fn<OrganisationStore['getAllOrganisationen']>();
+  const spy: MockInstance<OrganisationStore['getFilteredSchulen']> = vi.spyOn(organisationStore, 'getFilteredSchulen');
   let schuleAutoComplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
   beforeEach(() => {
     schuleAutoComplete = wrapper!.findComponent({ ref: 'schule-select' });
-    organisationStore.getAllOrganisationen = spy;
     spy.mockClear();
   });
 
   describe('when schule is autoselected', async () => {
-    const schule: TranslatedObject = schulen[0]!;
+    const schule: TranslatedObject = translatedSchulen[0]!;
     beforeEach(async () => {
       wrapper!.setProps({
+        autoselectedSchuleId: schule.value,
         schulen: [schule],
       });
       await nextTick();
@@ -90,23 +98,25 @@ describe('Schule searchInput', () => {
       expect(inputElement!.hasAttribute('disabled')).toBeTruthy();
     });
 
-    test('it handles empty object', async () => {
-      expect(schuleAutoComplete?.text()).toBeTruthy();
-      await wrapper!.setProps({
-        schulen: [
-          {
-            value: '',
-            title: '',
-          },
-        ],
-      });
+    test('it enables input if more schulen are loaded', async () => {
+      let inputElement: Element | null = document.querySelector('#schule-select');
       await nextTick();
-      expect(schuleAutoComplete?.text()).toBeFalsy();
+      expect(inputElement).toBeDefined();
+      expect(inputElement!.hasAttribute('disabled')).toBeTruthy();
+      expect(wrapper?.find('[data-testid="schule-select"]').text()).toContain(schule.title);
+
+      wrapper?.setProps({ autoselectedSchuleId: null });
+      await nextTick();
+
+      inputElement = document.querySelector('#schule-select');
+      expect(inputElement).toBeDefined();
+      expect(inputElement!.hasAttribute('disabled')).toBeFalsy();
+      expect(wrapper?.find('[data-testid="schule-select"]').text()).not.toContain(schule.title);
     });
   });
 
   describe('when schule is selected', async () => {
-    const schule: TranslatedObject = schulen[0]!;
+    const schule: TranslatedObject = translatedSchulen[0]!;
     beforeEach(async () => {
       wrapper!.setProps({
         selectedSchule: schule.value,
@@ -115,7 +125,7 @@ describe('Schule searchInput', () => {
     });
 
     test.each([
-      ['selected schule', schule.title],
+      ['already selected schule', schule.title],
       ['empty string', ''],
     ])('does nothing, if searching for %s', async (_label: string, searchInput: string) => {
       schuleAutoComplete?.vm.$emit('update:search', searchInput);
@@ -133,10 +143,10 @@ describe('Schule searchInput', () => {
 
       vi.runAllTimers();
 
-      expect(spy).toHaveBeenCalledWith({
+      expect(spy).toHaveBeenLastCalledWith({
         ...defaultFilter,
         searchString,
-        organisationIds: [schulen[0]!.value],
+        organisationIds: [translatedSchulen[0]!.value],
       });
     });
 
@@ -147,7 +157,7 @@ describe('Schule searchInput', () => {
 
       vi.runAllTimers();
 
-      expect(spy).toHaveBeenCalledWith({
+      expect(spy).toHaveBeenLastCalledWith({
         ...defaultFilter,
       });
     });
@@ -161,7 +171,7 @@ describe('Schule searchInput', () => {
 
       vi.runAllTimers();
 
-      expect(spy).toHaveBeenCalledWith({ ...defaultFilter, searchString: 'Gymnasium' });
+      expect(spy).toHaveBeenLastCalledWith({ ...defaultFilter, searchString: 'Gymnasium' });
     });
   });
 });
