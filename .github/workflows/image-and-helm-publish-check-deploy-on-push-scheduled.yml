@@ -94,7 +94,7 @@ jobs:
       packages: write
       security-events: write
       contents: read
-    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/image-publish-trivy.yaml@7DBP-1264-improve-pipeline
+    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/image-publish-trivy.yaml@DBP-1264-improve-pipeline
     with:
       image_name: 'schulportal-client'
       run_trivy_scan: true
