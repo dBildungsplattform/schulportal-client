@@ -202,7 +202,7 @@
     isChangeKlasseFormActive.value = false;
   };
 
-  const prepareChangeBerfristung = (): void => {
+  const prepareChangeBefristung = (): void => {
     pendingChangeBefristung.value = true;
     isChangeBefristungActive.value = false;
   };
@@ -566,10 +566,10 @@
     (newValue: Zuordnung | undefined) => {
       if (newValue) {
         const organisationId: string | undefined = newValue.sskId;
-        const rolleId: string | undefined = newValue.rolleId;
+        const rollenIds: string[] | undefined = [newValue.rolleId];
 
         // Trigger the API call
-        personenkontextStore.processWorkflowStep({ organisationId, rolleId, limit: 25 });
+        personenkontextStore.processWorkflowStep({ organisationId, rollenIds, limit: 25 });
       }
     },
     { immediate: true }, // Run on initialization if there's already a selected Zuordnung
@@ -714,7 +714,7 @@
     selectedBefristung,
     selectedBefristungOption,
     calculatedBefristung,
-    selectedRolle,
+    selectedRollen: computed(() => (selectedRolle.value ? [selectedRolle.value] : [])),
   });
 
   const {
@@ -726,7 +726,7 @@
     selectedBefristung: selectedChangeBefristung,
     selectedBefristungOption: selectedChangeBefristungOption,
     calculatedBefristung,
-    selectedRolle: changeBefristungRolle,
+    selectedRollen: computed(() => (changeBefristungRolle.value ? [changeBefristungRolle.value] : [])),
   });
 
   async function navigateBackToKopersForm(): Promise<void> {
@@ -1225,7 +1225,7 @@
       .map((zuordnung: Zuordnung | undefined) => (zuordnung === currentZuordnung ? newZuordnung.value : zuordnung))
       .filter((zuordnung: Zuordnung | undefined): zuordnung is Zuordnung => zuordnung !== undefined);
 
-    prepareChangeBerfristung();
+    prepareChangeBefristung();
   };
 
   const cancelAddition = (): void => {
@@ -1397,7 +1397,7 @@
 
   // Computed property to check if the second radio button should be disabled
   const isUnbefristetButtonDisabled: ComputedRef<boolean> = computed(() => {
-    return isBefristungspflichtRolle(selectedRolle.value);
+    return isBefristungspflichtRolle([selectedRolle.value as string]);
   });
 
   const intersectingOrganisations: ComputedRef<Set<Organisation>> = computed(() => {
@@ -2287,10 +2287,11 @@
               <v-container class="px-lg-16">
                 <!-- Organisation, Rolle, Klasse zuordnen -->
                 <PersonenkontextCreate
-                  ref="personenkontext-create"
+                  :allowMultipleRollen="false"
                   :showHeadline="false"
                   :organisationen="organisationen"
                   :rollen="filteredRollen"
+                  ref="personenkontext-create"
                   :klassen="klassen"
                   :selectedOrganisationProps="selectedOrganisationProps"
                   :selectedRolleProps="selectedRolleProps"
@@ -2299,7 +2300,7 @@
                     befristungProps: selectedBefristungProps,
                     befristungOptionProps: selectedBefristungOptionProps,
                     isUnbefristetDisabled: isUnbefristetButtonDisabled,
-                    isBefristungRequired: isBefristungspflichtRolle(selectedRolle),
+                    isBefristungRequired: isBefristungspflichtRolle([selectedRolle as string]),
                     nextSchuljahresende: getNextSchuljahresende(),
                     befristung: selectedBefristung,
                     befristungOption: selectedBefristungOption,
@@ -2316,7 +2317,7 @@
                   @fieldReset="handleFieldReset"
                 />
                 <KopersInput
-                  v-if="!hasKopersNummer && isKopersRolle(selectedRolle) && selectedOrganisation"
+                  v-if="!hasKopersNummer && isKopersRolle([selectedRolle as string], filteredRollen) && selectedOrganisation"
                   :hasNoKopersNr="hasNoKopersNr"
                   v-model:selectedKopersNr="selectedKopersNr"
                   :selectedKopersNrProps="selectedKopersNrProps"
@@ -2433,8 +2434,8 @@
                 ref="befristung-input-wrapper"
                 :befristungProps="selectedChangeBefristungProps"
                 :befristungOptionProps="selectedChangeBefristungOptionProps"
-                :isUnbefristetDisabled="isBefristungspflichtRolle(changeBefristungRolle)"
-                :isBefristungRequired="isBefristungspflichtRolle(changeBefristungRolle)"
+                :isUnbefristetDisabled="isBefristungspflichtRolle([changeBefristungRolle as string])"
+                :isBefristungRequired="isBefristungspflichtRolle([changeBefristungRolle as string])"
                 :nextSchuljahresende="getNextSchuljahresende()"
                 :befristung="selectedChangeBefristung"
                 :befristungOption="selectedChangeBefristungOption"

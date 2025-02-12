@@ -67,6 +67,7 @@
         localBefristungOption.value = BefristungOption.UNBEFRISTET;
       }
     },
+    { immediate: true },
   );
 </script>
 

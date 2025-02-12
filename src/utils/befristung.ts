@@ -14,7 +14,7 @@ type Props = {
   selectedBefristungOption: Ref<string | undefined>;
   calculatedBefristung: Ref<string | undefined>;
   formContext: ReturnType<typeof useForm>;
-  selectedRolle: Ref<string | undefined>;
+  selectedRollen: Ref<string[] | undefined>;
 };
 
 export type BefristungUtilsType = {
@@ -27,10 +27,13 @@ export type BefristungUtilsType = {
 const rollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
 
 // Checks if the selected Rolle has Befristungspflicht
-export function isBefristungspflichtRolle(selectedRolleId: string | undefined): boolean {
+export function isBefristungspflichtRolle(selectedRolleIds: string[] | undefined): boolean {
+  if (!selectedRolleIds || selectedRolleIds.length === 0) return false;
+
   return (
     rollen.value?.some(
-      (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId && r.merkmale?.has(RollenMerkmal.BefristungPflicht),
+      (r: TranslatedRolleWithAttrs) =>
+        selectedRolleIds.includes(r.value) && r.merkmale?.has(RollenMerkmal.BefristungPflicht),
     ) || false
   );
 }
@@ -43,9 +46,9 @@ export function useBefristungUtils(props: {
   selectedBefristung: Ref<string | undefined>;
   selectedBefristungOption: Ref<string | undefined>;
   calculatedBefristung: Ref<string | undefined>;
-  selectedRolle: Ref<string | undefined>;
+  selectedRollen: Ref<string[] | undefined>;
 }): BefristungUtilsType {
-  const { selectedBefristung, selectedBefristungOption, calculatedBefristung, selectedRolle, formContext }: Props =
+  const { selectedBefristung, selectedBefristungOption, calculatedBefristung, selectedRollen, formContext }: Props =
     props;
 
   const handleBefristungUpdate = (value: string | undefined): void => {
@@ -64,14 +67,16 @@ export function useBefristungUtils(props: {
   // Function to set an initial value for the radio buttons depending on the selected Rolle
   const setupRolleWatcher = (): void => {
     watch(
-      selectedRolle,
-      (newValue: string | undefined) => {
-        if (isBefristungspflichtRolle(newValue)) {
-          selectedBefristungOption.value = BefristungOption.SCHULJAHRESENDE;
-          calculatedBefristung.value = getNextSchuljahresende();
-        } else {
-          selectedBefristungOption.value = BefristungOption.UNBEFRISTET;
-          calculatedBefristung.value = undefined;
+      selectedRollen,
+      (newValue: string[] | undefined) => {
+        if (newValue) {
+          if (isBefristungspflichtRolle(newValue)) {
+            selectedBefristungOption.value = BefristungOption.SCHULJAHRESENDE;
+            calculatedBefristung.value = getNextSchuljahresende();
+          } else {
+            selectedBefristungOption.value = BefristungOption.UNBEFRISTET;
+            calculatedBefristung.value = undefined;
+          }
         }
       },
       { immediate: true },
