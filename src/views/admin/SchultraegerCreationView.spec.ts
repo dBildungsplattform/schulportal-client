@@ -134,7 +134,7 @@ describe('SchultraegerView', () => {
     await schulnameInput?.setValue('Random Schultraegername');
     await nextTick();
     const mockSchule: OrganisationResponse = {
-      id: '9876',
+      id: '2',
       name: 'Random Schulname Gymnasium',
       kennung: '',
       namensergaenzung: 'Traeger',
