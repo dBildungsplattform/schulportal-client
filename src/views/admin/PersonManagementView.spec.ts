@@ -182,7 +182,7 @@ beforeEach(() => {
     ],
     organisations: [],
     selectedOrganisation: null,
-    selectedRolle: null,
+    selectedRollen: null,
     canCommit: true,
   };
 
