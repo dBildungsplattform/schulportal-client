@@ -492,7 +492,7 @@ describe('OrganisationStore', () => {
           'Organisation 1',
           'Ergänzung',
           '01',
-          OrganisationsTyp.Schule,
+          OrganisationsTyp.Traeger,
         );
         expect(organisationStore.loading).toBe(true);
         await createOrganisationPromise;
