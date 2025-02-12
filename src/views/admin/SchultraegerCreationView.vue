@@ -82,15 +82,6 @@
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
   let blockedNext: () => void = () => {};
 
-  onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
-    if (isFormDirty()) {
-      showUnsavedChangesDialog.value = true;
-      blockedNext = next;
-    } else {
-      next();
-    }
-  });
-
   const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
     preservedSchultraegerform.value = schultraegerList.value?.find(
       (schultraeger: Organisation) => schultraeger.id === selectedSchultraegerform.value,
@@ -126,22 +117,22 @@
     organisationStore.errorCode = '';
   }
 
-  async function navigateToSchuleManagement(): Promise<void> {
+  async function navigateToSchultraegerManagement(): Promise<void> {
     organisationStore.createdSchule = null;
     await router.push({ name: 'schule-management' }).then(() => {
       router.go(0);
     });
   }
 
-  async function navigateBackToSchuleForm(): Promise<void> {
+  async function navigateBackToSchultraegerForm(): Promise<void> {
     if (organisationStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
       resetForm();
-      await router.push({ name: 'create-schule' }).then(() => {
+      await router.push({ name: 'create-schultraeger' }).then(() => {
         router.go(0);
       });
     } else {
       organisationStore.errorCode = '';
-      await router.push({ name: 'create-schule' });
+      await router.push({ name: 'create-schultraeger' });
     }
   }
 
@@ -166,6 +157,15 @@
     window.addEventListener('beforeunload', preventNavigation);
   });
 
+  onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
+    if (isFormDirty()) {
+      showUnsavedChangesDialog.value = true;
+      blockedNext = next;
+    } else {
+      next();
+    }
+  });
+
   onUnmounted(() => {
     window.removeEventListener('beforeunload', preventNavigation);
   });
@@ -181,7 +181,7 @@
     </h1>
     <LayoutCard
       :closable="!organisationStore.errorCode"
-      @onCloseClicked="navigateToSchuleManagement"
+      @onCloseClicked="navigateToSchultraegerManagement"
       :header="$t('admin.schultraeger.addNew')"
       :padded="true"
       :showCloseText="true"
@@ -195,7 +195,7 @@
           :hideActions="!!organisationStore.errorCode"
           id="schultraeger-creation-form"
           :isLoading="organisationStore.loading"
-          :onDiscard="navigateToSchuleManagement"
+          :onDiscard="navigateToSchultraegerManagement"
           @onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
           :onSubmit="onSubmit"
           ref="schutraegere-creation-form"
@@ -210,7 +210,7 @@
             :text="organisationStore.errorCode ? $t(`admin.schultraeger.errors.${organisationStore.errorCode}`) : ''"
             :showButton="true"
             :buttonText="$t('admin.schule.backToCreateSchule')"
-            :buttonAction="navigateBackToSchuleForm"
+            :buttonAction="navigateBackToSchultraegerForm"
             buttonClass="primary"
           />
 
@@ -333,7 +333,7 @@
               <v-btn
                 class="secondary"
                 data-testid="back-to-list-button"
-                @click="navigateToSchuleManagement"
+                @click="navigateToSchultraegerManagement"
                 :block="mdAndDown"
                 >{{ $t('nav.backToList') }}</v-btn
               >
