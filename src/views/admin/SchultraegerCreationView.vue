@@ -24,7 +24,7 @@
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import FormRow from '@/components/form/FormRow.vue';
 
-  const initialSchulFormCache: Ref<string> = ref('');
+  const initialSchultraegerFormCache: Ref<string> = ref('');
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -108,7 +108,7 @@
       );
       resetForm({
         values: {
-          selectedSchultraegerform: initialSchulFormCache.value,
+          selectedSchultraegerform: initialSchultraegerFormCache.value,
           selectedSchultraegername: '',
         },
       });
@@ -153,14 +153,14 @@
   }
 
   onMounted(async () => {
-    organisationStore.createdSchule = null;
+    organisationStore.createdSchultraeger = null;
     organisationStore.errorCode = '';
     await organisationStore.getSchultraeger();
 
     if (schultraegerList.value && schultraegerList.value.length > 0) {
-      const defaultSchulform: string = schultraegerList.value[0]?.id ?? '';
-      selectedSchultraegerform.value = defaultSchulform;
-      initialSchulFormCache.value = defaultSchulform;
+      const defaultSchultraegerform: string = schultraegerList.value[0]?.id ?? '';
+      selectedSchultraegerform.value = defaultSchultraegerform;
+      initialSchultraegerFormCache.value = defaultSchultraegerform;
     }
     /* listen for browser changes and prevent them when form is dirty */
     window.addEventListener('beforeunload', preventNavigation);
@@ -187,7 +187,7 @@
       :showCloseText="true"
     >
       <!-- The form to create a new Schultraeger -->
-      <template v-if="!organisationStore.createdSchule">
+      <template v-if="!organisationStore.createdSchultraeger">
         <FormWrapper
           :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
           :createButtonLabel="$t('admin.schultraeger.create')"
@@ -204,10 +204,10 @@
           <!-- Error Message Display if error on submit -->
           <SpshAlert
             :model-value="!!organisationStore.errorCode"
-            :title="$t('admin.schule.schuleCreateErrorTitle')"
+            :title="$t('admin.schultraeger.schultraegerCreateErrorTitle')"
             :type="'error'"
             :closable="false"
-            :text="organisationStore.errorCode ? $t(`admin.schule.errors.${organisationStore.errorCode}`) : ''"
+            :text="organisationStore.errorCode ? $t(`admin.schultraeger.errors.${organisationStore.errorCode}`) : ''"
             :showButton="true"
             :buttonText="$t('admin.schule.backToCreateSchule')"
             :buttonAction="navigateBackToSchuleForm"
@@ -312,7 +312,7 @@
             >
           </v-row>
           <v-row>
-            <v-col class="text-body bold text-right"> {{ $t('admin.schule.schultraegername') }}: </v-col>
+            <v-col class="text-body bold text-right"> {{ $t('admin.schultraeger.schultraegername') }}: </v-col>
             <v-col class="text-body"
               ><span data-testid="created-schultraeger-name">{{
                 organisationStore.createdSchultraeger.name

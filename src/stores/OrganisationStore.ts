@@ -109,7 +109,7 @@ type OrganisationActions = {
     traegerschaft?: TraegerschaftTyp,
     administriertVon?: string,
     zugehoerigZu?: string,
-  ) => Promise<Organisation>;
+  ) => Promise<void>;
   deleteOrganisationById: (organisationId: string) => Promise<void>;
   updateOrganisationById: (organisationId: string, name: string) => Promise<void>;
   getSchultraeger: () => Promise<void>;
@@ -361,7 +361,7 @@ export const useOrganisationStore: StoreDefinition<
       traegerschaft?: TraegerschaftTyp,
       administriertVon?: string,
       zugehoerigZu?: string,
-    ): Promise<Organisation> {
+    ): Promise<void> {
       this.loading = true;
       try {
         const createOrganisationBodyParams: CreateOrganisationBodyParams = {
@@ -383,10 +383,8 @@ export const useOrganisationStore: StoreDefinition<
         } else if (typ === OrganisationsTyp.Traeger) {
           this.createdSchultraeger = data;
         }
-        return data;
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'ORGANISATION_SPECIFICATION_ERROR');
-        return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
       }
