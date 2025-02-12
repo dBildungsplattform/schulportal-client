@@ -473,6 +473,33 @@ describe('OrganisationStore', () => {
         expect(organisationStore.loading).toBe(false);
       });
 
+      it('should create Schulträger and update state', async () => {
+        const mockResponse: Organisation[] = [
+          {
+            id: '1',
+            kennung: 'Traeger',
+            name: 'Traeger 1',
+            namensergaenzung: 'Ergänzung',
+            kuerzel: 'O1',
+            typ: OrganisationsTyp.Traeger,
+            administriertVon: '1',
+          },
+        ];
+
+        mockadapter.onPost('/api/organisationen').replyOnce(200, mockResponse);
+        const createOrganisationPromise: Promise<void> = organisationStore.createOrganisation(
+          'Org1',
+          'Organisation 1',
+          'Ergänzung',
+          '01',
+          OrganisationsTyp.Schule,
+        );
+        expect(organisationStore.loading).toBe(true);
+        await createOrganisationPromise;
+        expect(organisationStore.createdSchultraeger).toEqual(mockResponse);
+        expect(organisationStore.loading).toBe(false);
+      });
+
       it('should handle string error', async () => {
         mockadapter.onPost('/api/organisationen').replyOnce(500, 'some mock server error');
         const createOrganisationPromise: Promise<void> = organisationStore.createOrganisation(
