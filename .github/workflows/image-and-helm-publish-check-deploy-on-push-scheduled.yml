@@ -219,8 +219,6 @@ jobs:
       image_ref: 'ghcr.io/${{ github.repository_owner }}/schulportal-client:latest'
       fail_on_vulnerabilites: true
       report_location: 'Dockerfile'
-      # set back empty after testing
-      severity: 'MEDIUM,LOW'
       trivyignores: '.trivyignore'
 
   trivy_scan_rocketchat_notification:
