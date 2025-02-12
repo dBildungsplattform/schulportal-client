@@ -205,7 +205,7 @@ personenkontextStore.workflowStepResponse = {
     },
   ],
   selectedOrganisation: 'string',
-  selectedRolle: 'string',
+  selectedRollen: ['string'],
   canCommit: true,
 };
 

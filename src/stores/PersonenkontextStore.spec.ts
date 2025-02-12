@@ -1,7 +1,6 @@
 import {
   type DBiamPersonenkontextResponse,
   type FindRollenResponse,
-  type FindSchulstrukturknotenResponse,
   type SystemrechtResponse,
   OrganisationsTyp,
   RollenArt,
@@ -155,7 +154,7 @@ describe('PersonenkontextStore', () => {
       ],
       rollen: [],
       selectedOrganisation: '1',
-      selectedRolle: '1',
+      selectedRollen: ['1'],
       canCommit: true,
     };
     it('should get step', async () => {
@@ -169,9 +168,9 @@ describe('PersonenkontextStore', () => {
     });
 
     it('should get step with parameters', async () => {
-      mockadapter.onGet('/api/personenkontext-workflow/step?organisationId=1&rolleId=1').replyOnce(200, mockResponse);
+      mockadapter.onGet('/api/personenkontext-workflow/step?organisationId=1&rollenIds=1').replyOnce(200, mockResponse);
       const getPersonenkontextWorkFlowStep: Promise<PersonenkontextWorkflowResponse> =
-        personenkontextStore.processWorkflowStep({ organisationId: '1', rolleId: '1' });
+        personenkontextStore.processWorkflowStep({ organisationId: '1', rollenIds: ['1'] });
       expect(personenkontextStore.loading).toBe(true);
       await getPersonenkontextWorkFlowStep;
       expect(personenkontextStore.workflowStepResponse).toEqual(mockResponse);
@@ -348,57 +347,6 @@ describe('PersonenkontextStore', () => {
     });
   });
 
-  describe('getPersonenkontextAdministrationsebeneWithFilter', () => {
-    it('should get filtered Administrationsebenen', async () => {
-      const mockResponse: FindSchulstrukturknotenResponse = {
-        moeglicheSsks: [
-          {
-            id: 'string',
-            kennung: 'string',
-            name: 'Organisation1',
-            namensergaenzung: 'string',
-            kuerzel: 'string',
-            typ: 'TRAEGER',
-            administriertVon: '1',
-          },
-        ],
-        total: 0,
-      };
-      mockadapter
-        .onGet('/api/personenkontext-workflow/schulstrukturknoten?rolleId=1&sskName=Org&limit=2')
-        .replyOnce(200, mockResponse);
-      const getPersonenkontextAdministrationsebeneWithFilterPromise: Promise<void> =
-        personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter('1', 'Org', 2);
-      expect(personenkontextStore.loading).toBe(true);
-      await getPersonenkontextAdministrationsebeneWithFilterPromise;
-      expect(personenkontextStore.filteredOrganisationen).toEqual(mockResponse);
-      expect(personenkontextStore.loading).toBe(false);
-    });
-
-    it('should handle string error', async () => {
-      mockadapter
-        .onGet('/api/personenkontext-workflow/schulstrukturknoten?rolleId=1&sskName=Org&limit=2')
-        .replyOnce(500, 'some mock server error');
-      const getPersonenkontextAdministrationsebeneWithFilterPromise: Promise<void> =
-        personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter('1', 'Org', 2);
-      expect(personenkontextStore.loading).toBe(true);
-      await rejects(getPersonenkontextAdministrationsebeneWithFilterPromise);
-      expect(personenkontextStore.errorCode).toEqual('UNSPECIFIED_ERROR');
-      expect(personenkontextStore.loading).toBe(false);
-    });
-
-    it('should handle error code', async () => {
-      mockadapter
-        .onGet('/api/personenkontext-workflow/schulstrukturknoten?rolleId=1&sskName=Org&limit=2')
-        .replyOnce(500, { code: 'some mock server error' });
-      const getPersonenkontextAdministrationsebeneWithFilterPromise: Promise<void> =
-        personenkontextStore.getPersonenkontextAdministrationsebeneWithFilter('1', 'Org', 2);
-      expect(personenkontextStore.loading).toBe(true);
-      await rejects(getPersonenkontextAdministrationsebeneWithFilterPromise);
-      expect(personenkontextStore.errorCode).toEqual('some mock server error');
-      expect(personenkontextStore.loading).toBe(false);
-    });
-  });
   describe('createPersonWithKontexte', () => {
     it('should create a Person', async () => {
       const mockPerson: PersonendatensatzResponse = {
