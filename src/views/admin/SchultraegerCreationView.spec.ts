@@ -48,6 +48,22 @@ function mountComponent(): VueWrapper {
 }
 
 beforeEach(async () => {
+  Object.defineProperty(window, 'location', {
+    value: {
+      href: '',
+      reload: vi.fn(),
+    },
+    writable: true,
+  });
+
+  Object.defineProperty(window, 'history', {
+    value: {
+      go: vi.fn(),
+      pushState: vi.fn(),
+      replaceState: vi.fn(),
+    },
+    writable: true,
+  });
   document.body.innerHTML = `
     <div>
         <router-view>
@@ -84,13 +100,14 @@ beforeEach(async () => {
     routes,
   });
 
-  router.push('/');
+  router.push({ name: 'create-schultraeger' });
   await router.isReady();
 
   wrapper = mountComponent();
 });
 
 afterEach(() => {
+  vi.restoreAllMocks();
   wrapper?.unmount();
 });
 
@@ -140,7 +157,7 @@ describe('SchultraegerView', () => {
   });
 
   test('it shows error message', async () => {
-    organisationStore.errorCode = 'NAME_REQUIRED_FOR_SCHULE';
+    organisationStore.errorCode = 'TRAEGER_IN_TRAEGER';
     await nextTick();
     expect(wrapper?.find('[data-testid="alert-title"]').isVisible()).toBe(true);
     wrapper?.find('[data-testid="alert-button"]').trigger('click');
