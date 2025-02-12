@@ -431,7 +431,7 @@ describe('OrganisationStore', () => {
         ];
 
         mockadapter.onPost('/api/organisationen').replyOnce(200, mockResponse);
-        const createOrganisationPromise: Promise<Organisation> = organisationStore.createOrganisation(
+        const createOrganisationPromise: Promise<void> = organisationStore.createOrganisation(
           'Org1',
           'Organisation 1',
           'Ergänzung',
@@ -458,7 +458,7 @@ describe('OrganisationStore', () => {
         ];
 
         mockadapter.onPost('/api/organisationen').replyOnce(200, mockResponse);
-        const createOrganisationPromise: Promise<Organisation> = organisationStore.createOrganisation(
+        const createOrganisationPromise: Promise<void> = organisationStore.createOrganisation(
           'Org1',
           'Organisation 1',
           'Ergänzung',
@@ -475,7 +475,7 @@ describe('OrganisationStore', () => {
 
       it('should handle string error', async () => {
         mockadapter.onPost('/api/organisationen').replyOnce(500, 'some mock server error');
-        const createOrganisationPromise: Promise<Organisation> = organisationStore.createOrganisation(
+        const createOrganisationPromise: Promise<void> = organisationStore.createOrganisation(
           'Org1',
           'Organisation 1',
           'Ergänzung',
@@ -483,7 +483,7 @@ describe('OrganisationStore', () => {
           OrganisationsTyp.Schule,
         );
         expect(organisationStore.loading).toBe(true);
-        await rejects(createOrganisationPromise);
+        await createOrganisationPromise;
         expect(organisationStore.createdSchule).toEqual(null);
         expect(organisationStore.errorCode).toEqual('ORGANISATION_SPECIFICATION_ERROR');
         expect(organisationStore.loading).toBe(false);
@@ -491,7 +491,7 @@ describe('OrganisationStore', () => {
 
       it('should handle error code', async () => {
         mockadapter.onPost('/api/organisationen').replyOnce(500, { i18nKey: 'SOME_MOCK_SERVER_ERROR' });
-        const createOrganisationPromise: Promise<Organisation> = organisationStore.createOrganisation(
+        const createOrganisationPromise: Promise<void> = organisationStore.createOrganisation(
           'Org1',
           'Organisation 1',
           'Ergänzung',
@@ -499,7 +499,7 @@ describe('OrganisationStore', () => {
           OrganisationsTyp.Schule,
         );
         expect(organisationStore.loading).toBe(true);
-        await expect(createOrganisationPromise).rejects.toEqual('SOME_MOCK_SERVER_ERROR');
+        await createOrganisationPromise;
         expect(organisationStore.createdSchule).toEqual(null);
         expect(organisationStore.errorCode).toEqual('SOME_MOCK_SERVER_ERROR');
         expect(organisationStore.loading).toBe(false);
