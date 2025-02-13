@@ -119,9 +119,6 @@
 
   async function navigateToSchultraegerManagement(): Promise<void> {
     organisationStore.createdSchule = null;
-    await router.push({ name: 'schule-management' }).then(() => {
-      router.go(0);
-    });
   }
 
   async function navigateBackToSchultraegerForm(): Promise<void> {
