@@ -5,7 +5,7 @@
     id: string;
     visible: boolean;
     text: string;
-    type: 'error' | 'warning';
+    type: 'errorAlt' | 'warning';
   }>();
 
   type Emits = {
