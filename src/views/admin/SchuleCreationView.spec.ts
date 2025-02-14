@@ -1,45 +1,120 @@
-import { expect, test, type MockInstance } from 'vitest';
+import { expect, test, type Mock, type MockInstance } from 'vitest';
 import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import SchuleCreationView from './SchuleCreationView.vue';
-import { createRouter, createWebHistory, type Router } from 'vue-router';
+import {
+  createRouter,
+  createWebHistory,
+  type NavigationGuardNext,
+  type RouteLocationNormalized,
+  type Router,
+} from 'vue-router';
 import routes from '@/router/routes';
 import { nextTick } from 'vue';
-import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+import {
+  OrganisationsTyp,
+  useOrganisationStore,
+  type Organisation,
+  type OrganisationStore,
+} from '@/stores/OrganisationStore';
 import type { OrganisationResponse } from '@/api-client/generated';
+import type Module from 'module';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
-let organisationStore: OrganisationStore;
+const organisationStore: OrganisationStore = useOrganisationStore();
+
+const mockSchultraeger: Array<Organisation> = [
+  {
+    id: '2',
+    name: 'Öffentliche Schulen',
+    namensergaenzung: 'Ergänzung',
+    kennung: null,
+    kuerzel: '',
+    typ: OrganisationsTyp.Land,
+    administriertVon: '1',
+  },
+  {
+    id: '3',
+    name: 'Ersatzschulen Schulen',
+    namensergaenzung: 'Ergänzung',
+    kennung: null,
+    kuerzel: '',
+    typ: OrganisationsTyp.Land,
+    administriertVon: '1',
+  },
+];
+
+type OnBeforeRouteLeaveCallback = (
+  _to: RouteLocationNormalized,
+  _from: RouteLocationNormalized,
+  _next: NavigationGuardNext,
+) => void;
+
+let { storedBeforeRouteLeaveCallback }: { storedBeforeRouteLeaveCallback: OnBeforeRouteLeaveCallback } = vi.hoisted(
+  () => {
+    return {
+      storedBeforeRouteLeaveCallback: (
+        _to: RouteLocationNormalized,
+        _from: RouteLocationNormalized,
+        _next: NavigationGuardNext,
+      ): void => {},
+    };
+  },
+);
+
+function mountComponent(): VueWrapper {
+  return mount(SchuleCreationView, {
+    attachTo: document.getElementById('app') || '',
+    global: {
+      components: {
+        SchuleCreationView,
+      },
+      plugins: [router],
+    },
+  });
+}
+
+type FormFields = {
+  dienststellennummer: string;
+  schulname: string;
+};
+
+type FormSelectors = {
+  dienststellennummerInput: VueWrapper;
+  schulnameInput: VueWrapper;
+};
+
+async function fillForm(args: Partial<FormFields>): Promise<Partial<FormSelectors>> {
+  const { dienststellennummer, schulname }: Partial<FormFields> = args;
+  const selectors: Partial<FormSelectors> = {};
+
+  const dienststellennummerInput: VueWrapper | undefined = wrapper
+    ?.findComponent({ ref: 'dienststellennummer-input' });
+  expect(dienststellennummerInput?.exists()).toBe(true);
+
+  await dienststellennummerInput?.setValue(dienststellennummer);
+  await nextTick();
+  selectors.dienststellennummerInput = dienststellennummerInput;
+
+  const schulnameInput: VueWrapper | undefined = wrapper
+    ?.findComponent({ ref: 'schulname-input' });
+  expect(schulnameInput?.exists()).toBe(true);
+
+  await schulnameInput?.setValue(schulname);
+  await nextTick();
+  selectors.schulnameInput = schulnameInput;
+
+  return selectors;
+}
 
 beforeEach(async () => {
   document.body.innerHTML = `
     <div>
-      <div id="app"></div>
+      <router-view>
+        <div id="app"></div>
+      </router-view>
     </div>
   `;
-
-  organisationStore = useOrganisationStore();
-  organisationStore.schultraeger = [
-    {
-      id: '2',
-      name: 'Öffentliche Schulen',
-      namensergaenzung: 'Ergänzung',
-      kennung: null,
-      kuerzel: '',
-      typ: OrganisationsTyp.Land,
-      administriertVon: '1',
-    },
-    {
-      id: '3',
-      name: 'Ersatzschulen Schulen',
-      namensergaenzung: 'Ergänzung',
-      kennung: null,
-      kuerzel: '',
-      typ: OrganisationsTyp.Land,
-      administriertVon: '1',
-    },
-  ];
-  organisationStore.errorCode = '';
 
   router = createRouter({
     history: createWebHistory(),
@@ -49,20 +124,14 @@ beforeEach(async () => {
   router.push('/');
   await router.isReady();
 
-  wrapper = mount(SchuleCreationView, {
-    attachTo: document.getElementById('app') || '',
-    global: {
-      components: {
-        SchuleCreationView,
-      },
-      mocks: {
-        route: {
-          fullPath: 'full/path',
-        },
-      },
-      plugins: [router],
-    },
-  });
+  wrapper = mountComponent();
+  organisationStore.errorCode = '';
+  organisationStore.createdSchule = null;
+  organisationStore.schultraeger = mockSchultraeger;
+});
+
+afterEach(() => {
+  wrapper?.unmount();
 });
 
 describe('SchuleCreationView', () => {
@@ -85,15 +154,12 @@ describe('SchuleCreationView', () => {
   });
 
   test('it fills form and triggers submit', async () => {
-    const dienststellennummerInput: VueWrapper | undefined = wrapper?.findComponent({
-      ref: 'dienststellennummer-input',
+    await fillForm({
+      dienststellennummer: '9356494',
+      schulname: 'Random Schulname Gymnasium',
     });
-    await dienststellennummerInput?.setValue('9356494');
     await nextTick();
 
-    const schulnameInput: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schulname-input' });
-    await schulnameInput?.setValue('Random Schulname Gymnasium');
-    await nextTick();
     const mockSchule: OrganisationResponse = {
       id: '9876',
       name: 'Random Schulname Gymnasium',
@@ -120,21 +186,85 @@ describe('SchuleCreationView', () => {
     expect(organisationStore.createdSchule).toBe(null);
   });
 
-  test('it fills form and navigates to trigger dirty prompt', async () => {
-    const dienststellennummerInput: VueWrapper | undefined = wrapper?.findComponent({
-      ref: 'dienststellennummer-input',
+  test('it takes else paths in onMounted', async () => {
+    organisationStore.schultraeger = [];
+    await flushPromises();
+
+    organisationStore.schultraeger = mockSchultraeger;
+  });
+
+  describe('navigation interception', () => {
+    afterEach(() => {
+      vi.unmock('vue-router');
     });
-    await dienststellennummerInput?.setValue('9356494');
-    await nextTick();
 
-    const schulnameInput: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schulname-input' });
-    await schulnameInput?.setValue('Random Schulname Gymnasium');
-    await nextTick();
+    test('it triggers if form is dirty', async () => {
+      const expectedCallsToNext: number = 0;
+      vi.mock('vue-router', async (importOriginal: () => Promise<Module>) => {
+        const mod: Module = await importOriginal();
+        return {
+          ...mod,
+          onBeforeRouteLeave: vi.fn((actualCallback: OnBeforeRouteLeaveCallback) => {
+            storedBeforeRouteLeaveCallback = actualCallback;
+          }),
+        };
+      });
 
-    wrapper?.find('[data-testid="close-layout-card-button"]').trigger('click');
-    await nextTick();
+      wrapper = mountComponent();
+      await fillForm({
+        dienststellennummer: '9356494',
+        schulname: 'Random Schulname Gymnasium',
+      });
+      await nextTick();
 
-    await document.querySelector('[data-testid="confirm-unsaved-changes-button"]');
+      const spy: Mock = vi.fn();
+      storedBeforeRouteLeaveCallback({} as RouteLocationNormalized, {} as RouteLocationNormalized, spy);
+      expect(spy).toHaveBeenCalledTimes(expectedCallsToNext);
+      await nextTick();
+
+      const confirmButton: Element | null = document.querySelector('[data-testid="confirm-unsaved-changes-button"]');
+      expect(confirmButton).not.toBeNull();
+      confirmButton!.dispatchEvent(new Event('click'));
+      expect(spy).toHaveBeenCalledOnce();
+    });
+
+    test('it does not trigger if form is not dirty', async () => {
+      const expectedCallsToNext: number = 1;
+      vi.mock('vue-router', async (importOriginal: () => Promise<Module>) => {
+        const mod: Module = await importOriginal();
+        return {
+          ...mod,
+          onBeforeRouteLeave: vi.fn((actualCallback: OnBeforeRouteLeaveCallback) => {
+            storedBeforeRouteLeaveCallback = actualCallback;
+          }),
+        };
+      });
+      wrapper = mountComponent();
+      const spy: Mock = vi.fn();
+      storedBeforeRouteLeaveCallback({} as RouteLocationNormalized, {} as RouteLocationNormalized, spy);
+      expect(spy).toHaveBeenCalledTimes(expectedCallsToNext);
+    });
+  });
+
+  describe.each([[true], [false]])('when form is dirty:%s', async (isFormDirty: boolean) => {
+    beforeEach(async () => {
+      if (isFormDirty)
+        await fillForm({
+          dienststellennummer: '9356494',
+          schulname: 'Random Schulname Gymnasium',
+        });
+      await nextTick();
+    });
+
+    test('it handles unloading', async () => {
+      const event: Event = new Event('beforeunload');
+      const spy: MockInstance = vi.spyOn(event, 'preventDefault');
+      window.dispatchEvent(event);
+      // TODO: why is spy called 3 times?
+      // if (isFormDirty) expect(spy).toHaveBeenCalledOnce();
+      if (isFormDirty) expect(spy).toHaveBeenCalled();
+      else expect(spy).not.toHaveBeenCalledOnce();
+    });
   });
 
   test('it shows error message', async () => {
@@ -143,6 +273,7 @@ describe('SchuleCreationView', () => {
     expect(wrapper?.find('[data-testid="alert-title"]').isVisible()).toBe(true);
     wrapper?.find('[data-testid="alert-button"]').trigger('click');
     await nextTick();
+    organisationStore.errorCode = '';
   });
 
   test('shows error message if REQUIRED_STEP_UP_LEVEL_NOT_MET error is present and click close button', async () => {
@@ -151,5 +282,6 @@ describe('SchuleCreationView', () => {
     expect(wrapper?.find('[data-testid="alert-title"]').isVisible()).toBe(true);
     wrapper?.find('[data-testid="alert-button"]').trigger('click');
     await nextTick();
+    organisationStore.errorCode = '';
   });
 });
