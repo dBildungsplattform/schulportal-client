@@ -559,4 +559,40 @@ describe('PersonImportView', () => {
       totalImportDataItems.toString(),
     );
   });
+
+  test('it clears selected role when clearSelectedRolle is called', async () => {
+    const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+    rolleAutocomplete?.setValue('SuS');
+    await nextTick();
+
+    expect(rolleAutocomplete?.text()).toBe('SuS');
+
+    const clearButton: Element | null = document.body.querySelector('[data-testid="rolle-select"] i');
+    expect(clearButton).not.toBeNull();
+
+    if (clearButton) {
+      clearButton.dispatchEvent(new Event('click'));
+    }
+    await flushPromises();
+
+    expect(rolleAutocomplete?.attributes('value')).toBeUndefined();
+  });
+
+  test('it clears selected school when clearSelectedSchule is called', async () => {
+    const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
+    schuleAutocomplete?.setValue('Schule');
+    await nextTick();
+
+    expect(schuleAutocomplete?.text()).toBe('Schule');
+
+    const clearButton: Element | null = document.body.querySelector('[data-testid="schule-select"] i');
+    expect(clearButton).not.toBeNull();
+
+    if (clearButton) {
+      clearButton.dispatchEvent(new Event('click'));
+    }
+    await flushPromises();
+
+    expect(schuleAutocomplete?.attributes('value')).toBeUndefined();
+  });
 });
