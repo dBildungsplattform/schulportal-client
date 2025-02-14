@@ -23,6 +23,7 @@ type OnBeforeRouteLeaveCallback = (
   _from: RouteLocationNormalized,
   _next: NavigationGuardNext,
 ) => void;
+
 let { storedBeforeRouteLeaveCallback }: { storedBeforeRouteLeaveCallback: OnBeforeRouteLeaveCallback } = vi.hoisted(
   () => {
     return {
@@ -63,31 +64,33 @@ type FormFields = {
   schule: string;
   klassenname: string;
 };
+
 type FormSelectors = {
   schuleSelect: VueWrapper;
   klassennameInput: VueWrapper;
 };
+
 async function fillForm(args: Partial<FormFields>): Promise<Partial<FormSelectors>> {
   const { schule, klassenname }: Partial<FormFields> = args;
   const selectors: Partial<FormSelectors> = {};
-  if (schule) {
-    const schuleSelect: VueWrapper | undefined = wrapper
-      ?.findComponent({ ref: 'klasse-creation-form' })
-      .findComponent({ ref: 'schule-select' });
-    await schuleSelect?.setValue(schule);
-    await nextTick();
-    selectors.schuleSelect = schuleSelect;
-  }
 
-  if (klassenname) {
-    const klassennameInput: VueWrapper | undefined = wrapper
-      ?.findComponent({ ref: 'klasse-creation-form' })
-      .findComponent({ ref: 'klassenname-input' });
-    expect(klassennameInput?.exists()).toBe(true);
-    await klassennameInput?.setValue(klassenname);
-    await nextTick();
-    selectors.klassennameInput = klassennameInput;
-  }
+  const schuleSelect: VueWrapper | undefined = wrapper
+    ?.findComponent({ ref: 'klasse-creation-form' })
+    .findComponent({ ref: 'schule-select' });
+  expect(schuleSelect?.exists()).toBe(true);
+
+  await schuleSelect?.setValue(schule);
+  await nextTick();
+  selectors.schuleSelect = schuleSelect;
+
+  const klassennameInput: VueWrapper | undefined = wrapper
+    ?.findComponent({ ref: 'klasse-creation-form' })
+    .findComponent({ ref: 'klassenname-input' });
+  expect(klassennameInput?.exists()).toBe(true);
+
+  await klassennameInput?.setValue(klassenname);
+  await nextTick();
+  selectors.klassennameInput = klassennameInput;
 
   return selectors;
 }
@@ -203,7 +206,7 @@ describe('KlasseCreationView', () => {
       vi.unmock('vue-router');
     });
 
-    test('triggers, if form is dirty', async () => {
+    test('it triggers if form is dirty', async () => {
       const expectedCallsToNext: number = 0;
       vi.mock('vue-router', async (importOriginal: () => Promise<Module>) => {
         const mod: Module = await importOriginal();
@@ -231,7 +234,7 @@ describe('KlasseCreationView', () => {
       expect(spy).toHaveBeenCalledOnce();
     });
 
-    test('does not trigger, if form is not dirty', async () => {
+    test('it does not trigger if form is not dirty', async () => {
       const expectedCallsToNext: number = 1;
       vi.mock('vue-router', async (importOriginal: () => Promise<Module>) => {
         const mod: Module = await importOriginal();

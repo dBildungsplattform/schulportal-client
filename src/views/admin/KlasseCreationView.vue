@@ -149,7 +149,6 @@
 
   onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
     if (isFormDirty()) {
-      console.log("hamid")
       showUnsavedChangesDialog.value = true;
       blockedNext = next;
     } else {
