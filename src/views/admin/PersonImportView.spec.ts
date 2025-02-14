@@ -273,6 +273,54 @@ describe('PersonImportView', () => {
     expect(document.querySelector('[data-testid="person-import-confirmation-text"]')).toBeNull();
   });
 
+  test('it cancels the import and returns to form', async () => {
+    const mockFile: File = new File([''], 'personen.csv', { type: 'text/csv' });
+    const fileInput: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="file-input"] input');
+    importStore.executePersonenImport = vi.fn();
+    importStore.startImportStatusPolling = vi.fn();
+
+    Object.defineProperty(fileInput?.element, 'files', {
+      value: [mockFile],
+    });
+    await nextTick();
+
+    const uploadResponse: ImportUploadResponse = (importStore.uploadResponse = {
+      importvorgangId: '1234567890',
+      isValid: true,
+      totalImportDataItems: 2,
+      totalInvalidImportDataItems: 0,
+      invalidImportDataItems: [],
+    });
+
+    wrapper?.find('[data-testid="person-import-form-submit-button"]').trigger('click');
+    await nextTick();
+
+    expect(importStore.uploadResponse).toStrictEqual(uploadResponse);
+    expect(wrapper?.find('[data-testid="person-upload-success-text"]').isVisible()).toBe(true);
+
+    wrapper?.find('[data-testid="open-confirmation-dialog-button"]').trigger('click');
+    await nextTick();
+
+    const importConfirmationText: Element = document.querySelector(
+      '[data-testid="person-import-confirmation-text"]',
+    ) as Element;
+    const cancelImportButton: HTMLInputElement = document.querySelector(
+      '[data-testid="cancel-import-button"]',
+    ) as HTMLInputElement;
+
+    expect(importConfirmationText).not.toBeNull();
+    expect(cancelImportButton).not.toBeNull();
+
+    cancelImportButton.click();
+    await nextTick();
+
+    expect(importStore.executePersonenImport).not.toHaveBeenCalled();
+    expect(importStore.uploadResponse).toBeNull();
+    expect(importStore.importResponse).toBeNull();
+    expect(importStore.errorCode).toBeNull();
+    expect(document.querySelector('[data-testid="person-import-confirmation-text"]')).toBeNull();
+  });
+
   test('it downloads an imported file through the download all button', async () => {
     importStore.importResponse = {
       importvorgandId: '1',
