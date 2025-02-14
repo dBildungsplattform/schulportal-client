@@ -17,7 +17,7 @@ beforeEach(() => {
       id: 'alert',
       visible: true,
       text: 'This is the text of the alert',
-      type: 'errorAlt',
+      type: 'errorLight',
     },
 
     global: {

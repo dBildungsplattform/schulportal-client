@@ -22,7 +22,7 @@ const shTheme: ThemeDefinition = {
     info: '#2196F3',
     success: '#4CAF50',
     warning: '#FF9825',
-    errorAlt: '#FF5555',
+    errorLight: '#FF5555',
   },
 };
 

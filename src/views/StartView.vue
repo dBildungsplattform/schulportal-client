@@ -26,7 +26,7 @@
     id: string;
     message: string;
     visible: boolean;
-    type: 'errorAlt' | 'warning';
+    type: 'errorLight' | 'warning';
   };
 
   const personInfoStore: PersonInfoStore = usePersonInfoStore();
@@ -74,9 +74,9 @@
     );
   });
 
-  function getUrgencyType(date: Date): 'errorAlt' | 'warning' {
+  function getUrgencyType(date: Date): 'errorLight' | 'warning' {
     const error: boolean = date.valueOf() < new Date().valueOf() + 14 * 24 * 60 * 60 * 1000;
-    return error ? 'errorAlt' : 'warning';
+    return error ? 'errorLight' : 'warning';
   }
 
   function addAlert(alerts: Alert[], occasion: string, messageKey: string): void {

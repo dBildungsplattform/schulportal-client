@@ -211,6 +211,6 @@ describe('StartView', () => {
 
     const banner: WrapperLike | undefined = wrapper?.find('[data-testid="KOPERS-banner"]');
 
-    expect(banner?.classes()).toContain('bg-errorAlt');
+    expect(banner?.classes()).toContain('bg-errorLight');
   });
 });
