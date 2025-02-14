@@ -144,7 +144,7 @@
   onMounted(async () => {
     organisationStore.createdSchultraeger = null;
     organisationStore.errorCode = '';
-    await organisationStore.getSchultraeger();
+    await organisationStore.getRootKinderSchultraeger();
 
     if (rootChildSchultraegerList.value && rootChildSchultraegerList.value.length > 0) {
       const defaultSchultraegerform: string = rootChildSchultraegerList.value[0]?.id ?? '';

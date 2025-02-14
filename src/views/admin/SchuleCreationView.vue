@@ -166,7 +166,7 @@
   onMounted(async () => {
     organisationStore.createdSchule = null;
     organisationStore.errorCode = '';
-    await organisationStore.getSchultraeger();
+    await organisationStore.getRootKinderSchultraeger();
 
     if (schultraegerList.value && schultraegerList.value.length > 0) {
       const defaultSchulform: string = schultraegerList.value[0]?.id ?? '';

@@ -118,7 +118,7 @@ type OrganisationActions = {
   ) => Promise<void>;
   deleteOrganisationById: (organisationId: string) => Promise<void>;
   updateOrganisationById: (organisationId: string, name: string) => Promise<void>;
-  getSchultraeger: () => Promise<void>;
+  getRootKinderSchultraeger: () => Promise<void>;
   fetchSchuleDetailsForKlassen: (filterActive: boolean) => Promise<void>;
   setItsLearningForSchule: (organisationId: string) => Promise<void>;
 };
@@ -458,7 +458,7 @@ export const useOrganisationStore: StoreDefinition<
       }
     },
 
-    async getSchultraeger() {
+    async getRootKinderSchultraeger() {
       try {
         const response: AxiosResponse<OrganisationRootChildrenResponse> =
           await organisationApi.organisationControllerGetRootChildren();
