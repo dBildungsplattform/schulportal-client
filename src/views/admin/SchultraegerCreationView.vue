@@ -24,7 +24,7 @@
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import FormRow from '@/components/form/FormRow.vue';
 
-  const initialSchultraegerFormCache: Ref<string> = ref('');
+  const initialSchultraegerformCache: Ref<string> = ref('');
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -50,13 +50,13 @@
     },
   });
 
-  type SchuleCreationForm = {
+  type SchultraegerCreationForm = {
     selectedSchultraegerform: string;
     selectedSchultraegername: string;
   };
 
   // eslint-disable-next-line @typescript-eslint/typedef
-  const { defineField, handleSubmit, isFieldDirty, resetForm } = useForm<SchuleCreationForm>({
+  const { defineField, handleSubmit, isFieldDirty, resetForm } = useForm<SchultraegerCreationForm>({
     validationSchema,
   });
 
@@ -71,7 +71,7 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedSchultraegername', vuetifyConfig);
 
-  const schultraegerList: ComputedRef<Organisation[] | undefined> = computed(() => {
+  const rootChildSchultraegerList: ComputedRef<Organisation[] | undefined> = computed(() => {
     return organisationStore.schultraeger;
   });
 
@@ -83,7 +83,7 @@
   let blockedNext: () => void = () => {};
 
   const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
-    preservedSchultraegerform.value = schultraegerList.value?.find(
+    preservedSchultraegerform.value = rootChildSchultraegerList.value?.find(
       (schultraeger: Organisation) => schultraeger.id === selectedSchultraegerform.value,
     )?.name;
     if (selectedSchultraegername.value) {
@@ -99,7 +99,7 @@
       );
       resetForm({
         values: {
-          selectedSchultraegerform: initialSchultraegerFormCache.value,
+          selectedSchultraegerform: initialSchultraegerformCache.value,
           selectedSchultraegername: '',
         },
       });
@@ -117,6 +117,7 @@
     organisationStore.errorCode = '';
   }
 
+  // TODO: add a router.push to the Management when it's available
   async function navigateToSchultraegerManagement(): Promise<void> {
     organisationStore.createdSchule = null;
   }
@@ -145,10 +146,10 @@
     organisationStore.errorCode = '';
     await organisationStore.getSchultraeger();
 
-    if (schultraegerList.value && schultraegerList.value.length > 0) {
-      const defaultSchultraegerform: string = schultraegerList.value[0]?.id ?? '';
+    if (rootChildSchultraegerList.value && rootChildSchultraegerList.value.length > 0) {
+      const defaultSchultraegerform: string = rootChildSchultraegerList.value[0]?.id ?? '';
       selectedSchultraegerform.value = defaultSchultraegerform;
-      initialSchultraegerFormCache.value = defaultSchultraegerform;
+      initialSchultraegerformCache.value = defaultSchultraegerform;
     }
     /* listen for browser changes and prevent them when form is dirty */
     window.addEventListener('beforeunload', preventNavigation);
@@ -229,7 +230,7 @@
                 data-testid="schultraegerform-radio-group"
               >
                 <v-col
-                  v-for="(schultraeger, index) in schultraegerList"
+                  v-for="schultraeger in rootChildSchultraegerList"
                   :key="schultraeger.id"
                   offset-md="1"
                   cols="12"
@@ -239,7 +240,9 @@
                   <v-radio
                     :label="schultraeger.name"
                     :value="schultraeger.id"
-                    :data-testid="'schultraegerform-radio-button-' + index"
+                    :data-testid="
+                      'schultraegerform-radio-button-' + schultraeger.name.replace(/\s+/g, '-').toLowerCase()
+                    "
                   ></v-radio>
                 </v-col>
               </v-radio-group>
@@ -247,7 +250,7 @@
             <!-- select Schultraeger name -->
             <v-row>
               <v-col>
-                <h3 class="headline-3">2. {{ $t('admin.schultraeger.enterschultraegername') }}</h3>
+                <h3 class="headline-3">2. {{ $t('admin.schultraeger.enterSchultraegername') }}</h3>
               </v-col>
             </v-row>
             <FormRow
@@ -271,7 +274,7 @@
           </template>
         </FormWrapper>
       </template>
-      <!-- Result template on success after submit (Present value in createdSchule and no errorCode)  -->
+      <!-- Result template on success after submit (Present value in createdSchultraeger and no errorCode)  -->
       <template v-if="organisationStore.createdSchultraeger && !organisationStore.errorCode">
         <v-container class="new-schultraeger-success">
           <v-row justify="center">
