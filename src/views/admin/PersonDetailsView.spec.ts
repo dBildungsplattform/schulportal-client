@@ -636,8 +636,41 @@ describe('PersonDetailsView', () => {
 
     expect(resetPasswordButton).not.toBeNull();
     resetPasswordButton.click();
+    resetPasswordButton.dispatchEvent(new Event('click'));
+    await flushPromises();
     await nextTick();
 
+    expect(personStore.resetDevicePassword).toHaveBeenCalled();
+
+    // reset personenuebersicht
+    personStore.personenuebersicht = mockPersonenuebersicht;
+  });
+
+  test('it shows password reset template', async () => {
+    personStore.personenuebersicht = mockPersonenuebersichtLehr;
+    setCurrentPerson(EmailAddressStatus.Enabled);
+    await nextTick();
+    if (!wrapper) return;
+
+    const devicePasswordChangeButton: DOMWrapper<Element> | undefined = wrapper
+      .findComponent({ ref: 'password-reset' })
+      .find('[data-testid="open-password-reset-dialog-button"]');
+    devicePasswordChangeButton.trigger('click');
+    await nextTick();
+
+    expect(document.querySelector('[data-testid="password-reset-info-text"]')).not.toBeNull();
+
+    const resetPasswordButton: HTMLElement = (await document.querySelector(
+      '[data-testid="password-reset-button"]',
+    )) as HTMLElement;
+
+    expect(resetPasswordButton).not.toBeNull();
+    resetPasswordButton.click();
+    resetPasswordButton.dispatchEvent(new Event('click'));
+    await flushPromises();
+    await nextTick();
+
+    expect(personStore.resetPassword).toHaveBeenCalled();
     // reset personenuebersicht
     personStore.personenuebersicht = mockPersonenuebersicht;
   });
