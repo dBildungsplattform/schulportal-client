@@ -11,10 +11,8 @@
   } from '@/stores/OrganisationStore';
   import { RollenSystemRecht } from '@/stores/RolleStore';
   import { type TranslatedObject } from '@/types.d';
-  import { getValidationSchema, getVuetifyConfig } from '@/utils/validationKlasse';
-  import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
-  import { computed, onMounted, onUnmounted, ref, watch, type ComputedRef, type Ref } from 'vue';
-  import { useI18n, type Composer } from 'vue-i18n';
+  import { type ValidationSchema } from '@/utils/validationKlasse';
+  import { computed, onMounted, onUnmounted, ref, useTemplateRef, type ComputedRef, type Ref } from 'vue';
   import {
     onBeforeRouteLeave,
     useRouter,
@@ -23,36 +21,9 @@
     type Router,
   } from 'vue-router';
 
-  const { t }: Composer = useI18n({ useScope: 'global' });
   const router: Router = useRouter();
   const organisationStore: OrganisationStore = useOrganisationStore();
-
-  const hasAutoselectedSchule: ComputedRef<boolean> = computed(() => organisationStore.autoselectedSchule !== null);
-
-  const validationSchema: TypedSchema = getValidationSchema(t);
-
-  const vuetifyConfig = (state: {
-    errors: Array<string>;
-  }): { props: { error: boolean; 'error-messages': Array<string> } } => getVuetifyConfig(state);
-
-  type KlasseCreationForm = {
-    selectedSchule: string;
-    selectedKlassenname: string;
-  };
-
-  // eslint-disable-next-line @typescript-eslint/typedef
-  const { defineField, handleSubmit, isFieldDirty, resetForm } = useForm<KlasseCreationForm>({
-    validationSchema,
-  });
-
-  const [selectedSchule, selectedSchuleProps]: [
-    Ref<string | undefined>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedSchule', vuetifyConfig);
-  const [selectedKlassenname, selectedKlassennameProps]: [
-    Ref<string>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedKlassenname', vuetifyConfig);
+  const formRef: Readonly<typeof KlasseForm> = useTemplateRef<InstanceType<typeof KlasseForm>>('klasse-creation-form');
 
   const schulen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
     return organisationStore.allSchulen
@@ -71,15 +42,12 @@
       )?.title || '',
   );
 
-  function isFormDirty(): boolean {
-    const schuleDirty: boolean = hasAutoselectedSchule.value ? false : isFieldDirty('selectedSchule');
-    return schuleDirty || isFieldDirty('selectedKlassenname');
-  }
+  const isFormDirty: Ref<boolean> = ref(false);
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
   let blockedNext: () => void = () => {};
 
   function preventNavigation(event: BeforeUnloadEvent): void {
-    if (!isFormDirty()) return;
+    if (!isFormDirty.value) return;
     event.preventDefault();
     /* Chrome requires returnValue to be set. */
     event.returnValue = '';
@@ -96,7 +64,7 @@
   }
 
   onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
-    if (isFormDirty()) {
+    if (isFormDirty.value) {
       showUnsavedChangesDialog.value = true;
       blockedNext = next;
     } else {
@@ -105,14 +73,14 @@
   });
 
   const handleCreateAnotherKlasse = async (): Promise<void> => {
-    resetForm();
+    formRef.value?.reset();
     await initStores();
     router.push({ name: 'create-klasse' });
   };
 
   async function navigateBackToKlasseForm(): Promise<void> {
     if (organisationStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
-      resetForm();
+      formRef.value?.reset();
       await router.push({ name: 'create-klasse' }).then(() => {
         router.go(0);
       });
@@ -124,7 +92,7 @@
 
   async function navigateToKlasseManagement(): Promise<void> {
     if (organisationStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
-      resetForm();
+      formRef.value?.reset();
       await router.push({ name: 'create-klasse' }).then(() => {
         router.go(0);
       });
@@ -139,27 +107,18 @@
     organisationStore.errorCode = '';
   }
 
-  const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
+  const onSubmit = async ({ selectedSchule, selectedKlassenname }: ValidationSchema): Promise<void> => {
     await organisationStore.createOrganisation(
       undefined,
-      selectedKlassenname.value,
+      selectedKlassenname,
       undefined,
       undefined,
       OrganisationsTyp.Klasse,
       undefined,
-      selectedSchule.value,
-      selectedSchule.value,
+      selectedSchule,
+      selectedSchule,
     );
-    resetForm();
-  });
-
-  watch(
-    () => organisationStore.schulenFilter.selectedItems,
-    (newSelection: Array<Organisation>) => {
-      if (newSelection.length === 1) selectedSchule.value = newSelection[0]!.id;
-      else selectedSchule.value = undefined;
-    },
-  );
+  };
 
   onMounted(async () => {
     await initStores();
@@ -190,21 +149,18 @@
       <!-- The form to create a new Klasse -->
       <template v-if="!organisationStore.createdKlasse">
         <KlasseForm
+          :isFormDirty
           :errorCode="organisationStore.errorCode"
           :schulen="schulen"
           :isEditActive="true"
           :isLoading="organisationStore.loading"
           :readonly="false"
-          :selectedSchuleProps="selectedSchuleProps"
-          :selectedKlassennameProps="selectedKlassennameProps"
           :showUnsavedChangesDialog="showUnsavedChangesDialog"
           :onHandleConfirmUnsavedChanges="handleConfirmUnsavedChanges"
           :onHandleDiscard="navigateToKlasseManagement"
           :onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
-          :onSubmit="onSubmit"
+          :onSubmit
           ref="klasse-creation-form"
-          v-model:selectedSchule="selectedSchule"
-          v-model:selectedKlassenname="selectedKlassenname"
         >
           <!-- Error Message Display if error on submit -->
           <SpshAlert

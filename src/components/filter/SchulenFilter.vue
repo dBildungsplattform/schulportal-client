@@ -13,11 +13,13 @@
   import { computed, onMounted, reactive, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
 
+  type SelectedSchulenIds = Array<string> | string | undefined;
   type Props = {
     includeTraeger?: boolean;
     systemrechteForSearch?: Array<RollenSystemRecht>;
     multiple: boolean;
     readonly?: boolean;
+    initialIds?: Array<string> | string;
     selectedSchuleProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
   };
   type Emits = {
@@ -28,8 +30,8 @@
   const organisationStore: OrganisationStore = useOrganisationStore();
   const { t }: Composer = useI18n({ useScope: 'global' });
 
+  const selectedSchulenIds: Ref<SelectedSchulenIds> = ref(props.initialIds ?? []);
   const searchInput: Ref<string | undefined> = ref(undefined);
-  const selectedSchulenIds: Ref<Array<string> | string | undefined> = ref([]);
   const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
   const schulenFilter: OrganisationenFilter = reactive({
     includeTyp: OrganisationsTyp.Schule,
@@ -37,27 +39,31 @@
     limit: 25,
   });
 
+  const clearInput = (): void => {
+    searchInput.value = undefined;
+    selectedSchulenIds.value = undefined;
+  };
+
+  defineExpose({ clearInput });
+
   const hasAutoselectedSchule: ComputedRef<boolean> = computed(() => organisationStore.autoselectedSchule !== null);
-  const selectedSchulen: ComputedRef<Array<Organisation>> = computed(
-    () => organisationStore.schulenFilter.selectedItems,
-  );
   const translatedSchulen: ComputedRef<Array<TranslatedObject>> = computed(() =>
     organisationStore.schulenFilter.filterResult.map((schule: Organisation) => ({
       value: schule.id,
       title: getDisplayNameForOrg(schule),
     })),
   );
+  function hasItemsSelected(selection: SelectedSchulenIds): boolean {
+    if (Array.isArray(selection)) {
+      return selection.filter(Boolean).length > 0;
+    } else return Boolean(selection);
+  }
   const hasSelectedSchule: ComputedRef<boolean> = computed(
-    () => hasAutoselectedSchule.value || selectedSchulen.value.length > 0,
+    () => hasAutoselectedSchule.value || hasItemsSelected(selectedSchulenIds.value),
   );
 
   const updateSearchString = (searchString: string | undefined): void => {
     schulenFilter.searchString = searchString;
-  };
-
-  const clearInput = (): void => {
-    searchInput.value = undefined;
-    selectedSchulenIds.value = undefined;
   };
 
   watch(

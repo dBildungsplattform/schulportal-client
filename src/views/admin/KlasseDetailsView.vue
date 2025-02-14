@@ -11,8 +11,7 @@
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
   import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
-  import { getValidationSchema, getVuetifyConfig } from '@/utils/validationKlasse';
-  import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
+  import { type ValidationSchema as KlasseFormValues } from '@/utils/validationKlasse';
   import { computed, onBeforeMount, onUnmounted, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import {
@@ -35,7 +34,7 @@
   const organisationStore: OrganisationStore = useOrganisationStore();
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
 
-  const currentOrganisationId: string = route.params['id'] as string;
+  const currentKlasseId: string = route.params['id'] as string;
   const isEditActive: Ref<boolean> = ref(false);
 
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
@@ -61,38 +60,11 @@
       : t(`admin.klasse.errors.${organisationStore.errorCode}`);
   });
 
-  const validationSchema: TypedSchema = getValidationSchema(t);
-
-  const vuetifyConfig = (state: {
-    errors: Array<string>;
-  }): { props: { error: boolean; 'error-messages': Array<string> } } => getVuetifyConfig(state);
-
-  type KlasseEditForm = {
-    selectedSchule: string;
-    selectedKlassenname: string;
-  };
-
-  // eslint-disable-next-line @typescript-eslint/typedef
-  const { defineField, handleSubmit, isFieldDirty, resetForm, setFieldValue } = useForm<KlasseEditForm>({
-    validationSchema,
-  });
-
-  const [selectedSchule, selectedSchuleProps]: [
-    Ref<string>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedSchule', vuetifyConfig);
-  const [selectedKlassenname, selectedKlassennameProps]: [
-    Ref<string>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedKlassenname', vuetifyConfig);
-
-  function isFormDirty(): boolean {
-    // Only check for dirtiness if the form is in edit mode
-    // Only check if klassenname is dirty, because selectedSchule is readonly
-    if (!isEditActive.value) return false;
-    else if (selectedKlassenname.value === organisationStore.currentKlasse?.name) return false;
-    else return isFieldDirty('selectedKlassenname');
-  }
+  const initialFormValues: ComputedRef<Partial<KlasseFormValues>> = computed(() => ({
+    selectedSchule: organisationStore.currentOrganisation?.id,
+    selectedKlassenname: organisationStore.currentKlasse?.name,
+  }));
+  const isFormDirty: Ref<boolean> = ref(false);
 
   let blockedNext: () => void = () => {};
 
@@ -111,17 +83,17 @@
     isEditActive.value = false;
   }
 
-  function handleCancel(next: NavigationGuardNext): void {
-    if (isFormDirty()) {
+  function handleCancel(next?: NavigationGuardNext): void {
+    if (isFormDirty.value) {
       showUnsavedChangesDialog.value = true;
-      blockedNext = next;
+      if (next) blockedNext = next;
     } else {
       cancelEdit();
     }
   }
 
   function preventNavigation(event: BeforeUnloadEvent): void {
-    if (!isFormDirty()) return;
+    if (!isFormDirty.value) return;
     event.preventDefault();
     /* Chrome requires returnValue to be set. */
     event.returnValue = '';
@@ -137,14 +109,13 @@
     navigateToKlasseManagement();
   };
 
-  const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
-    if (selectedSchule.value && selectedKlassenname.value) {
+  const onSubmit = async ({ selectedKlassenname }: KlasseFormValues): Promise<void> => {
+    if (selectedKlassenname) {
       if (organisationStore.currentOrganisation) {
-        await organisationStore.updateOrganisationById(currentOrganisationId, selectedKlassenname.value);
+        await organisationStore.updateOrganisationById(currentKlasseId, selectedKlassenname);
       }
-      resetForm();
     }
-  });
+  };
 
   async function deleteKlasseById(organisationId: string): Promise<void> {
     await organisationStore.deleteOrganisationById(organisationId);
@@ -155,11 +126,10 @@
   }
 
   const alertButtonText: ComputedRef<string> = computed(() => {
-    return organisationStore.errorCode === 'NEWER_VERSION_ORGANISATION'
-      ? t('refreshData')
-      : isEditActive.value
-        ? t('admin.klasse.backToEditKlasse')
-        : t('nav.backToList');
+    if (organisationStore.errorCode === 'NEWER_VERSION_ORGANISATION') return t('refreshData');
+    else if (isEditActive.value) {
+      return t('admin.klasse.backToEditKlasse');
+    } else return t('nav.backToList');
   });
 
   const alertButtonAction: ComputedRef<() => void> = computed(() => {
@@ -173,16 +143,9 @@
     async (newKlasse: Organisation | null) => {
       if (!newKlasse) return;
       if (newKlasse.administriertVon) {
-        await organisationStore.getOrganisationById(newKlasse.administriertVon, OrganisationsTyp.Schule);
+        if (organisationStore.currentOrganisation?.id !== newKlasse.administriertVon)
+          await organisationStore.getOrganisationById(newKlasse.administriertVon, OrganisationsTyp.Schule);
       }
-    },
-    { immediate: true },
-  );
-
-  watch(
-    () => organisationStore.currentOrganisation,
-    (org: Organisation | null) => {
-      if (org) setFieldValue('selectedSchule', org.id);
     },
     { immediate: true },
   );
@@ -191,18 +154,15 @@
     organisationStore.errorCode = '';
     organisationStore.updatedOrganisation = null;
     // Retrieves the Klasse using the Id in the route since that's all we have
-    await organisationStore.getOrganisationById(currentOrganisationId, OrganisationsTyp.Klasse);
+    await organisationStore.getOrganisationById(currentKlasseId, OrganisationsTyp.Klasse);
     // Retrieves the parent Organisation of the Klasse using the same endpoint but with a different parameter
-
-    // Set the initial values using the computed properties
-    setFieldValue('selectedKlassenname', organisationStore.currentKlasse?.name || '');
 
     /* listen for browser changes and prevent them when form is dirty */
     window.addEventListener('beforeunload', preventNavigation);
   });
 
   onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
-    if (isFormDirty()) {
+    if (isFormDirty.value) {
       showUnsavedChangesDialog.value = true;
       blockedNext = next;
     } else {
@@ -235,20 +195,18 @@
         <v-container>
           <div v-if="organisationStore.currentOrganisation">
             <KlasseForm
+              :initialValues="initialFormValues"
+              :isFormDirty
               :errorCode="organisationStore.errorCode"
               :isEditActive="isEditActive"
               :isLoading="organisationStore.loading"
               :readonly="true"
-              :selectedSchuleProps="selectedSchuleProps"
-              :selectedKlassennameProps="selectedKlassennameProps"
               :showUnsavedChangesDialog="showUnsavedChangesDialog"
               :onHandleConfirmUnsavedChanges="handleConfirmUnsavedChanges"
-              :onHandleDiscard="navigateToKlasseManagement"
+              :onHandleDiscard="handleCancel"
               :onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
               :onSubmit="onSubmit"
               ref="klasse-creation-form"
-              v-model:selectedSchule="selectedSchule"
-              v-model:selectedKlassenname="selectedKlassenname"
             >
               <!-- Error Message Display -->
               <SpshAlert
@@ -285,10 +243,10 @@
                       :klassenname="organisationStore.currentKlasse?.name || ''"
                       :klassenId="organisationStore.currentKlasse?.id || ''"
                       ref="klasse-delete"
-                      :schulname="selectedSchule || ''"
+                      :schulname="organisationStore.currentOrganisation.name || ''"
                       :isLoading="organisationStore.loading"
                       :useIconActivator="false"
-                      @onDeleteKlasse="deleteKlasseById(currentOrganisationId)"
+                      @onDeleteKlasse="deleteKlasseById(currentKlasseId)"
                     >
                     </KlasseDelete>
                   </div>
@@ -305,43 +263,6 @@
                     :block="mdAndDown"
                   >
                     {{ $t('edit') }}
-                  </v-btn>
-                </v-col>
-              </v-row>
-            </div>
-            <div
-              v-else-if="!organisationStore.errorCode"
-              class="d-flex justify-end"
-            >
-              <v-row class="pt-3 px-2 save-cancel-row justify-end">
-                <v-col
-                  class="cancel-col"
-                  cols="12"
-                  sm="6"
-                  md="auto"
-                >
-                  <v-btn
-                    class="secondary"
-                    data-testid="klasse-edit-cancel-button"
-                    @click="handleCancel"
-                    :block="mdAndDown"
-                  >
-                    {{ $t('cancel') }}
-                  </v-btn>
-                </v-col>
-                <v-col
-                  cols="12"
-                  sm="6"
-                  md="auto"
-                >
-                  <v-btn
-                    class="primary"
-                    data-testid="klasse-changes-save-button"
-                    @Click="onSubmit"
-                    :block="mdAndDown"
-                    :disabled="organisationStore.loading"
-                  >
-                    {{ $t('save') }}
                   </v-btn>
                 </v-col>
               </v-row>

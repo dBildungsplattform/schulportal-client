@@ -286,7 +286,7 @@ export const useOrganisationStore: StoreDefinition<
     },
     async getAutoselectedSchule() {
       this.errorCode = '';
-      this.loading = true;
+      this.schulenFilter.loading = true;
       try {
         const response: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations(
           0,
