@@ -6,17 +6,7 @@
   import type { TranslatedObject } from '@/types';
   import { getValidationSchema, getVuetifyConfig } from '@/utils/validationKlasse';
   import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
-  import {
-    computed,
-    defineProps,
-    onMounted,
-    ref,
-    useTemplateRef,
-    watch,
-    type ComputedRef,
-    type ModelRef,
-    type Ref,
-  } from 'vue';
+  import { computed, defineProps, ref, useTemplateRef, watch, type ComputedRef, type ModelRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import SchulenFilter from '../filter/SchulenFilter.vue';
 
@@ -101,6 +91,21 @@
       if (oldValue && !newValue) setInitialValues();
     },
   );
+
+  watch(
+    () =>
+      ({
+        selectedSchule: props.initialValues?.selectedSchule,
+        selectedKlassenname: props.initialValues?.selectedKlassenname,
+      }) as Partial<KlasseForm>,
+    (newValues: Partial<KlasseForm>, oldValues: Partial<KlasseForm>) => {
+      if (
+        newValues.selectedSchule !== oldValues.selectedSchule ||
+        newValues.selectedKlassenname !== oldValues.selectedKlassenname
+      )
+        setInitialValues();
+    },
+  );
 </script>
 
 <template data-test-id="klasse-form">
@@ -141,9 +146,6 @@
             :selectedSchuleProps="selectedSchuleProps"
             @onSchuleSelected="setSelectedSchule"
           ></SchulenFilter>
-          {{ props.initialValues?.selectedSchule }}
-          {{ isFieldDirty('selectedSchule') }}
-          {{ isFieldValid('selectedSchule') }}
         </div>
       </FormRow>
 
@@ -170,10 +172,8 @@
           v-bind="selectedKlassennameProps"
           v-model="selectedKlassenname"
         ></v-text-field>
-        {{ isFieldValid('selectedKlassenname') }}
       </FormRow>
     </template>
-    {{ canCommit }}
   </FormWrapper>
 </template>
 
