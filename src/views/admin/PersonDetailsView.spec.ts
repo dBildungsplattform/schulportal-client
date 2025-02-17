@@ -234,6 +234,21 @@ organisationStore.getParentOrganisationsByIds = async (_organisationIds: string[
   return;
 };
 
+organisationStore.parentOrganisationen = [
+  {
+    id: '123456',
+    name: 'Testschule Birmingham',
+    typ: OrganisationsTyp.Schule,
+    administriertVon: '1',
+  },
+  {
+    id: '123459',
+    name: 'Testschule London',
+    typ: OrganisationsTyp.Schule,
+    administriertVon: '1',
+  },
+];
+
 authStore.currentUser = mockCurrentUser;
 personStore.currentPerson = mockPerson;
 personStore.personenuebersicht = mockPersonenuebersicht;
@@ -825,6 +840,38 @@ describe('PersonDetailsView', () => {
       await nextTick();
 
       expect(wrapper?.find('[data-testid="befristung-change-button"]').attributes('disabled')).toBeDefined();
+    });
+    test('it submits the form to lock the user', async () => {
+      const devicePasswordChangeButton: DOMWrapper<Element> | undefined = wrapper?.find(
+        '[data-testid="open-lock-dialog-button"]',
+      );
+      devicePasswordChangeButton?.trigger('click');
+      await nextTick();
+
+      expect(document.querySelector('[data-testid="lock-user-info-text"]')).not.toBeNull();
+
+      const unbefristetRadioButton: HTMLElement = (await document.querySelector(
+        '[data-testid="unbefristet-radio-button"] input[type="radio"]',
+      )) as HTMLElement;
+
+      expect(unbefristetRadioButton).not.toBeNull();
+      unbefristetRadioButton.click();
+      unbefristetRadioButton.dispatchEvent(new Event('click'));
+
+      const lockUserButton: HTMLElement = (await document.querySelector(
+        '[data-testid="lock-user-button"]',
+      )) as HTMLElement;
+
+      expect(lockUserButton).not.toBeNull();
+      lockUserButton.click();
+      lockUserButton.dispatchEvent(new Event('click'));
+      await nextTick();
+      await flushPromises();
+      await flushPromises();
+
+      expect(personStore.lockPerson).toHaveBeenCalled();
+      // reset personenuebersicht
+      personStore.personenuebersicht = mockPersonenuebersicht;
     });
 
     test.each([
