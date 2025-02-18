@@ -8,6 +8,7 @@
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
   import type { TranslatedObject } from '@/types';
+  import { dedup } from '@/utils/arrays';
   import { getDisplayNameForOrg } from '@/utils/formatting';
   import type { BaseFieldProps } from 'vee-validate';
   import { computed, onMounted, reactive, ref, watch, type ComputedRef, type Ref } from 'vue';
@@ -66,6 +67,22 @@
     schulenFilter.searchString = searchString;
   };
 
+  const getDefaultIds = (): Array<string> => {
+    if (!props.initialIds) return [];
+    if (Array.isArray(props.initialIds)) return props.initialIds;
+    return [props.initialIds];
+  };
+
+  const updateOrganisationenIds = (ids: SelectedSchulenIds): void => {
+    const tempIds: Array<string> = [...getDefaultIds()];
+    if (Array.isArray(ids)) {
+      tempIds.push(...ids);
+    } else if (ids) {
+      tempIds.push(ids);
+    }
+    schulenFilter.organisationIds = dedup(tempIds.filter(Boolean));
+  };
+
   watch(
     () => organisationStore.autoselectedSchule,
     (selectedSchule: Organisation | null) => {
@@ -78,18 +95,25 @@
   );
 
   watch(
-    () => organisationStore.schulenFilter.selectedItems,
-    (newSelectedSchulen: Array<Organisation>) => {
-      if (props.multiple) {
-        selectedSchulenIds.value = newSelectedSchulen.map((schule: Organisation) => schule.id);
-      } else if (newSelectedSchulen.length === 1) selectedSchulenIds.value = newSelectedSchulen[0]!.id;
-      else if (newSelectedSchulen.length === 0 && !props.readonly) clearInput();
+    () => props.initialIds,
+    (newIds: SelectedSchulenIds) => {
+      selectedSchulenIds.value = newIds;
     },
   );
 
-  watch(selectedSchulenIds, (newIds: Array<string> | string | undefined) => {
+  // watch(
+  //   () => organisationStore.schulenFilter.selectedItems,
+  //   (newSelectedSchulen: Array<Organisation>) => {
+  //     if (props.multiple) {
+  //       selectedSchulenIds.value = newSelectedSchulen.map((schule: Organisation) => schule.id);
+  //     } else if (newSelectedSchulen.length === 1) selectedSchulenIds.value = newSelectedSchulen[0]!.id;
+  //     else if (newSelectedSchulen.length === 0 && !props.readonly) clearInput();
+  //   },
+  // );
+
+  watch(selectedSchulenIds, (newIds: SelectedSchulenIds) => {
     if (Array.isArray(newIds)) {
-      schulenFilter.organisationIds = newIds;
+      updateOrganisationenIds(newIds);
       // TODO: measure performance impact
       organisationStore.schulenFilter.selectedItems = newIds.reduce(
         (newSelection: Array<Organisation>, schuleId: string) => {
@@ -102,12 +126,12 @@
         [] as Array<Organisation>,
       );
     } else if (newIds === '' || newIds === undefined) {
-      schulenFilter.organisationIds = [];
-      schulenFilter.searchString = undefined;
+      updateOrganisationenIds([]);
+      updateSearchString(undefined);
       organisationStore.schulenFilter.selectedItems = [];
       clearInput();
     } else {
-      schulenFilter.organisationIds = [newIds];
+      updateOrganisationenIds([newIds]);
       const selectedSchule: Organisation | undefined = organisationStore.schulenFilter.filterResult.find(
         (schule: Organisation) => schule.id === newIds,
       );
@@ -129,6 +153,7 @@
 
   onMounted(async () => {
     organisationStore.resetSchulFilter();
+    updateOrganisationenIds([]);
     await organisationStore.getAutoselectedSchule();
     await organisationStore.loadSchulenForFilter(schulenFilter);
   });
@@ -150,7 +175,6 @@
     :multiple="props.multiple"
     :no-data-text="'noDataFound'"
     :placeholder="t('admin.schule.assignSchule')"
-    ref="schule-select"
     required="true"
     variant="outlined"
     @update:search="updateSearchString"

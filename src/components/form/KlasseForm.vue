@@ -3,32 +3,29 @@
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import type { Organisation } from '@/stores/OrganisationStore';
   import { RollenSystemRecht } from '@/stores/RolleStore';
-  import type { TranslatedObject } from '@/types';
-  import { getValidationSchema, getVuetifyConfig } from '@/utils/validationKlasse';
-  import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
-  import { computed, defineProps, ref, useTemplateRef, watch, type ComputedRef, type ModelRef, type Ref } from 'vue';
+  import { getValidationSchema, getVuetifyConfig, type ValidationSchema } from '@/utils/validationKlasse';
+  import { useForm, useIsFormDirty, useIsFormValid, type BaseFieldProps, type TypedSchema } from 'vee-validate';
+  import { computed, useTemplateRef, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import SchulenFilter from '../filter/SchulenFilter.vue';
 
-  type KlasseForm = {
-    selectedSchule: string;
-    selectedKlassenname: string;
-  };
   type Props = {
-    initialValues?: Partial<KlasseForm>;
+    initialValues?: Partial<ValidationSchema>;
     errorCode?: string;
-    schulen?: Array<TranslatedObject>;
-    readonly?: boolean;
     showUnsavedChangesDialog?: boolean;
+    editMode: boolean;
     isEditActive?: boolean;
     isLoading: boolean;
     onHandleConfirmUnsavedChanges: () => void;
     onHandleDiscard: () => void;
     onShowDialogChange: (value?: boolean) => void;
-    onSubmit: (values: KlasseForm) => Promise<void>;
+    onSubmit: (values: ValidationSchema) => Promise<void>;
   };
   const props: Props = defineProps<Props>();
-  const isFormDirty: ModelRef<boolean, string> = defineModel<boolean>('isFormDirty', { default: false });
+  type Emits = {
+    (event: 'formStateChanged', payload: { values: ValidationSchema; dirty: boolean; valid: boolean }): void;
+  };
+  const emit: Emits = defineEmits<Emits>();
   const { t }: Composer = useI18n({ useScope: 'global' });
   const schulenFilterRef = useTemplateRef('schulenFilter');
 
@@ -38,7 +35,7 @@
   const validationSchema: TypedSchema = getValidationSchema(t);
 
   // eslint-disable-next-line @typescript-eslint/typedef
-  const { defineField, isFieldDirty, resetForm, setFieldValue, isFieldValid } = useForm<KlasseForm>({
+  const { defineField, resetForm, setFieldValue } = useForm<ValidationSchema>({
     validationSchema,
     initialValues: {
       selectedSchule: props.initialValues?.selectedSchule ?? '',
@@ -51,8 +48,6 @@
   }
   defineExpose({ reset });
 
-  const isInEditMode: ComputedRef<boolean> = computed(() => props.isEditActive !== undefined);
-
   const [selectedSchule, selectedSchuleProps]: [
     Ref<string>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
@@ -61,18 +56,14 @@
     Ref<string>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedKlassenname', vuetifyConfig);
-  const canCommit: Ref<boolean> = ref(false);
+  const isDirty: ComputedRef<boolean> = useIsFormDirty();
+  const isValid: ComputedRef<boolean> = useIsFormValid();
+  const canCommit: ComputedRef<boolean> = computed(() => isDirty.value && isValid.value);
 
   async function submitHandler(): Promise<void> {
     await props.onSubmit({ selectedSchule: selectedSchule.value, selectedKlassenname: selectedKlassenname.value });
     reset();
   }
-
-  watch([selectedSchule, selectedKlassenname], ([newSelectedSchule, newSelectedKlassenname]) => {
-    isFormDirty.value =
-      props.isEditActive !== false && (isFieldDirty('selectedSchule') || isFieldDirty('selectedKlassenname'));
-    canCommit.value = isFormDirty.value && isFieldValid('selectedSchule') && isFieldValid('selectedKlassenname');
-  });
 
   function setSelectedSchule(schulen: Array<Organisation>): void {
     const newSchuleId: string = schulen.length === 1 ? schulen[0]!.id : '';
@@ -93,17 +84,28 @@
   );
 
   watch(
+    [isDirty, isValid],
+    () => {
+      emit('formStateChanged', {
+        values: { selectedKlassenname: selectedKlassenname.value, selectedSchule: selectedSchule.value },
+        dirty: isDirty.value,
+        valid: isValid.value,
+      });
+    },
+    { immediate: true },
+  );
+
+  watch(
     () =>
       ({
         selectedSchule: props.initialValues?.selectedSchule,
         selectedKlassenname: props.initialValues?.selectedKlassenname,
-      }) as Partial<KlasseForm>,
-    (newValues: Partial<KlasseForm>, oldValues: Partial<KlasseForm>) => {
-      if (
-        newValues.selectedSchule !== oldValues.selectedSchule ||
-        newValues.selectedKlassenname !== oldValues.selectedKlassenname
-      )
-        setInitialValues();
+      }) as Partial<ValidationSchema>,
+    (newValues: Partial<ValidationSchema>, oldValues: Partial<ValidationSchema>) => {
+      if (newValues.selectedSchule !== oldValues.selectedSchule) {
+        if (newValues.selectedKlassenname !== oldValues.selectedKlassenname) setInitialValues();
+        else setFieldValue('selectedSchule', newValues.selectedSchule ?? '');
+      }
     },
   );
 </script>
@@ -112,9 +114,9 @@
   <FormWrapper
     :canCommit
     :confirmUnsavedChangesAction="onHandleConfirmUnsavedChanges"
-    :createButtonLabel="isInEditMode ? t('save') : t('admin.klasse.create')"
-    :discardButtonLabel="isInEditMode ? t('cancel') : t('admin.klasse.discard')"
-    :hideActions="!isEditActive"
+    :createButtonLabel="props.editMode ? t('save') : t('admin.klasse.create')"
+    :discardButtonLabel="props.editMode ? t('cancel') : t('admin.klasse.discard')"
+    :hideActions="props.editMode && !isEditActive"
     id="klasse-form"
     :isLoading="isLoading"
     :onDiscard="onHandleDiscard"
@@ -140,7 +142,7 @@
           <SchulenFilter
             ref="schulenFilter"
             :multiple="false"
-            :readonly
+            :readonly="props.editMode"
             :initialIds="props.initialValues?.selectedSchule"
             :systemrechteForSearch="[RollenSystemRecht.KlassenVerwalten]"
             :selectedSchuleProps="selectedSchuleProps"
@@ -163,7 +165,7 @@
           clearable
           data-testid="klassenname-input"
           density="compact"
-          :disabled="!isEditActive"
+          :disabled="editMode && !isEditActive"
           id="klassenname-input"
           :placeholder="t('admin.klasse.enterKlassenname')"
           ref="klassenname-input"

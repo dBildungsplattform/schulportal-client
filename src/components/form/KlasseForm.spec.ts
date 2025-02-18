@@ -1,29 +1,45 @@
 import {
   OrganisationsTyp,
   useOrganisationStore,
+  type Organisation,
   type OrganisationStore,
-  type OrganisationenFilter,
 } from '@/stores/OrganisationStore';
-import { RollenSystemRecht } from '@/stores/RolleStore';
 import { type TranslatedObject } from '@/types.d';
-import { VueWrapper, mount } from '@vue/test-utils';
+import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import { expect, test, type Mock } from 'vitest';
-import { nextTick } from 'vue';
 import KlasseForm from './KlasseForm.vue';
+import { nextTick } from 'vue';
+import type { ValidationSchema as KlasseFormSchema, ValidationSchema } from '@/utils/validationKlasse';
 
-let wrapper: VueWrapper | null = null;
 const organisationStore: OrganisationStore = useOrganisationStore();
 
-const schulen: Array<TranslatedObject> = [
-  {
-    title: 'Albert-Gymnasium',
-    value: '9356495',
-  },
-  {
-    title: 'Hohver-Gymnasium',
-    value: '8456571',
-  },
-];
+const initialValues: KlasseFormSchema = {
+  selectedSchule: 'Ina-Initial-Schule',
+  selectedKlassenname: '1a',
+};
+const newValues: KlasseFormSchema = {
+  selectedSchule: 'Gerda-Geändert-Schule',
+  selectedKlassenname: '9z',
+};
+const mountComponent = (props?: object): VueWrapper => {
+  return mount(KlasseForm, {
+    attachTo: document.getElementById('app') || '',
+    props: {
+      isLoading: false,
+      editMode: false,
+      onHandleConfirmUnsavedChanges: () => '',
+      onHandleDiscard: () => '',
+      onShowDialogChange: (value: boolean | undefined) => value,
+      onSubmit: () => '',
+      ...props,
+    },
+    global: {
+      components: {
+        KlasseForm,
+      },
+    },
+  });
+};
 
 vi.useFakeTimers();
 
@@ -34,135 +50,153 @@ beforeEach(() => {
     </div>
   `;
 
-  wrapper = mount(KlasseForm, {
-    attachTo: document.getElementById('app') || '',
-    props: {
-      isLoading: false,
-      onHandleConfirmUnsavedChanges: () => '',
-      onHandleDiscard: () => '',
-      onShowDialogChange: (value: boolean | undefined) => value,
-      onSubmit: () => '',
-      schulen,
-    },
-    global: {
-      components: {
-        KlasseForm,
-      },
-    },
-  });
   organisationStore.$reset();
+  organisationStore.schulenFilter.filterResult = [initialValues, newValues].map(
+    ({ selectedSchule }: KlasseFormSchema): Organisation => ({
+      id: selectedSchule,
+      name: selectedSchule,
+      typ: OrganisationsTyp.Schule,
+    }),
+  );
 });
 
 describe('KlasseForm', () => {
-  test('it renders the Klasse form', () => {
-    expect(wrapper?.find('[data-testid="klasse-form"]').isVisible()).toBe(true);
-  });
-});
+  describe.each([[true], [false]])('when editMode is %s', (editMode: boolean) => {
+    const defaultProps: object = {
+      editMode,
+      errorCode: '',
+      initialValues,
+    };
 
-describe('Schule searchInput', () => {
-  const defaultFilter: OrganisationenFilter = {
-    includeTyp: OrganisationsTyp.Schule,
-    systemrechte: [RollenSystemRecht.KlassenVerwalten],
-    limit: 25,
-  };
-  const spy: Mock<OrganisationStore['getAllOrganisationen']> = vi.fn<OrganisationStore['getAllOrganisationen']>();
-  let schuleAutoComplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
-  beforeEach(() => {
-    schuleAutoComplete = wrapper!.findComponent({ ref: 'schule-select' });
-    organisationStore.getAllOrganisationen = spy;
-    spy.mockClear();
-  });
+    test('it renders the Klasse form', () => {
+      const wrapper: VueWrapper = mountComponent(defaultProps);
+      expect(wrapper.find('[data-testid="klasse-form"]').isVisible()).toBe(true);
+      expect(wrapper.find('#schule-select').isVisible()).toBe(true);
+      expect(wrapper.find('#klassenname-input').isVisible()).toBe(true);
+    });
 
-  describe('when schule is autoselected', async () => {
-    const schule: TranslatedObject = schulen[0]!;
-    beforeEach(async () => {
-      wrapper!.setProps({
-        schulen: [schule],
+    test('it does not render when there is an error', async () => {
+      const wrapper: VueWrapper = mountComponent({
+        ...defaultProps,
+        errorCode: 'something',
       });
-      organisationStore.autoselectedSchule = { id: schule.value, name: 'schule', typ: OrganisationsTyp.Schule };
-      await nextTick();
+      expect(wrapper.find('[data-testid="klasse-form"]').exists()).toBe(true);
+      expect(wrapper.find('#schule-select').exists()).toBe(false);
+      expect(wrapper.find('#klassenname-input').exists()).toBe(false);
     });
 
-    test('it is readonly', async () => {
-      const inputElement: Element | null = document.querySelector('#schule-select');
-      await nextTick();
-
-      expect(inputElement).toBeDefined();
-      expect(inputElement!.hasAttribute('disabled')).toBeTruthy();
+    test('it contains initial values', () => {
+      const wrapper: VueWrapper = mountComponent(defaultProps);
+      expect(wrapper.find('[data-testid="klasse-form"]').isVisible()).toBe(true);
+      expect(wrapper.find('[data-testid="schule-select"]').text()).toContain(initialValues.selectedSchule);
+      expect(wrapper.find('#klassenname-input').attributes('value')).toBe(initialValues.selectedKlassenname);
     });
 
-    test('it handles empty object', async () => {
-      expect(schuleAutoComplete?.text()).toBeTruthy();
-      await wrapper!.setProps({
-        schulen: [
-          {
-            value: '',
-            title: '',
-          },
-        ],
+    test('it handles changing props', async () => {
+      const wrapper: VueWrapper = mountComponent({
+        ...defaultProps,
+        isEditActive: false,
       });
-      await nextTick();
-      expect(schuleAutoComplete?.text()).toBeFalsy();
-    });
-  });
+      expect(wrapper.find('[data-testid="schule-select"]').text()).toContain(initialValues.selectedSchule);
+      expect(wrapper.find('#klassenname-input').attributes('value')).toBe(initialValues.selectedKlassenname);
 
-  describe('when schule is selected', async () => {
-    const schule: TranslatedObject = schulen[0]!;
-    beforeEach(async () => {
-      wrapper!.setProps({
-        selectedSchule: schule.value,
+      await wrapper.setProps({ initialValues: newValues });
+      expect(wrapper.find('[data-testid="schule-select"]').text()).toContain(newValues.selectedSchule);
+      expect(wrapper.find('#klassenname-input').attributes('value')).toBe(newValues.selectedKlassenname);
+    });
+
+    test.runIf(editMode)('it correctly toggles editActive', async () => {
+      const onHandleDiscard: Mock = vi.fn();
+      const wrapper: VueWrapper = mountComponent({
+        ...defaultProps,
+        isEditActive: false,
+        onHandleDiscard,
       });
+      expect(wrapper.find('[data-testid="klasse-form-submit-button"]').exists()).toBe(false);
+      expect(wrapper.find('[data-testid="klasse-form-discard-button"]').exists()).toBe(false);
+      wrapper.setProps({ isEditActive: true });
       await nextTick();
+
+      expect(wrapper.find('[data-testid="klasse-form-submit-button"]').exists()).toBe(true);
+      expect(wrapper.find('[data-testid="klasse-form-discard-button"]').exists()).toBe(true);
+      wrapper.find('[data-testid="klasse-form-discard-button"]').trigger('click');
+      await nextTick();
+
+      expect(onHandleDiscard).toHaveBeenCalledOnce();
+      wrapper.setProps({ isEditActive: false });
+      await nextTick();
+      expect(wrapper.find('[data-testid="klasse-form-submit-button"]').exists()).toBe(false);
+      expect(wrapper.find('[data-testid="klasse-form-discard-button"]').exists()).toBe(false);
     });
 
-    test.each([
-      ['selected schule', schule.title],
-      ['empty string', ''],
-    ])('does nothing, if searching for %s', async (_label: string, searchInput: string) => {
-      schuleAutoComplete?.vm.$emit('update:search', searchInput);
-      await nextTick();
+    describe.each([[true], [false]])('when isEditActive is %s', (isEditActive: boolean) => {
+      test('it dynamically displays actions', () => {
+        const wrapper: VueWrapper = mountComponent({
+          ...defaultProps,
+          isEditActive,
+        });
+        if (editMode) {
+          expect(wrapper.find('[data-testid="klasse-form-discard-button"]').exists()).toBe(isEditActive);
+          expect(wrapper.find('[data-testid="klasse-form-submit-button"]').exists()).toBe(isEditActive);
+        } else {
+          expect(wrapper.find('[data-testid="klasse-form-discard-button"]').exists()).toBe(true);
+          expect(wrapper.find('[data-testid="klasse-form-submit-button"]').exists()).toBe(true);
+        }
+      });
 
-      vi.runAllTimers();
+      test('it correctly sets "disabled"-attributes on inputs', () => {
+        const wrapper: VueWrapper = mountComponent({ ...defaultProps, isEditActive });
+        if (editMode) {
+          expect(wrapper.find('#schule-select').attributes('disabled')).toBe('');
+        } else {
+          expect(wrapper.find('#schule-select').attributes('disabled')).toBeUndefined();
+        }
+        if (editMode && !isEditActive) expect(wrapper.find('#klassenname-input').attributes('disabled')).toBe('');
+        else expect(wrapper.find('#klassenname-input').attributes('disabled')).toBeUndefined();
+      });
 
-      expect(spy).not.toHaveBeenCalled();
-    });
+      test('data-entry and submission are correctly en-/disabled', async () => {
+        const wrapper: VueWrapper = mountComponent({
+          ...defaultProps,
+          isEditActive,
+        });
+        await wrapper.find('#schule-select').setValue(newValues.selectedSchule);
+        await wrapper.find('#klassenname-input').setValue(newValues.selectedKlassenname);
+        vi.runAllTimers();
+        await flushPromises();
+        if (editMode) {
+          expect(wrapper.find('[data-testid="schule-select"]').text()).toContain(initialValues.selectedSchule);
+          if (isEditActive) {
+            expect(wrapper.find('#klassenname-input').attributes('value')).toBe(newValues.selectedKlassenname);
+          } else {
+            expect(wrapper.find('#klassenname-input').attributes('value')).toBe(initialValues.selectedKlassenname);
+          }
+        } else {
+          expect(wrapper.find('#schule-select').attributes('value')).toContain(newValues.selectedSchule);
+          expect(wrapper.find('#klassenname-input').attributes('value')).toBe(newValues.selectedKlassenname);
+        }
 
-    test('triggers refresh, if searchValue is set', async () => {
-      const searchString: string = 'Gymnasium';
-      schuleAutoComplete?.vm.$emit('update:search', searchString);
-      await nextTick();
-
-      vi.runAllTimers();
-
-      expect(spy).toHaveBeenCalledWith({
-        ...defaultFilter,
-        searchString,
-        organisationIds: [schulen[0]!.value],
+        if (!editMode || isEditActive) {
+          expect(wrapper.find('[data-testid="klasse-form-submit-button"]').attributes('disabled')).toBeFalsy();
+        }
       });
     });
 
-    test('triggers refresh, if searchValue is cleared', async () => {
-      schuleAutoComplete?.setValue('');
-      schuleAutoComplete?.vm.$emit('update:search');
-      await nextTick();
-
-      vi.runAllTimers();
-
-      expect(spy).toHaveBeenCalledWith({
-        ...defaultFilter,
+    test.runIf(editMode)('toggling isEditActive reinitializes fields', async () => {
+      const wrapper: VueWrapper = mountComponent({
+        ...defaultProps,
+        isEditActive: false,
       });
-    });
-  });
+      expect(wrapper.find('[data-testid="schule-select"]').text()).toContain(initialValues.selectedSchule);
+      expect(wrapper.find('#klassenname-input').attributes('value')).toBe(initialValues.selectedKlassenname);
+      await wrapper.setProps({ isEditActive: true });
 
-  describe('when schule is not selected', async () => {
-    test('triggers refresh, if searchValue is set', async () => {
-      const searchString: string = 'Gymnasium';
-      schuleAutoComplete?.vm.$emit('update:search', searchString);
-      await nextTick();
+      await wrapper.find('#klassenname-input').setValue(newValues.selectedKlassenname);
+      expect(wrapper.find('#klassenname-input').attributes('value')).toBe(newValues.selectedKlassenname);
 
-      vi.runAllTimers();
-
-      expect(spy).toHaveBeenCalledWith({ ...defaultFilter, searchString: 'Gymnasium' });
+      await wrapper.setProps({ isEditActive: false });
+      expect(wrapper.find('[data-testid="schule-select"]').text()).toContain(initialValues.selectedSchule);
+      expect(wrapper.find('#klassenname-input').attributes('value')).toBe(initialValues.selectedKlassenname);
     });
   });
 });

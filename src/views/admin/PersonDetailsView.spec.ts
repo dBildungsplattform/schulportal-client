@@ -48,7 +48,7 @@ const mockPerson: Personendatensatz = {
     isLocked: false,
     userLock: null,
     revision: '1',
-    lastModified: '2024-05-22',
+    lastModified: '2024-05-22T08:20:33.758Z',
     email: {
       address: 'email@email.com',
       status: EmailAddressStatus.Enabled,
@@ -87,7 +87,7 @@ const mockCurrentUser: UserInfo = {
   ],
   password_updated_at: null,
 };
-const befristung: string = '12.08.2099';
+const befristung: string = '2099-08-12T13:03:53.802Z';
 const mockPersonenuebersicht: PersonWithUebersicht = {
   personId: '1',
   vorname: 'John',
@@ -276,7 +276,7 @@ const setCurrentPerson = (emailStatus: EmailAddressStatus): void => {
       isLocked: false,
       userLock: null,
       revision: '1',
-      lastModified: '2024-12-22',
+      lastModified: '2024-12-22T13:03:53.802Z',
       email: {
         address: 'test@example.com',
         status: emailStatus,
@@ -653,7 +653,7 @@ describe('PersonDetailsView', () => {
     });
 
     test.each([
-      ['12.08.2099', undefined],
+      ['2099-08-12T13:03:53.802Z', undefined],
       [undefined, 'unbefristet'],
       [undefined, 'schuljahresende'],
     ])(

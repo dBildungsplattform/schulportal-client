@@ -81,10 +81,7 @@ describe('KlasseCreationView', () => {
   });
 
   test('it fills form and triggers submit', async () => {
-    const schuleSelect: VueWrapper | undefined = wrapper
-      ?.findComponent({ ref: 'klasse-creation-form' })
-      .findComponent({ ref: 'schule-select' });
-    await schuleSelect?.setValue('1');
+    wrapper?.find('#schule-select').setValue('1');
     await nextTick();
 
     const klassennameInput: VueWrapper | undefined = wrapper

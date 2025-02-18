@@ -11,7 +11,7 @@
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
   import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
-  import { type ValidationSchema as KlasseFormValues } from '@/utils/validationKlasse';
+  import { type ValidationSchema as KlasseFormValues, type ValidationSchema } from '@/utils/validationKlasse';
   import { computed, onBeforeMount, onUnmounted, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import {
@@ -138,12 +138,19 @@
       : navigateToKlasseManagement;
   });
 
+  function handleChangedFormState({ dirty }: { values: ValidationSchema; dirty: boolean; valid: boolean }): void {
+    isFormDirty.value = dirty;
+  }
+
   watch(
     () => organisationStore.currentKlasse,
     async (newKlasse: Organisation | null) => {
       if (!newKlasse) return;
       if (newKlasse.administriertVon) {
-        if (organisationStore.currentOrganisation?.id !== newKlasse.administriertVon)
+        if (
+          !organisationStore.currentOrganisation ||
+          organisationStore.currentOrganisation.id !== newKlasse.administriertVon
+        )
           await organisationStore.getOrganisationById(newKlasse.administriertVon, OrganisationsTyp.Schule);
       }
     },
@@ -153,6 +160,8 @@
   onBeforeMount(async () => {
     organisationStore.errorCode = '';
     organisationStore.updatedOrganisation = null;
+    organisationStore.currentKlasse = null;
+    organisationStore.currentOrganisation = null;
     // Retrieves the Klasse using the Id in the route since that's all we have
     await organisationStore.getOrganisationById(currentKlasseId, OrganisationsTyp.Klasse);
     // Retrieves the parent Organisation of the Klasse using the same endpoint but with a different parameter
@@ -196,16 +205,16 @@
           <div v-if="organisationStore.currentOrganisation">
             <KlasseForm
               :initialValues="initialFormValues"
-              :isFormDirty
               :errorCode="organisationStore.errorCode"
+              :editMode="true"
               :isEditActive="isEditActive"
               :isLoading="organisationStore.loading"
-              :readonly="true"
               :showUnsavedChangesDialog="showUnsavedChangesDialog"
               :onHandleConfirmUnsavedChanges="handleConfirmUnsavedChanges"
               :onHandleDiscard="handleCancel"
               :onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
               :onSubmit="onSubmit"
+              @form-state-changed="handleChangedFormState"
               ref="klasse-creation-form"
             >
               <!-- Error Message Display -->

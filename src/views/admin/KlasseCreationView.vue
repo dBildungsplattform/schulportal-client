@@ -107,6 +107,10 @@
     organisationStore.errorCode = '';
   }
 
+  function handleChangedFormState({ dirty }: { values: ValidationSchema; dirty: boolean; valid: boolean }): void {
+    isFormDirty.value = dirty;
+  }
+
   const onSubmit = async ({ selectedSchule, selectedKlassenname }: ValidationSchema): Promise<void> => {
     await organisationStore.createOrganisation(
       undefined,
@@ -149,17 +153,15 @@
       <!-- The form to create a new Klasse -->
       <template v-if="!organisationStore.createdKlasse">
         <KlasseForm
-          :isFormDirty
           :errorCode="organisationStore.errorCode"
-          :schulen="schulen"
-          :isEditActive="true"
+          :editMode="false"
           :isLoading="organisationStore.loading"
-          :readonly="false"
           :showUnsavedChangesDialog="showUnsavedChangesDialog"
           :onHandleConfirmUnsavedChanges="handleConfirmUnsavedChanges"
           :onHandleDiscard="navigateToKlasseManagement"
           :onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
           :onSubmit
+          @form-state-changed="handleChangedFormState"
           ref="klasse-creation-form"
         >
           <!-- Error Message Display if error on submit -->

@@ -416,13 +416,6 @@
         includeTyp: OrganisationsTyp.Klasse,
         systemrechte: ['KLASSEN_VERWALTEN'],
       });
-      await organisationStore.getAutoselectedSchule();
-      await organisationStore.getAllOrganisationen({
-        offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
-        limit: 25,
-        includeTyp: OrganisationsTyp.Schule,
-        systemrechte: ['KLASSEN_VERWALTEN'],
-      });
       // Initialize klassenOptions with all Klassen
       klassenOptions.value = organisationStore.allKlassen.map((org: Organisation) => ({
         value: org.id,
@@ -494,7 +487,10 @@
             cols="12"
             class="py-md-0"
           >
-            <SchulenFilter :multiple="false">
+            <SchulenFilter
+              :multiple="false"
+              ref="schule-select"
+            >
               <template v-slot:prepend-item>
                 <v-list-item>
                   <v-progress-circular

@@ -1,10 +1,19 @@
-import { expect, test, type MockInstance } from 'vitest';
-import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
-import KlassenManagementView from './KlassenManagementView.vue';
-import { nextTick } from 'vue';
-import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
-import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
+import { RollenSystemRecht } from '@/api-client/generated';
 import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+import {
+  OrganisationsTyp,
+  useOrganisationStore,
+  type Organisation,
+  type OrganisationenFilter,
+  type OrganisationStore,
+} from '@/stores/OrganisationStore';
+import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
+import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
+import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
+import { expect, test, type MockInstance } from 'vitest';
+import { nextTick } from 'vue';
+import { useRouter, type Router } from 'vue-router';
+import KlassenManagementView from './KlassenManagementView.vue';
 
 function mountComponent(): VueWrapper {
   return mount(KlassenManagementView, {
@@ -24,7 +33,24 @@ function mountComponent(): VueWrapper {
 
 let wrapper: VueWrapper | null = null;
 const organisationStore: OrganisationStore = useOrganisationStore();
+const searchFilterStore: SearchFilterStore = useSearchFilterStore();
 const authStore: AuthStore = useAuthStore();
+const router: Router = useRouter();
+
+function selectSchule(schule?: Partial<Organisation> | null): Organisation | null {
+  if (schule === null) {
+    organisationStore.schulenFilter.selectedItems = [];
+    return null;
+  }
+  const schuleWithDefaults: Organisation = {
+    id: '987342',
+    name: 'Hans-Wurst-Schule',
+    typ: OrganisationsTyp.Schule,
+    ...schule,
+  };
+  organisationStore.schulenFilter.selectedItems = [schuleWithDefaults];
+  return schuleWithDefaults;
+}
 
 beforeEach(() => {
   document.body.innerHTML = `
@@ -33,6 +59,7 @@ beforeEach(() => {
     </div>
   `;
 
+  organisationStore.$reset();
   organisationStore.allKlassen = [
     {
       id: '1',
@@ -151,7 +178,7 @@ describe('KlassenManagementView', () => {
   });
 
   test('it does not render extra table headers, if unnecessary', async () => {
-    authStore.currentUser = null;
+    organisationStore.autoselectedSchule = organisationStore.allSchulen[0]!;
     wrapper = mountComponent();
     expect(wrapper.getComponent({ name: 'ResultTable' })).toBeTruthy();
     expect(wrapper.find('[data-testid="klasse-table"]').isVisible()).toBe(true);
@@ -202,34 +229,22 @@ describe('KlassenManagementView', () => {
   });
 
   test('it resets field Klasse when Schule is reset after being selected', async () => {
-    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
-    await organisationAutocomplete?.setValue('O1');
+    selectSchule();
     await nextTick();
 
     const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
     await klasseAutocomplete?.setValue('9a');
     await nextTick();
 
-    await organisationAutocomplete?.setValue(null);
+    organisationStore.schulenFilter.selectedItems = [];
     await nextTick();
 
     expect(klasseAutocomplete?.text()).toEqual('');
   });
 
-  test('it calls watcher for klasse without schule', async () => {
-    const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
-    await klasseAutocomplete?.setValue('9a');
-    await nextTick();
-
-    await klasseAutocomplete?.setValue('1b');
-    await nextTick();
-
-    expect(klasseAutocomplete?.text()).toEqual('1b');
-  });
-
   test('it triggers reset for filters', async () => {
     const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
-    await organisationAutocomplete?.setValue('O1');
+    selectSchule();
     await nextTick();
 
     const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
@@ -239,77 +254,52 @@ describe('KlassenManagementView', () => {
     wrapper?.find('[data-testid="reset-filter-button"]').trigger('click');
     await nextTick();
 
+    expect(organisationAutocomplete?.text()).toEqual('');
     expect(klasseAutocomplete?.text()).toEqual('');
   });
 
-  test('it updates Organisation search correctly', async () => {
-    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
-
-    await organisationAutocomplete?.setValue(undefined);
-    await nextTick();
-
-    await organisationAutocomplete?.vm.$emit('update:search', '');
-    await nextTick();
-    expect(organisationStore.getAllOrganisationen).toHaveBeenCalled();
-  });
-
-  test('it does nothing if the oldValue is equal to what is selected on Organisation', async () => {
-    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
-
-    // Set a value in orga that will match with something given by the props and so the component will calculate the selectedOrganisationTitle
-    await organisationAutocomplete?.setValue('1133');
-    await nextTick();
-
-    // Set the searchValue to 'orga' which matches the title before
-    await organisationAutocomplete?.vm.$emit('update:search', 'orga');
-    await nextTick();
-
-    // Set the newValue to '' and the oldValue is in this case 'orga' and so the method should just return
-    await organisationAutocomplete?.vm.$emit('update:search', '');
-    await nextTick();
-
-    expect(organisationAutocomplete?.text()).toEqual('9356494-9a (orga)');
-  });
-
   it('should fetch all Klassen when search string is empty and no Schule is selected', async () => {
+    organisationStore.schulenFilter.selectedItems = [];
     const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
 
     await klasseAutocomplete?.vm.$emit('update:search', '');
-    await nextTick();
+    await flushPromises();
 
-    expect(organisationStore.getAllOrganisationen).toHaveBeenCalled();
+    expect(organisationStore.getAllOrganisationen).toHaveBeenCalledWith({
+      offset: 0,
+      limit: searchFilterStore.klassenPerPage,
+      includeTyp: OrganisationsTyp.Klasse,
+      systemrechte: [RollenSystemRecht.KlassenVerwalten],
+    });
   });
 
   it('should fetch Klassen for selected Schule when search string is empty', async () => {
-    const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
+    const schule: Organisation = selectSchule()!;
     const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
 
-    await schuleAutocomplete?.setValue('123');
-    await nextTick();
-
     await klasseAutocomplete?.vm.$emit('update:search', '');
-    await nextTick();
-
-    expect(organisationStore.getAllOrganisationen).toHaveBeenCalled();
+    await flushPromises();
+    const expectedFilter: OrganisationenFilter = {
+      administriertVon: [schule.id],
+      includeTyp: 'KLASSE',
+      limit: searchFilterStore.klassenPerPage,
+      offset: 0,
+      searchString: '',
+      systemrechte: ['KLASSEN_VERWALTEN'],
+    };
+    expect(organisationStore.getAllOrganisationen).toHaveBeenLastCalledWith(expectedFilter);
   });
 
-  test('it does nothing if oldValue equals selectedOrganisationTitle', async () => {
-    const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
+  test('it does nothing if same schule is selected again', async () => {
+    selectSchule();
 
-    // Set initial value
-    await schuleAutocomplete?.setValue('1133');
-    await nextTick();
+    const allSpy: MockInstance = vi.spyOn(organisationStore, 'getAllOrganisationen');
+    allSpy.mockClear();
 
-    const spy: MockInstance = vi.spyOn(organisationStore, 'getAllOrganisationen');
-    spy.mockClear(); // Clear any previous calls
+    selectSchule();
+    await flushPromises();
 
-    // Simulate the autocomplete behavior
-    await schuleAutocomplete?.vm.$emit('update:search', 'orga'); // This should match the title
-    await nextTick();
-
-    await new Promise((resolve: (value: unknown) => void) => setTimeout(resolve, 600)); // Wait for debounce
-
-    expect(spy).toHaveBeenCalled();
+    expect(allSpy).not.toHaveBeenCalled();
   });
 
   test('it fetches initial data when newValue is empty and no Schule is selected', async () => {
@@ -323,43 +313,6 @@ describe('KlassenManagementView', () => {
     await nextTick();
 
     expect(spy).not.toHaveBeenCalled();
-  });
-
-  test('it fetches Schulen when newValue is not empty and different from current title', async () => {
-    const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
-    const spy: MockInstance = vi.spyOn(organisationStore, 'getAllOrganisationen');
-
-    await schuleAutocomplete?.vm.$emit('update:search', 'New School');
-
-    await new Promise((resolve: (value: unknown) => void) => setTimeout(resolve, 600)); // Wait for debounce
-    await nextTick();
-
-    expect(spy).toHaveBeenCalledWith({
-      searchString: 'New School',
-      includeTyp: OrganisationsTyp.Schule,
-      limit: 25,
-      systemrechte: ['KLASSEN_VERWALTEN'],
-    });
-  });
-
-  test('it fetches roles when newValue is not empty and a Schule is selected', async () => {
-    const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
-    await schuleAutocomplete?.setValue('1133');
-    await nextTick();
-
-    const spy: MockInstance = vi.spyOn(organisationStore, 'getAllOrganisationen');
-
-    await schuleAutocomplete?.vm.$emit('update:search', '23');
-
-    await new Promise((resolve: (value: unknown) => void) => setTimeout(resolve, 600)); // Wait for debounce
-    await nextTick();
-
-    expect(spy).toHaveBeenCalledWith({
-      searchString: '23',
-      includeTyp: OrganisationsTyp.Schule,
-      limit: 25,
-      systemrechte: ['KLASSEN_VERWALTEN'],
-    });
   });
 
   test.each([
