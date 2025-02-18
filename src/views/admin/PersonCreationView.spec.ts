@@ -206,7 +206,7 @@ function mountComponent(): VueWrapper {
 
 type FormFields = {
   organisationsebene: string;
-  rolle: string;
+  rollen: Array<string>;
   klasse?: string;
   befristung?: string;
   vorname: string;
@@ -216,7 +216,7 @@ type FormFields = {
 
 type FormSelectors = {
   organisationsebeneSelect: VueWrapper;
-  rolleSelect: VueWrapper;
+  rollenSelect: VueWrapper;
   klasseSelect: VueWrapper;
   befristungInput: VueWrapper;
   vornameInput: VueWrapper;
@@ -225,7 +225,7 @@ type FormSelectors = {
 };
 
 async function fillForm(args: Partial<FormFields>): Promise<Partial<FormSelectors>> {
-  const { organisationsebene, rolle, klasse, befristung, vorname, nachname, kopersNr }: Partial<FormFields> = args;
+  const { organisationsebene, rollen, klasse, befristung, vorname, nachname, kopersNr }: Partial<FormFields> = args;
   const selectors: Partial<FormSelectors> = {};
 
   const organisationsebeneSelect: VueWrapper | undefined = wrapper
@@ -237,14 +237,14 @@ async function fillForm(args: Partial<FormFields>): Promise<Partial<FormSelector
   await nextTick();
   selectors.organisationsebeneSelect = organisationsebeneSelect;
 
-  const rolleSelect: VueWrapper | undefined = wrapper
+  const rollenSelect: VueWrapper | undefined = wrapper
     ?.findComponent({ ref: 'personenkontext-create' })
-    .findComponent({ ref: 'rolle-select' });
-  expect(rolleSelect?.exists()).toBe(true);
+    .findComponent({ ref: 'rollen-select' });
+  expect(rollenSelect?.exists()).toBe(true);
 
-  await rolleSelect?.setValue(rolle);
+  await rollenSelect?.setValue(rollen);
   await nextTick();
-  selectors.rolleSelect = rolleSelect;
+  selectors.rollenSelect = rollenSelect;
 
   const klasseSelect: VueWrapper | undefined = wrapper
     ?.findComponent({ ref: 'personenkontext-create' })
@@ -427,10 +427,10 @@ describe('PersonCreationView', () => {
     await organisationSelect?.setValue('9876');
     await nextTick();
 
-    const rolleSelect: VueWrapper | undefined = wrapper
+    const rollenSelect: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'rollen-select' });
-    await rolleSelect?.setValue('1');
+    await rollenSelect?.setValue(['1']);
     await nextTick();
 
     const klasseSelect: VueWrapper | undefined = wrapper
@@ -507,10 +507,10 @@ describe('PersonCreationView', () => {
     await organisationSelect?.setValue('9876');
     await nextTick();
 
-    const rolleSelect: VueWrapper | undefined = wrapper
+    const rollenSelect: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'rollen-select' });
-    await rolleSelect?.setValue(['1']);
+    await rollenSelect?.setValue(['1']);
     await nextTick();
 
     const klasseSelect: VueWrapper | undefined = wrapper
@@ -558,7 +558,7 @@ describe('PersonCreationView', () => {
 
     const selectors: Partial<FormSelectors> = await fillForm({
       organisationsebene: '9876',
-      rolle: '1',
+      rollen: ['1'],
       befristung: '12.08.2099',
       vorname: 'Randy',
       nachname: 'Cena',
@@ -622,7 +622,7 @@ describe('PersonCreationView', () => {
       wrapper = mountComponent();
       await fillForm({
         organisationsebene: '9876',
-        rolle: '1',
+        rollen: ['1'],
         befristung: '12.08.2099',
         vorname: 'John',
         nachname: 'Orton',
@@ -666,7 +666,7 @@ describe('PersonCreationView', () => {
       if (isFormDirty)
         await fillForm({
           organisationsebene: '9876',
-          rolle: '1',
+          rollen: ['1'],
           befristung: '12.08.2099',
           vorname: 'John',
           nachname: 'Orton',
