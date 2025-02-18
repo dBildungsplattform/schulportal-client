@@ -273,6 +273,54 @@ describe('PersonImportView', () => {
     expect(document.querySelector('[data-testid="person-import-confirmation-text"]')).toBeNull();
   });
 
+  test('it cancels the import and returns to form', async () => {
+    const mockFile: File = new File([''], 'personen.csv', { type: 'text/csv' });
+    const fileInput: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="file-input"] input');
+    importStore.executePersonenImport = vi.fn();
+    importStore.startImportStatusPolling = vi.fn();
+
+    Object.defineProperty(fileInput?.element, 'files', {
+      value: [mockFile],
+    });
+    await nextTick();
+
+    const uploadResponse: ImportUploadResponse = (importStore.uploadResponse = {
+      importvorgangId: '1234567890',
+      isValid: true,
+      totalImportDataItems: 2,
+      totalInvalidImportDataItems: 0,
+      invalidImportDataItems: [],
+    });
+
+    wrapper?.find('[data-testid="person-import-form-submit-button"]').trigger('click');
+    await nextTick();
+
+    expect(importStore.uploadResponse).toStrictEqual(uploadResponse);
+    expect(wrapper?.find('[data-testid="person-upload-success-text"]').isVisible()).toBe(true);
+
+    wrapper?.find('[data-testid="open-confirmation-dialog-button"]').trigger('click');
+    await nextTick();
+
+    const importConfirmationText: Element = document.querySelector(
+      '[data-testid="person-import-confirmation-text"]',
+    ) as Element;
+    const cancelImportButton: HTMLInputElement = document.querySelector(
+      '[data-testid="cancel-import-button"]',
+    ) as HTMLInputElement;
+
+    expect(importConfirmationText).not.toBeNull();
+    expect(cancelImportButton).not.toBeNull();
+
+    cancelImportButton.click();
+    await nextTick();
+
+    expect(importStore.executePersonenImport).not.toHaveBeenCalled();
+    expect(importStore.uploadResponse).toBeNull();
+    expect(importStore.importResponse).toBeNull();
+    expect(importStore.errorCode).toBeNull();
+    expect(document.querySelector('[data-testid="person-import-confirmation-text"]')).toBeNull();
+  });
+
   test('it downloads an imported file through the download all button', async () => {
     importStore.importResponse = {
       importvorgandId: '1',
@@ -510,5 +558,41 @@ describe('PersonImportView', () => {
     expect(wrapper?.find('[data-testid="person-upload-success-text"]').text()).toContain(
       totalImportDataItems.toString(),
     );
+  });
+
+  test('it clears selected role when clearSelectedRolle is called', async () => {
+    const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+    rolleAutocomplete?.setValue('SuS');
+    await nextTick();
+
+    expect(rolleAutocomplete?.text()).toBe('SuS');
+
+    const clearButton: Element | null = document.body.querySelector('[data-testid="rolle-select"] i');
+    expect(clearButton).not.toBeNull();
+
+    if (clearButton) {
+      clearButton.dispatchEvent(new Event('click'));
+    }
+    await flushPromises();
+
+    expect(rolleAutocomplete?.attributes('value')).toBeUndefined();
+  });
+
+  test('it clears selected school when clearSelectedSchule is called', async () => {
+    const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
+    schuleAutocomplete?.setValue('Schule');
+    await nextTick();
+
+    expect(schuleAutocomplete?.text()).toBe('Schule');
+
+    const clearButton: Element | null = document.body.querySelector('[data-testid="schule-select"] i');
+    expect(clearButton).not.toBeNull();
+
+    if (clearButton) {
+      clearButton.dispatchEvent(new Event('click'));
+    }
+    await flushPromises();
+
+    expect(schuleAutocomplete?.attributes('value')).toBeUndefined();
   });
 });
