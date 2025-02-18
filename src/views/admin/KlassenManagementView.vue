@@ -120,7 +120,7 @@
   }
 
   async function getPaginatedKlassen(page: number): Promise<void> {
-    searchFilterStore.klassenPage = page || 1;
+    searchFilterStore.klassenPage = page;
 
     if (selectedSchule.value) {
       fetchKlassenBySelectedSchuleId(selectedSchule.value);
@@ -140,7 +140,7 @@
       searchFilterStore.klassenPage = 1;
     }
 
-    searchFilterStore.klassenPerPage = limit || 1;
+    searchFilterStore.klassenPerPage = limit;
 
     if (selectedSchule.value) {
       fetchKlassenBySelectedSchuleId(selectedSchule.value);
