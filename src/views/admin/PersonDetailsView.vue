@@ -2980,6 +2980,7 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary"
+                data-testid="change-klasse-success-close"
                 @click.stop="closeChangeKlasseSuccessDialog"
               >
                 {{ $t('close') }}
@@ -3163,6 +3164,7 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary"
+                data-testid="confirm-change-klasse-button"
                 @click.stop="confirmDialogChangeKlasse"
               >
                 {{ $t('yes') }}
