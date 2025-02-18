@@ -220,7 +220,7 @@ describe('StartView', () => {
 
     const banner: WrapperLike | undefined = wrapper?.find('[data-testid="KOPERS-banner"]');
 
-    expect(banner?.classes()).toContain('bg-error');
+    expect(banner?.classes()).toContain('bg-errorLight');
   });
 
   test('it dismisses the banner', async () => {

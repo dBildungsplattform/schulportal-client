@@ -1,6 +1,8 @@
-import type { OrganisationResponse } from '@/api-client/generated';
+import type { DBiamPersonenuebersichtResponse, OrganisationResponse } from '@/api-client/generated';
 import routes from '@/router/routes';
+import { useAuthStore, type AuthStore, type UserInfo } from '@/stores/AuthStore';
 import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
 import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import { beforeEach, describe, expect, test, vi, type Mock, type MockInstance } from 'vitest';
 import { nextTick } from 'vue';
@@ -176,7 +178,7 @@ describe('KlasseCreationView', () => {
     expect(wrapper?.find('[data-testid="create-another-klasse-button"]').isVisible()).toBe(true);
 
     wrapper?.find('[data-testid="create-another-klasse-button"]').trigger('click');
-    await nextTick();
+    await flushPromises();
 
     expect(organisationStore.createdKlasse).toBe(null);
   });
@@ -274,5 +276,40 @@ describe('KlasseCreationView', () => {
 
       organisationStore.errorCode = '';
     });
+  });
+
+  describe('autoselect logic', () => {
+    const personId: string = 'super-unique-and-special';
+    const personStore: PersonStore = usePersonStore();
+    const authStore: AuthStore = useAuthStore();
+
+    beforeEach(() => {
+      personStore.$reset();
+      authStore.$reset();
+      mountComponent();
+    });
+
+    test.each([
+      {
+        label: 'null',
+        uebersicht: null,
+      },
+      {
+        label: 'for someone else',
+        uebersicht: {
+          personId: 'someone-else',
+          zuordnungen: [],
+        } as unknown as DBiamPersonenuebersichtResponse,
+      },
+    ])(
+      'if uebersicht is $label, it refreshes store',
+      async ({ uebersicht }: { uebersicht: DBiamPersonenuebersichtResponse | null }) => {
+        const spy: MockInstance = vi.spyOn(personStore, 'getPersonenuebersichtById');
+        authStore.currentUser = { personId, personenkontexte: [] } as unknown as UserInfo;
+        personStore.personenuebersicht = uebersicht;
+        await flushPromises();
+        expect(spy).toHaveBeenLastCalledWith(personId);
+      },
+    );
   });
 });

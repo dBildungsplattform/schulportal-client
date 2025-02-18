@@ -53,41 +53,6 @@
                 ]
             }
         },
-        "/api/auth/externaldata": {
-            "get": {
-                "operationId": "AuthenticationController_getExternalData",
-                "summary": "External Data about logged in user.",
-                "parameters": [],
-                "responses": {
-                    "200": {
-                        "description": "Returns external Data about the logged in user.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/UserExeternalDataResponse"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "User is not logged in."
-                    }
-                },
-                "tags": [
-                    "auth"
-                ],
-                "security": [
-                    {
-                        "oauth2": [
-                            "openid"
-                        ]
-                    },
-                    {
-                        "bearer": []
-                    }
-                ]
-            }
-        },
         "/api/auth/logininfo": {
             "get": {
                 "operationId": "AuthenticationController_info",
@@ -152,6 +117,28 @@
                 },
                 "tags": [
                     "auth"
+                ]
+            }
+        },
+        "/keycloakinternal/externaldata": {
+            "post": {
+                "operationId": "KeycloakInternalController_getExternalData",
+                "summary": "External Data about requested in user.",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "Returns external Data about the requested user.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserExeternalDataResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "Keycloakinternal"
                 ]
             }
         },
@@ -3542,13 +3529,15 @@
                         }
                     },
                     {
-                        "name": "rolleId",
+                        "name": "rollenIds",
                         "required": false,
                         "in": "query",
-                        "description": "ID of the rolle.",
+                        "description": "IDs of the rollen.",
                         "schema": {
-                            "nullable": true,
-                            "type": "string"
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
                         }
                     },
                     {
@@ -3682,77 +3671,6 @@
                     },
                     "500": {
                         "description": "Internal server error while updating personenkontexte."
-                    }
-                },
-                "tags": [
-                    "personenkontext"
-                ],
-                "security": [
-                    {
-                        "oauth2": [
-                            "openid"
-                        ]
-                    },
-                    {
-                        "bearer": []
-                    }
-                ]
-            }
-        },
-        "/api/personenkontext-workflow/schulstrukturknoten": {
-            "get": {
-                "operationId": "DbiamPersonenkontextWorkflowController_findSchulstrukturknoten",
-                "parameters": [
-                    {
-                        "name": "rolleId",
-                        "required": true,
-                        "in": "query",
-                        "description": "RolleId used to filter for schulstrukturknoten in personenkontext.",
-                        "schema": {
-                            "nullable": false,
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "sskName",
-                        "required": false,
-                        "in": "query",
-                        "description": "Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.",
-                        "schema": {
-                            "nullable": true,
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "limit",
-                        "required": false,
-                        "in": "query",
-                        "description": "The limit of items for the request.",
-                        "schema": {
-                            "nullable": false,
-                            "type": "number"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "The schulstrukturknoten for a personenkontext were successfully returned.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/FindSchulstrukturknotenResponse"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Not authorized to get available schulstrukturknoten for personenkontexte."
-                    },
-                    "403": {
-                        "description": "Insufficient permission to get schulstrukturknoten for personenkontext."
-                    },
-                    "500": {
-                        "description": "Internal server error while getting schulstrukturknoten for personenkontexte."
                     }
                 },
                 "tags": [
@@ -5003,121 +4921,6 @@
             }
         },
         "schemas": {
-            "UserExeternalDataResponseOx": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "id"
-                ]
-            },
-            "UserExeternalDataResponseItslearning": {
-                "type": "object",
-                "properties": {
-                    "personId": {
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "personId"
-                ]
-            },
-            "UserExeternalDataResponseVidis": {
-                "type": "object",
-                "properties": {
-                    "dienststellenNummern": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
-                    }
-                },
-                "required": [
-                    "dienststellenNummern"
-                ]
-            },
-            "UserExeternalDataResponseOpshPk": {
-                "type": "object",
-                "properties": {
-                    "rollenArt": {
-                        "type": "string"
-                    },
-                    "dstNr": {
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "rollenArt",
-                    "dstNr"
-                ]
-            },
-            "UserExeternalDataResponseOpsh": {
-                "type": "object",
-                "properties": {
-                    "vorname": {
-                        "type": "string"
-                    },
-                    "nachname": {
-                        "type": "string"
-                    },
-                    "personenkontexte": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/UserExeternalDataResponseOpshPk"
-                        }
-                    },
-                    "emailAdresse": {
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "vorname",
-                    "nachname",
-                    "personenkontexte",
-                    "emailAdresse"
-                ]
-            },
-            "UserExeternalDataResponseOnlineDateiablage": {
-                "type": "object",
-                "properties": {
-                    "personId": {
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "personId"
-                ]
-            },
-            "UserExeternalDataResponse": {
-                "type": "object",
-                "properties": {
-                    "ox": {
-                        "$ref": "#/components/schemas/UserExeternalDataResponseOx"
-                    },
-                    "itslearning": {
-                        "$ref": "#/components/schemas/UserExeternalDataResponseItslearning"
-                    },
-                    "vidis": {
-                        "$ref": "#/components/schemas/UserExeternalDataResponseVidis"
-                    },
-                    "opsh": {
-                        "$ref": "#/components/schemas/UserExeternalDataResponseOpsh"
-                    },
-                    "onlineDateiablage": {
-                        "$ref": "#/components/schemas/UserExeternalDataResponseOnlineDateiablage"
-                    }
-                },
-                "required": [
-                    "ox",
-                    "itslearning",
-                    "vidis",
-                    "opsh",
-                    "onlineDateiablage"
-                ]
-            },
             "RollenSystemRechtServiceProviderIDResponse": {
                 "type": "object",
                 "properties": {
@@ -5302,6 +5105,121 @@
                     "personenkontexte",
                     "acr",
                     "timeLimits"
+                ]
+            },
+            "UserExeternalDataResponseOx": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id"
+                ]
+            },
+            "UserExeternalDataResponseItslearning": {
+                "type": "object",
+                "properties": {
+                    "personId": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "personId"
+                ]
+            },
+            "UserExeternalDataResponseVidis": {
+                "type": "object",
+                "properties": {
+                    "dienststellenNummern": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "required": [
+                    "dienststellenNummern"
+                ]
+            },
+            "UserExeternalDataResponseOpshPk": {
+                "type": "object",
+                "properties": {
+                    "rollenArt": {
+                        "type": "string"
+                    },
+                    "dstNr": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "rollenArt",
+                    "dstNr"
+                ]
+            },
+            "UserExeternalDataResponseOpsh": {
+                "type": "object",
+                "properties": {
+                    "vorname": {
+                        "type": "string"
+                    },
+                    "nachname": {
+                        "type": "string"
+                    },
+                    "personenkontexte": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/UserExeternalDataResponseOpshPk"
+                        }
+                    },
+                    "emailAdresse": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "vorname",
+                    "nachname",
+                    "personenkontexte",
+                    "emailAdresse"
+                ]
+            },
+            "UserExeternalDataResponseOnlineDateiablage": {
+                "type": "object",
+                "properties": {
+                    "personId": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "personId"
+                ]
+            },
+            "UserExeternalDataResponse": {
+                "type": "object",
+                "properties": {
+                    "ox": {
+                        "$ref": "#/components/schemas/UserExeternalDataResponseOx"
+                    },
+                    "itslearning": {
+                        "$ref": "#/components/schemas/UserExeternalDataResponseItslearning"
+                    },
+                    "vidis": {
+                        "$ref": "#/components/schemas/UserExeternalDataResponseVidis"
+                    },
+                    "opsh": {
+                        "$ref": "#/components/schemas/UserExeternalDataResponseOpsh"
+                    },
+                    "onlineDateiablage": {
+                        "$ref": "#/components/schemas/UserExeternalDataResponseOnlineDateiablage"
+                    }
+                },
+                "required": [
+                    "ox",
+                    "itslearning",
+                    "vidis",
+                    "opsh",
+                    "onlineDateiablage"
                 ]
             },
             "CreatePersonMigrationBodyParams": {
@@ -7084,10 +7002,13 @@
                         "description": "Selected organisation.",
                         "nullable": true
                     },
-                    "selectedRolle": {
-                        "type": "string",
-                        "description": "Selected rolle.",
-                        "nullable": true
+                    "selectedRollen": {
+                        "description": "Selected rollen.",
+                        "nullable": true,
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
                     },
                     "canCommit": {
                         "type": "boolean",
@@ -7098,7 +7019,7 @@
                     "organisations",
                     "rollen",
                     "selectedOrganisation",
-                    "selectedRolle",
+                    "selectedRollen",
                     "canCommit"
                 ]
             },
@@ -7191,24 +7112,6 @@
                 "required": [
                     "i18nKey",
                     "code"
-                ]
-            },
-            "FindSchulstrukturknotenResponse": {
-                "type": "object",
-                "properties": {
-                    "moeglicheSsks": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/OrganisationResponseLegacy"
-                        }
-                    },
-                    "total": {
-                        "type": "number"
-                    }
-                },
-                "required": [
-                    "moeglicheSsks",
-                    "total"
                 ]
             },
             "DbiamCreatePersonenkontextBodyParams": {

@@ -1,19 +1,22 @@
 <script setup lang="ts">
   import KlasseSuccessTemplate from '@/components/admin/klassen/KlasseSuccessTemplate.vue';
+  import type { DBiamPersonenzuordnungResponse, PersonenkontextRolleFieldsResponse } from '@/api-client/generated';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import KlasseForm from '@/components/form/KlasseForm.vue';
+  import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import {
     OrganisationsTyp,
     useOrganisationStore,
     type Organisation,
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
+  import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
   import { RollenSystemRecht } from '@/stores/RolleStore';
   import { type TranslatedObject } from '@/types.d';
   import { getValidationSchema, getVuetifyConfig } from '@/utils/validationKlasse';
   import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
-  import { computed, onMounted, onUnmounted, ref, type ComputedRef, type Ref } from 'vue';
+  import { computed, onMounted, onUnmounted, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import {
     onBeforeRouteLeave,
@@ -25,9 +28,50 @@
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const router: Router = useRouter();
+  const authStore: AuthStore = useAuthStore();
+  const personStore: PersonStore = usePersonStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
+  // get personenuebersicht for the current user, if we don't have it
+  watch(
+    () => ({
+      uebersicht: personStore.personenuebersicht,
+      currentUser: authStore.currentUser,
+    }),
+    async ({
+      uebersicht,
+      currentUser,
+    }: {
+      uebersicht: PersonStore['personenuebersicht'];
+      currentUser: AuthStore['currentUser'];
+    }) => {
+      if (!(currentUser && currentUser.personId)) return;
+      if (uebersicht && uebersicht.personId === currentUser.personId) return;
 
-  const hasAutoselectedSchule: Ref<boolean> = ref(false);
+      await personStore.getPersonenuebersichtById(currentUser.personId);
+    },
+    { immediate: true },
+  );
+
+  const autoselectedSchuleId: ComputedRef<string | null> = computed(() => {
+    const { currentUser }: AuthStore = authStore;
+    if (!currentUser?.personenkontexte) return null;
+    // Find all contexts where the user has KlassenVerwalten
+    const schuleIdsWithKlasseVerwaltenPermission: Array<string> = currentUser.personenkontexte.reduce(
+      (acc: Array<string>, personenkontext: PersonenkontextRolleFieldsResponse) => {
+        if (!personenkontext.rolle.systemrechte.includes(RollenSystemRecht.KlassenVerwalten)) return acc;
+        const schulZuordnung: DBiamPersonenzuordnungResponse | undefined =
+          personStore.personenuebersicht?.zuordnungen.find(
+            (z: DBiamPersonenzuordnungResponse) =>
+              z.sskId === personenkontext.organisationsId && z.typ === OrganisationsTyp.Schule,
+          );
+        if (schulZuordnung) acc.push(personenkontext.organisationsId);
+        return acc;
+      },
+      [],
+    );
+    return schuleIdsWithKlasseVerwaltenPermission.length === 1 ? schuleIdsWithKlasseVerwaltenPermission[0]! : null;
+  });
+  const hasAutoselectedSchule: ComputedRef<boolean> = computed(() => autoselectedSchuleId.value !== null);
 
   const validationSchema: TypedSchema = getValidationSchema(t);
 
@@ -36,7 +80,7 @@
   }): { props: { error: boolean; 'error-messages': Array<string> } } => getVuetifyConfig(state);
 
   type KlasseCreationForm = {
-    selectedSchule: string;
+    selectedSchule: string | undefined;
     selectedKlassenname: string;
   };
 
@@ -46,7 +90,7 @@
   });
 
   const [selectedSchule, selectedSchuleProps]: [
-    Ref<string>,
+    Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedSchule', vuetifyConfig);
   const [selectedKlassenname, selectedKlassennameProps]: [
@@ -54,8 +98,8 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedKlassenname', vuetifyConfig);
 
-  const schulen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    return organisationStore.allSchulen
+  const filteredSchulen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
+    return organisationStore.filteredSchulen.schulen
       .slice(0, 25)
       .map((org: Organisation) => ({
         value: org.id,
@@ -64,9 +108,20 @@
       .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
   });
 
+  watch(
+    autoselectedSchuleId,
+    (newAutoSelectedOrgId: string | null) => {
+      const newSelectedSchule: TranslatedObject | undefined = filteredSchulen.value?.find(
+        (schule: TranslatedObject) => schule.value === newAutoSelectedOrgId,
+      );
+      selectedSchule.value = newSelectedSchule?.value;
+    },
+    { immediate: true },
+  );
+
   const translatedSchulname: ComputedRef<string> = computed(
     () =>
-      schulen.value?.find(
+      filteredSchulen.value?.find(
         (schule: TranslatedObject) => schule.value === organisationStore.createdKlasse?.administriertVon,
       )?.title || '',
   );
@@ -86,7 +141,8 @@
   }
 
   async function initStores(): Promise<void> {
-    await organisationStore.getAllOrganisationen({
+    // initial options for autocomplete
+    await organisationStore.getFilteredSchulen({
       includeTyp: OrganisationsTyp.Schule,
       systemrechte: [RollenSystemRecht.KlassenVerwalten],
       limit: 25,
@@ -175,10 +231,11 @@
       <!-- The form to create a new Klasse -->
       <template v-if="!organisationStore.createdKlasse">
         <KlasseForm
+          :autoselected-schule-id="autoselectedSchuleId"
           :errorCode="organisationStore.errorCode"
-          :schulen="schulen"
+          :schulen="filteredSchulen"
           :isEditActive="true"
-          :isLoading="organisationStore.loading"
+          :isLoading="organisationStore.filteredSchulen.loading"
           :readonly="false"
           :selectedSchuleProps="selectedSchuleProps"
           :selectedKlassennameProps="selectedKlassennameProps"
