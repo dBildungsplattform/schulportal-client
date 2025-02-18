@@ -845,6 +845,53 @@ describe('PersonDetailsView', () => {
     expect(wrapper?.find('[data-testid="zuordnung-edit-button"]').isVisible()).toBe(true);
   });
 
+  test('renders form to delete Zuordnung and triggers submit', async () => {
+    await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
+    await nextTick();
+
+    const checkbox: DOMWrapper<HTMLInputElement> | undefined = wrapper?.find(
+      '[data-testid="person-zuordnung-1"] input[type="checkbox"]',
+    );
+    await checkbox?.setValue(!checkbox.element.checked);
+    await nextTick();
+
+    await wrapper
+      ?.findComponent({ ref: 'personenkontext-delete' })
+      .find('[data-testid="open-zuordnung-delete-dialog-button"]')
+      .trigger('click');
+    await nextTick();
+
+    expect(document.body.querySelector('[data-testid="zuordnung-delete-confirmation-text"]')).not.toBeNull();
+
+    const confirmDeleteButton: Element | null = document.body.querySelector('[data-testid="zuordnung-delete-button"]');
+    expect(confirmDeleteButton).not.toBeNull();
+
+    if (confirmDeleteButton) {
+      confirmDeleteButton.dispatchEvent(new Event('click'));
+    }
+
+    const saveButton: Element | null = document.body.querySelector('[data-testid="zuordnung-changes-save"]');
+    expect(saveButton).not.toBeNull();
+
+    if (saveButton) {
+      saveButton.dispatchEvent(new Event('click'));
+    }
+
+    await flushPromises();
+
+    /*     const closeSuccessButton: Element | null = document.body.querySelector(
+      '[data-testid="close-zuordnung-delete-success-button"]',
+    );
+    expect(closeSuccessButton).not.toBeNull();
+
+    if (closeSuccessButton) {
+      closeSuccessButton.dispatchEvent(new Event('click'));
+    } */
+    await flushPromises();
+
+    expect(wrapper?.find('[data-testid="zuordnung-edit-button"]').isVisible()).toBe(true);
+  });
+
   describe('change befristung', () => {
     test('it shows befristung change form', async () => {
       await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');

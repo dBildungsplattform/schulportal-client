@@ -2140,6 +2140,7 @@
                     :zuordnungCount="
                       zuordnungenResult?.filter((zuordnung: Zuordnung) => zuordnung.editable).length ?? 0
                     "
+                    ref="personenkontext-delete"
                     @onDeletePersonenkontext="prepareDeletion"
                   >
                   </PersonenkontextDelete>
@@ -2901,6 +2902,7 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary"
+                data-testId="close-zuordnung-delete-success-button"
                 @click.stop="closeDeleteSuccessDialog"
               >
                 {{ $t('close') }}
