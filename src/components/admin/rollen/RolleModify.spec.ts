@@ -82,7 +82,7 @@ personenkontextStore.workflowStepResponse = {
     },
   ],
   selectedOrganisation: null,
-  selectedRolle: null,
+  selectedRollen: null,
   canCommit: true,
 };
 
