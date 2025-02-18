@@ -88,16 +88,14 @@ async function fillForm(args: Partial<FormFields>): Promise<Partial<FormSelector
   const { dienststellennummer, schulname }: Partial<FormFields> = args;
   const selectors: Partial<FormSelectors> = {};
 
-  const dienststellennummerInput: VueWrapper | undefined = wrapper
-    ?.findComponent({ ref: 'dienststellennummer-input' });
+  const dienststellennummerInput: VueWrapper | undefined = wrapper?.findComponent({ ref: 'dienststellennummer-input' });
   expect(dienststellennummerInput?.exists()).toBe(true);
 
   await dienststellennummerInput?.setValue(dienststellennummer);
   await nextTick();
   selectors.dienststellennummerInput = dienststellennummerInput;
 
-  const schulnameInput: VueWrapper | undefined = wrapper
-    ?.findComponent({ ref: 'schulname-input' });
+  const schulnameInput: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schulname-input' });
   expect(schulnameInput?.exists()).toBe(true);
 
   await schulnameInput?.setValue(schulname);
@@ -267,21 +265,29 @@ describe('SchuleCreationView', () => {
     });
   });
 
-  test('it shows error message', async () => {
-    organisationStore.errorCode = 'NAME_REQUIRED_FOR_SCHULE';
-    await nextTick();
-    expect(wrapper?.find('[data-testid="alert-title"]').isVisible()).toBe(true);
-    wrapper?.find('[data-testid="alert-button"]').trigger('click');
-    await nextTick();
-    organisationStore.errorCode = '';
-  });
+  describe('error handling', () => {
+    test('it shows error message', async () => {
+      organisationStore.errorCode = 'NAME_REQUIRED_FOR_SCHULE';
+      await nextTick();
 
-  test('shows error message if REQUIRED_STEP_UP_LEVEL_NOT_MET error is present and click close button', async () => {
-    organisationStore.errorCode = 'REQUIRED_STEP_UP_LEVEL_NOT_MET';
-    await nextTick();
-    expect(wrapper?.find('[data-testid="alert-title"]').isVisible()).toBe(true);
-    wrapper?.find('[data-testid="alert-button"]').trigger('click');
-    await nextTick();
-    organisationStore.errorCode = '';
+      expect(wrapper?.find('[data-testid="alert-title"]').isVisible()).toBe(true);
+
+      wrapper?.find('[data-testid="alert-button"]').trigger('click');
+      await nextTick();
+
+      expect(organisationStore.errorCode).toBe('');
+    });
+
+    test('shows error message if REQUIRED_STEP_UP_LEVEL_NOT_MET error is present and click close button', async () => {
+      organisationStore.errorCode = 'REQUIRED_STEP_UP_LEVEL_NOT_MET';
+      await nextTick();
+
+      expect(wrapper?.find('[data-testid="alert-title"]').isVisible()).toBe(true);
+
+      wrapper?.find('[data-testid="alert-button"]').trigger('click');
+      await nextTick();
+
+      organisationStore.errorCode = '';
+    });
   });
 });

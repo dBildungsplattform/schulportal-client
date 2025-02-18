@@ -181,26 +181,6 @@ describe('KlasseCreationView', () => {
     expect(organisationStore.createdKlasse).toBe(null);
   });
 
-  test('it shows error message', async () => {
-    organisationStore.errorCode = 'KLASSENNAME_AN_SCHULE_EINDEUTIG';
-    await nextTick();
-
-    expect(wrapper?.find('[data-testid="alert-title"]').isVisible()).toBe(true);
-
-    wrapper?.find('[data-testid="alert-button"]').trigger('click');
-    await nextTick();
-
-    expect(organisationStore.errorCode).toBe('');
-  });
-
-  test('shows error message if REQUIRED_STEP_UP_LEVEL_NOT_MET error is present and click close button', async () => {
-    organisationStore.errorCode = 'REQUIRED_STEP_UP_LEVEL_NOT_MET';
-    await nextTick();
-    expect(wrapper?.find('[data-testid="alert-title"]').isVisible()).toBe(true);
-    wrapper?.find('[data-testid="alert-button"]').trigger('click');
-    await nextTick();
-  });
-
   describe('navigation interception', () => {
     afterEach(() => {
       vi.unmock('vue-router');
@@ -267,6 +247,32 @@ describe('KlasseCreationView', () => {
       window.dispatchEvent(event);
       if (isFormDirty) expect(spy).toHaveBeenCalledOnce();
       else expect(spy).not.toHaveBeenCalledOnce();
+    });
+  });
+
+  describe('error handling', () => {
+    test('it shows error message', async () => {
+      organisationStore.errorCode = 'KLASSENNAME_AN_SCHULE_EINDEUTIG';
+      await nextTick();
+
+      expect(wrapper?.find('[data-testid="alert-title"]').isVisible()).toBe(true);
+
+      wrapper?.find('[data-testid="alert-button"]').trigger('click');
+      await nextTick();
+
+      expect(organisationStore.errorCode).toBe('');
+    });
+
+    test('shows error message if REQUIRED_STEP_UP_LEVEL_NOT_MET error is present and click close button', async () => {
+      organisationStore.errorCode = 'REQUIRED_STEP_UP_LEVEL_NOT_MET';
+      await nextTick();
+
+      expect(wrapper?.find('[data-testid="alert-title"]').isVisible()).toBe(true);
+
+      wrapper?.find('[data-testid="alert-button"]').trigger('click');
+      await nextTick();
+
+      organisationStore.errorCode = '';
     });
   });
 });
