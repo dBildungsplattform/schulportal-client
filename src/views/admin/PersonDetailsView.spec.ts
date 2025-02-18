@@ -207,7 +207,7 @@ describe('PersonDetailsView', () => {
         },
       ],
       selectedOrganisation: 'string',
-      selectedRolle: 'string',
+      selectedRollen: ['string'],
       canCommit: true,
     };
 
@@ -787,6 +787,64 @@ describe('PersonDetailsView', () => {
     expect(wrapper?.find('[data-testid="zuordnung-edit-button"]').isVisible()).toBe(true);
   });
 
+  test('renders form to change Klasse and triggers submit', async () => {
+    await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
+    await nextTick();
+
+    const checkbox: DOMWrapper<HTMLInputElement> | undefined = wrapper?.find(
+      '[data-testid="person-zuordnung-1"] input[type="checkbox"]',
+    );
+    await checkbox?.setValue(!checkbox.element.checked);
+    await nextTick();
+
+    await wrapper?.find('[data-testid="klasse-change-button"]').trigger('click');
+    await nextTick();
+
+    expect(wrapper?.find('[data-testid="klasse-change-form"]').isVisible()).toBe(true);
+
+    const klasseInput: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'klasse-change-form' })
+      .findComponent({ ref: 'klasse-select' });
+    await klasseInput?.setValue('9a');
+    await nextTick();
+
+    await wrapper?.find('[data-testid="klasse-change-submit-button"]').trigger('click');
+    await nextTick();
+
+    await flushPromises();
+    await flushPromises();
+
+    const confirmDialogButton: Element | null = await document.body.querySelector(
+      '[data-testid="confirm-change-klasse-button"]',
+    );
+    expect(confirmDialogButton).not.toBeNull();
+
+    if (confirmDialogButton) {
+      confirmDialogButton.dispatchEvent(new Event('click'));
+    }
+    await flushPromises();
+
+    const saveButton: Element | null = document.body.querySelector('[data-testid="zuordnung-changes-save"]');
+    expect(saveButton).not.toBeNull();
+
+    if (saveButton) {
+      saveButton.dispatchEvent(new Event('click'));
+    }
+    await flushPromises();
+
+    const closeSuccessButton: Element | null = document.body.querySelector(
+      '[data-testid="change-klasse-success-close"]',
+    );
+    expect(closeSuccessButton).not.toBeNull();
+
+    if (closeSuccessButton) {
+      closeSuccessButton.dispatchEvent(new Event('click'));
+    }
+    await flushPromises();
+
+    expect(wrapper?.find('[data-testid="zuordnung-edit-button"]').isVisible()).toBe(true);
+  });
+
   describe('change befristung', () => {
     test('it shows befristung change form', async () => {
       await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
@@ -878,64 +936,6 @@ describe('PersonDetailsView', () => {
       expect(personStore.lockPerson).toHaveBeenCalled();
       // reset personenuebersicht
       personStore.personenuebersicht = mockPersonenuebersicht;
-    });
-
-    test('it shows klasse change form and submits', async () => {
-      await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
-      await nextTick();
-
-      const checkbox: DOMWrapper<HTMLInputElement> | undefined = wrapper?.find(
-        '[data-testid="person-zuordnung-1"] input[type="checkbox"]',
-      );
-      await checkbox?.setValue(!checkbox.element.checked);
-      await nextTick();
-
-      await wrapper?.find('[data-testid="klasse-change-button"]').trigger('click');
-      await nextTick();
-
-      expect(wrapper?.find('[data-testid="klasse-change-form"]').isVisible()).toBe(true);
-
-      const klasseInput: VueWrapper | undefined = wrapper
-        ?.findComponent({ ref: 'klasse-change-form' })
-        .findComponent({ ref: 'klasse-select' });
-      await klasseInput?.setValue('9a');
-      await nextTick();
-
-      await wrapper?.find('[data-testid="klasse-change-submit-button"]').trigger('click');
-      await nextTick();
-
-      await flushPromises();
-      await flushPromises();
-
-      const confirmDialogButton: Element | null = await document.body.querySelector(
-        '[data-testid="confirm-change-klasse-button"]',
-      );
-      expect(confirmDialogButton).not.toBeNull();
-
-      if (confirmDialogButton) {
-        confirmDialogButton.dispatchEvent(new Event('click'));
-      }
-      await flushPromises();
-
-      const saveButton: Element | null = document.body.querySelector('[data-testid="zuordnung-changes-save"]');
-      expect(saveButton).not.toBeNull();
-
-      if (saveButton) {
-        saveButton.dispatchEvent(new Event('click'));
-      }
-      await flushPromises();
-
-      const closeSuccessButton: Element | null = document.body.querySelector(
-        '[data-testid="change-klasse-success-close"]',
-      );
-      expect(closeSuccessButton).not.toBeNull();
-
-      if (closeSuccessButton) {
-        closeSuccessButton.dispatchEvent(new Event('click'));
-      }
-      await flushPromises();
-
-      expect(wrapper?.find('[data-testid="zuordnung-edit-button"]').isVisible()).toBe(true);
     });
 
     test.each([
