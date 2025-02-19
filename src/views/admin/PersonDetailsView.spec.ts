@@ -374,12 +374,43 @@ describe('PersonDetailsView', () => {
     expect(push).toHaveBeenCalledTimes(1);
   });
 
-  test('it shows an error if error code exists', async () => {
-    personStore.errorCode = 'ERROR_LOADING_USER';
-    await nextTick();
+  describe('error handling', () => {
+    test('it shows an error if error code exists', async () => {
+      personStore.errorCode = 'ERROR_LOADING_USER';
+      await nextTick();
 
-    expect(wrapper?.find('[data-testid="alert-title"]').text()).toBe('Fehler beim Laden des Benutzers');
-    personStore.errorCode = '';
+      expect(wrapper?.find('[data-testid="alert-title"]').text()).toBe('Fehler beim Laden des Benutzers');
+
+      personStore.errorCode = '';
+      await nextTick();
+    });
+
+    test('it shows correct alert depending on error code', async () => {
+      personStore.errorCode = '';
+      personenkontextStore.errorCode = 'PERSON_NOT_FOUND';
+      await nextTick();
+
+      const alertButton = wrapper
+        ?.findComponent({ ref: 'personenkontext-store-error-alert' })
+        .find('[data-testid="alert-button"]');
+
+      expect(alertButton?.text()).toBe('Zurück zur Ergebnisliste');
+
+      personenkontextStore.errorCode = 'SOME_OTHER_CODE';
+      await nextTick();
+
+      expect(alertButton?.text()).toBe('Daten aktualisieren');
+
+      personenkontextStore.errorCode = '';
+      personStore.errorCode = 'NEWER_VERSION_OF_PERSON_AVAILABLE';
+      await nextTick();
+
+      expect(alertButton?.text()).toBe('Daten aktualisieren');
+
+      personenkontextStore.errorCode = '';
+      personStore.errorCode = '';
+      await nextTick();
+    });
   });
 
   // test('It cancels editing', async () => {

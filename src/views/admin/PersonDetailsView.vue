@@ -1529,26 +1529,28 @@
           <!-- Error Message Display if the personStore throws any kind of error (Not being able to load the person) -->
           <SpshAlert
             :model-value="!!personStore.errorCode"
-            :type="'error'"
-            :closable="false"
-            :text="$t(`admin.person.errors.${personStore.errorCode}`)"
-            :showButton="true"
             :buttonText="alertButtonTextKopers"
             :buttonAction="alertButtonActionKopers"
+            :closable="false"
+            ref="person-store-error-alert"
+            :showButton="true"
+            :text="$t(`admin.person.errors.${personStore.errorCode}`)"
             :title="$t(`admin.person.title.${personStore.errorCode}`)"
+            :type="'error'"
             @update:modelValue="handleAlertClose"
           />
 
           <!-- Error Message Display if the personenkontextStore throws any kind of error (Not being able to load the kontext) -->
           <SpshAlert
             :model-value="!!personenkontextStore.errorCode"
-            :type="'error'"
-            :closable="false"
-            :text="creationErrorText"
-            :showButton="true"
             :buttonText="alertButtonText"
             :buttonAction="alertButtonAction"
+            :closable="false"
+            ref="personenkontext-store-error-alert"
+            :showButton="true"
+            :text="creationErrorText"
             :title="creationErrorTitle"
+            :type="'error'"
             @update:modelValue="handleAlertClose"
           />
         </v-container>
