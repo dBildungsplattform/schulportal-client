@@ -879,14 +879,14 @@ describe('PersonDetailsView', () => {
 
     await flushPromises();
 
-    /*     const closeSuccessButton: Element | null = document.body.querySelector(
+    const closeSuccessButton: Element | null = document.body.querySelector(
       '[data-testid="close-zuordnung-delete-success-button"]',
     );
     expect(closeSuccessButton).not.toBeNull();
 
     if (closeSuccessButton) {
       closeSuccessButton.dispatchEvent(new Event('click'));
-    } */
+    }
     await flushPromises();
 
     expect(wrapper?.find('[data-testid="zuordnung-edit-button"]').isVisible()).toBe(true);

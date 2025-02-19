@@ -402,8 +402,6 @@
         deleteSuccessDialogVisible.value = false;
         navigateToPersonTable();
       };
-    } else {
-      closeDeleteSuccessDialog();
     }
   };
 
