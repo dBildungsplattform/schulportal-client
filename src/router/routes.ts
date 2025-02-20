@@ -144,6 +144,17 @@ const routes: readonly RouteRecordRaw[] = [
     },
   },
   {
+    path: '/admin/schultraeger/new',
+    name: 'create-schultraeger',
+    component: () => import('../views/admin/SchultraegerCreationView.vue'),
+    meta: {
+      layout: 'AdminLayout',
+      requiresAuth: true,
+      requiredStepUpLevel: StepUpLevel.GOLD,
+      requiresPermission: 'schultraegerverwaltung',
+    },
+  },
+  {
     path: '/start',
     name: 'start',
     component: () => import('../views/StartView.vue'),
