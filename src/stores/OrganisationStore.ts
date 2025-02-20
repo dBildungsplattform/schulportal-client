@@ -4,10 +4,10 @@ import { getResponseErrorCode } from '@/utils/errorHandlers';
 import {
   OrganisationenApiFactory,
   OrganisationsTyp,
+  RollenSystemRecht,
   TraegerschaftTyp,
   type OrganisationenApiInterface,
   type CreateOrganisationBodyParams,
-  type RollenSystemRecht,
   type OrganisationByNameBodyParams,
   type ParentOrganisationenResponse,
   type OrganisationRootChildrenResponse,
@@ -58,12 +58,18 @@ export type SchuleTableItem = {
 type OrganisationState = {
   allOrganisationen: Array<Organisation>;
   allKlassen: Array<Organisation>;
+  filteredSchulen: {
+    total: number;
+    schulen: Array<Organisation>;
+    loading: boolean;
+  };
   allSchulen: Array<Organisation>;
   currentOrganisation: Organisation | null;
   currentKlasse: Organisation | null;
   updatedOrganisation: Organisation | null;
   createdKlasse: Organisation | null;
   createdSchule: Organisation | null;
+  createdSchultraeger: Organisation | null;
   lockingOrganisation: Organisation | null;
   totalKlassen: number;
   totalSchulen: number;
@@ -94,6 +100,7 @@ export type OrganisationenFilter = {
 type OrganisationGetters = {};
 type OrganisationActions = {
   getAllOrganisationen: (filter?: OrganisationenFilter) => Promise<void>;
+  getFilteredSchulen(filter?: OrganisationenFilter): Promise<void>;
   getFilteredKlassen(filter?: OrganisationenFilter): Promise<void>;
   getKlassenByOrganisationId: (filter?: OrganisationenFilter) => Promise<void>;
   getOrganisationById: (organisationId: string, organisationsTyp: OrganisationsTyp) => Promise<Organisation>;
@@ -108,10 +115,10 @@ type OrganisationActions = {
     traegerschaft?: TraegerschaftTyp,
     administriertVon?: string,
     zugehoerigZu?: string,
-  ) => Promise<Organisation>;
+  ) => Promise<void>;
   deleteOrganisationById: (organisationId: string) => Promise<void>;
   updateOrganisationById: (organisationId: string, name: string) => Promise<void>;
-  getSchultraeger: () => Promise<void>;
+  getRootKinderSchultraeger: () => Promise<void>;
   fetchSchuleDetailsForKlassen: (filterActive: boolean) => Promise<void>;
   setItsLearningForSchule: (organisationId: string) => Promise<void>;
 };
@@ -130,12 +137,18 @@ export const useOrganisationStore: StoreDefinition<
     return {
       allOrganisationen: [],
       allKlassen: [],
+      filteredSchulen: {
+        total: 0,
+        schulen: [],
+        loading: false,
+      },
       allSchulen: [],
       currentOrganisation: null,
       currentKlasse: null,
       updatedOrganisation: null,
       createdKlasse: null,
       createdSchule: null,
+      createdSchultraeger: null,
       lockingOrganisation: null,
       totalKlassen: 0,
       totalSchulen: 0,
@@ -235,6 +248,30 @@ export const useOrganisationStore: StoreDefinition<
         ...klasse,
         schuleDetails: schulenMap.get(klasse.administriertVon || '') || '---',
       }));
+    },
+
+    async getFilteredSchulen(filter?: OrganisationenFilter) {
+      this.filteredSchulen.loading = true;
+      try {
+        const response: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations(
+          undefined,
+          25,
+          undefined,
+          undefined,
+          filter?.searchString,
+          OrganisationsTyp.Schule,
+          filter?.systemrechte,
+          filter?.excludeTyp,
+          filter?.administriertVon,
+          filter?.organisationIds,
+        );
+        this.filteredSchulen.total = +response.headers['x-paging-total'];
+        this.filteredSchulen.schulen = response.data;
+      } catch (error: unknown) {
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+      } finally {
+        this.filteredSchulen.loading = false;
+      }
     },
 
     async getFilteredKlassen(filter?: OrganisationenFilter) {
@@ -359,7 +396,7 @@ export const useOrganisationStore: StoreDefinition<
       traegerschaft?: TraegerschaftTyp,
       administriertVon?: string,
       zugehoerigZu?: string,
-    ): Promise<Organisation> {
+    ): Promise<void> {
       this.loading = true;
       try {
         const createOrganisationBodyParams: CreateOrganisationBodyParams = {
@@ -378,11 +415,11 @@ export const useOrganisationStore: StoreDefinition<
           this.createdKlasse = data;
         } else if (typ === OrganisationsTyp.Schule) {
           this.createdSchule = data;
+        } else if (typ === OrganisationsTyp.Traeger) {
+          this.createdSchultraeger = data;
         }
-        return data;
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'ORGANISATION_SPECIFICATION_ERROR');
-        return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
       }
@@ -421,7 +458,7 @@ export const useOrganisationStore: StoreDefinition<
       }
     },
 
-    async getSchultraeger() {
+    async getRootKinderSchultraeger() {
       try {
         const response: AxiosResponse<OrganisationRootChildrenResponse> =
           await organisationApi.organisationControllerGetRootChildren();

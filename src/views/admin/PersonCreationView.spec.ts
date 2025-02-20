@@ -174,7 +174,7 @@ describe('PersonCreationView', () => {
 
     const rolleSelect: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
-      .findComponent({ ref: 'rolle-select' });
+      .findComponent({ ref: 'rollen-select' });
     await rolleSelect?.setValue('1');
     await nextTick();
 
@@ -202,7 +202,7 @@ describe('PersonCreationView', () => {
 
     const rolleSelect: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
-      .findComponent({ ref: 'rolle-select' });
+      .findComponent({ ref: 'rollen-select' });
     await rolleSelect?.setValue('1');
     await nextTick();
 
@@ -266,7 +266,7 @@ describe('PersonCreationView', () => {
         },
       ],
       selectedOrganisation: null,
-      selectedRolle: null,
+      selectedRollen: null,
       canCommit: true,
     };
 
@@ -278,7 +278,7 @@ describe('PersonCreationView', () => {
 
     const rolleSelect: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
-      .findComponent({ ref: 'rolle-select' });
+      .findComponent({ ref: 'rollen-select' });
     await rolleSelect?.setValue('1');
     await nextTick();
 
@@ -346,7 +346,7 @@ describe('PersonCreationView', () => {
         },
       ],
       selectedOrganisation: null,
-      selectedRolle: null,
+      selectedRollen: null,
       canCommit: true,
     };
 
@@ -358,8 +358,8 @@ describe('PersonCreationView', () => {
 
     const rolleSelect: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
-      .findComponent({ ref: 'rolle-select' });
-    await rolleSelect?.setValue('1');
+      .findComponent({ ref: 'rollen-select' });
+    await rolleSelect?.setValue(['1']);
     await nextTick();
 
     const klasseSelect: VueWrapper | undefined = wrapper
