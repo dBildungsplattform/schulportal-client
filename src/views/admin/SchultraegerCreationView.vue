@@ -24,7 +24,7 @@
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import FormRow from '@/components/form/FormRow.vue';
 
-  const initialSchulFormCache: Ref<string> = ref('');
+  const initialSchultraegerformCache: Ref<string> = ref('');
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -34,13 +34,10 @@
 
   const validationSchema: TypedSchema = toTypedSchema(
     object({
-      selectedDienststellennummer: string()
-        .matches(NO_LEADING_TRAILING_SPACES, t('admin.schule.rules.dienststellennummer.noLeadingTrailingSpaces'))
-        .required(t('admin.schule.rules.dienststellennummer.required')),
-      selectedSchulname: string()
-        .matches(DIN_91379A_EXT, t('admin.schule.rules.schulname.matches'))
-        .matches(NO_LEADING_TRAILING_SPACES, t('admin.schule.rules.schulname.noLeadingTrailingSpaces'))
-        .required(t('admin.schule.rules.schulname.required')),
+      selectedSchultraegername: string()
+        .matches(DIN_91379A_EXT, t('admin.schultraeger.rules.schultraegername.matches'))
+        .matches(NO_LEADING_TRAILING_SPACES, t('admin.schultraeger.rules.schultraegername.noLeadingTrailingSpaces'))
+        .required(t('admin.schultraeger.rules.schultraegername.required')),
     }),
   );
 
@@ -53,83 +50,66 @@
     },
   });
 
-  type SchuleCreationForm = {
-    selectedSchulform: string;
-    selectedDienststellennummer: string;
-    selectedSchulname: string;
+  type SchultraegerCreationForm = {
+    selectedSchultraegerform: string;
+    selectedSchultraegername: string;
   };
 
   // eslint-disable-next-line @typescript-eslint/typedef
-  const { defineField, handleSubmit, isFieldDirty, resetForm } = useForm<SchuleCreationForm>({
+  const { defineField, handleSubmit, isFieldDirty, resetForm } = useForm<SchultraegerCreationForm>({
     validationSchema,
   });
 
-  const preservedSchulform: Ref<string | undefined> = ref<string>('');
+  const preservedSchultraegerform: Ref<string | undefined> = ref<string>('');
 
-  const [selectedSchulform]: [Ref<string>, Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>] =
-    defineField('selectedSchulform', vuetifyConfig);
-  const [selectedSchulname, selectedSchulnameProps]: [
+  const [selectedSchultraegerform]: [
     Ref<string>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedSchulname', vuetifyConfig);
-  const [selectedDienststellennummer, selectedDienststellennummerProps]: [
+  ] = defineField('selectedSchultraegerform', vuetifyConfig);
+  const [selectedSchultraegername, selectedSchultraegernameProps]: [
     Ref<string>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedDienststellennummer', vuetifyConfig);
+  ] = defineField('selectedSchultraegername', vuetifyConfig);
 
-  const schultraegerList: ComputedRef<Organisation[] | undefined> = computed(() => {
+  const rootChildSchultraegerList: ComputedRef<Organisation[] | undefined> = computed(() => {
     return organisationStore.schultraeger;
   });
 
   function isFormDirty(): boolean {
-    return (
-      isFieldDirty('selectedSchulform') ||
-      isFieldDirty('selectedSchulname') ||
-      isFieldDirty('selectedDienststellennummer')
-    );
+    return isFieldDirty('selectedSchultraegerform') || isFieldDirty('selectedSchultraegername');
   }
 
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
   let blockedNext: () => void = () => {};
 
-  onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
-    if (isFormDirty()) {
-      showUnsavedChangesDialog.value = true;
-      blockedNext = next;
-    } else {
-      next();
-    }
-  });
-
   const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
-    preservedSchulform.value = schultraegerList.value?.find(
-      (schultraeger: Organisation) => schultraeger.id === selectedSchulform.value,
+    preservedSchultraegerform.value = rootChildSchultraegerList.value?.find(
+      (schultraeger: Organisation) => schultraeger.id === selectedSchultraegerform.value,
     )?.name;
-    if (selectedDienststellennummer.value && selectedSchulname.value) {
+    if (selectedSchultraegername.value) {
       await organisationStore.createOrganisation(
-        selectedDienststellennummer.value,
-        selectedSchulname.value,
+        undefined,
+        selectedSchultraegername.value,
         undefined,
         undefined,
-        OrganisationsTyp.Schule,
+        OrganisationsTyp.Traeger,
         undefined,
-        selectedSchulform.value,
-        selectedSchulform.value,
+        selectedSchultraegerform.value,
+        selectedSchultraegerform.value,
       );
       resetForm({
         values: {
-          selectedSchulform: initialSchulFormCache.value,
-          selectedDienststellennummer: '',
-          selectedSchulname: '',
+          selectedSchultraegerform: initialSchultraegerformCache.value,
+          selectedSchultraegername: '',
         },
       });
     }
   });
 
-  const handleCreateAnotherSchule = (): void => {
-    organisationStore.createdSchule = null;
+  const handleCreateAnotherSchultraeger = (): void => {
+    organisationStore.createdSchultraeger = null;
     resetForm();
-    router.push({ name: 'create-schule' });
+    router.push({ name: 'create-schultraeger' });
   };
 
   function handleConfirmUnsavedChanges(): void {
@@ -137,22 +117,20 @@
     organisationStore.errorCode = '';
   }
 
-  async function navigateToSchuleManagement(): Promise<void> {
+  // TODO: add a router.push to the Management when it's available
+  async function navigateToSchultraegerManagement(): Promise<void> {
     organisationStore.createdSchule = null;
-    await router.push({ name: 'schule-management' }).then(() => {
-      router.go(0);
-    });
   }
 
-  async function navigateBackToSchuleForm(): Promise<void> {
+  async function navigateBackToSchultraegerForm(): Promise<void> {
     if (organisationStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
       resetForm();
-      await router.push({ name: 'create-schule' }).then(() => {
+      await router.push({ name: 'create-schultraeger' }).then(() => {
         router.go(0);
       });
     } else {
       organisationStore.errorCode = '';
-      await router.push({ name: 'create-schule' });
+      await router.push({ name: 'create-schultraeger' });
     }
   }
 
@@ -164,17 +142,26 @@
   }
 
   onMounted(async () => {
-    organisationStore.createdSchule = null;
+    organisationStore.createdSchultraeger = null;
     organisationStore.errorCode = '';
     await organisationStore.getRootKinderSchultraeger();
 
-    if (schultraegerList.value && schultraegerList.value.length > 0) {
-      const defaultSchulform: string = schultraegerList.value[0]?.id ?? '';
-      selectedSchulform.value = defaultSchulform;
-      initialSchulFormCache.value = defaultSchulform;
+    if (rootChildSchultraegerList.value && rootChildSchultraegerList.value.length > 0) {
+      const defaultSchultraegerform: string = rootChildSchultraegerList.value[0]?.id ?? '';
+      selectedSchultraegerform.value = defaultSchultraegerform;
+      initialSchultraegerformCache.value = defaultSchultraegerform;
     }
     /* listen for browser changes and prevent them when form is dirty */
     window.addEventListener('beforeunload', preventNavigation);
+  });
+
+  onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
+    if (isFormDirty()) {
+      showUnsavedChangesDialog.value = true;
+      blockedNext = next;
+    } else {
+      next();
+    }
   });
 
   onUnmounted(() => {
@@ -192,44 +179,44 @@
     </h1>
     <LayoutCard
       :closable="!organisationStore.errorCode"
-      @onCloseClicked="navigateToSchuleManagement"
-      :header="$t('admin.schule.addNew')"
+      @onCloseClicked="navigateToSchultraegerManagement"
+      :header="$t('admin.schultraeger.addNew')"
       :padded="true"
       :showCloseText="true"
     >
-      <!-- The form to create a new school (No created school yet and no errorCode) -->
-      <template v-if="!organisationStore.createdSchule">
+      <!-- The form to create a new Schultraeger -->
+      <template v-if="!organisationStore.createdSchultraeger">
         <FormWrapper
           :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
-          :createButtonLabel="$t('admin.schule.create')"
-          :discardButtonLabel="$t('admin.schule.discard')"
+          :createButtonLabel="$t('admin.schultraeger.create')"
+          :discardButtonLabel="$t('admin.schultraeger.discard')"
           :hideActions="!!organisationStore.errorCode"
-          id="schule-creation-form"
+          id="schultraeger-creation-form"
           :isLoading="organisationStore.loading"
-          :onDiscard="navigateToSchuleManagement"
+          :onDiscard="navigateToSchultraegerManagement"
           @onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
           :onSubmit="onSubmit"
-          ref="schule-creation-form"
+          ref="schutraegere-creation-form"
           :showUnsavedChangesDialog="showUnsavedChangesDialog"
         >
           <!-- Error Message Display if error on submit -->
           <SpshAlert
             :model-value="!!organisationStore.errorCode"
-            :title="$t('admin.schule.schuleCreateErrorTitle')"
+            :title="$t('admin.schultraeger.schultraegerCreateErrorTitle')"
             :type="'error'"
             :closable="false"
-            :text="organisationStore.errorCode ? $t(`admin.schule.errors.${organisationStore.errorCode}`) : ''"
+            :text="organisationStore.errorCode ? $t(`admin.schultraeger.errors.${organisationStore.errorCode}`) : ''"
             :showButton="true"
             :buttonText="$t('admin.schule.backToCreateSchule')"
-            :buttonAction="navigateBackToSchuleForm"
+            :buttonAction="navigateBackToSchultraegerForm"
             buttonClass="primary"
           />
 
           <template v-if="!organisationStore.errorCode">
-            <!-- Select school type. For now not bound to anything and just a UI element -->
+            <!-- Select Schultraeger type. For now not bound to anything and just a UI element -->
             <v-row>
               <v-col>
-                <h3 class="headline-3">1. {{ $t('admin.schule.assignSchulform') }}</h3>
+                <h3 class="headline-3">1. {{ $t('admin.schultraeger.assignSchultraegerform') }}</h3>
               </v-col>
             </v-row>
             <v-row>
@@ -239,11 +226,11 @@
               ></v-col>
               <v-radio-group
                 inline
-                v-model="selectedSchulform"
-                data-testid="schulform-radio-group"
+                v-model="selectedSchultraegerform"
+                data-testid="schultraegerform-radio-group"
               >
                 <v-col
-                  v-for="(schultraeger, index) in schultraegerList"
+                  v-for="schultraeger in rootChildSchultraegerList"
                   :key="schultraeger.id"
                   offset-md="1"
                   cols="12"
@@ -253,53 +240,32 @@
                   <v-radio
                     :label="schultraeger.name"
                     :value="schultraeger.id"
-                    :data-testid="'schulform-radio-button-' + index"
+                    :data-testid="
+                      'schultraegerform-radio-button-' + schultraeger.name.replace(/\s+/g, '-').toLowerCase()
+                    "
                   ></v-radio>
                 </v-col>
               </v-radio-group>
             </v-row>
-            <!-- Enter service number -->
+            <!-- select Schultraeger name -->
             <v-row>
               <v-col>
-                <h3 class="headline-3">2. {{ $t('admin.schule.enterDienststellennummer') }}</h3>
+                <h3 class="headline-3">2. {{ $t('admin.schultraeger.enterSchultraegername') }}</h3>
               </v-col>
             </v-row>
             <FormRow
-              :errorLabel="selectedDienststellennummerProps['error']"
-              labelForId="dienststellennummer-input"
+              :errorLabel="selectedSchultraegernameProps['error']"
+              labelForId="schultraegername-input"
               :isRequired="true"
-              :label="$t('admin.schule.dienststellennummer')"
+              :label="$t('admin.schultraeger.schultraegername')"
             >
               <v-text-field
                 clearable
-                data-testid="dienststellennummer-input"
-                v-bind="selectedDienststellennummerProps"
-                v-model="selectedDienststellennummer"
-                :placeholder="$t('admin.schule.dienststellennummer')"
-                ref="dienststellennummer-input"
-                variant="outlined"
-                density="compact"
-              ></v-text-field>
-            </FormRow>
-            <!-- select school name -->
-            <v-row>
-              <v-col>
-                <h3 class="headline-3">3. {{ $t('admin.schule.enterSchulname') }}</h3>
-              </v-col>
-            </v-row>
-            <FormRow
-              :errorLabel="selectedSchulnameProps['error']"
-              labelForId="schulname-input"
-              :isRequired="true"
-              :label="$t('admin.schule.schulname')"
-            >
-              <v-text-field
-                clearable
-                data-testid="schulname-input"
-                v-bind="selectedSchulnameProps"
-                v-model="selectedSchulname"
-                :placeholder="$t('admin.schule.schulname')"
-                ref="schulname-input"
+                data-testid="schultraegername-input"
+                v-bind="selectedSchultraegernameProps"
+                v-model="selectedSchultraegername"
+                :placeholder="$t('admin.schultraeger.schultraegername')"
+                ref="schultraegername-input"
                 variant="outlined"
                 density="compact"
                 required
@@ -308,15 +274,17 @@
           </template>
         </FormWrapper>
       </template>
-      <!-- Result template on success after submit (Present value in createdSchule and no errorCode)  -->
-      <template v-if="organisationStore.createdSchule && !organisationStore.errorCode">
-        <v-container class="new-schule-success">
+      <!-- Result template on success after submit (Present value in createdSchultraeger and no errorCode)  -->
+      <template v-if="organisationStore.createdSchultraeger && !organisationStore.errorCode">
+        <v-container class="new-schultraeger-success">
           <v-row justify="center">
             <v-col
               class="subtitle-1"
               cols="auto"
             >
-              <span data-testid="schule-success-text">{{ $t('admin.schule.schuleAddedSuccessfully') }}</span>
+              <span data-testid="schultraeger-success-text">{{
+                $t('admin.schultraeger.schultraegerAddedSuccessfully')
+              }}</span>
             </v-col>
           </v-row>
           <v-row justify="center">
@@ -338,23 +306,17 @@
             </v-col>
           </v-row>
           <v-row>
-            <v-col class="text-body bold text-right"> {{ $t('admin.schule.schulform') }}: </v-col>
+            <v-col class="text-body bold text-right"> {{ $t('admin.schultraeger.schultraegerform') }}: </v-col>
             <v-col class="text-body"
-              ><span data-testid="created-schule-form">{{ preservedSchulform }}</span></v-col
+              ><span data-testid="created-schultraeger-form">{{ preservedSchultraegerform }}</span></v-col
             >
           </v-row>
           <v-row>
-            <v-col class="text-body bold text-right"> {{ $t('admin.schule.dienststellennummer') }}: </v-col>
+            <v-col class="text-body bold text-right"> {{ $t('admin.schultraeger.schultraegername') }}: </v-col>
             <v-col class="text-body"
-              ><span data-testid="created-schule-dienststellennummer">{{
-                organisationStore.createdSchule.kennung
+              ><span data-testid="created-schultraeger-name">{{
+                organisationStore.createdSchultraeger.name
               }}</span></v-col
-            >
-          </v-row>
-          <v-row>
-            <v-col class="text-body bold text-right"> {{ $t('admin.schule.schulname') }}: </v-col>
-            <v-col class="text-body"
-              ><span data-testid="created-schule-name">{{ organisationStore.createdSchule.name }}</span></v-col
             >
           </v-row>
           <v-divider
@@ -371,7 +333,7 @@
               <v-btn
                 class="secondary"
                 data-testid="back-to-list-button"
-                @click="navigateToSchuleManagement"
+                @click="navigateToSchultraegerManagement"
                 :block="mdAndDown"
                 >{{ $t('nav.backToList') }}</v-btn
               >
@@ -383,11 +345,11 @@
             >
               <v-btn
                 class="primary button"
-                data-testid="create-another-schule-button"
-                @click="handleCreateAnotherSchule"
+                data-testid="create-another-schultraeger-button"
+                @click="handleCreateAnotherSchultraeger"
                 :block="mdAndDown"
               >
-                {{ $t('admin.schule.createAnother') }}
+                {{ $t('admin.schultraeger.createAnother') }}
               </v-btn>
             </v-col>
           </v-row>

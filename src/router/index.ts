@@ -11,7 +11,8 @@ type Permission =
   | 'personenimport'
   | 'personenverwaltung'
   | 'rollenverwaltung'
-  | 'schulverwaltung';
+  | 'schulverwaltung'
+  | 'schultraegerverwaltung';
 
 const router: Router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -93,6 +94,8 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
         case 'rollenverwaltung':
           return authStore.hasRollenverwaltungPermission;
         case 'schulverwaltung':
+          return authStore.hasSchulverwaltungPermission;
+        case 'schultraegerverwaltung':
           return authStore.hasSchulverwaltungPermission;
         default:
           return false;

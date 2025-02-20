@@ -224,13 +224,20 @@
         to="/admin/schulen/new"
       ></v-list-item>
     </div>
-
     <!-- Schulträgerverwaltung -->
     <div v-if="authStore.hasSchultraegerverwaltungPermission">
       <v-list-item
         class="menu-bar-main-item headline-2"
         data-testid="schultraeger-management-title"
         :title="$t('admin.schultraeger.management')"
+      ></v-list-item>
+      <v-list-item
+        class="menu-bar-sub-item caption"
+        @click="closeMenuOnMobile"
+        data-testid="schultraeger-creation-menu-item"
+        prepend-icon="mdi-plus-circle-outline"
+        :title="$t('admin.schultraeger.createNew')"
+        to="/admin/schultraeger/new"
       ></v-list-item>
     </div>
   </v-navigation-drawer>
