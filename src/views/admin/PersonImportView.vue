@@ -286,12 +286,12 @@
   }
 
   function downloadFileContent(fileContent: string): void {
-    const blob: Blob = new Blob([fileContent], { type: 'text/csv' });
+    const blob: Blob = new Blob([fileContent], { type: 'text/txt' });
     const url: string = window.URL.createObjectURL(blob);
 
     const link: HTMLAnchorElement = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `${t('admin.import.fileName.person')}.csv`);
+    link.setAttribute('download', `${t('admin.import.fileName.person')}.txt`);
     document.body.appendChild(link);
     link.click();
     link.remove();
@@ -307,8 +307,12 @@
       (user: ImportedUserResponse) => user.status === ImportDataItemStatus.Failed,
     );
 
-    let fileContent: string = `Schule; ${importStore.importResponse?.organisationsname}; Rolle; ${importStore.importResponse?.rollenname}`;
-    fileContent += `\n\n${t('admin.import.successfullyImportedUsersNotice')}\n\n`;
+    /**
+     * make sure every (non-empty) line contains the correct amount of semicolons, otherwise the excel-data-import will not recognize the format
+     */
+
+    let fileContent: string = `Schule:; ${importStore.importResponse?.organisationsname}; Rolle; ${importStore.importResponse?.rollenname};`;
+    fileContent += `\n\n${t('admin.import.successfullyImportedUsersNotice')};;;;\n\n`;
     fileContent += 'Klasse; Vorname; Nachname; Benutzername; Passwort\n';
 
     successfulUsers.forEach((user: ImportedUserResponse) => {
@@ -316,11 +320,11 @@
     });
 
     if (failedUsers.length > 0) {
-      fileContent += `\n\n${t('admin.import.failedToImportUsersNotice')}\n\n`;
-      fileContent += 'Klasse; Vorname; Nachname; Benutzername\n';
+      fileContent += `\n\n${t('admin.import.failedToImportUsersNotice')};;;;\n\n`;
+      fileContent += 'Klasse; Vorname; Nachname; Benutzername;\n';
 
       failedUsers.forEach((user: ImportedUserResponse) => {
-        fileContent += `${user.klasse}; ${user.vorname}; ${user.nachname}; ${user.benutzername}\n`;
+        fileContent += `${user.klasse}; ${user.vorname}; ${user.nachname}; ${user.benutzername};\n`;
       });
     }
 
