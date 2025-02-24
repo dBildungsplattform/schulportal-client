@@ -311,20 +311,20 @@
      * make sure every (non-empty) line contains the correct amount of semicolons, otherwise the excel-data-import will not recognize the format
      */
 
-    let fileContent: string = `Schule:; ${importStore.importResponse?.organisationsname}; Rolle; ${importStore.importResponse?.rollenname};`;
+    let fileContent: string = `Schule:;${importStore.importResponse?.organisationsname};Rolle;${importStore.importResponse?.rollenname};`;
     fileContent += `\n\n${t('admin.import.successfullyImportedUsersNotice')};;;;\n\n`;
-    fileContent += 'Klasse; Vorname; Nachname; Benutzername; Passwort\n';
+    fileContent += 'Klasse;Vorname;Nachname;Benutzername;Passwort\n';
 
     successfulUsers.forEach((user: ImportedUserResponse) => {
-      fileContent += `${user.klasse}; ${user.vorname}; ${user.nachname}; ${user.benutzername}; ${user.startpasswort}\n`;
+      fileContent += `${user.klasse};${user.vorname};${user.nachname};${user.benutzername};${user.startpasswort}\n`;
     });
 
     if (failedUsers.length > 0) {
       fileContent += `\n\n${t('admin.import.failedToImportUsersNotice')};;;;\n\n`;
-      fileContent += 'Klasse; Vorname; Nachname; Benutzername;\n';
+      fileContent += 'Klasse;Vorname;Nachname;Benutzername;\n';
 
       failedUsers.forEach((user: ImportedUserResponse) => {
-        fileContent += `${user.klasse}; ${user.vorname}; ${user.nachname}; ${user.benutzername};\n`;
+        fileContent += `${user.klasse};${user.vorname};${user.nachname};${user.benutzername};\n`;
       });
     }
 
