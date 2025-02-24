@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
-import SuccessTemplate from './SuccessTemplate.vue';
+import KlasseSuccessTemplate from './KlasseSuccessTemplate.vue';
 
 let wrapper: VueWrapper | null = null;
 
@@ -11,7 +11,7 @@ beforeEach(() => {
     </div>
   `;
 
-  wrapper = mount(SuccessTemplate, {
+  wrapper = mount(KlasseSuccessTemplate, {
     attachTo: document.getElementById('app') || '',
     props: {
       successMessage: 'Klasse updated successfully',
@@ -25,13 +25,13 @@ beforeEach(() => {
     },
     global: {
       components: {
-        SuccessTemplate,
+        KlasseSuccessTemplate,
       },
     },
   });
 });
 
-describe('SuccessTemplate', () => {
+describe('KlasseSuccessTemplate', () => {
   test('it displays the success message and data correctly', () => {
     expect(wrapper?.get('[data-testid="klasse-success-text"]').text()).toBe('Klasse updated successfully');
   });
