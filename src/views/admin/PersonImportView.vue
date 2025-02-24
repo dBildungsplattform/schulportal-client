@@ -311,7 +311,7 @@
      * make sure every (non-empty) line contains the correct amount of semicolons, otherwise the excel-data-import will not recognize the format
      */
 
-    let fileContent: string = `Schule:;${importStore.importResponse?.organisationsname};Rolle;${importStore.importResponse?.rollenname};`;
+    let fileContent: string = `Schule:;${importStore.importResponse?.organisationsname};Rolle:;${importStore.importResponse?.rollenname};`;
     fileContent += `\n\n${t('admin.import.successfullyImportedUsersNotice')};;;;\n\n`;
     fileContent += 'Klasse;Vorname;Nachname;Benutzername;Passwort\n';
 
