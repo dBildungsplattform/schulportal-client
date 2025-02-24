@@ -73,14 +73,16 @@
   });
 
   const handleCreateAnotherKlasse = async (): Promise<void> => {
-    formRef.value?.reset();
+    // eslint-disable-next-line @typescript-eslint/dot-notation
+    formRef['value']?.reset();
     await initStores();
     router.push({ name: 'create-klasse' });
   };
 
   async function navigateBackToKlasseForm(): Promise<void> {
+    // eslint-disable-next-line @typescript-eslint/dot-notation
+    formRef['value']?.reset();
     if (organisationStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
-      formRef.value?.reset();
       await router.push({ name: 'create-klasse' }).then(() => {
         router.go(0);
       });
@@ -92,7 +94,8 @@
 
   async function navigateToKlasseManagement(): Promise<void> {
     if (organisationStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
-      formRef.value?.reset();
+      // eslint-disable-next-line @typescript-eslint/dot-notation
+      formRef['value']?.reset();
       await router.push({ name: 'create-klasse' }).then(() => {
         router.go(0);
       });
@@ -122,6 +125,7 @@
       selectedSchule,
       selectedSchule,
     );
+    isFormDirty.value = false;
   };
 
   onMounted(async () => {

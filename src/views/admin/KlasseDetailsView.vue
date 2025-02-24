@@ -100,6 +100,7 @@
   }
 
   async function navigateToKlasseManagement(): Promise<void> {
+    console.log('he')
     await router.push({ name: 'klasse-management' });
     organisationStore.updatedOrganisation = null;
   }

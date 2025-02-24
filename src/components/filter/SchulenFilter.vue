@@ -1,5 +1,6 @@
 <script setup lang="ts">
   import type { RollenSystemRecht } from '@/api-client/generated/api';
+  import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
   import {
     OrganisationsTyp,
     useOrganisationStore,
@@ -11,7 +12,7 @@
   import { dedup } from '@/utils/arrays';
   import { getDisplayNameForOrg } from '@/utils/formatting';
   import type { BaseFieldProps } from 'vee-validate';
-  import { computed, onMounted, reactive, ref, watch, type ComputedRef, type Ref } from 'vue';
+  import { computed, onBeforeMount, reactive, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
 
   type SelectedSchulenIds = Array<string> | string | undefined;
@@ -23,11 +24,7 @@
     initialIds?: Array<string> | string;
     selectedSchuleProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
   };
-  type Emits = {
-    (event: 'onSchuleSelected', payload: Array<Organisation>): void;
-  };
   const props: Props = defineProps<Props>();
-  const emit: Emits = defineEmits<Emits>();
   const organisationStore: OrganisationStore = useOrganisationStore();
   const { t }: Composer = useI18n({ useScope: 'global' });
 
@@ -47,7 +44,8 @@
 
   defineExpose({ clearInput });
 
-  const hasAutoselectedSchule: ComputedRef<boolean> = computed(() => organisationStore.autoselectedSchule !== null);
+  const { hasAutoselectedSchule, autoselectedSchule, currentUserSchulen }: ReturnType<typeof useAutoselectedSchule> =
+    useAutoselectedSchule(props.systemrechteForSearch ?? []);
   const translatedSchulen: ComputedRef<Array<TranslatedObject>> = computed(() =>
     organisationStore.schulenFilter.filterResult.map((schule: Organisation) => ({
       value: schule.id,
@@ -68,9 +66,14 @@
   };
 
   const getDefaultIds = (): Array<string> => {
-    if (!props.initialIds) return [];
-    if (Array.isArray(props.initialIds)) return props.initialIds;
-    return [props.initialIds];
+    const tempIds: Array<string> = [];
+    if (props.initialIds) {
+      if (Array.isArray(props.initialIds)) tempIds.push(...props.initialIds);
+      else tempIds.push(props.initialIds);
+    } else if (hasAutoselectedSchule.value) {
+      tempIds.push(...currentUserSchulen.value.map((schule: Organisation) => schule.id));
+    }
+    return tempIds;
   };
 
   const updateOrganisationenIds = (ids: SelectedSchulenIds): void => {
@@ -83,48 +86,33 @@
     schulenFilter.organisationIds = dedup(tempIds.filter(Boolean));
   };
 
+  // populate input, but prioritize props over autoselection
   watch(
-    () => organisationStore.autoselectedSchule,
-    (selectedSchule: Organisation | null) => {
-      if (selectedSchule === null) {
-        selectedSchulenIds.value = props.multiple ? [] : undefined;
+    () => ({
+      hasAutoselectedSchule: hasAutoselectedSchule.value,
+      initialIds: props.initialIds,
+    }),
+    (newValues: { hasAutoselectedSchule: boolean; initialIds: SelectedSchulenIds }) => {
+      let tempIds: SelectedSchulenIds = props.multiple ? [] : undefined;
+      const noIdsInProps: boolean = !newValues.initialIds || newValues.initialIds.length === 0;
+      if (noIdsInProps) {
+        if (newValues.hasAutoselectedSchule) {
+          if (autoselectedSchule.value) {
+            if (props.multiple) tempIds = [autoselectedSchule.value.id];
+            else tempIds = autoselectedSchule.value.id;
+          }
+        }
       } else {
-        selectedSchulenIds.value = selectedSchule.id;
+        tempIds = props.initialIds;
       }
+      selectedSchulenIds.value = tempIds;
     },
+    { immediate: true },
   );
-
-  watch(
-    () => props.initialIds,
-    (newIds: SelectedSchulenIds) => {
-      selectedSchulenIds.value = newIds;
-    },
-  );
-
-  // watch(
-  //   () => organisationStore.schulenFilter.selectedItems,
-  //   (newSelectedSchulen: Array<Organisation>) => {
-  //     if (props.multiple) {
-  //       selectedSchulenIds.value = newSelectedSchulen.map((schule: Organisation) => schule.id);
-  //     } else if (newSelectedSchulen.length === 1) selectedSchulenIds.value = newSelectedSchulen[0]!.id;
-  //     else if (newSelectedSchulen.length === 0 && !props.readonly) clearInput();
-  //   },
-  // );
 
   watch(selectedSchulenIds, (newIds: SelectedSchulenIds) => {
     if (Array.isArray(newIds)) {
       updateOrganisationenIds(newIds);
-      // TODO: measure performance impact
-      organisationStore.schulenFilter.selectedItems = newIds.reduce(
-        (newSelection: Array<Organisation>, schuleId: string) => {
-          const matchedSchule: Organisation | undefined = organisationStore.schulenFilter.filterResult.find(
-            (schule: Organisation) => schule.id === schuleId,
-          );
-          if (matchedSchule) newSelection.push(matchedSchule);
-          return newSelection;
-        },
-        [] as Array<Organisation>,
-      );
     } else if (newIds === '' || newIds === undefined) {
       updateOrganisationenIds([]);
       updateSearchString(undefined);
@@ -132,16 +120,35 @@
       clearInput();
     } else {
       updateOrganisationenIds([newIds]);
-      const selectedSchule: Organisation | undefined = organisationStore.schulenFilter.filterResult.find(
-        (schule: Organisation) => schule.id === newIds,
-      );
-      if (selectedSchule) {
-        organisationStore.schulenFilter.selectedItems = [selectedSchule];
-      }
     }
-
-    emit('onSchuleSelected', organisationStore.schulenFilter.selectedItems);
   });
+
+  watch(
+    () => organisationStore.schulenFilter.filterResult,
+    () => {
+      const ids: SelectedSchulenIds = selectedSchulenIds.value;
+      if (Array.isArray(ids)) {
+        // TODO: measure performance impact
+        organisationStore.schulenFilter.selectedItems = ids.reduce(
+          (newSelection: Array<Organisation>, schuleId: string) => {
+            const matchedSchule: Organisation | undefined = organisationStore.schulenFilter.filterResult.find(
+              (schule: Organisation) => schule.id === schuleId,
+            );
+            if (matchedSchule) newSelection.push(matchedSchule);
+            return newSelection;
+          },
+          [] as Array<Organisation>,
+        );
+      } else if (ids) {
+        const selectedSchule: Organisation | undefined = organisationStore.schulenFilter.filterResult.find(
+          (schule: Organisation) => schule.id === ids,
+        );
+        if (selectedSchule) {
+          organisationStore.schulenFilter.selectedItems = [selectedSchule];
+        }
+      }
+    },
+  );
 
   watch(schulenFilter, (newFilter: OrganisationenFilter) => {
     clearTimeout(timerId.value);
@@ -151,10 +158,9 @@
     }, 500);
   });
 
-  onMounted(async () => {
+  onBeforeMount(async () => {
     organisationStore.resetSchulFilter();
     updateOrganisationenIds([]);
-    await organisationStore.getAutoselectedSchule();
     await organisationStore.loadSchulenForFilter(schulenFilter);
   });
 </script>

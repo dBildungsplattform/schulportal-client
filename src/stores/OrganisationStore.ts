@@ -66,7 +66,6 @@ type OrganisationState = {
   allKlassen: Array<Organisation>;
   allSchulen: Array<Organisation>;
   schulenFilter: AutoCompleteStore<Organisation>;
-  autoselectedSchule: Organisation | null;
   currentOrganisation: Organisation | null;
   currentKlasse: Organisation | null;
   updatedOrganisation: Organisation | null;
@@ -103,7 +102,6 @@ type OrganisationGetters = {};
 type OrganisationActions = {
   getAllOrganisationen: (filter?: OrganisationenFilter) => Promise<void>;
   getFilteredKlassen(filter?: OrganisationenFilter): Promise<void>;
-  getAutoselectedSchule: () => Promise<void>;
   getKlassenByOrganisationId: (filter?: OrganisationenFilter) => Promise<void>;
   getOrganisationById: (organisationId: string, organisationsTyp: OrganisationsTyp) => Promise<Organisation>;
   getLockingOrganisationById: (organisationId: string) => Promise<void>;
@@ -148,7 +146,6 @@ export const useOrganisationStore: StoreDefinition<
         total: 0,
         loading: false,
       },
-      autoselectedSchule: null,
       currentOrganisation: null,
       currentKlasse: null,
       updatedOrganisation: null,
@@ -282,32 +279,6 @@ export const useOrganisationStore: StoreDefinition<
         return await Promise.reject(this.errorCode);
       } finally {
         this.loadingKlassen = false;
-      }
-    },
-    async getAutoselectedSchule() {
-      this.errorCode = '';
-      this.schulenFilter.loading = true;
-      try {
-        const response: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations(
-          0,
-          2,
-          undefined,
-          undefined,
-          undefined,
-          OrganisationsTyp.Schule,
-          [RollenSystemRecht.KlassenVerwalten],
-          undefined,
-          undefined,
-          undefined,
-        );
-        this.autoselectedSchule = response.data.length === 1 ? (response.data[0] ?? null) : null;
-      } catch (error: unknown) {
-        this.errorCode = 'UNSPECIFIED_ERROR';
-        if (isAxiosError(error)) {
-          this.errorCode = error.response?.data.i18nKey || 'ORGANISATION_SPECIFICATION_ERROR';
-        }
-      } finally {
-        this.schulenFilter.loading = false;
       }
     },
 

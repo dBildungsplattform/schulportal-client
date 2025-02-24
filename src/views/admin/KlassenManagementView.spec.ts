@@ -1,5 +1,5 @@
-import { RollenSystemRecht } from '@/api-client/generated';
-import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+import { RollenSystemRecht, TraegerschaftTyp } from '@/api-client/generated';
+import { useAuthStore, type AuthStore, type UserInfo } from '@/stores/AuthStore';
 import {
   OrganisationsTyp,
   useOrganisationStore,
@@ -52,146 +52,165 @@ function selectSchule(schule?: Partial<Organisation> | null): Organisation | nul
   return schuleWithDefaults;
 }
 
-beforeEach(() => {
-  document.body.innerHTML = `
+const schule1: Organisation = {
+  id: '1111111',
+  name: 'Schule 1',
+  kennung: '1111111',
+  typ: 'SCHULE',
+  administriertVon: '1',
+};
+const schule2: Organisation = {
+  id: '2222222',
+  name: 'Schule 2',
+  kennung: '2222222',
+  typ: 'SCHULE',
+  administriertVon: '1',
+};
+const personenkontexte: UserInfo['personenkontexte'] = [
+  {
+    organisation: {
+      ...schule1,
+      namensergaenzung: null,
+      kuerzel: '',
+      version: 1,
+      itslearningEnabled: true,
+      // eslint-disable-next-line no-underscore-dangle
+      traegerschaft: TraegerschaftTyp._01,
+      administriertVon: '1',
+      kennung: schule1.kennung ?? '',
+    },
+    rolle: {
+      systemrechte: [RollenSystemRecht.KlassenVerwalten, 'SCHULEN_VERWALTEN'],
+      serviceProviderIds: ['789897798'],
+    },
+  },
+  {
+    organisation: {
+      ...schule2,
+      namensergaenzung: null,
+      kuerzel: '',
+      version: 1,
+      itslearningEnabled: true,
+      typ: OrganisationsTyp.Schule,
+      // eslint-disable-next-line no-underscore-dangle
+      traegerschaft: TraegerschaftTyp._01,
+      administriertVon: '1',
+      kennung: schule2.kennung ?? '',
+    },
+    rolle: {
+      systemrechte: [RollenSystemRecht.KlassenVerwalten, 'SCHULEN_VERWALTEN'],
+      serviceProviderIds: ['789897798'],
+    },
+  },
+];
+const authUser: UserInfo = {
+  middle_name: null,
+  nickname: null,
+  profile: null,
+  picture: null,
+  website: null,
+  gender: null,
+  birthdate: null,
+  zoneinfo: null,
+  locale: null,
+  phone_number: null,
+  updated_at: null,
+  personId: '2',
+  email: 'albert@test.de',
+  email_verified: true,
+  family_name: 'Test',
+  given_name: 'Albert',
+  name: 'Albert Test',
+  preferred_username: 'albert',
+  sub: 'c71be903-d0ec-4207-b653-40c114680b63',
+  personenkontexte: [],
+  password_updated_at: null,
+};
+
+describe('KlassenManagementView', () => {
+  beforeEach(() => {
+    document.body.innerHTML = `
     <div>
       <div id="app"></div>
     </div>
   `;
 
-  organisationStore.$reset();
-  organisationStore.allKlassen = [
-    {
-      id: '1',
-      name: '9a',
-      kennung: '9356494-9a',
-      namensergaenzung: 'Klasse',
-      kuerzel: 'aehg',
-      typ: 'KLASSE',
-      administriertVon: '1',
-    },
-    {
-      id: '2',
-      name: '9b',
-      kennung: '9356494-9b',
-      namensergaenzung: 'Klasse',
-      kuerzel: 'aehg',
-      typ: 'KLASSE',
-      administriertVon: '1',
-    },
-  ];
-
-  organisationStore.allOrganisationen = [
-    {
-      id: '1',
-      name: '9a',
-      kennung: '9356494-9a',
-      namensergaenzung: 'Klasse',
-      kuerzel: 'aehg',
-      typ: 'SCHULE',
-      administriertVon: '1',
-    },
-    {
-      id: '1',
-      name: '9b',
-      kennung: '9356494-9b',
-      namensergaenzung: 'Klasse',
-      kuerzel: 'aehg',
-      typ: 'SCHULE',
-      administriertVon: '1',
-    },
-  ];
-
-  organisationStore.allSchulen = [
-    {
-      id: '1133',
-      name: 'orga',
-      kennung: '9356494-9a',
-      namensergaenzung: 'Klasse',
-      kuerzel: 'aehg',
-      typ: 'SCHULE',
-      administriertVon: '1',
-    },
-    {
-      id: '1',
-      name: '9b',
-      kennung: '9356494-9b',
-      namensergaenzung: 'Klasse',
-      kuerzel: 'aehg',
-      typ: 'SCHULE',
-      administriertVon: '1',
-    },
-  ];
-
-  organisationStore.totalKlassen = 2;
-
-  authStore.currentUser = {
-    middle_name: null,
-    nickname: null,
-    profile: null,
-    picture: null,
-    website: null,
-    gender: null,
-    birthdate: null,
-    zoneinfo: null,
-    locale: null,
-    phone_number: null,
-    updated_at: null,
-    personId: '2',
-    email: 'albert@test.de',
-    email_verified: true,
-    family_name: 'Test',
-    given_name: 'Albert',
-    name: 'Albert Test',
-    preferred_username: 'albert',
-    sub: 'c71be903-d0ec-4207-b653-40c114680b63',
-    personenkontexte: [
+    organisationStore.$reset();
+    organisationStore.allKlassen = [
       {
-        organisationsId: '123456',
-        rolle: {
-          systemrechte: ['ROLLEN_VERWALTEN', 'SCHULEN_VERWALTEN'],
-          serviceProviderIds: ['789897798'],
-        },
+        id: '1',
+        name: '9a',
+        kennung: `${schule1.kennung}-9a`,
+        namensergaenzung: 'Klasse',
+        kuerzel: 'aehg',
+        typ: 'KLASSE',
+        administriertVon: schule1.id,
       },
-    ],
-    password_updated_at: null,
-  };
+      {
+        id: '2',
+        name: '9b',
+        kennung: `${schule2.kennung}-9b`,
+        namensergaenzung: 'Klasse',
+        kuerzel: 'aehg',
+        typ: 'KLASSE',
+        administriertVon: schule2.id,
+      },
+    ];
 
-  wrapper = mountComponent();
-  vi.resetAllMocks();
-});
+    organisationStore.allOrganisationen = [schule1, schule2];
 
-describe('KlassenManagementView', () => {
-  test('it renders klasse management view', async () => {
-    expect(wrapper?.getComponent({ name: 'ResultTable' })).toBeTruthy();
-    expect(wrapper?.find('[data-testid="klasse-table"]').isVisible()).toBe(true);
-    await flushPromises();
-    expect(wrapper?.findAll('.v-data-table__tr').length).toBe(2);
-    await nextTick();
+    organisationStore.allSchulen = [schule1, schule2];
 
-    const tableHeadersText: string | undefined = wrapper?.find('.v-data-table__thead').text();
-    const elements: DOMWrapper<Element>[] | undefined = wrapper?.findAll('.v-data-table__th');
-    expect(elements?.length).toBe(4);
-    expect(tableHeadersText).toContain('Dienststellennummer');
-    expect(tableHeadersText).toContain('Klasse');
-    expect(tableHeadersText).toContain('Aktion');
-  });
+    organisationStore.totalKlassen = 2;
 
-  test('it does not render extra table headers, if unnecessary', async () => {
-    organisationStore.autoselectedSchule = organisationStore.allSchulen[0]!;
+    authStore.currentUser = authUser;
+
     wrapper = mountComponent();
-    expect(wrapper.getComponent({ name: 'ResultTable' })).toBeTruthy();
-    expect(wrapper.find('[data-testid="klasse-table"]').isVisible()).toBe(true);
-    await flushPromises();
-    expect(wrapper.findAll('.v-data-table__tr').length).toBe(2);
-    await nextTick();
+    vi.resetAllMocks();
+  });
+  type AutoselectTestcase = {
+    label: string;
+    isSchuleAutoselected: boolean;
+  };
+  const autoselectTestcases: Array<AutoselectTestcase> = [
+    {
+      label: 'not autoselected',
+      isSchuleAutoselected: false,
+    },
+    {
+      label: 'autoselected',
+      isSchuleAutoselected: true,
+    },
+  ];
+  describe.each(autoselectTestcases)('when Schule is $label', ({ isSchuleAutoselected }: AutoselectTestcase) => {
+    beforeEach(() => {
+      authStore.currentUser = {
+        ...authUser,
+        personenkontexte: isSchuleAutoselected ? personenkontexte.slice(0, 1) : personenkontexte,
+      };
+    });
 
-    const tableHeadersText: string | undefined = wrapper.find('.v-data-table__thead').text();
-    const elements: DOMWrapper<Element>[] | undefined = wrapper.findAll('.v-data-table__th');
-    expect(elements.length).toBe(3);
-    expect(tableHeadersText).not.toContain('Dienststellennummer');
-    expect(tableHeadersText).toContain('Klasse');
-    expect(tableHeadersText).toContain('Aktion');
+    test('it renders klasse management view', async () => {
+      wrapper = mountComponent();
+      expect(wrapper.getComponent({ name: 'ResultTable' })).toBeTruthy();
+      expect(wrapper.find('[data-testid="klasse-table"]').isVisible()).toBe(true);
+      await flushPromises();
+      const numberOfRows: number = wrapper.findAll('.v-data-table__tr').length;
+      expect(numberOfRows).toBe(organisationStore.allKlassen.length);
+      await nextTick();
+
+      const tableHeadersText: string | undefined = wrapper.find('.v-data-table__thead').text();
+      const elements: DOMWrapper<Element>[] | undefined = wrapper.findAll('.v-data-table__th');
+      if (isSchuleAutoselected) {
+        expect(elements.length).toBe(3);
+        expect(tableHeadersText).not.toContain('Dienststellennummer');
+      } else {
+        expect(elements.length).toBe(4);
+        expect(tableHeadersText).toContain('Dienststellennummer');
+      }
+      expect(tableHeadersText).toContain('Klasse');
+      expect(tableHeadersText).toContain('Aktion');
+    });
   });
 
   test('it reloads data after changing page', async () => {

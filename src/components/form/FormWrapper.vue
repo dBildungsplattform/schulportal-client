@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { computed, type Ref, type WritableComputedRef } from 'vue';
+  import { computed, watch, type Ref, type WritableComputedRef } from 'vue';
   import { useDisplay } from 'vuetify';
   import LayoutCard from '../cards/LayoutCard.vue';
 
@@ -38,6 +38,9 @@
     set(newValue: boolean | undefined) {
       emit('onShowDialogChange', newValue);
     },
+  });
+  watch(showDialogValue, () => {
+    console.log(showDialogValue.value);
   });
 </script>
 

@@ -4,15 +4,17 @@
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SchulenFilter from '@/components/filter/SchulenFilter.vue';
+  import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
   import {
     OrganisationsTyp,
     useOrganisationStore,
     type Organisation,
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
+  import { RollenSystemRecht } from '@/stores/RolleStore';
   import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
   import { type Mutable, type TranslatedObject } from '@/types.d';
-  import { computed, onMounted, ref, watch, type ComputedRef, type Ref } from 'vue';
+  import { computed, onMounted, ref, useTemplateRef, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { onBeforeRouteLeave, useRouter, type Router } from 'vue-router';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
@@ -42,13 +44,16 @@
   ];
   // Define headers as a mutable array
   let headers: Ref<Mutable<TableHeaders>> = ref([...defaultHeaders]);
+  const schulenFilterRef = useTemplateRef('schule-select');
 
   const selectedSchuleId: ComputedRef<string | null> = computed(() => {
     if (organisationStore.schulenFilter.selectedItems.length === 1)
       return organisationStore.schulenFilter.selectedItems[0]!.id;
     else return null;
   });
-  const hasAutoselectedSchule: ComputedRef<boolean> = computed(() => organisationStore.autoselectedSchule !== null);
+  const { hasAutoselectedSchule }: ReturnType<typeof useAutoselectedSchule> = useAutoselectedSchule([
+    RollenSystemRecht.KlassenVerwalten,
+  ]);
   const selectedKlassen: Ref<Array<string>> = ref([]);
   const finalKlassen: ComputedRef<Organisation[]> = computed(() => {
     // If there are selected Klassen, filter the allKlassen to show only those
@@ -340,6 +345,7 @@
       organisationStore.getKlassenByOrganisationId({ limit: 25, administriertVon: [selectedSchuleId.value] });
       organisationStore.allKlassen = organisationStore.klassen;
     } else {
+      schulenFilterRef.value?.clearInput();
       organisationStore.resetSchulFilter();
       // Reset klassenOptions
       klassenOptions.value = [];
@@ -488,6 +494,7 @@
             class="py-md-0"
           >
             <SchulenFilter
+              :systemrechte-for-search="[RollenSystemRecht.KlassenVerwalten]"
               :multiple="false"
               ref="schule-select"
             >

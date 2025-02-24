@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import FormRow from '@/components/form/FormRow.vue';
   import FormWrapper from '@/components/form/FormWrapper.vue';
-  import type { Organisation } from '@/stores/OrganisationStore';
+  import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
   import { RollenSystemRecht } from '@/stores/RolleStore';
   import { getValidationSchema, getVuetifyConfig, type ValidationSchema } from '@/utils/validationKlasse';
   import { useForm, useIsFormDirty, useIsFormValid, type BaseFieldProps, type TypedSchema } from 'vee-validate';
@@ -28,6 +28,7 @@
   const emit: Emits = defineEmits<Emits>();
   const { t }: Composer = useI18n({ useScope: 'global' });
   const schulenFilterRef = useTemplateRef('schulenFilter');
+  const organisationStore: OrganisationStore = useOrganisationStore();
 
   const vuetifyConfig = (state: {
     errors: Array<string>;
@@ -42,11 +43,6 @@
       selectedKlassenname: props.initialValues?.selectedKlassenname ?? '',
     },
   });
-  function reset(): void {
-    resetForm();
-    schulenFilterRef.value?.clearInput();
-  }
-  defineExpose({ reset });
 
   const [selectedSchule, selectedSchuleProps]: [
     Ref<string>,
@@ -59,16 +55,29 @@
   const isDirty: ComputedRef<boolean> = useIsFormDirty();
   const isValid: ComputedRef<boolean> = useIsFormValid();
   const canCommit: ComputedRef<boolean> = computed(() => isDirty.value && isValid.value);
+  function reset(): void {
+    resetForm();
+    schulenFilterRef.value?.clearInput();
+    emit('formStateChanged', {
+      values: { selectedKlassenname: selectedKlassenname.value, selectedSchule: selectedSchule.value },
+      dirty: isDirty.value,
+      valid: isValid.value,
+    });
+  }
+  defineExpose({ reset });
 
   async function submitHandler(): Promise<void> {
     await props.onSubmit({ selectedSchule: selectedSchule.value, selectedKlassenname: selectedKlassenname.value });
     reset();
   }
 
-  function setSelectedSchule(schulen: Array<Organisation>): void {
-    const newSchuleId: string = schulen.length === 1 ? schulen[0]!.id : '';
-    if (selectedSchule.value !== newSchuleId) selectedSchule.value = newSchuleId;
-  }
+  watch(
+    () => organisationStore.schulenFilter.selectedItems,
+    (schulen: Array<Organisation>) => {
+      const newSchuleId: string = schulen.length === 1 ? schulen[0]!.id : '';
+      if (selectedSchule.value !== newSchuleId) selectedSchule.value = newSchuleId;
+    },
+  );
 
   function setInitialValues(): void {
     if (!props.initialValues) return;
@@ -116,7 +125,7 @@
     :confirmUnsavedChangesAction="onHandleConfirmUnsavedChanges"
     :createButtonLabel="props.editMode ? t('save') : t('admin.klasse.create')"
     :discardButtonLabel="props.editMode ? t('cancel') : t('admin.klasse.discard')"
-    :hideActions="props.editMode && !isEditActive"
+    :hideActions="Boolean(errorCode) || (props.editMode && !isEditActive)"
     id="klasse-form"
     :isLoading="isLoading"
     :onDiscard="onHandleDiscard"
@@ -146,7 +155,6 @@
             :initialIds="props.initialValues?.selectedSchule"
             :systemrechteForSearch="[RollenSystemRecht.KlassenVerwalten]"
             :selectedSchuleProps="selectedSchuleProps"
-            @onSchuleSelected="setSelectedSchule"
           ></SchulenFilter>
         </div>
       </FormRow>
