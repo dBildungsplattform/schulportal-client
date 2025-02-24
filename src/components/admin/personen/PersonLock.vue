@@ -382,7 +382,7 @@
                   ) && !selectedOrganisation
                 "
                 @click.stop="isEditMode = true"
-                data-testid="lock-user-button"
+                data-testid="edit-user-lock-button"
               >
                 {{ $t('admin.person.editLock') }}
               </v-btn>

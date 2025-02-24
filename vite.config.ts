@@ -83,10 +83,10 @@ export default defineConfig({
         // TODO: reset thresholds to 100,
         // so our base coverage will be at 100% and exceptions are defined below
         'src/**/**.*': {
-          statements: 60,
-          functions: 60,
-          branches: 60,
-          lines: 60,
+          statements: 70,
+          functions: 70,
+          branches: 70,
+          lines: 70,
         },
         // TODO: reset components threshold to 80 when thresholds can be reached
         'src/components/**/**.vue': {
@@ -114,17 +114,17 @@ export default defineConfig({
         },
         // TODO: reset thresholds to 80 and write tests for utils
         'src/utils/**/**.ts': {
-          statements: 60,
-          functions: 60,
-          branches: 60,
-          lines: 60,
+          statements: 70,
+          functions: 70,
+          branches: 70,
+          lines: 70,
         },
         'src/views/**/**.vue': {
           // TODO: reset thresholds to 80 and write tests for views
-          statements: 60,
-          functions: 60,
-          branches: 60,
-          lines: 60,
+          statements: 70,
+          functions: 70,
+          branches: 70,
+          lines: 70,
         },
       },
     },

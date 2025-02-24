@@ -164,137 +164,153 @@ const mockPersonenuebersichtLehr: PersonWithUebersicht = {
   ],
 };
 
-personenkontextStore.workflowStepResponse = {
-  organisations: [
-    {
-      id: 'O1',
-      administriertVon: 'string',
-      kennung: 'string',
-      name: 'string',
-      namensergaenzung: 'string',
-      kuerzel: 'string',
-      typ: 'ROOT',
-    },
-  ],
-  rollen: [
-    {
-      id: '54321',
-      createdAt: '2024-06-25T13:03:53.802Z',
-      updatedAt: '2024-06-25T13:03:53.802Z',
-      name: 'string',
-      administeredBySchulstrukturknoten: 'string',
-      rollenart: 'LERN',
-      merkmale: new Set<RollenMerkmal>(['BEFRISTUNG_PFLICHT']),
-      systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
-      administeredBySchulstrukturknotenName: 'Land SH',
-      administeredBySchulstrukturknotenKennung: '',
-      version: 1,
-    },
-    {
-      id: '1',
-      createdAt: '2024-06-25T13:03:53.802Z',
-      updatedAt: '2024-06-25T13:03:53.802Z',
-      name: 'SuS',
-      administeredBySchulstrukturknoten: '1',
-      rollenart: 'LERN',
-      merkmale: new Set<RollenMerkmal>(['BEFRISTUNG_PFLICHT']),
-      systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
-      administeredBySchulstrukturknotenName: 'Land SH',
-      administeredBySchulstrukturknotenKennung: '',
-      version: 1,
-    },
-  ],
-  selectedOrganisation: 'string',
-  selectedRollen: ['string'],
-  canCommit: true,
-};
+describe('PersonDetailsView', () => {
+  beforeEach(async () => {
+    personenkontextStore.workflowStepResponse = {
+      organisations: [
+        {
+          id: 'O1',
+          administriertVon: 'string',
+          kennung: 'string',
+          name: 'string',
+          namensergaenzung: 'string',
+          kuerzel: 'string',
+          typ: 'ROOT',
+        },
+      ],
+      rollen: [
+        {
+          id: '54321',
+          createdAt: '2024-06-25T13:03:53.802Z',
+          updatedAt: '2024-06-25T13:03:53.802Z',
+          name: 'string',
+          administeredBySchulstrukturknoten: 'string',
+          rollenart: 'LERN',
+          merkmale: new Set<RollenMerkmal>(['BEFRISTUNG_PFLICHT']),
+          systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+          administeredBySchulstrukturknotenName: 'Land SH',
+          administeredBySchulstrukturknotenKennung: '',
+          version: 1,
+        },
+        {
+          id: '1',
+          createdAt: '2024-06-25T13:03:53.802Z',
+          updatedAt: '2024-06-25T13:03:53.802Z',
+          name: 'SuS',
+          administeredBySchulstrukturknoten: '1',
+          rollenart: 'LERN',
+          merkmale: new Set<RollenMerkmal>(['BEFRISTUNG_PFLICHT']),
+          systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+          administeredBySchulstrukturknotenName: 'Land SH',
+          administeredBySchulstrukturknotenKennung: '',
+          version: 1,
+        },
+      ],
+      selectedOrganisation: 'string',
+      selectedRollen: ['string'],
+      canCommit: true,
+    };
 
-organisationStore.klassen = [
-  {
-    id: '1',
-    kennung: '1234567',
-    name: 'Klasse 1',
-    namensergaenzung: 'Ergänzung',
-    kuerzel: 'K1',
-    typ: OrganisationsTyp.Klasse,
-    administriertVon: '1',
-  },
-  {
-    id: '9a',
-    kennung: '1234567',
-    name: 'Klasse 2',
-    namensergaenzung: 'Ergänzung',
-    kuerzel: 'K1',
-    typ: OrganisationsTyp.Klasse,
-    administriertVon: 'O1',
-  },
-];
+    organisationStore.klassen = [
+      {
+        id: '1',
+        kennung: '1234567',
+        name: 'Klasse 1',
+        namensergaenzung: 'Ergänzung',
+        kuerzel: 'K1',
+        typ: OrganisationsTyp.Klasse,
+        administriertVon: '1',
+      },
+      {
+        id: '9a',
+        kennung: '1234567',
+        name: 'Klasse 2',
+        namensergaenzung: 'Ergänzung',
+        kuerzel: 'K1',
+        typ: OrganisationsTyp.Klasse,
+        administriertVon: 'O1',
+      },
+    ];
 
-organisationStore.getParentOrganisationsByIds = async (_organisationIds: string[]): Promise<void> => {
-  return;
-};
+    organisationStore.getParentOrganisationsByIds = async (_organisationIds: string[]): Promise<void> => {
+      return;
+    };
 
-authStore.currentUser = mockCurrentUser;
-personStore.currentPerson = mockPerson;
-personStore.personenuebersicht = mockPersonenuebersicht;
+    organisationStore.parentOrganisationen = [
+      {
+        id: '123456',
+        name: 'Testschule Birmingham',
+        typ: OrganisationsTyp.Schule,
+        administriertVon: '1',
+      },
+      {
+        id: '123459',
+        name: 'Testschule London',
+        typ: OrganisationsTyp.Schule,
+        administriertVon: '1',
+      },
+    ];
 
-beforeEach(async () => {
-  document.body.innerHTML = `
+    authStore.currentUser = mockCurrentUser;
+    personStore.currentPerson = mockPerson;
+    personStore.personenuebersicht = mockPersonenuebersicht;
+
+    document.body.innerHTML = `
     <div>
       <div id="app"></div>
     </div>
   `;
 
-  router = createRouter({
-    history: createWebHistory(),
-    routes,
+    router = createRouter({
+      history: createWebHistory(),
+      routes,
+    });
+
+    router.push('/');
+    await router.isReady();
+
+    wrapper = mount(PersonDetailsView, {
+      attachTo: document.getElementById('app') || '',
+      global: {
+        components: {
+          PersonDetailsView,
+        },
+        plugins: [router],
+      },
+    });
+
+    configStore.configData = {
+      befristungBearbeitenEnabled: true,
+      rolleBearbeitenEnabled: true,
+    };
+
+    authStore.currentUser = mockCurrentUser;
+    personStore.currentPerson = mockPerson;
+    personStore.personenuebersicht = mockPersonenuebersicht;
   });
 
-  router.push('/');
-  await router.isReady();
-
-  wrapper = mount(PersonDetailsView, {
-    attachTo: document.getElementById('app') || '',
-    global: {
-      components: {
-        PersonDetailsView,
+  const setCurrentPerson = (emailStatus: EmailAddressStatus): void => {
+    personStore.currentPerson = {
+      person: {
+        id: '123456',
+        name: {
+          familienname: 'Vimes',
+          vorname: 'Susan',
+        },
+        referrer: '6978',
+        personalnummer: '9183756',
+        isLocked: false,
+        userLock: null,
+        revision: '1',
+        lastModified: '2024-12-22',
+        email: {
+          address: 'test@example.com',
+          status: emailStatus,
+        },
       },
-      plugins: [router],
-    },
-  });
-
-  configStore.configData = {
-    befristungBearbeitenEnabled: true,
-    rolleBearbeitenEnabled: true,
+    };
   };
 
-  // reset personenuebersicht
-  personStore.personenuebersicht = mockPersonenuebersicht;
-});
-
-const setCurrentPerson = (emailStatus: EmailAddressStatus): void => {
-  personStore.currentPerson = {
-    person: {
-      id: '123456',
-      name: {
-        familienname: 'Vimes',
-        vorname: 'Susan',
-      },
-      referrer: '6978',
-      personalnummer: '9183756',
-      isLocked: false,
-      userLock: null,
-      revision: '1',
-      lastModified: '2024-12-22',
-      email: {
-        address: 'test@example.com',
-        status: emailStatus,
-      },
-    },
-  };
-};
-
-describe('PersonDetailsView', () => {
   test('it renders the person details page and shows person data', async () => {
     expect(wrapper).toBeTruthy();
     expect(wrapper?.find('[data-testid="person-details-card"]').isVisible()).toBe(true);
@@ -358,12 +374,43 @@ describe('PersonDetailsView', () => {
     expect(push).toHaveBeenCalledTimes(1);
   });
 
-  test('it shows an error if error code exists', async () => {
-    personStore.errorCode = 'ERROR_LOADING_USER';
-    await nextTick();
+  describe('error handling', () => {
+    test('it shows an error if error code exists', async () => {
+      personStore.errorCode = 'ERROR_LOADING_USER';
+      await nextTick();
 
-    expect(wrapper?.find('[data-testid="alert-title"]').text()).toBe('Fehler beim Laden des Benutzers');
-    personStore.errorCode = '';
+      expect(wrapper?.find('[data-testid="alert-title"]').text()).toBe('Fehler beim Laden des Benutzers');
+
+      personStore.errorCode = '';
+      await nextTick();
+    });
+
+    test('it shows correct alert depending on error code', async () => {
+      personStore.errorCode = '';
+      personenkontextStore.errorCode = 'PERSON_NOT_FOUND';
+      await nextTick();
+
+      const alertButton = wrapper
+        ?.findComponent({ ref: 'personenkontext-store-error-alert' })
+        .find('[data-testid="alert-button"]');
+
+      expect(alertButton?.text()).toBe('Zurück zur Ergebnisliste');
+
+      personenkontextStore.errorCode = 'SOME_OTHER_CODE';
+      await nextTick();
+
+      expect(alertButton?.text()).toBe('Daten aktualisieren');
+
+      personenkontextStore.errorCode = '';
+      personStore.errorCode = 'NEWER_VERSION_OF_PERSON_AVAILABLE';
+      await nextTick();
+
+      expect(alertButton?.text()).toBe('Daten aktualisieren');
+
+      personenkontextStore.errorCode = '';
+      personStore.errorCode = '';
+      await nextTick();
+    });
   });
 
   // test('It cancels editing', async () => {
@@ -636,8 +683,41 @@ describe('PersonDetailsView', () => {
 
     expect(resetPasswordButton).not.toBeNull();
     resetPasswordButton.click();
+    resetPasswordButton.dispatchEvent(new Event('click'));
+    await flushPromises();
     await nextTick();
 
+    expect(personStore.resetDevicePassword).toHaveBeenCalled();
+
+    // reset personenuebersicht
+    personStore.personenuebersicht = mockPersonenuebersicht;
+  });
+
+  test('it shows password reset template', async () => {
+    personStore.personenuebersicht = mockPersonenuebersichtLehr;
+    setCurrentPerson(EmailAddressStatus.Enabled);
+    await nextTick();
+    if (!wrapper) return;
+
+    const devicePasswordChangeButton: DOMWrapper<Element> | undefined = wrapper
+      .findComponent({ ref: 'password-reset' })
+      .find('[data-testid="open-password-reset-dialog-button"]');
+    devicePasswordChangeButton.trigger('click');
+    await nextTick();
+
+    expect(document.querySelector('[data-testid="password-reset-info-text"]')).not.toBeNull();
+
+    const resetPasswordButton: HTMLElement = (await document.querySelector(
+      '[data-testid="password-reset-button"]',
+    )) as HTMLElement;
+
+    expect(resetPasswordButton).not.toBeNull();
+    resetPasswordButton.click();
+    resetPasswordButton.dispatchEvent(new Event('click'));
+    await flushPromises();
+    await nextTick();
+
+    expect(personStore.resetPassword).toHaveBeenCalled();
     // reset personenuebersicht
     personStore.personenuebersicht = mockPersonenuebersicht;
   });
@@ -738,6 +818,111 @@ describe('PersonDetailsView', () => {
     expect(wrapper?.find('[data-testid="zuordnung-edit-button"]').isVisible()).toBe(true);
   });
 
+  test('renders form to change Klasse and triggers submit', async () => {
+    await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
+    await nextTick();
+
+    const checkbox: DOMWrapper<HTMLInputElement> | undefined = wrapper?.find(
+      '[data-testid="person-zuordnung-1"] input[type="checkbox"]',
+    );
+    await checkbox?.setValue(!checkbox.element.checked);
+    await nextTick();
+
+    await wrapper?.find('[data-testid="klasse-change-button"]').trigger('click');
+    await nextTick();
+
+    expect(wrapper?.find('[data-testid="klasse-change-form"]').isVisible()).toBe(true);
+
+    const klasseInput: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'klasse-change-form' })
+      .findComponent({ ref: 'klasse-select' });
+    await klasseInput?.setValue('9a');
+    await nextTick();
+
+    await wrapper?.find('[data-testid="klasse-change-submit-button"]').trigger('click');
+    await nextTick();
+
+    await flushPromises();
+    await flushPromises();
+
+    const confirmDialogButton: Element | null = await document.body.querySelector(
+      '[data-testid="confirm-change-klasse-button"]',
+    );
+    expect(confirmDialogButton).not.toBeNull();
+
+    if (confirmDialogButton) {
+      confirmDialogButton.dispatchEvent(new Event('click'));
+    }
+    await flushPromises();
+
+    const saveButton: Element | null = document.body.querySelector('[data-testid="zuordnung-changes-save"]');
+    expect(saveButton).not.toBeNull();
+
+    if (saveButton) {
+      saveButton.dispatchEvent(new Event('click'));
+    }
+    await flushPromises();
+
+    const closeSuccessButton: Element | null = document.body.querySelector(
+      '[data-testid="change-klasse-success-close"]',
+    );
+    expect(closeSuccessButton).not.toBeNull();
+
+    if (closeSuccessButton) {
+      closeSuccessButton.dispatchEvent(new Event('click'));
+    }
+    await flushPromises();
+
+    expect(wrapper?.find('[data-testid="zuordnung-edit-button"]').isVisible()).toBe(true);
+  });
+
+  test('renders form to delete Zuordnung and triggers submit', async () => {
+    await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
+    await nextTick();
+
+    const checkbox: DOMWrapper<HTMLInputElement> | undefined = wrapper?.find(
+      '[data-testid="person-zuordnung-1"] input[type="checkbox"]',
+    );
+    await checkbox?.setValue(!checkbox.element.checked);
+    await nextTick();
+
+    await wrapper
+      ?.findComponent({ ref: 'personenkontext-delete' })
+      .find('[data-testid="open-zuordnung-delete-dialog-button"]')
+      .trigger('click');
+    await nextTick();
+
+    expect(document.body.querySelector('[data-testid="zuordnung-delete-confirmation-text"]')).not.toBeNull();
+
+    const confirmDeleteButton: Element | null = document.body.querySelector('[data-testid="zuordnung-delete-button"]');
+    expect(confirmDeleteButton).not.toBeNull();
+
+    if (confirmDeleteButton) {
+      confirmDeleteButton.dispatchEvent(new Event('click'));
+    }
+
+    const saveButton: Element | null = document.body.querySelector('[data-testid="zuordnung-changes-save"]');
+    expect(saveButton).not.toBeNull();
+
+    if (saveButton) {
+      saveButton.dispatchEvent(new Event('click'));
+    }
+
+    await flushPromises();
+
+    const closeSuccessButton: Element | null = document.body.querySelector(
+      '[data-testid="close-zuordnung-delete-success-button"]',
+    );
+    expect(closeSuccessButton).not.toBeNull();
+
+    if (closeSuccessButton) {
+      closeSuccessButton.dispatchEvent(new Event('click'));
+    }
+    await flushPromises();
+
+    expect(wrapper?.find('[data-testid="zuordnung-edit-button"]').isVisible()).toBe(true);
+  });
+
   describe('change befristung', () => {
     test('it shows befristung change form', async () => {
       await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
@@ -792,6 +977,43 @@ describe('PersonDetailsView', () => {
       await nextTick();
 
       expect(wrapper?.find('[data-testid="befristung-change-button"]').attributes('disabled')).toBeDefined();
+    });
+
+    test('it submits the form to lock the user', async () => {
+      if (personStore.currentPerson) {
+        personStore.currentPerson.person.isLocked = false;
+        personStore.currentPerson.person.userLock = null;
+      }
+      const devicePasswordChangeButton: DOMWrapper<Element> | undefined = wrapper?.find(
+        '[data-testid="open-lock-dialog-button"]',
+      );
+      devicePasswordChangeButton?.trigger('click');
+      await nextTick();
+
+      expect(document.querySelector('[data-testid="lock-user-info-text"]')).not.toBeNull();
+
+      const unbefristetRadioButton: HTMLElement = (await document.querySelector(
+        '[data-testid="unbefristet-radio-button"] input[type="radio"]',
+      )) as HTMLElement;
+
+      expect(unbefristetRadioButton).not.toBeNull();
+      unbefristetRadioButton.click();
+      unbefristetRadioButton.dispatchEvent(new Event('click'));
+
+      const lockUserButton: HTMLElement = (await document.querySelector(
+        '[data-testid="lock-user-button"]',
+      )) as HTMLElement;
+
+      expect(lockUserButton).not.toBeNull();
+      lockUserButton.click();
+      lockUserButton.dispatchEvent(new Event('click'));
+      await nextTick();
+      await flushPromises();
+      await flushPromises();
+
+      expect(personStore.lockPerson).toHaveBeenCalled();
+      // reset personenuebersicht
+      personStore.personenuebersicht = mockPersonenuebersicht;
     });
 
     test.each([

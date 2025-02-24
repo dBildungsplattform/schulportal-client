@@ -1,6 +1,6 @@
 <script setup lang="ts">
+  import KlasseSuccessTemplate from '@/components/admin/klassen/KlasseSuccessTemplate.vue';
   import type { DBiamPersonenzuordnungResponse, PersonenkontextRolleFieldsResponse } from '@/api-client/generated';
-  import SuccessTemplate from '@/components/admin/klassen/SuccessTemplate.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import KlasseForm from '@/components/form/KlasseForm.vue';
@@ -151,15 +151,6 @@
     organisationStore.errorCode = '';
   }
 
-  onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
-    if (isFormDirty()) {
-      showUnsavedChangesDialog.value = true;
-      blockedNext = next;
-    } else {
-      next();
-    }
-  });
-
   const handleCreateAnotherKlasse = async (): Promise<void> => {
     resetForm();
     await initStores();
@@ -210,6 +201,15 @@
 
   onUnmounted(() => {
     window.removeEventListener('beforeunload', preventNavigation);
+  });
+
+  onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
+    if (isFormDirty()) {
+      showUnsavedChangesDialog.value = true;
+      blockedNext = next;
+    } else {
+      next();
+    }
   });
 </script>
 
@@ -264,7 +264,7 @@
 
       <!-- Result template on success after submit -->
       <template v-if="organisationStore.createdKlasse && !organisationStore.errorCode">
-        <SuccessTemplate
+        <KlasseSuccessTemplate
           :successMessage="$t('admin.klasse.klasseAddedSuccessfully')"
           :followingDataCreated="$t('admin.followingDataCreated')"
           :createdData="[
