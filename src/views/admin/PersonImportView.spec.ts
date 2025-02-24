@@ -560,7 +560,7 @@ describe('PersonImportView', () => {
     );
   });
 
-  test('it clears selected role when clearSelectedRolle is called', async () => {
+  test('it clears selected rolle when clearSelectedRolle is called', async () => {
     const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
     rolleAutocomplete?.setValue('SuS');
     await nextTick();
@@ -578,7 +578,7 @@ describe('PersonImportView', () => {
     expect(rolleAutocomplete?.attributes('value')).toBeUndefined();
   });
 
-  test('it clears selected school when clearSelectedSchule is called', async () => {
+  test('it clears selected schule when clearSelectedSchule is called', async () => {
     const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
     schuleAutocomplete?.setValue('Schule');
     await nextTick();

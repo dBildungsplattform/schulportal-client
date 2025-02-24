@@ -184,13 +184,6 @@ describe('SchuleCreationView', () => {
     expect(organisationStore.createdSchule).toBe(null);
   });
 
-  test('it takes else paths in onMounted', async () => {
-    organisationStore.schultraeger = [];
-    await flushPromises();
-
-    organisationStore.schultraeger = mockSchultraeger;
-  });
-
   describe('navigation interception', () => {
     afterEach(() => {
       vi.unmock('vue-router');

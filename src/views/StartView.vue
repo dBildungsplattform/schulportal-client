@@ -185,7 +185,7 @@
           :text="alert.message"
           :type="alert.type"
           :visible="alert.visible"
-          @dismiss-banner="dismissBannerForSession"
+          @dismissBanner="dismissBannerForSession"
         ></SpshBanner>
       </v-col>
     </v-row>

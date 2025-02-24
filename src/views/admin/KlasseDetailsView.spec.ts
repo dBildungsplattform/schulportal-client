@@ -76,29 +76,29 @@ describe('KlassenDetailsView', () => {
     expect(wrapper?.findComponent({ ref: 'klasse-delete' }).isVisible()).toBe(true);
   });
 
-  // test('it shows current klasse data', async () => {
-  //   organisationStore.currentOrganisation!.name = '';
-  //   organisationStore.currentOrganisation!.kennung = '';
-  //   organisationStore.currentKlasse!.administriertVon = '';
-  //   await nextTick();
+  test.skip('it shows current klasse data', async () => {
+    organisationStore.currentOrganisation!.name = '';
+    organisationStore.currentOrganisation!.kennung = '';
+    organisationStore.currentKlasse!.administriertVon = '';
+    await nextTick();
 
-  //   // expect(wrapper?.find('[data-testid="schule-select"]').text()).toEqual('---');
+    expect(wrapper?.find('[data-testid="schule-select"]').text()).toEqual('---');
 
-  //   organisationStore.currentOrganisation!.name = 'BTC Schule';
-  //   await nextTick();
+    organisationStore.currentOrganisation!.name = 'BTC Schule';
+    await nextTick();
 
-  //   // expect(wrapper?.find('[data-testid="schule-select"]').text()).toEqual('BTC Schule');
+    expect(wrapper?.find('[data-testid="schule-select"]').text()).toEqual('BTC Schule');
 
-  //   organisationStore.currentOrganisation!.kennung = '1234654';
-  //   await nextTick();
+    organisationStore.currentOrganisation!.kennung = '1234654';
+    await nextTick();
 
-  //   expect(wrapper?.find('[data-testid="schule-select"]').text()).toEqual('1234654 (BTC Schule)');
-  //   // TODO: the klassenname is not displayed in the input field
-  //   // expect(wrapper?.find('[data-testid="klassenname-input"] input').text()).toEqual('1a');
+    expect(wrapper?.find('[data-testid="schule-select"]').text()).toEqual('1234654 (BTC Schule)');
+    // TODO: the klassenname is not displayed in the input field
+    expect(wrapper?.find('[data-testid="klassenname-input"] input').text()).toEqual('1a');
 
-  //   organisationStore.currentOrganisation = mockCurrentOrganisation;
-  //   organisationStore.currentKlasse = mockCurrentKlasse;
-  // });
+    organisationStore.currentOrganisation = mockCurrentOrganisation;
+    organisationStore.currentKlasse = mockCurrentKlasse;
+  });
 
   test('it shows an error if error code exists', async () => {
     organisationStore.errorCode = 'UNSPECIFIED_ERROR';
@@ -169,17 +169,6 @@ describe('KlassenDetailsView', () => {
 
     organisationStore.updatedOrganisation = null;
   });
-
-  // test('it takes else paths in submit function', async () => {
-  //   await wrapper?.find('[data-testid="klasse-edit-button"]').trigger('click');
-  //   await nextTick();
-
-  //   await wrapper?.find('[data-testid="klassenname-input"] input').setValue(null);
-  //   await nextTick();
-
-  //   await wrapper?.find('[data-testid="klasse-changes-save-button"]').trigger('click');
-  //   await flushPromises();
-  // });
 
   test('it deletes a klasse', async () => {
     const push: MockInstance = vi.spyOn(router, 'push');
