@@ -16,7 +16,7 @@
   import { useDisplay } from 'vuetify';
   import { type BaseFieldProps, type TypedSchema, useForm } from 'vee-validate';
   import KlasseForm from '@/components/form/KlasseForm.vue';
-  import SuccessTemplate from '@/components/admin/klassen/SuccessTemplate.vue';
+  import KlasseSuccessTemplate from '@/components/admin/klassen/KlasseSuccessTemplate.vue';
   import KlasseDelete from '@/components/admin/klassen/KlasseDelete.vue';
   import { getValidationSchema, getVuetifyConfig } from '@/utils/validationKlasse';
   import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
@@ -317,7 +317,7 @@
                   <v-btn
                     class="primary"
                     data-testid="klasse-changes-save-button"
-                    @Click="onSubmit"
+                    @click="onSubmit"
                     :block="mdAndDown"
                     :disabled="organisationStore.loading"
                   >
@@ -334,7 +334,7 @@
       </template>
       <!-- Result template on success after submit  -->
       <template v-if="organisationStore.updatedOrganisation && !organisationStore.errorCode">
-        <SuccessTemplate
+        <KlasseSuccessTemplate
           :backButtonTestId="'back-to-details-button'"
           :backButtonText="$t('nav.backToList')"
           :createAnotherButtonText="$t('admin.klasse.createAnother')"

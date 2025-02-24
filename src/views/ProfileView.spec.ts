@@ -8,7 +8,7 @@ import {
   type TwoFactorAuthentificationStore,
 } from '@/stores/TwoFactorAuthentificationStore';
 import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
-import { beforeEach, describe, expect, test } from 'vitest';
+import { beforeEach, describe, expect, test, type MockInstance } from 'vitest';
 import { nextTick } from 'vue';
 import { createMemoryHistory, createRouter, useRoute, type Router } from 'vue-router';
 import ProfileView from './ProfileView.vue';
@@ -276,6 +276,14 @@ describe('ProfileView', () => {
     personInfoStore.personInfo = mockLehrer;
     personStore.personenuebersicht = mockLehrerUebersicht;
     expect(wrapper?.find('[data-testid="profile-headline"]').isVisible()).toBe(true);
+  });
+
+  test('it goes back to the previous page', () => {
+    const push: MockInstance = vi.spyOn(router, 'push');
+
+    wrapper?.find('[data-testid="back-to-previous-page-button"]').trigger('click');
+
+    expect(push).toHaveBeenCalledTimes(1);
   });
 
   test('it displays personal data', () => {

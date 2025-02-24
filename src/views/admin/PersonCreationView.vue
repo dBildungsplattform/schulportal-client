@@ -650,7 +650,7 @@
           <v-row
             v-if="
               isKopersRolle(
-                schuleZuordnungFromCreatedKontext.map((kontext) => kontext.rolleId),
+                schuleZuordnungFromCreatedKontext.map((kontext: DBiamPersonenkontextResponse) => kontext.rolleId),
                 filteredRollenCache,
               )
             "
@@ -658,7 +658,7 @@
             <v-col
               :class="`${
                 isKopersRolle(
-                  schuleZuordnungFromCreatedKontext.map((kontext) => kontext.rolleId),
+                  schuleZuordnungFromCreatedKontext.map((kontext: DBiamPersonenkontextResponse) => kontext.rolleId),
                   filteredRollenCache,
                 ) && personenkontextStore.createdPersonWithKontext.person.personalnummer
                   ? 'text-body bold text-right'
@@ -670,7 +670,7 @@
             <v-col
               :class="`${
                 isKopersRolle(
-                  schuleZuordnungFromCreatedKontext.map((kontext) => kontext.rolleId),
+                  schuleZuordnungFromCreatedKontext.map((kontext: DBiamPersonenkontextResponse) => kontext.rolleId),
                   filteredRollenCache,
                 ) && personenkontextStore.createdPersonWithKontext.person.personalnummer
                   ? 'text-body'
@@ -717,7 +717,13 @@
               ><span data-testid="created-person-befristung">{{ translatedBefristung }}</span></v-col
             >
           </v-row>
-          <v-row v-if="isLernRolle(klasseZuordnungFromCreatedKontext.map((kontext) => kontext.rolleId))">
+          <v-row
+            v-if="
+              isLernRolle(
+                klasseZuordnungFromCreatedKontext.map((kontext: DBiamPersonenkontextResponse) => kontext.rolleId),
+              )
+            "
+          >
             <v-col class="text-body bold text-right"> {{ $t('admin.klasse.klasse') }}: </v-col>
             <v-col class="text-body"
               ><span data-testid="created-person-klasse">{{

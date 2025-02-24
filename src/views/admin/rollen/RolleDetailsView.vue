@@ -37,7 +37,7 @@
   } from '@/utils/validationRolle';
   import RolleDelete from '@/components/admin/rollen/RolleDelete.vue';
   import { type TranslatedObject } from '@/types.d';
-  import SuccessTemplate from '@/components/admin/rollen/SuccessTemplate.vue';
+  import RolleSuccessTemplate from '@/components/admin/rollen/RolleSuccessTemplate.vue';
   import { isHiddenSystemrecht } from '@/utils/systemrechte';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
@@ -66,20 +66,13 @@
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
 
   const translatedOrgName: ComputedRef<string | undefined> = computed(() => {
-    if (!rolleStore.currentRolle?.administeredBySchulstrukturknoten) {
-      return '---';
-    }
     return organisationStore.currentOrganisation?.kennung
       ? `${organisationStore.currentOrganisation.kennung} (${organisationStore.currentOrganisation.name})`
       : organisationStore.currentOrganisation?.name;
   });
 
   const translatedRollenart: ComputedRef<string> = computed(() => {
-    if (!rolleStore.currentRolle?.rollenart) {
-      return '---';
-    }
-
-    return t(`admin.rolle.mappingFrontBackEnd.rollenarten.${rolleStore.currentRolle.rollenart}`);
+    return t(`admin.rolle.mappingFrontBackEnd.rollenarten.${rolleStore.currentRolle?.rollenart}`);
   });
 
   const translatedProviderNames: ComputedRef<TranslatedObject[]> = computed(() => {
@@ -441,7 +434,7 @@
                 >
                   <v-btn
                     class="secondary"
-                    data-testid="rolle-edit-cancel"
+                    data-testid="rolle-edit-cancel-button"
                     @click="handleCancel"
                     :block="mdAndDown"
                   >
@@ -473,7 +466,7 @@
       </template>
       <!-- Result template on success after submit  -->
       <template v-if="rolleStore.updatedRolle && !rolleStore.errorCode">
-        <SuccessTemplate
+        <RolleSuccessTemplate
           :successMessage="$t('admin.rolle.rolleUpdatedSuccessfully')"
           :followingRolleDataCreated="$t('admin.followingDataCreated')"
           :createdRolleData="[
@@ -491,7 +484,7 @@
             {
               label: $t('admin.rolle.systemrechte'),
               value: translatedUpdatedSystemrecht,
-              testId: 'updated-rolle-systemrecht',
+              testId: 'updated-rolle-systemrechte',
             },
           ]"
           :backButtonText="$t('nav.backToDetails')"

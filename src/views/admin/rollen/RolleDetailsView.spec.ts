@@ -1,17 +1,26 @@
 import { expect, test } from 'vitest';
-import { VueWrapper, mount } from '@vue/test-utils';
+import { DOMWrapper, VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import RolleDetailsView from './RolleDetailsView.vue';
 import { setActivePinia, createPinia } from 'pinia';
 import routes from '@/router/routes';
 import { type Router, createRouter, createWebHistory } from 'vue-router';
-import { RollenMerkmal, RollenSystemRecht, useRolleStore, type RolleStore } from '@/stores/RolleStore';
+import {
+  RollenMerkmal,
+  RollenSystemRecht,
+  useRolleStore,
+  type Rolle,
+  type RolleStore,
+  type RolleWithServiceProvidersResponse,
+} from '@/stores/RolleStore';
 import { nextTick } from 'vue';
+import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
 const rolleStore: RolleStore = useRolleStore();
+const organisationStore: OrganisationStore = useOrganisationStore();
 
-rolleStore.currentRolle = {
+const mockCurrentRolle: Rolle = {
   administeredBySchulstrukturknoten: '1234',
   rollenart: 'LEHR',
   name: 'Lehrer',
@@ -22,7 +31,7 @@ rolleStore.currentRolle = {
   version: 1,
 };
 
-rolleStore.updatedRolle = {
+const mockUpdatedRolle: RolleWithServiceProvidersResponse = {
   administeredBySchulstrukturknoten: '1234',
   rollenart: 'LEHR',
   name: 'Updated Lehrer',
@@ -36,6 +45,9 @@ rolleStore.updatedRolle = {
   administeredBySchulstrukturknotenKennung: '',
   version: 2,
 };
+
+rolleStore.currentRolle = mockCurrentRolle;
+rolleStore.updatedRolle = mockUpdatedRolle;
 
 beforeEach(async () => {
   setActivePinia(createPinia());
@@ -74,7 +86,74 @@ describe('RolleDetailsView', () => {
     expect(wrapper?.find('[data-testid="rolle-details-card"]').isVisible()).toBe(true);
   });
 
-  test('activates editing mode', async () => {
+  test('it renders data for current rolle', async () => {
+    rolleStore.errorCode = '';
+    rolleStore.updatedRolle = null;
+    rolleStore.currentRolle = {
+      administeredBySchulstrukturknoten: '1234',
+      rollenart: 'LEHR',
+      name: 'Current Lehrer',
+      merkmale: [] as unknown as Set<RollenMerkmal>,
+      systemrechte: [] as unknown as Set<RollenSystemRecht>,
+      id: '1',
+      serviceProviders: [],
+      version: 2,
+    };
+    organisationStore.currentOrganisation = {
+      id: '1234',
+      kennung: '',
+      name: 'Current Schule',
+      namensergaenzung: 'Current Schule',
+      kuerzel: 'CurrentSchool',
+      typ: 'SCHULE',
+      administriertVon: '1',
+      schuleDetails: 'SchuleDetails',
+      version: 1,
+      itslearningEnabled: true,
+    };
+    await flushPromises();
+
+    // TODO: the computed value does not render inside the input
+    // const orgaSelectInput: DOMWrapper<Element> | undefined = wrapper?.find('input#administrationsebene-select');
+    // expect(wrapper?.find('[data-testid="administrationsebene-select"]').text()).toEqual('---');
+
+    rolleStore.currentRolle = mockCurrentRolle;
+    rolleStore.updatedRolle = mockUpdatedRolle;
+  });
+
+  test('it renders data in success template', async () => {
+    rolleStore.updatedRolle = {
+      administeredBySchulstrukturknoten: '1234',
+      rollenart: 'LEHR',
+      name: 'Updated Lehrer',
+      merkmale: [] as unknown as Set<RollenMerkmal>,
+      systemrechte: [] as unknown as Set<RollenSystemRecht>,
+      createdAt: '2022',
+      updatedAt: '2023',
+      id: '1',
+      serviceProviders: [],
+      administeredBySchulstrukturknotenName: 'Land SH',
+      administeredBySchulstrukturknotenKennung: '',
+      version: 2,
+    };
+    await flushPromises();
+
+    const rolleName: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="updated-rolle-name"]');
+    const rolleMerkmale: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="updated-rolle-merkmale"]');
+    const rolleAngebote: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="updated-rolle-angebote"]');
+    const rolleSystemrechte: DOMWrapper<Element> | undefined = wrapper?.find(
+      '[data-testid="updated-rolle-systemrechte"]',
+    );
+
+    expect(rolleName?.text()).toEqual('Updated Lehrer');
+    expect(rolleMerkmale?.text()).toEqual('---');
+    expect(rolleAngebote?.text()).toEqual('---');
+    expect(rolleSystemrechte?.text()).toEqual('---');
+
+    rolleStore.updatedRolle = mockUpdatedRolle;
+  });
+
+  test('it activates editing mode', async () => {
     rolleStore.updatedRolle = null;
     rolleStore.errorCode = '';
 
@@ -86,20 +165,23 @@ describe('RolleDetailsView', () => {
     expect(wrapper?.find('[data-testid="rolle-changes-save"]').isVisible()).toBe(true);
   });
 
-  test('Does not cancel editing because of unsaved changes', async () => {
+  test('it does not cancel editing because of unsaved changes', async () => {
     rolleStore.updatedRolle = null;
     rolleStore.errorCode = '';
 
     await wrapper?.find('[data-testid="rolle-edit-button"]').trigger('click');
     await nextTick();
 
-    await wrapper?.find('[data-testid="rolle-edit-cancel"]').trigger('click');
+    await wrapper?.find('[data-testid="rollenname-input"] input').setValue('1b');
     await nextTick();
 
-    expect(wrapper?.find('[data-testid="rolle-edit-button"]').exists()).toBe(false);
+    await wrapper?.find('[data-testid="rolle-edit-cancel-button"]').trigger('click');
+    await nextTick();
+
+    expect(document.querySelector('[data-testid="unsaved-changes-warning-text"]')).not.toBeNull();
   });
 
-  test('submits the form and shows the success template', async () => {
+  test('it submits the form and shows the success template', async () => {
     rolleStore.updatedRolle = null;
     rolleStore.errorCode = '';
 
@@ -121,25 +203,14 @@ describe('RolleDetailsView', () => {
     await wrapper?.find('[data-testid="rolle-changes-save"]').trigger('click');
     await nextTick();
 
-    rolleStore.updatedRolle = {
-      administeredBySchulstrukturknoten: '1234',
-      rollenart: 'LEHR',
-      name: 'Updated Lehrer',
-      merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
-      systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
-      createdAt: '2022',
-      updatedAt: '2023',
-      id: '1',
-      serviceProviders: [{ id: 'sp1', name: 'ServiceProvider1' }],
-      administeredBySchulstrukturknotenName: 'Land SH',
-      administeredBySchulstrukturknotenKennung: '',
-      version: 2,
-    };
+    rolleStore.updatedRolle = mockUpdatedRolle;
     await nextTick();
 
-    const successTemplate: VueWrapper<never, never> | undefined = wrapper?.findComponent({ name: 'SuccessTemplate' });
+    const rolleSuccessTemplate: VueWrapper<never, never> | undefined = wrapper?.findComponent({
+      name: 'RolleSuccessTemplate',
+    });
 
-    expect(successTemplate?.find('[data-testid="rolle-success-text"]').text()).toBe(
+    expect(rolleSuccessTemplate?.find('[data-testid="rolle-success-text"]').text()).toBe(
       'Die Rolle wurde erfolgreich geändert.',
     );
   });

@@ -79,11 +79,24 @@ describe('SchuleManagementView', () => {
   });
 
   test('it reloads data after changing limit', async () => {
+    /* check for both cases, first if total is greater than, afterwards if total is less or equal than chosen limit */
+    organisationStore.totalOrganisationen = 51;
+    await nextTick();
+
     expect(wrapper?.find('.v-data-table-footer__items-per-page').isVisible()).toBe(true);
     expect(wrapper?.find('.v-data-table-footer__items-per-page').text()).toContain('30');
 
-    const component: WrapperLike | undefined = wrapper?.findComponent('.v-data-table-footer__items-per-page .v-select');
-    await component?.setValue(50);
+    const itemsPerPageSelection: WrapperLike | undefined = wrapper?.findComponent(
+      '.v-data-table-footer__items-per-page .v-select',
+    );
+    await itemsPerPageSelection?.setValue(50);
+
     expect(wrapper?.find('.v-data-table-footer__items-per-page').text()).toContain('50');
+
+    organisationStore.totalOrganisationen = 30;
+    await itemsPerPageSelection?.setValue(30);
+
+    expect(wrapper?.find('.v-data-table-footer__items-per-page').text()).toContain('30');
+    organisationStore.totalOrganisationen = 3;
   });
 });

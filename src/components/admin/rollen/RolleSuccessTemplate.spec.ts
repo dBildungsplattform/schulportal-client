@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
-import SuccessTemplate from './SuccessTemplate.vue';
+import RolleSuccessTemplate from './RolleSuccessTemplate.vue';
 
 let wrapper: VueWrapper | null = null;
 
@@ -11,7 +11,7 @@ beforeEach(() => {
     </div>
   `;
 
-  wrapper = mount(SuccessTemplate, {
+  wrapper = mount(RolleSuccessTemplate, {
     attachTo: document.getElementById('app') || '',
     props: {
       successMessage: 'Role updated successfully',
@@ -20,7 +20,7 @@ beforeEach(() => {
         { label: 'Role Name', value: 'Test Role', testId: 'updated-rolle-name' },
         { label: 'Merkmale', value: 'Merkmal 1, Merkmal 2', testId: 'updated-rolle-merkmale' },
         { label: 'Assigned Service Providers', value: 'Service Provider 1', testId: 'updated-rolle-angebote' },
-        { label: 'System Rights', value: 'Systemrecht 1', testId: 'updated-rolle-systemrecht' },
+        { label: 'System Rights', value: 'Systemrecht 1', testId: 'updated-rolle-systemrechte' },
       ],
       backButtonText: 'Back to List',
       createAnotherRolleButtonText: 'Create Another',
@@ -30,13 +30,13 @@ beforeEach(() => {
     },
     global: {
       components: {
-        SuccessTemplate,
+        RolleSuccessTemplate,
       },
     },
   });
 });
 
-describe('SuccessTemplate', () => {
+describe('RolleSuccessTemplate', () => {
   test('it displays the success message and data correctly', () => {
     expect(wrapper?.get('[data-testid="rolle-success-text"]').text()).toBe('Role updated successfully');
   });
