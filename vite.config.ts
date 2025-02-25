@@ -80,17 +80,27 @@ export default defineConfig({
         'src/main.ts',
       ],
       thresholds: {
+        /* we cannot set the base coverage of all folders to 100% using the wildcards and then define exceptions, like we first planned.
+           unfortunately the exceptions will still be calculated into the base coverage, so we have to define the coverage backwards.
+           this means the base coverage will be 80%, and each folder will have to be listed separately, with a respective coverage threshold.
+        */
         'src/**/**.*': {
-          statements: 100,
-          functions: 100,
-          branches: 100,
-          lines: 100,
+          statements: 80,
+          functions: 80,
+          branches: 80,
+          lines: 80,
         },
         'src/components/**/**.vue': {
           statements: 80,
           functions: 80,
           branches: 80,
           lines: 80,
+        },
+        'src/composables/**/**.ts': {
+          statements: 100,
+          functions: 100,
+          branches: 100,
+          lines: 100,
         },
         // TODO: reset thresholds to 80 and write tests for layouts
         // TODO: before we can increase the coverage threshold for layouts, we have to fix the broken layout that result from fixing the tests
@@ -101,13 +111,17 @@ export default defineConfig({
           branches: 80,
           lines: 0,
         },
-        // TODO: reset thresholds to 80 and write tests for utils
-        // should we go for 100 here?
+        'src/stores/**/**.ts': {
+          statements: 100,
+          functions: 100,
+          branches: 100,
+          lines: 100,
+        },
         'src/utils/**/**.ts': {
-          statements: 80,
-          functions: 80,
-          branches: 80,
-          lines: 80,
+          statements: 100,
+          functions: 100,
+          branches: 100,
+          lines: 100,
         },
         'src/views/**/**.vue': {
           statements: 80,
