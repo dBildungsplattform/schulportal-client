@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import KlasseDelete from '@/components/admin/klassen/KlasseDelete.vue';
-  import SuccessTemplate from '@/components/admin/klassen/SuccessTemplate.vue';
+  import KlasseSuccessTemplate from '@/components/admin/klassen/KlasseSuccessTemplate.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import KlasseForm from '@/components/form/KlasseForm.vue';
@@ -100,7 +100,6 @@
   }
 
   async function navigateToKlasseManagement(): Promise<void> {
-    console.log('he')
     await router.push({ name: 'klasse-management' });
     organisationStore.updatedOrganisation = null;
   }
@@ -285,7 +284,7 @@
       </template>
       <!-- Result template on success after submit  -->
       <template v-if="organisationStore.updatedOrganisation && !organisationStore.errorCode">
-        <SuccessTemplate
+        <KlasseSuccessTemplate
           :backButtonTestId="'back-to-details-button'"
           :backButtonText="$t('nav.backToList')"
           :createAnotherButtonText="$t('admin.klasse.createAnother')"

@@ -8,11 +8,11 @@ import {
   type OrganisationStore,
 } from '@/stores/OrganisationStore';
 import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
+import { DoFactory } from '@/testing/DoFactory';
 import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
 import { expect, test, type MockInstance } from 'vitest';
 import { nextTick } from 'vue';
-import { useRouter, type Router } from 'vue-router';
 import KlassenManagementView from './KlassenManagementView.vue';
 
 function mountComponent(): VueWrapper {
@@ -35,7 +35,6 @@ let wrapper: VueWrapper | null = null;
 const organisationStore: OrganisationStore = useOrganisationStore();
 const searchFilterStore: SearchFilterStore = useSearchFilterStore();
 const authStore: AuthStore = useAuthStore();
-const router: Router = useRouter();
 
 function selectSchule(schule?: Partial<Organisation> | null): Organisation | null {
   if (schule === null) {
@@ -52,20 +51,8 @@ function selectSchule(schule?: Partial<Organisation> | null): Organisation | nul
   return schuleWithDefaults;
 }
 
-const schule1: Organisation = {
-  id: '1111111',
-  name: 'Schule 1',
-  kennung: '1111111',
-  typ: 'SCHULE',
-  administriertVon: '1',
-};
-const schule2: Organisation = {
-  id: '2222222',
-  name: 'Schule 2',
-  kennung: '2222222',
-  typ: 'SCHULE',
-  administriertVon: '1',
-};
+const schule1: Organisation = DoFactory.getSchule();
+const schule2: Organisation = DoFactory.getSchule();
 const personenkontexte: UserInfo['personenkontexte'] = [
   {
     organisation: {
@@ -103,29 +90,7 @@ const personenkontexte: UserInfo['personenkontexte'] = [
     },
   },
 ];
-const authUser: UserInfo = {
-  middle_name: null,
-  nickname: null,
-  profile: null,
-  picture: null,
-  website: null,
-  gender: null,
-  birthdate: null,
-  zoneinfo: null,
-  locale: null,
-  phone_number: null,
-  updated_at: null,
-  personId: '2',
-  email: 'albert@test.de',
-  email_verified: true,
-  family_name: 'Test',
-  given_name: 'Albert',
-  name: 'Albert Test',
-  preferred_username: 'albert',
-  sub: 'c71be903-d0ec-4207-b653-40c114680b63',
-  personenkontexte: [],
-  password_updated_at: null,
-};
+const authUser: UserInfo = DoFactory.getUserinfoResponse();
 
 describe('KlassenManagementView', () => {
   beforeEach(() => {
@@ -224,15 +189,42 @@ describe('KlassenManagementView', () => {
     expect(wrapper?.find('.v-pagination__next button:not(.v-btn--disabled)').isVisible()).toBe(true);
     await wrapper?.find('.v-pagination__next button:not(.v-btn--disabled)').trigger('click');
     expect(wrapper?.find('.v-data-table-footer__info').text()).toContain('31-50');
+
+    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
+    await organisationAutocomplete?.setValue('O1');
+    await nextTick();
+    await wrapper?.find('.v-pagination__prev button:not(.v-btn--disabled)').trigger('click');
+
+    expect(wrapper?.find('.v-data-table-footer__info').text()).toContain('1-30');
   });
 
   test('it reloads data after changing limit', async () => {
+    /* check for both cases, first if total is greater than, afterwards if total is less or equal than chosen limit */
+    organisationStore.totalOrganisationen = 51;
+    await nextTick();
+
     expect(wrapper?.find('.v-data-table-footer__items-per-page').isVisible()).toBe(true);
     expect(wrapper?.find('.v-data-table-footer__items-per-page').text()).toContain('30');
 
-    const component: WrapperLike | undefined = wrapper?.findComponent('.v-data-table-footer__items-per-page .v-select');
-    await component?.setValue(50);
+    const itemsPerPageSelection: WrapperLike | undefined = wrapper?.findComponent(
+      '.v-data-table-footer__items-per-page .v-select',
+    );
+    await itemsPerPageSelection?.setValue(50);
+
     expect(wrapper?.find('.v-data-table-footer__items-per-page').text()).toContain('50');
+
+    organisationStore.totalOrganisationen = 30;
+    await itemsPerPageSelection?.setValue(30);
+
+    expect(wrapper?.find('.v-data-table-footer__items-per-page').text()).toContain('30');
+    organisationStore.totalOrganisationen = 2;
+
+    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
+    await organisationAutocomplete?.setValue('O1');
+    await nextTick();
+
+    await itemsPerPageSelection?.setValue(50);
+    expect(wrapper?.find('.v-data-table-footer__info').text()).toContain('1-2');
   });
 
   test('it calls watchers for selected Schule and klasse with value', async () => {

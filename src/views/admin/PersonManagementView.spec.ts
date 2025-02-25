@@ -4,7 +4,7 @@ import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
 import { useRolleStore, type RolleResponse, type RolleStore, type RollenMerkmal } from '@/stores/RolleStore';
 import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
-import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
+import { DOMWrapper, VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
 import { expect, test, type Mock, type MockInstance } from 'vitest';
 import { nextTick } from 'vue';
@@ -35,6 +35,7 @@ beforeEach(() => {
   authStore = useAuthStore();
 
   authStore.hasPersonenBulkPermission = true;
+  authStore.hasPersonenLoeschenPermission = true;
 
   organisationStore.klassen = [
     {
@@ -55,6 +56,15 @@ beforeEach(() => {
       kennung: '9356494',
       namensergaenzung: 'Schule',
       kuerzel: 'rsg',
+      typ: 'SCHULE',
+      administriertVon: '1',
+    },
+    {
+      id: '198',
+      name: 'Realschule Randomname',
+      kennung: '13465987',
+      namensergaenzung: 'Schule',
+      kuerzel: 'rsrn',
       typ: 'SCHULE',
       administriertVon: '1',
     },
@@ -172,7 +182,7 @@ beforeEach(() => {
     ],
     organisations: [],
     selectedOrganisation: null,
-    selectedRolle: null,
+    selectedRollen: null,
     canCommit: true,
   };
 
@@ -193,6 +203,7 @@ beforeEach(() => {
         personenkontextStore,
         rolleStore,
         searchFilterStore,
+        authStore,
       },
     },
   });
@@ -203,6 +214,66 @@ describe('PersonManagementView', () => {
     expect(wrapper?.getComponent({ name: 'ResultTable' })).toBeTruthy();
     expect(wrapper?.find('[data-testid="person-table"]').isVisible()).toBe(true);
     expect(wrapper?.findAll('.v-data-table__tr').length).toBe(2);
+  });
+
+  test('it renders person management table with active orga filter', () => {
+    searchFilterStore.selectedOrganisationen = ['9876'];
+    searchFilterStore.selectedRollen = null;
+    searchFilterStore.selectedKlassen = null;
+    expect(wrapper?.getComponent({ name: 'ResultTable' })).toBeTruthy();
+    expect(wrapper?.find('[data-testid="person-table"]').isVisible()).toBe(true);
+    expect(wrapper?.findAll('.v-data-table__tr').length).toBe(2);
+  });
+
+  test('it renders person management table with active rolle filter', () => {
+    searchFilterStore.selectedOrganisationen = null;
+    searchFilterStore.selectedRollen = ['10'];
+    searchFilterStore.selectedKlassen = null;
+    expect(wrapper?.getComponent({ name: 'ResultTable' })).toBeTruthy();
+    expect(wrapper?.find('[data-testid="person-table"]').isVisible()).toBe(true);
+    expect(wrapper?.findAll('.v-data-table__tr').length).toBe(2);
+  });
+
+  test('it autoselects orga if only one is available', async () => {
+    /* set all orgas to 1 */
+    organisationStore.allOrganisationen = [
+      {
+        id: '9876',
+        name: 'Random Schulname Gymnasium',
+        kennung: '9356494',
+        namensergaenzung: 'Schule',
+        kuerzel: 'rsg',
+        typ: 'SCHULE',
+        administriertVon: '1',
+      },
+    ];
+    await flushPromises();
+
+    const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
+
+    expect(schuleAutocomplete?.text()).toContain('9356494 (Random Schulname Gymnasium)');
+
+    /* reset all orgas back to 2 */
+    organisationStore.allOrganisationen = [
+      {
+        id: '9876',
+        name: 'Random Schulname Gymnasium',
+        kennung: '9356494',
+        namensergaenzung: 'Schule',
+        kuerzel: 'rsg',
+        typ: 'SCHULE',
+        administriertVon: '1',
+      },
+      {
+        id: '198',
+        name: 'Realschule Randomname',
+        kennung: '13465987',
+        namensergaenzung: 'Schule',
+        kuerzel: 'rsrn',
+        typ: 'SCHULE',
+        administriertVon: '1',
+      },
+    ];
   });
 
   test('it reloads data after changing page', async () => {
@@ -254,9 +325,14 @@ describe('PersonManagementView', () => {
     const component: WrapperLike | undefined = wrapper?.findComponent('.v-data-table-footer__items-per-page .v-select');
     await component?.setValue(50);
     expect(wrapper?.find('.v-data-table-footer__items-per-page').text()).toContain('50');
+
+    /* set a limit lower than total persons */
+    personStore.totalPersons = 100;
+    await component?.setValue(30);
+    expect(wrapper?.find('.v-data-table-footer__items-per-page').text()).toContain('30');
   });
 
-  test('it sets filters', async () => {
+  test('it sets and resets filters', async () => {
     const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
     await schuleAutocomplete?.setValue(['9876']);
     await nextTick();
@@ -274,6 +350,13 @@ describe('PersonManagementView', () => {
     await nextTick();
 
     expect(klasseAutocomplete?.text()).toEqual('11b');
+
+    wrapper?.find('[data-testid="reset-filter-button"]').trigger('click');
+    await nextTick();
+
+    expect(schuleAutocomplete?.text()).toBe('');
+    expect(rolleAutocomplete?.text()).toBe('');
+    expect(klasseAutocomplete?.text()).toBe('');
   });
 
   test('it updates Organisation search correctly', async () => {
@@ -346,5 +429,77 @@ describe('PersonManagementView', () => {
     await nextTick();
 
     expect(wrapper?.findComponent({ ref: 'personenkontext-create' }));
+  });
+
+  test('it checks a checkbox in the table, selects the delete person option and triggers dialog', async () => {
+    authStore.hasPersonenLoeschenPermission = true;
+    // Find the first checkbox in the table
+    const checkbox: DOMWrapper<Element> | undefined = wrapper?.find(
+      '[data-testid="person-table"] .v-selection-control',
+    );
+
+    // Initial state check (optional)
+    expect(checkbox?.classes()).not.toContain('v-selection-control--selected');
+
+    // Trigger the checkbox click
+    await checkbox?.trigger('click');
+    await nextTick();
+
+    const benutzerEditSelect: VueWrapper | undefined = wrapper?.findComponent({ ref: 'benutzer-bulk-edit-select' });
+
+    // eslint-disable-next-line @typescript-eslint/dot-notation
+    const hasDeletePersonOption: boolean = (benutzerEditSelect?.props() as { items: { value: string }[] }).items.some(
+      (item: { value: string }) => item.value === 'DELETE_PERSON',
+    );
+    expect(hasDeletePersonOption).toBe(true);
+
+    benutzerEditSelect?.setValue('DELETE_PERSON');
+
+    benutzerEditSelect?.vm.$emit('input', 'DELETE_PERSON');
+    await nextTick();
+
+    expect(document.body.querySelector('[data-testid="person-delete-layout-card"]')).not.toBeNull();
+  });
+
+  test('person delete isnt shown if user has no permission', async () => {
+    authStore.hasPersonenLoeschenPermission = false;
+
+    wrapper = mount(PersonManagementView, {
+      attachTo: document.getElementById('app') || '',
+      global: {
+        components: {
+          PersonManagementView,
+        },
+        mocks: {
+          route: {
+            fullPath: 'full/path',
+          },
+        },
+        provide: {
+          organisationStore,
+          personStore,
+          personenkontextStore,
+          rolleStore,
+          searchFilterStore,
+          authStore,
+        },
+      },
+    });
+
+    // Find the first checkbox in the table
+    const checkbox: DOMWrapper<Element> | undefined = wrapper.find('[data-testid="person-table"] .v-selection-control');
+    // Initial state check (optional)
+    expect(checkbox.classes()).not.toContain('v-selection-control--selected');
+
+    // Trigger the checkbox click
+    await checkbox.trigger('click');
+    await nextTick();
+
+    const benutzerEditSelect: VueWrapper | undefined = wrapper.findComponent({ ref: 'benutzer-bulk-edit-select' });
+
+    // eslint-disable-next-line @typescript-eslint/dot-notation
+    (benutzerEditSelect.props() as { items: { value: string }[] })['items'].forEach((item: { value: string }) => {
+      expect(item.value).not.toBe('DELETE_PERSON');
+    });
   });
 });

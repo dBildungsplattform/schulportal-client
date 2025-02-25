@@ -27,6 +27,7 @@
   };
   const emit: Emits = defineEmits<Emits>();
   const { t }: Composer = useI18n({ useScope: 'global' });
+  // eslint-disable-next-line @typescript-eslint/typedef
   const schulenFilterRef = useTemplateRef('schulenFilter');
   const organisationStore: OrganisationStore = useOrganisationStore();
 

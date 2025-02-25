@@ -38,7 +38,7 @@
     getValidationSchema,
     type RolleFieldDefinitions,
   } from '@/utils/validationRolle';
-  import SuccessTemplate from '@/components/admin/rollen/SuccessTemplate.vue';
+  import RolleSuccessTemplate from '@/components/admin/rollen/RolleSuccessTemplate.vue';
   import { type TranslatedObject } from '@/types.d';
   import { isHiddenSystemrecht } from '@/utils/systemrechte';
 
@@ -115,10 +115,10 @@
   }
 
   async function navigateToRolleManagement(): Promise<void> {
-    formContext.resetForm();
     await router.push({ name: 'rolle-management' }).then(() => {
       router.go(0);
     });
+    formContext.resetForm();
     rolleStore.createdRolle = null;
   }
 
@@ -333,7 +333,7 @@
 
       <!-- Result template on success after submit  -->
       <template v-if="rolleStore.createdRolle && !rolleStore.errorCode">
-        <SuccessTemplate
+        <RolleSuccessTemplate
           :successMessage="$t('admin.rolle.rolleAddedSuccessfully')"
           :followingRolleDataCreated="$t('admin.followingDataCreated')"
           :createdRolleData="[

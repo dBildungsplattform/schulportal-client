@@ -26,24 +26,29 @@
   const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
   const canCommit: Ref<boolean> = ref(false);
   const hasAutoselectedSchule: Ref<boolean> = ref(false);
+
   const searchInputOrganisation: Ref<string> = ref('');
   const searchInputRolle: Ref<string> = ref('');
+  const searchInputRollen: Ref<string> = ref('');
 
   let isSearching: boolean = false;
 
   type Props = {
     organisationen: TranslatedObject[] | undefined;
     rollen: TranslatedRolleWithAttrs[] | undefined;
-    klassen?: TranslatedObject[] | undefined;
-    selectedOrganisationProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
-    selectedRolleProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
-    selectedKlasseProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedOrganisation: string | undefined;
-    selectedRolle: string | undefined;
     showHeadline: boolean;
+    selectedOrganisationProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
+    klassen?: TranslatedObject[] | undefined;
+    selectedRolle?: string | undefined;
+    selectedRollen?: string[] | undefined;
     selectedKlasse?: string | undefined;
+    selectedKlasseProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
+    selectedRolleProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
+    selectedRollenProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     isModifyRolleDialog?: boolean;
     befristungInputProps?: BefristungProps;
+    allowMultipleRollen?: boolean;
   };
 
   const props: Props = defineProps<Props>();
@@ -53,14 +58,16 @@
     (e: 'update:calculatedBefristungOption', value: string | undefined): void;
     (event: 'update:selectedOrganisation', value: string | undefined): void;
     (event: 'update:selectedRolle', value: string | undefined): void;
+    (event: 'update:selectedRollen', value: string[] | undefined): void;
     (event: 'update:selectedKlasse', value: string | undefined): void;
     (event: 'update:canCommit', value: boolean): void;
-    (event: 'fieldReset', field: 'selectedOrganisation' | 'selectedRolle' | 'selectedKlasse'): void;
+    (event: 'fieldReset', field: 'selectedOrganisation' | 'selectedRolle' | 'selectedKlasse' | 'selectedRollen'): void;
   };
   const emits: Emits = defineEmits<Emits>();
 
   const selectedOrganisation: Ref<string | undefined> = ref(props.selectedOrganisation);
   const selectedRolle: Ref<string | undefined> = ref(props.selectedRolle);
+  const selectedRollen: Ref<string[] | undefined> = ref(props.selectedRollen || []);
   const selectedKlasse: Ref<string | undefined> = ref(props.selectedKlasse);
 
   // Computed property to get the title of the selected organisation
@@ -78,11 +85,17 @@
     return props.klassen?.find((klasse: TranslatedObject | undefined) => klasse?.value === selectedKlasse.value)?.title;
   });
 
-  function isLernRolle(selectedRolleId: string | undefined): boolean {
-    const rolle: TranslatedRolleWithAttrs | undefined = props.rollen?.find(
-      (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
+  function isLernRolle(selectedRolleIds: string | string[] | undefined): boolean {
+    if (!selectedRolleIds) return false;
+
+    // Ensure we always work with an array
+    const rolleIdsArray: string[] = Array.isArray(selectedRolleIds) ? selectedRolleIds : [selectedRolleIds];
+
+    return rolleIdsArray.some((rolleId: string) =>
+      props.rollen?.some(
+        (rolle: TranslatedRolleWithAttrs) => rolle.value === rolleId && rolle.rollenart === RollenArt.Lern,
+      ),
     );
-    return !!rolle && rolle.rollenart === RollenArt.Lern;
   }
 
   // Watcher for selectedOrganisation to fetch roles and classes
@@ -90,7 +103,9 @@
     // Reset the selectedRolle field only if oldValue was not undefined
     if (oldValue !== undefined) {
       selectedRolle.value = undefined;
+      selectedRollen.value = undefined;
       emits('fieldReset', 'selectedRolle');
+      emits('fieldReset', 'selectedRollen');
     }
     if (newValue && newValue !== oldValue) {
       // Fetch the roles after selecting the organization
@@ -143,26 +158,51 @@
     emits('update:selectedOrganisation', newValue);
   });
 
-  watch(selectedRolle, async (newValue: string | undefined, oldValue: string | undefined) => {
-    if (newValue && newValue !== oldValue) {
-      // Call fetch with an empty string to get the initial organizations for the selected role without any filter
-      await personenkontextStore.processWorkflowStep({
-        organisationId: selectedOrganisation.value,
-        rolleId: newValue,
-        limit: 25,
-      });
-      canCommit.value = personenkontextStore.workflowStepResponse?.canCommit ?? false;
-      emits('update:canCommit', canCommit.value);
-    }
-    if (!newValue) {
-      // Set canCommit to false and reset Klasse
-      emits('update:canCommit', false);
-      selectedKlasse.value = undefined;
-      emits('fieldReset', 'selectedKlasse');
-    }
-    // Emit the new selected value to the parent
-    emits('update:selectedRolle', newValue);
-  });
+  watch(
+    () => (props.allowMultipleRollen ? selectedRollen.value : selectedRolle.value),
+    async (newValue: string | string[] | undefined, oldValue: string | string[] | undefined) => {
+      if (props.allowMultipleRollen) {
+        // Multiple rollen selected
+        const newRollen: string[] | undefined = newValue as string[] | undefined;
+        if (newRollen && newRollen.length > 0) {
+          await personenkontextStore.processWorkflowStep({
+            organisationId: selectedOrganisation.value,
+            rollenIds: newRollen,
+            limit: 25,
+          });
+          canCommit.value = personenkontextStore.workflowStepResponse?.canCommit ?? false;
+          emits('update:canCommit', canCommit.value);
+        } else {
+          // No roles selected, reset values
+          selectedKlasse.value = undefined;
+          emits('fieldReset', 'selectedKlasse');
+          emits('fieldReset', 'selectedRollen');
+          emits('update:canCommit', false);
+        }
+        emits('update:selectedRollen', newRollen);
+      } else {
+        // Single rolle selected
+        const newRolle: string | undefined = newValue as string | undefined;
+        if (newRolle && newRolle !== oldValue) {
+          await personenkontextStore.processWorkflowStep({
+            organisationId: selectedOrganisation.value,
+            rollenIds: [newRolle], // Wrap single rolle in an array
+            limit: 25,
+          });
+          canCommit.value = personenkontextStore.workflowStepResponse?.canCommit ?? false;
+          emits('update:canCommit', canCommit.value);
+        }
+        if (!newRolle) {
+          // Reset when no rolle is selected
+          emits('update:canCommit', false);
+          selectedKlasse.value = undefined;
+          emits('fieldReset', 'selectedKlasse');
+        }
+        emits('update:selectedRolle', newRolle); // Emit selected single rolle
+      }
+    },
+    { deep: true },
+  );
 
   watch(selectedKlasse, (newValue: string | undefined) => {
     emits('update:selectedKlasse', newValue);
@@ -207,30 +247,34 @@
     }
   });
 
-  watch(searchInputRolle, async (newValue: string, oldValue: string) => {
-    clearTimeout(timerId.value);
-    // If the oldValue (What has been in the searchValue beforing losing focus) is equal to the selected Rolle.title then do nothing
-    if (oldValue === selectedRolleTitle.value) return;
-    // If searchValue is empty, fetch all roles for the organisationId
-    if (newValue === '' && !selectedRolle.value) {
-      timerId.value = setTimeout(() => {
-        personenkontextStore.processWorkflowStep({
-          organisationId: selectedOrganisation.value,
-          limit: 25,
-        });
-      }, 500);
-      // Else fetch the Rollen that correspond to the orgaId
-      // (This stops an extra request being made once a value is selected since we check if model !== searchValue)
-    } else if (newValue && newValue !== selectedRolleTitle.value) {
-      timerId.value = setTimeout(() => {
-        personenkontextStore.processWorkflowStep({
-          organisationId: selectedOrganisation.value,
-          rolleName: newValue,
-          limit: 25,
-        });
-      }, 500);
-    }
-  });
+  watch(
+    props.allowMultipleRollen ? searchInputRollen : searchInputRolle,
+    async (newValue: string, oldValue: string) => {
+      clearTimeout(timerId.value);
+      // If the oldValue (What has been in the searchValue beforing losing focus) is equal to the selected Rolle.title then do nothing
+      if (oldValue === selectedRolleTitle.value) return;
+      // If searchValue is empty, fetch all roles for the organisationId
+      if (newValue === '' && !selectedRolle.value) {
+        timerId.value = setTimeout(() => {
+          personenkontextStore.processWorkflowStep({
+            organisationId: selectedOrganisation.value,
+            limit: 25,
+          });
+        }, 500);
+        // Else fetch the Rollen that correspond to the orgaId
+        // (This stops an extra request being made once a value is selected since we check if model !== searchValue)
+      } else if (newValue && newValue !== selectedRolleTitle.value) {
+        timerId.value = setTimeout(() => {
+          personenkontextStore.processWorkflowStep({
+            organisationId: selectedOrganisation.value,
+            rolleName: newValue,
+            rollenIds: selectedRollen.value,
+            limit: 25,
+          });
+        }, 500);
+      }
+    },
+  );
 
   function updateKlassenSearch(searchValue: string): void {
     clearTimeout(timerId.value);
@@ -270,6 +314,10 @@
   // This is also important since we only want to fetch all orgas once the selected Rolle is null, otherwise an extra request is made with an empty string
   function clearSelectedRolle(): void {
     emits('fieldReset', 'selectedRolle');
+  }
+
+  function clearSelectedRollen(): void {
+    emits('fieldReset', 'selectedRollen');
   }
 
   watch(
@@ -337,12 +385,36 @@
       </v-row>
       <!-- Rollenzuordnung -->
       <FormRow
-        :errorLabel="selectedRolleProps['error']"
+        :errorLabel="
+          allowMultipleRollen ? (selectedRollenProps?.['error'] ?? false) : (selectedRolleProps?.['error'] ?? false)
+        "
         labelForId="rolle-select"
         :isRequired="true"
         :label="$t('admin.rolle.rolle')"
       >
         <v-autocomplete
+          v-if="allowMultipleRollen"
+          autocomplete="off"
+          clearable
+          @clear="clearSelectedRollen"
+          data-testid="rollen-select"
+          density="compact"
+          id="rollen-select"
+          ref="rollen-select"
+          :items="rollen"
+          item-value="value"
+          item-text="title"
+          :multiple="allowMultipleRollen"
+          :no-data-text="$t('noDataFound')"
+          :placeholder="$t('admin.rolle.selectRolle')"
+          required="true"
+          variant="outlined"
+          v-bind="selectedRollenProps"
+          v-model="selectedRollen"
+          v-model:search="searchInputRolle"
+        ></v-autocomplete>
+        <v-autocomplete
+          v-else-if="!allowMultipleRollen"
           autocomplete="off"
           clearable
           @clear="clearSelectedRolle"
@@ -365,7 +437,11 @@
 
       <!-- Klasse zuordnen -->
       <FormRow
-        v-if="isLernRolle(selectedRolle) && selectedOrganisation"
+        v-if="
+          allowMultipleRollen
+            ? isLernRolle(selectedRollen) && selectedOrganisation
+            : isLernRolle(selectedRolle) && selectedOrganisation
+        "
         :errorLabel="selectedKlasseProps?.['error'] || false"
         :isRequired="true"
         labelForId="klasse-select"
@@ -390,11 +466,21 @@
         ></v-autocomplete>
       </FormRow>
       <!-- Befristung -->
-      <v-row v-if="selectedOrganisation && selectedRolle && showHeadline">
+      <v-row
+        v-if="
+          selectedOrganisation &&
+          (allowMultipleRollen ? (selectedRollen?.length ?? 0) > 0 : selectedRolle) &&
+          showHeadline
+        "
+      >
         <h3 class="headline-3">3. {{ $t('admin.befristung.assignBefristung') }}</h3>
       </v-row>
       <BefristungInput
-        v-if="selectedOrganisation && selectedRolle && !isModifyRolleDialog"
+        v-if="
+          selectedOrganisation &&
+          (allowMultipleRollen ? (selectedRollen?.length ?? 0) > 0 : selectedRolle) &&
+          !isModifyRolleDialog
+        "
         :befristungProps="befristungInputProps?.befristungProps"
         :befristungOptionProps="befristungInputProps?.befristungOptionProps"
         :isUnbefristetDisabled="befristungInputProps?.isUnbefristetDisabled"
@@ -402,6 +488,7 @@
         :nextSchuljahresende="befristungInputProps?.nextSchuljahresende"
         :befristung="befristungInputProps?.befristung"
         :befristungOption="befristungInputProps?.befristungOption"
+        ref="befristung-input-wrapper"
         @update:befristung="handleBefristungChange"
         @update:calculatedBefristungOption="handleCalculatedBefristungOptionChange"
       />

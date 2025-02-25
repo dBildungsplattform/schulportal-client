@@ -22,6 +22,7 @@
   import RolleModify from '@/components/admin/rollen/RolleModify.vue';
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
+  import PersonBulkDelete from '@/components/admin/personen/PersonBulkDelete.vue';
 
   const searchFieldComponent: Ref = ref();
 
@@ -37,6 +38,7 @@
   const hasAutoSelectedOrganisation: Ref<boolean> = ref(false);
 
   const selectedPersonIds: Ref<string[]> = ref<string[]>([]);
+  const resultTable: Ref = ref(null);
 
   type ReadonlyHeaders = VDataTableServer['headers'];
   const headers: ReadonlyHeaders = [
@@ -67,6 +69,8 @@
   const sortOrder: Ref<SortOrder | null> = ref(null);
 
   const rolleModifiyDialogVisible: Ref<boolean> = ref(false);
+  const benutzerDeleteDialogVisible: Ref<boolean> = ref(false);
+
   const selectedOption: Ref<string | null> = ref(null);
 
   const authStore: AuthStore = useAuthStore();
@@ -74,12 +78,17 @@
   // Define an enum for action types (Other pairs will be added here for each new bulk feature)
   enum ActionTypes {
     MODIFY_ROLLE = 'MODIFY_ROLLE',
+    DELETE_PERSON = 'DELETE_PERSON',
   }
 
   // Define i18n values for action types to act as a title/value in the v-select
-  const actionTypeTitles: Record<ActionTypes, string> = {
+  const actionTypeTitles: Partial<Record<ActionTypes, string>> = {
     [ActionTypes.MODIFY_ROLLE]: t('admin.rolle.assignRolle'),
   };
+
+  if (authStore.hasPersonenLoeschenPermission) {
+    actionTypeTitles[ActionTypes.DELETE_PERSON] = t('admin.person.deletePerson');
+  }
 
   // Computed property for generating options dynamically for v-selects
   const actions: ComputedRef<TranslatedObject[]> = computed(() => {
@@ -134,57 +143,6 @@
 
   const statuses: Array<string> = ['Aktiv', 'Inaktiv'];
 
-  async function getPaginatedPersonen(page: number): Promise<void> {
-    searchFilterStore.personenPage = page;
-    await personStore.getAllPersons({
-      offset: (searchFilterStore.personenPage - 1) * searchFilterStore.personenPerPage,
-      limit: searchFilterStore.personenPerPage,
-      organisationIDs: selectedKlassen.value.length ? selectedKlassen.value : selectedOrganisation.value,
-      rolleIDs: searchFilterStore.selectedRollen || selectedRollen.value,
-      searchFilter: searchFilterStore.searchFilterPersonen || searchFilter.value,
-      sortField: searchFilterStore.sortField as SortField,
-      sortOrder: searchFilterStore.sortOrder as SortOrder,
-    });
-  }
-
-  async function getPaginatedPersonenWithLimit(limit: number): Promise<void> {
-    /* reset page to 1 if entries are equal to or less than selected limit */
-    if (personStore.totalPersons <= limit) {
-      searchFilterStore.personenPage = 1;
-    }
-
-    searchFilterStore.personenPerPage = limit;
-    await personStore.getAllPersons({
-      offset: (searchFilterStore.personenPage - 1) * searchFilterStore.personenPerPage,
-      limit: searchFilterStore.personenPerPage,
-      organisationIDs: searchFilterStore.selectedOrganisationen || selectedOrganisation.value,
-      rolleIDs: searchFilterStore.selectedRollen || selectedRollen.value,
-      searchFilter: searchFilterStore.searchFilterPersonen || searchFilter.value,
-    });
-  }
-
-  async function autoSelectOrganisation(): Promise<void> {
-    // Autoselect the Orga for the current user that only has 1 Orga assigned to him.
-    if (organisationStore.allOrganisationen.length === 1) {
-      selectedOrganisation.value = [organisationStore.allOrganisationen[0]?.id || ''];
-      hasAutoSelectedOrganisation.value = true;
-      if (selectedOrganisation.value.length) {
-        await organisationStore.getFilteredKlassen({
-          administriertVon: selectedOrganisation.value,
-          searchString: searchInputKlassen.value,
-        });
-        // Dropdown wasn't updated. Ideally it should be automatically updated once the selectedOrganisation holds a value.
-        klassenOptions.value = organisationStore.klassen
-          .map((org: Organisation) => ({
-            value: org.id,
-            title: org.name,
-          }))
-          .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
-        totalKlassen = klassenOptions.value.length;
-      }
-    }
-  }
-
   async function applySearchAndFilters(): Promise<void> {
     await organisationStore.getFilteredKlassen({
       administriertVon: selectedOrganisation.value,
@@ -207,6 +165,61 @@
       sortField: searchFilterStore.sortField as SortField,
       sortOrder: searchFilterStore.sortOrder as SortOrder,
     });
+  }
+
+  async function getPaginatedPersonen(page: number): Promise<void> {
+    searchFilterStore.personenPage = page;
+    await personStore.getAllPersons({
+      offset: (searchFilterStore.personenPage - 1) * searchFilterStore.personenPerPage,
+      limit: searchFilterStore.personenPerPage,
+      organisationIDs: selectedKlassen.value.length ? selectedKlassen.value : selectedOrganisation.value,
+      rolleIDs: searchFilterStore.selectedRollen || selectedRollen.value,
+      searchFilter: searchFilterStore.searchFilterPersonen || searchFilter.value,
+      sortField: searchFilterStore.sortField as SortField,
+      sortOrder: searchFilterStore.sortOrder as SortOrder,
+    });
+
+    await applySearchAndFilters();
+  }
+
+  async function getPaginatedPersonenWithLimit(limit: number): Promise<void> {
+    /* reset page to 1 if entries are equal to or less than selected limit */
+    if (personStore.totalPersons <= limit) {
+      searchFilterStore.personenPage = 1;
+    }
+
+    searchFilterStore.personenPerPage = limit;
+    await personStore.getAllPersons({
+      offset: (searchFilterStore.personenPage - 1) * searchFilterStore.personenPerPage,
+      limit: searchFilterStore.personenPerPage,
+      organisationIDs: searchFilterStore.selectedOrganisationen || selectedOrganisation.value,
+      rolleIDs: searchFilterStore.selectedRollen || selectedRollen.value,
+      searchFilter: searchFilterStore.searchFilterPersonen || searchFilter.value,
+    });
+
+    await applySearchAndFilters();
+  }
+
+  async function autoSelectOrganisation(): Promise<void> {
+    // Autoselect the Orga for the current user that only has 1 Orga assigned to him.
+    if (organisationStore.allOrganisationen.length === 1) {
+      selectedOrganisation.value = [organisationStore.allOrganisationen[0]?.id || ''];
+      hasAutoSelectedOrganisation.value = true;
+      if (selectedOrganisation.value.length) {
+        await organisationStore.getFilteredKlassen({
+          administriertVon: selectedOrganisation.value,
+          searchString: searchInputKlassen.value,
+        });
+        // Dropdown wasn't updated. Ideally it should be automatically updated once the selectedOrganisation holds a value.
+        klassenOptions.value = organisationStore.klassen
+          .map((org: Organisation) => ({
+            value: org.id,
+            title: org.name,
+          }))
+          .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
+        totalKlassen = klassenOptions.value.length;
+      }
+    }
   }
 
   async function setKlasseFilter(newValue: Array<string>): Promise<void> {
@@ -423,6 +436,9 @@
       case ActionTypes.MODIFY_ROLLE:
         rolleModifiyDialogVisible.value = true;
         break;
+      case ActionTypes.DELETE_PERSON:
+        benutzerDeleteDialogVisible.value = true;
+        break;
     }
   };
 
@@ -430,6 +446,16 @@
   const handleDialog = (isDialogVisible: boolean): void => {
     rolleModifiyDialogVisible.value = isDialogVisible;
     selectedOption.value = null;
+  };
+
+  const handleBulkDeleteDialog = async (finished: boolean): Promise<void> => {
+    benutzerDeleteDialogVisible.value = false;
+    selectedOption.value = null;
+    if (finished) {
+      selectedPersonIds.value = [];
+      await getPaginatedPersonen(searchFilterStore.personenPage);
+      resultTable.value.resetSelection();
+    }
   };
 
   function handleSelectedRows(selectedItems: TableItem[]): void {
@@ -486,8 +512,9 @@
         >
           <v-btn
             class="px-0 reset-filter"
-            :disabled="!filterOrSearchActive"
             @click="resetSearchAndFilter()"
+            data-testid="reset-filter-button"
+            :disabled="!filterOrSearchActive"
             size="x-small"
             variant="text"
             width="auto"
@@ -745,6 +772,16 @@
             @update:getUebersichten="getPaginatedPersonen(searchFilterStore.personenPage)"
           >
           </RolleModify>
+          <PersonBulkDelete
+            ref="person-bulk-delete"
+            v-if="benutzerDeleteDialogVisible"
+            :errorCode="personStore.errorCode"
+            :isLoading="personStore.loading"
+            :isDialogVisible="benutzerDeleteDialogVisible"
+            :personIDs="selectedPersonIds"
+            @update:dialogExit="handleBulkDeleteDialog($event)"
+          >
+          </PersonBulkDelete>
         </v-col>
         <!-- Display the number of selected checkboxes -->
         <v-col
@@ -766,6 +803,7 @@
       <ResultTable
         :currentPage="searchFilterStore.personenPage"
         data-testid="person-table"
+        ref="resultTable"
         :items="personStore.personenWithUebersicht || []"
         :itemsPerPage="searchFilterStore.personenPerPage"
         :loading="personStore.loading"

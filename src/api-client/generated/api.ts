@@ -129,13 +129,13 @@ export interface CreateOrganisationBodyParams {
      * @type {string}
      * @memberof CreateOrganisationBodyParams
      */
-    'administriertVon'?: string;
+    'administriertVon': string;
     /**
      * 
      * @type {string}
      * @memberof CreateOrganisationBodyParams
      */
-    'zugehoerigZu'?: string;
+    'zugehoerigZu': string;
     /**
      * Required, if `typ` is equal to `SCHULE`
      * @type {string}
@@ -608,7 +608,9 @@ export const DbiamOrganisationErrorI18nKeyEnum = {
     NameEnthaeltLeerzeichen: 'NAME_ENTHAELT_LEERZEICHEN',
     KennungEnthaeltLeerzeichen: 'KENNUNG_ENTHAELT_LEERZEICHEN',
     EmailAdressOnOrganisationTyp: 'EMAIL_ADRESS_ON_ORGANISATION_TYP',
-    NewerVersionOrganisation: 'NEWER_VERSION_ORGANISATION'
+    NewerVersionOrganisation: 'NEWER_VERSION_ORGANISATION',
+    OrganisationWechseltTeilbaum: 'ORGANISATION_WECHSELT_TEILBAUM',
+    OrganisationZuweisungFehler: 'ORGANISATION_ZUWEISUNG_FEHLER'
 } as const;
 
 export type DbiamOrganisationErrorI18nKeyEnum = typeof DbiamOrganisationErrorI18nKeyEnum[keyof typeof DbiamOrganisationErrorI18nKeyEnum];
@@ -2979,13 +2981,13 @@ export interface UpdateOrganisationBodyParams {
      * @type {string}
      * @memberof UpdateOrganisationBodyParams
      */
-    'administriertVon'?: string;
+    'administriertVon': string;
     /**
      * 
      * @type {string}
      * @memberof UpdateOrganisationBodyParams
      */
-    'zugehoerigZu'?: string;
+    'zugehoerigZu': string;
     /**
      * Required, if `typ` is equal to `SCHULE`
      * @type {string}
@@ -6279,53 +6281,6 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerAddAdministrierteOrganisation: async (organisationId: string, organisationByIdBodyParams: OrganisationByIdBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'organisationId' is not null or undefined
-            assertParamExists('organisationControllerAddAdministrierteOrganisation', 'organisationId', organisationId)
-            // verify required parameter 'organisationByIdBodyParams' is not null or undefined
-            assertParamExists('organisationControllerAddAdministrierteOrganisation', 'organisationByIdBodyParams', organisationByIdBodyParams)
-            const localVarPath = `/api/organisationen/{organisationId}/administriert`
-                .replace(`{${"organisationId"}}`, encodeURIComponent(String(organisationId)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication bearer required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            // authentication oauth2 required
-            // oauth required
-            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(organisationByIdBodyParams, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @param {string} organisationId The id of an organization
-         * @param {OrganisationByIdBodyParams} organisationByIdBodyParams 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
         organisationControllerAddZugehoerigeOrganisation: async (organisationId: string, organisationByIdBodyParams: OrganisationByIdBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'organisationId' is not null or undefined
             assertParamExists('organisationControllerAddZugehoerigeOrganisation', 'organisationId', organisationId)
@@ -6945,17 +6900,6 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async organisationControllerAddAdministrierteOrganisation(organisationId: string, organisationByIdBodyParams: OrganisationByIdBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerAddAdministrierteOrganisation(organisationId, organisationByIdBodyParams, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * 
-         * @param {string} organisationId The id of an organization
-         * @param {OrganisationByIdBodyParams} organisationByIdBodyParams 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
         async organisationControllerAddZugehoerigeOrganisation(organisationId: string, organisationByIdBodyParams: OrganisationByIdBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerAddZugehoerigeOrganisation(organisationId, organisationByIdBodyParams, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
@@ -7110,16 +7054,6 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerAddAdministrierteOrganisation(organisationId: string, organisationByIdBodyParams: OrganisationByIdBodyParams, options?: any): AxiosPromise<void> {
-            return localVarFp.organisationControllerAddAdministrierteOrganisation(organisationId, organisationByIdBodyParams, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @param {string} organisationId The id of an organization
-         * @param {OrganisationByIdBodyParams} organisationByIdBodyParams 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
         organisationControllerAddZugehoerigeOrganisation(organisationId: string, organisationByIdBodyParams: OrganisationByIdBodyParams, options?: any): AxiosPromise<void> {
             return localVarFp.organisationControllerAddZugehoerigeOrganisation(organisationId, organisationByIdBodyParams, options).then((request) => request(axios, basePath));
         },
@@ -7261,16 +7195,6 @@ export interface OrganisationenApiInterface {
      * @throws {RequiredError}
      * @memberof OrganisationenApiInterface
      */
-    organisationControllerAddAdministrierteOrganisation(organisationId: string, organisationByIdBodyParams: OrganisationByIdBodyParams, options?: AxiosRequestConfig): AxiosPromise<void>;
-
-    /**
-     * 
-     * @param {string} organisationId The id of an organization
-     * @param {OrganisationByIdBodyParams} organisationByIdBodyParams 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof OrganisationenApiInterface
-     */
     organisationControllerAddZugehoerigeOrganisation(organisationId: string, organisationByIdBodyParams: OrganisationByIdBodyParams, options?: AxiosRequestConfig): AxiosPromise<void>;
 
     /**
@@ -7403,18 +7327,6 @@ export interface OrganisationenApiInterface {
  * @extends {BaseAPI}
  */
 export class OrganisationenApi extends BaseAPI implements OrganisationenApiInterface {
-    /**
-     * 
-     * @param {string} organisationId The id of an organization
-     * @param {OrganisationByIdBodyParams} organisationByIdBodyParams 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof OrganisationenApi
-     */
-    public organisationControllerAddAdministrierteOrganisation(organisationId: string, organisationByIdBodyParams: OrganisationByIdBodyParams, options?: AxiosRequestConfig) {
-        return OrganisationenApiFp(this.configuration).organisationControllerAddAdministrierteOrganisation(organisationId, organisationByIdBodyParams, options).then((request) => request(this.axios, this.basePath));
-    }
-
     /**
      * 
      * @param {string} organisationId The id of an organization

@@ -26,7 +26,7 @@
     id: string;
     message: string;
     visible: boolean;
-    type: 'error' | 'warning';
+    type: 'errorLight' | 'warning';
   };
 
   const personInfoStore: PersonInfoStore = usePersonInfoStore();
@@ -74,9 +74,9 @@
     );
   });
 
-  function getUrgencyType(date: Date): 'error' | 'warning' {
+  function getUrgencyType(date: Date): 'errorLight' | 'warning' {
     const error: boolean = date.valueOf() < new Date().valueOf() + 14 * 24 * 60 * 60 * 1000;
-    return error ? 'error' : 'warning';
+    return error ? 'errorLight' : 'warning';
   }
 
   function addAlert(alerts: Alert[], occasion: string, messageKey: string): void {
@@ -181,10 +181,11 @@
           v-bind:key="alert.id"
           v-for="alert in alerts"
           :id="alert.id.toString()"
-          :visible="alert.visible"
+          ref="spsh-banner"
           :text="alert.message"
           :type="alert.type"
-          @dismiss-banner="dismissBannerForSession"
+          :visible="alert.visible"
+          @dismissBanner="dismissBannerForSession"
         ></SpshBanner>
       </v-col>
     </v-row>

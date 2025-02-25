@@ -8,7 +8,7 @@ import {
   type TwoFactorAuthentificationStore,
 } from '@/stores/TwoFactorAuthentificationStore';
 import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
-import { beforeEach, describe, expect, test } from 'vitest';
+import { beforeEach, describe, expect, test, type MockInstance } from 'vitest';
 import { nextTick } from 'vue';
 import { createMemoryHistory, createRouter, useRoute, type Router } from 'vue-router';
 import ProfileView from './ProfileView.vue';
@@ -124,7 +124,7 @@ const mockLehrerUebersicht: PersonWithUebersicht = {
       sskName: 'Muster-Schule',
       sskDstNr: '123456',
       rolle: 'Lehrer',
-      rollenArt: RollenArt.Lern,
+      rollenArt: RollenArt.Lehr,
       administriertVon: 'root-sh',
       typ: OrganisationsTyp.Schule,
       editable: true,
@@ -278,6 +278,14 @@ describe('ProfileView', () => {
     expect(wrapper?.find('[data-testid="profile-headline"]').isVisible()).toBe(true);
   });
 
+  test('it goes back to the previous page', () => {
+    const push: MockInstance = vi.spyOn(router, 'push');
+
+    wrapper?.find('[data-testid="back-to-previous-page-button"]').trigger('click');
+
+    expect(push).toHaveBeenCalledTimes(1);
+  });
+
   test('it displays personal data', () => {
     personInfoStore.personInfo = mockLehrer;
     personStore.personenuebersicht = mockLehrerUebersicht;
@@ -329,25 +337,71 @@ describe('ProfileView', () => {
     expect(wrapper.find('[data-testid="rolle-value-1"]').text()).toContain(klasse.rolle);
   });
 
-  test('it displays password data if there is any', async () => {
-    await nextTick();
-    if (!wrapper) return;
-    const container: DOMWrapper<Element> = wrapper.find('[data-testid="password-card"]');
-    const passwordCardText: string = container.text();
-    expect(passwordCardText).toContain(passwordUpdatedAt.getDate());
-    expect(passwordCardText).toContain(passwordUpdatedAt.getMonth());
-    expect(passwordCardText).toContain(passwordUpdatedAt.getFullYear());
+  describe('password', () => {
+    test('it displays password data if there is any', async () => {
+      await nextTick();
+      if (!wrapper) return;
+      const container: DOMWrapper<Element> = wrapper.find('[data-testid="password-card"]');
+      const passwordCardText: string = container.text();
+      expect(passwordCardText).toContain(passwordUpdatedAt.getDate());
+      expect(passwordCardText).toContain(passwordUpdatedAt.getMonth());
+      expect(passwordCardText).toContain(passwordUpdatedAt.getFullYear());
+    });
+
+    test('it does not display password data if there is none', async () => {
+      authStore.currentUser!.password_updated_at = null;
+      await nextTick();
+      if (!wrapper) return;
+      const container: DOMWrapper<Element> = wrapper.find('[data-testid="password-card"]');
+      const passwordCardText: string = container.text();
+      expect(passwordCardText).not.toContain(passwordUpdatedAt.getDate());
+      expect(passwordCardText).not.toContain(passwordUpdatedAt.getMonth());
+      expect(passwordCardText).not.toContain(passwordUpdatedAt.getFullYear());
+    });
+
+    test('it opens and closes password change dialog', async () => {
+      await nextTick();
+      if (!wrapper) return;
+
+      const passwordChangeButton: DOMWrapper<Element> = wrapper.find(
+        '[data-testid="open-change-password-dialog-button"]',
+      );
+      passwordChangeButton.trigger('click');
+      await nextTick();
+
+      const closeDialogButton: HTMLElement = (await document.querySelector(
+        '[data-testid="close-change-password-dialog-button"]',
+      )) as HTMLElement;
+
+      expect(closeDialogButton).not.toBeNull();
+      closeDialogButton.click();
+      await nextTick();
+    });
   });
 
-  test('it does not display password data if there is none', async () => {
-    authStore.currentUser!.password_updated_at = null;
-    await nextTick();
-    if (!wrapper) return;
-    const container: DOMWrapper<Element> = wrapper.find('[data-testid="password-card"]');
-    const passwordCardText: string = container.text();
-    expect(passwordCardText).not.toContain(passwordUpdatedAt.getDate());
-    expect(passwordCardText).not.toContain(passwordUpdatedAt.getMonth());
-    expect(passwordCardText).not.toContain(passwordUpdatedAt.getFullYear());
+  describe('device password', () => {
+    test('it opens device password change dialog', async () => {
+      personInfoStore.personInfo = mockLehrer;
+      personStore.personenuebersicht = mockLehrerUebersicht;
+      await nextTick();
+      if (!wrapper) return;
+
+      const devicePasswordChangeButton: DOMWrapper<Element> = wrapper.find(
+        '[data-testid="open-device-password-dialog-button"]',
+      );
+      devicePasswordChangeButton.trigger('click');
+      await nextTick();
+
+      expect(document.querySelector('[data-testid="password-reset-info-text"]')).not.toBeNull();
+
+      const resetPasswordButton: HTMLElement = (await document.querySelector(
+        '[data-testid="password-reset-button"]',
+      )) as HTMLElement;
+
+      expect(resetPasswordButton).not.toBeNull();
+      resetPasswordButton.click();
+      await nextTick();
+    });
   });
 
   test('it displays 2FA section', async () => {

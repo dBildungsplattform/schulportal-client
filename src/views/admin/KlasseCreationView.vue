@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import SuccessTemplate from '@/components/admin/klassen/SuccessTemplate.vue';
+  import KlasseSuccessTemplate from '@/components/admin/klassen/KlasseSuccessTemplate.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import KlasseForm from '@/components/form/KlasseForm.vue';
@@ -9,8 +9,7 @@
     type Organisation,
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
-  import { RollenSystemRecht } from '@/stores/RolleStore';
-  import { type TranslatedObject } from '@/types.d';
+  import { getDisplayNameForOrg } from '@/utils/formatting';
   import { type ValidationSchema } from '@/utils/validationKlasse';
   import { computed, onMounted, onUnmounted, ref, useTemplateRef, type ComputedRef, type Ref } from 'vue';
   import {
@@ -23,24 +22,16 @@
 
   const router: Router = useRouter();
   const organisationStore: OrganisationStore = useOrganisationStore();
-  const formRef: Readonly<typeof KlasseForm> = useTemplateRef<InstanceType<typeof KlasseForm>>('klasse-creation-form');
+  // eslint-disable-next-line @typescript-eslint/typedef
+  const formRef = useTemplateRef('klasse-creation-form');
 
-  const schulen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    return organisationStore.allSchulen
-      .slice(0, 25)
-      .map((org: Organisation) => ({
-        value: org.id,
-        title: org.kennung ? `${org.kennung} (${org.name.trim()})` : org.name,
-      }))
-      .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
+  const translatedSchulname: ComputedRef<string> = computed(() => {
+    const schule: Organisation | undefined = organisationStore.schulenFilter.filterResult.find(
+      (s: Organisation) => s.id === organisationStore.createdKlasse?.administriertVon,
+    );
+    if (schule) return getDisplayNameForOrg(schule);
+    return '';
   });
-
-  const translatedSchulname: ComputedRef<string> = computed(
-    () =>
-      schulen.value?.find(
-        (schule: TranslatedObject) => schule.value === organisationStore.createdKlasse?.administriertVon,
-      )?.title || '',
-  );
 
   const isFormDirty: Ref<boolean> = ref(false);
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
@@ -54,11 +45,6 @@
   }
 
   async function initStores(): Promise<void> {
-    await organisationStore.getAllOrganisationen({
-      includeTyp: OrganisationsTyp.Schule,
-      systemrechte: [RollenSystemRecht.KlassenVerwalten],
-      limit: 25,
-    });
     organisationStore.createdKlasse = null;
     organisationStore.errorCode = '';
   }
@@ -121,7 +107,6 @@
       undefined,
       undefined,
       OrganisationsTyp.Klasse,
-      undefined,
       selectedSchule,
       selectedSchule,
     );
@@ -136,6 +121,15 @@
 
   onUnmounted(() => {
     window.removeEventListener('beforeunload', preventNavigation);
+  });
+
+  onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
+    if (isFormDirty.value) {
+      showUnsavedChangesDialog.value = true;
+      blockedNext = next;
+    } else {
+      next();
+    }
   });
 </script>
 
@@ -184,7 +178,7 @@
 
       <!-- Result template on success after submit -->
       <template v-if="organisationStore.createdKlasse && !organisationStore.errorCode">
-        <SuccessTemplate
+        <KlasseSuccessTemplate
           :successMessage="$t('admin.klasse.klasseAddedSuccessfully')"
           :followingDataCreated="$t('admin.followingDataCreated')"
           :createdData="[

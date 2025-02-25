@@ -75,6 +75,7 @@
   import type { TranslatedObject } from '@/types';
   import { DIN_91379A, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
   import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
+  import { isKopersRolle } from '@/utils/validationPersonenkontext';
   import BefristungInput from '@/components/admin/personen/BefristungInput.vue';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
@@ -201,7 +202,7 @@
     isChangeKlasseFormActive.value = false;
   };
 
-  const prepareChangeBerfristung = (): void => {
+  const prepareChangeBefristung = (): void => {
     pendingChangeBefristung.value = true;
     isChangeBefristungActive.value = false;
   };
@@ -401,8 +402,6 @@
         deleteSuccessDialogVisible.value = false;
         navigateToPersonTable();
       };
-    } else {
-      closeDeleteSuccessDialog();
     }
   };
 
@@ -525,14 +524,6 @@
     return !!rolle && rolle.rollenart === RollenArt.Lern;
   }
 
-  // Used for the form
-  function isKopersRolle(selectedRolleId: string | undefined): boolean {
-    const rolle: TranslatedRolleWithAttrs | undefined = rollen.value?.find(
-      (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
-    );
-    return !!rolle && !!rolle.merkmale && rolle.merkmale.has(RollenMerkmal.KopersPflicht);
-  }
-
   const hasKopersNummer: ComputedRef<boolean> = computed(() => {
     return !!personStore.currentPerson?.person.personalnummer;
   });
@@ -573,10 +564,10 @@
     (newValue: Zuordnung | undefined) => {
       if (newValue) {
         const organisationId: string | undefined = newValue.sskId;
-        const rolleId: string | undefined = newValue.rolleId;
+        const rollenIds: string[] | undefined = [newValue.rolleId];
 
         // Trigger the API call
-        personenkontextStore.processWorkflowStep({ organisationId, rolleId, limit: 25 });
+        personenkontextStore.processWorkflowStep({ organisationId, rollenIds, limit: 25 });
       }
     },
     { immediate: true }, // Run on initialization if there's already a selected Zuordnung
@@ -721,7 +712,7 @@
     selectedBefristung,
     selectedBefristungOption,
     calculatedBefristung,
-    selectedRolle,
+    selectedRollen: computed(() => (selectedRolle.value ? [selectedRolle.value] : [])),
   });
 
   const {
@@ -733,7 +724,7 @@
     selectedBefristung: selectedChangeBefristung,
     selectedBefristungOption: selectedChangeBefristungOption,
     calculatedBefristung,
-    selectedRolle: changeBefristungRolle,
+    selectedRollen: computed(() => (changeBefristungRolle.value ? [changeBefristungRolle.value] : [])),
   });
 
   async function navigateBackToKopersForm(): Promise<void> {
@@ -1232,7 +1223,7 @@
       .map((zuordnung: Zuordnung | undefined) => (zuordnung === currentZuordnung ? newZuordnung.value : zuordnung))
       .filter((zuordnung: Zuordnung | undefined): zuordnung is Zuordnung => zuordnung !== undefined);
 
-    prepareChangeBerfristung();
+    prepareChangeBefristung();
   };
 
   const cancelAddition = (): void => {
@@ -1404,12 +1395,12 @@
 
   // Computed property to check if the second radio button should be disabled
   const isUnbefristetButtonDisabled: ComputedRef<boolean> = computed(() => {
-    return isBefristungspflichtRolle(selectedRolle.value);
+    return isBefristungspflichtRolle([selectedRolle.value as string]);
   });
 
   const intersectingOrganisations: ComputedRef<Set<Organisation>> = computed(() => {
     const adminOrganisationIds: Set<string> = new Set(
-      authStore.currentUser?.personenkontexte?.map((pk: PersonenkontextRolleFieldsResponse) => pk.organisationsId),
+      authStore.currentUser?.personenkontexte?.map((pk: PersonenkontextRolleFieldsResponse) => pk.organisation.id),
     );
     return new Set<Organisation>(
       organisationStore.parentOrganisationen.filter((userOrg: Organisation) => adminOrganisationIds.has(userOrg.id)),
@@ -1538,26 +1529,28 @@
           <!-- Error Message Display if the personStore throws any kind of error (Not being able to load the person) -->
           <SpshAlert
             :model-value="!!personStore.errorCode"
-            :type="'error'"
-            :closable="false"
-            :text="$t(`admin.person.errors.${personStore.errorCode}`)"
-            :showButton="true"
             :buttonText="alertButtonTextKopers"
             :buttonAction="alertButtonActionKopers"
+            :closable="false"
+            ref="person-store-error-alert"
+            :showButton="true"
+            :text="$t(`admin.person.errors.${personStore.errorCode}`)"
             :title="$t(`admin.person.title.${personStore.errorCode}`)"
+            :type="'error'"
             @update:modelValue="handleAlertClose"
           />
 
           <!-- Error Message Display if the personenkontextStore throws any kind of error (Not being able to load the kontext) -->
           <SpshAlert
             :model-value="!!personenkontextStore.errorCode"
-            :type="'error'"
-            :closable="false"
-            :text="creationErrorText"
-            :showButton="true"
             :buttonText="alertButtonText"
             :buttonAction="alertButtonAction"
+            :closable="false"
+            ref="personenkontext-store-error-alert"
+            :showButton="true"
+            :text="creationErrorText"
             :title="creationErrorTitle"
+            :type="'error'"
             @update:modelValue="handleAlertClose"
           />
         </v-container>
@@ -1821,6 +1814,7 @@
                   @onClearPassword="password = ''"
                   @onResetPassword="resetPassword(currentPersonId)"
                   :password="password"
+                  ref="password-reset"
                   :testId="'password-reset'"
                 >
                 </PasswordReset>
@@ -2146,6 +2140,7 @@
                     :zuordnungCount="
                       zuordnungenResult?.filter((zuordnung: Zuordnung) => zuordnung.editable).length ?? 0
                     "
+                    ref="personenkontext-delete"
                     @onDeletePersonenkontext="prepareDeletion"
                   >
                   </PersonenkontextDelete>
@@ -2293,10 +2288,11 @@
               <v-container class="px-lg-16">
                 <!-- Organisation, Rolle, Klasse zuordnen -->
                 <PersonenkontextCreate
-                  ref="personenkontext-create"
+                  :allowMultipleRollen="false"
                   :showHeadline="false"
                   :organisationen="organisationen"
                   :rollen="filteredRollen"
+                  ref="personenkontext-create"
                   :klassen="klassen"
                   :selectedOrganisationProps="selectedOrganisationProps"
                   :selectedRolleProps="selectedRolleProps"
@@ -2305,7 +2301,7 @@
                     befristungProps: selectedBefristungProps,
                     befristungOptionProps: selectedBefristungOptionProps,
                     isUnbefristetDisabled: isUnbefristetButtonDisabled,
-                    isBefristungRequired: isBefristungspflichtRolle(selectedRolle),
+                    isBefristungRequired: isBefristungspflichtRolle([selectedRolle as string]),
                     nextSchuljahresende: getNextSchuljahresende(),
                     befristung: selectedBefristung,
                     befristungOption: selectedBefristungOption,
@@ -2322,7 +2318,9 @@
                   @fieldReset="handleFieldReset"
                 />
                 <KopersInput
-                  v-if="!hasKopersNummer && isKopersRolle(selectedRolle) && selectedOrganisation"
+                  v-if="
+                    !hasKopersNummer && isKopersRolle([selectedRolle as string], filteredRollen) && selectedOrganisation
+                  "
                   :hasNoKopersNr="hasNoKopersNr"
                   v-model:selectedKopersNr="selectedKopersNr"
                   :selectedKopersNrProps="selectedKopersNrProps"
@@ -2436,11 +2434,11 @@
               @submit="onSubmitChangeBefristung"
             >
               <BefristungInput
-                ref="befristung"
+                ref="befristung-input-wrapper"
                 :befristungProps="selectedChangeBefristungProps"
                 :befristungOptionProps="selectedChangeBefristungOptionProps"
-                :isUnbefristetDisabled="isBefristungspflichtRolle(changeBefristungRolle)"
-                :isBefristungRequired="isBefristungspflichtRolle(changeBefristungRolle)"
+                :isUnbefristetDisabled="isBefristungspflichtRolle([changeBefristungRolle as string])"
+                :isBefristungRequired="isBefristungspflichtRolle([changeBefristungRolle as string])"
                 :nextSchuljahresende="getNextSchuljahresende()"
                 :befristung="selectedChangeBefristung"
                 :befristungOption="selectedChangeBefristungOption"
@@ -2861,6 +2859,7 @@
                   @onClearPassword="password = ''"
                   @onResetPassword="resetDevicePassword(currentPersonId)"
                   :password="devicePassword"
+                  ref="device-password-reset"
                   :testId="'device-password'"
                 >
                 </PasswordReset>
@@ -2903,6 +2902,7 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary"
+                data-testId="close-zuordnung-delete-success-button"
                 @click.stop="closeDeleteSuccessDialog"
               >
                 {{ $t('close') }}
@@ -2926,10 +2926,7 @@
         <v-card-text>
           <v-container>
             <v-row class="text-body bold px-md-16">
-              <v-col
-                offset="1"
-                cols="10"
-              >
+              <v-col class="text-center">
                 <span>{{ $t('person.addZuordnungSuccess') }}</span>
               </v-col>
             </v-row>
@@ -2945,6 +2942,7 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary"
+                data-testId="close-zuordnung-create-success-button"
                 @click.stop="closeCreateSuccessDialog"
               >
                 {{ $t('close') }}
@@ -2987,6 +2985,7 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary"
+                data-testid="change-klasse-success-close"
                 @click.stop="closeChangeKlasseSuccessDialog"
               >
                 {{ $t('close') }}
@@ -3114,6 +3113,7 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary"
+                data-testid="confirm-zuordnung-dialog-addition"
                 @click.stop="confirmDialogAddition"
               >
                 {{ $t('yes') }}
@@ -3169,6 +3169,7 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary"
+                data-testid="confirm-change-klasse-button"
                 @click.stop="confirmDialogChangeKlasse"
               >
                 {{ $t('yes') }}

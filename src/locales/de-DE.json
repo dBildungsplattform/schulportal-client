@@ -169,7 +169,9 @@
       "creationErrorTitle": "Fehler beim Anlegen des Benutzers",
       "deletePerson": "Benutzer löschen",
       "deletePersonConfirmation": "Wollen Sie den Benutzer {firstname} {lastname} sofort und endgültig löschen?",
+      "deletePersonBulkConfirmation": "Möchten Sie wirklich alle Benutzer sofort und endgültig löschen?",
       "deletePersonSuccessMessage": "{firstname} {lastname} wurde erfolgreich gelöscht.",
+      "deletePersonBulkSuccessMessage": "Die Benutzer wurden erfolgreich gelöscht.",
       "devicePassword": {
         "createDevicePassword": "Inbetriebnahme-Passwort erzeugen",
         "createPassword": "Passwort erzeugen",
@@ -279,6 +281,7 @@
           "SERIENNUMMER_NICHT_GEFUNDEN": "Die eingegebene Seriennummer konnte leider nicht gefunden werden. Vergewissern Sie sich bitte, dass Sie eine korrekte Seriennummer eingegeben haben.",
           "SERIENNUMMER_IN_VERWENDUNG": "Die eingegebene Seriennummer ist bereits einem anderen Benutzer zugeordnet. Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut.",
           "OTP_NICHT_GUELTIG": "Ungültiges Einmalpasswort. Bitte versuchen Sie es erneut oder wenden Sie sich an Ihre schulischen Administratorinnen und Administratoren.",
+          "PI_UNAVAILABLE_ERROR": "Leider konnte aus technischen Gründen kein Hardware-Token zugeordnet werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut. Sollte das Problem weiterhin bestehen, geben Sie dazu bitte ein Ticket über den {0} auf.",
           "HARDWARE_TOKEN_SERVICE_FEHLER": "Leider konnte aus technischen Gründen kein Hardware-Token zugeordnet werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut. Sollte das Problem weiterhin bestehen, geben Sie dazu bitte ein Ticket über den {0} auf.",
           "UNKNOWN_ERROR": "Ein unbekannter Fehler ist aufgetreten.",
           "TOKEN_RESET_ERROR": "Leider konnte der Token aus technischen Gründen nicht zurückgesetzt werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut. Sollte das Problem weiterhin bestehen, geben Sie dazu bitte ein Ticket über den {0} auf.",
@@ -497,15 +500,40 @@
       "schulname": "Schulname",
       "schulnameDienststellennummer": "Schulname/Dienststellennummer",
       "schulform": "Schulform",
-      "schuleCreateErrorTitle": "Fehler beim Anlegen der Schule",
       "schuleAddedSuccessfully": "Die Schule wurde erfolgreich hinzugefügt.",
+      "schuleCreateErrorTitle": "Fehler beim Anlegen der Schule",
       "showAll": "Alle Schulen anzeigen"
     },
     "schultraeger": {
+      "addNew": "Neuen Schulträger hinzufügen",
+      "assignSchultraegerform": "Schulträgerform zuordnen",
+      "create": "Schulträger anlegen",
+      "createAnother": "Weiteren Schulträger anlegen",
+      "createNew": "Neuen Schulträger anlegen",
+      "discard": "Schulträger verwerfen",
+      "enterSchultraegername": "Schulträgername eingeben",
       "errors": {
-        "TRAEGER_IN_TRAEGER": "Ein Schulträger darf nur einem anderen Schulträger zugeordnet werden."
+        "TRAEGER_IN_TRAEGER": "Ein Schulträger darf nur einem anderen Schulträger zugeordnet werden.",
+        "ORGANISATION_SPECIFICATION_ERROR": "Der Schulträger konnte nicht angelegt werden.",
+        "SCHULTRAEGER_ERROR": "Mögliche Schulträger konnten nicht geladen werden.",
+        "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Die letzte Aktion konnte nicht ausgeführt werden. Aufgrund von längerer Inaktivität ist eine erneute Authentifizierung mit einem zweiten Faktor erforderlich. Um fortzufahren, klicken Sie bitte auf „Zurück zur Ergebnisliste“ oder „Schließen“. Sie werden anschließend zur Eingabe Ihres zweiten Faktors aufgefordert."
       },
-      "management": "Schulträgerverwaltung"
+      "management": "Schulträgerverwaltung",
+      "rules": {
+        "schultraegername": {
+          "matches": "Der Schulträgername darf keine ungültigen Zeichen beinhalten.",
+          "noLeadingTrailingSpaces": "Der Schulträgername darf nicht mit Leerzeichen beginnen oder enden.",
+          "required": "Der Schulträgername muss angegeben werden."
+        }
+      },
+      "schultraegerAddedSuccessfully": "Der Schulträger wurde erfolgreich hinzugefügt.",
+      "schultraegerCreateErrorTitle": "Fehler beim Anlegen des Schulträgers",
+      "schultraegerform": "Schulträgerform",
+      "schultraegername": "Schulträgername",
+      "title": {
+        "ORGANISATION_SPECIFICATION_ERROR": "Fehler bei Anlage des Schulträgers",
+        "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Zwei-Faktor-Authentifizierung (2FA) erforderlich"
+      }
     },
     "serviceProvider": {
       "assignServiceProvider": "Angebote zuordnen",

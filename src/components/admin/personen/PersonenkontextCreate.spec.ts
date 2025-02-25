@@ -127,7 +127,7 @@ beforeEach(() => {
     ],
     rollen: [],
     selectedOrganisation: null,
-    selectedRolle: null,
+    selectedRollen: null,
     canCommit: true,
   };
 
@@ -149,7 +149,7 @@ beforeEach(() => {
     ],
     organisations: [],
     selectedOrganisation: null,
-    selectedRolle: null,
+    selectedRollen: null,
     canCommit: true,
   };
 
@@ -439,5 +439,21 @@ describe('PersonenkontextCreate', () => {
     await nextTick();
 
     expect(klassenAutocomplete?.text()).toBeFalsy();
+  });
+
+  it('emits update:calculatedBefristungOption event', async () => {
+    // Simulate selecting organization and role to enable Befristung input
+    await wrapper?.findComponent({ ref: 'organisation-select' }).setValue('org1');
+    await wrapper?.findComponent({ ref: 'rolle-select' }).setValue('rolle1');
+
+    // Get the BefristungInput component
+    const befristungInput: VueWrapper | undefined = wrapper?.findComponent({ name: 'BefristungInput' });
+
+    // Emit the event from the child component
+    await befristungInput?.vm.$emit('update:calculatedBefristungOption', 'someOption');
+
+    // Assert that the parent component emitted the event
+    expect(wrapper?.emitted('update:calculatedBefristungOption')).toBeTruthy();
+    expect(wrapper?.emitted('update:calculatedBefristungOption')![0]).toEqual(['someOption']);
   });
 });

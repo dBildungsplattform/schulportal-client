@@ -51,11 +51,17 @@ export type PersonenkontextFieldDefinitions = {
 type Schema = StringSchema<string | undefined, AnyObject, undefined, ''>;
 
 // Used for the form
-function isKopersRolle(selectedRolleId: string | undefined): boolean {
-  const rolle: TranslatedRolleWithAttrs | undefined = rollen.value?.find(
-    (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
+export function isKopersRolle(
+  selectedRolleIds: string[] | undefined,
+  translatedRollen: TranslatedRolleWithAttrs[] | undefined,
+): boolean {
+  if (!selectedRolleIds || selectedRolleIds.length === 0) return false;
+  return (
+    translatedRollen?.some(
+      (r: TranslatedRolleWithAttrs) =>
+        selectedRolleIds.includes(r.value) && r.merkmale?.has(RollenMerkmal.KopersPflicht),
+    ) || false
   );
-  return !!rolle && !!rolle.merkmale && rolle.merkmale.has(RollenMerkmal.KopersPflicht);
 }
 
 const bestfristungSchema = (t: (key: string) => string): StringSchema =>
@@ -65,7 +71,7 @@ const bestfristungSchema = (t: (key: string) => string): StringSchema =>
     .matches(DDMMYYYY, t('admin.befristung.rules.format')) // Ensure the date matches the DDMMYYYY format
     .when(['selectedRolle', 'selectedBefristungOption'], {
       is: (selectedRolleId: string, selectedBefristungOption: string | undefined) =>
-        isBefristungspflichtRolle(selectedRolleId) && selectedBefristungOption === undefined, // Conditional required
+        isBefristungspflichtRolle([selectedRolleId]) && selectedBefristungOption === undefined, // Conditional required
       then: (schema: Schema) => schema.required(t('admin.befristung.rules.required')),
     });
 
@@ -93,7 +99,7 @@ export const getValidationSchema = (
         .when('selectedRolle', {
           is: (selectedRolleId: string) => {
             // Check if the selected role requires a KopersNr
-            return isKopersRolle(selectedRolleId) && !hasKopersNummer.value;
+            return isKopersRolle([selectedRolleId], rollen.value) && !hasKopersNummer.value;
           },
           // Now apply the conditional logic based on `hasNoKopersNr`
           then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>

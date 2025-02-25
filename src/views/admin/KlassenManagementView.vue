@@ -44,6 +44,7 @@
   ];
   // Define headers as a mutable array
   let headers: Ref<Mutable<TableHeaders>> = ref([...defaultHeaders]);
+  // eslint-disable-next-line @typescript-eslint/typedef
   const schulenFilterRef = useTemplateRef('schule-select');
 
   const selectedSchuleId: ComputedRef<string | null> = computed(() => {
@@ -115,7 +116,7 @@
   }
 
   async function getPaginatedKlassen(page: number): Promise<void> {
-    searchFilterStore.klassenPage = page || 1;
+    searchFilterStore.klassenPage = page;
 
     if (selectedSchuleId.value) {
       fetchKlassenBySelectedSchuleId(selectedSchuleId.value);
@@ -135,7 +136,7 @@
       searchFilterStore.klassenPage = 1;
     }
 
-    searchFilterStore.klassenPerPage = limit || 1;
+    searchFilterStore.klassenPerPage = limit;
 
     if (selectedSchuleId.value) {
       fetchKlassenBySelectedSchuleId(selectedSchuleId.value);
