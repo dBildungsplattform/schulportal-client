@@ -65,6 +65,10 @@
     selectedKlassenname: organisationStore.currentKlasse?.name,
   }));
   const isFormDirty: Ref<boolean> = ref(false);
+  const hasUnsavedChanges: ComputedRef<boolean> = computed(() => {
+    if (organisationStore.updatedOrganisation) return false;
+    return isFormDirty.value;
+  });
 
   let blockedNext: () => void = () => {};
 
@@ -84,7 +88,7 @@
   }
 
   function handleCancel(next?: NavigationGuardNext): void {
-    if (isFormDirty.value) {
+    if (hasUnsavedChanges.value) {
       showUnsavedChangesDialog.value = true;
       if (next) blockedNext = next;
     } else {
@@ -93,7 +97,7 @@
   }
 
   function preventNavigation(event: BeforeUnloadEvent): void {
-    if (!isFormDirty.value) return;
+    if (!hasUnsavedChanges.value) return;
     event.preventDefault();
     /* Chrome requires returnValue to be set. */
     event.returnValue = '';
@@ -171,7 +175,7 @@
   });
 
   onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
-    if (isFormDirty.value) {
+    if (hasUnsavedChanges.value) {
       showUnsavedChangesDialog.value = true;
       blockedNext = next;
     } else {

@@ -34,11 +34,20 @@
   });
 
   const isFormDirty: Ref<boolean> = ref(false);
+  const hasUnsavedChanges: ComputedRef<boolean> = computed(() => {
+    if (organisationStore.createdKlasse) return false;
+    return isFormDirty.value;
+  });
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
   let blockedNext: () => void = () => {};
 
+  function resetForm(): void {
+    // eslint-disable-next-line @typescript-eslint/dot-notation
+    formRef['value']?.reset();
+  }
+
   function preventNavigation(event: BeforeUnloadEvent): void {
-    if (!isFormDirty.value) return;
+    if (!hasUnsavedChanges.value) return;
     event.preventDefault();
     /* Chrome requires returnValue to be set. */
     event.returnValue = '';
@@ -49,25 +58,14 @@
     organisationStore.errorCode = '';
   }
 
-  onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
-    if (isFormDirty.value) {
-      showUnsavedChangesDialog.value = true;
-      blockedNext = next;
-    } else {
-      next();
-    }
-  });
-
   const handleCreateAnotherKlasse = async (): Promise<void> => {
-    // eslint-disable-next-line @typescript-eslint/dot-notation
-    formRef['value']?.reset();
+    resetForm();
     await initStores();
     router.push({ name: 'create-klasse' });
   };
 
   async function navigateBackToKlasseForm(): Promise<void> {
-    // eslint-disable-next-line @typescript-eslint/dot-notation
-    formRef['value']?.reset();
+    resetForm();
     if (organisationStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
       await router.push({ name: 'create-klasse' }).then(() => {
         router.go(0);
@@ -80,8 +78,7 @@
 
   async function navigateToKlasseManagement(): Promise<void> {
     if (organisationStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
-      // eslint-disable-next-line @typescript-eslint/dot-notation
-      formRef['value']?.reset();
+      resetForm();
       await router.push({ name: 'create-klasse' }).then(() => {
         router.go(0);
       });
@@ -110,7 +107,6 @@
       selectedSchule,
       selectedSchule,
     );
-    isFormDirty.value = false;
   };
 
   onMounted(async () => {
@@ -124,7 +120,7 @@
   });
 
   onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
-    if (isFormDirty.value) {
+    if (hasUnsavedChanges.value) {
       showUnsavedChangesDialog.value = true;
       blockedNext = next;
     } else {
