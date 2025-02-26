@@ -6,15 +6,16 @@ import {
 } from '@/api-client/generated';
 import type { Organisation } from '@/stores/OrganisationStore';
 import { randomUUID } from 'crypto';
+import { faker } from '@faker-js/faker';
 
 export class DoFactory {
   public static getSchule(props?: Partial<Organisation>): Organisation {
     return {
-      id: randomUUID(),
-      name: `Schule ${this.getRandomNumber({ length: 4 })}`,
-      kennung: this.getRandomNumber({ length: 7 }),
+      id: faker.string.uuid(),
+      name: `${faker.person.firstName()}-${faker.person.lastName()}-Schule`,
+      kennung: faker.string.numeric(7),
       typ: OrganisationsTyp.Schule,
-      administriertVon: randomUUID(),
+      administriertVon: faker.string.uuid(),
       ...props,
     };
   }
@@ -24,8 +25,8 @@ export class DoFactory {
       ...DoFactory.getSchule(),
       // eslint-disable-next-line no-underscore-dangle
       traegerschaft: TraegerschaftTyp._01,
-      administriertVon: '1234567',
-      kennung: 'Schulkennung',
+      administriertVon: faker.string.uuid(),
+      kennung: faker.string.numeric(7),
       kuerzel: 'Schulkürzel',
       itslearningEnabled: true,
       namensergaenzung: null,
@@ -60,17 +61,7 @@ export class DoFactory {
       sub: 'c71be903-d0ec-4207-b653-40c114680b63',
       personenkontexte: [
         {
-          organisation: {
-            ...DoFactory.getSchule(),
-            // eslint-disable-next-line no-underscore-dangle
-            traegerschaft: TraegerschaftTyp._01,
-            administriertVon: '1234567',
-            kennung: 'Schulkennung',
-            kuerzel: 'Schulkürzel',
-            itslearningEnabled: true,
-            namensergaenzung: null,
-            version: 1,
-          },
+          organisation: this.getOrganisationResponse(),
           rolle: {
             systemrechte: ['ROLLEN_VERWALTEN', 'SCHULEN_VERWALTEN', 'IMPORT_DURCHFUEHREN', 'PERSON_SYNCHRONISIEREN'],
             serviceProviderIds: ['789897798'],

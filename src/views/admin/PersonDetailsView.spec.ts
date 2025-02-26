@@ -3,7 +3,9 @@ import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
 import routes from '@/router/routes';
 import { useAuthStore, type AuthStore, type UserInfo } from '@/stores/AuthStore';
 import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
+import { useImportStore, type ImportStore } from '@/stores/ImportStore';
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+import { usePersonInfoStore, type PersonInfoStore } from '@/stores/PersonInfoStore';
 import {
   parseUserLock,
   PersonLockOccasion,
@@ -14,7 +16,9 @@ import {
   type UserLock,
 } from '@/stores/PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
-import { RollenArt, RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
+import { RollenArt, RollenMerkmal, RollenSystemRecht, useRolleStore, type RolleStore } from '@/stores/RolleStore';
+import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
+import { useServiceProviderStore, type ServiceProviderStore } from '@/stores/ServiceProviderStore';
 import {
   useTwoFactorAuthentificationStore,
   type TwoFactorAuthentificationStore,
@@ -22,6 +26,7 @@ import {
 import { DoFactory } from '@/testing/DoFactory';
 import { adjustDateForTimezoneAndFormat, getNextSchuljahresende } from '@/utils/date';
 import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
+import * as _ from 'lodash-es';
 import { expect, test, type MockInstance } from 'vitest';
 import { nextTick, type ComputedRef, type DefineComponent } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
@@ -31,11 +36,16 @@ let wrapper: VueWrapper | null = null;
 let router: Router;
 
 const authStore: AuthStore = useAuthStore();
+const configStore: ConfigStore = useConfigStore();
+const importStore: ImportStore = useImportStore();
 const organisationStore: OrganisationStore = useOrganisationStore();
+const personInfoStore: PersonInfoStore = usePersonInfoStore();
 const personStore: PersonStore = usePersonStore();
 const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
+const rolleStore: RolleStore = useRolleStore();
+const searchFilterStore: SearchFilterStore = useSearchFilterStore();
+const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
 const twoFactorAuthenticationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
-const configStore: ConfigStore = useConfigStore();
 
 const mockPerson: Personendatensatz = {
   person: {
@@ -167,6 +177,13 @@ const mockPersonenuebersichtLehr: PersonWithUebersicht = {
 
 describe('PersonDetailsView', () => {
   beforeEach(async () => {
+    authStore.$reset();
+    organisationStore.$reset();
+    personStore.$reset();
+    personenkontextStore.$reset();
+    twoFactorAuthenticationStore.$reset();
+    configStore.$reset();
+
     personenkontextStore.workflowStepResponse = {
       organisations: [
         {
@@ -262,6 +279,11 @@ describe('PersonDetailsView', () => {
     personStore.currentPerson = mockPerson;
     personStore.personenuebersicht = mockPersonenuebersicht;
 
+    configStore.configData = {
+      befristungBearbeitenEnabled: true,
+      rolleBearbeitenEnabled: true,
+    };
+
     document.body.innerHTML = `
     <div>
       <div id="app"></div>
@@ -285,15 +307,6 @@ describe('PersonDetailsView', () => {
         plugins: [router],
       },
     });
-
-    configStore.configData = {
-      befristungBearbeitenEnabled: true,
-      rolleBearbeitenEnabled: true,
-    };
-
-    authStore.currentUser = mockCurrentUser;
-    personStore.currentPerson = mockPerson;
-    personStore.personenuebersicht = mockPersonenuebersicht;
   });
 
   const setCurrentPerson = (emailStatus: EmailAddressStatus): void => {
@@ -930,6 +943,43 @@ describe('PersonDetailsView', () => {
     expect(wrapper?.find('[data-testid="zuordnung-edit-button"]').isVisible()).toBe(true);
   });
 
+  test('it submits the form to lock the user', async () => {
+    if (personStore.currentPerson) {
+      personStore.currentPerson.person.isLocked = false;
+      personStore.currentPerson.person.userLock = null;
+    }
+    const openLockDialogButton: DOMWrapper<Element> | undefined = wrapper?.find(
+      '[data-testid="open-lock-dialog-button"]',
+    );
+    openLockDialogButton?.trigger('click');
+    await nextTick();
+
+    expect(document.querySelector('[data-testid="lock-user-info-text"]')).not.toBeNull();
+
+    const unbefristetRadioButton: HTMLElement = (await document.querySelector(
+      '[data-testid="unbefristet-radio-button"] input[type="radio"]',
+    )) as HTMLElement;
+
+    expect(unbefristetRadioButton).not.toBeNull();
+    unbefristetRadioButton.click();
+    unbefristetRadioButton.dispatchEvent(new Event('click'));
+
+    const lockUserButton: HTMLElement = (await document.querySelector(
+      '[data-testid="lock-user-button"]',
+    )) as HTMLElement;
+
+    expect(lockUserButton).not.toBeNull();
+    lockUserButton.click();
+    lockUserButton.dispatchEvent(new Event('click'));
+    await nextTick();
+    await flushPromises();
+    await flushPromises();
+
+    expect(personStore.lockPerson).toHaveBeenCalled();
+    // reset personenuebersicht
+    personStore.personenuebersicht = mockPersonenuebersicht;
+  });
+
   describe('change befristung', () => {
     test('it shows befristung change form', async () => {
       await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
@@ -956,12 +1006,6 @@ describe('PersonDetailsView', () => {
       await nextTick();
 
       expect(wrapper?.find('[data-testid="befristung-change-button"]').exists()).toBe(false);
-
-      /* reset config data */
-      configStore.configData = {
-        befristungBearbeitenEnabled: true,
-        rolleBearbeitenEnabled: true,
-      };
     });
 
     test('button only active if one zuordnung is selected', async () => {
@@ -986,43 +1030,6 @@ describe('PersonDetailsView', () => {
       expect(wrapper?.find('[data-testid="befristung-change-button"]').attributes('disabled')).toBeDefined();
     });
 
-    test('it submits the form to lock the user', async () => {
-      if (personStore.currentPerson) {
-        personStore.currentPerson.person.isLocked = false;
-        personStore.currentPerson.person.userLock = null;
-      }
-      const openLockDialogButton: DOMWrapper<Element> | undefined = wrapper?.find(
-        '[data-testid="open-lock-dialog-button"]',
-      );
-      openLockDialogButton?.trigger('click');
-      await nextTick();
-
-      expect(document.querySelector('[data-testid="lock-user-info-text"]')).not.toBeNull();
-
-      const unbefristetRadioButton: HTMLElement = (await document.querySelector(
-        '[data-testid="unbefristet-radio-button"] input[type="radio"]',
-      )) as HTMLElement;
-
-      expect(unbefristetRadioButton).not.toBeNull();
-      unbefristetRadioButton.click();
-      unbefristetRadioButton.dispatchEvent(new Event('click'));
-
-      const lockUserButton: HTMLElement = (await document.querySelector(
-        '[data-testid="lock-user-button"]',
-      )) as HTMLElement;
-
-      expect(lockUserButton).not.toBeNull();
-      lockUserButton.click();
-      lockUserButton.dispatchEvent(new Event('click'));
-      await nextTick();
-      await flushPromises();
-      await flushPromises();
-
-      expect(personStore.lockPerson).toHaveBeenCalled();
-      // reset personenuebersicht
-      personStore.personenuebersicht = mockPersonenuebersicht;
-    });
-
     test.each([
       ['2099-08-12T13:03:53.802Z', undefined],
       [undefined, 'unbefristet'],
@@ -1030,7 +1037,7 @@ describe('PersonDetailsView', () => {
     ])(
       'renders form to change befristung with %s %s and triggers submit',
       async (existingBefristung: string | undefined, existingBefristungOption: string | undefined) => {
-        personStore.personenuebersicht = mockPersonenuebersicht;
+        personStore.personenuebersicht = _.cloneDeep(mockPersonenuebersicht);
         if (personStore.personenuebersicht.zuordnungen[0]) {
           if (existingBefristung) {
             personStore.personenuebersicht.zuordnungen[0].befristung = existingBefristung;
@@ -1100,11 +1107,6 @@ describe('PersonDetailsView', () => {
         await flushPromises();
 
         expect(wrapper?.find('[data-testid="zuordnung-edit-button"]').isVisible()).toBe(true);
-
-        // reset everything
-        authStore.currentUser = mockCurrentUser;
-        personStore.currentPerson = mockPerson;
-        personStore.personenuebersicht = mockPersonenuebersicht;
       },
     );
   });

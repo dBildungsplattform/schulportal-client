@@ -1,12 +1,15 @@
 <script setup lang="ts">
+  import type { LockUserBodyParams } from '@/api-client/generated';
   import type { PersonenkontextRolleFieldsResponse } from '@/api-client/generated/api';
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
   import KlasseChange from '@/components/admin/klassen/KlasseChange.vue';
+  import BefristungInput from '@/components/admin/personen/BefristungInput.vue';
   import KopersInput from '@/components/admin/personen/KopersInput.vue';
   import PasswordReset from '@/components/admin/personen/PasswordReset.vue';
   import PersonDelete from '@/components/admin/personen/PersonDelete.vue';
   import PersonLock from '@/components/admin/personen/PersonLock.vue';
   import PersonSync from '@/components/admin/personen/PersonSync.vue';
+  import PersonenMetadataChange from '@/components/admin/personen/PersonenMetadataChange.vue';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
   import PersonenkontextDelete from '@/components/admin/personen/PersonenkontextDelete.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
@@ -17,6 +20,7 @@
   import { useOrganisationen } from '@/composables/useOrganisationen';
   import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+  import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
   import {
     OrganisationsTyp,
     useOrganisationStore,
@@ -46,14 +50,16 @@
     useTwoFactorAuthentificationStore,
     type TwoFactorAuthentificationStore,
   } from '@/stores/TwoFactorAuthentificationStore';
-  import PersonenMetadataChange from '@/components/admin/personen/PersonenMetadataChange.vue';
+  import type { TranslatedObject } from '@/types';
   import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
   import { adjustDateForTimezoneAndFormat, formatDate, formatDateToISO, getNextSchuljahresende } from '@/utils/date';
+  import { DIN_91379A, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
   import {
     getBefristungSchema,
     getDirtyState,
     getPersonenkontextFieldDefinitions,
     getValidationSchema,
+    isKopersRolle,
     type PersonenkontextFieldDefinitions,
   } from '@/utils/validationPersonenkontext';
   import { toTypedSchema } from '@vee-validate/yup';
@@ -71,12 +77,6 @@
   } from 'vue-router';
   import { useDisplay } from 'vuetify';
   import { object, string, StringSchema, type AnyObject } from 'yup';
-  import type { LockUserBodyParams } from '@/api-client/generated';
-  import type { TranslatedObject } from '@/types';
-  import { DIN_91379A, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
-  import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
-  import { isKopersRolle } from '@/utils/validationPersonenkontext';
-  import BefristungInput from '@/components/admin/personen/BefristungInput.vue';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
