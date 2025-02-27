@@ -1,4 +1,8 @@
-import { RollenSystemRecht, TraegerschaftTyp, type PersonenkontextRolleFieldsResponse } from '@/api-client/generated';
+import {
+  RollenSystemRecht,
+  type PersonenkontextRolleFieldsResponse,
+  type RollenSystemRechtServiceProviderIDResponse,
+} from '@/api-client/generated';
 import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 import {
   OrganisationsTyp,
@@ -6,6 +10,7 @@ import {
   type OrganisationenFilter,
   type OrganisationStore,
 } from '@/stores/OrganisationStore';
+import { DoFactory } from '@/testing/DoFactory';
 import { flushPromises, mount, type VueWrapper } from '@vue/test-utils';
 import type { BaseFieldProps } from 'vee-validate';
 import type { MockInstance } from 'vitest';
@@ -72,19 +77,9 @@ describe('SchulenFilter', async () => {
         label: string;
         autoSelectedSchule: PersonenkontextRolleFieldsResponse['organisation'] | null;
       };
-      const tempSchule: PersonenkontextRolleFieldsResponse['organisation'] = {
+      const tempSchule: PersonenkontextRolleFieldsResponse['organisation'] = DoFactory.getOrganisationResponse({
         id: 'auto-selected-schule-id',
-        kennung: '23314',
-        name: 'Siegbert-Schwafel-Schule',
-        typ: OrganisationsTyp.Schule,
-        administriertVon: null,
-        namensergaenzung: null,
-        kuerzel: '',
-        // eslint-disable-next-line no-underscore-dangle
-        traegerschaft: TraegerschaftTyp._01,
-        itslearningEnabled: true,
-        version: 1,
-      };
+      });
       describe.each([
         {
           label: 'auto-selected',
@@ -95,55 +90,32 @@ describe('SchulenFilter', async () => {
           autoSelectedSchule: null,
         },
       ])('when schule is $label', ({ autoSelectedSchule }: AutoselectTestData) => {
+        const rolle: RollenSystemRechtServiceProviderIDResponse =
+          DoFactory.getRollenSystemRechtServiceProviderIDResponse({
+            systemrechte: [RollenSystemRecht.KlassenVerwalten, RollenSystemRecht.SchulenVerwalten],
+          });
         beforeEach(() => {
-          authStore.currentUser = {
-            sub: 'blaaaah',
-            name: null,
-            given_name: null,
-            family_name: null,
-            middle_name: null,
-            nickname: null,
-            preferred_username: null,
-            profile: null,
-            picture: null,
-            website: null,
-            email: null,
-            email_verified: null,
-            gender: null,
-            birthdate: null,
-            zoneinfo: null,
-            locale: null,
-            phone_number: null,
-            updated_at: null,
-            personId: null,
+          authStore.currentUser = DoFactory.getUserinfoResponse({
             personenkontexte: autoSelectedSchule
               ? [
-                  {
+                  DoFactory.getPersonenkontextRolleFieldsResponse({
                     organisation: autoSelectedSchule,
-                    rolle: {
-                      systemrechte: [RollenSystemRecht.KlassenVerwalten, RollenSystemRecht.SchulenVerwalten],
-                      serviceProviderIds: ['some-sp-id'],
-                    },
-                  },
+                    rolle,
+                  }),
                 ]
               : [
+                  DoFactory.getPersonenkontextRolleFieldsResponse({
+                    rolle,
+                  }),
+                  DoFactory.getPersonenkontextRolleFieldsResponse({
+                    rolle,
+                  }),
                   {
                     organisation: tempSchule,
-                    rolle: {
-                      systemrechte: [RollenSystemRecht.KlassenVerwalten, RollenSystemRecht.SchulenVerwalten],
-                      serviceProviderIds: ['some-sp-id'],
-                    },
-                  },
-                  {
-                    organisation: tempSchule,
-                    rolle: {
-                      systemrechte: [RollenSystemRecht.KlassenVerwalten, RollenSystemRecht.SchulenVerwalten],
-                      serviceProviderIds: ['some-sp-id'],
-                    },
+                    rolle,
                   },
                 ],
-            password_updated_at: null,
-          };
+          });
         });
         type InitialIdsTestData = {
           label: string;

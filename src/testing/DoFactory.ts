@@ -1,7 +1,10 @@
 import {
   OrganisationsTyp,
+  RollenSystemRecht,
   TraegerschaftTyp,
   type OrganisationResponse,
+  type PersonenkontextRolleFieldsResponse,
+  type RollenSystemRechtServiceProviderIDResponse,
   type UserinfoResponse,
 } from '@/api-client/generated';
 import type { Organisation } from '@/stores/OrganisationStore';
@@ -71,6 +74,31 @@ export class DoFactory {
           },
         },
       ],
+      ...props,
+    };
+  }
+
+  public static getPersonenkontextRolleFieldsResponse(
+    props?: Partial<PersonenkontextRolleFieldsResponse>,
+  ): PersonenkontextRolleFieldsResponse {
+    return {
+      organisation: this.getOrganisationResponse(),
+      rolle: this.getRollenSystemRechtServiceProviderIDResponse(),
+      ...props,
+    };
+  }
+
+  public static getRollenSystemRechtServiceProviderIDResponse(
+    props?: Partial<RollenSystemRechtServiceProviderIDResponse>,
+  ): RollenSystemRechtServiceProviderIDResponse {
+    return {
+      systemrechte: [
+        RollenSystemRecht.RollenVerwalten,
+        RollenSystemRecht.SchulenVerwalten,
+        RollenSystemRecht.ImportDurchfuehren,
+        RollenSystemRecht.PersonSynchronisieren,
+      ],
+      serviceProviderIds: [faker.string.uuid()],
       ...props,
     };
   }
