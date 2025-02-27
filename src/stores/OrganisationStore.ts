@@ -64,6 +64,7 @@ type OrganisationState = {
     loading: boolean;
   };
   allSchulen: Array<Organisation>;
+  allSchultraeger: Array<Organisation>;
   currentOrganisation: Organisation | null;
   currentKlasse: Organisation | null;
   updatedOrganisation: Organisation | null;
@@ -74,6 +75,8 @@ type OrganisationState = {
   totalKlassen: number;
   totalSchulen: number;
   totalPaginatedSchulen: number;
+  totalSchultraeger: number;
+  totalPaginatedSchultraeger: number;
   totalPaginatedKlassen: number;
   totalPaginatedOrganisationen: number;
   totalOrganisationen: number;
@@ -143,6 +146,7 @@ export const useOrganisationStore: StoreDefinition<
         loading: false,
       },
       allSchulen: [],
+      allSchultraeger: [],
       currentOrganisation: null,
       currentKlasse: null,
       updatedOrganisation: null,
@@ -153,6 +157,8 @@ export const useOrganisationStore: StoreDefinition<
       totalKlassen: 0,
       totalSchulen: 0,
       totalPaginatedSchulen: 0,
+      totalSchultraeger: 0,
+      totalPaginatedSchultraeger: 0,
       totalPaginatedKlassen: 0,
       totalPaginatedOrganisationen: 0,
       totalOrganisationen: 0,
@@ -192,6 +198,10 @@ export const useOrganisationStore: StoreDefinition<
           this.totalSchulen = +response.headers['x-paging-total'];
           // The paginated total number to show in the autocomplete filters.
           this.totalPaginatedSchulen = +response.headers['x-paging-pagetotal'];
+        } else if (filter?.includeTyp === OrganisationsTyp.Traeger) {
+          this.allSchultraeger = response.data;
+          this.totalSchultraeger = +response.headers['x-paging-total'];
+          this.totalPaginatedSchultraeger = +response.headers['x-paging-pagetotal'];
         } else {
           this.allOrganisationen = response.data;
           this.totalOrganisationen = +response.headers['x-paging-total'];

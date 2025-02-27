@@ -11,7 +11,6 @@
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
   import { type SearchFilterStore, useSearchFilterStore } from '@/stores/SearchFilterStore';
-  import ItsLearningSetup from '@/components/admin/schulen/itsLearningSetup.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import { onBeforeRouteLeave, useRouter, type Router } from 'vue-router';
 
@@ -32,35 +31,30 @@
     { title: t('admin.schule.schulen'), key: 'name', align: 'start' },
   ];
 
-  const allSchulen: Ref<Array<Organisation>> = ref([]);
+  const allSchultraeger: Ref<Array<Organisation>> = ref([]);
 
   async function fetchSchultraeger(): Promise<void> {
     await organisationStore.getAllOrganisationen({
-      offset: (searchFilterStore.schulenPage - 1) * searchFilterStore.schulenPerPage,
-      limit: searchFilterStore.schulenPerPage,
-      includeTyp: OrganisationsTyp.Schultraeger,
+      offset: (searchFilterStore.schultraegerPage - 1) * searchFilterStore.schulentraegerPerPage,
+      limit: searchFilterStore.schulentraegerPerPage,
+      includeTyp: OrganisationsTyp.Traeger,
       systemrechte: ['SCHULTRAEGER_VERWALTEN'],
-      searchString: searchFilterStore.searchFilterSchulen || '',
     });
   }
 
   function getPaginatedSchultraeger(page: number): void {
-    searchFilterStore.schulenPage = page;
+    searchFilterStore.schultraegerPage = page;
     fetchSchultraeger();
   }
 
-  function getPaginatedSchulenWithLimit(limit: number): void {
+  function getPaginatedSchultraegerWithLimit(limit: number): void {
     /* reset page to 1 if entries are equal to or less than selected limit */
     if (organisationStore.totalOrganisationen <= limit) {
-      searchFilterStore.schulenPage = 1;
+      searchFilterStore.schultraegerPage = 1;
     }
 
-    searchFilterStore.schulenPerPage = limit;
-    fetchSchulen();
-  }
-
-  async function toggleItsLearningStatus(organisationId: string): Promise<void> {
-    await organisationStore.setItsLearningForSchule(organisationId);
+    searchFilterStore.schulentraegerPerPage = limit;
+    fetchSchultraeger();
   }
 
   const handleAlertClose = (): void => {
@@ -69,8 +63,8 @@
   };
 
   onMounted(async () => {
-    await fetchSchulen();
-    allSchulen.value = organisationStore.allSchulen;
+    await fetchSchultraeger();
+    allSchultraeger.value = organisationStore.allSchultraeger;
   });
 
   onBeforeRouteLeave(async () => {
@@ -92,15 +86,15 @@
         :model-value="!!organisationStore.errorCode"
         :title="
           organisationStore.errorCode === 'UNSPECIFIED_ERROR'
-            ? $t('admin.schule.loadingErrorTitle')
-            : $t(`admin.schule.title.${organisationStore.errorCode}`)
+            ? $t('admin.schultraeger.loadingErrorTitle')
+            : $t(`admin.schultraeger.title.${organisationStore.errorCode}`)
         "
         :type="'error'"
         :closable="false"
         :text="
           organisationStore.errorCode === 'UNSPECIFIED_ERROR'
-            ? $t('admin.schule.loadingErrorText')
-            : $t(`admin.schule.errors.${organisationStore.errorCode}`)
+            ? $t('admin.schultraeger.loadingErrorText')
+            : $t(`admin.schultraeger.errors.${organisationStore.errorCode}`)
         "
         :showButton="true"
         :buttonText="$t('nav.backToList')"
@@ -115,18 +109,18 @@
         >
         </v-row>
         <ResultTable
-          :currentPage="searchFilterStore.schulenPage"
-          data-testid="schule-table"
-          :items="organisationStore.allSchulen || []"
+          :currentPage="searchFilterStore.schultraegerPage"
+          data-testid="schultraeger-table"
+          :items="organisationStore.allSchultraeger || []"
           :loading="organisationStore.loading"
           :headers="headers"
           item-value-path="id"
           :disableRowClick="true"
-          @onItemsPerPageUpdate="getPaginatedSchulenWithLimit"
+          @onItemsPerPageUpdate="getPaginatedSchultraegerWithLimit"
           @onPageUpdate="getPaginatedSchultraeger"
           ref="result-table"
-          :totalItems="organisationStore.totalSchulen"
-          :itemsPerPage="searchFilterStore.schulenPerPage"
+          :totalItems="organisationStore.totalSchultraeger"
+          :itemsPerPage="searchFilterStore.schulentraegerPerPage"
         >
           <template v-slot:[`item.name`]="{ item }">
             <div
@@ -135,15 +129,6 @@
             >
               {{ item.name }}
             </div>
-          </template>
-          <template v-slot:[`item.itslearning`]="{ item }">
-            <ItsLearningSetup
-              :errorCode="organisationStore.errorCode"
-              :schulname="item.name"
-              :schulId="item.id"
-              :itslearningEnabled="item.itslearningEnabled || false"
-              @onActivateItslearning="toggleItsLearningStatus(item.id)"
-            ></ItsLearningSetup>
           </template>
         </ResultTable>
       </template>
