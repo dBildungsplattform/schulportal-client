@@ -1,10 +1,11 @@
+import { OrganisationsTyp, TraegerschaftTyp } from '@/api-client/generated';
 import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 import { VueWrapper, mount } from '@vue/test-utils';
 import { expect, test, type Mock, type MockInstance } from 'vitest';
 import { h, nextTick } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { VApp } from 'vuetify/components';
 import { useDisplay } from 'vuetify';
+import { VApp } from 'vuetify/components';
 import MenuBar from './MenuBar.vue';
 
 let wrapper: VueWrapper | null = null;
@@ -32,7 +33,19 @@ authStore.currentUser = {
   sub: 'c71be903-d0ec-4207-b653-40c114680b63',
   personenkontexte: [
     {
-      organisationsId: '123456',
+      organisation: {
+        id: '123456',
+        name: '',
+        itslearningEnabled: true,
+        typ: OrganisationsTyp.Schule,
+        administriertVon: null,
+        kennung: null,
+        kuerzel: '',
+        namensergaenzung: '',
+        // eslint-disable-next-line no-underscore-dangle
+        traegerschaft: TraegerschaftTyp._01,
+        version: 1,
+      },
       rolle: {
         systemrechte: ['ROLLEN_VERWALTEN', 'SCHULEN_VERWALTEN'],
         serviceProviderIds: ['789897798'],

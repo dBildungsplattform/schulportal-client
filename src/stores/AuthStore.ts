@@ -1,3 +1,4 @@
+import axiosApiInstance from '@/services/ApiService';
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import {
   AuthApiFactory,
@@ -6,8 +7,6 @@ import {
   type PersonenkontextRolleFieldsResponse,
   type UserinfoResponse,
 } from '../api-client/generated/api';
-import axiosApiInstance from '@/services/ApiService';
-import type { UserinfoPersonenkontext } from './PersonenkontextStore';
 
 export enum StepUpLevel {
   NONE = 'none',
@@ -101,8 +100,8 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
           this.timeLimitInfos = data.timeLimits;
 
           /* extract all system permissions from current user's personenkontexte */
-          const personenkontexte: Array<UserinfoPersonenkontext> | null = this.currentUser.personenkontexte;
-          personenkontexte?.forEach((personenkontext: UserinfoPersonenkontext) => {
+          const personenkontexte: UserInfo['personenkontexte'] = this.currentUser.personenkontexte;
+          personenkontexte?.forEach((personenkontext: (typeof personenkontexte)[number]) => {
             personenkontext.rolle.systemrechte.forEach((systemrecht: string) => {
               /* push unique permissions only */
               if (systemrecht && this.currentUserPermissions.indexOf(systemrecht) === -1)

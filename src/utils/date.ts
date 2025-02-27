@@ -68,6 +68,7 @@ export function formatDateDigitsToGermanDate(date: Date): string {
 export function adjustDateForTimezoneAndFormat(dateString: string | undefined): string {
   if (!dateString) return '';
   const date: Date = new Date(dateString);
+  if (isNaN(date.getTime())) return '';
   if (date.getTimezoneOffset() >= -120) {
     date.setHours(date.getHours() - 1);
   }

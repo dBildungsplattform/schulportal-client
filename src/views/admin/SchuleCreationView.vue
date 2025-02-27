@@ -112,9 +112,9 @@
         undefined,
         undefined,
         OrganisationsTyp.Schule,
+        selectedSchulform.value,
+        selectedSchulform.value,
         undefined,
-        selectedSchulform.value,
-        selectedSchulform.value,
       );
       resetForm({
         values: {
