@@ -500,6 +500,33 @@ describe('OrganisationStore', () => {
         expect(organisationStore.loading).toBe(false);
       });
 
+      it('should throw an error when orga type is unsupported ', async () => {
+        const mockResponse: Organisation[] = [
+          {
+            id: '1',
+            kennung: 'Traeger',
+            name: 'Traeger 1',
+            namensergaenzung: 'Ergänzung',
+            kuerzel: 'O1',
+            typ: OrganisationsTyp.Unbestaetigt,
+            administriertVon: '1',
+          },
+        ];
+
+        mockadapter.onPost('/api/organisationen').replyOnce(200, mockResponse);
+        const createOrganisationPromise: Promise<void> = organisationStore.createOrganisation(
+          'Org1',
+          'Organisation 1',
+          'Ergänzung',
+          '01',
+          OrganisationsTyp.Unbestaetigt,
+        );
+        expect(organisationStore.loading).toBe(true);
+        await createOrganisationPromise;
+        expect(organisationStore.errorCode).toEqual('Type is not supported');
+        expect(organisationStore.loading).toBe(false);
+      });
+
       it('should handle string error', async () => {
         mockadapter.onPost('/api/organisationen').replyOnce(500, 'some mock server error');
         const createOrganisationPromise: Promise<void> = organisationStore.createOrganisation(
@@ -609,31 +636,31 @@ describe('OrganisationStore', () => {
             typ: OrganisationsTyp.Schule,
           },
         ];
-  
+
         mockadapter.onGet(url).replyOnce(200, mockResponse, { 'x-paging-total': '1' });
         const getFilteredSchulenPromise: Promise<void> = sut();
-  
+
         expect(organisationStore.filteredSchulen.loading).toBe(true);
         await getFilteredSchulenPromise;
         expect(organisationStore.filteredSchulen.schulen).toEqual(mockResponse);
         expect(organisationStore.filteredSchulen.total).toEqual(1);
         expect(organisationStore.filteredSchulen.loading).toBe(false);
       });
-  
+
       it('should handle string error', async () => {
         mockadapter.onGet(url).replyOnce(500, 'some mock server error');
         const getFilteredSchulenPromise: Promise<void> = sut();
-  
+
         expect(organisationStore.filteredSchulen.loading).toBe(true);
         await getFilteredSchulenPromise;
         expect(organisationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
         expect(organisationStore.filteredSchulen.loading).toBe(false);
       });
-  
+
       it('should handle error code', async () => {
         mockadapter.onGet(url).replyOnce(500, { code: 'some mock server error' });
         const getFilteredSchulenPromise: Promise<void> = sut();
-  
+
         expect(organisationStore.filteredSchulen.loading).toBe(true);
         await getFilteredSchulenPromise;
         expect(organisationStore.errorCode).toEqual('some mock server error');

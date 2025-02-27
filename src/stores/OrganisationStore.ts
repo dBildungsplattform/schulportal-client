@@ -241,12 +241,12 @@ export const useOrganisationStore: StoreDefinition<
 
       this.allKlassen = this.allKlassen.map((klasse: Organisation) => ({
         ...klasse,
-        schuleDetails: schulenMap.get(klasse.administriertVon || '') || '---',
+        schuleDetails: schulenMap.get(klasse.administriertVon as string) || '---',
       }));
 
       this.klassen = this.klassen.map((klasse: Organisation) => ({
         ...klasse,
-        schuleDetails: schulenMap.get(klasse.administriertVon || '') || '---',
+        schuleDetails: schulenMap.get(klasse.administriertVon as string),
       }));
     },
 
@@ -417,6 +417,8 @@ export const useOrganisationStore: StoreDefinition<
           this.createdSchule = data;
         } else if (typ === OrganisationsTyp.Traeger) {
           this.createdSchultraeger = data;
+        } else {
+          this.errorCode = 'Type is not supported';
         }
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'ORGANISATION_SPECIFICATION_ERROR');
