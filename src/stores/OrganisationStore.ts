@@ -55,6 +55,11 @@ export type SchuleTableItem = {
   updatedAt?: string;
 };
 
+export type SchultraegerFormType = {
+  selectedSchultraegerform: string | undefined;
+  selectedSchultraegername: string | undefined;
+};
+
 type OrganisationState = {
   allOrganisationen: Array<Organisation>;
   allKlassen: Array<Organisation>;
