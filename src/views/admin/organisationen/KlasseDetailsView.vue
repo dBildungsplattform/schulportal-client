@@ -15,7 +15,7 @@
   import { type Composer, useI18n } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
   import { type BaseFieldProps, type TypedSchema, useForm } from 'vee-validate';
-  import KlasseForm from '@/components/form/KlasseForm.vue';
+  import KlasseForm from '@/components/admin/klassen/KlasseForm.vue';
   import KlasseSuccessTemplate from '@/components/admin/klassen/KlasseSuccessTemplate.vue';
   import KlasseDelete from '@/components/admin/klassen/KlasseDelete.vue';
   import { getValidationSchema, getVuetifyConfig } from '@/utils/validationKlasse';
