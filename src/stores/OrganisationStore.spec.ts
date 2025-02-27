@@ -609,31 +609,31 @@ describe('OrganisationStore', () => {
             typ: OrganisationsTyp.Schule,
           },
         ];
-  
+
         mockadapter.onGet(url).replyOnce(200, mockResponse, { 'x-paging-total': '1' });
         const getFilteredSchulenPromise: Promise<void> = sut();
-  
+
         expect(organisationStore.filteredSchulen.loading).toBe(true);
         await getFilteredSchulenPromise;
         expect(organisationStore.filteredSchulen.schulen).toEqual(mockResponse);
         expect(organisationStore.filteredSchulen.total).toEqual(1);
         expect(organisationStore.filteredSchulen.loading).toBe(false);
       });
-  
+
       it('should handle string error', async () => {
         mockadapter.onGet(url).replyOnce(500, 'some mock server error');
         const getFilteredSchulenPromise: Promise<void> = sut();
-  
+
         expect(organisationStore.filteredSchulen.loading).toBe(true);
         await getFilteredSchulenPromise;
         expect(organisationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
         expect(organisationStore.filteredSchulen.loading).toBe(false);
       });
-  
+
       it('should handle error code', async () => {
         mockadapter.onGet(url).replyOnce(500, { code: 'some mock server error' });
         const getFilteredSchulenPromise: Promise<void> = sut();
-  
+
         expect(organisationStore.filteredSchulen.loading).toBe(true);
         await getFilteredSchulenPromise;
         expect(organisationStore.errorCode).toEqual('some mock server error');
