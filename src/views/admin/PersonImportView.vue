@@ -1,7 +1,23 @@
 <script setup lang="ts">
-  import FormWrapper from '@/components/form/FormWrapper.vue';
-  import FormRow from '@/components/form/FormRow.vue';
+  import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import SchulenFilter from '@/components/filter/SchulenFilter.vue';
+  import FormRow from '@/components/form/FormRow.vue';
+  import FormWrapper from '@/components/form/FormWrapper.vue';
+  import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
+  import {
+    ImportDataItemStatus,
+    useImportStore,
+    type ImportedUserResponse,
+    type ImportStore,
+  } from '@/stores/ImportStore';
+  import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
+  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
+  import { RollenArt } from '@/stores/RolleStore';
+  import { toTypedSchema } from '@vee-validate/yup';
+  import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
+  import { computed, onMounted, onUnmounted, ref, watch, type ComputedRef, type Ref } from 'vue';
+  import { useI18n, type Composer } from 'vue-i18n';
   import {
     onBeforeRouteLeave,
     useRouter,
@@ -9,25 +25,8 @@
     type RouteLocationNormalized,
     type Router,
   } from 'vue-router';
-  import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
-  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
-  import { useSchulen } from '@/composables/useSchulen';
-  import { computed, onMounted, onUnmounted, ref, watch, type ComputedRef, type Ref } from 'vue';
-  import type { TranslatedObject } from '@/types';
-  import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
-  import { toTypedSchema } from '@vee-validate/yup';
-  import { mixed, object, string } from 'yup';
-  import { useI18n, type Composer } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
-  import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
-  import {
-    ImportDataItemStatus,
-    type ImportedUserResponse,
-    type ImportStore,
-    useImportStore,
-  } from '@/stores/ImportStore';
-  import { RollenArt } from '@/stores/RolleStore';
-  import SpshAlert from '@/components/alert/SpshAlert.vue';
+  import { mixed, object, string } from 'yup';
 
   const organisationStore: OrganisationStore = useOrganisationStore();
   const importStore: ImportStore = useImportStore();
@@ -51,11 +50,6 @@
       return rolle.rollenart === RollenArt.Lern;
     });
   });
-
-  const schulen: ComputedRef<TranslatedObject[] | undefined> = useSchulen();
-  const searchInputSchule: Ref<string> = ref('');
-
-  let timerId: ReturnType<typeof setTimeout>;
 
   const validationSchema: TypedSchema = toTypedSchema(
     object({
@@ -99,11 +93,13 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = formContext.defineField('selectedFiles', vuetifyConfig);
 
-  // Computed property to get the title of the selected schule
-  const selectedSchuleTitle: ComputedRef<string | undefined> = computed(() => {
-    return schulen.value?.find((org: TranslatedObject) => org.value === selectedSchule.value)?.title;
-  });
-
+  watch(
+    () => organisationStore.schulenFilter.selectedItems,
+    (newSelection: Array<Organisation>) => {
+      if (newSelection.length === 1) selectedSchule.value = newSelection[0]!.id;
+      else selectedSchule.value = '';
+    },
+  );
   watch(selectedSchule, async (newValue: string | undefined, oldValue: string | undefined) => {
     if (newValue && newValue !== oldValue) {
       // Fetch rollen after selecting the organization
@@ -130,23 +126,6 @@
     }
   });
 
-  watch(searchInputSchule, (newValue: string | undefined, _oldValue: string | undefined) => {
-    if (!newValue || newValue === selectedSchuleTitle.value) {
-      return;
-    }
-
-    /* cancel pending call */
-    clearTimeout(timerId);
-
-    /* delay new call 500ms */
-    timerId = setTimeout(() => {
-      personenkontextStore.processWorkflowStep({
-        organisationName: newValue,
-        limit: 25,
-      });
-    }, 500);
-  });
-
   const showUploadSuccessTemplate: ComputedRef<boolean> = computed(() => {
     return (
       (importStore.uploadResponse?.isValid as boolean) &&
@@ -164,10 +143,6 @@
 
   function clearSelectedRolle(): void {
     selectedRolle.value = undefined;
-  }
-
-  function clearSelectedSchule(): void {
-    selectedSchule.value = undefined;
   }
 
   function navigateToPersonTable(): void {
@@ -645,25 +620,12 @@
             labelForId="schule-select"
             :label="$t('admin.schule.schule')"
           >
-            <v-autocomplete
-              autocomplete="off"
-              clearable
-              @click:clear="clearSelectedSchule"
-              data-testid="schule-select"
-              density="compact"
-              id="schule-select"
+            <SchulenFilter
+              :multiple="false"
+              :texts="{ placeholder: t('admin.schule.selectSchule') }"
+              :selected-schule-props="selectedSchuleProps"
               ref="schule-select"
-              :items="schulen"
-              item-value="value"
-              item-text="title"
-              :no-data-text="$t('noDataFound')"
-              :placeholder="$t('admin.schule.selectSchule')"
-              required="true"
-              variant="outlined"
-              v-bind="selectedSchuleProps"
-              v-model="selectedSchule"
-              v-model:search="searchInputSchule"
-            ></v-autocomplete>
+            />
           </FormRow>
 
           <!-- Rollenauswahl (currently limited to SuS) -->

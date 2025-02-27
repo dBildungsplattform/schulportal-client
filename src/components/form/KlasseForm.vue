@@ -148,16 +148,14 @@
         :isRequired="true"
         :label="t('admin.schule.schule')"
       >
-        <div class="pb-sm-4">
-          <SchulenFilter
-            ref="schulenFilter"
-            :multiple="false"
-            :readonly="props.editMode"
-            :initialIds="props.initialValues?.selectedSchule"
-            :systemrechteForSearch="[RollenSystemRecht.KlassenVerwalten]"
-            :selectedSchuleProps="selectedSchuleProps"
-          ></SchulenFilter>
-        </div>
+        <SchulenFilter
+          ref="schulenFilter"
+          :multiple="false"
+          :readonly="props.editMode"
+          :initialIds="props.initialValues?.selectedSchule"
+          :systemrechteForSearch="[RollenSystemRecht.KlassenVerwalten]"
+          :selectedSchuleProps="selectedSchuleProps"
+        ></SchulenFilter>
       </FormRow>
 
       <!-- Klassenname eingeben -->

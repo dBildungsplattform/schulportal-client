@@ -497,6 +497,7 @@
             <SchulenFilter
               :systemrechte-for-search="[RollenSystemRecht.KlassenVerwalten]"
               :multiple="false"
+              :hideDetails="true"
               ref="schule-select"
             >
               <template v-slot:prepend-item>

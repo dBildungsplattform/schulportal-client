@@ -5,7 +5,6 @@ import {
   type UserinfoResponse,
 } from '@/api-client/generated';
 import type { Organisation } from '@/stores/OrganisationStore';
-import { randomUUID } from 'crypto';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { faker } from '@faker-js/faker';
 
@@ -37,29 +36,32 @@ export class DoFactory {
   }
 
   public static getUserinfoResponse(props?: Partial<UserinfoResponse>): UserinfoResponse {
+    const gender: string = faker.person.gender();
+    const firstName: string = faker.person.firstName();
+    const lastName: string = faker.person.lastName();
     return {
-      personId: randomUUID(),
-      email: 'albert@test.de',
+      personId: faker.string.uuid(),
+      email: faker.internet.email({ firstName, lastName }),
       email_verified: true,
-      family_name: 'Test',
-      given_name: 'Albert',
-      middle_name: null,
-      nickname: null,
+      family_name: lastName,
+      given_name: firstName,
+      middle_name: faker.person.middleName(),
+      nickname: faker.internet.displayName({ firstName, lastName }),
       profile: null,
       picture: null,
-      phone_number: null,
-      website: null,
-      gender: null,
-      birthdate: null,
+      phone_number: faker.phone.number(),
+      website: faker.internet.url(),
+      gender,
+      birthdate: faker.date.birthdate().toISOString(),
       zoneinfo: null,
-      locale: null,
-      updated_at: null,
-      password_updated_at: null,
+      locale: faker.location.countryCode(),
+      updated_at: faker.date.past().toISOString(),
+      password_updated_at: faker.date.past().toISOString(),
       acr: 'gold',
       timeLimits: [],
-      name: 'Albert Test',
-      preferred_username: 'albert',
-      sub: 'c71be903-d0ec-4207-b653-40c114680b63',
+      name: faker.person.fullName({ firstName, lastName }),
+      preferred_username: faker.internet.displayName({ firstName, lastName }),
+      sub: faker.string.uuid(),
       personenkontexte: [
         {
           organisation: this.getOrganisationResponse(),
@@ -71,9 +73,5 @@ export class DoFactory {
       ],
       ...props,
     };
-  }
-
-  private static getRandomNumber(options?: { length: number }): string {
-    return String(Math.round(Math.random() * Math.pow(10, options?.length ?? 8)));
   }
 }

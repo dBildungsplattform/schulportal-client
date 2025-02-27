@@ -18,11 +18,16 @@
   type SelectedSchulenIds = Array<string> | string | undefined;
   type Props = {
     includeTraeger?: boolean;
+    hideDetails?: boolean;
     systemrechteForSearch?: Array<RollenSystemRecht>;
     multiple: boolean;
     readonly?: boolean;
     initialIds?: Array<string> | string;
     selectedSchuleProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
+    texts?: {
+      noData?: string;
+      placeholder?: string;
+    };
   };
   const props: Props = defineProps<Props>();
   const organisationStore: OrganisationStore = useOrganisationStore();
@@ -52,11 +57,23 @@
       title: getDisplayNameForOrg(schule),
     })),
   );
-  function hasItemsSelected(selection: SelectedSchulenIds): boolean {
-    if (Array.isArray(selection)) {
-      return selection.filter(Boolean).length > 0;
-    } else return Boolean(selection);
-  }
+
+  // selection is represented as an array internally
+  // wrap/unwrap is used to convert between internal and vuetify representation
+  const wrapSelectedSchulenIds = (selectedIds: SelectedSchulenIds): Array<string> => {
+    if (Array.isArray(selectedIds)) return selectedIds.filter(Boolean);
+    if (selectedIds) return [selectedIds];
+    return [];
+  };
+  const unwrapSelectedSchulenIds = (selectedIds: Array<string>): SelectedSchulenIds => {
+    if (selectedIds.length === 0) return undefined;
+    else if (selectedIds.length === 1) return selectedIds.at(0);
+    else return selectedIds;
+  };
+
+  const hasItemsSelected = (selection: SelectedSchulenIds): boolean => {
+    return wrapSelectedSchulenIds(selection).filter(Boolean).length > 0;
+  };
   const hasSelectedSchule: ComputedRef<boolean> = computed(
     () => hasAutoselectedSchule.value || hasItemsSelected(selectedSchulenIds.value),
   );
@@ -66,24 +83,26 @@
   };
 
   const getDefaultIds = (): Array<string> => {
-    const tempIds: Array<string> = [];
     if (props.initialIds) {
-      if (Array.isArray(props.initialIds)) tempIds.push(...props.initialIds);
-      else tempIds.push(props.initialIds);
+      return wrapSelectedSchulenIds(props.initialIds);
     } else if (hasAutoselectedSchule.value) {
-      tempIds.push(...currentUserSchulen.value.map((schule: Organisation) => schule.id));
+      return currentUserSchulen.value.map((schule: Organisation) => schule.id);
     }
-    return tempIds;
+    return [];
   };
 
   const updateOrganisationenIds = (ids: SelectedSchulenIds): void => {
-    const tempIds: Array<string> = [...getDefaultIds()];
-    if (Array.isArray(ids)) {
-      tempIds.push(...ids);
-    } else if (ids) {
-      tempIds.push(ids);
-    }
+    const tempIds: Array<string> = getDefaultIds().concat(wrapSelectedSchulenIds(ids));
     schulenFilter.organisationIds = dedup(tempIds.filter(Boolean));
+  };
+
+  const findSchulenInResultByIds = (ids: Array<string>): Array<Organisation> => {
+    return organisationStore.schulenFilter.filterResult.filter((schule: Organisation) => ids.includes(schule.id));
+  };
+
+  const mirrorSelectionToStore = (selection: SelectedSchulenIds): void => {
+    let ids: Array<string> = wrapSelectedSchulenIds(selection);
+    organisationStore.schulenFilter.selectedItems = findSchulenInResultByIds(ids);
   };
 
   // populate input, but prioritize props over autoselection
@@ -94,13 +113,10 @@
     }),
     (newValues: { hasAutoselectedSchule: boolean; initialIds: SelectedSchulenIds }) => {
       let tempIds: SelectedSchulenIds = props.multiple ? [] : undefined;
-      const noIdsInProps: boolean = !newValues.initialIds || newValues.initialIds.length === 0;
+      const noIdsInProps: boolean = wrapSelectedSchulenIds(newValues.initialIds).length === 0;
       if (noIdsInProps) {
-        if (newValues.hasAutoselectedSchule) {
-          if (autoselectedSchule.value) {
-            if (props.multiple) tempIds = [autoselectedSchule.value.id];
-            else tempIds = autoselectedSchule.value.id;
-          }
+        if (newValues.hasAutoselectedSchule && autoselectedSchule.value) {
+          tempIds = unwrapSelectedSchulenIds([autoselectedSchule.value.id]);
         }
       } else {
         tempIds = props.initialIds;
@@ -111,42 +127,23 @@
   );
 
   watch(selectedSchulenIds, (newIds: SelectedSchulenIds) => {
-    if (Array.isArray(newIds)) {
-      updateOrganisationenIds(newIds);
-    } else if (newIds === '' || newIds === undefined) {
+    if (newIds === '' || newIds === undefined) {
       updateOrganisationenIds([]);
       updateSearchString(undefined);
-      organisationStore.schulenFilter.selectedItems = [];
       clearInput();
     } else {
-      updateOrganisationenIds([newIds]);
+      updateOrganisationenIds(newIds);
     }
+    mirrorSelectionToStore(newIds);
   });
 
   watch(
     () => organisationStore.schulenFilter.filterResult,
     () => {
       const ids: SelectedSchulenIds = selectedSchulenIds.value;
-      if (Array.isArray(ids)) {
-        // TODO: measure performance impact
-        organisationStore.schulenFilter.selectedItems = ids.reduce(
-          (newSelection: Array<Organisation>, schuleId: string) => {
-            const matchedSchule: Organisation | undefined = organisationStore.schulenFilter.filterResult.find(
-              (schule: Organisation) => schule.id === schuleId,
-            );
-            if (matchedSchule) newSelection.push(matchedSchule);
-            return newSelection;
-          },
-          [] as Array<Organisation>,
-        );
-      } else if (ids) {
-        const selectedSchule: Organisation | undefined = organisationStore.schulenFilter.filterResult.find(
-          (schule: Organisation) => schule.id === ids,
-        );
-        if (selectedSchule) {
-          organisationStore.schulenFilter.selectedItems = [selectedSchule];
-        }
-      }
+      // this is a special case, because we can't assume that the appropriate schule is in the store already
+      // this is redundant in all other cases
+      if (props.initialIds) mirrorSelectionToStore(ids);
     },
   );
 
@@ -179,8 +176,8 @@
     item-text="title"
     :loading="organisationStore.schulenFilter.loading"
     :multiple="props.multiple"
-    :no-data-text="'noDataFound'"
-    :placeholder="t('admin.schule.assignSchule')"
+    :no-data-text="props.texts?.noData ?? 'noDataFound'"
+    :placeholder="props.texts?.placeholder ?? t('admin.schule.assignSchule')"
     required="true"
     variant="outlined"
     @update:search="updateSearchString"
@@ -188,7 +185,7 @@
     v-bind="selectedSchuleProps"
     v-model="selectedSchulenIds"
     v-model:search="searchInput"
-    hide-details
+    :hide-details
   >
     <template v-slot:prepend-item>
       <slot name="prepend-item"></slot>
