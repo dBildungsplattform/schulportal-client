@@ -6,6 +6,7 @@ import {
 } from '@/api-client/generated';
 import type { Organisation } from '@/stores/OrganisationStore';
 import { randomUUID } from 'crypto';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { faker } from '@faker-js/faker';
 
 export class DoFactory {

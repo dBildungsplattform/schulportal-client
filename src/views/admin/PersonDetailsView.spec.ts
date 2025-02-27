@@ -3,9 +3,7 @@ import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
 import routes from '@/router/routes';
 import { useAuthStore, type AuthStore, type UserInfo } from '@/stores/AuthStore';
 import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
-import { useImportStore, type ImportStore } from '@/stores/ImportStore';
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
-import { usePersonInfoStore, type PersonInfoStore } from '@/stores/PersonInfoStore';
 import {
   parseUserLock,
   PersonLockOccasion,
@@ -16,9 +14,7 @@ import {
   type UserLock,
 } from '@/stores/PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
-import { RollenArt, RollenMerkmal, RollenSystemRecht, useRolleStore, type RolleStore } from '@/stores/RolleStore';
-import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
-import { useServiceProviderStore, type ServiceProviderStore } from '@/stores/ServiceProviderStore';
+import { RollenArt, RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
 import {
   useTwoFactorAuthentificationStore,
   type TwoFactorAuthentificationStore,
@@ -37,14 +33,9 @@ let router: Router;
 
 const authStore: AuthStore = useAuthStore();
 const configStore: ConfigStore = useConfigStore();
-const importStore: ImportStore = useImportStore();
 const organisationStore: OrganisationStore = useOrganisationStore();
-const personInfoStore: PersonInfoStore = usePersonInfoStore();
 const personStore: PersonStore = usePersonStore();
 const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
-const rolleStore: RolleStore = useRolleStore();
-const searchFilterStore: SearchFilterStore = useSearchFilterStore();
-const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
 const twoFactorAuthenticationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
 
 const mockPerson: Personendatensatz = {
