@@ -146,24 +146,23 @@ describe('ImportStore', () => {
     });
 
     describe('startImportStatusPolling', () => {
-      it('should poll and update status to finished', async () => {
+      it('shows progress bar of 0%', async () => {
         const importvorgangId: string = '123';
 
-        mockadapter.onGet(`/api/import/${importvorgangId}/status`).replyOnce(200, { status: ImportStatus.Finished });
+        mockadapter
+          .onGet(`/api/import/${importvorgangId}/status`)
+          .replyOnce(200, { dataItemCount: 10, status: ImportStatus.Started, totalDataItemImported: 0 });
         mockadapter
           .onGet(`/api/import/importedUsers?offset=0&limit=100&importvorgangId=${importvorgangId}`)
           .replyOnce(200, []);
 
         const pollingPromise: Promise<void> = importStore.startImportStatusPolling(importvorgangId);
-
-        // Fast forward timer to trigger first poll
-        vi.advanceTimersByTime(30000);
         await Promise.resolve(); // Allow async actions to settle
 
         await pollingPromise;
 
-        expect(importStore.importStatus?.status).toEqual(ImportStatus.Finished);
-        expect(importStore.importProgress).toEqual(100);
+        expect(importStore.importStatus?.status).toEqual(ImportStatus.Started);
+        expect(importStore.importProgress).toEqual(1);
       });
 
       it('should poll and update progress bar to 50%', async () => {
@@ -183,6 +182,28 @@ describe('ImportStore', () => {
 
         expect(importStore.importStatus?.status).toEqual(ImportStatus.Inprogress);
         expect(importStore.importProgress).toEqual(50);
+      });
+
+      it('should poll and update status to finished with 100% progress', async () => {
+        const importvorgangId: string = '123';
+
+        mockadapter
+          .onGet(`/api/import/${importvorgangId}/status`)
+          .replyOnce(200, { dataItemCount: 10, status: ImportStatus.Finished, totalDataItemImported: 10 });
+        mockadapter
+          .onGet(`/api/import/importedUsers?offset=0&limit=100&importvorgangId=${importvorgangId}`)
+          .replyOnce(200, []);
+
+        const pollingPromise: Promise<void> = importStore.startImportStatusPolling(importvorgangId);
+
+        // Fast forward timer to trigger first poll
+        vi.advanceTimersByTime(30000);
+        await Promise.resolve(); // Allow async actions to settle
+
+        await pollingPromise;
+
+        expect(importStore.importStatus?.status).toEqual(ImportStatus.Finished);
+        expect(importStore.importProgress).toEqual(100);
       });
 
       it('should not poll for FAILED and should throw ERROR_IMPORTING_FILE', async () => {

@@ -32,12 +32,20 @@ describe('SearchFilterStore', () => {
     expect(searchFilterStore.selectedOrganisationen).toEqual(['10', '20']);
 
     // it sets the searchFilter for personen
-    searchFilterStore.setSearchFilterForPersonen('search');
-    expect(searchFilterStore.searchFilterPersonen).toEqual('search');
+    searchFilterStore.setSearchFilterForPersonen('person');
+    expect(searchFilterStore.searchFilterPersonen).toEqual('person');
+
+    // it sets an empty string as default searchFilter for personen
+    searchFilterStore.setSearchFilterForPersonen(null);
+    expect(searchFilterStore.searchFilterPersonen).toEqual('');
 
     // it sets the searchFilter for schulen
-    searchFilterStore.setSearchFilterForSchulen('search');
-    expect(searchFilterStore.searchFilterPersonen).toEqual('search');
+    searchFilterStore.setSearchFilterForSchulen('schule');
+    expect(searchFilterStore.searchFilterSchulen).toEqual('schule');
+
+    // it sets an empty string as default searchFilter for schulen
+    searchFilterStore.setSearchFilterForSchulen(null);
+    expect(searchFilterStore.searchFilterSchulen).toEqual('');
 
     // it sets sortOrder
     searchFilterStore.setSortOrderForPersonen('desc');

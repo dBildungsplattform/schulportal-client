@@ -170,7 +170,13 @@ describe('PersonStore', () => {
             referrer: 'hmardy',
             personalnummer: null,
             isLocked: false,
-            lockInfo: null,
+            /* this person's (unnatural) user lock info is used to cover else paths in store coverage */
+            userLock: [
+              {
+                personId: '1',
+                lock_occasion: PersonLockOccasion.MANUELL_GESPERRT,
+              },
+            ],
             revision: '1',
             lastModified: '2024-12-22',
           },
@@ -184,8 +190,13 @@ describe('PersonStore', () => {
             },
             referrer: 'hjardy',
             personalnummer: null,
-            isLocked: false,
-            lockInfo: null,
+            isLocked: true,
+            /* this person's (unnatural) user lock info is used to cover else paths in store coverage */
+            userLock: [
+              {
+                personId: '1',
+              },
+            ],
             revision: '1',
             lastModified: '2024-12-22',
           },

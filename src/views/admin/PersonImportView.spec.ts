@@ -1,4 +1,8 @@
-import { ImportDataItemStatus, type ImportUploadResponse } from '@/api-client/generated';
+import {
+  ImportDataItemStatus,
+  type ImportUploadResponse,
+  type OrganisationResponseLegacy,
+} from '@/api-client/generated';
 import routes from '@/router/routes';
 import { useImportStore, type ImportStore } from '@/stores/ImportStore';
 import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
@@ -6,23 +10,25 @@ import {
   RollenMerkmal,
   RollenSystemRecht,
   useRolleStore,
+  type RolleResponse,
   type RolleStore,
-  type RolleWithServiceProvidersResponse,
 } from '@/stores/RolleStore';
 import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import { expect, test, type Mock, type MockInstance } from 'vitest';
 import { nextTick } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import PersonImportView from './PersonImportView.vue';
+import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
 
 const importStore: ImportStore = useImportStore();
 const organisationStore: OrganisationStore = useOrganisationStore();
+const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
 const rolleStore: RolleStore = useRolleStore();
 
-organisationStore.allSchulen = [
+const mockSchulen: Array<OrganisationResponseLegacy> = [
   {
     id: '1133',
     name: 'Schule',
@@ -41,9 +47,28 @@ organisationStore.allSchulen = [
     typ: 'SCHULE',
     administriertVon: '1',
   },
+  {
+    id: '9',
+    name: 'orga ohne kennung',
+    kennung: '',
+    namensergaenzung: '',
+    kuerzel: 'aehg',
+    typ: 'SCHULE',
+    administriertVon: '1',
+  },
+  /* we need an orga with duplicate id to cover useSchulen composable */
+  {
+    id: '9',
+    name: 'orga mit doppelter id',
+    kennung: '',
+    namensergaenzung: '',
+    kuerzel: 'aehg',
+    typ: 'SCHULE',
+    administriertVon: '1',
+  },
 ];
 
-rolleStore.allRollen = [
+const mockRollen: Array<RolleResponse> = [
   {
     administeredBySchulstrukturknoten: '1234',
     rollenart: 'LEHR',
@@ -54,16 +79,7 @@ rolleStore.allRollen = [
     createdAt: '2022',
     updatedAt: '2022',
     id: '1',
-    serviceProviders: [
-      {
-        id: '1',
-        name: 'itslearning',
-      },
-      {
-        id: '2',
-        name: 'E-Mail',
-      },
-    ],
+    version: 1,
     administeredBySchulstrukturknotenName: 'Land SH',
     administeredBySchulstrukturknotenKennung: '',
   },
@@ -77,16 +93,22 @@ rolleStore.allRollen = [
     createdAt: '2022',
     updatedAt: '2022',
     id: '2',
-    serviceProviders: [
-      {
-        id: '1',
-        name: 'itslearning',
-      },
-    ],
+    version: 1,
     administeredBySchulstrukturknotenName: 'Land SH',
     administeredBySchulstrukturknotenKennung: '1234567',
   },
-] as RolleWithServiceProvidersResponse[];
+];
+
+organisationStore.allSchulen = mockSchulen;
+rolleStore.allRollen = mockRollen;
+
+personenkontextStore.workflowStepResponse = {
+  organisations: mockSchulen,
+  rollen: mockRollen,
+  selectedOrganisation: null,
+  selectedRollen: null,
+  canCommit: false,
+};
 
 beforeEach(async () => {
   document.body.innerHTML = `
@@ -515,6 +537,8 @@ describe('PersonImportView', () => {
     const mockFile: File = new File([fileContent], 'personen.csv', {
       type: 'text/csv',
     });
+
+    // schuleAutocomplete?.trigger('click');
 
     // Set form values
     schuleAutocomplete?.setValue('Schule');
