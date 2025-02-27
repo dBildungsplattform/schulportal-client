@@ -390,7 +390,7 @@ describe('PersonDetailsView', () => {
       personenkontextStore.errorCode = 'PERSON_NOT_FOUND';
       await nextTick();
 
-      const alertButton = wrapper
+      const alertButton: DOMWrapper<Element> | undefined = wrapper
         ?.findComponent({ ref: 'personenkontext-store-error-alert' })
         .find('[data-testid="alert-button"]');
 
