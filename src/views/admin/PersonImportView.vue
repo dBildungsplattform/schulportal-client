@@ -97,7 +97,7 @@
     () => organisationStore.schulenFilter.selectedItems,
     (newSelection: Array<Organisation>) => {
       if (newSelection.length === 1) selectedSchule.value = newSelection[0]!.id;
-      else selectedSchule.value = '';
+      else selectedSchule.value = undefined;
     },
   );
   watch(selectedSchule, async (newValue: string | undefined, oldValue: string | undefined) => {
