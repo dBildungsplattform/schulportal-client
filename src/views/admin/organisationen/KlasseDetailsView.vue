@@ -123,7 +123,11 @@
   const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
     if (selectedSchule.value && selectedKlassenname.value) {
       if (organisationStore.currentOrganisation) {
-        await organisationStore.updateOrganisationById(currentKlasseId, selectedKlassenname.value);
+        await organisationStore.updateOrganisationById(
+          currentKlasseId,
+          selectedKlassenname.value,
+          OrganisationsTyp.Klasse,
+        );
       }
       resetForm();
     }

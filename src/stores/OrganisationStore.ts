@@ -122,7 +122,7 @@ type OrganisationActions = {
     zugehoerigZu?: string,
   ) => Promise<void>;
   deleteOrganisationById: (organisationId: string) => Promise<void>;
-  updateOrganisationById: (organisationId: string, name: string) => Promise<void>;
+  updateOrganisationById: (organisationId: string, name: string, type: OrganisationsTyp) => Promise<void>;
   getRootKinderSchultraeger: () => Promise<void>;
   fetchSchuleDetailsForKlassen: (filterActive: boolean) => Promise<void>;
   setItsLearningForSchule: (organisationId: string) => Promise<void>;
@@ -429,21 +429,34 @@ export const useOrganisationStore: StoreDefinition<
         this.loading = false;
       }
     },
-    async updateOrganisationById(organisationId: string, name: string): Promise<void> {
+
+    async updateOrganisationById(organisationId: string, name: string, type: OrganisationsTyp): Promise<void> {
       this.errorCode = '';
       this.loading = true;
       try {
-        if (!this.currentKlasse?.version) {
-          throw new Error('Organisation version not found');
-        }
+        /* prepare body params */
         const organisationByNameBodyParams: OrganisationByNameBodyParams = {
           name: name,
-          version: this.currentKlasse.version,
+          version: 1,
         };
+        if (type === OrganisationsTyp.Klasse) {
+          if (!this.currentKlasse?.version) {
+            throw new Error('Organisation version not found');
+          }
+          organisationByNameBodyParams.version = this.currentKlasse.version;
+        } else if (type === OrganisationsTyp.Traeger) {
+          if (!this.currentOrganisation?.version) {
+            throw new Error('Organisation version not found');
+          }
+          organisationByNameBodyParams.version = this.currentOrganisation.version;
+        }
+
+        /* actual request */
         const { data }: { data: Organisation } = await organisationApi.organisationControllerUpdateOrganisationName(
           organisationId,
           organisationByNameBodyParams,
         );
+
         this.updatedOrganisation = data;
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'KLASSE_ERROR');
@@ -451,6 +464,7 @@ export const useOrganisationStore: StoreDefinition<
         this.loading = false;
       }
     },
+
     async deleteOrganisationById(organisationId: string): Promise<void> {
       this.errorCode = '';
       this.loading = true;

@@ -210,7 +210,9 @@
   function handleCancel(next: NavigationGuardNext): void {
     if (isFormDirty.value) {
       showUnsavedChangesDialog.value = true;
+      console.log('handleCancel before', blockedNext);
       blockedNext = next;
+      console.log('handleCancel after', blockedNext);
     } else {
       cancelEdit();
     }
@@ -449,7 +451,7 @@
                   <v-btn
                     class="primary"
                     data-testid="rolle-changes-save"
-                    @Click="onSubmit"
+                    @click="onSubmit"
                     :block="mdAndDown"
                     :disabled="rolleStore.loading"
                   >

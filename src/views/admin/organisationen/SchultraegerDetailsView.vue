@@ -20,6 +20,7 @@
   } from '@/stores/OrganisationStore';
   import { useForm, type TypedSchema, type FormContext } from 'vee-validate';
   import {
+    getDirtyState,
     getSchultraegerFieldDefinitions,
     getValidationSchema,
     type SchultraegerFieldDefinitions,
@@ -39,11 +40,9 @@
   const currentSchultraegerId: string = route.params['id'] as string;
 
   // eslint-disable-next-line @typescript-eslint/typedef
-  const { isFieldDirty, resetForm } = useForm<SchultraegerFormType>({
+  const { resetForm } = useForm<SchultraegerFormType>({
     validationSchema,
   });
-
-  const preservedSchultraegerform: Ref<string | undefined> = ref<string>('');
 
   const formContext: FormContext<SchultraegerFormType, SchultraegerFormType> = useForm<SchultraegerFormType>({
     validationSchema,
@@ -59,43 +58,12 @@
     return organisationStore.schultraeger;
   });
 
-  function isFormDirty(): boolean {
-    return isFieldDirty('selectedSchultraegerform') || isFieldDirty('selectedSchultraegername');
-  }
-
+  const isFormDirty: ComputedRef<boolean> = computed(() => getDirtyState(formContext));
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
   let blockedNext: () => void = () => {};
 
-  const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = formContext.handleSubmit(async () => {
-    // preservedSchultraegerform.value = rootChildSchultraegerList.value?.find(
-    //   (schultraeger: Organisation) => schultraeger.id === selectedSchultraegerform.value,
-    // )?.name;
-    // if (selectedSchultraegername.value) {
-    //   await organisationStore.createOrganisation(
-    //     undefined,
-    //     selectedSchultraegername.value,
-    //     undefined,
-    //     undefined,
-    //     OrganisationsTyp.Traeger,
-    //     undefined,
-    //     selectedSchultraegerform.value,
-    //     selectedSchultraegerform.value,
-    //   );
-    //   resetForm({
-    //     values: {
-    //       selectedSchultraegername: '',
-    //     },
-    //   });
-    // }
-  });
-
-  const handleCreateAnotherSchultraeger = (): void => {
-    organisationStore.createdSchultraeger = null;
-    resetForm();
-    router.push({ name: 'create-schultraeger' });
-  };
-
   function handleConfirmUnsavedChanges(): void {
+    showUnsavedChangesDialog.value = false;
     blockedNext();
     organisationStore.errorCode = '';
   }
@@ -118,10 +86,33 @@
   }
 
   function preventNavigation(event: BeforeUnloadEvent): void {
-    if (!isFormDirty()) return;
+    if (!isFormDirty.value) return;
     event.preventDefault();
     /* Chrome requires returnValue to be set. */
     event.returnValue = '';
+  }
+
+  const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = formContext.handleSubmit(async () => {
+    console.log('submit');
+    console.log(selectedSchultraegername.value);
+    if (selectedSchultraegername.value) {
+      await organisationStore.updateOrganisationById(
+        currentSchultraegerId,
+        selectedSchultraegername.value,
+        OrganisationsTyp.Traeger,
+      );
+    }
+  });
+
+  function handleCancel(next: NavigationGuardNext): void {
+    if (isFormDirty.value) {
+      showUnsavedChangesDialog.value = true;
+      console.log('handleCancel before', blockedNext);
+      blockedNext = next;
+      console.log('handleCancel after', blockedNext);
+    } else {
+      navigateToSchultraegerManagement();
+    }
   }
 
   onBeforeMount(async () => {
@@ -146,7 +137,7 @@
   });
 
   onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
-    if (isFormDirty()) {
+    if (isFormDirty.value) {
       showUnsavedChangesDialog.value = true;
       blockedNext = next;
     } else {
@@ -170,25 +161,26 @@
     <LayoutCard
       :closable="!organisationStore.errorCode"
       @onCloseClicked="navigateToSchultraegerManagement"
-      :header="$t('admin.schultraeger.addNew')"
+      :header="$t('admin.schultraeger.edit')"
       :padded="true"
       :showCloseText="true"
     >
-      <!-- The form to create a new Schultraeger -->
-      <template v-if="!organisationStore.createdSchultraeger">
+      <!-- The form to edit the current Schultraeger -->
+      <template v-if="organisationStore.currentOrganisation">
         <SchultraegerForm
           :errorCode="organisationStore.errorCode"
           :isLoading="organisationStore.loading"
           :onHandleConfirmUnsavedChanges="handleConfirmUnsavedChanges"
           :onHandleDiscard="navigateToSchultraegerManagement"
           :onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
-          :onShowUnsavedChangesDialog="showUnsavedChangesDialog"
           :onSubmit="onSubmit"
+          :readonly="true"
           ref="schultraeger-edit-form"
           :rootChildSchultraegerList="rootChildSchultraegerList"
+          :selectedSchultraegernameProps="selectedSchultraegernameProps"
+          :showUnsavedChangesDialog="showUnsavedChangesDialog"
           v-model:selectedSchultraegerform="selectedSchultraegerform"
           v-model:selectedSchultraegername="selectedSchultraegername"
-          :selectedSchultraegernameProps="selectedSchultraegernameProps"
         >
           <!-- Error Message Display if error on submit -->
           <!-- To trigger unsaved changes dialog the alert has to be inside the form wrapper -->
@@ -205,87 +197,39 @@
           />
         </SchultraegerForm>
       </template>
-      <!-- Result template on success after submit (Present value in createdSchultraeger and no errorCode)  -->
-      <template v-if="organisationStore.createdSchultraeger && !organisationStore.errorCode">
-        <v-container class="new-schultraeger-success">
-          <v-row justify="center">
-            <v-col
-              class="subtitle-1"
-              cols="auto"
-            >
-              <span data-testid="schultraeger-success-text">{{
-                $t('admin.schultraeger.schultraegerAddedSuccessfully')
-              }}</span>
-            </v-col>
-          </v-row>
-          <v-row justify="center">
-            <v-col cols="auto">
-              <v-icon
-                small
-                color="#1EAE9C"
-                icon="mdi-check-circle"
-              >
-              </v-icon>
-            </v-col>
-          </v-row>
-          <v-row justify="center">
-            <v-col
-              class="subtitle-2"
-              cols="auto"
-            >
-              {{ $t('admin.followingDataCreated') }}
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col class="text-body bold text-right"> {{ $t('admin.schultraeger.schultraegerform') }}: </v-col>
-            <v-col class="text-body"
-              ><span data-testid="created-schultraeger-form">{{ preservedSchultraegerform }}</span></v-col
-            >
-          </v-row>
-          <v-row>
-            <v-col class="text-body bold text-right"> {{ $t('admin.schultraeger.schultraegername') }}: </v-col>
-            <v-col class="text-body"
-              ><span data-testid="created-schultraeger-name">{{
-                organisationStore.createdSchultraeger.name
-              }}</span></v-col
-            >
-          </v-row>
-          <v-divider
-            class="border-opacity-100 rounded my-6"
-            color="#E5EAEF"
-            thickness="6"
-          ></v-divider>
-          <v-row justify="end">
-            <v-col
-              cols="12"
-              sm="6"
-              md="auto"
-            >
-              <v-btn
-                class="secondary"
-                data-testid="back-to-list-button"
-                @click="navigateToSchultraegerManagement"
-                :block="mdAndDown"
-                >{{ $t('nav.backToList') }}</v-btn
-              >
-            </v-col>
-            <v-col
-              cols="12"
-              sm="6"
-              md="auto"
-            >
-              <v-btn
-                class="primary button"
-                data-testid="create-another-schultraeger-button"
-                @click="handleCreateAnotherSchultraeger"
-                :block="mdAndDown"
-              >
-                {{ $t('admin.schultraeger.createAnother') }}
-              </v-btn>
-            </v-col>
-          </v-row>
-        </v-container>
-      </template>
+
+      <v-row class="pt-3 px-2 save-cancel-row justify-end">
+        <v-col
+          class="cancel-col"
+          cols="12"
+          sm="6"
+          md="auto"
+        >
+          <v-btn
+            class="secondary"
+            data-testid="schultraeger-edit-cancel-button"
+            @click="handleCancel"
+            :block="mdAndDown"
+          >
+            {{ $t('cancel') }}
+          </v-btn>
+        </v-col>
+        <v-col
+          cols="12"
+          sm="6"
+          md="auto"
+        >
+          <v-btn
+            class="primary"
+            data-testid="schultraeger-edit-save-button"
+            @click="onSubmit"
+            :block="mdAndDown"
+            :disabled="organisationStore.loading"
+          >
+            {{ $t('save') }}
+          </v-btn>
+        </v-col>
+      </v-row>
     </LayoutCard>
   </div>
 </template>

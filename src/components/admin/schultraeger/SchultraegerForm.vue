@@ -39,6 +39,9 @@
     ref="schultraeger-form"
     :showUnsavedChangesDialog="showUnsavedChangesDialog"
   >
+    <!-- Slot for SPSH alerts -->
+    <slot />
+
     <template v-if="!props.errorCode">
       <!-- Select Schultraeger type. For now not bound to anything and just a UI element -->
       <v-row>
@@ -55,6 +58,7 @@
           inline
           v-model="selectedSchultraegerform"
           data-testid="schultraegerform-radio-group"
+          :disabled="readonly"
         >
           <v-col
             v-for="schultraeger in rootChildSchultraegerList"

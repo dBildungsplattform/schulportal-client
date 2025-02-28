@@ -699,6 +699,7 @@ describe('OrganisationStore', () => {
       const updateOrganisationPromise: Promise<void> = organisationStore.updateOrganisationById(
         '1',
         'Updated Organisation 1',
+        OrganisationsTyp.Klasse,
       );
       expect(organisationStore.loading).toBe(true);
       await updateOrganisationPromise;
@@ -721,6 +722,7 @@ describe('OrganisationStore', () => {
       const updateOrganisationPromise: Promise<void> = organisationStore.updateOrganisationById(
         '1',
         'Updated Organisation 1',
+        OrganisationsTyp.Klasse,
       );
       expect(organisationStore.loading).toBe(true);
       await updateOrganisationPromise;
@@ -744,6 +746,7 @@ describe('OrganisationStore', () => {
       const updateOrganisationPromise: Promise<void> = organisationStore.updateOrganisationById(
         '1',
         'Updated Organisation 1',
+        OrganisationsTyp.Klasse,
       );
       expect(organisationStore.loading).toBe(true);
       await updateOrganisationPromise;
@@ -767,6 +770,7 @@ describe('OrganisationStore', () => {
       const updateOrganisationPromise: Promise<void> = organisationStore.updateOrganisationById(
         '1',
         'Updated Organisation 1',
+        OrganisationsTyp.Klasse,
       );
 
       await updateOrganisationPromise;

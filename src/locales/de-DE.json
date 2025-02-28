@@ -511,6 +511,7 @@
       "createAnother": "Weiteren Schulträger anlegen",
       "createNew": "Neuen Schulträger anlegen",
       "discard": "Schulträger verwerfen",
+      "edit": "Schulträger bearbeiten",
       "enterSchultraegername": "Schulträgername eingeben",
       "errors": {
         "TRAEGER_IN_TRAEGER": "Ein Schulträger darf nur einem anderen Schulträger zugeordnet werden.",
