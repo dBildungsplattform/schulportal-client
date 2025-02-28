@@ -31,12 +31,12 @@
     :createButtonLabel="$t('admin.schultraeger.create')"
     :discardButtonLabel="$t('admin.schultraeger.discard')"
     :hideActions="readonly || !!props.errorCode"
-    id="schultraeger-creation-form"
+    id="schultraeger-form"
     :isLoading="isLoading"
     :onDiscard="onHandleDiscard"
     @onShowDialogChange="onShowDialogChange"
     :onSubmit="onSubmit"
-    ref="schutraegere-creation-form"
+    ref="schultraeger-form"
     :showUnsavedChangesDialog="showUnsavedChangesDialog"
   >
     <template v-if="!props.errorCode">

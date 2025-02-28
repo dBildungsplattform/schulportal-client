@@ -39,7 +39,7 @@
   const currentSchultraegerId: string = route.params['id'] as string;
 
   // eslint-disable-next-line @typescript-eslint/typedef
-  const { handleSubmit, isFieldDirty, resetForm } = useForm<SchultraegerFormType>({
+  const { isFieldDirty, resetForm } = useForm<SchultraegerFormType>({
     validationSchema,
   });
 
@@ -66,7 +66,7 @@
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
   let blockedNext: () => void = () => {};
 
-  const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
+  const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = formContext.handleSubmit(async () => {
     // preservedSchultraegerform.value = rootChildSchultraegerList.value?.find(
     //   (schultraeger: Organisation) => schultraeger.id === selectedSchultraegerform.value,
     // )?.name;
@@ -184,6 +184,7 @@
           :onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
           :onShowUnsavedChangesDialog="showUnsavedChangesDialog"
           :onSubmit="onSubmit"
+          ref="schultraeger-edit-form"
           :rootChildSchultraegerList="rootChildSchultraegerList"
           v-model:selectedSchultraegerform="selectedSchultraegerform"
           v-model:selectedSchultraegername="selectedSchultraegername"

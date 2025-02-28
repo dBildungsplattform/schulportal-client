@@ -14,61 +14,43 @@
     useOrganisationStore,
     type Organisation,
     type OrganisationStore,
+    type SchultraegerFormType,
   } from '@/stores/OrganisationStore';
-  import { useForm, type TypedSchema, type BaseFieldProps } from 'vee-validate';
-  import { object, string } from 'yup';
-  import { toTypedSchema } from '@vee-validate/yup';
-  import { DIN_91379A_EXT, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
+  import { useForm, type TypedSchema, type FormContext } from 'vee-validate';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SchultraegerForm from '@/components/admin/schultraeger/SchultraegerForm.vue';
+  import {
+    getSchultraegerFieldDefinitions,
+    getValidationSchema,
+    type SchultraegerFieldDefinitions,
+  } from '@/utils/validationSchultraeger';
 
   const initialSchultraegerformCache: Ref<string> = ref('');
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   const { t }: Composer = useI18n({ useScope: 'global' });
+  const validationSchema: TypedSchema = getValidationSchema(t);
   const router: Router = useRouter();
   const organisationStore: OrganisationStore = useOrganisationStore();
 
-  const validationSchema: TypedSchema = toTypedSchema(
-    object({
-      selectedSchultraegername: string()
-        .matches(DIN_91379A_EXT, t('admin.schultraeger.rules.schultraegername.matches'))
-        .matches(NO_LEADING_TRAILING_SPACES, t('admin.schultraeger.rules.schultraegername.noLeadingTrailingSpaces'))
-        .required(t('admin.schultraeger.rules.schultraegername.required')),
-    }),
-  );
-
-  const vuetifyConfig = (state: {
-    errors: Array<string>;
-  }): { props: { error: boolean; 'error-messages': Array<string> } } => ({
-    props: {
-      error: !!state.errors.length,
-      'error-messages': state.errors,
-    },
-  });
-
-  type SchultraegerCreationForm = {
-    selectedSchultraegerform: string;
-    selectedSchultraegername: string;
-  };
-
   // eslint-disable-next-line @typescript-eslint/typedef
-  const { defineField, handleSubmit, isFieldDirty, resetForm } = useForm<SchultraegerCreationForm>({
+  const { isFieldDirty, resetForm } = useForm<SchultraegerFormType>({
     validationSchema,
   });
 
   const preservedSchultraegerform: Ref<string | undefined> = ref<string>('');
 
-  const [selectedSchultraegerform]: [
-    Ref<string>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedSchultraegerform', vuetifyConfig);
-  const [selectedSchultraegername, selectedSchultraegernameProps]: [
-    Ref<string>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedSchultraegername', vuetifyConfig);
+  const formContext: FormContext<SchultraegerFormType, SchultraegerFormType> = useForm<SchultraegerFormType>({
+    validationSchema,
+  });
+
+  const {
+    selectedSchultraegerform,
+    selectedSchultraegername,
+    selectedSchultraegernameProps,
+  }: SchultraegerFieldDefinitions = getSchultraegerFieldDefinitions(formContext);
 
   const rootChildSchultraegerList: ComputedRef<Organisation[]> = computed(() => {
     return organisationStore.schultraeger;
@@ -81,7 +63,7 @@
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
   let blockedNext: () => void = () => {};
 
-  const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
+  const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = formContext.handleSubmit(async () => {
     preservedSchultraegerform.value = rootChildSchultraegerList.value.find(
       (schultraeger: Organisation) => schultraeger.id === selectedSchultraegerform.value,
     )?.name;
@@ -193,6 +175,7 @@
           :onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
           :onShowUnsavedChangesDialog="showUnsavedChangesDialog"
           :onSubmit="onSubmit"
+          ref="schultraeger-creation-form"
           :rootChildSchultraegerList="rootChildSchultraegerList"
           v-model:selectedSchultraegerform="selectedSchultraegerform"
           v-model:selectedSchultraegername="selectedSchultraegername"
