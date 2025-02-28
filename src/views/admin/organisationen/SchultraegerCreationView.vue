@@ -21,6 +21,7 @@
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SchultraegerForm from '@/components/admin/schultraeger/SchultraegerForm.vue';
   import {
+    getDirtyState,
     getSchultraegerFieldDefinitions,
     getValidationSchema,
     type SchultraegerFieldDefinitions,
@@ -36,7 +37,7 @@
   const organisationStore: OrganisationStore = useOrganisationStore();
 
   // eslint-disable-next-line @typescript-eslint/typedef
-  const { isFieldDirty, resetForm } = useForm<SchultraegerFormType>({
+  const { resetForm } = useForm<SchultraegerFormType>({
     validationSchema,
   });
 
@@ -56,9 +57,7 @@
     return organisationStore.schultraeger;
   });
 
-  function isFormDirty(): boolean {
-    return isFieldDirty('selectedSchultraegerform') || isFieldDirty('selectedSchultraegername');
-  }
+  const isFormDirty: ComputedRef<boolean> = computed(() => getDirtyState(formContext));
 
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
   let blockedNext: () => void = () => {};
@@ -116,7 +115,7 @@
   }
 
   function preventNavigation(event: BeforeUnloadEvent): void {
-    if (!isFormDirty()) return;
+    if (!isFormDirty.value) return;
     event.preventDefault();
     /* Chrome requires returnValue to be set. */
     event.returnValue = '';
@@ -137,7 +136,7 @@
   });
 
   onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
-    if (isFormDirty()) {
+    if (isFormDirty.value) {
       showUnsavedChangesDialog.value = true;
       blockedNext = next;
     } else {
@@ -173,13 +172,13 @@
           :onHandleConfirmUnsavedChanges="handleConfirmUnsavedChanges"
           :onHandleDiscard="navigateToSchultraegerManagement"
           :onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
-          :onShowUnsavedChangesDialog="showUnsavedChangesDialog"
           :onSubmit="onSubmit"
           ref="schultraeger-creation-form"
           :rootChildSchultraegerList="rootChildSchultraegerList"
+          :selectedSchultraegernameProps="selectedSchultraegernameProps"
+          :showUnsavedChangesDialog="showUnsavedChangesDialog"
           v-model:selectedSchultraegerform="selectedSchultraegerform"
           v-model:selectedSchultraegername="selectedSchultraegername"
-          :selectedSchultraegernameProps="selectedSchultraegernameProps"
         >
           <!-- Error Message Display if error on submit -->
           <!-- To trigger unsaved changes dialog the alert has to be inside the form wrapper -->
