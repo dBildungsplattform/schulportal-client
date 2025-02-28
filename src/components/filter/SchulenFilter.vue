@@ -71,11 +71,12 @@
     else return selectedIds;
   };
 
-  const hasItemsSelected = (selection: SelectedSchulenIds): boolean => {
-    return wrapSelectedSchulenIds(selection).filter(Boolean).length > 0;
+  const isEmptySelection = (selection: SelectedSchulenIds): boolean => {
+    if (!selection) return true;
+    return wrapSelectedSchulenIds(selection).filter(Boolean).length === 0;
   };
   const hasSelectedSchule: ComputedRef<boolean> = computed(
-    () => hasAutoselectedSchule.value || hasItemsSelected(selectedSchulenIds.value),
+    () => hasAutoselectedSchule.value || !isEmptySelection(selectedSchulenIds.value),
   );
 
   const updateSearchString = (searchString: string | undefined): void => {
@@ -105,37 +106,55 @@
     organisationStore.schulenFilter.selectedItems = findSchulenInResultByIds(ids);
   };
 
-  // populate input, but prioritize props over autoselection
-  watch(
-    () => ({
-      hasAutoselectedSchule: hasAutoselectedSchule.value,
-      initialIds: props.initialIds,
-    }),
-    (newValues: { hasAutoselectedSchule: boolean; initialIds: SelectedSchulenIds }) => {
-      let tempIds: SelectedSchulenIds = props.multiple ? [] : undefined;
-      const noIdsInProps: boolean = wrapSelectedSchulenIds(newValues.initialIds).length === 0;
-      if (noIdsInProps) {
-        if (newValues.hasAutoselectedSchule && autoselectedSchule.value) {
-          tempIds = unwrapSelectedSchulenIds([autoselectedSchule.value.id]);
-        }
-      } else {
-        tempIds = props.initialIds;
-      }
-      selectedSchulenIds.value = tempIds;
-    },
-    { immediate: true },
-  );
-
-  watch(selectedSchulenIds, (newIds: SelectedSchulenIds) => {
-    if (newIds === '' || newIds === undefined) {
+  const handleSelectionUpdate = (selection: SelectedSchulenIds): void => {
+    if (isEmptySelection(selection)) {
       updateOrganisationenIds([]);
       updateSearchString(undefined);
       clearInput();
     } else {
-      updateOrganisationenIds(newIds);
+      updateOrganisationenIds(selection);
     }
-    mirrorSelectionToStore(newIds);
-  });
+    mirrorSelectionToStore(selection);
+  };
+
+  const isSameSelection = (a: SelectedSchulenIds, b: SelectedSchulenIds): boolean => {
+    const aSet: Set<string> = new Set(wrapSelectedSchulenIds(a));
+    const bSet: Set<string> = new Set(wrapSelectedSchulenIds(b));
+    if (aSet.size !== bSet.size) return false;
+    for (let value of aSet) {
+      if (!bSet.has(value)) return false;
+    }
+    return true;
+  };
+
+  type SelectionChange = [SelectedSchulenIds, SelectedSchulenIds, boolean];
+  type PreviousSelectionChange = [SelectedSchulenIds, Array<string> | undefined, boolean | undefined];
+  // populate input, but prioritize props over autoselection
+  watch(
+    [selectedSchulenIds, (): Array<string> => wrapSelectedSchulenIds(props.initialIds), hasAutoselectedSchule],
+    (
+      [currentSelection, currentInitialIds, currentlyHasAutoselectedSchule]: SelectionChange,
+      [oldSelection]: PreviousSelectionChange,
+    ) => {
+      const hasSelectionChanged: boolean = !isSameSelection(currentSelection, oldSelection);
+      if (hasSelectionChanged) {
+        handleSelectionUpdate(currentSelection);
+      } else if (isEmptySelection(currentSelection)) {
+        let tempIds: SelectedSchulenIds = props.multiple ? [] : undefined;
+        const noIdsInProps: boolean = wrapSelectedSchulenIds(currentInitialIds).length === 0;
+        if (noIdsInProps) {
+          if (currentlyHasAutoselectedSchule && autoselectedSchule.value) {
+            tempIds = unwrapSelectedSchulenIds([autoselectedSchule.value.id]);
+          }
+        } else {
+          tempIds = props.initialIds;
+        }
+        selectedSchulenIds.value = tempIds;
+        handleSelectionUpdate(tempIds);
+      }
+    },
+    { immediate: true },
+  );
 
   watch(
     () => organisationStore.schulenFilter.filterResult,

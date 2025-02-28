@@ -392,21 +392,6 @@
     { immediate: true },
   );
 
-  watch(
-    () => searchFilterStore.selectedSchuleForKlassen,
-    (newSelectedSchuleId: string | null) => {
-      if (newSelectedSchuleId === null) return;
-      const selectedSchule: Organisation | undefined = organisationStore.allSchulen.find(
-        (schule: Organisation) => schule.id === newSelectedSchuleId,
-      );
-      if (!selectedSchule) return;
-      if (organisationStore.schulenFilter.selectedItems.find((schule: Organisation) => schule.id === selectedSchule.id))
-        return;
-      organisationStore.schulenFilter.selectedItems.push(selectedSchule);
-    },
-    { immediate: true },
-  );
-
   function navigateToKlassenDetails(_$event: PointerEvent, { item }: { item: Organisation }): void {
     router.push({ name: 'klasse-details', params: { id: item.id } });
   }
@@ -498,6 +483,7 @@
               :systemrechte-for-search="[RollenSystemRecht.KlassenVerwalten]"
               :multiple="false"
               :hideDetails="true"
+              :initialIds="searchFilterStore.selectedSchuleForKlassen ?? undefined"
               ref="schule-select"
             >
               <template v-slot:prepend-item>
