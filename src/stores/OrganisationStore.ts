@@ -123,6 +123,7 @@ type OrganisationActions = {
   updateOrganisationById: (organisationId: string, name: string) => Promise<void>;
   getRootKinderSchultraeger: () => Promise<void>;
   fetchSchuleDetailsForKlassen: (filterActive: boolean) => Promise<void>;
+  fetchSchuleDetailsForSchultraeger: () => Promise<void>;
   setItsLearningForSchule: (organisationId: string) => Promise<void>;
 };
 
@@ -202,6 +203,7 @@ export const useOrganisationStore: StoreDefinition<
           this.allSchultraeger = response.data;
           this.totalSchultraeger = +response.headers['x-paging-total'];
           this.totalPaginatedSchultraeger = +response.headers['x-paging-pagetotal'];
+          await this.fetchSchuleDetailsForSchultraeger();
         } else {
           this.allOrganisationen = response.data;
           this.totalOrganisationen = +response.headers['x-paging-total'];
@@ -231,33 +233,75 @@ export const useOrganisationStore: StoreDefinition<
         );
       }
 
-      // TO DO: do we need try-catch for this request?
-      const response: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations(
-        undefined,
-        searchFilterStore.klassenPerPage,
-        undefined,
-        undefined,
-        undefined,
-        OrganisationsTyp.Schule,
-        ['KLASSEN_VERWALTEN'],
-        undefined,
-        undefined,
-        Array.from(administriertVonSet),
+      this.loading = true;
+      try {
+        const response: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations(
+          undefined,
+          searchFilterStore.klassenPerPage,
+          undefined,
+          undefined,
+          undefined,
+          OrganisationsTyp.Schule,
+          ['KLASSEN_VERWALTEN'],
+          undefined,
+          undefined,
+          // Here we get the parents by filling the property organisationIds with the administriertVon array extracted from the Klassen above.
+          Array.from(administriertVonSet),
+        );
+
+        const schulenMap: Map<string, string> = new Map(
+          response.data.map((org: Organisation) => [org.id, `${org.kennung} (${org.name.trim()})`]),
+        );
+
+        this.allKlassen = this.allKlassen.map((klasse: Organisation) => ({
+          ...klasse,
+          schuleDetails: schulenMap.get(klasse.administriertVon || '') || '---',
+        }));
+
+        this.klassen = this.klassen.map((klasse: Organisation) => ({
+          ...klasse,
+          schuleDetails: schulenMap.get(klasse.administriertVon || '') || '---',
+        }));
+      } catch (error: unknown) {
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async fetchSchuleDetailsForSchultraeger(): Promise<void> {
+      const schultraegerIds: Set<string> = new Set(
+        this.allSchultraeger.map((schultraeger: Organisation) => schultraeger.id),
       );
+      this.loading = true;
+      try {
+        const response: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations(
+          undefined,
+          searchFilterStore.klassenPerPage,
+          undefined,
+          undefined,
+          undefined,
+          OrganisationsTyp.Schule,
+          ['SCHULTRAEGER_VERWALTEN'],
+          undefined,
+          // Sending Schulträger IDs in administriertVon to get the direct children
+          Array.from(schultraegerIds),
+          undefined,
+        );
 
-      const schulenMap: Map<string, string> = new Map(
-        response.data.map((org: Organisation) => [org.id, `${org.kennung} (${org.name.trim()})`]),
-      );
+        const schulenMap: Map<string, string> = new Map(
+          response.data.map((org: Organisation) => [org.administriertVon!, `${org.kennung}`]),
+        );
 
-      this.allKlassen = this.allKlassen.map((klasse: Organisation) => ({
-        ...klasse,
-        schuleDetails: schulenMap.get(klasse.administriertVon || '') || '---',
-      }));
-
-      this.klassen = this.klassen.map((klasse: Organisation) => ({
-        ...klasse,
-        schuleDetails: schulenMap.get(klasse.administriertVon || '') || '---',
-      }));
+        this.allSchultraeger = this.allSchultraeger.map((schultraeger: Organisation) => ({
+          ...schultraeger,
+          schuleDetails: schulenMap.get(schultraeger.id) || '---',
+        }));
+      } catch (error: unknown) {
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+      } finally {
+        this.loading = false;
+      }
     },
 
     async getFilteredSchulen(filter?: OrganisationenFilter) {

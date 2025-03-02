@@ -28,7 +28,7 @@
       key: 'name',
       align: 'start',
     },
-    { title: t('admin.schule.schulen'), key: 'name', align: 'start' },
+    { title: t('admin.schultraeger.assignedSchulen'), key: 'schuleDetails', align: 'start' },
   ];
 
   const allSchultraeger: Ref<Array<Organisation>> = ref([]);
