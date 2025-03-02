@@ -288,14 +288,22 @@ export const useOrganisationStore: StoreDefinition<
           Array.from(schultraegerIds),
           undefined,
         );
+        // Map Schulträger IDs to multiple assigned Schulen 
+        const schulenMap: Map<string, string[]> = new Map();
 
-        const schulenMap: Map<string, string> = new Map(
-          response.data.map((org: Organisation) => [org.administriertVon!, `${org.kennung}`]),
-        );
+        response.data.forEach((org: Organisation) => {
+          if (!org.administriertVon) return; // Skip if administriertVon is missing
+
+          if (!schulenMap.has(org.administriertVon)) {
+            schulenMap.set(org.administriertVon, []);
+          }
+
+          schulenMap.get(org.administriertVon)!.push(`${org.kennung}`);
+        });
 
         this.allSchultraeger = this.allSchultraeger.map((schultraeger: Organisation) => ({
           ...schultraeger,
-          schuleDetails: schulenMap.get(schultraeger.id) || '---',
+          schuleDetails: schulenMap.get(schultraeger.id)?.join(', ') || '---',
         }));
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');

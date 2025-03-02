@@ -130,6 +130,14 @@
               {{ item.name }}
             </div>
           </template>
+          <template v-slot:[`item.schuleDetails`]="{ item }">
+            <div
+              class="ellipsis-wrapper"
+              :title="item.schuleDetails"
+            >
+              {{ item.schuleDetails }}
+            </div>
+          </template>
         </ResultTable>
       </template>
     </LayoutCard>
