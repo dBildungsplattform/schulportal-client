@@ -75,7 +75,7 @@
   });
 
   function getUrgencyType(date: Date): 'errorLight' | 'warning' {
-    const error: boolean = date.valueOf() < new Date().valueOf() + 14 * 24 * 60 * 60 * 1000;
+    const error: boolean = date.valueOf() < new Date().valueOf() + 15 * 24 * 60 * 60 * 1000;
     return error ? 'errorLight' : 'warning';
   }
 
