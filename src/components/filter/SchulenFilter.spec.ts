@@ -162,7 +162,6 @@ describe('SchulenFilter', async () => {
               });
 
               test('it initializes store', async () => {
-                const resetSpy: MockInstance = vi.spyOn(organisationStore, 'resetSchulFilter');
                 const loadSpy: MockInstance = vi.spyOn(organisationStore, 'loadSchulenForFilter');
                 const wrapper: VueWrapper = mountComponent({
                   ...defaultProps,
@@ -171,13 +170,16 @@ describe('SchulenFilter', async () => {
                 });
                 expect(wrapper.find('[data-testid="schule-select"]').isVisible()).toBe(true);
                 await nextTick();
-                expect(resetSpy).toHaveBeenCalledOnce();
                 expect(loadSpy).toHaveBeenCalledOnce();
                 expect(loadSpy).toHaveBeenLastCalledWith(expectedFilter);
               });
 
               describe.each([[''], ['string']])('when searching for %s', (searchString: string) => {
                 test('it triggers search', async () => {
+                  const expected: OrganisationenFilter = {
+                    ...expectedFilter,
+                  };
+                  if (searchString.length > 0 && !readonly && !autoSelectedSchule) expected.searchString = searchString;
                   const loadSpy: MockInstance = vi.spyOn(organisationStore, 'loadSchulenForFilter');
                   const wrapper: VueWrapper = mountComponent({
                     ...defaultProps,
@@ -188,17 +190,7 @@ describe('SchulenFilter', async () => {
                   await schuleSearchInput.setValue(searchString);
                   vi.runAllTimers();
                   await flushPromises();
-                  if (readonly || autoSelectedSchule !== null) {
-                    expect(loadSpy).not.toHaveBeenLastCalledWith({
-                      ...expectedFilter,
-                      searchString,
-                    });
-                  } else {
-                    expect(loadSpy).toHaveBeenLastCalledWith({
-                      ...expectedFilter,
-                      searchString,
-                    });
-                  }
+                  expect(loadSpy).toHaveBeenLastCalledWith(expected);
                 });
               });
 

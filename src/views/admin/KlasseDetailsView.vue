@@ -168,7 +168,6 @@
     organisationStore.currentOrganisation = null;
     // Retrieves the Klasse using the Id in the route since that's all we have
     await organisationStore.getOrganisationById(currentKlasseId, OrganisationsTyp.Klasse);
-    // Retrieves the parent Organisation of the Klasse using the same endpoint but with a different parameter
 
     /* listen for browser changes and prevent them when form is dirty */
     window.addEventListener('beforeunload', preventNavigation);

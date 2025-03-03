@@ -14,6 +14,7 @@
   import { RollenSystemRecht } from '@/stores/RolleStore';
   import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
   import { type Mutable, type TranslatedObject } from '@/types.d';
+  import { sameContent } from '@/utils/arrays';
   import { computed, onMounted, ref, useTemplateRef, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { onBeforeRouteLeave, useRouter, type Router } from 'vue-router';
@@ -162,39 +163,6 @@
       );
     }
   }
-
-  watch(
-    () => organisationStore.schulenFilter.selectedItems,
-    async (newSelection: Array<Organisation>) => {
-      const newSchuleId: string | null = newSelection.length === 1 ? newSelection[0]!.id : null;
-      await searchFilterStore.setSchuleFilterForKlassen(newSchuleId);
-      if (newSchuleId) {
-        selectedKlassen.value = [];
-        organisationStore.allKlassen = [];
-        await fetchKlassenBySelectedSchuleId(newSchuleId);
-      } else {
-        // Reset selectedKlassen and klassenOptions when Schule is unselected
-        selectedKlassen.value = [];
-        klassenOptions.value = [];
-        organisationStore.allKlassen = [];
-        searchFilterStore.selectedKlassenForKlassen = [];
-        totalKlassen = 0;
-
-        // Fetch all Klassen when no Schule is selected
-        await organisationStore.getAllOrganisationen({
-          offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
-          limit: 25,
-          includeTyp: OrganisationsTyp.Klasse,
-          systemrechte: ['KLASSEN_VERWALTEN'],
-        });
-        klassenOptions.value = organisationStore.allKlassen.map((org: Organisation) => ({
-          value: org.id,
-          title: org.name,
-        }));
-      }
-      totalKlassen = organisationStore.allKlassen.length;
-    },
-  );
 
   async function updateSelectedKlassen(newValue: string[]): Promise<void> {
     await searchFilterStore.setKlasseFilterForKlassen(newValue);
@@ -347,7 +315,6 @@
       organisationStore.allKlassen = organisationStore.klassen;
     } else {
       schulenFilterRef.value?.clearInput();
-      organisationStore.resetSchulFilter();
       // Reset klassenOptions
       klassenOptions.value = [];
       // Refetch all data
@@ -364,13 +331,6 @@
       });
     }
   }
-
-  watch(
-    () => organisationStore.schulenFilter.selectedItems,
-    async (newSelection: Array<Organisation>, oldSelection: Array<Organisation>) => {
-      if (oldSelection.length > 0 && newSelection.length === 0) await resetSearchAndFilter();
-    },
-  );
 
   watch(
     hasAutoselectedSchule,
@@ -390,6 +350,50 @@
       }
     },
     { immediate: true },
+  );
+
+  watch(
+    () => organisationStore.schulenFilter.selectedItems,
+    async (newSelection: Array<Organisation>, oldSelection: Array<Organisation>) => {
+      if (oldSelection.length > 0 && newSelection.length === 0) {
+        await resetSearchAndFilter();
+        return;
+      }
+      if (
+        newSelection.length === oldSelection.length &&
+        sameContent(newSelection, oldSelection, (o: Organisation) => o.id)
+      ) {
+        return;
+      }
+
+      const newSchuleId: string | null = newSelection.length === 1 ? newSelection[0]!.id : null;
+      await searchFilterStore.setSchuleFilterForKlassen(newSchuleId);
+      if (newSchuleId) {
+        selectedKlassen.value = [];
+        organisationStore.allKlassen = [];
+        await fetchKlassenBySelectedSchuleId(newSchuleId);
+      } else {
+        // Reset selectedKlassen and klassenOptions when Schule is unselected
+        selectedKlassen.value = [];
+        klassenOptions.value = [];
+        organisationStore.allKlassen = [];
+        searchFilterStore.selectedKlassenForKlassen = [];
+        totalKlassen = 0;
+
+        // Fetch all Klassen when no Schule is selected
+        await organisationStore.getAllOrganisationen({
+          offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
+          limit: 25,
+          includeTyp: OrganisationsTyp.Klasse,
+          systemrechte: ['KLASSEN_VERWALTEN'],
+        });
+        klassenOptions.value = organisationStore.allKlassen.map((org: Organisation) => ({
+          value: org.id,
+          title: org.name,
+        }));
+      }
+      totalKlassen = organisationStore.allKlassen.length;
+    },
   );
 
   function navigateToKlassenDetails(_$event: PointerEvent, { item }: { item: Organisation }): void {
