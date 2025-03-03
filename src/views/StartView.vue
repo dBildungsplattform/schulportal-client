@@ -75,7 +75,8 @@
   });
 
   function getUrgencyType(date: Date): 'errorLight' | 'warning' {
-    const error: boolean = date.valueOf() < new Date().valueOf() + 15 * 24 * 60 * 60 * 1000;
+    // The +1 is added to ensure that the 14th day is explicitly included in the range
+    const error: boolean = date.valueOf() < new Date().valueOf() + (14 + 1) * 24 * 60 * 60 * 1000;
     return error ? 'errorLight' : 'warning';
   }
 
