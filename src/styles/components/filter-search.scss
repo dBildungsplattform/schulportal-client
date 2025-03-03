@@ -13,7 +13,9 @@
   }
 
   &.selected {
-    background-color: variables.$filterDropdownSelectionColor;
+    .v-input__control {
+      background-color: variables.$filterDropdownSelectionColor;
+    }
 
     .v-chip {
       background-color: white;

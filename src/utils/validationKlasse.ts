@@ -3,7 +3,7 @@ import { toTypedSchema } from '@vee-validate/yup';
 import { DIN_91379A_EXT, HAS_LETTER_OR_NUMBER, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
 import type { TypedSchema } from 'vee-validate';
 
-type ValidationSchema = {
+export type ValidationSchema = {
   selectedSchule: string;
   selectedKlassenname: string;
 };

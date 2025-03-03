@@ -1,46 +1,17 @@
 import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+import { DoFactory } from '@/testing/DoFactory';
 import { VueWrapper, mount } from '@vue/test-utils';
 import { expect, test, type Mock, type MockInstance } from 'vitest';
 import { h, nextTick } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { VApp } from 'vuetify/components';
 import { useDisplay } from 'vuetify';
+import { VApp } from 'vuetify/components';
 import MenuBar from './MenuBar.vue';
 
 let wrapper: VueWrapper | null = null;
 const authStore: AuthStore = useAuthStore();
 
-authStore.currentUser = {
-  middle_name: null,
-  nickname: null,
-  profile: null,
-  picture: null,
-  website: null,
-  gender: null,
-  birthdate: null,
-  zoneinfo: null,
-  locale: null,
-  phone_number: null,
-  updated_at: null,
-  personId: null,
-  email: 'albert@test.de',
-  email_verified: true,
-  family_name: 'Test',
-  given_name: 'Albert',
-  name: 'Albert Test',
-  preferred_username: 'albert',
-  sub: 'c71be903-d0ec-4207-b653-40c114680b63',
-  personenkontexte: [
-    {
-      organisationsId: '123456',
-      rolle: {
-        systemrechte: ['ROLLEN_VERWALTEN', 'SCHULEN_VERWALTEN'],
-        serviceProviderIds: ['789897798'],
-      },
-    },
-  ],
-  password_updated_at: null,
-};
+authStore.currentUser = DoFactory.getUserinfoResponse();
 
 vi.mock('vue-router', () => ({
   useRoute: vi.fn(() => ({

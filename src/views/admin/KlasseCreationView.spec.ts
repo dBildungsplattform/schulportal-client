@@ -1,9 +1,8 @@
-import type { DBiamPersonenuebersichtResponse, OrganisationResponse } from '@/api-client/generated';
+import type { OrganisationResponse } from '@/api-client/generated';
 import routes from '@/router/routes';
-import { useAuthStore, type AuthStore, type UserInfo } from '@/stores/AuthStore';
 import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
-import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
-import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
+import { DOMWrapper, VueWrapper, flushPromises, mount } from '@vue/test-utils';
+import type Module from 'module';
 import { beforeEach, describe, expect, test, vi, type Mock, type MockInstance } from 'vitest';
 import { nextTick } from 'vue';
 import {
@@ -14,7 +13,6 @@ import {
   type Router,
 } from 'vue-router';
 import KlasseCreationView from './KlasseCreationView.vue';
-import type Module from 'module';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -68,7 +66,7 @@ type FormFields = {
 };
 
 type FormSelectors = {
-  schuleSelect: VueWrapper;
+  schuleSelect: DOMWrapper<Element>;
   klassennameInput: VueWrapper;
 };
 
@@ -76,9 +74,7 @@ async function fillForm(args: Partial<FormFields>): Promise<Partial<FormSelector
   const { schule, klassenname }: Partial<FormFields> = args;
   const selectors: Partial<FormSelectors> = {};
 
-  const schuleSelect: VueWrapper | undefined = wrapper
-    ?.findComponent({ ref: 'klasse-creation-form' })
-    .findComponent({ ref: 'schule-select' });
+  const schuleSelect: DOMWrapper<Element> | undefined = wrapper?.find('#schule-select');
   expect(schuleSelect?.exists()).toBe(true);
 
   await schuleSelect?.setValue(schule);
@@ -276,40 +272,5 @@ describe('KlasseCreationView', () => {
 
       organisationStore.errorCode = '';
     });
-  });
-
-  describe('autoselect logic', () => {
-    const personId: string = 'super-unique-and-special';
-    const personStore: PersonStore = usePersonStore();
-    const authStore: AuthStore = useAuthStore();
-
-    beforeEach(() => {
-      personStore.$reset();
-      authStore.$reset();
-      mountComponent();
-    });
-
-    test.each([
-      {
-        label: 'null',
-        uebersicht: null,
-      },
-      {
-        label: 'for someone else',
-        uebersicht: {
-          personId: 'someone-else',
-          zuordnungen: [],
-        } as unknown as DBiamPersonenuebersichtResponse,
-      },
-    ])(
-      'if uebersicht is $label, it refreshes store',
-      async ({ uebersicht }: { uebersicht: DBiamPersonenuebersichtResponse | null }) => {
-        const spy: MockInstance = vi.spyOn(personStore, 'getPersonenuebersichtById');
-        authStore.currentUser = { personId, personenkontexte: [] } as unknown as UserInfo;
-        personStore.personenuebersicht = uebersicht;
-        await flushPromises();
-        expect(spy).toHaveBeenLastCalledWith(personId);
-      },
-    );
   });
 });
