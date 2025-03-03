@@ -1,5 +1,5 @@
-import { OrganisationsTyp, TraegerschaftTyp } from '@/api-client/generated';
 import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+import { DoFactory } from '@/testing/DoFactory';
 import { VueWrapper, mount } from '@vue/test-utils';
 import { expect, test, type Mock, type MockInstance } from 'vitest';
 import { h, nextTick } from 'vue';
@@ -11,49 +11,7 @@ import MenuBar from './MenuBar.vue';
 let wrapper: VueWrapper | null = null;
 const authStore: AuthStore = useAuthStore();
 
-authStore.currentUser = {
-  middle_name: null,
-  nickname: null,
-  profile: null,
-  picture: null,
-  website: null,
-  gender: null,
-  birthdate: null,
-  zoneinfo: null,
-  locale: null,
-  phone_number: null,
-  updated_at: null,
-  personId: null,
-  email: 'albert@test.de',
-  email_verified: true,
-  family_name: 'Test',
-  given_name: 'Albert',
-  name: 'Albert Test',
-  preferred_username: 'albert',
-  sub: 'c71be903-d0ec-4207-b653-40c114680b63',
-  personenkontexte: [
-    {
-      organisation: {
-        id: '123456',
-        name: '',
-        itslearningEnabled: true,
-        typ: OrganisationsTyp.Schule,
-        administriertVon: null,
-        kennung: null,
-        kuerzel: '',
-        namensergaenzung: '',
-        // eslint-disable-next-line no-underscore-dangle
-        traegerschaft: TraegerschaftTyp._01,
-        version: 1,
-      },
-      rolle: {
-        systemrechte: ['ROLLEN_VERWALTEN', 'SCHULEN_VERWALTEN'],
-        serviceProviderIds: ['789897798'],
-      },
-    },
-  ],
-  password_updated_at: null,
-};
+authStore.currentUser = DoFactory.getUserinfoResponse();
 
 vi.mock('vue-router', () => ({
   useRoute: vi.fn(() => ({

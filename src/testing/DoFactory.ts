@@ -23,6 +23,20 @@ export class DoFactory {
     };
   }
 
+  public static getKlasse(parentSchule?: Organisation, props?: Partial<Organisation>): Organisation {
+    const name: string = props?.name ?? `${faker.string.numeric(2)}${faker.string.alpha(1)}`;
+    return {
+      id: faker.string.uuid(),
+      name,
+      kennung: `${parentSchule?.kennung ?? faker.string.numeric(7)}-${name}`,
+      namensergaenzung: 'Klasse',
+      kuerzel: faker.string.alpha(4),
+      typ: OrganisationsTyp.Klasse,
+      administriertVon: parentSchule?.id ?? faker.string.uuid(),
+      ...props,
+    };
+  }
+
   public static getOrganisationResponse(props?: Partial<OrganisationResponse>): OrganisationResponse {
     return {
       ...DoFactory.getSchule(),

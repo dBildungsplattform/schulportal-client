@@ -1,4 +1,4 @@
-import { RollenSystemRecht, TraegerschaftTyp } from '@/api-client/generated';
+import { RollenSystemRecht } from '@/api-client/generated';
 import { useAuthStore, type AuthStore, type UserInfo } from '@/stores/AuthStore';
 import {
   OrganisationsTyp,
@@ -56,38 +56,27 @@ const schule2: Organisation = DoFactory.getSchule();
 const personenkontexte: UserInfo['personenkontexte'] = [
   {
     organisation: {
+      ...DoFactory.getOrganisationResponse({
+        administriertVon: '1',
+        kennung: schule1.kennung ?? '',
+      }),
       ...schule1,
-      namensergaenzung: null,
-      kuerzel: '',
-      version: 1,
-      itslearningEnabled: true,
-      // eslint-disable-next-line no-underscore-dangle
-      traegerschaft: TraegerschaftTyp._01,
-      administriertVon: '1',
-      kennung: schule1.kennung ?? '',
     },
-    rolle: {
-      systemrechte: [RollenSystemRecht.KlassenVerwalten, 'SCHULEN_VERWALTEN'],
-      serviceProviderIds: ['789897798'],
-    },
+    rolle: DoFactory.getRollenSystemRechtServiceProviderIDResponse({
+      systemrechte: [RollenSystemRecht.KlassenVerwalten, RollenSystemRecht.SchulenVerwalten],
+    }),
   },
   {
     organisation: {
+      ...DoFactory.getOrganisationResponse({
+        administriertVon: '1',
+        kennung: schule2.kennung ?? '',
+      }),
       ...schule2,
-      namensergaenzung: null,
-      kuerzel: '',
-      version: 1,
-      itslearningEnabled: true,
-      typ: OrganisationsTyp.Schule,
-      // eslint-disable-next-line no-underscore-dangle
-      traegerschaft: TraegerschaftTyp._01,
-      administriertVon: '1',
-      kennung: schule2.kennung ?? '',
     },
-    rolle: {
-      systemrechte: [RollenSystemRecht.KlassenVerwalten, 'SCHULEN_VERWALTEN'],
-      serviceProviderIds: ['789897798'],
-    },
+    rolle: DoFactory.getRollenSystemRechtServiceProviderIDResponse({
+      systemrechte: [RollenSystemRecht.KlassenVerwalten, RollenSystemRecht.SchulenVerwalten],
+    }),
   },
 ];
 const authUser: UserInfo = DoFactory.getUserinfoResponse();
@@ -102,24 +91,8 @@ describe('KlassenManagementView', () => {
 
     organisationStore.$reset();
     organisationStore.allKlassen = [
-      {
-        id: '1',
-        name: '9a',
-        kennung: `${schule1.kennung}-9a`,
-        namensergaenzung: 'Klasse',
-        kuerzel: 'aehg',
-        typ: 'KLASSE',
-        administriertVon: schule1.id,
-      },
-      {
-        id: '2',
-        name: '9b',
-        kennung: `${schule2.kennung}-9b`,
-        namensergaenzung: 'Klasse',
-        kuerzel: 'aehg',
-        typ: 'KLASSE',
-        administriertVon: schule2.id,
-      },
+      DoFactory.getKlasse(schule1, { name: '9a' }),
+      DoFactory.getKlasse(schule2, { name: '9b' }),
     ];
 
     organisationStore.allOrganisationen = [schule1, schule2];
