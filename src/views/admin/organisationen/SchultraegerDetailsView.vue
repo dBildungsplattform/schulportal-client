@@ -40,9 +40,8 @@
 
   const currentSchultraegerId: string = route.params['id'] as string;
 
-  const schulenWithoutTraeger: ComputedRef = computed(() => {
-    return [];
-  });
+  let assignedSchulen: Ref = ref([]);
+  let unassignedSchulen: Ref = ref([]);
 
   // eslint-disable-next-line @typescript-eslint/typedef
   const { resetForm } = useForm<SchultraegerFormType>({
@@ -73,7 +72,6 @@
     organisationStore.errorCode = '';
   }
 
-  // TODO: add a router.push to the Management when it's available
   async function navigateToSchultraegerManagement(): Promise<void> {
     organisationStore.createdSchule = null;
   }
@@ -117,11 +115,19 @@
   }
 
   async function searchInAssignedSchulen(searchString: string): Promise<void> {
-    await organisationStore.getSchulenByTraegerId(currentSchultraegerId, searchString);
+    if (!organisationStore.currentOrganisation) return;
+    assignedSchulen.value = await organisationStore.getSchulenByTraegerId(currentSchultraegerId, { searchFilter: searchString });
   }
 
   async function searchInUnassignedSchulen(searchString: string): Promise<void> {
-    console.log('searchInUnassignedSchulen', searchString);
+    if (!organisationStore.currentOrganisation || !searchString) return;
+    unassignedSchulen.value = await organisationStore.getSchulenByTraegerId(
+      organisationStore.currentOrganisation.administriertVon!,
+      {
+        limit: 25,
+        searchFilter: searchString,
+      }
+    );
   }
 
   onBeforeMount(async () => {
@@ -129,7 +135,7 @@
 
     await organisationStore.getRootKinderSchultraeger();
     await organisationStore.getOrganisationById(currentSchultraegerId, OrganisationsTyp.Traeger);
-    await organisationStore.getSchulenByTraegerId(currentSchultraegerId, '');
+    assignedSchulen.value = await organisationStore.getSchulenByTraegerId(currentSchultraegerId, { searchFilter: '' });
 
     // Set the initial values using the computed properties
     if (rootChildSchultraegerList.value.length > 0) {
@@ -216,11 +222,9 @@
             </v-row>
             <v-row class="align-center mt-8 px-5">
               <RelationshipAssign
-                :assignedItems="organisationStore.schulenInTraeger"
-                :assignedItemsHeader="
-                  $t('admin.schultraeger.schulenOfThisTraeger', { amount: organisationStore.schulenInTraeger.length })
-                "
-                :unassignedItems="schulenWithoutTraeger"
+                :assignedItems="assignedSchulen"
+                :assignedItemsHeader="$t('admin.schultraeger.schulenOfThisTraeger', { amount: assignedSchulen.length })"
+                :unassignedItems="unassignedSchulen"
                 :unassignedItemsHeader="$t('admin.schultraeger.schulenWithoutTraeger')"
                 @onHandleAssignedItemsSearchFilter="searchInAssignedSchulen"
                 @onHandleUnassignedItemsSearchFilter="searchInUnassignedSchulen"
