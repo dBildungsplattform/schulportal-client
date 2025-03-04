@@ -241,14 +241,14 @@
       ></v-list-item>
     </div>
     <!-- Portalverwaltung -->
-    <div v-if="authStore.hasPortalVerwaltungPermission && authStore.hasPortalVerwaltungPermission">
+    <div v-if="authStore.hasPortalVerwaltungPermission && authStore.hasHinweiseBearbeitenPermission">
       <v-list-item
         class="menu-bar-main-item headline-2"
         data-testid="portal-management-title"
         :title="$t('admin.portal.management')"
       ></v-list-item>
       <v-list-item
-        v-if="authStore.hasPortalVerwaltungPermission"
+        v-if="authStore.hasHinweiseBearbeitenPermission"
         class="menu-bar-sub-item caption"
         @click="closeMenuOnMobile"
         data-testid="hinweise-edit-menu-item"
