@@ -1,9 +1,9 @@
 import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
-import SchuleManagementView from './SchuleManagementView.vue';
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import { nextTick } from 'vue';
 import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
+import SchultraegerManagementView from './SchultraegerManagementView.vue';
 
 let wrapper: VueWrapper | null = null;
 let organisationStore: OrganisationStore;
@@ -17,34 +17,34 @@ beforeEach(() => {
 
   organisationStore = useOrganisationStore();
 
-  organisationStore.allSchulen = [
+  organisationStore.allSchultraeger = [
     {
       id: '9876',
-      name: 'Random Schulname Gymnasium',
+      name: 'Schultraeger 1',
       kennung: '9356494',
-      namensergaenzung: 'Schule',
+      namensergaenzung: 'Traeger',
       kuerzel: 'rsg',
-      typ: OrganisationsTyp.Schule,
+      typ: OrganisationsTyp.Traeger,
       administriertVon: '1',
     },
     {
       id: '1123',
-      name: 'Albert-Emil-Hansebrot-Gymnasium',
+      name: 'Schultraeger 2',
       kennung: '2745475',
-      namensergaenzung: 'Schule',
+      namensergaenzung: 'Traeger',
       kuerzel: 'aehg',
-      typ: OrganisationsTyp.Schule,
+      typ: OrganisationsTyp.Traeger,
       administriertVon: '1',
     },
   ];
 
-  organisationStore.totalSchulen = 2;
+  organisationStore.totalSchultraeger = 2;
 
-  wrapper = mount(SchuleManagementView, {
+  wrapper = mount(SchultraegerManagementView, {
     attachTo: document.getElementById('app') || '',
     global: {
       components: {
-        SchuleManagementView,
+        SchultraegerManagementView,
       },
       mocks: {
         route: {
@@ -58,10 +58,10 @@ beforeEach(() => {
   });
 });
 
-describe('SchuleManagementView', () => {
-  test('it renders schule management view', () => {
+describe('SchultraegerManagementView', () => {
+  test('it renders Schultraeger management view', () => {
     expect(wrapper?.getComponent({ name: 'ResultTable' })).toBeTruthy();
-    expect(wrapper?.find('[data-testid="schule-table"]').isVisible()).toBe(true);
+    expect(wrapper?.find('[data-testid="schultraeger-table"]').isVisible()).toBe(true);
     expect(wrapper?.findAll('.v-data-table__tr').length).toBe(2);
   });
 
@@ -69,7 +69,7 @@ describe('SchuleManagementView', () => {
     expect(wrapper?.find('.v-pagination__next button.v-btn--disabled').isVisible()).toBe(true);
     expect(wrapper?.find('.v-data-table-footer__info').text()).toContain('1-2');
 
-    organisationStore.totalSchulen = 50;
+    organisationStore.totalSchultraeger = 50;
     await nextTick();
 
     expect(wrapper?.find('.v-data-table-footer__info').text()).toContain('1-30');

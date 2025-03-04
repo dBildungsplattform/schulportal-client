@@ -126,8 +126,8 @@ describe('SchultraegerView', () => {
   test('it navigates back to schultraeger table', async () => {
     const push: MockInstance = vi.spyOn(router, 'push');
     await wrapper?.find('[data-testid="close-layout-card-button"]').trigger('click');
-    // TODO: The number of push calls should be set to 1 after the Ergebnisliste for Träger is available
-    expect(push).toHaveBeenCalledTimes(0);
+
+    expect(push).toHaveBeenCalledTimes(1);
   });
 
   test('it fills form and triggers submit', async () => {

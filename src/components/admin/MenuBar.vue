@@ -233,6 +233,14 @@
       ></v-list-item>
       <v-list-item
         class="menu-bar-sub-item caption"
+        @click="handleMenuItemClick('/admin/schultraeger')"
+        data-testid="schultraeger-management-menu-item"
+        prepend-icon="mdi-format-list-bulleted"
+        :title="$t('admin.schultraeger.showAll')"
+        to="/admin/schultraeger"
+      ></v-list-item>
+      <v-list-item
+        class="menu-bar-sub-item caption"
         @click="closeMenuOnMobile"
         data-testid="schultraeger-creation-menu-item"
         prepend-icon="mdi-plus-circle-outline"
