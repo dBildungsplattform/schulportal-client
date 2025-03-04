@@ -63,7 +63,7 @@ EXPOSE 8080
 
 # Conditional command for development or production
 CMD if [ "$NODE_ENV" = "dev" ]; then \
-      npm install && npm run dev; \
+      npm install && vite; \
     else \
       nginx -g "daemon off;"; \
     fi
