@@ -72,15 +72,16 @@ export const useMeldungStore: StoreDefinition<'meldungStore', MeldungState, Meld
         this.loading = true;
         this.errorCode = '';
         try {
-          const { data }: AxiosResponse<MeldungResponse> = await meldungenApi.meldungControllerGetCurrentMeldung();
-          //TODO better way
-          if (!data.id) return;
-          this.currentMeldung = {
-            id: data.id,
-            text: data.inhalt,
-            status: data.status as MeldungStatus,
-            revision: data.revision,
-          };
+          const { data }: AxiosResponse<MeldungResponse | null> =
+            await meldungenApi.meldungControllerGetCurrentMeldung();
+          if (data) {
+            this.currentMeldung = {
+              id: data.id,
+              text: data.inhalt,
+              status: data.status as MeldungStatus,
+              revision: data.revision,
+            };
+          }
         } catch (error: unknown) {
           this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
         } finally {
