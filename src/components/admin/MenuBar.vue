@@ -240,6 +240,23 @@
         to="/admin/schultraeger/new"
       ></v-list-item>
     </div>
+    <!-- Portalverwaltung -->
+    <div v-if="authStore.hasPortalVerwaltungPermission && authStore.hasPortalVerwaltungPermission">
+      <v-list-item
+        class="menu-bar-main-item headline-2"
+        data-testid="portal-management-title"
+        :title="$t('admin.portal.management')"
+      ></v-list-item>
+      <v-list-item
+        v-if="authStore.hasPortalVerwaltungPermission"
+        class="menu-bar-sub-item caption"
+        @click="closeMenuOnMobile"
+        data-testid="hinweise-edit-menu-item"
+        prepend-icon="mdi-pencil"
+        :title="$t('admin.portal.editHinweise')"
+        to="/admin/hinweise"
+      ></v-list-item>
+    </div>
   </v-navigation-drawer>
 </template>
 
