@@ -144,6 +144,17 @@ const routes: readonly RouteRecordRaw[] = [
     },
   },
   {
+    path: '/admin/schultraeger',
+    name: 'schultraeger-management',
+    component: () => import('../views/admin/SchultraegerManagementView.vue'),
+    meta: {
+      layout: 'AdminLayout',
+      requiresAuth: true,
+      requiredStepUpLevel: StepUpLevel.GOLD,
+      requiresPermission: 'schultraegerverwaltung',
+    },
+  },
+  {
     path: '/admin/schultraeger/new',
     name: 'create-schultraeger',
     component: () => import('../views/admin/organisationen/SchultraegerCreationView.vue'),

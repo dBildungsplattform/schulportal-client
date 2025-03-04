@@ -97,9 +97,11 @@
     organisationStore.errorCode = '';
   }
 
-  // TODO: add a router.push to the Management when it's available
   async function navigateToSchultraegerManagement(): Promise<void> {
     organisationStore.createdSchule = null;
+    await router.push({ name: 'schultraeger-management' }).then(() => {
+      router.go(0);
+    });
   }
 
   async function navigateBackToSchultraegerForm(): Promise<void> {

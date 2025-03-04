@@ -495,6 +495,7 @@
       "selectSchule": "Schule auswählen",
       "selectSchuleFirst": "Bitte erst eine Schule auswählen.",
       "schule": "Schule",
+      "schulen": "Schulen",
       "schulenFound": "{count} Schule gefunden | {count} Schulen gefunden",
       "schulenSelected": "{count} Schulen ausgewählt",
       "schulname": "Schulname",
@@ -508,6 +509,7 @@
       "addNew": "Neuen Schulträger hinzufügen",
       "assignSchulenOrganisationally": "Schulen zuordnen (organisatorisch)",
       "assignSchultraegerform": "Schulträgerform zuordnen",
+      "assignedSchulen": "Zugeordnete Schulen",
       "create": "Schulträger anlegen",
       "createAnother": "Weiteren Schulträger anlegen",
       "createNew": "Neuen Schulträger anlegen",
@@ -534,6 +536,7 @@
       "schultraegerCreateErrorTitle": "Fehler beim Anlegen des Schulträgers",
       "schultraegerform": "Schulträgerform",
       "schultraegername": "Schulträgername",
+      "showAll": "Alle Schulträger anzeigen",
       "title": {
         "ORGANISATION_SPECIFICATION_ERROR": "Fehler bei Anlage des Schulträgers",
         "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Zwei-Faktor-Authentifizierung (2FA) erforderlich"
