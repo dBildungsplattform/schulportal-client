@@ -56,6 +56,13 @@ export type SchuleTableItem = {
   updatedAt?: string;
 };
 
+export type SchultraegerTableItem = {
+  id: string;
+  name: string;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
 export type SchultraegerFormType = {
   selectedSchultraegerform: string | undefined;
   selectedSchultraegername: string | undefined;
