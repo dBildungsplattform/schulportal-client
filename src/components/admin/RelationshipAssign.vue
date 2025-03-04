@@ -3,13 +3,28 @@
   import RelationshipAssignList from './RelationshipAssignList.vue';
 
   type Props = {
-    itemPoolHeader: string;
+    unassignedItemsHeader: string;
     assignedItemsHeader: string;
-    itemPool: Array<Organisation>;
+    unassignedItems: Array<Organisation>;
     assignedItems: Array<Organisation>;
   };
 
   defineProps<Props>();
+
+  type Emits = {
+    (event: 'onHandleAssignedItemsSearchFilter', searchFilter: string): void;
+    (event: 'onHandleUnassignedItemsSearchFilter', searchFilter: string): void;
+  };
+
+  const emit: Emits = defineEmits<Emits>();
+
+  function handleAssignedItemsSearchFilter(searchFilter: string): void {
+    emit('onHandleAssignedItemsSearchFilter', searchFilter.trim());
+  }
+
+  function handleUnassignedItemsSearchFilter(searchFilter: string): void {
+    emit('onHandleUnassignedItemsSearchFilter', searchFilter.trim());
+  }
 </script>
 
 <template>
@@ -17,9 +32,10 @@
     cols="12"
     md="6"
   >
-    <h3 class="subtitle-1 mb-3">{{ itemPoolHeader }}</h3>
+    <h3 class="subtitle-1 mb-3">{{ unassignedItemsHeader }}</h3>
     <RelationshipAssignList
-      :items="itemPool"
+      :items="unassignedItems"
+      @onHandleSearchFilter="handleUnassignedItemsSearchFilter"
       ref="itemPoolList"
     >
     </RelationshipAssignList>
@@ -31,6 +47,7 @@
     <h3 class="subtitle-1 mb-3">{{ assignedItemsHeader }}</h3>
     <RelationshipAssignList
       :items="assignedItems"
+      @onHandleSearchFilter="handleAssignedItemsSearchFilter"
       ref="assignedItemsList"
     >
     </RelationshipAssignList>

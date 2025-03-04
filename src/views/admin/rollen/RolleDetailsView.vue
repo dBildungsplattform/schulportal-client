@@ -210,9 +210,7 @@
   function handleCancel(next: NavigationGuardNext): void {
     if (isFormDirty.value) {
       showUnsavedChangesDialog.value = true;
-      console.log('handleCancel before', blockedNext);
       blockedNext = next;
-      console.log('handleCancel after', blockedNext);
     } else {
       cancelEdit();
     }

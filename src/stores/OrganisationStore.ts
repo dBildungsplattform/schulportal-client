@@ -126,7 +126,7 @@ type OrganisationActions = {
   deleteOrganisationById: (organisationId: string) => Promise<void>;
   updateOrganisationById: (organisationId: string, name: string, type: OrganisationsTyp) => Promise<void>;
   getRootKinderSchultraeger: () => Promise<void>;
-  getSchulenByTraegerId: (traegerId: string) => Promise<void>;
+  getSchulenByTraegerId: (traegerId: string, searchString: string) => Promise<void>;
   fetchSchuleDetailsForKlassen: (filterActive: boolean) => Promise<void>;
   setItsLearningForSchule: (organisationId: string) => Promise<void>;
 };
@@ -491,12 +491,17 @@ export const useOrganisationStore: StoreDefinition<
       }
     },
 
-    async getSchulenByTraegerId(traegerId: string) {
+    async getSchulenByTraegerId(traegerId: string, searchString?: string) {
       this.errorCode = '';
       this.loading = true;
       try {
         const { data }: { data: Array<OrganisationResponse> } =
-          await organisationApi.organisationControllerGetAdministrierteOrganisationen(traegerId);
+          await organisationApi.organisationControllerGetAdministrierteOrganisationen(
+            traegerId,
+            undefined,
+            undefined,
+            searchString,
+          );
         this.schulenInTraeger = data;
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'SCHULTRAEGER_ERROR');

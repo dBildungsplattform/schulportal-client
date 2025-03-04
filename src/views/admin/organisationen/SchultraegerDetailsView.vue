@@ -98,8 +98,6 @@
   }
 
   const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = formContext.handleSubmit(async () => {
-    console.log('submit');
-    console.log(selectedSchultraegername.value);
     if (selectedSchultraegername.value) {
       await organisationStore.updateOrganisationById(
         currentSchultraegerId,
@@ -112,12 +110,18 @@
   function handleCancel(next: NavigationGuardNext): void {
     if (isFormDirty.value) {
       showUnsavedChangesDialog.value = true;
-      console.log('handleCancel before', blockedNext);
       blockedNext = next;
-      console.log('handleCancel after', blockedNext);
     } else {
       navigateToSchultraegerManagement();
     }
+  }
+
+  async function searchInAssignedSchulen(searchString: string): Promise<void> {
+    await organisationStore.getSchulenByTraegerId(currentSchultraegerId, searchString);
+  }
+
+  async function searchInUnassignedSchulen(searchString: string): Promise<void> {
+    console.log('searchInUnassignedSchulen', searchString);
   }
 
   onBeforeMount(async () => {
@@ -125,7 +129,7 @@
 
     await organisationStore.getRootKinderSchultraeger();
     await organisationStore.getOrganisationById(currentSchultraegerId, OrganisationsTyp.Traeger);
-    await organisationStore.getSchulenByTraegerId(currentSchultraegerId);
+    await organisationStore.getSchulenByTraegerId(currentSchultraegerId, '');
 
     // Set the initial values using the computed properties
     if (rootChildSchultraegerList.value.length > 0) {
@@ -212,12 +216,14 @@
             </v-row>
             <v-row class="align-center mt-8 px-5">
               <RelationshipAssign
-                :itemPool="schulenWithoutTraeger"
-                :itemPoolHeader="$t('admin.schultraeger.schulenWithoutTraeger')"
                 :assignedItems="organisationStore.schulenInTraeger"
                 :assignedItemsHeader="
                   $t('admin.schultraeger.schulenOfThisTraeger', { amount: organisationStore.schulenInTraeger.length })
                 "
+                :unassignedItems="schulenWithoutTraeger"
+                :unassignedItemsHeader="$t('admin.schultraeger.schulenWithoutTraeger')"
+                @onHandleAssignedItemsSearchFilter="searchInAssignedSchulen"
+                @onHandleUnassignedItemsSearchFilter="searchInUnassignedSchulen"
               >
               </RelationshipAssign>
             </v-row>

@@ -8,8 +8,14 @@
 
   defineProps<Props>();
 
+  type Emits = {
+    (event: 'onHandleSearchFilter', searchFilter: string): void;
+  };
+
+  const emit: Emits = defineEmits<Emits>();
+
   function handleSearchFilter(searchFilter: string): void {
-    console.log('searchFilter', searchFilter);
+    emit('onHandleSearchFilter', searchFilter.trim());
   }
 </script>
 
