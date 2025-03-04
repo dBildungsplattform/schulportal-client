@@ -296,10 +296,10 @@
   </v-card>
 </template>
 
-<style scoped>
+<style>
   textarea {
     text-align: justify;
-    -moz-text-align-last: center; /* Firefox 12+  TODO*/
+    -moz-text-align-last: center; /* Firefox 12+*/
     text-align-last: center;
   }
 
