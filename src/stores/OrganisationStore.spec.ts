@@ -859,7 +859,7 @@ describe('OrganisationStore', () => {
   });
 
   describe('fetchSchuleDetailsForKlassen', () => {
-    const mockKlassen = [
+    const mockKlassen: Organisation[] = [
       {
         id: '1',
         administriertVon: '101',
@@ -900,16 +900,26 @@ describe('OrganisationStore', () => {
     it.each([
       ['some mock server error', 'UNSPECIFIED_ERROR'],
       [{ i18nKey: 'GET_ERROR' }, 'GET_ERROR'],
-    ])('should handle error response %p', async (response, expectedError) => {
-      mockadapter
-        .onGet('/api/organisationen?limit=30&typ=SCHULE&systemrechte=KLASSEN_VERWALTEN&organisationIds=101')
-        .replyOnce(500, response);
+    ])(
+      'should handle error response %p',
+      async (
+        response:
+          | string
+          | {
+              i18nKey: string;
+            },
+        expectedError: string,
+      ) => {
+        mockadapter
+          .onGet('/api/organisationen?limit=30&typ=SCHULE&systemrechte=KLASSEN_VERWALTEN&organisationIds=101')
+          .replyOnce(500, response);
 
-      await organisationStore.fetchSchuleDetailsForKlassen(false);
+        await organisationStore.fetchSchuleDetailsForKlassen(false);
 
-      expect(organisationStore.schultraeger).toEqual([]);
-      expect(organisationStore.errorCode).toEqual(expectedError);
-    });
+        expect(organisationStore.schultraeger).toEqual([]);
+        expect(organisationStore.errorCode).toEqual(expectedError);
+      },
+    );
   });
 
   describe('fetchSchuleDetailsForSchultraeger', () => {
@@ -959,16 +969,26 @@ describe('OrganisationStore', () => {
     it.each([
       ['some mock server error', 'UNSPECIFIED_ERROR'],
       [{ i18nKey: 'GET_ERROR' }, 'GET_ERROR'],
-    ])('should handle error response %p', async (response, expectedError) => {
-      mockadapter
-        .onGet('/api/organisationen?limit=30&typ=SCHULE&systemrechte=SCHULTRAEGER_VERWALTEN&administriertVon=999')
-        .replyOnce(500, response);
+    ])(
+      'should handle error response %p',
+      async (
+        response:
+          | string
+          | {
+              i18nKey: string;
+            },
+        expectedError: string,
+      ) => {
+        mockadapter
+          .onGet('/api/organisationen?limit=30&typ=SCHULE&systemrechte=SCHULTRAEGER_VERWALTEN&administriertVon=999')
+          .replyOnce(500, response);
 
-      await organisationStore.fetchSchuleDetailsForSchultraeger();
+        await organisationStore.fetchSchuleDetailsForSchultraeger();
 
-      expect(organisationStore.errorCode).toBe(expectedError);
-      expect(organisationStore.loading).toBe(false);
-    });
+        expect(organisationStore.errorCode).toBe(expectedError);
+        expect(organisationStore.loading).toBe(false);
+      },
+    );
   });
 
   describe('setItsLearningForSchule', () => {
