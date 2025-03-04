@@ -519,7 +519,7 @@
         "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Die letzte Aktion konnte nicht ausgeführt werden. Aufgrund von längerer Inaktivität ist eine erneute Authentifizierung mit einem zweiten Faktor erforderlich. Um fortzufahren, klicken Sie bitte auf „Zurück zur Ergebnisliste“ oder „Schließen“. Sie werden anschließend zur Eingabe Ihres zweiten Faktors aufgefordert."
       },
       "management": "Schulträgerverwaltung",
-      "rules":{
+      "rules": {
         "schultraegername": {
           "matches": "Der Schulträgername darf keine ungültigen Zeichen beinhalten.",
           "noLeadingTrailingSpaces": "Der Schulträgername darf nicht mit Leerzeichen beginnen oder enden.",
@@ -541,7 +541,28 @@
       "selectServiceProvider": "Angebote auswählen",
       "serviceProvider": "Angebote"
     },
-    "status": "Status"
+    "status": "Status",
+    "portal": {
+      "management": "Portalverwaltung",
+      "editHinweise": "Hinweise bearbeiten"
+    },
+    "hinweise": {
+      "hinweiseTexte": "Hinweistexte",
+      "newsbox": "Newsbox",
+      "publish": "Veröffenlichen",
+      "publishEnd": "Veröffentlichen beenden",
+      "title": {
+        "UNSPECIFIED_ERROR": "Fehler beim Speichern der Hinweise",
+        "MISMATCHED_REVISION": "Geänderte Daten"
+      },
+      "errors": {
+        "UNSPECIFIED_ERROR": "Es ist ein Fehler aufgetreten.",
+        "MISMATCHED_REVISION": "Die Hinweise wurden zwischenzeitlich von einer anderen Administratorin oder einem anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut."
+      },
+      "validation": {
+        "max": "Der Text darf maximal 2000 Zeichen lang sein."
+      }
+    }
   },
   "cancel": "Abbrechen",
   "proceed": "Weiter",
