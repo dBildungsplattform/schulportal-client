@@ -105,24 +105,6 @@ jobs:
       fail_on_vulnerabilites: false
       report_location: 'Dockerfile'
   
-  build_dev_image_on_push:
-    needs:
-      - check_deployment_clearance
-      - create_branch_identifier
-    name: 'Publish development image'
-    if: ${{ github.event_name == 'push' && needs.check_deployment_clearance.outputs.deployment_clearance == 'true' && github.ref_name != 'main' }}
-    permissions:
-      packages: write
-      security-events: write
-      contents: read
-    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/image-publish-trivy.yaml@7
-    with:
-      image_name: 'schulportal-client'
-      dockerfile: 'Dockerfile.dev'  # Specify the development Dockerfile
-      image_tag: 'dev'  # Tag the image as 'dev'
-      container_registry: 'ghcr.io'
-      run_trivy_scan: false  # Skip Trivy scan for the development image
-
   scan_helm:
     uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-helm-kics.yaml@5
     permissions:
