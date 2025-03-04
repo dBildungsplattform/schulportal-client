@@ -189,8 +189,8 @@
         <SpshBanner
           v-bind:key="hinweis.id"
           v-for="hinweis in hinweise"
-          :id="hinweis.id?.toString() ?? hinweise.findIndex((m: Meldung) => m === hinweis).toString()"
-          ref="spsh-banner"
+          id="hinweis"
+          ref="hinweis-banner"
           type="background-grey"
           :visible="true"
           :dismissable="false"

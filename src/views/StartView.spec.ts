@@ -12,7 +12,7 @@ import StartView from './StartView.vue';
 import { type PersonStore, usePersonStore, type PersonWithUebersicht } from '@/stores/PersonStore';
 import { usePersonInfoStore, type PersonInfoResponse, type PersonInfoStore } from '@/stores/PersonInfoStore';
 import { OrganisationsTyp, RollenArt, RollenMerkmal, ServiceProviderKategorie } from '@/api-client/generated/api';
-import { useMeldungStore, type MeldungStore } from '@/stores/MeldungStore';
+import { MeldungStatus, useMeldungStore, type MeldungStore } from '@/stores/MeldungStore';
 
 let wrapper: VueWrapper | null = null;
 let authStore: AuthStore;
@@ -157,7 +157,12 @@ beforeEach(() => {
 
   personInfoStore.personInfo = mockPerson;
   personStore.personenuebersicht = mockPersonenUebersicht;
-  meldungStore.meldungen = [];
+  meldungStore.currentMeldung = {
+    id: '1',
+    text: 'Test',
+    status: MeldungStatus.VEROEFFENTLICHT,
+  };
+
   wrapper = mount(StartView, {
     attachTo: document.getElementById('app') || '',
     global: {
@@ -240,6 +245,15 @@ describe('StartView', () => {
     banner?.find('[data-testid="banner-close-icon"]').trigger('click');
     await nextTick();
     expect(banner?.emitted('dismissBanner')).toBeTruthy();
+  });
+
+  test('it renders a hinweis banner', async () => {
+    await nextTick();
+    await nextTick();
+
+    const banner: WrapperLike | undefined = wrapper?.find('[data-testid="hinweis-banner"]');
+
+    expect(banner?.isVisible()).toBe(true);
   });
 
   test('filterSortProviders sorts service providers alphabetically', () => {
