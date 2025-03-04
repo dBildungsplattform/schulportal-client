@@ -146,7 +146,7 @@ const routes: readonly RouteRecordRaw[] = [
   {
     path: '/admin/schultraeger',
     name: 'schultraeger-management',
-    component: () => import('../views/admin/SchultraegerManagementView.vue'),
+    component: () => import('../views/admin/organisationen/SchultraegerManagementView.vue'),
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
