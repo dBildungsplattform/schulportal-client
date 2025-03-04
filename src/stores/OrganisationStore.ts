@@ -11,6 +11,7 @@ import {
   type OrganisationByNameBodyParams,
   type ParentOrganisationenResponse,
   type OrganisationRootChildrenResponse,
+  type OrganisationResponse,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 import { useSearchFilterStore, type SearchFilterStore } from './SearchFilterStore';
@@ -76,6 +77,7 @@ type OrganisationState = {
   createdSchule: Organisation | null;
   createdSchultraeger: Organisation | null;
   lockingOrganisation: Organisation | null;
+  schulenInTraeger: Array<Organisation>;
   totalKlassen: number;
   totalSchulen: number;
   totalPaginatedSchulen: number;
@@ -124,6 +126,7 @@ type OrganisationActions = {
   deleteOrganisationById: (organisationId: string) => Promise<void>;
   updateOrganisationById: (organisationId: string, name: string, type: OrganisationsTyp) => Promise<void>;
   getRootKinderSchultraeger: () => Promise<void>;
+  getSchulenByTraegerId: (traegerId: string) => Promise<void>;
   fetchSchuleDetailsForKlassen: (filterActive: boolean) => Promise<void>;
   setItsLearningForSchule: (organisationId: string) => Promise<void>;
 };
@@ -155,6 +158,7 @@ export const useOrganisationStore: StoreDefinition<
       createdSchule: null,
       createdSchultraeger: null,
       lockingOrganisation: null,
+      schulenInTraeger: [],
       totalKlassen: 0,
       totalSchulen: 0,
       totalPaginatedSchulen: 0,
@@ -484,6 +488,20 @@ export const useOrganisationStore: StoreDefinition<
         this.schultraeger = Object.values(response.data);
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'SCHULTRAEGER_ERROR');
+      }
+    },
+
+    async getSchulenByTraegerId(traegerId: string) {
+      this.errorCode = '';
+      this.loading = true;
+      try {
+        const { data }: { data: Array<OrganisationResponse> } =
+          await organisationApi.organisationControllerGetAdministrierteOrganisationen(traegerId);
+        this.schulenInTraeger = data;
+      } catch (error: unknown) {
+        this.errorCode = getResponseErrorCode(error, 'SCHULTRAEGER_ERROR');
+      } finally {
+        this.loading = false;
       }
     },
 

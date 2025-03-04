@@ -28,6 +28,7 @@
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SchultraegerForm from '@/components/admin/schultraeger/SchultraegerForm.vue';
+  import RelationshipAssign from '@/components/admin/RelationshipAssign.vue';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -38,6 +39,10 @@
   const organisationStore: OrganisationStore = useOrganisationStore();
 
   const currentSchultraegerId: string = route.params['id'] as string;
+
+  const schulenWithoutTraeger: ComputedRef = computed(() => {
+    return [];
+  });
 
   // eslint-disable-next-line @typescript-eslint/typedef
   const { resetForm } = useForm<SchultraegerFormType>({
@@ -120,6 +125,7 @@
 
     await organisationStore.getRootKinderSchultraeger();
     await organisationStore.getOrganisationById(currentSchultraegerId, OrganisationsTyp.Traeger);
+    await organisationStore.getSchulenByTraegerId(currentSchultraegerId);
 
     // Set the initial values using the computed properties
     if (rootChildSchultraegerList.value.length > 0) {
@@ -196,6 +202,27 @@
             buttonClass="primary"
           />
         </SchultraegerForm>
+
+        <v-container class="px-3 px-sm-16">
+          <v-container class="px-lg-16">
+            <v-row>
+              <v-col>
+                <h3 class="headline-3">3. {{ $t('admin.schultraeger.assignSchulenOrganisationally') }}</h3>
+              </v-col>
+            </v-row>
+            <v-row class="align-center mt-8 px-5">
+              <RelationshipAssign
+                :itemPool="schulenWithoutTraeger"
+                :itemPoolHeader="$t('admin.schultraeger.schulenWithoutTraeger')"
+                :assignedItems="organisationStore.schulenInTraeger"
+                :assignedItemsHeader="
+                  $t('admin.schultraeger.schulenOfThisTraeger', { amount: organisationStore.schulenInTraeger.length })
+                "
+              >
+              </RelationshipAssign>
+            </v-row>
+          </v-container>
+        </v-container>
       </template>
 
       <v-row class="pt-3 px-2 save-cancel-row justify-end">

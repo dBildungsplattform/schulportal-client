@@ -506,6 +506,7 @@
     },
     "schultraeger": {
       "addNew": "Neuen Schulträger hinzufügen",
+      "assignSchulenOrganisationally": "Schulen zuordnen (organisatorisch)",
       "assignSchultraegerform": "Schulträgerform zuordnen",
       "create": "Schulträger anlegen",
       "createAnother": "Weiteren Schulträger anlegen",
@@ -527,6 +528,8 @@
           "required": "Der Schulträgername muss angegeben werden."
         }
       },
+      "schulenWithoutTraeger": "Schulen ohne Träger",
+      "schulenOfThisTraeger": "Schulen dieses Trägers ({amount})",
       "schultraegerAddedSuccessfully": "Der Schulträger wurde erfolgreich hinzugefügt.",
       "schultraegerCreateErrorTitle": "Fehler beim Anlegen des Schulträgers",
       "schultraegerform": "Schulträgerform",
