@@ -63,7 +63,7 @@
   let blockedNext: () => void = () => {};
 
   const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
-    meldungStore.createOrUpdateMeldung({
+    await meldungStore.createOrUpdateMeldung({
       ...newsboxMeldung.value,
       text: meldungText.value,
       status:
@@ -74,7 +74,7 @@
   });
 
   const onCloseDialog = (): void => {
-    window.history.back();
+    window.history.go(-1);
   };
 
   function handleConfirmUnsavedChanges(): void {
@@ -134,7 +134,6 @@
       @onCloseClicked="onCloseDialog"
     >
       <FormWrapper
-        v-if="!meldungStore.errorCode"
         :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
         :createButtonLabel="$t('admin.schultraeger.create')"
         :discardButtonLabel="$t('admin.schultraeger.discard')"
@@ -146,6 +145,7 @@
         @onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
       >
         <SpshAlert
+          v-if="meldungStore.errorCode"
           :model-value="!!meldungStore.errorCode"
           :title="$t(`admin.hinweise.title.${meldungStore.errorCode}`)"
           :type="'error'"
@@ -161,6 +161,8 @@
           </v-col>
           <v-col :cols="$vuetify.display.smAndDown ? 12 : 9">
             <v-textarea
+              data-testid="newsboxText"
+              ref="newsboxText"
               v-bind="meldungTextProps"
               v-model="meldungText"
               variant="outlined"
@@ -180,6 +182,7 @@
             md="auto"
           >
             <v-btn
+              data-testid="submit-newsbox"
               :block="smAndDown"
               :disabled="meldungStore.loading"
               color="primary"
