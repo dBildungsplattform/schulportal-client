@@ -197,4 +197,9 @@
   </div>
 </template>
 
-<style></style>
+<style>
+  .v-textarea .v-field__input {
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+  }
+</style>
