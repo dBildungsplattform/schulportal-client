@@ -87,7 +87,7 @@ describe('MeldungStore', () => {
     });
 
     it('should ignore empty response', async () => {
-      mockadapter.onGet('/api/portal/meldung/current').replyOnce(200, null);
+      mockadapter.onGet('/api/portal/meldung/current').replyOnce(200, {});
       const getCurrentMeldung: Promise<void> = meldungStore.getCurrentMeldung();
       expect(meldungStore.loading).toBe(true);
       expect(meldungStore.errorCode).toBe('');
