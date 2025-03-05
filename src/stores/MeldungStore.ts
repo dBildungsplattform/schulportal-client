@@ -74,7 +74,7 @@ export const useMeldungStore: StoreDefinition<'meldungStore', MeldungState, Meld
         try {
           const { data }: AxiosResponse<MeldungResponse | null> =
             await meldungenApi.meldungControllerGetCurrentMeldung();
-          if (data) {
+          if (data.id) {
             this.currentMeldung = {
               id: data.id,
               text: data.inhalt,
