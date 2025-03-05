@@ -123,14 +123,10 @@ describe('HinweiseManagementView', () => {
     const meldungTextInput: VueWrapper | undefined = wrapper?.findComponent({ ref: 'newsboxText' });
     await meldungTextInput?.setValue('Updated Hinweis');
     await nextTick();
-    await nextTick();
 
-    wrapper?.find('[data-testid="submit-newsbox"]').trigger('click');
-
+    await wrapper?.find('[data-testid="submit-newsbox"]').trigger('click');
     await nextTick();
     await nextTick();
-
-    await flushPromises();
     await flushPromises();
     await flushPromises();
 
