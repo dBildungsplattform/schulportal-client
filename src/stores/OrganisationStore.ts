@@ -142,7 +142,7 @@ type OrganisationActions = {
   deleteOrganisationById: (organisationId: string) => Promise<void>;
   updateOrganisationById: (organisationId: string, name: string, type: OrganisationsTyp) => Promise<void>;
   getRootKinderSchultraeger: () => Promise<void>;
-  getSchulenByTraegerId: (traegerId: string, filter: GetAdministrierteOrganisationenFilter) => Promise<Array<OrganisationResponse>>;
+  getSchulenByTraegerId: (filter: OrganisationenFilter) => Promise<Array<OrganisationResponse>>;
   fetchSchuleDetailsForKlassen: (filterActive: boolean) => Promise<void>;
   fetchSchuleDetailsForSchultraeger: () => Promise<void>;
   setItsLearningForSchule: (organisationId: string) => Promise<void>;
@@ -565,16 +565,22 @@ export const useOrganisationStore: StoreDefinition<
       }
     },
 
-    async getSchulenByTraegerId(organisationId, filter: GetAdministrierteOrganisationenFilter): Promise<Array<OrganisationResponse>> {
+    async getSchulenByTraegerId(filter: OrganisationenFilter): Promise<Array<OrganisationResponse>> {
       this.errorCode = '';
       this.loading = true;
       try {
         const { data }: { data: Array<OrganisationResponse> } =
-          await organisationApi.organisationControllerGetAdministrierteOrganisationen(
-            organisationId,
-            filter?.offset,
-            filter?.limit,
-            filter?.searchFilter,
+          await organisationApi.organisationControllerFindOrganizations(
+            filter.offset,
+            filter.limit,
+            undefined,
+            undefined,
+            filter.searchString,
+            OrganisationsTyp.Schule,
+            ['SCHULTRAEGER_VERWALTEN'],
+            undefined,
+            filter.administriertVon,
+            undefined,
           );
         return data;
       } catch (error: unknown) {

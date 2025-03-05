@@ -40,8 +40,8 @@
 
   const currentSchultraegerId: string = route.params['id'] as string;
 
-  let assignedSchulen: Ref = ref([]);
-  let unassignedSchulen: Ref = ref([]);
+  let assignedSchulen: Ref<Array<Organisation>> = ref([]);
+  let unassignedSchulen: Ref<Array<Organisation>> = ref([]);
 
   // eslint-disable-next-line @typescript-eslint/typedef
   const { resetForm } = useForm<SchultraegerFormType>({
@@ -116,18 +116,19 @@
 
   async function searchInAssignedSchulen(searchString: string): Promise<void> {
     if (!organisationStore.currentOrganisation) return;
-    assignedSchulen.value = await organisationStore.getSchulenByTraegerId(currentSchultraegerId, { searchFilter: searchString });
+    assignedSchulen.value = await organisationStore.getSchulenByTraegerId({
+      searchString: searchString,
+      administriertVon: [currentSchultraegerId],
+    });
   }
 
   async function searchInUnassignedSchulen(searchString: string): Promise<void> {
     if (!organisationStore.currentOrganisation || !searchString) return;
-    unassignedSchulen.value = await organisationStore.getSchulenByTraegerId(
-      organisationStore.currentOrganisation.administriertVon!,
-      {
-        limit: 25,
-        searchFilter: searchString,
-      }
-    );
+    unassignedSchulen.value = await organisationStore.getSchulenByTraegerId({
+      limit: 50,
+      searchString: searchString,
+      administriertVon: [organisationStore.currentOrganisation.administriertVon!],
+    });
   }
 
   onBeforeMount(async () => {
@@ -135,7 +136,10 @@
 
     await organisationStore.getRootKinderSchultraeger();
     await organisationStore.getOrganisationById(currentSchultraegerId, OrganisationsTyp.Traeger);
-    assignedSchulen.value = await organisationStore.getSchulenByTraegerId(currentSchultraegerId, { searchFilter: '' });
+    assignedSchulen.value = await organisationStore.getSchulenByTraegerId({
+      searchString: '',
+      administriertVon: [currentSchultraegerId],
+    });
 
     // Set the initial values using the computed properties
     if (rootChildSchultraegerList.value.length > 0) {
