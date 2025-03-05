@@ -1,5 +1,5 @@
 import { expect, test, type Mock, type MockInstance } from 'vitest';
-import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
+import { VueWrapper, mount } from '@vue/test-utils';
 import {
   createRouter,
   createWebHistory,
