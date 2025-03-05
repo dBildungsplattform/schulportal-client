@@ -456,8 +456,6 @@ export const useOrganisationStore: StoreDefinition<
       kuerzel: string | undefined,
       typ: OrganisationsTyp,
       traegerschaft?: TraegerschaftTyp,
-      administriertVon?: string,
-      zugehoerigZu?: string,
     ): Promise<void> {
       this.loading = true;
       try {
@@ -468,8 +466,6 @@ export const useOrganisationStore: StoreDefinition<
           kuerzel: kuerzel,
           typ: typ,
           traegerschaft: traegerschaft,
-          administriertVon: administriertVon,
-          zugehoerigZu: zugehoerigZu,
         };
         const { data }: { data: Organisation } =
           await organisationApi.organisationControllerCreateOrganisation(createOrganisationBodyParams);
