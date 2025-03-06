@@ -45,8 +45,10 @@
       :noItemsFoundText="noUnassignedItemsFoundText"
       @onHandleItemClick="handleUnassignedItemClick"
       @onHandleSearchFilter="handleUnassignedItemsSearchFilter"
-      ref="itemPoolList"
+      ref="unassignedItemsList"
+      v-slot="{ item }"
     >
+      <slot :item="item"></slot>
     </RelationshipAssignList>
   </v-col>
   <v-col
@@ -59,7 +61,9 @@
       :noItemsFoundText="noUnassignedItemsFoundText"
       @onHandleSearchFilter="handleAssignedItemsSearchFilter"
       ref="assignedItemsList"
+      v-slot="{ item }"
     >
+      <slot :item="item"></slot>
     </RelationshipAssignList>
   </v-col>
 </template>

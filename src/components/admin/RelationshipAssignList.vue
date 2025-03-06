@@ -56,7 +56,7 @@
             @click="handleItemClick(item)"
             :key="item.id"
           >
-            <v-chip>{{ item.name }}</v-chip>
+            <v-chip><slot :item="item"></slot></v-chip>
           </v-list-item>
         </v-list>
         <div v-else>

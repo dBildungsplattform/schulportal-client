@@ -253,14 +253,17 @@
               <RelationshipAssign
                 :assignedItems="assignedSchulen"
                 :assignedItemsHeader="$t('admin.schultraeger.schulenOfThisTraeger', { amount: assignedSchulen.length })"
-                :unassignedItems="unassignedSchulen"
-                :unassignedItemsHeader="$t('admin.schultraeger.schulenWithoutTraeger')"
                 noAssignedItemsFoundText=""
                 :noUnassignedItemsFoundText="$t('admin.schultraeger.unassignedSchulenDefaultText')"
                 @onHandleAssignedItemsSearchFilter="searchInAssignedSchulen"
                 @onHandleUnassignedItemClick="addAssignableSchule"
                 @onHandleUnassignedItemsSearchFilter="searchInUnassignedSchulen"
+                :unassignedItems="unassignedSchulen"
+                :unassignedItemsHeader="$t('admin.schultraeger.schulenWithoutTraeger')"
               >
+                <template v-slot="{ item }">
+                  {{ `(${item.kennung}) ${item.name}` }}
+                </template>
               </RelationshipAssign>
             </v-row>
           </v-container>
