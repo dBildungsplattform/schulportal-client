@@ -3,7 +3,7 @@
   import type { DBiamPersonenzuordnungResponse, PersonenkontextRolleFieldsResponse } from '@/api-client/generated';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import KlasseForm from '@/components/form/KlasseForm.vue';
+  import KlasseForm from '@/components/admin/klassen/KlasseForm.vue';
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import {
     OrganisationsTyp,
@@ -180,15 +180,16 @@
   }
 
   const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
+    if (!selectedSchule.value) return;
     await organisationStore.createOrganisation(
+      selectedSchule.value,
+      selectedSchule.value,
       undefined,
       selectedKlassenname.value,
       undefined,
       undefined,
       OrganisationsTyp.Klasse,
       undefined,
-      selectedSchule.value,
-      selectedSchule.value,
     );
     resetForm();
   });
