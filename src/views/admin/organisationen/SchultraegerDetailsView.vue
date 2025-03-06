@@ -74,7 +74,8 @@
   }
 
   async function navigateToSchultraegerManagement(): Promise<void> {
-    organisationStore.createdSchule = null;
+    organisationStore.errorCode = '';
+    await router.push({ name: 'schultraeger-management' });
   }
 
   async function navigateBackToSchultraegerDetails(): Promise<void> {
@@ -114,15 +115,6 @@
       });
     }
   });
-
-  function handleCancel(next: NavigationGuardNext): void {
-    if (isFormDirty.value) {
-      showUnsavedChangesDialog.value = true;
-      blockedNext = next;
-    } else {
-      navigateToSchultraegerManagement();
-    }
-  }
 
   function addAssignableSchule(schule: Organisation): void {
     assignableSchulen.value.push(schule.id);
@@ -281,11 +273,11 @@
           >
             <v-btn
               class="secondary"
-              data-testid="schultraeger-edit-cancel-button"
-              @click="handleCancel"
+              data-testid="navigate-to-schultraeger-management-button"
+              @click="navigateToSchultraegerManagement"
               :block="mdAndDown"
             >
-              {{ $t('cancel') }}
+              {{ $t('nav.backToList') }}
             </v-btn>
           </v-col>
           <v-col
