@@ -3,10 +3,12 @@
   import RelationshipAssignList from './RelationshipAssignList.vue';
 
   type Props = {
-    unassignedItemsHeader: string;
-    assignedItemsHeader: string;
-    unassignedItems: Array<Organisation>;
     assignedItems: Array<Organisation>;
+    assignedItemsHeader: string;
+    noAssignedItemsFoundText: string;
+    noUnassignedItemsFoundText: string;
+    unassignedItems: Array<Organisation>;
+    unassignedItemsHeader: string;
   };
 
   defineProps<Props>();
@@ -40,6 +42,7 @@
     <h3 class="subtitle-1 mb-3">{{ unassignedItemsHeader }}</h3>
     <RelationshipAssignList
       :items="unassignedItems"
+      :noItemsFoundText="noUnassignedItemsFoundText"
       @onHandleItemClick="handleUnassignedItemClick"
       @onHandleSearchFilter="handleUnassignedItemsSearchFilter"
       ref="itemPoolList"
@@ -53,6 +56,7 @@
     <h3 class="subtitle-1 mb-3">{{ assignedItemsHeader }}</h3>
     <RelationshipAssignList
       :items="assignedItems"
+      :noItemsFoundText="noUnassignedItemsFoundText"
       @onHandleSearchFilter="handleAssignedItemsSearchFilter"
       ref="assignedItemsList"
     >

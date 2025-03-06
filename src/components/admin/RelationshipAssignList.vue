@@ -4,6 +4,7 @@
 
   type Props = {
     items: Array<Organisation>;
+    noItemsFoundText: string;
   };
 
   defineProps<Props>();
@@ -39,8 +40,12 @@
   </v-row>
   <v-row>
     <v-col>
-      <v-card>
+      <v-card
+        max-height="344"
+        min-height="344"
+      >
         <v-list
+          v-if="items.length > 0"
           density="compact"
           max-height="344"
           min-height="344"
@@ -54,6 +59,9 @@
             <v-chip>{{ item.name }}</v-chip>
           </v-list-item>
         </v-list>
+        <div v-else>
+          <p class="body-2 ma-16 text-center">{{ noItemsFoundText }}</p>
+        </div>
       </v-card>
     </v-col>
   </v-row>

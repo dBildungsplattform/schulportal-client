@@ -542,7 +542,8 @@
       "title": {
         "ORGANISATION_SPECIFICATION_ERROR": "Fehler bei Anlage des Schulträgers",
         "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Zwei-Faktor-Authentifizierung (2FA) erforderlich"
-      }
+      },
+      "unassignedSchulenDefaultText": "Bitte geben Sie zunächst einen Wert im Filter ein."
     },
     "serviceProvider": {
       "assignServiceProvider": "Angebote zuordnen",
