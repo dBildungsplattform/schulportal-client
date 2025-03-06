@@ -40,8 +40,9 @@
 
   const currentSchultraegerId: string = route.params['id'] as string;
 
-  let assignedSchulen: Ref<Array<Organisation>> = ref([]);
-  let unassignedSchulen: Ref<Array<Organisation>> = ref([]);
+  const assignableSchulen: Ref<Array<string>> = ref([]);
+  const assignedSchulen: Ref<Array<Organisation>> = ref([]);
+  const unassignedSchulen: Ref<Array<Organisation>> = ref([]);
 
   // eslint-disable-next-line @typescript-eslint/typedef
   const { resetForm } = useForm<SchultraegerFormType>({
@@ -76,15 +77,15 @@
     organisationStore.createdSchule = null;
   }
 
-  async function navigateBackToSchultraegerForm(): Promise<void> {
+  async function navigateBackToSchultraegerDetails(): Promise<void> {
     if (organisationStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
       resetForm();
-      await router.push({ name: 'create-schultraeger' }).then(() => {
+      await router.push({ name: 'schultraeger-details' }).then(() => {
         router.go(0);
       });
     } else {
       organisationStore.errorCode = '';
-      await router.push({ name: 'create-schultraeger' });
+      await router.push({ name: 'schultraeger-details' });
     }
   }
 
@@ -96,12 +97,21 @@
   }
 
   const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = formContext.handleSubmit(async () => {
-    if (selectedSchultraegername.value) {
+    if (
+      selectedSchultraegername.value &&
+      selectedSchultraegername.value !== organisationStore.currentOrganisation?.name
+    ) {
       await organisationStore.updateOrganisationById(
         currentSchultraegerId,
         selectedSchultraegername.value,
         OrganisationsTyp.Traeger,
       );
+    }
+
+    if (assignableSchulen.value.length > 0) {
+      assignableSchulen.value.forEach(async (schuleId: string) => {
+        await organisationStore.assignSchuleToTraeger(currentSchultraegerId, { organisationId: schuleId });
+      });
     }
   });
 
@@ -114,11 +124,17 @@
     }
   }
 
+  function addAssignableSchule(schule: Organisation): void {
+    assignableSchulen.value.push(schule.id);
+    assignedSchulen.value = [schule, ...assignedSchulen.value];
+    unassignedSchulen.value = unassignedSchulen.value.filter((item: Organisation) => item.id !== schule.id);
+  }
+
   async function searchInAssignedSchulen(searchString: string): Promise<void> {
     if (!organisationStore.currentOrganisation) return;
     assignedSchulen.value = await organisationStore.getSchulenByTraegerId({
       searchString: searchString,
-      administriertVon: [currentSchultraegerId],
+      zugehoerigZu: [currentSchultraegerId],
     });
   }
 
@@ -127,8 +143,14 @@
     unassignedSchulen.value = await organisationStore.getSchulenByTraegerId({
       limit: 50,
       searchString: searchString,
-      administriertVon: [organisationStore.currentOrganisation.administriertVon!],
+      zugehoerigZu: [organisationStore.currentOrganisation.zugehoerigZu!],
     });
+
+    if (assignableSchulen.value.length > 0) {
+      unassignedSchulen.value = unassignedSchulen.value.filter(
+        (schule: Organisation) => !assignableSchulen.value.includes(schule.id),
+      );
+    }
   }
 
   onBeforeMount(async () => {
@@ -138,7 +160,7 @@
     await organisationStore.getOrganisationById(currentSchultraegerId, OrganisationsTyp.Traeger);
     assignedSchulen.value = await organisationStore.getSchulenByTraegerId({
       searchString: '',
-      administriertVon: [currentSchultraegerId],
+      zugehoerigZu: [currentSchultraegerId],
     });
 
     // Set the initial values using the computed properties
@@ -146,7 +168,7 @@
       formContext.setFieldValue(
         'selectedSchultraegerform',
         rootChildSchultraegerList.value.find(
-          (schultraeger: Organisation) => schultraeger.id === organisationStore.currentOrganisation?.administriertVon,
+          (schultraeger: Organisation) => schultraeger.id === organisationStore.currentOrganisation?.zugehoerigZu,
         )?.id || '',
       );
     }
@@ -211,13 +233,16 @@
             :closable="false"
             :text="organisationStore.errorCode ? $t(`admin.schultraeger.errors.${organisationStore.errorCode}`) : ''"
             :showButton="true"
-            :buttonText="$t('admin.schule.backToCreateSchule')"
-            :buttonAction="navigateBackToSchultraegerForm"
+            :buttonText="$t('admin.schultraeger.backToSchultraeger')"
+            :buttonAction="navigateBackToSchultraegerDetails"
             buttonClass="primary"
           />
         </SchultraegerForm>
 
-        <v-container class="px-3 px-sm-16">
+        <v-container
+          v-if="!organisationStore.errorCode"
+          class="px-3 px-sm-16"
+        >
           <v-container class="px-lg-16">
             <v-row>
               <v-col>
@@ -231,46 +256,50 @@
                 :unassignedItems="unassignedSchulen"
                 :unassignedItemsHeader="$t('admin.schultraeger.schulenWithoutTraeger')"
                 @onHandleAssignedItemsSearchFilter="searchInAssignedSchulen"
+                @onHandleUnassignedItemClick="addAssignableSchule"
                 @onHandleUnassignedItemsSearchFilter="searchInUnassignedSchulen"
               >
               </RelationshipAssign>
             </v-row>
           </v-container>
         </v-container>
-      </template>
 
-      <v-row class="pt-3 px-2 save-cancel-row justify-end">
-        <v-col
-          class="cancel-col"
-          cols="12"
-          sm="6"
-          md="auto"
+        <v-row
+          v-if="!organisationStore.errorCode"
+          class="pt-3 px-2 save-cancel-row justify-end"
         >
-          <v-btn
-            class="secondary"
-            data-testid="schultraeger-edit-cancel-button"
-            @click="handleCancel"
-            :block="mdAndDown"
+          <v-col
+            class="cancel-col"
+            cols="12"
+            sm="6"
+            md="auto"
           >
-            {{ $t('cancel') }}
-          </v-btn>
-        </v-col>
-        <v-col
-          cols="12"
-          sm="6"
-          md="auto"
-        >
-          <v-btn
-            class="primary"
-            data-testid="schultraeger-edit-save-button"
-            @click="onSubmit"
-            :block="mdAndDown"
-            :disabled="organisationStore.loading"
+            <v-btn
+              class="secondary"
+              data-testid="schultraeger-edit-cancel-button"
+              @click="handleCancel"
+              :block="mdAndDown"
+            >
+              {{ $t('cancel') }}
+            </v-btn>
+          </v-col>
+          <v-col
+            cols="12"
+            sm="6"
+            md="auto"
           >
-            {{ $t('save') }}
-          </v-btn>
-        </v-col>
-      </v-row>
+            <v-btn
+              class="primary"
+              data-testid="schultraeger-edit-save-button"
+              @click="onSubmit"
+              :block="mdAndDown"
+              :disabled="organisationStore.loading"
+            >
+              {{ $t('save') }}
+            </v-btn>
+          </v-col>
+        </v-row>
+      </template>
     </LayoutCard>
   </div>
 </template>

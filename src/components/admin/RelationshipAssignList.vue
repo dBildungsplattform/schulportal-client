@@ -9,10 +9,15 @@
   defineProps<Props>();
 
   type Emits = {
+    (event: 'onHandleItemClick', item: Organisation): void;
     (event: 'onHandleSearchFilter', searchFilter: string): void;
   };
 
   const emit: Emits = defineEmits<Emits>();
+
+  function handleItemClick(item: Organisation): void {
+    emit('onHandleItemClick', item);
+  }
 
   function handleSearchFilter(searchFilter: string): void {
     emit('onHandleSearchFilter', searchFilter.trim());
@@ -43,6 +48,7 @@
         >
           <v-list-item
             v-for="item in items"
+            @click="handleItemClick(item)"
             :key="item.id"
           >
             <v-chip>{{ item.name }}</v-chip>

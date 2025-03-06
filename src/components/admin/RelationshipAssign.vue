@@ -13,6 +13,7 @@
 
   type Emits = {
     (event: 'onHandleAssignedItemsSearchFilter', searchFilter: string): void;
+    (event: 'onHandleUnassignedItemClick', item: Organisation): void;
     (event: 'onHandleUnassignedItemsSearchFilter', searchFilter: string): void;
   };
 
@@ -20,6 +21,10 @@
 
   function handleAssignedItemsSearchFilter(searchFilter: string): void {
     emit('onHandleAssignedItemsSearchFilter', searchFilter.trim());
+  }
+
+  function handleUnassignedItemClick(item: Organisation): void {
+    emit('onHandleUnassignedItemClick', item);
   }
 
   function handleUnassignedItemsSearchFilter(searchFilter: string): void {
@@ -35,6 +40,7 @@
     <h3 class="subtitle-1 mb-3">{{ unassignedItemsHeader }}</h3>
     <RelationshipAssignList
       :items="unassignedItems"
+      @onHandleItemClick="handleUnassignedItemClick"
       @onHandleSearchFilter="handleUnassignedItemsSearchFilter"
       ref="itemPoolList"
     >

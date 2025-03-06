@@ -12,6 +12,7 @@ import {
   type ParentOrganisationenResponse,
   type OrganisationRootChildrenResponse,
   type OrganisationResponse,
+  type OrganisationByIdBodyParams,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 import { useSearchFilterStore, type SearchFilterStore } from './SearchFilterStore';
@@ -595,6 +596,23 @@ export const useOrganisationStore: StoreDefinition<
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'SCHULTRAEGER_ERROR');
         return await Promise.reject(this.errorCode);
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async assignSchuleToTraeger(
+      currentSchultraegerId: string,
+      organisationIdBodyParams: OrganisationByIdBodyParams,
+    ): Promise<void> {
+      this.errorCode = '';
+      this.loading = true;
+      try {
+        await organisationApi.organisationControllerAddZugehoerigeOrganisation(currentSchultraegerId, {
+          organisationId: organisationIdBodyParams.organisationId,
+        });
+      } catch (error: unknown) {
+        this.errorCode = getResponseErrorCode(error, 'SCHULTRAEGER_ERROR');
       } finally {
         this.loading = false;
       }
