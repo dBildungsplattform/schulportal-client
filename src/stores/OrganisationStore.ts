@@ -27,6 +27,7 @@ export type Organisation = {
   kuerzel?: string;
   typ: OrganisationsTyp;
   administriertVon?: string | null;
+  zugehoerigZu?: string | null;
   schuleDetails?: string;
   version?: number;
   itslearningEnabled?: boolean;
@@ -110,6 +111,7 @@ export type OrganisationenFilter = {
   includeTyp?: OrganisationsTyp;
   excludeTyp?: OrganisationsTyp[];
   administriertVon?: Array<string>;
+  zugehoerigZu?: Array<string>;
   organisationIds?: Array<string>;
 };
 
@@ -130,19 +132,20 @@ type OrganisationActions = {
   getLockingOrganisationById: (organisationId: string) => Promise<void>;
   getParentOrganisationsByIds: (organisationIds: string[]) => Promise<void>;
   createOrganisation: (
+    administriertVon: string,
+    zugehoerigZu: string,
     kennung: string | undefined,
     name: string,
     namensergaenzung: string | undefined,
     kuerzel: string | undefined,
     typ: OrganisationsTyp,
     traegerschaft?: TraegerschaftTyp,
-    administriertVon?: string,
-    zugehoerigZu?: string,
   ) => Promise<void>;
   deleteOrganisationById: (organisationId: string) => Promise<void>;
   updateOrganisationById: (organisationId: string, name: string, type: OrganisationsTyp) => Promise<void>;
   getRootKinderSchultraeger: () => Promise<void>;
   getSchulenByTraegerId: (filter: OrganisationenFilter) => Promise<Array<OrganisationResponse>>;
+  assignSchuleToTraeger(schuleId: string, organisationIdBodyParams: OrganisationByIdBodyParams): Promise<void>;
   fetchSchuleDetailsForKlassen: (filterActive: boolean) => Promise<void>;
   fetchSchuleDetailsForSchultraeger: () => Promise<void>;
   setItsLearningForSchule: (organisationId: string) => Promise<void>;
@@ -208,6 +211,7 @@ export const useOrganisationStore: StoreDefinition<
           filter?.systemrechte,
           filter?.excludeTyp,
           filter?.administriertVon,
+          filter?.zugehoerigZu,
           filter?.organisationIds,
         );
         if (filter?.includeTyp === OrganisationsTyp.Klasse) {
@@ -305,7 +309,8 @@ export const useOrganisationStore: StoreDefinition<
           OrganisationsTyp.Schule,
           ['SCHULTRAEGER_VERWALTEN'],
           undefined,
-          // Sending Schulträger IDs in administriertVon to get the direct children
+          undefined,
+          // Sending Schulträger IDs in zugehoerigZu to get the direct children
           Array.from(schultraegerIds),
           undefined,
         );
@@ -313,12 +318,12 @@ export const useOrganisationStore: StoreDefinition<
         const schulenMap: Map<string, string[]> = new Map();
 
         response.data.forEach((org: Organisation) => {
-          if (org.administriertVon) {
-            if (!schulenMap.has(org.administriertVon)) {
-              schulenMap.set(org.administriertVon, []);
+          if (org.zugehoerigZu) {
+            if (!schulenMap.has(org.zugehoerigZu)) {
+              schulenMap.set(org.zugehoerigZu, []);
             }
 
-            schulenMap.get(org.administriertVon)!.push(`${org.kennung}`);
+            schulenMap.get(org.zugehoerigZu)!.push(`${org.kennung}`);
           }
         });
 
@@ -346,6 +351,7 @@ export const useOrganisationStore: StoreDefinition<
           filter?.systemrechte,
           filter?.excludeTyp,
           filter?.administriertVon,
+          filter?.zugehoerigZu,
           filter?.organisationIds,
         );
         this.filteredSchulen.total = +response.headers['x-paging-total'];
@@ -370,6 +376,7 @@ export const useOrganisationStore: StoreDefinition<
           filter?.systemrechte,
           filter?.excludeTyp,
           filter?.administriertVon,
+          filter?.zugehoerigZu,
           filter?.organisationIds,
         );
         this.klassen = response.data;
@@ -455,6 +462,7 @@ export const useOrganisationStore: StoreDefinition<
           [],
           undefined,
           filter?.administriertVon,
+          undefined,
           filter?.organisationIds,
         );
 
@@ -471,26 +479,26 @@ export const useOrganisationStore: StoreDefinition<
     },
 
     async createOrganisation(
+      administriertVon: string,
+      zugehoerigZu: string,
       kennung: string | undefined,
       name: string,
       namensergaenzung: string | undefined,
       kuerzel: string | undefined,
       typ: OrganisationsTyp,
       traegerschaft?: TraegerschaftTyp,
-      administriertVon?: string,
-      zugehoerigZu?: string,
     ): Promise<void> {
       this.loading = true;
       try {
         const createOrganisationBodyParams: CreateOrganisationBodyParams = {
+          administriertVon: administriertVon,
+          zugehoerigZu: zugehoerigZu,
           kennung: kennung,
           name: name,
           namensergaenzung: namensergaenzung,
           kuerzel: kuerzel,
           typ: typ,
           traegerschaft: traegerschaft,
-          administriertVon: administriertVon,
-          zugehoerigZu: zugehoerigZu,
         };
         const { data }: { data: Organisation } =
           await organisationApi.organisationControllerCreateOrganisation(createOrganisationBodyParams);
@@ -579,7 +587,8 @@ export const useOrganisationStore: StoreDefinition<
             OrganisationsTyp.Schule,
             ['SCHULTRAEGER_VERWALTEN'],
             undefined,
-            filter.administriertVon,
+            undefined,
+            filter.zugehoerigZu,
             undefined,
           );
         return data;

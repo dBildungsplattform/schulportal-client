@@ -462,10 +462,12 @@ describe('OrganisationStore', () => {
 
         mockadapter.onPost('/api/organisationen').replyOnce(200, mockResponse);
         const createOrganisationPromise: Promise<void> = organisationStore.createOrganisation(
+          '1',
+          '1',
           'Org1',
           'Organisation 1',
           'Ergänzung',
-          '01',
+          'Org1',
           OrganisationsTyp.Schule,
         );
         expect(organisationStore.loading).toBe(true);
@@ -489,13 +491,14 @@ describe('OrganisationStore', () => {
 
         mockadapter.onPost('/api/organisationen').replyOnce(200, mockResponse);
         const createOrganisationPromise: Promise<void> = organisationStore.createOrganisation(
+          '1',
+          '1',
           'Org1',
           'Organisation 1',
           'Ergänzung',
           '01',
           OrganisationsTyp.Klasse,
           undefined,
-          '1',
         );
         expect(organisationStore.loading).toBe(true);
         await createOrganisationPromise;
@@ -518,10 +521,12 @@ describe('OrganisationStore', () => {
 
         mockadapter.onPost('/api/organisationen').replyOnce(200, mockResponse);
         const createOrganisationPromise: Promise<void> = organisationStore.createOrganisation(
+          '1',
+          '1',
           'Org1',
           'Organisation 1',
           'Ergänzung',
-          '01',
+          'Org1',
           OrganisationsTyp.Traeger,
         );
         expect(organisationStore.loading).toBe(true);
@@ -533,10 +538,12 @@ describe('OrganisationStore', () => {
       it('should handle string error', async () => {
         mockadapter.onPost('/api/organisationen').replyOnce(500, 'some mock server error');
         const createOrganisationPromise: Promise<void> = organisationStore.createOrganisation(
+          '1',
+          '1',
           'Org1',
           'Organisation 1',
           'Ergänzung',
-          '01',
+          'Org1',
           OrganisationsTyp.Schule,
         );
         expect(organisationStore.loading).toBe(true);
@@ -549,10 +556,12 @@ describe('OrganisationStore', () => {
       it('should handle error code', async () => {
         mockadapter.onPost('/api/organisationen').replyOnce(500, { i18nKey: 'SOME_MOCK_SERVER_ERROR' });
         const createOrganisationPromise: Promise<void> = organisationStore.createOrganisation(
+          '1',
+          '1',
           'Org1',
           'Organisation 1',
           'Ergänzung',
-          '01',
+          'Org1',
           OrganisationsTyp.Schule,
         );
         expect(organisationStore.loading).toBe(true);
@@ -822,6 +831,7 @@ describe('OrganisationStore', () => {
           traegerschaft: '01',
           typ: OrganisationsTyp.Land,
           administriertVon: '1',
+          zugehoerigZu: '1',
           version: 1,
           itslearningEnabled: true,
         },
@@ -834,6 +844,7 @@ describe('OrganisationStore', () => {
           traegerschaft: '01',
           typ: OrganisationsTyp.Land,
           administriertVon: '1',
+          zugehoerigZu: '1',
           version: 1,
           itslearningEnabled: true,
         },

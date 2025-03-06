@@ -66,16 +66,16 @@
     preservedSchultraegerform.value = rootChildSchultraegerList.value.find(
       (schultraeger: Organisation) => schultraeger.id === selectedSchultraegerform.value,
     )?.name;
-    if (selectedSchultraegername.value) {
+    if (selectedSchultraegername.value && selectedSchultraegerform.value) {
       await organisationStore.createOrganisation(
+        selectedSchultraegerform.value,
+        selectedSchultraegerform.value,
         undefined,
         selectedSchultraegername.value,
         undefined,
         undefined,
         OrganisationsTyp.Traeger,
         undefined,
-        selectedSchultraegerform.value,
-        selectedSchultraegerform.value,
       );
       resetForm({
         values: {
