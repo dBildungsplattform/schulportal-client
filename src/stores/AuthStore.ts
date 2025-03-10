@@ -52,6 +52,8 @@ type AuthState = {
   hasSchulverwaltungPermission: boolean;
   hasSchultraegerverwaltungPermission: boolean;
   hasPersonenBulkPermission: boolean;
+  hasPortalVerwaltungPermission: boolean;
+  hasHinweiseBearbeitenPermission: boolean;
   isAuthed: boolean;
   acr: StepUpLevel;
   timeLimitInfos: PersonTimeLimitInfoResponse[];
@@ -82,6 +84,8 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
     hasSchulverwaltungPermission: false,
     hasSchultraegerverwaltungPermission: false,
     hasPersonenBulkPermission: false,
+    hasPortalVerwaltungPermission: false,
+    hasHinweiseBearbeitenPermission: false,
     isAuthed: false,
     acr: StepUpLevel.NONE,
     timeLimitInfos: [],
@@ -121,6 +125,8 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
           this.hasSchulverwaltungPermission = this.currentUserPermissions.includes('SCHULEN_VERWALTEN');
           this.hasSchultraegerverwaltungPermission = this.currentUserPermissions.includes('SCHULTRAEGER_VERWALTEN');
           this.hasPersonenBulkPermission = this.currentUserPermissions.includes('BULK_VERWALTEN');
+          this.hasPortalVerwaltungPermission = this.currentUserPermissions.includes('SCHULPORTAL_VERWALTEN');
+          this.hasHinweiseBearbeitenPermission = this.currentUserPermissions.includes('HINWEISE_BEARBEITEN');
         } else {
           throw new Error('User info could not be retrieved.');
         }

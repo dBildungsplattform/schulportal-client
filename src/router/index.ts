@@ -12,8 +12,9 @@ type Permission =
   | 'personenverwaltung'
   | 'rollenverwaltung'
   | 'schulverwaltung'
-  | 'schultraegerverwaltung';
-
+  | 'schultraegerverwaltung'
+  | 'portalverwaltung'
+  | 'hinweisebearbeiten';
 const router: Router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
@@ -97,6 +98,10 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
           return authStore.hasSchulverwaltungPermission;
         case 'schultraegerverwaltung':
           return authStore.hasSchulverwaltungPermission;
+        case 'portalverwaltung':
+          return authStore.hasPortalVerwaltungPermission;
+        case 'hinweisebearbeiten':
+          return authStore.hasHinweiseBearbeitenPermission;
         default:
           return false;
       }
