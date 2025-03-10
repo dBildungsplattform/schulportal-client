@@ -26,7 +26,7 @@ FROM $BASE_IMAGE as deployment
 # CVE-2024-2511, CVE-2024-34459, CVE-2024-2398, CVE-2024-45492,
 # CVE-2025-24928
 RUN apk --no-cache add "busybox-binsh>=1.36.1-r16" "libcrypto3>=3.1.5-r0" "libcurl>=8.7.1-r0" "libexpat>=2.6.3-r0" "libssl3>=3.1.5-r0" ^
-"libx11>=1.8.7-r0" "libxml2>=2.12.7-r1" "ssl_client>=1.36.1-r17"
+ "libx11>=1.8.7-r0" "libxml2>=2.12.7-r1" "ssl_client>=1.36.1-r17"
 
 COPY --from=build /app/dist/ /usr/share/nginx/html/
 
