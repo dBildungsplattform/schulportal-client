@@ -110,14 +110,14 @@ type OrganisationActions = {
   getLockingOrganisationById: (organisationId: string) => Promise<void>;
   getParentOrganisationsByIds: (organisationIds: string[]) => Promise<void>;
   createOrganisation: (
+    administriertVon: string,
+    zugehoerigZu: string,
     kennung: string | undefined,
     name: string,
     namensergaenzung: string | undefined,
     kuerzel: string | undefined,
     typ: OrganisationsTyp,
     traegerschaft?: TraegerschaftTyp,
-    administriertVon?: string,
-    zugehoerigZu?: string,
   ) => Promise<void>;
   deleteOrganisationById: (organisationId: string) => Promise<void>;
   updateOrganisationById: (organisationId: string, name: string) => Promise<void>;
@@ -450,6 +450,8 @@ export const useOrganisationStore: StoreDefinition<
     },
 
     async createOrganisation(
+      administriertVon: string,
+      zugehoerigZu: string,
       kennung: string | undefined,
       name: string,
       namensergaenzung: string | undefined,
@@ -460,6 +462,8 @@ export const useOrganisationStore: StoreDefinition<
       this.loading = true;
       try {
         const createOrganisationBodyParams: CreateOrganisationBodyParams = {
+          administriertVon: administriertVon,
+          zugehoerigZu: zugehoerigZu,
           kennung: kennung,
           name: name,
           namensergaenzung: namensergaenzung,

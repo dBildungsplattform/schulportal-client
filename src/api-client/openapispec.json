@@ -4528,6 +4528,7 @@
             "description": "Internal server error while getting all meldungen."
           }
         },
+        "tags": ["meldung"],
         "security": [
           {
             "bearer": []
@@ -4564,6 +4565,7 @@
             "description": "Internal server error while modifying the meldung."
           }
         },
+        "tags": ["meldung"],
         "security": [
           {
             "bearer": []
@@ -4601,6 +4603,7 @@
             "description": "Internal server error while getting current veroeffentlicht meldung."
           }
         },
+        "tags": ["meldung"],
         "security": [
           {
             "bearer": []
@@ -5675,6 +5678,12 @@
       "CreateOrganisationBodyParams": {
         "type": "object",
         "properties": {
+          "administriertVon": {
+            "type": "string"
+          },
+          "zugehoerigZu": {
+            "type": "string"
+          },
           "kennung": {
             "type": "string",
             "description": "Required, if `typ` is equal to `SCHULE`"
@@ -5698,7 +5707,7 @@
             "type": "string"
           }
         },
-        "required": ["name", "typ"]
+        "required": ["administriertVon", "zugehoerigZu", "name", "typ"]
       },
       "OrganisationResponse": {
         "type": "object",
@@ -5787,6 +5796,12 @@
       "UpdateOrganisationBodyParams": {
         "type": "object",
         "properties": {
+          "administriertVon": {
+            "type": "string"
+          },
+          "zugehoerigZu": {
+            "type": "string"
+          },
           "kennung": {
             "type": "string",
             "description": "Required, if `typ` is equal to `SCHULE`"
@@ -5810,7 +5825,7 @@
             "type": "string"
           }
         },
-        "required": ["name", "typ"]
+        "required": ["administriertVon", "zugehoerigZu", "name", "typ"]
       },
       "OrganisationRootChildrenResponse": {
         "type": "object",

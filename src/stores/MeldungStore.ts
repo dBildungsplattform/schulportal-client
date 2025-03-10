@@ -1,7 +1,7 @@
 import {
-  DefaultApiFactory,
+  MeldungApiFactory,
   type CreateOrUpdateMeldungBodyParams,
-  type DefaultApiInterface,
+  type MeldungApiInterface,
   type MeldungResponse,
 } from '@/api-client/generated';
 import axiosApiInstance from '@/services/ApiService';
@@ -9,7 +9,7 @@ import { getResponseErrorCode } from '@/utils/errorHandlers';
 import type { AxiosResponse } from 'axios';
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 
-const meldungenApi: DefaultApiInterface = DefaultApiFactory(undefined, '', axiosApiInstance);
+const meldungenApi: MeldungApiInterface = MeldungApiFactory(undefined, '', axiosApiInstance);
 
 export type Meldung = {
   id?: string;
