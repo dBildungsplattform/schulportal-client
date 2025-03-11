@@ -1,5 +1,5 @@
-ARG BASE_IMAGE_BUILDER=node:20.18.1-alpine3.21
-ARG BASE_IMAGE=nginx:1.26-alpine
+ARG BASE_IMAGE_BUILDER=node:20.18.3-alpine3.21
+ARG BASE_IMAGE=nginx:1.26.3-alpine
 
 # Build Stage
 FROM $BASE_IMAGE_BUILDER as build
@@ -25,8 +25,7 @@ FROM $BASE_IMAGE as deployment
 # CVE-2023-42365, CVE-2023-42366, CVE-2023-42366, CVE-2023-43787,
 # CVE-2024-2511, CVE-2024-34459, CVE-2024-2398, CVE-2024-45492,
 # CVE-2025-24928
-RUN apk --no-cache add "busybox-binsh>=1.36.1-r16" "libcrypto3>=3.1.5-r0" "libcurl>=8.7.1-r0" "libexpat>=2.6.3-r0" "libssl3>=3.1.5-r0" \
- "libx11>=1.8.7-r0" "libxml2>=2.12.7-r1" "ssl_client>=1.36.1-r17"
+# RUN apk --no-cache add "busybox-binsh>=1.36.1-r16" "libcrypto3>=3.1.5-r0" "libcurl>=8.7.1-r0" "libexpat>=2.6.3-r0" "libssl3>=3.1.5-r0" \ "libx11>=1.8.7-r0" "libxml2>=2.12.7-r1" "ssl_client>=1.36.1-r17"
 
 COPY --from=build /app/dist/ /usr/share/nginx/html/
 
