@@ -388,7 +388,9 @@
           "SCHULTRAEGER_VERWALTEN": "Darf Schulträger verwalten",
           "PERSON_SYNCHRONISIEREN": "Darf Benutzer synchronisieren",
           "PERSONEN_ANLEGEN": "Darf Benutzer anlegen",
-          "BULK_VERWALTEN": "Darf Mehrfachbearbeitung ausführen"
+          "BULK_VERWALTEN": "Darf Mehrfachbearbeitung ausführen",
+          "SCHULPORTAL_VERWALTEN": "Darf das Portal verwalten",
+          "HINWEISE_BEARBEITEN": "Darf Hinweise bearbeiten"
         },
         "rollenarten": {
           "LERN": "Lern",
