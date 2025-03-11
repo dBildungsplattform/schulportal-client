@@ -297,12 +297,6 @@
 </template>
 
 <style>
-  textarea {
-    text-align: justify;
-    -moz-text-align-last: center; /* Firefox 12+*/
-    text-align-last: center;
-  }
-
   .v-textarea .v-field__input {
     -webkit-mask-image: none !important;
     mask-image: none !important;
