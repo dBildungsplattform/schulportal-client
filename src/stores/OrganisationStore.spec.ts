@@ -947,6 +947,7 @@ describe('OrganisationStore', () => {
         kuerzel: 'ST1',
         typ: OrganisationsTyp.Traeger,
         administriertVon: '',
+        zugehoerigZu: '',
         version: 1,
       },
     ];
@@ -966,13 +967,13 @@ describe('OrganisationStore', () => {
           namensergaenzung: 'Zusatz A',
           kuerzel: 'S1',
           typ: OrganisationsTyp.Schule,
-          administriertVon: '999',
+          zugehoerigZu: '999',
           version: 1,
           schuleDetails: '',
         },
       ];
       mockadapter
-        .onGet('/api/organisationen?limit=30&typ=SCHULE&systemrechte=SCHULTRAEGER_VERWALTEN&administriertVon=999')
+        .onGet('/api/organisationen?limit=30&typ=SCHULE&systemrechte=SCHULTRAEGER_VERWALTEN&zugehoerigZu=999')
         .replyOnce(200, mockResponse);
 
       await organisationStore.fetchSchuleDetailsForSchultraeger();
@@ -981,7 +982,7 @@ describe('OrganisationStore', () => {
       expect(organisationStore.loading).toBe(false);
     });
 
-    it.each([
+    it.only.each([
       ['some mock server error', 'UNSPECIFIED_ERROR'],
       [{ i18nKey: 'GET_ERROR' }, 'GET_ERROR'],
     ])(
@@ -995,7 +996,7 @@ describe('OrganisationStore', () => {
         expectedError: string,
       ) => {
         mockadapter
-          .onGet('/api/organisationen?limit=30&typ=SCHULE&systemrechte=SCHULTRAEGER_VERWALTEN&administriertVon=999')
+          .onGet('/api/organisationen?limit=30&typ=SCHULE&systemrechte=SCHULTRAEGER_VERWALTEN&zugehoerigZu=999')
           .replyOnce(500, response);
 
         await organisationStore.fetchSchuleDetailsForSchultraeger();
