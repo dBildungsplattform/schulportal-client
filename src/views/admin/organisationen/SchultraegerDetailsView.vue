@@ -29,6 +29,7 @@
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SchultraegerForm from '@/components/admin/schultraeger/SchultraegerForm.vue';
   import RelationshipAssign from '@/components/admin/RelationshipAssign.vue';
+  import SchultraegerSuccessTemplate from '@/components/admin/schultraeger/SchultraegerSuccessTemplate.vue';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -43,6 +44,9 @@
   const assignableSchulen: Ref<Array<string>> = ref([]);
   const assignedSchulen: Ref<Array<Organisation>> = ref([]);
   const unassignedSchulen: Ref<Array<Organisation>> = ref([]);
+
+  const progress: Ref<number> = ref<number>(0);
+  const successMessage: Ref<string> = ref<string>('');
 
   // eslint-disable-next-line @typescript-eslint/typedef
   const { resetForm } = useForm<SchultraegerFormType>({
@@ -74,20 +78,22 @@
   }
 
   async function navigateToSchultraegerManagement(): Promise<void> {
+    resetForm();
+    organisationStore.updatedOrganisation = null;
+    progress.value = 0;
+    successMessage.value = '';
     organisationStore.errorCode = '';
     await router.push({ name: 'schultraeger-management' });
   }
 
   async function navigateBackToSchultraegerDetails(): Promise<void> {
-    if (organisationStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
-      resetForm();
-      await router.push({ name: 'schultraeger-details' }).then(() => {
-        router.go(0);
-      });
-    } else {
-      organisationStore.errorCode = '';
-      await router.push({ name: 'schultraeger-details' });
-    }
+    resetForm();
+    organisationStore.updatedOrganisation = null;
+    progress.value = 0;
+    successMessage.value = '';
+    await router.push({ name: 'schultraeger-details' }).then(() => {
+      router.go(0);
+    });
   }
 
   function preventNavigation(event: BeforeUnloadEvent): void {
@@ -109,9 +115,21 @@
       );
     }
 
+    /* reset success message and progress bar before processing items */
+    successMessage.value = '';
+    progress.value = 0;
+
     if (assignableSchulen.value.length > 0) {
-      assignableSchulen.value.forEach(async (schuleId: string) => {
+      assignableSchulen.value.forEach(async (schuleId: string, index: number) => {
         await organisationStore.assignSchuleToTraeger(currentSchultraegerId, { organisationId: schuleId });
+
+        /* Update progress for each item processed */
+        progress.value = Math.ceil(((index + 1) / assignableSchulen.value.length) * 100);
+
+        /* Only show success message after all items have been processed */
+        if (index === assignableSchulen.value.length - 1) {
+          successMessage.value = t('admin.schultraeger.schulenAssignedSuccessfully');
+        }
       });
     }
   });
@@ -202,6 +220,7 @@
       <!-- The form to edit the current Schultraeger -->
       <template v-if="organisationStore.currentOrganisation">
         <SchultraegerForm
+          v-if="progress === 0 && !organisationStore.updatedOrganisation"
           :errorCode="organisationStore.errorCode"
           :isLoading="organisationStore.loading"
           :onHandleConfirmUnsavedChanges="handleConfirmUnsavedChanges"
@@ -232,7 +251,7 @@
         </SchultraegerForm>
 
         <v-container
-          v-if="!organisationStore.errorCode"
+          v-if="!organisationStore.errorCode && progress === 0 && !organisationStore.updatedOrganisation"
           class="px-3 px-sm-16"
         >
           <v-container class="px-lg-16">
@@ -261,19 +280,88 @@
           </v-container>
         </v-container>
 
+        <!-- Result template on success after submit  -->
+        <template v-if="organisationStore.updatedOrganisation && !organisationStore.errorCode">
+          <SchultraegerSuccessTemplate
+            :successMessage="$t('admin.schultraeger.schultraegerUpdatedSuccessfully')"
+            :followingDataChanged="$t('admin.followingDataCreated')"
+            :changedData="[
+              {
+                label: $t('admin.schultraeger.schultraegername'),
+                value: organisationStore.updatedOrganisation.name,
+                testId: 'updated-schultraeger-name',
+              },
+            ]"
+            :backButtonText="$t('nav.backToDetails')"
+            :createAnotherButtonText="$t('admin.schultraeger.createAnother')"
+            :showBackButton="false"
+            :showCreateAnotherButton="false"
+            backButtonTestId="back-to-details-button"
+            createAnotherButtonTestId="create-another-schultraeger-button"
+            @onNavigateBackToSchultraegerManagement="navigateToSchultraegerManagement"
+          />
+        </template>
+
+        <!-- Progress Bar -->
+        <div
+          v-if="progress > 0"
+          class="mt-4"
+        >
+          <v-container v-if="successMessage">
+            <v-row justify="center">
+              <v-col cols="auto">
+                <v-icon
+                  small
+                  color="#1EAE9C"
+                  icon="mdi-check-circle"
+                ></v-icon>
+              </v-col>
+            </v-row>
+            <p class="mt-2 text-center">
+              {{ successMessage }}
+            </p>
+          </v-container>
+          <v-row
+            v-if="progress < 100"
+            align="center"
+            justify="center"
+          >
+            <v-col cols="auto">
+              <v-icon
+                aria-hidden="true"
+                class="mr-2"
+                icon="mdi-alert-circle-outline"
+                size="small"
+              ></v-icon>
+              <span class="subtitle-2">
+                {{ $t('admin.doNotCloseBrowserNotice') }}
+              </span>
+            </v-col>
+          </v-row>
+          <v-progress-linear
+            class="mt-5"
+            :modelValue="progress"
+            color="primary"
+            height="25"
+          >
+            <template v-slot:default="{ value }">
+              <strong class="text-white">{{ Math.ceil(value) }}%</strong>
+            </template>
+          </v-progress-linear>
+        </div>
+
         <v-row
           v-if="!organisationStore.errorCode"
           class="pt-3 px-2 save-cancel-row justify-end"
         >
           <v-col
-            class="cancel-col"
             cols="12"
             sm="6"
             md="auto"
           >
             <v-btn
               class="secondary"
-              data-testid="navigate-to-schultraeger-management-button"
+              data-testid="go-to-schultraeger-management-button"
               @click="navigateToSchultraegerManagement"
               :block="mdAndDown"
             >
@@ -281,6 +369,22 @@
             </v-btn>
           </v-col>
           <v-col
+            v-if="progress === 100 || organisationStore.updatedOrganisation"
+            cols="12"
+            sm="6"
+            md="auto"
+          >
+            <v-btn
+              class="secondary"
+              data-testid="back-to-schultraeger-button"
+              @click="navigateBackToSchultraegerDetails"
+              :block="mdAndDown"
+            >
+              {{ $t('nav.backToDetails') }}
+            </v-btn>
+          </v-col>
+          <v-col
+            v-if="progress === 0 && !organisationStore.updatedOrganisation"
             cols="12"
             sm="6"
             md="auto"

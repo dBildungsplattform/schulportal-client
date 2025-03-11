@@ -58,7 +58,7 @@
     <h3 class="subtitle-1 mb-3">{{ assignedItemsHeader }}</h3>
     <RelationshipAssignList
       :items="assignedItems"
-      :noItemsFoundText="noUnassignedItemsFoundText"
+      :noItemsFoundText="noAssignedItemsFoundText"
       @onHandleSearchFilter="handleAssignedItemsSearchFilter"
       ref="assignedItemsList"
       v-slot="{ item }"
