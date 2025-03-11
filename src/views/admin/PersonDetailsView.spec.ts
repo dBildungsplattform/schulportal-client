@@ -24,7 +24,7 @@ import {
   type TwoFactorAuthentificationStore,
 } from '@/stores/TwoFactorAuthentificationStore';
 import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
-import { adjustDateForTimezoneAndFormat, getNextSchuljahresende } from '@/utils/date';
+import { adjustDateForTimezoneAndFormat } from '@/utils/date';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -923,6 +923,43 @@ describe('PersonDetailsView', () => {
     expect(wrapper?.find('[data-testid="zuordnung-edit-button"]').isVisible()).toBe(true);
   });
 
+  test('it submits the form to lock the user', async () => {
+    if (personStore.currentPerson) {
+      personStore.currentPerson.person.isLocked = false;
+      personStore.currentPerson.person.userLock = null;
+    }
+    const devicePasswordChangeButton: DOMWrapper<Element> | undefined = wrapper?.find(
+      '[data-testid="open-lock-dialog-button"]',
+    );
+    devicePasswordChangeButton?.trigger('click');
+    await nextTick();
+
+    expect(document.querySelector('[data-testid="lock-user-info-text"]')).not.toBeNull();
+
+    const unbefristetRadioButton: HTMLElement = (await document.querySelector(
+      '[data-testid="unbefristet-radio-button"] input[type="radio"]',
+    )) as HTMLElement;
+
+    expect(unbefristetRadioButton).not.toBeNull();
+    unbefristetRadioButton.click();
+    unbefristetRadioButton.dispatchEvent(new Event('click'));
+
+    const lockUserButton: HTMLElement = (await document.querySelector(
+      '[data-testid="lock-user-button"]',
+    )) as HTMLElement;
+
+    expect(lockUserButton).not.toBeNull();
+    lockUserButton.click();
+    lockUserButton.dispatchEvent(new Event('click'));
+    await nextTick();
+    await flushPromises();
+    await flushPromises();
+
+    expect(personStore.lockPerson).toHaveBeenCalled();
+    // reset personenuebersicht
+    personStore.personenuebersicht = mockPersonenuebersicht;
+  });
+
   describe('change befristung', () => {
     test('it shows befristung change form', async () => {
       await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
@@ -979,42 +1016,19 @@ describe('PersonDetailsView', () => {
       expect(wrapper?.find('[data-testid="befristung-change-button"]').attributes('disabled')).toBeDefined();
     });
 
-    test('it submits the form to lock the user', async () => {
-      if (personStore.currentPerson) {
-        personStore.currentPerson.person.isLocked = false;
-        personStore.currentPerson.person.userLock = null;
+    function getNextSchuljahresende(): string {
+      const today: Date = new Date();
+      const currentYear: number = today.getFullYear();
+      const july31stThisYear: Date = new Date(currentYear, 6, 31);
+
+      // If today's date is after July 31st this year, return July 31st of next year
+      if (today > july31stThisYear) {
+        return `${currentYear + 1}-07-31`;
       }
-      const devicePasswordChangeButton: DOMWrapper<Element> | undefined = wrapper?.find(
-        '[data-testid="open-lock-dialog-button"]',
-      );
-      devicePasswordChangeButton?.trigger('click');
-      await nextTick();
 
-      expect(document.querySelector('[data-testid="lock-user-info-text"]')).not.toBeNull();
-
-      const unbefristetRadioButton: HTMLElement = (await document.querySelector(
-        '[data-testid="unbefristet-radio-button"] input[type="radio"]',
-      )) as HTMLElement;
-
-      expect(unbefristetRadioButton).not.toBeNull();
-      unbefristetRadioButton.click();
-      unbefristetRadioButton.dispatchEvent(new Event('click'));
-
-      const lockUserButton: HTMLElement = (await document.querySelector(
-        '[data-testid="lock-user-button"]',
-      )) as HTMLElement;
-
-      expect(lockUserButton).not.toBeNull();
-      lockUserButton.click();
-      lockUserButton.dispatchEvent(new Event('click'));
-      await nextTick();
-      await flushPromises();
-      await flushPromises();
-
-      expect(personStore.lockPerson).toHaveBeenCalled();
-      // reset personenuebersicht
-      personStore.personenuebersicht = mockPersonenuebersicht;
-    });
+      // Otherwise, return July 31st of this year
+      return `${currentYear}-07-31`;
+    }
 
     test.each([
       ['12.08.2099', undefined],
@@ -1023,7 +1037,7 @@ describe('PersonDetailsView', () => {
     ])(
       'renders form to change befristung with %s %s and triggers submit',
       async (existingBefristung: string | undefined, existingBefristungOption: string | undefined) => {
-        personStore.personenuebersicht = mockPersonenuebersicht;
+        personStore.personenuebersicht = mockPersonenuebersichtLehr;
         if (personStore.personenuebersicht.zuordnungen[0]) {
           if (existingBefristung) {
             personStore.personenuebersicht.zuordnungen[0].befristung = existingBefristung;
@@ -1048,6 +1062,24 @@ describe('PersonDetailsView', () => {
         const befristungInput: VueWrapper | undefined = wrapper
           ?.findComponent({ ref: 'befristung-input-wrapper' })
           .findComponent({ ref: 'befristung-input' });
+        const schuljahresendeRadioButton: DOMWrapper<HTMLInputElement> | undefined = wrapper?.find(
+          '[data-testid="schuljahresende-radio-button"] input[type="radio"]',
+        );
+        const unbefristetRadioButton: DOMWrapper<HTMLInputElement> | undefined = wrapper?.find(
+          '[data-testid="unbefristet-radio-button"] input[type="radio"]',
+        );
+
+        if (existingBefristungOption === 'schuljahresende') {
+          expect(schuljahresendeRadioButton?.attributes('checked')).toBeDefined();
+          expect(unbefristetRadioButton?.attributes('checked')).toBeUndefined();
+        } else if (existingBefristungOption === 'unbefristet') {
+          expect(schuljahresendeRadioButton?.attributes('checked')).toBeUndefined();
+          expect(unbefristetRadioButton?.attributes('checked')).toBeDefined();
+        } else {
+          expect(schuljahresendeRadioButton?.attributes('checked')).toBeUndefined();
+          expect(unbefristetRadioButton?.attributes('checked')).toBeUndefined();
+        }
+
         await befristungInput?.setValue('13.08.2099');
         await nextTick();
 
