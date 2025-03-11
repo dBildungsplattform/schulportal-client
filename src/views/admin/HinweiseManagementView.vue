@@ -156,10 +156,8 @@
           :buttonAction="refreshPage"
         />
         <v-row>
-          <v-col :cols="$vuetify.display.smAndDown ? 12 : 3">
-            <h3 class="headline-3">{{ $t('admin.hinweise.newsbox') }}</h3>
-          </v-col>
-          <v-col :cols="$vuetify.display.smAndDown ? 12 : 9">
+          <v-col cols="12">
+            <h3 class="headline-3 mb-4">{{ $t('admin.hinweise.newsbox') }}</h3>
             <v-textarea
               data-testid="newsboxText"
               ref="newsboxText"
