@@ -53,9 +53,11 @@
     Ref<string>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedKlassenname', vuetifyConfig);
+  
   const isDirty: ComputedRef<boolean> = useIsFormDirty();
   const isValid: ComputedRef<boolean> = useIsFormValid();
   const canCommit: ComputedRef<boolean> = computed(() => isDirty.value && isValid.value);
+  
   function reset(): void {
     resetForm();
     schulenFilterRef.value?.clearInput();
@@ -65,6 +67,7 @@
       valid: isValid.value,
     });
   }
+ 
   defineExpose({ reset });
 
   async function submitHandler(): Promise<void> {

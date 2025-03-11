@@ -15,6 +15,8 @@
   import { computed, reactive, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
 
+  const { t }: Composer = useI18n({ useScope: 'global' });
+
   type SelectedSchulenIds = Array<string> | string | undefined;
   type Props = {
     includeTraeger?: boolean;
@@ -30,13 +32,13 @@
     };
   };
   const props: Props = defineProps<Props>();
+  
   const organisationStore: OrganisationStore = useOrganisationStore();
   // clear selection before anything else runs
   organisationStore.schulenFilter.selectedItems = [];
-  const { t }: Composer = useI18n({ useScope: 'global' });
 
   const selectedSchulenIds: Ref<SelectedSchulenIds> = ref(props.initialIds ?? []);
-  const searchInput: Ref<string | undefined> = ref(undefined);
+  const searchInputSchulen: Ref<string | undefined> = ref(undefined);
   const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
   const schulenFilter: OrganisationenFilter = reactive({
     includeTyp: OrganisationsTyp.Schule,
@@ -137,61 +139,71 @@
   type SelectionChange = [SelectedSchulenIds, SelectedSchulenIds, boolean];
   type PreviousSelectionChange = [SelectedSchulenIds, Array<string> | undefined, boolean | undefined];
 
-  watch(
-    [selectedSchulenIds, (): Array<string> => wrapSelectedSchulenIds(props.initialIds), hasAutoselectedSchule],
-    (
-      [currentSelection, currentInitialIds, currentlyHasAutoselectedSchule]: SelectionChange,
-      [oldSelection, oldInitialIds]: PreviousSelectionChange,
-    ) => {
-      const hasSelectionChanged: boolean = !isSameSelection(currentSelection, oldSelection);
-      const havePropsChanged: boolean = !isSameSelection(currentInitialIds, oldInitialIds);
-      if (hasSelectionChanged) {
-        handleSelectionUpdate(currentSelection);
-      } else if (havePropsChanged) {
-        selectedSchulenIds.value = currentInitialIds;
-        handleSelectionUpdate(currentInitialIds);
-      } else if (isEmptySelection(currentSelection)) {
-        let tempIds: SelectedSchulenIds;
-        if (currentlyHasAutoselectedSchule && autoselectedSchule.value) {
-          tempIds = unwrapSelectedSchulenIds([autoselectedSchule.value.id]);
-        } else {
-          tempIds = currentInitialIds;
-        }
-        if (!isSameSelection(selectedSchulenIds.value, tempIds)) {
-          selectedSchulenIds.value = tempIds;
-          handleSelectionUpdate(tempIds);
-        }
+watch(
+  [
+    selectedSchulenIds, 
+    () => wrapSelectedSchulenIds(props.initialIds), 
+    hasAutoselectedSchule
+  ],
+  (
+    [currentSelection, currentInitialIds, currentlyHasAutoselectedSchule], 
+    [oldSelection, oldInitialIds]
+  ) => {
+    // Case 1: Selection has changed - update parent directly
+    if (!isSameSelection(currentSelection, oldSelection)) {
+      handleSelectionUpdate(currentSelection);
+      return;
+    }
+    
+    // Case 2: Props changed - update selection and store
+    if (!isSameSelection(currentInitialIds, oldInitialIds)) {
+      selectedSchulenIds.value = currentInitialIds;
+      handleSelectionUpdate(currentInitialIds);
+      return;
+    }
+    
+    // Case 3: Empty selection - use autoselected or initial values
+    if (isEmptySelection(currentSelection)) {
+      const newIds: sring = currentlyHasAutoselectedSchule && autoselectedSchule.value 
+        ? unwrapSelectedSchulenIds([autoselectedSchule.value.id])
+        : currentInitialIds;
+        
+      if (!isSameSelection(selectedSchulenIds.value, newIds)) {
+        selectedSchulenIds.value = newIds;
+        handleSelectionUpdate(newIds);
       }
-    },
-    { immediate: true },
-  );
+    }
+  },
+  { immediate: true }
+);
 
-  watch(
-    () => organisationStore.schulenFilter.filterResult,
-    () => {
-      const ids: SelectedSchulenIds = selectedSchulenIds.value;
-      // this is a special case, because we can't assume that the appropriate schule is in the store already
+watch(
+  () => organisationStore.schulenFilter.filterResult,
+  () => {
+       // this is a special case, because we can't assume that the appropriate schule is in the store already
       // this is redundant in all other cases
-      if (props.initialIds) mirrorSelectionToStore(ids);
-    },
-  );
+    if (props.initialIds) mirrorSelectionToStore(selectedSchulenIds.value);
+  }
+);
 
-  watch(
-    schulenFilter,
-    async (newFilter: OrganisationenFilter, oldFilter: OrganisationenFilter | undefined) => {
-      if (oldFilter) {
-        clearTimeout(timerId.value);
-        if (hasAutoselectedSchule.value) return;
-        timerId.value = setTimeout(async () => {
-          await organisationStore.loadSchulenForFilter(newFilter);
-        }, 500);
-      } else {
-        // initial load
-        await organisationStore.loadSchulenForFilter(newFilter);
-      }
-    },
-    { immediate: true },
-  );
+watch(
+  schulenFilter,
+  async (newFilter, oldFilter) => {
+    // The timer can be cleared in all cases??
+    if (timerId.value) clearTimeout(timerId.value);
+    
+    // We skiip if we have an autoselectedSchule
+    if (oldFilter && hasAutoselectedSchule.value) return;
+    
+    // We apply the debounce of 500 only when there is an oldFilter (a change has been made)
+    const delay = oldFilter ? 500 : 0;
+    
+    timerId.value = setTimeout(async () => {
+      await organisationStore.loadSchulenForFilter(newFilter);
+    }, delay);
+  },
+  { immediate: true }
+);
 </script>
 
 <template>

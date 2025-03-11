@@ -155,7 +155,7 @@
           :onHandleDiscard="navigateToKlasseManagement"
           :onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
           :onSubmit
-          @form-state-changed="handleChangedFormState"
+          @formStateChanged="handleChangedFormState"
           ref="klasse-creation-form"
         >
           <!-- Error Message Display if error on submit -->

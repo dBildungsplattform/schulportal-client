@@ -623,7 +623,7 @@
             <SchulenFilter
               :multiple="false"
               :texts="{ placeholder: t('admin.schule.selectSchule') }"
-              :selected-schule-props="selectedSchuleProps"
+              :selectedSchuleProps="selectedSchuleProps"
               ref="schule-select"
             />
           </FormRow>
