@@ -69,6 +69,28 @@
     },
     { immediate: true },
   );
+
+  watch(
+    () => props.befristung,
+    (newValue: string | undefined) => {
+      if (newValue) {
+        localBefristung.value = newValue;
+        localBefristungOption.value = undefined;
+      }
+    },
+    { immediate: true },
+  );
+
+  watch(
+    () => props.befristungOption,
+    (newValue: string | undefined) => {
+      if (newValue) {
+        localBefristungOption.value = newValue;
+        localBefristung.value = undefined;
+      }
+    },
+    { immediate: true },
+  );
 </script>
 
 <template>
