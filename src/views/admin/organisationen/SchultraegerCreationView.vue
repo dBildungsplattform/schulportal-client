@@ -36,11 +36,6 @@
   const router: Router = useRouter();
   const organisationStore: OrganisationStore = useOrganisationStore();
 
-  // eslint-disable-next-line @typescript-eslint/typedef
-  const { resetForm } = useForm<SchultraegerFormType>({
-    validationSchema,
-  });
-
   const preservedSchultraegerform: Ref<string | undefined> = ref<string>('');
 
   const formContext: FormContext<SchultraegerFormType, SchultraegerFormType> = useForm<SchultraegerFormType>({
@@ -77,7 +72,7 @@
         OrganisationsTyp.Traeger,
         undefined,
       );
-      resetForm({
+      formContext.resetForm({
         values: {
           selectedSchultraegerform: initialSchultraegerformCache.value,
           selectedSchultraegername: '',
@@ -88,7 +83,7 @@
 
   const handleCreateAnotherSchultraeger = (): void => {
     organisationStore.createdSchultraeger = null;
-    resetForm();
+    formContext.resetForm();
     router.push({ name: 'create-schultraeger' });
   };
 
@@ -98,7 +93,7 @@
   }
 
   async function navigateToSchultraegerManagement(): Promise<void> {
-    organisationStore.createdSchule = null;
+    organisationStore.createdSchultraeger = null;
     await router.push({ name: 'schultraeger-management' }).then(() => {
       router.go(0);
     });
@@ -106,11 +101,12 @@
 
   async function navigateBackToSchultraegerForm(): Promise<void> {
     if (organisationStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
-      resetForm();
+      formContext.resetForm();
       await router.push({ name: 'create-schultraeger' }).then(() => {
         router.go(0);
       });
     } else {
+      selectedSchultraegername.value = '';
       organisationStore.errorCode = '';
       await router.push({ name: 'create-schultraeger' });
     }
@@ -191,7 +187,7 @@
             :closable="false"
             :text="organisationStore.errorCode ? $t(`admin.schultraeger.errors.${organisationStore.errorCode}`) : ''"
             :showButton="true"
-            :buttonText="$t('admin.schule.backToCreateSchule')"
+            :buttonText="$t('admin.schultraeger.backToCreateSchultraeger')"
             :buttonAction="navigateBackToSchultraegerForm"
             buttonClass="primary"
           />

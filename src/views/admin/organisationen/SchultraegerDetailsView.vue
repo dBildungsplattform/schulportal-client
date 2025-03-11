@@ -48,11 +48,6 @@
   const progress: Ref<number> = ref<number>(0);
   const successMessage: Ref<string> = ref<string>('');
 
-  // eslint-disable-next-line @typescript-eslint/typedef
-  const { resetForm } = useForm<SchultraegerFormType>({
-    validationSchema,
-  });
-
   const formContext: FormContext<SchultraegerFormType, SchultraegerFormType> = useForm<SchultraegerFormType>({
     validationSchema,
   });
@@ -78,7 +73,7 @@
   }
 
   async function navigateToSchultraegerManagement(): Promise<void> {
-    resetForm();
+    formContext.resetForm();
     organisationStore.updatedOrganisation = null;
     progress.value = 0;
     successMessage.value = '';
@@ -87,7 +82,7 @@
   }
 
   async function navigateBackToSchultraegerDetails(): Promise<void> {
-    resetForm();
+    formContext.resetForm();
     organisationStore.updatedOrganisation = null;
     progress.value = 0;
     successMessage.value = '';
@@ -127,7 +122,7 @@
         progress.value = Math.ceil(((index + 1) / assignableSchulen.value.length) * 100);
 
         /* Only show success message after all items have been processed */
-        if (index === assignableSchulen.value.length - 1) {
+        if (index === assignableSchulen.value.length - 1 && !organisationStore.errorCode) {
           successMessage.value = t('admin.schultraeger.schulenAssignedSuccessfully');
         }
       });
@@ -239,7 +234,7 @@
           <!-- To trigger unsaved changes dialog the alert has to be inside the form wrapper -->
           <SpshAlert
             :model-value="!!organisationStore.errorCode"
-            :title="$t('admin.schultraeger.schultraegerCreateErrorTitle')"
+            :title="$t('admin.schultraeger.schultraegerDetailsErrorTitle')"
             :type="'error'"
             :closable="false"
             :text="organisationStore.errorCode ? $t(`admin.schultraeger.errors.${organisationStore.errorCode}`) : ''"
@@ -304,7 +299,7 @@
 
         <!-- Progress Bar -->
         <div
-          v-if="progress > 0"
+          v-if="progress > 0 && !organisationStore.errorCode"
           class="mt-4"
         >
           <v-container v-if="successMessage">
@@ -400,6 +395,18 @@
             </v-btn>
           </v-col>
         </v-row>
+
+        <SpshAlert
+          :model-value="!!organisationStore.errorCode"
+          :title="$t('admin.schultraeger.schultraegerDetailsErrorTitle')"
+          :type="'error'"
+          :closable="false"
+          :text="organisationStore.errorCode ? $t(`admin.schultraeger.errors.${organisationStore.errorCode}`) : ''"
+          :showButton="true"
+          :buttonText="$t('admin.schultraeger.backToSchultraeger')"
+          :buttonAction="navigateBackToSchultraegerDetails"
+          buttonClass="primary"
+        />
       </template>
     </LayoutCard>
   </div>
