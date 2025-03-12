@@ -121,6 +121,45 @@ export interface AssignHardwareTokenResponse {
 /**
  * 
  * @export
+ * @interface CreateOrUpdateMeldungBodyParams
+ */
+export interface CreateOrUpdateMeldungBodyParams {
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateOrUpdateMeldungBodyParams
+     */
+    'id'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateOrUpdateMeldungBodyParams
+     */
+    'inhalt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateOrUpdateMeldungBodyParams
+     */
+    'status': CreateOrUpdateMeldungBodyParamsStatusEnum;
+    /**
+     * 
+     * @type {number}
+     * @memberof CreateOrUpdateMeldungBodyParams
+     */
+    'revision': number;
+}
+
+export const CreateOrUpdateMeldungBodyParamsStatusEnum = {
+    Veroeffentlicht: 'VEROEFFENTLICHT',
+    NichtVeroeffentlicht: 'NICHT_VEROEFFENTLICHT'
+} as const;
+
+export type CreateOrUpdateMeldungBodyParamsStatusEnum = typeof CreateOrUpdateMeldungBodyParamsStatusEnum[keyof typeof CreateOrUpdateMeldungBodyParamsStatusEnum];
+
+/**
+ * 
+ * @export
  * @interface CreateOrganisationBodyParams
  */
 export interface CreateOrganisationBodyParams {
@@ -129,13 +168,13 @@ export interface CreateOrganisationBodyParams {
      * @type {string}
      * @memberof CreateOrganisationBodyParams
      */
-    'administriertVon'?: string;
+    'administriertVon': string;
     /**
      * 
      * @type {string}
      * @memberof CreateOrganisationBodyParams
      */
-    'zugehoerigZu'?: string;
+    'zugehoerigZu': string;
     /**
      * Required, if `typ` is equal to `SCHULE`
      * @type {string}
@@ -608,7 +647,9 @@ export const DbiamOrganisationErrorI18nKeyEnum = {
     NameEnthaeltLeerzeichen: 'NAME_ENTHAELT_LEERZEICHEN',
     KennungEnthaeltLeerzeichen: 'KENNUNG_ENTHAELT_LEERZEICHEN',
     EmailAdressOnOrganisationTyp: 'EMAIL_ADRESS_ON_ORGANISATION_TYP',
-    NewerVersionOrganisation: 'NEWER_VERSION_ORGANISATION'
+    NewerVersionOrganisation: 'NEWER_VERSION_ORGANISATION',
+    OrganisationWechseltTeilbaum: 'ORGANISATION_WECHSELT_TEILBAUM',
+    OrganisationZuweisungFehler: 'ORGANISATION_ZUWEISUNG_FEHLER'
 } as const;
 
 export type DbiamOrganisationErrorI18nKeyEnum = typeof DbiamOrganisationErrorI18nKeyEnum[keyof typeof DbiamOrganisationErrorI18nKeyEnum];
@@ -1255,6 +1296,57 @@ export interface LoeschungResponse {
      */
     'zeitpunkt': string;
 }
+/**
+ * 
+ * @export
+ * @interface MeldungResponse
+ */
+export interface MeldungResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof MeldungResponse
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof MeldungResponse
+     */
+    'createdAt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof MeldungResponse
+     */
+    'updatedAt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof MeldungResponse
+     */
+    'inhalt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof MeldungResponse
+     */
+    'status': MeldungResponseStatusEnum;
+    /**
+     * 
+     * @type {number}
+     * @memberof MeldungResponse
+     */
+    'revision': number;
+}
+
+export const MeldungResponseStatusEnum = {
+    Veroeffentlicht: 'VEROEFFENTLICHT',
+    NichtVeroeffentlicht: 'NICHT_VEROEFFENTLICHT'
+} as const;
+
+export type MeldungResponseStatusEnum = typeof MeldungResponseStatusEnum[keyof typeof MeldungResponseStatusEnum];
+
 /**
  * 
  * @export
@@ -2702,7 +2794,9 @@ export const RollenSystemRecht = {
     PersonenAnlegen: 'PERSONEN_ANLEGEN',
     ImportDurchfuehren: 'IMPORT_DURCHFUEHREN',
     PersonenLesen: 'PERSONEN_LESEN',
-    BulkVerwalten: 'BULK_VERWALTEN'
+    BulkVerwalten: 'BULK_VERWALTEN',
+    SchulportalVerwalten: 'SCHULPORTAL_VERWALTEN',
+    HinweiseBearbeiten: 'HINWEISE_BEARBEITEN'
 } as const;
 
 export type RollenSystemRecht = typeof RollenSystemRecht[keyof typeof RollenSystemRecht];
@@ -2979,13 +3073,13 @@ export interface UpdateOrganisationBodyParams {
      * @type {string}
      * @memberof UpdateOrganisationBodyParams
      */
-    'administriertVon'?: string;
+    'administriertVon': string;
     /**
      * 
      * @type {string}
      * @memberof UpdateOrganisationBodyParams
      */
-    'zugehoerigZu'?: string;
+    'zugehoerigZu': string;
     /**
      * Required, if `typ` is equal to `SCHULE`
      * @type {string}
@@ -6152,6 +6246,288 @@ export class KeycloakinternalApi extends BaseAPI implements KeycloakinternalApiI
 
 
 /**
+ * MeldungApi - axios parameter creator
+ * @export
+ */
+export const MeldungApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @param {CreateOrUpdateMeldungBodyParams} createOrUpdateMeldungBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        meldungControllerCreateOrUpdateMeldung: async (createOrUpdateMeldungBodyParams: CreateOrUpdateMeldungBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'createOrUpdateMeldungBodyParams' is not null or undefined
+            assertParamExists('meldungControllerCreateOrUpdateMeldung', 'createOrUpdateMeldungBodyParams', createOrUpdateMeldungBodyParams)
+            const localVarPath = `/api/portal/meldung`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(createOrUpdateMeldungBodyParams, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Get all meldungen.
+         * @summary 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        meldungControllerGetAllMeldungen: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/portal/meldung`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Get current veroeffentlicht meldung.
+         * @summary 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        meldungControllerGetCurrentMeldung: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/portal/meldung/current`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * MeldungApi - functional programming interface
+ * @export
+ */
+export const MeldungApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = MeldungApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @param {CreateOrUpdateMeldungBodyParams} createOrUpdateMeldungBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async meldungControllerCreateOrUpdateMeldung(createOrUpdateMeldungBodyParams: CreateOrUpdateMeldungBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.meldungControllerCreateOrUpdateMeldung(createOrUpdateMeldungBodyParams, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Get all meldungen.
+         * @summary 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async meldungControllerGetAllMeldungen(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<MeldungResponse>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.meldungControllerGetAllMeldungen(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Get current veroeffentlicht meldung.
+         * @summary 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async meldungControllerGetCurrentMeldung(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<MeldungResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.meldungControllerGetCurrentMeldung(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * MeldungApi - factory interface
+ * @export
+ */
+export const MeldungApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = MeldungApiFp(configuration)
+    return {
+        /**
+         * 
+         * @param {CreateOrUpdateMeldungBodyParams} createOrUpdateMeldungBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        meldungControllerCreateOrUpdateMeldung(createOrUpdateMeldungBodyParams: CreateOrUpdateMeldungBodyParams, options?: any): AxiosPromise<void> {
+            return localVarFp.meldungControllerCreateOrUpdateMeldung(createOrUpdateMeldungBodyParams, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Get all meldungen.
+         * @summary 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        meldungControllerGetAllMeldungen(options?: any): AxiosPromise<Array<MeldungResponse>> {
+            return localVarFp.meldungControllerGetAllMeldungen(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Get current veroeffentlicht meldung.
+         * @summary 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        meldungControllerGetCurrentMeldung(options?: any): AxiosPromise<MeldungResponse> {
+            return localVarFp.meldungControllerGetCurrentMeldung(options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * MeldungApi - interface
+ * @export
+ * @interface MeldungApi
+ */
+export interface MeldungApiInterface {
+    /**
+     * 
+     * @param {CreateOrUpdateMeldungBodyParams} createOrUpdateMeldungBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MeldungApiInterface
+     */
+    meldungControllerCreateOrUpdateMeldung(createOrUpdateMeldungBodyParams: CreateOrUpdateMeldungBodyParams, options?: AxiosRequestConfig): AxiosPromise<void>;
+
+    /**
+     * Get all meldungen.
+     * @summary 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MeldungApiInterface
+     */
+    meldungControllerGetAllMeldungen(options?: AxiosRequestConfig): AxiosPromise<Array<MeldungResponse>>;
+
+    /**
+     * Get current veroeffentlicht meldung.
+     * @summary 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MeldungApiInterface
+     */
+    meldungControllerGetCurrentMeldung(options?: AxiosRequestConfig): AxiosPromise<MeldungResponse>;
+
+}
+
+/**
+ * MeldungApi - object-oriented interface
+ * @export
+ * @class MeldungApi
+ * @extends {BaseAPI}
+ */
+export class MeldungApi extends BaseAPI implements MeldungApiInterface {
+    /**
+     * 
+     * @param {CreateOrUpdateMeldungBodyParams} createOrUpdateMeldungBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MeldungApi
+     */
+    public meldungControllerCreateOrUpdateMeldung(createOrUpdateMeldungBodyParams: CreateOrUpdateMeldungBodyParams, options?: AxiosRequestConfig) {
+        return MeldungApiFp(this.configuration).meldungControllerCreateOrUpdateMeldung(createOrUpdateMeldungBodyParams, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Get all meldungen.
+     * @summary 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MeldungApi
+     */
+    public meldungControllerGetAllMeldungen(options?: AxiosRequestConfig) {
+        return MeldungApiFp(this.configuration).meldungControllerGetAllMeldungen(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Get current veroeffentlicht meldung.
+     * @summary 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MeldungApi
+     */
+    public meldungControllerGetCurrentMeldung(options?: AxiosRequestConfig) {
+        return MeldungApiFp(this.configuration).meldungControllerGetCurrentMeldung(options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
  * MetricsApi - axios parameter creator
  * @export
  */
@@ -6272,53 +6648,6 @@ export class MetricsApi extends BaseAPI implements MetricsApiInterface {
  */
 export const OrganisationenApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
-        /**
-         * 
-         * @param {string} organisationId The id of an organization
-         * @param {OrganisationByIdBodyParams} organisationByIdBodyParams 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        organisationControllerAddAdministrierteOrganisation: async (organisationId: string, organisationByIdBodyParams: OrganisationByIdBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'organisationId' is not null or undefined
-            assertParamExists('organisationControllerAddAdministrierteOrganisation', 'organisationId', organisationId)
-            // verify required parameter 'organisationByIdBodyParams' is not null or undefined
-            assertParamExists('organisationControllerAddAdministrierteOrganisation', 'organisationByIdBodyParams', organisationByIdBodyParams)
-            const localVarPath = `/api/organisationen/{organisationId}/administriert`
-                .replace(`{${"organisationId"}}`, encodeURIComponent(String(organisationId)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication bearer required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            // authentication oauth2 required
-            // oauth required
-            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(organisationByIdBodyParams, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
         /**
          * 
          * @param {string} organisationId The id of an organization
@@ -6945,17 +7274,6 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async organisationControllerAddAdministrierteOrganisation(organisationId: string, organisationByIdBodyParams: OrganisationByIdBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerAddAdministrierteOrganisation(organisationId, organisationByIdBodyParams, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * 
-         * @param {string} organisationId The id of an organization
-         * @param {OrganisationByIdBodyParams} organisationByIdBodyParams 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
         async organisationControllerAddZugehoerigeOrganisation(organisationId: string, organisationByIdBodyParams: OrganisationByIdBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerAddZugehoerigeOrganisation(organisationId, organisationByIdBodyParams, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
@@ -7110,16 +7428,6 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerAddAdministrierteOrganisation(organisationId: string, organisationByIdBodyParams: OrganisationByIdBodyParams, options?: any): AxiosPromise<void> {
-            return localVarFp.organisationControllerAddAdministrierteOrganisation(organisationId, organisationByIdBodyParams, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @param {string} organisationId The id of an organization
-         * @param {OrganisationByIdBodyParams} organisationByIdBodyParams 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
         organisationControllerAddZugehoerigeOrganisation(organisationId: string, organisationByIdBodyParams: OrganisationByIdBodyParams, options?: any): AxiosPromise<void> {
             return localVarFp.organisationControllerAddZugehoerigeOrganisation(organisationId, organisationByIdBodyParams, options).then((request) => request(axios, basePath));
         },
@@ -7261,16 +7569,6 @@ export interface OrganisationenApiInterface {
      * @throws {RequiredError}
      * @memberof OrganisationenApiInterface
      */
-    organisationControllerAddAdministrierteOrganisation(organisationId: string, organisationByIdBodyParams: OrganisationByIdBodyParams, options?: AxiosRequestConfig): AxiosPromise<void>;
-
-    /**
-     * 
-     * @param {string} organisationId The id of an organization
-     * @param {OrganisationByIdBodyParams} organisationByIdBodyParams 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof OrganisationenApiInterface
-     */
     organisationControllerAddZugehoerigeOrganisation(organisationId: string, organisationByIdBodyParams: OrganisationByIdBodyParams, options?: AxiosRequestConfig): AxiosPromise<void>;
 
     /**
@@ -7403,18 +7701,6 @@ export interface OrganisationenApiInterface {
  * @extends {BaseAPI}
  */
 export class OrganisationenApi extends BaseAPI implements OrganisationenApiInterface {
-    /**
-     * 
-     * @param {string} organisationId The id of an organization
-     * @param {OrganisationByIdBodyParams} organisationByIdBodyParams 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof OrganisationenApi
-     */
-    public organisationControllerAddAdministrierteOrganisation(organisationId: string, organisationByIdBodyParams: OrganisationByIdBodyParams, options?: AxiosRequestConfig) {
-        return OrganisationenApiFp(this.configuration).organisationControllerAddAdministrierteOrganisation(organisationId, organisationByIdBodyParams, options).then((request) => request(this.axios, this.basePath));
-    }
-
     /**
      * 
      * @param {string} organisationId The id of an organization
