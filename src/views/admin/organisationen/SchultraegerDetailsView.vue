@@ -30,6 +30,7 @@
   import SchultraegerForm from '@/components/admin/schultraeger/SchultraegerForm.vue';
   import RelationshipAssign from '@/components/admin/RelationshipAssign.vue';
   import SchultraegerSuccessTemplate from '@/components/admin/schultraeger/SchultraegerSuccessTemplate.vue';
+  import SpshTooltip from '@/components/admin/SpshTooltip.vue';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -71,6 +72,8 @@
     blockedNext();
     organisationStore.errorCode = '';
   }
+
+  const noUnassignedSchulenFoundText: Ref<string> = ref(t('admin.schultraeger.unassignedSchulenDefaultText'));
 
   async function navigateToSchultraegerManagement(): Promise<void> {
     formContext.resetForm();
@@ -151,6 +154,10 @@
       zugehoerigZu: [organisationStore.currentOrganisation.zugehoerigZu!],
     });
 
+    if (unassignedSchulen.value.length === 0) {
+      noUnassignedSchulenFoundText.value = t('admin.schultraeger.noSchulenFound');
+    }
+
     if (assignableSchulen.value.length > 0) {
       unassignedSchulen.value = unassignedSchulen.value.filter(
         (schule: Organisation) => !assignableSchulen.value.includes(schule.id),
@@ -160,6 +167,8 @@
 
   onBeforeMount(async () => {
     organisationStore.errorCode = '';
+    progress.value = 0;
+    successMessage.value = '';
 
     await organisationStore.getRootKinderSchultraeger();
     await organisationStore.getOrganisationById(currentSchultraegerId, OrganisationsTyp.Traeger);
@@ -260,7 +269,7 @@
                 :assignedItems="assignedSchulen"
                 :assignedItemsHeader="$t('admin.schultraeger.schulenOfThisTraeger', { amount: assignedSchulen.length })"
                 noAssignedItemsFoundText=""
-                :noUnassignedItemsFoundText="$t('admin.schultraeger.unassignedSchulenDefaultText')"
+                :noUnassignedItemsFoundText="noUnassignedSchulenFoundText"
                 @onHandleAssignedItemsSearchFilter="searchInAssignedSchulen"
                 @onHandleUnassignedItemClick="addAssignableSchule"
                 @onHandleUnassignedItemsSearchFilter="searchInUnassignedSchulen"
@@ -268,7 +277,12 @@
                 :unassignedItemsHeader="$t('admin.schultraeger.schulenWithoutTraeger')"
               >
                 <template v-slot="{ item }">
-                  {{ `(${item.kennung}) ${item.name}` }}
+                  <SpshTooltip
+                    :enabledCondition="true"
+                    :enabledText="`(${item.kennung}) ${item.name}`"
+                  >
+                    {{ `(${item.kennung}) ${item.name}` }}
+                  </SpshTooltip>
                 </template>
               </RelationshipAssign>
             </v-row>

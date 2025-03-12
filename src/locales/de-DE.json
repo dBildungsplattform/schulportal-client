@@ -526,6 +526,7 @@
         "TRAEGER_IN_TRAEGER": "Ein Schulträger darf nur einem anderen Schulträger zugeordnet werden."
       },
       "management": "Schulträgerverwaltung",
+      "noSchulenFound": "Keine Schulen gefunden",
       "rules":{
         "schultraegername": {
           "matches": "Der Schulträgername darf keine ungültigen Zeichen beinhalten.",
