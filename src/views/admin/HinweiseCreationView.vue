@@ -52,7 +52,7 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('meldungText', vuetifyConfig);
 
-  const btnText: ComputedRef<string> = computed(() => {
+  const publishOrUnpublishButton: ComputedRef<string> = computed(() => {
     return !newsboxMeldung.value || newsboxMeldung.value.status == MeldungStatus.NICHT_VEROEFFENTLICHT
       ? t('admin.hinweise.publish')
       : t('admin.hinweise.publishEnd');
@@ -188,7 +188,7 @@
               color="primary"
               type="submit"
               @click="onSubmit"
-              >{{ btnText }}</v-btn
+              >{{ publishOrUnpublishButton }}</v-btn
             >
           </v-col>
         </v-row>
