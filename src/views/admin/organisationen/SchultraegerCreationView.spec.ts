@@ -111,7 +111,7 @@ afterEach(() => {
   wrapper?.unmount();
 });
 
-describe('SchultraegerView', () => {
+describe('SchultraegerCreationView', () => {
   test('it renders the Schultraeger form', () => {
     expect(wrapper?.find('[data-testid="schultraegername-input"]').isVisible()).toBe(true);
   });
@@ -119,6 +119,7 @@ describe('SchultraegerView', () => {
   test('it renders all child components', () => {
     expect(wrapper?.getComponent({ name: 'LayoutCard' })).toBeTruthy();
     expect(wrapper?.getComponent({ name: 'SpshAlert' })).toBeTruthy();
+    expect(wrapper?.getComponent({ name: 'SchultraegerForm' })).toBeTruthy();
     expect(wrapper?.getComponent({ name: 'FormWrapper' })).toBeTruthy();
     expect(wrapper?.getComponent({ name: 'FormRow' })).toBeTruthy();
   });
