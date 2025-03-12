@@ -51,7 +51,7 @@ export const useMeldungStore: StoreDefinition<'meldungStore', MeldungState, Meld
       };
     },
     actions: {
-      async getAllMeldungen() {
+      async getAllMeldungen(): Promise<void> {
         this.loading = true;
         this.errorCode = '';
         try {
@@ -68,7 +68,7 @@ export const useMeldungStore: StoreDefinition<'meldungStore', MeldungState, Meld
           this.loading = false;
         }
       },
-      async getCurrentMeldung() {
+      async getCurrentMeldung(): Promise<void> {
         this.loading = true;
         this.errorCode = '';
         try {
@@ -88,7 +88,7 @@ export const useMeldungStore: StoreDefinition<'meldungStore', MeldungState, Meld
           this.loading = false;
         }
       },
-      async createOrUpdateMeldung(meldung: Meldung) {
+      async createOrUpdateMeldung(meldung: Meldung): Promise<void> {
         this.loading = true;
         this.errorCode = '';
         try {
@@ -99,7 +99,6 @@ export const useMeldungStore: StoreDefinition<'meldungStore', MeldungState, Meld
             revision: meldung.revision ?? 0,
           };
           await meldungenApi.meldungControllerCreateOrUpdateMeldung(params);
-          await this.getAllMeldungen();
         } catch (error: unknown) {
           this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
         } finally {

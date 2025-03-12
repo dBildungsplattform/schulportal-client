@@ -10,7 +10,7 @@ import {
 import routes from '@/router/routes';
 import { nextTick } from 'vue';
 import { MeldungStatus, useMeldungStore, type MeldungStore } from '@/stores/MeldungStore';
-import HinweiseManagementView from './HinweiseManagementView.vue';
+import HinweiseManagementView from './HinweiseCreationView.vue';
 import type Module from 'module';
 
 let wrapper: VueWrapper | null = null;
@@ -87,7 +87,7 @@ describe('HinweiseManagementView', () => {
       routes,
     });
 
-    router.push({ name: 'hinweise-management' });
+    router.push({ name: 'hinweise-creation' });
     await router.isReady();
 
     wrapper = mountComponent();
@@ -97,7 +97,7 @@ describe('HinweiseManagementView', () => {
     wrapper?.unmount();
   });
   test('it renders the Hinweise form', () => {
-    expect(wrapper?.find('[data-testid="newsboxText"]').isVisible()).toBe(true);
+    expect(wrapper?.find('[data-testid="newsbox-text"]').isVisible()).toBe(true);
   });
 
   test('it renders all child components', () => {
@@ -120,7 +120,7 @@ describe('HinweiseManagementView', () => {
   //     },
   //   ];
 
-  //   const meldungTextInput: VueWrapper | undefined = wrapper?.findComponent({ ref: 'newsboxText' });
+  //   const meldungTextInput: VueWrapper | undefined = wrapper?.findComponent({ ref: 'newsbox-text' });
   //   await meldungTextInput?.setValue('Updated Hinweis');
   //   await nextTick();
 
@@ -164,7 +164,7 @@ describe('HinweiseManagementView', () => {
       await nextTick();
 
       // Fill the form to make it dirty
-      const meldungTextInput: VueWrapper | undefined = wrapper.findComponent({ ref: 'newsboxText' });
+      const meldungTextInput: VueWrapper | undefined = wrapper.findComponent({ ref: 'newsbox-text' });
       await meldungTextInput.setValue('Hinweis');
       await nextTick();
 

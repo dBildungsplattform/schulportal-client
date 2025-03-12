@@ -262,7 +262,7 @@
         data-testid="hinweise-edit-menu-item"
         prepend-icon="mdi-pencil"
         :title="$t('admin.portal.editHinweise')"
-        to="/admin/hinweise"
+        to="/admin/hinweise/new"
       ></v-list-item>
     </div>
   </v-navigation-drawer>

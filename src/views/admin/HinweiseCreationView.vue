@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { MeldungStatus, useMeldungStore, type Meldung, type MeldungStore } from '@/stores/MeldungStore';
-  import { computed, onMounted, onUnmounted, ref, type ComputedRef, type Ref } from 'vue';
+  import { computed, onBeforeMount, onUnmounted, ref, type ComputedRef, type Ref } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import {
     onBeforeRouteLeave,
@@ -21,13 +21,11 @@
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { smAndDown }: { smAndDown: Ref<boolean> } = useDisplay();
   const meldungStore: MeldungStore = useMeldungStore();
-  const newsboxMeldung: ComputedRef<Meldung> = computed(
-    () => meldungStore.meldungen[0] ?? { text: '', status: MeldungStatus.NICHT_VEROEFFENTLICHT },
-  );
+  const newsboxMeldung: ComputedRef<Meldung | undefined> = computed(() => meldungStore.meldungen[0]);
 
   const validationSchema: TypedSchema = toTypedSchema(
     object({
-      meldungText: string().max(2000, t('admin.hinweise.validation.max')),
+      meldungText: string().max(2000, t('admin.hinweise.rules.max')).min(1, t('admin.hinweise.rules.min')),
     }),
   );
 
@@ -46,6 +44,7 @@
 
   const { defineField, handleSubmit, resetForm }: FormContext = useForm<NewsboxForm>({
     validationSchema,
+    validateOnMount: false,
   });
 
   const [meldungText, meldungTextProps]: [
@@ -54,7 +53,7 @@
   ] = defineField('meldungText', vuetifyConfig);
 
   const btnText: ComputedRef<string> = computed(() => {
-    return newsboxMeldung.value.status == MeldungStatus.NICHT_VEROEFFENTLICHT
+    return !newsboxMeldung.value || newsboxMeldung.value.status == MeldungStatus.NICHT_VEROEFFENTLICHT
       ? t('admin.hinweise.publish')
       : t('admin.hinweise.publishEnd');
   });
@@ -67,10 +66,11 @@
       ...newsboxMeldung.value,
       text: meldungText.value,
       status:
-        newsboxMeldung.value.status == MeldungStatus.NICHT_VEROEFFENTLICHT
+        !newsboxMeldung.value || newsboxMeldung.value.status == MeldungStatus.NICHT_VEROEFFENTLICHT
           ? MeldungStatus.VEROEFFENTLICHT
           : MeldungStatus.NICHT_VEROEFFENTLICHT,
     });
+    await meldungStore.getAllMeldungen();
   });
 
   const onCloseDialog = (): void => {
@@ -87,7 +87,7 @@
   };
 
   const formWasChanged = (): boolean => {
-    return meldungText.value !== newsboxMeldung.value.text;
+    return meldungText.value !== newsboxMeldung.value?.text;
   };
 
   function preventNavigation(event: BeforeUnloadEvent): void {
@@ -97,9 +97,11 @@
     event.returnValue = '';
   }
 
-  onMounted(async () => {
+  onBeforeMount(async () => {
     await meldungStore.getAllMeldungen();
-    meldungText.value = newsboxMeldung.value.text;
+    if (newsboxMeldung.value) {
+      meldungText.value = newsboxMeldung.value.text;
+    }
     /* listen for browser changes and prevent them when form is dirty */
     window.addEventListener('beforeunload', preventNavigation);
   });
@@ -159,8 +161,8 @@
           <v-col cols="12">
             <h3 class="headline-3 mb-4">{{ $t('admin.hinweise.newsbox') }}</h3>
             <v-textarea
-              data-testid="newsboxText"
-              ref="newsboxText"
+              data-testid="newsbox-text"
+              ref="newsbox-text"
               v-bind="meldungTextProps"
               v-model="meldungText"
               variant="outlined"
@@ -195,9 +197,4 @@
   </div>
 </template>
 
-<style>
-  .v-textarea .v-field__input {
-    -webkit-mask-image: none !important;
-    mask-image: none !important;
-  }
-</style>
+<style></style>

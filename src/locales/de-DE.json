@@ -389,7 +389,7 @@
           "PERSON_SYNCHRONISIEREN": "Darf Benutzer synchronisieren",
           "PERSONEN_ANLEGEN": "Darf Benutzer anlegen",
           "BULK_VERWALTEN": "Darf Mehrfachbearbeitung ausführen",
-          "SCHULPORTAL_VERWALTEN": "Darf das Portal verwalten",
+          "SCHULPORTAL_VERWALTEN": "Darf Portal verwalten",
           "HINWEISE_BEARBEITEN": "Darf Hinweise bearbeiten"
         },
         "rollenarten": {
@@ -564,8 +564,9 @@
         "UNSPECIFIED_ERROR": "Es ist ein Fehler aufgetreten.",
         "MISMATCHED_REVISION": "Die Hinweise wurden zwischenzeitlich von einer anderen Administratorin oder einem anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut."
       },
-      "validation": {
-        "max": "Der Text darf maximal 2000 Zeichen lang sein."
+      "rules": {
+        "max": "Der Text darf maximal 2000 Zeichen lang sein.",
+        "min": "Der Text muss mindestens 1 Zeichen lang sein."
       }
     }
   },

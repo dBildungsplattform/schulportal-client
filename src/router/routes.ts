@@ -166,9 +166,9 @@ const routes: readonly RouteRecordRaw[] = [
     },
   },
   {
-    path: '/admin/hinweise',
-    name: 'hinweise-management',
-    component: () => import('../views/admin/HinweiseManagementView.vue'),
+    path: '/admin/hinweise/new',
+    name: 'hinweise-creation',
+    component: () => import('../views/admin/HinweiseCreationView.vue'),
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
