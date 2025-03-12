@@ -140,19 +140,21 @@
 
   async function searchInAssignedSchulen(searchString: string): Promise<void> {
     if (!organisationStore.currentOrganisation) return;
-    assignedSchulen.value = await organisationStore.getSchulenByTraegerId({
+    await organisationStore.fetchSchulenFromTraeger({
       searchString: searchString,
       zugehoerigZu: [currentSchultraegerId],
     });
+    assignedSchulen.value = organisationStore.schulenFromTraeger;
   }
 
   async function searchInUnassignedSchulen(searchString: string): Promise<void> {
     if (!organisationStore.currentOrganisation || !searchString) return;
-    unassignedSchulen.value = await organisationStore.getSchulenByTraegerId({
+    await organisationStore.fetchSchulenWithoutTraeger({
       limit: 50,
       searchString: searchString,
       zugehoerigZu: [organisationStore.currentOrganisation.zugehoerigZu!],
     });
+    unassignedSchulen.value = organisationStore.schulenWithoutTraeger;
 
     if (unassignedSchulen.value.length === 0) {
       noUnassignedSchulenFoundText.value = t('admin.schultraeger.noSchulenFound');
@@ -172,10 +174,11 @@
 
     await organisationStore.getRootKinderSchultraeger();
     await organisationStore.getOrganisationById(currentSchultraegerId, OrganisationsTyp.Traeger);
-    assignedSchulen.value = await organisationStore.getSchulenByTraegerId({
+    await organisationStore.fetchSchulenFromTraeger({
       searchString: '',
       zugehoerigZu: [currentSchultraegerId],
     });
+    assignedSchulen.value = organisationStore.schulenFromTraeger;
 
     // Set the initial values using the computed properties
     if (rootChildSchultraegerList.value.length > 0) {
