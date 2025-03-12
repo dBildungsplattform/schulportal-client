@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { computed, onMounted, type ComputedRef, type Ref, ref } from 'vue';
+  import { computed, onMounted, type ComputedRef, type Ref, ref, watch } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
   import { type Router, useRouter } from 'vue-router';
@@ -463,6 +463,21 @@
     selectedPersonIds.value = selectedItems as unknown as string[];
   }
 
+  // This method filters the selectedPersonIds to avoid items being selected when they are not included in the current table "items"
+  function updateSelectedRowsAfterFilter(): void {
+    const visiblePersonIds: string[] | undefined = personStore.personenWithUebersicht?.map(
+      (person: Personendatensatz) => person.person.id,
+    );
+    selectedPersonIds.value = selectedPersonIds.value.filter((id: string) => visiblePersonIds?.includes(id));
+  }
+  // Whenever the array of items of the table (personStore.personenWithUebersicht) changes (Filters, search function, page update etc...) update the selection.
+  watch(
+    () => personStore.personenWithUebersicht,
+    () => {
+      updateSelectedRowsAfterFilter();
+    },
+  );
+
   onMounted(async () => {
     personenkontextStore.processWorkflowStep({
       limit: 25,
@@ -817,6 +832,7 @@
         @onPageUpdate="getPaginatedPersonen"
         @onTableUpdate="handleTableSorting"
         @update:selectedRows="handleSelectedRows"
+        :modelValue="selectedPersonIds as unknown as TableItem[]"
         :totalItems="personStore.totalPersons"
         item-value-path="person.id"
         ><template v-slot:[`item.rollen`]="{ item }">
