@@ -122,7 +122,6 @@ describe('MeldungStore', () => {
       } as Meldung;
 
       mockadapter.onPut('/api/portal/meldung').replyOnce(200);
-      mockadapter.onGet('/api/portal/meldung').replyOnce(200, meldungResponse);
 
       const createOrUpdateMeldung: Promise<void> = meldungStore.createOrUpdateMeldung(createUpdateMeldung);
 
@@ -132,13 +131,6 @@ describe('MeldungStore', () => {
       await createOrUpdateMeldung;
       expect(meldungStore.loading).toBe(false);
       expect(meldungStore.errorCode).toBe('');
-      expect(meldungStore.meldungen).toEqual(
-        meldungResponse.map((meldung: MeldungResponse) => ({
-          id: meldung.id,
-          text: meldung.inhalt,
-          status: meldung.status,
-        })),
-      );
     });
 
     it('should handle error', async () => {

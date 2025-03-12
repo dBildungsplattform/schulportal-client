@@ -1,5 +1,5 @@
 import { expect, test, type Mock, type MockInstance } from 'vitest';
-import { VueWrapper, mount } from '@vue/test-utils';
+import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import {
   createRouter,
   createWebHistory,
@@ -92,10 +92,12 @@ describe('HinweiseManagementView', () => {
 
     wrapper = mountComponent();
   });
+
   afterEach(() => {
     vi.restoreAllMocks();
     wrapper?.unmount();
   });
+
   test('it renders the Hinweise form', () => {
     expect(wrapper?.find('[data-testid="newsbox-text"]').isVisible()).toBe(true);
   });
@@ -111,25 +113,34 @@ describe('HinweiseManagementView', () => {
     expect(goBack).toHaveBeenCalledWith(-1);
   });
 
-  // test('it fills form and triggers submit', async () => {
-  //   meldungStore.meldungen = [
-  //     {
-  //       id: '1',
-  //       text: 'Initial Hinweis',
-  //       status: MeldungStatus.NICHT_VEROEFFENTLICHT,
-  //     },
-  //   ];
+  test('it fills form and triggers submit', async () => {
+    meldungStore.meldungen = [
+      {
+        id: '1',
+        text: 'Initial Hinweis',
+        status: MeldungStatus.NICHT_VEROEFFENTLICHT,
+      },
+    ];
+    await flushPromises();
+    await nextTick();
 
-  //   const meldungTextInput: VueWrapper | undefined = wrapper?.findComponent({ ref: 'newsbox-text' });
-  //   await meldungTextInput?.setValue('Updated Hinweis');
-  //   await nextTick();
+    const meldungTextInput: VueWrapper | undefined = wrapper?.findComponent({ ref: 'newsbox-text' });
+    await meldungTextInput?.setValue('Updated Hinweis');
+    await nextTick();
 
-  //   await wrapper?.find('[data-testid="submit-newsbox"]').trigger('click');
-  //   await nextTick();
-  //   await flushPromises();
+    const submitButton: Element | null = document.body.querySelector('[data-testid="submit-newsbox"]');
+    expect(submitButton).not.toBeNull();
 
-  //   expect(meldungStore.createOrUpdateMeldung).toHaveBeenCalled();
-  // });
+    if (submitButton) {
+      submitButton.dispatchEvent(new Event('click'));
+    }
+
+    await flushPromises();
+    await flushPromises();
+    await nextTick();
+
+    expect(meldungStore.createOrUpdateMeldung).toHaveBeenCalled();
+  });
 
   test('it shows error message', async () => {
     meldungStore.errorCode = 'MELDUNG_ERROR';
