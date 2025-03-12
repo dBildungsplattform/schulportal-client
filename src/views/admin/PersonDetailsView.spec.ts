@@ -1016,19 +1016,19 @@ describe('PersonDetailsView', () => {
       expect(wrapper?.find('[data-testid="befristung-change-button"]').attributes('disabled')).toBeDefined();
     });
 
-    //function getNextSchuljahresende(): string {
-    //  const today: Date = new Date();
-    //  const currentYear: number = today.getFullYear();
-    //  const july31stThisYear: Date = new Date(currentYear, 6, 31);
-    //
-    //  // If today's date is after July 31st this year, return July 31st of next year
-    //  if (today > july31stThisYear) {
-    //    return `${currentYear + 1}-07-31`;
-    //  }
-    //
-    //  // Otherwise, return July 31st of this year
-    //  return `${currentYear}-07-31`;
-    //}
+    function getNextSchuljahresende(): string {
+      const today: Date = new Date();
+      const currentYear: number = today.getFullYear();
+      const july31stThisYear: Date = new Date(currentYear, 6, 31);
+
+      // If today's date is after July 31st this year, return July 31st of next year
+      if (today > july31stThisYear) {
+        return `${currentYear + 1}-07-31T15:07:37.000Z`;
+      }
+
+      // Otherwise, return July 31st of this year
+      return `${currentYear}-07-31T15:07:37.000Z`;
+    }
 
     test.each([
       ['12.08.2099', undefined],
@@ -1043,7 +1043,7 @@ describe('PersonDetailsView', () => {
             personStore.personenuebersicht.zuordnungen[0].befristung = existingBefristung;
           } else if (existingBefristungOption) {
             personStore.personenuebersicht.zuordnungen[0].befristung =
-              existingBefristungOption === 'schuljahresende' ? '2025-08-01' : '';
+              existingBefristungOption === 'schuljahresende' ? getNextSchuljahresende() : '';
           }
         }
 
