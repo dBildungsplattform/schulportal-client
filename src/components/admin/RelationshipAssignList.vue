@@ -55,6 +55,7 @@
             v-for="item in items"
             @click="handleItemClick(item)"
             :key="item.id"
+            :data-testid="`assign-list-item-${item.id}`"
           >
             <v-chip><slot :item="item"></slot></v-chip>
           </v-list-item>
