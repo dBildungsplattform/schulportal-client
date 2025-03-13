@@ -276,6 +276,7 @@ export const useOrganisationStore: StoreDefinition<
           ['KLASSEN_VERWALTEN'],
           undefined,
           undefined,
+          undefined,
           // Here we get the parents by filling the property organisationIds with the administriertVon array extracted from the Klassen above.
           Array.from(administriertVonSet),
         );
