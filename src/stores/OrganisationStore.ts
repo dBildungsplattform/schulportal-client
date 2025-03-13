@@ -149,7 +149,7 @@ type OrganisationActions = {
   getRootKinderSchultraeger: () => Promise<void>;
   fetchSchulenFromTraeger: (filter: OrganisationenFilter) => Promise<void>;
   fetchSchulenWithoutTraeger: (filter: OrganisationenFilter) => Promise<void>;
-  assignSchuleToTraeger(schuleId: string, organisationIdBodyParams: OrganisationByIdBodyParams): Promise<void>;
+  assignSchuleToTraeger(schultraegerId: string, organisationIdBodyParams: OrganisationByIdBodyParams): Promise<void>;
   fetchSchuleDetailsForKlassen: (filterActive: boolean) => Promise<void>;
   fetchSchuleDetailsForSchultraeger: () => Promise<void>;
   setItsLearningForSchule: (organisationId: string) => Promise<void>;
@@ -635,13 +635,13 @@ export const useOrganisationStore: StoreDefinition<
     },
 
     async assignSchuleToTraeger(
-      currentSchultraegerId: string,
+      schultraegerId: string,
       organisationIdBodyParams: OrganisationByIdBodyParams,
     ): Promise<void> {
       this.errorCode = '';
       this.loading = true;
       try {
-        await organisationApi.organisationControllerAddZugehoerigeOrganisation(currentSchultraegerId, {
+        await organisationApi.organisationControllerAddZugehoerigeOrganisation(schultraegerId, {
           organisationId: organisationIdBodyParams.organisationId,
         });
       } catch (error: unknown) {
