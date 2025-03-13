@@ -71,21 +71,13 @@
   );
 
   watch(
-    () => props.befristung,
-    (newValue: string | undefined) => {
-      if (newValue) {
-        localBefristung.value = newValue;
+    [(): string | undefined => props.befristung, (): string | undefined => props.befristungOption],
+    ([newBefristung, newBefristungOption]: [string | undefined, string | undefined]) => {
+      if (newBefristung) {
+        localBefristung.value = newBefristung;
         localBefristungOption.value = undefined;
-      }
-    },
-    { immediate: true },
-  );
-
-  watch(
-    () => props.befristungOption,
-    (newValue: string | undefined) => {
-      if (newValue) {
-        localBefristungOption.value = newValue;
+      } else if (newBefristungOption) {
+        localBefristungOption.value = newBefristungOption;
         localBefristung.value = undefined;
       }
     },
