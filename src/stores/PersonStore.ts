@@ -85,7 +85,7 @@ export type Person = {
   email: PersonResponse['email'];
 };
 
-type PersonenWithRolleAndZuordnung = {
+export type PersonenWithRolleAndZuordnung = {
   rollen: string;
   administrationsebenen: string;
   klassen: string;

@@ -4,7 +4,7 @@
    */
   import { SortOrder } from '@/stores/PersonStore';
   import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
-  import { onMounted, onUnmounted, ref, type Ref } from 'vue';
+  import { onMounted, onUnmounted, ref, watch, type Ref } from 'vue';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
 
   type Headers = VDataTableServer['headers'];
@@ -29,6 +29,8 @@
     loading: boolean;
     totalItems: number;
     currentSort?: { key: string; order: 'asc' | 'desc' } | null;
+    // This prop is necessary so the parent component can decide which items should be de-selected after the filters have been used.
+    modelValue?: TableItem[];
   };
 
   const props: Props = defineProps<Props>();
@@ -123,6 +125,15 @@
     const selectedRows: TableItem[] = selectedItems.value;
     emit('update:selectedRows', selectedRows);
   }
+
+  // Update the selectedItems dependings on what the table shows currently.
+  watch(
+    () => props.modelValue,
+    (newValue: TableItem[] | undefined) => {
+      selectedItems.value = newValue || [];
+    },
+    { immediate: true },
+  );
 
   // On Mount we emit an event to the parent to sort the table by first column and ASC.
   onMounted(() => {
