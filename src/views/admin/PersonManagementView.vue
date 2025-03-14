@@ -479,7 +479,7 @@
     },
   );
 
-// If no filter or search is active then de-select everything.
+  // If no filter or search is active then de-select everything.
   watch(filterOrSearchActive, (newValue: boolean) => {
     if (!newValue) {
       selectedPersonIds.value = [];
