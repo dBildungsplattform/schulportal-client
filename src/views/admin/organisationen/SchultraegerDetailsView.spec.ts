@@ -235,7 +235,7 @@ describe('SchultraegerDetailsView', () => {
     expect(wrapper?.findComponent({ ref: 'result-table' }).exists());
   });
 
-  test.only('it assigns a Schule to a Schultraeger', async () => {
+  test('it assigns a Schule to a Schultraeger', async () => {
     organisationStore.schulenWithoutTraeger = [
       {
         id: '2',
