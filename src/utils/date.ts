@@ -11,7 +11,11 @@ export function getNextSchuljahresende(): string {
 
   // If today's date is after July 31st this year, return July 31st of next year
   if (today > july31stThisYear) {
-    return new Date(currentYear + 1, 6, 31).toLocaleDateString('de-DE');
+    return new Date(currentYear + 1, 6, 31).toLocaleDateString('de-DE', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    });
   }
 
   // Otherwise, return July 31st of this year
