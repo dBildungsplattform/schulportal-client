@@ -114,7 +114,6 @@
         OrganisationsTyp.Schule,
         selectedSchulform.value,
         selectedSchulform.value,
-        undefined,
       );
       resetForm({
         values: {

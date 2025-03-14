@@ -95,7 +95,7 @@ describe('sameContent', () => {
       expected: false,
     },
   ];
-  
+
   function mapTestData<T>(converter: (arg: string) => T): Array<Case<T>> {
     return data.map(({ a, b, expected }: Case<string>) => ({
       a: a.map(converter),

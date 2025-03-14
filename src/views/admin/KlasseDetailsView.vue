@@ -64,9 +64,9 @@
     selectedSchule: organisationStore.currentOrganisation?.id,
     selectedKlassenname: organisationStore.currentKlasse?.name,
   }));
-  
+
   const isFormDirty: Ref<boolean> = ref(false);
- 
+
   const hasUnsavedChanges: ComputedRef<boolean> = computed(() => {
     if (organisationStore.updatedOrganisation) return false;
     return isFormDirty.value;

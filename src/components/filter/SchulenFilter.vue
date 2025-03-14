@@ -32,7 +32,7 @@
     };
   };
   const props: Props = defineProps<Props>();
-  
+
   const organisationStore: OrganisationStore = useOrganisationStore();
   // clear selection before anything else runs
   organisationStore.schulenFilter.selectedItems = [];
@@ -48,7 +48,7 @@
   });
 
   const clearInput = (): void => {
-    searchInput.value = undefined;
+    searchInputSchulen.value = undefined;
     selectedSchulenIds.value = undefined;
   };
 
@@ -139,71 +139,68 @@
   type SelectionChange = [SelectedSchulenIds, SelectedSchulenIds, boolean];
   type PreviousSelectionChange = [SelectedSchulenIds, Array<string> | undefined, boolean | undefined];
 
-watch(
-  [
-    selectedSchulenIds, 
-    () => wrapSelectedSchulenIds(props.initialIds), 
-    hasAutoselectedSchule
-  ],
-  (
-    [currentSelection, currentInitialIds, currentlyHasAutoselectedSchule], 
-    [oldSelection, oldInitialIds]
-  ) => {
-    // Case 1: Selection has changed - update parent directly
-    if (!isSameSelection(currentSelection, oldSelection)) {
-      handleSelectionUpdate(currentSelection);
-      return;
-    }
-    
-    // Case 2: Props changed - update selection and store
-    if (!isSameSelection(currentInitialIds, oldInitialIds)) {
-      selectedSchulenIds.value = currentInitialIds;
-      handleSelectionUpdate(currentInitialIds);
-      return;
-    }
-    
-    // Case 3: Empty selection - use autoselected or initial values
-    if (isEmptySelection(currentSelection)) {
-      const newIds: sring = currentlyHasAutoselectedSchule && autoselectedSchule.value 
-        ? unwrapSelectedSchulenIds([autoselectedSchule.value.id])
-        : currentInitialIds;
-        
-      if (!isSameSelection(selectedSchulenIds.value, newIds)) {
-        selectedSchulenIds.value = newIds;
-        handleSelectionUpdate(newIds);
+  watch(
+    [selectedSchulenIds, (): Array<string> => wrapSelectedSchulenIds(props.initialIds), hasAutoselectedSchule],
+    (
+      [currentSelection, currentInitialIds, currentlyHasAutoselectedSchule]: SelectionChange,
+      [oldSelection, oldInitialIds]: PreviousSelectionChange,
+    ) => {
+      // Case 1: Selection has changed - update parent directly
+      if (!isSameSelection(currentSelection, oldSelection)) {
+        handleSelectionUpdate(currentSelection);
+        return;
       }
-    }
-  },
-  { immediate: true }
-);
 
-watch(
-  () => organisationStore.schulenFilter.filterResult,
-  () => {
-       // this is a special case, because we can't assume that the appropriate schule is in the store already
+      // Case 2: Props changed - update selection and store
+      if (!isSameSelection(currentInitialIds, oldInitialIds)) {
+        selectedSchulenIds.value = currentInitialIds;
+        handleSelectionUpdate(currentInitialIds);
+        return;
+      }
+
+      // Case 3: Empty selection - use autoselected or initial values
+      if (isEmptySelection(currentSelection)) {
+        const newIds: SelectedSchulenIds =
+          currentlyHasAutoselectedSchule && autoselectedSchule.value
+            ? unwrapSelectedSchulenIds([autoselectedSchule.value.id])
+            : currentInitialIds;
+
+        if (!isSameSelection(selectedSchulenIds.value, newIds)) {
+          selectedSchulenIds.value = newIds;
+          handleSelectionUpdate(newIds);
+        }
+      }
+    },
+    { immediate: true },
+  );
+
+  watch(
+    () => organisationStore.schulenFilter.filterResult,
+    () => {
+      // this is a special case, because we can't assume that the appropriate schule is in the store already
       // this is redundant in all other cases
-    if (props.initialIds) mirrorSelectionToStore(selectedSchulenIds.value);
-  }
-);
+      if (props.initialIds) mirrorSelectionToStore(selectedSchulenIds.value);
+    },
+  );
 
-watch(
-  schulenFilter,
-  async (newFilter, oldFilter) => {
-    // The timer can be cleared in all cases??
-    if (timerId.value) clearTimeout(timerId.value);
-    
-    // We skiip if we have an autoselectedSchule
-    if (oldFilter && hasAutoselectedSchule.value) return;
-    
-    // We apply the debounce of 500 only when there is an oldFilter (a change has been made)
-    const delay = oldFilter ? 500 : 0;
-    
-    timerId.value = setTimeout(async () => {
-      await organisationStore.loadSchulenForFilter(newFilter);
-    }, delay);
-  },
-  { immediate: true }
-);
+  watch(
+    schulenFilter,
+    async (newFilter: OrganisationenFilter | undefined, oldFilter: OrganisationenFilter | undefined) => {
+      // The timer can be cleared in all cases??
+      if (timerId.value) clearTimeout(timerId.value);
+
+      // We skiip if we have an autoselectedSchule
+      if (oldFilter && hasAutoselectedSchule.value) return;
+
+      // We apply the debounce of 500 only when there is an oldFilter (a change has been made)
+      const delay: number = oldFilter ? 500 : 0;
+
+      timerId.value = setTimeout(async () => {
+        await organisationStore.loadSchulenForFilter(newFilter);
+      }, delay);
+    },
+    { immediate: true },
+  );
 </script>
 
 <template>
@@ -228,7 +225,7 @@ watch(
     @click:clear="organisationStore.resetSchulFilter"
     v-bind="selectedSchuleProps"
     v-model="selectedSchulenIds"
-    v-model:search="searchInput"
+    v-model:search="searchInputSchulen"
     :hide-details
   >
     <template v-slot:prepend-item>
