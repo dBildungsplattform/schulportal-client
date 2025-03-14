@@ -152,7 +152,6 @@
     await organisationStore.fetchSchulenWithoutTraeger({
       limit: 50,
       searchString: searchString,
-      zugehoerigZu: [organisationStore.currentOrganisation.zugehoerigZu!],
     });
     unassignedSchulen.value = organisationStore.schulenWithoutTraeger;
 
