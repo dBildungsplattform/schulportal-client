@@ -479,6 +479,12 @@
     },
   );
 
+  watch(filterOrSearchActive, (newValue) => {
+    if (!newValue) {
+      selectedPersonIds.value = [];
+    }
+  });
+
   onMounted(async () => {
     personenkontextStore.processWorkflowStep({
       limit: 25,
