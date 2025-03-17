@@ -96,6 +96,7 @@ describe('HinweiseManagementView', () => {
   afterEach(() => {
     vi.restoreAllMocks();
     wrapper?.unmount();
+    meldungStore.$reset();
   });
 
   test('it renders the Hinweise form', () => {
