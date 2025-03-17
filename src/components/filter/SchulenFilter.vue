@@ -37,7 +37,7 @@
   // clear selection before anything else runs
   organisationStore.schulenFilter.selectedItems = [];
 
-  const selectedSchulenIds: Ref<SelectedSchulenIds> = ref(props.initialIds ?? []);
+  const selectedSchulen: Ref<SelectedSchulenIds> = ref(props.initialIds ?? []);
   const searchInputSchulen: Ref<string | undefined> = ref(undefined);
   const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
   const schulenFilter: OrganisationenFilter = reactive({
@@ -49,7 +49,7 @@
 
   const clearInput = (): void => {
     searchInputSchulen.value = undefined;
-    selectedSchulenIds.value = undefined;
+    selectedSchulen.value = undefined;
   };
 
   defineExpose({ clearInput });
@@ -81,7 +81,7 @@
     return wrapSelectedSchulenIds(selection).filter(Boolean).length === 0;
   };
   const hasSelectedSchule: ComputedRef<boolean> = computed(
-    () => hasAutoselectedSchule.value || !isEmptySelection(selectedSchulenIds.value),
+    () => hasAutoselectedSchule.value || !isEmptySelection(selectedSchulen.value),
   );
 
   const updateSearchString = (searchString: string | undefined): void => {
@@ -140,7 +140,7 @@
   type PreviousSelectionChange = [SelectedSchulenIds, Array<string> | undefined, boolean | undefined];
 
   watch(
-    [selectedSchulenIds, (): Array<string> => wrapSelectedSchulenIds(props.initialIds), hasAutoselectedSchule],
+    [selectedSchulen, (): Array<string> => wrapSelectedSchulenIds(props.initialIds), hasAutoselectedSchule],
     (
       [currentSelection, currentInitialIds, currentlyHasAutoselectedSchule]: SelectionChange,
       [oldSelection, oldInitialIds]: PreviousSelectionChange,
@@ -153,7 +153,7 @@
 
       // Case 2: Props changed - update selection and store
       if (!isSameSelection(currentInitialIds, oldInitialIds)) {
-        selectedSchulenIds.value = currentInitialIds;
+        selectedSchulen.value = currentInitialIds;
         handleSelectionUpdate(currentInitialIds);
         return;
       }
@@ -165,8 +165,8 @@
             ? unwrapSelectedSchulenIds([autoselectedSchule.value.id])
             : currentInitialIds;
 
-        if (!isSameSelection(selectedSchulenIds.value, newIds)) {
-          selectedSchulenIds.value = newIds;
+        if (!isSameSelection(selectedSchulen.value, newIds)) {
+          selectedSchulen.value = newIds;
           handleSelectionUpdate(newIds);
         }
       }
@@ -179,7 +179,7 @@
     () => {
       // this is a special case, because we can't assume that the appropriate schule is in the store already
       // this is redundant in all other cases
-      if (props.initialIds) mirrorSelectionToStore(selectedSchulenIds.value);
+      if (props.initialIds) mirrorSelectionToStore(selectedSchulen.value);
     },
   );
 
@@ -224,7 +224,8 @@
     @update:search="updateSearchString"
     @click:clear="organisationStore.resetSchulFilter"
     v-bind="selectedSchuleProps"
-    v-model="selectedSchulenIds"
+    v
+    -model="selectedSchulen"
     v-model:search="searchInputSchulen"
     :hide-details
   >
