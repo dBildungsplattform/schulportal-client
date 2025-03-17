@@ -212,6 +212,7 @@
     density="compact"
     :disabled="hasAutoselectedSchule || readonly"
     id="schule-select"
+    ref="schule-select"
     :items="translatedSchulen"
     item-value="value"
     item-text="title"
@@ -224,8 +225,7 @@
     @update:search="updateSearchString"
     @click:clear="organisationStore.resetSchulFilter"
     v-bind="selectedSchuleProps"
-    v
-    -model="selectedSchulen"
+    v-model="selectedSchulen"
     v-model:search="searchInputSchulen"
     :hide-details
   >

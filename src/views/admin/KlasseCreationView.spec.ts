@@ -66,7 +66,7 @@ type FormFields = {
 };
 
 type FormSelectors = {
-  schuleSelect: DOMWrapper<Element>;
+  schuleSelect: VueWrapper;
   klassennameInput: VueWrapper;
 };
 
@@ -74,7 +74,10 @@ async function fillForm(args: Partial<FormFields>): Promise<Partial<FormSelector
   const { schule, klassenname }: Partial<FormFields> = args;
   const selectors: Partial<FormSelectors> = {};
 
-  const schuleSelect: DOMWrapper<Element> | undefined = wrapper?.find('#schule-select');
+  const schuleSelect: VueWrapper | undefined = wrapper
+    ?.findComponent({ ref: 'klasse-creation-form' })
+    .findComponent({ ref: 'schulenFilter' })
+    .findComponent({ ref: 'schule-select' });
   expect(schuleSelect?.exists()).toBe(true);
 
   await schuleSelect?.setValue(schule);
