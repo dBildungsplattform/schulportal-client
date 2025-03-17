@@ -189,7 +189,7 @@
       // The timer can be cleared in all cases??
       if (timerId.value) clearTimeout(timerId.value);
 
-      // We skiip if we have an autoselectedSchule
+      // We skip if we have an autoselectedSchule
       if (oldFilter && hasAutoselectedSchule.value) return;
 
       // We apply the debounce of 500 only when there is an oldFilter (a change has been made)
