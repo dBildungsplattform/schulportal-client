@@ -52,8 +52,9 @@
     organisationIds: [],
   });
 
-  const { hasAutoselectedSchule, autoselectedSchule, currentUserSchulen }: ReturnType<typeof useAutoselectedSchule> =
-    useAutoselectedSchule(props.systemrechteForSearch ?? []);
+  const { hasAutoselectedSchule, autoselectedSchule }: ReturnType<typeof useAutoselectedSchule> = useAutoselectedSchule(
+    props.systemrechteForSearch ?? [],
+  );
   const translatedSchulen: ComputedRef<Array<TranslatedObject>> = computed(() =>
     organisationStore.schulenFilter.filterResult.map((schule: Organisation) => ({
       value: schule.id,
@@ -94,7 +95,7 @@
     if (props.initialIds) {
       return wrapSelectedSchulenIds(props.initialIds);
     } else if (hasAutoselectedSchule.value) {
-      return currentUserSchulen.value.map((schule: Organisation) => schule.id);
+      return wrapSelectedSchulenIds(autoselectedSchule.value?.id);
     }
     return [];
   };
