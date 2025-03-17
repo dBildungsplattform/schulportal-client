@@ -75,6 +75,12 @@
     reset();
   }
 
+  function setInitialValues(): void {
+    if (!props.initialValues) return;
+    setFieldValue('selectedSchule', props.initialValues.selectedSchule ?? '');
+    setFieldValue('selectedKlassenname', props.initialValues.selectedKlassenname ?? '');
+  }
+
   watch(
     () => organisationStore.schulenFilter.selectedItems,
     (schulen: Array<Organisation>) => {
@@ -82,12 +88,6 @@
       if (selectedSchule.value !== newSchuleId) selectedSchule.value = newSchuleId;
     },
   );
-
-  function setInitialValues(): void {
-    if (!props.initialValues) return;
-    setFieldValue('selectedSchule', props.initialValues.selectedSchule ?? '');
-    setFieldValue('selectedKlassenname', props.initialValues.selectedKlassenname ?? '');
-  }
 
   watch(
     () => props.isEditActive,
