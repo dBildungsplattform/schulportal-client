@@ -15,8 +15,6 @@
   import { computed, reactive, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
 
-  const { t }: Composer = useI18n({ useScope: 'global' });
-
   type SelectedSchulenIds = Array<string> | string | undefined;
   type Props = {
     includeTraeger?: boolean;
@@ -32,13 +30,20 @@
     };
   };
   const props: Props = defineProps<Props>();
+  const selectedSchulen: Ref<SelectedSchulenIds> = ref(props.initialIds ?? []);
+  const searchInputSchulen: Ref<string | undefined> = ref(undefined);
+  const clearInput = (): void => {
+    searchInputSchulen.value = undefined;
+    selectedSchulen.value = undefined;
+  };
 
+  defineExpose({ clearInput });
+
+  const { t }: Composer = useI18n({ useScope: 'global' });
   const organisationStore: OrganisationStore = useOrganisationStore();
   // clear selection before anything else runs
   organisationStore.schulenFilter.selectedItems = [];
 
-  const selectedSchulen: Ref<SelectedSchulenIds> = ref(props.initialIds ?? []);
-  const searchInputSchulen: Ref<string | undefined> = ref(undefined);
   const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
   const schulenFilter: OrganisationenFilter = reactive({
     includeTyp: OrganisationsTyp.Schule,
@@ -46,13 +51,6 @@
     limit: 25,
     organisationIds: [],
   });
-
-  const clearInput = (): void => {
-    searchInputSchulen.value = undefined;
-    selectedSchulen.value = undefined;
-  };
-
-  defineExpose({ clearInput });
 
   const { hasAutoselectedSchule, autoselectedSchule, currentUserSchulen }: ReturnType<typeof useAutoselectedSchule> =
     useAutoselectedSchule(props.systemrechteForSearch ?? []);
