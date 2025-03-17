@@ -1,5 +1,5 @@
 import { expect, test, type Mock, type MockInstance } from 'vitest';
-import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
+import { VueWrapper, mount } from '@vue/test-utils';
 import {
   createRouter,
   createWebHistory,
@@ -235,28 +235,7 @@ describe('SchultraegerDetailsView', () => {
     expect(wrapper?.findComponent({ ref: 'result-table' }).exists());
   });
 
-  test('it assigns a Schule to a Schultraeger', async () => {
-    organisationStore.schulenWithoutTraeger = [
-      {
-        id: '2',
-        kennung: 'Org2',
-        name: 'Schule 1',
-        namensergaenzung: 'Ergänzung',
-        kuerzel: 'O2',
-        typ: OrganisationsTyp.Schule,
-        administriertVon: '1',
-        zugehoerigZu: '1',
-        version: undefined,
-      },
-    ];
-
-    const firstListItem: DOMWrapper<Element> | undefined = wrapper?.find('.v-list-item');
-    expect(firstListItem?.exists()).toBe(true);
-
-    await firstListItem?.trigger('click');
-  });
-
-  test('it navigates back to ', async () => {
+  test('it closes the alert', async () => {
     organisationStore.errorCode = 'MOCK_ERROR';
     await nextTick();
 

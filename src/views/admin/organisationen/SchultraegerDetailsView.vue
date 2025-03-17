@@ -148,15 +148,34 @@
   }
 
   async function searchInUnassignedSchulen(searchString: string): Promise<void> {
-    if (!organisationStore.currentOrganisation || !searchString) return;
+    if (!organisationStore.currentOrganisation) return;
     await organisationStore.fetchSchulenWithoutTraeger({
       limit: 50,
       searchString: searchString,
     });
+
+    // fetch the Kinder knoten of Root (Either öffentlich or Ersatz)
+    await organisationStore.getRootKinderSchultraeger();
+
+    // Extract their IDs
+    const validSchultraegerIds: string[] = organisationStore.schultraeger.map(
+      (schultraeger: Organisation) => schultraeger.id,
+    );
+
     unassignedSchulen.value = organisationStore.schulenWithoutTraeger;
+
+    // Only the Schulen under either öffentlich or Ersatz should be assignable. This is mainly to avoid seeing the Schulen already assigned to a Träger in the selection
+    unassignedSchulen.value = unassignedSchulen.value.filter((schule: Organisation) =>
+      validSchultraegerIds.includes(schule.zugehoerigZu ?? ''),
+    );
+
 
     if (unassignedSchulen.value.length === 0) {
       noUnassignedSchulenFoundText.value = t('admin.schultraeger.noSchulenFound');
+    }
+
+    if (!searchString) {
+      unassignedSchulen.value = [];
     }
 
     if (assignableSchulen.value.length > 0) {
