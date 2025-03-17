@@ -25,7 +25,6 @@
     initialIds?: Array<string> | string;
     selectedSchuleProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     texts?: {
-      noData?: string;
       placeholder?: string;
     };
   };
@@ -217,7 +216,7 @@
     item-text="title"
     :loading="organisationStore.schulenFilter.loading"
     :multiple="props.multiple"
-    :no-data-text="props.texts?.noData ?? 'noDataFound'"
+    :no-data-text="'noDataFound'"
     :placeholder="props.texts?.placeholder ?? t('admin.schule.assignSchule')"
     required="true"
     variant="outlined"
