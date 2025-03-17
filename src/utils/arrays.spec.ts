@@ -23,25 +23,40 @@ describe('dedup', () => {
 
   describe('when type is string', () => {
     const testData: Cases<string> = data;
+
     test.each(testData)('it returns the deduplicated array for %s', (input: Array<string>, output: Array<string>) => {
-      expect(dedup(input)).toEqual(output);
+      expect(dedup(input, (s: string) => s)).toEqual(output);
     });
+
+    test.each(testData)(
+      'it returns the deduplicated array for %s without toKey',
+      (input: Array<string>, output: Array<string>) => {
+        expect(dedup(input)).toEqual(output);
+      },
+    );
   });
 
   describe('when type is number ', () => {
     const testData: Cases<number> = mapTestData((s: string) => Number(s));
+
     test.each(testData)('it returns the deduplicated array for %s', (input: Array<number>, output: Array<number>) => {
-      expect(dedup(input)).toEqual(output);
+      expect(dedup(input, (n: number) => n)).toEqual(output);
     });
+
+    test.each(testData)(
+      'it returns the deduplicated array for %s without toKey',
+      (input: Array<number>, output: Array<number>) => {
+        expect(dedup(input)).toEqual(output);
+      },
+    );
   });
 
   describe('when type is nested', () => {
     const testData: Cases<NestedType> = mapTestData((s: string) => ({ id: s }));
-    const comp: (a: NestedType, b: NestedType) => boolean = (a: NestedType, b: NestedType) => a.id === b.id;
     test.each(testData)(
       'it returns the deduplicated array for %s',
       (input: Array<NestedType>, output: Array<NestedType>) => {
-        expect(dedup(input, comp)).toEqual(output);
+        expect(dedup(input, (o: NestedType) => o.id)).toEqual(output);
       },
     );
   });

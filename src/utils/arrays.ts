@@ -1,14 +1,22 @@
 /**
- * Deduplicate SMALL arrays
+ * Deduplicate array
  * @param a array to deduplicate
- * @param comp optional function to use for comparison
- * @returns a with all duplciate values (according to comp) removed
+ * @param toKey optional function to create the key that determines uniqueness
+ * @returns a with all duplciate values (according to toKey) removed
  */
-export function dedup<T>(arr: Array<T>, comp: (a: T, b: T) => boolean = (a: T, b: T): boolean => a === b): Array<T> {
-  return arr.reduce((acc: Array<T>, cur: T): Array<T> => {
-    if (!acc.find((el: T) => comp(cur, el))) acc.push(cur);
-    return acc;
-  }, []);
+export function dedup<K, V>(arr: Array<V>, toKey?: (a: V) => K): Array<V> {
+  if (!toKey) {
+    return [...new Set(arr)];
+  }
+  const result: Array<V> = [];
+  const keySet: Set<K> = new Set();
+  arr.forEach((value: V) => {
+    const key: K = toKey(value);
+    if (keySet.has(key)) return;
+    keySet.add(key);
+    result.push(value);
+  });
+  return result;
 }
 
 /**
