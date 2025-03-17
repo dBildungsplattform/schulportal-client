@@ -42,8 +42,7 @@
   let blockedNext: () => void = () => {};
 
   function resetForm(): void {
-    // eslint-disable-next-line @typescript-eslint/dot-notation
-    formRef['value']?.reset();
+    formRef.value?.reset();
   }
 
   function preventNavigation(event: BeforeUnloadEvent): void {

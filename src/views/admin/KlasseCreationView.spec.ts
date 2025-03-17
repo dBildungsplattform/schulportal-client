@@ -1,7 +1,7 @@
 import type { OrganisationResponse } from '@/api-client/generated';
 import routes from '@/router/routes';
 import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
-import { DOMWrapper, VueWrapper, flushPromises, mount } from '@vue/test-utils';
+import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import type Module from 'module';
 import { beforeEach, describe, expect, test, vi, type Mock, type MockInstance } from 'vitest';
 import { nextTick } from 'vue';
