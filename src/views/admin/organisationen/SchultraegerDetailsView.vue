@@ -74,6 +74,7 @@
   }
 
   const noUnassignedSchulenFoundText: Ref<string> = ref(t('admin.schultraeger.unassignedSchulenDefaultText'));
+  const noAssignedSchulenFoundText: Ref<string> = ref('');
 
   async function navigateToSchultraegerManagement(): Promise<void> {
     formContext.resetForm();
@@ -145,30 +146,27 @@
       zugehoerigZu: [currentSchultraegerId],
     });
     assignedSchulen.value = organisationStore.schulenFromTraeger;
+
+    if (assignedSchulen.value.length === 0) {
+      noAssignedSchulenFoundText.value = t('admin.schultraeger.noSchulenFound');
+    }
   }
 
   async function searchInUnassignedSchulen(searchString: string): Promise<void> {
     if (!organisationStore.currentOrganisation) return;
+
     await organisationStore.fetchSchulenWithoutTraeger({
       limit: 50,
       searchString: searchString,
     });
 
-    // fetch the Kinder knoten of Root (Either öffentlich or Ersatz)
-    await organisationStore.getRootKinderSchultraeger();
+    // Get the parent ID of the current Schultraeger
+    const currentOrganisationParentId: string | null | undefined = organisationStore.currentOrganisation.zugehoerigZu;
 
-    // Extract their IDs
-    const validSchultraegerIds: string[] = organisationStore.schultraeger.map(
-      (schultraeger: Organisation) => schultraeger.id,
+    // Filter unassigned Schulen to only include those having the same parent (zugehoerigZu) as the current Schultraeger
+    unassignedSchulen.value = organisationStore.schulenWithoutTraeger.filter(
+      (schule: Organisation) => schule.zugehoerigZu === currentOrganisationParentId,
     );
-
-    unassignedSchulen.value = organisationStore.schulenWithoutTraeger;
-
-    // Only the Schulen under either öffentlich or Ersatz should be assignable. This is mainly to avoid seeing the Schulen already assigned to a Träger in the selection
-    unassignedSchulen.value = unassignedSchulen.value.filter((schule: Organisation) =>
-      validSchultraegerIds.includes(schule.zugehoerigZu ?? ''),
-    );
-
 
     if (unassignedSchulen.value.length === 0) {
       noUnassignedSchulenFoundText.value = t('admin.schultraeger.noSchulenFound');
@@ -289,7 +287,7 @@
               <RelationshipAssign
                 :assignedItems="assignedSchulen"
                 :assignedItemsHeader="$t('admin.schultraeger.schulenOfThisTraeger', { amount: assignedSchulen.length })"
-                noAssignedItemsFoundText=""
+                :noAssignedItemsFoundText="noAssignedSchulenFoundText"
                 :noUnassignedItemsFoundText="noUnassignedSchulenFoundText"
                 @onHandleAssignedItemsSearchFilter="searchInAssignedSchulen"
                 @onHandleUnassignedItemClick="addAssignableSchule"
