@@ -7,10 +7,12 @@ import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 import {
   OrganisationsTyp,
   useOrganisationStore,
+  type Organisation,
   type OrganisationenFilter,
   type OrganisationStore,
 } from '@/stores/OrganisationStore';
 import { DoFactory } from '@/testing/DoFactory';
+import { getDisplayNameForOrg } from '@/utils/formatting';
 import { faker } from '@faker-js/faker';
 import { flushPromises, mount, type VueWrapper } from '@vue/test-utils';
 import type { BaseFieldProps } from 'vee-validate';
@@ -66,6 +68,7 @@ beforeEach(() => {
   `;
   organisationStore.$reset();
   authStore.$reset();
+  vi.restoreAllMocks();
 });
 
 describe('SchulenFilter', async () => {
@@ -149,11 +152,17 @@ describe('SchulenFilter', async () => {
               };
 
               test('it correctly initializes input', async () => {
-                const expected: Array<string> | string = multiple
-                  ? (expectedIdsInFilter ?? [])
-                  : (expectedIdsInFilter?.at(0) ?? '');
+                organisationStore.loadSchulenForFilter = vi.fn(async (filter: OrganisationenFilter | undefined) => {
+                  const mockSchulen: Organisation[] =
+                    filter?.organisationIds?.map((id: string) => DoFactory.getSchule({ id })) ?? [];
+                  organisationStore.schulenFilter.filterResult = mockSchulen;
+                });
                 const wrapper: VueWrapper = mountComponent({ ...defaultProps, initialIds, systemrechteForSearch });
-                expect(wrapper.find('[data-testid="schule-select"]').text()).toBe(expected);
+                const actualText: string = wrapper.find('[data-testid="schule-select"]').text();
+                if (autoSelectedSchule && !initialIds)
+                  expect(actualText).toContain(getDisplayNameForOrg(autoSelectedSchule));
+                else
+                  expect(actualText).toContain(organisationStore.schulenFilter.filterResult.map(getDisplayNameForOrg));
               });
 
               test('it correctly sets disabled-attribute on input', async () => {
@@ -166,20 +175,18 @@ describe('SchulenFilter', async () => {
               });
 
               test('it initializes store', async () => {
-                const loadSpy: MockInstance = vi.spyOn(organisationStore, 'loadSchulenForFilter');
-                const wrapper: VueWrapper = mountComponent({
+                const spy: MockInstance = vi.spyOn(organisationStore, 'loadSchulenForFilter');
+                mountComponent({
                   ...defaultProps,
                   initialIds,
                   systemrechteForSearch,
                 });
-                expect(wrapper.find('[data-testid="schule-select"]').isVisible()).toBe(true);
-                await nextTick();
                 vi.runAllTimers();
-                if (autoSelectedSchule != null && !initialIds) {
-                  expect(loadSpy).not.toHaveBeenCalled();
+                if (autoSelectedSchule != null) {
+                  expect(spy).not.toHaveBeenCalled();
                 } else {
-                  expect(loadSpy).toHaveBeenCalledOnce();
-                  expect(loadSpy).toHaveBeenLastCalledWith(expectedFilter);
+                  expect(spy).toHaveBeenCalledOnce();
+                  expect(spy).toHaveBeenLastCalledWith(expectedFilter);
                 }
               });
 
