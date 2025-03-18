@@ -11,6 +11,7 @@ import {
   type OrganisationStore,
 } from '@/stores/OrganisationStore';
 import { DoFactory } from '@/testing/DoFactory';
+import { faker } from '@faker-js/faker';
 import { flushPromises, mount, type VueWrapper } from '@vue/test-utils';
 import type { BaseFieldProps } from 'vee-validate';
 import type { MockInstance } from 'vitest';
@@ -24,6 +25,10 @@ type Props = {
   readonly?: boolean;
   initialIds?: Array<string> | string;
   selectedSchuleProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
+  highlightSelection?: boolean;
+  texts?: {
+    placeholder?: string;
+  };
 };
 
 function mountComponent(props: Partial<Props> = {}): VueWrapper {
@@ -215,38 +220,74 @@ describe('SchulenFilter', async () => {
                 });
               });
 
-              describe.each([[''], ['753-21064aeu-075wmvou']])('when selecting %s', (selectedSchuleId: string) => {
-                function getExpectedIds(): Array<string> {
-                  const ids: Array<string> = [...(expectedIdsInFilter ?? [])];
-                  if (selectedSchuleId) ids.push(selectedSchuleId);
-                  return ids;
-                }
+              describe.each([[true], [false]])('when highlightSelection is %s', async (highlightSelection: boolean) => {
+                test('it correctly displays highlight', async () => {
+                  const selectedSchuleId: string = faker.string.uuid();
+                  const wrapper: VueWrapper = mountComponent({
+                    ...defaultProps,
+                    initialIds,
+                    systemrechteForSearch,
+                    highlightSelection,
+                  });
+                  await wrapper
+                    .findComponent({
+                      name: 'v-autocomplete',
+                    })
+                    .setValue(selectedSchuleId);
 
-                test('it triggers search', async () => {
-                  const loadSpy: MockInstance = vi.spyOn(organisationStore, 'loadSchulenForFilter');
+                  const classes: Array<string> = wrapper.findComponent({ ref: 'schule-select' }).classes();
+                  if (highlightSelection || autoSelectedSchule) {
+                    expect(classes).toContain('selected');
+                  } else {
+                    expect(classes).not.toContain('selected');
+                  }
+                });
+              });
+
+              describe.runIf(!readonly && !autoSelectedSchule)('when selecting', () => {
+                async function setup(): Promise<VueWrapper> {
                   const wrapper: VueWrapper = mountComponent({
                     ...defaultProps,
                     initialIds,
                     systemrechteForSearch,
                   });
+                  vi.runAllTimers();
+                  await flushPromises();
+                  return wrapper;
+                }
+                async function selectSchule(wrapper: VueWrapper, id: string | undefined): Promise<void> {
                   const schuleAutoComplete: ReturnType<VueWrapper['findComponent']> = wrapper.findComponent({
                     name: 'v-autocomplete',
                   });
-                  await schuleAutoComplete.setValue(selectedSchuleId);
+                  await schuleAutoComplete.setValue(id);
                   vi.runAllTimers();
                   await flushPromises();
-                  if (readonly || autoSelectedSchule !== null) {
-                    expect(loadSpy).not.toHaveBeenLastCalledWith({
-                      ...expectedFilter,
-                      searchString: selectedSchuleId,
-                    });
-                  } else {
+                }
+
+                test('it triggers search', async () => {
+                  const selectedSchuleId: string = faker.string.uuid();
+                  const wrapper: VueWrapper = await setup();
+                  const loadSpy: MockInstance = vi.spyOn(organisationStore, 'loadSchulenForFilter');
+                  await selectSchule(wrapper, selectedSchuleId);
+                  const expected: OrganisationenFilter = {
+                    ...expectedFilter,
+                    organisationIds: [...(expectedIdsInFilter ?? []), selectedSchuleId],
+                  };
+                  expect(loadSpy).toHaveBeenLastCalledWith(expected);
+                });
+
+                describe('and clearing selection', async () => {
+                  test('it triggers search', async () => {
+                    const wrapper: VueWrapper = await setup();
+                    await selectSchule(wrapper, faker.string.uuid());
+                    const loadSpy: MockInstance = vi.spyOn(organisationStore, 'loadSchulenForFilter');
+                    await selectSchule(wrapper, undefined);
                     const expected: OrganisationenFilter = {
                       ...expectedFilter,
-                      organisationIds: getExpectedIds(),
+                      organisationIds: [...(expectedIdsInFilter ?? [])],
                     };
                     expect(loadSpy).toHaveBeenLastCalledWith(expected);
-                  }
+                  });
                 });
               });
             });

@@ -488,6 +488,7 @@
               :multiple="false"
               :hideDetails="true"
               :initialIds="searchFilterStore.selectedSchuleForKlassen ?? undefined"
+              :highlightSelection="true"
               ref="schule-select"
             >
               <template v-slot:prepend-item>

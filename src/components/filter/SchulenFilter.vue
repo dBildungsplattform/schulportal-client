@@ -24,6 +24,7 @@
     readonly?: boolean;
     initialIds?: Array<string> | string;
     selectedSchuleProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
+    highlightSelection?: boolean;
     texts?: {
       placeholder?: string;
     };
@@ -78,9 +79,11 @@
     if (!selection) return true;
     return wrapSelectedSchulenIds(selection).filter(Boolean).length === 0;
   };
-  const hasSelectedSchule: ComputedRef<boolean> = computed(
-    () => hasAutoselectedSchule.value || !isEmptySelection(selectedSchulen.value),
-  );
+  const shouldHighlightSelection: ComputedRef<boolean> = computed(() => {
+    if (hasAutoselectedSchule.value) return true;
+    if (props.highlightSelection && !isEmptySelection(selectedSchulen.value)) return true;
+    return false;
+  });
 
   const updateSearchString = (searchString: string | undefined): void => {
     if (searchString) {
@@ -184,7 +187,6 @@
   watch(
     schulenFilter,
     async (newFilter: OrganisationenFilter | undefined, oldFilter: OrganisationenFilter | undefined) => {
-      // The timer can be cleared in all cases??
       if (timerId.value) clearTimeout(timerId.value);
 
       // We skip if we have an autoselectedSchule
@@ -204,7 +206,7 @@
 <template>
   <v-autocomplete
     autocomplete="off"
-    :class="['filter-dropdown', { selected: hasSelectedSchule }]"
+    :class="['filter-dropdown', { selected: shouldHighlightSelection }]"
     clearable
     data-testid="schule-select"
     density="compact"
