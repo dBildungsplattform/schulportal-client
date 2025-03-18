@@ -23,6 +23,15 @@
   function handleSearchFilter(searchFilter: string): void {
     emit('onHandleSearchFilter', searchFilter.trim());
   }
+
+  // Move focus to the next chip when a chip is selected
+  function focusNextChip(currentIndex: number): void {
+    const chips: NodeListOf<Element> = document.querySelectorAll('[data-testid^="assign-list-item-"]');
+    if (currentIndex + 1 < chips.length) {
+      // Move focus to the next chip
+      (chips[currentIndex + 1] as HTMLElement).focus();
+    }
+  }
 </script>
 
 <template>
@@ -52,10 +61,12 @@
           rounded="xl"
         >
           <v-list-item
-            v-for="item in items"
+            v-for="(item, index) in items"
             @click="handleItemClick(item)"
+            @keydown.enter.prevent="focusNextChip(index)"
             :key="item.id"
             :data-testid="`assign-list-item-${item.id}`"
+            tabindex="0"
           >
             <v-chip><slot :item="item"></slot></v-chip>
           </v-list-item>

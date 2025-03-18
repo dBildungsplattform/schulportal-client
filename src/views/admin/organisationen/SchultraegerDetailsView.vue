@@ -114,22 +114,24 @@
       );
     }
 
-    /* reset success message and progress bar before processing items */
+    /* Reset success message and progress bar before processing items */
     successMessage.value = '';
     progress.value = 0;
 
     if (assignableSchulen.value.length > 0) {
-      assignableSchulen.value.forEach(async (schuleId: string, index: number) => {
+      for (let index: number = 0; index < assignableSchulen.value.length; index++) {
+        const schuleId: string = assignableSchulen.value[index]!;
+
         await organisationStore.assignSchuleToTraeger(currentSchultraegerId, { organisationId: schuleId });
 
         /* Update progress for each item processed */
         progress.value = Math.ceil(((index + 1) / assignableSchulen.value.length) * 100);
+      }
 
-        /* Only show success message after all items have been processed */
-        if (index === assignableSchulen.value.length - 1 && !organisationStore.errorCode) {
-          successMessage.value = t('admin.schultraeger.schulenAssignedSuccessfully');
-        }
-      });
+      /* Show success message only after all items have been processed */
+      if (!organisationStore.errorCode) {
+        successMessage.value = t('admin.schultraeger.schulenAssignedSuccessfully');
+      }
     }
   });
 
