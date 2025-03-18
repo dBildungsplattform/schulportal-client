@@ -55,12 +55,14 @@
   const { hasAutoselectedSchule, autoselectedSchule }: ReturnType<typeof useAutoselectedSchule> = useAutoselectedSchule(
     props.systemrechteForSearch ?? [],
   );
-  const translatedSchulen: ComputedRef<Array<TranslatedObject>> = computed(() =>
-    organisationStore.schulenFilter.filterResult.map((schule: Organisation) => ({
-      value: schule.id,
-      title: getDisplayNameForOrg(schule),
-    })),
-  );
+  const translateSchule = (schule: Organisation): TranslatedObject => ({
+    value: schule.id,
+    title: getDisplayNameForOrg(schule),
+  });
+  const translatedSchulen: ComputedRef<Array<TranslatedObject>> = computed(() => {
+    if (autoselectedSchule.value) return [translateSchule(autoselectedSchule.value)];
+    return organisationStore.schulenFilter.filterResult.map(translateSchule);
+  });
 
   // selection is represented as an array internally
   // wrap/unwrap is used to convert between internal and vuetify representation
@@ -190,7 +192,7 @@
       if (timerId.value) clearTimeout(timerId.value);
 
       // We skip if we have an autoselectedSchule
-      if (oldFilter && hasAutoselectedSchule.value) return;
+      if (hasAutoselectedSchule.value) return;
 
       // We apply the debounce of 500 only when there is an oldFilter (a change has been made)
       const delay: number = oldFilter ? 500 : 0;
