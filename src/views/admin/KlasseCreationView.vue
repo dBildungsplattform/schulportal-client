@@ -180,15 +180,16 @@
   }
 
   const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
+    if (!selectedSchule.value) return;
     await organisationStore.createOrganisation(
+      selectedSchule.value,
+      selectedSchule.value,
       undefined,
       selectedKlassenname.value,
       undefined,
       undefined,
       OrganisationsTyp.Klasse,
       undefined,
-      selectedSchule.value,
-      selectedSchule.value,
     );
     resetForm();
   });

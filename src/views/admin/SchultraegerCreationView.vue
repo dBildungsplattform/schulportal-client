@@ -88,14 +88,14 @@
     )?.name;
     if (selectedSchultraegername.value) {
       await organisationStore.createOrganisation(
+        selectedSchultraegerform.value,
+        selectedSchultraegerform.value,
         undefined,
         selectedSchultraegername.value,
         undefined,
         undefined,
         OrganisationsTyp.Traeger,
         undefined,
-        selectedSchultraegerform.value,
-        selectedSchultraegerform.value,
       );
       resetForm({
         values: {
