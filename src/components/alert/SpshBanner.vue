@@ -4,8 +4,8 @@
   defineProps<{
     id: string;
     visible: boolean;
-    text: string;
-    type: 'errorLight' | 'warning';
+    type: 'errorLight' | 'warning' | 'background-grey';
+    dismissable: boolean;
   }>();
 
   type Emits = {
@@ -33,16 +33,14 @@
       class="align-center"
       justify="space-between"
     >
-      <v-col class="text-center mr-8 primary-text-color">
-        <span class="text-body bold">{{ $t('banner.hint') }} </span>
-        <span
+      <v-col :class="['text-center primary-text-color', { 'mr-8': dismissable }]">
+        <slot
           class="text-body"
-          data-testid="alert-text"
-          >{{ text }}</span
-        >
-        <slot name="text"></slot>
+          name="text"
+        ></slot>
       </v-col>
       <v-col
+        v-if="dismissable"
         cols="auto"
         class="text-center primary-text-color"
       >

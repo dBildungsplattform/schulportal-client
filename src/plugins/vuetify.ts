@@ -13,6 +13,7 @@ const shTheme: ThemeDefinition = {
   dark: false,
   colors: {
     background: '#FFFFFF',
+    'background-grey': '#e5eaef',
     surface: '#FFFFFF',
     primary: '#001e49',
     'primary-darken-1': '#3700B3',
