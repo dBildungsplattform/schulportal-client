@@ -17,6 +17,7 @@
     useOrganisationStore,
     type Organisation,
     type OrganisationStore,
+    SchuleType,
   } from '@/stores/OrganisationStore';
   import { useForm, type TypedSchema, type FormContext } from 'vee-validate';
   import {
@@ -141,47 +142,48 @@
     unassignedSchulen.value = unassignedSchulen.value.filter((item: Organisation) => item.id !== schule.id);
   }
 
-  async function searchInAssignedSchulen(searchString: string): Promise<void> {
-    if (!organisationStore.currentOrganisation) return;
-    await organisationStore.fetchSchulenFromTraeger({
-      searchString: searchString,
-      zugehoerigZu: [currentSchultraegerId],
-    });
-    assignedSchulen.value = organisationStore.schulenFromTraeger;
-
-    if (assignedSchulen.value.length === 0) {
-      noAssignedSchulenFoundText.value = t('admin.schultraeger.noSchulenFound');
-    }
-  }
-
-  async function searchInUnassignedSchulen(searchString: string): Promise<void> {
+  // This method will search for both assigned or unassigned Schulen depending on the parameter "type" which could be either 'assigned' or 'unassigned'.
+  async function searchSchulen(searchString: string, type: SchuleType): Promise<void> {
     if (!organisationStore.currentOrganisation) return;
 
-    await organisationStore.fetchSchulenWithoutTraeger({
-      limit: 50,
-      searchString: searchString,
-    });
-
-    // Get the parent ID of the current Schultraeger
-    const currentOrganisationParentId: string | null | undefined = organisationStore.currentOrganisation.zugehoerigZu;
-
-    // Filter unassigned Schulen to only include those having the same parent (zugehoerigZu) as the current Schultraeger
-    unassignedSchulen.value = organisationStore.schulenWithoutTraeger.filter(
-      (schule: Organisation) => schule.zugehoerigZu === currentOrganisationParentId,
+    await organisationStore.fetchSchulen(
+      {
+        searchString,
+        zugehoerigZu: type === SchuleType.ASSIGNED ? [currentSchultraegerId] : undefined,
+        limit: type === SchuleType.UNASSIGNED ? 50 : undefined,
+      },
+      type,
     );
 
-    if (unassignedSchulen.value.length === 0) {
-      noUnassignedSchulenFoundText.value = t('admin.schultraeger.noSchulenFound');
-    }
+    if (type === SchuleType.ASSIGNED) {
+      assignedSchulen.value = organisationStore.schulenFromTraeger;
+      noAssignedSchulenFoundText.value =
+        assignedSchulen.value.length === 0 ? t('admin.schultraeger.noSchulenFound') : '';
+    } else {
+      const currentOrganisationParentId: string | null | undefined = organisationStore.currentOrganisation.zugehoerigZu;
 
-    if (!searchString) {
-      unassignedSchulen.value = [];
-    }
-
-    if (assignableSchulen.value.length > 0) {
-      unassignedSchulen.value = unassignedSchulen.value.filter(
-        (schule: Organisation) => !assignableSchulen.value.includes(schule.id),
+      // Filter unassigned Schulen to only include those having the same parent (zugehoerigZu) as the current Schultraeger
+      unassignedSchulen.value = organisationStore.schulenWithoutTraeger.filter(
+        (schule: Organisation) => schule.zugehoerigZu === currentOrganisationParentId,
       );
+
+      // If no search string is given then ask for Input first
+      if (!searchString) {
+        unassignedSchulen.value = [];
+        noUnassignedSchulenFoundText.value = t('admin.schultraeger.unassignedSchulenDefaultText');
+        return;
+      }
+
+      // After assigning the Schule to the Schultraeger, remove it from the unassigned Schulen
+      if (assignableSchulen.value.length > 0) {
+        unassignedSchulen.value = unassignedSchulen.value.filter(
+          (schule: Organisation) => !assignableSchulen.value.includes(schule.id),
+        );
+      }
+
+      // if input is given and no Schulen were found, show that there were none found
+      noUnassignedSchulenFoundText.value =
+        unassignedSchulen.value.length === 0 && searchString ? t('admin.schultraeger.noSchulenFound') : '';
     }
   }
 
@@ -192,10 +194,13 @@
 
     await organisationStore.getRootKinderSchultraeger();
     await organisationStore.getOrganisationById(currentSchultraegerId, OrganisationsTyp.Traeger);
-    await organisationStore.fetchSchulenFromTraeger({
-      searchString: '',
-      zugehoerigZu: [currentSchultraegerId],
-    });
+    await organisationStore.fetchSchulen(
+      {
+        searchString: '',
+        zugehoerigZu: [currentSchultraegerId],
+      },
+      SchuleType.ASSIGNED,
+    );
     assignedSchulen.value = organisationStore.schulenFromTraeger;
 
     // Set the initial values using the computed properties
@@ -291,9 +296,11 @@
                 :assignedItemsHeader="$t('admin.schultraeger.schulenOfThisTraeger', { amount: assignedSchulen.length })"
                 :noAssignedItemsFoundText="noAssignedSchulenFoundText"
                 :noUnassignedItemsFoundText="noUnassignedSchulenFoundText"
-                @onHandleAssignedItemsSearchFilter="searchInAssignedSchulen"
+                @onHandleAssignedItemsSearchFilter="(searchString) => searchSchulen(searchString, SchuleType.ASSIGNED)"
                 @onHandleUnassignedItemClick="addAssignableSchule"
-                @onHandleUnassignedItemsSearchFilter="searchInUnassignedSchulen"
+                @onHandleUnassignedItemsSearchFilter="
+                  (searchString) => searchSchulen(searchString, SchuleType.UNASSIGNED)
+                "
                 :unassignedItems="unassignedSchulen"
                 :unassignedItemsHeader="$t('admin.schultraeger.schulenWithoutTraeger')"
               >
@@ -405,7 +412,7 @@
             md="auto"
           >
             <v-btn
-              class="secondary"
+              class="primary"
               data-testid="back-to-schultraeger-button"
               @click="navigateBackToSchultraegerDetails"
               :block="mdAndDown"
@@ -430,18 +437,6 @@
             </v-btn>
           </v-col>
         </v-row>
-
-        <SpshAlert
-          :model-value="!!organisationStore.errorCode"
-          :title="$t('admin.schultraeger.schultraegerDetailsErrorTitle')"
-          :type="'error'"
-          :closable="false"
-          :text="organisationStore.errorCode ? $t(`admin.schultraeger.errors.${organisationStore.errorCode}`) : ''"
-          :showButton="true"
-          :buttonText="$t('admin.schultraeger.backToSchultraeger')"
-          :buttonAction="navigateBackToSchultraegerDetails"
-          buttonClass="primary"
-        />
       </template>
     </LayoutCard>
   </div>

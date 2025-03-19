@@ -92,7 +92,7 @@
         v-if="showCreateAnotherButton"
       >
         <v-btn
-          class="primary button"
+          class="primary"
           :data-testid="createAnotherButtonTestId"
           :block="mdAndDown"
           @click="createAnother"

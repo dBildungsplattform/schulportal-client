@@ -125,6 +125,11 @@ export type GetAdministrierteOrganisationenFilter = {
   searchFilter?: string;
 };
 
+export enum SchuleType {
+  ASSIGNED = 'assigned',
+  UNASSIGNED = 'unassigned',
+}
+
 type OrganisationGetters = {};
 type OrganisationActions = {
   getAllOrganisationen: (filter?: OrganisationenFilter) => Promise<void>;
@@ -147,8 +152,7 @@ type OrganisationActions = {
   deleteOrganisationById: (organisationId: string) => Promise<void>;
   updateOrganisationById: (organisationId: string, name: string, type: OrganisationsTyp) => Promise<void>;
   getRootKinderSchultraeger: () => Promise<void>;
-  fetchSchulenFromTraeger: (filter: OrganisationenFilter) => Promise<void>;
-  fetchSchulenWithoutTraeger: (filter: OrganisationenFilter) => Promise<void>;
+  fetchSchulen: (filter: OrganisationenFilter, type: SchuleType) => Promise<void>;
   assignSchuleToTraeger(schultraegerId: string, organisationIdBodyParams: OrganisationByIdBodyParams): Promise<void>;
   fetchSchuleDetailsForKlassen: (filterActive: boolean) => Promise<void>;
   fetchSchuleDetailsForSchultraeger: () => Promise<void>;
@@ -580,7 +584,7 @@ export const useOrganisationStore: StoreDefinition<
       }
     },
 
-    async fetchSchulenFromTraeger(filter: OrganisationenFilter): Promise<void> {
+    async fetchSchulen(filter: OrganisationenFilter, type: SchuleType): Promise<void> {
       this.errorCode = '';
       this.loading = true;
       try {
@@ -598,41 +602,18 @@ export const useOrganisationStore: StoreDefinition<
             filter.zugehoerigZu,
             undefined,
           );
-        this.schulenFromTraeger = data;
+    
+        if (type === SchuleType.ASSIGNED) {
+          this.schulenFromTraeger = data;
+        } else {
+          this.schulenWithoutTraeger = data;
+        }
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'SCHULTRAEGER_ERROR');
-        return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
       }
-    },
-
-    async fetchSchulenWithoutTraeger(filter: OrganisationenFilter): Promise<void> {
-      this.errorCode = '';
-      this.loading = true;
-      try {
-        const { data }: { data: Array<OrganisationResponse> } =
-          await organisationApi.organisationControllerFindOrganizations(
-            filter.offset,
-            filter.limit,
-            undefined,
-            undefined,
-            filter.searchString,
-            OrganisationsTyp.Schule,
-            ['SCHULTRAEGER_VERWALTEN'],
-            undefined,
-            undefined,
-            filter.zugehoerigZu,
-            undefined,
-          );
-        this.schulenWithoutTraeger = data;
-      } catch (error: unknown) {
-        this.errorCode = getResponseErrorCode(error, 'SCHULTRAEGER_ERROR');
-        return await Promise.reject(this.errorCode);
-      } finally {
-        this.loading = false;
-      }
-    },
+    },    
 
     async assignSchuleToTraeger(
       schultraegerId: string,
