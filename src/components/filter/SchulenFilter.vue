@@ -30,7 +30,7 @@
     };
   };
   const props: Props = defineProps<Props>();
-  const selectedSchulen: Ref<SelectedSchulenIds> = ref(props.initialIds ?? []);
+  const selectedSchulen: Ref<SelectedSchulenIds> = defineModel('selectedSchulen');
   const searchInputSchulen: Ref<string | undefined> = ref(undefined);
   const clearInput = (): void => {
     searchInputSchulen.value = undefined;

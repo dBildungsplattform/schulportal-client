@@ -1,11 +1,10 @@
 <script setup lang="ts">
   import FormRow from '@/components/form/FormRow.vue';
   import FormWrapper from '@/components/form/FormWrapper.vue';
-  import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
   import { RollenSystemRecht } from '@/stores/RolleStore';
   import { getValidationSchema, getVuetifyConfig, type ValidationSchema } from '@/utils/validationKlasse';
   import { useForm, useIsFormDirty, useIsFormValid, type BaseFieldProps, type TypedSchema } from 'vee-validate';
-  import { computed, useTemplateRef, watch, type ComputedRef, type Ref } from 'vue';
+  import { computed, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import SchulenFilter from '../filter/SchulenFilter.vue';
 
@@ -27,9 +26,6 @@
   };
   const emit: Emits = defineEmits<Emits>();
   const { t }: Composer = useI18n({ useScope: 'global' });
-  // eslint-disable-next-line @typescript-eslint/typedef
-  const schulenFilterRef = useTemplateRef('schulenFilter');
-  const organisationStore: OrganisationStore = useOrganisationStore();
 
   const vuetifyConfig = (state: {
     errors: Array<string>;
@@ -40,13 +36,13 @@
   const { defineField, resetForm, setFieldValue } = useForm<ValidationSchema>({
     validationSchema,
     initialValues: {
-      selectedSchule: props.initialValues?.selectedSchule ?? '',
+      selectedSchule: props.initialValues?.selectedSchule,
       selectedKlassenname: props.initialValues?.selectedKlassenname ?? '',
     },
   });
 
   const [selectedSchule, selectedSchuleProps]: [
-    Ref<string>,
+    Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = defineField('selectedSchule', vuetifyConfig);
   const [selectedKlassenname, selectedKlassennameProps]: [
@@ -60,9 +56,9 @@
 
   function reset(): void {
     resetForm();
-    schulenFilterRef.value?.clearInput();
+    selectedSchule.value = undefined;
     emit('formStateChanged', {
-      values: { selectedKlassenname: selectedKlassenname.value, selectedSchule: selectedSchule.value },
+      values: { selectedKlassenname: selectedKlassenname.value, selectedSchule: '' },
       dirty: isDirty.value,
       valid: isValid.value,
     });
@@ -71,6 +67,7 @@
   defineExpose({ reset });
 
   async function submitHandler(): Promise<void> {
+    if (!selectedSchule.value) return;
     await props.onSubmit({ selectedSchule: selectedSchule.value, selectedKlassenname: selectedKlassenname.value });
     reset();
   }
@@ -80,14 +77,6 @@
     setFieldValue('selectedSchule', props.initialValues.selectedSchule ?? '');
     setFieldValue('selectedKlassenname', props.initialValues.selectedKlassenname ?? '');
   }
-
-  watch(
-    () => organisationStore.schulenFilter.selectedItems,
-    (schulen: Array<Organisation>) => {
-      const newSchuleId: string = schulen.length === 1 ? schulen[0]!.id : '';
-      if (selectedSchule.value !== newSchuleId) selectedSchule.value = newSchuleId;
-    },
-  );
 
   watch(
     () => props.isEditActive,
@@ -100,7 +89,7 @@
     [isDirty, isValid],
     () => {
       emit('formStateChanged', {
-        values: { selectedKlassenname: selectedKlassenname.value, selectedSchule: selectedSchule.value },
+        values: { selectedKlassenname: selectedKlassenname.value, selectedSchule: selectedSchule.value ?? '' },
         dirty: isDirty.value,
         valid: isValid.value,
       });
@@ -121,6 +110,10 @@
       }
     },
   );
+
+  function updateSchuleSelection(schuleId: string): void {
+    setFieldValue('selectedSchule', schuleId);
+  }
 </script>
 
 <template data-test-id="klasse-form">
@@ -153,11 +146,13 @@
       >
         <SchulenFilter
           ref="schulenFilter"
+          :selectedSchulen="selectedSchule"
           :multiple="false"
           :readonly="props.editMode"
           :initialIds="props.initialValues?.selectedSchule"
           :systemrechteForSearch="[RollenSystemRecht.KlassenVerwalten]"
           :selectedSchuleProps="selectedSchuleProps"
+          @update:selectedSchulen="updateSchuleSelection"
         ></SchulenFilter>
       </FormRow>
 

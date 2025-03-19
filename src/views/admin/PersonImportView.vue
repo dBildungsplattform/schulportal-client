@@ -11,7 +11,6 @@
     type ImportedUserResponse,
     type ImportStore,
   } from '@/stores/ImportStore';
-  import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
   import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
   import { RollenArt } from '@/stores/RolleStore';
   import { toTypedSchema } from '@vee-validate/yup';
@@ -28,7 +27,6 @@
   import { useDisplay } from 'vuetify';
   import { mixed, object, string } from 'yup';
 
-  const organisationStore: OrganisationStore = useOrganisationStore();
   const importStore: ImportStore = useImportStore();
   const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
 
@@ -69,7 +67,7 @@
   });
 
   type PersonImportForm = {
-    selectedSchule: string;
+    selectedSchule: string | undefined;
     selectedRolle: string;
     selectedFiles: Array<File>;
   };
@@ -93,13 +91,6 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = formContext.defineField('selectedFiles', vuetifyConfig);
 
-  watch(
-    () => organisationStore.schulenFilter.selectedItems,
-    (newSelection: Array<Organisation>) => {
-      if (newSelection.length === 1) selectedSchule.value = newSelection[0]!.id;
-      else selectedSchule.value = undefined;
-    },
-  );
   watch(selectedSchule, async (newValue: string | undefined, oldValue: string | undefined) => {
     if (newValue && newValue !== oldValue) {
       // Fetch rollen after selecting the organization
@@ -369,6 +360,10 @@
     event.returnValue = '';
   }
 
+  function updateSelectedSchule(id: string | undefined): void {
+    formContext.setFieldValue('selectedSchule', id);
+  }
+
   onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
     if (isFormDirty()) {
       showUnsavedChangesDialog.value = true;
@@ -390,7 +385,6 @@
     importStore.uploadResponse = null;
     importStore.importResponse = null;
     importStore.importProgress = 0;
-    organisationStore.errorCode = '';
     /* listen for browser changes and prevent them when form is dirty */
     window.addEventListener('beforeunload', preventNavigation);
   });
@@ -624,6 +618,8 @@
               :multiple="false"
               :texts="{ placeholder: t('admin.schule.selectSchule') }"
               :selectedSchuleProps="selectedSchuleProps"
+              :selectedSchulen="selectedSchule"
+              @update:selectedSchulen="updateSelectedSchule"
               ref="schule-select"
             />
           </FormRow>
