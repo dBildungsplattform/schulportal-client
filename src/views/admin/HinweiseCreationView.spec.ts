@@ -1,5 +1,5 @@
 import { expect, test, type Mock, type MockInstance } from 'vitest';
-import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
+import { DOMWrapper, VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import {
   createRouter,
   createWebHistory,
@@ -46,7 +46,7 @@ function mountComponent(): VueWrapper {
   });
 }
 
-describe('HinweiseManagementView', () => {
+describe('HinweiseCreationView', () => {
   beforeEach(async () => {
     Object.defineProperty(window, 'location', {
       value: {
@@ -115,6 +115,9 @@ describe('HinweiseManagementView', () => {
   });
 
   test('it fills form and triggers submit', async () => {
+    meldungStore.createOrUpdateMeldung = vi.fn().mockResolvedValue(undefined);
+    meldungStore.getAllMeldungen = vi.fn().mockResolvedValue(undefined);
+
     meldungStore.meldungen = [
       {
         id: '1',
@@ -123,22 +126,14 @@ describe('HinweiseManagementView', () => {
       },
     ];
     await flushPromises();
-    await nextTick();
 
     const meldungTextInput: VueWrapper | undefined = wrapper?.findComponent({ ref: 'newsbox-text' });
     await meldungTextInput?.setValue('Updated Hinweis');
-    await nextTick();
 
-    const submitButton: Element | null = document.body.querySelector('[data-testid="submit-newsbox"]');
-    expect(submitButton).not.toBeNull();
-
-    if (submitButton) {
-      submitButton.dispatchEvent(new Event('click'));
-    }
+    const submitButton: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="submit-newsbox"]');
+    await submitButton?.trigger('click');
 
     await flushPromises();
-    await flushPromises();
-    await nextTick();
 
     expect(meldungStore.createOrUpdateMeldung).toHaveBeenCalled();
   });
