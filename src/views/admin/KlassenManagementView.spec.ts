@@ -36,18 +36,24 @@ const organisationStore: OrganisationStore = useOrganisationStore();
 const searchFilterStore: SearchFilterStore = useSearchFilterStore();
 const authStore: AuthStore = useAuthStore();
 
-function selectSchule(schule?: Partial<Organisation> | null): Organisation | null {
+/**
+ *
+ * @param schule org to solect, null to clear selection
+ * @returns selected org or nothing, if cleared
+ */
+async function selectSchule(schule?: Partial<Organisation> | null): Promise<Organisation | undefined> {
+  const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' }).findComponent({
+    name: 'v-autocomplete',
+  });
+
   if (schule === null) {
-    organisationStore.schulenFilter.selectedItems = [];
-    return null;
+    await schuleAutocomplete?.setValue(schule);
+    return;
   }
-  const schuleWithDefaults: Organisation = {
-    id: '987342',
-    name: 'Hans-Wurst-Schule',
-    typ: OrganisationsTyp.Schule,
-    ...schule,
-  };
-  organisationStore.schulenFilter.selectedItems = [schuleWithDefaults];
+
+  const schuleWithDefaults: Organisation = DoFactory.getSchule(schule);
+  organisationStore.schulenFilter.filterResult = [schuleWithDefaults];
+  await schuleAutocomplete?.setValue(schuleWithDefaults.id);
   return schuleWithDefaults;
 }
 
@@ -220,7 +226,7 @@ describe('KlassenManagementView', () => {
     await klasseAutocomplete?.setValue('9a');
     await nextTick();
 
-    organisationStore.schulenFilter.selectedItems = [];
+    selectSchule(null);
     await nextTick();
 
     expect(klasseAutocomplete?.text()).toEqual('');
@@ -258,7 +264,7 @@ describe('KlassenManagementView', () => {
   });
 
   it('should fetch Klassen for selected Schule when search string is empty', async () => {
-    const schule: Organisation = selectSchule()!;
+    const schule: Organisation = (await selectSchule())!;
     const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
 
     await klasseAutocomplete?.vm.$emit('update:search', '');
