@@ -1,6 +1,5 @@
 <script setup lang="ts">
   import type { LockUserBodyParams } from '@/api-client/generated';
-  import type { PersonenkontextRolleFieldsResponse } from '@/api-client/generated/api';
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
   import KlasseChange from '@/components/admin/klassen/KlasseChange.vue';
   import BefristungInput from '@/components/admin/personen/BefristungInput.vue';
@@ -19,7 +18,7 @@
   import { useKlassen } from '@/composables/useKlassen';
   import { useOrganisationen } from '@/composables/useOrganisationen';
   import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
-  import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+  import { useAuthStore, type AuthStore, type PersonenkontextRolleFields } from '@/stores/AuthStore';
   import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
   import {
     OrganisationsTyp,
@@ -1400,7 +1399,7 @@
 
   const intersectingOrganisations: ComputedRef<Set<Organisation>> = computed(() => {
     const adminOrganisationIds: Set<string> = new Set(
-      authStore.currentUser?.personenkontexte?.map((pk: PersonenkontextRolleFieldsResponse) => pk.organisation.id),
+      authStore.currentUser?.personenkontexte?.map((pk: PersonenkontextRolleFields) => pk.organisation.id),
     );
     return new Set<Organisation>(
       organisationStore.parentOrganisationen.filter((userOrg: Organisation) => adminOrganisationIds.has(userOrg.id)),

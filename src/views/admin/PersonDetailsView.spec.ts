@@ -1,7 +1,7 @@
-import { EmailAddressStatus, type PersonenkontextRolleFieldsResponse } from '@/api-client/generated';
+import { EmailAddressStatus } from '@/api-client/generated';
 import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
 import routes from '@/router/routes';
-import { useAuthStore, type AuthStore, type UserInfo } from '@/stores/AuthStore';
+import { useAuthStore, type AuthStore, type PersonenkontextRolleFields, type UserInfo } from '@/stores/AuthStore';
 import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import {
@@ -258,7 +258,7 @@ describe('PersonDetailsView', () => {
         typ: OrganisationsTyp.Schule,
         administriertVon: '1',
       },
-      ...(mockCurrentUser.personenkontexte?.map((pk: PersonenkontextRolleFieldsResponse) => ({
+      ...(mockCurrentUser.personenkontexte?.map((pk: PersonenkontextRolleFields) => ({
         id: pk.organisation.id,
         name: pk.organisation.name,
         typ: pk.organisation.typ,
