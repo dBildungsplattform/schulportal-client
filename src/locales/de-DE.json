@@ -388,7 +388,9 @@
           "SCHULTRAEGER_VERWALTEN": "Darf Schulträger verwalten",
           "PERSON_SYNCHRONISIEREN": "Darf Benutzer synchronisieren",
           "PERSONEN_ANLEGEN": "Darf Benutzer anlegen",
-          "BULK_VERWALTEN": "Darf Mehrfachbearbeitung ausführen"
+          "BULK_VERWALTEN": "Darf Mehrfachbearbeitung ausführen",
+          "SCHULPORTAL_VERWALTEN": "Darf Portal verwalten",
+          "HINWEISE_BEARBEITEN": "Darf Hinweise bearbeiten"
         },
         "rollenarten": {
           "LERN": "Lern",
@@ -527,7 +529,7 @@
       },
       "management": "Schulträgerverwaltung",
       "noSchulenFound": "Keine Schulen gefunden",
-      "rules":{
+      "rules": {
         "schultraegername": {
           "matches": "Der Schulträgername darf keine ungültigen Zeichen beinhalten.",
           "noLeadingTrailingSpaces": "Der Schulträgername darf nicht mit Leerzeichen beginnen oder enden.",
@@ -556,7 +558,29 @@
       "selectServiceProvider": "Angebote auswählen",
       "serviceProvider": "Angebote"
     },
-    "status": "Status"
+    "status": "Status",
+    "portal": {
+      "management": "Portalverwaltung",
+      "editHinweise": "Hinweise bearbeiten"
+    },
+    "hinweise": {
+      "hinweiseTexte": "Hinweistexte",
+      "newsbox": "Newsbox",
+      "publish": "Veröffentlichen",
+      "publishEnd": "Veröffentlichung beenden",
+      "title": {
+        "UNSPECIFIED_ERROR": "Fehler beim Speichern der Hinweise",
+        "MISMATCHED_REVISION": "Geänderte Daten"
+      },
+      "errors": {
+        "UNSPECIFIED_ERROR": "Es ist ein Fehler aufgetreten.",
+        "MISMATCHED_REVISION": "Die Hinweise wurden zwischenzeitlich von einer anderen Administratorin oder einem anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut."
+      },
+      "rules": {
+        "max": "Der Text darf maximal 2000 Zeichen lang sein.",
+        "min": "Der Text muss mindestens 1 Zeichen lang sein."
+      }
+    }
   },
   "cancel": "Abbrechen",
   "proceed": "Weiter",

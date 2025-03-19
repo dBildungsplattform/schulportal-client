@@ -4,7 +4,7 @@ import {
   type ServiceProvider,
   type ServiceProviderStore,
 } from '@/stores/ServiceProviderStore';
-import { VueWrapper, mount } from '@vue/test-utils';
+import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
 import { expect, test, type Mock } from 'vitest';
 import { nextTick } from 'vue';
@@ -12,12 +12,14 @@ import StartView from './StartView.vue';
 import { type PersonStore, usePersonStore, type PersonWithUebersicht } from '@/stores/PersonStore';
 import { usePersonInfoStore, type PersonInfoResponse, type PersonInfoStore } from '@/stores/PersonInfoStore';
 import { OrganisationsTyp, RollenArt, RollenMerkmal, ServiceProviderKategorie } from '@/api-client/generated/api';
+import { MeldungStatus, useMeldungStore, type MeldungStore } from '@/stores/MeldungStore';
 
 let wrapper: VueWrapper | null = null;
 let authStore: AuthStore;
 let serviceProviderStore: ServiceProviderStore;
 let personStore: PersonStore;
 let personInfoStore: PersonInfoStore;
+let meldungStore: MeldungStore;
 
 const mockProviders: Array<ServiceProvider> = [
   {
@@ -137,6 +139,7 @@ beforeEach(() => {
   serviceProviderStore = useServiceProviderStore();
   personStore = usePersonStore();
   personInfoStore = usePersonInfoStore();
+  meldungStore = useMeldungStore();
   serviceProviderStore.availableServiceProviders = mockProviders;
 
   authStore.hasPersonenverwaltungPermission = false;
@@ -154,6 +157,11 @@ beforeEach(() => {
 
   personInfoStore.personInfo = mockPerson;
   personStore.personenuebersicht = mockPersonenUebersicht;
+  meldungStore.currentMeldung = {
+    id: '1',
+    text: 'Test',
+    status: MeldungStatus.VEROEFFENTLICHT,
+  };
 
   wrapper = mount(StartView, {
     attachTo: document.getElementById('app') || '',
@@ -168,6 +176,10 @@ beforeEach(() => {
       },
     },
   });
+});
+
+afterEach(() => {
+  wrapper?.unmount();
 });
 
 describe('StartView', () => {
@@ -216,6 +228,7 @@ describe('StartView', () => {
   });
 
   test('it displays correct banner color', async () => {
+    await flushPromises();
     await nextTick();
 
     const banner: WrapperLike | undefined = wrapper?.find('[data-testid="KOPERS-banner"]');
@@ -224,6 +237,7 @@ describe('StartView', () => {
   });
 
   test('it dismisses the banner', async () => {
+    await flushPromises();
     await nextTick();
     const banner: VueWrapper | undefined = wrapper?.findComponent({ ref: 'spsh-banner' });
 
@@ -231,6 +245,15 @@ describe('StartView', () => {
     banner?.find('[data-testid="banner-close-icon"]').trigger('click');
     await nextTick();
     expect(banner?.emitted('dismissBanner')).toBeTruthy();
+  });
+
+  test('it renders a hinweis banner', async () => {
+    await nextTick();
+    await nextTick();
+
+    const banner: WrapperLike | undefined = wrapper?.find('[data-testid="hinweis-banner"]');
+
+    expect(banner?.isVisible()).toBe(true);
   });
 
   test('filterSortProviders sorts service providers alphabetically', () => {
