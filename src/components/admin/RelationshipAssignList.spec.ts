@@ -1,5 +1,5 @@
-import { expect, test } from 'vitest';
-import { VueWrapper, mount } from '@vue/test-utils';
+import { expect, test, type MockInstance } from 'vitest';
+import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import routes from '@/router/routes';
 import RelationshipAssignList from './RelationshipAssignList.vue';
@@ -61,5 +61,22 @@ describe('RelationshipAssignList', () => {
 
   test('it emits', async () => {
     expect(true).toBeTruthy();
+  });
+  test('it moves focus to the next chip on Enter key press', async () => {
+    const listItems: DOMWrapper<Element>[] | undefined = wrapper?.findAll('[data-testid^="assign-list-item-"]');
+    expect(listItems).toHaveLength(mockItems.length);
+
+    if (listItems) {
+      const secondItem: HTMLElement = listItems[1]?.element as HTMLElement;
+
+      // Spy on focus method
+      const focusSpy: MockInstance = vi.spyOn(secondItem, 'focus');
+
+      // Trigger Enter key event manually
+      await listItems[0]?.trigger('keydown', { key: 'Enter' });
+
+      // Ensure the second item received focus
+      expect(focusSpy).toHaveBeenCalled();
+    }
   });
 });
