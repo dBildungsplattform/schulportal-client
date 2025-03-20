@@ -602,7 +602,7 @@ export const useOrganisationStore: StoreDefinition<
             filter.zugehoerigZu,
             undefined,
           );
-    
+
         if (type === SchuleType.ASSIGNED) {
           this.schulenFromTraeger = data;
         } else {
@@ -613,7 +613,7 @@ export const useOrganisationStore: StoreDefinition<
       } finally {
         this.loading = false;
       }
-    },    
+    },
 
     async assignSchuleToTraeger(
       schultraegerId: string,
