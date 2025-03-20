@@ -107,7 +107,7 @@ beforeEach(async () => {
   organisationStore.schultraeger = [
     {
       id: '2',
-      name: 'Öffentlicher Träger',
+      name: 'Öffentliches Land',
       namensergaenzung: 'Ergänzung',
       kennung: null,
       kuerzel: '',
@@ -117,7 +117,7 @@ beforeEach(async () => {
     },
     {
       id: '3',
-      name: 'Ersatz Träger',
+      name: 'Ersatz Land',
       namensergaenzung: 'Ergänzung',
       kennung: null,
       kuerzel: '',
@@ -126,69 +126,74 @@ beforeEach(async () => {
       administriertVon: '1',
     },
   ];
+
   organisationStore.currentOrganisation = {
-    id: '2',
+    id: '4',
     name: 'Öffentlicher Träger',
     namensergaenzung: 'Ergänzung',
     kennung: null,
     kuerzel: '',
     typ: OrganisationsTyp.Traeger,
-    zugehoerigZu: '1',
+    zugehoerigZu: '2',
+    administriertVon: '2',
   };
+
   organisationStore.schulenWithoutTraeger = [
     {
-      id: '2522',
+      id: '10',
       name: 'Öffentliche Schule A',
       namensergaenzung: 'Ergänzung',
-      kennung: null,
+      kennung: '123456',
       kuerzel: '',
       typ: OrganisationsTyp.Traeger,
-      zugehoerigZu: '1',
-      administriertVon: '1',
+      zugehoerigZu: '2',
+      administriertVon: '2',
     },
     {
-      id: '25225',
+      id: '11',
       name: 'Öffentliche Schule B',
       namensergaenzung: 'Ergänzung',
-      kennung: null,
-      kuerzel: '',
-      typ: OrganisationsTyp.Schule,
-      zugehoerigZu: '1',
-      administriertVon: '1',
-    },
-    {
-      id: '458579',
-      name: 'Ersatzschule B',
-      namensergaenzung: 'Ergänzung',
-      kennung: null,
-      kuerzel: '',
-      typ: OrganisationsTyp.Schule,
-      zugehoerigZu: '1',
-      administriertVon: '1',
-    },
-  ];
-  organisationStore.schulenFromTraeger = [
-    {
-      id: '6792',
-      name: 'Öffentliche Schule C',
-      namensergaenzung: 'Ergänzung',
-      kennung: null,
+      kennung: '465456',
       kuerzel: '',
       typ: OrganisationsTyp.Schule,
       zugehoerigZu: '2',
       administriertVon: '2',
+    },
+    {
+      id: '12',
+      name: 'Ersatzschule B',
+      namensergaenzung: 'Ergänzung',
+      kennung: '12345678',
+      kuerzel: '',
+      typ: OrganisationsTyp.Schule,
+      zugehoerigZu: '3',
+      administriertVon: '3',
+    },
+  ];
+
+  organisationStore.schulenFromTraeger = [
+    {
+      id: '9',
+      name: 'Zugeordnete Schule A',
+      namensergaenzung: 'Ergänzung',
+      kennung: null,
+      kuerzel: '',
+      typ: OrganisationsTyp.Schule,
+      zugehoerigZu: '4',
+      administriertVon: '4',
     },
     {
       id: '13',
-      name: 'Öffentliche Schule D',
+      name: 'Zugeordnete Schule B',
       namensergaenzung: 'Ergänzung',
       kennung: null,
       kuerzel: '',
       typ: OrganisationsTyp.Schule,
-      zugehoerigZu: '2',
-      administriertVon: '2',
+      zugehoerigZu: '4',
+      administriertVon: '4',
     },
   ];
+
   organisationStore.errorCode = '';
   organisationStore.updatedOrganisation = null;
 

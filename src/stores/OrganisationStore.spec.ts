@@ -1085,51 +1085,51 @@ describe('OrganisationStore', () => {
           zugehoerigZu: '2',
         },
       ];
-  
+
       mockadapter
         .onGet('/api/organisationen?searchString=&typ=SCHULE&systemrechte=SCHULTRAEGER_VERWALTEN&zugehoerigZu=2')
         .replyOnce(200, mockResponse);
-  
+
       await organisationStore.fetchSchulen(
         { searchString: '', zugehoerigZu: ['2'], offset: undefined, limit: undefined },
-        SchuleType.ASSIGNED
+        SchuleType.ASSIGNED,
       );
-  
+
       expect(organisationStore.schulenFromTraeger).toEqual(mockResponse);
       expect(organisationStore.loading).toBe(false);
       expect(organisationStore.errorCode).toBe('');
     });
-  
+
     it('should handle a server error and set default error code', async () => {
       mockadapter
         .onGet('/api/organisationen?searchString=&typ=SCHULE&systemrechte=SCHULTRAEGER_VERWALTEN&zugehoerigZu=999')
         .replyOnce(500, 'some mock server error');
-  
+
       await organisationStore.fetchSchulen(
         { searchString: '', zugehoerigZu: ['999'], offset: undefined, limit: undefined },
-        SchuleType.ASSIGNED
+        SchuleType.ASSIGNED,
       );
-  
+
       expect(organisationStore.schulenFromTraeger).toEqual([]); // Should reset to empty array
       expect(organisationStore.errorCode).toEqual('SCHULTRAEGER_ERROR'); // Default error code
       expect(organisationStore.loading).toBe(false);
     });
-  
+
     it('should handle API error responses containing a specific error code', async () => {
       mockadapter
         .onGet('/api/organisationen?searchString=&typ=SCHULE&systemrechte=SCHULTRAEGER_VERWALTEN&zugehoerigZu=999')
         .replyOnce(500, { code: 'MOCK_ERROR_CODE' });
-  
+
       await organisationStore.fetchSchulen(
         { searchString: '', zugehoerigZu: ['999'], offset: undefined, limit: undefined },
-        SchuleType.ASSIGNED
+        SchuleType.ASSIGNED,
       );
-  
+
       expect(organisationStore.schulenFromTraeger).toEqual([]); // Should reset to empty array
       expect(organisationStore.errorCode).toEqual('MOCK_ERROR_CODE'); // Should pick up the mock error code
       expect(organisationStore.loading).toBe(false);
     });
-  
+
     it('should load unassigned schulen when called with SchuleType.UNASSIGNED', async () => {
       const mockResponse: Array<Organisation> = [
         {
@@ -1146,18 +1146,18 @@ describe('OrganisationStore', () => {
       mockadapter
         .onGet('/api/organisationen?limit=50&searchString=&typ=SCHULE&systemrechte=SCHULTRAEGER_VERWALTEN')
         .replyOnce(200, mockResponse);
-  
+
       await organisationStore.fetchSchulen(
-        { searchString: '', zugehoerigZu: undefined, offset: undefined, limit: 50},
-        SchuleType.UNASSIGNED
+        { searchString: '', zugehoerigZu: undefined, offset: undefined, limit: 50 },
+        SchuleType.UNASSIGNED,
       );
-  
+
       expect(organisationStore.schulenWithoutTraeger).toEqual(mockResponse);
       expect(organisationStore.loading).toBe(false);
       expect(organisationStore.errorCode).toBe('');
     });
   });
-  
+
   describe('assignSchuleToTraeger', () => {
     it('should assign schule to traeger', async () => {
       mockadapter.onPost('api/organisationen/2/zugehoerig').replyOnce(201);
