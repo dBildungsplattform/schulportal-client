@@ -17,12 +17,10 @@
 
   type SelectedSchulenIds = Array<string> | string | undefined;
   type Props = {
-    includeTraeger?: boolean;
     hideDetails?: boolean;
     systemrechteForSearch?: Array<RollenSystemRecht>;
     multiple: boolean;
     readonly?: boolean;
-    initialIds?: Array<string> | string;
     selectedSchuleProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     highlightSelection?: boolean;
     texts?: {
@@ -36,8 +34,6 @@
     searchInputSchulen.value = undefined;
     selectedSchulen.value = undefined;
   };
-
-  defineExpose({ clearInput });
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const organisationStore: OrganisationStore = useOrganisationStore();
@@ -55,13 +51,17 @@
   const { hasAutoselectedSchule, autoselectedSchule }: ReturnType<typeof useAutoselectedSchule> = useAutoselectedSchule(
     props.systemrechteForSearch ?? [],
   );
+  const isInputDisabled: ComputedRef<boolean> = computed(() => {
+    return props.readonly || hasAutoselectedSchule.value;
+  });
   const translateSchule = (schule: Organisation): TranslatedObject => ({
     value: schule.id,
     title: getDisplayNameForOrg(schule),
   });
   const translatedSchulen: ComputedRef<Array<TranslatedObject>> = computed(() => {
-    if (autoselectedSchule.value) return [translateSchule(autoselectedSchule.value)];
-    return organisationStore.schulenFilter.filterResult.map(translateSchule);
+    const options: Array<TranslatedObject> = organisationStore.schulenFilter.filterResult.map(translateSchule);
+    if (autoselectedSchule.value) return options.concat(translateSchule(autoselectedSchule.value));
+    return options;
   });
 
   // selection is represented as an array internally
@@ -75,6 +75,18 @@
     if (selectedIds.length === 0) return undefined;
     else if (selectedIds.length === 1) return selectedIds.at(0);
     else return selectedIds;
+  };
+
+  const canDisplaySelection = (selection: SelectedSchulenIds): boolean => {
+    const result: boolean = wrapSelectedSchulenIds(selection).every((selectedSchuleId: string) =>
+      Boolean(
+        // translatedSchulen should include autoSelection if needed, so no extra logic is needed here
+        translatedSchulen.value.find(
+          (translatedSchule: TranslatedObject) => translatedSchule.value === selectedSchuleId,
+        ),
+      ),
+    );
+    return result;
   };
 
   const isEmptySelection = (selection: SelectedSchulenIds): boolean => {
@@ -96,9 +108,7 @@
   };
 
   const getDefaultIds = (): Array<string> => {
-    if (props.initialIds) {
-      return wrapSelectedSchulenIds(props.initialIds);
-    } else if (hasAutoselectedSchule.value) {
+    if (hasAutoselectedSchule.value) {
       return wrapSelectedSchulenIds(autoselectedSchule.value?.id);
     }
     return [];
@@ -139,34 +149,24 @@
     return sameContent(wrapSelectedSchulenIds(a), wrapSelectedSchulenIds(b));
   };
 
-  type SelectionChange = [SelectedSchulenIds, SelectedSchulenIds, boolean];
-  type PreviousSelectionChange = [SelectedSchulenIds, Array<string> | undefined, boolean | undefined];
+  type SelectionChange = [SelectedSchulenIds, boolean];
+  type PreviousSelectionChange = [SelectedSchulenIds, boolean | undefined];
 
   watch(
-    [selectedSchulen, (): Array<string> => wrapSelectedSchulenIds(props.initialIds), hasAutoselectedSchule],
-    (
-      [currentSelection, currentInitialIds, currentlyHasAutoselectedSchule]: SelectionChange,
-      [oldSelection, oldInitialIds]: PreviousSelectionChange,
-    ) => {
+    [selectedSchulen, hasAutoselectedSchule],
+    ([currentSelection, currentlyHasAutoselectedSchule]: SelectionChange, [oldSelection]: PreviousSelectionChange) => {
       // Case 1: Selection has changed - update parent directly
       if (!isSameSelection(currentSelection, oldSelection)) {
         handleSelectionUpdate(currentSelection);
         return;
       }
 
-      // Case 2: Props changed - update selection and store
-      if (!isSameSelection(currentInitialIds, oldInitialIds)) {
-        selectedSchulen.value = currentInitialIds;
-        handleSelectionUpdate(currentInitialIds);
-        return;
-      }
-
-      // Case 3: Empty selection - use autoselected or initial values
+      // Case 2: Empty selection - use autoselected or initial values
       if (isEmptySelection(currentSelection)) {
         const newIds: SelectedSchulenIds =
           currentlyHasAutoselectedSchule && autoselectedSchule.value
             ? unwrapSelectedSchulenIds([autoselectedSchule.value.id])
-            : currentInitialIds;
+            : [];
 
         if (!isSameSelection(selectedSchulen.value, newIds)) {
           selectedSchulen.value = newIds;
@@ -178,21 +178,18 @@
   );
 
   watch(
-    () => organisationStore.schulenFilter.filterResult,
-    () => {
-      // this is a special case, because we can't assume that the appropriate schule is in the store already
-      // this is redundant in all other cases
-      if (props.initialIds) mirrorSelectionToStore(selectedSchulen.value);
-    },
-  );
-
-  watch(
     schulenFilter,
     async (newFilter: OrganisationenFilter | undefined, oldFilter: OrganisationenFilter | undefined) => {
       if (timerId.value) clearTimeout(timerId.value);
 
-      // We skip if we have an autoselectedSchule
-      if (hasAutoselectedSchule.value) return;
+      // We skip if selection is disabled and we already know how to display the selection
+      // empty selection means we have to reload anyways
+      if (
+        !isEmptySelection(selectedSchulen.value) &&
+        isInputDisabled.value &&
+        canDisplaySelection(selectedSchulen.value)
+      )
+        return;
 
       // We apply the debounce of 500 only when there is an oldFilter (a change has been made)
       const delay: number = oldFilter ? 500 : 0;
@@ -212,7 +209,7 @@
     clearable
     data-testid="schule-select"
     density="compact"
-    :disabled="hasAutoselectedSchule || readonly"
+    :disabled="isInputDisabled"
     id="schule-select"
     ref="schule-select"
     :items="translatedSchulen"
