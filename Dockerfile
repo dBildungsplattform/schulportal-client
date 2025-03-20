@@ -22,8 +22,8 @@ RUN npm run build
 FROM $BASE_IMAGE as deployment
 
 # Fix Trivy Warnings
-# CVE-2025-24928
-RUN apk --no-cache add "libxml2>=2.12.7-r1"
+# CVE-2025-24928, CVE-2024-8176, CVE-2025-24855
+RUN apk --no-cache add "libexpat>=2.7.0-r0" "libxml2>=2.12.7-r1" "libxslt>=1.1.39-r2"
 
 COPY --from=build /app/dist/ /usr/share/nginx/html/
 
