@@ -25,7 +25,7 @@
   } from 'vue-router';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
-  import RolleForm from '@/components/form/RolleForm.vue';
+  import RolleForm from '@/components/admin/rollen/RolleForm.vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
   import { useForm, type FormContext, type TypedSchema } from 'vee-validate';
@@ -449,7 +449,7 @@
                   <v-btn
                     class="primary"
                     data-testid="rolle-changes-save"
-                    @Click="onSubmit"
+                    @click="onSubmit"
                     :block="mdAndDown"
                     :disabled="rolleStore.loading"
                   >

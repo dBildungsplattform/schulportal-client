@@ -649,7 +649,8 @@ export const DbiamOrganisationErrorI18nKeyEnum = {
     EmailAdressOnOrganisationTyp: 'EMAIL_ADRESS_ON_ORGANISATION_TYP',
     NewerVersionOrganisation: 'NEWER_VERSION_ORGANISATION',
     OrganisationWechseltTeilbaum: 'ORGANISATION_WECHSELT_TEILBAUM',
-    OrganisationZuweisungFehler: 'ORGANISATION_ZUWEISUNG_FEHLER'
+    OrganisationZuweisungFehler: 'ORGANISATION_ZUWEISUNG_FEHLER',
+    SchultraegerNameEindeutig: 'SCHULTRAEGER_NAME_EINDEUTIG'
 } as const;
 
 export type DbiamOrganisationErrorI18nKeyEnum = typeof DbiamOrganisationErrorI18nKeyEnum[keyof typeof DbiamOrganisationErrorI18nKeyEnum];
@@ -1402,6 +1403,12 @@ export interface OrganisationResponse {
      * @type {string}
      * @memberof OrganisationResponse
      */
+    'zugehoerigZu': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof OrganisationResponse
+     */
     'kennung': string | null;
     /**
      * 
@@ -1564,87 +1571,6 @@ export interface ParentOrganisationsByIdsBodyParams {
      */
     'organisationIds': Array<string>;
 }
-/**
- * 
- * @export
- * @interface Person
- */
-export interface Person {
-    /**
-     * 
-     * @type {string}
-     * @memberof Person
-     */
-    'id': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Person
-     */
-    'referrer': string | null;
-    /**
-     * 
-     * @type {string}
-     * @memberof Person
-     */
-    'mandant': string;
-    /**
-     * 
-     * @type {PersonNameResponse}
-     * @memberof Person
-     */
-    'name': PersonNameResponse;
-    /**
-     * 
-     * @type {PersonBirthResponse}
-     * @memberof Person
-     */
-    'geburt': PersonBirthResponse | null;
-    /**
-     * 
-     * @type {string}
-     * @memberof Person
-     */
-    'stammorganisation': string | null;
-    /**
-     * 
-     * @type {string}
-     * @memberof Person
-     */
-    'geschlecht': string | null;
-    /**
-     * 
-     * @type {string}
-     * @memberof Person
-     */
-    'lokalisierung': string | null;
-    /**
-     * 
-     * @type {Vertrauensstufe}
-     * @memberof Person
-     */
-    'vertrauensstufe': Vertrauensstufe;
-    /**
-     * 
-     * @type {string}
-     * @memberof Person
-     */
-    'revision': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Person
-     */
-    'personalnummer': string | null;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof Person
-     */
-    'dienststellen': Array<string> | null;
-}
-
-
 /**
  * 
  * @export
@@ -1819,10 +1745,10 @@ export interface PersonInfoResponse {
     'pid': string;
     /**
      * 
-     * @type {Person}
+     * @type {PersonNestedInPersonInfoResponse}
      * @memberof PersonInfoResponse
      */
-    'person': Person;
+    'person': PersonNestedInPersonInfoResponse;
     /**
      * 
      * @type {Array<PersonenkontextResponse>}
@@ -2026,6 +1952,87 @@ export interface PersonNameResponse {
      */
     'sortierindex': string | null;
 }
+/**
+ * 
+ * @export
+ * @interface PersonNestedInPersonInfoResponse
+ */
+export interface PersonNestedInPersonInfoResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonNestedInPersonInfoResponse
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonNestedInPersonInfoResponse
+     */
+    'referrer': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonNestedInPersonInfoResponse
+     */
+    'mandant': string;
+    /**
+     * 
+     * @type {PersonNameResponse}
+     * @memberof PersonNestedInPersonInfoResponse
+     */
+    'name': PersonNameResponse;
+    /**
+     * 
+     * @type {PersonBirthResponse}
+     * @memberof PersonNestedInPersonInfoResponse
+     */
+    'geburt': PersonBirthResponse | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonNestedInPersonInfoResponse
+     */
+    'stammorganisation': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonNestedInPersonInfoResponse
+     */
+    'geschlecht': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonNestedInPersonInfoResponse
+     */
+    'lokalisierung': string | null;
+    /**
+     * 
+     * @type {Vertrauensstufe}
+     * @memberof PersonNestedInPersonInfoResponse
+     */
+    'vertrauensstufe': Vertrauensstufe;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonNestedInPersonInfoResponse
+     */
+    'revision': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonNestedInPersonInfoResponse
+     */
+    'personalnummer': string | null;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof PersonNestedInPersonInfoResponse
+     */
+    'dienststellen': Array<string> | null;
+}
+
+
 /**
  * 
  * @export
@@ -6651,7 +6658,7 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
         /**
          * 
          * @param {string} organisationId The id of an organization
-         * @param {OrganisationByIdBodyParams} organisationByIdBodyParams 
+         * @param {OrganisationByIdBodyParams} organisationByIdBodyParams The ID of the child organisation that will be assigned to the parent organisation.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -6873,11 +6880,12 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
          * @param {Array<RollenSystemRecht>} [systemrechte] 
          * @param {Array<OrganisationsTyp>} [excludeTyp] 
          * @param {Array<string>} [administriertVon] 
+         * @param {Array<string>} [zugehoerigZu] Liefert die Kinderorganisation die den IDs hier zugehören.
          * @param {Array<string>} [organisationIds] Liefert Organisationen mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerFindOrganizations: async (offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, organisationIds?: Array<string>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        organisationControllerFindOrganizations: async (offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/organisationen`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -6932,6 +6940,10 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
 
             if (administriertVon) {
                 localVarQueryParameter['administriertVon'] = administriertVon;
+            }
+
+            if (zugehoerigZu) {
+                localVarQueryParameter['zugehoerigZu'] = zugehoerigZu;
             }
 
             if (organisationIds) {
@@ -7270,7 +7282,7 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @param {string} organisationId The id of an organization
-         * @param {OrganisationByIdBodyParams} organisationByIdBodyParams 
+         * @param {OrganisationByIdBodyParams} organisationByIdBodyParams The ID of the child organisation that will be assigned to the parent organisation.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -7330,12 +7342,13 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
          * @param {Array<RollenSystemRecht>} [systemrechte] 
          * @param {Array<OrganisationsTyp>} [excludeTyp] 
          * @param {Array<string>} [administriertVon] 
+         * @param {Array<string>} [zugehoerigZu] Liefert die Kinderorganisation die den IDs hier zugehören.
          * @param {Array<string>} [organisationIds] Liefert Organisationen mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, organisationIds?: Array<string>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OrganisationResponse>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, systemrechte, excludeTyp, administriertVon, organisationIds, options);
+        async organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OrganisationResponse>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, systemrechte, excludeTyp, administriertVon, zugehoerigZu, organisationIds, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -7424,7 +7437,7 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
         /**
          * 
          * @param {string} organisationId The id of an organization
-         * @param {OrganisationByIdBodyParams} organisationByIdBodyParams 
+         * @param {OrganisationByIdBodyParams} organisationByIdBodyParams The ID of the child organisation that will be assigned to the parent organisation.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -7479,12 +7492,13 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
          * @param {Array<RollenSystemRecht>} [systemrechte] 
          * @param {Array<OrganisationsTyp>} [excludeTyp] 
          * @param {Array<string>} [administriertVon] 
+         * @param {Array<string>} [zugehoerigZu] Liefert die Kinderorganisation die den IDs hier zugehören.
          * @param {Array<string>} [organisationIds] Liefert Organisationen mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, organisationIds?: Array<string>, options?: any): AxiosPromise<Array<OrganisationResponse>> {
-            return localVarFp.organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, systemrechte, excludeTyp, administriertVon, organisationIds, options).then((request) => request(axios, basePath));
+        organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, options?: any): AxiosPromise<Array<OrganisationResponse>> {
+            return localVarFp.organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, systemrechte, excludeTyp, administriertVon, zugehoerigZu, organisationIds, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -7564,7 +7578,7 @@ export interface OrganisationenApiInterface {
     /**
      * 
      * @param {string} organisationId The id of an organization
-     * @param {OrganisationByIdBodyParams} organisationByIdBodyParams 
+     * @param {OrganisationByIdBodyParams} organisationByIdBodyParams The ID of the child organisation that will be assigned to the parent organisation.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganisationenApiInterface
@@ -7619,12 +7633,13 @@ export interface OrganisationenApiInterface {
      * @param {Array<RollenSystemRecht>} [systemrechte] 
      * @param {Array<OrganisationsTyp>} [excludeTyp] 
      * @param {Array<string>} [administriertVon] 
+     * @param {Array<string>} [zugehoerigZu] Liefert die Kinderorganisation die den IDs hier zugehören.
      * @param {Array<string>} [organisationIds] Liefert Organisationen mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganisationenApiInterface
      */
-    organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, organisationIds?: Array<string>, options?: AxiosRequestConfig): AxiosPromise<Array<OrganisationResponse>>;
+    organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, options?: AxiosRequestConfig): AxiosPromise<Array<OrganisationResponse>>;
 
     /**
      * 
@@ -7704,7 +7719,7 @@ export class OrganisationenApi extends BaseAPI implements OrganisationenApiInter
     /**
      * 
      * @param {string} organisationId The id of an organization
-     * @param {OrganisationByIdBodyParams} organisationByIdBodyParams 
+     * @param {OrganisationByIdBodyParams} organisationByIdBodyParams The ID of the child organisation that will be assigned to the parent organisation.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganisationenApi
@@ -7769,13 +7784,14 @@ export class OrganisationenApi extends BaseAPI implements OrganisationenApiInter
      * @param {Array<RollenSystemRecht>} [systemrechte] 
      * @param {Array<OrganisationsTyp>} [excludeTyp] 
      * @param {Array<string>} [administriertVon] 
+     * @param {Array<string>} [zugehoerigZu] Liefert die Kinderorganisation die den IDs hier zugehören.
      * @param {Array<string>} [organisationIds] Liefert Organisationen mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganisationenApi
      */
-    public organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, organisationIds?: Array<string>, options?: AxiosRequestConfig) {
-        return OrganisationenApiFp(this.configuration).organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, systemrechte, excludeTyp, administriertVon, organisationIds, options).then((request) => request(this.axios, this.basePath));
+    public organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, options?: AxiosRequestConfig) {
+        return OrganisationenApiFp(this.configuration).organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, systemrechte, excludeTyp, administriertVon, zugehoerigZu, organisationIds, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { onMounted, ref, type Ref } from 'vue';
-  import ResultTable from '@/components/admin/ResultTable.vue';
+  import ResultTable, { type TableRow } from '@/components/admin/ResultTable.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
@@ -9,6 +9,7 @@
     useOrganisationStore,
     type Organisation,
     type OrganisationStore,
+    type SchultraegerTableItem,
   } from '@/stores/OrganisationStore';
   import { type SearchFilterStore, useSearchFilterStore } from '@/stores/SearchFilterStore';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
@@ -62,6 +63,10 @@
     router.go(0);
   };
 
+  function navigateToSchultraegerDetails(_$event: PointerEvent, { item }: { item: SchultraegerTableItem }): void {
+    router.push({ name: 'schultraeger-details', params: { id: item.id } });
+  }
+
   onMounted(async () => {
     await fetchSchultraeger();
     allSchultraeger.value = organisationStore.allSchultraeger;
@@ -114,8 +119,11 @@
           :items="organisationStore.allSchultraeger || []"
           :loading="organisationStore.loading"
           :headers="headers"
+          @onHandleRowClick="
+            (event: PointerEvent, item: TableRow<unknown>) =>
+              navigateToSchultraegerDetails(event, item as TableRow<SchultraegerTableItem>)
+          "
           item-value-path="id"
-          :disableRowClick="true"
           @onItemsPerPageUpdate="getPaginatedSchultraegerWithLimit"
           @onPageUpdate="getPaginatedSchultraeger"
           ref="result-table"
