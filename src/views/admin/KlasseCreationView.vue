@@ -3,12 +3,14 @@
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import KlasseForm from '@/components/form/KlasseForm.vue';
+  import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
   import {
     OrganisationsTyp,
     useOrganisationStore,
     type Organisation,
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
+  import { RollenSystemRecht } from '@/stores/RolleStore';
   import { getDisplayNameForOrg } from '@/utils/formatting';
   import { type ValidationSchema } from '@/utils/validationKlasse';
   import { computed, onMounted, onUnmounted, ref, useTemplateRef, type ComputedRef, type Ref } from 'vue';
@@ -25,11 +27,16 @@
   // eslint-disable-next-line @typescript-eslint/typedef
   const formRef = useTemplateRef('klasse-creation-form');
 
+  const { autoselectedSchule }: ReturnType<typeof useAutoselectedSchule> = useAutoselectedSchule([
+    RollenSystemRecht.KlassenVerwalten,
+  ]);
+
   const translatedSchulname: ComputedRef<string> = computed(() => {
     const schule: Organisation | undefined = organisationStore.schulenFilter.filterResult.find(
       (s: Organisation) => s.id === organisationStore.createdKlasse?.administriertVon,
     );
     if (schule) return getDisplayNameForOrg(schule);
+    if (autoselectedSchule.value) return getDisplayNameForOrg(autoselectedSchule.value);
     return '';
   });
 
