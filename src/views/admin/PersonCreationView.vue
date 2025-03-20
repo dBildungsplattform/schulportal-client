@@ -337,6 +337,9 @@
     // Format the date in ISO 8601 format if it exists
     const formattedBefristung: string | undefined = befristungDate ? formatDateToISO(befristungDate) : undefined;
 
+    // This is used to cache the filtered Rollen to use for isLernRolle and isKopersRolle in the success template
+    filteredRollenCache.value = filteredRollen.value;
+
     const bodyParams: CreatePersonBodyParams = {
       familienname: selectedFamilienname.value as string,
       vorname: selectedVorname.value as string,
@@ -351,8 +354,13 @@
             }) as DbiamCreatePersonenkontextBodyParams,
         ) || [],
     };
-
-    if (selectedKlasse.value && selectedRollen.value && selectedRollen.value.length > 0) {
+    // Klasse is only allowed if the selectedRolle is of type LERN.
+    if (
+      selectedKlasse.value &&
+      selectedRollen.value &&
+      selectedRollen.value.length > 0 &&
+      isLernRolle(selectedRollen.value)
+    ) {
       selectedKlasseCache.value = JSON.parse(JSON.stringify(selectedKlasse.value));
       for (const rolleId of selectedRollen.value)
         bodyParams.createPersonenkontexte.push({
@@ -367,7 +375,6 @@
     await personenkontextStore.createPersonWithKontexte(bodyParams);
     formContext.resetForm();
     hasNoKopersNr.value = false;
-    filteredRollenCache.value = filteredRollen.value;
     filteredRollen.value = [];
   }
 

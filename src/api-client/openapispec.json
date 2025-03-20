@@ -2405,6 +2405,66 @@
         },
         "tags": ["config"]
       }
+    },
+    "/api/portal/meldung": {
+      "get": {
+        "operationId": "MeldungController_getAllMeldungen",
+        "summary": "",
+        "description": "Get all meldungen.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The meldungen were successfully returned.",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/MeldungResponse" } }
+              }
+            }
+          },
+          "401": { "description": "Not authorized to get available meldungen." },
+          "403": { "description": "Insufficient permissions to get meldungen." },
+          "500": { "description": "Internal server error while getting all meldungen." }
+        },
+        "tags": ["meldung"],
+        "security": [{ "bearer": [] }, { "oauth2": ["openid"] }]
+      },
+      "put": {
+        "operationId": "MeldungController_createOrUpdateMeldung",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/CreateOrUpdateMeldungBodyParams" } }
+          }
+        },
+        "responses": {
+          "200": { "description": "The meldung was successfully edited." },
+          "401": { "description": "Not authorized to modify the meldung." },
+          "403": { "description": "Not permitted to modify the meldung." },
+          "500": { "description": "Internal server error while modifying the meldung." }
+        },
+        "tags": ["meldung"],
+        "security": [{ "bearer": [] }, { "oauth2": ["openid"] }]
+      }
+    },
+    "/api/portal/meldung/current": {
+      "get": {
+        "operationId": "MeldungController_getCurrentMeldung",
+        "summary": "",
+        "description": "Get current veroeffentlicht meldung.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The meldung was successfully returned.",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/MeldungResponse" } } }
+          },
+          "401": { "description": "Not authorized to get current veroeffentlicht meldunge." },
+          "403": { "description": "Insufficient permissions to get meldungen." },
+          "500": { "description": "Internal server error while getting current veroeffentlicht meldung." }
+        },
+        "tags": ["meldung"],
+        "security": [{ "bearer": [] }, { "oauth2": ["openid"] }]
+      }
     }
   },
   "info": {
@@ -2924,7 +2984,7 @@
         },
         "required": ["datum", "geburtsort"]
       },
-      "Person": {
+      "PersonNestedInPersonInfoResponse": {
         "type": "object",
         "properties": {
           "id": { "type": "string" },
@@ -2959,7 +3019,7 @@
         "type": "object",
         "properties": {
           "pid": { "type": "string" },
-          "person": { "$ref": "#/components/schemas/Person" },
+          "person": { "$ref": "#/components/schemas/PersonNestedInPersonInfoResponse" },
           "personenkontexte": { "type": "array", "items": { "$ref": "#/components/schemas/PersonenkontextResponse" } },
           "gruppen": { "type": "array", "items": { "type": "string" } },
           "email": {
@@ -3073,7 +3133,9 @@
           "PERSONEN_ANLEGEN",
           "IMPORT_DURCHFUEHREN",
           "PERSONEN_LESEN",
-          "BULK_VERWALTEN"
+          "BULK_VERWALTEN",
+          "SCHULPORTAL_VERWALTEN",
+          "HINWEISE_BEARBEITEN"
         ]
       },
       "OrganisationByIdBodyParams": {
@@ -3725,6 +3787,28 @@
           "befristungBearbeitenEnabled": { "type": "boolean" }
         },
         "required": ["rolleBearbeitenEnabled", "befristungBearbeitenEnabled"]
+      },
+      "MeldungResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "createdAt": { "format": "date-time", "type": "string" },
+          "updatedAt": { "format": "date-time", "type": "string" },
+          "inhalt": { "type": "string" },
+          "status": { "type": "string", "enum": ["VEROEFFENTLICHT", "NICHT_VEROEFFENTLICHT"] },
+          "revision": { "type": "number" }
+        },
+        "required": ["id", "createdAt", "updatedAt", "inhalt", "status", "revision"]
+      },
+      "CreateOrUpdateMeldungBodyParams": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "inhalt": { "type": "string" },
+          "status": { "type": "string", "enum": ["VEROEFFENTLICHT", "NICHT_VEROEFFENTLICHT"] },
+          "revision": { "type": "number" }
+        },
+        "required": ["inhalt", "status", "revision"]
       }
     }
   }

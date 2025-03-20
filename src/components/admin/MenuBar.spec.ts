@@ -52,6 +52,8 @@ function setPermissions(hasPermission: boolean): void {
   authStore.hasSchultraegerverwaltungPermission = hasPermission;
   authStore.hasPersonenAnlegenPermission = hasPermission;
   authStore.hasSchultraegerverwaltungPermission = hasPermission;
+  authStore.hasPortalVerwaltungPermission = hasPermission;
+  authStore.hasHinweiseBearbeitenPermission = hasPermission;
 }
 
 beforeEach(async () => {
@@ -98,6 +100,9 @@ describe('MenuBar', () => {
       expect(wrapper?.find('[data-testid="schultraeger-creation-menu-item"]').exists()).toBe(hasPermission);
 
       expect(wrapper?.find('[data-testid="schultraeger-management-title"]').exists()).toBe(hasPermission);
+
+      expect(wrapper?.find('[data-testid="portal-management-title"]').exists()).toBe(hasPermission);
+      expect(wrapper?.find('[data-testid="hinweise-edit-menu-item"]').exists()).toBe(hasPermission);
     },
   );
 

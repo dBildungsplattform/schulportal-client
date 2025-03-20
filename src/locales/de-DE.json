@@ -388,7 +388,9 @@
           "SCHULTRAEGER_VERWALTEN": "Darf Schulträger verwalten",
           "PERSON_SYNCHRONISIEREN": "Darf Benutzer synchronisieren",
           "PERSONEN_ANLEGEN": "Darf Benutzer anlegen",
-          "BULK_VERWALTEN": "Darf Mehrfachbearbeitung ausführen"
+          "BULK_VERWALTEN": "Darf Mehrfachbearbeitung ausführen",
+          "SCHULPORTAL_VERWALTEN": "Darf Portal verwalten",
+          "HINWEISE_BEARBEITEN": "Darf Hinweise bearbeiten"
         },
         "rollenarten": {
           "LERN": "Lern",
@@ -495,6 +497,7 @@
       "selectSchule": "Schule auswählen",
       "selectSchuleFirst": "Bitte erst eine Schule auswählen.",
       "schule": "Schule",
+      "schulen": "Schulen",
       "schulenFound": "{count} Schule gefunden | {count} Schulen gefunden",
       "schulenSelected": "{count} Schulen ausgewählt",
       "schulname": "Schulname",
@@ -507,6 +510,7 @@
     "schultraeger": {
       "addNew": "Neuen Schulträger hinzufügen",
       "assignSchultraegerform": "Schulträgerform zuordnen",
+      "assignedSchulen": "Zugeordnete Schulen",
       "create": "Schulträger anlegen",
       "createAnother": "Weiteren Schulträger anlegen",
       "createNew": "Neuen Schulträger anlegen",
@@ -530,6 +534,7 @@
       "schultraegerCreateErrorTitle": "Fehler beim Anlegen des Schulträgers",
       "schultraegerform": "Schulträgerform",
       "schultraegername": "Schulträgername",
+      "showAll": "Alle Schulträger anzeigen",
       "title": {
         "ORGANISATION_SPECIFICATION_ERROR": "Fehler bei Anlage des Schulträgers",
         "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Zwei-Faktor-Authentifizierung (2FA) erforderlich"
@@ -541,7 +546,29 @@
       "selectServiceProvider": "Angebote auswählen",
       "serviceProvider": "Angebote"
     },
-    "status": "Status"
+    "status": "Status",
+    "portal": {
+      "management": "Portalverwaltung",
+      "editHinweise": "Hinweise bearbeiten"
+    },
+    "hinweise": {
+      "hinweiseTexte": "Hinweistexte",
+      "newsbox": "Newsbox",
+      "publish": "Veröffentlichen",
+      "publishEnd": "Veröffentlichung beenden",
+      "title": {
+        "UNSPECIFIED_ERROR": "Fehler beim Speichern der Hinweise",
+        "MISMATCHED_REVISION": "Geänderte Daten"
+      },
+      "errors": {
+        "UNSPECIFIED_ERROR": "Es ist ein Fehler aufgetreten.",
+        "MISMATCHED_REVISION": "Die Hinweise wurden zwischenzeitlich von einer anderen Administratorin oder einem anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut."
+      },
+      "rules": {
+        "max": "Der Text darf maximal 2000 Zeichen lang sein.",
+        "min": "Der Text muss mindestens 1 Zeichen lang sein."
+      }
+    }
   },
   "cancel": "Abbrechen",
   "proceed": "Weiter",

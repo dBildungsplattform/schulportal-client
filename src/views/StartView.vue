@@ -19,6 +19,7 @@
   import type { DBiamPersonenzuordnungResponse, PersonTimeLimitInfoResponse } from '@/api-client/generated';
   import { RollenMerkmal } from '@/stores/RolleStore';
   import { adjustDateForTimezoneAndFormat } from '@/utils/date';
+  import { useMeldungStore, type Meldung, type MeldungStore } from '@/stores/MeldungStore';
 
   const { t }: { t: Function } = useI18n();
 
@@ -34,6 +35,7 @@
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
   const twoFactorAuthentificationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
   const authStore: AuthStore = useAuthStore();
+  const meldungStore: MeldungStore = useMeldungStore();
 
   function filterSortProviders(providers: ServiceProvider[], kategorie: ServiceProviderKategorie): ServiceProvider[] {
     return providers
@@ -119,10 +121,12 @@
     await authStore.initializeAuthStatus();
     await personInfoStore.initPersonInfo();
     await personStore.getPersonenuebersichtById(personInfoStore.personInfo?.person.id ?? '');
+    await meldungStore.getCurrentMeldung();
   }
 
   const closedAlerts: Ref<Set<string>> = ref(new Set());
   let alerts: Ref<Alert[]> = ref([]);
+  let hinweise: Ref<Meldung[]> = ref([]);
 
   onMounted(async () => {
     await authStore.initializeAuthStatus();
@@ -150,6 +154,10 @@
         }
       });
     }
+
+    hinweise.value = [meldungStore.currentMeldung].filter(
+      (meldung: Meldung | null): meldung is Meldung => meldung !== null,
+    );
   });
 
   const dismissBannerForSession = (id: string): void => {
@@ -175,18 +183,52 @@
       </v-col>
     </v-row>
 
-    <v-row class="flex-nowrap mb-1 mt-1 justify-center">
+    <v-row class="flex-nowrap mb-1 justify-center">
       <v-col cols="12">
+        <!-- Banner for hinweise -->
+        <SpshBanner
+          v-bind:key="hinweis.id"
+          v-for="hinweis in hinweise"
+          id="hinweis"
+          ref="hinweis-banner"
+          type="background-grey"
+          :visible="true"
+          :dismissable="false"
+        >
+          <template v-slot:text>
+            <span class="text-body">
+              <v-textarea
+                v-model="hinweis.text"
+                variant="plain"
+                :hide-details="true"
+                readonly
+                auto-grow
+                rows="1"
+              />
+            </span>
+          </template>
+        </SpshBanner>
+
+        <!-- Banner for alerts -->
         <SpshBanner
           v-bind:key="alert.id"
           v-for="alert in alerts"
           :id="alert.id.toString()"
           ref="spsh-banner"
-          :text="alert.message"
           :type="alert.type"
           :visible="alert.visible"
+          :dismissable="true"
           @dismissBanner="dismissBannerForSession"
-        ></SpshBanner>
+        >
+          <template v-slot:text>
+            <span class="text-body bold">{{ $t('banner.hint') }} </span>
+            <span
+              class="text-body"
+              data-testid="alert-text"
+              >{{ alert.message }}</span
+            >
+          </template>
+        </SpshBanner>
       </v-col>
     </v-row>
 

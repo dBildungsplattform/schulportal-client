@@ -20,9 +20,8 @@ import {
   type TwoFactorAuthentificationStore,
 } from '@/stores/TwoFactorAuthentificationStore';
 import { DoFactory } from '@/testing/DoFactory';
-import { adjustDateForTimezoneAndFormat, getNextSchuljahresende } from '@/utils/date';
+import { adjustDateForTimezoneAndFormat } from '@/utils/date';
 import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
-import * as _ from 'lodash-es';
 import { expect, test, type MockInstance } from 'vitest';
 import { nextTick, type ComputedRef, type DefineComponent } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
@@ -1021,6 +1020,20 @@ describe('PersonDetailsView', () => {
       expect(wrapper?.find('[data-testid="befristung-change-button"]').attributes('disabled')).toBeDefined();
     });
 
+    function getNextSchuljahresende(): string {
+      const today: Date = new Date();
+      const currentYear: number = today.getFullYear();
+      const july31stThisYear: Date = new Date(currentYear, 6, 31);
+
+      // If today's date is after July 31st this year, return July 31st of next year
+      if (today > july31stThisYear) {
+        return `${currentYear + 1}-07-31T15:07:37.000Z`;
+      }
+
+      // Otherwise, return July 31st of this year
+      return `${currentYear}-07-31T15:07:37.000Z`;
+    }
+
     test.each([
       ['2099-08-12T13:03:53.802Z', undefined],
       [undefined, 'unbefristet'],
@@ -1028,7 +1041,7 @@ describe('PersonDetailsView', () => {
     ])(
       'renders form to change befristung with %s %s and triggers submit',
       async (existingBefristung: string | undefined, existingBefristungOption: string | undefined) => {
-        personStore.personenuebersicht = _.cloneDeep(mockPersonenuebersicht);
+        personStore.personenuebersicht = mockPersonenuebersichtLehr;
         if (personStore.personenuebersicht.zuordnungen[0]) {
           if (existingBefristung) {
             personStore.personenuebersicht.zuordnungen[0].befristung = existingBefristung;
@@ -1053,6 +1066,24 @@ describe('PersonDetailsView', () => {
         const befristungInput: VueWrapper | undefined = wrapper
           ?.findComponent({ ref: 'befristung-input-wrapper' })
           .findComponent({ ref: 'befristung-input' });
+        const schuljahresendeRadioButton: DOMWrapper<HTMLInputElement> | undefined = wrapper?.find(
+          '[data-testid="schuljahresende-radio-button"] input[type="radio"]',
+        );
+        const unbefristetRadioButton: DOMWrapper<HTMLInputElement> | undefined = wrapper?.find(
+          '[data-testid="unbefristet-radio-button"] input[type="radio"]',
+        );
+
+        if (existingBefristungOption === 'schuljahresende') {
+          expect(schuljahresendeRadioButton?.attributes('checked')).toBeDefined();
+          expect(unbefristetRadioButton?.attributes('checked')).toBeUndefined();
+        } else if (existingBefristungOption === 'unbefristet') {
+          expect(schuljahresendeRadioButton?.attributes('checked')).toBeUndefined();
+          expect(unbefristetRadioButton?.attributes('checked')).toBeDefined();
+        } else {
+          expect(schuljahresendeRadioButton?.attributes('checked')).toBeUndefined();
+          expect(unbefristetRadioButton?.attributes('checked')).toBeUndefined();
+        }
+
         await befristungInput?.setValue('13.08.2099');
         await nextTick();
 

@@ -88,14 +88,13 @@
     )?.name;
     if (selectedSchultraegername.value) {
       await organisationStore.createOrganisation(
+        selectedSchultraegerform.value,
+        selectedSchultraegerform.value,
         undefined,
         selectedSchultraegername.value,
         undefined,
         undefined,
         OrganisationsTyp.Traeger,
-        selectedSchultraegerform.value,
-        selectedSchultraegerform.value,
-        undefined,
       );
       resetForm({
         values: {
@@ -117,9 +116,11 @@
     organisationStore.errorCode = '';
   }
 
-  // TODO: add a router.push to the Management when it's available
   async function navigateToSchultraegerManagement(): Promise<void> {
     organisationStore.createdSchule = null;
+    await router.push({ name: 'schultraeger-management' }).then(() => {
+      router.go(0);
+    });
   }
 
   async function navigateBackToSchultraegerForm(): Promise<void> {

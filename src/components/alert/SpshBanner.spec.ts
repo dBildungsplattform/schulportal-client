@@ -18,6 +18,7 @@ beforeEach(() => {
       visible: true,
       text: 'This is the text of the alert',
       type: 'errorLight',
+      dismissable: true,
     },
 
     global: {

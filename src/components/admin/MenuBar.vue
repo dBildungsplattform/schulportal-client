@@ -233,11 +233,36 @@
       ></v-list-item>
       <v-list-item
         class="menu-bar-sub-item caption"
+        @click="handleMenuItemClick('/admin/schultraeger')"
+        data-testid="schultraeger-management-menu-item"
+        prepend-icon="mdi-format-list-bulleted"
+        :title="$t('admin.schultraeger.showAll')"
+        to="/admin/schultraeger"
+      ></v-list-item>
+      <v-list-item
+        class="menu-bar-sub-item caption"
         @click="closeMenuOnMobile"
         data-testid="schultraeger-creation-menu-item"
         prepend-icon="mdi-plus-circle-outline"
         :title="$t('admin.schultraeger.createNew')"
         to="/admin/schultraeger/new"
+      ></v-list-item>
+    </div>
+    <!-- Portalverwaltung -->
+    <div v-if="authStore.hasPortalVerwaltungPermission && authStore.hasHinweiseBearbeitenPermission">
+      <v-list-item
+        class="menu-bar-main-item headline-2"
+        data-testid="portal-management-title"
+        :title="$t('admin.portal.management')"
+      ></v-list-item>
+      <v-list-item
+        v-if="authStore.hasHinweiseBearbeitenPermission"
+        class="menu-bar-sub-item caption"
+        @click="closeMenuOnMobile"
+        data-testid="hinweise-edit-menu-item"
+        prepend-icon="mdi-pencil"
+        :title="$t('admin.portal.editHinweise')"
+        to="/admin/hinweise/new"
       ></v-list-item>
     </div>
   </v-navigation-drawer>

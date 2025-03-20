@@ -107,13 +107,13 @@
     )?.name;
     if (selectedDienststellennummer.value && selectedSchulname.value) {
       await organisationStore.createOrganisation(
+        selectedSchulform.value,
+        selectedSchulform.value,
         selectedDienststellennummer.value,
         selectedSchulname.value,
         undefined,
         undefined,
         OrganisationsTyp.Schule,
-        selectedSchulform.value,
-        selectedSchulform.value,
       );
       resetForm({
         values: {

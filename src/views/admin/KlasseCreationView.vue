@@ -105,13 +105,13 @@
 
   const onSubmit = async ({ selectedSchule, selectedKlassenname }: ValidationSchema): Promise<void> => {
     await organisationStore.createOrganisation(
+      selectedSchule,
+      selectedSchule,
       undefined,
       selectedKlassenname,
       undefined,
       undefined,
       OrganisationsTyp.Klasse,
-      selectedSchule,
-      selectedSchule,
     );
   };
 

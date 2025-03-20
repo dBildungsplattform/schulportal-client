@@ -144,6 +144,17 @@ const routes: readonly RouteRecordRaw[] = [
     },
   },
   {
+    path: '/admin/schultraeger',
+    name: 'schultraeger-management',
+    component: () => import('../views/admin/SchultraegerManagementView.vue'),
+    meta: {
+      layout: 'AdminLayout',
+      requiresAuth: true,
+      requiredStepUpLevel: StepUpLevel.GOLD,
+      requiresPermission: 'schultraegerverwaltung',
+    },
+  },
+  {
     path: '/admin/schultraeger/new',
     name: 'create-schultraeger',
     component: () => import('../views/admin/SchultraegerCreationView.vue'),
@@ -152,6 +163,17 @@ const routes: readonly RouteRecordRaw[] = [
       requiresAuth: true,
       requiredStepUpLevel: StepUpLevel.GOLD,
       requiresPermission: 'schultraegerverwaltung',
+    },
+  },
+  {
+    path: '/admin/hinweise/new',
+    name: 'hinweise-creation',
+    component: () => import('../views/admin/HinweiseCreationView.vue'),
+    meta: {
+      layout: 'AdminLayout',
+      requiresAuth: true,
+      requiredStepUpLevel: StepUpLevel.GOLD,
+      requiresPermission: ['portalverwaltung', 'hinweisebearbeiten'],
     },
   },
   {
