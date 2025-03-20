@@ -11,6 +11,7 @@ import routes from '@/router/routes';
 import { nextTick } from 'vue';
 import {
   OrganisationsTyp,
+  SchuleType,
   useOrganisationStore,
   type Organisation,
   type OrganisationStore,
@@ -256,14 +257,16 @@ describe('SchultraegerDetailsView', () => {
     expect(push).toHaveBeenCalledTimes(1);
   });
 
-  test('it calls addAssignableSchule when an unassigned item is clicked', async () => {
+  test('it calls addAssignableSchule when an unassigned item is clicked and then searches for it', async () => {
     interface SchultraegerDetailsView {
       assignableSchulen: string[];
+      unassignedSchulen: Organisation[];
     }
 
     const unassignedItem: Organisation = organisationStore.schulenWithoutTraeger[0]!;
 
     const assignableSchulen: string[] = (wrapper?.vm as unknown as SchultraegerDetailsView).assignableSchulen;
+    const unassignedSchulen: Organisation[] = (wrapper?.vm as unknown as SchultraegerDetailsView).unassignedSchulen;
 
     // Simulate the event being triggered on RelationshipAssign
     await wrapper
@@ -272,6 +275,15 @@ describe('SchultraegerDetailsView', () => {
     await nextTick();
 
     expect(assignableSchulen.some((schule: string) => schule === unassignedItem.id)).toBeTruthy();
+
+    // Now simulate a search for  the already assigned Schule.
+    await wrapper
+      ?.findComponent({ name: 'RelationshipAssign' })
+      .vm.$emit('onHandleUnassignedItemsSearchFilter', 'Öffentliche Schule A', SchuleType.UNASSIGNED);
+    await nextTick();
+
+    // The unassignedSchulen should be empty because the Schule was already assigned
+    expect(unassignedSchulen).toEqual([]);
 
   });
 
