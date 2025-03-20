@@ -9,7 +9,12 @@ import {
 } from 'vue-router';
 import routes from '@/router/routes';
 import { nextTick } from 'vue';
-import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+import {
+  OrganisationsTyp,
+  useOrganisationStore,
+  type Organisation,
+  type OrganisationStore,
+} from '@/stores/OrganisationStore';
 import SchultraegerDetailsView from './SchultraegerDetailsView.vue';
 import type Module from 'module';
 
@@ -244,6 +249,25 @@ describe('SchultraegerDetailsView', () => {
     await nextTick();
 
     expect(push).toHaveBeenCalledTimes(1);
+  });
+
+  test('it calls addAssignableSchule when an unassigned item is clicked', async () => {
+    interface SchultraegerDetailsView {
+      assignableSchulen: string[];
+    }
+
+    const unassignedItem: Organisation = organisationStore.schulenWithoutTraeger[0]!;
+
+    const assignableSchulen: string[] = (wrapper?.vm as unknown as SchultraegerDetailsView).assignableSchulen;
+
+    // Simulate the event being triggered on RelationshipAssign
+    await wrapper
+      ?.findComponent({ name: 'RelationshipAssign' })
+      .vm.$emit('onHandleUnassignedItemClick', unassignedItem);
+    await nextTick();
+
+    expect(assignableSchulen.some((schule: string) => schule === unassignedItem.id)).toBeTruthy();
+
   });
 
   describe('navigation interception', () => {
