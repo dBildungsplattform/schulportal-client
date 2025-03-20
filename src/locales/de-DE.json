@@ -529,6 +529,7 @@
       },
       "management": "Schulträgerverwaltung",
       "noSchulenFound": "Keine Schulen gefunden",
+      "noSchulenAssigned": "Keine Schulen zugeordnet",
       "rules": {
         "schultraegername": {
           "matches": "Der Schulträgername darf keine ungültigen Zeichen beinhalten.",

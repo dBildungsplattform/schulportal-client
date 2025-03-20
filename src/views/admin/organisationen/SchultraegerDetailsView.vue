@@ -158,7 +158,7 @@
     if (type === SchuleType.ASSIGNED) {
       assignedSchulen.value = organisationStore.schulenFromTraeger;
       noAssignedSchulenFoundText.value =
-        assignedSchulen.value.length === 0 ? t('admin.schultraeger.noSchulenFound') : '';
+        assignedSchulen.value.length === 0 ? t('admin.schultraeger.noSchulenAssigned') : '';
     } else {
       const currentOrganisationParentId: string | null | undefined = organisationStore.currentOrganisation.zugehoerigZu;
 

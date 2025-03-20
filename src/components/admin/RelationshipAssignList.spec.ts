@@ -84,16 +84,16 @@ describe('RelationshipAssignList', () => {
   test('it does not move focus when the last chip is selected and Enter is pressed', async () => {
     const listItems: DOMWrapper<Element>[] | undefined = wrapper?.findAll('[data-testid^="assign-list-item-"]');
     expect(listItems).toHaveLength(mockItems.length);
-  
+
     if (listItems) {
       const lastItem: HTMLElement = listItems[listItems.length - 1]?.element as HTMLElement;
-  
+
       // Spy on focus method to check if it's called
       const focusSpy: MockInstance = vi.spyOn(lastItem, 'focus');
-  
+
       // Trigger Enter key event on the last item
       await listItems[listItems.length - 1]?.trigger('keydown', { key: 'Enter' });
-  
+
       // Ensure focus was NOT called (because it's the last item)
       expect(focusSpy).not.toHaveBeenCalled();
     }

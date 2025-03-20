@@ -584,6 +584,7 @@ export const useOrganisationStore: StoreDefinition<
       }
     },
 
+    // This method will search for both assigned or unassigned Schulen depending on the parameter "type" which could be either 'assigned' or 'unassigned'.
     async fetchSchulen(filter: OrganisationenFilter, type: SchuleType): Promise<void> {
       this.errorCode = '';
       this.loading = true;

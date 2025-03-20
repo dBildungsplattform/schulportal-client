@@ -64,6 +64,7 @@
             v-for="(item, index) in items"
             @click="handleItemClick(item)"
             @keydown.enter.prevent="focusNextChip(index)"
+            @keydown.space.prevent="focusNextChip(index)"
             :key="item.id"
             :data-testid="`assign-list-item-${item.id}`"
             tabindex="0"
