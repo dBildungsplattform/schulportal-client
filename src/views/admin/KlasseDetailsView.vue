@@ -235,52 +235,50 @@
                 @update:modelValue="handleAlertClose"
               />
             </KlasseForm>
-            <v-divider
-              v-if="isEditActive && !organisationStore.errorCode"
-              class="border-opacity-100 rounded"
-              color="#E5EAEF"
-              thickness="5px"
-            ></v-divider>
-            <div
-              v-if="!isEditActive && !organisationStore.errorCode"
-              class="d-flex justify-sm-end"
-            >
-              <v-row class="pt-3 px-2 justify-end">
-                <v-col
-                  cols="12"
-                  md="auto"
-                  sm="6"
-                >
-                  <div class="d-flex justify-sm-end">
-                    <KlasseDelete
-                      :errorCode="organisationStore.errorCode"
-                      :klassenname="organisationStore.currentKlasse?.name || ''"
-                      :klassenId="organisationStore.currentKlasse?.id || ''"
-                      ref="klasse-delete"
-                      :schulname="organisationStore.currentOrganisation.name || ''"
-                      :isLoading="organisationStore.loading"
-                      :useIconActivator="false"
-                      @onDeleteKlasse="deleteKlasseById(currentKlasseId)"
-                    >
-                    </KlasseDelete>
-                  </div>
-                </v-col>
-                <v-col
-                  cols="12"
-                  sm="6"
-                  md="auto"
-                >
-                  <v-btn
-                    class="primary ml-lg-8"
-                    data-testid="klasse-edit-button"
-                    @click="activateEditing"
-                    :block="mdAndDown"
+            <template v-if="!isEditActive && !organisationStore.errorCode">
+              <v-divider
+                class="border-opacity-100 rounded"
+                color="#E5EAEF"
+                thickness="5px"
+              ></v-divider>
+              <div class="d-flex justify-sm-end">
+                <v-row class="pt-3 px-2 justify-end">
+                  <v-col
+                    cols="12"
+                    md="auto"
+                    sm="6"
                   >
-                    {{ $t('edit') }}
-                  </v-btn>
-                </v-col>
-              </v-row>
-            </div>
+                    <div class="d-flex justify-sm-end">
+                      <KlasseDelete
+                        :errorCode="organisationStore.errorCode"
+                        :klassenname="organisationStore.currentKlasse?.name || ''"
+                        :klassenId="organisationStore.currentKlasse?.id || ''"
+                        ref="klasse-delete"
+                        :schulname="organisationStore.currentOrganisation.name || ''"
+                        :isLoading="organisationStore.loading"
+                        :useIconActivator="false"
+                        @onDeleteKlasse="deleteKlasseById(currentKlasseId)"
+                      >
+                      </KlasseDelete>
+                    </div>
+                  </v-col>
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="auto"
+                  >
+                    <v-btn
+                      class="primary ml-lg-8"
+                      data-testid="klasse-edit-button"
+                      @click="activateEditing"
+                      :block="mdAndDown"
+                    >
+                      {{ $t('edit') }}
+                    </v-btn>
+                  </v-col>
+                </v-row>
+              </div>
+            </template>
           </div>
           <div v-else-if="organisationStore.loading">
             <v-progress-circular indeterminate></v-progress-circular>
