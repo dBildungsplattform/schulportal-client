@@ -308,7 +308,6 @@
       organisationStore.allKlassen = organisationStore.klassen;
     } else {
       selectedSchule.value = undefined;
-      // schulenFilterRef.value?.clearInput();
       // Reset klassenOptions
       klassenOptions.value = [];
       // Refetch all data
@@ -359,50 +358,6 @@
     await fetchKlassenBySelectedSchuleId(id);
     totalKlassen = organisationStore.allKlassen.length;
   }
-
-  // watch(
-  //   () => organisationStore.schulenFilter.selectedItems,
-  //   async (newSelection: Array<Organisation>, oldSelection: Array<Organisation>) => {
-  //     if (oldSelection.length > 0 && newSelection.length === 0) {
-  //       await resetSearchAndFilter();
-  //       return;
-  //     }
-  //     if (
-  //       newSelection.length === oldSelection.length &&
-  //       sameContent(newSelection, oldSelection, (o: Organisation) => o.id)
-  //     ) {
-  //       return;
-  //     }
-
-  //     const newSchuleId: string | null = newSelection.length === 1 ? newSelection[0]!.id : null;
-  //     await searchFilterStore.setSchuleFilterForKlassen(newSchuleId);
-  //     if (newSchuleId) {
-  //       selectedKlassen.value = [];
-  //       organisationStore.allKlassen = [];
-  //       await fetchKlassenBySelectedSchuleId(newSchuleId);
-  //     } else {
-  //       // Reset selectedKlassen and klassenOptions when Schule is unselected
-  //       selectedKlassen.value = [];
-  //       klassenOptions.value = [];
-  //       organisationStore.allKlassen = [];
-  //       searchFilterStore.selectedKlassenForKlassen = [];
-  //       totalKlassen = 0;
-
-  //       // Fetch all Klassen when no Schule is selected
-  //       await organisationStore.getAllOrganisationen({
-  //         offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
-  //         limit: 25,
-  //         includeTyp: OrganisationsTyp.Klasse,
-  //         systemrechte: ['KLASSEN_VERWALTEN'],
-  //       });
-  //       klassenOptions.value = organisationStore.allKlassen.map((org: Organisation) => ({
-  //         value: org.id,
-  //         title: org.name,
-  //       }));
-  //     }
-  //     totalKlassen = organisationStore.allKlassen.length;
-  //   },
-  // );
 
   function navigateToKlassenDetails(_$event: PointerEvent, { item }: { item: Organisation }): void {
     router.push({ name: 'klasse-details', params: { id: item.id } });
