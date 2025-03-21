@@ -149,6 +149,7 @@
           :selectedSchulen="selectedSchule"
           :multiple="false"
           :readonly="props.editMode"
+          :highlightSelection="props.editMode"
           :systemrechteForSearch="[RollenSystemRecht.KlassenVerwalten]"
           :selectedSchuleProps="selectedSchuleProps"
           @update:selectedSchulen="updateSchuleSelection"
