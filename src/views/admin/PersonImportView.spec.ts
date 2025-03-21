@@ -1,7 +1,7 @@
 import { ImportDataItemStatus, type ImportUploadResponse } from '@/api-client/generated';
 import routes from '@/router/routes';
 import { useImportStore, type ImportStore } from '@/stores/ImportStore';
-import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
 import {
   RollenMerkmal,
   RollenSystemRecht,
@@ -9,7 +9,10 @@ import {
   type RolleStore,
   type RolleWithServiceProvidersResponse,
 } from '@/stores/RolleStore';
+import { DoFactory } from '@/testing/DoFactory';
+import { getDisplayNameForOrg } from '@/utils/formatting';
 import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
+import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
 import { expect, test, type Mock, type MockInstance } from 'vitest';
 import { nextTick } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
@@ -22,26 +25,8 @@ const importStore: ImportStore = useImportStore();
 const organisationStore: OrganisationStore = useOrganisationStore();
 const rolleStore: RolleStore = useRolleStore();
 
-organisationStore.allSchulen = [
-  {
-    id: '1133',
-    name: 'Schule',
-    kennung: '9356494',
-    namensergaenzung: '',
-    kuerzel: 'aehg',
-    typ: 'SCHULE',
-    administriertVon: '1',
-  },
-  {
-    id: '1',
-    name: 'orga',
-    kennung: '9356494',
-    namensergaenzung: '',
-    kuerzel: 'aehg',
-    typ: 'SCHULE',
-    administriertVon: '1',
-  },
-];
+const schule: Organisation = DoFactory.getSchule();
+organisationStore.schulenFilter.filterResult = [schule, DoFactory.getSchule()];
 
 rolleStore.allRollen = [
   {
@@ -87,6 +72,14 @@ rolleStore.allRollen = [
     administeredBySchulstrukturknotenKennung: '1234567',
   },
 ] as RolleWithServiceProvidersResponse[];
+
+async function selectSchule(value: string): Promise<WrapperLike | undefined> {
+  const schuleAutocomplete: WrapperLike | undefined = wrapper
+    ?.findComponent({ ref: 'schule-select' })
+    .findComponent('[data-testid="schule-select"]');
+  await schuleAutocomplete?.setValue(value);
+  return schuleAutocomplete;
+}
 
 beforeEach(async () => {
   document.body.innerHTML = `
@@ -140,9 +133,7 @@ describe('PersonImportView', () => {
   });
 
   test('it clears selects', async () => {
-    const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
-    schuleAutocomplete?.setValue('Schule');
-    await nextTick();
+    const schuleAutocomplete: WrapperLike | undefined = await selectSchule(schule.id);
 
     const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
     rolleAutocomplete?.setValue('SuS');
@@ -150,11 +141,9 @@ describe('PersonImportView', () => {
 
     schuleAutocomplete?.find('.v-field__clearable').trigger('click');
     await nextTick();
-    // expect(wrapper?.emitted('click:clear')).toBe(true);
 
     wrapper?.find('[data-testid="rolle-select"] .v-field__clearable').trigger('click');
     await nextTick();
-    // expect(wrapper?.emitted('click:clear')).toBe(true);
   });
 
   test('it shows validation messages', async () => {
@@ -469,7 +458,7 @@ describe('PersonImportView', () => {
   });
 
   test('it resets the store and navigates when discarding', async () => {
-    const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
+    const schuleAutocomplete: WrapperLike | undefined = wrapper?.findComponent({ ref: 'schule-select' });
     const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
     const fileInput: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="file-input"] input');
     const mockFile: File = new File([''], 'personen.csv', { type: 'text/csv' });
@@ -503,7 +492,6 @@ describe('PersonImportView', () => {
     const totalImportDataItems: number = 1234;
 
     // Find components
-    const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
     const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
     const fileInput: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="file-input"] input');
 
@@ -517,8 +505,8 @@ describe('PersonImportView', () => {
     });
 
     // Set form values
-    schuleAutocomplete?.setValue('Schule');
-    rolleAutocomplete?.setValue('SuS');
+    await selectSchule(schule.id);
+    await rolleAutocomplete?.setValue('SuS');
     Object.defineProperty(fileInput?.element, 'files', {
       value: [mockFile],
     });
@@ -579,11 +567,9 @@ describe('PersonImportView', () => {
   });
 
   test('it clears selected schule when clearSelectedSchule is called', async () => {
-    const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
-    schuleAutocomplete?.setValue('Schule');
+    const schuleAutocomplete: WrapperLike | undefined = await selectSchule(schule.id);
     await nextTick();
-
-    expect(schuleAutocomplete?.text()).toBe('Schule');
+    expect(schuleAutocomplete?.text()).toBe(getDisplayNameForOrg(schule));
 
     const clearButton: Element | null = document.body.querySelector('[data-testid="schule-select"] i');
     expect(clearButton).not.toBeNull();
