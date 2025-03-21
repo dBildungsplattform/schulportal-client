@@ -454,7 +454,7 @@
               :highlightSelection="true"
               :selectedSchulen="selectedSchule"
               @update:selectedSchulen="updateSchuleSelection"
-              :texts="{ placeholder: t('admin.schule.schule') }"
+              :placeholderText="t('admin.schule.schule')"
               ref="schule-select"
             >
               <template v-slot:prepend-item>

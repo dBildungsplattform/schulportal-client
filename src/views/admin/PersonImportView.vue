@@ -616,7 +616,7 @@
           >
             <SchulenFilter
               :multiple="false"
-              :texts="{ placeholder: t('admin.schule.selectSchule') }"
+              :placeholderText="t('admin.schule.selectSchule')"
               :selectedSchuleProps="selectedSchuleProps"
               :selectedSchulen="selectedSchule"
               @update:selectedSchulen="updateSelectedSchule"

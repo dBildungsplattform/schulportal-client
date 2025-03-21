@@ -23,9 +23,7 @@
     readonly?: boolean;
     selectedSchuleProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     highlightSelection?: boolean;
-    texts?: {
-      placeholder?: string;
-    };
+    placeholderText?: string;
   };
   const props: Props = defineProps<Props>();
   const selectedSchulen: Ref<SelectedSchulenIds> = defineModel('selectedSchulen');
@@ -218,7 +216,7 @@
     :loading="organisationStore.schulenFilter.loading"
     :multiple="props.multiple"
     :no-data-text="'noDataFound'"
-    :placeholder="props.texts?.placeholder ?? t('admin.schule.assignSchule')"
+    :placeholder="props.placeholderText ?? t('admin.schule.assignSchule')"
     required="true"
     variant="outlined"
     @update:search="updateSearchString"
