@@ -1,28 +1,28 @@
 <script setup lang="ts">
-  import { computed, onMounted, type ComputedRef, type Ref, ref, watch } from 'vue';
-  import { type Composer, useI18n } from 'vue-i18n';
-  import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
-  import { type Router, useRouter } from 'vue-router';
-  import {
-    useOrganisationStore,
-    type OrganisationStore,
-    type Organisation,
-    OrganisationsTyp,
-  } from '@/stores/OrganisationStore';
-  import { SortField, SortOrder, usePersonStore, type PersonStore, type Personendatensatz } from '@/stores/PersonStore';
-  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
-  import { useRolleStore, type RolleStore, type RolleResponse, RollenArt, RollenMerkmal } from '@/stores/RolleStore';
-  import { type SearchFilterStore, useSearchFilterStore } from '@/stores/SearchFilterStore';
-  import LayoutCard from '@/components/cards/LayoutCard.vue';
   import ResultTable, { type TableItem, type TableRow } from '@/components/admin/ResultTable.vue';
   import SearchField from '@/components/admin/SearchField.vue';
-  import { type TranslatedObject } from '@/types.d';
-  import { useOrganisationen } from '@/composables/useOrganisationen';
-  import { type TranslatedRolleWithAttrs, useRollen } from '@/composables/useRollen';
-  import RolleModify from '@/components/admin/rollen/RolleModify.vue';
-  import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
   import PersonBulkDelete from '@/components/admin/personen/PersonBulkDelete.vue';
+  import RolleModify from '@/components/admin/rollen/RolleModify.vue';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import { useOrganisationen } from '@/composables/useOrganisationen';
+  import { type TranslatedRolleWithAttrs, useRollen } from '@/composables/useRollen';
+  import { type AuthStore, useAuthStore } from '@/stores/AuthStore';
+  import {
+    type Organisation,
+    type OrganisationStore,
+    OrganisationsTyp,
+    useOrganisationStore,
+  } from '@/stores/OrganisationStore';
+  import { type PersonStore, type Personendatensatz, SortField, SortOrder, usePersonStore } from '@/stores/PersonStore';
+  import { type PersonenkontextStore, usePersonenkontextStore } from '@/stores/PersonenkontextStore';
+  import { type RolleResponse, type RolleStore, RollenArt, RollenMerkmal, useRolleStore } from '@/stores/RolleStore';
+  import { type SearchFilterStore, useSearchFilterStore } from '@/stores/SearchFilterStore';
+  import { type TranslatedObject } from '@/types.d';
+  import { type ComputedRef, type Ref, computed, onMounted, ref, watch } from 'vue';
+  import { type Composer, useI18n } from 'vue-i18n';
+  import { type Router, useRouter } from 'vue-router';
+  import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
 
   const searchFieldComponent: Ref = ref();
 
@@ -70,6 +70,7 @@
 
   const rolleModifiyDialogVisible: Ref<boolean> = ref(false);
   const benutzerDeleteDialogVisible: Ref<boolean> = ref(false);
+  const passwordResetDialogVisible: Ref<boolean> = ref(false);
 
   const selectedOption: Ref<string | null> = ref(null);
 
@@ -79,6 +80,7 @@
   enum ActionTypes {
     MODIFY_ROLLE = 'MODIFY_ROLLE',
     DELETE_PERSON = 'DELETE_PERSON',
+    RESET_PASSWORD = 'RESET_PASSWORD',
   }
 
   // Define i18n values for action types to act as a title/value in the v-select
@@ -88,6 +90,10 @@
 
   if (authStore.hasPersonenLoeschenPermission) {
     actionTypeTitles[ActionTypes.DELETE_PERSON] = t('admin.person.deletePerson');
+  }
+
+  if (authStore.hasPersonenverwaltungPermission) {
+    actionTypeTitles[ActionTypes.RESET_PASSWORD] = t('admin.person.resetPassword');
   }
 
   // Computed property for generating options dynamically for v-selects
@@ -439,6 +445,9 @@
         break;
       case ActionTypes.DELETE_PERSON:
         benutzerDeleteDialogVisible.value = true;
+        break;
+      case ActionTypes.RESET_PASSWORD:
+        passwordResetDialogVisible.value = true;
         break;
     }
   };

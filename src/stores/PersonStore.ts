@@ -198,6 +198,7 @@ type PersonState = {
   loading: boolean;
   newDevicePassword: string | null;
   newPassword: string | null;
+  bulkResetPasswordResult: BulkResetPasswordResult | null;
   patchedPerson: PersonendatensatzResponse | null;
   personenuebersicht: DBiamPersonenuebersichtResponse | null;
   personenWithUebersicht: PersonenWithRolleAndZuordnung | null;
@@ -214,12 +215,20 @@ export type PersonFilter = {
   sortField?: SortField;
 };
 
+export type BulkResetPasswordResult = {
+  progress: number;
+  complete: boolean;
+  errors: Map<string, string>;
+  passwords: Map<string, string>;
+};
+
 type PersonGetters = {};
 type PersonActions = {
   resetState: () => void;
   getAllPersons: (filter: PersonFilter) => Promise<void>;
   getPersonById: (personId: string) => Promise<Personendatensatz>;
   resetPassword: (personId: string) => Promise<void>;
+  bulkResetPassword: (personIds: Array<string>) => Promise<void>;
   resetDevicePassword: (personId?: string) => Promise<void>;
   deletePersonById: (personId: string) => Promise<void>;
   lockPerson: (personId: string, bodyParams: LockUserBodyParams) => Promise<void>;
@@ -244,6 +253,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       loading: false,
       newDevicePassword: null,
       newPassword: null,
+      bulkResetPasswordResult: null,
       patchedPerson: null,
       personenuebersicht: null,
       personenWithUebersicht: null,
@@ -378,6 +388,25 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       } finally {
         this.loading = false;
       }
+    },
+
+    async bulkResetPassword(personIds: Array<string>): Promise<void> {
+      this.loading = true;
+      this.bulkResetPasswordResult = {
+        complete: false,
+        progress: 0,
+        errors: new Map(),
+        passwords: new Map(),
+      };
+      personIds.forEach(async (personId: string) => {
+        try {
+          const { data }: { data: string } = await personenApi.personControllerResetPasswordByPersonId(personId);
+        } catch (error: unknown) {
+          this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+        }
+      });
+      this.loading = false;
+      this.bulkResetPasswordResult.complete = true;
     },
 
     async resetDevicePassword(personId?: string): Promise<void> {
