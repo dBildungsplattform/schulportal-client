@@ -56,7 +56,6 @@ export type SchuleTableItem = {
 };
 
 export type AutoCompleteStore<T> = {
-  selectedItems: Array<T>;
   filterResult: Array<T>;
   total: number;
   loading: boolean;
@@ -147,7 +146,6 @@ export const useOrganisationStore: StoreDefinition<
       allKlassen: [],
       allSchulen: [],
       schulenFilter: {
-        selectedItems: [],
         filterResult: [],
         total: 0,
         loading: false,
@@ -553,7 +551,6 @@ export const useOrganisationStore: StoreDefinition<
     resetSchulFilter(): void {
       this.schulenFilter = {
         filterResult: [],
-        selectedItems: [],
         loading: false,
         total: 0,
       };

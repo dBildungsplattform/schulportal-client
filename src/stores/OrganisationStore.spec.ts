@@ -1054,13 +1054,11 @@ describe('OrganisationStore', () => {
     test('should reset filter', () => {
       organisationStore.schulenFilter = {
         filterResult: [DoFactory.getSchule()],
-        selectedItems: [DoFactory.getSchule()],
         loading: true,
         total: 1,
       };
       const expected: AutoCompleteStore<Organisation> = {
         filterResult: [],
-        selectedItems: [],
         loading: false,
         total: 0,
       };

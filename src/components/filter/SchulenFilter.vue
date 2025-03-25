@@ -35,8 +35,6 @@
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const organisationStore: OrganisationStore = useOrganisationStore();
-  // clear selection before anything else runs
-  organisationStore.schulenFilter.selectedItems = [];
 
   const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
   const schulenFilter: OrganisationenFilter = reactive({
@@ -117,21 +115,6 @@
     schulenFilter.organisationIds = dedup(tempIds.filter(Boolean));
   };
 
-  const findSchulenInResultByIds = (ids: Array<string>): Array<Organisation> => {
-    return organisationStore.schulenFilter.filterResult.filter((schule: Organisation) => ids.includes(schule.id));
-  };
-
-  const mirrorSelectionToStore = (selection: SelectedSchulenIds): void => {
-    let ids: Array<string> = wrapSelectedSchulenIds(selection);
-    let newSelection: Array<Organisation> = [];
-    if (autoselectedSchule.value && ids.includes(autoselectedSchule.value.id)) {
-      newSelection.push(autoselectedSchule.value);
-    } else {
-      newSelection = findSchulenInResultByIds(ids);
-    }
-    organisationStore.schulenFilter.selectedItems = newSelection;
-  };
-
   const handleSelectionUpdate = (selection: SelectedSchulenIds): void => {
     if (isEmptySelection(selection)) {
       updateOrganisationenIds([]);
@@ -140,7 +123,6 @@
     } else {
       updateOrganisationenIds(selection);
     }
-    mirrorSelectionToStore(selection);
   };
 
   const isSameSelection = (a: SelectedSchulenIds, b: SelectedSchulenIds): boolean => {
