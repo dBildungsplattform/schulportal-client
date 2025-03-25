@@ -91,6 +91,7 @@ describe('HinweiseCreationView', () => {
     await router.isReady();
 
     wrapper = mountComponent();
+    vi.restoreAllMocks();
   });
 
   afterEach(() => {
@@ -115,6 +116,7 @@ describe('HinweiseCreationView', () => {
   });
 
   test('it fills form and triggers submit', async () => {
+    wrapper = mountComponent();
     meldungStore.createOrUpdateMeldung = vi.fn().mockResolvedValue(undefined);
     meldungStore.getAllMeldungen = vi.fn().mockResolvedValue(undefined);
 
@@ -127,14 +129,16 @@ describe('HinweiseCreationView', () => {
     ];
     await flushPromises();
 
-    const meldungTextInput: VueWrapper | undefined = wrapper?.findComponent({ ref: 'newsbox-text' });
-    await meldungTextInput?.setValue('Updated Hinweis');
+    const meldungTextInput: VueWrapper | undefined = wrapper.findComponent({ ref: 'newsbox-text' });
+    await meldungTextInput.setValue('Updated Hinweis');
 
-    const submitButton: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="submit-newsbox"]');
-    await submitButton?.trigger('click');
+    const submitButton: DOMWrapper<Element> | undefined = wrapper.find('[data-testid="submit-newsbox"]');
+    expect(submitButton).toBeDefined();
+    await submitButton.trigger('click');
 
     await flushPromises();
 
+    console.log(wrapper.html());
     expect(meldungStore.createOrUpdateMeldung).toHaveBeenCalled();
   });
 
