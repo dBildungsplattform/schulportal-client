@@ -249,7 +249,6 @@ describe('KlassenManagementView', () => {
   });
 
   it('should fetch all Klassen when search string is empty and no Schule is selected', async () => {
-    organisationStore.schulenFilter.selectedItems = [];
     const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
 
     await klasseAutocomplete?.vm.$emit('update:search', '');
