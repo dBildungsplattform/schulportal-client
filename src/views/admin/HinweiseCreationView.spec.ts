@@ -138,7 +138,6 @@ describe('HinweiseCreationView', () => {
 
     await flushPromises();
 
-    console.log(wrapper.html());
     expect(meldungStore.createOrUpdateMeldung).toHaveBeenCalled();
   });
 
