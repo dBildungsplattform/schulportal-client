@@ -398,13 +398,18 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
         errors: new Map(),
         passwords: new Map(),
       };
-      personIds.forEach(async (personId: string) => {
+      for (let i: number = 0; i < personIds.length; i++) {
+        const id: string = personIds[i]!;
         try {
-          const { data }: { data: string } = await personenApi.personControllerResetPasswordByPersonId(personId);
+          const { data }: { data: string } = await personenApi.personControllerResetPasswordByPersonId(id);
+          this.bulkResetPasswordResult.passwords.set(id, data);
         } catch (error: unknown) {
-          this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+          const errorCode: string = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+          this.bulkResetPasswordResult.errors.set(id, errorCode);
+        } finally {
+          this.bulkResetPasswordResult.progress = (i + 1) / personIds.length;
         }
-      });
+      }
       this.loading = false;
       this.bulkResetPasswordResult.complete = true;
     },
