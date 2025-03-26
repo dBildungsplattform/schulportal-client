@@ -1,7 +1,9 @@
 <script setup lang="ts">
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { type PersonStore, usePersonStore } from '@/stores/PersonStore';
-  import { type Ref, ref } from 'vue';
+  import { buildCSV, download } from '@/utils/file';
+  import { computed } from 'vue';
+  import { type ComputedRef, type Ref, ref } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
 
@@ -10,8 +12,25 @@
 
   const personStore: PersonStore = usePersonStore();
 
-  const progress: Ref<number> = ref<number>(0);
-  const successMessage: Ref<string> = ref<string>('');
+  const successMessage: ComputedRef<string> = computed(() => {
+    if (personStore.bulkResetPasswordResult?.complete) return t('admin.person.resetPasswordBulkSuccessMessage');
+    return '';
+  });
+  const progress: ComputedRef<number> = computed(() => {
+    if (!personStore.bulkResetPasswordResult?.progress) return 0;
+    return Math.round(personStore.bulkResetPasswordResult.progress * 100);
+  });
+  const resultFile: ComputedRef<Blob | null> = computed(() => {
+    if (!personStore.bulkResetPasswordResult?.complete) return null;
+    let entries = [];
+    for (const [id, password] of personStore.bulkResetPasswordResult.passwords.entries()) {
+      entries.push({
+        Benutzer: id,
+        Passwort: password,
+      });
+    }
+    return buildCSV(['Benutzer', 'Passwort'], entries);
+  });
 
   type Props = {
     errorCode: string;
@@ -27,29 +46,17 @@
   const showPasswordResetDialog: Ref<boolean> = ref(props.isDialogVisible);
 
   async function closePasswordResetDialog(finished: boolean): Promise<void> {
-    progress.value = 0;
     showPasswordResetDialog.value = false;
     emit('update:dialogExit', finished);
+    personStore.bulkResetPasswordResult = null;
   }
 
   async function handleResetPassword(personIDs: string[]): Promise<void> {
-    successMessage.value = '';
-    progress.value = 0; // Reset progress bar to 0 at the start
+    await personStore.bulkResetPassword(personIDs);
+  }
 
-    for (let i: number = 0; i < personIDs.length; i++) {
-      const personId: string = personIDs[i] as string;
-
-      // Delete person by ID
-      await personStore.resetPassword(personId);
-
-      // Update progress for each item processed
-      progress.value = Math.ceil(((i + 1) / personIDs.length) * 100);
-
-      // Only show success message after all items have been processed
-      if (i === personIDs.length - 1) {
-        successMessage.value = t('admin.person.resetPasswordBulkSuccessMessage');
-      }
-    }
+  function downloadFile(blob: Blob): void {
+    download('ergebnis.txt', blob);
   }
 </script>
 
@@ -61,7 +68,7 @@
   >
     <LayoutCard
       data-testid="password-reset-layout-card"
-      :header="$t('admin.person.resetPassword')"
+      :header="t('admin.person.resetPassword')"
     >
       <v-container
         class="mt-8 mb-4"
@@ -78,7 +85,6 @@
         v-if="progress > 0"
         class="mt-4"
       >
-        <!-- Progress Bar -->
         <v-container
           v-if="successMessage"
           data-testid="password-reset-success-text"
@@ -95,6 +101,15 @@
           <p class="mt-2 text-center">
             {{ successMessage }}
           </p>
+          <v-btn
+            v-if="resultFile"
+            :block="mdAndDown"
+            class="primary"
+            @click="downloadFile(resultFile)"
+            data-testid="download-result-button"
+          >
+            {{ 'Download' }}
+          </v-btn>
         </v-container>
         <v-row
           v-if="progress < 100"
@@ -109,10 +124,11 @@
               size="small"
             ></v-icon>
             <span class="subtitle-2">
-              {{ $t('admin.doNotCloseBrowserNotice') }}
+              {{ t('admin.doNotCloseBrowserNotice') }}
             </span>
           </v-col>
         </v-row>
+        <!-- Progress Bar -->
         <v-progress-linear
           class="mt-5"
           :modelValue="progress"
@@ -141,7 +157,7 @@
               @click="closePasswordResetDialog(false)"
               data-testid="password-reset-discard-button"
             >
-              {{ $t('cancel') }}
+              {{ t('cancel') }}
             </v-btn>
           </v-col>
           <v-col
@@ -157,7 +173,7 @@
               data-testid="password-reset-submit-button"
               type="submit"
             >
-              {{ $t('admin.person.resetPassword') }}
+              {{ t('admin.person.resetPassword') }}
             </v-btn>
           </v-col>
         </v-row>
@@ -176,7 +192,7 @@
               @click="closePasswordResetDialog(true)"
               data-testid="password-reset-close-button"
             >
-              {{ $t('close') }}
+              {{ t('close') }}
             </v-btn>
           </v-col>
         </v-row>

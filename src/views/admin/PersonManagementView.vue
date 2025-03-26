@@ -3,6 +3,7 @@
   import SearchField from '@/components/admin/SearchField.vue';
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
   import PersonBulkDelete from '@/components/admin/personen/PersonBulkDelete.vue';
+  import PersonBulkPasswordReset from '@/components/admin/personen/PersonBulkPasswordReset.vue';
   import RolleModify from '@/components/admin/rollen/RolleModify.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { useOrganisationen } from '@/composables/useOrganisationen';
@@ -467,6 +468,10 @@
       resultTable.value.resetSelection();
     }
   };
+  const handleBulkPasswordResetDialog = async (finished: boolean): Promise<void> => {
+    passwordResetDialogVisible.value = false;
+    selectedOption.value = null;
+  };
 
   function handleSelectedRows(selectedItems: TableItem[]): void {
     // Directly assign the selected items to selectedPersonIds since the emitted tableItems are always IDs of the specific rows
@@ -814,6 +819,15 @@
             @update:dialogExit="handleBulkDeleteDialog($event)"
           >
           </PersonBulkDelete>
+          <PersonBulkPasswordReset
+            v-if="passwordResetDialogVisible"
+            :error-code="personStore.errorCode"
+            :isLoading="personStore.loading"
+            :isDialogVisible="passwordResetDialogVisible"
+            :personIDs="selectedPersonIds"
+            @update:dialogExit="handleBulkPasswordResetDialog($event)"
+          >
+          </PersonBulkPasswordReset>
         </v-col>
         <!-- Display the number of selected checkboxes -->
         <v-col
