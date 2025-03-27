@@ -158,6 +158,14 @@
       "addNew": "Neuen Benutzer hinzufügen",
       "backToCreatePerson": "Zurück zur Benutzeranlage",
       "backToInput": "Zurück zur Eingabe",
+      "bulkPasswordReset": {
+        "confirmation": "Platzhalter",
+        "downloadResult": "Platzhalter",
+        "error": {
+          "onlyOneSchool": "Platzhalter"
+        },
+        "success": "Platzhalter"
+      },
       "changePassword": "Passwort ändern",
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
       "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",

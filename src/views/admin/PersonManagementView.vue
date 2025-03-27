@@ -15,7 +15,14 @@
     OrganisationsTyp,
     useOrganisationStore,
   } from '@/stores/OrganisationStore';
-  import { type PersonStore, type Personendatensatz, SortField, SortOrder, usePersonStore } from '@/stores/PersonStore';
+  import {
+    type PersonStore,
+    type PersonenWithRolleAndZuordnung,
+    type Personendatensatz,
+    SortField,
+    SortOrder,
+    usePersonStore,
+  } from '@/stores/PersonStore';
   import { type PersonenkontextStore, usePersonenkontextStore } from '@/stores/PersonenkontextStore';
   import { type RolleResponse, type RolleStore, RollenArt, RollenMerkmal, useRolleStore } from '@/stores/RolleStore';
   import { type SearchFilterStore, useSearchFilterStore } from '@/stores/SearchFilterStore';
@@ -39,6 +46,11 @@
   const hasAutoSelectedOrganisation: Ref<boolean> = ref(false);
 
   const selectedPersonIds: Ref<string[]> = ref<string[]>([]);
+  const selectedPersons: ComputedRef<PersonenWithRolleAndZuordnung> = computed(() => {
+    return personStore.personenWithUebersicht?.filter((p: PersonenWithRolleAndZuordnung[number]) =>
+      selectedPersonIds.value.includes(p.person.id),
+    );
+  });
   const resultTable: Ref = ref(null);
 
   type ReadonlyHeaders = VDataTableServer['headers'];
@@ -824,7 +836,7 @@
             :error-code="personStore.errorCode"
             :isLoading="personStore.loading"
             :isDialogVisible="passwordResetDialogVisible"
-            :personIDs="selectedPersonIds"
+            :selectedPersons
             @update:dialogExit="handleBulkPasswordResetDialog($event)"
           >
           </PersonBulkPasswordReset>

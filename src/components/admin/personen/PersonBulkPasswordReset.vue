@@ -1,11 +1,27 @@
 <script setup lang="ts">
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { type PersonStore, usePersonStore } from '@/stores/PersonStore';
+  import { type PersonenWithRolleAndZuordnung, type PersonStore, usePersonStore } from '@/stores/PersonStore';
   import { buildCSV, download } from '@/utils/file';
   import { computed } from 'vue';
   import { type ComputedRef, type Ref, ref } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
+
+  type PersonWithRolleAndZuordnung = PersonenWithRolleAndZuordnung[number];
+  type CSVHeaders = 'Administrationsebenen' | 'Klassen' | 'Nachname' | 'Vorname' | 'Benutzername' | 'Passwort';
+  type CSVRow = Record<CSVHeaders, string | undefined>;
+
+  type Props = {
+    errorCode: string;
+    isLoading: boolean;
+    isDialogVisible: boolean;
+    selectedPersons: PersonenWithRolleAndZuordnung;
+  };
+
+  type Emits = (event: 'update:dialogExit', finished: boolean) => void;
+
+  const props: Props = defineProps<Props>();
+  const emit: Emits = defineEmits<Emits>();
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
@@ -13,7 +29,7 @@
   const personStore: PersonStore = usePersonStore();
 
   const successMessage: ComputedRef<string> = computed(() => {
-    if (personStore.bulkResetPasswordResult?.complete) return t('admin.person.resetPasswordBulkSuccessMessage');
+    if (personStore.bulkResetPasswordResult?.complete) return t('admin.person.bulkPasswordReset.success');
     return '';
   });
   const progress: ComputedRef<number> = computed(() => {
@@ -22,27 +38,26 @@
   });
   const resultFile: ComputedRef<Blob | null> = computed(() => {
     if (!personStore.bulkResetPasswordResult?.complete) return null;
-    let entries = [];
+    let rows: Array<CSVRow> = [];
     for (const [id, password] of personStore.bulkResetPasswordResult.passwords.entries()) {
-      entries.push({
-        Benutzer: id,
+      const personWithRolleAndZuordnung: PersonWithRolleAndZuordnung | undefined = props.selectedPersons.find(
+        (p: PersonWithRolleAndZuordnung) => p.person.id === id,
+      );
+      rows.push({
+        Administrationsebenen: personWithRolleAndZuordnung?.administrationsebenen,
+        Klassen: personWithRolleAndZuordnung?.klassen,
+        Nachname: personWithRolleAndZuordnung?.person.name.familienname,
+        Vorname: personWithRolleAndZuordnung?.person.name.vorname,
+        Benutzername: personWithRolleAndZuordnung?.person.referrer ?? undefined,
         Passwort: password,
       });
     }
-    return buildCSV(['Benutzer', 'Passwort'], entries);
+    return buildCSV<CSVHeaders>(
+      ['Administrationsebenen', 'Klassen', 'Nachname', 'Vorname', 'Benutzername', 'Passwort'],
+      rows,
+    );
   });
 
-  type Props = {
-    errorCode: string;
-    isLoading: boolean;
-    isDialogVisible: boolean;
-    personIDs: string[];
-  };
-
-  type Emits = (event: 'update:dialogExit', finished: boolean) => void;
-
-  const props: Props = defineProps<Props>();
-  const emit: Emits = defineEmits<Emits>();
   const showPasswordResetDialog: Ref<boolean> = ref(props.isDialogVisible);
 
   async function closePasswordResetDialog(finished: boolean): Promise<void> {
@@ -70,17 +85,19 @@
       data-testid="password-reset-layout-card"
       :header="t('admin.person.resetPassword')"
     >
+      <!-- Initial block -->
       <v-container
         class="mt-8 mb-4"
         v-if="progress == 0"
       >
         <v-row class="text-body bold justify-center">
           <span data-testid="password-reset-confirmation-text">
-            {{ t('admin.person.resetPasswordBulkConfirmation') }}
+            {{ t('admin.person.bulkPasswordReset.confirmation') }}
           </span>
         </v-row>
       </v-container>
 
+      <!-- In progress -->
       <v-container
         v-if="progress > 0"
         class="mt-4"
@@ -101,15 +118,6 @@
           <p class="mt-2 text-center">
             {{ successMessage }}
           </p>
-          <v-btn
-            v-if="resultFile"
-            :block="mdAndDown"
-            class="primary"
-            @click="downloadFile(resultFile)"
-            data-testid="download-result-button"
-          >
-            {{ 'Download' }}
-          </v-btn>
         </v-container>
         <v-row
           v-if="progress < 100"
@@ -142,16 +150,14 @@
       </v-container>
 
       <v-card-actions class="justify-center">
-        <v-row
-          v-if="progress === 0"
-          class="py-3 px-2 justify-center"
-        >
+        <v-row class="py-3 px-2 justify-center">
           <v-col
             cols="12"
             sm="6"
             md="auto"
           >
             <v-btn
+              v-if="progress === 0"
               :block="mdAndDown"
               class="secondary"
               @click="closePasswordResetDialog(false)"
@@ -159,40 +165,40 @@
             >
               {{ t('cancel') }}
             </v-btn>
-          </v-col>
-          <v-col
-            cols="12"
-            sm="6"
-            md="auto"
-          >
             <v-btn
-              :block="mdAndDown"
-              :disabled="personStore.loading"
-              class="primary"
-              @click="handleResetPassword(props.personIDs)"
-              data-testid="password-reset-submit-button"
-              type="submit"
-            >
-              {{ t('admin.person.resetPassword') }}
-            </v-btn>
-          </v-col>
-        </v-row>
-        <v-row
-          v-if="progress === 100"
-          class="py-3 px-2 justify-center"
-        >
-          <v-col
-            cols="12"
-            sm="6"
-            md="auto"
-          >
-            <v-btn
+              v-else-if="personStore.bulkResetPasswordResult?.complete"
               :block="mdAndDown"
               class="primary"
               @click="closePasswordResetDialog(true)"
               data-testid="password-reset-close-button"
             >
               {{ t('close') }}
+            </v-btn>
+          </v-col>
+          <v-col
+            cols="12"
+            sm="6"
+            md="auto"
+          >
+            <v-btn
+              v-if="progress === 0"
+              :block="mdAndDown"
+              :disabled="personStore.loading"
+              class="primary"
+              @click="handleResetPassword(props.selectedPersons.map((p: PersonWithRolleAndZuordnung) => p.person.id))"
+              data-testid="password-reset-submit-button"
+              type="submit"
+            >
+              {{ t('admin.person.resetPassword') }}
+            </v-btn>
+            <v-btn
+              v-else-if="resultFile"
+              :block="mdAndDown"
+              class="primary"
+              @click="downloadFile(resultFile)"
+              data-testid="download-result-button"
+            >
+              {{ t('admin.person.bulkPasswordReset.downloadResult') }}
             </v-btn>
           </v-col>
         </v-row>
