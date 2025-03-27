@@ -79,18 +79,11 @@
 
   async function navigateToSchultraegerManagement(): Promise<void> {
     formContext.resetForm();
-    organisationStore.updatedOrganisation = null;
-    progress.value = 0;
-    successMessage.value = '';
-    organisationStore.errorCode = '';
     await router.push({ name: 'schultraeger-management' });
   }
 
   async function navigateBackToSchultraegerDetails(): Promise<void> {
     formContext.resetForm();
-    organisationStore.updatedOrganisation = null;
-    progress.value = 0;
-    successMessage.value = '';
     await router.push({ name: 'schultraeger-details' }).then(() => {
       router.go(0);
     });
@@ -228,6 +221,10 @@
   });
 
   onUnmounted(() => {
+    organisationStore.updatedOrganisation = null;
+    progress.value = 0;
+    successMessage.value = '';
+    organisationStore.errorCode = '';
     window.removeEventListener('beforeunload', preventNavigation);
   });
 </script>
@@ -388,10 +385,16 @@
         </div>
 
         <v-row
-          v-if="!organisationStore.errorCode"
-          class="pt-3 px-2 save-cancel-row justify-end"
+          v-if="!organisationStore.errorCode && (progress === 0 || progress === 100)"
+          class="py-3 px-2 save-cancel-row justify-end"
         >
+          <v-divider
+            class="border-opacity-100 rounded my-6"
+            color="#E5EAEF"
+            thickness="6"
+          ></v-divider>
           <v-col
+            v-if="progress === 0 || progress === 100 || organisationStore.updatedOrganisation"
             cols="12"
             sm="6"
             md="auto"

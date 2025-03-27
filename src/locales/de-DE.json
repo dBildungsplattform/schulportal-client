@@ -524,7 +524,7 @@
         "ORGANISATION_SPECIFICATION_ERROR": "Der Schulträger konnte nicht angelegt werden.",
         "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Die letzte Aktion konnte nicht ausgeführt werden. Aufgrund von längerer Inaktivität ist eine erneute Authentifizierung mit einem zweiten Faktor erforderlich. Um fortzufahren, klicken Sie bitte auf „Zurück zur Ergebnisliste“ oder „Schließen“. Sie werden anschließend zur Eingabe Ihres zweiten Faktors aufgefordert.",
         "SCHULTRAEGER_ERROR": "Mögliche Schulträger konnten nicht geladen werden.",
-        "SCHULTRAEGER_NAME_EINDEUTIG": "Der eingegebene Name ist bereits vergeben. Bitte wählen Sie einen anderen Namen.",
+        "SCHULTRAEGER_NAME_EINDEUTIG": "Der Schulträgername existiert bereits.",
         "TRAEGER_IN_TRAEGER": "Ein Schulträger darf nur einem anderen Schulträger zugeordnet werden."
       },
       "management": "Schulträgerverwaltung",
