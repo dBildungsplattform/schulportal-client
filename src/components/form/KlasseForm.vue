@@ -1,89 +1,133 @@
 <script setup lang="ts">
   import FormRow from '@/components/form/FormRow.vue';
   import FormWrapper from '@/components/form/FormWrapper.vue';
-  import {
-    OrganisationsTyp,
-    useOrganisationStore,
-    type OrganisationenFilter,
-    type OrganisationStore,
-  } from '@/stores/OrganisationStore';
   import { RollenSystemRecht } from '@/stores/RolleStore';
-  import type { TranslatedObject } from '@/types';
-  import { type BaseFieldProps } from 'vee-validate';
-  import { computed, ref, watch, type ComputedRef, type ModelRef, type Ref } from 'vue';
-
-  const searchInputSchule: Ref<string> = ref('');
-  const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
-
-  const organisationStore: OrganisationStore = useOrganisationStore();
+  import { getValidationSchema, getVuetifyConfig, type ValidationSchema } from '@/utils/validationKlasse';
+  import { useForm, useIsFormDirty, useIsFormValid, type BaseFieldProps, type TypedSchema } from 'vee-validate';
+  import { computed, watch, type ComputedRef, type Ref } from 'vue';
+  import { useI18n, type Composer } from 'vue-i18n';
+  import SchulenFilter from '../filter/SchulenFilter.vue';
 
   type Props = {
+    initialValues?: Partial<ValidationSchema>;
     errorCode?: string;
-    schulen?: Array<{ value: string; title: string }>;
-    readonly?: boolean;
-    selectedSchuleProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
-    selectedKlassennameProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     showUnsavedChangesDialog?: boolean;
+    editMode: boolean;
     isEditActive?: boolean;
-    autoselectedSchuleId: string | null;
     isLoading: boolean;
     onHandleConfirmUnsavedChanges: () => void;
     onHandleDiscard: () => void;
     onShowDialogChange: (value?: boolean) => void;
-    onSubmit: () => void;
+    onSubmit: (values: ValidationSchema) => Promise<void>;
   };
-
   const props: Props = defineProps<Props>();
-  // derive this from props by checking id against props.schulen
-  const hasAutoselected: ComputedRef<boolean> = computed(() => props.autoselectedSchuleId !== null);
-  const selectedSchule: ModelRef<string | undefined, string> = defineModel('selectedSchule');
-  const selectedSchuleTitle: ComputedRef<string> = computed(() => {
-    return props.schulen?.find((schule: TranslatedObject) => schule.value === selectedSchule.value)?.title || '';
+  type Emits = {
+    (event: 'formStateChanged', payload: { values: ValidationSchema; dirty: boolean; valid: boolean }): void;
+  };
+  const emit: Emits = defineEmits<Emits>();
+  const { t }: Composer = useI18n({ useScope: 'global' });
+
+  const vuetifyConfig = (state: {
+    errors: Array<string>;
+  }): { props: { error: boolean; 'error-messages': Array<string> } } => getVuetifyConfig(state);
+  const validationSchema: TypedSchema = getValidationSchema(t);
+
+  // eslint-disable-next-line @typescript-eslint/typedef
+  const { defineField, resetForm, setFieldValue } = useForm<ValidationSchema>({
+    validationSchema,
+    initialValues: {
+      selectedSchule: props.initialValues?.selectedSchule,
+      selectedKlassenname: props.initialValues?.selectedKlassenname ?? '',
+    },
   });
-  const selectedKlassenname: ModelRef<string | undefined, string> = defineModel('selectedKlassenname');
+
+  const [selectedSchule, selectedSchuleProps]: [
+    Ref<string | undefined>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineField('selectedSchule', vuetifyConfig);
+  const [selectedKlassenname, selectedKlassennameProps]: [
+    Ref<string>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = defineField('selectedKlassenname', vuetifyConfig);
+
+  const isDirty: ComputedRef<boolean> = useIsFormDirty();
+  const isValid: ComputedRef<boolean> = useIsFormValid();
+  const canCommit: ComputedRef<boolean> = computed(() => isDirty.value && isValid.value);
+
+  function reset(): void {
+    resetForm();
+    selectedSchule.value = undefined;
+    emit('formStateChanged', {
+      values: { selectedKlassenname: selectedKlassenname.value, selectedSchule: '' },
+      dirty: isDirty.value,
+      valid: isValid.value,
+    });
+  }
+
+  defineExpose({ reset });
+
+  async function submitHandler(): Promise<void> {
+    if (!selectedSchule.value) return;
+    await props.onSubmit({ selectedSchule: selectedSchule.value, selectedKlassenname: selectedKlassenname.value });
+    reset();
+  }
+
+  function setInitialValues(): void {
+    if (!props.initialValues) return;
+    setFieldValue('selectedSchule', props.initialValues.selectedSchule ?? '');
+    setFieldValue('selectedKlassenname', props.initialValues.selectedKlassenname ?? '');
+  }
 
   watch(
-    () => props.autoselectedSchuleId,
-    (newId: string | null) => {
-      selectedSchule.value = newId || undefined;
+    () => props.isEditActive,
+    (newValue: boolean | undefined, oldValue: boolean | undefined) => {
+      if (oldValue && !newValue) setInitialValues();
     },
   );
 
-  // Watcher to detect when the search input for Organisationen is triggered.
-  watch(searchInputSchule, async (newValue: string | undefined) => {
-    clearTimeout(timerId.value);
-    if (hasAutoselected.value) return;
-    if (newValue !== '' && newValue === selectedSchuleTitle.value) return;
+  watch(
+    [isDirty, isValid],
+    () => {
+      emit('formStateChanged', {
+        values: { selectedKlassenname: selectedKlassenname.value, selectedSchule: selectedSchule.value ?? '' },
+        dirty: isDirty.value,
+        valid: isValid.value,
+      });
+    },
+    { immediate: true },
+  );
 
-    const organisationFilter: OrganisationenFilter = {
-      includeTyp: OrganisationsTyp.Schule,
-      systemrechte: [RollenSystemRecht.KlassenVerwalten],
-      limit: 25,
-    };
-    if (newValue) {
-      organisationFilter.searchString = newValue;
-    }
-    if (selectedSchule.value) {
-      organisationFilter.organisationIds = [selectedSchule.value];
-    }
+  watch(
+    () =>
+      ({
+        selectedSchule: props.initialValues?.selectedSchule,
+        selectedKlassenname: props.initialValues?.selectedKlassenname,
+      }) as Partial<ValidationSchema>,
+    (newValues: Partial<ValidationSchema>, oldValues: Partial<ValidationSchema>) => {
+      if (newValues.selectedSchule !== oldValues.selectedSchule) {
+        if (newValues.selectedKlassenname !== oldValues.selectedKlassenname) setInitialValues();
+        else setFieldValue('selectedSchule', newValues.selectedSchule ?? '');
+      }
+    },
+  );
 
-    timerId.value = setTimeout(async () => {
-      await organisationStore.getFilteredSchulen(organisationFilter);
-    }, 500);
-  });
+  function updateSchuleSelection(schuleId: string): void {
+    setFieldValue('selectedSchule', schuleId);
+  }
 </script>
 
 <template data-test-id="klasse-form">
   <FormWrapper
+    :canCommit
     :confirmUnsavedChangesAction="onHandleConfirmUnsavedChanges"
-    :createButtonLabel="$t('admin.klasse.create')"
-    :discardButtonLabel="$t('admin.klasse.discard')"
-    :hideActions="readonly || !!props.errorCode"
+    :createButtonLabel="props.editMode ? t('save') : t('admin.klasse.create')"
+    :discardButtonLabel="props.editMode ? t('cancel') : t('admin.klasse.discard')"
+    :hideActions="Boolean(errorCode) || (props.editMode && !isEditActive)"
     id="klasse-form"
     :isLoading="isLoading"
     :onDiscard="onHandleDiscard"
     @onShowDialogChange="onShowDialogChange"
-    :onSubmit="onSubmit"
+    :onSubmit="submitHandler"
     :showUnsavedChangesDialog="showUnsavedChangesDialog"
   >
     <!-- Slot for SPSH alerts -->
@@ -92,54 +136,43 @@
     <template v-if="!props.errorCode">
       <!-- Schule zuordnen -->
       <v-row>
-        <h3 class="headline-3">1. {{ $t('admin.schule.assignSchule') }}</h3>
+        <h3 class="headline-3">1. {{ t('admin.schule.assignSchule') }}</h3>
       </v-row>
       <FormRow
         :errorLabel="selectedSchuleProps?.error || ''"
         labelForId="schule-select"
         :isRequired="true"
-        :label="$t('admin.schule.schule')"
+        :label="t('admin.schule.schule')"
       >
-        <v-autocomplete
-          autocomplete="off"
-          :class="['filter-dropdown mb-4', { selected: selectedSchule }]"
-          clearable
-          data-testid="schule-select"
-          density="compact"
-          :disabled="hasAutoselected || readonly"
-          id="schule-select"
-          :items="schulen"
-          item-value="value"
-          item-text="title"
-          :no-data-text="$t('noDataFound')"
-          :placeholder="$t('admin.schule.assignSchule')"
-          ref="schule-select"
-          required="true"
-          variant="outlined"
-          v-bind="selectedSchuleProps"
-          v-model="selectedSchule"
-          v-model:search="searchInputSchule"
-          hide-details
-        ></v-autocomplete>
+        <SchulenFilter
+          ref="schulenFilter"
+          :selectedSchulen="selectedSchule"
+          :multiple="false"
+          :readonly="props.editMode"
+          :highlightSelection="props.editMode"
+          :systemrechteForSearch="[RollenSystemRecht.KlassenVerwalten]"
+          :selectedSchuleProps="selectedSchuleProps"
+          @update:selectedSchulen="updateSchuleSelection"
+        ></SchulenFilter>
       </FormRow>
 
       <!-- Klassenname eingeben -->
       <v-row class="mt-8">
-        <h3 class="headline-3">2. {{ $t('admin.klasse.enterKlassenname') }}</h3>
+        <h3 class="headline-3">2. {{ t('admin.klasse.enterKlassenname') }}</h3>
       </v-row>
       <FormRow
         :errorLabel="selectedKlassennameProps?.error || ''"
         labelForId="klassenname-input"
         :isRequired="true"
-        :label="$t('admin.klasse.klassenname')"
+        :label="t('admin.klasse.klassenname')"
       >
         <v-text-field
           clearable
           data-testid="klassenname-input"
           density="compact"
-          :disabled="!isEditActive"
+          :disabled="editMode && !isEditActive"
           id="klassenname-input"
-          :placeholder="$t('admin.klasse.enterKlassenname')"
+          :placeholder="t('admin.klasse.enterKlassenname')"
           ref="klassenname-input"
           required="true"
           variant="outlined"

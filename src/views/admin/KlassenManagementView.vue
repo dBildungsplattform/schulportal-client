@@ -1,24 +1,24 @@
 <script setup lang="ts">
-  import { computed, onMounted, ref, watch, type ComputedRef, type Ref } from 'vue';
+  import KlasseDelete from '@/components/admin/klassen/KlasseDelete.vue';
   import ResultTable, { type TableRow } from '@/components/admin/ResultTable.vue';
-  import { type Composer, useI18n } from 'vue-i18n';
-  import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
+  import SpshAlert from '@/components/alert/SpshAlert.vue';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import SchulenFilter from '@/components/filter/SchulenFilter.vue';
+  import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
   import {
     OrganisationsTyp,
     useOrganisationStore,
     type Organisation,
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
-  import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
-  import type { UserinfoPersonenkontext } from '@/stores/PersonenkontextStore';
+  import { RollenSystemRecht } from '@/stores/RolleStore';
   import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
   import { type Mutable, type TranslatedObject } from '@/types.d';
+  import { computed, onMounted, ref, watch, type ComputedRef, type Ref } from 'vue';
+  import { useI18n, type Composer } from 'vue-i18n';
   import { onBeforeRouteLeave, useRouter, type Router } from 'vue-router';
-  import KlasseDelete from '@/components/admin/klassen/KlasseDelete.vue';
-  import SpshAlert from '@/components/alert/SpshAlert.vue';
+  import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
 
-  const authStore: AuthStore = useAuthStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
   const { t }: Composer = useI18n({ useScope: 'global' });
@@ -27,8 +27,7 @@
 
   type TableHeaders = VDataTableServer['headers'];
 
-  // Define headers as a mutable array
-  let headers: Ref<Mutable<TableHeaders>> = ref([
+  const defaultHeaders: TableHeaders = [
     {
       title: t('admin.klasse.klasse'),
       key: 'name',
@@ -42,9 +41,14 @@
       sortable: false,
       width: '250px',
     },
-  ]);
+  ];
+  // Define headers as a mutable array
+  let headers: Ref<Mutable<TableHeaders>> = ref([...defaultHeaders]);
 
-  const selectedSchule: Ref<string | null> = ref(null);
+  const selectedSchule: Ref<string | undefined> = ref(undefined);
+  const { hasAutoselectedSchule }: ReturnType<typeof useAutoselectedSchule> = useAutoselectedSchule([
+    RollenSystemRecht.KlassenVerwalten,
+  ]);
   const selectedKlassen: Ref<Array<string>> = ref([]);
   const finalKlassen: ComputedRef<Organisation[]> = computed(() => {
     // If there are selected Klassen, filter the allKlassen to show only those
@@ -57,24 +61,10 @@
   });
 
   const klassenOptions: Ref<TranslatedObject[] | undefined> = ref([]);
-
-  const searchInputSchulen: Ref<string> = ref('');
   const searchInputKlassen: Ref<string> = ref('');
-  const hasAutoselectedSchule: Ref<boolean> = ref(false);
-
-  const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
 
   // Variable to track the number of Klassen found depending on the search. The variable totalKlasse in the store controls the table paging and can't be used here correctly.
   let totalKlassen: number = 0;
-
-  const schulen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    return organisationStore.allSchulen
-      .map((org: Organisation) => ({
-        value: org.id,
-        title: `${org.kennung} (${org.name.trim()})`,
-      }))
-      .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
-  });
 
   const errorTitle: ComputedRef<string> = computed(() => {
     if (!organisationStore.errorCode) {
@@ -167,38 +157,9 @@
     }
   }
 
-  async function updateSelectedSchule(newValue: string | null): Promise<void> {
-    await searchFilterStore.setSchuleFilterForKlassen(newValue);
-    if (newValue !== null) {
-      selectedKlassen.value = [];
-      organisationStore.allKlassen = [];
-      await fetchKlassenBySelectedSchuleId(newValue);
-    } else {
-      // Reset selectedKlassen and klassenOptions when Schule is unselected
-      selectedKlassen.value = [];
-      klassenOptions.value = [];
-      organisationStore.allKlassen = [];
-      searchFilterStore.selectedKlassenForKlassen = [];
-      totalKlassen = 0;
-
-      // Fetch all Klassen when no Schule is selected
-      await organisationStore.getAllOrganisationen({
-        offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
-        limit: 25,
-        includeTyp: OrganisationsTyp.Klasse,
-        systemrechte: ['KLASSEN_VERWALTEN'],
-      });
-      klassenOptions.value = organisationStore.allKlassen.map((org: Organisation) => ({
-        value: org.id,
-        title: org.name,
-      }));
-    }
-    totalKlassen = organisationStore.allKlassen.length;
-  }
-
   async function updateSelectedKlassen(newValue: string[]): Promise<void> {
     await searchFilterStore.setKlasseFilterForKlassen(newValue);
-    if (newValue.length > 0 && selectedSchule.value !== null) {
+    if (newValue.length > 0 && selectedSchule.value !== undefined) {
       await organisationStore.getKlassenByOrganisationId({
         offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
         limit: searchFilterStore.klassenPerPage,
@@ -216,7 +177,7 @@
         value: org.id,
         title: org.name,
       }));
-    } else if (selectedSchule.value !== null) {
+    } else if (selectedSchule.value !== undefined) {
       // If no Klassen are selected but a Schule is selected, show all Klassen for the selected Schule
       organisationStore.allKlassen = organisationStore.klassen;
     } else {
@@ -230,55 +191,8 @@
     }
   }
 
-  // Computed property to get the title of the selected organisation
-  const selectedOrganisationTitle: ComputedRef<string | undefined> = computed(() => {
-    return schulen.value?.find((org: TranslatedObject) => org.value === selectedSchule.value)?.title;
-  });
-
-  // Using a watcher instead of modelUpdate since we need the old Value as well.
-  // Default behavior of the autocomplete is to reset the newValue to empty string and that causes another request to be made
-  watch(searchInputSchulen, async (newValue: string, oldValue: string) => {
-    clearTimeout(timerId.value);
-
-    if (oldValue === selectedOrganisationTitle.value) {
-      return;
-    }
-    // If searchValue is empty and selectedOrganisation does not have a value, fetch initial data
-    if (newValue === '' && !selectedSchule.value) {
-      timerId.value = setTimeout(async () => {
-        // Fetch Schulen matching the search string when it has 3 or more characters
-        await organisationStore.getAllOrganisationen({
-          includeTyp: OrganisationsTyp.Schule,
-          limit: 25,
-          systemrechte: ['KLASSEN_VERWALTEN'],
-        });
-      }, 500);
-    } else if (newValue && newValue !== selectedOrganisationTitle.value) {
-      // If searchValue is not empty and different from the current title, proceed with the search
-      timerId.value = setTimeout(async () => {
-        // Fetch Schulen matching the search string when it has 3 or more characters
-        await organisationStore.getAllOrganisationen({
-          searchString: newValue,
-          includeTyp: OrganisationsTyp.Schule,
-          limit: 25,
-          systemrechte: ['KLASSEN_VERWALTEN'],
-        });
-      }, 500);
-    } else if (newValue === '' && selectedSchule.value) {
-      // If searchValue is empty and an organization is selected, fetch roles for the selected organization
-      timerId.value = setTimeout(async () => {
-        await organisationStore.getAllOrganisationen({
-          searchString: newValue,
-          includeTyp: OrganisationsTyp.Schule,
-          limit: 25,
-          systemrechte: ['KLASSEN_VERWALTEN'],
-        });
-      }, 500);
-    }
-  });
-
   async function updateKlassenSearch(searchValue: string): Promise<void> {
-    if (searchValue.length >= 1 && selectedSchule.value !== null) {
+    if (searchValue.length >= 1 && selectedSchule.value !== undefined) {
       // Fetch Klassen matching the search string and selected schule
       await organisationStore.getAllOrganisationen({
         offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
@@ -317,7 +231,7 @@
 
       // Calculate the total Klassen by summing up unique matches
       totalKlassen = filteredOptions.length + matchedSelectedKlassen.length;
-    } else if (searchValue.length >= 1 && selectedSchule.value === null) {
+    } else if (searchValue.length >= 1 && selectedSchule.value === undefined) {
       await organisationStore.getAllOrganisationen({
         offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
         limit: searchFilterStore.klassenPerPage,
@@ -325,14 +239,14 @@
         includeTyp: OrganisationsTyp.Klasse,
         systemrechte: ['KLASSEN_VERWALTEN'],
       });
-    } else if (searchValue.length < 1 && selectedSchule.value === null) {
+    } else if (searchValue.length < 1 && selectedSchule.value === undefined) {
       await organisationStore.getAllOrganisationen({
         offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
         limit: searchFilterStore.klassenPerPage,
         includeTyp: OrganisationsTyp.Klasse,
         systemrechte: ['KLASSEN_VERWALTEN'],
       });
-    } else if (searchValue === '' && selectedSchule.value !== null && selectedKlassen.value.length === 0) {
+    } else if (searchValue === '' && selectedSchule.value !== undefined && selectedKlassen.value.length === 0) {
       // Fetch all Klassen for the selected Schule when the search string is cleared
       await organisationStore.getAllOrganisationen({
         searchString: searchValue,
@@ -348,7 +262,7 @@
         title: org.name,
       }));
       totalKlassen = klassenOptions.value.length;
-    } else if (searchValue === '' && selectedSchule.value !== null && selectedKlassen.value.length !== 0) {
+    } else if (searchValue === '' && selectedSchule.value !== undefined && selectedKlassen.value.length !== 0) {
       // Fetch all Klassen for the selected Schule when the search string is cleared
       await organisationStore.getAllOrganisationen({
         searchString: searchValue,
@@ -388,15 +302,12 @@
     searchFilterStore.setKlasseFilterForKlassen([]);
 
     // If the user has an autoselected Schule, do not reset it
-    if (hasAutoselectedSchule.value && selectedSchule.value !== null) {
+    if (hasAutoselectedSchule.value && selectedSchule.value !== undefined) {
       // Fetch all Klassen for the selected Schule
       organisationStore.getKlassenByOrganisationId({ limit: 25, administriertVon: [selectedSchule.value] });
       organisationStore.allKlassen = organisationStore.klassen;
     } else {
-      // Clear search input for Schulen
-      searchInputSchulen.value = '';
-      // Clear selected Schule
-      selectedSchule.value = null;
+      selectedSchule.value = undefined;
       // Reset klassenOptions
       klassenOptions.value = [];
       // Refetch all data
@@ -413,19 +324,13 @@
       });
     }
   }
-  // Checks the current logged in user's kontexte and compares that to the organisations in the DB.
-  // If the user has exactly 1 matching organisation then the Schule will be autoselectd for him.
-  async function handleUserContext(): Promise<void> {
-    const personenkontexte: Array<UserinfoPersonenkontext> = authStore.currentUser?.personenkontexte || [];
-    if (personenkontexte.length > 0) {
-      if (organisationStore.allSchulen.length === 1 && !searchFilterStore.selectedSchuleForKlassen) {
-        selectedSchule.value = organisationStore.allSchulen[0]?.id || null;
-        if (selectedSchule.value) {
-          await organisationStore.getKlassenByOrganisationId({ administriertVon: [selectedSchule.value] });
-          hasAutoselectedSchule.value = true;
-          totalKlassen = klassenOptions.value?.length || 0;
-        }
-      } else if (headers.value) {
+
+  watch(
+    hasAutoselectedSchule,
+    () => {
+      if (hasAutoselectedSchule.value) {
+        headers.value = [...defaultHeaders];
+      } else {
         headers.value = [
           {
             title: t('admin.schule.dienststellennummer'),
@@ -433,15 +338,31 @@
             align: 'start',
             width: '350px',
           },
-          ...headers.value,
+          ...defaultHeaders,
         ];
       }
+    },
+    { immediate: true },
+  );
+
+  async function updateSchuleSelection(id: string | undefined): Promise<void> {
+    if (selectedSchule.value == id) return;
+    selectedSchule.value = id;
+    if (!id) {
+      await resetSearchAndFilter();
+      return;
     }
+    await searchFilterStore.setSchuleFilterForKlassen(id);
+    selectedKlassen.value = [];
+    organisationStore.allKlassen = [];
+    await fetchKlassenBySelectedSchuleId(id);
+    totalKlassen = organisationStore.allKlassen.length;
   }
 
   function navigateToKlassenDetails(_$event: PointerEvent, { item }: { item: Organisation }): void {
     router.push({ name: 'klasse-details', params: { id: item.id } });
   }
+
   onMounted(async () => {
     // If the store holds a Schule already then use it
     if (searchFilterStore.selectedSchuleForKlassen) {
@@ -455,20 +376,12 @@
         includeTyp: OrganisationsTyp.Klasse,
         systemrechte: ['KLASSEN_VERWALTEN'],
       });
-      await organisationStore.getAllOrganisationen({
-        offset: (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
-        limit: 25,
-        includeTyp: OrganisationsTyp.Schule,
-        systemrechte: ['KLASSEN_VERWALTEN'],
-      });
       // Initialize klassenOptions with all Klassen
       klassenOptions.value = organisationStore.allKlassen.map((org: Organisation) => ({
         value: org.id,
         title: org.name,
       }));
     }
-    // Handle user context
-    await handleUserContext();
   });
 
   async function deleteKlasse(organisationId: string): Promise<void> {
@@ -534,33 +447,21 @@
             cols="12"
             class="py-md-0"
           >
-            <v-autocomplete
-              autocomplete="off"
-              class="filter-dropdown"
-              :class="{ selected: selectedSchule }"
-              clearable
-              data-testid="schule-select"
-              density="compact"
-              :disabled="hasAutoselectedSchule"
-              hide-details
-              id="schule-select"
-              :items="schulen"
-              item-value="value"
-              item-text="title"
-              :no-data-text="$t('noDataFound')"
-              :placeholder="$t('admin.schule.schule')"
+            <SchulenFilter
+              :systemrechte-for-search="[RollenSystemRecht.KlassenVerwalten]"
+              :multiple="false"
+              :hideDetails="true"
+              :highlightSelection="true"
+              :selectedSchulen="selectedSchule"
+              @update:selectedSchulen="updateSchuleSelection"
+              :placeholderText="t('admin.schule.schule')"
               ref="schule-select"
-              required="true"
-              variant="outlined"
-              @update:modelValue="updateSelectedSchule"
-              v-model="selectedSchule"
-              v-model:search="searchInputSchulen"
             >
               <template v-slot:prepend-item>
                 <v-list-item>
                   <v-progress-circular
                     indeterminate
-                    v-if="organisationStore.loading"
+                    v-if="organisationStore.schulenFilter.loading"
                   ></v-progress-circular>
                   <span
                     v-else
@@ -568,14 +469,14 @@
                     >{{
                       $t(
                         'admin.schule.schulenFound',
-                        { count: organisationStore.totalPaginatedSchulen },
-                        organisationStore.totalPaginatedSchulen,
+                        { count: organisationStore.schulenFilter.total },
+                        organisationStore.schulenFilter.total,
                       )
                     }}</span
                   >
                 </v-list-item>
               </template>
-            </v-autocomplete>
+            </SchulenFilter>
           </v-col>
           <v-col
             md="3"
@@ -663,7 +564,7 @@
               :errorCode="organisationStore.errorCode"
               :klassenname="item.name"
               :klassenId="item.id"
-              :schulname="item.schuleDetails || ''"
+              :schulname="item.schuleDetails ?? ''"
               :useIconActivator="true"
               :isLoading="organisationStore.loading"
               @onDeleteKlasse="deleteKlasse(item.id)"

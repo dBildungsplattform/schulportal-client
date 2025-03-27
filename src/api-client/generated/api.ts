@@ -1567,87 +1567,6 @@ export interface ParentOrganisationsByIdsBodyParams {
 /**
  * 
  * @export
- * @interface Person
- */
-export interface Person {
-    /**
-     * 
-     * @type {string}
-     * @memberof Person
-     */
-    'id': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Person
-     */
-    'referrer': string | null;
-    /**
-     * 
-     * @type {string}
-     * @memberof Person
-     */
-    'mandant': string;
-    /**
-     * 
-     * @type {PersonNameResponse}
-     * @memberof Person
-     */
-    'name': PersonNameResponse;
-    /**
-     * 
-     * @type {PersonBirthResponse}
-     * @memberof Person
-     */
-    'geburt': PersonBirthResponse | null;
-    /**
-     * 
-     * @type {string}
-     * @memberof Person
-     */
-    'stammorganisation': string | null;
-    /**
-     * 
-     * @type {string}
-     * @memberof Person
-     */
-    'geschlecht': string | null;
-    /**
-     * 
-     * @type {string}
-     * @memberof Person
-     */
-    'lokalisierung': string | null;
-    /**
-     * 
-     * @type {Vertrauensstufe}
-     * @memberof Person
-     */
-    'vertrauensstufe': Vertrauensstufe;
-    /**
-     * 
-     * @type {string}
-     * @memberof Person
-     */
-    'revision': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Person
-     */
-    'personalnummer': string | null;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof Person
-     */
-    'dienststellen': Array<string> | null;
-}
-
-
-/**
- * 
- * @export
  * @interface PersonBirthParams
  */
 export interface PersonBirthParams {
@@ -1819,10 +1738,10 @@ export interface PersonInfoResponse {
     'pid': string;
     /**
      * 
-     * @type {Person}
+     * @type {PersonNestedInPersonInfoResponse}
      * @memberof PersonInfoResponse
      */
-    'person': Person;
+    'person': PersonNestedInPersonInfoResponse;
     /**
      * 
      * @type {Array<PersonenkontextResponse>}
@@ -2026,6 +1945,87 @@ export interface PersonNameResponse {
      */
     'sortierindex': string | null;
 }
+/**
+ * 
+ * @export
+ * @interface PersonNestedInPersonInfoResponse
+ */
+export interface PersonNestedInPersonInfoResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonNestedInPersonInfoResponse
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonNestedInPersonInfoResponse
+     */
+    'referrer': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonNestedInPersonInfoResponse
+     */
+    'mandant': string;
+    /**
+     * 
+     * @type {PersonNameResponse}
+     * @memberof PersonNestedInPersonInfoResponse
+     */
+    'name': PersonNameResponse;
+    /**
+     * 
+     * @type {PersonBirthResponse}
+     * @memberof PersonNestedInPersonInfoResponse
+     */
+    'geburt': PersonBirthResponse | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonNestedInPersonInfoResponse
+     */
+    'stammorganisation': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonNestedInPersonInfoResponse
+     */
+    'geschlecht': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonNestedInPersonInfoResponse
+     */
+    'lokalisierung': string | null;
+    /**
+     * 
+     * @type {Vertrauensstufe}
+     * @memberof PersonNestedInPersonInfoResponse
+     */
+    'vertrauensstufe': Vertrauensstufe;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonNestedInPersonInfoResponse
+     */
+    'revision': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonNestedInPersonInfoResponse
+     */
+    'personalnummer': string | null;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof PersonNestedInPersonInfoResponse
+     */
+    'dienststellen': Array<string> | null;
+}
+
+
 /**
  * 
  * @export
@@ -2418,10 +2418,10 @@ export type PersonenkontextResponseSichtfreigabeEnum = typeof PersonenkontextRes
 export interface PersonenkontextRolleFieldsResponse {
     /**
      * 
-     * @type {string}
+     * @type {OrganisationResponse}
      * @memberof PersonenkontextRolleFieldsResponse
      */
-    'organisationsId': string;
+    'organisation': OrganisationResponse;
     /**
      * 
      * @type {RollenSystemRechtServiceProviderIDResponse}

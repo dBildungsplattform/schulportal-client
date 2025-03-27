@@ -1,13 +1,12 @@
+import axiosApiInstance from '@/services/ApiService';
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import {
   AuthApiFactory,
   type AuthApiInterface,
   type PersonTimeLimitInfoResponse,
-  type PersonenkontextRolleFieldsResponse,
   type UserinfoResponse,
 } from '../api-client/generated/api';
-import axiosApiInstance from '@/services/ApiService';
-import type { UserinfoPersonenkontext } from './PersonenkontextStore';
+import type { Organisation } from './OrganisationStore';
 
 export enum StepUpLevel {
   NONE = 'none',
@@ -35,8 +34,16 @@ export type UserInfo = {
   phone_number: string | null;
   updated_at: string | null;
   personId: string | null;
-  personenkontexte: Array<PersonenkontextRolleFieldsResponse> | null;
+  personenkontexte: Array<PersonenkontextRolleFields> | null;
   password_updated_at: string | null;
+};
+
+export type PersonenkontextRolleFields = {
+  organisation: Organisation;
+  rolle: {
+    systemrechte: Array<string>;
+    serviceProviderIds: Array<string>;
+  };
 };
 
 type AuthState = {
@@ -105,8 +112,8 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
           this.timeLimitInfos = data.timeLimits;
 
           /* extract all system permissions from current user's personenkontexte */
-          const personenkontexte: Array<UserinfoPersonenkontext> | null = this.currentUser.personenkontexte;
-          personenkontexte?.forEach((personenkontext: UserinfoPersonenkontext) => {
+          const personenkontexte: Array<PersonenkontextRolleFields> | null = this.currentUser.personenkontexte;
+          personenkontexte?.forEach((personenkontext: PersonenkontextRolleFields) => {
             personenkontext.rolle.systemrechte.forEach((systemrecht: string) => {
               /* push unique permissions only */
               if (systemrecht && this.currentUserPermissions.indexOf(systemrecht) === -1)
