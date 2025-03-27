@@ -1,16 +1,16 @@
-import { expect, test, type MockInstance } from 'vitest';
-import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
-import KlassenDetailsView from './KlasseDetailsView.vue';
-import { setActivePinia, createPinia } from 'pinia';
 import routes from '@/router/routes';
-import { type Router, createRouter, createWebHistory } from 'vue-router';
 import {
   OrganisationsTyp,
   useOrganisationStore,
   type Organisation,
   type OrganisationStore,
 } from '@/stores/OrganisationStore';
+import { DOMWrapper, VueWrapper, flushPromises, mount } from '@vue/test-utils';
+import { createPinia, setActivePinia } from 'pinia';
+import { expect, test, type MockInstance } from 'vitest';
 import { nextTick } from 'vue';
+import { createRouter, createWebHistory, type Router } from 'vue-router';
+import KlassenDetailsView from './KlasseDetailsView.vue';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -51,7 +51,15 @@ beforeEach(async () => {
   await router.isReady();
 
   organisationStore.currentOrganisation = mockCurrentOrganisation;
+  organisationStore.schulenFilter.filterResult = [mockCurrentOrganisation];
   organisationStore.currentKlasse = mockCurrentKlasse;
+  vi.spyOn(organisationStore, 'getOrganisationById').mockImplementation(
+    (_id: string, _typ: OrganisationsTyp): Promise<Organisation> => {
+      organisationStore.currentKlasse = mockCurrentKlasse;
+      organisationStore.currentOrganisation = mockCurrentOrganisation;
+      return Promise.resolve(mockCurrentOrganisation);
+    },
+  );
 
   wrapper = mount(KlassenDetailsView, {
     attachTo: document.getElementById('app') || '',
@@ -73,6 +81,9 @@ describe('KlassenDetailsView', () => {
   test('it renders the klasse details view and its components', () => {
     expect(wrapper?.find('[data-testid="klasse-details-card"]').isVisible()).toBe(true);
     expect(wrapper?.findComponent({ ref: 'klasse-creation-form' }).isVisible()).toBe(true);
+    expect(wrapper?.findComponent({ ref: 'klasse-delete' }).isVisible()).toBe(true);
+    expect(wrapper?.find('[data-testid="schule-select"]').text()).toEqual('1234654 (BTC Schule)');
+    expect(wrapper?.find('#klassenname-input').attributes('value')).toEqual('1a');
     expect(wrapper?.findComponent({ ref: 'klasse-delete' }).isVisible()).toBe(true);
   });
 
@@ -115,15 +126,34 @@ describe('KlassenDetailsView', () => {
   });
 
   test('it activates and cancels editing', async () => {
+    expect(wrapper?.find('[data-testid="klasse-form-submit-button"]').exists()).toBe(false);
+    expect(wrapper?.find('[data-testid="klasse-form-discard-button"]').exists()).toBe(false);
     await wrapper?.find('[data-testid="klasse-edit-button"]').trigger('click');
     await nextTick();
 
     const saveKlasseButton: DOMWrapper<HTMLInputElement> | undefined = wrapper?.find(
-      '[data-testid="klasse-changes-save-button"]',
+      '[data-testid="klasse-form-submit-button"]',
     );
     expect(saveKlasseButton?.isVisible()).toBe(true);
 
-    await wrapper?.find('[data-testid="klasse-edit-cancel-button"]').trigger('click');
+    await wrapper?.find('[data-testid="klasse-form-discard-button"]').trigger('click');
+    await nextTick();
+
+    expect(wrapper?.find('[data-testid="klasse-form-submit-button"]').exists()).toBe(false);
+    expect(wrapper?.find('[data-testid="klasse-form-discard-button"]').exists()).toBe(false);
+  });
+
+  test('it does not cancel editing because of unsaved changes', async () => {
+    organisationStore.updatedOrganisation = null;
+    organisationStore.errorCode = '';
+
+    await wrapper?.find('[data-testid="klasse-edit-button"]').trigger('click');
+    await nextTick();
+
+    await wrapper?.find('[data-testid="klassenname-input"] input').setValue('1b');
+    await nextTick();
+
+    await wrapper?.find('[data-testid="klasse-form-discard-button"]').trigger('click');
     await nextTick();
 
     // TODO: the dialog is not removed from DOM
@@ -140,21 +170,28 @@ describe('KlassenDetailsView', () => {
     await wrapper?.find('[data-testid="klassenname-input"] input').setValue('1b');
     await nextTick();
 
-    await wrapper?.find('[data-testid="klasse-edit-cancel-button"]').trigger('click');
+    await wrapper?.find('[data-testid="klasse-form-discard-button"]').trigger('click');
     await nextTick();
 
     expect(document.querySelector('[data-testid="unsaved-changes-warning-text"]')).not.toBeNull();
   });
 
   test('it edits klassenname', async () => {
+    vi.spyOn(organisationStore, 'updateOrganisationById').mockImplementationOnce((_orgId: string, name: string) => {
+      organisationStore.updatedOrganisation = {
+        ...organisationStore.currentOrganisation!,
+        name,
+      };
+      return Promise.resolve();
+    });
     await wrapper?.find('[data-testid="klasse-edit-button"]').trigger('click');
     await nextTick();
 
-    await wrapper?.find('[data-testid="klassenname-input"] input').setValue('1b');
-    await nextTick();
+    await wrapper?.find('#klassenname-input').setValue('1b');
+    expect(wrapper?.find('#klassenname-input').attributes('value')).toEqual('1b');
 
-    await wrapper?.find('[data-testid="klasse-changes-save-button"]').trigger('click');
-    await nextTick();
+    await wrapper?.find('[data-testid="klasse-form-submit-button"]').trigger('click');
+    await flushPromises();
 
     organisationStore.updatedOrganisation = {
       id: '3',

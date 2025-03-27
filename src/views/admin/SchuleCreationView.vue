@@ -114,7 +114,6 @@
         undefined,
         undefined,
         OrganisationsTyp.Schule,
-        undefined,
       );
       resetForm({
         values: {
