@@ -382,17 +382,17 @@
               <strong class="text-white">{{ Math.ceil(value) }}%</strong>
             </template>
           </v-progress-linear>
+          <v-divider
+            class="border-opacity-100 rounded my-6"
+            color="#E5EAEF"
+            thickness="6"
+          ></v-divider>
         </div>
 
         <v-row
           v-if="!organisationStore.errorCode && (progress === 0 || progress === 100)"
           class="py-3 px-2 save-cancel-row justify-end"
         >
-          <v-divider
-            class="border-opacity-100 rounded my-6"
-            color="#E5EAEF"
-            thickness="6"
-          ></v-divider>
           <v-col
             v-if="progress === 0 || progress === 100 || organisationStore.updatedOrganisation"
             cols="12"
