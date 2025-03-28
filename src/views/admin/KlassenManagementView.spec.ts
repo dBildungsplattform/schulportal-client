@@ -252,7 +252,7 @@ describe('KlassenManagementView', () => {
   it('should fetch all Klassen when search string is empty and no Schule is selected', async () => {
     const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
 
-    await klasseAutocomplete?.vm.$emit('update:search', '');
+    await klasseAutocomplete?.vm.$emit('update:search', '1');
     await flushPromises();
 
     expect(organisationStore.getAllOrganisationen).toHaveBeenCalledWith({
@@ -260,6 +260,7 @@ describe('KlassenManagementView', () => {
       limit: searchFilterStore.klassenPerPage,
       includeTyp: OrganisationsTyp.Klasse,
       systemrechte: [RollenSystemRecht.KlassenVerwalten],
+      searchString: '1',
     });
   });
 
@@ -274,19 +275,21 @@ describe('KlassenManagementView', () => {
       includeTyp: 'KLASSE',
       limit: searchFilterStore.klassenPerPage,
       offset: 0,
-      searchString: '',
+      organisationIds: [],
       systemrechte: ['KLASSEN_VERWALTEN'],
     };
     expect(organisationStore.getAllOrganisationen).toHaveBeenLastCalledWith(expectedFilter);
   });
 
   test('it does nothing if same schule is selected again', async () => {
-    selectSchule();
+    const selectedSchule: Organisation = (await selectSchule())!;
 
     const allSpy: MockInstance = vi.spyOn(organisationStore, 'getAllOrganisationen');
     allSpy.mockClear();
 
-    selectSchule();
+    expect(allSpy).not.toHaveBeenCalled();
+
+    await selectSchule(selectedSchule);
     await flushPromises();
 
     expect(allSpy).not.toHaveBeenCalled();
