@@ -170,6 +170,8 @@
     searchFilterStore.klassenPage = 1;
     if (id) {
       klassenAutocompleteFilter.administriertVon = [id];
+    } else {
+      await resetSearchAndFilter();
     }
   }
 

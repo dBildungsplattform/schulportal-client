@@ -112,6 +112,7 @@ describe('KlassenManagementView', () => {
     wrapper = mountComponent();
     vi.resetAllMocks();
   });
+
   type AutoselectTestcase = {
     label: string;
     isSchuleAutoselected: boolean;
@@ -227,7 +228,7 @@ describe('KlassenManagementView', () => {
     await nextTick();
 
     selectSchule(null);
-    await nextTick();
+    await flushPromises();
 
     expect(klasseAutocomplete?.text()).toEqual('');
   });
