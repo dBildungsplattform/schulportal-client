@@ -236,6 +236,8 @@
     if (searchFilterStore.selectedSchuleForKlassen) {
       await updateSchuleSelection(searchFilterStore.selectedSchuleForKlassen);
       selectedKlassen.value = searchFilterStore.selectedKlassenForKlassen || [];
+    } else {
+      await updateSchuleSelection(undefined);
     }
   });
 
