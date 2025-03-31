@@ -2,6 +2,7 @@ import { RollenSystemRecht } from '@/api-client/generated';
 import routes from '@/router/routes';
 import { useAuthStore, type AuthStore, type UserInfo } from '@/stores/AuthStore';
 import {
+  OrganisationsTyp,
   useOrganisationStore,
   type Organisation,
   type OrganisationenFilter,
@@ -116,6 +117,7 @@ describe('KlassenManagementView', () => {
     authStore.currentUser = authUser;
 
     wrapper = await mountComponent();
+    vi.useFakeTimers();
     vi.resetAllMocks();
   });
 
@@ -257,13 +259,53 @@ describe('KlassenManagementView', () => {
     await flushPromises();
     const expectedFilter: OrganisationenFilter = {
       administriertVon: [schule.id],
-      includeTyp: 'KLASSE',
+      includeTyp: OrganisationsTyp.Klasse,
       limit: searchFilterStore.klassenPerPage,
       offset: 0,
       organisationIds: [],
-      systemrechte: ['KLASSEN_VERWALTEN'],
+      systemrechte: [RollenSystemRecht.KlassenVerwalten],
     };
     expect(organisationStore.getAllOrganisationen).toHaveBeenLastCalledWith(expectedFilter);
+  });
+
+  test('it searches for klasse', async () => {
+    const searchString: string = organisationStore.allKlassen[0]!.name.substring(0, 1);
+    const schule: Organisation = (await selectSchule())!;
+    const klasseSearchInput: ReturnType<VueWrapper['findComponent']> | undefined = wrapper?.find('#klasse-select');
+
+    await klasseSearchInput?.setValue(searchString);
+    await flushPromises();
+    vi.runAllTimers();
+
+    expect(klasseSearchInput?.html()).includes(searchString);
+    expect(organisationStore.getKlassenByOrganisationId).toHaveBeenCalledWith({
+      searchString,
+      administriertVon: [schule.id],
+      limit: 25,
+      offset: 0,
+      organisationIds: [],
+      systemrechte: [RollenSystemRecht.KlassenVerwalten],
+    });
+  });
+
+  test('it clears searchfield when losing focus', async () => {
+    const searchString: string = organisationStore.allKlassen[0]!.name.substring(0, 1);
+    await selectSchule();
+    const klasseSearchInput: ReturnType<VueWrapper['findComponent']> | undefined = wrapper?.find('#klasse-select');
+    const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
+
+    await klasseSearchInput?.setValue(searchString);
+    await klasseAutocomplete?.vm.$emit('update:search', searchString);
+
+    await flushPromises();
+    vi.runAllTimers();
+
+    expect(klasseSearchInput?.html()).includes(searchString);
+
+    // focus ANOTHER element, so the input loses focus and triggers the listener
+    await klasseSearchInput?.trigger('focus');
+
+    expect(klasseSearchInput?.html()).not.includes(searchString);
   });
 
   test('it does nothing if same schule is selected again', async () => {

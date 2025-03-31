@@ -85,6 +85,7 @@
     limit: 25,
     organisationIds: searchFilterStore.selectedKlassenForKlassen || [],
     systemrechte: [RollenSystemRecht.KlassenVerwalten],
+    searchString: '',
   });
 
   const klassenOptions: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
@@ -217,19 +218,30 @@
     { immediate: true },
   );
 
-  watch(searchInputKlassen, (newInput: string) => {
-    const timeout: number = klassenAutocompleteDebounceTimer ? 500 : 0;
-    if (klassenAutocompleteDebounceTimer) clearTimeout(klassenAutocompleteDebounceTimer);
-    klassenAutocompleteDebounceTimer = setTimeout(() => (klassenAutocompleteFilter.searchString = newInput), timeout);
-  });
+  function updateKlasseSearchstring(searchString: string): void {
+    klassenAutocompleteFilter.searchString = searchString;
+  }
+
+  watch(searchInputKlassen, updateKlasseSearchstring);
 
   watchEffect(async () => {
     await organisationStore.getAllOrganisationen(klassenListFilter.value);
   });
 
-  watchEffect(async () => {
-    await organisationStore.getKlassenByOrganisationId(klassenAutocompleteFilter);
-  });
+  watch(
+    klassenAutocompleteFilter,
+    async (updatedFilter: OrganisationenFilter | undefined) => {
+      const timeout: number = klassenAutocompleteDebounceTimer ? 500 : 0;
+      if (klassenAutocompleteDebounceTimer) clearTimeout(klassenAutocompleteDebounceTimer);
+      klassenAutocompleteDebounceTimer = setTimeout(async () => {
+        await organisationStore.getKlassenByOrganisationId(updatedFilter);
+      }, timeout);
+    },
+    {
+      deep: true,
+      immediate: true,
+    },
+  );
 
   onMounted(async () => {
     // If the store holds a Schule already then use it
