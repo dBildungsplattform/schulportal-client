@@ -1751,10 +1751,10 @@ export interface PersonInfoResponse {
     'person': PersonNestedInPersonInfoResponse;
     /**
      * 
-     * @type {Array<PersonenkontextResponse>}
+     * @type {Array<PersonenInfoKontextResponse>}
      * @memberof PersonInfoResponse
      */
-    'personenkontexte': Array<PersonenkontextResponse>;
+    'personenkontexte': Array<PersonenInfoKontextResponse>;
     /**
      * 
      * @type {Array<string>}
@@ -2274,6 +2274,106 @@ export interface PersonTimeLimitInfoResponse {
 /**
  * 
  * @export
+ * @interface PersonenInfoKontextResponse
+ */
+export interface PersonenInfoKontextResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonenInfoKontextResponse
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonenInfoKontextResponse
+     */
+    'referrer': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonenInfoKontextResponse
+     */
+    'mandant': string;
+    /**
+     * 
+     * @type {object}
+     * @memberof PersonenInfoKontextResponse
+     */
+    'organisation': object;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonenInfoKontextResponse
+     */
+    'rollenart': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonenInfoKontextResponse
+     */
+    'rollenname': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonenInfoKontextResponse
+     */
+    'personenstatus': PersonenInfoKontextResponsePersonenstatusEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonenInfoKontextResponse
+     */
+    'jahrgangsstufe': PersonenInfoKontextResponseJahrgangsstufeEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonenInfoKontextResponse
+     */
+    'sichtfreigabe': PersonenInfoKontextResponseSichtfreigabeEnum;
+    /**
+     * 
+     * @type {LoeschungResponse}
+     * @memberof PersonenInfoKontextResponse
+     */
+    'loeschung': LoeschungResponse | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonenInfoKontextResponse
+     */
+    'revision': string;
+}
+
+export const PersonenInfoKontextResponsePersonenstatusEnum = {
+    Aktiv: 'AKTIV'
+} as const;
+
+export type PersonenInfoKontextResponsePersonenstatusEnum = typeof PersonenInfoKontextResponsePersonenstatusEnum[keyof typeof PersonenInfoKontextResponsePersonenstatusEnum];
+export const PersonenInfoKontextResponseJahrgangsstufeEnum = {
+    _01: '01',
+    _02: '02',
+    _03: '03',
+    _04: '04',
+    _05: '05',
+    _06: '06',
+    _07: '07',
+    _08: '08',
+    _09: '09',
+    _10: '10'
+} as const;
+
+export type PersonenInfoKontextResponseJahrgangsstufeEnum = typeof PersonenInfoKontextResponseJahrgangsstufeEnum[keyof typeof PersonenInfoKontextResponseJahrgangsstufeEnum];
+export const PersonenInfoKontextResponseSichtfreigabeEnum = {
+    Ja: 'ja',
+    Nein: 'nein'
+} as const;
+
+export type PersonenInfoKontextResponseSichtfreigabeEnum = typeof PersonenInfoKontextResponseSichtfreigabeEnum[keyof typeof PersonenInfoKontextResponseSichtfreigabeEnum];
+
+/**
+ * 
+ * @export
  * @interface PersonendatensatzResponse
  */
 export interface PersonendatensatzResponse {
@@ -2425,10 +2525,10 @@ export type PersonenkontextResponseSichtfreigabeEnum = typeof PersonenkontextRes
 export interface PersonenkontextRolleFieldsResponse {
     /**
      * 
-     * @type {string}
+     * @type {OrganisationResponse}
      * @memberof PersonenkontextRolleFieldsResponse
      */
-    'organisationsId': string;
+    'organisation': OrganisationResponse;
     /**
      * 
      * @type {RollenSystemRechtServiceProviderIDResponse}
@@ -6880,7 +6980,7 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
          * @param {Array<RollenSystemRecht>} [systemrechte] 
          * @param {Array<OrganisationsTyp>} [excludeTyp] 
          * @param {Array<string>} [administriertVon] 
-         * @param {Array<string>} [zugehoerigZu] Liefert die Kinderorganisation die den IDs hier zugehören.
+         * @param {Array<string>} [zugehoerigZu] Liefert die Kind-Organisationen, die den angegebenen IDs zugehörig sind.
          * @param {Array<string>} [organisationIds] Liefert Organisationen mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -7342,7 +7442,7 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
          * @param {Array<RollenSystemRecht>} [systemrechte] 
          * @param {Array<OrganisationsTyp>} [excludeTyp] 
          * @param {Array<string>} [administriertVon] 
-         * @param {Array<string>} [zugehoerigZu] Liefert die Kinderorganisation die den IDs hier zugehören.
+         * @param {Array<string>} [zugehoerigZu] Liefert die Kind-Organisationen, die den angegebenen IDs zugehörig sind.
          * @param {Array<string>} [organisationIds] Liefert Organisationen mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -7492,7 +7592,7 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
          * @param {Array<RollenSystemRecht>} [systemrechte] 
          * @param {Array<OrganisationsTyp>} [excludeTyp] 
          * @param {Array<string>} [administriertVon] 
-         * @param {Array<string>} [zugehoerigZu] Liefert die Kinderorganisation die den IDs hier zugehören.
+         * @param {Array<string>} [zugehoerigZu] Liefert die Kind-Organisationen, die den angegebenen IDs zugehörig sind.
          * @param {Array<string>} [organisationIds] Liefert Organisationen mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -7633,7 +7733,7 @@ export interface OrganisationenApiInterface {
      * @param {Array<RollenSystemRecht>} [systemrechte] 
      * @param {Array<OrganisationsTyp>} [excludeTyp] 
      * @param {Array<string>} [administriertVon] 
-     * @param {Array<string>} [zugehoerigZu] Liefert die Kinderorganisation die den IDs hier zugehören.
+     * @param {Array<string>} [zugehoerigZu] Liefert die Kind-Organisationen, die den angegebenen IDs zugehörig sind.
      * @param {Array<string>} [organisationIds] Liefert Organisationen mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -7784,7 +7884,7 @@ export class OrganisationenApi extends BaseAPI implements OrganisationenApiInter
      * @param {Array<RollenSystemRecht>} [systemrechte] 
      * @param {Array<OrganisationsTyp>} [excludeTyp] 
      * @param {Array<string>} [administriertVon] 
-     * @param {Array<string>} [zugehoerigZu] Liefert die Kinderorganisation die den IDs hier zugehören.
+     * @param {Array<string>} [zugehoerigZu] Liefert die Kind-Organisationen, die den angegebenen IDs zugehörig sind.
      * @param {Array<string>} [organisationIds] Liefert Organisationen mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}

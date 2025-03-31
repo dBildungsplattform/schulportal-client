@@ -1,9 +1,16 @@
-import { OrganisationsTyp, RollenSystemRecht, type OrganisationRootChildrenResponse } from '@/api-client/generated';
+import { OrganisationsTyp, type OrganisationRootChildrenResponse } from '@/api-client/generated';
 import ApiService from '@/services/ApiService';
-import MockAdapter from 'axios-mock-adapter';
-import { setActivePinia, createPinia } from 'pinia';
+import { DoFactory } from '@/testing/DoFactory';
 import { rejects } from 'assert';
-import { useOrganisationStore, type OrganisationStore, type Organisation, SchuleType } from './OrganisationStore';
+import MockAdapter from 'axios-mock-adapter';
+import { createPinia, setActivePinia } from 'pinia';
+import {
+  SchuleType,
+  useOrganisationStore,
+  type AutoCompleteStore,
+  type Organisation,
+  type OrganisationStore,
+} from './OrganisationStore';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 
@@ -498,7 +505,6 @@ describe('OrganisationStore', () => {
           'Ergänzung',
           '01',
           OrganisationsTyp.Klasse,
-          undefined,
         );
         expect(organisationStore.loading).toBe(true);
         await createOrganisationPromise;
@@ -629,54 +635,6 @@ describe('OrganisationStore', () => {
         await rejects(getFilteredKlassenPromise);
         expect(organisationStore.errorCode).toEqual('some mock server error');
         expect(organisationStore.loadingKlassen).toBe(false);
-      });
-    });
-
-    describe('getFilteredSchulen', () => {
-      const url: string = '/api/organisationen?limit=25&searchString=astrid&typ=SCHULE&systemrechte=KLASSEN_VERWALTEN';
-      const sut: OrganisationStore['getFilteredSchulen'] = () =>
-        organisationStore.getFilteredSchulen({
-          searchString: 'astrid',
-          systemrechte: [RollenSystemRecht.KlassenVerwalten],
-        });
-      it('should get all schulen with search string', async () => {
-        const mockResponse: Organisation[] = [
-          {
-            id: '1',
-            kennung: '1234567',
-            name: 'Astrid-Lindgren-Schule',
-            typ: OrganisationsTyp.Schule,
-          },
-        ];
-
-        mockadapter.onGet(url).replyOnce(200, mockResponse, { 'x-paging-total': '1' });
-        const getFilteredSchulenPromise: Promise<void> = sut();
-
-        expect(organisationStore.filteredSchulen.loading).toBe(true);
-        await getFilteredSchulenPromise;
-        expect(organisationStore.filteredSchulen.schulen).toEqual(mockResponse);
-        expect(organisationStore.filteredSchulen.total).toEqual(1);
-        expect(organisationStore.filteredSchulen.loading).toBe(false);
-      });
-
-      it('should handle string error', async () => {
-        mockadapter.onGet(url).replyOnce(500, 'some mock server error');
-        const getFilteredSchulenPromise: Promise<void> = sut();
-
-        expect(organisationStore.filteredSchulen.loading).toBe(true);
-        await getFilteredSchulenPromise;
-        expect(organisationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
-        expect(organisationStore.filteredSchulen.loading).toBe(false);
-      });
-
-      it('should handle error code', async () => {
-        mockadapter.onGet(url).replyOnce(500, { code: 'some mock server error' });
-        const getFilteredSchulenPromise: Promise<void> = sut();
-
-        expect(organisationStore.filteredSchulen.loading).toBe(true);
-        await getFilteredSchulenPromise;
-        expect(organisationStore.errorCode).toEqual('some mock server error');
-        expect(organisationStore.filteredSchulen.loading).toBe(false);
       });
     });
 
@@ -1236,6 +1194,67 @@ describe('OrganisationStore', () => {
       expect(organisationStore.activatedItslearningOrganisation).toBeNull();
       expect(organisationStore.errorCode).toBe('ENABLE_ERROR');
       expect(organisationStore.loading).toBe(false);
+    });
+  });
+
+  describe('loadSchulenForFilter', () => {
+    test('should load schulen for filter', async () => {
+      const mockResponse: Organisation[] = [DoFactory.getSchule()];
+
+      mockadapter.onGet('/api/organisationen?offset=0&limit=30&typ=SCHULE').replyOnce(200, mockResponse, {
+        'x-paging-total': '1',
+      });
+      const promise: Promise<void> = organisationStore.loadSchulenForFilter({
+        offset: 0,
+        limit: 30,
+        includeTyp: OrganisationsTyp.Schule,
+      });
+      await promise;
+      expect(organisationStore.schulenFilter.filterResult).toEqual(mockResponse);
+      expect(organisationStore.schulenFilter.total).toEqual(1);
+      expect(organisationStore.schulenFilter.loading).toBe(false);
+    });
+
+    it('should handle string error', async () => {
+      mockadapter.onGet('/api/organisationen?offset=0&limit=30').replyOnce(500, 'some mock server error');
+      const getAllOrganisationenPromise: Promise<void> = organisationStore.loadSchulenForFilter({
+        offset: 0,
+        limit: 30,
+      });
+      expect(organisationStore.schulenFilter.loading).toBe(true);
+      await getAllOrganisationenPromise;
+      expect(organisationStore.schulenFilter.filterResult).toEqual([]);
+      expect(organisationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(organisationStore.schulenFilter.loading).toBe(false);
+    });
+
+    it('should handle error code', async () => {
+      mockadapter.onGet('/api/organisationen?offset=0&limit=30').replyOnce(500, { code: 'some mock server error' });
+      const getAllOrganisationenPromise: Promise<void> = organisationStore.loadSchulenForFilter({
+        offset: 0,
+        limit: 30,
+      });
+      expect(organisationStore.schulenFilter.loading).toBe(true);
+      await getAllOrganisationenPromise;
+      expect(organisationStore.schulenFilter.filterResult).toEqual([]);
+      expect(organisationStore.errorCode).toEqual('some mock server error');
+      expect(organisationStore.schulenFilter.loading).toBe(false);
+    });
+  });
+  describe('resetSchulFilter', () => {
+    test('should reset filter', () => {
+      organisationStore.schulenFilter = {
+        filterResult: [DoFactory.getSchule()],
+        loading: true,
+        total: 1,
+      };
+      const expected: AutoCompleteStore<Organisation> = {
+        filterResult: [],
+        loading: false,
+        total: 0,
+      };
+      organisationStore.resetSchulFilter();
+      expect(organisationStore.schulenFilter).toEqual(expected);
     });
   });
 });

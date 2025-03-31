@@ -1,23 +1,19 @@
 <script setup lang="ts">
+  import KlasseForm from '@/components/admin/klassen/KlasseForm.vue';
   import KlasseSuccessTemplate from '@/components/admin/klassen/KlasseSuccessTemplate.vue';
-  import type { DBiamPersonenzuordnungResponse, PersonenkontextRolleFieldsResponse } from '@/api-client/generated';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import KlasseForm from '@/components/admin/klassen/KlasseForm.vue';
-  import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+  import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
   import {
     OrganisationsTyp,
     useOrganisationStore,
     type Organisation,
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
-  import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
   import { RollenSystemRecht } from '@/stores/RolleStore';
-  import { type TranslatedObject } from '@/types.d';
-  import { getValidationSchema, getVuetifyConfig } from '@/utils/validationKlasse';
-  import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
-  import { computed, onMounted, onUnmounted, ref, watch, type ComputedRef, type Ref } from 'vue';
-  import { useI18n, type Composer } from 'vue-i18n';
+  import { getDisplayNameForOrg } from '@/utils/formatting';
+  import { type ValidationSchema } from '@/utils/validationKlasse';
+  import { computed, onMounted, onUnmounted, ref, useTemplateRef, type ComputedRef, type Ref } from 'vue';
   import {
     onBeforeRouteLeave,
     useRouter,
@@ -26,127 +22,44 @@
     type Router,
   } from 'vue-router';
 
-  const { t }: Composer = useI18n({ useScope: 'global' });
   const router: Router = useRouter();
-  const authStore: AuthStore = useAuthStore();
-  const personStore: PersonStore = usePersonStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
-  // get personenuebersicht for the current user, if we don't have it
-  watch(
-    () => ({
-      uebersicht: personStore.personenuebersicht,
-      currentUser: authStore.currentUser,
-    }),
-    async ({
-      uebersicht,
-      currentUser,
-    }: {
-      uebersicht: PersonStore['personenuebersicht'];
-      currentUser: AuthStore['currentUser'];
-    }) => {
-      if (!(currentUser && currentUser.personId)) return;
-      if (uebersicht && uebersicht.personId === currentUser.personId) return;
-
-      await personStore.getPersonenuebersichtById(currentUser.personId);
-    },
-    { immediate: true },
-  );
-
-  const autoselectedSchuleId: ComputedRef<string | null> = computed(() => {
-    const { currentUser }: AuthStore = authStore;
-    if (!currentUser?.personenkontexte) return null;
-    // Find all contexts where the user has KlassenVerwalten
-    const schuleIdsWithKlasseVerwaltenPermission: Array<string> = currentUser.personenkontexte.reduce(
-      (acc: Array<string>, personenkontext: PersonenkontextRolleFieldsResponse) => {
-        if (!personenkontext.rolle.systemrechte.includes(RollenSystemRecht.KlassenVerwalten)) return acc;
-        const schulZuordnung: DBiamPersonenzuordnungResponse | undefined =
-          personStore.personenuebersicht?.zuordnungen.find(
-            (z: DBiamPersonenzuordnungResponse) =>
-              z.sskId === personenkontext.organisationsId && z.typ === OrganisationsTyp.Schule,
-          );
-        if (schulZuordnung) acc.push(personenkontext.organisationsId);
-        return acc;
-      },
-      [],
-    );
-    return schuleIdsWithKlasseVerwaltenPermission.length === 1 ? schuleIdsWithKlasseVerwaltenPermission[0]! : null;
-  });
-  const hasAutoselectedSchule: ComputedRef<boolean> = computed(() => autoselectedSchuleId.value !== null);
-
-  const validationSchema: TypedSchema = getValidationSchema(t);
-
-  const vuetifyConfig = (state: {
-    errors: Array<string>;
-  }): { props: { error: boolean; 'error-messages': Array<string> } } => getVuetifyConfig(state);
-
-  type KlasseCreationForm = {
-    selectedSchule: string | undefined;
-    selectedKlassenname: string;
-  };
-
   // eslint-disable-next-line @typescript-eslint/typedef
-  const { defineField, handleSubmit, isFieldDirty, resetForm } = useForm<KlasseCreationForm>({
-    validationSchema,
+  const formRef = useTemplateRef('klasse-creation-form');
+
+  const { autoselectedSchule }: ReturnType<typeof useAutoselectedSchule> = useAutoselectedSchule([
+    RollenSystemRecht.KlassenVerwalten,
+  ]);
+
+  const translatedSchulname: ComputedRef<string> = computed(() => {
+    const schule: Organisation | undefined = organisationStore.schulenFilter.filterResult.find(
+      (s: Organisation) => s.id === organisationStore.createdKlasse?.administriertVon,
+    );
+    if (schule) return getDisplayNameForOrg(schule);
+    if (autoselectedSchule.value) return getDisplayNameForOrg(autoselectedSchule.value);
+    return '';
   });
 
-  const [selectedSchule, selectedSchuleProps]: [
-    Ref<string | undefined>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedSchule', vuetifyConfig);
-  const [selectedKlassenname, selectedKlassennameProps]: [
-    Ref<string>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = defineField('selectedKlassenname', vuetifyConfig);
-
-  const filteredSchulen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    return organisationStore.filteredSchulen.schulen
-      .slice(0, 25)
-      .map((org: Organisation) => ({
-        value: org.id,
-        title: org.kennung ? `${org.kennung} (${org.name.trim()})` : org.name,
-      }))
-      .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
+  const isFormDirty: Ref<boolean> = ref(false);
+  const hasUnsavedChanges: ComputedRef<boolean> = computed(() => {
+    if (organisationStore.createdKlasse) return false;
+    return isFormDirty.value;
   });
-
-  watch(
-    autoselectedSchuleId,
-    (newAutoSelectedOrgId: string | null) => {
-      const newSelectedSchule: TranslatedObject | undefined = filteredSchulen.value?.find(
-        (schule: TranslatedObject) => schule.value === newAutoSelectedOrgId,
-      );
-      selectedSchule.value = newSelectedSchule?.value;
-    },
-    { immediate: true },
-  );
-
-  const translatedSchulname: ComputedRef<string> = computed(
-    () =>
-      filteredSchulen.value?.find(
-        (schule: TranslatedObject) => schule.value === organisationStore.createdKlasse?.administriertVon,
-      )?.title || '',
-  );
-
-  function isFormDirty(): boolean {
-    const schuleDirty: boolean = hasAutoselectedSchule.value ? false : isFieldDirty('selectedSchule');
-    return schuleDirty || isFieldDirty('selectedKlassenname');
-  }
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
   let blockedNext: () => void = () => {};
 
+  function resetForm(): void {
+    formRef.value?.reset();
+  }
+
   function preventNavigation(event: BeforeUnloadEvent): void {
-    if (!isFormDirty()) return;
+    if (!hasUnsavedChanges.value) return;
     event.preventDefault();
     /* Chrome requires returnValue to be set. */
     event.returnValue = '';
   }
 
   async function initStores(): Promise<void> {
-    // initial options for autocomplete
-    await organisationStore.getFilteredSchulen({
-      includeTyp: OrganisationsTyp.Schule,
-      systemrechte: [RollenSystemRecht.KlassenVerwalten],
-      limit: 25,
-    });
     organisationStore.createdKlasse = null;
     organisationStore.errorCode = '';
   }
@@ -158,8 +71,8 @@
   };
 
   async function navigateBackToKlasseForm(): Promise<void> {
+    resetForm();
     if (organisationStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
-      resetForm();
       await router.push({ name: 'create-klasse' }).then(() => {
         router.go(0);
       });
@@ -170,8 +83,15 @@
   }
 
   async function navigateToKlasseManagement(): Promise<void> {
-    organisationStore.errorCode = '';
-    await router.push({ name: 'klasse-management' });
+    if (organisationStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
+      resetForm();
+      await router.push({ name: 'create-klasse' }).then(() => {
+        router.go(0);
+      });
+    } else {
+      organisationStore.errorCode = '';
+      await router.push({ name: 'klasse-management' });
+    }
   }
 
   function handleConfirmUnsavedChanges(): void {
@@ -179,20 +99,21 @@
     organisationStore.errorCode = '';
   }
 
-  const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
-    if (!selectedSchule.value) return;
+  function handleChangedFormState({ dirty }: { values: ValidationSchema; dirty: boolean; valid: boolean }): void {
+    isFormDirty.value = dirty;
+  }
+
+  const onSubmit = async ({ selectedSchule, selectedKlassenname }: ValidationSchema): Promise<void> => {
     await organisationStore.createOrganisation(
-      selectedSchule.value,
-      selectedSchule.value,
+      selectedSchule,
+      selectedSchule,
       undefined,
-      selectedKlassenname.value,
+      selectedKlassenname,
       undefined,
       undefined,
       OrganisationsTyp.Klasse,
-      undefined,
     );
-    resetForm();
-  });
+  };
 
   onMounted(async () => {
     await initStores();
@@ -205,7 +126,7 @@
   });
 
   onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
-    if (isFormDirty()) {
+    if (hasUnsavedChanges.value) {
       showUnsavedChangesDialog.value = true;
       blockedNext = next;
     } else {
@@ -232,22 +153,16 @@
       <!-- The form to create a new Klasse -->
       <template v-if="!organisationStore.createdKlasse">
         <KlasseForm
-          :autoselected-schule-id="autoselectedSchuleId"
           :errorCode="organisationStore.errorCode"
-          :schulen="filteredSchulen"
-          :isEditActive="true"
-          :isLoading="organisationStore.filteredSchulen.loading"
-          :readonly="false"
-          :selectedSchuleProps="selectedSchuleProps"
-          :selectedKlassennameProps="selectedKlassennameProps"
+          :editMode="false"
+          :isLoading="organisationStore.loading"
           :showUnsavedChangesDialog="showUnsavedChangesDialog"
           :onHandleConfirmUnsavedChanges="handleConfirmUnsavedChanges"
           :onHandleDiscard="navigateToKlasseManagement"
           :onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
-          :onSubmit="onSubmit"
+          :onSubmit
+          @formStateChanged="handleChangedFormState"
           ref="klasse-creation-form"
-          v-model:selectedSchule="selectedSchule"
-          v-model:selectedKlassenname="selectedKlassenname"
         >
           <!-- Error Message Display if error on submit -->
           <SpshAlert

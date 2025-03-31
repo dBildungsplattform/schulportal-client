@@ -70,7 +70,6 @@
         undefined,
         undefined,
         OrganisationsTyp.Traeger,
-        undefined,
       );
       formContext.resetForm({
         values: {

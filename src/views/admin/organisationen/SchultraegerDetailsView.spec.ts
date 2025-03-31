@@ -284,7 +284,6 @@ describe('SchultraegerDetailsView', () => {
 
     // The unassignedSchulen should be empty because the Schule was already assigned
     expect(unassignedSchulen).toEqual([]);
-
   });
 
   describe('navigation interception', () => {
