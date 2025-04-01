@@ -1,4 +1,4 @@
-ARG BASE_IMAGE_BUILDER=node:20.18.3-alpine3.21
+ARG BASE_IMAGE_BUILDER=node:22.14.0-alpine3.21
 ARG BASE_IMAGE=nginx:1.26.3-alpine
 
 # Build Stage
