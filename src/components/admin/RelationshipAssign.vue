@@ -41,6 +41,7 @@
   >
     <h3 class="subtitle-1 mb-3">{{ unassignedItemsHeader }}</h3>
     <RelationshipAssignList
+      dataTestId="unassigned-items-list"
       :items="unassignedItems"
       :noItemsFoundText="noUnassignedItemsFoundText"
       @onHandleItemClick="handleUnassignedItemClick"
@@ -57,6 +58,7 @@
   >
     <h3 class="subtitle-1 mb-3">{{ assignedItemsHeader }}</h3>
     <RelationshipAssignList
+      dataTestId="assigned-items-list"
       :items="assignedItems"
       :noItemsFoundText="noAssignedItemsFoundText"
       @onHandleSearchFilter="handleAssignedItemsSearchFilter"
