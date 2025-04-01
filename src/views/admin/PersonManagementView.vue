@@ -818,6 +818,10 @@
         <v-spacer></v-spacer>
         <SearchField
           :initialValue="searchFilterStore.searchFilterPersonen ?? ''"
+          :inputCols="6"
+          :inputColsMd="3"
+          :buttonCols="6"
+          :buttonColsMd="2"
           :hoverText="$t('person.firstNameLastNameReferrerKopersNr')"
           @onApplySearchFilter="handleSearchFilter"
           ref="searchFieldComponent"
