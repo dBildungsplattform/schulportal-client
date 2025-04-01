@@ -211,7 +211,7 @@ describe('KlassenDetailsView', () => {
     const push: MockInstance = vi.spyOn(router, 'push');
 
     wrapper?.find('[data-testid="open-klasse-delete-dialog-button"]').trigger('click');
-    await nextTick();
+    await flushPromises();
 
     await document.querySelector('[data-testid="klasse-delete-confirmation-text"]');
     expect(document.querySelector('[data-testid="klasse-delete-confirmation-text"]')).not.toBeNull();

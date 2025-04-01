@@ -1,4 +1,5 @@
 <script setup lang="ts">
+  import SchulenFilter from '@/components/filter/SchulenFilter.vue';
   import FormRow from '@/components/form/FormRow.vue';
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import { RollenSystemRecht } from '@/stores/RolleStore';
@@ -6,7 +7,6 @@
   import { useForm, useIsFormDirty, useIsFormValid, type BaseFieldProps, type TypedSchema } from 'vee-validate';
   import { computed, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
-  import SchulenFilter from '../filter/SchulenFilter.vue';
 
   type Props = {
     initialValues?: Partial<ValidationSchema>;
