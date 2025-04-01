@@ -15,17 +15,7 @@
   import { RollenSystemRecht } from '@/stores/RolleStore';
   import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
   import { type Mutable, type TranslatedObject } from '@/types.d';
-  import {
-    computed,
-    onMounted,
-    reactive,
-    ref,
-    watch,
-    watchEffect,
-    type ComputedRef,
-    type Reactive,
-    type Ref,
-  } from 'vue';
+  import { computed, reactive, ref, watch, watchEffect, type ComputedRef, type Reactive, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { onBeforeRouteLeave, useRouter, type Router } from 'vue-router';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
@@ -64,7 +54,7 @@
     () => (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
   );
 
-  const selectedSchule: Ref<string | undefined> = ref(undefined);
+  const selectedSchule: Ref<string | undefined> = ref(searchFilterStore.selectedSchuleForKlassen || undefined);
   const klassenListFilter: ComputedRef<OrganisationenFilter> = computed(() => {
     const initialFilter: OrganisationenFilter = {
       includeTyp: OrganisationsTyp.Klasse,
@@ -78,7 +68,7 @@
   });
 
   const searchInputKlassen: Ref<string> = ref('');
-  const selectedKlassen: Ref<Array<string>> = ref([]);
+  const selectedKlassen: Ref<Array<string>> = ref(searchFilterStore.selectedKlassenForKlassen || []);
   let klassenAutocompleteDebounceTimer: ReturnType<typeof setTimeout> | undefined;
   const klassenAutocompleteFilter: Reactive<OrganisationenFilter> = reactive({
     offset: 0,
@@ -86,6 +76,9 @@
     organisationIds: searchFilterStore.selectedKlassenForKlassen || [],
     systemrechte: [RollenSystemRecht.KlassenVerwalten],
     searchString: '',
+    administriertVon: searchFilterStore.selectedSchuleForKlassen
+      ? [searchFilterStore.selectedSchuleForKlassen]
+      : undefined,
   });
 
   const klassenOptions: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
@@ -156,10 +149,7 @@
     searchFilterStore.klassenPage = 1;
 
     // If the user has an autoselected Schule, do not reset it
-    if (hasAutoselectedSchule.value && selectedSchule.value !== undefined) {
-      // Fetch all Klassen for the selected Schule
-      organisationStore.getKlassenByOrganisationId({ limit: 25, administriertVon: [selectedSchule.value] });
-    } else {
+    if (!hasAutoselectedSchule.value) {
       selectedSchule.value = undefined;
     }
   }
@@ -231,6 +221,7 @@
   watch(
     klassenAutocompleteFilter,
     async (updatedFilter: OrganisationenFilter | undefined) => {
+      if (!selectedSchule.value) return;
       const timeout: number = klassenAutocompleteDebounceTimer ? 500 : 0;
       if (klassenAutocompleteDebounceTimer) clearTimeout(klassenAutocompleteDebounceTimer);
       klassenAutocompleteDebounceTimer = setTimeout(async () => {
@@ -242,16 +233,6 @@
       immediate: true,
     },
   );
-
-  onMounted(async () => {
-    // If the store holds a Schule already then use it
-    if (searchFilterStore.selectedSchuleForKlassen) {
-      await updateSchuleSelection(searchFilterStore.selectedSchuleForKlassen);
-      selectedKlassen.value = searchFilterStore.selectedKlassenForKlassen || [];
-    } else {
-      await updateSchuleSelection(undefined);
-    }
-  });
 
   onBeforeRouteLeave(async () => {
     organisationStore.errorCode = '';

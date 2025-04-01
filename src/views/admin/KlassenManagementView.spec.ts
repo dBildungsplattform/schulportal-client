@@ -171,6 +171,18 @@ describe('KlassenManagementView', () => {
       });
     });
   });
+  describe.each([[true], [false]])('when searchFilterStore has data (%s)', (hasStoreData: boolean) => {
+    test('it populates filter', async () => {
+      searchFilterStore.selectedSchuleForKlassen = hasStoreData ? schule1.id : null;
+      organisationStore.schulenFilter.filterResult = [schule1];
+      await flushPromises();
+      wrapper = await mountComponent();
+      await flushPromises();
+      const organisationAutocomplete: VueWrapper | undefined = wrapper.findComponent({ ref: 'schule-select' });
+      if (hasStoreData) expect(organisationAutocomplete.text()).toContain(schule1.name);
+      else expect(organisationAutocomplete.text()).toBe('');
+    });
+  });
 
   test('it reloads data after changing page', async () => {
     expect(wrapper?.find('.v-pagination__next button.v-btn--disabled').isVisible()).toBe(true);
