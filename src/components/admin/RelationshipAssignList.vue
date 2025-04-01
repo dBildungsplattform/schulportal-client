@@ -34,6 +34,11 @@
       // Move focus to the next chip
       (chips[currentIndex + 1] as HTMLElement).focus();
     }
+
+    if (currentIndex + 1 === chips.length && chips.length > 1) {
+      // Move focus to the previous chip
+      (chips[currentIndex - 1] as HTMLElement).focus();
+    }
   }
 </script>
 
@@ -58,6 +63,7 @@
       >
         <v-list
           v-if="items.length > 0"
+          :data-testid="dataTestId"
           density="compact"
           max-height="344"
           min-height="344"
