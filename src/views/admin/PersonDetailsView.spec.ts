@@ -713,7 +713,7 @@ describe('PersonDetailsView', () => {
       .findComponent({ ref: 'password-reset' })
       .find('[data-testid="open-password-reset-dialog-button"]');
     devicePasswordChangeButton.trigger('click');
-    await nextTick();
+    await flushPromises();
 
     expect(document.querySelector('[data-testid="password-reset-info-text"]')).not.toBeNull();
 

@@ -111,7 +111,7 @@ afterEach(() => {
   wrapper?.unmount();
 });
 
-describe('SchultraegerView', () => {
+describe('SchultraegerCreationView', () => {
   test('it renders the Schultraeger form', () => {
     expect(wrapper?.find('[data-testid="schultraegername-input"]').isVisible()).toBe(true);
   });
@@ -119,6 +119,7 @@ describe('SchultraegerView', () => {
   test('it renders all child components', () => {
     expect(wrapper?.getComponent({ name: 'LayoutCard' })).toBeTruthy();
     expect(wrapper?.getComponent({ name: 'SpshAlert' })).toBeTruthy();
+    expect(wrapper?.getComponent({ name: 'SchultraegerForm' })).toBeTruthy();
     expect(wrapper?.getComponent({ name: 'FormWrapper' })).toBeTruthy();
     expect(wrapper?.getComponent({ name: 'FormRow' })).toBeTruthy();
   });
@@ -131,22 +132,26 @@ describe('SchultraegerView', () => {
   });
 
   test('it fills form and triggers submit', async () => {
-    const schulnameInput: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schultraegername-input' });
-    await schulnameInput?.setValue('Random Schultraegername');
+    organisationStore.createdSchultraeger = null;
     await nextTick();
-    const mockSchule: OrganisationResponse = {
+
+    const schultraegernameInput: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'schultraeger-creation-form' })
+      .findComponent({ ref: 'schultraegername-input' });
+    await schultraegernameInput?.setValue('Random Schultraegername');
+    await nextTick();
+    const mockSchultraeger: OrganisationResponse = {
       id: '2',
-      name: 'Random Schulname Gymnasium',
+      name: 'Random Schulträger',
       kennung: '',
       namensergaenzung: 'Traeger',
-      kuerzel: 'rsg',
+      kuerzel: 'rst',
       typ: OrganisationsTyp.Traeger,
       administriertVon: '1',
     } as OrganisationResponse;
 
-    organisationStore.createdSchultraeger = mockSchule;
-
-    wrapper?.find('[data-testid="schultraeger-creation-form-submit-button"]').trigger('click');
+    wrapper?.find('[data-testid="schultraeger-form-submit-button"]').trigger('click');
+    organisationStore.createdSchultraeger = mockSchultraeger;
     await flushPromises();
 
     expect(wrapper?.find('[data-testid="create-another-schultraeger-button"]').isVisible()).toBe(true);
@@ -163,6 +168,9 @@ describe('SchultraegerView', () => {
     expect(wrapper?.find('[data-testid="alert-title"]').isVisible()).toBe(true);
     wrapper?.find('[data-testid="alert-button"]').trigger('click');
     await nextTick();
+
+    organisationStore.errorCode = '';
+    await nextTick();
   });
 
   test('shows error message if REQUIRED_STEP_UP_LEVEL_NOT_MET error is present and click close button', async () => {
@@ -170,6 +178,9 @@ describe('SchultraegerView', () => {
     await nextTick();
     expect(wrapper?.find('[data-testid="alert-title"]').isVisible()).toBe(true);
     wrapper?.find('[data-testid="alert-button"]').trigger('click');
+    await nextTick();
+
+    organisationStore.errorCode = '';
     await nextTick();
   });
 
@@ -196,8 +207,10 @@ describe('SchultraegerView', () => {
       await nextTick();
 
       // Fill the form to make it dirty
-      const schulnameInput: VueWrapper | undefined = wrapper.findComponent({ ref: 'schultraegername-input' });
-      await schulnameInput.setValue('Random Schultraegername');
+      const schultraegernameInput: VueWrapper | undefined = wrapper
+        .findComponent({ ref: 'schultraeger-creation-form' })
+        .findComponent({ ref: 'schultraegername-input' });
+      await schultraegernameInput.setValue('Random Schultraegername');
       await nextTick();
 
       const spy: Mock = vi.fn();
