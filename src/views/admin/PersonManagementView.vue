@@ -479,7 +479,7 @@
       resultTable.value.resetSelection();
     }
   };
-  const handleBulkPasswordResetDialog = async (finished: boolean): Promise<void> => {
+  const handleBulkPasswordResetDialog = async (_finished: boolean): Promise<void> => {
     passwordResetDialogVisible.value = false;
     selectedOption.value = null;
   };

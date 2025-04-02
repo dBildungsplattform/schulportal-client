@@ -1,11 +1,9 @@
 <script setup lang="ts">
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import type { Organisation } from '@/stores/OrganisationStore';
   import { type PersonenWithRolleAndZuordnung, type PersonStore, usePersonStore } from '@/stores/PersonStore';
   import { buildCSV, download } from '@/utils/file';
   import { intersect } from '@/utils/sets';
-  import { computed } from 'vue';
-  import { type ComputedRef, type Ref, ref } from 'vue';
+  import { computed, type ComputedRef, type Ref, ref } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
 
