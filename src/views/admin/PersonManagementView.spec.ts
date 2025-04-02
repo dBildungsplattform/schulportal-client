@@ -101,7 +101,7 @@ beforeEach(() => {
     ],
   };
 
-  personStore.personenWithUebersicht = [
+  personStore.personWithUebersicht = [
     {
       rollen: 'Admin',
       administrationsebenen: 'Level1',

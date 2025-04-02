@@ -23,6 +23,7 @@
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
   import PersonBulkDelete from '@/components/admin/personen/PersonBulkDelete.vue';
+  import OrganisationUnassign from '@/components/admin/schulen/OrganisationUnassign.vue';
 
   const searchFieldComponent: Ref = ref();
 
@@ -70,6 +71,7 @@
 
   const rolleModifiyDialogVisible: Ref<boolean> = ref(false);
   const benutzerDeleteDialogVisible: Ref<boolean> = ref(false);
+  const organisationUnassignDialogVisible: Ref<boolean> = ref(false);
 
   const selectedOption: Ref<string | null> = ref(null);
 
@@ -79,11 +81,13 @@
   enum ActionTypes {
     MODIFY_ROLLE = 'MODIFY_ROLLE',
     DELETE_PERSON = 'DELETE_PERSON',
+    ORG_UNASSIGN = 'ORG_UNASSIGN',
   }
 
   // Define i18n values for action types to act as a title/value in the v-select
   const actionTypeTitles: Partial<Record<ActionTypes, string>> = {
     [ActionTypes.MODIFY_ROLLE]: t('admin.rolle.assignRolle'),
+    [ActionTypes.ORG_UNASSIGN]: t('person.removeZuordnung'),
   };
 
   if (authStore.hasPersonenLoeschenPermission) {
@@ -440,12 +444,16 @@
       case ActionTypes.DELETE_PERSON:
         benutzerDeleteDialogVisible.value = true;
         break;
+      case ActionTypes.ORG_UNASSIGN:
+        organisationUnassignDialogVisible.value = true;
+        break;
     }
   };
 
   // Handles the event when closing the dialog
   const handleDialog = (isDialogVisible: boolean): void => {
     rolleModifiyDialogVisible.value = isDialogVisible;
+    organisationUnassignDialogVisible.value = isDialogVisible;
     selectedOption.value = null;
   };
 
@@ -466,14 +474,14 @@
 
   // This method filters the selectedPersonIds to avoid items being selected when they are not included in the current table "items"
   function updateSelectedRowsAfterFilter(): void {
-    const visiblePersonIds: string[] | undefined = personStore.personenWithUebersicht?.map(
+    const visiblePersonIds: string[] | undefined = personStore.personWithUebersicht?.map(
       (person: Personendatensatz) => person.person.id,
     );
     selectedPersonIds.value = selectedPersonIds.value.filter((id: string) => visiblePersonIds?.includes(id));
   }
   // Whenever the array of items of the table (personStore.personenWithUebersicht) changes (Filters, search function, page update etc...) update the selection.
   watch(
-    () => personStore.personenWithUebersicht,
+    () => personStore.personWithUebersicht,
     () => {
       updateSelectedRowsAfterFilter();
     },
@@ -805,6 +813,15 @@
             @update:dialogExit="handleBulkDeleteDialog($event)"
           >
           </PersonBulkDelete>
+          <OrganisationUnassign
+            ref="organisation-unassign"
+            v-if="organisationUnassignDialogVisible"
+            :errorCode="personenkontextStore.errorCode"
+            :isLoading="personenkontextStore.loading"
+            :selectedPersonenIds="selectedPersonIds"
+            @update:isDialogVisible="handleDialog($event)"
+          >
+          </OrganisationUnassign>
         </v-col>
         <!-- Display the number of selected checkboxes -->
         <v-col
@@ -827,7 +844,7 @@
         :currentPage="searchFilterStore.personenPage"
         data-testid="person-table"
         ref="resultTable"
-        :items="personStore.personenWithUebersicht || []"
+        :items="personStore.personWithUebersicht || []"
         :itemsPerPage="searchFilterStore.personenPerPage"
         :loading="personStore.loading"
         :headers="headers"
