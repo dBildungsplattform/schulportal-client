@@ -22,6 +22,12 @@
 
   type Emits = (event: 'update:dialogExit', finished: boolean) => void;
 
+  enum State {
+    INITIAL,
+    PROGRESSING,
+    FINISHED,
+  }
+
   const props: Props = defineProps<Props>();
   const emit: Emits = defineEmits<Emits>();
 
@@ -29,6 +35,13 @@
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   const personStore: PersonStore = usePersonStore();
+
+  const progressState: ComputedRef<State> = computed(() => {
+    if (!personStore.bulkResetPasswordResult) return State.INITIAL;
+    if (personStore.bulkResetPasswordResult.complete) return State.FINISHED;
+    if (personStore.bulkResetPasswordResult.progress > 0) return State.PROGRESSING;
+    return State.INITIAL;
+  });
 
   const transformPersonToZuordnungSet = (person?: PersonWithRolleAndZuordnung): Set<string> =>
     new Set(person?.administrationsebenen.split(','));
@@ -100,7 +113,7 @@
       <!-- Initial block -->
       <v-container
         class="mt-8 mb-4"
-        v-if="progress == 0"
+        v-if="progressState === State.INITIAL"
       >
         <template v-if="!arePersonsOnSameOrganisation">
           <v-row class="text-body text-error justify-center">
@@ -125,28 +138,10 @@
 
       <!-- In progress -->
       <v-container
-        v-if="progress > 0"
+        v-if="progressState === State.PROGRESSING"
         class="mt-4"
       >
-        <v-container
-          v-if="successMessage"
-          data-testid="password-reset-success-text"
-        >
-          <v-row justify="center">
-            <v-col cols="auto">
-              <v-icon
-                small
-                color="#1EAE9C"
-                icon="mdi-check-circle"
-              ></v-icon>
-            </v-col>
-          </v-row>
-          <p class="mt-2 text-center">
-            {{ successMessage }}
-          </p>
-        </v-container>
         <v-row
-          v-if="progress < 100"
           align="center"
           justify="center"
         >
@@ -175,6 +170,26 @@
         </v-progress-linear>
       </v-container>
 
+      <!-- Result -->
+      <v-container v-if="progressState === State.FINISHED">
+        <v-row justify="center">
+          <v-col cols="auto">
+            <v-icon
+              small
+              color="#1EAE9C"
+              icon="mdi-check-circle"
+            ></v-icon>
+          </v-col>
+        </v-row>
+        <p
+          class="mt-2 text-center"
+          data-testid="password-reset-success-text"
+        >
+          {{ successMessage }}
+        </p>
+        <p class="mt-2 text-center"></p>
+      </v-container>
+
       <v-card-actions class="justify-center">
         <v-row class="py-3 px-2 justify-center">
           <v-col
@@ -183,22 +198,22 @@
             md="auto"
           >
             <v-btn
-              v-if="progress === 0"
-              :block="mdAndDown"
-              class="secondary"
-              @click="closePasswordResetDialog(false)"
-              data-testid="password-reset-discard-button"
-            >
-              {{ t('cancel') }}
-            </v-btn>
-            <v-btn
-              v-else-if="personStore.bulkResetPasswordResult?.complete"
+              v-if="progressState === State.FINISHED"
               :block="mdAndDown"
               class="primary"
               @click="closePasswordResetDialog(true)"
               data-testid="password-reset-close-button"
             >
               {{ t('close') }}
+            </v-btn>
+            <v-btn
+              v-else-if="progressState === State.INITIAL"
+              :block="mdAndDown"
+              class="secondary"
+              @click="closePasswordResetDialog(false)"
+              data-testid="password-reset-discard-button"
+            >
+              {{ t('cancel') }}
             </v-btn>
           </v-col>
           <v-col
@@ -207,7 +222,7 @@
             md="auto"
           >
             <v-btn
-              v-if="progress === 0"
+              v-if="progressState === State.INITIAL && arePersonsOnSameOrganisation"
               :block="mdAndDown"
               :disabled="personStore.loading"
               class="primary"
@@ -218,7 +233,7 @@
               {{ t('admin.person.resetPassword') }}
             </v-btn>
             <v-btn
-              v-else-if="resultFile"
+              v-if="progressState === State.FINISHED && resultFile"
               :block="mdAndDown"
               class="primary"
               @click="downloadFile(resultFile)"
