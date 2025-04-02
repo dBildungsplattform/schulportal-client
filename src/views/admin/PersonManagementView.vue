@@ -98,22 +98,19 @@
     RESET_PASSWORD = 'RESET_PASSWORD',
   }
 
-  // Define i18n values for action types to act as a title/value in the v-select
-  const actionTypeTitles: Partial<Record<ActionTypes, string>> = {
-    [ActionTypes.MODIFY_ROLLE]: t('admin.rolle.assignRolle'),
-  };
-
-  if (authStore.hasPersonenLoeschenPermission) {
-    actionTypeTitles[ActionTypes.DELETE_PERSON] = t('admin.person.deletePerson');
-  }
-
-  if (authStore.hasPersonenverwaltungPermission) {
-    actionTypeTitles[ActionTypes.RESET_PASSWORD] = t('admin.person.resetPassword');
-  }
-
   // Computed property for generating options dynamically for v-selects
   const actions: ComputedRef<TranslatedObject[]> = computed(() => {
-    return Object.entries(actionTypeTitles).map(([key, value]: [string, string]) => ({
+    const actionTypeTitles: Map<ActionTypes, string> = new Map();
+    actionTypeTitles.set(ActionTypes.MODIFY_ROLLE, t('admin.rolle.assignRolle'));
+    if (authStore.hasPersonenLoeschenPermission) {
+      actionTypeTitles.set(ActionTypes.DELETE_PERSON, t('admin.person.deletePerson'));
+    }
+
+    if (authStore.hasPersonenverwaltungPermission) {
+      actionTypeTitles.set(ActionTypes.RESET_PASSWORD, t('admin.person.resetPassword'));
+    }
+
+    return [...actionTypeTitles.entries()].map(([key, value]: [string, string]) => ({
       value: key,
       title: value,
     }));
