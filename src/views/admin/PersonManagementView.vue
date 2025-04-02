@@ -47,8 +47,10 @@
 
   const selectedPersonIds: Ref<string[]> = ref<string[]>([]);
   const selectedPersons: ComputedRef<PersonenWithRolleAndZuordnung> = computed(() => {
-    return personStore.personenWithUebersicht?.filter((p: PersonenWithRolleAndZuordnung[number]) =>
-      selectedPersonIds.value.includes(p.person.id),
+    return (
+      personStore.personenWithUebersicht?.filter((p: PersonenWithRolleAndZuordnung[number]) =>
+        selectedPersonIds.value.includes(p.person.id),
+      ) ?? []
     );
   });
   const resultTable: Ref = ref(null);

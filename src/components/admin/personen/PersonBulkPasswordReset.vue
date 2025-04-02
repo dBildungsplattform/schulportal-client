@@ -1,14 +1,16 @@
 <script setup lang="ts">
   import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import type { Organisation } from '@/stores/OrganisationStore';
   import { type PersonenWithRolleAndZuordnung, type PersonStore, usePersonStore } from '@/stores/PersonStore';
   import { buildCSV, download } from '@/utils/file';
+  import { intersect } from '@/utils/sets';
   import { computed } from 'vue';
   import { type ComputedRef, type Ref, ref } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
 
   type PersonWithRolleAndZuordnung = PersonenWithRolleAndZuordnung[number];
-  type CSVHeaders = 'Administrationsebenen' | 'Klassen' | 'Nachname' | 'Vorname' | 'Benutzername' | 'Passwort';
+  type CSVHeaders = 'Klassen' | 'Nachname' | 'Vorname' | 'Benutzername' | 'Passwort';
   type CSVRow = Record<CSVHeaders, string | undefined>;
 
   type Props = {
@@ -28,6 +30,20 @@
 
   const personStore: PersonStore = usePersonStore();
 
+  const transformPersonToZuordnungSet = (person?: PersonWithRolleAndZuordnung): Set<string> =>
+    new Set(person?.administrationsebenen.split(','));
+
+  const arePersonsOnSameOrganisation: ComputedRef<boolean> = computed(() => {
+    if (props.selectedPersons.length <= 1) return true;
+    let zuordnungIntersectionSet: Set<string> = transformPersonToZuordnungSet(props.selectedPersons.at(0));
+    if (zuordnungIntersectionSet.size === 0) return true;
+    for (let i: number = 1; i < props.selectedPersons.length; i++) {
+      const newSet: Set<string> = transformPersonToZuordnungSet(props.selectedPersons[i]);
+      zuordnungIntersectionSet = intersect(zuordnungIntersectionSet, newSet);
+      if (zuordnungIntersectionSet.size === 0) return false;
+    }
+    return true;
+  });
   const successMessage: ComputedRef<string> = computed(() => {
     if (personStore.bulkResetPasswordResult?.complete) return t('admin.person.bulkPasswordReset.success');
     return '';
@@ -44,7 +60,6 @@
         (p: PersonWithRolleAndZuordnung) => p.person.id === id,
       );
       rows.push({
-        Administrationsebenen: personWithRolleAndZuordnung?.administrationsebenen,
         Klassen: personWithRolleAndZuordnung?.klassen,
         Nachname: personWithRolleAndZuordnung?.person.name.familienname,
         Vorname: personWithRolleAndZuordnung?.person.name.vorname,
@@ -52,10 +67,7 @@
         Passwort: password,
       });
     }
-    return buildCSV<CSVHeaders>(
-      ['Administrationsebenen', 'Klassen', 'Nachname', 'Vorname', 'Benutzername', 'Passwort'],
-      rows,
-    );
+    return buildCSV<CSVHeaders>(['Klassen', 'Nachname', 'Vorname', 'Benutzername', 'Passwort'], rows);
   });
 
   const showPasswordResetDialog: Ref<boolean> = ref(props.isDialogVisible);
@@ -90,7 +102,21 @@
         class="mt-8 mb-4"
         v-if="progress == 0"
       >
-        <v-row class="text-body bold justify-center">
+        <template v-if="!arePersonsOnSameOrganisation">
+          <v-row class="text-body text-error justify-center">
+            <v-icon
+              class="mr-4"
+              icon="mdi-alert"
+            ></v-icon>
+            <span data-testid="error-text">
+              {{ t('admin.person.bulkPasswordReset.error.onlyOneSchool') }}
+            </span>
+          </v-row>
+        </template>
+        <v-row
+          v-else
+          class="text-body bold justify-center"
+        >
           <span data-testid="password-reset-confirmation-text">
             {{ t('admin.person.bulkPasswordReset.confirmation') }}
           </span>
