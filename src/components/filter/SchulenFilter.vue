@@ -160,6 +160,9 @@
   watch(
     schulenFilter,
     async (newFilter: OrganisationenFilter | undefined, oldFilter: OrganisationenFilter | undefined) => {
+      //check if filters are the same
+      if (oldFilter && newFilter && JSON.stringify(oldFilter) === JSON.stringify(newFilter)) return;
+
       if (timerId.value) clearTimeout(timerId.value);
 
       // We skip if selection is disabled and we already know how to display the selection
