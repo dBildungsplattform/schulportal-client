@@ -13,6 +13,10 @@
   type Props = {
     hoverText: string;
     initialValue: string;
+    inputCols: number;
+    inputColsMd: number;
+    buttonCols: number;
+    buttonColsMd: number;
   };
 
   const emit: Emits = defineEmits<{
@@ -41,8 +45,8 @@
 
 <template>
   <v-col
-    cols="6"
-    md="3"
+    :cols="inputCols"
+    :md="inputColsMd"
   >
     <v-text-field
       autocomplete="off"
@@ -61,8 +65,8 @@
     ></v-text-field>
   </v-col>
   <v-col
-    md="2"
-    cols="6"
+    :cols="buttonCols"
+    :md="buttonColsMd"
   >
     <v-btn
       block

@@ -16,6 +16,10 @@ beforeEach(() => {
     props: {
       initialValue: '',
       hoverText: 'search',
+      buttonCols: 12,
+      buttonColsMd: 4,
+      inputCols: 12,
+      inputColsMd: 8,
     },
     global: {
       components: {

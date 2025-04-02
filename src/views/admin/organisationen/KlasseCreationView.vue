@@ -1,8 +1,8 @@
 <script setup lang="ts">
+  import KlasseForm from '@/components/admin/klassen/KlasseForm.vue';
   import KlasseSuccessTemplate from '@/components/admin/klassen/KlasseSuccessTemplate.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import KlasseForm from '@/components/form/KlasseForm.vue';
   import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
   import {
     OrganisationsTyp,
