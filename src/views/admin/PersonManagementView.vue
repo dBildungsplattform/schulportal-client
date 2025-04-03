@@ -134,6 +134,18 @@
       title: org.kennung ? `${org.kennung} (${org.name})` : org.name,
     }));
   });
+  const selectedOrganisationKennung: ComputedRef<string> = computed(() => {
+    if (selectedOrganisation.value.length === 1) {
+      const id: string | undefined = selectedOrganisation.value[0];
+      if (!id) return '';
+      const organisation: Organisation | undefined = organisationStore.allOrganisationen.find(
+        (org: Organisation) => org.id === id,
+      );
+      if (!organisation) return '';
+      return organisation.kennung ?? '';
+    }
+    return '';
+  });
 
   const rollen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
     const filteredRollen: RolleResponse[] = personenkontextStore.filteredRollen?.moeglicheRollen || [];
@@ -835,6 +847,8 @@
             :error-code="personStore.errorCode"
             :isLoading="personStore.loading"
             :isDialogVisible="passwordResetDialogVisible"
+            :isSelectionFromSingleSchule="selectedOrganisation.length === 1"
+            :selectedSchuleKennung="selectedOrganisationKennung"
             :selectedPersons
             @update:dialogExit="handleBulkPasswordResetDialog($event)"
           >

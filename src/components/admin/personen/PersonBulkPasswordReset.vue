@@ -2,7 +2,6 @@
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { type PersonenWithRolleAndZuordnung, type PersonStore, usePersonStore } from '@/stores/PersonStore';
   import { buildCSV, download } from '@/utils/file';
-  import { intersect } from '@/utils/sets';
   import { computed, type ComputedRef, type Ref, ref } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
@@ -15,6 +14,8 @@
     errorCode: string;
     isLoading: boolean;
     isDialogVisible: boolean;
+    isSelectionFromSingleSchule: boolean;
+    selectedSchuleKennung?: string;
     selectedPersons: PersonenWithRolleAndZuordnung;
   };
 
@@ -41,20 +42,6 @@
     return State.INITIAL;
   });
 
-  const transformPersonToZuordnungSet = (person?: PersonWithRolleAndZuordnung): Set<string> =>
-    new Set(person?.administrationsebenen.split(','));
-
-  const arePersonsOnSameOrganisation: ComputedRef<boolean> = computed(() => {
-    if (props.selectedPersons.length <= 1) return true;
-    let zuordnungIntersectionSet: Set<string> = transformPersonToZuordnungSet(props.selectedPersons.at(0));
-    if (zuordnungIntersectionSet.size === 0) return true;
-    for (let i: number = 1; i < props.selectedPersons.length; i++) {
-      const newSet: Set<string> = transformPersonToZuordnungSet(props.selectedPersons[i]);
-      zuordnungIntersectionSet = intersect(zuordnungIntersectionSet, newSet);
-      if (zuordnungIntersectionSet.size === 0) return false;
-    }
-    return true;
-  });
   const successMessage: ComputedRef<string> = computed(() => {
     if (personStore.bulkResetPasswordResult?.complete) return t('admin.person.bulkPasswordReset.success');
     return '';
@@ -94,7 +81,8 @@
   }
 
   function downloadFile(blob: Blob): void {
-    download('ergebnis.txt', blob);
+    const filename: string = props.selectedSchuleKennung ? `PW_${props.selectedSchuleKennung}.txt` : 'PW.txt';
+    download(filename, blob);
   }
 </script>
 
@@ -113,7 +101,7 @@
         class="mt-8 mb-4"
         v-if="progressState === State.INITIAL"
       >
-        <template v-if="!arePersonsOnSameOrganisation">
+        <template v-if="!isSelectionFromSingleSchule">
           <v-row class="text-body text-error justify-center">
             <v-icon
               class="mr-4"
@@ -220,7 +208,7 @@
             md="auto"
           >
             <v-btn
-              v-if="progressState === State.INITIAL && arePersonsOnSameOrganisation"
+              v-if="progressState === State.INITIAL && isSelectionFromSingleSchule"
               :block="mdAndDown"
               :disabled="personStore.loading"
               class="primary"
