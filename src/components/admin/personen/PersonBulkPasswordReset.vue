@@ -2,7 +2,7 @@
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { type PersonenWithRolleAndZuordnung, type PersonStore, usePersonStore } from '@/stores/PersonStore';
   import { buildCSV, download } from '@/utils/file';
-  import { computed, type ComputedRef, type Ref, ref } from 'vue';
+  import { computed, type ComputedRef, type Ref } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
 
@@ -11,8 +11,6 @@
   type CSVRow = Record<CSVHeaders, string | undefined>;
 
   type Props = {
-    errorCode: string;
-    isLoading: boolean;
     isDialogVisible: boolean;
     isSelectionFromSingleSchule: boolean;
     selectedSchuleKennung?: string;
@@ -68,10 +66,7 @@
     return buildCSV<CSVHeaders>(['Klassen', 'Nachname', 'Vorname', 'Benutzername', 'Passwort'], rows);
   });
 
-  const showPasswordResetDialog: Ref<boolean> = ref(props.isDialogVisible);
-
   async function closePasswordResetDialog(finished: boolean): Promise<void> {
-    showPasswordResetDialog.value = false;
     emit('update:dialogExit', finished);
     personStore.bulkResetPasswordResult = null;
   }
@@ -89,7 +84,7 @@
 <template>
   <v-dialog
     ref="resetPasswordBulkDialog"
-    v-model="showPasswordResetDialog"
+    :model-value="isDialogVisible"
     persistent
   >
     <LayoutCard
@@ -138,7 +133,10 @@
               icon="mdi-alert-circle-outline"
               size="small"
             ></v-icon>
-            <span class="subtitle-2">
+            <span
+              class="subtitle-2"
+              data-testid="password-reset-progressing-notice"
+            >
               {{ t('admin.doNotCloseBrowserNotice') }}
             </span>
           </v-col>
@@ -149,6 +147,7 @@
           :modelValue="progress"
           color="primary"
           height="25"
+          data-testid="password-reset-progressbar"
         >
           <template v-slot:default="{ value }">
             <strong class="text-white">{{ Math.ceil(value) }}%</strong>

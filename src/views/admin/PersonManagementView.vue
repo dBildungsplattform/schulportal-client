@@ -844,8 +844,6 @@
           </PersonBulkDelete>
           <PersonBulkPasswordReset
             v-if="passwordResetDialogVisible"
-            :error-code="personStore.errorCode"
-            :isLoading="personStore.loading"
             :isDialogVisible="passwordResetDialogVisible"
             :isSelectionFromSingleSchule="selectedOrganisation.length === 1"
             :selectedSchuleKennung="selectedOrganisationKennung"
