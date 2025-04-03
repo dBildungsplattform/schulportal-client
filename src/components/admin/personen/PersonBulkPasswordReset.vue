@@ -34,16 +34,12 @@
   const personStore: PersonStore = usePersonStore();
 
   const progressState: ComputedRef<State> = computed(() => {
-    if (!personStore.bulkResetPasswordResult) return State.INITIAL;
-    if (personStore.bulkResetPasswordResult.complete) return State.FINISHED;
-    if (personStore.bulkResetPasswordResult.progress > 0) return State.PROGRESSING;
+    if (personStore.bulkResetPasswordResult?.complete) return State.FINISHED;
+    if (personStore.bulkResetPasswordResult?.progress && personStore.bulkResetPasswordResult.progress > 0)
+      return State.PROGRESSING;
     return State.INITIAL;
   });
 
-  const successMessage: ComputedRef<string> = computed(() => {
-    if (personStore.bulkResetPasswordResult?.complete) return t('admin.person.bulkPasswordReset.success');
-    return '';
-  });
   const progress: ComputedRef<number> = computed(() => {
     if (!personStore.bulkResetPasswordResult?.progress) return 0;
     return Math.round(personStore.bulkResetPasswordResult.progress * 100);
@@ -170,7 +166,7 @@
           class="mt-2 text-center"
           data-testid="password-reset-success-text"
         >
-          {{ successMessage }}
+          {{ t('admin.person.bulkPasswordReset.success') }}
         </p>
         <p class="mt-2 text-center"></p>
       </v-container>
