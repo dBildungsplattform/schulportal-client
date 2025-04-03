@@ -95,8 +95,12 @@
     return false;
   });
 
+  const isDisplayName = (name: string): boolean => {
+    return translatedSchulen.value.find((schule: TranslatedObject) => schule.title === name) !== undefined;
+  };
+
   const updateSearchString = (searchString: string | undefined): void => {
-    if (searchString) {
+    if (searchString && !isDisplayName(searchString)) {
       schulenFilter.searchString = searchString;
     } else {
       delete schulenFilter.searchString;

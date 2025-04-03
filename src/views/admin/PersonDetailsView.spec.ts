@@ -829,6 +829,8 @@ describe('PersonDetailsView', () => {
   });
 
   test('renders form to change Klasse and triggers submit', async () => {
+    organisationStore.getKlassenByOrganisationId = vi.fn().mockResolvedValue(undefined);
+
     await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
     await nextTick();
 
