@@ -119,9 +119,13 @@
 
   const rollen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
     const filteredRollen: RolleResponse[] = personenkontextStore.filteredRollen?.moeglicheRollen || [];
-    const uniqueRollen: RolleResponse[] = [...new Set([...filteredRollen, ...selectedRollenObjects.value])];
+    const uniqueRollenMap: Map<string, RolleResponse> = new Map();
 
-    return uniqueRollen
+    [...filteredRollen, ...selectedRollenObjects.value].forEach((rolle: RolleResponse) => {
+      uniqueRollenMap.set(rolle.id, rolle);
+    });
+
+    return [...uniqueRollenMap.values()]
       .map((rolle: RolleResponse) => ({
         value: rolle.id,
         title: rolle.name,
