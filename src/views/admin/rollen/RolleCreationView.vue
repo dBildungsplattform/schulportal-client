@@ -31,7 +31,7 @@
   } from 'vue-router';
   import { useForm, type FormContext, type TypedSchema } from 'vee-validate';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import RolleForm from '@/components/form/RolleForm.vue';
+  import RolleForm from '@/components/admin/rollen/RolleForm.vue';
   import {
     getDirtyState,
     getRolleFieldDefinitions,
