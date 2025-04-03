@@ -1,11 +1,11 @@
 import routes from '@/router/routes';
 import { usePersonStore, type PersonenWithRolleAndZuordnung, type PersonStore } from '@/stores/PersonStore';
+import { download } from '@/utils/file';
 import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import { test } from 'vitest';
 import { nextTick } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import PersonBulkPasswordReset from './PersonBulkPasswordReset.vue';
-import { buildCSV, download } from '@/utils/file';
 
 let router: Router;
 const personStore: PersonStore = usePersonStore();
