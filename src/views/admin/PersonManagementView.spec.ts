@@ -36,6 +36,7 @@ beforeEach(() => {
 
   authStore.hasPersonenBulkPermission = true;
   authStore.hasPersonenLoeschenPermission = true;
+  authStore.hasPersonenverwaltungPermission = true;
 
   organisationStore.klassen = [
     {
@@ -461,6 +462,36 @@ describe('PersonManagementView', () => {
     expect(document.body.querySelector('[data-testid="person-delete-layout-card"]')).not.toBeNull();
   });
 
+  test('it checks a checkbox in the table, selects the reset password option and triggers dialog', async () => {
+    authStore.hasPersonenverwaltungPermission = true;
+    // Find the first checkbox in the table
+    const checkbox: DOMWrapper<Element> | undefined = wrapper?.find(
+      '[data-testid="person-table"] .v-selection-control',
+    );
+
+    // Initial state check (optional)
+    expect(checkbox?.classes()).not.toContain('v-selection-control--selected');
+
+    // Trigger the checkbox click
+    await checkbox?.trigger('click');
+    await nextTick();
+
+    const benutzerEditSelect: VueWrapper | undefined = wrapper?.findComponent({ ref: 'benutzer-bulk-edit-select' });
+
+    // eslint-disable-next-line @typescript-eslint/dot-notation
+    const hasPasswordResetOption: boolean = (benutzerEditSelect?.props() as { items: { value: string }[] }).items.some(
+      (item: { value: string }) => item.value === 'RESET_PASSWORD',
+    );
+    expect(hasPasswordResetOption).toBe(true);
+
+    benutzerEditSelect?.setValue('RESET_PASSWORD');
+
+    benutzerEditSelect?.vm.$emit('input', 'RESET_PASSWORD');
+    await nextTick();
+
+    expect(document.body.querySelector('[data-testid="password-reset-layout-card"]')).not.toBeNull();
+  });
+
   test('person delete isnt shown if user has no permission', async () => {
     authStore.hasPersonenLoeschenPermission = false;
 
@@ -500,6 +531,48 @@ describe('PersonManagementView', () => {
     // eslint-disable-next-line @typescript-eslint/dot-notation
     (benutzerEditSelect.props() as { items: { value: string }[] })['items'].forEach((item: { value: string }) => {
       expect(item.value).not.toBe('DELETE_PERSON');
+    });
+  });
+
+  test('password reset isnt shown if user has no permission', async () => {
+    authStore.hasPersonenverwaltungPermission = false;
+
+    wrapper = mount(PersonManagementView, {
+      attachTo: document.getElementById('app') || '',
+      global: {
+        components: {
+          PersonManagementView,
+        },
+        mocks: {
+          route: {
+            fullPath: 'full/path',
+          },
+        },
+        provide: {
+          organisationStore,
+          personStore,
+          personenkontextStore,
+          rolleStore,
+          searchFilterStore,
+          authStore,
+        },
+      },
+    });
+
+    // Find the first checkbox in the table
+    const checkbox: DOMWrapper<Element> | undefined = wrapper.find('[data-testid="person-table"] .v-selection-control');
+    // Initial state check (optional)
+    expect(checkbox.classes()).not.toContain('v-selection-control--selected');
+
+    // Trigger the checkbox click
+    await checkbox.trigger('click');
+    await nextTick();
+
+    const benutzerEditSelect: VueWrapper | undefined = wrapper.findComponent({ ref: 'benutzer-bulk-edit-select' });
+
+    // eslint-disable-next-line @typescript-eslint/dot-notation
+    (benutzerEditSelect.props() as { items: { value: string }[] })['items'].forEach((item: { value: string }) => {
+      expect(item.value).not.toBe('RESET_PASSWORD');
     });
   });
 });
