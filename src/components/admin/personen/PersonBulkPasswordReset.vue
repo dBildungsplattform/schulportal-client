@@ -59,7 +59,8 @@
         Passwort: password,
       });
     }
-    return buildCSV<CSVHeaders>(['Klassen', 'Nachname', 'Vorname', 'Benutzername', 'Passwort'], rows);
+    const csv: string = buildCSV<CSVHeaders>(['Klassen', 'Nachname', 'Vorname', 'Benutzername', 'Passwort'], rows);
+    return new Blob([csv], { type: 'text/txt' });
   });
 
   async function closePasswordResetDialog(finished: boolean): Promise<void> {

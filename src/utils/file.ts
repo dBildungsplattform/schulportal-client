@@ -1,14 +1,15 @@
-export function buildCSV<K extends string>(headers: Array<K>, rows: Array<Record<K, string | undefined>>): Blob {
+const separator: string = ';';
+
+export function buildCSV<K extends string>(headers: Array<K>, rows: Array<Record<K, string | undefined>>): string {
   let fileContent: string = '';
-  fileContent += headers.join(';');
+  fileContent += headers.join(separator);
   fileContent += '\n';
   for (const row of rows) {
-    const data: string = headers.map((header: K) => row[header] ?? '').join(';');
+    const data: string = headers.map((header: K) => row[header] ?? '').join(separator);
     fileContent += data;
     fileContent += '\n';
   }
-  const blob: Blob = new Blob([fileContent], { type: 'text/txt' });
-  return blob;
+  return fileContent;
 }
 
 export function download(fileName: string, file: Blob): void {
