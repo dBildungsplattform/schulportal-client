@@ -538,6 +538,7 @@
         }
       },
       "schulenAssignedSuccessfully": "Die Schulen wurden erfolgreich zugeordnet.",
+      "schulenUnassignedSuccessfully": "Die Schulen wurden erfolgreich entfernt.",
       "schulenWithoutTraeger": "Schulen ohne Träger",
       "schulenOfThisTraeger": "Schulen dieses Trägers ({amount})",
       "schultraegerAddedSuccessfully": "Der Schulträger wurde erfolgreich hinzugefügt.",

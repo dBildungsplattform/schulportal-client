@@ -14,12 +14,17 @@
   defineProps<Props>();
 
   type Emits = {
+    (event: 'onHandleAssignedItemClick', item: Organisation): void;
     (event: 'onHandleAssignedItemsSearchFilter', searchFilter: string): void;
     (event: 'onHandleUnassignedItemClick', item: Organisation): void;
     (event: 'onHandleUnassignedItemsSearchFilter', searchFilter: string): void;
   };
 
   const emit: Emits = defineEmits<Emits>();
+
+  function handleAssignedItemClick(item: Organisation): void {
+    emit('onHandleAssignedItemClick', item);
+  }
 
   function handleAssignedItemsSearchFilter(searchFilter: string): void {
     emit('onHandleAssignedItemsSearchFilter', searchFilter.trim());
@@ -41,6 +46,7 @@
   >
     <h3 class="subtitle-1 mb-3">{{ unassignedItemsHeader }}</h3>
     <RelationshipAssignList
+      dataTestId="unassigned-items-list"
       :items="unassignedItems"
       :noItemsFoundText="noUnassignedItemsFoundText"
       @onHandleItemClick="handleUnassignedItemClick"
@@ -57,8 +63,10 @@
   >
     <h3 class="subtitle-1 mb-3">{{ assignedItemsHeader }}</h3>
     <RelationshipAssignList
+      dataTestId="assigned-items-list"
       :items="assignedItems"
       :noItemsFoundText="noAssignedItemsFoundText"
+      @onHandleItemClick="handleAssignedItemClick"
       @onHandleSearchFilter="handleAssignedItemsSearchFilter"
       ref="assignedItemsList"
       v-slot="{ item }"
