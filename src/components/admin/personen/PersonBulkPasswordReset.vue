@@ -59,7 +59,7 @@
     return Math.round(personStore.bulkResetPasswordResult.progress * 100);
   });
 
-  // Create the file and returns the Blob 
+  // Create the file and returns the Blob
   const resultFile: ComputedRef<Blob | null> = computed(() => {
     const result: BulkResetPasswordResult | null = personStore.bulkResetPasswordResult;
 
@@ -246,6 +246,7 @@
               class="primary"
               @click="downloadFile(resultFile)"
               data-testid="download-result-button"
+              :disabled="personStore.loading"
             >
               {{ t('admin.person.bulkPasswordReset.downloadResult') }}
             </v-btn>

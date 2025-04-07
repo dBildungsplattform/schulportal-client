@@ -474,7 +474,6 @@ describe('PersonManagementView', () => {
 
     expect(document.body.querySelector('[data-testid="person-delete-layout-card"]')).toBeNull();
   });
-  
 
   test('it checks a checkbox in the table, selects the reset password option and triggers dialog then cancels it', async () => {
     authStore.hasPersonenverwaltungPermission = true;
