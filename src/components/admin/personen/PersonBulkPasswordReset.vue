@@ -1,6 +1,11 @@
 <script setup lang="ts">
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { type PersonenWithRolleAndZuordnung, type PersonStore, usePersonStore } from '@/stores/PersonStore';
+  import {
+    type BulkResetPasswordResult,
+    type PersonenWithRolleAndZuordnung,
+    type PersonStore,
+    usePersonStore,
+  } from '@/stores/PersonStore';
   import { buildCSV, download } from '@/utils/file';
   import { computed, type ComputedRef, type Ref } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
@@ -33,34 +38,55 @@
 
   const personStore: PersonStore = usePersonStore();
 
+  // Computed that determines the state of the operation. Could either be initial (Progress === 0) or Progressing (progress > 0) or finished (operation is complete)
   const progressState: ComputedRef<State> = computed(() => {
-    if (personStore.bulkResetPasswordResult?.complete) return State.FINISHED;
-    if (personStore.bulkResetPasswordResult?.progress && personStore.bulkResetPasswordResult.progress > 0)
+    const result: BulkResetPasswordResult | null = personStore.bulkResetPasswordResult;
+
+    if (result?.complete === true) {
+      return State.FINISHED;
+    }
+
+    if (result?.progress !== undefined && result.progress > 0) {
       return State.PROGRESSING;
+    }
+
     return State.INITIAL;
   });
 
+  // Calculates the progress dynamically (Requests are sent sequentially and for every response we get the bar increments)
   const progress: ComputedRef<number> = computed(() => {
     if (!personStore.bulkResetPasswordResult?.progress) return 0;
     return Math.round(personStore.bulkResetPasswordResult.progress * 100);
   });
+
+  // Create the file and returns the Blob 
   const resultFile: ComputedRef<Blob | null> = computed(() => {
-    if (!personStore.bulkResetPasswordResult?.complete) return null;
-    let rows: Array<CSVRow> = [];
-    for (const [id, password] of personStore.bulkResetPasswordResult.passwords.entries()) {
+    const result: BulkResetPasswordResult | null = personStore.bulkResetPasswordResult;
+
+    if (!result?.complete) return null;
+
+    const rows: Array<CSVRow> = [];
+
+    // For every password in the Map find the corresponding person (using the key) and merge them together in the file.
+    for (const [id, password] of result.passwords.entries()) {
       const personWithRolleAndZuordnung: PersonWithRolleAndZuordnung | undefined = props.selectedPersons.find(
         (p: PersonWithRolleAndZuordnung) => p.person.id === id,
       );
-      rows.push({
-        Klassen: personWithRolleAndZuordnung?.klassen,
-        Nachname: personWithRolleAndZuordnung?.person.name.familienname,
-        Vorname: personWithRolleAndZuordnung?.person.name.vorname,
-        Benutzername: personWithRolleAndZuordnung?.person.referrer ?? undefined,
-        Passwort: password,
-      });
+
+      if (personWithRolleAndZuordnung) {
+        rows.push({
+          Klassen: personWithRolleAndZuordnung.klassen,
+          Nachname: personWithRolleAndZuordnung.person.name.familienname,
+          Vorname: personWithRolleAndZuordnung.person.name.vorname,
+          Benutzername: personWithRolleAndZuordnung.person.referrer || '',
+          Passwort: password,
+        });
+      }
     }
+
     const csv: string = buildCSV<CSVHeaders>(['Klassen', 'Nachname', 'Vorname', 'Benutzername', 'Passwort'], rows);
-    return new Blob([csv], { type: 'text/txt' });
+
+    return new Blob([csv], { type: 'text/csv' });
   });
 
   async function closePasswordResetDialog(finished: boolean): Promise<void> {
@@ -182,7 +208,7 @@
             <v-btn
               v-if="progressState === State.FINISHED"
               :block="mdAndDown"
-              class="primary"
+              class="secondary"
               @click="closePasswordResetDialog(true)"
               data-testid="password-reset-close-button"
             >

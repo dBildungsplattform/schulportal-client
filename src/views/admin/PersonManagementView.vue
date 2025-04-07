@@ -134,17 +134,16 @@
       title: org.kennung ? `${org.kennung} (${org.name})` : org.name,
     }));
   });
+
   const selectedOrganisationKennung: ComputedRef<string> = computed(() => {
-    if (selectedOrganisation.value.length === 1) {
-      const id: string | undefined = selectedOrganisation.value[0];
-      if (!id) return '';
-      const organisation: Organisation | undefined = organisationStore.allOrganisationen.find(
-        (org: Organisation) => org.id === id,
-      );
-      if (!organisation) return '';
-      return organisation.kennung ?? '';
+    if (selectedOrganisation.value.length !== 1) {
+      return '';
     }
-    return '';
+    const id: string = selectedOrganisation.value[0]!;
+    const organisation: Organisation | undefined = organisationStore.allOrganisationen.find(
+      (org: Organisation) => org.id === id,
+    );
+    return organisation?.kennung ?? '';
   });
 
   const rollen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
@@ -495,6 +494,7 @@
       resultTable.value.resetSelection();
     }
   };
+
   const handleBulkPasswordResetDialog = async (_finished: boolean): Promise<void> => {
     passwordResetDialogVisible.value = false;
     selectedOption.value = null;
@@ -824,7 +824,7 @@
             ></v-select>
           </SpshTooltip>
           <RolleModify
-            ref="rolle-modify"
+            ref="person-bulk-rolle-modify"
             v-if="rolleModifiyDialogVisible"
             :organisationen="organisationenForForm"
             :rollen="lehrRollen"
@@ -847,6 +847,7 @@
           >
           </PersonBulkDelete>
           <PersonBulkPasswordReset
+            ref="person-bulk-password-reset"
             v-if="passwordResetDialogVisible"
             :isDialogVisible="passwordResetDialogVisible"
             :isSelectionFromSingleSchule="selectedOrganisation.length === 1"
