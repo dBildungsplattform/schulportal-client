@@ -78,6 +78,8 @@ type PersonenkontextState = {
   loading: boolean;
   totalFilteredRollen: number;
   totalPaginatedRollen: number;
+  bulkProgress: number;
+  bulkErrors: Map<string, string>;
 };
 
 type PersonenkontextGetters = {};
@@ -93,6 +95,7 @@ type PersonenkontextActions = {
   createPersonWithKontexte: (
     params: DbiamCreatePersonWithPersonenkontexteBodyParams,
   ) => Promise<PersonendatensatzResponse>;
+  unassignPersonenFromOrg(organisationId: string, personIds: string[]): Promise<void>;
 };
 
 export type {
@@ -138,6 +141,8 @@ export const usePersonenkontextStore: StoreDefinition<
       loading: false,
       totalFilteredRollen: 0,
       totalPaginatedRollen: 0,
+      bulkProgress: 0,
+      bulkErrors: new Map<string, string>(),
     };
   },
   actions: {
@@ -233,6 +238,47 @@ export const usePersonenkontextStore: StoreDefinition<
         return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
+      }
+    },
+    async unassignPersonenFromOrg(organisationId: string, personIDs: string[]): Promise<void> {
+      try {
+        this.bulkProgress = 0;
+        const personStore: PersonStore = usePersonStore();
+
+        for (let i: number = 0; i < personIDs.length; i++) {
+          const personId: string = personIDs[i] as string;
+
+          await personStore.getPersonenuebersichtById(personId);
+
+          if (personStore.errorCode) {
+            this.bulkErrors.set(personId, personStore.errorCode);
+            continue;
+          }
+
+          const existingZuordnungen: Zuordnung[] = personStore.personenuebersicht?.zuordnungen ?? [];
+
+          //check if has zuordnung at that organisation
+          const hasZuordnung: boolean | undefined = existingZuordnungen.some(
+            (zuordnung: Zuordnung) => zuordnung.sskId === organisationId,
+          );
+          if (!hasZuordnung) {
+            this.bulkProgress = Math.ceil(((i + 1) / personIDs.length) * 100);
+            continue;
+          }
+
+          const updatedZuordnungen: Zuordnung[] = existingZuordnungen.filter(
+            (zuordnung: Zuordnung) => zuordnung.sskId !== organisationId,
+          );
+          await this.updatePersonenkontexte(updatedZuordnungen, personId);
+
+          if (this.errorCode) {
+            this.bulkErrors.set(personId, this.errorCode);
+          }
+
+          this.bulkProgress = Math.ceil(((i + 1) / personIDs.length) * 100);
+        }
+      } catch (error: unknown) {
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       }
     },
   },

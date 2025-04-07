@@ -158,6 +158,11 @@
       "addNew": "Neuen Benutzer hinzufügen",
       "backToCreatePerson": "Zurück zur Benutzeranlage",
       "backToInput": "Zurück zur Eingabe",
+      "bulkUnassignOrganisation": {
+        "confirmation": "Möchten Sie wirklich die Schulzuordnungen der ausgewählten Benutzer an der {schule} zurücknehmen?",
+        "success": "Die Schulzuordnungen der Benutzer wurden erfolgreich entfernt."
+      },
+      "onlyOneSchoolAlert": "Bitte wählen Sie im Filter genau eine Schule aus, um die Aktion durchzuführen.",
       "changePassword": "Passwort ändern",
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
       "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",

@@ -24,6 +24,7 @@
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
   import PersonBulkDelete from '@/components/admin/personen/PersonBulkDelete.vue';
   import OrganisationUnassign from '@/components/admin/schulen/OrganisationUnassign.vue';
+  import OneSchoolAlert from '@/components/alert/OneSchoolAlert.vue';
 
   const searchFieldComponent: Ref = ref();
 
@@ -61,7 +62,7 @@
   let totalKlassen: number = 0;
   const selectedKlassen: Ref<Array<string>> = ref([]);
   const selectedRollen: Ref<Array<string>> = ref([]);
-  const selectedOrganisation: Ref<Array<string>> = ref([]);
+  const selectedOrganisationId: Ref<Array<string>> = ref([]);
   const selectedStatus: Ref<string | null> = ref(null);
   const searchFilter: Ref<string> = ref('');
 
@@ -72,6 +73,7 @@
   const rolleModifiyDialogVisible: Ref<boolean> = ref(false);
   const benutzerDeleteDialogVisible: Ref<boolean> = ref(false);
   const organisationUnassignDialogVisible: Ref<boolean> = ref(false);
+  const onlyOneSchoolAlertDialogVisible: Ref<boolean> = ref(false);
 
   const selectedOption: Ref<string | null> = ref(null);
 
@@ -104,7 +106,7 @@
 
   const filterOrSearchActive: Ref<boolean> = computed(
     () =>
-      (!hasAutoSelectedOrganisation.value && selectedOrganisation.value.length > 0) ||
+      (!hasAutoSelectedOrganisation.value && selectedOrganisationId.value.length > 0) ||
       selectedRollen.value.length > 0 ||
       !!searchFilterStore.selectedOrganisationen?.length ||
       !!searchFilterStore.selectedRollen?.length ||
@@ -149,7 +151,7 @@
 
   async function applySearchAndFilters(): Promise<void> {
     await organisationStore.getFilteredKlassen({
-      administriertVon: selectedOrganisation.value,
+      administriertVon: selectedOrganisationId.value,
       searchString: searchInputKlassen.value,
     });
     // THe dropdown should be updated as well here alongside the count
@@ -176,7 +178,7 @@
     await personStore.getAllPersons({
       offset: (searchFilterStore.personenPage - 1) * searchFilterStore.personenPerPage,
       limit: searchFilterStore.personenPerPage,
-      organisationIDs: selectedKlassen.value.length ? selectedKlassen.value : selectedOrganisation.value,
+      organisationIDs: selectedKlassen.value.length ? selectedKlassen.value : selectedOrganisationId.value,
       rolleIDs: searchFilterStore.selectedRollen || selectedRollen.value,
       searchFilter: searchFilterStore.searchFilterPersonen || searchFilter.value,
       sortField: searchFilterStore.sortField as SortField,
@@ -196,7 +198,7 @@
     await personStore.getAllPersons({
       offset: (searchFilterStore.personenPage - 1) * searchFilterStore.personenPerPage,
       limit: searchFilterStore.personenPerPage,
-      organisationIDs: searchFilterStore.selectedOrganisationen || selectedOrganisation.value,
+      organisationIDs: searchFilterStore.selectedOrganisationen || selectedOrganisationId.value,
       rolleIDs: searchFilterStore.selectedRollen || selectedRollen.value,
       searchFilter: searchFilterStore.searchFilterPersonen || searchFilter.value,
     });
@@ -207,11 +209,11 @@
   async function autoSelectOrganisation(): Promise<void> {
     // Autoselect the Orga for the current user that only has 1 Orga assigned to him.
     if (organisationStore.allOrganisationen.length === 1) {
-      selectedOrganisation.value = [organisationStore.allOrganisationen[0]?.id || ''];
+      selectedOrganisationId.value = [organisationStore.allOrganisationen[0]?.id || ''];
       hasAutoSelectedOrganisation.value = true;
-      if (selectedOrganisation.value.length) {
+      if (selectedOrganisationId.value.length) {
         await organisationStore.getFilteredKlassen({
-          administriertVon: selectedOrganisation.value,
+          administriertVon: selectedOrganisationId.value,
           searchString: searchInputKlassen.value,
         });
         // Dropdown wasn't updated. Ideally it should be automatically updated once the selectedOrganisation holds a value.
@@ -251,9 +253,9 @@
     await searchFilterStore.setOrganisationFilterForPersonen(newValue);
     await searchFilterStore.setKlasseFilterForPersonen([]);
     selectedKlassen.value = [];
-    if (selectedOrganisation.value.length) {
+    if (selectedOrganisationId.value.length) {
       await organisationStore.getFilteredKlassen({
-        administriertVon: selectedOrganisation.value,
+        administriertVon: selectedOrganisationId.value,
         searchString: searchInputKlassen.value,
       });
       // set values for klassen dropdown
@@ -280,7 +282,7 @@
     searchFilterStore.setSearchFilterForPersonen('');
     /* do not reset orgas if orga was autoselected */
     if (!hasAutoSelectedOrganisation.value) {
-      selectedOrganisation.value = [];
+      selectedOrganisationId.value = [];
       searchFilterStore.setOrganisationFilterForPersonen([]);
     }
     searchInputOrganisationen.value = '';
@@ -317,12 +319,12 @@
       // fetch new klassen based on search value and include selected klassen
       await organisationStore.getFilteredKlassen({
         searchString: searchValue,
-        administriertVon: selectedOrganisation.value,
+        administriertVon: selectedOrganisationId.value,
         organisationIds: selectedKlassen.value,
       });
 
       // set values for klassen dropdown
-      if (selectedOrganisation.value.length) {
+      if (selectedOrganisationId.value.length) {
         klassenOptions.value = organisationStore.klassen
           .map((org: Organisation) => ({
             value: org.id,
@@ -368,7 +370,7 @@
         excludeTyp: [OrganisationsTyp.Klasse],
         limit: 25,
         systemrechte: ['PERSONEN_VERWALTEN'],
-        organisationIds: selectedOrganisation.value,
+        organisationIds: selectedOrganisationId.value,
       });
     }, 500);
   }
@@ -433,6 +435,14 @@
     getPaginatedPersonen(searchFilterStore.personenPage);
   }
 
+  const singleSchoolSelected: ComputedRef<boolean> = computed(() => {
+    return selectedOrganisationId.value.length === 1;
+  });
+
+  const selectedOrganisation: ComputedRef<Organisation | undefined> = computed(() => {
+    return organisationStore.allOrganisationen.find((org: Organisation) => org.id === selectedOrganisationId.value[0]);
+  });
+
   // Handle the selected action
   const handleOption = (newValue: string | null): void => {
     if (!newValue) return;
@@ -445,6 +455,10 @@
         benutzerDeleteDialogVisible.value = true;
         break;
       case ActionTypes.ORG_UNASSIGN:
+        if (!singleSchoolSelected.value) {
+          onlyOneSchoolAlertDialogVisible.value = true;
+          return;
+        }
         organisationUnassignDialogVisible.value = true;
         break;
     }
@@ -459,6 +473,15 @@
 
   const handleBulkDeleteDialog = async (finished: boolean): Promise<void> => {
     benutzerDeleteDialogVisible.value = false;
+    selectedOption.value = null;
+    if (finished) {
+      selectedPersonIds.value = [];
+      await getPaginatedPersonen(searchFilterStore.personenPage);
+      resultTable.value.resetSelection();
+    }
+  };
+  const handleUnassignOrgDialog = async (finished: boolean): Promise<void> => {
+    organisationUnassignDialogVisible.value = false;
     selectedOption.value = null;
     if (finished) {
       selectedPersonIds.value = [];
@@ -499,7 +522,7 @@
       limit: 25,
     });
     if (filterOrSearchActive.value) {
-      selectedOrganisation.value = searchFilterStore.selectedOrganisationen || [];
+      selectedOrganisationId.value = searchFilterStore.selectedOrganisationen || [];
       selectedRollen.value = searchFilterStore.selectedRollen || [];
       selectedKlassen.value = searchFilterStore.selectedKlassen || [];
       selectedRollenObjects.value = searchFilterStore.selectedRollenObjects;
@@ -511,7 +534,7 @@
       excludeTyp: [OrganisationsTyp.Klasse],
       systemrechte: ['PERSONEN_VERWALTEN'],
       limit: 25,
-      organisationIds: selectedOrganisation.value,
+      organisationIds: selectedOrganisationId.value,
     });
 
     await getPaginatedPersonen(searchFilterStore.personenPage);
@@ -561,7 +584,7 @@
           <v-autocomplete
             autocomplete="off"
             class="filter-dropdown"
-            :class="{ selected: selectedOrganisation.length > 0 }"
+            :class="{ selected: selectedOrganisationId.length > 0 }"
             clearable
             data-testid="schule-select"
             density="compact"
@@ -579,7 +602,7 @@
             @update:modelValue="setOrganisationFilter"
             @update:search="updateOrganisationSearch"
             variant="outlined"
-            v-model="selectedOrganisation"
+            v-model="selectedOrganisationId"
             v-model:search="searchInputOrganisationen"
           >
             <template v-slot:prepend-item>
@@ -603,12 +626,12 @@
             </template>
             <template v-slot:selection="{ item, index }">
               <span
-                v-if="selectedOrganisation.length < 2"
+                v-if="selectedOrganisationId.length < 2"
                 class="v-autocomplete__selection-text"
                 >{{ item.title }}</span
               >
               <div v-else-if="index === 0">
-                {{ $t('admin.schule.schulenSelected', { count: selectedOrganisation.length }) }}
+                {{ $t('admin.schule.schulenSelected', { count: selectedOrganisationId.length }) }}
               </div>
             </template>
           </v-autocomplete>
@@ -676,7 +699,7 @@
           class="py-md-0"
         >
           <v-tooltip
-            :disabled="!!selectedOrganisation.length"
+            :disabled="!!selectedOrganisationId.length"
             location="top"
           >
             <template v-slot:activator="{ props }">
@@ -688,7 +711,7 @@
                   clearable
                   data-testid="klasse-select"
                   density="compact"
-                  :disabled="!selectedOrganisation.length"
+                  :disabled="!selectedOrganisationId.length"
                   hide-details
                   id="klasse-select"
                   :items="klassenOptions"
@@ -790,6 +813,16 @@
               @update:modelValue="handleOption"
             ></v-select>
           </SpshTooltip>
+          <OneSchoolAlert
+            :isDialogVisible="onlyOneSchoolAlertDialogVisible"
+            header="WIP"
+            @update:dialogExit="
+              () => {
+                onlyOneSchoolAlertDialogVisible = false;
+                selectedOption = null;
+              }
+            "
+          />
           <RolleModify
             ref="rolle-modify"
             v-if="rolleModifiyDialogVisible"
@@ -815,11 +848,11 @@
           </PersonBulkDelete>
           <OrganisationUnassign
             ref="organisation-unassign"
-            v-if="organisationUnassignDialogVisible"
-            :errorCode="personenkontextStore.errorCode"
-            :isLoading="personenkontextStore.loading"
+            v-if="organisationUnassignDialogVisible && selectedOrganisation"
+            :isDialogVisible="organisationUnassignDialogVisible"
             :selectedPersonenIds="selectedPersonIds"
-            @update:isDialogVisible="handleDialog($event)"
+            :selectedOrganisation="selectedOrganisation"
+            @update:dialogExit="handleUnassignOrgDialog($event)"
           >
           </OrganisationUnassign>
         </v-col>
