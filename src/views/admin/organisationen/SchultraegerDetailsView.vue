@@ -43,9 +43,7 @@
 
   const currentSchultraegerId: string = route.params['id'] as string;
 
-  const assignableSchulen: Ref<Array<string>> = ref([]);
   const assignedSchulen: Ref<Array<Organisation>> = ref([]);
-  const unassignableSchulen: Ref<Array<string>> = ref([]);
   const unassignedSchulen: Ref<Array<Organisation>> = ref([]);
 
   const progress: Ref<number> = ref<number>(0);
@@ -113,14 +111,23 @@
     successMessage.value = '';
     progress.value = 0;
 
-    if (assignableSchulen.value.length > 0) {
-      for (let index: number = 0; index < assignableSchulen.value.length; index++) {
-        const schuleId: string = assignableSchulen.value[index]!;
+    /* filter for schulen with isNotPersisted true */
+    const unpersistedSchulenToAssign: Array<string> = assignedSchulen.value
+      .filter((schule: Organisation) => schule.isNotPersisted)
+      .map((schule: Organisation) => schule.id);
+
+    const unpersistedSchulenToUnassign: Array<string> = unassignedSchulen.value
+      .filter((schule: Organisation) => schule.isNotPersisted)
+      .map((schule: Organisation) => schule.id);
+
+    if (unpersistedSchulenToAssign.length > 0) {
+      for (let index: number = 0; index < unpersistedSchulenToAssign.length; index++) {
+        const schuleId: string = unpersistedSchulenToAssign[index]!;
 
         await organisationStore.assignSchuleToTraeger(currentSchultraegerId, { organisationId: schuleId });
 
         /* Update progress for each item processed */
-        progress.value = Math.ceil(((index + 1) / assignableSchulen.value.length) * 100);
+        progress.value = Math.ceil(((index + 1) / unpersistedSchulenToAssign.length) * 100);
       }
 
       /* Show success message only after all items have been processed */
@@ -129,9 +136,9 @@
       }
     }
 
-    if (unassignableSchulen.value.length > 0) {
-      for (let index: number = 0; index < unassignableSchulen.value.length; index++) {
-        const schuleId: string = unassignableSchulen.value[index]!;
+    if (unpersistedSchulenToUnassign.length > 0) {
+      for (let index: number = 0; index < unpersistedSchulenToUnassign.length; index++) {
+        const schuleId: string = unpersistedSchulenToUnassign[index]!;
 
         /* assign to traeger's parent */
         if (organisationStore.currentOrganisation?.zugehoerigZu) {
@@ -141,7 +148,7 @@
         }
 
         /* Update progress for each item processed */
-        progress.value = Math.ceil(((index + 1) / unassignableSchulen.value.length) * 100);
+        progress.value = Math.ceil(((index + 1) / unpersistedSchulenToUnassign.length) * 100);
       }
 
       /* Show success message only after all items have been processed */
@@ -151,15 +158,19 @@
     }
   });
 
-  function addAssignableSchule(schule: Organisation): void {
-    assignableSchulen.value.push(schule.id);
-    assignedSchulen.value = [schule, ...assignedSchulen.value];
+  function prepareSchuleToAssign(schule: Organisation): void {
+    /* add isNotPersisted flag */
+    const schuleWithPersistence: Organisation = { ...schule, isNotPersisted: true };
+
+    assignedSchulen.value = [schuleWithPersistence, ...assignedSchulen.value];
     unassignedSchulen.value = unassignedSchulen.value.filter((item: Organisation) => item.id !== schule.id);
   }
 
-  function addUnassignableSchule(schule: Organisation): void {
-    unassignableSchulen.value.push(schule.id);
-    unassignedSchulen.value = [schule, ...unassignedSchulen.value];
+  function prepareSchuleToUnassign(schule: Organisation): void {
+    /* add isNotPersisted flag */
+    const schuleWithPersistence: Organisation = { ...schule, isNotPersisted: true };
+
+    unassignedSchulen.value = [schuleWithPersistence, ...unassignedSchulen.value];
     assignedSchulen.value = assignedSchulen.value.filter((item: Organisation) => item.id !== schule.id);
   }
 
@@ -196,11 +207,11 @@
       }
 
       // After assigning the Schule to the Schultraeger, remove it from the unassigned Schulen
-      if (assignableSchulen.value.length > 0) {
-        unassignedSchulen.value = unassignedSchulen.value.filter(
-          (schule: Organisation) => !assignableSchulen.value.includes(schule.id),
-        );
-      }
+      // if (assignableSchulen.value.length > 0) {
+      //   unassignedSchulen.value = unassignedSchulen.value.filter(
+      //     (schule: Organisation) => !assignableSchulen.value.includes(schule.id),
+      //   );
+      // }
 
       // if input is given and no Schulen were found, show that there were none found
       noUnassignedSchulenFoundText.value =
@@ -321,11 +332,11 @@
                 :assignedItemsHeader="$t('admin.schultraeger.schulenOfThisTraeger', { amount: assignedSchulen.length })"
                 :noAssignedItemsFoundText="noAssignedSchulenFoundText"
                 :noUnassignedItemsFoundText="noUnassignedSchulenFoundText"
-                @onHandleAssignedItemClick="addUnassignableSchule"
+                @onHandleAssignedItemClick="prepareSchuleToUnassign"
                 @onHandleAssignedItemsSearchFilter="
                   (searchString: string) => searchSchulen(searchString, SchuleType.ASSIGNED)
                 "
-                @onHandleUnassignedItemClick="addAssignableSchule"
+                @onHandleUnassignedItemClick="prepareSchuleToAssign"
                 @onHandleUnassignedItemsSearchFilter="
                   (searchString: string) => searchSchulen(searchString, SchuleType.UNASSIGNED)
                 "

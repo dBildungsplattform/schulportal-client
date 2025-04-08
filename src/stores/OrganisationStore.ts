@@ -32,6 +32,8 @@ export type Organisation = {
   schuleDetails?: string;
   version?: number;
   itslearningEnabled?: boolean;
+  /* isNotPersisted is optional and currently only used for SchultraegerDetailsView */
+  isNotPersisted?: boolean;
 };
 
 export type KlasseTableItem = {
