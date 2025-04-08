@@ -1,28 +1,36 @@
 <script setup lang="ts">
-  import { computed, onMounted, type ComputedRef, type Ref, ref, watch } from 'vue';
-  import { type Composer, useI18n } from 'vue-i18n';
-  import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
-  import { type Router, useRouter } from 'vue-router';
-  import {
-    useOrganisationStore,
-    type OrganisationStore,
-    type Organisation,
-    OrganisationsTyp,
-  } from '@/stores/OrganisationStore';
-  import { SortField, SortOrder, usePersonStore, type PersonStore, type Personendatensatz } from '@/stores/PersonStore';
-  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
-  import { useRolleStore, type RolleStore, type RolleResponse, RollenArt, RollenMerkmal } from '@/stores/RolleStore';
-  import { type SearchFilterStore, useSearchFilterStore } from '@/stores/SearchFilterStore';
-  import LayoutCard from '@/components/cards/LayoutCard.vue';
   import ResultTable, { type TableItem, type TableRow } from '@/components/admin/ResultTable.vue';
   import SearchField from '@/components/admin/SearchField.vue';
-  import { type TranslatedObject } from '@/types.d';
-  import { useOrganisationen } from '@/composables/useOrganisationen';
-  import { type TranslatedRolleWithAttrs, useRollen } from '@/composables/useRollen';
-  import RolleModify from '@/components/admin/rollen/RolleModify.vue';
-  import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
   import PersonBulkDelete from '@/components/admin/personen/PersonBulkDelete.vue';
+  import PersonBulkPasswordReset from '@/components/admin/personen/PersonBulkPasswordReset.vue';
+  import RolleModify from '@/components/admin/rollen/RolleModify.vue';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import { useOrganisationen } from '@/composables/useOrganisationen';
+  import { type TranslatedRolleWithAttrs, useRollen } from '@/composables/useRollen';
+  import { type AuthStore, useAuthStore } from '@/stores/AuthStore';
+  import {
+    type Organisation,
+    type OrganisationStore,
+    OrganisationsTyp,
+    useOrganisationStore,
+  } from '@/stores/OrganisationStore';
+  import {
+    type PersonStore,
+    type PersonenWithRolleAndZuordnung,
+    type Personendatensatz,
+    SortField,
+    SortOrder,
+    usePersonStore,
+  } from '@/stores/PersonStore';
+  import { type PersonenkontextStore, usePersonenkontextStore } from '@/stores/PersonenkontextStore';
+  import { type RolleResponse, type RolleStore, RollenArt, RollenMerkmal, useRolleStore } from '@/stores/RolleStore';
+  import { type SearchFilterStore, useSearchFilterStore } from '@/stores/SearchFilterStore';
+  import { type TranslatedObject } from '@/types.d';
+  import { type ComputedRef, type Ref, computed, onMounted, ref, watch } from 'vue';
+  import { type Composer, useI18n } from 'vue-i18n';
+  import { type Router, useRouter } from 'vue-router';
+  import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
   import OrganisationUnassign from '@/components/admin/schulen/OrganisationUnassign.vue';
   import OneSchoolAlert from '@/components/alert/OneSchoolAlert.vue';
 
@@ -40,6 +48,13 @@
   const hasAutoSelectedOrganisation: Ref<boolean> = ref(false);
 
   const selectedPersonIds: Ref<string[]> = ref<string[]>([]);
+  const selectedPersons: ComputedRef<PersonenWithRolleAndZuordnung> = computed(() => {
+    return (
+      personStore.personenWithUebersicht?.filter((p: PersonenWithRolleAndZuordnung[number]) =>
+        selectedPersonIds.value.includes(p.person.id),
+      ) ?? []
+    );
+  });
   const resultTable: Ref = ref(null);
 
   type ReadonlyHeaders = VDataTableServer['headers'];
@@ -72,6 +87,7 @@
 
   const rolleModifiyDialogVisible: Ref<boolean> = ref(false);
   const benutzerDeleteDialogVisible: Ref<boolean> = ref(false);
+  const passwordResetDialogVisible: Ref<boolean> = ref(false);
   const organisationUnassignDialogVisible: Ref<boolean> = ref(false);
   const onlyOneSchoolAlertDialogVisible: Ref<boolean> = ref(false);
 
@@ -83,22 +99,23 @@
   enum ActionTypes {
     MODIFY_ROLLE = 'MODIFY_ROLLE',
     DELETE_PERSON = 'DELETE_PERSON',
+    RESET_PASSWORD = 'RESET_PASSWORD',
     ORG_UNASSIGN = 'ORG_UNASSIGN',
-  }
-
-  // Define i18n values for action types to act as a title/value in the v-select
-  const actionTypeTitles: Partial<Record<ActionTypes, string>> = {
-    [ActionTypes.MODIFY_ROLLE]: t('admin.rolle.assignRolle'),
-    [ActionTypes.ORG_UNASSIGN]: t('person.removeZuordnung'),
-  };
-
-  if (authStore.hasPersonenLoeschenPermission) {
-    actionTypeTitles[ActionTypes.DELETE_PERSON] = t('admin.person.deletePerson');
   }
 
   // Computed property for generating options dynamically for v-selects
   const actions: ComputedRef<TranslatedObject[]> = computed(() => {
-    return Object.entries(actionTypeTitles).map(([key, value]: [string, string]) => ({
+    const actionTypeTitles: Map<ActionTypes, string> = new Map();
+    actionTypeTitles.set(ActionTypes.MODIFY_ROLLE, t('admin.rolle.assignRolle'));
+    if (authStore.hasPersonenLoeschenPermission) {
+      actionTypeTitles.set(ActionTypes.DELETE_PERSON, t('admin.person.deletePerson'));
+    }
+
+    if (authStore.hasPersonenverwaltungPermission) {
+      actionTypeTitles.set(ActionTypes.RESET_PASSWORD, t('admin.person.resetPassword'));
+    }
+
+    return [...actionTypeTitles.entries()].map(([key, value]: [string, string]) => ({
       value: key,
       title: value,
     }));
@@ -123,11 +140,26 @@
     }));
   });
 
+  const selectedOrganisationKennung: ComputedRef<string> = computed(() => {
+    if (selectedOrganisation.value.length !== 1) {
+      return '';
+    }
+    const id: string = selectedOrganisation.value[0]!;
+    const organisation: Organisation | undefined = organisationStore.allOrganisationen.find(
+      (org: Organisation) => org.id === id,
+    );
+    return organisation?.kennung ?? '';
+  });
+
   const rollen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
     const filteredRollen: RolleResponse[] = personenkontextStore.filteredRollen?.moeglicheRollen || [];
-    const uniqueRollen: RolleResponse[] = [...new Set([...filteredRollen, ...selectedRollenObjects.value])];
+    const uniqueRollenMap: Map<string, RolleResponse> = new Map();
 
-    return uniqueRollen
+    [...filteredRollen, ...selectedRollenObjects.value].forEach((rolle: RolleResponse) => {
+      uniqueRollenMap.set(rolle.id, rolle);
+    });
+
+    return [...uniqueRollenMap.values()]
       .map((rolle: RolleResponse) => ({
         value: rolle.id,
         title: rolle.name,
@@ -454,6 +486,9 @@
       case ActionTypes.DELETE_PERSON:
         benutzerDeleteDialogVisible.value = true;
         break;
+      case ActionTypes.RESET_PASSWORD:
+        passwordResetDialogVisible.value = true;
+        break;
       case ActionTypes.ORG_UNASSIGN:
         if (!singleSchoolSelected.value) {
           onlyOneSchoolAlertDialogVisible.value = true;
@@ -465,7 +500,7 @@
   };
 
   // Handles the event when closing the dialog
-  const handleDialog = (isDialogVisible: boolean): void => {
+  const handleRolleModifyDialog = (isDialogVisible: boolean): void => {
     rolleModifiyDialogVisible.value = isDialogVisible;
     organisationUnassignDialogVisible.value = isDialogVisible;
     selectedOption.value = null;
@@ -479,6 +514,11 @@
       await getPaginatedPersonen(searchFilterStore.personenPage);
       resultTable.value.resetSelection();
     }
+  };
+
+  const handleBulkPasswordResetDialog = async (_finished: boolean): Promise<void> => {
+    passwordResetDialogVisible.value = false;
+    selectedOption.value = null;
   };
   const handleUnassignOrgDialog = async (finished: boolean): Promise<void> => {
     organisationUnassignDialogVisible.value = false;
@@ -824,7 +864,7 @@
             "
           />
           <RolleModify
-            ref="rolle-modify"
+            ref="person-bulk-rolle-modify"
             v-if="rolleModifiyDialogVisible"
             :organisationen="organisationenForForm"
             :rollen="lehrRollen"
@@ -832,7 +872,7 @@
             :isDialogVisible="rolleModifiyDialogVisible"
             :errorCode="personenkontextStore.errorCode"
             :personIDs="selectedPersonIds"
-            @update:isDialogVisible="handleDialog($event)"
+            @update:isDialogVisible="handleRolleModifyDialog($event)"
             @update:getUebersichten="getPaginatedPersonen(searchFilterStore.personenPage)"
           >
           </RolleModify>
@@ -846,6 +886,16 @@
             @update:dialogExit="handleBulkDeleteDialog($event)"
           >
           </PersonBulkDelete>
+          <PersonBulkPasswordReset
+            ref="person-bulk-password-reset"
+            v-if="passwordResetDialogVisible"
+            :isDialogVisible="passwordResetDialogVisible"
+            :isSelectionFromSingleSchule="selectedOrganisation.length === 1"
+            :selectedSchuleKennung="selectedOrganisationKennung"
+            :selectedPersons
+            @update:dialogExit="handleBulkPasswordResetDialog($event)"
+          >
+          </PersonBulkPasswordReset>
           <OrganisationUnassign
             ref="organisation-unassign"
             v-if="organisationUnassignDialogVisible && selectedOrganisation"
@@ -868,6 +918,10 @@
         <v-spacer></v-spacer>
         <SearchField
           :initialValue="searchFilterStore.searchFilterPersonen ?? ''"
+          :inputCols="6"
+          :inputColsMd="3"
+          :buttonCols="6"
+          :buttonColsMd="2"
           :hoverText="$t('person.firstNameLastNameReferrerKopersNr')"
           @onApplySearchFilter="handleSearchFilter"
           ref="searchFieldComponent"

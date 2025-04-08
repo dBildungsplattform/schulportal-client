@@ -158,6 +158,15 @@
       "addNew": "Neuen Benutzer hinzufügen",
       "backToCreatePerson": "Zurück zur Benutzeranlage",
       "backToInput": "Zurück zur Eingabe",
+      "bulkPasswordReset": {
+        "confirmation": "Sind Sie sicher, dass Sie das Passwort für die ausgewählten Benutzer zurücksetzen möchten?",
+        "downloadResult": "Benutzerdaten herunterladen",
+        "error": {
+          "onlyOneSchool": "Bitte wählen Sie im Filter genau eine Schule aus, um die Aktion durchzuführen."
+        },
+        "info": "Bitte laden Sie die Datei mit den temporären Passwörtern herunter und teilen Sie den Benutzern die Passwörter mit. Nach dem Schließen des Dialogs ist ein Herunterladen aus Sicherheitsgründen nicht mehr möglich.",
+        "success": "Die Passwörter wurden erfolgreich zurückgesetzt."
+      },
       "bulkUnassignOrganisation": {
         "confirmation": "Möchten Sie wirklich die Schulzuordnungen der ausgewählten Benutzer an der {schule} zurücknehmen?",
         "success": "Die Schulzuordnungen der Benutzer wurden erfolgreich entfernt."
@@ -514,20 +523,27 @@
     },
     "schultraeger": {
       "addNew": "Neuen Schulträger hinzufügen",
+      "assignSchulenOrganisationally": "Schulen zuordnen (organisatorisch)",
       "assignSchultraegerform": "Schulträgerform zuordnen",
-      "assignedSchulen": "Zugeordnete Schulen",
+      "assignedSchulen": "Zugeordnete Schulen (organisatorisch)",
+      "backToCreateSchultraeger": "Zurück zur Schulträgeranlage",
+      "backToSchultraeger": "Zurück zur Gesamtübersicht",
       "create": "Schulträger anlegen",
       "createAnother": "Weiteren Schulträger anlegen",
       "createNew": "Neuen Schulträger anlegen",
       "discard": "Schulträger verwerfen",
+      "edit": "Schulträger bearbeiten",
       "enterSchultraegername": "Schulträgername eingeben",
       "errors": {
-        "TRAEGER_IN_TRAEGER": "Ein Schulträger darf nur einem anderen Schulträger zugeordnet werden.",
         "ORGANISATION_SPECIFICATION_ERROR": "Der Schulträger konnte nicht angelegt werden.",
+        "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Die letzte Aktion konnte nicht ausgeführt werden. Aufgrund von längerer Inaktivität ist eine erneute Authentifizierung mit einem zweiten Faktor erforderlich. Um fortzufahren, klicken Sie bitte auf „Zurück zur Ergebnisliste“ oder „Schließen“. Sie werden anschließend zur Eingabe Ihres zweiten Faktors aufgefordert.",
         "SCHULTRAEGER_ERROR": "Mögliche Schulträger konnten nicht geladen werden.",
-        "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Die letzte Aktion konnte nicht ausgeführt werden. Aufgrund von längerer Inaktivität ist eine erneute Authentifizierung mit einem zweiten Faktor erforderlich. Um fortzufahren, klicken Sie bitte auf „Zurück zur Ergebnisliste“ oder „Schließen“. Sie werden anschließend zur Eingabe Ihres zweiten Faktors aufgefordert."
+        "SCHULTRAEGER_NAME_EINDEUTIG": "Der Schulträgername existiert bereits.",
+        "TRAEGER_IN_TRAEGER": "Ein Schulträger darf nur einem anderen Schulträger zugeordnet werden."
       },
       "management": "Schulträgerverwaltung",
+      "noSchulenFound": "Keine Schulen gefunden",
+      "noSchulenAssigned": "Keine Schulen zugeordnet",
       "rules": {
         "schultraegername": {
           "matches": "Der Schulträgername darf keine ungültigen Zeichen beinhalten.",
@@ -535,15 +551,21 @@
           "required": "Der Schulträgername muss angegeben werden."
         }
       },
+      "schulenAssignedSuccessfully": "Die Schulen wurden erfolgreich zugeordnet.",
+      "schulenWithoutTraeger": "Schulen ohne Träger",
+      "schulenOfThisTraeger": "Schulen dieses Trägers ({amount})",
       "schultraegerAddedSuccessfully": "Der Schulträger wurde erfolgreich hinzugefügt.",
       "schultraegerCreateErrorTitle": "Fehler beim Anlegen des Schulträgers",
+      "schultraegerDetailsErrorTitle": "Fehler beim Laden des Schulträgers",
       "schultraegerform": "Schulträgerform",
       "schultraegername": "Schulträgername",
+      "schultraegerUpdatedSuccessfully": "Der Schulträger wurde erfolgreich bearbeitet.",
       "showAll": "Alle Schulträger anzeigen",
       "title": {
         "ORGANISATION_SPECIFICATION_ERROR": "Fehler bei Anlage des Schulträgers",
         "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Zwei-Faktor-Authentifizierung (2FA) erforderlich"
-      }
+      },
+      "unassignedSchulenDefaultText": "Bitte geben Sie zunächst einen Wert im Filter ein."
     },
     "serviceProvider": {
       "assignServiceProvider": "Angebote zuordnen",

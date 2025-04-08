@@ -124,6 +124,10 @@
         >
           <SearchField
             :initialValue="searchFilterStore.searchFilterSchulen ?? ''"
+            :inputCols="6"
+            :inputColsMd="3"
+            :buttonCols="6"
+            :buttonColsMd="2"
             :hoverText="$t('admin.schule.schulnameDienststellennummer')"
             @onApplySearchFilter="handleSearchFilter"
             ref="searchFieldComponent"
