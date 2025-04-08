@@ -480,7 +480,7 @@
   };
 
   // Handles the event when closing the dialog
-  const handleDialog = (isDialogVisible: boolean): void => {
+  const handleRolleModifyDialog = (isDialogVisible: boolean): void => {
     rolleModifiyDialogVisible.value = isDialogVisible;
     selectedOption.value = null;
   };
@@ -832,7 +832,7 @@
             :isDialogVisible="rolleModifiyDialogVisible"
             :errorCode="personenkontextStore.errorCode"
             :personIDs="selectedPersonIds"
-            @update:isDialogVisible="handleDialog($event)"
+            @update:isDialogVisible="handleRolleModifyDialog($event)"
             @update:getUebersichten="getPaginatedPersonen(searchFilterStore.personenPage)"
           >
           </RolleModify>

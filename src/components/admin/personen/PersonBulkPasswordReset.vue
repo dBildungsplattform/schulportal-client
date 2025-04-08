@@ -12,7 +12,7 @@
   import { useDisplay } from 'vuetify';
 
   type PersonWithRolleAndZuordnung = PersonenWithRolleAndZuordnung[number];
-  type CSVHeaders = 'Klassen' | 'Nachname' | 'Vorname' | 'Benutzername' | 'Passwort';
+  type CSVHeaders = 'Klasse' | 'Nachname' | 'Vorname' | 'Benutzername' | 'Passwort';
   type CSVRow = Record<CSVHeaders, string | undefined>;
 
   type Props = {
@@ -75,7 +75,7 @@
 
       if (personWithRolleAndZuordnung) {
         rows.push({
-          Klassen: personWithRolleAndZuordnung.klassen,
+          Klasse: personWithRolleAndZuordnung.klassen,
           Nachname: personWithRolleAndZuordnung.person.name.familienname,
           Vorname: personWithRolleAndZuordnung.person.name.vorname,
           Benutzername: personWithRolleAndZuordnung.person.referrer || '',
@@ -84,7 +84,7 @@
       }
     }
 
-    const csv: string = buildCSV<CSVHeaders>(['Klassen', 'Nachname', 'Vorname', 'Benutzername', 'Passwort'], rows);
+    const csv: string = buildCSV<CSVHeaders>(['Klasse', 'Nachname', 'Vorname', 'Benutzername', 'Passwort'], rows);
 
     return new Blob([csv], { type: 'text/csv' });
   });
