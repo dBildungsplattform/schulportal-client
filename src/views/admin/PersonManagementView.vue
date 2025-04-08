@@ -50,7 +50,7 @@
   const selectedPersonIds: Ref<string[]> = ref<string[]>([]);
   const selectedPersons: ComputedRef<PersonenWithRolleAndZuordnung> = computed(() => {
     return (
-      personStore.personenWithUebersicht?.filter((p: PersonenWithRolleAndZuordnung[number]) =>
+      personStore.personWithUebersicht?.filter((p: PersonenWithRolleAndZuordnung[number]) =>
         selectedPersonIds.value.includes(p.person.id),
       ) ?? []
     );
@@ -141,10 +141,10 @@
   });
 
   const selectedOrganisationKennung: ComputedRef<string> = computed(() => {
-    if (selectedOrganisation.value.length !== 1) {
+    if (selectedOrganisationId.value.length !== 1) {
       return '';
     }
-    const id: string = selectedOrganisation.value[0]!;
+    const id: string = selectedOrganisationId.value[0]!;
     const organisation: Organisation | undefined = organisationStore.allOrganisationen.find(
       (org: Organisation) => org.id === id,
     );
@@ -890,7 +890,7 @@
             ref="person-bulk-password-reset"
             v-if="passwordResetDialogVisible"
             :isDialogVisible="passwordResetDialogVisible"
-            :isSelectionFromSingleSchule="selectedOrganisation.length === 1"
+            :isSelectionFromSingleSchule="selectedOrganisationId.length === 1"
             :selectedSchuleKennung="selectedOrganisationKennung"
             :selectedPersons
             @update:dialogExit="handleBulkPasswordResetDialog($event)"
