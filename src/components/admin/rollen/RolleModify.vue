@@ -170,7 +170,7 @@
     persistent
   >
     <LayoutCard
-      data-testid="layout-card"
+      data-testid="rolle-modify-layout-card"
       :closable="false"
       :header="$t('admin.rolle.assignRolle')"
       @onCloseClicked="closeModifyRolleDeleteDialog()"

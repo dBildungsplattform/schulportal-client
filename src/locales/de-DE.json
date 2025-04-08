@@ -158,6 +158,15 @@
       "addNew": "Neuen Benutzer hinzufügen",
       "backToCreatePerson": "Zurück zur Benutzeranlage",
       "backToInput": "Zurück zur Eingabe",
+      "bulkPasswordReset": {
+        "confirmation": "Sind Sie sicher, dass Sie das Passwort für die ausgewählten Benutzer zurücksetzen möchten?",
+        "downloadResult": "Benutzerdaten herunterladen",
+        "error": {
+          "onlyOneSchool": "Bitte wählen Sie im Filter genau eine Schule aus, um die Aktion durchzuführen."
+        },
+        "info": "Bitte laden Sie die Datei mit den temporären Passwörtern herunter und teilen Sie den Benutzern die Passwörter mit. Nach dem Schließen des Dialogs ist ein Herunterladen aus Sicherheitsgründen nicht mehr möglich.",
+        "success": "Die Passwörter wurden erfolgreich zurückgesetzt."
+      },
       "changePassword": "Passwort ändern",
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
       "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",

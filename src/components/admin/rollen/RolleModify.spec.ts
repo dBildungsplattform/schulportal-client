@@ -125,7 +125,7 @@ describe('RolleModify', () => {
     await nextTick();
 
     // Find the teleported content in the document body
-    const dialogContent: Element | null = document.body.querySelector('[data-testid="layout-card"]');
+    const dialogContent: Element | null = document.body.querySelector('[data-testid="rolle-modify-layout-card"]');
     expect(dialogContent).not.toBeNull();
 
     // Find buttons within the teleported content
@@ -135,13 +135,13 @@ describe('RolleModify', () => {
     expect(discardButton).not.toBeNull();
     expect(submitButton).not.toBeNull();
 
-    expect(document.querySelector('[data-testid="layout-card"]')).not.toBeNull();
+    expect(document.querySelector('[data-testid="rolle-modify-layout-card"]')).not.toBeNull();
   });
 
   test('renders the dialog when isDialogVisible and closes it', async () => {
     await nextTick();
 
-    const dialogContent: Element | null = document.body.querySelector('[data-testid="layout-card"]');
+    const dialogContent: Element | null = document.body.querySelector('[data-testid="rolle-modify-layout-card"]');
     expect(dialogContent).not.toBeNull();
 
     const discardButton: Element | null = document.body.querySelector('[data-testid="rolle-modify-discard-button"]');
