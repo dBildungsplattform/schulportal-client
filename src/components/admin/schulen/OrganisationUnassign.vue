@@ -41,7 +41,7 @@
   >
     <LayoutCard
       data-testid="layout-card"
-      :header="$t('person.removeZuordnung')"
+      :header="$t('admin.person.bulkUnassignOrganisation.cancelZuordnung')"
     >
       <!-- Initial block -->
       <v-container
@@ -153,7 +153,7 @@
               data-testid="org-unassign-submit-button"
               type="submit"
             >
-              {{ t('person.removeZuordnung') }}
+              {{ t('admin.person.bulkUnassignOrganisation.cancelZuordnung') }}
             </v-btn>
           </v-col>
         </v-row>

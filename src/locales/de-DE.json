@@ -168,6 +168,7 @@
         "success": "Die Passwörter wurden erfolgreich zurückgesetzt."
       },
       "bulkUnassignOrganisation": {
+        "cancelZuordnung": "Schulzuordnung aufheben",
         "confirmation": "Möchten Sie wirklich die Schulzuordnungen der ausgewählten Benutzer an der {schule} zurücknehmen?",
         "success": "Die Schulzuordnungen der Benutzer wurden erfolgreich entfernt."
       },
