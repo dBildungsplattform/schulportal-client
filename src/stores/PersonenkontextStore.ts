@@ -259,7 +259,8 @@ export const usePersonenkontextStore: StoreDefinition<
 
           //check if has zuordnung at that organisation
           const hasZuordnung: boolean | undefined = existingZuordnungen.some(
-            (zuordnung: Zuordnung) => zuordnung.sskId === organisationId,
+            (zuordnung: Zuordnung) =>
+              zuordnung.sskId === organisationId || zuordnung.administriertVon === organisationId,
           );
           if (!hasZuordnung) {
             this.bulkProgress = Math.ceil(((i + 1) / personIDs.length) * 100);
@@ -267,7 +268,8 @@ export const usePersonenkontextStore: StoreDefinition<
           }
 
           const updatedZuordnungen: Zuordnung[] = existingZuordnungen.filter(
-            (zuordnung: Zuordnung) => zuordnung.sskId !== organisationId,
+            (zuordnung: Zuordnung) =>
+              zuordnung.sskId !== organisationId && zuordnung.administriertVon !== organisationId,
           );
           await this.updatePersonenkontexte(updatedZuordnungen, personId);
 
