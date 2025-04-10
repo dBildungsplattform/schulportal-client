@@ -259,13 +259,13 @@ describe('SchultraegerDetailsView', () => {
 
   test('it calls addAssignableSchule when an unassigned item is clicked and then searches for it', async () => {
     interface SchultraegerDetailsView {
-      assignableSchulen: string[];
+      unpersistedSchulenToAssign: string[];
       unassignedSchulen: Organisation[];
     }
 
     const unassignedItem: Organisation = organisationStore.schulenWithoutTraeger[0]!;
 
-    const assignableSchulen: string[] = (wrapper?.vm as unknown as SchultraegerDetailsView).assignableSchulen;
+    const unpersistedSchulenToAssign: string[] = (wrapper?.vm as unknown as SchultraegerDetailsView).unpersistedSchulenToAssign;
     const unassignedSchulen: Organisation[] = (wrapper?.vm as unknown as SchultraegerDetailsView).unassignedSchulen;
 
     // Simulate the event being triggered on RelationshipAssign
@@ -274,7 +274,7 @@ describe('SchultraegerDetailsView', () => {
       .vm.$emit('onHandleUnassignedItemClick', unassignedItem);
     await nextTick();
 
-    expect(assignableSchulen.some((schule: string) => schule === unassignedItem.id)).toBeTruthy();
+    expect(unpersistedSchulenToAssign.some((schule: string) => schule === unassignedItem.id)).toBeTruthy();
 
     // Now simulate a search for the already assigned Schule.
     await wrapper
@@ -289,20 +289,20 @@ describe('SchultraegerDetailsView', () => {
 
   test('it calls addUnassignableSchule when an assigned item is clicked and then searches for it', async () => {
     interface SchultraegerDetailsView {
-      unassignableSchulen: string[];
+      unpersistedSchulenToUnassign: string[];
       assignedSchulen: Organisation[];
     }
 
     const assignedItem: Organisation = organisationStore.schulenFromTraeger[0]!;
 
-    const unassignableSchulen: string[] = (wrapper?.vm as unknown as SchultraegerDetailsView).unassignableSchulen;
+    const unpersistedSchulenToUnassign: string[] = (wrapper?.vm as unknown as SchultraegerDetailsView).unpersistedSchulenToUnassign;
     const assignedSchulen: Organisation[] = (wrapper?.vm as unknown as SchultraegerDetailsView).assignedSchulen;
 
     // Simulate the event being triggered on RelationshipAssign
     await wrapper?.findComponent({ name: 'RelationshipAssign' }).vm.$emit('onHandleAssignedItemClick', assignedItem);
     await flushPromises();
 
-    expect(unassignableSchulen.some((schule: string) => schule === assignedItem.id)).toBeTruthy();
+    expect(unpersistedSchulenToUnassign.some((schule: string) => schule === assignedItem.id)).toBeTruthy();
 
     // Now simulate a search for the unassigned Schule.
     await wrapper

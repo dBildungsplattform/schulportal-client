@@ -46,6 +46,14 @@
   const assignedSchulen: Ref<Array<Organisation>> = ref([]);
   const unassignedSchulen: Ref<Array<Organisation>> = ref([]);
 
+  const unpersistedSchulenToAssign: ComputedRef<Array<Organisation>> = computed(() =>
+    assignedSchulen.value.filter((schule: Organisation) => schule.isNotPersisted),
+  );
+
+  const unpersistedSchulenToUnassign: ComputedRef<Array<Organisation>> = computed(() =>
+    unassignedSchulen.value.filter((schule: Organisation) => schule.isNotPersisted),
+  );
+
   const progress: Ref<number> = ref<number>(0);
   const successMessage: Ref<string> = ref<string>('');
 
@@ -111,23 +119,14 @@
     successMessage.value = '';
     progress.value = 0;
 
-    /* filter for schulen with isNotPersisted true */
-    const unpersistedSchulenToAssign: Array<string> = assignedSchulen.value
-      .filter((schule: Organisation) => schule.isNotPersisted)
-      .map((schule: Organisation) => schule.id);
-
-    const unpersistedSchulenToUnassign: Array<string> = unassignedSchulen.value
-      .filter((schule: Organisation) => schule.isNotPersisted)
-      .map((schule: Organisation) => schule.id);
-
-    if (unpersistedSchulenToAssign.length > 0) {
-      for (let index: number = 0; index < unpersistedSchulenToAssign.length; index++) {
-        const schuleId: string = unpersistedSchulenToAssign[index]!;
+    if (unpersistedSchulenToAssign.value.length > 0) {
+      for (let index: number = 0; index < unpersistedSchulenToAssign.value.length; index++) {
+        const schuleId: string = unpersistedSchulenToAssign.value[index]!.id;
 
         await organisationStore.assignSchuleToTraeger(currentSchultraegerId, { organisationId: schuleId });
 
         /* Update progress for each item processed */
-        progress.value = Math.ceil(((index + 1) / unpersistedSchulenToAssign.length) * 100);
+        progress.value = Math.ceil(((index + 1) / unpersistedSchulenToAssign.value.length) * 100);
       }
 
       /* Show success message only after all items have been processed */
@@ -136,9 +135,9 @@
       }
     }
 
-    if (unpersistedSchulenToUnassign.length > 0) {
-      for (let index: number = 0; index < unpersistedSchulenToUnassign.length; index++) {
-        const schuleId: string = unpersistedSchulenToUnassign[index]!;
+    if (unpersistedSchulenToUnassign.value.length > 0) {
+      for (let index: number = 0; index < unpersistedSchulenToUnassign.value.length; index++) {
+        const schuleId: string = unpersistedSchulenToUnassign.value[index]!.id;
 
         /* assign to traeger's parent */
         if (organisationStore.currentOrganisation?.zugehoerigZu) {
@@ -148,7 +147,7 @@
         }
 
         /* Update progress for each item processed */
-        progress.value = Math.ceil(((index + 1) / unpersistedSchulenToUnassign.length) * 100);
+        progress.value = Math.ceil(((index + 1) / unpersistedSchulenToUnassign.value.length) * 100);
       }
 
       /* Show success message only after all items have been processed */
@@ -178,44 +177,68 @@
   async function searchSchulen(searchString: string, type: SchuleType): Promise<void> {
     if (!organisationStore.currentOrganisation) return;
 
-    await organisationStore.fetchSchulen(
-      {
-        searchString,
-        zugehoerigZu: type === SchuleType.ASSIGNED ? [currentSchultraegerId] : undefined,
-        limit: type === SchuleType.UNASSIGNED ? 50 : undefined,
-      },
-      type,
-    );
-
+    /* if schule type is assigned, search in frontend */
     if (type === SchuleType.ASSIGNED) {
-      assignedSchulen.value = organisationStore.schulenFromTraeger;
       noAssignedSchulenFoundText.value =
         assignedSchulen.value.length === 0 ? t('admin.schultraeger.noSchulenAssigned') : '';
-    } else {
-      const currentOrganisationParentId: string | null | undefined = organisationStore.currentOrganisation.zugehoerigZu;
 
-      // Filter unassigned Schulen to only include those having the same parent (zugehoerigZu) as the current Schultraeger
-      unassignedSchulen.value = organisationStore.schulenWithoutTraeger.filter(
-        (schule: Organisation) => schule.zugehoerigZu === currentOrganisationParentId,
+      /* if no search string is given, use store variable as leading source to get all schulen from traeger */
+      if (!searchString) {
+        /* if there are unpersisted schulen, add them back in first */
+        assignedSchulen.value = unpersistedSchulenToAssign.value.length
+          ? [...unpersistedSchulenToAssign.value, ...organisationStore.schulenFromTraeger]
+          : organisationStore.schulenFromTraeger;
+      }
+
+      /* search locally in assigned schulen */
+      assignedSchulen.value = assignedSchulen.value.filter((schule: Organisation) => {
+        const searchStringLowerCase: string = searchString.toLowerCase();
+        return (
+          schule.name.toLowerCase().includes(searchStringLowerCase) ||
+          schule.kennung!.toLowerCase().includes(searchStringLowerCase)
+        );
+      });
+      /* if schule type is unassigned, fetch and search schulen from BE */
+    } else {
+      /* cache unpersisted schulen before fetching from backend */
+      const unpersistedSchulenToUnassignCache: Array<Organisation> = unpersistedSchulenToUnassign.value;
+
+      await organisationStore.fetchSchulen(
+        {
+          searchString,
+          zugehoerigZu: undefined,
+          limit: 50,
+        },
+        type,
       );
 
-      // If no search string is given then ask for Input first
+      const currentOrganisationParentId: string | null | undefined = organisationStore.currentOrganisation.zugehoerigZu;
+      const unpersistedSchulenToAssignIds: Array<string> = unpersistedSchulenToAssign.value.map(
+        (schule: Organisation) => schule.id,
+      );
+
+      /* Filter unassigned Schulen to only include those having the same parent (zugehoerigZu) as the current Schultraeger,
+         as well as removing the unpersisted schulen that have been assigned to the traeger */
+      unassignedSchulen.value = organisationStore.schulenWithoutTraeger.filter(
+        (schule: Organisation) =>
+          schule.zugehoerigZu === currentOrganisationParentId && !unpersistedSchulenToAssignIds.includes(schule.id),
+      );
+
+      /* If no search string is given then ask for Input first */
       if (!searchString) {
         unassignedSchulen.value = [];
         noUnassignedSchulenFoundText.value = t('admin.schultraeger.unassignedSchulenDefaultText');
         return;
       }
 
-      // After assigning the Schule to the Schultraeger, remove it from the unassigned Schulen
-      // if (assignableSchulen.value.length > 0) {
-      //   unassignedSchulen.value = unassignedSchulen.value.filter(
-      //     (schule: Organisation) => !assignableSchulen.value.includes(schule.id),
-      //   );
-      // }
-
-      // if input is given and no Schulen were found, show that there were none found
+      /* if input is given and no Schulen were found, show that there were none found */
       noUnassignedSchulenFoundText.value =
         unassignedSchulen.value.length === 0 && searchString ? t('admin.schultraeger.noSchulenFound') : '';
+
+      /* if there are unpersisted schulen, add them back in after searching */
+      unassignedSchulen.value = unpersistedSchulenToUnassignCache.length
+        ? [...unpersistedSchulenToUnassignCache, ...unassignedSchulen.value]
+        : unassignedSchulen.value;
     }
   }
 
