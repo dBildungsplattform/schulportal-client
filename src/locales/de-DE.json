@@ -14,23 +14,19 @@
       "rules": {
         "required": "Die Befristung muss eingegeben werden.",
         "format": "Die Befristung muss im Format TT.MM.JJJJ. eingegeben werden.",
-        "pastDateNotAllowed": "Das eingegebene Datum darf nicht in der Vergangenheit liegen.",
-        "invalidDateNotAllowed": "Bitte geben Sie ein gültiges Datum ein."
+        "pastDateNotAllowed": "Das eingegebene Datum darf nicht in der Vergangenheit liegen."
       },
       "selectBefristung": "Befristung auswählen",
       "unlimited": "Unbefristet",
-      "unlimitedLower": "unbefristet",
       "limited": "Befristet",
+      "unlimitedSuccessTemplate": "unbefristet",
       "unlimitedInactive": "Diese Option kann für Rollen mit Befristungspflicht nicht ausgewählt werden.",
       "limitedUntil": "befristet bis",
       "untilEndOfSchoolYear": "Bis Schuljahresende"
     },
-    "doNotCloseBrowserNotice": "Bitte den Browser während der Bearbeitung nicht schließen!",
     "followingDataCreated": "Folgende Daten wurden gespeichert:",
     "headline": "Administrationsbereich",
     "import": {
-      "doNotCloseNoticeDownload": "Bitte den Browser während des Herunterladens nicht schließen!",
-      "doNotCloseNoticeImport": "Bitte den Browser während eines laufenden Importvorgangs nicht schließen!",
       "anotherImport": "Weiteren Import durchführen",
       "backToUpload": "Andere Datei hochladen",
       "confirmationText": "Achtung, diese Aktion kann nicht rückgängig gemacht werden. Möchten Sie den Import wirklich durchführen?",
@@ -46,11 +42,9 @@
         "IMPORT_DATA_ITEM_NACHNAME_IS_TOO_SHORT": "Nachname fehlt",
         "IMPORT_DATA_ITEM_VORNAME_IS_INVALID": "Vorname enthält ungültige Zeichen",
         "IMPORT_DATA_ITEM_VORNAME_IS_TOO_SHORT": "Vorname fehlt",
-        "IMPORT_MAX_USERS_LIMIT_ERROR": "Die Datei enthält mehr als 2000 Benutzer. Bitte reduzieren Sie die Anzahl der Benutzer in der Datei auf maximal 2000 und versuchen Sie den Import erneut.",
         "CSV_FILE_INVALID_HEADER_ERROR": "Die Datei konnte nicht gelesen werden. Bitte überprüfen Sie die Spaltenüberschriften."
       },
       "executeImport": "Import durchführen",
-      "failedToImportUsersNotice": "Die folgenden Benutzer konnten nicht importiert werden. Bitte überprüfen Sie die Daten:",
       "fileName": {
         "person": "Benutzerdaten"
       },
@@ -68,7 +62,6 @@
       },
       "recordsReadyForImport": "{count} Datensatz steht zum Import bereit. | {count} Datensätze stehen zum Import bereit.",
       "selectOrDropFile": "Datei auswählen oder ablegen",
-      "successfullyImportedUsersNotice": "Die folgenden Benutzer wurden erfolgreich importiert:",
       "uploadedSuccessfully": "Die Datei wurde erfolgreich hochgeladen.",
       "uploadErrorTitle": "Fehler beim Upload",
       "uploadFile": "Datei hochladen"
@@ -81,7 +74,6 @@
       "addNew": "Neue Klasse hinzufügen",
       "assignKlasse": "Klasse zuordnen",
       "backToCreateKlasse": "Zurück zur Klassenanlage",
-      "backToEditKlasse": "Zurück zur Klassenbearbeitung",
       "create": "Klasse anlegen",
       "createAnother": "Weitere Klasse anlegen",
       "createNew": "Neue Klasse anlegen",
@@ -91,12 +83,9 @@
       "deleteKlasseSuccessMessage": "Die Klasse {klassenname} an der Schule {schulname} wurde erfolgreich gelöscht.",
       "edit": "Klasse bearbeiten",
       "title": {
-        "KLASSE_ERROR": "Fehler bei Änderung der Klasse.",
         "KLASSENNAME_AN_SCHULE_EINDEUTIG": "Fehler bei Änderung der Klasse",
         "ORGANISATION_IST_BEREITS_ZUGEWIESEN_ERROR": "Fehler beim Löschen",
-        "ORGANISATION_SPECIFICATION_ERROR": "Fehler bei Anlage der Klasse.",
-        "NEWER_VERSION_ORGANISATION": "Geänderte Daten",
-        "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Zwei-Faktor-Authentifizierung (2FA) erforderlich"
+        "NEWER_VERSION_ORGANISATION": "Geänderte Daten"
       },
       "errors": {
         "KLASSE_ERROR": "Die Klasse konnte nicht geändert werden.",
@@ -104,8 +93,7 @@
         "KLASSENNAME_AN_SCHULE_EINDEUTIG": "Der Klassenname existiert bereits an dieser Schule.",
         "ORGANISATION_SPECIFICATION_ERROR": "Die Klasse konnte nicht angelegt werden.",
         "ORGANISATION_IST_BEREITS_ZUGEWIESEN_ERROR": "Die Klasse kann nicht gelöscht werden, da noch Benutzer zugeordnet sind.",
-        "NEWER_VERSION_ORGANISATION": "Die Klasse wurde zwischenzeitlich von einer anderen Administratorin oder einem anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut.",
-        "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Die letzte Aktion konnte nicht ausgeführt werden. Aufgrund von längerer Inaktivität ist eine erneute Authentifizierung mit einem zweiten Faktor erforderlich. Um fortzufahren, klicken Sie bitte auf „Zurück zur Ergebnisliste“ oder „Schließen“. Sie werden anschließend zur Eingabe Ihres zweiten Faktors aufgefordert."
+        "NEWER_VERSION_ORGANISATION": "Die Klasse wurde zwischenzeitlich von einer anderen Administratorin oder einem anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut."
       },
       "enterKlassenname": "Klassenname eingeben",
       "klasse": "Klasse",
@@ -127,7 +115,6 @@
         "klassenname": {
           "matches": "Der Klassenname darf keine ungültigen Zeichen beinhalten.",
           "noLeadingTrailingSpaces": "Der Klassenname darf nicht mit Leerzeichen beginnen oder enden.",
-          "mustContainLetterOrNumber": "Der Klassenname muss mindestens einen Buchstaben oder eine Zahl enthalten.",
           "required": "Der Klassenname muss angegeben werden."
         },
         "schule": {
@@ -158,19 +145,9 @@
       "addNew": "Neuen Benutzer hinzufügen",
       "backToCreatePerson": "Zurück zur Benutzeranlage",
       "backToInput": "Zurück zur Eingabe",
-      "bulkPasswordReset": {
-        "confirmation": "Sind Sie sicher, dass Sie das Passwort für die ausgewählten Benutzer zurücksetzen möchten?",
-        "downloadResult": "Benutzerdaten herunterladen",
-        "error": {
-          "onlyOneSchool": "Bitte wählen Sie im Filter genau eine Schule aus, um die Aktion durchzuführen."
-        },
-        "info": "Bitte laden Sie die Datei mit den temporären Passwörtern herunter und teilen Sie den Benutzern die Passwörter mit. Nach dem Schließen des Dialogs ist ein Herunterladen aus Sicherheitsgründen nicht mehr möglich.",
-        "success": "Die Passwörter wurden erfolgreich zurückgesetzt."
-      },
       "changePassword": "Passwort ändern",
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
       "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",
-      "choosePersonFirst": "Bitte erst einen Benutzer auswählen.",
       "create": "Benutzer anlegen",
       "createAnother": "Weiteren Benutzer anlegen",
       "createNew": "Neue Benutzer anlegen",
@@ -178,38 +155,19 @@
       "creationErrorTitle": "Fehler beim Anlegen des Benutzers",
       "deletePerson": "Benutzer löschen",
       "deletePersonConfirmation": "Wollen Sie den Benutzer {firstname} {lastname} sofort und endgültig löschen?",
-      "deletePersonBulkConfirmation": "Möchten Sie wirklich alle Benutzer sofort und endgültig löschen?",
       "deletePersonSuccessMessage": "{firstname} {lastname} wurde erfolgreich gelöscht.",
-      "deletePersonBulkSuccessMessage": "Die Benutzer wurden erfolgreich gelöscht.",
-      "devicePassword": {
-        "createDevicePassword": "Inbetriebnahme-Passwort erzeugen",
-        "createPassword": "Passwort erzeugen",
-        "createPasswordSuccessMessage": "Das Passwort wurde erfolgreich erzeugt.",
-        "dialogText": "Bitte teilen Sie dem Benutzer das Passwort mit. Nach dem Schließen des Dialogs wird das Passwort nicht mehr angezeigt. Der Benutzer benötigt dieses Passwort ausschließlich zur erstmaligen Anmeldung an seinem neuen LK-Endgerät.",
-        "dialogTextProfile": "Bitte notieren Sie sich das Passwort oder drucken Sie es aus. Nach dem Schließen des Dialogs wird das Passwort nicht mehr angezeigt. Sie benötigen dieses Passwort ausschließlich zur erstmaligen Anmeldung an Ihrem neuen LK-Endgerät.",
-        "errorMessage": "Bei der Erzeugung des Passwortes ist ein Fehler aufgetreten. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut oder informieren Sie Ihre schulischen Administratorinnen und Administratoren!",
-        "header": "Inbetriebnahme-Passwort für LK-Endgerät",
-        "infoTextPersonDetails": "Dieses Passwort wird vom Benutzer einmalig zur Eingabe beim ersten Start seines neuen Lehrkräfte-Endgerätes benötigt oder wenn das Gerät zurückgesetzt wurde!",
-        "infoTextProfile": "Sie benötigen dieses Passwort ausschließlich zur einmaligen Eingabe beim ersten Start Ihres neuen LK-Endgerätes oder wenn das Gerät zurückgesetzt wurde!\n\nBei Fragen wenden Sie sich bitte an Ihre schulischen Administratorinnen und Administratoren."
-      },
       "discard": "Benutzer verwerfen",
       "disableUser": "Benutzer sperren",
-      "editLock": "Sperre bearbeiten",
-      "removeLock": "Sperre aufheben",
       "edit": "Benutzer bearbeiten",
       "editPersonalInfo": "Persönliche Informationen bearbeiten",
       "errors": {
         "PERSONALNUMMER_NICHT_EINDEUTIG": "Die eingegebene KoPers.-Nr. ist bereits vergeben. Bitte korrigieren Sie Ihre Eingabe.",
         "ERROR_LOADING_USER": "Es konnten keine Benutzerdaten geladen werden.",
         "PERSONALNUMMER_REQUIRED": "Die Änderungen wurden nicht gespeichert, da keine KoPers.-Nr. eingegeben wurde.",
-        "PERSON_NOT_FOUND": "Der Benutzer wurde seit Ihrer letzten Änderung gelöscht und kann nicht mehr bearbeitet werden.",
-        "PERSON_UEM_PASSWORD_MODIFICATION_ERROR": "Das Passwort konnte nicht erzeugt werden. Bitte versuchen Sie es später erneut.",
-        "NEWER_VERSION_OF_PERSON_AVAILABLE": "Der Benutzer wurde zwischenzeitlich von einer anderen Administratorin oder einem anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut.",
-        "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Die letzte Aktion konnte nicht ausgeführt werden. Aufgrund von längerer Inaktivität ist eine erneute Authentifizierung mit einem zweiten Faktor erforderlich. Um fortzufahren, klicken Sie bitte auf „Zurück zur Ergebnisliste“ oder „Schließen“. Sie werden anschließend zur Eingabe Ihres zweiten Faktors aufgefordert.",
-        "UNSPECIFIED_ERROR": "Leider ist ein technischer Fehler aufgetreten. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut."
+        "PERSON_NOT_FOUND": "Der Benutzer wurde seit Ihrer letzten Änderung gelöscht und kann nicht mehr bearbeitet werden."
       },
       "generatedPassword": "Generiertes Passwort",
-      "homePageIQSH": "Homepage der IQSH-Medienberatung",
+      "homePageIQSH":"Homepage der IQSH-Medienberatung",
       "import": "Benutzer importieren",
       "loadingErrorText": "Es konnten keine Benutzerdaten geladen werden.",
       "loadingErrorTitle": "Fehler beim Laden des Benutzers",
@@ -217,15 +175,14 @@
       "noKopersNr": "KoPers.-Nr. nicht vorhanden",
       "noKopersNrConfirmationDialogMessage": "Bitte beachten Sie, dass ein Benutzerkonto ohne KoPers.-Nr. nach 8 Wochen automatisch gesperrt wird. Tragen Sie daher die KoPers.-Nr. bitte in der Gesamtübersicht des Benutzers nach, sobald diese Ihnen vorliegt.",
       "personalInfo": "Persönliche Informationen",
-      "personalInfoChangeNotice": "Namensänderungen haben unmittelbare Auswirkungen auf den Benutzernamen im Schulportal SH und auf die E-Mail-Adresse! \n\nWeitere Informationen finden Sie auf der Homepage der IQSH-Medienberatung.",
+      "personalInfoChangeNotice": "Namensänderungen haben unmittelbare Auswirkungen auf den Benutzernamen im ErWIn Portal und auf die E-Mail-Adresse! \n\nWeitere Informationen finden Sie auf der Homepage der IQSH-Medienberatung.",
       "personalInfoChangeNotice2": "Weitere Informationen finden Sie auf der ",
       "personalInfoSuccessDialogMessage": "Die Stammdaten wurden erfolgreich geändert.",
-      "personalInfoSuccessDialogMessageWithUsername": "Die Stammdaten wurden erfolgreich geändert.\n\nDas Passwort wurde nicht verändert und kann wie zuvor verwendet werden. \n\nBitte teilen Sie der betroffenen Person die Stammdatenänderung (Benutzername, Mail-Adresse) mit. \n\nDie neuen Daten können Sie in der Gesamtübersicht einsehen.",
+      "personalInfoSuccessDialogMessageWithUsername": "Die Stammdaten wurden erfolgreich geändert.\n\nDas Passwort wurde nicht verändert und kann wie zuvor verwendet werden. \n\nBitte teilen Sie der betroffenen Person die Stammdatenänderung (Benutzername, Mail-Adresse) mit. \n\nDie neuen Daten können Sie in der Gesamtübersicht einsehen." ,
       "printPassword": "Passwort drucken",
-      "resetPassword": "Passwort zurücksetzen",
       "resetPasswordConfirmation": "Sind Sie sicher, dass Sie das Passwort für {firstname} {lastname} zurücksetzen möchten?",
       "resetPasswordInformation": "Bitte teilen Sie dem Benutzer das temporäre Passwort mit. Nach dem Schließen des Dialogs wird es aus Sicherheitsgründen nicht mehr angezeigt.",
-      "resetPasswordSuccessMessage": "Das Passwort wurde erfolgreich zurückgesetzt.",
+      "resetPassword": "Passwort zurücksetzen",
       "rules": {
         "vorname": {
           "matches": "Der Vorname enthält ungültige Zeichen.",
@@ -251,11 +208,7 @@
         "ERROR_LOADING_USER": "Fehler beim Laden des Benutzers",
         "PERSONALNUMMER_NICHT_EINDEUTIG": "KoPers.-Nr. nicht eindeutig",
         "PERSONALNUMMER_REQUIRED": "Personalnummer erforderlich",
-        "PERSON_NOT_FOUND": "Benutzer gelöscht",
-        "PERSON_UEM_PASSWORD_MODIFICATION_ERROR": "Fehler beim Erzeugen des Passworts",
-        "NEWER_VERSION_OF_PERSON_AVAILABLE": "Geänderte Daten",
-        "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Zwei-Faktor-Authentifizierung (2FA) erforderlich",
-        "UNSPECIFIED_ERROR": "Technischer Fehler"
+        "PERSON_NOT_FOUND": "Benutzer gelöscht"
       },
       "twoFactorAuthentication": {
         "setUpShort": "2FA einrichten",
@@ -283,14 +236,13 @@
         "serial": "Seriennummer",
         "otpPlaceholder": "Einmalpasswort",
         "requiredSecondFactor": "Diese Aktion setzt eine Zwei-Faktor-Authentifizierung (2FA) voraus.",
-        "noSecondFactorText": "Aktuell ist noch keine 2FA eingerichtet.",
-        "setUpInfo": "Sie können die Einrichtung der 2FA selbst über ein mobiles Endgerät durchführen. Alternativ wenden Sie sich bitte an Ihre schulischen Administratorinnen und Administratoren.",
+        "noSecondFactorText": "Aktuell ist noch keine 2FA eingrichtet.",
+        "setUpInfo": "Sie können die Einrichtung der 2FA selbst über ein mobiles Endgerät durchführen. Alternativ wenden Sie sich bitte an Ihre schulischen Admins.",
         "toSecondFactorSetup": "Zur 2FA Einrichtung",
         "errors": {
           "SERIENNUMMER_NICHT_GEFUNDEN": "Die eingegebene Seriennummer konnte leider nicht gefunden werden. Vergewissern Sie sich bitte, dass Sie eine korrekte Seriennummer eingegeben haben.",
           "SERIENNUMMER_IN_VERWENDUNG": "Die eingegebene Seriennummer ist bereits einem anderen Benutzer zugeordnet. Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut.",
           "OTP_NICHT_GUELTIG": "Ungültiges Einmalpasswort. Bitte versuchen Sie es erneut oder wenden Sie sich an Ihre schulischen Administratorinnen und Administratoren.",
-          "PI_UNAVAILABLE_ERROR": "Leider konnte aus technischen Gründen kein Hardware-Token zugeordnet werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut. Sollte das Problem weiterhin bestehen, geben Sie dazu bitte ein Ticket über den {0} auf.",
           "HARDWARE_TOKEN_SERVICE_FEHLER": "Leider konnte aus technischen Gründen kein Hardware-Token zugeordnet werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut. Sollte das Problem weiterhin bestehen, geben Sie dazu bitte ein Ticket über den {0} auf.",
           "UNKNOWN_ERROR": "Ein unbekannter Fehler ist aufgetreten.",
           "TOKEN_RESET_ERROR": "Leider konnte der Token aus technischen Gründen nicht zurückgesetzt werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut. Sollte das Problem weiterhin bestehen, geben Sie dazu bitte ein Ticket über den {0} auf.",
@@ -333,8 +285,7 @@
         "NEWER_VERSION_OF_PERSONENKONTEXTE_AVAILABLE": "Geänderte Daten",
         "PERSONALNUMMER_NICHT_EINDEUTIG": "KoPers.-Nr. nicht eindeutig",
         "PERSONENKONTEXTE_UPDATE_ERROR": "Geänderte Daten",
-        "PERSON_NOT_FOUND": "Benutzer gelöscht",
-        "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Zwei-Faktor-Authentifizierung (2FA) erforderlich"
+        "PERSON_NOT_FOUND": "Benutzer gelöscht"
       },
       "errors": {
         "COUNT_MISMATCHING": "Der Benutzer wurde zwischenzeitlich von einer anderen Administratorin oder einem anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut.",
@@ -344,8 +295,7 @@
         "PERSONALNUMMER_NICHT_EINDEUTIG": "Die eingegebene KoPers.-Nr. ist bereits vergeben. Bitte korrigieren Sie Ihre Eingabe.",
         "PERSONENKONTEXT_SPECIFICATION_ERROR": "Die Zuordnung konnte nicht angelegt werden.",
         "PERSONENKONTEXTE_UPDATE_ERROR": "Die Zuordnung konnte nicht aktualisiert werden. Bitte versuchen Sie es später erneut.",
-        "PERSON_NOT_FOUND": "Der Benutzer wurde seit Ihrer letzten Änderung gelöscht und kann nicht mehr bearbeitet werden.",
-        "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Die letzte Aktion konnte nicht ausgeführt werden. Aufgrund von längerer Inaktivität ist eine erneute Authentifizierung mit einem zweiten Faktor erforderlich. Um fortzufahren, klicken Sie bitte auf „Zurück zur Ergebnisliste“ oder „Schließen“. Sie werden anschließend zur Eingabe Ihres zweiten Faktors aufgefordert."
+        "PERSON_NOT_FOUND": "Der Benutzer wurde seit Ihrer letzten Änderung gelöscht und kann nicht mehr bearbeitet werden."
       }
     },
     "rolle": {
@@ -370,8 +320,7 @@
         "ROLLE_ERROR": "Die Rolle konnte nicht angelegt werden.",
         "ROLLE_HAT_PERSONENKONTEXTE_ERROR": "Die Rolle kann nicht gelöscht werden, da die sie noch Benutzern zugeordnet ist. Nehmen Sie bitte zunächst alle Zuordnungen zurück.",
         "ROLLE_NAME_UNIQUE_ON_SSK": "Der Rollenname ist bereits vergeben. Bitte korrigieren Sie Ihre Eingabe.",
-        "UPDATE_MERKMALE_ERROR": "Die gewünschte Bearbeitung kann nicht ausgeführt werden, da die Rolle noch Benutzern zugeordnet ist. Nehmen Sie bitte zunächst alle Zuordnungen zurück.",
-        "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Die letzte Aktion konnte nicht ausgeführt werden. Aufgrund von längerer Inaktivität ist eine erneute Authentifizierung mit einem zweiten Faktor erforderlich. Um fortzufahren, klicken Sie bitte auf „Zurück zur Ergebnisliste“ oder „Schließen“. Sie werden anschließend zur Eingabe Ihres zweiten Faktors aufgefordert."
+        "UPDATE_MERKMALE_ERROR": "Die gewünschte Bearbeitung kann nicht ausgeführt werden, da die Rolle noch Benutzern zugeordnet ist. Nehmen Sie bitte zunächst alle Zuordnungen zurück."
       },
       "title": {
         "NEWER_VERSION_OF_ROLLE_AVAILABLE": "Geänderte Daten",
@@ -379,8 +328,7 @@
         "ROLLE_HAT_PERSONENKONTEXTE_ERROR": "Löschen nicht möglich",
         "ROLLE_UPDATE_ERROR": "Die Rolle konnte nicht bearbeitet werden",
         "ROLLE_NAME_UNIQUE_ON_SSK": "Der Rollenname ist nicht eindeutig",
-        "UPDATE_MERKMALE_ERROR": "Die Merkmale konnten nicht bearbeitet werden",
-        "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Zwei-Faktor-Authentifizierung (2FA) erforderlich"
+        "UPDATE_MERKMALE_ERROR": "Die Merkmale konnten nicht bearbeitet werden"
       },
       "isAllowedToManageRollen": "Darf Rollen verwalten",
       "loadingErrorText": "Es konnten keine Rollendaten geladen werden.",
@@ -396,10 +344,7 @@
           "KLASSEN_VERWALTEN": "Darf Klassen verwalten",
           "SCHULTRAEGER_VERWALTEN": "Darf Schulträger verwalten",
           "PERSON_SYNCHRONISIEREN": "Darf Benutzer synchronisieren",
-          "PERSONEN_ANLEGEN": "Darf Benutzer anlegen",
-          "BULK_VERWALTEN": "Darf Mehrfachbearbeitung ausführen",
-          "SCHULPORTAL_VERWALTEN": "Darf Portal verwalten",
-          "HINWEISE_BEARBEITEN": "Darf Hinweise bearbeiten"
+          "PERSONEN_ANLEGEN": "Darf Benutzer anlegen"
         },
         "rollenarten": {
           "LERN": "Lern",
@@ -427,7 +372,6 @@
       "rollenSelected": "{count} Rollen ausgewählt",
       "rolleAddedSuccessfully": "Die Rolle wurde erfolgreich hinzugefügt.",
       "rolleUpdatedSuccessfully": "Die Rolle wurde erfolgreich geändert.",
-      "rollenAssignedSuccessfully": "Die Rollen wurden erfolgreich zugeordnet.",
       "rules": {
         "rolle": {
           "required": "Die Rolle muss ausgewählt werden."
@@ -452,13 +396,9 @@
     },
     "searchResultTable": "Ergebnisliste durchsuchen",
     "schule": {
-      "activateInItsLearning": "itslearning freischalten",
-      "activateSchuleConfirmationMessage": "Wollen Sie die Daten der Schule {schulname} an itslearning übertragen?",
-      "activateSchuleSuccessMessage": "Die Schule {schulname} wird in itslearning angelegt.",
       "addNew": "Neue Schule hinzufügen",
       "administratingSchultraeger": "Verwaltender Schulträger",
       "all": "Alle Schulen",
-      "enableNow": "Jetzt freischalten",
       "ersatzschule": "Ersatzschule",
       "assignAdministratingSchultraeger": "Verwaltenden Schulträger zuordnen",
       "assignSchulform": "Schulform zuordnen",
@@ -471,25 +411,15 @@
       "dienststellennummer": "Dienststellennummer",
       "enterDienststellennummer": "Dienststellennummer eingeben",
       "enterSchulname": "Schulname eingeben",
-      "title": {
-        "ORGANISATION_SPECIFICATION_ERROR": "Fehler bei Anlage der Schule.",
-        "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Zwei-Faktor-Authentifizierung (2FA) erforderlich"
-      },
       "errors": {
         "KENNUNG_REQUIRED_FOR_SCHULE": "Die Angabe einer Dienststellennummer ist erforderlich.",
         "NAME_REQUIRED_FOR_SCHULE": "Die Angabe eines Namens ist erforderlich.",
         "NUR_KLASSE_UNTER_SCHULE": "Die Klasse muss einer Schule zugeordnet werden.",
-        "ORGANISATION_SPECIFICATION_ERROR": "Die Schule konnte in itslearning nicht angelegt werden.",
+        "ORGANISATION_SPECIFICATION_ERROR": "Die Schule konnte nicht angelegt werden.",
         "SCHULE_KENNUNG_EINDEUTIG": "Die Dienststellennummer existiert bereits.",
         "SCHULE_UNTER_TRAEGER": "Eine Schule darf nicht einer anderen Schule zugeordnet werden.",
-        "SCHULTRAEGER_ERROR": "Mögliche Schulträger konnten nicht geladen werden.",
-        "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Die letzte Aktion konnte nicht ausgeführt werden. Aufgrund von längerer Inaktivität ist eine erneute Authentifizierung mit einem zweiten Faktor erforderlich. Um fortzufahren, klicken Sie bitte auf „Zurück zur Ergebnisliste“ oder „Schließen“. Sie werden anschließend zur Eingabe Ihres zweiten Faktors aufgefordert."
+        "SCHULTRAEGER_ERROR": "Mögliche Schulträger konnten nicht geladen werden."
       },
-      "loadingErrorText": "Es konnten keine Schuldaten geladen werden.",
-      "loadingErrorTitle": "Fehler beim Laden der Schulen",
-      "itsLearningStatus": "itslearning-Status",
-      "retransmit": "Erneut übertragen",
-      "retransmitSchuleConfirmationMessage": "Wollen Sie die Daten der Schule {schulname} erneut an itslearning übertragen?",
       "management": "Schulverwaltung",
       "publicSchule": "Öffentliche Schule",
       "rules": {
@@ -506,61 +436,19 @@
       "selectSchule": "Schule auswählen",
       "selectSchuleFirst": "Bitte erst eine Schule auswählen.",
       "schule": "Schule",
-      "schulen": "Schulen",
       "schulenFound": "{count} Schule gefunden | {count} Schulen gefunden",
       "schulenSelected": "{count} Schulen ausgewählt",
       "schulname": "Schulname",
-      "schulnameDienststellennummer": "Schulname/Dienststellennummer",
       "schulform": "Schulform",
-      "schuleAddedSuccessfully": "Die Schule wurde erfolgreich hinzugefügt.",
       "schuleCreateErrorTitle": "Fehler beim Anlegen der Schule",
+      "schuleAddedSuccessfully": "Die Schule wurde erfolgreich hinzugefügt.",
       "showAll": "Alle Schulen anzeigen"
     },
     "schultraeger": {
-      "addNew": "Neuen Schulträger hinzufügen",
-      "assignSchulenOrganisationally": "Schulen zuordnen (organisatorisch)",
-      "assignSchultraegerform": "Schulträgerform zuordnen",
-      "assignedSchulen": "Zugeordnete Schulen (organisatorisch)",
-      "backToCreateSchultraeger": "Zurück zur Schulträgeranlage",
-      "backToSchultraeger": "Zurück zur Gesamtübersicht",
-      "create": "Schulträger anlegen",
-      "createAnother": "Weiteren Schulträger anlegen",
-      "createNew": "Neuen Schulträger anlegen",
-      "discard": "Schulträger verwerfen",
-      "edit": "Schulträger bearbeiten",
-      "enterSchultraegername": "Schulträgername eingeben",
       "errors": {
-        "ORGANISATION_SPECIFICATION_ERROR": "Der Schulträger konnte nicht angelegt werden.",
-        "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Die letzte Aktion konnte nicht ausgeführt werden. Aufgrund von längerer Inaktivität ist eine erneute Authentifizierung mit einem zweiten Faktor erforderlich. Um fortzufahren, klicken Sie bitte auf „Zurück zur Ergebnisliste“ oder „Schließen“. Sie werden anschließend zur Eingabe Ihres zweiten Faktors aufgefordert.",
-        "SCHULTRAEGER_ERROR": "Mögliche Schulträger konnten nicht geladen werden.",
-        "SCHULTRAEGER_NAME_EINDEUTIG": "Der Schulträgername existiert bereits.",
         "TRAEGER_IN_TRAEGER": "Ein Schulträger darf nur einem anderen Schulträger zugeordnet werden."
       },
-      "management": "Schulträgerverwaltung",
-      "noSchulenFound": "Keine Schulen gefunden",
-      "noSchulenAssigned": "Keine Schulen zugeordnet",
-      "rules": {
-        "schultraegername": {
-          "matches": "Der Schulträgername darf keine ungültigen Zeichen beinhalten.",
-          "noLeadingTrailingSpaces": "Der Schulträgername darf nicht mit Leerzeichen beginnen oder enden.",
-          "required": "Der Schulträgername muss angegeben werden."
-        }
-      },
-      "schulenAssignedSuccessfully": "Die Schulen wurden erfolgreich zugeordnet.",
-      "schulenWithoutTraeger": "Schulen ohne Träger",
-      "schulenOfThisTraeger": "Schulen dieses Trägers ({amount})",
-      "schultraegerAddedSuccessfully": "Der Schulträger wurde erfolgreich hinzugefügt.",
-      "schultraegerCreateErrorTitle": "Fehler beim Anlegen des Schulträgers",
-      "schultraegerDetailsErrorTitle": "Fehler beim Laden des Schulträgers",
-      "schultraegerform": "Schulträgerform",
-      "schultraegername": "Schulträgername",
-      "schultraegerUpdatedSuccessfully": "Der Schulträger wurde erfolgreich bearbeitet.",
-      "showAll": "Alle Schulträger anzeigen",
-      "title": {
-        "ORGANISATION_SPECIFICATION_ERROR": "Fehler bei Anlage des Schulträgers",
-        "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Zwei-Faktor-Authentifizierung (2FA) erforderlich"
-      },
-      "unassignedSchulenDefaultText": "Bitte geben Sie zunächst einen Wert im Filter ein."
+      "management": "Schulträgerverwaltung"
     },
     "serviceProvider": {
       "assignServiceProvider": "Angebote zuordnen",
@@ -568,29 +456,7 @@
       "selectServiceProvider": "Angebote auswählen",
       "serviceProvider": "Angebote"
     },
-    "status": "Status",
-    "portal": {
-      "management": "Portalverwaltung",
-      "editHinweise": "Hinweise bearbeiten"
-    },
-    "hinweise": {
-      "hinweiseTexte": "Hinweistexte",
-      "newsbox": "Newsbox",
-      "publish": "Veröffentlichen",
-      "publishEnd": "Veröffentlichung beenden",
-      "title": {
-        "UNSPECIFIED_ERROR": "Fehler beim Speichern der Hinweise",
-        "MISMATCHED_REVISION": "Geänderte Daten"
-      },
-      "errors": {
-        "UNSPECIFIED_ERROR": "Es ist ein Fehler aufgetreten.",
-        "MISMATCHED_REVISION": "Die Hinweise wurden zwischenzeitlich von einer anderen Administratorin oder einem anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut."
-      },
-      "rules": {
-        "max": "Der Text darf maximal 2000 Zeichen lang sein.",
-        "min": "Der Text muss mindestens 1 Zeichen lang sein."
-      }
-    }
+    "status": "Status"
   },
   "cancel": "Abbrechen",
   "proceed": "Weiter",
@@ -607,7 +473,7 @@
     "NOT_FOUND": "Die aufgerufene Seite wurde nicht gefunden.",
     "UNKNOWN_USER": {
       "title": "Unbekannter Benutzer",
-      "text": "Der Benutzer ist im Schulportal SH nicht bekannt"
+      "text": "Der Benutzer ist im ErWIn Portal nicht bekannt"
     }
   },
   "footer": {
@@ -615,22 +481,16 @@
     "contact": "Kontakt",
     "help": "Hilfe",
     "legalNotice": "Impressum",
-    "privacyPolicy": "Datenschutzerklärung",
-    "status": "Systemstatus"
+    "privacyPolicy": "Datenschutzerklärung"
   },
-  "IQSHMedienberatung": "IQSH-Medienberatung",
   "itemsPerPage": "Einträge pro Seite",
-  "landingTitle": "Willkommen im Schulportal SH.",
+  "landingTitle": "Willkommen im ErWIn Portal.",
   "login": {
     "button": "Anmelden",
-    "features": {
-      "secondFactorInput": "Die Eingabe des zweiten Faktors im Dialog kann nun auch per Copy & Paste erfolgen, auf mobilen Endgeräten wird die Tastatur auf Zahleneingabe voreingestellt.",
-      "lkDevicePasswords": "Inbetriebnahme-Passworte für LK-Endgeräte können über das Profil des Benutzers (Self-Service) oder durch schulische Administratorinnen oder Administratoren selbstständig erzeugt werden."
-    },
     "forgotPassword": "Passwort vergessen? \n Wenden Sie sich bitte an Ihre schulischen Administratorinnen und Administratoren.",
-    "header": "Anmeldung im Schulportal SH",
+    "header": "Anmeldung im ErWIn Portal",
     "maintenanceNoticeTitle": "Achtung Wartungsarbeiten!",
-    "maintenanceNoticeText": "Am 7.12. und 8.12.2024 werden ganztägig Wartungsarbeiten am Schulportal SH ausgeführt.",
+    "maintenanceNoticeText": "Am 7.12. und 8.12.2024 werden ganztägig Wartungsarbeiten am ErWIn Portal ausgeführt.",
     "doNotLogin": "Bitte melden Sie sich nicht an!",
     "password": "Passwort",
     "username": "Benutzername"
@@ -639,7 +499,6 @@
   "nav": {
     "admin": "Schulportal-Administration",
     "backToDetails": "Zurück zur Gesamtübersicht",
-    "toDetails": "Zur Gesamtübersicht",
     "backToList": "Zurück zur Ergebnisliste",
     "back": "Zurück",
     "backToStart": "Zurück zur Startseite",
@@ -669,7 +528,7 @@
     "checkAndSave": "Bitte prüfen und abschließend speichern, um die Aktion auszuführen",
     "changeRolle": "Rolle ändern",
     "changeKlasseConfirmation": "Wollen Sie den Schüler/die Schülerin aus Klasse {oldKlasse} in Klasse {newKlasse} versetzen?",
-    "changeKlasseSuccess": "Der Schüler/die Schülerin wurde erfolgreich versetzt.",
+    "changeKlasseSuccess": "Der Schüler/die Schülerin wurde erfoglreich versetzt.",
     "changeRolleDescription": "Ändert die Rolle des Benutzers an der Schule ohne ihn zu entfernen.",
     "changeKlasseDescription": "Ändert die Klasse des Benutzers an der Schule.",
     "changeKlasseNotDisabledDescription": "Bitte wählen Sie eine neue Klasse aus.",
@@ -702,7 +561,7 @@
     "kopersNr": "KoPers.-Nr.",
     "lastName": "Nachname",
     "lockUser": "Benutzer sperren",
-    "lockUserInfoText": "Für die Dauer der Sperre hat der Benutzer keinen Zugriff mehr auf das Schulportal SH und die daran angeschlossenen Dienste.",
+    "lockUserInfoText": "Für die Dauer der Sperre hat der Benutzer keinen Zugriff mehr auf das ErWIn Portal und die daran angeschlossenen Dienste.",
     "lockedBy": "Gesperrt durch",
     "lockedSince": "Gesperrt seit",
     "lockedUntil": "Gesperrt bis",
@@ -713,7 +572,6 @@
     "noChangesToSave": "Es liegen keine zu speichernden Änderungen vor.",
     "noZuordnungenFound": "Keine Schulzuordnungen gefunden.",
     "password": "Passwort",
-    "passwords": "Passwörter",
     "removeZuordnung": "Schulzuordnung entfernen",
     "removeZuordnungDescription": "Entfernt den Benutzer von der Schule.",
     "rolle": "Rolle",
@@ -721,18 +579,14 @@
     "twoFactorAuthenticationSetUpHeader": "Zwei-Faktor-Authentifizierung (2FA)",
     "unlockError": "Der Benutzer konnte nicht entsperrt werden.",
     "unlockUser": "Benutzer entsperren",
-    "unLockUserInfoText": "Ich bestätige, dass ich mit der sperrenden Stelle geklärt habe, dass die Sperre bearbeitet oder aufgehoben werden darf.",
+    "unLockUserInfoText": "Ich bestätige, dass ich mit der sperrenden Stelle geklärt habe, dass die Sperre aufgehoben werden darf.",
     "userIsLocked": "Dieser Benutzer ist gesperrt.",
     "userIsUnlocked": "Dieser Benutzer ist aktiv.",
     "userName": "Benutzername",
     "willBeCreated": "wird hinzugefügt",
     "willBeRemoved": "wird entfernt",
     "zuordnungen": "Schulzuordnung(en)",
-    "zuordnung": "Schulzuordnung",
-    "changeBefristung": "Befristung ändern",
-    "changeBefristungConfirmation": "Möchten Sie die Befristung wirklich von {oldBefristung} in {newBefristung} ändern?",
-    "changeBefristungSuccess": "Die Befristung wurde erfolgreich geändert.",
-    "changeBefristungDisabledDescription": "Bitte wählen Sie eine neue Befristung aus."
+    "zuordnung": "Schulzuordnung"
   },
   "profile": {
     "personalData": "Persönliche Daten",
@@ -769,7 +623,6 @@
     "limitedUntil": "Befristet bis"
   },
   "save": "Speichern",
-  "selected": "ausgewählt",
   "since": "Seit",
   "refreshData": "Daten aktualisieren",
   "resetFilter": "Filter zurücksetzen",
@@ -790,18 +643,7 @@
     "message": "Sie haben nicht gespeicherte Änderungen vorgenommen. Wollen Sie die Seite trotzdem verlassen?",
     "title": "Änderungen vorgenommen"
   },
-  "whatsNew": {
-    "moreInformation": "Weitere Informationen zu den neuen Funktionen finden Sie auf der Seite der",
-    "title": "Was ist neu?",
-    "updateInformationForVersion": "Update-Informationen zur Version {version}"
-  },
-  "willBeCreated": "wird hinzugefügt",
-  "willBeRemoved": "wird entfernt",
   "yes": "Ja",
-  "banner": {
-    "hint": "Hinweis: ",
-    "kopers": "Die Verwendung dieses Benutzerkontos setzt eine KoPers.-Nr. voraus. Bitte kontaktieren Sie Ihre schulischen Administratorinnen und Administratoren, um eine KoPers.-Nr. eintragen zu lassen. Andernfalls wird Ihr Zugang zum {date} automatisch gesperrt.",
-    "noKontexte": "Dieses Benutzerkonto ist aktuell keiner Schule zugeordnet. Ohne Schulzuordnung sind ein großer Teil der Funktionalitäten des Schulportal SH nicht verfügbar. Sollten Sie weiterhin an einer Schule in Schleswig-Holstein tätig sein, wenden Sie sich an Ihre Schulleitung. Ist dieses Konto auch weiterhin keiner Schule zugeordnet, wird es zum {date} gelöscht.",
-    "kontextExpires": "Die Zuordnung dieses Benutzerkontos zu der Schule \"{schule}\" mit der Rolle \"{rolle}\" ist bis zum {date} befristet. Sollte dies nicht zutreffen, wenden Sie sich bitte an Ihre Schulleitung. Nach Ende der Zuordnung sind Funktionalitäten, die im Bezug zu dieser Schule und Rolle stehen, nicht mehr verfügbar."
-  }
+  "willBeCreated": "wird hinzugefügt",
+  "willBeRemoved": "wird entfernt"
 }

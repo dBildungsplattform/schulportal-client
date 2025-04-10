@@ -52,9 +52,6 @@
     filterSortProviders(serviceProviderStore.availableServiceProviders, ServiceProviderKategorie.Unterricht),
   );
   // Filter service providers by category "VERWALTUNG"
-  const administrationServiceProviders: ComputedRef<ServiceProvider[]> = computed(() =>
-    filterSortProviders(serviceProviderStore.availableServiceProviders, ServiceProviderKategorie.Verwaltung),
-  );
   // Filter service providers by category "HINWEISE"
   const hintsServiceProviders: ComputedRef<ServiceProvider[]> = computed(() =>
     filterSortProviders(serviceProviderStore.availableServiceProviders, ServiceProviderKategorie.Hinweise),
@@ -275,11 +272,6 @@
         :hasToken="getHasToken()"
       ></ServiceProviderCategory>
       <!-- Categorie 3: Administration -->
-      <ServiceProviderCategory
-        :categoryTitle="$t('start.categories.administration')"
-        :serviceProviders="administrationServiceProviders"
-        :hasToken="getHasToken()"
-      ></ServiceProviderCategory>
       <!-- Categorie 4: Hints -->
       <ServiceProviderCategory
         :categoryTitle="$t('start.categories.hints')"

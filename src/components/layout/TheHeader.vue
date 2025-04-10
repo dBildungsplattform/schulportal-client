@@ -24,8 +24,8 @@
         >
           <router-link :to="auth.isAuthed ? '/start' : '/'">
             <img
-              alt="Logo Schulportal"
-              src="@/assets/logos/Schulportal_SH_Wort_Bildmarke_RGB_Anwendung_HG_Blau.svg"
+              alt="Logo ErWIn Portal"
+              src="@/assets/logos/erwin_logos/Logo-ErWIn-Portal-weiss.svg"
               width="354"
               height="60"
             />
@@ -39,8 +39,8 @@
         >
           <router-link :to="auth.isAuthed ? '/start' : '/'">
             <img
-              alt="Logo Schulportal"
-              src="@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg"
+              alt="Logo ErWIn Portal"
+              src="@/assets/logos/erwin_logos/Logo-ErWIn-Portal-weiss.svg"
               width="33"
               height="33"
             />
@@ -55,7 +55,7 @@
         <a
           class="secondary"
           data-testid="help-button"
-          href="https://medienberatung.iqsh.de/paedagogischer-helpdesk.html"
+          href="https://www.bmbf.de/bmbf/de/forschung/zukunftsstrategie/foerderung-in-der-forschung/foerderung-in-der-forschung_node.html"
           rel="noopener noreferrer"
           target="_blank"
         >
