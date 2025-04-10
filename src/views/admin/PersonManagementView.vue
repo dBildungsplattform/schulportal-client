@@ -476,6 +476,14 @@
     return organisationStore.allOrganisationen.find((org: Organisation) => org.id === selectedOrganisationId.value[0]);
   });
 
+  const checkSingleOrgDisplayDialog = (dialog: Ref<boolean>): void => {
+    if (!singleSchoolSelected.value) {
+      onlyOneSchoolAlertDialogVisible.value = true;
+      return;
+    }
+    dialog.value = true;
+  };
+
   // Handle the selected action
   const handleOption = (newValue: string | null): void => {
     if (!newValue) return;
@@ -488,15 +496,10 @@
         benutzerDeleteDialogVisible.value = true;
         break;
       case ActionTypes.RESET_PASSWORD:
-        passwordResetDialogVisible.value = true;
+        checkSingleOrgDisplayDialog(passwordResetDialogVisible);
         break;
       case ActionTypes.ORG_UNASSIGN:
-        if (!singleSchoolSelected.value) {
-          onlyOneSchoolAlertDialogVisible.value = true;
-          return;
-        }
-        organisationUnassignDialogVisible.value = true;
-        break;
+        checkSingleOrgDisplayDialog(organisationUnassignDialogVisible);
     }
   };
 
