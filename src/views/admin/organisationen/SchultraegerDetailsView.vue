@@ -188,18 +188,22 @@
         assignedSchulen.value = unpersistedSchulenToAssign.value.length
           ? [...unpersistedSchulenToAssign.value, ...organisationStore.schulenFromTraeger]
           : organisationStore.schulenFromTraeger;
-      }
+      } else {
+        /* search locally in assigned schulen */
+        assignedSchulen.value = assignedSchulen.value.filter((schule: Organisation) => {
+          const searchStringLowerCase: string = searchString.toLowerCase();
+          return (
+            schule.name.toLowerCase().includes(searchStringLowerCase) ||
+            schule.kennung!.toLowerCase().includes(searchStringLowerCase)
+          );
+        });
 
-      /* search locally in assigned schulen */
-      assignedSchulen.value = assignedSchulen.value.filter((schule: Organisation) => {
-        const searchStringLowerCase: string = searchString.toLowerCase();
-        return (
-          schule.name.toLowerCase().includes(searchStringLowerCase) ||
-          schule.kennung!.toLowerCase().includes(searchStringLowerCase)
-        );
-      });
-      /* if schule type is unassigned, fetch and search schulen from BE */
+        /* if input is given and no Schulen were found, show that there were none found */
+        noAssignedSchulenFoundText.value =
+          assignedSchulen.value.length === 0 && searchString ? t('admin.schultraeger.noSchulenFound') : '';
+      }
     } else {
+      /* if schule type is unassigned, fetch and search schulen from BE */
       /* cache unpersisted schulen before fetching from backend */
       const unpersistedSchulenToUnassignCache: Array<Organisation> = unpersistedSchulenToUnassign.value;
 
