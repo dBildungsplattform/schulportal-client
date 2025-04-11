@@ -641,6 +641,7 @@ export const useOrganisationStore: StoreDefinition<
           filter?.systemrechte,
           filter?.excludeTyp,
           filter?.administriertVon,
+          filter?.zugehoerigZu,
           filter?.organisationIds,
         );
         this.schulenFilter.filterResult = response.data;
