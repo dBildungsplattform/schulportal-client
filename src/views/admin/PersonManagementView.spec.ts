@@ -485,6 +485,10 @@ describe('PersonManagementView', () => {
     // Initial state check (optional)
     expect(checkbox?.classes()).not.toContain('v-selection-control--selected');
 
+    const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
+    await schuleAutocomplete?.setValue(['9876']);
+    await nextTick();
+
     // Trigger the checkbox click
     await checkbox?.trigger('click');
     await nextTick();
