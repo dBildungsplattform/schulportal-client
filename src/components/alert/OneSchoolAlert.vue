@@ -22,13 +22,13 @@
 
 <template>
   <v-dialog
-    ref="resetPasswordBulkDialog"
+    ref="one-school-alert-dialog"
     :modelValue="isDialogVisible"
     persistent
   >
     <LayoutCard
       v-if="isDialogVisible"
-      data-testid="password-reset-layout-card"
+      data-testid="one-school-alert-layout-card"
       :header="header"
     >
       <v-container class="mt-8 mb-4">
