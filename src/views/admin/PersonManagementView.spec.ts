@@ -511,6 +511,43 @@ describe('PersonManagementView', () => {
     expect(document.body.querySelector('[data-testid="person-delete-layout-card"]')).toBeNull();
   });
 
+  test('it checks a checkbox in the table, selects the unassign org option and triggers dialog then cancels it', async () => {
+    authStore.hasPersonenverwaltungPermission = true;
+    // Find the first checkbox in the table
+    const checkbox: DOMWrapper<Element> | undefined = wrapper?.find(
+      '[data-testid="person-table"] .v-selection-control',
+    );
+
+    // Initial state check (optional)
+    expect(checkbox?.classes()).not.toContain('v-selection-control--selected');
+
+    // Trigger the checkbox click
+    await checkbox?.trigger('click');
+    await nextTick();
+
+    const benutzerEditSelect: VueWrapper | undefined = wrapper?.findComponent({ ref: 'benutzer-bulk-edit-select' });
+
+    // eslint-disable-next-line @typescript-eslint/dot-notation
+    const hasUnassingOrgOption: boolean = (benutzerEditSelect?.props() as { items: { value: string }[] }).items.some(
+      (item: { value: string }) => item.value === 'ORG_UNASSIGN',
+    );
+    expect(hasUnassingOrgOption).toBe(true);
+
+    benutzerEditSelect?.setValue('ORG_UNASSIGN');
+
+    benutzerEditSelect?.vm.$emit('input', 'ORG_UNASSIGN');
+    await nextTick();
+    await flushPromises();
+
+    expect(document.body.querySelector('[data-testid="org-unassign-layout-card"]')).not.toBeNull();
+
+    const cancelButton: Element | null = document.querySelector('[data-testid="org-unassign-discard-button"]');
+    cancelButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    await nextTick();
+
+    expect(document.body.querySelector('[data-testid="org-unassign-layout-card"]')).toBeNull();
+  });
+
   test('person delete isnt shown if user has no permission', async () => {
     authStore.hasPersonenLoeschenPermission = false;
 
