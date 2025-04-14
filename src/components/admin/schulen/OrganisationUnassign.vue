@@ -38,7 +38,7 @@
     persistent
   >
     <LayoutCard
-      data-testid="org-uassign-layout-card"
+      data-testid="org-unassign-layout-card"
       :header="$t('admin.person.bulkUnassignOrganisation.cancelZuordnung')"
     >
       <!-- Initial block -->

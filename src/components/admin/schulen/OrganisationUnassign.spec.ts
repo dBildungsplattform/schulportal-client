@@ -62,7 +62,7 @@ describe('OrganisationUnassign', () => {
   test.each([[true], [false]])('renders the dialog when isDialogVisible=%s', async (isDialogVisible: boolean) => {
     wrapper = mountComponent({ isDialogVisible });
     await nextTick();
-    const layoutCard: Element | null = document.body.querySelector('[data-testid="org-uassign-layout-card"]');
+    const layoutCard: Element | null = document.body.querySelector('[data-testid="org-unassign-layout-card"]');
     if (isDialogVisible) expect(layoutCard).not.toBeNull();
     else expect(layoutCard).toBeNull();
   });
