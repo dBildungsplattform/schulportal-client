@@ -50,7 +50,7 @@
   const selectedPersonIds: Ref<string[]> = ref<string[]>([]);
   const selectedPersons: ComputedRef<PersonenWithRolleAndZuordnung> = computed(() => {
     return (
-      personStore.personWithUebersicht?.filter((p: PersonenWithRolleAndZuordnung[number]) =>
+      personStore.personenWithUebersicht?.filter((p: PersonenWithRolleAndZuordnung[number]) =>
         selectedPersonIds.value.includes(p.person.id),
       ) ?? []
     );
@@ -541,14 +541,14 @@
 
   // This method filters the selectedPersonIds to avoid items being selected when they are not included in the current table "items"
   function updateSelectedRowsAfterFilter(): void {
-    const visiblePersonIds: string[] | undefined = personStore.personWithUebersicht?.map(
+    const visiblePersonIds: string[] | undefined = personStore.personenWithUebersicht?.map(
       (person: Personendatensatz) => person.person.id,
     );
     selectedPersonIds.value = selectedPersonIds.value.filter((id: string) => visiblePersonIds?.includes(id));
   }
   // Whenever the array of items of the table (personStore.personenWithUebersicht) changes (Filters, search function, page update etc...) update the selection.
   watch(
-    () => personStore.personWithUebersicht,
+    () => personStore.personenWithUebersicht,
     () => {
       updateSelectedRowsAfterFilter();
     },
@@ -935,7 +935,7 @@
         :currentPage="searchFilterStore.personenPage"
         data-testid="person-table"
         ref="resultTable"
-        :items="personStore.personWithUebersicht || []"
+        :items="personStore.personenWithUebersicht || []"
         :itemsPerPage="searchFilterStore.personenPerPage"
         :loading="personStore.loading"
         :headers="headers"

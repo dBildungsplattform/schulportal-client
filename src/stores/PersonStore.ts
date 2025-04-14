@@ -201,9 +201,8 @@ type PersonState = {
   bulkResetPasswordResult: BulkResetPasswordResult | null;
   patchedPerson: PersonendatensatzResponse | null;
   personenuebersicht: DBiamPersonenuebersichtResponse | null;
-  personWithUebersicht: PersonenWithRolleAndZuordnung | null;
+  personenWithUebersicht: PersonenWithRolleAndZuordnung | null;
   totalPersons: number;
-  personenWithUebersicht: PersonWithUebersicht[] | null;
 };
 
 export type PersonFilter = {
@@ -257,9 +256,8 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       bulkResetPasswordResult: null,
       patchedPerson: null,
       personenuebersicht: null,
-      personWithUebersicht: null,
-      totalPersons: 0,
       personenWithUebersicht: null,
+      totalPersons: 0,
     };
   },
   actions: {
@@ -292,7 +290,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
         // Fetch overviews for all persons
         const personIds: string[] = data.items.map((person: PersonendatensatzResponse) => person.person.id);
         if (personIds.length === 0) {
-          this.personWithUebersicht = null;
+          this.personenWithUebersicht = null;
           return;
         }
         const bodyParams: PersonenuebersichtBodyParams = {
@@ -302,9 +300,8 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
           await personenuebersichtApi.dBiamPersonenuebersichtControllerFindPersonenuebersichten(bodyParams);
         const allUebersichten: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response = uebersichten;
 
-        this.personenWithUebersicht = allUebersichten.items;
         // Aggregate the personen with their uebersichten
-        this.personWithUebersicht = allPersons
+        this.personenWithUebersicht = allPersons
           .map(mapPersonendatensatzResponseToPersonendatensatz)
           .map((person: Personendatensatz) => {
             const uebersicht: PersonWithUebersicht = allUebersichten.items.find(

@@ -349,19 +349,19 @@ describe('PersonStore', () => {
       expect(personStore.loading).toBe(false);
 
       // check if the kopersnr is displayed correctly
-      expect(personStore.personWithUebersicht?.[0]?.person.personalnummer).toEqual('1234567');
-      expect(personStore.personWithUebersicht?.[1]?.person.personalnummer).toEqual('fehlt');
-      expect(personStore.personWithUebersicht?.[2]?.person.personalnummer).toEqual('---');
+      expect(personStore.personenWithUebersicht?.[0]?.person.personalnummer).toEqual('1234567');
+      expect(personStore.personenWithUebersicht?.[1]?.person.personalnummer).toEqual('fehlt');
+      expect(personStore.personenWithUebersicht?.[2]?.person.personalnummer).toEqual('---');
 
       // check if administrationsebenen are displayed correctly
-      expect(personStore.personWithUebersicht?.[0]?.administrationsebenen).toEqual('642462');
-      expect(personStore.personWithUebersicht?.[1]?.administrationsebenen).toEqual('Schule B');
-      expect(personStore.personWithUebersicht?.[2]?.administrationsebenen).toEqual('---');
+      expect(personStore.personenWithUebersicht?.[0]?.administrationsebenen).toEqual('642462');
+      expect(personStore.personenWithUebersicht?.[1]?.administrationsebenen).toEqual('Schule B');
+      expect(personStore.personenWithUebersicht?.[2]?.administrationsebenen).toEqual('---');
 
       // check if klassen are displayed correctly
-      expect(personStore.personWithUebersicht?.[0]?.klassen).toEqual('---');
-      expect(personStore.personWithUebersicht?.[3]?.klassen).toEqual('2b');
-      expect(personStore.personWithUebersicht?.[4]?.klassen).toEqual('---');
+      expect(personStore.personenWithUebersicht?.[0]?.klassen).toEqual('---');
+      expect(personStore.personenWithUebersicht?.[3]?.klassen).toEqual('2b');
+      expect(personStore.personenWithUebersicht?.[4]?.klassen).toEqual('---');
     });
 
     it('should return null if no persons were found', async () => {
@@ -377,10 +377,10 @@ describe('PersonStore', () => {
 
       const getAllPersonsPromise: Promise<void> = personStore.getAllPersons({});
       expect(personStore.loading).toBe(true);
-      expect(personStore.personWithUebersicht).toEqual(null);
+      expect(personStore.personenWithUebersicht).toEqual(null);
       await getAllPersonsPromise;
       expect(personStore.loading).toBe(false);
-      expect(personStore.personWithUebersicht).toEqual(null);
+      expect(personStore.personenWithUebersicht).toEqual(null);
     });
 
     it('should load persons according to filter', async () => {
