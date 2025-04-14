@@ -2,7 +2,6 @@
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { type Organisation } from '@/stores/OrganisationStore';
   import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
-  import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
   import { type Ref } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
@@ -10,7 +9,6 @@
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
-  const personStore: PersonStore = usePersonStore();
   const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
 
   type Props = {
@@ -40,7 +38,7 @@
     persistent
   >
     <LayoutCard
-      data-testid="layout-card"
+      data-testid="org-uassign-layout-card"
       :header="$t('admin.person.bulkUnassignOrganisation.cancelZuordnung')"
     >
       <!-- Initial block -->
@@ -147,7 +145,7 @@
             <v-btn
               v-if="personenkontextStore.bulkProgress === 0"
               :block="mdAndDown"
-              :disabled="personStore.loading"
+              :disabled="personenkontextStore.loading"
               class="primary"
               @click="handleOrgUnassign()"
               data-testid="org-unassign-submit-button"
