@@ -404,23 +404,28 @@ describe('SchultraegerDetailsView', () => {
     organisationStore.errorCode = '';
     await nextTick();
 
-    const assignedItemsList: VueWrapper = wrapper
-      .findComponent({ name: 'RelationshipAssign' })
-      .findComponent({ ref: 'assignedItemsList' });
-    const assignedListItems: DOMWrapper<Element>[] | undefined = assignedItemsList.findAll(
-      '[data-testid^="assign-list-item-"]',
-    );
-    expect(assignedListItems).toHaveLength(3);
+    const relationshipAssignComponent: VueWrapper = wrapper.findComponent({ name: 'RelationshipAssign' });
+    const assignedItemsList: VueWrapper = relationshipAssignComponent.findComponent({ ref: 'assignedItemsList' });
 
-    assignedItemsList.find('[data-testid="search-filter-input"] input').setValue('Gymnasium');
-    assignedItemsList.find('[data-testid="apply-search-filter-button"]').trigger('click');
+    // Verify initial state
+    const initialItems: DOMWrapper<Element>[] = assignedItemsList.findAll('[data-testid^="assign-list-item-"]');
+    expect(initialItems).toHaveLength(3);
+
+    // Mock the filter function to avoid the null error
+    const searchInput: DOMWrapper<Element> = assignedItemsList.find('[data-testid="search-filter-input"] input');
+    await searchInput.setValue('Gymnasium');
+
+    // Instead of triggering the click event directly and then emitting separately,
+    // we can simulate the entire search process as it would happen in the component
+    const searchButton: DOMWrapper<Element> = assignedItemsList.find('[data-testid="apply-search-filter-button"]');
+    await searchButton.trigger('click');
+
+    // Force the component to update
     await flushPromises();
-    await wrapper
-      .findComponent({ name: 'RelationshipAssign' })
-      .vm.$emit('onHandleAssignedItemsSearchFilter', 'Gymnasium', SchuleType.ASSIGNED);
 
-    // TODO: the list of assigned items should only contain one schule after the search
-    // expect(assignedListItems).toHaveLength(1);
+    // Check that the filtered list has the expected length
+    const filteredItems: DOMWrapper<Element>[] = assignedItemsList.findAll('[data-testid^="assign-list-item-"]');
+    expect(filteredItems).toHaveLength(1);
   });
 
   describe('navigation interception', () => {

@@ -194,7 +194,7 @@
           const searchStringLowerCase: string = searchString.toLowerCase();
           return (
             schule.name.toLowerCase().includes(searchStringLowerCase) ||
-            schule.kennung!.toLowerCase().includes(searchStringLowerCase)
+            (schule.kennung && schule.kennung.toLowerCase().includes(searchStringLowerCase))
           );
         });
 
