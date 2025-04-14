@@ -1,5 +1,7 @@
 import {
   type DBiamPersonenkontextResponse,
+  type DBiamPersonenuebersichtResponse,
+  type DBiamPersonenzuordnungResponse,
   type FindRollenResponse,
   type SystemrechtResponse,
   OrganisationsTyp,
@@ -19,6 +21,7 @@ import {
   type Zuordnung,
 } from './PersonenkontextStore';
 import { usePersonStore, type PersonendatensatzResponse, type PersonStore } from './PersonStore';
+import type { MockInstance } from 'vitest';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 
@@ -413,6 +416,102 @@ describe('PersonenkontextStore', () => {
       await rejects(createPersonPromise);
       expect(personenkontextStore.errorCode).toEqual('SOME_MOCK_SERVER_ERROR');
       expect(personenkontextStore.loading).toBe(false);
+    });
+  });
+
+  describe('unassignPersonenFromOrg', () => {
+    const mockPersonId: string = '1';
+    const mockError: string = 'some error';
+
+    const mockZuordnung: DBiamPersonenzuordnungResponse = {
+      sskId: '1234',
+      rolleId: '5678',
+      sskName: 'some ssk name',
+      sskDstNr: '123',
+      rolle: 'some role',
+      rollenArt: RollenArt.Lern,
+      administriertVon: '123',
+      typ: OrganisationsTyp.Schule,
+      editable: true,
+      befristung: 'unbefristet',
+      merkmale: [] as unknown as RollenMerkmal,
+      admins: ['admin1', 'admin2'],
+    };
+
+    const person: DBiamPersonenuebersichtResponse = {
+      personId: mockPersonId,
+      vorname: 'John',
+      nachname: 'Doe',
+      benutzername: 'jdoe',
+      zuordnungen: [mockZuordnung],
+      lastModifiedZuordnungen: '2024-03-24T16:35:32.711Z',
+    };
+
+    const personWithoutOrg: DBiamPersonenuebersichtResponse = {
+      personId: mockPersonId,
+      vorname: 'John',
+      nachname: 'Doe',
+      benutzername: 'jdoe',
+      zuordnungen: [],
+      lastModifiedZuordnungen: '2024-03-24T16:35:32.711Z',
+    };
+
+    beforeEach(() => {
+      personStore.$reset();
+      personenkontextStore.$reset();
+
+      personStore.getPersonenuebersichtById = vi.fn(async (_personId: string) => Promise.resolve());
+      personenkontextStore.updatePersonenkontexte = vi.fn(
+        async (_zuordnungen: Zuordnung[] | undefined, _personId: string) => {
+          return Promise.resolve();
+        },
+      );
+
+      personStore.personenuebersicht = person;
+    });
+
+    test('should unassign Personen from Organisation', async () => {
+      const spy: MockInstance = vi.spyOn(personStore, 'getPersonenuebersichtById');
+
+      await personenkontextStore.unassignPersonenFromOrg('1234', [mockPersonId]);
+
+      expect(spy).toHaveBeenCalledOnce();
+    });
+
+    test('should skip if not at org', async () => {
+      personStore.personenuebersicht = personWithoutOrg;
+
+      const spy: MockInstance = vi.spyOn(personenkontextStore, 'updatePersonenkontexte');
+      await personenkontextStore.unassignPersonenFromOrg('1234', [mockPersonId]);
+
+      expect(spy).not.toHaveBeenCalled();
+      expect(personenkontextStore.bulkProgress).toEqual(100);
+    });
+
+    test('should handle personstore error', async () => {
+      personStore.errorCode = mockError;
+      await personenkontextStore.unassignPersonenFromOrg('1234', [mockPersonId]);
+
+      expect(personenkontextStore.bulkErrors).toHaveLength(1);
+      expect(personenkontextStore.bulkErrors.get(mockPersonId)).toEqual(mockError);
+    });
+
+    test('should handle personenkontext error', async () => {
+      personenkontextStore.errorCode = mockError;
+
+      await personenkontextStore.unassignPersonenFromOrg('1234', [mockPersonId]);
+
+      expect(personenkontextStore.bulkErrors).toHaveLength(1);
+      expect(personenkontextStore.bulkErrors.get(mockPersonId)).toEqual(mockError);
+    });
+
+    test('should handle error', async () => {
+      personStore.getPersonenuebersichtById = vi.fn(async (_personId: string) => {
+        throw new Error(mockError);
+      });
+
+      await personenkontextStore.unassignPersonenFromOrg('1234', [mockPersonId]);
+      expect(personenkontextStore.errorCode).toBe('UNSPECIFIED_ERROR');
     });
   });
 });
