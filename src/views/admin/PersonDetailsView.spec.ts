@@ -1038,7 +1038,7 @@ describe('PersonDetailsView', () => {
       return `${currentYear}-07-31T15:07:37.000Z`;
     }
 
-    test.only.each([
+    test.each([
       ['2099-08-12T13:03:53.802Z', undefined],
       [undefined, 'unbefristet'],
       [undefined, 'schuljahresende'],
