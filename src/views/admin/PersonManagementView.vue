@@ -472,6 +472,10 @@
     return selectedOrganisationId.value.length === 1;
   });
 
+  const singleSchoolAlertHeader: ComputedRef<string> = computed(() => {
+    return actions.value.find((action: TranslatedObject) => action.value === selectedOption.value)?.title || '';
+  });
+
   const selectedOrganisation: ComputedRef<Organisation | undefined> = computed(() => {
     return organisationStore.allOrganisationen.find((org: Organisation) => org.id === selectedOrganisationId.value[0]);
   });
@@ -859,7 +863,7 @@
           </SpshTooltip>
           <OneSchoolAlert
             :isDialogVisible="onlyOneSchoolAlertDialogVisible"
-            header="WIP"
+            :header="singleSchoolAlertHeader"
             @update:dialogExit="
               () => {
                 onlyOneSchoolAlertDialogVisible = false;
