@@ -831,6 +831,8 @@ describe('PersonDetailsView', () => {
   test('renders form to change Klasse and triggers submit', async () => {
     organisationStore.getAllOrganisationen = vi.fn().mockResolvedValue(undefined);
     organisationStore.getKlassenByOrganisationId = vi.fn().mockResolvedValue(undefined);
+    organisationStore.fetchSchuleDetailsForKlassen = vi.fn().mockResolvedValue(undefined);
+    personenkontextStore.processWorkflowStep = vi.fn().mockResolvedValue(undefined);
     personenkontextStore.updatePersonenkontexte = vi.fn().mockResolvedValue(undefined);
 
     await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
