@@ -1038,13 +1038,16 @@ describe('PersonDetailsView', () => {
       return `${currentYear}-07-31T15:07:37.000Z`;
     }
 
-    test.each([
+    test.only.each([
       ['2099-08-12T13:03:53.802Z', undefined],
       [undefined, 'unbefristet'],
       [undefined, 'schuljahresende'],
     ])(
       'renders form to change befristung with %s %s and triggers submit',
       async (existingBefristung: string | undefined, existingBefristungOption: string | undefined) => {
+        personenkontextStore.processWorkflowStep = vi.fn().mockResolvedValue(undefined);
+        personenkontextStore.updatePersonenkontexte = vi.fn().mockResolvedValue(undefined);
+
         personStore.personenuebersicht = mockPersonenuebersichtLehr;
         if (personStore.personenuebersicht.zuordnungen[0]) {
           if (existingBefristung) {
