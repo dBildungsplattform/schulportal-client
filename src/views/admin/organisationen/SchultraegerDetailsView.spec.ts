@@ -326,6 +326,80 @@ describe('SchultraegerDetailsView', () => {
     expect(assignedSchulen.length).toEqual(2);
   });
 
+  test('it assigns a new schule and unassigns an existing schule', async () => {
+    if (!wrapper) return;
+
+    organisationStore.updatedOrganisation = null;
+    organisationStore.errorCode = '';
+    await nextTick();
+
+    interface SchultraegerDetailsView {
+      assignedSchulen: Organisation[];
+      unassignedSchulen: Organisation[];
+      unpersistedSchulenToAssign: string[];
+      unpersistedSchulenToUnassign: string[];
+    }
+
+    const firstAssignedSchule: Organisation = organisationStore.schulenFromTraeger[0]!;
+    const firstUnassignedSchule: Organisation = organisationStore.schulenWithoutTraeger[0]!;
+
+    let assignedSchulen: Organisation[] = (wrapper.vm as unknown as SchultraegerDetailsView).assignedSchulen;
+    let unassignedSchulen: Organisation[] = (wrapper.vm as unknown as SchultraegerDetailsView).unassignedSchulen;
+
+    expect(assignedSchulen[0]).toEqual(firstAssignedSchule);
+    /* unassignedSchulen equals empty array, since the list is empty in the beginning */
+    expect(unassignedSchulen).toEqual([]);
+
+    let unpersistedSchulenToAssign: string[] = (wrapper.vm as unknown as SchultraegerDetailsView)
+      .unpersistedSchulenToAssign;
+    let unpersistedSchulenToUnassign: string[] = (wrapper.vm as unknown as SchultraegerDetailsView)
+      .unpersistedSchulenToUnassign;
+
+    expect(unpersistedSchulenToAssign).toHaveLength(0);
+    expect(unpersistedSchulenToUnassign).toHaveLength(0);
+
+    /* search for unassigned schulen and click first item in list */
+    const unassignedItemsList: VueWrapper = wrapper
+      .findComponent({ name: 'RelationshipAssign' })
+      .findComponent({ ref: 'unassignedItemsList' });
+
+    unassignedItemsList.find('[data-testid="search-filter-input"] input').setValue('Öffentliche Schule');
+    unassignedItemsList.find('[data-testid="apply-search-filter-button"]').trigger('click');
+    await flushPromises();
+
+    const unassignedListItems: DOMWrapper<Element>[] | undefined = unassignedItemsList.findAll(
+      '[data-testid^="assign-list-item-"]',
+    );
+    await unassignedListItems[0]?.trigger('click');
+    await flushPromises();
+
+    /* click second item in assigned schulen list, since first item should now be the unpersisted schule to assign */
+    const assignedItemsList: VueWrapper = wrapper
+      .findComponent({ name: 'RelationshipAssign' })
+      .findComponent({ ref: 'assignedItemsList' });
+
+    const assignedListItems: DOMWrapper<Element>[] | undefined = assignedItemsList.findAll(
+      '[data-testid^="assign-list-item-"]',
+    );
+    await assignedListItems[1]?.trigger('click');
+    await flushPromises();
+
+    assignedSchulen = (wrapper.vm as unknown as SchultraegerDetailsView).assignedSchulen;
+    unassignedSchulen = (wrapper.vm as unknown as SchultraegerDetailsView).unassignedSchulen;
+
+    /* expect first item of each list to have changed */
+    expect(assignedSchulen[0]).toEqual({ ...firstUnassignedSchule, isNotPersisted: true });
+    expect(unassignedSchulen[0]).toEqual({ ...firstAssignedSchule, isNotPersisted: true });
+
+    unpersistedSchulenToAssign = (wrapper.vm as unknown as SchultraegerDetailsView).unpersistedSchulenToAssign;
+    unpersistedSchulenToUnassign = (wrapper.vm as unknown as SchultraegerDetailsView).unpersistedSchulenToUnassign;
+
+    expect(unpersistedSchulenToAssign).toHaveLength(1);
+    expect(unpersistedSchulenToUnassign).toHaveLength(1);
+
+    await wrapper.find('[data-testid="schultraeger-edit-save-button"]').trigger('click');
+  });
+
   test('it edits the schultraeger name', async () => {
     organisationStore.updatedOrganisation = null;
     organisationStore.errorCode = '';
