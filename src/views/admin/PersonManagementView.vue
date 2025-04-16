@@ -180,6 +180,7 @@
     await organisationStore.getFilteredKlassen({
       administriertVon: selectedOrganisation.value,
       searchString: searchInputKlassen.value,
+      organisationIds: selectedKlassen.value,
     });
     // THe dropdown should be updated as well here alongside the count
     klassenOptions.value = organisationStore.klassen.map((org: Organisation) => ({
