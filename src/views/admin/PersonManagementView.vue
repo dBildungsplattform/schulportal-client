@@ -32,7 +32,7 @@
   import { type Router, useRouter } from 'vue-router';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
   import OrganisationUnassign from '@/components/admin/schulen/OrganisationUnassign.vue';
-  import OneSchoolAlert from '@/components/alert/OneSchoolAlert.vue';
+  import InfoDialog from '@/components/alert/InfoDialog.vue';
 
   const searchFieldComponent: Ref = ref();
 
@@ -861,9 +861,11 @@
               @update:modelValue="handleOption"
             ></v-select>
           </SpshTooltip>
-          <OneSchoolAlert
+          <InfoDialog
+            id="only-one-school"
             :isDialogVisible="onlyOneSchoolAlertDialogVisible"
             :header="singleSchoolAlertHeader"
+            :message="$t('admin.person.onlyOneSchoolAlert')"
             @update:dialogExit="
               () => {
                 onlyOneSchoolAlertDialogVisible = false;

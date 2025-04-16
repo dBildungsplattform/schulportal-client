@@ -5,8 +5,10 @@
   import { useDisplay } from 'vuetify';
 
   type Props = {
+    id: string;
     isDialogVisible: boolean;
     header: string;
+    message: string;
   };
   type Emits = (event: 'update:dialogExit') => void;
 
@@ -22,13 +24,13 @@
 
 <template>
   <v-dialog
-    ref="one-school-alert-dialog"
+    :ref="`${id}-dialog`"
     :modelValue="isDialogVisible"
     persistent
   >
     <LayoutCard
       v-if="isDialogVisible"
-      data-testid="one-school-alert-layout-card"
+      :data-testid="`${id}-layout-card`"
       :header="header"
     >
       <v-container class="mt-8 mb-4">
@@ -37,8 +39,8 @@
             class="mr-4"
             icon="mdi-alert"
           ></v-icon>
-          <span data-testid="error-text">
-            {{ t('admin.person.onlyOneSchoolAlert') }}
+          <span :data-testid="`${id}-text`">
+            {{ message }}
           </span>
         </v-row>
       </v-container>
@@ -54,7 +56,7 @@
               :block="mdAndDown"
               class="primary"
               @click="closeDialog()"
-              data-testid="one-school-alert-cancel-button"
+              :data-testid="`${id}-cancel-button`"
             >
               {{ t('cancel') }}
             </v-btn>

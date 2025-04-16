@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
-import OneSchoolAlert from './OneSchoolAlert.vue';
+import InfoDialog from './InfoDialog.vue';
 import { nextTick } from 'vue';
 
 let wrapper: VueWrapper | null = null;
@@ -12,30 +12,32 @@ beforeEach(() => {
     </div>
   `;
 
-  wrapper = mount(OneSchoolAlert, {
+  wrapper = mount(InfoDialog, {
     props: {
+      id: 'test-id',
       isDialogVisible: true,
       header: 'Test Header',
+      message: 'Test Message',
     },
 
     global: {
       components: {
-        OneSchoolAlert,
+        InfoDialog,
       },
     },
   });
 });
 
-describe('OneSchoolAlert Dialog', () => {
+describe('InfoDialog', () => {
   test('it renders the dialog when isDialogVisible is true', () => {
-    const dialog: VueWrapper | undefined = wrapper?.findComponent({ ref: 'one-school-alert-dialog' });
+    const dialog: VueWrapper | undefined = wrapper?.findComponent({ ref: 'test-id-dialog' });
     expect(dialog?.exists()).toBe(true);
     expect(dialog?.isVisible()).toBe(true);
   });
 
   test('close button is visible and clickable', async () => {
     const syncPersonButton: HTMLElement = (await document.querySelector(
-      '[data-testid="one-school-alert-cancel-button"]',
+      '[data-testid="test-id-cancel-button"]',
     )) as HTMLElement;
     syncPersonButton.click();
     await nextTick();
