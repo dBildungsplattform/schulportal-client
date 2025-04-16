@@ -733,6 +733,12 @@ describe('PersonDetailsView', () => {
   });
 
   test('renders form to add Zuordnung and triggers submit', async () => {
+    organisationStore.getAllOrganisationen = vi.fn().mockResolvedValue(undefined);
+    organisationStore.getKlassenByOrganisationId = vi.fn().mockResolvedValue(undefined);
+    organisationStore.fetchSchuleDetailsForKlassen = vi.fn().mockResolvedValue(undefined);
+    personenkontextStore.processWorkflowStep = vi.fn().mockResolvedValue(undefined);
+    personenkontextStore.updatePersonenkontexte = vi.fn().mockResolvedValue(undefined);
+
     // No existing Zuordnungen for the user for easier testing
     const mockPersonenuebersichtForAddZuordnung: PersonWithUebersicht = {
       personId: '1',
