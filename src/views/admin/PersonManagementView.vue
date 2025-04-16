@@ -77,7 +77,7 @@
   let totalKlassen: number = 0;
   const selectedKlassen: Ref<Array<string>> = ref([]);
   const selectedRollen: Ref<Array<string>> = ref([]);
-  const selectedOrganisationId: Ref<Array<string>> = ref([]);
+  const selectedOrganisationIds: Ref<Array<string>> = ref([]);
   const selectedStatus: Ref<string | null> = ref(null);
   const searchFilter: Ref<string> = ref('');
 
@@ -124,7 +124,7 @@
 
   const filterOrSearchActive: Ref<boolean> = computed(
     () =>
-      (!hasAutoSelectedOrganisation.value && selectedOrganisationId.value.length > 0) ||
+      (!hasAutoSelectedOrganisation.value && selectedOrganisationIds.value.length > 0) ||
       selectedRollen.value.length > 0 ||
       !!searchFilterStore.selectedOrganisationen?.length ||
       !!searchFilterStore.selectedRollen?.length ||
@@ -142,10 +142,10 @@
   });
 
   const selectedOrganisationKennung: ComputedRef<string> = computed(() => {
-    if (selectedOrganisationId.value.length !== 1) {
+    if (selectedOrganisationIds.value.length !== 1) {
       return '';
     }
-    const id: string = selectedOrganisationId.value[0]!;
+    const id: string = selectedOrganisationIds.value[0]!;
     const organisation: Organisation | undefined = organisationStore.allOrganisationen.find(
       (org: Organisation) => org.id === id,
     );
@@ -184,7 +184,7 @@
 
   async function applySearchAndFilters(): Promise<void> {
     await organisationStore.getFilteredKlassen({
-      administriertVon: selectedOrganisationId.value,
+      administriertVon: selectedOrganisationIds.value,
       searchString: searchInputKlassen.value,
     });
     // THe dropdown should be updated as well here alongside the count
@@ -211,7 +211,7 @@
     await personStore.getAllPersons({
       offset: (searchFilterStore.personenPage - 1) * searchFilterStore.personenPerPage,
       limit: searchFilterStore.personenPerPage,
-      organisationIDs: selectedKlassen.value.length ? selectedKlassen.value : selectedOrganisationId.value,
+      organisationIDs: selectedKlassen.value.length ? selectedKlassen.value : selectedOrganisationIds.value,
       rolleIDs: searchFilterStore.selectedRollen || selectedRollen.value,
       searchFilter: searchFilterStore.searchFilterPersonen || searchFilter.value,
       sortField: searchFilterStore.sortField as SortField,
@@ -231,7 +231,7 @@
     await personStore.getAllPersons({
       offset: (searchFilterStore.personenPage - 1) * searchFilterStore.personenPerPage,
       limit: searchFilterStore.personenPerPage,
-      organisationIDs: searchFilterStore.selectedOrganisationen || selectedOrganisationId.value,
+      organisationIDs: searchFilterStore.selectedOrganisationen || selectedOrganisationIds.value,
       rolleIDs: searchFilterStore.selectedRollen || selectedRollen.value,
       searchFilter: searchFilterStore.searchFilterPersonen || searchFilter.value,
     });
@@ -242,11 +242,11 @@
   async function autoSelectOrganisation(): Promise<void> {
     // Autoselect the Orga for the current user that only has 1 Orga assigned to him.
     if (organisationStore.allOrganisationen.length === 1) {
-      selectedOrganisationId.value = [organisationStore.allOrganisationen[0]?.id || ''];
+      selectedOrganisationIds.value = [organisationStore.allOrganisationen[0]?.id || ''];
       hasAutoSelectedOrganisation.value = true;
-      if (selectedOrganisationId.value.length) {
+      if (selectedOrganisationIds.value.length) {
         await organisationStore.getFilteredKlassen({
-          administriertVon: selectedOrganisationId.value,
+          administriertVon: selectedOrganisationIds.value,
           searchString: searchInputKlassen.value,
         });
         // Dropdown wasn't updated. Ideally it should be automatically updated once the selectedOrganisation holds a value.
@@ -286,9 +286,9 @@
     await searchFilterStore.setOrganisationFilterForPersonen(newValue);
     await searchFilterStore.setKlasseFilterForPersonen([]);
     selectedKlassen.value = [];
-    if (selectedOrganisationId.value.length) {
+    if (selectedOrganisationIds.value.length) {
       await organisationStore.getFilteredKlassen({
-        administriertVon: selectedOrganisationId.value,
+        administriertVon: selectedOrganisationIds.value,
         searchString: searchInputKlassen.value,
       });
       // set values for klassen dropdown
@@ -315,7 +315,7 @@
     searchFilterStore.setSearchFilterForPersonen('');
     /* do not reset orgas if orga was autoselected */
     if (!hasAutoSelectedOrganisation.value) {
-      selectedOrganisationId.value = [];
+      selectedOrganisationIds.value = [];
       searchFilterStore.setOrganisationFilterForPersonen([]);
     }
     searchInputOrganisationen.value = '';
@@ -352,12 +352,12 @@
       // fetch new klassen based on search value and include selected klassen
       await organisationStore.getFilteredKlassen({
         searchString: searchValue,
-        administriertVon: selectedOrganisationId.value,
+        administriertVon: selectedOrganisationIds.value,
         organisationIds: selectedKlassen.value,
       });
 
       // set values for klassen dropdown
-      if (selectedOrganisationId.value.length) {
+      if (selectedOrganisationIds.value.length) {
         klassenOptions.value = organisationStore.klassen
           .map((org: Organisation) => ({
             value: org.id,
@@ -403,7 +403,7 @@
         excludeTyp: [OrganisationsTyp.Klasse],
         limit: 25,
         systemrechte: ['PERSONEN_VERWALTEN'],
-        organisationIds: selectedOrganisationId.value,
+        organisationIds: selectedOrganisationIds.value,
       });
     }, 500);
   }
@@ -469,7 +469,7 @@
   }
 
   const singleSchoolSelected: ComputedRef<boolean> = computed(() => {
-    return selectedOrganisationId.value.length === 1;
+    return selectedOrganisationIds.value.length === 1;
   });
 
   const singleSchoolAlertHeader: ComputedRef<string> = computed(() => {
@@ -477,7 +477,7 @@
   });
 
   const selectedOrganisation: ComputedRef<Organisation | undefined> = computed(() => {
-    return organisationStore.allOrganisationen.find((org: Organisation) => org.id === selectedOrganisationId.value[0]);
+    return organisationStore.allOrganisationen.find((org: Organisation) => org.id === selectedOrganisationIds.value[0]);
   });
 
   const checkSingleOrgDisplayDialog = (dialog: Ref<boolean>): void => {
@@ -570,7 +570,7 @@
       limit: 25,
     });
     if (filterOrSearchActive.value) {
-      selectedOrganisationId.value = searchFilterStore.selectedOrganisationen || [];
+      selectedOrganisationIds.value = searchFilterStore.selectedOrganisationen || [];
       selectedRollen.value = searchFilterStore.selectedRollen || [];
       selectedKlassen.value = searchFilterStore.selectedKlassen || [];
       selectedRollenObjects.value = searchFilterStore.selectedRollenObjects;
@@ -582,7 +582,7 @@
       excludeTyp: [OrganisationsTyp.Klasse],
       systemrechte: ['PERSONEN_VERWALTEN'],
       limit: 25,
-      organisationIds: selectedOrganisationId.value,
+      organisationIds: selectedOrganisationIds.value,
     });
 
     await getPaginatedPersonen(searchFilterStore.personenPage);
@@ -632,7 +632,7 @@
           <v-autocomplete
             autocomplete="off"
             class="filter-dropdown"
-            :class="{ selected: selectedOrganisationId.length > 0 }"
+            :class="{ selected: selectedOrganisationIds.length > 0 }"
             clearable
             data-testid="schule-select"
             density="compact"
@@ -650,7 +650,7 @@
             @update:modelValue="setOrganisationFilter"
             @update:search="updateOrganisationSearch"
             variant="outlined"
-            v-model="selectedOrganisationId"
+            v-model="selectedOrganisationIds"
             v-model:search="searchInputOrganisationen"
           >
             <template v-slot:prepend-item>
@@ -674,12 +674,12 @@
             </template>
             <template v-slot:selection="{ item, index }">
               <span
-                v-if="selectedOrganisationId.length < 2"
+                v-if="selectedOrganisationIds.length < 2"
                 class="v-autocomplete__selection-text"
                 >{{ item.title }}</span
               >
               <div v-else-if="index === 0">
-                {{ $t('admin.schule.schulenSelected', { count: selectedOrganisationId.length }) }}
+                {{ $t('admin.schule.schulenSelected', { count: selectedOrganisationIds.length }) }}
               </div>
             </template>
           </v-autocomplete>
@@ -747,7 +747,7 @@
           class="py-md-0"
         >
           <v-tooltip
-            :disabled="!!selectedOrganisationId.length"
+            :disabled="!!selectedOrganisationIds.length"
             location="top"
           >
             <template v-slot:activator="{ props }">
@@ -759,7 +759,7 @@
                   clearable
                   data-testid="klasse-select"
                   density="compact"
-                  :disabled="!selectedOrganisationId.length"
+                  :disabled="!selectedOrganisationIds.length"
                   hide-details
                   id="klasse-select"
                   :items="klassenOptions"
@@ -900,7 +900,7 @@
             ref="person-bulk-password-reset"
             v-if="passwordResetDialogVisible"
             :isDialogVisible="passwordResetDialogVisible"
-            :isSelectionFromSingleSchule="selectedOrganisationId.length === 1"
+            :isSelectionFromSingleSchule="selectedOrganisationIds.length === 1"
             :selectedSchuleKennung="selectedOrganisationKennung"
             :selectedPersons
             @update:dialogExit="handleBulkPasswordResetDialog($event)"
