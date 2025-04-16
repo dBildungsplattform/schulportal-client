@@ -5,6 +5,7 @@
   import { type Ref } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
+  import { getDisplayNameForOrg } from '@/utils/formatting';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
@@ -51,9 +52,16 @@
             class="text-center"
             cols="10"
           >
-            <span data-testid="org-unassign-confirmation-text">
-              {{ t('admin.person.bulkUnassignOrganisation.confirmation', { schule: selectedOrganisation.name }) }}
-            </span>
+            <div data-testid="org-unassign-confirmation-text">
+              {{ t('admin.person.bulkUnassignOrganisation.confirmation') }}
+            </div>
+            <div data-testid="org-unassign-affected-school">
+              {{
+                t('admin.person.bulkUnassignOrganisation.affectedSchool', {
+                  schule: getDisplayNameForOrg(selectedOrganisation),
+                })
+              }}
+            </div>
           </v-col>
         </v-row>
       </v-container>
