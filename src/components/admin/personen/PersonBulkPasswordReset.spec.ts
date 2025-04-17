@@ -12,7 +12,6 @@ const personStore: PersonStore = usePersonStore();
 
 type Props = {
   isDialogVisible: boolean;
-  isSelectionFromSingleSchule: boolean;
   selectedSchuleKennung?: string;
   selectedPersons: PersonenWithRolleAndZuordnung;
 };
@@ -20,7 +19,6 @@ type Props = {
 function mountComponent(partialProps: Partial<Props> = {}): VueWrapper {
   const props: Props = {
     isDialogVisible: true,
-    isSelectionFromSingleSchule: true,
     selectedSchuleKennung: '1234567',
     selectedPersons: [
       {
@@ -79,7 +77,7 @@ beforeEach(async () => {
   vi.restoreAllMocks();
 });
 
-describe('PersonBulkDelete', () => {
+describe('PersonBulkPasswordReset', () => {
   test.each([[true], [false]])('renders the dialog when isDialogVisible=%s', async (isDialogVisible: boolean) => {
     mountComponent({ isDialogVisible });
     await nextTick();
@@ -87,25 +85,6 @@ describe('PersonBulkDelete', () => {
     if (isDialogVisible) expect(layoutCard).not.toBeNull();
     else expect(layoutCard).toBeNull();
   });
-
-  test.each([[true], [false]])(
-    'switches between error and confirmation text when isSelectionFromSingleSchule=%s',
-    async (isSelectionFromSingleSchule: boolean) => {
-      mountComponent({ isSelectionFromSingleSchule });
-      await nextTick();
-      const errorMessage: Element | null = document.body.querySelector('[data-testid="error-text"]');
-      const confirmationMessage: Element | null = document.body.querySelector(
-        '[data-testid="password-reset-confirmation-text"]',
-      );
-      if (isSelectionFromSingleSchule) {
-        expect(errorMessage).toBeNull();
-        expect(confirmationMessage).not.toBeNull();
-      } else {
-        expect(errorMessage).not.toBeNull();
-        expect(confirmationMessage).toBeNull();
-      }
-    },
-  );
 
   test('when state changes, it switches to next template', async () => {
     type UiElements = {

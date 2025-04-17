@@ -733,6 +733,12 @@ describe('PersonDetailsView', () => {
   });
 
   test('renders form to add Zuordnung and triggers submit', async () => {
+    organisationStore.getAllOrganisationen = vi.fn().mockResolvedValue(undefined);
+    organisationStore.getKlassenByOrganisationId = vi.fn().mockResolvedValue(undefined);
+    organisationStore.fetchSchuleDetailsForKlassen = vi.fn().mockResolvedValue(undefined);
+    personenkontextStore.processWorkflowStep = vi.fn().mockResolvedValue(undefined);
+    personenkontextStore.updatePersonenkontexte = vi.fn().mockResolvedValue(undefined);
+
     // No existing Zuordnungen for the user for easier testing
     const mockPersonenuebersichtForAddZuordnung: PersonWithUebersicht = {
       personId: '1',
@@ -829,7 +835,11 @@ describe('PersonDetailsView', () => {
   });
 
   test('renders form to change Klasse and triggers submit', async () => {
+    organisationStore.getAllOrganisationen = vi.fn().mockResolvedValue(undefined);
     organisationStore.getKlassenByOrganisationId = vi.fn().mockResolvedValue(undefined);
+    organisationStore.fetchSchuleDetailsForKlassen = vi.fn().mockResolvedValue(undefined);
+    personenkontextStore.processWorkflowStep = vi.fn().mockResolvedValue(undefined);
+    personenkontextStore.updatePersonenkontexte = vi.fn().mockResolvedValue(undefined);
 
     await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
     await nextTick();
@@ -1043,6 +1053,9 @@ describe('PersonDetailsView', () => {
     ])(
       'renders form to change befristung with %s %s and triggers submit',
       async (existingBefristung: string | undefined, existingBefristungOption: string | undefined) => {
+        personenkontextStore.processWorkflowStep = vi.fn().mockResolvedValue(undefined);
+        personenkontextStore.updatePersonenkontexte = vi.fn().mockResolvedValue(undefined);
+
         personStore.personenuebersicht = mockPersonenuebersichtLehr;
         if (personStore.personenuebersicht.zuordnungen[0]) {
           if (existingBefristung) {

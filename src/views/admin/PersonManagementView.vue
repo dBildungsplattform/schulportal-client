@@ -31,6 +31,8 @@
   import { type Composer, useI18n } from 'vue-i18n';
   import { type Router, useRouter } from 'vue-router';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
+  import OrganisationUnassign from '@/components/admin/schulen/OrganisationUnassign.vue';
+  import InfoDialog from '@/components/alert/InfoDialog.vue';
 
   const searchFieldComponent: Ref = ref();
 
@@ -75,7 +77,7 @@
   let totalKlassen: number = 0;
   const selectedKlassen: Ref<Array<string>> = ref([]);
   const selectedRollen: Ref<Array<string>> = ref([]);
-  const selectedOrganisation: Ref<Array<string>> = ref([]);
+  const selectedOrganisationIds: Ref<Array<string>> = ref([]);
   const selectedStatus: Ref<string | null> = ref(null);
   const searchFilter: Ref<string> = ref('');
 
@@ -86,6 +88,8 @@
   const rolleModifiyDialogVisible: Ref<boolean> = ref(false);
   const benutzerDeleteDialogVisible: Ref<boolean> = ref(false);
   const passwordResetDialogVisible: Ref<boolean> = ref(false);
+  const organisationUnassignDialogVisible: Ref<boolean> = ref(false);
+  const onlyOneSchoolAlertDialogVisible: Ref<boolean> = ref(false);
 
   const selectedOption: Ref<string | null> = ref(null);
 
@@ -96,6 +100,7 @@
     MODIFY_ROLLE = 'MODIFY_ROLLE',
     DELETE_PERSON = 'DELETE_PERSON',
     RESET_PASSWORD = 'RESET_PASSWORD',
+    ORG_UNASSIGN = 'ORG_UNASSIGN',
   }
 
   // Computed property for generating options dynamically for v-selects
@@ -108,6 +113,7 @@
 
     if (authStore.hasPersonenverwaltungPermission) {
       actionTypeTitles.set(ActionTypes.RESET_PASSWORD, t('admin.person.resetPassword'));
+      actionTypeTitles.set(ActionTypes.ORG_UNASSIGN, t('admin.person.bulkUnassignOrganisation.cancelZuordnung'));
     }
 
     return [...actionTypeTitles.entries()].map(([key, value]: [string, string]) => ({
@@ -118,7 +124,7 @@
 
   const filterOrSearchActive: Ref<boolean> = computed(
     () =>
-      (!hasAutoSelectedOrganisation.value && selectedOrganisation.value.length > 0) ||
+      (!hasAutoSelectedOrganisation.value && selectedOrganisationIds.value.length > 0) ||
       selectedRollen.value.length > 0 ||
       !!searchFilterStore.selectedOrganisationen?.length ||
       !!searchFilterStore.selectedRollen?.length ||
@@ -136,10 +142,10 @@
   });
 
   const selectedOrganisationKennung: ComputedRef<string> = computed(() => {
-    if (selectedOrganisation.value.length !== 1) {
+    if (selectedOrganisationIds.value.length !== 1) {
       return '';
     }
-    const id: string = selectedOrganisation.value[0]!;
+    const id: string = selectedOrganisationIds.value[0]!;
     const organisation: Organisation | undefined = organisationStore.allOrganisationen.find(
       (org: Organisation) => org.id === id,
     );
@@ -178,7 +184,7 @@
 
   async function applySearchAndFilters(): Promise<void> {
     await organisationStore.getFilteredKlassen({
-      administriertVon: selectedOrganisation.value,
+      administriertVon: selectedOrganisationIds.value,
       searchString: searchInputKlassen.value,
       organisationIds: selectedKlassen.value,
     });
@@ -206,7 +212,7 @@
     await personStore.getAllPersons({
       offset: (searchFilterStore.personenPage - 1) * searchFilterStore.personenPerPage,
       limit: searchFilterStore.personenPerPage,
-      organisationIDs: selectedKlassen.value.length ? selectedKlassen.value : selectedOrganisation.value,
+      organisationIDs: selectedKlassen.value.length ? selectedKlassen.value : selectedOrganisationIds.value,
       rolleIDs: searchFilterStore.selectedRollen || selectedRollen.value,
       searchFilter: searchFilterStore.searchFilterPersonen || searchFilter.value,
       sortField: searchFilterStore.sortField as SortField,
@@ -226,7 +232,7 @@
     await personStore.getAllPersons({
       offset: (searchFilterStore.personenPage - 1) * searchFilterStore.personenPerPage,
       limit: searchFilterStore.personenPerPage,
-      organisationIDs: searchFilterStore.selectedOrganisationen || selectedOrganisation.value,
+      organisationIDs: searchFilterStore.selectedOrganisationen || selectedOrganisationIds.value,
       rolleIDs: searchFilterStore.selectedRollen || selectedRollen.value,
       searchFilter: searchFilterStore.searchFilterPersonen || searchFilter.value,
     });
@@ -237,11 +243,11 @@
   async function autoSelectOrganisation(): Promise<void> {
     // Autoselect the Orga for the current user that only has 1 Orga assigned to him.
     if (organisationStore.allOrganisationen.length === 1) {
-      selectedOrganisation.value = [organisationStore.allOrganisationen[0]?.id || ''];
+      selectedOrganisationIds.value = [organisationStore.allOrganisationen[0]?.id || ''];
       hasAutoSelectedOrganisation.value = true;
-      if (selectedOrganisation.value.length) {
+      if (selectedOrganisationIds.value.length) {
         await organisationStore.getFilteredKlassen({
-          administriertVon: selectedOrganisation.value,
+          administriertVon: selectedOrganisationIds.value,
           searchString: searchInputKlassen.value,
         });
         // Dropdown wasn't updated. Ideally it should be automatically updated once the selectedOrganisation holds a value.
@@ -281,9 +287,9 @@
     await searchFilterStore.setOrganisationFilterForPersonen(newValue);
     await searchFilterStore.setKlasseFilterForPersonen([]);
     selectedKlassen.value = [];
-    if (selectedOrganisation.value.length) {
+    if (selectedOrganisationIds.value.length) {
       await organisationStore.getFilteredKlassen({
-        administriertVon: selectedOrganisation.value,
+        administriertVon: selectedOrganisationIds.value,
         searchString: searchInputKlassen.value,
       });
       // set values for klassen dropdown
@@ -310,7 +316,7 @@
     searchFilterStore.setSearchFilterForPersonen('');
     /* do not reset orgas if orga was autoselected */
     if (!hasAutoSelectedOrganisation.value) {
-      selectedOrganisation.value = [];
+      selectedOrganisationIds.value = [];
       searchFilterStore.setOrganisationFilterForPersonen([]);
     }
     searchInputOrganisationen.value = '';
@@ -347,12 +353,12 @@
       // fetch new klassen based on search value and include selected klassen
       await organisationStore.getFilteredKlassen({
         searchString: searchValue,
-        administriertVon: selectedOrganisation.value,
+        administriertVon: selectedOrganisationIds.value,
         organisationIds: selectedKlassen.value,
       });
 
       // set values for klassen dropdown
-      if (selectedOrganisation.value.length) {
+      if (selectedOrganisationIds.value.length) {
         klassenOptions.value = organisationStore.klassen
           .map((org: Organisation) => ({
             value: org.id,
@@ -398,7 +404,7 @@
         excludeTyp: [OrganisationsTyp.Klasse],
         limit: 25,
         systemrechte: ['PERSONEN_VERWALTEN'],
-        organisationIds: selectedOrganisation.value,
+        organisationIds: selectedOrganisationIds.value,
       });
     }, 500);
   }
@@ -463,6 +469,26 @@
     getPaginatedPersonen(searchFilterStore.personenPage);
   }
 
+  const singleSchoolSelected: ComputedRef<boolean> = computed(() => {
+    return selectedOrganisationIds.value.length === 1;
+  });
+
+  const singleSchoolAlertHeader: ComputedRef<string> = computed(() => {
+    return actions.value.find((action: TranslatedObject) => action.value === selectedOption.value)?.title || '';
+  });
+
+  const selectedOrganisation: ComputedRef<Organisation | undefined> = computed(() => {
+    return organisationStore.allOrganisationen.find((org: Organisation) => org.id === selectedOrganisationIds.value[0]);
+  });
+
+  const checkSingleOrgDisplayDialog = (dialog: Ref<boolean>): void => {
+    if (!singleSchoolSelected.value) {
+      onlyOneSchoolAlertDialogVisible.value = true;
+      return;
+    }
+    dialog.value = true;
+  };
+
   // Handle the selected action
   const handleOption = (newValue: string | null): void => {
     if (!newValue) return;
@@ -475,14 +501,17 @@
         benutzerDeleteDialogVisible.value = true;
         break;
       case ActionTypes.RESET_PASSWORD:
-        passwordResetDialogVisible.value = true;
+        checkSingleOrgDisplayDialog(passwordResetDialogVisible);
         break;
+      case ActionTypes.ORG_UNASSIGN:
+        checkSingleOrgDisplayDialog(organisationUnassignDialogVisible);
     }
   };
 
   // Handles the event when closing the dialog
   const handleRolleModifyDialog = (isDialogVisible: boolean): void => {
     rolleModifiyDialogVisible.value = isDialogVisible;
+    organisationUnassignDialogVisible.value = isDialogVisible;
     selectedOption.value = null;
   };
 
@@ -499,6 +528,15 @@
   const handleBulkPasswordResetDialog = async (_finished: boolean): Promise<void> => {
     passwordResetDialogVisible.value = false;
     selectedOption.value = null;
+  };
+  const handleUnassignOrgDialog = async (finished: boolean): Promise<void> => {
+    organisationUnassignDialogVisible.value = false;
+    selectedOption.value = null;
+    if (finished) {
+      selectedPersonIds.value = [];
+      await getPaginatedPersonen(searchFilterStore.personenPage);
+      resultTable.value.resetSelection();
+    }
   };
 
   function handleSelectedRows(selectedItems: TableItem[]): void {
@@ -533,7 +571,7 @@
       limit: 25,
     });
     if (filterOrSearchActive.value) {
-      selectedOrganisation.value = searchFilterStore.selectedOrganisationen || [];
+      selectedOrganisationIds.value = searchFilterStore.selectedOrganisationen || [];
       selectedRollen.value = searchFilterStore.selectedRollen || [];
       selectedKlassen.value = searchFilterStore.selectedKlassen || [];
       selectedRollenObjects.value = searchFilterStore.selectedRollenObjects;
@@ -545,7 +583,7 @@
       excludeTyp: [OrganisationsTyp.Klasse],
       systemrechte: ['PERSONEN_VERWALTEN'],
       limit: 25,
-      organisationIds: selectedOrganisation.value,
+      organisationIds: selectedOrganisationIds.value,
     });
 
     await getPaginatedPersonen(searchFilterStore.personenPage);
@@ -595,7 +633,7 @@
           <v-autocomplete
             autocomplete="off"
             class="filter-dropdown"
-            :class="{ selected: selectedOrganisation.length > 0 }"
+            :class="{ selected: selectedOrganisationIds.length > 0 }"
             clearable
             data-testid="schule-select"
             density="compact"
@@ -613,7 +651,7 @@
             @update:modelValue="setOrganisationFilter"
             @update:search="updateOrganisationSearch"
             variant="outlined"
-            v-model="selectedOrganisation"
+            v-model="selectedOrganisationIds"
             v-model:search="searchInputOrganisationen"
           >
             <template v-slot:prepend-item>
@@ -637,12 +675,12 @@
             </template>
             <template v-slot:selection="{ item, index }">
               <span
-                v-if="selectedOrganisation.length < 2"
+                v-if="selectedOrganisationIds.length < 2"
                 class="v-autocomplete__selection-text"
                 >{{ item.title }}</span
               >
               <div v-else-if="index === 0">
-                {{ $t('admin.schule.schulenSelected', { count: selectedOrganisation.length }) }}
+                {{ $t('admin.schule.schulenSelected', { count: selectedOrganisationIds.length }) }}
               </div>
             </template>
           </v-autocomplete>
@@ -710,7 +748,7 @@
           class="py-md-0"
         >
           <v-tooltip
-            :disabled="!!selectedOrganisation.length"
+            :disabled="!!selectedOrganisationIds.length"
             location="top"
           >
             <template v-slot:activator="{ props }">
@@ -722,7 +760,7 @@
                   clearable
                   data-testid="klasse-select"
                   density="compact"
-                  :disabled="!selectedOrganisation.length"
+                  :disabled="!selectedOrganisationIds.length"
                   hide-details
                   id="klasse-select"
                   :items="klassenOptions"
@@ -824,6 +862,18 @@
               @update:modelValue="handleOption"
             ></v-select>
           </SpshTooltip>
+          <InfoDialog
+            id="only-one-school"
+            :isDialogVisible="onlyOneSchoolAlertDialogVisible"
+            :header="singleSchoolAlertHeader"
+            :message="$t('admin.person.onlyOneSchoolAlert')"
+            @update:dialogExit="
+              () => {
+                onlyOneSchoolAlertDialogVisible = false;
+                selectedOption = null;
+              }
+            "
+          />
           <RolleModify
             ref="person-bulk-rolle-modify"
             v-if="rolleModifiyDialogVisible"
@@ -851,12 +901,21 @@
             ref="person-bulk-password-reset"
             v-if="passwordResetDialogVisible"
             :isDialogVisible="passwordResetDialogVisible"
-            :isSelectionFromSingleSchule="selectedOrganisation.length === 1"
+            :isSelectionFromSingleSchule="selectedOrganisationIds.length === 1"
             :selectedSchuleKennung="selectedOrganisationKennung"
             :selectedPersons
             @update:dialogExit="handleBulkPasswordResetDialog($event)"
           >
           </PersonBulkPasswordReset>
+          <OrganisationUnassign
+            ref="organisation-unassign"
+            v-if="organisationUnassignDialogVisible && selectedOrganisation"
+            :isDialogVisible="organisationUnassignDialogVisible"
+            :selectedPersonenIds="selectedPersonIds"
+            :selectedOrganisation="selectedOrganisation"
+            @update:dialogExit="handleUnassignOrgDialog($event)"
+          >
+          </OrganisationUnassign>
         </v-col>
         <!-- Display the number of selected checkboxes -->
         <v-col

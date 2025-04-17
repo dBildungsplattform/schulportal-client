@@ -17,7 +17,6 @@
 
   type Props = {
     isDialogVisible: boolean;
-    isSelectionFromSingleSchule: boolean;
     selectedSchuleKennung?: string;
     selectedPersons: PersonenWithRolleAndZuordnung;
   };
@@ -119,21 +118,7 @@
         class="mt-8 mb-4"
         v-if="progressState === State.INITIAL"
       >
-        <template v-if="!isSelectionFromSingleSchule">
-          <v-row class="text-body text-error justify-center">
-            <v-icon
-              class="mr-4"
-              icon="mdi-alert"
-            ></v-icon>
-            <span data-testid="error-text">
-              {{ t('admin.person.bulkPasswordReset.error.onlyOneSchool') }}
-            </span>
-          </v-row>
-        </template>
-        <v-row
-          v-else
-          class="text-body bold justify-center"
-        >
+        <v-row class="text-body bold justify-center">
           <span data-testid="password-reset-confirmation-text">
             {{ t('admin.person.bulkPasswordReset.confirmation') }}
           </span>
@@ -230,7 +215,7 @@
             md="auto"
           >
             <v-btn
-              v-if="progressState === State.INITIAL && isSelectionFromSingleSchule"
+              v-if="progressState === State.INITIAL"
               :block="mdAndDown"
               :disabled="personStore.loading"
               class="primary"
