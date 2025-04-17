@@ -157,19 +157,23 @@
     }
   });
 
-  function prepareSchuleToAssign(schule: Organisation): void {
-    /* add isNotPersisted flag */
-    const schuleWithPersistence: Organisation = { ...schule, isNotPersisted: true };
+  function prepareSchuleToAssign(schuleToAssign: Organisation): void {
+    /* if schule is member of persisted schulen, remove isNotPersistedFlag */
+    if (organisationStore.schulenFromTraeger.some((schuleFromTraeger: Organisation) => schuleFromTraeger.id === schuleToAssign.id)) {
+      delete schuleToAssign['isNotPersisted'];
+    } else {
+      schuleToAssign = { ...schuleToAssign, isNotPersisted: true };
+    }
 
-    assignedSchulen.value = [schuleWithPersistence, ...assignedSchulen.value];
-    unassignedSchulen.value = unassignedSchulen.value.filter((item: Organisation) => item.id !== schule.id);
+    assignedSchulen.value = [schuleToAssign, ...assignedSchulen.value];
+    unassignedSchulen.value = unassignedSchulen.value.filter((item: Organisation) => item.id !== schuleToAssign.id);
   }
 
   function prepareSchuleToUnassign(schule: Organisation): void {
     /* add isNotPersisted flag */
-    const schuleWithPersistence: Organisation = { ...schule, isNotPersisted: true };
+    const schuleWithPersistenceFlag: Organisation = { ...schule, isNotPersisted: true };
 
-    unassignedSchulen.value = [schuleWithPersistence, ...unassignedSchulen.value];
+    unassignedSchulen.value = [schuleWithPersistenceFlag, ...unassignedSchulen.value];
     assignedSchulen.value = assignedSchulen.value.filter((item: Organisation) => item.id !== schule.id);
   }
 
@@ -184,10 +188,17 @@
 
       /* if no search string is given, use store variable as leading source to get all schulen from traeger */
       if (!searchString) {
-        /* if there are unpersisted schulen, add them back in first */
+        /* if there are unpersisted schulen to unassign, remove them from list, else keep assignedSchulen value */
+        assignedSchulen.value = unpersistedSchulenToUnassign.value.length > 0 ? organisationStore.schulenFromTraeger.filter((schule: Organisation) => {
+          return unpersistedSchulenToUnassign.value.some((unpersistedSchule: Organisation) => {
+            return unpersistedSchule.id !== schule.id;
+          });
+        }) : assignedSchulen.value;
+
+        /* if there are unpersisted schulen to assign, prepend them */
         assignedSchulen.value = unpersistedSchulenToAssign.value.length
-          ? [...unpersistedSchulenToAssign.value, ...organisationStore.schulenFromTraeger]
-          : organisationStore.schulenFromTraeger;
+          ? [...unpersistedSchulenToAssign.value, ...assignedSchulen.value]
+          : assignedSchulen.value;
       } else {
         /* search locally in assigned schulen */
         assignedSchulen.value = assignedSchulen.value.filter((schule: Organisation) => {
