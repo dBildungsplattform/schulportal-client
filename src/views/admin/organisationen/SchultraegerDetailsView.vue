@@ -198,9 +198,9 @@
         assignedSchulen.value =
           unpersistedSchulenToUnassign.value.length > 0
             ? organisationStore.schulenFromTraeger.filter((schule: Organisation) => {
-          return unpersistedSchulenToUnassign.value.some((unpersistedSchule: Organisation) => {
-            return unpersistedSchule.id !== schule.id;
-          });
+                return unpersistedSchulenToUnassign.value.some((unpersistedSchule: Organisation) => {
+                  return unpersistedSchule.id !== schule.id;
+                });
               })
             : assignedSchulen.value;
 
@@ -250,7 +250,7 @@
 
       /* If no search string is given then ask for Input first */
       if (!searchString) {
-        unassignedSchulen.value = [];
+        unassignedSchulen.value = unpersistedSchulenToUnassignCache.length ? unpersistedSchulenToUnassignCache : [];
         noUnassignedSchulenFoundText.value = t('admin.schultraeger.unassignedSchulenDefaultText');
         return;
       }
