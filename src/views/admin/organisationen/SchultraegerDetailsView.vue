@@ -152,7 +152,7 @@
 
       /* Show success message only after all items have been processed */
       if (!organisationStore.errorCode) {
-        successMessage.value = t('admin.schultraeger.schulenUnassignedSuccessfully');
+        successMessage.value = t('admin.schultraeger.schulenAssignedSuccessfully');
       }
     }
   });

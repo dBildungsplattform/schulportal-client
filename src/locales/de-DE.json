@@ -546,8 +546,7 @@
           "required": "Der Schulträgername muss angegeben werden."
         }
       },
-      "schulenAssignedSuccessfully": "Die Schulen wurden erfolgreich zugeordnet.",
-      "schulenUnassignedSuccessfully": "Die Schulen wurden erfolgreich entfernt.",
+      "schulenAssignedSuccessfully": "Die Zuordnungen wurden erfolgreich bearbeitet.",
       "schulenWithoutTraeger": "Schulen ohne Träger",
       "schulenOfThisTraeger": "Schulen dieses Trägers ({amount})",
       "schultraegerAddedSuccessfully": "Der Schulträger wurde erfolgreich hinzugefügt.",
