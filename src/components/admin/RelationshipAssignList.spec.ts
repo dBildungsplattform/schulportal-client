@@ -17,6 +17,7 @@ function mountComponent(): VueWrapper {
   return mount(RelationshipAssignList, {
     attachTo: document.getElementById('app') || '',
     props: {
+      dataTestId: 'assign-list',
       items: mockItems,
       noItemsFoundText: 'No items found',
     },

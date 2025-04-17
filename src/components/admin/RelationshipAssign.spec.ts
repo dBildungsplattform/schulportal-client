@@ -71,10 +71,19 @@ describe('RelationshipAssign', () => {
     expect(true).toBeTruthy();
   });
 
+  test('it emits onHandleAssignedItemClick when an assigned item is clicked', async () => {
+    const assignedItem: Organisation | undefined = mockUnassignedItems[0];
+
+    await wrapper?.findComponent({ ref: 'assignedItemsList' }).vm.$emit('onHandleItemClick', assignedItem);
+
+    expect(wrapper?.emitted('onHandleAssignedItemClick')).toBeTruthy();
+    expect(wrapper?.emitted('onHandleAssignedItemClick')?.[0]).toEqual([assignedItem]);
+  });
+
   test('it emits onHandleUnassignedItemClick when an unassigned item is clicked', async () => {
     const unassignedItem: Organisation | undefined = mockUnassignedItems[0];
 
-    await wrapper?.findComponent({ name: 'RelationshipAssignList' }).vm.$emit('onHandleItemClick', unassignedItem);
+    await wrapper?.findComponent({ ref: 'unassignedItemsList' }).vm.$emit('onHandleItemClick', unassignedItem);
 
     expect(wrapper?.emitted('onHandleUnassignedItemClick')).toBeTruthy();
     expect(wrapper?.emitted('onHandleUnassignedItemClick')?.[0]).toEqual([unassignedItem]);
