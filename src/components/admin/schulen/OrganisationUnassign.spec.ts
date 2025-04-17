@@ -3,13 +3,13 @@ import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import OrganisationUnassign from './OrganisationUnassign.vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import routes from '@/router/routes';
-import { type PersonenkontextStore, usePersonenkontextStore } from '@/stores/PersonenkontextStore';
 import { nextTick } from 'vue';
 import type { MockInstance } from 'vitest';
+import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
-const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
+const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
 
 type Props = {
   isDialogVisible: boolean;
@@ -49,7 +49,7 @@ beforeEach(async () => {
 
   await router.push('/');
   await router.isReady();
-  personenkontextStore.$reset();
+  bulkOperationStore.$reset();
   vi.restoreAllMocks();
 });
 
@@ -73,7 +73,7 @@ describe('OrganisationUnassign', () => {
     expect(submitButton).not.toBeNull();
     await nextTick();
 
-    const unassignPersonenkontexteSpy: MockInstance = vi.spyOn(personenkontextStore, 'unassignPersonenFromOrg');
+    const unassignPersonenkontexteSpy: MockInstance = vi.spyOn(bulkOperationStore, 'unassignPersonenFromOrg');
 
     if (submitButton) {
       submitButton.dispatchEvent(new Event('click'));
@@ -93,12 +93,12 @@ describe('OrganisationUnassign', () => {
     await flushPromises();
 
     expect(wrapper.emitted('update:dialogExit')).toEqual([[false]]);
-    expect(personenkontextStore.bulkProgress).toEqual(0);
+    expect(bulkOperationStore.progress).toEqual(0);
   });
 
   test('shows progressbar when unassigning', async () => {
     wrapper = mountComponent();
-    personenkontextStore.bulkProgress = 25;
+    bulkOperationStore.progress = 25;
     await nextTick();
 
     const progressBar: Element | null = document.body.querySelector('[data-testid="org-unassign-progressbar"]');

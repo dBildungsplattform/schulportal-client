@@ -1,16 +1,16 @@
 <script setup lang="ts">
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { type Organisation } from '@/stores/OrganisationStore';
-  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
   import { type Ref } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
   import { getDisplayNameForOrg } from '@/utils/formatting';
+  import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
-  const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
+  const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
 
   type Props = {
     isDialogVisible: boolean;
@@ -24,12 +24,12 @@
   const emit: Emits = defineEmits<Emits>();
 
   async function closeDialog(finished: boolean): Promise<void> {
-    personenkontextStore.bulkProgress = 0;
+    bulkOperationStore.progress = 0;
     emit('update:dialogExit', finished);
   }
 
   async function handleOrgUnassign(): Promise<void> {
-    await personenkontextStore.unassignPersonenFromOrg(props.selectedOrganisation.id, props.selectedPersonenIds);
+    await bulkOperationStore.unassignPersonenFromOrg(props.selectedOrganisation.id, props.selectedPersonenIds);
   }
 </script>
 
@@ -45,7 +45,7 @@
       <!-- Initial block -->
       <v-container
         class="mt-8 mb-4"
-        v-if="personenkontextStore.bulkProgress === 0"
+        v-if="bulkOperationStore.progress === 0"
       >
         <v-row class="text-body bold justify-center">
           <v-col
@@ -68,10 +68,10 @@
 
       <!-- In progress -->
       <v-container
-        v-if="personenkontextStore.bulkProgress > 0"
+        v-if="bulkOperationStore.progress > 0"
         class="mt-4"
       >
-        <v-container v-if="personenkontextStore.bulkProgress === 100">
+        <v-container v-if="bulkOperationStore.progress === 100">
           <v-row justify="center">
             <v-col cols="auto">
               <v-icon
@@ -86,7 +86,7 @@
           </p>
         </v-container>
         <v-row
-          v-if="personenkontextStore.bulkProgress < 100"
+          v-if="bulkOperationStore.progress < 100"
           align="center"
           justify="center"
         >
@@ -108,7 +108,7 @@
         <!-- Progress Bar -->
         <v-progress-linear
           class="mt-5"
-          :modelValue="personenkontextStore.bulkProgress"
+          :modelValue="bulkOperationStore.progress"
           color="primary"
           height="25"
           data-testid="org-unassign-progressbar"
@@ -127,7 +127,7 @@
             md="auto"
           >
             <v-btn
-              v-if="personenkontextStore.bulkProgress === 100"
+              v-if="bulkOperationStore.progress === 100"
               :block="mdAndDown"
               class="primary"
               @click="closeDialog(true)"
@@ -136,7 +136,7 @@
               {{ t('close') }}
             </v-btn>
             <v-btn
-              v-else-if="personenkontextStore.bulkProgress === 0"
+              v-else-if="bulkOperationStore.progress === 0"
               :block="mdAndDown"
               class="secondary"
               @click="closeDialog(false)"
@@ -151,9 +151,9 @@
             md="auto"
           >
             <v-btn
-              v-if="personenkontextStore.bulkProgress === 0"
+              v-if="bulkOperationStore.progress === 0"
               :block="mdAndDown"
-              :disabled="personenkontextStore.loading"
+              :disabled="bulkOperationStore.isOperationRunning"
               class="primary"
               @click="handleOrgUnassign()"
               data-testid="org-unassign-submit-button"
