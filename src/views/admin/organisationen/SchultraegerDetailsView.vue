@@ -157,10 +157,16 @@
     }
   });
 
-  function prepareSchuleToAssign(schuleToAssign: Organisation): void {
+  function prepareSchuleToAssign(schule: Organisation): void {
+    let schuleToAssign: Organisation = schule;
+
     /* if schule is member of persisted schulen, remove isNotPersistedFlag */
-    if (organisationStore.schulenFromTraeger.some((schuleFromTraeger: Organisation) => schuleFromTraeger.id === schuleToAssign.id)) {
-      delete schuleToAssign['isNotPersisted'];
+    if (
+      organisationStore.schulenFromTraeger.some(
+        (schuleFromTraeger: Organisation) => schuleFromTraeger.id === schuleToAssign.id,
+      )
+    ) {
+      delete schuleToAssign.isNotPersisted;
     } else {
       schuleToAssign = { ...schuleToAssign, isNotPersisted: true };
     }
@@ -189,11 +195,14 @@
       /* if no search string is given, use store variable as leading source to get all schulen from traeger */
       if (!searchString) {
         /* if there are unpersisted schulen to unassign, remove them from list, else keep assignedSchulen value */
-        assignedSchulen.value = unpersistedSchulenToUnassign.value.length > 0 ? organisationStore.schulenFromTraeger.filter((schule: Organisation) => {
+        assignedSchulen.value =
+          unpersistedSchulenToUnassign.value.length > 0
+            ? organisationStore.schulenFromTraeger.filter((schule: Organisation) => {
           return unpersistedSchulenToUnassign.value.some((unpersistedSchule: Organisation) => {
             return unpersistedSchule.id !== schule.id;
           });
-        }) : assignedSchulen.value;
+              })
+            : assignedSchulen.value;
 
         /* if there are unpersisted schulen to assign, prepend them */
         assignedSchulen.value = unpersistedSchulenToAssign.value.length
