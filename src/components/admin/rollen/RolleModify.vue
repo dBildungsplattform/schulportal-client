@@ -12,7 +12,7 @@
   import { usePersonenkontextStore, type PersonenkontextStore, type Zuordnung } from '@/stores/PersonenkontextStore';
   import { OrganisationsTyp, type Organisation } from '@/stores/OrganisationStore';
   import type { RollenArt, RollenMerkmal } from '@/stores/RolleStore';
-  import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
+  import { usePersonStore, type PersonenWithRolleAndZuordnung, type PersonStore } from '@/stores/PersonStore';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
@@ -23,6 +23,7 @@
   const progress: Ref<number> = ref<number>(0);
   const canCommit: Ref<boolean> = ref(false);
   const successMessage: Ref<string> = ref<string>('');
+  const bulkErrorList: Ref<BulkError[]> = ref([]);
 
   type Props = {
     errorCode: string;
@@ -30,12 +31,18 @@
     rollen: TranslatedRolleWithAttrs[] | undefined;
     isLoading: boolean;
     isDialogVisible: boolean;
-    personIDs: string[];
+    selectedPersons: PersonenWithRolleAndZuordnung;
   };
 
   type Emits = {
     (event: 'update:isDialogVisible', isDialogVisible: boolean): void;
     (event: 'update:getUebersichten'): void;
+  };
+
+  type BulkError = {
+    error: string;
+    vorname: string;
+    nachname: string;
   };
 
   const props: Props = defineProps<Props>();
@@ -105,6 +112,7 @@
     const organisation: Organisation | undefined = personenkontextStore.workflowStepResponse?.organisations.find(
       (orga: Organisation) => orga.id === selectedOrganisation.value,
     );
+    
 
     if (organisation) {
       const baseZuordnung: Zuordnung = {
@@ -272,7 +280,7 @@
               :block="mdAndDown"
               :disabled="!canCommit || personenkontextStore.loading"
               class="primary"
-              @click="handleModifyRolle(props.personIDs)"
+              @click="handleModifyRolle(props.selectedPersons.map((person) => person.person.id))"
               data-testid="rolle-modify-submit-button"
               type="submit"
             >
