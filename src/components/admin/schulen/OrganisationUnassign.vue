@@ -24,7 +24,7 @@
   const emit: Emits = defineEmits<Emits>();
 
   async function closeDialog(finished: boolean): Promise<void> {
-    bulkOperationStore.progress = 0;
+    bulkOperationStore.currentOperation = null;
     emit('update:dialogExit', finished);
   }
 
@@ -45,7 +45,7 @@
       <!-- Initial block -->
       <v-container
         class="mt-8 mb-4"
-        v-if="bulkOperationStore.progress === 0"
+        v-if="bulkOperationStore.currentOperation?.progress === 0"
       >
         <v-row class="text-body bold justify-center">
           <v-col
@@ -68,10 +68,13 @@
 
       <!-- In progress -->
       <v-container
-        v-if="bulkOperationStore.progress > 0"
+        v-if="
+          bulkOperationStore.currentOperation?.progress !== undefined &&
+          bulkOperationStore.currentOperation?.progress > 0
+        "
         class="mt-4"
       >
-        <v-container v-if="bulkOperationStore.progress === 100">
+        <v-container v-if="bulkOperationStore.currentOperation?.progress === 100">
           <v-row justify="center">
             <v-col cols="auto">
               <v-icon
@@ -86,7 +89,10 @@
           </p>
         </v-container>
         <v-row
-          v-if="bulkOperationStore.progress < 100"
+          v-if="
+            bulkOperationStore.currentOperation?.progress !== undefined &&
+            bulkOperationStore.currentOperation?.progress < 100
+          "
           align="center"
           justify="center"
         >
@@ -108,7 +114,7 @@
         <!-- Progress Bar -->
         <v-progress-linear
           class="mt-5"
-          :modelValue="bulkOperationStore.progress"
+          :modelValue="bulkOperationStore.currentOperation?.progress"
           color="primary"
           height="25"
           data-testid="org-unassign-progressbar"
@@ -127,7 +133,7 @@
             md="auto"
           >
             <v-btn
-              v-if="bulkOperationStore.progress === 100"
+              v-if="bulkOperationStore.currentOperation?.progress === 100"
               :block="mdAndDown"
               class="primary"
               @click="closeDialog(true)"
@@ -136,7 +142,7 @@
               {{ t('close') }}
             </v-btn>
             <v-btn
-              v-else-if="bulkOperationStore.progress === 0"
+              v-else-if="bulkOperationStore.currentOperation?.progress === 0"
               :block="mdAndDown"
               class="secondary"
               @click="closeDialog(false)"
@@ -151,9 +157,9 @@
             md="auto"
           >
             <v-btn
-              v-if="bulkOperationStore.progress === 0"
+              v-if="bulkOperationStore.currentOperation?.progress === 0"
               :block="mdAndDown"
-              :disabled="bulkOperationStore.isOperationRunning"
+              :disabled="bulkOperationStore.currentOperation?.isRunning"
               class="primary"
               @click="handleOrgUnassign()"
               data-testid="org-unassign-submit-button"

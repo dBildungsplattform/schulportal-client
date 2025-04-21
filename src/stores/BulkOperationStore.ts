@@ -1,16 +1,32 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import { usePersonenkontextStore, type PersonenkontextStore, type Zuordnung } from './PersonenkontextStore';
 import { type PersonStore, usePersonStore } from './PersonStore';
+import { type PersonenApiInterface, PersonenApiFactory } from '@/api-client/generated';
+import axiosApiInstance from '@/services/ApiService';
+import { getResponseErrorCode } from '@/utils/errorHandlers';
+
+const personenApi: PersonenApiInterface = PersonenApiFactory(undefined, '', axiosApiInstance);
+
+type OperationType = 'UNASSIGN_PERSON' | 'RESET_PASSWORD' | null;
+
+export type CurrentOperation = {
+  type: OperationType;
+  isRunning: boolean;
+  progress: number;
+  complete: boolean;
+  errors: Map<string, string>;
+  data: Map<string, unknown>;
+};
 
 type BulkOperationState = {
-  isOperationRunning: boolean;
-  progress: number;
-  errors: Map<string, string>;
+  currentOperation: CurrentOperation | null;
 };
 
 type BulkOperationGetters = {};
+
 type BulkOperationActions = {
   unassignPersonenFromOrg(organisationId: string, personIds: string[]): Promise<void>;
+  bulkResetPassword(personIds: string[]): Promise<void>;
 };
 
 export type BulkOperationStore = Store<
@@ -27,27 +43,37 @@ export const useBulkOperationStore: StoreDefinition<
   BulkOperationActions
 > = defineStore({
   id: 'bulkOperationStore',
-  state: (): BulkOperationState => {
-    return {
-      isOperationRunning: false,
+  state: (): BulkOperationState => ({
+    currentOperation: {
+      type: null,
+      isRunning: false,
       progress: 0,
-      errors: new Map<string, string>(),
-    };
-  },
+      complete: false,
+      errors: new Map(),
+      data: new Map(),
+    },
+  }),
   actions: {
     async unassignPersonenFromOrg(organisationId: string, personIDs: string[]): Promise<void> {
       const personStore: PersonStore = usePersonStore();
       const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
 
-      this.isOperationRunning = true;
-      this.progress = 0;
+      this.currentOperation = {
+        type: 'UNASSIGN_PERSON',
+        isRunning: true,
+        progress: 0,
+        complete: false,
+        errors: new Map(),
+        data: new Map(),
+      };
+
       for (let i: number = 0; i < personIDs.length; i++) {
-        const personId: string = personIDs[i] as string;
+        const personId: string = personIDs[i]!;
 
         await personStore.getPersonenuebersichtById(personId);
 
         if (personStore.errorCode) {
-          this.errors.set(personId, personStore.errorCode);
+          this.currentOperation.errors.set(personId, personStore.errorCode);
           continue;
         }
 
@@ -58,19 +84,49 @@ export const useBulkOperationStore: StoreDefinition<
         );
 
         if (updatedZuordnungen.length === existingZuordnungen.length) {
-          this.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
+          this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
           continue;
         }
 
         await personenkontextStore.updatePersonenkontexte(updatedZuordnungen, personId);
 
         if (personenkontextStore.errorCode) {
-          this.errors.set(personId, personenkontextStore.errorCode);
+          this.currentOperation.errors.set(personId, personenkontextStore.errorCode);
         }
 
-        this.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
+        this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
       }
-      this.isOperationRunning = false;
+
+      this.currentOperation.isRunning = false;
+      this.currentOperation.complete = true;
+    },
+
+    async bulkResetPassword(personIds: string[]): Promise<void> {
+      this.currentOperation = {
+        type: 'RESET_PASSWORD',
+        isRunning: true,
+        progress: 0,
+        complete: false,
+        errors: new Map(),
+        data: new Map(),
+      };
+
+      for (let i: number = 0; i < personIds.length; i++) {
+        const id: string = personIds[i]!;
+
+        try {
+          const { data }: { data: string } = await personenApi.personControllerResetPasswordByPersonId(id);
+          this.currentOperation.data.set(id, data);
+        } catch (error: unknown) {
+          const errorCode: string = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+          this.currentOperation.errors.set(id, errorCode);
+        } finally {
+          this.currentOperation.progress = Math.ceil(((i + 1) / personIds.length) * 100);
+        }
+      }
+
+      this.currentOperation.isRunning = false;
+      this.currentOperation.complete = true;
     },
   },
 });
