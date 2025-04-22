@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref, type Ref } from 'vue';
+  import { computed, ref, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
@@ -9,20 +9,16 @@
   import { object, string } from 'yup';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
   import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
-  import { usePersonenkontextStore, type PersonenkontextStore, type Zuordnung } from '@/stores/PersonenkontextStore';
-  import { OrganisationsTyp, type Organisation } from '@/stores/OrganisationStore';
-  import type { RollenArt, RollenMerkmal } from '@/stores/RolleStore';
-  import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
+  import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
+  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
-  const personStore: PersonStore = usePersonStore();
+  const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
 
-  const progress: Ref<number> = ref<number>(0);
   const canCommit: Ref<boolean> = ref(false);
-  const successMessage: Ref<string> = ref<string>('');
 
   type Props = {
     errorCode: string;
@@ -42,6 +38,10 @@
   const emit: Emits = defineEmits<Emits>();
 
   const showModifyRolleDialog: Ref<boolean> = ref(props.isDialogVisible);
+
+  const successMessage: ComputedRef<string> = computed(() =>
+    bulkOperationStore.currentOperation?.successMessage ? t(bulkOperationStore.currentOperation.successMessage) : '',
+  );
 
   // Define the form validation schema for the Personenkontext
   export type ZuordnungCreationForm = {
@@ -89,7 +89,9 @@
   ] = formContext.defineField('selectedRolle', getVuetifyConfig);
 
   async function closeModifyRolleDeleteDialog(): Promise<void> {
-    progress.value = 0;
+    if (bulkOperationStore.currentOperation) {
+      bulkOperationStore.currentOperation.progress = 0;
+    }
     showModifyRolleDialog.value = false;
     emit('update:isDialogVisible', false);
   }
@@ -102,65 +104,15 @@
 
   // Creates a new Personenkontext for an array of Person IDs. For each processed ID the progress bar will increment according to the total number of items to process
   async function handleModifyRolle(personIDs: string[]): Promise<void> {
-    const organisation: Organisation | undefined = personenkontextStore.workflowStepResponse?.organisations.find(
-      (orga: Organisation) => orga.id === selectedOrganisation.value,
+    await bulkOperationStore.bulkModifyPersonenRolle(
+      personIDs,
+      selectedOrganisation.value!,
+      selectedRolle.value!,
+      props.rollen || [],
+      personenkontextStore.workflowStepResponse?.organisations || [],
     );
 
-    if (organisation) {
-      const baseZuordnung: Zuordnung = {
-        sskId: organisation.id,
-        rolleId: selectedRolle.value ?? '',
-        klasse: undefined,
-        sskDstNr: organisation.kennung ?? '',
-        sskName: organisation.name,
-        rolle:
-          props.rollen?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolle.value)?.title || '',
-        rollenArt: props.rollen?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolle.value)
-          ?.rollenart as RollenArt,
-        administriertVon: organisation.administriertVon ?? '',
-        editable: true,
-        merkmale: [] as unknown as RollenMerkmal,
-        typ: OrganisationsTyp.Schule,
-        befristung: undefined,
-      };
-
-      successMessage.value = '';
-      progress.value = 0; // Reset progress bar to 0 at the start
-
-      for (let i: number = 0; i < personIDs.length; i++) {
-        const personId: string = personIDs[i] as string;
-
-        const newZuordnung: Zuordnung = { ...baseZuordnung };
-
-        // Fetch the Zuordnungen for this specific user (To send alongside the new one)
-        await personStore.getPersonenuebersichtById(personId);
-
-        // Extract the current Zuordnungen for this person
-        const currentZuordnungen: Zuordnung[] = personStore.personenuebersicht?.zuordnungen || [];
-
-        // Combine the new Zuordnung with the existing ones
-        const combinedZuordnungen: Zuordnung[] = [...currentZuordnungen, newZuordnung];
-
-        // Await the processing of each ID
-        await personenkontextStore.updatePersonenkontexte(combinedZuordnungen, personId);
-
-        // Update progress for each item processed
-        progress.value = Math.ceil(((i + 1) / personIDs.length) * 100);
-
-        // Only show success message after all items have been processed
-        if (i === personIDs.length - 1) {
-          successMessage.value = t('admin.rolle.rollenAssignedSuccessfully');
-        }
-      }
-    }
-
-    // Send an event to PersonManagement to fetch the updated Uebersichte (otherwise we will receive a version error from the backend when trying to access the GÜ)
     emit('update:getUebersichten');
-
-    // If the Admin assigns a person a false Rolle like to Schuladmin a Lehrkraft Rolle we want to ignore the error because it's a bulk operation
-    if (personenkontextStore.errorCode === 'INVALID_PERSONENKONTEXT_FOR_PERSON_WITH_ROLLENART_LERN') {
-      personenkontextStore.errorCode = '';
-    }
   }
 </script>
 
@@ -178,7 +130,7 @@
       <v-container>
         <!-- Form Component -->
         <PersonenkontextCreate
-          v-if="progress === 0"
+          v-if="bulkOperationStore.currentOperation?.progress === 0"
           ref="personenkontext-create"
           :showHeadline="false"
           :isModifyRolleDialog="showModifyRolleDialog"
@@ -196,7 +148,7 @@
 
         <!-- Progress Bar -->
         <div
-          v-if="progress > 0"
+          v-if="bulkOperationStore.currentOperation && bulkOperationStore.currentOperation?.progress > 0"
           class="mt-4"
         >
           <v-container v-if="successMessage">
@@ -214,7 +166,7 @@
             </p>
           </v-container>
           <v-row
-            v-if="progress < 100"
+            v-if="bulkOperationStore.currentOperation?.progress < 100"
             align="center"
             justify="center"
           >
@@ -232,7 +184,7 @@
           </v-row>
           <v-progress-linear
             class="mt-5"
-            :modelValue="progress"
+            :modelValue="bulkOperationStore.currentOperation?.progress"
             color="primary"
             height="25"
           >
@@ -245,7 +197,7 @@
 
       <v-card-actions class="justify-center">
         <v-row
-          v-if="progress === 0"
+          v-if="bulkOperationStore.currentOperation?.progress === 0"
           class="py-3 px-2 justify-center"
         >
           <v-spacer class="hidden-sm-and-down"></v-spacer>
@@ -281,7 +233,7 @@
           </v-col>
         </v-row>
         <v-row
-          v-if="progress === 100"
+          v-if="bulkOperationStore.currentOperation?.progress === 100"
           class="py-3 px-2 justify-center"
         >
           <v-col

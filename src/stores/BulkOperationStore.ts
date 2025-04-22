@@ -1,13 +1,24 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import { usePersonenkontextStore, type PersonenkontextStore, type Zuordnung } from './PersonenkontextStore';
 import { type PersonStore, usePersonStore } from './PersonStore';
-import { type PersonenApiInterface, PersonenApiFactory } from '@/api-client/generated';
+import {
+  type PersonenApiInterface,
+  OrganisationsTyp,
+  PersonenApiFactory,
+  RollenArt,
+  RollenMerkmal,
+} from '@/api-client/generated';
 import axiosApiInstance from '@/services/ApiService';
 import { getResponseErrorCode } from '@/utils/errorHandlers';
+import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
+import type { Organisation } from './OrganisationStore';
+
+const personStore: PersonStore = usePersonStore();
+const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
 
 const personenApi: PersonenApiInterface = PersonenApiFactory(undefined, '', axiosApiInstance);
 
-type OperationType = 'UNASSIGN_PERSON' | 'RESET_PASSWORD' | null;
+type OperationType = 'UNASSIGN_PERSON' | 'RESET_PASSWORD' | 'MODIFY_ROLLE' | 'DELETE_PERSON' | null;
 
 export type CurrentOperation = {
   type: OperationType;
@@ -16,6 +27,7 @@ export type CurrentOperation = {
   complete: boolean;
   errors: Map<string, string>;
   data: Map<string, unknown>;
+  successMessage?: string;
 };
 
 type BulkOperationState = {
@@ -25,8 +37,16 @@ type BulkOperationState = {
 type BulkOperationGetters = {};
 
 type BulkOperationActions = {
-  unassignPersonenFromOrg(organisationId: string, personIds: string[]): Promise<void>;
+  bulkUnassignPersonenFromOrg(organisationId: string, personIds: string[]): Promise<void>;
   bulkResetPassword(personIds: string[]): Promise<void>;
+  bulkModifyPersonenRolle(
+    personIDs: string[],
+    selectedOrganisationId: string,
+    selectedRolleId: string,
+    rollen: TranslatedRolleWithAttrs[],
+    workflowStepResponseOrganisations: Organisation[],
+  ): Promise<void>;
+  bulkPersonenDelete(personIDs: string[]): Promise<void>;
 };
 
 export type BulkOperationStore = Store<
@@ -54,10 +74,7 @@ export const useBulkOperationStore: StoreDefinition<
     },
   }),
   actions: {
-    async unassignPersonenFromOrg(organisationId: string, personIDs: string[]): Promise<void> {
-      const personStore: PersonStore = usePersonStore();
-      const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
-
+    async bulkUnassignPersonenFromOrg(organisationId: string, personIDs: string[]): Promise<void> {
       this.currentOperation = {
         type: 'UNASSIGN_PERSON',
         isRunning: true,
@@ -65,11 +82,13 @@ export const useBulkOperationStore: StoreDefinition<
         complete: false,
         errors: new Map(),
         data: new Map(),
+        successMessage: undefined,
       };
 
       for (let i: number = 0; i < personIDs.length; i++) {
         const personId: string = personIDs[i]!;
 
+        // Fetch the Zuordnungen for this specific user (To send alongside the new one)
         await personStore.getPersonenuebersichtById(personId);
 
         if (personStore.errorCode) {
@@ -77,8 +96,10 @@ export const useBulkOperationStore: StoreDefinition<
           continue;
         }
 
+        // Extract the current Zuordnungen for this person
         const existingZuordnungen: Zuordnung[] = personStore.personenuebersicht?.zuordnungen ?? [];
 
+        // Combine the new Zuordnung with the existing ones
         const updatedZuordnungen: Zuordnung[] = existingZuordnungen.filter(
           (zuordnung: Zuordnung) => zuordnung.sskId !== organisationId && zuordnung.administriertVon !== organisationId,
         );
@@ -88,12 +109,14 @@ export const useBulkOperationStore: StoreDefinition<
           continue;
         }
 
+        // Await the processing of each ID
         await personenkontextStore.updatePersonenkontexte(updatedZuordnungen, personId);
 
         if (personenkontextStore.errorCode) {
           this.currentOperation.errors.set(personId, personenkontextStore.errorCode);
         }
 
+        // Update progress for each item processed
         this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
       }
 
@@ -109,6 +132,7 @@ export const useBulkOperationStore: StoreDefinition<
         complete: false,
         errors: new Map(),
         data: new Map(),
+        successMessage: undefined,
       };
 
       for (let i: number = 0; i < personIds.length; i++) {
@@ -127,6 +151,109 @@ export const useBulkOperationStore: StoreDefinition<
 
       this.currentOperation.isRunning = false;
       this.currentOperation.complete = true;
+    },
+
+    async bulkModifyPersonenRolle(
+      personIDs: string[],
+      selectedOrganisationId: string,
+      selectedRolleId: string,
+      rollen: TranslatedRolleWithAttrs[],
+      workflowStepResponseOrganisations: Organisation[],
+    ): Promise<void> {
+      this.currentOperation = {
+        type: 'MODIFY_ROLLE',
+        isRunning: true,
+        progress: 0,
+        complete: false,
+        errors: new Map(),
+        data: new Map(),
+        successMessage: undefined,
+      };
+      const organisation: Organisation | undefined = workflowStepResponseOrganisations.find(
+        (orga: Organisation) => orga.id === selectedOrganisationId,
+      );
+
+      if (!organisation) return;
+
+      const baseZuordnung: Zuordnung = {
+        sskId: organisation.id,
+        rolleId: selectedRolleId,
+        klasse: undefined,
+        sskDstNr: organisation.kennung ?? '',
+        sskName: organisation.name,
+        rolle: rollen.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolleId)?.title || '',
+        rollenArt: rollen.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolleId)
+          ?.rollenart as RollenArt,
+        administriertVon: organisation.administriertVon ?? '',
+        editable: true,
+        merkmale: [] as unknown as RollenMerkmal,
+        typ: OrganisationsTyp.Schule,
+        befristung: undefined,
+      };
+
+      this.currentOperation = {
+        type: null,
+        isRunning: true,
+        progress: 0,
+        complete: false,
+        errors: new Map(),
+        data: new Map(),
+      };
+
+      for (let i: number = 0; i < personIDs.length; i++) {
+        const personId: string = personIDs[i]!;
+
+        const newZuordnung: Zuordnung = { ...baseZuordnung };
+
+        await personStore.getPersonenuebersichtById(personId);
+
+        const currentZuordnungen: Zuordnung[] = personStore.personenuebersicht?.zuordnungen || [];
+
+        const combinedZuordnungen: Zuordnung[] = [...currentZuordnungen, newZuordnung];
+
+        await personenkontextStore.updatePersonenkontexte(combinedZuordnungen, personId);
+
+        this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
+
+        if (personenkontextStore.errorCode === 'INVALID_PERSONENKONTEXT_FOR_PERSON_WITH_ROLLENART_LERN') {
+          personenkontextStore.errorCode = '';
+        }
+      }
+
+      this.currentOperation.isRunning = false;
+      this.currentOperation.complete = true;
+      this.currentOperation.successMessage = 'admin.rolle.rollenAssignedSuccessfully';
+    },
+
+    async bulkPersonenDelete(personIDs: string[]) {
+      this.currentOperation = {
+        type: 'DELETE_PERSON',
+        isRunning: true,
+        progress: 0,
+        complete: false,
+        errors: new Map(),
+        data: new Map(),
+        successMessage: undefined,
+      };
+
+      for (let i: number = 0; i < personIDs.length; i++) {
+        const personId: string = personIDs[i]!;
+
+        try {
+          await personStore.deletePersonById(personId);
+        } catch (error) {
+          this.currentOperation.errors.set(personId, (error as Error).message);
+        }
+
+        this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
+      }
+
+      this.currentOperation.isRunning = false;
+      this.currentOperation.complete = true;
+
+      if (this.currentOperation.errors.size === 0) {
+        this.currentOperation.successMessage = 'admin.person.deletePersonBulkSuccessMessage';
+      }
     },
   },
 });

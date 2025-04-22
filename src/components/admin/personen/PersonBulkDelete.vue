@@ -1,17 +1,18 @@
 <script setup lang="ts">
-  import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
-  import { type Ref, ref } from 'vue';
+  import { computed, type ComputedRef, type Ref, ref } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
-  const personStore: PersonStore = usePersonStore();
+  const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
 
-  const progress: Ref<number> = ref<number>(0);
-  const successMessage: Ref<string> = ref<string>('');
+  const successMessage: ComputedRef<string> = computed(() =>
+    bulkOperationStore.currentOperation?.successMessage ? t(bulkOperationStore.currentOperation.successMessage) : '',
+  );
 
   type Props = {
     errorCode: string;
@@ -27,29 +28,15 @@
   const showDeletePersonDialog: Ref<boolean> = ref(props.isDialogVisible);
 
   async function closeDeletePersonDialog(finished: boolean): Promise<void> {
-    progress.value = 0;
+    if (bulkOperationStore.currentOperation) {
+      bulkOperationStore.currentOperation.progress = 0;
+    }
     showDeletePersonDialog.value = false;
     emit('update:dialogExit', finished);
   }
 
   async function handleDeletePerson(personIDs: string[]): Promise<void> {
-    successMessage.value = '';
-    progress.value = 0; // Reset progress bar to 0 at the start
-
-    for (let i: number = 0; i < personIDs.length; i++) {
-      const personId: string = personIDs[i] as string;
-
-      // Delete person by ID
-      await personStore.deletePersonById(personId);
-
-      // Update progress for each item processed
-      progress.value = Math.ceil(((i + 1) / personIDs.length) * 100);
-
-      // Only show success message after all items have been processed
-      if (i === personIDs.length - 1) {
-        successMessage.value = t('admin.person.deletePersonBulkSuccessMessage');
-      }
-    }
+    await bulkOperationStore.bulkPersonenDelete(personIDs);
   }
 </script>
 
@@ -65,7 +52,7 @@
     >
       <v-container
         class="mt-8 mb-4"
-        v-if="progress == 0"
+        v-if="bulkOperationStore.currentOperation?.progress == 0"
       >
         <v-row class="text-body bold justify-center">
           <span data-testid="person-delete-confirmation-text">
@@ -75,7 +62,7 @@
       </v-container>
 
       <v-container
-        v-if="progress > 0"
+        v-if="bulkOperationStore.currentOperation && bulkOperationStore.currentOperation?.progress > 0"
         class="mt-4"
       >
         <!-- Progress Bar -->
@@ -97,7 +84,7 @@
           </p>
         </v-container>
         <v-row
-          v-if="progress < 100"
+          v-if="bulkOperationStore.currentOperation?.progress < 100"
           align="center"
           justify="center"
         >
@@ -115,7 +102,7 @@
         </v-row>
         <v-progress-linear
           class="mt-5"
-          :modelValue="progress"
+          :modelValue="bulkOperationStore.currentOperation?.progress"
           color="primary"
           height="25"
         >
@@ -127,7 +114,7 @@
 
       <v-card-actions class="justify-center">
         <v-row
-          v-if="progress === 0"
+          v-if="bulkOperationStore.currentOperation?.progress === 0"
           class="py-3 px-2 justify-center"
         >
           <v-col
@@ -151,7 +138,7 @@
           >
             <v-btn
               :block="mdAndDown"
-              :disabled="personStore.loading"
+              :disabled="bulkOperationStore.currentOperation?.isRunning"
               class="primary"
               @click="handleDeletePerson(props.personIDs)"
               data-testid="person-delete-submit-button"
@@ -162,7 +149,7 @@
           </v-col>
         </v-row>
         <v-row
-          v-if="progress === 100"
+          v-if="bulkOperationStore.currentOperation?.progress === 100"
           class="py-3 px-2 justify-center"
         >
           <v-col
