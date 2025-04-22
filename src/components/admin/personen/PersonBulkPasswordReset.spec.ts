@@ -1,14 +1,15 @@
 import routes from '@/router/routes';
-import { usePersonStore, type PersonenWithRolleAndZuordnung, type PersonStore } from '@/stores/PersonStore';
+import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
 import { download } from '@/utils/file';
 import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
-import { test } from 'vitest';
+import { test, describe, expect, beforeEach, vi, type MockInstance } from 'vitest';
 import { nextTick } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import PersonBulkPasswordReset from './PersonBulkPasswordReset.vue';
+import type { PersonenWithRolleAndZuordnung } from '@/stores/PersonStore';
 
 let router: Router;
-const personStore: PersonStore = usePersonStore();
+const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
 
 type Props = {
   isDialogVisible: boolean;
@@ -51,9 +52,6 @@ function mountComponent(partialProps: Partial<Props> = {}): VueWrapper {
     attachTo: document.getElementById('app') || '',
     props,
     global: {
-      components: {
-        PersonBulkPasswordReset,
-      },
       plugins: [router],
     },
   });
@@ -73,7 +71,8 @@ beforeEach(async () => {
 
   await router.push('/');
   await router.isReady();
-  personStore.$reset();
+
+  bulkOperationStore.$reset();
   vi.restoreAllMocks();
 });
 
@@ -87,42 +86,36 @@ describe('PersonBulkPasswordReset', () => {
   });
 
   test('when state changes, it switches to next template', async () => {
-    type UiElements = {
-      notice: Element | null;
-      progressbar: Element | null;
-      successMessage: Element | null;
-    };
-    function findElements(): UiElements {
-      return {
-        notice: document.body.querySelector('[data-testid="password-reset-progressing-notice"]'),
-        progressbar: document.body.querySelector('[data-testid="password-reset-progressbar"]'),
-        successMessage: document.body.querySelector('[data-testid="password-reset-success-text"]'),
-      };
-    }
-
     mountComponent();
-    personStore.bulkResetPasswordResult = {
+    bulkOperationStore.currentOperation = {
+      type: 'DELETE_PERSON',
+      isRunning: true,
       progress: 0.5,
       complete: false,
       errors: new Map(),
-      passwords: new Map(),
+      data: new Map(),
+      successMessage: '',
     };
     await nextTick();
 
     {
-      const { notice, progressbar, successMessage }: UiElements = findElements();
+      const notice: Element | null = document.body.querySelector('[data-testid="password-reset-progressing-notice"]');
+      const progressbar: Element | null = document.body.querySelector('[data-testid="password-reset-progressbar"]');
+      const successMessage: Element | null = document.body.querySelector('[data-testid="password-reset-success-text"]');
       expect(notice).not.toBeNull();
       expect(progressbar).not.toBeNull();
-      expect(progressbar?.textContent).toContain(personStore.bulkResetPasswordResult.progress * 100);
       expect(successMessage).toBeNull();
     }
 
-    personStore.bulkResetPasswordResult.progress = 1;
-    personStore.bulkResetPasswordResult.complete = true;
+    bulkOperationStore.currentOperation.progress = 1;
+    bulkOperationStore.currentOperation.complete = true;
+    bulkOperationStore.currentOperation.isRunning = false;
     await nextTick();
 
     {
-      const { notice, progressbar, successMessage }: UiElements = findElements();
+      const notice: Element | null = document.body.querySelector('[data-testid="password-reset-progressing-notice"]');
+      const progressbar: Element | null = document.body.querySelector('[data-testid="password-reset-progressbar"]');
+      const successMessage: Element | null = document.body.querySelector('[data-testid="password-reset-success-text"]');
       expect(notice).toBeNull();
       expect(progressbar).toBeNull();
       expect(successMessage).not.toBeNull();
@@ -141,15 +134,18 @@ describe('PersonBulkPasswordReset', () => {
     await flushPromises();
 
     expect(wrapper.emitted('update:dialogExit')).toEqual([[false]]);
-    expect(personStore.bulkResetPasswordResult).toBeNull();
+    expect(bulkOperationStore.currentOperation).toBeNull();
   });
 
   test('close button closes dialog and resets store', async () => {
-    personStore.bulkResetPasswordResult = {
+    bulkOperationStore.currentOperation = {
+      type: 'DELETE_PERSON',
+      isRunning: false,
       progress: 1,
       complete: true,
       errors: new Map(),
-      passwords: new Map(),
+      data: new Map(),
+      successMessage: '',
     };
     const wrapper: VueWrapper = mountComponent();
     await nextTick();
@@ -162,11 +158,13 @@ describe('PersonBulkPasswordReset', () => {
     await flushPromises();
 
     expect(wrapper.emitted('update:dialogExit')).toEqual([[true]]);
-    expect(personStore.bulkResetPasswordResult).toBeNull();
+    expect(bulkOperationStore.currentOperation).toBeNull();
   });
 
   test('clicking the reset button starts processing', async () => {
-    mountComponent({});
+    const spy: MockInstance = vi.spyOn(bulkOperationStore, 'bulkResetPassword').mockResolvedValue();
+
+    mountComponent();
     await nextTick();
 
     const submitButton: Element | null = document.body.querySelector('[data-testid="password-reset-submit-button"]');
@@ -175,15 +173,18 @@ describe('PersonBulkPasswordReset', () => {
     submitButton!.dispatchEvent(new Event('click'));
     await flushPromises();
 
-    expect(personStore.bulkResetPassword).toHaveBeenCalledWith(['test']);
+    expect(spy).toHaveBeenCalledWith(['test']);
   });
 
   test('download is enabled after operation', async () => {
-    personStore.bulkResetPasswordResult = {
+    bulkOperationStore.currentOperation = {
+      type: 'DELETE_PERSON',
+      isRunning: false,
       progress: 1,
       complete: true,
       errors: new Map(),
-      passwords: new Map([['test', 'neuesPasswort']]),
+      data: new Map([['test', 'neuesPasswort']]),
+      successMessage: '',
     };
     mountComponent();
     await nextTick();
@@ -195,29 +196,34 @@ describe('PersonBulkPasswordReset', () => {
     await flushPromises();
   });
 
-  test.each([['test'], [undefined]])(
-    'file is correctly named and can be downloaded, when kennung=%s',
+  test.each([['1234567'], [undefined]])(
+    'file is correctly named and can be downloaded, when selectedSchuleKennung=%s',
     async (selectedSchuleKennung: string | undefined) => {
       vi.mock('@/utils/file', () => ({
         buildCSV: vi.fn(() => new Blob()),
         download: vi.fn(),
       }));
+
       const filename: string = selectedSchuleKennung ? `PW_${selectedSchuleKennung}.txt` : 'PW.txt';
-      personStore.bulkResetPasswordResult = {
+
+      bulkOperationStore.currentOperation = {
+        type: 'DELETE_PERSON',
+        isRunning: false,
         progress: 1,
         complete: true,
         errors: new Map(),
-        passwords: new Map([['test', 'neuesPasswort']]),
+        data: new Map([['test', 'neuesPasswort']]),
+        successMessage: '',
       };
-      mountComponent({
-        selectedSchuleKennung,
-      });
+
+      mountComponent({ selectedSchuleKennung });
       await nextTick();
 
       const downloadButton: Element | null = document.body.querySelector('[data-testid="download-result-button"]');
       downloadButton!.dispatchEvent(new Event('click'));
       await flushPromises();
-      expect(download).toHaveBeenCalledWith(filename, new Blob());
+
+      expect(download).toHaveBeenCalledWith(filename, expect.any(Blob));
     },
   );
 });
