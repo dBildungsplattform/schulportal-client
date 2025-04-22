@@ -103,6 +103,14 @@
     event.returnValue = '';
   }
 
+  const canCommit: ComputedRef<boolean> = computed(() => {
+    return (
+      selectedSchultraegername.value !== organisationStore.currentOrganisation?.name ||
+      unpersistedSchulenToAssign.value.length > 0 ||
+      unpersistedSchulenToUnassign.value.length > 0
+    );
+  });
+
   const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = formContext.handleSubmit(async () => {
     if (
       selectedSchultraegername.value &&
@@ -160,7 +168,7 @@
   function prepareSchuleToAssign(schule: Organisation): void {
     let schuleToAssign: Organisation = schule;
 
-    /* if schule is member of persisted schulen, remove isNotPersistedFlag */
+    /* if schule is member of persisted schulen, remove isNotPersistedFlag; else set flag */
     if (
       organisationStore.schulenFromTraeger.some(
         (schuleFromTraeger: Organisation) => schuleFromTraeger.id === schuleToAssign.id,
@@ -176,10 +184,20 @@
   }
 
   function prepareSchuleToUnassign(schule: Organisation): void {
-    /* add isNotPersisted flag */
-    const schuleWithPersistenceFlag: Organisation = { ...schule, isNotPersisted: true };
+    let schuleToUnassign: Organisation = schule;
 
-    unassignedSchulen.value = [schuleWithPersistenceFlag, ...unassignedSchulen.value];
+    /* if schule is not a member of persisted schulen, remove isNotPersistedFlag; else set flag */
+    if (
+      !organisationStore.schulenFromTraeger.some(
+        (schuleFromTraeger: Organisation) => schuleFromTraeger.id === schuleToUnassign.id,
+      )
+    ) {
+      delete schuleToUnassign.isNotPersisted;
+    } else {
+      schuleToUnassign = { ...schuleToUnassign, isNotPersisted: true };
+    }
+
+    unassignedSchulen.value = [schuleToUnassign, ...unassignedSchulen.value];
     assignedSchulen.value = assignedSchulen.value.filter((item: Organisation) => item.id !== schule.id);
   }
 
@@ -334,6 +352,7 @@
       <template v-if="organisationStore.currentOrganisation">
         <SchultraegerForm
           v-if="progress === 0 && !organisationStore.updatedOrganisation"
+          :canCommit="canCommit"
           :errorCode="organisationStore.errorCode"
           :isLoading="organisationStore.loading"
           :onHandleConfirmUnsavedChanges="handleConfirmUnsavedChanges"
@@ -519,11 +538,11 @@
             md="auto"
           >
             <v-btn
-              class="primary"
-              data-testid="schultraeger-edit-save-button"
-              @click="onSubmit"
               :block="mdAndDown"
-              :disabled="organisationStore.loading"
+              class="primary"
+              @click="onSubmit"
+              data-testid="schultraeger-edit-save-button"
+              :disabled="!canCommit || organisationStore.loading"
             >
               {{ $t('save') }}
             </v-btn>
