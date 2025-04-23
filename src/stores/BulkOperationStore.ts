@@ -15,10 +15,15 @@ import type { Organisation } from './OrganisationStore';
 
 const personenApi: PersonenApiInterface = PersonenApiFactory(undefined, '', axiosApiInstance);
 
-type OperationType = 'UNASSIGN_PERSON' | 'RESET_PASSWORD' | 'MODIFY_ROLLE' | 'DELETE_PERSON' | null;
+export enum OperationType {
+  MODIFY_ROLLE = 'MODIFY_ROLLE',
+  DELETE_PERSON = 'DELETE_PERSON',
+  RESET_PASSWORD = 'RESET_PASSWORD',
+  ORG_UNASSIGN = 'ORG_UNASSIGN',
+}
 
 export type CurrentOperation = {
-  type: OperationType;
+  type: OperationType | null;
   isRunning: boolean;
   progress: number;
   complete: boolean;
@@ -89,7 +94,7 @@ export const useBulkOperationStore: StoreDefinition<
       const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
 
       this.currentOperation = {
-        type: 'UNASSIGN_PERSON',
+        type: OperationType.ORG_UNASSIGN,
         isRunning: true,
         progress: 0,
         complete: false,
@@ -131,7 +136,7 @@ export const useBulkOperationStore: StoreDefinition<
 
     async bulkResetPassword(personIds: string[]): Promise<void> {
       this.currentOperation = {
-        type: 'RESET_PASSWORD',
+        type: OperationType.RESET_PASSWORD,
         isRunning: true,
         progress: 0,
         complete: false,
@@ -169,7 +174,7 @@ export const useBulkOperationStore: StoreDefinition<
       const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
 
       this.currentOperation = {
-        type: 'MODIFY_ROLLE',
+        type: OperationType.MODIFY_ROLLE,
         isRunning: true,
         progress: 0,
         complete: false,
@@ -227,7 +232,7 @@ export const useBulkOperationStore: StoreDefinition<
       const personStore: PersonStore = usePersonStore();
 
       this.currentOperation = {
-        type: 'DELETE_PERSON',
+        type: OperationType.DELETE_PERSON,
         isRunning: true,
         progress: 0,
         complete: false,

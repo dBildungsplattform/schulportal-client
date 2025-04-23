@@ -8,7 +8,7 @@ import type {
 import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
 import { createPinia, setActivePinia } from 'pinia';
-import { useBulkOperationStore, type BulkOperationStore } from './BulkOperationStore';
+import { OperationType, useBulkOperationStore, type BulkOperationStore } from './BulkOperationStore';
 import { usePersonStore, type PersonStore } from './PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from './PersonenkontextStore';
 import { OrganisationsTyp, type Organisation } from './OrganisationStore';
@@ -87,6 +87,9 @@ describe('BulkOperationStore', () => {
       expect(bulkOperationStore.currentOperation?.progress).toBe(0);
 
       await unassign;
+
+      expect(personStore.personenuebersicht).not.toBeNull();
+      expect(personStore.personenuebersicht).toEqual(mockPersonResponse);
       expect(bulkOperationStore.currentOperation?.progress).toBe(100);
       expect(bulkOperationStore.currentOperation?.errors.size).toBe(0);
     });
@@ -147,6 +150,8 @@ describe('BulkOperationStore', () => {
 
       await unassign;
 
+      expect(personStore.personenuebersicht).not.toBeNull();
+      expect(personStore.personenuebersicht).toEqual(mockPersonResponse);
       expect(bulkOperationStore.currentOperation?.progress).toBe(100);
       expect(bulkOperationStore.currentOperation?.errors.size).toBe(0);
     });
@@ -155,6 +160,9 @@ describe('BulkOperationStore', () => {
       mockAdapter.onGet('/api/dbiam/personenuebersicht/1').replyOnce(200, []);
 
       await bulkOperationStore.bulkUnassignPersonenFromOrg('1234', [mockPersonId]);
+
+      expect(personStore.personenuebersicht).not.toBeNull();
+      expect(personStore.personenuebersicht).toEqual([]);
       expect(bulkOperationStore.currentOperation?.progress).toBe(100);
     });
 
@@ -162,6 +170,8 @@ describe('BulkOperationStore', () => {
       mockAdapter.onGet('/api/dbiam/personenuebersicht/1').replyOnce(200, null);
 
       await bulkOperationStore.bulkUnassignPersonenFromOrg('1234', [mockPersonId]);
+
+      expect(personStore.personenuebersicht).toBeNull();
       expect(bulkOperationStore.currentOperation?.progress).toBe(100);
     });
   });
@@ -392,7 +402,7 @@ describe('BulkOperationStore', () => {
   describe('resetState', () => {
     it('should reset the currentOperation state', () => {
       bulkOperationStore.currentOperation = {
-        type: 'DELETE_PERSON',
+        type: OperationType.DELETE_PERSON,
         isRunning: true,
         progress: 55,
         complete: true,

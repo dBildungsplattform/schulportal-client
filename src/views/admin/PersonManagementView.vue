@@ -33,6 +33,7 @@
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
   import OrganisationUnassign from '@/components/admin/schulen/OrganisationUnassign.vue';
   import InfoDialog from '@/components/alert/InfoDialog.vue';
+import { OperationType } from '@/stores/BulkOperationStore';
 
   const searchFieldComponent: Ref = ref();
 
@@ -89,31 +90,23 @@
   const benutzerDeleteDialogVisible: Ref<boolean> = ref(false);
   const passwordResetDialogVisible: Ref<boolean> = ref(false);
   const organisationUnassignDialogVisible: Ref<boolean> = ref(false);
-  const onlyOneSchoolAlertDialogVisible: Ref<boolean> = ref(false);
+  const onlyOneOrganisationAlertDialogVisible: Ref<boolean> = ref(false);
 
   const selectedOption: Ref<string | null> = ref(null);
 
   const authStore: AuthStore = useAuthStore();
 
-  // Define an enum for action types (Other pairs will be added here for each new bulk feature)
-  enum ActionTypes {
-    MODIFY_ROLLE = 'MODIFY_ROLLE',
-    DELETE_PERSON = 'DELETE_PERSON',
-    RESET_PASSWORD = 'RESET_PASSWORD',
-    ORG_UNASSIGN = 'ORG_UNASSIGN',
-  }
-
   // Computed property for generating options dynamically for v-selects
   const actions: ComputedRef<TranslatedObject[]> = computed(() => {
-    const actionTypeTitles: Map<ActionTypes, string> = new Map();
-    actionTypeTitles.set(ActionTypes.MODIFY_ROLLE, t('admin.rolle.assignRolle'));
+    const actionTypeTitles: Map<OperationType, string> = new Map();
+    actionTypeTitles.set(OperationType.MODIFY_ROLLE, t('admin.rolle.assignRolle'));
     if (authStore.hasPersonenLoeschenPermission) {
-      actionTypeTitles.set(ActionTypes.DELETE_PERSON, t('admin.person.deletePerson'));
+      actionTypeTitles.set(OperationType.DELETE_PERSON, t('admin.person.deletePerson'));
     }
 
     if (authStore.hasPersonenverwaltungPermission) {
-      actionTypeTitles.set(ActionTypes.RESET_PASSWORD, t('admin.person.resetPassword'));
-      actionTypeTitles.set(ActionTypes.ORG_UNASSIGN, t('admin.person.bulkUnassignOrganisation.cancelZuordnung'));
+      actionTypeTitles.set(OperationType.RESET_PASSWORD, t('admin.person.resetPassword'));
+      actionTypeTitles.set(OperationType.ORG_UNASSIGN, t('admin.person.bulkUnassignOrganisation.cancelZuordnung'));
     }
 
     return [...actionTypeTitles.entries()].map(([key, value]: [string, string]) => ({
@@ -483,7 +476,7 @@
 
   const checkSingleOrgDisplayDialog = (dialog: Ref<boolean>): void => {
     if (!singleSchoolSelected.value) {
-      onlyOneSchoolAlertDialogVisible.value = true;
+      onlyOneOrganisationAlertDialogVisible.value = true;
       return;
     }
     dialog.value = true;
@@ -494,16 +487,16 @@
     if (!newValue) return;
 
     switch (newValue) {
-      case ActionTypes.MODIFY_ROLLE:
+      case OperationType.MODIFY_ROLLE:
         rolleModifiyDialogVisible.value = true;
         break;
-      case ActionTypes.DELETE_PERSON:
+      case OperationType.DELETE_PERSON:
         benutzerDeleteDialogVisible.value = true;
         break;
-      case ActionTypes.RESET_PASSWORD:
+      case OperationType.RESET_PASSWORD:
         checkSingleOrgDisplayDialog(passwordResetDialogVisible);
         break;
-      case ActionTypes.ORG_UNASSIGN:
+      case OperationType.ORG_UNASSIGN:
         checkSingleOrgDisplayDialog(organisationUnassignDialogVisible);
     }
   };
@@ -511,7 +504,6 @@
   // Handles the event when closing the dialog
   const handleRolleModifyDialog = (isDialogVisible: boolean): void => {
     rolleModifiyDialogVisible.value = isDialogVisible;
-    organisationUnassignDialogVisible.value = isDialogVisible;
     selectedOption.value = null;
   };
 
@@ -864,12 +856,12 @@
           </SpshTooltip>
           <InfoDialog
             id="only-one-school-notice"
-            :isDialogVisible="onlyOneSchoolAlertDialogVisible"
+            :isDialogVisible="onlyOneOrganisationAlertDialogVisible"
             :header="singleSchoolAlertHeader"
             :message="$t('admin.person.onlyOneSchoolAlert')"
             @update:dialogExit="
               () => {
-                onlyOneSchoolAlertDialogVisible = false;
+                onlyOneOrganisationAlertDialogVisible = false;
                 selectedOption = null;
               }
             "
@@ -901,7 +893,6 @@
             ref="person-bulk-password-reset"
             v-if="passwordResetDialogVisible"
             :isDialogVisible="passwordResetDialogVisible"
-            :isSelectionFromSingleSchule="selectedOrganisationIds.length === 1"
             :selectedSchuleKennung="selectedOrganisationKennung"
             :selectedPersons
             @update:dialogExit="handleBulkPasswordResetDialog($event)"

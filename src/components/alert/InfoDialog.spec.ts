@@ -36,9 +36,9 @@ describe('InfoDialog', () => {
   });
 
   test('close button is visible and clickable', async () => {
-    const syncPersonButton: HTMLElement = (await document.querySelector(
+    const syncPersonButton: HTMLElement = document.querySelector(
       '[data-testid="test-id-cancel-button"]',
-    )) as HTMLElement;
+    ) as HTMLElement;
     syncPersonButton.click();
     await nextTick();
     expect(wrapper?.emitted('update:dialogExit')).toBeTruthy();

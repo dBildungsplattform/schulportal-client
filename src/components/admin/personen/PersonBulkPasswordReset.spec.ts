@@ -73,7 +73,7 @@ beforeEach(async () => {
   await router.isReady();
 
   bulkOperationStore.$reset();
-  bulkOperationStore.resetState()
+  bulkOperationStore.resetState();
   vi.restoreAllMocks();
 });
 

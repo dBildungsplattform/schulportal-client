@@ -67,7 +67,7 @@ describe('OrganisationUnassign', () => {
     else expect(layoutCard).toBeNull();
   });
 
-  test('disaplys confirmation form and trigger submit', async () => {
+  test('displays confirmation form and trigger submit', async () => {
     wrapper = mountComponent();
     const submitButton: Element | null = document.body.querySelector('[data-testid="org-unassign-submit-button"]');
     expect(submitButton).not.toBeNull();

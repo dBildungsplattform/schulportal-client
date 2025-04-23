@@ -214,7 +214,6 @@ export const usePersonenkontextStore: StoreDefinition<
           await personenKontextApi.dbiamPersonenkontextWorkflowControllerCommit(personId, updateParams, personalnummer);
         this.updatedPersonenkontexte = data;
       } catch (error: unknown) {
-
         this.errorCode = getResponseErrorCode(error, 'PERSONENKONTEXTE_UPDATE_ERROR');
       } finally {
         this.loading = false;

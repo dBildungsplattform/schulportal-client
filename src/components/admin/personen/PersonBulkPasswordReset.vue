@@ -51,7 +51,7 @@
   // Calculates the progress dynamically (Requests are sent sequentially and for every response we get the bar increments)
   const progress: ComputedRef<number> = computed(() => {
     if (!bulkOperationStore.currentOperation?.progress) return 0;
-    return Math.round(bulkOperationStore.currentOperation.progress * 100);
+    return bulkOperationStore.currentOperation.progress;
   });
 
   // Create the file and returns the Blob
