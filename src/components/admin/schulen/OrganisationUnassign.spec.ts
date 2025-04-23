@@ -93,7 +93,7 @@ describe('OrganisationUnassign', () => {
     await flushPromises();
 
     expect(wrapper.emitted('update:dialogExit')).toEqual([[false]]);
-    expect(bulkOperationStore.currentOperation?.progress).toEqual(undefined);
+    expect(bulkOperationStore.currentOperation?.progress).toEqual(0);
   });
 
   test('shows progressbar when unassigning', async () => {

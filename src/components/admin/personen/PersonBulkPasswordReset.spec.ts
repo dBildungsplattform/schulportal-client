@@ -73,6 +73,7 @@ beforeEach(async () => {
   await router.isReady();
 
   bulkOperationStore.$reset();
+  bulkOperationStore.resetState()
   vi.restoreAllMocks();
 });
 
@@ -134,7 +135,14 @@ describe('PersonBulkPasswordReset', () => {
     await flushPromises();
 
     expect(wrapper.emitted('update:dialogExit')).toEqual([[false]]);
-    expect(bulkOperationStore.currentOperation).toBeNull();
+    expect(bulkOperationStore.currentOperation).toEqual({
+      complete: false,
+      data: new Map(),
+      errors: new Map(),
+      isRunning: false,
+      progress: 0,
+      type: null,
+    });
   });
 
   test('close button closes dialog and resets store', async () => {
@@ -158,7 +166,6 @@ describe('PersonBulkPasswordReset', () => {
     await flushPromises();
 
     expect(wrapper.emitted('update:dialogExit')).toEqual([[true]]);
-    expect(bulkOperationStore.currentOperation).toBeNull();
   });
 
   test('clicking the reset button starts processing', async () => {

@@ -75,7 +75,6 @@ export const useBulkOperationStore: StoreDefinition<
     },
   }),
   actions: {
-
     resetState() {
       this.currentOperation = {
         type: null,
@@ -87,6 +86,7 @@ export const useBulkOperationStore: StoreDefinition<
         successMessage: undefined,
       };
     },
+
     async bulkUnassignPersonenFromOrg(organisationId: string, personIDs: string[]): Promise<void> {
       this.currentOperation = {
         type: 'UNASSIGN_PERSON',
