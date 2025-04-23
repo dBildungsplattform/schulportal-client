@@ -37,6 +37,7 @@ type BulkOperationState = {
 type BulkOperationGetters = {};
 
 type BulkOperationActions = {
+  resetState(): void;
   bulkUnassignPersonenFromOrg(organisationId: string, personIds: string[]): Promise<void>;
   bulkResetPassword(personIds: string[]): Promise<void>;
   bulkModifyPersonenRolle(
@@ -74,6 +75,18 @@ export const useBulkOperationStore: StoreDefinition<
     },
   }),
   actions: {
+
+    resetState() {
+      this.currentOperation = {
+        type: null,
+        isRunning: false,
+        progress: 0,
+        complete: false,
+        errors: new Map(),
+        data: new Map(),
+        successMessage: undefined,
+      };
+    },
     async bulkUnassignPersonenFromOrg(organisationId: string, personIDs: string[]): Promise<void> {
       this.currentOperation = {
         type: 'UNASSIGN_PERSON',

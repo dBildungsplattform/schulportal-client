@@ -24,7 +24,7 @@
   const emit: Emits = defineEmits<Emits>();
 
   async function closeDialog(finished: boolean): Promise<void> {
-    bulkOperationStore.currentOperation = null;
+    bulkOperationStore.resetState();
     emit('update:dialogExit', finished);
   }
 

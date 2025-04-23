@@ -86,7 +86,7 @@
 
   async function closePasswordResetDialog(finished: boolean): Promise<void> {
     emit('update:dialogExit', finished);
-    bulkOperationStore.currentOperation = null;
+    bulkOperationStore.resetState();
   }
 
   async function handleResetPassword(personIDs: string[]): Promise<void> {

@@ -90,7 +90,7 @@
 
   async function closeModifyRolleDeleteDialog(): Promise<void> {
     if (bulkOperationStore.currentOperation) {
-      bulkOperationStore.currentOperation.progress = 0;
+      bulkOperationStore.resetState();
     }
     showModifyRolleDialog.value = false;
     emit('update:isDialogVisible', false);

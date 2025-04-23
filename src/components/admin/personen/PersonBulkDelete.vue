@@ -29,7 +29,7 @@
 
   async function closeDeletePersonDialog(finished: boolean): Promise<void> {
     if (bulkOperationStore.currentOperation) {
-      bulkOperationStore.currentOperation.progress = 0;
+      bulkOperationStore.resetState();
     }
     showDeletePersonDialog.value = false;
     emit('update:dialogExit', finished);
