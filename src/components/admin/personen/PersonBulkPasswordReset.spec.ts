@@ -1,5 +1,5 @@
 import routes from '@/router/routes';
-import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
+import { OperationType, useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
 import { download } from '@/utils/file';
 import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import { test, describe, expect, beforeEach, vi, type MockInstance } from 'vitest';
@@ -89,7 +89,7 @@ describe('PersonBulkPasswordReset', () => {
   test('when state changes, it switches to next template', async () => {
     mountComponent();
     bulkOperationStore.currentOperation = {
-      type: 'DELETE_PERSON',
+      type: OperationType.DELETE_PERSON,
       isRunning: true,
       progress: 0.5,
       complete: false,
@@ -147,7 +147,7 @@ describe('PersonBulkPasswordReset', () => {
 
   test('close button closes dialog and resets store', async () => {
     bulkOperationStore.currentOperation = {
-      type: 'DELETE_PERSON',
+      type: OperationType.DELETE_PERSON,
       isRunning: false,
       progress: 1,
       complete: true,
@@ -185,7 +185,7 @@ describe('PersonBulkPasswordReset', () => {
 
   test('download is enabled after operation', async () => {
     bulkOperationStore.currentOperation = {
-      type: 'DELETE_PERSON',
+      type: OperationType.DELETE_PERSON,
       isRunning: false,
       progress: 1,
       complete: true,
@@ -214,7 +214,7 @@ describe('PersonBulkPasswordReset', () => {
       const filename: string = selectedSchuleKennung ? `PW_${selectedSchuleKennung}.txt` : 'PW.txt';
 
       bulkOperationStore.currentOperation = {
-        type: 'DELETE_PERSON',
+        type: OperationType.DELETE_PERSON,
         isRunning: false,
         progress: 1,
         complete: true,

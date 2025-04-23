@@ -33,7 +33,7 @@
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
   import OrganisationUnassign from '@/components/admin/schulen/OrganisationUnassign.vue';
   import InfoDialog from '@/components/alert/InfoDialog.vue';
-import { OperationType } from '@/stores/BulkOperationStore';
+  import { OperationType } from '@/stores/BulkOperationStore';
 
   const searchFieldComponent: Ref = ref();
 
