@@ -73,7 +73,7 @@ describe('OrganisationUnassign', () => {
     expect(submitButton).not.toBeNull();
     await nextTick();
 
-    const unassignPersonenkontexteSpy: MockInstance = vi.spyOn(bulkOperationStore, 'unassignPersonenFromOrg');
+    const unassignPersonenkontexteSpy: MockInstance = vi.spyOn(bulkOperationStore, 'bulkUnassignPersonenFromOrg');
 
     if (submitButton) {
       submitButton.dispatchEvent(new Event('click'));
@@ -93,12 +93,14 @@ describe('OrganisationUnassign', () => {
     await flushPromises();
 
     expect(wrapper.emitted('update:dialogExit')).toEqual([[false]]);
-    expect(bulkOperationStore.progress).toEqual(0);
+    expect(bulkOperationStore.currentOperation?.progress).toEqual(0);
   });
 
   test('shows progressbar when unassigning', async () => {
     wrapper = mountComponent();
-    bulkOperationStore.progress = 25;
+    if (bulkOperationStore.currentOperation) {
+      bulkOperationStore.currentOperation.progress = 25;
+    }
     await nextTick();
 
     const progressBar: Element | null = document.body.querySelector('[data-testid="org-unassign-progressbar"]');
