@@ -54,7 +54,7 @@
           >
             <v-btn
               :block="mdAndDown"
-              class="primary"
+              class="secondary"
               @click="closeDialog()"
               :data-testid="`${id}-cancel-button`"
             >

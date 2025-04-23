@@ -863,7 +863,7 @@
             ></v-select>
           </SpshTooltip>
           <InfoDialog
-            id="only-one-school"
+            id="only-one-school-notice"
             :isDialogVisible="onlyOneSchoolAlertDialogVisible"
             :header="singleSchoolAlertHeader"
             :message="$t('admin.person.onlyOneSchoolAlert')"

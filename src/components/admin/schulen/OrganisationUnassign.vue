@@ -135,7 +135,7 @@
             <v-btn
               v-if="bulkOperationStore.currentOperation?.progress === 100"
               :block="mdAndDown"
-              class="primary"
+              class="secondary"
               @click="closeDialog(true)"
               data-testid="org-unassign-close-button"
             >
