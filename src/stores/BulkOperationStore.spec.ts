@@ -195,7 +195,6 @@ describe('BulkOperationStore', () => {
     it('should set successMessage when all deletes succeed', async () => {
       const personIds: string[] = ['id-1', 'id-2'];
 
-
       mockAdapter.onDelete(`/api/personen/${personIds[0]}`).replyOnce(204);
       mockAdapter.onDelete(`/api/personen/${personIds[1]}`).replyOnce(204);
 
@@ -205,6 +204,30 @@ describe('BulkOperationStore', () => {
 
       expect(bulkOperationStore.currentOperation?.errors.size).toBe(0);
       expect(bulkOperationStore.currentOperation?.successMessage).toBe('admin.person.deletePersonBulkSuccessMessage');
+    });
+  });
+
+  describe('resetState', () => {
+    it('should reset the currentOperation state', () => {
+      bulkOperationStore.currentOperation = {
+        type: 'DELETE_PERSON',
+        isRunning: true,
+        progress: 55,
+        complete: true,
+        errors: new Map([['someId', 'someError']]),
+        data: new Map([['someId', 'someData']]),
+        successMessage: 'Some success message',
+      };
+
+      bulkOperationStore.resetState();
+
+      expect(bulkOperationStore.currentOperation.type).toBeNull();
+      expect(bulkOperationStore.currentOperation.isRunning).toBe(false);
+      expect(bulkOperationStore.currentOperation.progress).toBe(0);
+      expect(bulkOperationStore.currentOperation.complete).toBe(false);
+      expect(bulkOperationStore.currentOperation.errors.size).toBe(0);
+      expect(bulkOperationStore.currentOperation.data.size).toBe(0);
+      expect(bulkOperationStore.currentOperation.successMessage).toBeUndefined();
     });
   });
 });
