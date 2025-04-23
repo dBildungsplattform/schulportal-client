@@ -61,8 +61,26 @@ describe('BulkOperationStore', () => {
 
   describe('bulkUnassignPersonenFromOrg', () => {
     it('should unassign person from Organisation successfully', async () => {
-      vi.spyOn(personStore, 'getPersonenuebersichtById').mockResolvedValue();
-      vi.spyOn(personenkontextStore, 'updatePersonenkontexte').mockResolvedValue();
+      const mockPersonResponse: DBiamPersonenuebersichtResponse = {
+        personId: '1',
+        vorname: 'John',
+        nachname: 'Doe',
+        benutzername: 'jdoe',
+        lastModifiedZuordnungen: '2024-04-01T00:00:00.000Z',
+        zuordnungen: [],
+      };
+      const mockUpdateResponse: PersonenkontexteUpdateResponse = {
+        dBiamPersonenkontextResponses: [
+          {
+            personId: '1',
+            organisationId: 'org-123',
+            rolleId: 'rolle-456',
+          } as DBiamPersonenkontextResponse,
+        ],
+      };
+
+      mockAdapter.onGet('/api/dbiam/personenuebersicht/1').replyOnce(200, mockPersonResponse);
+      mockAdapter.onPut('/api/personenkontext-workflow/1').replyOnce(200, mockUpdateResponse);
 
       const unassign: Promise<void> = bulkOperationStore.bulkUnassignPersonenFromOrg('1234', [mockPersonId]);
       expect(bulkOperationStore.currentOperation?.progress).toBe(0);
@@ -73,16 +91,14 @@ describe('BulkOperationStore', () => {
     });
 
     it('should skip if person has no zuordnungen', async () => {
-      personStore.personenuebersicht = { ...person, zuordnungen: [] };
-      vi.spyOn(personenkontextStore, 'updatePersonenkontexte').mockResolvedValue();
+      mockAdapter.onGet('/api/dbiam/personenuebersicht/1').replyOnce(200, []);
 
       await bulkOperationStore.bulkUnassignPersonenFromOrg('1234', [mockPersonId]);
       expect(bulkOperationStore.currentOperation?.progress).toBe(100);
     });
 
     it('should skip if personenuebersicht is missing', async () => {
-      personStore.personenuebersicht = null;
-      vi.spyOn(personStore, 'getPersonenuebersichtById').mockResolvedValue();
+      mockAdapter.onGet('/api/dbiam/personenuebersicht/1').replyOnce(200, null);
 
       await bulkOperationStore.bulkUnassignPersonenFromOrg('1234', [mockPersonId]);
       expect(bulkOperationStore.currentOperation?.progress).toBe(100);

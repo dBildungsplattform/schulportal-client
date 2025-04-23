@@ -104,11 +104,6 @@ export const useBulkOperationStore: StoreDefinition<
         // Fetch the Zuordnungen for this specific user (To send alongside the new one)
         await personStore.getPersonenuebersichtById(personId);
 
-        if (personStore.errorCode) {
-          this.currentOperation.errors.set(personId, personStore.errorCode);
-          continue;
-        }
-
         // Extract the current Zuordnungen for this person
         const existingZuordnungen: Zuordnung[] = personStore.personenuebersicht?.zuordnungen ?? [];
 
@@ -124,10 +119,6 @@ export const useBulkOperationStore: StoreDefinition<
 
         // Await the processing of each ID
         await personenkontextStore.updatePersonenkontexte(updatedZuordnungen, personId);
-
-        if (personenkontextStore.errorCode) {
-          this.currentOperation.errors.set(personId, personenkontextStore.errorCode);
-        }
 
         // Update progress for each item processed
         this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
@@ -210,22 +201,10 @@ export const useBulkOperationStore: StoreDefinition<
 
         await personStore.getPersonenuebersichtById(personId);
 
-        if (personStore.errorCode) {
-          this.currentOperation.errors.set(personId, personStore.errorCode);
-          personStore.errorCode = '';
-          this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
-          continue;
-        }
-
         const currentZuordnungen: Zuordnung[] = personStore.personenuebersicht?.zuordnungen || [];
         const combinedZuordnungen: Zuordnung[] = [...currentZuordnungen, { ...baseZuordnung }];
 
         await personenkontextStore.updatePersonenkontexte(combinedZuordnungen, personId);
-
-        if (personenkontextStore.errorCode) {
-          this.currentOperation.errors.set(personId, personenkontextStore.errorCode);
-          personenkontextStore.errorCode = '';
-        }
 
         this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
       }
@@ -235,6 +214,10 @@ export const useBulkOperationStore: StoreDefinition<
 
       if (this.currentOperation.errors.size === 0) {
         this.currentOperation.successMessage = 'admin.rolle.rollenAssignedSuccessfully';
+      }
+
+      if (personenkontextStore.errorCode === 'INVALID_PERSONENKONTEXT_FOR_PERSON_WITH_ROLLENART_LERN') {
+        personenkontextStore.errorCode = '';
       }
     },
 
@@ -253,11 +236,6 @@ export const useBulkOperationStore: StoreDefinition<
         const personId: string = personIDs[i]!;
 
         await personStore.deletePersonById(personId);
-
-        if (personStore.errorCode) {
-          this.currentOperation.errors.set(personId, personStore.errorCode);
-          personStore.errorCode = '';
-        }
 
         this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
       }
