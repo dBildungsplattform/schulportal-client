@@ -32,7 +32,7 @@
 
   watch(selectedNewKlasse, (newValue: string | undefined) => {
     if (!selectedNewKlasse.value) {
-      organisationStore.getKlassenByOrganisationId({ limit: 25, administriertVon: [selectedSchule.value as string] });
+      organisationStore.getKlassenByOrganisationId({ limit: 200, administriertVon: [selectedSchule.value as string] });
     }
     selectedNewKlasse.value = newValue;
   });
@@ -48,7 +48,7 @@
       timerId.value = setTimeout(() => {
         organisationStore.getKlassenByOrganisationId({
           searchString: searchValue,
-          limit: 25,
+          limit: 200,
           administriertVon: [organisationId],
         });
       }, 500);
@@ -59,7 +59,7 @@
       timerId.value = setTimeout(() => {
         organisationStore.getKlassenByOrganisationId({
           searchString: searchValue,
-          limit: 25,
+          limit: 200,
           administriertVon: [organisationId],
         });
       }, 500);
