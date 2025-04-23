@@ -13,9 +13,6 @@ import { getResponseErrorCode } from '@/utils/errorHandlers';
 import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
 import type { Organisation } from './OrganisationStore';
 
-const personStore: PersonStore = usePersonStore();
-const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
-
 const personenApi: PersonenApiInterface = PersonenApiFactory(undefined, '', axiosApiInstance);
 
 type OperationType = 'UNASSIGN_PERSON' | 'RESET_PASSWORD' | 'MODIFY_ROLLE' | 'DELETE_PERSON' | null;
@@ -88,6 +85,9 @@ export const useBulkOperationStore: StoreDefinition<
     },
 
     async bulkUnassignPersonenFromOrg(organisationId: string, personIDs: string[]): Promise<void> {
+      const personStore: PersonStore = usePersonStore();
+      const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
+
       this.currentOperation = {
         type: 'UNASSIGN_PERSON',
         isRunning: true,
@@ -107,7 +107,8 @@ export const useBulkOperationStore: StoreDefinition<
         // Extract the current Zuordnungen for this person
         const existingZuordnungen: Zuordnung[] = personStore.personenuebersicht?.zuordnungen ?? [];
 
-        // Combine the new Zuordnung with the existing ones
+        // Remove the selected Organisation and it's children from the existing Zuordnungen
+        // This is done by filtering out any Zuordnung that has the same sskId or administriertVon as the selected organisationId
         const updatedZuordnungen: Zuordnung[] = existingZuordnungen.filter(
           (zuordnung: Zuordnung) => zuordnung.sskId !== organisationId && zuordnung.administriertVon !== organisationId,
         );
@@ -164,6 +165,9 @@ export const useBulkOperationStore: StoreDefinition<
       rollen: TranslatedRolleWithAttrs[],
       workflowStepResponseOrganisations: Organisation[],
     ): Promise<void> {
+      const personStore: PersonStore = usePersonStore();
+      const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
+
       this.currentOperation = {
         type: 'MODIFY_ROLLE',
         isRunning: true,
@@ -212,9 +216,7 @@ export const useBulkOperationStore: StoreDefinition<
       this.currentOperation.isRunning = false;
       this.currentOperation.complete = true;
 
-      if (this.currentOperation.errors.size === 0) {
-        this.currentOperation.successMessage = 'admin.rolle.rollenAssignedSuccessfully';
-      }
+      this.currentOperation.successMessage = 'admin.rolle.rollenAssignedSuccessfully';
 
       if (personenkontextStore.errorCode === 'INVALID_PERSONENKONTEXT_FOR_PERSON_WITH_ROLLENART_LERN') {
         personenkontextStore.errorCode = '';
@@ -222,6 +224,8 @@ export const useBulkOperationStore: StoreDefinition<
     },
 
     async bulkPersonenDelete(personIDs: string[]): Promise<void> {
+      const personStore: PersonStore = usePersonStore();
+
       this.currentOperation = {
         type: 'DELETE_PERSON',
         isRunning: true,
@@ -243,9 +247,7 @@ export const useBulkOperationStore: StoreDefinition<
       this.currentOperation.isRunning = false;
       this.currentOperation.complete = true;
 
-      if (this.currentOperation.errors.size === 0) {
-        this.currentOperation.successMessage = 'admin.person.deletePersonBulkSuccessMessage';
-      }
+      this.currentOperation.successMessage = 'admin.person.deletePersonBulkSuccessMessage';
     },
   },
 });

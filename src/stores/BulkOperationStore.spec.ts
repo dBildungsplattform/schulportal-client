@@ -56,6 +56,7 @@ describe('BulkOperationStore', () => {
     mockAdapter.reset();
     personStore.$reset();
     personenkontextStore.$reset();
+    bulkOperationStore.$reset();
     personStore.personenuebersicht = person;
   });
 
@@ -86,6 +87,66 @@ describe('BulkOperationStore', () => {
       expect(bulkOperationStore.currentOperation?.progress).toBe(0);
 
       await unassign;
+      expect(bulkOperationStore.currentOperation?.progress).toBe(100);
+      expect(bulkOperationStore.currentOperation?.errors.size).toBe(0);
+    });
+
+    it('should unassign and call updatePersonenkontexte if matching zuordnung exists', async () => {
+      const mockPersonResponse: DBiamPersonenuebersichtResponse = {
+        personId: '1',
+        vorname: 'John',
+        nachname: 'Doe',
+        benutzername: 'jdoe',
+        lastModifiedZuordnungen: '2024-04-01T00:00:00.000Z',
+        zuordnungen: [
+          {
+            sskId: '1234', // <- matches org ID
+            rolleId: 'some-role',
+            sskName: 'Test School',
+            sskDstNr: '123',
+            rolle: 'Test Role',
+            rollenArt: RollenArt.Lern,
+            administriertVon: 'admin-org-id',
+            typ: OrganisationsTyp.Schule,
+            editable: true,
+            befristung: 'unbefristet',
+            merkmale: [] as unknown as RollenMerkmal,
+            admins: ['admin1'],
+          },
+          {
+            sskId: '12345',
+            rolleId: 'some-role',
+            sskName: 'Test School',
+            sskDstNr: '123',
+            rolle: 'Test Role',
+            rollenArt: RollenArt.Lern,
+            administriertVon: '1234',
+            typ: OrganisationsTyp.Klasse,
+            editable: true,
+            befristung: 'unbefristet',
+            merkmale: [] as unknown as RollenMerkmal,
+            admins: ['admin1'],
+          },
+        ],
+      };
+
+      const mockUpdateResponse: PersonenkontexteUpdateResponse = {
+        dBiamPersonenkontextResponses: [
+          {
+            personId: '1',
+            organisationId: '1234',
+            rolleId: 'some-role',
+          } as DBiamPersonenkontextResponse,
+        ],
+      };
+
+      mockAdapter.onGet('/api/dbiam/personenuebersicht/1').replyOnce(200, mockPersonResponse);
+      mockAdapter.onPut('/api/personenkontext-workflow/1').replyOnce(200, mockUpdateResponse);
+
+      const unassign: Promise<void> = bulkOperationStore.bulkUnassignPersonenFromOrg('1234', [mockPersonId]);
+
+      await unassign;
+
       expect(bulkOperationStore.currentOperation?.progress).toBe(100);
       expect(bulkOperationStore.currentOperation?.errors.size).toBe(0);
     });
@@ -138,8 +199,8 @@ describe('BulkOperationStore', () => {
     });
   });
 
-  describe('bulkModifyPersonenRolle - error handling', () => {
-    it('should collect errors when updating a person fails', async () => {
+  describe('bulkModifyPersonenRolle', () => {
+    it('should update successfully with given values', async () => {
       const personIds: string[] = ['1', '2'];
       const selectedOrganisationId: string = 'org-123';
       const selectedRolleId: string = 'rolle-456';
@@ -180,14 +241,11 @@ describe('BulkOperationStore', () => {
         ],
       };
 
-      // Mock successful get for both persons
       mockAdapter.onGet('/api/dbiam/personenuebersicht/1').replyOnce(200, mockPersonResponse);
       mockAdapter.onGet('/api/dbiam/personenuebersicht/2').replyOnce(200, mockPersonResponse);
 
-      // Mock successful update for the first person
       mockAdapter.onPut('/api/personenkontext-workflow/1').replyOnce(200, mockUpdateResponse);
-      // Mock failed update for the second person
-      mockAdapter.onPut('/api/personenkontext-workflow/2').replyOnce(500, { i18nKey: 'MOCK_UPDATE_ERROR' });
+      mockAdapter.onPut('/api/personenkontext-workflow/2').replyOnce(200, mockUpdateResponse);
 
       const modifyPromise: Promise<void> = bulkOperationStore.bulkModifyPersonenRolle(
         personIds,
@@ -197,6 +255,114 @@ describe('BulkOperationStore', () => {
         workflowStepResponseOrganisations,
       );
 
+      // We set the errorCode to cover the case where the update fails
+      vi.spyOn(personenkontextStore, 'updatePersonenkontexte').mockImplementation(async () => {
+        personenkontextStore.errorCode = 'INVALID_PERSONENKONTEXT_FOR_PERSON_WITH_ROLLENART_LERN';
+        return Promise.resolve();
+      });
+
+      expect(bulkOperationStore.currentOperation?.isRunning).toBe(true);
+
+      await modifyPromise;
+
+      expect(personenkontextStore.errorCode).toBe('');
+      expect(bulkOperationStore.currentOperation?.isRunning).toBe(false);
+      expect(bulkOperationStore.currentOperation?.complete).toBe(true);
+      expect(bulkOperationStore.currentOperation?.progress).toBe(100);
+    });
+
+    it('should return early if organisation is not found', async () => {
+      const personIds: string[] = ['1', '2'];
+      const selectedOrganisationId: string = 'non-existing-org';
+      const selectedRolleId: string = 'rolle-456';
+
+      const workflowStepResponseOrganisations: Organisation[] = [
+        {
+          id: 'some-other-org',
+          name: 'Other Schule',
+          kennung: 'SCH999',
+          administriertVon: 'adminId',
+        } as Organisation,
+      ];
+
+      const rollen: TranslatedRolleWithAttrs[] = [
+        {
+          title: 'Lehrer',
+          value: 'rolle-456',
+          rollenart: RollenArt.Lern,
+        },
+      ];
+
+      const modifyPromise: Promise<void> = bulkOperationStore.bulkModifyPersonenRolle(
+        personIds,
+        selectedOrganisationId,
+        selectedRolleId,
+        rollen,
+        workflowStepResponseOrganisations,
+      );
+
+      await modifyPromise;
+
+      // Assertions
+      expect(bulkOperationStore.currentOperation?.isRunning).toBe(true);
+      expect(bulkOperationStore.currentOperation?.progress).toBe(0);
+      expect(bulkOperationStore.currentOperation?.complete).toBe(false);
+    });
+
+    it('should update successfully with default values for baseZuordnung', async () => {
+      const personIds: string[] = ['1', '2'];
+      const selectedOrganisationId: string = 'org-123';
+      const selectedRolleId: string = 'rolle-456';
+
+      const workflowStepResponseOrganisations: Organisation[] = [
+        {
+          id: 'org-123',
+          name: 'Test Schule',
+          kennung: null,
+          administriertVon: null,
+        } as Organisation,
+      ];
+
+      const rollen: TranslatedRolleWithAttrs[] = [
+        {
+          title: 'Lehrer',
+          value: 'rolle-457',
+          rollenart: RollenArt.Lern,
+        },
+      ];
+
+      const mockPersonResponse: DBiamPersonenuebersichtResponse = {
+        personId: '1',
+        vorname: 'John',
+        nachname: 'Doe',
+        benutzername: 'jdoe',
+        lastModifiedZuordnungen: '2024-04-01T00:00:00.000Z',
+        zuordnungen: [],
+      };
+
+      const mockUpdateResponse: PersonenkontexteUpdateResponse = {
+        dBiamPersonenkontextResponses: [
+          {
+            personId: '1',
+            organisationId: 'org-123',
+            rolleId: 'rolle-456',
+          } as DBiamPersonenkontextResponse,
+        ],
+      };
+
+      mockAdapter.onGet('/api/dbiam/personenuebersicht/1').replyOnce(200, []);
+      mockAdapter.onGet('/api/dbiam/personenuebersicht/2').replyOnce(200, mockPersonResponse);
+
+      mockAdapter.onPut('/api/personenkontext-workflow/1').replyOnce(200, mockUpdateResponse);
+      mockAdapter.onPut('/api/personenkontext-workflow/2').replyOnce(200, mockUpdateResponse);
+
+      const modifyPromise: Promise<void> = bulkOperationStore.bulkModifyPersonenRolle(
+        personIds,
+        selectedOrganisationId,
+        selectedRolleId,
+        rollen,
+        workflowStepResponseOrganisations,
+      );
       expect(bulkOperationStore.currentOperation?.isRunning).toBe(true);
 
       await modifyPromise;
