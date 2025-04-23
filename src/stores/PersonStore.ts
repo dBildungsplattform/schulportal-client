@@ -400,7 +400,6 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
         await personenApi.personControllerDeletePersonById(personId);
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
-        return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
       }

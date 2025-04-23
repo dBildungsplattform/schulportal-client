@@ -169,6 +169,7 @@ export const useBulkOperationStore: StoreDefinition<
         data: new Map(),
         successMessage: undefined,
       };
+
       const organisation: Organisation | undefined = workflowStepResponseOrganisations.find(
         (orga: Organisation) => orga.id === selectedOrganisationId,
       );
@@ -191,41 +192,40 @@ export const useBulkOperationStore: StoreDefinition<
         befristung: undefined,
       };
 
-      this.currentOperation = {
-        type: null,
-        isRunning: true,
-        progress: 0,
-        complete: false,
-        errors: new Map(),
-        data: new Map(),
-      };
-
       for (let i: number = 0; i < personIDs.length; i++) {
         const personId: string = personIDs[i]!;
 
-        const newZuordnung: Zuordnung = { ...baseZuordnung };
-
         await personStore.getPersonenuebersichtById(personId);
 
-        const currentZuordnungen: Zuordnung[] = personStore.personenuebersicht?.zuordnungen || [];
+        if (personStore.errorCode) {
+          this.currentOperation.errors.set(personId, personStore.errorCode);
+          personStore.errorCode = '';
+          this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
+          continue;
+        }
 
-        const combinedZuordnungen: Zuordnung[] = [...currentZuordnungen, newZuordnung];
+        const currentZuordnungen: Zuordnung[] = personStore.personenuebersicht?.zuordnungen || [];
+        const combinedZuordnungen: Zuordnung[] = [...currentZuordnungen, { ...baseZuordnung }];
 
         await personenkontextStore.updatePersonenkontexte(combinedZuordnungen, personId);
 
-        this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
-
-        if (personenkontextStore.errorCode === 'INVALID_PERSONENKONTEXT_FOR_PERSON_WITH_ROLLENART_LERN') {
+        if (personenkontextStore.errorCode) {
+          this.currentOperation.errors.set(personId, personenkontextStore.errorCode);
           personenkontextStore.errorCode = '';
         }
+
+        this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
       }
 
       this.currentOperation.isRunning = false;
       this.currentOperation.complete = true;
-      this.currentOperation.successMessage = 'admin.rolle.rollenAssignedSuccessfully';
+
+      if (this.currentOperation.errors.size === 0) {
+        this.currentOperation.successMessage = 'admin.rolle.rollenAssignedSuccessfully';
+      }
     },
 
-    async bulkPersonenDelete(personIDs: string[]) {
+    async bulkPersonenDelete(personIDs: string[]): Promise<void> {
       this.currentOperation = {
         type: 'DELETE_PERSON',
         isRunning: true,
@@ -239,10 +239,11 @@ export const useBulkOperationStore: StoreDefinition<
       for (let i: number = 0; i < personIDs.length; i++) {
         const personId: string = personIDs[i]!;
 
-        try {
-          await personStore.deletePersonById(personId);
-        } catch (error) {
-          this.currentOperation.errors.set(personId, (error as Error).message);
+        await personStore.deletePersonById(personId);
+
+        if (personStore.errorCode) {
+          this.currentOperation.errors.set(personId, personStore.errorCode);
+          personStore.errorCode = '';
         }
 
         this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);

@@ -599,32 +599,6 @@ describe('PersonStore', () => {
     });
   });
 
-  describe('bulkResetPassword', () => {
-    it('should reset and return passwords', async () => {
-      const userIds: Array<string> = [
-        'bd5c231b-5171-49f4-a3c2-cb9fb470ed91',
-        'f4e64f48-f1cf-463e-958f-ffd68e712713',
-        'ede4055b-e18a-4f1a-9bce-9e8871772229',
-      ];
-      const mockResponse: string = 'fakePassword';
-      mockadapter.onPatch(`/api/personen/${userIds[0]}/password`).replyOnce(200, mockResponse);
-      mockadapter.onPatch(`/api/personen/${userIds[1]}/password`).replyOnce(200, mockResponse);
-      mockadapter.onPatch(`/api/personen/${userIds[2]}/password`).replyOnce(500, new Error());
-      const resetPasswordPromise: Promise<void> = personStore.bulkResetPassword(userIds);
-
-      await resetPasswordPromise;
-
-      expect(personStore.loading).toBe(false);
-      expect(personStore.bulkResetPasswordResult?.complete).toBe(true);
-      expect(personStore.bulkResetPasswordResult?.progress).toBe(1);
-      expect(personStore.bulkResetPasswordResult?.errors.size).toBe(1);
-      expect(personStore.bulkResetPasswordResult?.errors.get(userIds[2]!)).toBe('UNSPECIFIED_ERROR');
-      expect(personStore.bulkResetPasswordResult?.passwords.size).toBe(2);
-      expect(personStore.bulkResetPasswordResult?.passwords.get(userIds[0]!)).toBe(mockResponse);
-      expect(personStore.bulkResetPasswordResult?.passwords.get(userIds[1]!)).toBe(mockResponse);
-    });
-  });
-
   describe('resetDevicePassword', () => {
     it('should reset and return device password when given a personId', async () => {
       const userId: string = '2345';
@@ -689,7 +663,7 @@ describe('PersonStore', () => {
 
       mockadapter.onDelete(`/api/personen/${personId}`).replyOnce(500, 'some error');
 
-      await rejects(personStore.deletePersonById(personId));
+      await personStore.deletePersonById(personId);
 
       expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR');
       expect(personStore.loading).toBe(false);
@@ -700,7 +674,7 @@ describe('PersonStore', () => {
 
       mockadapter.onDelete(`/api/personen/${personId}`).replyOnce(500, { code: 'some mock server error' });
 
-      await rejects(personStore.deletePersonById(personId));
+      await personStore.deletePersonById(personId);
 
       expect(personStore.errorCode).toEqual('some mock server error');
       expect(personStore.loading).toBe(false);

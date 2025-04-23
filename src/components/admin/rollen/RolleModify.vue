@@ -222,7 +222,7 @@
           >
             <v-btn
               :block="mdAndDown"
-              :disabled="!canCommit || personenkontextStore.loading"
+              :disabled="!canCommit || bulkOperationStore.currentOperation.isRunning"
               class="primary"
               @click="handleModifyRolle(props.personIDs)"
               data-testid="rolle-modify-submit-button"
