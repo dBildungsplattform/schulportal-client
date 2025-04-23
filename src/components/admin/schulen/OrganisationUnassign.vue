@@ -29,7 +29,7 @@
   }
 
   async function handleOrgUnassign(): Promise<void> {
-    await bulkOperationStore.unassignPersonenFromOrg(props.selectedOrganisation.id, props.selectedPersonenIds);
+    await bulkOperationStore.bulkUnassignPersonenFromOrg(props.selectedOrganisation.id, props.selectedPersonenIds);
   }
 </script>
 
