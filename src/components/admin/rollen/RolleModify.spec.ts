@@ -90,7 +90,7 @@ personenkontextStore.workflowStepResponse = {
 };
 
 describe('RolleModify', () => {
-  test.only('renders form and triggers submit', async () => {
+  test('renders form and triggers submit', async () => {
     await nextTick();
 
     // Set organisation value
