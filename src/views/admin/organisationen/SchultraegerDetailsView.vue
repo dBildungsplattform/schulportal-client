@@ -212,9 +212,7 @@
         (schuleFromTraeger: Organisation) => schuleFromTraeger.id === schule.id,
       );
 
-      const schuleToUnassign: Organisation = isPersisted
-        ? { ...schule, isNotPersisted: undefined }
-        : { ...schule, isNotPersisted: true };
+      const schuleToUnassign: Organisation = isPersisted ? { ...schule, isNotPersisted: true } : schule;
 
       unassignedSchulen.value = [schuleToUnassign, ...unassignedSchulen.value];
 
