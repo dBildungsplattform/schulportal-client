@@ -3,11 +3,11 @@ import { flushPromises, mount } from '@vue/test-utils';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import routes from '@/router/routes';
 import PersonBulkDelete from './PersonBulkDelete.vue';
-import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
 import { nextTick } from 'vue';
+import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
 
 let router: Router;
-const personStore: PersonStore = usePersonStore();
+const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
 
 beforeEach(async () => {
   // Create a container for the app and append it to the document body
@@ -66,13 +66,13 @@ describe('PersonBulkDelete', () => {
     expect(success).toBeNull();
     await nextTick();
 
-    const deletePersonByIdSpy: MockInstance = vi.spyOn(personStore, 'deletePersonById');
+    const bulkPersonenDeleteSpy: MockInstance = vi.spyOn(bulkOperationStore, 'bulkPersonenDelete');
     if (submitButton) {
       submitButton.dispatchEvent(new Event('click'));
     }
 
     await flushPromises();
-    expect(deletePersonByIdSpy).toHaveBeenCalledTimes(2);
+    expect(bulkPersonenDeleteSpy).toHaveBeenCalledTimes(1);
   });
 
   test('closes dialog', async () => {
