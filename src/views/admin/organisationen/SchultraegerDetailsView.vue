@@ -213,19 +213,27 @@
       /* if no search string is given, use store variable as leading source to get all schulen from traeger */
       if (!searchString) {
         /* if there are unpersisted schulen to unassign, remove them from list, else keep assignedSchulen value */
-        assignedSchulen.value =
-          unpersistedSchulenToUnassign.value.length > 0
-            ? organisationStore.schulenFromTraeger.filter((schule: Organisation) => {
-                return unpersistedSchulenToUnassign.value.some((unpersistedSchule: Organisation) => {
-                  return unpersistedSchule.id !== schule.id;
-                });
-              })
-            : assignedSchulen.value;
+        if (unpersistedSchulenToUnassign.value.length > 0) {
+          const filteredSchulenFromTraeger: Array<Organisation> = organisationStore.schulenFromTraeger.filter(
+            (schule: Organisation) => {
+              return unpersistedSchulenToUnassign.value.some((unpersistedSchule: Organisation) => {
+                return unpersistedSchule.id !== schule.id;
+              });
+            },
+          );
 
-        /* if there are unpersisted schulen to assign, prepend them */
-        assignedSchulen.value = unpersistedSchulenToAssign.value.length
-          ? [...unpersistedSchulenToAssign.value, ...assignedSchulen.value]
-          : assignedSchulen.value;
+          /* if there are also unpersisted schulen to assign, prepend them */
+          assignedSchulen.value =
+            unpersistedSchulenToAssign.value.length > 0
+              ? [...unpersistedSchulenToAssign.value, ...filteredSchulenFromTraeger]
+              : filteredSchulenFromTraeger;
+        } else if (unpersistedSchulenToAssign.value.length > 0) {
+          /* if there are ONLY unpersisted schulen to assign, prepend them to persisted schulen */
+          assignedSchulen.value = [...unpersistedSchulenToAssign.value, ...organisationStore.schulenFromTraeger];
+        } else {
+          /* if there are no unpersisted schulen, show persisted schulen from store */
+          assignedSchulen.value = organisationStore.schulenFromTraeger;
+        }
       } else {
         /* search locally in assigned schulen */
         assignedSchulen.value = assignedSchulen.value.filter((schule: Organisation) => {
