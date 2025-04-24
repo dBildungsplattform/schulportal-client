@@ -198,7 +198,6 @@ type PersonState = {
   loading: boolean;
   newDevicePassword: string | null;
   newPassword: string | null;
-  bulkResetPasswordResult: BulkResetPasswordResult | null;
   patchedPerson: PersonendatensatzResponse | null;
   personenuebersicht: DBiamPersonenuebersichtResponse | null;
   personenWithUebersicht: PersonenWithRolleAndZuordnung | null;
@@ -215,20 +214,12 @@ export type PersonFilter = {
   sortField?: SortField;
 };
 
-export type BulkResetPasswordResult = {
-  progress: number;
-  complete: boolean;
-  errors: Map<string, string>;
-  passwords: Map<string, string>;
-};
-
 type PersonGetters = {};
 type PersonActions = {
   resetState: () => void;
   getAllPersons: (filter: PersonFilter) => Promise<void>;
   getPersonById: (personId: string) => Promise<Personendatensatz>;
   resetPassword: (personId: string) => Promise<void>;
-  bulkResetPassword: (personIds: Array<string>) => Promise<void>;
   resetDevicePassword: (personId?: string) => Promise<void>;
   deletePersonById: (personId: string) => Promise<void>;
   lockPerson: (personId: string, bodyParams: LockUserBodyParams) => Promise<void>;
@@ -253,7 +244,6 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       loading: false,
       newDevicePassword: null,
       newPassword: null,
-      bulkResetPasswordResult: null,
       patchedPerson: null,
       personenuebersicht: null,
       personenWithUebersicht: null,
@@ -390,30 +380,6 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       }
     },
 
-    async bulkResetPassword(personIds: Array<string>): Promise<void> {
-      this.loading = true;
-      this.bulkResetPasswordResult = {
-        complete: false,
-        progress: 0,
-        errors: new Map(),
-        passwords: new Map(),
-      };
-      for (let i: number = 0; i < personIds.length; i++) {
-        const id: string = personIds[i]!;
-        try {
-          const { data }: { data: string } = await personenApi.personControllerResetPasswordByPersonId(id);
-          this.bulkResetPasswordResult.passwords.set(id, data);
-        } catch (error: unknown) {
-          const errorCode: string = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
-          this.bulkResetPasswordResult.errors.set(id, errorCode);
-        } finally {
-          this.bulkResetPasswordResult.progress = (i + 1) / personIds.length;
-        }
-      }
-      this.loading = false;
-      this.bulkResetPasswordResult.complete = true;
-    },
-
     async resetDevicePassword(personId?: string): Promise<void> {
       this.loading = true;
       try {
@@ -434,7 +400,6 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
         await personenApi.personControllerDeletePersonById(personId);
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
-        return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
       }

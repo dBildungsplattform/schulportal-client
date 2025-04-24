@@ -6,10 +6,13 @@ import routes from '@/router/routes';
 import RolleModify from './RolleModify.vue';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
 import { nextTick } from 'vue';
+import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
 const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
+const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
+
 beforeEach(async () => {
   // Create a container for the app and append it to the document body
   const appContainer: HTMLDivElement = document.createElement('div');
@@ -111,14 +114,14 @@ describe('RolleModify', () => {
     expect(submitButton).not.toBeNull();
     await nextTick();
 
-    const updatePersonenkontexteSpy: MockInstance = vi.spyOn(personenkontextStore, 'updatePersonenkontexte');
+    const bulkModifyPersonenRolleSpy: MockInstance = vi.spyOn(bulkOperationStore, 'bulkModifyPersonenRolle');
 
     if (submitButton) {
       submitButton.dispatchEvent(new Event('click'));
     }
 
     await flushPromises();
-    expect(updatePersonenkontexteSpy).toHaveBeenCalledTimes(2);
+    expect(bulkModifyPersonenRolleSpy).toHaveBeenCalledTimes(1);
   });
 
   test('renders the dialog when isDialogVisible is true', async () => {
