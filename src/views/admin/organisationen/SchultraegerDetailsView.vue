@@ -50,9 +50,18 @@
     assignedSchulen.value.filter((schule: Organisation) => schule.isNotPersisted),
   );
 
-  const unpersistedSchulenToUnassign: ComputedRef<Array<Organisation>> = computed(() =>
-    unassignedSchulen.value.filter((schule: Organisation) => schule.isNotPersisted),
+  const unpersistedSchulenToUnassign: ComputedRef<Organisation[]> = computed(() =>
+    unassignedSchulen.value.filter(
+      (schule: Organisation) =>
+        schule.isNotPersisted || organisationStore.schulenFromTraeger.some((s: Organisation) => s.id === schule.id), // Was previously assigned
+    ),
   );
+
+  // These computed properties are used to display the assigned and unassigned schulen in the UI.
+  // They are initialized with the same values as assignedSchulen and unassignedSchulen respectively. Extra added to distinguish between the search operation and the schule assignment.
+  // The displayed lists are used to show the schulen in the UI, while the original lists are used to keep track of the schulen that are assigned/unassigned.
+  const displayedAssignedSchulen: Ref<Organisation[]> = ref([]);
+  const displayedUnassignedSchulen: Ref<Organisation[]> = ref([]);
 
   const progress: Ref<number> = ref<number>(0);
   const successMessage: Ref<string> = ref<string>('');
@@ -165,131 +174,132 @@
     }
   });
 
+  // This method will prepare the schule to be assigned to the Schultraeger.
+  // It will set the 'isNotPersisted' to true flag if the schule is not already in the store and add it to the assignedSchulen array.
   function prepareSchuleToAssign(schule: Organisation): void {
-    let schuleToAssign: Organisation = schule;
+    // 1. Add to assignedSchulen (if not already there)
+    if (!assignedSchulen.value.some((item: Organisation) => item.id === schule.id)) {
+      const isPersisted: boolean = organisationStore.schulenFromTraeger.some(
+        (schuleFromTraeger: Organisation) => schuleFromTraeger.id === schule.id,
+      );
 
-    /* if schule is member of persisted schulen, remove isNotPersistedFlag; else set flag */
-    if (
-      organisationStore.schulenFromTraeger.some(
-        (schuleFromTraeger: Organisation) => schuleFromTraeger.id === schuleToAssign.id,
-      )
-    ) {
-      delete schuleToAssign.isNotPersisted;
-    } else {
-      schuleToAssign = { ...schuleToAssign, isNotPersisted: true };
+      const schuleToAssign: Organisation = isPersisted
+        ? { ...schule, isNotPersisted: undefined }
+        : { ...schule, isNotPersisted: true };
+
+      assignedSchulen.value = [schuleToAssign, ...assignedSchulen.value];
+      displayedAssignedSchulen.value = [schuleToAssign, ...displayedAssignedSchulen.value];
     }
 
-    assignedSchulen.value = [schuleToAssign, ...assignedSchulen.value];
-    unassignedSchulen.value = unassignedSchulen.value.filter((item: Organisation) => item.id !== schuleToAssign.id);
+    // 2. Remove from unassignedSchulen (if present)
+    unassignedSchulen.value = unassignedSchulen.value.filter((item: Organisation) => item.id !== schule.id);
+    displayedUnassignedSchulen.value = displayedUnassignedSchulen.value.filter(
+      (item: Organisation) => item.id !== schule.id,
+    );
+
+    // 3. Update the empty state text if unassigned list is now empty
+    if (unassignedSchulen.value.length === 0) {
+      noUnassignedSchulenFoundText.value = t('admin.schultraeger.unassignedSchulenDefaultText');
+    }
   }
 
+  // This method will prepare the schule to be unassigned from the Schultraeger.
+  // It will set the 'isNotPersisted' to true flag if the schule is not already in the store and add it to the unassignedSchulen array.
   function prepareSchuleToUnassign(schule: Organisation): void {
-    let schuleToUnassign: Organisation = schule;
+    // 1. Add to unassignedSchulen (if not already there)
+    if (!unassignedSchulen.value.some((item: Organisation) => item.id === schule.id)) {
+      const isPersisted: boolean = organisationStore.schulenFromTraeger.some(
+        (schuleFromTraeger: Organisation) => schuleFromTraeger.id === schule.id,
+      );
 
-    /* if schule is not a member of persisted schulen, remove isNotPersistedFlag; else set flag */
-    if (
-      !organisationStore.schulenFromTraeger.some(
-        (schuleFromTraeger: Organisation) => schuleFromTraeger.id === schuleToUnassign.id,
-      )
-    ) {
-      delete schuleToUnassign.isNotPersisted;
-    } else {
-      schuleToUnassign = { ...schuleToUnassign, isNotPersisted: true };
+      const schuleToUnassign: Organisation = isPersisted
+        ? { ...schule, isNotPersisted: undefined }
+        : { ...schule, isNotPersisted: true };
+
+      unassignedSchulen.value = [schuleToUnassign, ...unassignedSchulen.value];
+
+      // Update displayed unassigned list (add the new Schule)
+      displayedUnassignedSchulen.value = [schuleToUnassign, ...displayedUnassignedSchulen.value];
     }
 
-    unassignedSchulen.value = [schuleToUnassign, ...unassignedSchulen.value];
-    assignedSchulen.value = assignedSchulen.value.filter((item: Organisation) => item.id !== schule.id);
+    // 2. Remove from assignedSchulen (if present)
+    if (assignedSchulen.value.some((item: Organisation) => item.id === schule.id)) {
+      assignedSchulen.value = assignedSchulen.value.filter((item: Organisation) => item.id !== schule.id);
+
+      // Update displayed assigned list (remove the Schule)
+      displayedAssignedSchulen.value = displayedAssignedSchulen.value.filter(
+        (item: Organisation) => item.id !== schule.id,
+      );
+    }
+
+    // 3. Update the empty state text if assigned list is now empty
+    if (assignedSchulen.value.length === 0) {
+      noAssignedSchulenFoundText.value = t('admin.schultraeger.noSchulenFound');
+    }
   }
 
   // This method will search for both assigned or unassigned Schulen depending on the parameter "type" which could be either 'assigned' or 'unassigned'.
   async function searchSchulen(searchString: string, type: SchuleType): Promise<void> {
     if (!organisationStore.currentOrganisation) return;
 
-    /* if schule type is assigned, search in frontend */
-    if (type === SchuleType.ASSIGNED) {
-      noAssignedSchulenFoundText.value =
-        assignedSchulen.value.length === 0 ? t('admin.schultraeger.noSchulenAssigned') : '';
+    const isAssigned: boolean = type === SchuleType.ASSIGNED;
+    const hasSearchInput: boolean = !!searchString;
+    const currentParentId: string = organisationStore.currentOrganisation.zugehoerigZu!;
 
-      /* if no search string is given, use store variable as leading source to get all schulen from traeger */
-      if (!searchString) {
-        /* if there are unpersisted schulen to unassign, remove them from list, else keep assignedSchulen value */
-        if (unpersistedSchulenToUnassign.value.length > 0) {
-          const filteredSchulenFromTraeger: Array<Organisation> = organisationStore.schulenFromTraeger.filter(
-            (schule: Organisation) => {
-              return unpersistedSchulenToUnassign.value.some((unpersistedSchule: Organisation) => {
-                return unpersistedSchule.id !== schule.id;
-              });
-            },
-          );
-
-          /* if there are also unpersisted schulen to assign, prepend them */
-          assignedSchulen.value =
-            unpersistedSchulenToAssign.value.length > 0
-              ? [...unpersistedSchulenToAssign.value, ...filteredSchulenFromTraeger]
-              : filteredSchulenFromTraeger;
-        } else if (unpersistedSchulenToAssign.value.length > 0) {
-          /* if there are ONLY unpersisted schulen to assign, prepend them to persisted schulen */
-          assignedSchulen.value = [...unpersistedSchulenToAssign.value, ...organisationStore.schulenFromTraeger];
-        } else {
-          /* if there are no unpersisted schulen, show persisted schulen from store */
-          assignedSchulen.value = organisationStore.schulenFromTraeger;
-        }
-      } else {
-        /* search locally in assigned schulen */
-        assignedSchulen.value = assignedSchulen.value.filter((schule: Organisation) => {
-          const searchStringLowerCase: string = searchString.toLowerCase();
-          return (
-            schule.name.toLowerCase().includes(searchStringLowerCase) ||
-            (schule.kennung && schule.kennung.toLowerCase().includes(searchStringLowerCase))
-          );
-        });
-
-        /* if input is given and no Schulen were found, show that there were none found */
-        noAssignedSchulenFoundText.value =
-          assignedSchulen.value.length === 0 && searchString ? t('admin.schultraeger.noSchulenFound') : '';
-      }
-    } else {
-      /* if schule type is unassigned, fetch and search schulen from BE */
-      /* cache unpersisted schulen before fetching from backend */
-      const unpersistedSchulenToUnassignCache: Array<Organisation> = unpersistedSchulenToUnassign.value;
-
-      await organisationStore.fetchSchulen(
-        {
-          searchString,
-          zugehoerigZu: undefined,
-          limit: 50,
-        },
-        type,
+    if (isAssigned) {
+      // For assigned schools, we always show:
+      // 1. Persisted schools from the store (minus any pending unassigns)
+      // 2. Plus any pending assigns
+      const persistedSchulen: Organisation[] = organisationStore.schulenFromTraeger.filter(
+        (schule: Organisation) => !unpersistedSchulenToUnassign.value.some((u: Organisation) => u.id === schule.id),
       );
 
-      const currentOrganisationParentId: string | null | undefined = organisationStore.currentOrganisation.zugehoerigZu;
-      const unpersistedSchulenToAssignIds: Array<string> = unpersistedSchulenToAssign.value.map(
-        (schule: Organisation) => schule.id,
-      );
+      const workingSet: Organisation[] = [...unpersistedSchulenToAssign.value, ...persistedSchulen];
 
-      /* Filter unassigned Schulen to only include those having the same parent (zugehoerigZu) as the current Schultraeger,
-         as well as removing the unpersisted schulen that have been assigned to the traeger */
-      unassignedSchulen.value = organisationStore.schulenWithoutTraeger.filter(
-        (schule: Organisation) =>
-          schule.zugehoerigZu === currentOrganisationParentId && !unpersistedSchulenToAssignIds.includes(schule.id),
-      );
-
-      /* If no search string is given then ask for Input first */
-      if (!searchString) {
-        unassignedSchulen.value = unpersistedSchulenToUnassignCache.length ? unpersistedSchulenToUnassignCache : [];
-        noUnassignedSchulenFoundText.value = t('admin.schultraeger.unassignedSchulenDefaultText');
+      if (!hasSearchInput) {
+        // Show full working set when no search
+        displayedAssignedSchulen.value = workingSet;
+        noAssignedSchulenFoundText.value = workingSet.length === 0 ? t('admin.schultraeger.noSchulenAssigned') : '';
         return;
       }
 
-      /* if input is given and no Schulen were found, show that there were none found */
-      noUnassignedSchulenFoundText.value =
-        unassignedSchulen.value.length === 0 && searchString ? t('admin.schultraeger.noSchulenFound') : '';
+      // Filter working set when searching
+      const lowerCaseSearchString: string = searchString.toLowerCase();
+      displayedAssignedSchulen.value = workingSet.filter(
+        (s: Organisation) =>
+          s.name.toLowerCase().includes(lowerCaseSearchString) ||
+          s.kennung?.toLowerCase().includes(lowerCaseSearchString),
+      );
 
-      /* if there are unpersisted schulen, add them back in after searching */
-      unassignedSchulen.value = unpersistedSchulenToUnassignCache.length
-        ? [...unpersistedSchulenToUnassignCache, ...unassignedSchulen.value]
-        : unassignedSchulen.value;
+      noAssignedSchulenFoundText.value =
+        displayedAssignedSchulen.value.length === 0 ? t('admin.schultraeger.noSchulenFound') : '';
+      return;
     }
+
+    // UNASSIGNED section
+    if (!hasSearchInput) {
+      // When no search, just show pending unassigns
+      displayedUnassignedSchulen.value = [...unpersistedSchulenToUnassign.value];
+      noUnassignedSchulenFoundText.value = t('admin.schultraeger.unassignedSchulenDefaultText');
+      return;
+    }
+
+    // When searching unassigned, fetch from server
+    await organisationStore.fetchSchulen({ searchString, zugehoerigZu: undefined, limit: 50 }, type);
+
+    // Filter out:
+    // 1. Schools already assigned (persisted or pending)
+    // 2. Schools that don't match the current parent
+    const unpersistedAssignIds: string[] = unpersistedSchulenToAssign.value.map((s: Organisation) => s.id);
+    const filtered: Organisation[] = organisationStore.schulenWithoutTraeger.filter(
+      (s: Organisation) => s.zugehoerigZu === currentParentId && !unpersistedAssignIds.includes(s.id),
+    );
+
+    // Combine with pending unassigns
+    displayedUnassignedSchulen.value = [...unpersistedSchulenToUnassign.value, ...filtered];
+
+    noUnassignedSchulenFoundText.value =
+      displayedUnassignedSchulen.value.length === 0 ? t('admin.schultraeger.noSchulenFound') : '';
   }
 
   onBeforeMount(async () => {
@@ -307,6 +317,7 @@
       SchuleType.ASSIGNED,
     );
     assignedSchulen.value = organisationStore.schulenFromTraeger;
+    displayedAssignedSchulen.value = organisationStore.schulenFromTraeger;
 
     // Set the initial values using the computed properties
     if (rootChildSchultraegerList.value.length > 0) {
@@ -402,7 +413,7 @@
             </v-row>
             <v-row class="align-center mt-8 px-5">
               <RelationshipAssign
-                :assignedItems="assignedSchulen"
+                :assignedItems="displayedAssignedSchulen"
                 :assignedItemsHeader="$t('admin.schultraeger.schulenOfThisTraeger', { amount: assignedSchulen.length })"
                 :noAssignedItemsFoundText="noAssignedSchulenFoundText"
                 :noUnassignedItemsFoundText="noUnassignedSchulenFoundText"
@@ -414,7 +425,7 @@
                 @onHandleUnassignedItemsSearchFilter="
                   (searchString: string) => searchSchulen(searchString, SchuleType.UNASSIGNED)
                 "
-                :unassignedItems="unassignedSchulen"
+                :unassignedItems="displayedUnassignedSchulen"
                 :unassignedItemsHeader="$t('admin.schultraeger.schulenWithoutTraeger')"
               >
                 <template v-slot="{ item }">
