@@ -245,7 +245,7 @@ describe('ImportStore', () => {
 
         await pollingPromise;
 
-        expect(importStore.errorCode).toEqual('ERROR_IMPORTING_FILE');
+        expect(importStore.errorCode).toEqual('UNSPECIFIED_ERROR');
         expect(importStore.importProgress).toEqual(0);
       });
     });

@@ -146,7 +146,7 @@ export const useImportStore: StoreDefinition<'importStore', ImportState, ImportG
           }
         } catch (error: unknown) {
           this.stopImportStatusPolling();
-          this.errorCode = getResponseErrorCode(error, 'ERROR_IMPORTING_FILE');
+          this.errorCode = 'UNSPECIFIED_ERROR';
           this.importProgress = 0;
         }
       };
