@@ -32,6 +32,8 @@ export type Organisation = {
   schuleDetails?: string;
   version?: number;
   itslearningEnabled?: boolean;
+  /* isNotPersisted is optional and currently only used for SchultraegerDetailsView */
+  isNotPersisted?: boolean;
 };
 
 export type KlasseTableItem = {
@@ -357,7 +359,7 @@ export const useOrganisationStore: StoreDefinition<
       try {
         const response: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations(
           undefined,
-          25,
+          200,
           undefined,
           undefined,
           filter?.searchString,

@@ -72,7 +72,7 @@
   let klassenAutocompleteDebounceTimer: ReturnType<typeof setTimeout> | undefined;
   const klassenAutocompleteFilter: Reactive<OrganisationenFilter> = reactive({
     offset: 0,
-    limit: 25,
+    limit: 200,
     organisationIds: searchFilterStore.selectedKlassenForKlassen || [],
     systemrechte: [RollenSystemRecht.KlassenVerwalten],
     searchString: '',

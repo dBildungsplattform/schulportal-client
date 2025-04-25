@@ -293,7 +293,7 @@ describe('KlassenManagementView', () => {
     expect(organisationStore.getKlassenByOrganisationId).toHaveBeenCalledWith({
       searchString,
       administriertVon: [schule.id],
-      limit: 25,
+      limit: 200,
       offset: 0,
       organisationIds: [],
       systemrechte: [RollenSystemRecht.KlassenVerwalten],

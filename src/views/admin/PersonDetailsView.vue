@@ -766,7 +766,7 @@
         administriertVon: [selectedZuordnungen.value[0]?.sskId],
         includeTyp: OrganisationsTyp.Klasse,
         systemrechte: ['KLASSEN_VERWALTEN'],
-        limit: 25,
+        limit: 200,
       });
 
       await organisationStore.getKlassenByOrganisationId({

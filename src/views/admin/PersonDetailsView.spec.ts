@@ -762,7 +762,7 @@ describe('PersonDetailsView', () => {
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'organisation-select' });
     await organisationAutocomplete?.setValue('O1');
-    await organisationAutocomplete?.vm.$emit('update:search', 'O1');
+    organisationAutocomplete?.vm.$emit('update:search', 'O1');
     await nextTick();
 
     // Set rolle value
@@ -777,7 +777,7 @@ describe('PersonDetailsView', () => {
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'klasse-select' });
     await klasseAutocomplete?.setValue('9a');
-    await klasseAutocomplete?.vm.$emit('update:search', '9a');
+    klasseAutocomplete?.vm.$emit('update:search', '9a');
     await nextTick();
 
     const befristungInput: VueWrapper | undefined = wrapper
@@ -866,8 +866,9 @@ describe('PersonDetailsView', () => {
 
     await flushPromises();
     await flushPromises();
+    await flushPromises();
 
-    const confirmDialogButton: Element | null = await document.body.querySelector(
+    const confirmDialogButton: Element | null = document.body.querySelector(
       '[data-testid="confirm-change-klasse-button"]',
     );
     expect(confirmDialogButton).not.toBeNull();
