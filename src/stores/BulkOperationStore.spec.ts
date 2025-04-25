@@ -480,7 +480,7 @@ describe('BulkOperationStore', () => {
       expect(bulkOperationStore.currentOperation?.progress).toBe(100);
       expect(bulkOperationStore.currentOperation?.successMessage).toBe('admin.rolle.rollenAssignedSuccessfully');
       expect(bulkOperationStore.currentOperation?.errors).toEqual(new Map());
-      mockPersonResponses.forEach((response) => {
+      mockPersonResponses.forEach((response: DBiamPersonenuebersichtResponse) => {
         const personId: string = response.personId;
         const correctBefristung: string = isBefore(response.zuordnungen[0]!.befristung, befristung)
           ? response.zuordnungen[0]!.befristung
