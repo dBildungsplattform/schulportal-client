@@ -164,6 +164,7 @@
       <!-- The form to create a new Schultraeger -->
       <template v-if="!organisationStore.createdSchultraeger">
         <SchultraegerForm
+          :canCommit="!!selectedSchultraegername"
           :errorCode="organisationStore.errorCode"
           :isLoading="organisationStore.loading"
           :onHandleConfirmUnsavedChanges="handleConfirmUnsavedChanges"
