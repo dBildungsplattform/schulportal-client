@@ -405,6 +405,7 @@ describe('BulkOperationStore', () => {
         },
       ];
       const mockBefristungen: string[] = [
+        '',
         faker.date.between({ from: new Date(), to: befristung }).toISOString(),
         befristung,
         faker.date.past({ refDate: befristung }).toISOString(),

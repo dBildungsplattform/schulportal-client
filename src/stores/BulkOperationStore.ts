@@ -244,10 +244,6 @@ export const useBulkOperationStore: StoreDefinition<
       this.currentOperation.complete = true;
 
       this.currentOperation.successMessage = 'admin.rolle.rollenAssignedSuccessfully';
-
-      if (personenkontextStore.errorCode === 'INVALID_PERSONENKONTEXT_FOR_PERSON_WITH_ROLLENART_LERN') {
-        personenkontextStore.errorCode = '';
-      }
     },
 
     async bulkPersonenDelete(personIDs: string[]): Promise<void> {
