@@ -1,21 +1,30 @@
 import {
   OrganisationsTyp,
+  RollenArt,
+  RollenMerkmal,
   RollenSystemRecht,
   TraegerschaftTyp,
+  type DBiamPersonenuebersichtResponse,
+  type DBiamPersonenzuordnungResponse,
   type OrganisationResponse,
   type PersonenkontextRolleFieldsResponse,
   type RollenSystemRechtServiceProviderIDResponse,
   type UserinfoResponse,
 } from '@/api-client/generated';
 import type { Organisation } from '@/stores/OrganisationStore';
+import type { Zuordnung } from '@/stores/PersonenkontextStore';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { faker } from '@faker-js/faker';
 
 export class DoFactory {
+  private static getFakeSchuleName(): string {
+    return `${faker.person.firstName()}-${faker.person.lastName()}-Schule`;
+  }
+
   public static getSchule(props?: Partial<Organisation>): Organisation {
     return {
       id: faker.string.uuid(),
-      name: `${faker.person.firstName()}-${faker.person.lastName()}-Schule`,
+      name: DoFactory.getFakeSchuleName(),
       kennung: faker.string.numeric(7),
       typ: OrganisationsTyp.Schule,
       administriertVon: faker.string.uuid(),
@@ -114,6 +123,58 @@ export class DoFactory {
         RollenSystemRecht.PersonSynchronisieren,
       ],
       serviceProviderIds: [faker.string.uuid()],
+      ...props,
+    };
+  }
+
+  public static getDBiamPersonenuebersichtResponse(
+    props?: Partial<DBiamPersonenuebersichtResponse>,
+  ): DBiamPersonenuebersichtResponse {
+    return {
+      personId: faker.string.uuid(),
+      vorname: faker.person.firstName(),
+      nachname: faker.person.lastName(),
+      benutzername: faker.internet.username(),
+      lastModifiedZuordnungen: faker.date.recent().toISOString(),
+      zuordnungen: [],
+      ...props,
+    };
+  }
+
+  public static getDBiamPersonenzuordnungResponse(
+    props?: Partial<DBiamPersonenzuordnungResponse>,
+  ): DBiamPersonenzuordnungResponse {
+    return {
+      sskId: faker.string.uuid(),
+      sskName: DoFactory.getFakeSchuleName(),
+      sskDstNr: faker.string.numeric(7),
+      rolleId: faker.string.uuid(),
+      rolle: faker.string.alpha(4),
+      rollenArt: RollenArt.Lehr,
+      befristung: faker.date.future().toISOString(),
+      administriertVon: faker.string.uuid(),
+      editable: true,
+      merkmale: [] as unknown as RollenMerkmal,
+      admins: [faker.person.fullName()],
+      typ: OrganisationsTyp.Schule,
+      ...props,
+    };
+  }
+
+  public static getZuordnung(props?: Partial<Zuordnung>): Zuordnung {
+    return {
+      sskId: faker.string.uuid(),
+      rolleId: faker.string.uuid(),
+      sskName: DoFactory.getFakeSchuleName(),
+      sskDstNr: faker.string.numeric(7),
+      rolle: faker.string.alpha(4),
+      rollenArt: RollenArt.Lehr,
+      befristung: faker.date.future().toISOString(),
+      klasse: undefined,
+      administriertVon: faker.string.uuid(),
+      editable: true,
+      merkmale: [] as unknown as RollenMerkmal,
+      typ: OrganisationsTyp.Schule,
       ...props,
     };
   }

@@ -1,19 +1,23 @@
 import type {
-  DBiamPersonenzuordnungResponse,
-  DBiamPersonenuebersichtResponse,
-  RollenMerkmal,
   DBiamPersonenkontextResponse,
+  DBiamPersonenuebersichtResponse,
+  DBiamPersonenzuordnungResponse,
   PersonenkontexteUpdateResponse,
+  RollenMerkmal,
 } from '@/api-client/generated';
+import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
 import ApiService from '@/services/ApiService';
+import { DoFactory } from '@/testing/DoFactory';
+import { faker } from '@faker-js/faker';
 import MockAdapter from 'axios-mock-adapter';
+import { isBefore } from 'date-fns';
 import { createPinia, setActivePinia } from 'pinia';
+import type { MockInstance } from 'vitest';
 import { OperationType, useBulkOperationStore, type BulkOperationStore } from './BulkOperationStore';
+import { OrganisationsTyp, type Organisation } from './OrganisationStore';
 import { usePersonStore, type PersonStore } from './PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from './PersonenkontextStore';
-import { OrganisationsTyp, type Organisation } from './OrganisationStore';
 import { RollenArt } from './RolleStore';
-import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
 
 const mockAdapter: MockAdapter = new MockAdapter(ApiService);
 
@@ -58,6 +62,7 @@ describe('BulkOperationStore', () => {
     personenkontextStore.$reset();
     bulkOperationStore.$reset();
     personStore.personenuebersicht = person;
+    vi.restoreAllMocks();
   });
 
   describe('bulkUnassignPersonenFromOrg', () => {
@@ -381,45 +386,166 @@ describe('BulkOperationStore', () => {
       expect(bulkOperationStore.currentOperation?.complete).toBe(true);
       expect(bulkOperationStore.currentOperation?.progress).toBe(100);
     });
-  });
 
-  describe('bulkPersonenDelete', () => {
-    it('should set successMessage when all deletes succeed', async () => {
-      const personIds: string[] = ['id-1', 'id-2'];
+    it('should correctly handle befristungen', async () => {
+      const selectedOrganisationId: string = faker.string.uuid();
+      const selectedRolleTitle: string = 'Lehrer';
+      const selectedRolleId: string = faker.string.uuid();
+      const befristung: string = faker.date.future().toISOString();
+      const spy: MockInstance = vi.spyOn(personenkontextStore, 'updatePersonenkontexte');
 
-      mockAdapter.onDelete(`/api/personen/${personIds[0]}`).replyOnce(204);
-      mockAdapter.onDelete(`/api/personen/${personIds[1]}`).replyOnce(204);
+      const selectedOrganisation: Organisation = DoFactory.getOrganisationResponse({ id: selectedOrganisationId });
+      const workflowStepResponseOrganisations: Organisation[] = [selectedOrganisation];
 
-      const bulkDeletePromise: Promise<void> = bulkOperationStore.bulkPersonenDelete(personIds);
+      const rollen: TranslatedRolleWithAttrs[] = [
+        {
+          title: selectedRolleTitle,
+          value: selectedRolleId,
+          rollenart: RollenArt.Lern,
+        },
+      ];
+      const mockBefristungen: string[] = [
+        faker.date.between({ from: new Date(), to: befristung }).toISOString(),
+        befristung,
+        faker.date.past({ refDate: befristung }).toISOString(),
+      ];
+      const mockZuordnungen: Array<DBiamPersonenzuordnungResponse> = mockBefristungen.map((mockBefristung: string) => ({
+        befristung: mockBefristung,
+        sskId: selectedOrganisation.id,
+        sskName: selectedOrganisation.name,
+        sskDstNr: selectedOrganisation.kennung ?? '',
+        rolleId: selectedRolleId,
+        rolle: selectedRolleTitle,
+        administriertVon: selectedOrganisation.administriertVon ?? '',
+        editable: true,
+        merkmale: [] as unknown as RollenMerkmal,
+        typ: selectedOrganisation.typ,
+        rollenArt: RollenArt.Lern,
+        admins: [faker.person.fullName()],
+      }));
+      const mockPersonResponses: Array<DBiamPersonenuebersichtResponse> = mockZuordnungen.map(
+        (zuordnung: DBiamPersonenzuordnungResponse) => ({
+          ...DoFactory.getDBiamPersonenuebersichtResponse({ zuordnungen: [zuordnung] }),
+        }),
+      );
+      const personIds: string[] = mockPersonResponses.map(
+        (response: DBiamPersonenuebersichtResponse) => response.personId,
+      );
 
-      await bulkDeletePromise;
+      const mockUpdateResponses: Array<PersonenkontexteUpdateResponse> = mockPersonResponses.map(
+        (response: DBiamPersonenuebersichtResponse) => ({
+          dBiamPersonenkontextResponses: [
+            ...response.zuordnungen.map((zuordnung: DBiamPersonenzuordnungResponse) => ({
+              personId: response.personId,
+              organisationId: zuordnung.sskId,
+              rolleId: zuordnung.rolleId,
+              befristung: zuordnung.befristung,
+            })),
+            {
+              personId: response.personId,
+              organisationId: selectedOrganisationId,
+              rolleId: selectedRolleId,
+              befristung: isBefore(response.zuordnungen[0]!.befristung, befristung)
+                ? response.zuordnungen[0]!.befristung
+                : befristung,
+            },
+          ],
+        }),
+      );
+      mockPersonResponses.forEach((response: DBiamPersonenuebersichtResponse) => {
+        mockAdapter.onGet(`/api/dbiam/personenuebersicht/${response.personId}`).replyOnce(200, response);
+      });
+      mockUpdateResponses.forEach((response: PersonenkontexteUpdateResponse) => {
+        mockAdapter
+          .onPut(`/api/personenkontext-workflow/${response.dBiamPersonenkontextResponses[0]!.personId}`)
+          .replyOnce(200, response);
+      });
 
-      expect(bulkOperationStore.currentOperation?.errors.size).toBe(0);
-      expect(bulkOperationStore.currentOperation?.successMessage).toBe('admin.person.deletePersonBulkSuccessMessage');
+      const modifyPromise: Promise<void> = bulkOperationStore.bulkModifyPersonenRolle(
+        personIds,
+        selectedOrganisationId,
+        selectedRolleId,
+        rollen,
+        workflowStepResponseOrganisations,
+        befristung,
+      );
+
+      expect(bulkOperationStore.currentOperation?.isRunning).toBe(true);
+
+      await modifyPromise;
+
+      expect(personenkontextStore.errorCode).toBe('');
+      expect(bulkOperationStore.currentOperation?.isRunning).toBe(false);
+      expect(bulkOperationStore.currentOperation?.complete).toBe(true);
+      expect(bulkOperationStore.currentOperation?.progress).toBe(100);
+      expect(bulkOperationStore.currentOperation?.successMessage).toBe('admin.rolle.rollenAssignedSuccessfully');
+      expect(bulkOperationStore.currentOperation?.errors).toEqual(new Map());
+      mockPersonResponses.forEach((response) => {
+        const personId: string = response.personId;
+        const correctBefristung: string = isBefore(response.zuordnungen[0]!.befristung, befristung)
+          ? response.zuordnungen[0]!.befristung
+          : befristung;
+        expect(spy).toHaveBeenCalledWith(
+          [
+            ...response.zuordnungen,
+            {
+              administriertVon: selectedOrganisation.administriertVon ?? '',
+              befristung: correctBefristung,
+              editable: true,
+              klasse: undefined,
+              merkmale: [],
+              rolle: selectedRolleTitle,
+              rollenArt: RollenArt.Lern,
+              sskDstNr: selectedOrganisation.kennung ?? '',
+              sskId: selectedOrganisationId,
+              rolleId: selectedRolleId,
+              sskName: selectedOrganisation.name,
+              typ: selectedOrganisation.typ,
+            },
+          ],
+          personId,
+        );
+      });
     });
-  });
 
-  describe('resetState', () => {
-    it('should reset the currentOperation state', () => {
-      bulkOperationStore.currentOperation = {
-        type: OperationType.DELETE_PERSON,
-        isRunning: true,
-        progress: 55,
-        complete: true,
-        errors: new Map([['someId', 'someError']]),
-        data: new Map([['someId', 'someData']]),
-        successMessage: 'Some success message',
-      };
+    describe('bulkPersonenDelete', () => {
+      it('should set successMessage when all deletes succeed', async () => {
+        const personIds: string[] = ['id-1', 'id-2'];
 
-      bulkOperationStore.resetState();
+        mockAdapter.onDelete(`/api/personen/${personIds[0]}`).replyOnce(204);
+        mockAdapter.onDelete(`/api/personen/${personIds[1]}`).replyOnce(204);
 
-      expect(bulkOperationStore.currentOperation.type).toBeNull();
-      expect(bulkOperationStore.currentOperation.isRunning).toBe(false);
-      expect(bulkOperationStore.currentOperation.progress).toBe(0);
-      expect(bulkOperationStore.currentOperation.complete).toBe(false);
-      expect(bulkOperationStore.currentOperation.errors.size).toBe(0);
-      expect(bulkOperationStore.currentOperation.data.size).toBe(0);
-      expect(bulkOperationStore.currentOperation.successMessage).toBeUndefined();
+        const bulkDeletePromise: Promise<void> = bulkOperationStore.bulkPersonenDelete(personIds);
+
+        await bulkDeletePromise;
+
+        expect(bulkOperationStore.currentOperation?.errors.size).toBe(0);
+        expect(bulkOperationStore.currentOperation?.successMessage).toBe('admin.person.deletePersonBulkSuccessMessage');
+      });
+    });
+
+    describe('resetState', () => {
+      it('should reset the currentOperation state', () => {
+        bulkOperationStore.currentOperation = {
+          type: OperationType.DELETE_PERSON,
+          isRunning: true,
+          progress: 55,
+          complete: true,
+          errors: new Map([['someId', 'someError']]),
+          data: new Map([['someId', 'someData']]),
+          successMessage: 'Some success message',
+        };
+
+        bulkOperationStore.resetState();
+
+        expect(bulkOperationStore.currentOperation.type).toBeNull();
+        expect(bulkOperationStore.currentOperation.isRunning).toBe(false);
+        expect(bulkOperationStore.currentOperation.progress).toBe(0);
+        expect(bulkOperationStore.currentOperation.complete).toBe(false);
+        expect(bulkOperationStore.currentOperation.errors.size).toBe(0);
+        expect(bulkOperationStore.currentOperation.data.size).toBe(0);
+        expect(bulkOperationStore.currentOperation.successMessage).toBeUndefined();
+      });
     });
   });
 });

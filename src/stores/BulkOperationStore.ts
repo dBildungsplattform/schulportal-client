@@ -1,17 +1,18 @@
-import { defineStore, type Store, type StoreDefinition } from 'pinia';
-import { usePersonenkontextStore, type PersonenkontextStore, type Zuordnung } from './PersonenkontextStore';
-import { type PersonStore, usePersonStore } from './PersonStore';
 import {
-  type PersonenApiInterface,
   OrganisationsTyp,
   PersonenApiFactory,
   RollenArt,
   RollenMerkmal,
+  type PersonenApiInterface,
 } from '@/api-client/generated';
+import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
 import axiosApiInstance from '@/services/ApiService';
 import { getResponseErrorCode } from '@/utils/errorHandlers';
-import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
+import { isBefore } from 'date-fns';
+import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import type { Organisation } from './OrganisationStore';
+import { usePersonenkontextStore, type PersonenkontextStore, type Zuordnung } from './PersonenkontextStore';
+import { usePersonStore, type PersonStore } from './PersonStore';
 
 const personenApi: PersonenApiInterface = PersonenApiFactory(undefined, '', axiosApiInstance);
 
@@ -48,6 +49,7 @@ type BulkOperationActions = {
     selectedRolleId: string,
     rollen: TranslatedRolleWithAttrs[],
     workflowStepResponseOrganisations: Organisation[],
+    befristung?: string,
   ): Promise<void>;
   bulkPersonenDelete(personIDs: string[]): Promise<void>;
 };
@@ -169,6 +171,7 @@ export const useBulkOperationStore: StoreDefinition<
       selectedRolleId: string,
       rollen: TranslatedRolleWithAttrs[],
       workflowStepResponseOrganisations: Organisation[],
+      befristung?: string,
     ): Promise<void> {
       const personStore: PersonStore = usePersonStore();
       const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
@@ -183,26 +186,26 @@ export const useBulkOperationStore: StoreDefinition<
         successMessage: undefined,
       };
 
-      const organisation: Organisation | undefined = workflowStepResponseOrganisations.find(
+      const selectedOrganisation: Organisation | undefined = workflowStepResponseOrganisations.find(
         (orga: Organisation) => orga.id === selectedOrganisationId,
       );
 
-      if (!organisation) return;
+      if (!selectedOrganisation) return;
 
       const baseZuordnung: Zuordnung = {
-        sskId: organisation.id,
+        sskId: selectedOrganisation.id,
         rolleId: selectedRolleId,
         klasse: undefined,
-        sskDstNr: organisation.kennung ?? '',
-        sskName: organisation.name,
-        rolle: rollen.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolleId)?.title || '',
+        sskDstNr: selectedOrganisation.kennung ?? '',
+        sskName: selectedOrganisation.name,
+        rolle: rollen.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolleId)?.title ?? '',
         rollenArt: rollen.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolleId)
           ?.rollenart as RollenArt,
-        administriertVon: organisation.administriertVon ?? '',
+        administriertVon: selectedOrganisation.administriertVon ?? '',
         editable: true,
         merkmale: [] as unknown as RollenMerkmal,
         typ: OrganisationsTyp.Schule,
-        befristung: undefined,
+        befristung,
       };
 
       for (let i: number = 0; i < personIDs.length; i++) {
@@ -211,11 +214,30 @@ export const useBulkOperationStore: StoreDefinition<
         await personStore.getPersonenuebersichtById(personId);
 
         const currentZuordnungen: Zuordnung[] = personStore.personenuebersicht?.zuordnungen || [];
-        const combinedZuordnungen: Zuordnung[] = [...currentZuordnungen, { ...baseZuordnung }];
+        const newZuordnung: Zuordnung = {
+          ...baseZuordnung,
+        };
+
+        // If the new kontext is befristet, we use the earliest possible befristung out of all befristungen at the selected organisation and the specified befristung
+        if (befristung) {
+          newZuordnung.befristung = currentZuordnungen.reduce((earliest: string, zuordnung: Zuordnung) => {
+            if (zuordnung.sskId === selectedOrganisation.id && zuordnung.befristung) {
+              return isBefore(zuordnung.befristung, earliest) ? zuordnung.befristung : earliest;
+            }
+            return earliest;
+          }, befristung);
+        }
+
+        const combinedZuordnungen: Zuordnung[] = [...currentZuordnungen, newZuordnung];
 
         await personenkontextStore.updatePersonenkontexte(combinedZuordnungen, personId);
 
         this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
+
+        if (personenkontextStore.errorCode) {
+          this.currentOperation.errors.set(personId, personenkontextStore.errorCode);
+          personenkontextStore.errorCode = '';
+        }
       }
 
       this.currentOperation.isRunning = false;
