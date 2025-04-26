@@ -6,6 +6,7 @@
   import { type BaseFieldProps } from 'vee-validate';
 
   type Props = {
+    canCommit?: boolean;
     errorCode?: string;
     isLoading: boolean;
     onHandleConfirmUnsavedChanges: () => void;
@@ -27,6 +28,7 @@
 
 <template>
   <FormWrapper
+    :canCommit="canCommit"
     :confirmUnsavedChangesAction="onHandleConfirmUnsavedChanges"
     :createButtonLabel="$t('admin.schultraeger.create')"
     :discardButtonLabel="$t('admin.schultraeger.discard')"

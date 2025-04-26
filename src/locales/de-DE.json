@@ -173,6 +173,13 @@
       "closeList": "Liste schließen",
       "saveList": "Liste speichern"
       },
+      "bulkUnassignOrganisation": {
+        "cancelZuordnung": "Schulzuordnung aufheben",
+        "confirmation": "Möchten Sie wirklich die Schulzuordnungen der ausgewählten Benutzer aufheben?",
+        "affectedSchool": "Betroffene Schule: {schule}",
+        "success": "Die Schulzuordnungen wurden erfolgreich entfernt."
+      },
+      "onlyOneSchoolAlert": "Bitte wählen Sie im Filter genau eine Schule aus, um die Aktion durchzuführen.",
       "changePassword": "Passwort ändern",
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
       "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",
@@ -552,7 +559,7 @@
           "required": "Der Schulträgername muss angegeben werden."
         }
       },
-      "schulenAssignedSuccessfully": "Die Schulen wurden erfolgreich zugeordnet.",
+      "schulenAssignedSuccessfully": "Die Zuordnungen wurden erfolgreich bearbeitet.",
       "schulenWithoutTraeger": "Schulen ohne Träger",
       "schulenOfThisTraeger": "Schulen dieses Trägers ({amount})",
       "schultraegerAddedSuccessfully": "Der Schulträger wurde erfolgreich hinzugefügt.",

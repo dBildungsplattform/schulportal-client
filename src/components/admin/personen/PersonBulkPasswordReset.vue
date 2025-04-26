@@ -1,11 +1,7 @@
 <script setup lang="ts">
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import {
-    type BulkResetPasswordResult,
-    type PersonenWithRolleAndZuordnung,
-    type PersonStore,
-    usePersonStore,
-  } from '@/stores/PersonStore';
+  import { useBulkOperationStore, type BulkOperationStore, type CurrentOperation } from '@/stores/BulkOperationStore';
+  import { type PersonenWithRolleAndZuordnung } from '@/stores/PersonStore';
   import { buildCSV, download } from '@/utils/file';
   import { computed, type ComputedRef, type Ref } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
@@ -17,7 +13,6 @@
 
   type Props = {
     isDialogVisible: boolean;
-    isSelectionFromSingleSchule: boolean;
     selectedSchuleKennung?: string;
     selectedPersons: PersonenWithRolleAndZuordnung;
   };
@@ -36,17 +31,17 @@
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
-  const personStore: PersonStore = usePersonStore();
+  const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
 
   // Computed that determines the state of the operation. Could either be initial (Progress === 0) or Progressing (progress > 0) or finished (operation is complete)
   const progressState: ComputedRef<State> = computed(() => {
-    const result: BulkResetPasswordResult | null = personStore.bulkResetPasswordResult;
+    const operation: CurrentOperation | null = bulkOperationStore.currentOperation;
 
-    if (result?.complete === true) {
+    if (operation?.complete === true) {
       return State.FINISHED;
     }
 
-    if (result?.progress !== undefined && result.progress > 0) {
+    if (operation?.progress !== undefined && operation.progress > 0) {
       return State.PROGRESSING;
     }
 
@@ -55,20 +50,20 @@
 
   // Calculates the progress dynamically (Requests are sent sequentially and for every response we get the bar increments)
   const progress: ComputedRef<number> = computed(() => {
-    if (!personStore.bulkResetPasswordResult?.progress) return 0;
-    return Math.round(personStore.bulkResetPasswordResult.progress * 100);
+    if (!bulkOperationStore.currentOperation?.progress) return 0;
+    return bulkOperationStore.currentOperation.progress;
   });
 
   // Create the file and returns the Blob
   const resultFile: ComputedRef<Blob | null> = computed(() => {
-    const result: BulkResetPasswordResult | null = personStore.bulkResetPasswordResult;
+    const operation: CurrentOperation | null = bulkOperationStore.currentOperation;
 
-    if (!result?.complete) return null;
+    if (!operation?.complete) return null;
 
     const rows: Array<CSVRow> = [];
 
     // For every password in the Map find the corresponding person (using the key) and merge them together in the file.
-    for (const [id, password] of result.passwords.entries()) {
+    for (const [id, password] of operation.data.entries()) {
       const personWithRolleAndZuordnung: PersonWithRolleAndZuordnung | undefined = props.selectedPersons.find(
         (p: PersonWithRolleAndZuordnung) => p.person.id === id,
       );
@@ -79,7 +74,7 @@
           Nachname: personWithRolleAndZuordnung.person.name.familienname,
           Vorname: personWithRolleAndZuordnung.person.name.vorname,
           Benutzername: personWithRolleAndZuordnung.person.referrer || '',
-          Passwort: password,
+          Passwort: password as string,
         });
       }
     }
@@ -90,12 +85,12 @@
   });
 
   async function closePasswordResetDialog(finished: boolean): Promise<void> {
+    bulkOperationStore.resetState();
     emit('update:dialogExit', finished);
-    personStore.bulkResetPasswordResult = null;
   }
 
   async function handleResetPassword(personIDs: string[]): Promise<void> {
-    await personStore.bulkResetPassword(personIDs);
+    await bulkOperationStore.bulkResetPassword(personIDs);
   }
 
   function downloadFile(blob: Blob): void {
@@ -119,21 +114,7 @@
         class="mt-8 mb-4"
         v-if="progressState === State.INITIAL"
       >
-        <template v-if="!isSelectionFromSingleSchule">
-          <v-row class="text-body text-error justify-center">
-            <v-icon
-              class="mr-4"
-              icon="mdi-alert"
-            ></v-icon>
-            <span data-testid="error-text">
-              {{ t('admin.person.bulkPasswordReset.error.onlyOneSchool') }}
-            </span>
-          </v-row>
-        </template>
-        <v-row
-          v-else
-          class="text-body bold justify-center"
-        >
+        <v-row class="text-body bold justify-center">
           <span data-testid="password-reset-confirmation-text">
             {{ t('admin.person.bulkPasswordReset.confirmation') }}
           </span>
@@ -230,9 +211,9 @@
             md="auto"
           >
             <v-btn
-              v-if="progressState === State.INITIAL && isSelectionFromSingleSchule"
+              v-if="progressState === State.INITIAL"
               :block="mdAndDown"
-              :disabled="personStore.loading"
+              :disabled="bulkOperationStore.currentOperation?.isRunning"
               class="primary"
               @click="handleResetPassword(props.selectedPersons.map((p: PersonWithRolleAndZuordnung) => p.person.id))"
               data-testid="password-reset-submit-button"
@@ -246,7 +227,7 @@
               class="primary"
               @click="downloadFile(resultFile)"
               data-testid="download-result-button"
-              :disabled="personStore.loading"
+              :disabled="bulkOperationStore.currentOperation?.isRunning"
             >
               {{ t('admin.person.bulkPasswordReset.downloadResult') }}
             </v-btn>
