@@ -159,7 +159,7 @@
       "backToCreatePerson": "Zurück zur Benutzeranlage",
       "backToInput": "Zurück zur Eingabe",
       "bulk": {
-        "bulkErrorMessage": "Die Aktion konnte für die folgenden Benutzer nicht ausgeführt werden. Sie können sich die Liste für eine spätere Bearbeitung abspeichern. Die Daten stehen nach dem Schliessen dieses Dialogs nicht mehr zur Verfügung.",
+        "bulkErrorMessage": "Die Aktion konnte für die folgenden Benutzer nicht ausgeführt werden. \n\nSie können sich die Liste für eine spätere Bearbeitung abspeichern. Die Daten stehen nach dem Schließen dieses Dialogs nicht mehr zur Verfügung. \nSollten Sie Hilfe benötigen, eröffnen Sie ein Störungsticket über den IQSH-Helpdesk und fügen Sie die Liste als Anhang an.",
         "bulkErrorTitle": "Fehler bei der Massenbearbeitung",
         "bulkPasswordReset": {
           "confirmation": "Sind Sie sicher, dass Sie das Passwort für die ausgewählten Benutzer zurücksetzen möchten?",
@@ -351,6 +351,7 @@
       },
       "errors": {
         "COUNT_MISMATCHING": "Der Benutzer wurde zwischenzeitlich von einer anderen Administratorin oder einem anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut.",
+        "INVALID_PERSONENKONTEXT_FOR_PERSON_WITH_ROLLENART_LERN": "Schüler dürfen nur einer Rolle vom Typ 'Lern' zugeordnet werden.",
         "NEWER_VERSION_OF_PERSONENKONTEXTE_AVAILABLE": "Der Benutzer wurde zwischenzeitlich von einer anderen Administratorin oder einem anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut.",
         "GLEICHE_ROLLE_AN_KLASSE_WIE_SCHULE": "Mindestens eine Rolle des Benutzers ist an der Schule nicht bekannt.",
         "NUR_LEHR_UND_LERN_AN_KLASSE": "Nur Schüler dürfen einer Klasse zugeordnet werden.",

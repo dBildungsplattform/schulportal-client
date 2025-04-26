@@ -13,7 +13,7 @@
   import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
   import type { PersonenWithRolleAndZuordnung } from '@/stores/PersonStore';
   import PersonBulkError from '@/components/admin/personen/PersonBulkError.vue';
-import { useBulkErrors, type BulkErrorList } from '@/composables/useBulkErrors';
+  import { useBulkErrors, type BulkErrorList } from '@/composables/useBulkErrors';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
@@ -122,7 +122,7 @@ import { useBulkErrors, type BulkErrorList } from '@/composables/useBulkErrors';
 
     emit('update:getUebersichten');
 
-    if (Object.keys(bulkOperationStore.currentOperation?.errors || {}).length > 0) {
+    if (bulkOperationStore.currentOperation?.errors && bulkOperationStore.currentOperation.errors.size > 0) {
       showErrorDialog.value = true;
     }
   }
@@ -269,7 +269,14 @@ import { useBulkErrors, type BulkErrorList } from '@/composables/useBulkErrors';
   <template v-if="showErrorDialog">
     <PersonBulkError
       :isDialogVisible="showErrorDialog"
-      @update:isDialogVisible="(val: boolean) => (showErrorDialog = val)"
+      @update:isDialogVisible="
+        (val: boolean) => {
+          showErrorDialog = val;
+          if (!val) {
+            closeModifyRolleDeleteDialog();
+          }
+        }
+      "
       :errors="bulkErrorList"
     />
   </template>

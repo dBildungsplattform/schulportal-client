@@ -1,9 +1,10 @@
 <script setup lang="ts">
   import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import { type BulkErrorList, useBulkErrors } from '@/composables/useBulkErrors';
   import { useBulkOperationStore, type BulkOperationStore, type CurrentOperation } from '@/stores/BulkOperationStore';
   import { type PersonenWithRolleAndZuordnung } from '@/stores/PersonStore';
   import { buildCSV, download } from '@/utils/file';
-  import { computed, type ComputedRef, type Ref } from 'vue';
+  import { computed, ref, type ComputedRef, type Ref } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
 
@@ -32,6 +33,11 @@
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
+
+  const showErrorDialog: Ref<boolean, boolean> = ref(false);
+
+  // Define the error list for the selected persons using the useBulkErrors composable
+  const bulkErrorList: ComputedRef<BulkErrorList[]> = computed(() => useBulkErrors(props.selectedPersons));
 
   // Computed that determines the state of the operation. Could either be initial (Progress === 0) or Progressing (progress > 0) or finished (operation is complete)
   const progressState: ComputedRef<State> = computed(() => {
@@ -236,4 +242,18 @@
       </v-card-actions>
     </LayoutCard>
   </v-dialog>
+  <template v-if="showErrorDialog">
+    <PersonBulkError
+      :isDialogVisible="showErrorDialog"
+      @update:isDialogVisible="
+        (val: boolean) => {
+          showErrorDialog = val;
+          if (!val) {
+            closePasswordResetDialog(true);
+          }
+        }
+      "
+      :errors="bulkErrorList"
+    />
+  </template>
 </template>

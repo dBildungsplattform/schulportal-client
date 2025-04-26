@@ -245,10 +245,8 @@ export const useBulkOperationStore: StoreDefinition<
       this.currentOperation.isRunning = false;
       this.currentOperation.complete = true;
 
-      this.currentOperation.successMessage = 'admin.rolle.rollenAssignedSuccessfully';
-
-      if (personenkontextStore.errorCode === 'INVALID_PERSONENKONTEXT_FOR_PERSON_WITH_ROLLENART_LERN') {
-        personenkontextStore.errorCode = '';
+      if (this.currentOperation.errors.size === 0) {
+        this.currentOperation.successMessage = 'admin.rolle.rollenAssignedSuccessfully';
       }
     },
 
@@ -282,7 +280,9 @@ export const useBulkOperationStore: StoreDefinition<
       this.currentOperation.isRunning = false;
       this.currentOperation.complete = true;
 
-      this.currentOperation.successMessage = 'admin.person.deletePersonBulkSuccessMessage';
+      if (this.currentOperation.errors.size === 0) {
+        this.currentOperation.successMessage = 'admin.person.deletePersonBulkSuccessMessage';
+      }
     },
   },
 });

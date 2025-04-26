@@ -181,7 +181,14 @@
   <template v-if="showErrorDialog">
     <PersonBulkError
       :isDialogVisible="showErrorDialog"
-      @update:isDialogVisible="(val: boolean) => (showErrorDialog = val)"
+      @update:isDialogVisible="
+        (val: boolean) => {
+          showErrorDialog = val;
+          if (!val) {
+            closeDeletePersonDialog(true);
+          }
+        }
+      "
       :errors="bulkErrorList"
     />
   </template>

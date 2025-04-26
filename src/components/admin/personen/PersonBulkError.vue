@@ -3,6 +3,7 @@
   import { useI18n, type Composer } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import { buildCSV, download } from '@/utils/file';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
@@ -24,10 +25,32 @@
     (event: 'update:isDialogVisible', isDialogVisible: boolean): void;
   };
 
+  type CSVHeaders = 'Vorname' | 'Nachname' | 'Error';
+  type CSVRow = Record<CSVHeaders, string | undefined>;
+
   const props: Props = defineProps<Props>();
   const emit: Emits = defineEmits<Emits>();
 
   const showBulkErrorDialog: Ref<boolean> = ref(props.isDialogVisible);
+
+  // Saves the errors as a text file
+  function saveErrorsAsCSV(): void {
+    const headers: CSVHeaders[] = ['Vorname', 'Nachname', 'Error'];
+
+    const fileName: string = `massenbearbeitung-errors-${new Date().toLocaleDateString('de-DE').replace(/\./g, '-')}.txt`;
+
+    const csvRows: CSVRow[] = props.errors.map((entry: ErrorEntry) => ({
+      Vorname: entry.vorname,
+      Nachname: entry.nachname,
+      Error: entry.error,
+    }));
+
+    const csvContent: string = buildCSV<CSVHeaders>(headers, csvRows);
+
+    const blob: Blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+
+    download(fileName, blob);
+  }
 
   function closeBulkErrorDialog(): void {
     progress.value = 0;
@@ -44,27 +67,22 @@
     <LayoutCard
       data-testid="rolle-modify-layout-card"
       :closable="false"
-      :header="$t('person.bulk.bulkErrorTitle')"
+      :header="$t('admin.person.bulk.bulkErrorTitle')"
       @onCloseClicked="closeBulkErrorDialog()"
     >
       <v-container>
-        <p>{{ t('person.bulk.bulkErrorMessage') }}</p>
-
+        <p class="text-body bold pre-line">{{ t('admin.person.bulk.bulkErrorMessage') }}</p>
         <ol>
           <li
             v-for="(entry, index) in props.errors"
             :key="index"
-            class="my-2"
+            class="text-body font-weight-bold my-2 ml-4"
           >
             <div>
-              <span class="text-primary font-weight-bold">{{ entry.vorname }} {{ entry.nachname }}</span>
+              <span class="text-body font-weight-bold">{{ entry.vorname }} {{ entry.nachname }}</span>
             </div>
-            <div class="ml-4">
-              <v-alert
-                type="error"
-                dense
-                text="true"
-              >
+            <div class="ml-4 text-body">
+              <v-alert type="error">
                 {{ entry.error }}
               </v-alert>
             </div>
@@ -75,6 +93,7 @@
       <v-card-actions class="justify-center">
         <v-row class="py-3 px-2 justify-center">
           <v-spacer class="hidden-sm-and-down"></v-spacer>
+
           <v-col
             cols="12"
             sm="6"
@@ -86,11 +105,10 @@
               @click="closeBulkErrorDialog"
               data-testid="rolle-modify-discard-button"
             >
-              {{ t('person.bulk.closeList') }}
+              {{ t('admin.person.bulk.closeList') }}
             </v-btn>
           </v-col>
-        </v-row>
-        <v-row class="py-3 px-2 justify-center">
+
           <v-col
             cols="12"
             sm="6"
@@ -99,10 +117,10 @@
             <v-btn
               :block="mdAndDown"
               class="primary"
-              @click="closeBulkErrorDialog"
+              @click="saveErrorsAsCSV"
               data-testid="rolle-modify-close-button"
             >
-              {{ t('person.bulk.saveList') }}
+              {{ t('admin.person.bulk.saveList') }}
             </v-btn>
           </v-col>
         </v-row>
@@ -111,4 +129,8 @@
   </v-dialog>
 </template>
 
-<style></style>
+<style scoped>
+  .pre-line {
+    white-space: pre-wrap;
+  }
+</style>

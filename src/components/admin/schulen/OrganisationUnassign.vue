@@ -1,20 +1,24 @@
 <script setup lang="ts">
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { type Organisation } from '@/stores/OrganisationStore';
-  import { type Ref } from 'vue';
+  import { computed, ref, type ComputedRef, type Ref } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
   import { getDisplayNameForOrg } from '@/utils/formatting';
   import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
+  import { type BulkErrorList, useBulkErrors } from '@/composables/useBulkErrors';
+  import type { PersonenWithRolleAndZuordnung } from '@/stores/PersonStore';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
 
+  type PersonWithRolleAndZuordnung = PersonenWithRolleAndZuordnung[number];
+
   type Props = {
     isDialogVisible: boolean;
-    selectedPersonenIds: string[];
+    selectedPersons: PersonenWithRolleAndZuordnung;
     selectedOrganisation: Organisation;
   };
 
@@ -28,8 +32,16 @@
     emit('update:dialogExit', finished);
   }
 
+  const showErrorDialog: Ref<boolean, boolean> = ref(false);
+
+  // Define the error list for the selected persons using the useBulkErrors composable
+  const bulkErrorList: ComputedRef<BulkErrorList[]> = computed(() => useBulkErrors(props.selectedPersons));
+
   async function handleOrgUnassign(): Promise<void> {
-    await bulkOperationStore.bulkUnassignPersonenFromOrg(props.selectedOrganisation.id, props.selectedPersonenIds);
+    await bulkOperationStore.bulkUnassignPersonenFromOrg(
+      props.selectedOrganisation.id,
+      props.selectedPersons.map((person: PersonWithRolleAndZuordnung) => person.person.id),
+    );
   }
 </script>
 
@@ -172,6 +184,20 @@
       </v-card-actions>
     </LayoutCard>
   </v-dialog>
+  <template v-if="showErrorDialog">
+    <PersonBulkError
+      :isDialogVisible="showErrorDialog"
+      @update:isDialogVisible="
+        (val: boolean) => {
+          showErrorDialog = val;
+          if (!val) {
+            closeDialog(true);
+          }
+        }
+      "
+      :errors="bulkErrorList"
+    />
+  </template>
 </template>
 
 <style></style>
