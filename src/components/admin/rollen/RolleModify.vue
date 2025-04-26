@@ -11,7 +11,9 @@
   import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
   import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
   import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
-import type { PersonenWithRolleAndZuordnung } from '@/stores/PersonStore';
+  import type { PersonenWithRolleAndZuordnung } from '@/stores/PersonStore';
+  import PersonBulkError from '@/components/admin/personen/PersonBulkError.vue';
+import { useBulkErrors, type BulkErrorList } from '@/composables/useBulkErrors';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
@@ -40,9 +42,14 @@ import type { PersonenWithRolleAndZuordnung } from '@/stores/PersonStore';
 
   const showModifyRolleDialog: Ref<boolean> = ref(props.isDialogVisible);
 
+  const showErrorDialog: Ref<boolean, boolean> = ref(false);
+
   const successMessage: ComputedRef<string> = computed(() =>
     bulkOperationStore.currentOperation?.successMessage ? t(bulkOperationStore.currentOperation.successMessage) : '',
   );
+
+  // Define the error list for the selected persons using the useBulkErrors composable
+  const bulkErrorList: ComputedRef<BulkErrorList[]> = computed(() => useBulkErrors(props.selectedPersons));
 
   // Define the form validation schema for the Personenkontext
   export type ZuordnungCreationForm = {
@@ -112,9 +119,12 @@ import type { PersonenWithRolleAndZuordnung } from '@/stores/PersonStore';
       props.rollen || [],
       personenkontextStore.workflowStepResponse?.organisations || [],
     );
-    
 
     emit('update:getUebersichten');
+
+    if (Object.keys(bulkOperationStore.currentOperation?.errors || {}).length > 0) {
+      showErrorDialog.value = true;
+    }
   }
 </script>
 
@@ -256,6 +266,13 @@ import type { PersonenWithRolleAndZuordnung } from '@/stores/PersonStore';
       </v-card-actions>
     </LayoutCard>
   </v-dialog>
+  <template v-if="showErrorDialog">
+    <PersonBulkError
+      :isDialogVisible="showErrorDialog"
+      @update:isDialogVisible="(val: boolean) => (showErrorDialog = val)"
+      :errors="bulkErrorList"
+    />
+  </template>
 </template>
 
 <style></style>

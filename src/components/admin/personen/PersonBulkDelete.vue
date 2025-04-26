@@ -4,6 +4,9 @@
   import { useDisplay } from 'vuetify';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
+  import { useBulkErrors, type BulkErrorList } from '@/composables/useBulkErrors';
+  import type { PersonenWithRolleAndZuordnung } from '@/stores/PersonStore';
+  import PersonBulkError from '@/components/admin/personen/PersonBulkError.vue';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
@@ -14,11 +17,13 @@
     bulkOperationStore.currentOperation?.successMessage ? t(bulkOperationStore.currentOperation.successMessage) : '',
   );
 
+  const showErrorDialog: Ref<boolean, boolean> = ref(false);
+
   type Props = {
     errorCode: string;
     isLoading: boolean;
     isDialogVisible: boolean;
-    personIDs: string[];
+    selectedPersons: PersonenWithRolleAndZuordnung;
   };
 
   type Emits = (event: 'update:dialogExit', finished: boolean) => void;
@@ -26,6 +31,9 @@
   const props: Props = defineProps<Props>();
   const emit: Emits = defineEmits<Emits>();
   const showDeletePersonDialog: Ref<boolean> = ref(props.isDialogVisible);
+
+  // Define the error list for the selected persons using the useBulkErrors composable
+  const bulkErrorList: ComputedRef<BulkErrorList[]> = computed(() => useBulkErrors(props.selectedPersons));
 
   async function closeDeletePersonDialog(finished: boolean): Promise<void> {
     if (bulkOperationStore.currentOperation) {
@@ -140,7 +148,7 @@
               :block="mdAndDown"
               :disabled="bulkOperationStore.currentOperation?.isRunning"
               class="primary"
-              @click="handleDeletePerson(props.personIDs)"
+              @click="handleDeletePerson(props.selectedPersons.map((person) => person.person.id))"
               data-testid="person-delete-submit-button"
               type="submit"
             >
@@ -170,4 +178,11 @@
       </v-card-actions>
     </LayoutCard>
   </v-dialog>
+  <template v-if="showErrorDialog">
+    <PersonBulkError
+      :isDialogVisible="showErrorDialog"
+      @update:isDialogVisible="(val: boolean) => (showErrorDialog = val)"
+      :errors="bulkErrorList"
+    />
+  </template>
 </template>

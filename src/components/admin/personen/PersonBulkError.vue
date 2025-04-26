@@ -9,10 +9,14 @@
 
   const progress: Ref<number> = ref<number>(0);
 
-  type Props = {
+  type ErrorEntry = {
     error: string;
     vorname: string;
     nachname: string;
+  };
+
+  type Props = {
+    errors: ErrorEntry[];
     isDialogVisible: boolean;
   };
 
@@ -44,10 +48,29 @@
       @onCloseClicked="closeBulkErrorDialog()"
     >
       <v-container>
-        <p>
-          {{ t('person.bulk.bulkErrorMessage') }}
-        </p></v-container
-      >
+        <p>{{ t('person.bulk.bulkErrorMessage') }}</p>
+
+        <ol>
+          <li
+            v-for="(entry, index) in props.errors"
+            :key="index"
+            class="my-2"
+          >
+            <div>
+              <span class="text-primary font-weight-bold">{{ entry.vorname }} {{ entry.nachname }}</span>
+            </div>
+            <div class="ml-4">
+              <v-alert
+                type="error"
+                dense
+                text="true"
+              >
+                {{ entry.error }}
+              </v-alert>
+            </div>
+          </li>
+        </ol>
+      </v-container>
 
       <v-card-actions class="justify-center">
         <v-row class="py-3 px-2 justify-center">
