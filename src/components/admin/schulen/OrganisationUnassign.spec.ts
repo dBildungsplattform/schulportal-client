@@ -6,6 +6,7 @@ import routes from '@/router/routes';
 import { nextTick } from 'vue';
 import type { MockInstance } from 'vitest';
 import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
+import type { PersonenWithRolleAndZuordnung } from '@/stores/PersonStore';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -13,14 +14,37 @@ const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
 
 type Props = {
   isDialogVisible: boolean;
-  selectedPersonenIds: string[];
+  selectedPersons: PersonenWithRolleAndZuordnung;
   selectedOrganisation: Organisation;
 };
 
 function mountComponent(partialProps: Partial<Props> = {}): VueWrapper {
   const props: Props = {
     isDialogVisible: true,
-    selectedPersonenIds: ['1'],
+    selectedPersons: [
+      {
+        administrationsebenen: '',
+        klassen: '1a',
+        rollen: '',
+        person: {
+          id: 'test',
+          name: {
+            familienname: 'Pan',
+            vorname: 'Peter',
+          },
+          referrer: 'ppan',
+          revision: '1',
+          email: {
+            address: 'ppan@wunderland',
+            status: 'ENABLED',
+          },
+          isLocked: null,
+          lastModified: '',
+          personalnummer: '1234',
+          userLock: null,
+        },
+      },
+    ],
     selectedOrganisation: {
       id: '1234567',
       name: 'Testorganisation',

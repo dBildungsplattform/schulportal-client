@@ -885,7 +885,7 @@
             :errorCode="personStore.errorCode"
             :isLoading="personStore.loading"
             :isDialogVisible="benutzerDeleteDialogVisible"
-            :personIDs="selectedPersonIds"
+            :selectedPersons
             @update:dialogExit="handleBulkDeleteDialog($event)"
           >
           </PersonBulkDelete>
@@ -902,7 +902,7 @@
             ref="organisation-unassign"
             v-if="organisationUnassignDialogVisible && selectedOrganisation"
             :isDialogVisible="organisationUnassignDialogVisible"
-            :selectedPersonenIds="selectedPersonIds"
+            :selectedPersons
             :selectedOrganisation="selectedOrganisation"
             @update:dialogExit="handleUnassignOrgDialog($event)"
           >

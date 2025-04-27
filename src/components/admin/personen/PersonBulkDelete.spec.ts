@@ -29,7 +29,30 @@ beforeEach(async () => {
       isLoading: false,
       errorCode: '',
       isDialogVisible: true,
-      personIDs: ['person1', 'person2'],
+      selectedPersons: [
+        {
+          administrationsebenen: '',
+          klassen: '1a',
+          rollen: '',
+          person: {
+            id: 'test',
+            name: {
+              familienname: 'Pan',
+              vorname: 'Peter',
+            },
+            referrer: 'ppan',
+            revision: '1',
+            email: {
+              address: 'ppan@wunderland',
+              status: 'ENABLED',
+            },
+            isLocked: null,
+            lastModified: '',
+            personalnummer: '1234',
+            userLock: null,
+          },
+        },
+      ],
     },
     global: {
       components: {
