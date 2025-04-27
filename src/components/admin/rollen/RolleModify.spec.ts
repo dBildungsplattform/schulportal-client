@@ -147,6 +147,52 @@ describe('RolleModify', () => {
     expect(bulkModifyPersonenRolleSpy).toHaveBeenCalledTimes(1);
   });
 
+  test('shows error dialog if bulk operation has errors', async () => {
+    await nextTick();
+
+    // Mock the bulk operation with an error
+    bulkOperationStore.currentOperation = {
+      type: null,
+      isRunning: false,
+      progress: 0,
+      complete: false,
+      errors: new Map([['someId', 'Some error message']]),
+      data: new Map(),
+      successMessage: '',
+    };
+
+    const organisationAutocomplete: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'personenkontext-create' })
+      .findComponent({ ref: 'organisation-select' });
+    await organisationAutocomplete?.setValue('O1');
+    organisationAutocomplete?.vm.$emit('update:search', 'O1');
+    await nextTick();
+
+    const rolleAutocomplete: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'personenkontext-create' })
+      .findComponent({ ref: 'rolle-select' });
+    await rolleAutocomplete?.setValue('54321');
+    rolleAutocomplete?.vm.$emit('update:search', '54321');
+    await nextTick();
+
+    const submitButton: Element | null = document.body.querySelector('[data-testid="rolle-modify-submit-button"]');
+    expect(submitButton).not.toBeNull();
+    await nextTick();
+
+    const bulkModifyPersonenRolleSpy: MockInstance = vi.spyOn(bulkOperationStore, 'bulkModifyPersonenRolle');
+
+    if (submitButton) {
+      submitButton.dispatchEvent(new Event('click'));
+    }
+
+    await flushPromises();
+
+    expect(bulkModifyPersonenRolleSpy).toHaveBeenCalledTimes(1);
+
+    const errorDialog: Element | null = document.body.querySelector('.v-dialog');
+    expect(errorDialog).not.toBeNull();
+  });
+
   test('renders the dialog when isDialogVisible is true', async () => {
     await nextTick();
 
