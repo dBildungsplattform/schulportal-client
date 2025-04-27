@@ -174,6 +174,15 @@ describe('BulkOperationStore', () => {
       expect(personStore.personenuebersicht).toBeNull();
       expect(bulkOperationStore.currentOperation?.progress).toBe(100);
     });
+
+    it('should handle errors if endpoint replies with 500', async () => {
+      mockAdapter.onGet('/api/dbiam/personenuebersicht/1').replyOnce(500, { i18nKey: 'mockServerError' });
+
+      await bulkOperationStore.bulkUnassignPersonenFromOrg('1234', [mockPersonId]);
+
+      expect(bulkOperationStore.currentOperation?.errors.size).toBe(1);
+      expect(bulkOperationStore.currentOperation?.errors.get(mockPersonId)).toBe('mockServerError');
+    });
   });
 
   describe('bulkResetPassword', () => {
@@ -206,6 +215,20 @@ describe('BulkOperationStore', () => {
       expect(bulkOperationStore.currentOperation?.data.size).toBe(2);
       expect(bulkOperationStore.currentOperation?.data.get(userIds[0]!)).toBe(mockPassword);
       expect(bulkOperationStore.currentOperation?.data.get(userIds[1]!)).toBe(mockPassword);
+    });
+
+    it('should handle errors if endpoint replies with 500', async () => {
+      const userIds: Array<string> = ['id-1', 'id-2'];
+
+      mockAdapter.onPatch(`/api/personen/${userIds[0]}/password`).replyOnce(500, { i18nKey: 'mockServerError' });
+      mockAdapter.onPatch(`/api/personen/${userIds[1]}/password`).replyOnce(200, 'mockPassword');
+
+      const resetPromise: Promise<void> = bulkOperationStore.bulkResetPassword(userIds);
+
+      await resetPromise;
+
+      expect(bulkOperationStore.currentOperation?.errors.size).toBe(1);
+      expect(bulkOperationStore.currentOperation?.errors.get(userIds[0]!)).toBe('mockServerError');
     });
   });
 
@@ -381,6 +404,57 @@ describe('BulkOperationStore', () => {
       expect(bulkOperationStore.currentOperation?.complete).toBe(true);
       expect(bulkOperationStore.currentOperation?.progress).toBe(100);
     });
+
+    it('should handle errors from both endpoints gracefully', async () => {
+      const personIds: string[] = ['1', '2'];
+      const selectedOrganisationId: string = 'org-123';
+      const selectedRolleId: string = 'rolle-456';
+
+      const workflowStepResponseOrganisations: Organisation[] = [
+        {
+          id: 'org-123',
+          name: 'Test Schule',
+          kennung: 'SCH123',
+          administriertVon: 'adminId',
+        } as Organisation,
+      ];
+
+      const rollen: TranslatedRolleWithAttrs[] = [
+        {
+          title: 'Lehrer',
+          value: 'rolle-456',
+          rollenart: RollenArt.Lern,
+        },
+      ];
+
+      mockAdapter.onGet('/api/dbiam/personenuebersicht/1').replyOnce(500, { i18nKey: 'mockGetError' });
+      mockAdapter.onGet('/api/dbiam/personenuebersicht/2').replyOnce(200, {
+        personId: '2',
+        vorname: 'Jane',
+        nachname: 'Doe',
+        benutzername: 'jdoe2',
+        lastModifiedZuordnungen: '2024-04-01T00:00:00.000Z',
+        zuordnungen: [],
+      });
+
+      mockAdapter.onPut('/api/personenkontext-workflow/2').replyOnce(500, { i18nKey: 'mockPutError' });
+
+      const modifyPromise: Promise<void> = bulkOperationStore.bulkModifyPersonenRolle(
+        personIds,
+        selectedOrganisationId,
+        selectedRolleId,
+        rollen,
+        workflowStepResponseOrganisations,
+      );
+
+      await modifyPromise;
+
+      expect(bulkOperationStore.currentOperation?.errors.size).toBe(2);
+      expect(bulkOperationStore.currentOperation?.errors.get(personIds[0]!)).toBe('mockGetError');
+      expect(bulkOperationStore.currentOperation?.errors.get(personIds[1]!)).toBe('mockGetError');
+      expect(bulkOperationStore.currentOperation?.progress).toBe(100);
+      expect(bulkOperationStore.currentOperation?.complete).toBe(true);
+    });
   });
 
   describe('bulkPersonenDelete', () => {
@@ -396,6 +470,21 @@ describe('BulkOperationStore', () => {
 
       expect(bulkOperationStore.currentOperation?.errors.size).toBe(0);
       expect(bulkOperationStore.currentOperation?.successMessage).toBe('admin.person.deletePersonBulkSuccessMessage');
+    });
+
+    it('should handle errors if endpoint replies with 500', async () => {
+      const personIds: string[] = ['id-1', 'id-2'];
+
+      mockAdapter.onDelete(`/api/personen/${personIds[0]}`).replyOnce(204);
+      mockAdapter.onDelete(`/api/personen/${personIds[1]}`).replyOnce(500, { i18nKey: 'mockServerError' });
+
+      const bulkDeletePromise: Promise<void> = bulkOperationStore.bulkPersonenDelete(personIds);
+
+      await bulkDeletePromise;
+
+      expect(bulkOperationStore.currentOperation?.errors.size).toBe(1);
+      expect(bulkOperationStore.currentOperation?.errors.get(personIds[1]!)).toBe('mockServerError');
+      expect(bulkOperationStore.currentOperation?.successMessage).toBeUndefined();
     });
   });
 
