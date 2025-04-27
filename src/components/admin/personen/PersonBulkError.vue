@@ -65,7 +65,7 @@
     persistent
   >
     <LayoutCard
-      data-testid="rolle-modify-layout-card"
+      data-testid="person-bulk-error-layout-card"
       :closable="false"
       :header="$t('admin.person.bulk.bulkErrorTitle')"
       @onCloseClicked="closeBulkErrorDialog()"
@@ -103,7 +103,7 @@
               :block="mdAndDown"
               class="secondary"
               @click="closeBulkErrorDialog"
-              data-testid="rolle-modify-discard-button"
+              data-testid="person-bulk-error-discard-button"
             >
               {{ t('admin.person.bulk.closeList') }}
             </v-btn>
@@ -118,7 +118,7 @@
               :block="mdAndDown"
               class="primary"
               @click="saveErrorsAsCSV"
-              data-testid="rolle-modify-close-button"
+              data-testid="person-bulk-error-save-button"
             >
               {{ t('admin.person.bulk.saveList') }}
             </v-btn>

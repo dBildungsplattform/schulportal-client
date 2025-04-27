@@ -275,7 +275,7 @@ describe('BulkOperationStore', () => {
 
       await modifyPromise;
 
-      expect(personenkontextStore.errorCode).toBe('');
+      expect(personenkontextStore.errorCode).toBe('INVALID_PERSONENKONTEXT_FOR_PERSON_WITH_ROLLENART_LERN');
       expect(bulkOperationStore.currentOperation?.isRunning).toBe(false);
       expect(bulkOperationStore.currentOperation?.complete).toBe(true);
       expect(bulkOperationStore.currentOperation?.progress).toBe(100);
