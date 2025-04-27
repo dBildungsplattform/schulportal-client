@@ -122,7 +122,7 @@
       >
         <v-row class="text-body bold justify-center">
           <span data-testid="password-reset-confirmation-text">
-            {{ t('admin.person.bulkPasswordReset.confirmation') }}
+            {{ t('admin.person.bulk.bulkPasswordReset.confirmation') }}
           </span>
         </v-row>
       </v-container>
@@ -180,7 +180,7 @@
           class="mt-2 text-center"
           data-testid="password-reset-success-text"
         >
-          {{ t('admin.person.bulkPasswordReset.success') }}
+          {{ t('admin.person.bulk.bulkPasswordReset.success') }}
         </p>
         <p class="mt-2 text-center"></p>
       </v-container>
@@ -235,7 +235,7 @@
               data-testid="download-result-button"
               :disabled="bulkOperationStore.currentOperation?.isRunning"
             >
-              {{ t('admin.person.bulkPasswordReset.downloadResult') }}
+              {{ t('admin.person.bulk.bulkPasswordReset.downloadResult') }}
             </v-btn>
           </v-col>
         </v-row>
