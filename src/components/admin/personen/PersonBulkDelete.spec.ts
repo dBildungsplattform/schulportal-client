@@ -23,6 +23,7 @@ beforeEach(async () => {
 
   await router.push('/');
   await router.isReady();
+  bulkOperationStore.resetState();
 
   wrapper = mount(PersonBulkDelete, {
     attachTo: appContainer,
@@ -99,6 +100,40 @@ describe('PersonBulkDelete', () => {
     expect(bulkPersonenDeleteSpy).toHaveBeenCalledTimes(1);
   });
 
+  test('renders form and triggers submit with errors', async () => {
+    bulkOperationStore.currentOperation = {
+      type: null,
+      isRunning: false,
+      progress: 0,
+      complete: false,
+      errors: new Map([['someId', 'Some error message']]),
+      data: new Map(),
+      successMessage: '',
+    };
+    await nextTick();
+    const confirmation: Element | null = document.body.querySelector('[data-testid="person-delete-confirmation-text"]');
+    const submitButton: Element | null = document.body.querySelector('[data-testid="person-delete-submit-button"]');
+    const success: Element | null = document.body.querySelector('[data-testid="person-delete-success-text"]');
+
+    await nextTick();
+    await nextTick();
+    expect(confirmation).not.toBeNull();
+    expect(submitButton).not.toBeNull();
+    expect(success).toBeNull();
+    await nextTick();
+
+    const bulkPersonenDeleteSpy: MockInstance = vi.spyOn(bulkOperationStore, 'bulkPersonenDelete');
+    if (submitButton) {
+      submitButton.dispatchEvent(new Event('click'));
+    }
+
+    await flushPromises();
+    expect(bulkPersonenDeleteSpy).toHaveBeenCalledTimes(1); 
+
+    const errorDialog: Element | null = document.body.querySelector('.v-dialog');
+    expect(errorDialog).not.toBeNull();
+  });
+
   test('closes dialog', async () => {
     await nextTick();
     const discardButton: Element | null = document.body.querySelector('[data-testid="person-delete-discard-button"]');
@@ -115,7 +150,6 @@ describe('PersonBulkDelete', () => {
   test('shows error dialog when showErrorDialog is true', async () => {
     await nextTick();
 
-    // Manually set showErrorDialog to true
     (wrapper?.vm as unknown as { showErrorDialog: boolean }).showErrorDialog = true;
 
     await nextTick();

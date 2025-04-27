@@ -43,6 +43,10 @@
       props.selectedOrganisation.id,
       props.selectedPersons.map((person: PersonWithRolleAndZuordnung) => person.person.id),
     );
+
+    if (bulkOperationStore.currentOperation?.errors && bulkOperationStore.currentOperation.errors.size > 0) {
+      showErrorDialog.value = true;
+    }
   }
 </script>
 

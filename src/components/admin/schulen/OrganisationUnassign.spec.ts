@@ -107,6 +107,29 @@ describe('OrganisationUnassign', () => {
     expect(unassignPersonenkontexteSpy).toHaveBeenCalledTimes(1);
   });
 
+  test('displays confirmation form and trigger submit with errors', async () => {
+    wrapper = mountComponent();
+    await nextTick();
+
+
+
+    const submitButton: Element | null = document.body.querySelector('[data-testid="org-unassign-submit-button"]');
+    expect(submitButton).not.toBeNull();
+    await nextTick();
+
+    const unassignPersonenkontexteSpy: MockInstance = vi.spyOn(bulkOperationStore, 'bulkUnassignPersonenFromOrg');
+
+    if (submitButton) {
+      submitButton.dispatchEvent(new Event('click'));
+    }
+
+    await flushPromises();
+    expect(unassignPersonenkontexteSpy).toHaveBeenCalledTimes(1);
+
+    const errorDialog: Element | null = document.body.querySelector('.v-dialog');
+    expect(errorDialog).not.toBeNull();
+  });
+
   test('cancel button closes dialog and resets store', async () => {
     wrapper = mountComponent();
     const cancelButton: Element | null = document.body.querySelector('[data-testid="org-unassign-discard-button"]');

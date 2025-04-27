@@ -45,6 +45,10 @@
 
   async function handleDeletePerson(personIDs: string[]): Promise<void> {
     await bulkOperationStore.bulkPersonenDelete(personIDs);
+
+    if (bulkOperationStore.currentOperation?.errors && bulkOperationStore.currentOperation.errors.size > 0) {
+      showErrorDialog.value = true;
+    }
   }
 </script>
 

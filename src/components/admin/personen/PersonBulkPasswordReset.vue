@@ -98,6 +98,10 @@
 
   async function handleResetPassword(personIDs: string[]): Promise<void> {
     await bulkOperationStore.bulkResetPassword(personIDs);
+
+    if (bulkOperationStore.currentOperation?.errors && bulkOperationStore.currentOperation.errors.size > 0) {
+      showErrorDialog.value = true;
+    }
   }
 
   function downloadFile(blob: Blob): void {
