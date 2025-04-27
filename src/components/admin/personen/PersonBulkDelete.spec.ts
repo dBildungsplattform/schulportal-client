@@ -1,11 +1,12 @@
 import { test, type MockInstance } from 'vitest';
-import { flushPromises, mount } from '@vue/test-utils';
+import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import routes from '@/router/routes';
 import PersonBulkDelete from './PersonBulkDelete.vue';
 import { nextTick } from 'vue';
 import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
 
+let wrapper: VueWrapper | null = null;
 let router: Router;
 const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
 
@@ -23,7 +24,7 @@ beforeEach(async () => {
   await router.push('/');
   await router.isReady();
 
-  mount(PersonBulkDelete, {
+  wrapper = mount(PersonBulkDelete, {
     attachTo: appContainer,
     props: {
       isLoading: false,
@@ -109,5 +110,17 @@ describe('PersonBulkDelete', () => {
     if (discardButton) {
       discardButton.dispatchEvent(new Event('click'));
     }
+  });
+
+  test('shows error dialog when showErrorDialog is true', async () => {
+    await nextTick();
+
+    // Manually set showErrorDialog to true
+    (wrapper?.vm as unknown as { showErrorDialog: boolean }).showErrorDialog = true;
+
+    await nextTick();
+
+    const errorDialog: VueWrapper | undefined = wrapper?.findComponent({ name: 'PersonBulkError' });
+    expect(errorDialog?.exists()).toBe(true);
   });
 });

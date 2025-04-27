@@ -7,6 +7,7 @@
   import { computed, ref, type ComputedRef, type Ref } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
+  import PersonBulkError from '@/components/admin/personen/PersonBulkError.vue';
 
   type PersonWithRolleAndZuordnung = PersonenWithRolleAndZuordnung[number];
   type CSVHeaders = 'Klasse' | 'Nachname' | 'Vorname' | 'Benutzername' | 'Passwort';

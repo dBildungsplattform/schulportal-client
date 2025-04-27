@@ -130,4 +130,16 @@ describe('OrganisationUnassign', () => {
     const progressBar: Element | null = document.body.querySelector('[data-testid="org-unassign-progressbar"]');
     expect(progressBar).not.toBeNull();
   });
+
+  test('shows error dialog when showErrorDialog is true', async () => {
+    await nextTick();
+
+    // Manually set showErrorDialog to true
+    (wrapper?.vm as unknown as { showErrorDialog: boolean }).showErrorDialog = true;
+
+    await nextTick();
+
+    const errorDialog: VueWrapper | undefined = wrapper?.findComponent({ name: 'PersonBulkError' });
+    expect(errorDialog?.exists()).toBe(true);
+  });
 });

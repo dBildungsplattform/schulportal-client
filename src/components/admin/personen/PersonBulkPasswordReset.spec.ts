@@ -233,4 +233,17 @@ describe('PersonBulkPasswordReset', () => {
       expect(download).toHaveBeenCalledWith(filename, expect.any(Blob));
     },
   );
+
+  test('shows error dialog when showErrorDialog is true', async () => {
+    const wrapper: VueWrapper | undefined = mountComponent();
+    await nextTick();
+
+    // Manually set showErrorDialog to true
+    (wrapper.vm as unknown as { showErrorDialog: boolean }).showErrorDialog = true;
+
+    await nextTick();
+
+    const errorDialog: VueWrapper | undefined = wrapper.findComponent({ name: 'PersonBulkError' });
+    expect(errorDialog.exists()).toBe(true);
+  });
 });

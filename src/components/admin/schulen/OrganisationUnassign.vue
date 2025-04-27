@@ -8,6 +8,7 @@
   import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
   import { type BulkErrorList, useBulkErrors } from '@/composables/useBulkErrors';
   import type { PersonenWithRolleAndZuordnung } from '@/stores/PersonStore';
+  import PersonBulkError from '@/components/admin/personen/PersonBulkError.vue';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
