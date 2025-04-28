@@ -212,6 +212,7 @@
       "edit": "Benutzer bearbeiten",
       "editPersonalInfo": "Persönliche Informationen bearbeiten",
       "errors": {
+        "404": "Der Benutzer konnte nicht gefunden werden.",
         "PERSONALNUMMER_NICHT_EINDEUTIG": "Die eingegebene KoPers.-Nr. ist bereits vergeben. Bitte korrigieren Sie Ihre Eingabe.",
         "ERROR_LOADING_USER": "Es konnten keine Benutzerdaten geladen werden.",
         "PERSONALNUMMER_REQUIRED": "Die Änderungen wurden nicht gespeichert, da keine KoPers.-Nr. eingegeben wurde.",
