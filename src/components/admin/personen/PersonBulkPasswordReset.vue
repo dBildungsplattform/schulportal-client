@@ -249,6 +249,7 @@
   </v-dialog>
   <template v-if="showErrorDialog">
     <PersonBulkError
+      :bulkOperationName="t('admin.person.resetPassword')"
       :isDialogVisible="showErrorDialog"
       @update:isDialogVisible="
         (val: boolean) => {

@@ -17,6 +17,7 @@
   };
 
   type Props = {
+    bulkOperationName: string;
     errors: ErrorEntry[];
     isDialogVisible: boolean;
   };
@@ -71,7 +72,13 @@
       @onCloseClicked="closeBulkErrorDialog()"
     >
       <v-container>
-        <p class="text-body bold pre-line">{{ t('admin.person.bulk.bulkErrorMessage') }}</p>
+        <p class="text-body bold pre-line">
+          {{
+            t('admin.person.bulk.bulkErrorMessage', {
+              bulkOperationName: props.bulkOperationName,
+            })
+          }}
+        </p>
         <ol>
           <li
             v-for="(entry, index) in props.errors"

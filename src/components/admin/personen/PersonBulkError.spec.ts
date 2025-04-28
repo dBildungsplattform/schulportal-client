@@ -21,6 +21,7 @@ beforeEach(() => {
   wrapper = mount(PersonBulkError, {
     attachTo: document.getElementById('app') || undefined,
     props: {
+      bulkOperationName: 'John Doe',
       errors: errorsMock,
       isDialogVisible: true,
     },

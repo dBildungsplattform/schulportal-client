@@ -191,6 +191,7 @@
   </v-dialog>
   <template v-if="showErrorDialog">
     <PersonBulkError
+      :bulkOperationName="$t('admin.person.bulkUnassignOrganisation.cancelZuordnung')"
       :isDialogVisible="showErrorDialog"
       @update:isDialogVisible="
         (val: boolean) => {

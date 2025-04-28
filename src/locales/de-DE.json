@@ -159,7 +159,7 @@
       "backToCreatePerson": "Zurück zur Benutzeranlage",
       "backToInput": "Zurück zur Eingabe",
       "bulk": {
-        "bulkErrorMessage": "Die Aktion konnte für die folgenden Benutzer nicht ausgeführt werden. \n\nSie können sich die Liste für eine spätere Bearbeitung abspeichern. Die Daten stehen nach dem Schließen dieses Dialogs nicht mehr zur Verfügung. \nSollten Sie Hilfe benötigen, eröffnen Sie ein Störungsticket über den IQSH-Helpdesk und fügen Sie die Liste als Anhang an.",
+        "bulkErrorMessage": "Die Aktion {bulkOperationName} konnte für die folgenden Benutzer nicht ausgeführt werden. \n\nSie können sich die Liste für eine spätere Bearbeitung abspeichern. Die Daten stehen nach dem Schließen dieses Dialogs nicht mehr zur Verfügung. \nSollten Sie Hilfe benötigen, eröffnen Sie ein Störungsticket über den IQSH-Helpdesk und fügen Sie die Liste als Anhang an.",
         "bulkErrorTitle": "Fehler bei der Massenbearbeitung",
         "bulkPasswordReset": {
           "confirmation": "Sind Sie sicher, dass Sie das Passwort für die ausgewählten Benutzer zurücksetzen möchten?",

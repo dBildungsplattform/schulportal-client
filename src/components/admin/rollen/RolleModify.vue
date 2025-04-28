@@ -268,6 +268,7 @@
   </v-dialog>
   <template v-if="showErrorDialog">
     <PersonBulkError
+      :bulkOperationName="t('admin.rolle.assignRolle')"
       :isDialogVisible="showErrorDialog"
       @update:isDialogVisible="
         (val: boolean) => {

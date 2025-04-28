@@ -184,6 +184,7 @@
   </v-dialog>
   <template v-if="showErrorDialog">
     <PersonBulkError
+      :bulkOperationName="$t('admin.person.deletePerson')"
       :isDialogVisible="showErrorDialog"
       @update:isDialogVisible="
         (val: boolean) => {
