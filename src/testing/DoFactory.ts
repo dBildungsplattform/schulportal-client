@@ -1,18 +1,22 @@
 import {
+  EmailAddressStatus,
   OrganisationsTyp,
   RollenArt,
   RollenMerkmal,
   RollenSystemRecht,
   TraegerschaftTyp,
+  Vertrauensstufe,
   type DBiamPersonenuebersichtResponse,
   type DBiamPersonenzuordnungResponse,
   type OrganisationResponse,
+  type PersonendatensatzResponse,
   type PersonenkontextRolleFieldsResponse,
   type RollenSystemRechtServiceProviderIDResponse,
   type UserinfoResponse,
 } from '@/api-client/generated';
 import type { Organisation } from '@/stores/OrganisationStore';
 import type { Zuordnung } from '@/stores/PersonenkontextStore';
+import { PersonLockOccasion, type Person, type Personendatensatz, type UserLock } from '@/stores/PersonStore';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { faker } from '@faker-js/faker';
 
@@ -175,6 +179,64 @@ export class DoFactory {
       editable: true,
       merkmale: [] as unknown as RollenMerkmal,
       typ: OrganisationsTyp.Schule,
+      ...props,
+    };
+  }
+
+  public static getUserLockEntry(props?: Partial<UserLock>): UserLock {
+    return {
+      personId: faker.string.uuid(),
+      locked_by: faker.string.uuid(),
+      created_at: faker.date.recent().toISOString(),
+      locked_until: faker.date.future().toISOString(),
+      lock_occasion: PersonLockOccasion.MANUELL_GESPERRT,
+      ...props,
+    };
+  }
+
+  public static getPerson(props?: Partial<Person>): Person {
+    return {
+      id: faker.string.uuid(),
+      name: {
+        vorname: faker.person.firstName(),
+        familienname: faker.person.lastName(),
+      },
+      referrer: faker.internet.username(),
+      revision: faker.string.numeric(),
+      personalnummer: faker.string.numeric(7),
+      isLocked: false,
+      userLock: null,
+      lastModified: faker.date.recent().toISOString(),
+      email: {
+        status: EmailAddressStatus.Enabled,
+        address: faker.internet.email(),
+      },
+      ...props,
+    };
+  }
+
+  public static getPersonendatensatz(props?: Partial<Personendatensatz>): Personendatensatz {
+    return {
+      person: this.getPerson(),
+      ...props,
+    };
+  }
+
+  public static getPersonendatensatzResponse(
+    props?: Partial<PersonendatensatzResponse>,
+    person?: Person,
+  ): PersonendatensatzResponse {
+    return {
+      person: {
+        ...(person ?? this.getPersonendatensatz().person),
+        mandant: '',
+        geburt: {},
+        stammorganisation: '',
+        geschlecht: '',
+        lokalisierung: '',
+        vertrauensstufe: Vertrauensstufe.Teil,
+        startpasswort: '',
+      },
       ...props,
     };
   }
