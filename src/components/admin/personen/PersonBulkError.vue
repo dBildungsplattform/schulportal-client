@@ -26,7 +26,7 @@
     (event: 'update:isDialogVisible', isDialogVisible: boolean): void;
   };
 
-  type CSVHeaders = 'Vorname' | 'Nachname' | 'Error';
+  type CSVHeaders = 'Vorname' | 'Nachname' | 'Fehlermeldung';
   type CSVRow = Record<CSVHeaders, string | undefined>;
 
   const props: Props = defineProps<Props>();
@@ -36,14 +36,14 @@
 
   // Saves the errors as a text file
   function saveErrorsAsCSV(): void {
-    const headers: CSVHeaders[] = ['Vorname', 'Nachname', 'Error'];
+    const headers: CSVHeaders[] = ['Vorname', 'Nachname', 'Fehlermeldung'];
 
-    const fileName: string = `massenbearbeitung-errors-${new Date().toLocaleDateString('de-DE').replace(/\./g, '-')}.txt`;
+    const fileName: string = `Fehler-Mehrfachbearbeitung-${new Date().toLocaleDateString('de-DE').replace(/\./g, '-')}.txt`;
 
     const csvRows: CSVRow[] = props.errors.map((entry: ErrorEntry) => ({
       Vorname: entry.vorname,
       Nachname: entry.nachname,
-      Error: entry.error,
+      Fehlermeldung: entry.error,
     }));
 
     const csvContent: string = buildCSV<CSVHeaders>(headers, csvRows);
