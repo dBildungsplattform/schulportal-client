@@ -353,7 +353,7 @@
       "errors": {
         "404": "Der Benutzer konnte nicht gefunden werden.",
         "COUNT_MISMATCHING": "Der Benutzer wurde zwischenzeitlich von einer anderen Administratorin oder einem anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut.",
-        "INVALID_PERSONENKONTEXT_FOR_PERSON_WITH_ROLLENART_LERN": "Diese Rolle kann einem Schüler nicht zugeordnet werden.",
+        "INVALID_PERSONENKONTEXT_FOR_PERSON_WITH_ROLLENART_LERN": "Diese Rolle kann dem Benutzer nicht zugeordnet werden.",
         "NEWER_VERSION_OF_PERSONENKONTEXTE_AVAILABLE": "Der Benutzer wurde zwischenzeitlich von einer anderen Administratorin oder einem anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut.",
         "GLEICHE_ROLLE_AN_KLASSE_WIE_SCHULE": "Mindestens eine Rolle des Benutzers ist an der Schule nicht bekannt.",
         "NUR_LEHR_UND_LERN_AN_KLASSE": "Nur Schüler dürfen einer Klasse zugeordnet werden.",
