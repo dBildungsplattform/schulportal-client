@@ -132,10 +132,6 @@ export function parseUserLock(unparsedArray: object[]): UserLock[] {
   for (const unparsed of unparsedArray) {
     const result: Partial<UserLock> = {};
 
-    if (LockKeys.PersonId in unparsed) {
-      result.personId = '' + unparsed[LockKeys.PersonId];
-    }
-
     if (LockKeys.LockOccasion in unparsed && unparsed[LockKeys.LockOccasion] == PersonLockOccasion.MANUELL_GESPERRT) {
       // Process "MANUELL_GESPERRT" entries
       if (LockKeys.LockedBy in unparsed) {
