@@ -40,7 +40,7 @@
     if (bulkOperationStore.currentOperation) {
       bulkOperationStore.resetState();
     }
-    personStore.resetState();
+    personStore.errorCode = '';
     showDeletePersonDialog.value = false;
     emit('update:dialogExit', finished);
   }
