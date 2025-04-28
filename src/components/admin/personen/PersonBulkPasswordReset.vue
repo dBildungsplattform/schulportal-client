@@ -2,7 +2,7 @@
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { type BulkErrorList, useBulkErrors } from '@/composables/useBulkErrors';
   import { useBulkOperationStore, type BulkOperationStore, type CurrentOperation } from '@/stores/BulkOperationStore';
-  import { type PersonenWithRolleAndZuordnung } from '@/stores/PersonStore';
+  import { usePersonStore, type PersonenWithRolleAndZuordnung, type PersonStore } from '@/stores/PersonStore';
   import { buildCSV, download } from '@/utils/file';
   import { computed, ref, type ComputedRef, type Ref } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
@@ -34,6 +34,7 @@
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
+  const personStore: PersonStore = usePersonStore();
 
   const showErrorDialog: Ref<boolean, boolean> = ref(false);
 
@@ -93,6 +94,7 @@
 
   async function closePasswordResetDialog(finished: boolean): Promise<void> {
     bulkOperationStore.resetState();
+    personStore.resetState();
     emit('update:dialogExit', finished);
   }
 

@@ -101,6 +101,7 @@
       bulkOperationStore.resetState();
     }
     showModifyRolleDialog.value = false;
+    personenkontextStore.$reset();
     emit('update:isDialogVisible', false);
   }
 

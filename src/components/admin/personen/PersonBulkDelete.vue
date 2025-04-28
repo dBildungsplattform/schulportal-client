@@ -5,13 +5,14 @@
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
   import { useBulkErrors, type BulkErrorList } from '@/composables/useBulkErrors';
-  import type { PersonenWithRolleAndZuordnung } from '@/stores/PersonStore';
+  import { usePersonStore, type PersonenWithRolleAndZuordnung, type PersonStore } from '@/stores/PersonStore';
   import PersonBulkError from '@/components/admin/personen/PersonBulkError.vue';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
+  const personStore: PersonStore = usePersonStore();
 
   const successMessage: ComputedRef<string> = computed(() =>
     bulkOperationStore.currentOperation?.successMessage ? t(bulkOperationStore.currentOperation.successMessage) : '',
@@ -39,6 +40,7 @@
     if (bulkOperationStore.currentOperation) {
       bulkOperationStore.resetState();
     }
+    personStore.resetState();
     showDeletePersonDialog.value = false;
     emit('update:dialogExit', finished);
   }
