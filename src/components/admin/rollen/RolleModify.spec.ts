@@ -7,11 +7,27 @@ import RolleModify from './RolleModify.vue';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
 import { nextTick } from 'vue';
 import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
+import { DoFactory } from '@/testing/DoFactory';
+import type { Organisation } from '@/stores/OrganisationStore';
+import type { OrganisationResponseLegacy, RolleResponse } from '@/api-client/generated';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
 const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
 const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
+
+const organisation: OrganisationResponseLegacy = DoFactory.getOrganisationenResponseLegacy();
+const rolle: RolleResponse = DoFactory.getRolleResponse({
+  administeredBySchulstrukturknoten: organisation.id,
+  rollenart: RollenArt.Lehr,
+});
+
+const kopersRolle: RolleResponse = DoFactory.getRolleResponse({
+  administeredBySchulstrukturknoten: organisation.id,
+  merkmale: new Set<RollenMerkmal>([RollenMerkmal.KopersPflicht]),
+  systemrechte: new Set<RollenSystemRecht>([RollenSystemRecht.RollenVerwalten]),
+  rollenart: RollenArt.Lern,
+});
 
 beforeEach(async () => {
   // Create a container for the app and append it to the document body
@@ -35,20 +51,21 @@ beforeEach(async () => {
       isDialogVisible: true,
       personIDs: ['person1', 'person2'],
       organisationen: [
-        { title: 'orga', value: 'O1' },
+        { title: organisation.name, value: organisation.id },
         { title: 'orga1', value: '1133' },
       ],
       rollen: [
         {
-          value: '54321',
-          title: 'Lern',
-          rollenart: RollenArt.Lern,
+          value: rolle.id,
+          title: rolle.name,
+          merkmale: rolle.merkmale,
+          rollenart: rolle.rollenart,
         },
         {
-          value: '54329',
-          title: 'Lehr',
-          merkmale: new Set<RollenMerkmal>(['KOPERS_PFLICHT']),
-          rollenart: RollenArt.Lehr,
+          value: kopersRolle.id,
+          title: kopersRolle.name,
+          merkmale: kopersRolle.merkmale,
+          rollenart: kopersRolle.rollenart,
         },
       ],
     },
@@ -57,37 +74,11 @@ beforeEach(async () => {
     },
   });
 });
-personenkontextStore.workflowStepResponse = {
-  rollen: [
-    {
-      administeredBySchulstrukturknoten: '1234',
-      rollenart: 'LERN',
-      name: 'SuS',
-      merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
-      systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
-      createdAt: '2022',
-      updatedAt: '2022',
-      id: '54321',
-      administeredBySchulstrukturknotenName: 'Land SH',
-      administeredBySchulstrukturknotenKennung: '',
-      version: 1,
-    },
-  ],
-  organisations: [
-    {
-      id: 'O1',
-      kennung: '',
-      name: 'Organisation1',
-      namensergaenzung: 'string',
-      kuerzel: 'string',
-      typ: 'TRAEGER',
-      administriertVon: '1',
-    },
-  ],
-  selectedOrganisation: null,
-  selectedRollen: null,
+personenkontextStore.workflowStepResponse = DoFactory.getPersonenkontextWorkflowResponse({
+  organisations: [organisation],
+  rollen: [rolle, kopersRolle],
   canCommit: true,
-};
+});
 
 describe('RolleModify', () => {
   test('renders form and triggers submit', async () => {
@@ -97,16 +88,16 @@ describe('RolleModify', () => {
     const organisationAutocomplete: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'organisation-select' });
-    await organisationAutocomplete?.setValue('O1');
-    await organisationAutocomplete?.vm.$emit('update:search', 'O1');
+    await organisationAutocomplete?.setValue(organisation.id);
+    organisationAutocomplete?.vm.$emit('update:search', organisation.id);
     await nextTick();
 
     // Set rolle value
     const rolleAutocomplete: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'rolle-select' });
-    await rolleAutocomplete?.setValue('54321');
-    await rolleAutocomplete?.vm.$emit('update:search', '54321');
+    await rolleAutocomplete?.setValue(rolle.id);
+    rolleAutocomplete?.vm.$emit('update:search', rolle.id);
 
     await nextTick();
 

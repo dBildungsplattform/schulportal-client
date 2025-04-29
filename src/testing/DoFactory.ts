@@ -9,14 +9,16 @@ import {
   type DBiamPersonenuebersichtResponse,
   type DBiamPersonenzuordnungResponse,
   type OrganisationResponse,
+  type OrganisationResponseLegacy,
   type PersonendatensatzResponse,
   type PersonenkontextRolleFieldsResponse,
   type RollenSystemRechtServiceProviderIDResponse,
   type UserinfoResponse,
 } from '@/api-client/generated';
 import type { Organisation } from '@/stores/OrganisationStore';
-import type { Zuordnung } from '@/stores/PersonenkontextStore';
+import type { PersonenkontextWorkflowResponse, Zuordnung } from '@/stores/PersonenkontextStore';
 import { PersonLockOccasion, type Person, type Personendatensatz, type UserLock } from '@/stores/PersonStore';
+import type { Rolle, RolleResponse } from '@/stores/RolleStore';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { faker } from '@faker-js/faker';
 
@@ -46,6 +48,19 @@ export class DoFactory {
       kuerzel: faker.string.alpha(4),
       typ: OrganisationsTyp.Klasse,
       administriertVon: parentSchule?.id ?? faker.string.uuid(),
+      ...props,
+    };
+  }
+
+  public static getOrganisationenResponseLegacy(
+    props?: Partial<OrganisationResponseLegacy>,
+  ): OrganisationResponseLegacy {
+    return {
+      ...DoFactory.getSchule(),
+      administriertVon: faker.string.uuid(),
+      kennung: faker.string.numeric(7),
+      kuerzel: 'Schulkürzel',
+      namensergaenzung: null,
       ...props,
     };
   }
@@ -127,6 +142,52 @@ export class DoFactory {
         RollenSystemRecht.PersonSynchronisieren,
       ],
       serviceProviderIds: [faker.string.uuid()],
+      ...props,
+    };
+  }
+
+  public static getRolle(props?: Partial<Rolle>): Rolle {
+    return {
+      administeredBySchulstrukturknoten: faker.string.uuid(),
+      id: faker.string.uuid(),
+      name: faker.string.alpha(4),
+      merkmale: new Set<RollenMerkmal>(),
+      rollenart: RollenArt.Lehr,
+      systemrechte: new Set<RollenSystemRecht>(),
+      version: 1,
+      ...props,
+    };
+  }
+
+  public static getRolleResponse(props?: Partial<RolleResponse>): RolleResponse {
+    return {
+      ...this.getRolle(),
+      createdAt: faker.date.past().toISOString(),
+      updatedAt: faker.date.recent().toISOString(),
+      merkmale: new Set<RollenMerkmal>(),
+      systemrechte: new Set<RollenSystemRecht>(),
+      administeredBySchulstrukturknotenName: this.getFakeSchuleName(),
+      administeredBySchulstrukturknotenKennung: faker.string.numeric(7),
+      ...props,
+    };
+  }
+
+  public static getPersonenkontextWorkflowResponse(
+    props?: Partial<PersonenkontextWorkflowResponse>,
+  ): PersonenkontextWorkflowResponse {
+    const organisation: OrganisationResponseLegacy = this.getOrganisationenResponseLegacy();
+    return {
+      organisations: [organisation],
+      rollen: [
+        this.getRolleResponse({
+          administeredBySchulstrukturknoten: organisation.id,
+          administeredBySchulstrukturknotenName: organisation.name,
+          administeredBySchulstrukturknotenKennung: organisation.kennung,
+        }),
+      ],
+      selectedOrganisation: null,
+      selectedRollen: null,
+      canCommit: false,
       ...props,
     };
   }
