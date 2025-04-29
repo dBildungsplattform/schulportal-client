@@ -1,15 +1,14 @@
-import { test, type MockInstance } from 'vitest';
-import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
-import { RollenArt, RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
-import { createRouter, createWebHistory, type Router } from 'vue-router';
-import routes from '@/router/routes';
-import RolleModify from './RolleModify.vue';
-import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
-import { nextTick } from 'vue';
-import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
-import { DoFactory } from '@/testing/DoFactory';
-import type { Organisation } from '@/stores/OrganisationStore';
 import type { OrganisationResponseLegacy, RolleResponse } from '@/api-client/generated';
+import routes from '@/router/routes';
+import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
+import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
+import { RollenArt, RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
+import { DoFactory } from '@/testing/DoFactory';
+import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
+import { test, type MockInstance } from 'vitest';
+import { nextTick } from 'vue';
+import { createRouter, createWebHistory, type Router } from 'vue-router';
+import RolleModify from './RolleModify.vue';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
