@@ -167,6 +167,10 @@
         "info": "Bitte laden Sie die Datei mit den temporären Passwörtern herunter und teilen Sie den Benutzern die Passwörter mit. Nach dem Schließen des Dialogs ist ein Herunterladen aus Sicherheitsgründen nicht mehr möglich.",
         "success": "Die Passwörter wurden erfolgreich zurückgesetzt."
       },
+      "bulkRolleModify": {
+        "noKopersNrInfoHeadline": "Die ausgewählte Rolle verpflichtet zur Angabe einer KoPers.-Nr. am Benutzerkonto.",
+        "noKopersNrInfoText": "Bitte beachten Sie, dass ein Benutzerkonto ohne KoPers.-Nr. nach 8 Wochen automatisch gesperrt wird. Tragen Sie daher die KoPers.-Nr. bitte in der Gesamtübersicht des Benutzers nach, falls diese nicht bereits eingetragen ist."
+      },
       "bulkUnassignOrganisation": {
         "cancelZuordnung": "Schulzuordnung aufheben",
         "confirmation": "Möchten Sie wirklich die Schulzuordnungen der ausgewählten Benutzer aufheben?",

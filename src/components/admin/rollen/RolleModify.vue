@@ -1,16 +1,17 @@
 <script setup lang="ts">
-  import { computed, ref, type ComputedRef, type Ref } from 'vue';
-  import { useI18n, type Composer } from 'vue-i18n';
-  import { useDisplay } from 'vuetify';
-  import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import type { TranslatedObject } from '@/types';
-  import { toTypedSchema } from '@vee-validate/yup';
-  import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
-  import { object, string } from 'yup';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
   import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
   import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
   import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
+  import type { TranslatedObject } from '@/types';
+  import { isKopersRolle } from '@/utils/validationPersonenkontext';
+  import { toTypedSchema } from '@vee-validate/yup';
+  import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
+  import { computed, ref, type ComputedRef, type Ref } from 'vue';
+  import { useI18n, type Composer } from 'vue-i18n';
+  import { useDisplay } from 'vuetify';
+  import { object, string } from 'yup';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
@@ -88,6 +89,14 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = formContext.defineField('selectedRolle', getVuetifyConfig);
 
+  const selectedRollen: ComputedRef<Array<string>> = computed(() => {
+    return selectedRolle.value ? [selectedRolle.value] : [];
+  });
+
+  const showKopersHint: ComputedRef<boolean> = computed(() => {
+    return isKopersRolle(selectedRollen.value, props.rollen);
+  });
+
   async function closeModifyRolleDeleteDialog(): Promise<void> {
     if (bulkOperationStore.currentOperation) {
       bulkOperationStore.resetState();
@@ -124,27 +133,46 @@
     <LayoutCard
       data-testid="rolle-modify-layout-card"
       :closable="false"
-      :header="$t('admin.rolle.assignRolle')"
+      :header="t('admin.rolle.assignRolle')"
       @onCloseClicked="closeModifyRolleDeleteDialog()"
     >
       <v-container>
         <!-- Form Component -->
-        <PersonenkontextCreate
-          v-if="bulkOperationStore.currentOperation?.progress === 0"
-          ref="personenkontext-create"
-          :showHeadline="false"
-          :isModifyRolleDialog="showModifyRolleDialog"
-          :organisationen="organisationen"
-          :rollen="rollen"
-          :selectedOrganisationProps="selectedOrganisationProps"
-          :selectedRolleProps="selectedRolleProps"
-          v-model:selectedOrganisation="selectedOrganisation"
-          v-model:selectedRolle="selectedRolle"
-          @update:selectedOrganisation="(value?: string) => (selectedOrganisation = value)"
-          @update:selectedRolle="(value?: string) => (selectedRolle = value)"
-          @update:canCommit="canCommit = $event"
-          @fieldReset="handleFieldReset"
-        />
+        <template v-if="bulkOperationStore.currentOperation?.progress === 0">
+          <PersonenkontextCreate
+            v-if="bulkOperationStore.currentOperation?.progress === 0"
+            ref="personenkontext-create"
+            :showHeadline="false"
+            :isModifyRolleDialog="showModifyRolleDialog"
+            :organisationen="organisationen"
+            :rollen="rollen"
+            :selectedOrganisationProps="selectedOrganisationProps"
+            :selectedRolleProps="selectedRolleProps"
+            v-model:selectedOrganisation="selectedOrganisation"
+            v-model:selectedRolle="selectedRolle"
+            @update:selectedOrganisation="(value?: string) => (selectedOrganisation = value)"
+            @update:selectedRolle="(value?: string) => (selectedRolle = value)"
+            @update:canCommit="canCommit = $event"
+            @fieldReset="handleFieldReset"
+          />
+          <v-row
+            v-if="showKopersHint"
+            class="text-body bold px-md-16"
+            data-testid="no-kopersnr-information"
+          >
+            <v-col
+              offset="2"
+              cols="10"
+            >
+              <h3 class="mb-4">
+                {{ t('admin.person.bulkRolleModify.noKopersNrInfoHeadline') }}
+              </h3>
+              <p>
+                {{ t('admin.person.bulkRolleModify.noKopersNrInfoText') }}
+              </p>
+            </v-col>
+          </v-row>
+        </template>
 
         <!-- Progress Bar -->
         <div
@@ -178,7 +206,7 @@
                 size="small"
               ></v-icon>
               <span class="subtitle-2">
-                {{ $t('admin.doNotCloseBrowserNotice') }}
+                {{ t('admin.doNotCloseBrowserNotice') }}
               </span>
             </v-col>
           </v-row>
@@ -212,7 +240,7 @@
               @click="closeModifyRolleDeleteDialog"
               data-testid="rolle-modify-discard-button"
             >
-              {{ $t('cancel') }}
+              {{ t('cancel') }}
             </v-btn>
           </v-col>
           <v-col
@@ -228,7 +256,7 @@
               data-testid="rolle-modify-submit-button"
               type="submit"
             >
-              {{ $t('admin.rolle.assignRolle') }}
+              {{ t('admin.rolle.assignRolle') }}
             </v-btn>
           </v-col>
         </v-row>
@@ -247,7 +275,7 @@
               @click="closeModifyRolleDeleteDialog"
               data-testid="rolle-modify-close-button"
             >
-              {{ $t('close') }}
+              {{ t('close') }}
             </v-btn>
           </v-col>
         </v-row>
