@@ -22,7 +22,7 @@
           class="hidden-sm-and-down"
           cols="auto"
         >
-          <router-link :to="auth.isAuthed ? '/start' : '/'">
+          <router-link :to="auth.isAuthenticated ? '/start' : '/'">
             <img
               alt="Logo Schulportal"
               src="@/assets/logos/Schulportal_SH_Wort_Bildmarke_RGB_Anwendung_HG_Blau.svg"
@@ -37,7 +37,7 @@
           cols="auto"
           class="hidden-md-and-up"
         >
-          <router-link :to="auth.isAuthed ? '/start' : '/'">
+          <router-link :to="auth.isAuthenticated ? '/start' : '/'">
             <img
               alt="Logo Schulportal"
               src="@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg"
@@ -76,7 +76,7 @@
   >
     <v-spacer></v-spacer>
 
-    <v-toolbar-items v-if="!auth.isAuthed">
+    <v-toolbar-items v-if="!auth.isAuthenticated">
       <v-col class="align-self-center mr-2">
         <a
           class="primary"
@@ -93,7 +93,7 @@
       </v-col>
     </v-toolbar-items>
 
-    <v-toolbar-items v-if="auth.isAuthed">
+    <v-toolbar-items v-if="auth.isAuthenticated">
       <v-col class="d-flex align-self-center mr-2">
         <a
           class="primary d-flex"
