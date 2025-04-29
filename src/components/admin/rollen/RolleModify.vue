@@ -6,14 +6,14 @@
   import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
   import type { TranslatedObject } from '@/types';
   import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
-  import { formatDateToISO, getNextSchuljahresende, isValidDate, notInPast } from '@/utils/date';
-  import { DDMMYYYY } from '@/utils/validation';
+  import { formatDateToISO, getNextSchuljahresende } from '@/utils/date';
+  import { befristungSchema } from '@/utils/validationPersonenkontext';
   import { toTypedSchema } from '@vee-validate/yup';
   import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
   import { computed, ref, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
-  import { object, string, StringSchema, type AnyObject } from 'yup';
+  import { object, string } from 'yup';
 
   type Props = {
     errorCode: string;
@@ -68,16 +68,7 @@
       object({
         selectedRolle: string().required(t('admin.rolle.rules.rolle.required')),
         selectedOrganisation: string().required(t('admin.organisation.rules.organisation.required')),
-        selectedBefristung: string()
-          .test('notInPast', t('admin.befristung.rules.pastDateNotAllowed'), notInPast)
-          .test('isValidDate', t('admin.befristung.rules.invalidDateNotAllowed'), isValidDate)
-          .matches(DDMMYYYY, t('admin.befristung.rules.format'))
-          .when(['selectedRolle', 'selectedBefristungOption'], {
-            is: (selectedRolleIds: string[], selectedBefristungOption: string | undefined) =>
-              isBefristungspflichtRolle(selectedRolleIds) && selectedBefristungOption === undefined,
-            then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
-              schema.required(t('admin.befristung.rules.required')),
-          }),
+        selectedBefristung: befristungSchema(t),
       }),
     );
   };
