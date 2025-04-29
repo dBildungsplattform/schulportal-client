@@ -368,10 +368,6 @@
           rolleId: rolleId,
         });
     }
-    // We save a copy of the selected values because they are not available anymore since we reset the form right after submitting
-    // This will then be used to display the organisation again in the success template after receiving the orga ID and rolle ID back from the BE.
-    selectedOrgaCache.value = JSON.parse(JSON.stringify(selectedOrganisation.value));
-    selectedRolleCache.value = JSON.parse(JSON.stringify(selectedRollen.value));
     await personenkontextStore.createPersonWithKontexte(bodyParams);
     formContext.resetForm();
     hasNoKopersNr.value = false;
@@ -383,6 +379,20 @@
       showNoKopersNrConfirmationDialog.value = true;
     }
   });
+
+  watch(
+    [selectedOrganisation, selectedRollen],
+    ([newOrganisation, newRollen]: [string | undefined, string[] | undefined]) => {
+      // We save a copy of the selected values because they are not available anymore since we reset the form right after submitting
+      // This will then be used to display the organisation again in the success template after receiving the orga ID and rolle ID back from the BE.
+      if (newOrganisation) {
+        selectedOrgaCache.value = newOrganisation;
+      }
+      if (newRollen && newRollen.length > 0) {
+        selectedRolleCache.value = newRollen;
+      }
+    },
+  );
 
   const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = formContext.handleSubmit(() => {
     createPerson();
