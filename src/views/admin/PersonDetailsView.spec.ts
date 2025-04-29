@@ -265,9 +265,9 @@ describe('PersonDetailsView', () => {
       })) ?? []),
     ];
 
-    authStore.currentUser = mockCurrentUser;
-    personStore.currentPerson = mockPerson;
-    personStore.personenuebersicht = mockPersonenuebersicht;
+    authStore.currentUser = { ...mockCurrentUser };
+    personStore.currentPerson = { ...mockPerson };
+    personStore.personenuebersicht = { ...mockPersonenuebersicht };
 
     configStore.configData = {
       befristungBearbeitenEnabled: true,
@@ -802,6 +802,8 @@ describe('PersonDetailsView', () => {
     wrapper?.find('[data-testid="zuordnung-creation-submit-button"]').trigger('click');
 
     await flushPromises();
+    // wait for vuetify animation to complete
+    await vi.waitUntil(() => document.body.querySelector('[data-testid="confirm-zuordnung-dialog-addition"]') != null);
 
     const confirmDialogButton: Element | null = document.body.querySelector(
       '[data-testid="confirm-zuordnung-dialog-addition"]',
@@ -865,8 +867,8 @@ describe('PersonDetailsView', () => {
     await nextTick();
 
     await flushPromises();
-    await flushPromises();
-    await flushPromises();
+    // wait for vuetify animation to complete
+    await vi.waitUntil(() => document.body.querySelector('[data-testid="confirm-change-klasse-button"]') != null);
 
     const confirmDialogButton: Element | null = document.body.querySelector(
       '[data-testid="confirm-change-klasse-button"]',
@@ -959,17 +961,15 @@ describe('PersonDetailsView', () => {
 
     expect(document.querySelector('[data-testid="lock-user-info-text"]')).not.toBeNull();
 
-    const unbefristetRadioButton: HTMLElement = (await document.querySelector(
+    const unbefristetRadioButton: HTMLElement = document.querySelector(
       '[data-testid="unbefristet-radio-button"] input[type="radio"]',
-    )) as HTMLElement;
+    ) as HTMLElement;
 
     expect(unbefristetRadioButton).not.toBeNull();
     unbefristetRadioButton.click();
     unbefristetRadioButton.dispatchEvent(new Event('click'));
 
-    const lockUserButton: HTMLElement = (await document.querySelector(
-      '[data-testid="lock-user-button"]',
-    )) as HTMLElement;
+    const lockUserButton: HTMLElement = document.querySelector('[data-testid="lock-user-button"]') as HTMLElement;
 
     expect(lockUserButton).not.toBeNull();
     lockUserButton.click();
@@ -980,7 +980,7 @@ describe('PersonDetailsView', () => {
 
     expect(personStore.lockPerson).toHaveBeenCalled();
     // reset personenuebersicht
-    personStore.personenuebersicht = mockPersonenuebersicht;
+    personStore.personenuebersicht = { ...mockPersonenuebersicht };
   });
 
   describe('change befristung', () => {
@@ -1110,11 +1110,16 @@ describe('PersonDetailsView', () => {
         await nextTick();
         await flushPromises();
 
+        await wrapper?.find('[data-testid="change-befristung-submit-button"]').trigger('click');
         if (submitButton) {
           submitButton.dispatchEvent(new Event('click'));
         }
-        await wrapper?.find('[data-testid="change-befristung-submit-button"]').trigger('click');
+        await nextTick();
         await flushPromises();
+        // wait for vuetify animation to complete
+        await vi.waitUntil(
+          () => document.body.querySelector('[data-testid="confirm-change-befristung-button"]') != null,
+        );
 
         const confirmDialogButton: Element | null = document.body.querySelector(
           '[data-testid="confirm-change-befristung-button"]',
