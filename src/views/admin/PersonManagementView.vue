@@ -34,6 +34,7 @@
   import OrganisationUnassign from '@/components/admin/schulen/OrganisationUnassign.vue';
   import InfoDialog from '@/components/alert/InfoDialog.vue';
   import { OperationType } from '@/stores/BulkOperationStore';
+  import type PersonBulkChangeKlasse from '@/components/admin/personen/PersonBulkChangeKlasse.vue';
 
   const searchFieldComponent: Ref = ref();
 
@@ -90,6 +91,7 @@
   const benutzerDeleteDialogVisible: Ref<boolean> = ref(false);
   const passwordResetDialogVisible: Ref<boolean> = ref(false);
   const organisationUnassignDialogVisible: Ref<boolean> = ref(false);
+  const changeKlasseDialogVisible: Ref<boolean> = ref(false);
   const onlyOneOrganisationAlertDialogVisible: Ref<boolean> = ref(false);
 
   const selectedOption: Ref<string | null> = ref(null);
@@ -107,6 +109,7 @@
     if (authStore.hasPersonenverwaltungPermission) {
       actionTypeTitles.set(OperationType.RESET_PASSWORD, t('admin.person.resetPassword'));
       actionTypeTitles.set(OperationType.ORG_UNASSIGN, t('admin.person.bulkUnassignOrganisation.cancelZuordnung'));
+      actionTypeTitles.set(OperationType.CHANGE_KLASSE, t('admin.person.bulkChangeKlasse.title'));
     }
 
     return [...actionTypeTitles.entries()].map(([key, value]: [string, string]) => ({
@@ -498,6 +501,10 @@
         break;
       case OperationType.ORG_UNASSIGN:
         checkSingleOrgDisplayDialog(organisationUnassignDialogVisible);
+        break;
+      case OperationType.CHANGE_KLASSE:
+        checkSingleOrgDisplayDialog(changeKlasseDialogVisible);
+        break;
     }
   };
 
@@ -907,6 +914,17 @@
             @update:dialogExit="handleUnassignOrgDialog($event)"
           >
           </OrganisationUnassign>
+          <v-dialog
+            ref="changeKlasseBulkDialog"
+            :model-value="changeKlasseDialogVisible"
+            persistent
+          >
+            <PersonBulkChangeKlasse
+              :selectedPersonIds
+              :selectedSchuleId="selectedOrganisation"
+              :availableKlassen="klassenOptions"
+            />
+          </v-dialog>
         </v-col>
         <!-- Display the number of selected checkboxes -->
         <v-col

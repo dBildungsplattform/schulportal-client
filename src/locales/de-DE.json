@@ -173,6 +173,12 @@
         "affectedSchool": "Betroffene Schule: {schule}",
         "success": "Die Schulzuordnungen wurden erfolgreich entfernt."
       },
+      "bulkChangeKlasse": {
+        "title": "Versetzen",
+        "error": {
+          "onlySus": "Bitte wählen Sie nur Benutzer mit einer Schülerrolle aus, um die Aktion durchzuführen"
+        }
+      },
       "onlyOneSchoolAlert": "Bitte wählen Sie im Filter genau eine Schule aus, um die Aktion durchzuführen.",
       "changePassword": "Passwort ändern",
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",

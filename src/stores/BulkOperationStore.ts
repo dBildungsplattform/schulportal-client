@@ -20,6 +20,7 @@ export enum OperationType {
   DELETE_PERSON = 'DELETE_PERSON',
   RESET_PASSWORD = 'RESET_PASSWORD',
   ORG_UNASSIGN = 'ORG_UNASSIGN',
+  CHANGE_KLASSE = 'CHANGE_KLASSE',
 }
 
 export type CurrentOperation = {
@@ -50,6 +51,7 @@ type BulkOperationActions = {
     workflowStepResponseOrganisations: Organisation[],
   ): Promise<void>;
   bulkPersonenDelete(personIDs: string[]): Promise<void>;
+  bulkChangeKlasse(personIDs: string[], selectedOrganisationId: string, newKlasseId: string): Promise<void>;
 };
 
 export type BulkOperationStore = Store<
@@ -253,6 +255,50 @@ export const useBulkOperationStore: StoreDefinition<
       this.currentOperation.complete = true;
 
       this.currentOperation.successMessage = 'admin.person.deletePersonBulkSuccessMessage';
+    },
+
+    async bulkChangeKlasse(personIDs: string[], selectedOrganisationId: string, newKlasseId: string) {
+      const personStore: PersonStore = usePersonStore();
+      const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
+      this.currentOperation = {
+        type: OperationType.CHANGE_KLASSE,
+        isRunning: true,
+        progress: 0,
+        complete: false,
+        errors: new Map(),
+        data: new Map(),
+        successMessage: undefined,
+      };
+      for (let i: number = 0; i < personIDs.length; i++) {
+        const personId: string = personIDs[i]!;
+        await personStore.getPersonenuebersichtById(personId);
+
+        const zuordnungenToBeUpdated: Zuordnung[] = [];
+        const zuordnungenToRemainUnchanged: Zuordnung[] = [];
+
+        for (const zuordnung of personStore.personenuebersicht?.zuordnungen ?? []) {
+          if (zuordnung.sskId === selectedOrganisationId && zuordnung.rollenArt === RollenArt.Lern) {
+            zuordnungenToBeUpdated.push(zuordnung);
+          } else {
+            zuordnungenToRemainUnchanged.push(zuordnung);
+          }
+        }
+
+        const newZuordnungen: Zuordnung[] = zuordnungenToBeUpdated.map((zuordnung: Zuordnung) => ({
+          ...zuordnung,
+          sskId: newKlasseId,
+        }));
+
+        const combinedZuordnungen: Zuordnung[] = [...zuordnungenToRemainUnchanged, ...newZuordnungen];
+
+        await personenkontextStore.updatePersonenkontexte(combinedZuordnungen, personId);
+        this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
+      }
+
+      this.currentOperation.isRunning = false;
+      this.currentOperation.complete = true;
+
+      this.currentOperation.successMessage = 'admin.person.bulkChangeKlasse.success';
     },
   },
 });
