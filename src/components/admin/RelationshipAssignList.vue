@@ -3,11 +3,12 @@
   import SearchField from './SearchField.vue';
 
   type Props = {
+    dataTestId: string;
     items: Array<Organisation>;
     noItemsFoundText: string;
   };
 
-  defineProps<Props>();
+  const props: Props = defineProps<Props>();
 
   type Emits = {
     (event: 'onHandleItemClick', item: Organisation): void;
@@ -26,10 +27,17 @@
 
   // Move focus to the next chip when a chip is selected
   function focusNextChip(currentIndex: number): void {
-    const chips: NodeListOf<Element> = document.querySelectorAll('[data-testid^="assign-list-item-"]');
+    const chips: NodeListOf<Element> = document.querySelectorAll(
+      `[data-testid="${props.dataTestId}"] [data-testid^="assign-list-item-"]`,
+    );
     if (currentIndex + 1 < chips.length) {
       // Move focus to the next chip
       (chips[currentIndex + 1] as HTMLElement).focus();
+    }
+
+    if (currentIndex + 1 === chips.length && chips.length > 1) {
+      // Move focus to the previous chip
+      (chips[currentIndex - 1] as HTMLElement).focus();
     }
   }
 </script>
@@ -55,6 +63,7 @@
       >
         <v-list
           v-if="items.length > 0"
+          :data-testid="dataTestId"
           density="compact"
           max-height="344"
           min-height="344"
