@@ -12,7 +12,7 @@
   } from '@/stores/OrganisationStore';
   import { RollenSystemRecht } from '@/stores/RolleStore';
   import { getDisplayNameForOrg } from '@/utils/formatting';
-  import { type ValidationSchema } from '@/utils/validationKlasse';
+  import { type ValidationSchema as KlasseFormValues, type ValidationSchema } from '@/utils/validationKlasse';
   import { computed, onMounted, onUnmounted, ref, useTemplateRef, type ComputedRef, type Ref } from 'vue';
   import {
     onBeforeRouteLeave,
@@ -26,6 +26,11 @@
   const organisationStore: OrganisationStore = useOrganisationStore();
   // eslint-disable-next-line @typescript-eslint/typedef
   const formRef = useTemplateRef('klasse-creation-form');
+
+  const initialFormValues: Partial<KlasseFormValues> = {
+    selectedSchule: undefined,
+    selectedKlassenname: undefined,
+  };
 
   const { autoselectedSchule }: ReturnType<typeof useAutoselectedSchule> = useAutoselectedSchule([
     RollenSystemRecht.KlassenVerwalten,
@@ -65,13 +70,11 @@
   }
 
   const handleCreateAnotherKlasse = async (): Promise<void> => {
-    resetForm();
     await initStores();
     router.push({ name: 'create-klasse' });
   };
 
   async function navigateBackToKlasseForm(): Promise<void> {
-    resetForm();
     if (organisationStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
       await router.push({ name: 'create-klasse' }).then(() => {
         router.go(0);
@@ -104,6 +107,7 @@
   }
 
   const onSubmit = async ({ selectedSchule, selectedKlassenname }: ValidationSchema): Promise<void> => {
+    initialFormValues.selectedSchule = selectedSchule;
     await organisationStore.createOrganisation(
       selectedSchule,
       selectedSchule,
@@ -155,6 +159,7 @@
         <KlasseForm
           :errorCode="organisationStore.errorCode"
           :editMode="false"
+          :initialValues="initialFormValues"
           :isLoading="organisationStore.loading"
           :showUnsavedChangesDialog="showUnsavedChangesDialog"
           :onHandleConfirmUnsavedChanges="handleConfirmUnsavedChanges"
