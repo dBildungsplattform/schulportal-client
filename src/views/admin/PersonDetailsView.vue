@@ -1960,7 +1960,7 @@
                     </v-checkbox>
                   </div>
                 </template>
-                <!-- Template  to show when the creation of a Zuordnung is pending -->
+                <!-- Template to show when the creation of a Zuordnung is pending -->
                 <template v-else-if="pendingCreation && !pendingDeletion">
                   <span
                     class="text-body my-3 ml-5"
@@ -1994,9 +1994,15 @@
                     >
                       ({{ $t('willBeCreated') }})</span
                     >
+                    <span
+                      v-if="zuordnung.befristung"
+                      data-testid="zuordnung-befristung-text"
+                    >
+                      ({{ formatDate(zuordnung.befristung, t) }})</span
+                    >
                   </span>
                 </template>
-                <!-- Template  to show when the deletion of a Zuordnung is pending -->
+                <!-- Template to show when the deletion of a Zuordnung is pending -->
                 <template v-else-if="pendingDeletion">
                   <span
                     class="text-body my-3 ml-5"
@@ -2006,6 +2012,12 @@
                   >
                     {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
                     {{ zuordnung.klasse }}
+                    <span
+                      v-if="zuordnung.befristung"
+                      data-testid="zuordnung-befristung-text"
+                    >
+                      ({{ formatDate(zuordnung.befristung, t) }})</span
+                    >
                     <span
                       v-if="selectedZuordnungen.includes(zuordnung)"
                       class="text-body text-red"
@@ -2083,6 +2095,12 @@
                             : $t('admin.befristung.unlimited')
                         }})
                       </span>
+                      <span
+                        v-else-if="zuordnung.befristung"
+                        data-testid="zuordnung-befristung-text"
+                      >
+                        ({{ formatDate(zuordnung.befristung, t) }})</span
+                      >
                     </span>
 
                     <span
