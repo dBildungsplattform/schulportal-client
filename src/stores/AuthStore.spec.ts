@@ -16,7 +16,7 @@ describe('AuthStore', () => {
   });
 
   it('should initalize state correctly', () => {
-    expect(authStore.isAuthed).toBe(false);
+    expect(authStore.isAuthenticated).toBe(false);
   });
 
   describe('initializeAuthStatus', () => {
@@ -27,7 +27,7 @@ describe('AuthStore', () => {
 
       mockadapter.onGet('/api/auth/logininfo').replyOnce(200, mockResponse);
       const initializeAuthStatus: Promise<void> = authStore.initializeAuthStatus();
-      expect(authStore.isAuthed).toBe(false);
+      expect(authStore.isAuthenticated).toBe(false);
       expect(authStore.currentUser).toBe(null);
       expect(authStore.hasKlassenverwaltungPermission).toBe(false);
       expect(authStore.hasPersonenverwaltungPermission).toBe(false);
@@ -37,7 +37,7 @@ describe('AuthStore', () => {
       expect(authStore.hasPersonenSyncPermission).toBe(false);
       expect(authStore.hasImportPermission).toBe(false);
       await initializeAuthStatus;
-      expect(authStore.isAuthed).toBe(true);
+      expect(authStore.isAuthenticated).toBe(true);
       expect(authStore.currentUser).toEqual(mockInfo);
       expect(authStore.hasKlassenverwaltungPermission).toBe(false);
       expect(authStore.hasPersonenverwaltungPermission).toBe(false);
@@ -53,19 +53,19 @@ describe('AuthStore', () => {
 
       mockadapter.onGet('/api/auth/logininfo').replyOnce(200, mockResponse);
       const initializeAuthStatus: Promise<void> = authStore.initializeAuthStatus();
-      expect(authStore.isAuthed).toBe(false);
+      expect(authStore.isAuthenticated).toBe(false);
       expect(authStore.currentUserPermissions).toEqual([]);
       await initializeAuthStatus;
-      expect(authStore.isAuthed).toBe(true);
+      expect(authStore.isAuthenticated).toBe(true);
       expect(authStore.currentUserPermissions).toEqual([]);
     });
 
     it('should not authenticate on server error', async () => {
       mockadapter.onGet('/api/auth/logininfo').replyOnce(401, 'unauthorized error');
       const initializeAuthStatus: Promise<void> = authStore.initializeAuthStatus();
-      expect(authStore.isAuthed).toBe(false);
+      expect(authStore.isAuthenticated).toBe(false);
       await initializeAuthStatus;
-      expect(authStore.isAuthed).toBe(false);
+      expect(authStore.isAuthenticated).toBe(false);
     });
   });
 });
