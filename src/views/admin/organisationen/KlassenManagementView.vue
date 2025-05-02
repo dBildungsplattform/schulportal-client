@@ -4,6 +4,7 @@
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SchulenFilter from '@/components/filter/SchulenFilter.vue';
+  import KlassenFilter from '@/components/filter/KlassenFilter.vue';
   import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
   import {
     OrganisationsTyp,
@@ -14,8 +15,8 @@
   } from '@/stores/OrganisationStore';
   import { RollenSystemRecht } from '@/stores/RolleStore';
   import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
-  import { type Mutable, type TranslatedObject } from '@/types.d';
-  import { computed, reactive, ref, watch, watchEffect, type ComputedRef, type Reactive, type Ref } from 'vue';
+  import { type Mutable } from '@/types.d';
+  import { computed, ref, watch, watchEffect, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { onBeforeRouteLeave, useRouter, type Router } from 'vue-router';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
@@ -67,29 +68,12 @@
     return initialFilter;
   });
 
-  const searchInputKlassen: Ref<string> = ref('');
   const selectedKlassen: Ref<Array<string>> = ref(searchFilterStore.selectedKlassenForKlassen || []);
-  let klassenAutocompleteDebounceTimer: ReturnType<typeof setTimeout> | undefined;
-  const klassenAutocompleteFilter: Reactive<OrganisationenFilter> = reactive({
-    offset: 0,
-    limit: 200,
-    organisationIds: searchFilterStore.selectedKlassenForKlassen || [],
-    systemrechte: [RollenSystemRecht.KlassenVerwalten],
-    searchString: '',
-    administriertVon: searchFilterStore.selectedSchuleForKlassen
-      ? [searchFilterStore.selectedSchuleForKlassen]
-      : undefined,
-  });
 
-  const klassenOptions: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    return organisationStore.klassen.map((klasse: Organisation) => ({
-      value: klasse.id,
-      title: klasse.name,
-    }));
-  });
+
 
   const finalKlassen: ComputedRef<Organisation[]> = computed(() => {
-    // If there are selected Klassen, filter the allKlassen to show only those
+    // If there are selected Klassen, filter the w to show only those
     if (selectedKlassen.value.length > 0) {
       return organisationStore.allKlassen.filter((klasse: Organisation) => selectedKlassen.value.includes(klasse.id));
     }
@@ -97,7 +81,6 @@
     // Otherwise, return allKlassen as is
     return organisationStore.allKlassen;
   });
-  const totalKlassen: ComputedRef<number> = computed(() => organisationStore.totalKlassen);
 
   const errorTitle: ComputedRef<string> = computed(() => {
     if (!organisationStore.errorCode) {
@@ -139,8 +122,6 @@
 
   // // Function to reset search and filter
   async function resetSearchAndFilter(): Promise<void> {
-    // Clear search input for Klassen
-    searchInputKlassen.value = '';
     // Clear selected Klassen
     selectedKlassen.value = [];
     // Clear the store
@@ -159,20 +140,14 @@
     selectedSchule.value = id;
     await searchFilterStore.setSchuleFilterForKlassen(id ?? null);
     searchFilterStore.klassenPage = 1;
-    if (id) {
-      klassenAutocompleteFilter.administriertVon = [id];
-    } else {
+    if (!id) {
       await resetSearchAndFilter();
     }
   }
 
   async function updateKlassenSelection(ids: string[] | undefined): Promise<void> {
+    selectedKlassen.value = ids ?? [];
     await searchFilterStore.setKlasseFilterForKlassen(ids ?? null);
-    klassenAutocompleteFilter.organisationIds = ids ?? [];
-  }
-
-  function clearKlasseSearchInput(focused: boolean): void {
-    if (!focused) searchInputKlassen.value = '';
   }
 
   async function deleteKlasse(organisationId: string): Promise<void> {
@@ -208,31 +183,9 @@
     { immediate: true },
   );
 
-  function updateKlasseSearchstring(searchString: string): void {
-    klassenAutocompleteFilter.searchString = searchString;
-  }
-
-  watch(searchInputKlassen, updateKlasseSearchstring);
-
   watchEffect(async () => {
     await organisationStore.getAllOrganisationen(klassenListFilter.value);
   });
-
-  watch(
-    klassenAutocompleteFilter,
-    async (updatedFilter: OrganisationenFilter | undefined) => {
-      if (!selectedSchule.value) return;
-      const timeout: number = klassenAutocompleteDebounceTimer ? 500 : 0;
-      if (klassenAutocompleteDebounceTimer) clearTimeout(klassenAutocompleteDebounceTimer);
-      klassenAutocompleteDebounceTimer = setTimeout(async () => {
-        await organisationStore.getKlassenByOrganisationId(updatedFilter);
-      }, timeout);
-    },
-    {
-      deep: true,
-      immediate: true,
-    },
-  );
 
   onBeforeRouteLeave(async () => {
     organisationStore.errorCode = '';
@@ -328,48 +281,18 @@
               :disabled="!!selectedSchule"
               location="top"
             >
-              <template v-slot:activator="{ props }">
-                <div v-bind="props">
-                  <v-autocomplete
-                    autocomplete="off"
-                    chips
-                    class="filter-dropdown"
-                    :class="{ selected: selectedKlassen.length > 0 }"
-                    clearable
-                    data-testid="klasse-select"
-                    density="compact"
-                    :disabled="!selectedSchule"
-                    hide-details
-                    id="klasse-select"
-                    ref="klasse-select"
-                    :items="klassenOptions"
-                    item-value="value"
-                    item-text="title"
-                    multiple
-                    :no-data-text="t('noDataFound')"
-                    :placeholder="t('admin.klasse.klassen')"
-                    required="true"
-                    variant="outlined"
-                    v-model="selectedKlassen"
-                    @update:model-value="updateKlassenSelection"
-                    @update:focused="clearKlasseSearchInput"
-                    v-model:search="searchInputKlassen"
-                  >
-                    <template v-slot:prepend-item>
-                      <v-list-item>
-                        <v-progress-circular
-                          indeterminate
-                          v-if="organisationStore.loading"
-                        ></v-progress-circular>
-                        <span
-                          v-else
-                          class="filter-header"
-                          >{{ t('admin.klasse.klassenFound', { count: totalKlassen }, totalKlassen) }}</span
-                        >
-                      </v-list-item>
-                    </template>
-                  </v-autocomplete>
-                </div>
+              <template v-slot:activator="">
+                <KlassenFilter
+                  :systemrechte-for-search="[RollenSystemRecht.KlassenVerwalten]"
+                  :multiple="false"
+                  :hideDetails="true"
+                  :highlightSelection="true"
+                  :selectedKlassen="selectedKlassen"
+                  @update:selectedKlassen="updateKlassenSelection"
+                  :placeholderText="t('admin.klasse.klassen')"
+                  ref="klasse-select"
+                  :administriertVon="selectedSchule ? [selectedSchule] : undefined"
+                ></KlassenFilter>
               </template>
               <span>{{ t('admin.schule.selectSchuleFirst') }}</span>
             </v-tooltip>

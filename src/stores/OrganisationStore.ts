@@ -83,6 +83,7 @@ type OrganisationState = {
   allKlassen: Array<Organisation>;
   allSchulen: Array<Organisation>;
   allSchultraeger: Array<Organisation>;
+  klassenFilter: AutoCompleteStore<Organisation>;
   schulenFilter: AutoCompleteStore<Organisation>;
   currentOrganisation: Organisation | null;
   currentKlasse: Organisation | null;
@@ -162,6 +163,8 @@ type OrganisationActions = {
   setItsLearningForSchule: (organisationId: string) => Promise<void>;
   loadSchulenForFilter(filter?: OrganisationenFilter): Promise<void>;
   resetSchulFilter(): void;
+  loadKlassenForFilter(filter?: OrganisationenFilter): Promise<void>;
+  resetKlasseFilter(): void;
 };
 
 export { OrganisationsTyp };
@@ -180,6 +183,11 @@ export const useOrganisationStore: StoreDefinition<
       allKlassen: [],
       allSchulen: [],
       schulenFilter: {
+        filterResult: [],
+        total: 0,
+        loading: false,
+      },
+      klassenFilter: {
         filterResult: [],
         total: 0,
         loading: false,
@@ -655,6 +663,39 @@ export const useOrganisationStore: StoreDefinition<
 
     resetSchulFilter(): void {
       this.schulenFilter = {
+        filterResult: [],
+        loading: false,
+        total: 0,
+      };
+    },
+
+    async loadKlassenForFilter(filter?: OrganisationenFilter): Promise<void> {
+      this.errorCode = '';
+      this.klassenFilter.loading = true;
+      try {
+        const response: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations(
+          filter?.offset,
+          filter?.limit,
+          undefined,
+          undefined,
+          filter?.searchString,
+          OrganisationsTyp.Klasse,
+          filter?.systemrechte,
+          filter?.excludeTyp,
+          filter?.administriertVon,
+          filter?.zugehoerigZu,
+          filter?.organisationIds,
+        );
+        this.klassenFilter.filterResult = response.data;
+        this.klassenFilter.total = +response.headers['x-paging-total'];
+      } catch (error: unknown) {
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+      } finally {
+        this.klassenFilter.loading = false;
+      }
+    },
+    resetKlasseFilter(): void {
+      this.klassenFilter = {
         filterResult: [],
         loading: false,
         total: 0,
