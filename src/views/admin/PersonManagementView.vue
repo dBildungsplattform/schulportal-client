@@ -2,13 +2,17 @@
   import ResultTable, { type TableItem, type TableRow } from '@/components/admin/ResultTable.vue';
   import SearchField from '@/components/admin/SearchField.vue';
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
+  import PersonBulkChangeKlasse from '@/components/admin/personen/PersonBulkChangeKlasse.vue';
   import PersonBulkDelete from '@/components/admin/personen/PersonBulkDelete.vue';
   import PersonBulkPasswordReset from '@/components/admin/personen/PersonBulkPasswordReset.vue';
   import RolleModify from '@/components/admin/rollen/RolleModify.vue';
+  import OrganisationUnassign from '@/components/admin/schulen/OrganisationUnassign.vue';
+  import InfoDialog from '@/components/alert/InfoDialog.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { useOrganisationen } from '@/composables/useOrganisationen';
   import { type TranslatedRolleWithAttrs, useRollen } from '@/composables/useRollen';
   import { type AuthStore, useAuthStore } from '@/stores/AuthStore';
+  import { OperationType } from '@/stores/BulkOperationStore';
   import {
     type Organisation,
     type OrganisationStore,
@@ -31,10 +35,6 @@
   import { type Composer, useI18n } from 'vue-i18n';
   import { type Router, useRouter } from 'vue-router';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
-  import OrganisationUnassign from '@/components/admin/schulen/OrganisationUnassign.vue';
-  import InfoDialog from '@/components/alert/InfoDialog.vue';
-  import { OperationType } from '@/stores/BulkOperationStore';
-  import type PersonBulkChangeKlasse from '@/components/admin/personen/PersonBulkChangeKlasse.vue';
 
   const searchFieldComponent: Ref = ref();
 
@@ -538,6 +538,16 @@
     }
   };
 
+  const handleBulkKlasseChangeDialog = async (finished: boolean): Promise<void> => {
+    changeKlasseDialogVisible.value = false;
+    selectedOption.value = null;
+    if (finished) {
+      selectedPersonIds.value = [];
+      await getPaginatedPersonen(searchFilterStore.personenPage);
+      resultTable.value.resetSelection();
+    }
+  };
+
   function handleSelectedRows(selectedItems: TableItem[]): void {
     // Directly assign the selected items to selectedPersonIds since the emitted tableItems are always IDs of the specific rows
     selectedPersonIds.value = selectedItems as unknown as string[];
@@ -921,8 +931,9 @@
           >
             <PersonBulkChangeKlasse
               :selectedPersonIds
-              :selectedSchuleId="selectedOrganisation"
+              :selectedSchuleId="selectedOrganisation?.id"
               :availableKlassen="klassenOptions"
+              @update:dialog-exit="handleBulkKlasseChangeDialog"
             />
           </v-dialog>
         </v-col>

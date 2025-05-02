@@ -45,7 +45,7 @@ export enum PersonenKontextTyp {
 }
 
 export type Zuordnung = {
-  klasse?: string | undefined;
+  klasse?: string;
   sskId: string;
   rolleId: string;
   sskName: string;
@@ -59,7 +59,7 @@ export type Zuordnung = {
   befristung?: string;
   admins?: string[];
 };
-
+export type ZuordnungUpdate = Pick<Zuordnung, 'sskId' | 'rolleId' | 'befristung'>;
 export type WorkflowFilter = {
   organisationId?: string;
   rollenIds?: string[];
@@ -86,7 +86,7 @@ type PersonenkontextActions = {
   processWorkflowStep: (filter?: WorkflowFilter) => Promise<PersonenkontextWorkflowResponse>;
   getPersonenkontextRolleWithFilter: (rolleName: string, limit?: number) => Promise<void>;
   updatePersonenkontexte: (
-    combinedZuordnungen: Zuordnung[] | undefined,
+    combinedZuordnungen: ZuordnungUpdate[] | undefined,
     personId: string,
     personalnummer?: string,
   ) => Promise<void>;
@@ -192,7 +192,7 @@ export const usePersonenkontextStore: StoreDefinition<
     },
 
     async updatePersonenkontexte(
-      combinedZuordnungen: Zuordnung[] | undefined,
+      combinedZuordnungen: ZuordnungUpdate[] | undefined,
       personId: string,
       personalnummer?: string,
     ): Promise<void> {
@@ -203,12 +203,13 @@ export const usePersonenkontextStore: StoreDefinition<
         const updateParams: DbiamUpdatePersonenkontexteBodyParams = {
           lastModified: personStore.personenuebersicht?.lastModifiedZuordnungen ?? undefined,
           count: personStore.personenuebersicht?.zuordnungen.length ?? 0,
-          personenkontexte: combinedZuordnungen?.map((zuordnung: Zuordnung) => ({
-            personId: personId,
-            organisationId: zuordnung.sskId,
-            rolleId: zuordnung.rolleId,
-            befristung: zuordnung.befristung,
-          })) as DbiamPersonenkontextBodyParams[],
+          personenkontexte:
+            combinedZuordnungen?.map((zuordnung: ZuordnungUpdate) => ({
+              personId: personId,
+              organisationId: zuordnung.sskId,
+              rolleId: zuordnung.rolleId,
+              befristung: zuordnung.befristung,
+            })) ?? [],
         };
         const { data }: { data: PersonenkontexteUpdateResponse } =
           await personenKontextApi.dbiamPersonenkontextWorkflowControllerCommit(personId, updateParams, personalnummer);

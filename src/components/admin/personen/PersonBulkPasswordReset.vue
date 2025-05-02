@@ -176,7 +176,6 @@
         >
           {{ t('admin.person.bulkPasswordReset.success') }}
         </p>
-        <p class="mt-2 text-center"></p>
       </v-container>
 
       <v-card-actions class="justify-center">

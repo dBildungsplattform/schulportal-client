@@ -66,8 +66,7 @@ export const useBulkOperationStore: StoreDefinition<
   BulkOperationState,
   BulkOperationGetters,
   BulkOperationActions
-> = defineStore({
-  id: 'bulkOperationStore',
+> = defineStore('bulkOperationStore', {
   state: (): BulkOperationState => ({
     currentOperation: {
       type: null,
@@ -269,6 +268,7 @@ export const useBulkOperationStore: StoreDefinition<
         data: new Map(),
         successMessage: undefined,
       };
+
       for (let i: number = 0; i < personIDs.length; i++) {
         const personId: string = personIDs[i]!;
         await personStore.getPersonenuebersichtById(personId);
@@ -277,7 +277,11 @@ export const useBulkOperationStore: StoreDefinition<
         const zuordnungenToRemainUnchanged: Zuordnung[] = [];
 
         for (const zuordnung of personStore.personenuebersicht?.zuordnungen ?? []) {
-          if (zuordnung.sskId === selectedOrganisationId && zuordnung.rollenArt === RollenArt.Lern) {
+          if (
+            zuordnung.administriertVon === selectedOrganisationId &&
+            zuordnung.typ === OrganisationsTyp.Klasse &&
+            zuordnung.rollenArt === RollenArt.Lern
+          ) {
             zuordnungenToBeUpdated.push(zuordnung);
           } else {
             zuordnungenToRemainUnchanged.push(zuordnung);

@@ -1,16 +1,14 @@
 import routes from '@/router/routes';
 import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
+import type { Organisation } from '@/stores/OrganisationStore';
+import { DoFactory } from '@/testing/DoFactory';
+import type { TranslatedObject } from '@/types';
+import { faker } from '@faker-js/faker';
 import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
+import type { MockInstance } from 'vitest';
 import { nextTick } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import PersonBulkChangeKlasse from './PersonBulkChangeKlasse.vue';
-import { DoFactory } from '@/testing/DoFactory';
-import type { Organisation } from '@/stores/OrganisationStore';
-import { getDisplayNameForOrg } from '@/utils/formatting';
-import type { TranslatedObject } from '@/types';
-import { wrap } from 'module';
-import type { MockInstance } from 'vitest';
-import { faker } from '@faker-js/faker';
 
 let router: Router;
 const bulkOperationStore: BulkOperationStore = useBulkOperationStore();

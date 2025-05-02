@@ -175,6 +175,8 @@
       },
       "bulkChangeKlasse": {
         "title": "Versetzen",
+        "nextKlasse": "Nächste Klasse",
+        "success": "Die ausgewählten Schülerinnen und Schüler wurden erfolgreich versetzt.",
         "error": {
           "onlySus": "Bitte wählen Sie nur Benutzer mit einer Schülerrolle aus, um die Aktion durchzuführen"
         }
