@@ -1,7 +1,11 @@
 import {
   OrganisationsTyp,
+  RollenArt,
+  RollenMerkmal,
   RollenSystemRecht,
   TraegerschaftTyp,
+  type DBiamPersonenuebersichtResponse,
+  type DBiamPersonenzuordnungResponse,
   type OrganisationResponse,
   type PersonenkontextRolleFieldsResponse,
   type RollenSystemRechtServiceProviderIDResponse,
@@ -114,6 +118,51 @@ export class DoFactory {
         RollenSystemRecht.PersonSynchronisieren,
       ],
       serviceProviderIds: [faker.string.uuid()],
+      ...props,
+    };
+  }
+
+  public static getDBiamPersonenuebersichtResponse(
+    props?: Partial<DBiamPersonenuebersichtResponse>,
+    nested?: {
+      organisation?: Organisation;
+    },
+  ): DBiamPersonenuebersichtResponse {
+    const zuordnung: DBiamPersonenzuordnungResponse = DoFactory.getDBiamPersonenzuordnungResponse(
+      {},
+      { organisation: nested?.organisation },
+    );
+    return {
+      personId: faker.string.uuid(),
+      vorname: faker.person.firstName(),
+      nachname: faker.person.lastName(),
+      benutzername: faker.internet.username(),
+      lastModifiedZuordnungen: faker.date.recent().toISOString(),
+      zuordnungen: [zuordnung],
+      ...props,
+    };
+  }
+
+  public static getDBiamPersonenzuordnungResponse(
+    props?: Partial<DBiamPersonenzuordnungResponse>,
+    nested?: {
+      organisation?: Organisation;
+    },
+  ): DBiamPersonenzuordnungResponse {
+    const organisation: Organisation = DoFactory.getSchule(nested?.organisation);
+    return {
+      sskId: organisation.id,
+      rolleId: faker.string.uuid(),
+      sskName: organisation.name,
+      sskDstNr: organisation.kennung!,
+      rolle: faker.string.alpha(5),
+      rollenArt: RollenArt.Lern,
+      administriertVon: faker.string.uuid(),
+      typ: organisation.typ,
+      editable: true,
+      befristung: faker.date.soon().toISOString(),
+      merkmale: {} as RollenMerkmal,
+      admins: [faker.person.fullName()],
       ...props,
     };
   }

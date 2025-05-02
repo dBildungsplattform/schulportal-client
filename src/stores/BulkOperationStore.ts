@@ -273,10 +273,11 @@ export const useBulkOperationStore: StoreDefinition<
         const personId: string = personIDs[i]!;
         await personStore.getPersonenuebersichtById(personId);
 
+        const existingZuordnungen: Zuordnung[] = personStore.personenuebersicht?.zuordnungen ?? [];
         const zuordnungenToBeUpdated: Zuordnung[] = [];
         const zuordnungenToRemainUnchanged: Zuordnung[] = [];
 
-        for (const zuordnung of personStore.personenuebersicht?.zuordnungen ?? []) {
+        for (const zuordnung of existingZuordnungen) {
           if (
             zuordnung.administriertVon === selectedOrganisationId &&
             zuordnung.typ === OrganisationsTyp.Klasse &&
