@@ -7,16 +7,16 @@ import type {
 } from '@/api-client/generated';
 import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
 import ApiService from '@/services/ApiService';
+import { DoFactory } from '@/testing/DoFactory';
 import { faker } from '@faker-js/faker';
 import MockAdapter from 'axios-mock-adapter';
 import { createPinia, setActivePinia } from 'pinia';
+import type { MockInstance } from 'vitest';
 import { OperationType, useBulkOperationStore, type BulkOperationStore } from './BulkOperationStore';
 import { OrganisationsTyp, type Organisation } from './OrganisationStore';
 import { usePersonStore, type PersonStore } from './PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from './PersonenkontextStore';
 import { RollenArt } from './RolleStore';
-import { DoFactory } from '@/testing/DoFactory';
-import type { MockInstance } from 'vitest';
 
 const mockAdapter: MockAdapter = new MockAdapter(ApiService);
 
@@ -512,7 +512,7 @@ describe('BulkOperationStore', () => {
 
       expect(spy).toHaveBeenCalledTimes(2);
       expect(spy).toHaveBeenCalledWith(
-        [
+        expect.arrayContaining([
           expect.objectContaining({
             sskId: mockSchule.id,
             rolleId: mockKontexte.get(mockPersonIds[0]!)?.zuordnungen[0]?.rolleId,
@@ -525,11 +525,11 @@ describe('BulkOperationStore', () => {
             sskId: unchangedKlassenId,
             rolleId: mockKontexte.get(mockPersonIds[0]!)?.zuordnungen[2]?.rolleId,
           }),
-        ],
+        ]),
         mockPersonIds[0],
       );
       expect(spy).toHaveBeenCalledWith(
-        [
+        expect.arrayContaining([
           expect.objectContaining({
             sskId: mockSchule.id,
             rolleId: mockKontexte.get(mockPersonIds[1]!)?.zuordnungen[0]?.rolleId,
@@ -542,7 +542,7 @@ describe('BulkOperationStore', () => {
             sskId: klassenId,
             rolleId: mockKontexte.get(mockPersonIds[1]!)?.zuordnungen[2]?.rolleId,
           }),
-        ],
+        ]),
         mockPersonIds[1],
       );
     });

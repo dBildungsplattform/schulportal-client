@@ -5,12 +5,11 @@ import { DoFactory } from '@/testing/DoFactory';
 import type { TranslatedObject } from '@/types';
 import { faker } from '@faker-js/faker';
 import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
+import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
 import type { MockInstance } from 'vitest';
 import { nextTick } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import PersonBulkChangeKlasse from './PersonBulkChangeKlasse.vue';
-import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
-import { prependListener } from 'process';
 
 let router: Router;
 const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
