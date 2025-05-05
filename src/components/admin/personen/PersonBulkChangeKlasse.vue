@@ -51,11 +51,7 @@
   };
 
   const handleCloseDialog = (): void => {
-    if (state.value === State.FINISHED) {
-      emit('update:dialogExit', true);
-    } else {
-      emit('update:dialogExit', false);
-    }
+    emit('update:dialogExit', state.value === State.FINISHED);
     if (bulkOperationStore.currentOperation) {
       bulkOperationStore.resetState();
     }
@@ -72,8 +68,13 @@
         <v-row
           align="center"
           justify="center"
+          class="pt-2"
         >
-          <v-col align="right">
+          <v-col
+            cols="12"
+            sm="5"
+            class="text-sm-right"
+          >
             <label
               for="bulk-change-klasse-select"
               :required="true"
@@ -81,7 +82,10 @@
               {{ t('admin.person.bulkChangeKlasse.nextKlasse') }}
             </label>
           </v-col>
-          <v-col>
+          <v-col
+            cols="12"
+            sm="7"
+          >
             <v-autocomplete
               autocomplete="off"
               clearable
@@ -96,6 +100,7 @@
               :items="availableKlassen"
               v-model="selectedKlasse"
               required="true"
+              min-width="200"
             />
           </v-col>
         </v-row>
@@ -154,6 +159,7 @@
 
     <v-card-actions class="justify-center">
       <v-row class="py-3 px-2 justify-center">
+        <v-spacer />
         <v-col
           cols="12"
           sm="6"

@@ -1,6 +1,8 @@
-import { defineStore, type Store, type StoreDefinition } from 'pinia';
-import { type AxiosResponse } from 'axios';
+import axiosApiInstance from '@/services/ApiService';
+import { formatDateDigitsToGermanDate } from '@/utils/date';
 import { getResponseErrorCode } from '@/utils/errorHandlers';
+import { type AxiosResponse } from 'axios';
+import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import {
   DbiamPersonenuebersichtApiFactory,
   OrganisationsTyp,
@@ -21,9 +23,7 @@ import {
   type PersonMetadataBodyParams,
   type PersonResponse,
 } from '../api-client/generated/api';
-import axiosApiInstance from '@/services/ApiService';
 import { type DbiamPersonenkontextBodyParams, type Zuordnung } from './PersonenkontextStore';
-import { formatDateDigitsToGermanDate } from '@/utils/date';
 
 const personenApi: PersonenApiInterface = PersonenApiFactory(undefined, '', axiosApiInstance);
 const personenFrontendApi: PersonenFrontendApiInterface = PersonenFrontendApiFactory(undefined, '', axiosApiInstance);
@@ -193,6 +193,7 @@ export type Personendatensatz = {
 export type { PersonendatensatzResponse };
 
 type PersonState = {
+  allUebersichten: Map<string, PersonWithUebersicht>;
   currentPerson: Personendatensatz | null;
   errorCode: string;
   loading: boolean;
@@ -239,6 +240,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
   id: 'personStore',
   state: (): PersonState => {
     return {
+      allUebersichten: new Map<string, PersonWithUebersicht>(),
       currentPerson: null,
       errorCode: '',
       loading: false,
@@ -288,15 +290,15 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
         };
         const { data: uebersichten }: { data: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response } =
           await personenuebersichtApi.dBiamPersonenuebersichtControllerFindPersonenuebersichten(bodyParams);
-        const allUebersichten: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response = uebersichten;
+        this.allUebersichten = new Map<string, PersonWithUebersicht>(
+          uebersichten.items.filter(Boolean).map((ueb: PersonWithUebersicht) => [ueb!.personId, ueb]),
+        );
 
         // Aggregate the personen with their uebersichten
         this.personenWithUebersicht = allPersons
           .map(mapPersonendatensatzResponseToPersonendatensatz)
           .map((person: Personendatensatz) => {
-            const uebersicht: PersonWithUebersicht = allUebersichten.items.find(
-              (ueb: PersonWithUebersicht) => ueb?.personId === person.person.id,
-            );
+            const uebersicht: PersonWithUebersicht = this.allUebersichten.get(person.person.id);
 
             const uniqueRollen: Set<string> = new Set<string>();
             uebersicht?.zuordnungen.forEach((zuordnung: Zuordnung) => uniqueRollen.add(zuordnung.rolle));

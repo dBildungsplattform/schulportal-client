@@ -175,13 +175,16 @@
       },
       "bulkChangeKlasse": {
         "title": "Versetzen",
-        "nextKlasse": "Nächste Klasse",
+        "nextKlasse": "Neue Klasse",
         "success": "Die ausgewählten Schülerinnen und Schüler wurden erfolgreich versetzt.",
         "error": {
           "onlySus": "Bitte wählen Sie nur Benutzer mit einer Schülerrolle aus, um die Aktion durchzuführen"
         }
       },
-      "onlyOneSchoolAlert": "Bitte wählen Sie im Filter genau eine Schule aus, um die Aktion durchzuführen.",
+      "invalidSelection": {
+        "onlyOneSchool": "Bitte wählen Sie im Filter genau eine Schule aus, um die Aktion durchzuführen.",
+        "onlyLern": "Bitte wählen Sie nur Benutzer mit einer Schülerrolle aus, um die Aktion durchzuführen."
+      },
       "changePassword": "Passwort ändern",
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
       "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",

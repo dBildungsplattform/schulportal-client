@@ -69,7 +69,7 @@ beforeEach(async () => {
   vi.restoreAllMocks();
 });
 
-describe('PersonBulkPasswordReset', () => {
+describe('PersonBulkChangeKlasse', () => {
   test('commit button should be disabled initially', async () => {
     const wrapper: VueWrapper = mountComponent();
     await nextTick();
@@ -98,6 +98,18 @@ describe('PersonBulkPasswordReset', () => {
     await button.trigger('click');
 
     expect(spy).toHaveBeenCalledWith(mockPersonIds, mockSchule.id, mockKlassen[0]!.id);
+  });
+
+  test('clicking the close-button should emit close-event', async () => {
+    const wrapper: VueWrapper = mountComponent();
+    await nextTick();
+
+    const button: DOMWrapper<HTMLButtonElement> = wrapper.find('[data-testid="bulk-change-klasse-discard-button"]');
+    await button.trigger('click');
+
+    const events: Array<Array<unknown>> | undefined = wrapper.emitted('update:dialogExit');
+    expect(events).toBeTruthy();
+    expect(events).toEqual([[false]]);
   });
 
   describe('when operation is progressing', () => {
@@ -169,6 +181,10 @@ describe('PersonBulkPasswordReset', () => {
       await button.trigger('click');
 
       expect(spy).toHaveBeenCalledOnce();
+
+      const events: Array<Array<unknown>> | undefined = wrapper.emitted('update:dialogExit');
+      expect(events).toBeTruthy();
+      expect(events).toEqual([[true]]);
     });
   });
 });
