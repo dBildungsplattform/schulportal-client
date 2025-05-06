@@ -253,6 +253,8 @@
     <PersonBulkError
       :bulkOperationName="t('admin.person.resetPassword')"
       :isDialogVisible="showErrorDialog"
+      :passwords="resultFile"
+      :filename="props.selectedSchuleKennung ? `PW_${props.selectedSchuleKennung}.txt` : 'PW.txt'"
       @update:isDialogVisible="
         (val: boolean) => {
           showErrorDialog = val;

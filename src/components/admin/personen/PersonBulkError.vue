@@ -20,6 +20,8 @@
     bulkOperationName: string;
     errors: ErrorEntry[];
     isDialogVisible: boolean;
+    filename?: string;
+    passwords?: Blob | null;
   };
 
   type Emits = {
@@ -72,7 +74,42 @@
       @onCloseClicked="closeBulkErrorDialog()"
     >
       <v-container>
-        <p class="text-body bold pre-line">
+        <!-- Success Section in case there were passwords successfully generated while others resulted in an error -->
+        <template v-if="props.bulkOperationName === t('admin.person.resetPassword') && passwords">
+          <v-row
+            class="my-4"
+            justify="center"
+          >
+            <v-col cols="auto">
+              <v-icon
+                small
+                color="#1EAE9C"
+                icon="mdi-check-circle"
+              />
+            </v-col>
+          </v-row>
+          <p class="mt-2 text-center">{{ t('admin.person.bulk.bulkPasswordReset.success') }}</p>
+          <v-row class="mt-4 justify-center">
+            <v-col
+              cols="12"
+              sm="6"
+              md="auto"
+            >
+              <v-btn
+                :block="mdAndDown"
+                class="primary"
+                @click="() => passwords && download(filename ?? 'default-filename.csv', passwords)"
+              >
+                {{ t('admin.person.bulk.bulkPasswordReset.downloadResult') }}
+              </v-btn>
+            </v-col>
+          </v-row>
+          <v-divider
+            class="border-opacity-100 rounded my-8"
+            thickness="5px"
+          ></v-divider>
+        </template>
+        <p class="text-body bold pre-line mt-10">
           {{
             t('admin.person.bulk.bulkErrorMessage', {
               bulkOperationName: props.bulkOperationName,
@@ -89,7 +126,10 @@
               <span class="text-body font-weight-bold">{{ entry.vorname }} {{ entry.nachname }}</span>
             </div>
             <div class="ml-4 text-body">
-              <v-alert type="error">
+              <v-alert
+                class="py-2 px-2"
+                type="error"
+              >
                 {{ entry.error }}
               </v-alert>
             </div>

@@ -12,15 +12,34 @@ export type BulkErrorList = {
 type PersonWithRolleAndZuordnung = PersonenWithRolleAndZuordnung[number];
 
 /**
+ * Helper to translate with fallback keys.
+ * Tries each key in order and returns the first successful translation,
+ * or the fallback string if none are found.
+ */
+function translateWithFallback(t: Composer['t'], keys: string[], errorCode: string): string {
+  for (const key of keys) {
+    const result: string = t(key);
+    if (result !== key) return result;
+  }
+  // Fallback to a generic message with the error code appended
+  const fallbackBase: string = t(
+    'admin.personenkontext.errors..fallbackError',
+    {},
+    { default: 'Es ist ein Fehler aufgetreten.' },
+  );
+  return `${fallbackBase} (${errorCode})`;
+}
+
+/**
  * Composable function to map bulk operation errors to a list of detailed error objects.
- * 
+ *
  * This function retrieves the current bulk operation errors from the `BulkOperationStore`,
  * matches them with the provided list of persons, and translates the error codes into
  * human-readable error messages using the i18n translation system.
- * 
+ *
  * @param persons - An array of PersonenWithRolleAndZuordnung objects representing the persons
  *                  involved in the bulk operation.
- * 
+ *
  * @returns An array of BulkErrorList objects, where each object contains:
  *          - `id`: The ID of the person.
  *          - `vorname`: The first name of the person.
@@ -38,10 +57,11 @@ export function useBulkErrors(persons: PersonenWithRolleAndZuordnung): BulkError
       );
       if (!person) return null;
 
-      // Translate the error code using i18n, falling back to the error code itself if no translation is found
-      const errorTranslation: string =
-        t(`admin.personenkontext.errors.${errorCode}`, {}, { default: '' }) ||
-        t(`admin.person.errors.${errorCode}`, {}, { default: errorCode });
+      const errorTranslation: string = translateWithFallback(
+        t,
+        [`admin.personenkontext.errors.${errorCode}`, `admin.person.errors.${errorCode}`],
+        errorCode,
+      );
 
       return {
         id,
