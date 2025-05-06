@@ -197,5 +197,15 @@
     <template v-slot:prepend-item>
       <slot name="prepend-item"></slot>
     </template>
+    <template v-slot:selection="{ item, index }">
+      <span
+        v-if="selectedKlassen && selectedKlassen.length < 2"
+        class="v-autocomplete__selection-text"
+        >{{ item.title }}</span
+      >
+      <span v-else-if="selectedKlassen && index === 0">
+        {{ $t('admin.klasse.klassenSelected', { count: selectedKlassen.length }) }}
+      </span>
+    </template>
   </v-autocomplete>
 </template>

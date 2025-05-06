@@ -284,7 +284,7 @@
               <template v-slot:activator="">
                 <KlassenFilter
                   :systemrechte-for-search="[RollenSystemRecht.KlassenVerwalten]"
-                  :multiple="false"
+                  :multiple="true"
                   :hideDetails="true"
                   :highlightSelection="true"
                   :selectedKlassen="selectedKlassen"
