@@ -28,14 +28,10 @@
   } from '@/stores/OrganisationStore';
   import {
     EmailStatus,
-    LockKeys,
-    PersonLockOccasion,
     usePersonStore,
-    type Person,
     type Personendatensatz,
     type PersonStore,
     type PersonWithUebersicht,
-    type UserLock,
   } from '@/stores/PersonStore';
   import {
     usePersonenkontextStore,
@@ -49,9 +45,11 @@
     useTwoFactorAuthentificationStore,
     type TwoFactorAuthentificationStore,
   } from '@/stores/TwoFactorAuthentificationStore';
+  import type { Person } from '@/stores/types/Person';
   import type { TranslatedObject } from '@/types';
   import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
   import { adjustDateForTimezoneAndFormat, formatDate, formatDateToISO, getNextSchuljahresende } from '@/utils/date';
+  import { type UserLock, PersonLockOccasion, LockKeys } from '@/utils/lock';
   import { DIN_91379A, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
   import {
     getBefristungSchema,

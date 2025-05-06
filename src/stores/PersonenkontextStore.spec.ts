@@ -1,16 +1,16 @@
 import {
-  type DBiamPersonenkontextResponse,
-  type FindRollenResponse,
-  type SystemrechtResponse,
   OrganisationsTyp,
   RollenArt,
   RollenMerkmal,
   RollenSystemRecht,
+  type DBiamPersonenkontextResponse,
+  type FindRollenResponse,
+  type SystemrechtResponse,
 } from '@/api-client/generated';
 import ApiService from '@/services/ApiService';
-import MockAdapter from 'axios-mock-adapter';
-import { setActivePinia, createPinia } from 'pinia';
 import { rejects } from 'assert';
+import MockAdapter from 'axios-mock-adapter';
+import { createPinia, setActivePinia } from 'pinia';
 import {
   usePersonenkontextStore,
   type PersonenkontexteUpdateResponse,
@@ -18,22 +18,19 @@ import {
   type PersonenkontextWorkflowResponse,
   type Zuordnung,
 } from './PersonenkontextStore';
-import { usePersonStore, type PersonendatensatzResponse, type PersonStore } from './PersonStore';
+import { type PersonendatensatzResponse } from './PersonStore';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 
 describe('PersonenkontextStore', () => {
-  let personStore: PersonStore;
   let personenkontextStore: PersonenkontextStore;
   beforeEach(() => {
     setActivePinia(createPinia());
-    personStore = usePersonStore();
     personenkontextStore = usePersonenkontextStore();
     mockadapter.reset();
   });
 
   it('should initalize state correctly', () => {
-    expect(personStore.personenWithUebersicht).toEqual(null);
     expect(personenkontextStore.errorCode).toEqual('');
     expect(personenkontextStore.loading).toBe(false);
   });

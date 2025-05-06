@@ -1,29 +1,28 @@
-import { defineStore, type Store, type StoreDefinition } from 'pinia';
-import { getResponseErrorCode } from '@/utils/errorHandlers';
-import {
-  PersonenkontexteApiFactory,
-  type FindRollenResponse,
-  type DBiamPersonenkontextResponse,
-  type DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response,
-  type PersonenkontexteApiInterface,
-  type SystemrechtResponse,
-  PersonenkontextApiFactory,
-  type PersonenkontextApiInterface,
-  OrganisationsTyp,
-  type DbiamUpdatePersonenkontexteBodyParams,
-  type PersonenkontexteUpdateResponse,
-  type DbiamPersonenkontextBodyParams,
-  type PersonenkontextWorkflowResponse,
-  type DbiamCreatePersonWithPersonenkontexteBodyParams,
-  type DBiamPersonResponse,
-  type PersonendatensatzResponse,
-  type PersonAdministrationApiInterface,
-  PersonAdministrationApiFactory,
-  RollenMerkmal,
-  RollenArt,
-  type DbiamCreatePersonenkontextBodyParams,
-} from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
+import { getResponseErrorCode } from '@/utils/errorHandlers';
+import { defineStore, type Store, type StoreDefinition } from 'pinia';
+import {
+  OrganisationsTyp,
+  PersonAdministrationApiFactory,
+  PersonenkontextApiFactory,
+  PersonenkontexteApiFactory,
+  RollenArt,
+  RollenMerkmal,
+  type DbiamCreatePersonenkontextBodyParams,
+  type DbiamCreatePersonWithPersonenkontexteBodyParams,
+  type DbiamPersonenkontextBodyParams,
+  type DBiamPersonenkontextResponse,
+  type DBiamPersonResponse,
+  type DbiamUpdatePersonenkontexteBodyParams,
+  type FindRollenResponse,
+  type PersonAdministrationApiInterface,
+  type PersonendatensatzResponse,
+  type PersonenkontextApiInterface,
+  type PersonenkontexteApiInterface,
+  type PersonenkontexteUpdateResponse,
+  type PersonenkontextWorkflowResponse,
+  type SystemrechtResponse,
+} from '../api-client/generated/api';
 import { usePersonStore, type PersonStore } from './PersonStore';
 
 const personenKontextApi: PersonenkontextApiInterface = PersonenkontextApiFactory(undefined, '', axiosApiInstance);
@@ -69,7 +68,6 @@ export type WorkflowFilter = {
 };
 
 type PersonenkontextState = {
-  allUebersichten: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response | null;
   updatedPersonenkontexte: PersonenkontexteUpdateResponse | null;
   workflowStepResponse: PersonenkontextWorkflowResponse | null;
   filteredRollen: FindRollenResponse | null;
@@ -96,12 +94,12 @@ type PersonenkontextActions = {
 };
 
 export type {
-  SystemrechtResponse,
-  DbiamUpdatePersonenkontexteBodyParams,
-  DBiamPersonenkontextResponse,
   DbiamPersonenkontextBodyParams,
-  PersonenkontextWorkflowResponse,
+  DBiamPersonenkontextResponse,
+  DbiamUpdatePersonenkontexteBodyParams,
   PersonenkontexteUpdateResponse,
+  PersonenkontextWorkflowResponse,
+  SystemrechtResponse,
 };
 export type CreatedPersonenkontext = DbiamPersonenkontextBodyParams;
 export type { DbiamCreatePersonenkontextBodyParams };
@@ -129,7 +127,6 @@ export const usePersonenkontextStore: StoreDefinition<
   id: 'personenkontextStore',
   state: (): PersonenkontextState => {
     return {
-      allUebersichten: null,
       workflowStepResponse: null,
       updatedPersonenkontexte: null,
       filteredRollen: null,

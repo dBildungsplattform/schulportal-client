@@ -1,11 +1,13 @@
+import { EmailAddressStatus } from '@/api-client/generated';
 import { OrganisationsTyp, type Organisation } from '@/stores/OrganisationStore';
-import { PersonLockOccasion, type Person, type Personendatensatz } from '@/stores/PersonStore';
+import { type Personendatensatz } from '@/stores/PersonStore';
+import type { Person } from '@/stores/types/Person';
+import { PersonLockOccasion } from '@/utils/lock';
+import PersonDetailsView from '@/views/admin/PersonDetailsView.vue';
 import { mount, VueWrapper } from '@vue/test-utils';
 import { expect, test, type Mock } from 'vitest';
 import { nextTick } from 'vue';
 import PersonLock from './PersonLock.vue';
-import { EmailAddressStatus } from '@/api-client/generated';
-import PersonDetailsView from '@/views/admin/PersonDetailsView.vue';
 
 let wrapper: VueWrapper | null = null;
 

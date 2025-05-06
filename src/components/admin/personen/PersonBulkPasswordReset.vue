@@ -1,20 +1,19 @@
 <script setup lang="ts">
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { useBulkOperationStore, type BulkOperationStore, type CurrentOperation } from '@/stores/BulkOperationStore';
-  import { type PersonenWithRolleAndZuordnung } from '@/stores/PersonStore';
+  import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
   import { buildCSV, download } from '@/utils/file';
   import { computed, type ComputedRef, type Ref } from 'vue';
-  import { type Composer, useI18n } from 'vue-i18n';
+  import { useI18n, type Composer } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
 
-  type PersonWithRolleAndZuordnung = PersonenWithRolleAndZuordnung[number];
   type CSVHeaders = 'Klasse' | 'Nachname' | 'Vorname' | 'Benutzername' | 'Passwort';
   type CSVRow = Record<CSVHeaders, string | undefined>;
 
   type Props = {
     isDialogVisible: boolean;
     selectedSchuleKennung?: string;
-    selectedPersons: PersonenWithRolleAndZuordnung;
+    selectedPersons: Map<string, PersonWithZuordnungen>;
   };
 
   type Emits = (event: 'update:dialogExit', finished: boolean) => void;
@@ -64,19 +63,15 @@
 
     // For every password in the Map find the corresponding person (using the key) and merge them together in the file.
     for (const [id, password] of operation.data.entries()) {
-      const personWithRolleAndZuordnung: PersonWithRolleAndZuordnung | undefined = props.selectedPersons.find(
-        (p: PersonWithRolleAndZuordnung) => p.person.id === id,
-      );
-
-      if (personWithRolleAndZuordnung) {
-        rows.push({
-          Klasse: personWithRolleAndZuordnung.klassen,
-          Nachname: personWithRolleAndZuordnung.person.name.familienname,
-          Vorname: personWithRolleAndZuordnung.person.name.vorname,
-          Benutzername: personWithRolleAndZuordnung.person.referrer || '',
-          Passwort: password as string,
-        });
-      }
+      const personWithZuordnung: PersonWithZuordnungen | undefined = props.selectedPersons.get(id);
+      if (!personWithZuordnung) continue;
+      rows.push({
+        Klasse: personWithZuordnung.klassenZuordnungenAsString,
+        Nachname: personWithZuordnung.name.familienname,
+        Vorname: personWithZuordnung.name.vorname,
+        Benutzername: personWithZuordnung.referrer ?? '---',
+        Passwort: password as string,
+      });
     }
 
     const csv: string = buildCSV<CSVHeaders>(['Klasse', 'Nachname', 'Vorname', 'Benutzername', 'Passwort'], rows);
@@ -89,8 +84,8 @@
     emit('update:dialogExit', finished);
   }
 
-  async function handleResetPassword(personIDs: string[]): Promise<void> {
-    await bulkOperationStore.bulkResetPassword(personIDs);
+  async function handleResetPassword(): Promise<void> {
+    await bulkOperationStore.bulkResetPassword([...props.selectedPersons.keys()]);
   }
 
   function downloadFile(blob: Blob): void {
@@ -214,7 +209,7 @@
               :block="mdAndDown"
               :disabled="bulkOperationStore.currentOperation?.isRunning"
               class="primary"
-              @click="handleResetPassword(props.selectedPersons.map((p: PersonWithRolleAndZuordnung) => p.person.id))"
+              @click="handleResetPassword()"
               data-testid="password-reset-submit-button"
               type="submit"
             >

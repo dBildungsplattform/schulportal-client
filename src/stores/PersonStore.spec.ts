@@ -13,11 +13,15 @@ import {
   type PersonMetadataBodyParams,
   type PersonendatensatzResponse,
 } from '@/api-client/generated';
-import { PersonLockOccasion, usePersonStore, type PersonStore, type Personendatensatz } from './PersonStore';
 import ApiService from '@/services/ApiService';
-import MockAdapter from 'axios-mock-adapter';
-import { setActivePinia, createPinia } from 'pinia';
+import { DoFactory } from '@/testing/DoFactory';
+import { PersonLockOccasion } from '@/utils/lock';
 import { rejects } from 'assert';
+import MockAdapter from 'axios-mock-adapter';
+import { createPinia, setActivePinia } from 'pinia';
+import { usePersonStore, type PersonStore, type Personendatensatz } from './PersonStore';
+import type { PersonWithZuordnungen } from './types/PersonWithZuordnungen';
+import { Zuordnung } from './types/Zuordnung';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 function getMockPersonendatensatz(): Personendatensatz {
@@ -115,226 +119,33 @@ describe('PersonStore', () => {
     it('should load persons and their overviews, and update state', async () => {
       // Mock data for persons
       const mockPersons: PersonendatensatzResponse[] = [
-        {
-          person: {
-            id: '1234',
-            name: {
-              familienname: 'Johnson',
-              vorname: 'John',
-            },
-            referrer: 'jjohnson',
-            personalnummer: '1234567',
-            isLocked: false,
-            userLock: null,
-            revision: '1',
-            lastModified: '2024-12-22',
-          },
-        },
-        {
-          person: {
-            id: '5678',
-            name: {
-              familienname: 'Cena',
-              vorname: 'Randy',
-            },
-            referrer: 'rcena',
-            personalnummer: null,
-            isLocked: false,
-            userLock: null,
-            revision: '1',
-            lastModified: '2024-12-22',
-          },
-        },
-        {
-          person: {
-            id: '7894',
-            name: {
-              familienname: 'Orton',
-              vorname: 'Dwayne',
-            },
-            referrer: 'dorton',
-            personalnummer: null,
-            isLocked: false,
-            userLock: null,
-            revision: '1',
-            lastModified: '2024-12-22',
-          },
-        },
-        {
-          person: {
-            id: '3755',
-            name: {
-              familienname: 'Mardy',
-              vorname: 'Hatt',
-            },
-            referrer: 'hmardy',
-            personalnummer: null,
-            isLocked: false,
-            lockInfo: null,
-            revision: '1',
-            lastModified: '2024-12-22',
-          },
-        },
-        {
-          person: {
-            id: '3975',
-            name: {
-              familienname: 'Jardy',
-              vorname: 'Heff',
-            },
-            referrer: 'hjardy',
-            personalnummer: null,
-            isLocked: false,
-            lockInfo: null,
-            revision: '1',
-            lastModified: '2024-12-22',
-          },
-        },
-      ] as PersonendatensatzResponse[];
+        DoFactory.getPersonendatensatzResponse(),
+        DoFactory.getPersonendatensatzResponse(),
+        DoFactory.getPersonendatensatzResponse(),
+        DoFactory.getPersonendatensatzResponse(),
+      ];
 
       // Mock response for persons
       const mockPersonsResponse: PersonFrontendControllerFindPersons200Response = {
         offset: 0,
-        limit: 4,
-        total: 4,
+        limit: mockPersons.length,
+        total: mockPersons.length,
         items: mockPersons,
       };
 
       // Mock data for person overviews
       const mockUebersichten: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response = {
-        total: 4,
+        total: mockPersons.length,
         offset: 0,
-        limit: 4,
-        items: [
-          {
-            personId: '1234',
-            vorname: 'John',
-            nachname: 'Johnson',
-            benutzername: 'string',
-            lastModifiedZuordnungen: '08.02.2024',
-            zuordnungen: [
-              {
-                sskId: '1',
-                rolleId: 'string',
-                sskName: 'Schule A',
-                sskDstNr: '642462',
-                rolle: 'string',
-                rollenArt: RollenArt.Lern,
-                typ: OrganisationsTyp.Schule,
-                administriertVon: 'string',
-                editable: true,
-                merkmale: ['KOPERS_PFLICHT'] as unknown as RollenMerkmal,
-                befristung: '2025-04-05',
-                admins: ['test'],
-              },
-            ],
-          },
-          {
-            personId: '5678',
-            vorname: 'Randy',
-            nachname: 'Cena',
-            benutzername: 'string',
-            lastModifiedZuordnungen: '08.02.2024',
-            zuordnungen: [
-              {
-                sskId: '2',
-                rolleId: 'string',
-                sskName: 'Schule B',
-                sskDstNr: '',
-                rolle: 'string',
-                rollenArt: RollenArt.Lern,
-                typ: OrganisationsTyp.Schule,
-                administriertVon: 'string',
-                editable: true,
-                merkmale: ['KOPERS_PFLICHT'] as unknown as RollenMerkmal,
-                befristung: '2025-04-05',
-                admins: ['test'],
-              },
-            ],
-          },
-          {
-            personId: '7894',
-            vorname: 'Dwayne',
-            nachname: 'Orton',
-            benutzername: 'string',
-            lastModifiedZuordnungen: '08.02.2024',
-            zuordnungen: [],
-          },
-          {
-            personId: '3755',
-            vorname: 'Hatt',
-            nachname: 'Mardy',
-            benutzername: 'hmardy',
-            lastModifiedZuordnungen: '08.02.2024',
-            zuordnungen: [
-              {
-                sskId: '1',
-                rolleId: '3',
-                sskName: 'Schule A',
-                sskDstNr: '642462',
-                rolle: 'SuS',
-                rollenArt: RollenArt.Lern,
-                typ: OrganisationsTyp.Schule,
-                administriertVon: 'string',
-                editable: true,
-                merkmale: [] as unknown as RollenMerkmal,
-                befristung: '2025-04-05',
-                admins: ['test'],
-              },
-              {
-                sskId: '3',
-                rolleId: '3',
-                sskName: '2b',
-                sskDstNr: '642462-2b',
-                rolle: 'SuS',
-                rollenArt: RollenArt.Lern,
-                typ: OrganisationsTyp.Klasse,
-                administriertVon: '1',
-                editable: true,
-                merkmale: [] as unknown as RollenMerkmal,
-                befristung: '2025-04-05',
-                admins: ['test'],
-              },
-            ],
-          },
-          {
-            personId: '3975',
-            vorname: 'Heff',
-            nachname: 'Jardy',
-            benutzername: 'hjardy',
-            lastModifiedZuordnungen: '08.02.2024',
-            zuordnungen: [
-              {
-                sskId: '1',
-                rolleId: '3',
-                sskName: 'Schule A',
-                sskDstNr: '642462',
-                rolle: 'SuS',
-                rollenArt: RollenArt.Lern,
-                typ: OrganisationsTyp.Schule,
-                administriertVon: 'string',
-                editable: true,
-                merkmale: [] as unknown as RollenMerkmal,
-                befristung: '2025-04-05',
-                admins: ['test'],
-              },
-              {
-                sskId: '3',
-                rolleId: '3',
-                sskName: '',
-                sskDstNr: '642462-2b',
-                rolle: 'SuS',
-                rollenArt: RollenArt.Lern,
-                typ: OrganisationsTyp.Klasse,
-                administriertVon: '1',
-                editable: true,
-                merkmale: [] as unknown as RollenMerkmal,
-                befristung: '2025-04-05',
-                admins: ['test'],
-              },
-            ],
-          },
-        ],
+        limit: mockPersons.length,
+        items: mockPersons.map((person: PersonendatensatzResponse) => {
+          return DoFactory.getDBiamPersonenuebersichtResponse({
+            personId: person.person.id,
+            vorname: person.person.name.vorname,
+            nachname: person.person.name.familienname,
+            benutzername: person.person.referrer ?? '---',
+          });
+        }),
       };
 
       mockadapter.onGet('/api/personen-frontend').replyOnce(200, mockPersonsResponse);
@@ -348,23 +159,20 @@ describe('PersonStore', () => {
       await getAllPersonsPromise;
       expect(personStore.loading).toBe(false);
 
-      // check if the kopersnr is displayed correctly
-      expect(personStore.personenWithUebersicht?.[0]?.person.personalnummer).toEqual('1234567');
-      expect(personStore.personenWithUebersicht?.[1]?.person.personalnummer).toEqual('fehlt');
-      expect(personStore.personenWithUebersicht?.[2]?.person.personalnummer).toEqual('---');
-
-      // check if administrationsebenen are displayed correctly
-      expect(personStore.personenWithUebersicht?.[0]?.administrationsebenen).toEqual('642462');
-      expect(personStore.personenWithUebersicht?.[1]?.administrationsebenen).toEqual('Schule B');
-      expect(personStore.personenWithUebersicht?.[2]?.administrationsebenen).toEqual('---');
-
-      // check if klassen are displayed correctly
-      expect(personStore.personenWithUebersicht?.[0]?.klassen).toEqual('---');
-      expect(personStore.personenWithUebersicht?.[3]?.klassen).toEqual('2b');
-      expect(personStore.personenWithUebersicht?.[4]?.klassen).toEqual('---');
+      for (const mockUebersicht of mockUebersichten.items) {
+        const mockPerson: PersonendatensatzResponse = mockPersons.find(
+          (p: PersonendatensatzResponse) => p.person.id === mockUebersicht.personId,
+        )!;
+        const person: PersonWithZuordnungen = personStore.allUebersichten.get(mockUebersicht.personId)!;
+        expect(person).toBeDefined();
+        expect(person.personalnummer).toEqual(mockPerson.person.personalnummer);
+        for (const mockZuordnung of mockUebersicht.zuordnungen) {
+          expect(person.zuordnungen).toContainEqual(Zuordnung.fromPersonenzuordnung(mockZuordnung));
+        }
+      }
     });
 
-    it('should return null if no persons were found', async () => {
+    it('should return empty map if no persons were found', async () => {
       // Mock response for persons
       const mockPersonsResponse: PersonFrontendControllerFindPersons200Response = {
         offset: 0,
@@ -377,10 +185,10 @@ describe('PersonStore', () => {
 
       const getAllPersonsPromise: Promise<void> = personStore.getAllPersons({});
       expect(personStore.loading).toBe(true);
-      expect(personStore.personenWithUebersicht).toEqual(null);
+      expect(personStore.allUebersichten).toEqual(new Map());
       await getAllPersonsPromise;
       expect(personStore.loading).toBe(false);
-      expect(personStore.personenWithUebersicht).toEqual(null);
+      expect(personStore.allUebersichten).toEqual(new Map());
     });
 
     it('should load persons according to filter', async () => {
@@ -748,7 +556,7 @@ describe('PersonStore', () => {
       const lockUserBodyParams: LockUserBodyParams = getUserLockBodyParams(true);
       const lockPersonPromise: Promise<void> = personStore.lockPerson(mockPerson.person.id, lockUserBodyParams);
       expect(personStore.loading).toBe(true);
-      expect(lockPersonPromise).resolves.toBeUndefined();
+      await expect(lockPersonPromise).resolves.toBeUndefined();
       await lockPersonPromise;
       expect(personStore.loading).toBe(false);
     });

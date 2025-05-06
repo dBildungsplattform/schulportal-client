@@ -1,21 +1,112 @@
 import {
+  EmailAddressStatus,
   OrganisationsTyp,
   RollenArt,
   RollenMerkmal,
   RollenSystemRecht,
   TraegerschaftTyp,
+  Vertrauensstufe,
   type DBiamPersonenuebersichtResponse,
   type DBiamPersonenzuordnungResponse,
   type OrganisationResponse,
+  type PersonendatensatzResponse,
   type PersonenkontextRolleFieldsResponse,
+  type PersonResponse,
   type RollenSystemRechtServiceProviderIDResponse,
   type UserinfoResponse,
 } from '@/api-client/generated';
 import type { Organisation } from '@/stores/OrganisationStore';
+import type { Person } from '@/stores/types/Person';
+import { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
+import type { Zuordnung } from '@/stores/types/Zuordnung';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { faker } from '@faker-js/faker';
 
 export class DoFactory {
+  public static getPersonWithZuordnung(
+    person?: Partial<Person>,
+    zuordnungen?: Array<Zuordnung>,
+  ): PersonWithZuordnungen {
+    return new PersonWithZuordnungen(this.getPerson(person), zuordnungen ?? [this.getZuordnung()]);
+  }
+
+  public static getPerson(props?: Partial<Person>): Person {
+    return {
+      id: faker.string.uuid(),
+      name: {
+        vorname: faker.person.firstName(),
+        familienname: faker.person.lastName(),
+      },
+      referrer: faker.internet.username(),
+      revision: faker.string.numeric(2),
+      personalnummer: faker.string.numeric(7),
+      isLocked: false,
+      userLock: null,
+      lastModified: new Date().toISOString(),
+      email: {
+        status: EmailAddressStatus.Enabled,
+        address: faker.internet.email(),
+      },
+      ...props,
+    };
+  }
+
+  public static getZuordnung(props?: Partial<Zuordnung>, nested?: { organisation: Partial<Organisation> }): Zuordnung {
+    const schule: Organisation = DoFactory.getSchule(nested?.organisation);
+    return {
+      administriertVon: schule.administriertVon!,
+      befristung: faker.date.soon(),
+      admins: [faker.person.fullName()],
+      editable: true,
+      sskId: schule.id,
+      rolleId: faker.string.uuid(),
+      sskName: schule.name,
+      sskDstNr: schule.kennung!,
+      rolle: faker.string.alpha(5),
+      rollenArt: faker.helpers.arrayElement<RollenArt>([RollenArt.Lern, RollenArt.Lehr]),
+      merkmale: {} as RollenMerkmal,
+      typ: schule.typ,
+      ...props,
+    };
+  }
+
+  public static getPersonResponse(props?: Partial<PersonResponse>): PersonResponse {
+    return {
+      id: faker.string.uuid(),
+      name: {
+        vorname: faker.person.firstName(),
+        familienname: faker.person.lastName(),
+      },
+      referrer: faker.internet.username(),
+      revision: faker.string.numeric(2),
+      personalnummer: faker.string.numeric(7),
+      isLocked: false,
+      userLock: null,
+      lastModified: new Date().toISOString(),
+      email: {
+        status: EmailAddressStatus.Enabled,
+        address: faker.internet.email(),
+      },
+      mandant: faker.string.uuid(),
+      geburt: {
+        datum: faker.date.birthdate().toISOString(),
+        geburtsort: faker.location.city(),
+      },
+      stammorganisation: faker.string.uuid(),
+      geschlecht: faker.person.gender(),
+      lokalisierung: faker.location.language().alpha2,
+      startpasswort: faker.string.alpha(10),
+      vertrauensstufe: Vertrauensstufe.Voll,
+      ...props,
+    };
+  }
+
+  public static getPersonendatensatzResponse(props?: Partial<PersonResponse>): PersonendatensatzResponse {
+    return {
+      person: this.getPersonResponse(props),
+    };
+  }
+
   public static getSchule(props?: Partial<Organisation>): Organisation {
     return {
       id: faker.string.uuid(),

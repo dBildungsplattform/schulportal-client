@@ -5,13 +5,10 @@ import { useAuthStore, type AuthStore, type PersonenkontextRolleFields, type Use
 import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import {
-  parseUserLock,
-  PersonLockOccasion,
   usePersonStore,
   type Personendatensatz,
   type PersonStore,
   type PersonWithUebersicht,
-  type UserLock,
 } from '@/stores/PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
 import { RollenArt, RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
@@ -21,6 +18,7 @@ import {
 } from '@/stores/TwoFactorAuthentificationStore';
 import { DoFactory } from '@/testing/DoFactory';
 import { adjustDateForTimezoneAndFormat } from '@/utils/date';
+import { parseUserLock, PersonLockOccasion, type UserLock } from '@/utils/lock';
 import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import { expect, test, type MockInstance } from 'vitest';
 import { nextTick, type ComputedRef, type DefineComponent } from 'vue';

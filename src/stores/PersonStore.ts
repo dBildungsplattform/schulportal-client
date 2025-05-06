@@ -1,5 +1,4 @@
 import axiosApiInstance from '@/services/ApiService';
-import { formatDateDigitsToGermanDate } from '@/utils/date';
 import { getResponseErrorCode } from '@/utils/errorHandlers';
 import { type AxiosResponse } from 'axios';
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
@@ -14,6 +13,7 @@ import {
   type DbiamPersonenuebersichtApiInterface,
   type DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response,
   type DBiamPersonenuebersichtResponse,
+  type DBiamPersonenzuordnungResponse,
   type LockUserBodyParams,
   type PersonenApiInterface,
   type PersonendatensatzResponse,
@@ -21,9 +21,11 @@ import {
   type PersonenuebersichtBodyParams,
   type PersonFrontendControllerFindPersons200Response,
   type PersonMetadataBodyParams,
-  type PersonResponse,
 } from '../api-client/generated/api';
-import { type DbiamPersonenkontextBodyParams, type Zuordnung } from './PersonenkontextStore';
+import { type DbiamPersonenkontextBodyParams } from './PersonenkontextStore';
+import { Person } from './types/Person';
+import { PersonWithZuordnungen } from './types/PersonWithZuordnungen';
+import { Zuordnung } from './types/Zuordnung';
 
 const personenApi: PersonenApiInterface = PersonenApiFactory(undefined, '', axiosApiInstance);
 const personenFrontendApi: PersonenFrontendApiInterface = PersonenFrontendApiFactory(undefined, '', axiosApiInstance);
@@ -51,46 +53,6 @@ export enum SortOrder {
   Asc = 'asc',
   Desc = 'desc',
 }
-
-export enum PersonLockOccasion {
-  MANUELL_GESPERRT = 'MANUELL_GESPERRT',
-  KOPERS_GESPERRT = 'KOPERS_GESPERRT',
-}
-
-export enum LockKeys {
-  PersonId = 'personId',
-  LockedBy = 'locked_by',
-  CreatedAt = 'created_at',
-  LockedUntil = 'locked_until',
-  LockOccasion = 'lock_occasion',
-  MANUELL_GESPERRT = PersonLockOccasion.MANUELL_GESPERRT,
-}
-export type UserLock = {
-  personId: string;
-  locked_by: string;
-  created_at: string;
-  locked_until: string;
-  lock_occasion: string;
-};
-
-export type Person = {
-  id: PersonResponse['id'];
-  name: PersonResponse['name'];
-  referrer: PersonResponse['referrer'];
-  revision: PersonResponse['revision'];
-  personalnummer: PersonResponse['personalnummer'];
-  isLocked: PersonResponse['isLocked'];
-  userLock: UserLock[] | null;
-  lastModified: PersonResponse['lastModified'];
-  email: PersonResponse['email'];
-};
-
-export type PersonenWithRolleAndZuordnung = {
-  rollen: string;
-  administrationsebenen: string;
-  klassen: string;
-  person: Person;
-}[];
 
 export type PersonWithUebersicht =
   | {
@@ -126,63 +88,10 @@ export type PersonTableItem = {
 export type CreatePersonBodyParams = DbiamCreatePersonWithPersonenkontexteBodyParams;
 export type CreatedPersonenkontext = DbiamPersonenkontextBodyParams;
 
-export function parseUserLock(unparsedArray: object[]): UserLock[] {
-  const parsedLocks: UserLock[] = [];
-
-  for (const unparsed of unparsedArray) {
-    const result: Partial<UserLock> = {};
-
-    if (LockKeys.LockOccasion in unparsed && unparsed[LockKeys.LockOccasion] == PersonLockOccasion.MANUELL_GESPERRT) {
-      // Process "MANUELL_GESPERRT" entries
-      if (LockKeys.LockedBy in unparsed) {
-        result.locked_by = '' + unparsed[LockKeys.LockedBy];
-      }
-      if (LockKeys.CreatedAt in unparsed) {
-        result.created_at = '' + unparsed[LockKeys.CreatedAt];
-        result.created_at = formatDateDigitsToGermanDate(new Date(result.created_at));
-      }
-      if (LockKeys.LockedUntil in unparsed) {
-        result.locked_until = '' + unparsed[LockKeys.LockedUntil];
-        // Parse the UTC date
-        const utcDate: Date = new Date(result.locked_until);
-
-        // Adjust date for MESZ (German summer time) if necessary
-        if (utcDate.getTimezoneOffset() >= -120) {
-          utcDate.setDate(utcDate.getDate() - 1);
-        }
-        result.locked_until = formatDateDigitsToGermanDate(utcDate);
-      }
-      result.lock_occasion = '' + unparsed[LockKeys.LockOccasion];
-    } else if (
-      LockKeys.LockOccasion in unparsed &&
-      unparsed[LockKeys.LockOccasion] == PersonLockOccasion.KOPERS_GESPERRT
-    ) {
-      result.lock_occasion = '' + unparsed[LockKeys.LockOccasion];
-    }
-
-    if (Object.keys(result).length > 0) {
-      parsedLocks.push(result as UserLock);
-    }
-  }
-
-  return parsedLocks;
-}
-
 export function mapPersonendatensatzResponseToPersonendatensatz(
   response: PersonendatensatzResponse,
 ): Personendatensatz {
-  const userLock: UserLock[] | null = parseUserLock(response.person.userLock ? response.person.userLock : []);
-  const person: Person = {
-    id: response.person.id,
-    name: response.person.name,
-    referrer: response.person.referrer,
-    revision: response.person.revision,
-    personalnummer: response.person.personalnummer,
-    isLocked: response.person.isLocked,
-    userLock: userLock,
-    lastModified: response.person.lastModified,
-    email: response.person.email,
-  };
+  const person: Person = Person.fromResponse(response.person);
   return { person };
 }
 
@@ -193,7 +102,7 @@ export type Personendatensatz = {
 export type { PersonendatensatzResponse };
 
 type PersonState = {
-  allUebersichten: Map<string, PersonWithUebersicht>;
+  allUebersichten: Map<string, PersonWithZuordnungen>;
   currentPerson: Personendatensatz | null;
   errorCode: string;
   loading: boolean;
@@ -201,7 +110,6 @@ type PersonState = {
   newPassword: string | null;
   patchedPerson: PersonendatensatzResponse | null;
   personenuebersicht: DBiamPersonenuebersichtResponse | null;
-  personenWithUebersicht: PersonenWithRolleAndZuordnung | null;
   totalPersons: number;
 };
 
@@ -240,7 +148,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
   id: 'personStore',
   state: (): PersonState => {
     return {
-      allUebersichten: new Map<string, PersonWithUebersicht>(),
+      allUebersichten: new Map<string, PersonWithZuordnungen>(),
       currentPerson: null,
       errorCode: '',
       loading: false,
@@ -248,7 +156,6 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       newPassword: null,
       patchedPerson: null,
       personenuebersicht: null,
-      personenWithUebersicht: null,
       totalPersons: 0,
     };
   },
@@ -276,77 +183,34 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
           );
 
         // Store the fetched persons
-        const allPersons: PersonendatensatzResponse[] = data.items;
+        const allPersons: Map<string, Person> = new Map();
+        for (const personendatensatz of data.items) {
+          const person: Person = Person.fromResponse(personendatensatz.person);
+          allPersons.set(person.id, person);
+        }
         this.totalPersons = +data.total;
 
         // Fetch overviews for all persons
-        const personIds: string[] = data.items.map((person: PersonendatensatzResponse) => person.person.id);
-        if (personIds.length === 0) {
-          this.personenWithUebersicht = null;
+        if (allPersons.size === 0) {
+          this.allUebersichten = new Map<string, PersonWithZuordnungen>();
           return;
         }
         const bodyParams: PersonenuebersichtBodyParams = {
-          personIds: personIds,
+          personIds: [...allPersons.keys()],
         };
         const { data: uebersichten }: { data: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response } =
           await personenuebersichtApi.dBiamPersonenuebersichtControllerFindPersonenuebersichten(bodyParams);
-        this.allUebersichten = new Map<string, PersonWithUebersicht>(
-          uebersichten.items.filter(Boolean).map((ueb: PersonWithUebersicht) => [ueb!.personId, ueb]),
-        );
-
+        this.allUebersichten = new Map<string, PersonWithZuordnungen>();
         // Aggregate the personen with their uebersichten
-        this.personenWithUebersicht = allPersons
-          .map(mapPersonendatensatzResponseToPersonendatensatz)
-          .map((person: Personendatensatz) => {
-            const uebersicht: PersonWithUebersicht = this.allUebersichten.get(person.person.id);
-
-            const uniqueRollen: Set<string> = new Set<string>();
-            uebersicht?.zuordnungen.forEach((zuordnung: Zuordnung) => uniqueRollen.add(zuordnung.rolle));
-            const rollenZuordnungen: string = uniqueRollen.size > 0 ? Array.from(uniqueRollen).join(', ') : '---';
-
-            const uniqueAdministrationsebenen: Set<string> = new Set<string>();
-            uebersicht?.zuordnungen
-              .filter((zuordnung: Zuordnung) => zuordnung.typ !== OrganisationsTyp.Klasse)
-              .forEach((zuordnung: Zuordnung) =>
-                uniqueAdministrationsebenen.add(zuordnung.sskDstNr ? zuordnung.sskDstNr : zuordnung.sskName),
-              );
-            const administrationsebenen: string =
-              uniqueAdministrationsebenen.size > 0 ? Array.from(uniqueAdministrationsebenen).join(', ') : '---';
-
-            const klassenZuordnungen: string = uebersicht?.zuordnungen.some(
-              (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
-            )
-              ? uebersicht.zuordnungen
-                  .filter((zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse)
-                  .map((zuordnung: Zuordnung) => (zuordnung.sskName.length ? zuordnung.sskName : '---'))
-                  .join(', ')
-              : '---';
-
-            /* Check if person has personalnummer and show it, 
-              if not, check if kopersrolle exists and show "fehlt",
-              if not, show "---"
-            */
-            const hasKopersRolle: boolean = !!uebersicht?.zuordnungen.find((zuordnung: Zuordnung) =>
-              zuordnung.merkmale.includes(RollenMerkmal.KopersPflicht),
-            );
-            let personalnummer: string;
-
-            if (person.person.personalnummer) {
-              personalnummer = person.person.personalnummer;
-            } else if (hasKopersRolle) {
-              personalnummer = 'fehlt';
-            } else {
-              personalnummer = '---';
-            }
-
-            return {
-              ...person,
-              rollen: rollenZuordnungen,
-              administrationsebenen: administrationsebenen,
-              klassen: klassenZuordnungen,
-              person: { ...person.person, personalnummer: personalnummer },
-            };
-          });
+        for (const uebersicht of uebersichten.items) {
+          const person: Person | undefined = allPersons.get(uebersicht.personId);
+          if (!person) continue;
+          const zuordnungen: Zuordnung[] = uebersicht.zuordnungen.map(
+            (zuordnungResponse: DBiamPersonenzuordnungResponse) => Zuordnung.fromPersonenzuordnung(zuordnungResponse),
+          );
+          const personWithZuordnungen: PersonWithZuordnungen = new PersonWithZuordnungen(person, zuordnungen);
+          this.allUebersichten.set(person.id, personWithZuordnungen);
+        }
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
