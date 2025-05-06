@@ -61,7 +61,7 @@ type AuthState = {
   hasPersonenBulkPermission: boolean;
   hasPortalVerwaltungPermission: boolean;
   hasHinweiseBearbeitenPermission: boolean;
-  isAuthed: boolean;
+  isAuthenticated: boolean;
   acr: StepUpLevel;
   timeLimitInfos: PersonTimeLimitInfoResponse[];
 };
@@ -93,7 +93,7 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
     hasPersonenBulkPermission: false,
     hasPortalVerwaltungPermission: false,
     hasHinweiseBearbeitenPermission: false,
-    isAuthed: false,
+    isAuthenticated: false,
     acr: StepUpLevel.NONE,
     timeLimitInfos: [],
   }),
@@ -106,7 +106,7 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
           });
 
         if (loginStatus >= 200 && loginStatus < 400) {
-          this.isAuthed = true;
+          this.isAuthenticated = true;
           this.currentUser = data;
           this.acr = data.acr as StepUpLevel;
           this.timeLimitInfos = data.timeLimits;
@@ -139,7 +139,23 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
         }
       } catch {
         // If user info can't be retrieved, consider the user unauthenticated.
-        this.isAuthed = false;
+        this.currentUser = null;
+        this.currentUserPermissions = [];
+        this.hasImportPermission = false;
+        this.hasKlassenverwaltungPermission = false;
+        this.hasPersonenAnlegenPermission = false;
+        this.hasPersonenLoeschenPermission = false;
+        this.hasPersonenSyncPermission = false;
+        this.hasPersonenverwaltungPermission = false;
+        this.hasRollenverwaltungPermission = false;
+        this.hasSchulverwaltungPermission = false;
+        this.hasSchultraegerverwaltungPermission = false;
+        this.hasPersonenBulkPermission = false;
+        this.hasPortalVerwaltungPermission = false;
+        this.hasHinweiseBearbeitenPermission = false;
+        this.isAuthenticated = false;
+        this.acr = StepUpLevel.NONE;
+        this.timeLimitInfos = [];
       }
     },
   },

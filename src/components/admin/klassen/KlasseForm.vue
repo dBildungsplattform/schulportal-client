@@ -56,9 +56,8 @@
 
   function reset(): void {
     resetForm();
-    selectedSchule.value = undefined;
     emit('formStateChanged', {
-      values: { selectedKlassenname: selectedKlassenname.value, selectedSchule: '' },
+      values: { selectedKlassenname: selectedKlassenname.value, selectedSchule: selectedSchule.value ?? '' },
       dirty: isDirty.value,
       valid: isValid.value,
     });
@@ -66,16 +65,17 @@
 
   defineExpose({ reset });
 
-  async function submitHandler(): Promise<void> {
-    if (!selectedSchule.value) return;
-    await props.onSubmit({ selectedSchule: selectedSchule.value, selectedKlassenname: selectedKlassenname.value });
-    reset();
-  }
-
   function setInitialValues(): void {
     if (!props.initialValues) return;
     setFieldValue('selectedSchule', props.initialValues.selectedSchule ?? '');
     setFieldValue('selectedKlassenname', props.initialValues.selectedKlassenname ?? '');
+  }
+
+  async function submitHandler(): Promise<void> {
+    if (!selectedSchule.value) return;
+    await props.onSubmit({ selectedSchule: selectedSchule.value, selectedKlassenname: selectedKlassenname.value });
+    reset();
+    setInitialValues();
   }
 
   watch(

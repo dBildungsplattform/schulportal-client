@@ -38,7 +38,9 @@ function handleGoToPreviousPage(): void {
 
 router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormalized) => {
   const authStore: AuthStore = useAuthStore();
-  await authStore.initializeAuthStatus();
+  if (!authStore.isAuthenticated) {
+    await authStore.initializeAuthStatus();
+  }
   if (to.path != '/profile' && to.path != '/no-second-factor') sessionStorage.setItem('previousUrl', to.path);
 
   if (to.path === '/no-second-factor') {
@@ -53,11 +55,11 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
   }
 
   // Redirect authenticated users trying to access the login page to the start page
-  if (to.path === '/' && authStore.isAuthed) {
+  if (to.path === '/' && authStore.isAuthenticated) {
     return { path: '/start' };
   }
 
-  if (to.meta['requiresAuth'] && !authStore.isAuthed) {
+  if (to.meta['requiresAuth'] && !authStore.isAuthenticated) {
     window.location.href = `/api/auth/login?redirectUrl=${to.fullPath}`;
     return false;
   }
