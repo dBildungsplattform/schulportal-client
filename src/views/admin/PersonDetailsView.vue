@@ -1974,13 +1974,8 @@
                     {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
                     {{ zuordnung.klasse }}
                     <span
-                      v-if="
-                        zuordnung.befristung &&
-                        newZuordnung &&
-                        zuordnung.sskId === newZuordnung.sskId &&
-                        zuordnung.rolleId === newZuordnung.rolleId
-                      "
-                      class="text-body text-green"
+                      v-if="zuordnung.befristung"
+                      data-testid="zuordnung-befristung-text"
                     >
                       ({{ formatDate(zuordnung.befristung, t) }})</span
                     >
@@ -1993,12 +1988,6 @@
                       class="text-body text-green"
                     >
                       ({{ $t('willBeCreated') }})</span
-                    >
-                    <span
-                      v-if="zuordnung.befristung"
-                      data-testid="zuordnung-befristung-text"
-                    >
-                      ({{ formatDate(zuordnung.befristung, t) }})</span
                     >
                   </span>
                 </template>
