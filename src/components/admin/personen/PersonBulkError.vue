@@ -110,7 +110,7 @@
             thickness="5px"
           ></v-divider>
         </template>
-        <p class="text-body bold pre-line mt-10">
+        <p class="text-body bold pre-line">
           {{
             t('admin.person.bulk.bulkErrorMessage', {
               bulkOperationName: props.bulkOperationName,
