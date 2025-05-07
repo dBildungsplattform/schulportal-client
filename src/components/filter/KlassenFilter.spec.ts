@@ -47,7 +47,7 @@ const defaultFilter: OrganisationenFilter = {
   includeTyp: OrganisationsTyp.Klasse,
   systemrechte: [RollenSystemRecht.KlassenVerwalten],
   organisationIds: [],
-  limit: 25,
+  limit: 200,
 };
 
 beforeEach(() => {
@@ -193,11 +193,12 @@ describe('KlassenFilter', async () => {
       ])('when the parent $label the selection', ({ id }: { id?: string }) => {
         test('it correctly initializes input', async () => {
           const mockKlasse: Organisation = DoFactory.getKlasse();
+          const selectionRef: Ref<string | undefined> = ref(undefined);
           if (id) mockKlasse.id = id;
           organisationStore.loadKlassenForFilter = vi.fn(async () => {
             organisationStore.klassenFilter.filterResult = [mockKlasse];
+            selectionRef.value = id;
           });
-          const selectionRef: Ref<string | undefined> = ref(id);
           const wrapper: VueWrapper = mountComponent({ ...defaultProps });
           vi.runAllTimers();
           await wrapper.setProps({ selectedKlassen: selectionRef });

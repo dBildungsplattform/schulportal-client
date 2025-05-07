@@ -41,7 +41,7 @@
     includeTyp: OrganisationsTyp.Klasse,
     systemrechte: props.systemrechteForSearch,
     searchString: undefined,
-    limit: 25,
+    limit: 200,
     organisationIds: [],
     administriertVon: props.administriertVon,
   });
