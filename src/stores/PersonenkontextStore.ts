@@ -2,12 +2,9 @@ import axiosApiInstance from '@/services/ApiService';
 import { getResponseErrorCode } from '@/utils/errorHandlers';
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import {
-  OrganisationsTyp,
   PersonAdministrationApiFactory,
   PersonenkontextApiFactory,
   PersonenkontexteApiFactory,
-  RollenArt,
-  RollenMerkmal,
   type DbiamCreatePersonenkontextBodyParams,
   type DbiamCreatePersonWithPersonenkontexteBodyParams,
   type DbiamPersonenkontextBodyParams,
@@ -43,22 +40,12 @@ export enum PersonenKontextTyp {
   Klasse = 'KLASSE',
 }
 
-export type Zuordnung = {
-  klasse?: string;
+export type ZuordnungUpdate = {
   sskId: string;
   rolleId: string;
-  sskName: string;
-  sskDstNr?: string;
-  rolle: string;
-  rollenArt: RollenArt;
-  administriertVon: string;
-  typ: OrganisationsTyp;
-  editable: boolean;
-  merkmale: RollenMerkmal;
   befristung?: string;
-  admins?: string[];
 };
-export type ZuordnungUpdate = Pick<Zuordnung, 'sskId' | 'rolleId' | 'befristung'>;
+
 export type WorkflowFilter = {
   organisationId?: string;
   rollenIds?: string[];
@@ -123,8 +110,7 @@ export const usePersonenkontextStore: StoreDefinition<
   PersonenkontextState,
   PersonenkontextGetters,
   PersonenkontextActions
-> = defineStore({
-  id: 'personenkontextStore',
+> = defineStore('personenkontextStore', {
   state: (): PersonenkontextState => {
     return {
       workflowStepResponse: null,

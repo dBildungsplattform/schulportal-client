@@ -4,11 +4,8 @@ import { type AxiosResponse } from 'axios';
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import {
   DbiamPersonenuebersichtApiFactory,
-  OrganisationsTyp,
   PersonenApiFactory,
   PersonenFrontendApiFactory,
-  RollenArt,
-  RollenMerkmal,
   type DbiamCreatePersonWithPersonenkontexteBodyParams,
   type DbiamPersonenuebersichtApiInterface,
   type DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response,
@@ -24,6 +21,7 @@ import {
 } from '../api-client/generated/api';
 import { type DbiamPersonenkontextBodyParams } from './PersonenkontextStore';
 import { Person } from './types/Person';
+import { PersonenUebersicht } from './types/PersonenUebersicht';
 import { PersonWithZuordnungen } from './types/PersonWithZuordnungen';
 import { Zuordnung } from './types/Zuordnung';
 
@@ -53,31 +51,6 @@ export enum SortOrder {
   Asc = 'asc',
   Desc = 'desc',
 }
-
-export type PersonWithUebersicht =
-  | {
-      personId: string;
-      vorname: string;
-      nachname: string;
-      benutzername: string;
-      lastModifiedZuordnungen: string | null;
-      zuordnungen: {
-        klasse?: string | undefined;
-        sskId: string;
-        rolleId: string;
-        sskName: string;
-        sskDstNr: string;
-        rolle: string;
-        rollenArt: RollenArt;
-        administriertVon: string;
-        typ: OrganisationsTyp;
-        editable: boolean;
-        merkmale: RollenMerkmal;
-        befristung: string;
-        admins: string[];
-      }[];
-    }
-  | undefined;
 
 export type PersonTableItem = {
   person: Person;
@@ -109,7 +82,7 @@ type PersonState = {
   newDevicePassword: string | null;
   newPassword: string | null;
   patchedPerson: PersonendatensatzResponse | null;
-  personenuebersicht: DBiamPersonenuebersichtResponse | null;
+  personenuebersicht: PersonenUebersicht | null;
   totalPersons: number;
 };
 
@@ -206,7 +179,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
           const person: Person | undefined = allPersons.get(uebersicht.personId);
           if (!person) continue;
           const zuordnungen: Zuordnung[] = uebersicht.zuordnungen.map(
-            (zuordnungResponse: DBiamPersonenzuordnungResponse) => Zuordnung.fromPersonenzuordnung(zuordnungResponse),
+            (zuordnungResponse: DBiamPersonenzuordnungResponse) => Zuordnung.fromResponse(zuordnungResponse),
           );
           const personWithZuordnungen: PersonWithZuordnungen = new PersonWithZuordnungen(person, zuordnungen);
           this.allUebersichten.set(person.id, personWithZuordnungen);
@@ -300,7 +273,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       try {
         const { data }: { data: DBiamPersonenuebersichtResponse } =
           await personenuebersichtApi.dBiamPersonenuebersichtControllerFindPersonenuebersichtenByPerson(personId);
-        this.personenuebersicht = data;
+        this.personenuebersicht = PersonenUebersicht.fromResponse(data);
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {

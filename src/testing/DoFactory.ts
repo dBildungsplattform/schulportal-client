@@ -2,7 +2,6 @@ import {
   EmailAddressStatus,
   OrganisationsTyp,
   RollenArt,
-  RollenMerkmal,
   RollenSystemRecht,
   TraegerschaftTyp,
   Vertrauensstufe,
@@ -17,6 +16,7 @@ import {
 } from '@/api-client/generated';
 import type { Organisation } from '@/stores/OrganisationStore';
 import type { Person } from '@/stores/types/Person';
+import { PersonenUebersicht } from '@/stores/types/PersonenUebersicht';
 import { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
 import type { Zuordnung } from '@/stores/types/Zuordnung';
 // eslint-disable-next-line import/no-extraneous-dependencies
@@ -64,10 +64,24 @@ export class DoFactory {
       sskDstNr: schule.kennung!,
       rolle: faker.string.alpha(5),
       rollenArt: faker.helpers.arrayElement<RollenArt>([RollenArt.Lern, RollenArt.Lehr]),
-      merkmale: {} as RollenMerkmal,
+      merkmale: [],
       typ: schule.typ,
       ...props,
     };
+  }
+
+  public static getPersonenUebersicht(
+    person: Person = DoFactory.getPerson(),
+    zuordnungen: Array<Zuordnung> = [DoFactory.getZuordnung()],
+  ): PersonenUebersicht {
+    return new PersonenUebersicht(
+      person.id,
+      person.name.vorname,
+      person.name.familienname,
+      person.referrer!,
+      faker.date.recent().toISOString(),
+      zuordnungen,
+    );
   }
 
   public static getPersonResponse(props?: Partial<PersonResponse>): PersonResponse {
@@ -252,7 +266,7 @@ export class DoFactory {
       typ: organisation.typ,
       editable: true,
       befristung: faker.date.soon().toISOString(),
-      merkmale: {} as RollenMerkmal,
+      merkmale: [],
       admins: [faker.person.fullName()],
       ...props,
     };

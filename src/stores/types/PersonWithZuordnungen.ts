@@ -2,7 +2,7 @@ import { OrganisationsTyp, RollenMerkmal, type RollenArt } from '@/api-client/ge
 import { Person } from './Person';
 import { Zuordnung } from './Zuordnung';
 
-type Rolle = { name: Zuordnung['rolle']; art: Zuordnung['rollenArt']; merkmale: RollenMerkmal };
+type Rolle = { name: Zuordnung['rolle']; art: Zuordnung['rollenArt']; merkmale: Array<RollenMerkmal> };
 
 export class PersonWithZuordnungen extends Person {
   public uniqueRollen: Map<Zuordnung['rolleId'], Rolle> = new Map();
@@ -14,6 +14,7 @@ export class PersonWithZuordnungen extends Person {
   public constructor(
     person: Person,
     public zuordnungen: Array<Zuordnung>,
+    public lastModifiedZuordnungen?: string,
   ) {
     super(
       person.id,

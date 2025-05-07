@@ -1,9 +1,7 @@
 import type {
   DBiamPersonenkontextResponse,
   DBiamPersonenuebersichtResponse,
-  DBiamPersonenzuordnungResponse,
   PersonenkontexteUpdateResponse,
-  RollenMerkmal,
 } from '@/api-client/generated';
 import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
 import ApiService from '@/services/ApiService';
@@ -13,10 +11,12 @@ import MockAdapter from 'axios-mock-adapter';
 import { createPinia, setActivePinia } from 'pinia';
 import type { MockInstance } from 'vitest';
 import { OperationType, useBulkOperationStore, type BulkOperationStore } from './BulkOperationStore';
-import { OrganisationsTyp, type Organisation } from './OrganisationStore';
+import { type Organisation } from './OrganisationStore';
 import { usePersonStore, type PersonStore } from './PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from './PersonenkontextStore';
 import { RollenArt } from './RolleStore';
+import { PersonenUebersicht } from './types/PersonenUebersicht';
+import type { Zuordnung } from './types/Zuordnung';
 
 const mockAdapter: MockAdapter = new MockAdapter(ApiService);
 
@@ -26,30 +26,18 @@ describe('BulkOperationStore', () => {
   let personenkontextStore: PersonenkontextStore;
 
   const mockPersonId: string = '1';
+  const mockSchule: Organisation = DoFactory.getSchule();
 
-  const mockSchuleZuordnung: DBiamPersonenzuordnungResponse = {
-    sskId: '1234',
-    rolleId: '5678',
-    sskName: 'some ssk name',
-    sskDstNr: '123',
-    rolle: 'some role',
-    rollenArt: RollenArt.Lern,
-    administriertVon: '123',
-    typ: OrganisationsTyp.Schule,
-    editable: true,
-    befristung: 'unbefristet',
-    merkmale: [] as unknown as RollenMerkmal,
-    admins: ['admin1', 'admin2'],
-  };
+  const mockSchuleZuordnung: Zuordnung = DoFactory.getZuordnung({}, { organisation: mockSchule });
 
-  const person: DBiamPersonenuebersichtResponse = {
-    personId: mockPersonId,
-    vorname: 'John',
-    nachname: 'Doe',
-    benutzername: 'jdoe',
-    zuordnungen: [mockSchuleZuordnung],
-    lastModifiedZuordnungen: '2024-03-24T16:35:32.711Z',
-  };
+  const person: PersonenUebersicht = new PersonenUebersicht(
+    mockPersonId,
+    'John',
+    'Doe',
+    'jdoe',
+    '2024-03-24T16:35:32.711Z',
+    [mockSchuleZuordnung],
+  );
 
   beforeEach(() => {
     setActivePinia(createPinia());
@@ -98,43 +86,13 @@ describe('BulkOperationStore', () => {
     });
 
     it('should unassign and call updatePersonenkontexte if matching zuordnung exists', async () => {
-      const mockPersonResponse: DBiamPersonenuebersichtResponse = {
-        personId: '1',
-        vorname: 'John',
-        nachname: 'Doe',
-        benutzername: 'jdoe',
-        lastModifiedZuordnungen: '2024-04-01T00:00:00.000Z',
+      const mockPersonResponse: DBiamPersonenuebersichtResponse = DoFactory.getDBiamPersonenuebersichtResponse({
+        ...person,
         zuordnungen: [
-          {
-            sskId: '1234', // <- matches org ID
-            rolleId: 'some-role',
-            sskName: 'Test School',
-            sskDstNr: '123',
-            rolle: 'Test Role',
-            rollenArt: RollenArt.Lern,
-            administriertVon: 'admin-org-id',
-            typ: OrganisationsTyp.Schule,
-            editable: true,
-            befristung: 'unbefristet',
-            merkmale: [] as unknown as RollenMerkmal,
-            admins: ['admin1'],
-          },
-          {
-            sskId: '12345',
-            rolleId: 'some-role',
-            sskName: 'Test School',
-            sskDstNr: '123',
-            rolle: 'Test Role',
-            rollenArt: RollenArt.Lern,
-            administriertVon: '1234',
-            typ: OrganisationsTyp.Klasse,
-            editable: true,
-            befristung: 'unbefristet',
-            merkmale: [] as unknown as RollenMerkmal,
-            admins: ['admin1'],
-          },
+          DoFactory.getDBiamPersonenzuordnungResponse({}, { organisation: mockSchule }),
+          DoFactory.getDBiamPersonenzuordnungResponse(),
         ],
-      };
+      });
 
       const mockUpdateResponse: PersonenkontexteUpdateResponse = {
         dBiamPersonenkontextResponses: [
@@ -154,28 +112,32 @@ describe('BulkOperationStore', () => {
       await unassign;
 
       expect(personStore.personenuebersicht).not.toBeNull();
-      expect(personStore.personenuebersicht).toEqual(mockPersonResponse);
+      expect(personStore.personenuebersicht).toEqual(PersonenUebersicht.fromResponse(mockPersonResponse));
       expect(bulkOperationStore.currentOperation?.progress).toBe(100);
       expect(bulkOperationStore.currentOperation?.errors.size).toBe(0);
     });
 
     it('should skip if person has no zuordnungen', async () => {
-      mockAdapter.onGet('/api/dbiam/personenuebersicht/1').replyOnce(200, []);
+      const spy: MockInstance = vi.spyOn(personenkontextStore, 'updatePersonenkontexte');
+      mockAdapter
+        .onGet(`/api/dbiam/personenuebersicht/${mockPersonId}`)
+        .replyOnce(200, DoFactory.getDBiamPersonenuebersichtResponse({ zuordnungen: [] }));
 
       await bulkOperationStore.bulkUnassignPersonenFromOrg('1234', [mockPersonId]);
 
-      expect(personStore.personenuebersicht).not.toBeNull();
-      expect(personStore.personenuebersicht).toEqual([]);
       expect(bulkOperationStore.currentOperation?.progress).toBe(100);
+      expect(spy).not.toHaveBeenCalled();
     });
 
     it('should skip if personenuebersicht is missing', async () => {
-      mockAdapter.onGet('/api/dbiam/personenuebersicht/1').replyOnce(200, null);
+      const spy: MockInstance = vi.spyOn(personenkontextStore, 'updatePersonenkontexte');
+      mockAdapter.onGet(`/api/dbiam/personenuebersicht/${mockPersonId}`).replyOnce(200);
 
       await bulkOperationStore.bulkUnassignPersonenFromOrg('1234', [mockPersonId]);
 
-      expect(personStore.personenuebersicht).toBeNull();
       expect(bulkOperationStore.currentOperation?.progress).toBe(100);
+
+      expect(spy).not.toHaveBeenCalled();
     });
   });
 
@@ -437,6 +399,7 @@ describe('BulkOperationStore', () => {
       );
 
       mockAdapter.onGet(`/api/dbiam/personenuebersicht/${personId}`).replyOnce(200, []);
+      mockAdapter.onPut(`/api/personenkontext-workflow/${personId}`).replyOnce(200, []);
 
       expect(bulkOperationStore.currentOperation?.isRunning).toBe(true);
       expect(bulkOperationStore.currentOperation?.progress).toBe(0);
@@ -454,7 +417,6 @@ describe('BulkOperationStore', () => {
       const mockPersonIds: string[] = [faker.string.uuid(), faker.string.uuid()];
       const klassenId: string = faker.string.uuid();
       const unchangedKlassenId: string = faker.string.uuid();
-      const mockSchule: Organisation = DoFactory.getSchule();
       const mockKlassen: Organisation[] = [
         DoFactory.getKlasse(mockSchule),
         DoFactory.getKlasse(mockSchule),

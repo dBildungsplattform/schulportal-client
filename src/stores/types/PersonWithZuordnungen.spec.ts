@@ -1,6 +1,6 @@
 import { DoFactory } from '@/testing/DoFactory';
 import { OrganisationsTyp, type Organisation } from '../OrganisationStore';
-import { RollenArt } from '../RolleStore';
+import { RollenArt, RollenMerkmal } from '../RolleStore';
 import { Person } from './Person';
 import { PersonWithZuordnungen } from './PersonWithZuordnungen';
 import type { Zuordnung } from './Zuordnung';
@@ -49,5 +49,24 @@ describe('PersonWithZuordnungen', () => {
         expect(klassenZuordnungenAsString).toContain(zuordnung.sskName);
       }
     }
+  });
+
+  it('should return personalnummerAsString', () => {
+    const { personalnummerAsString }: PersonWithZuordnungen = personWithZuordnungen;
+    expect(personalnummerAsString).toBe(person.personalnummer);
+  });
+
+  describe.each([[true], [false]])('when hasKopersRolle=%s', (hasKopersRolle: boolean) => {
+    it('should return correct placeholder for empty personalnummer', () => {
+      const zuordnung: Zuordnung = DoFactory.getZuordnung({
+        rolle: 'Kopers',
+        rollenArt: RollenArt.Lehr,
+        merkmale: hasKopersRolle ? [RollenMerkmal.KopersPflicht] : [],
+      });
+      const personWithKopersZuordnung: PersonWithZuordnungen = new PersonWithZuordnungen(person, [zuordnung]);
+      personWithKopersZuordnung.personalnummer = null;
+      const { personalnummerAsString }: PersonWithZuordnungen = personWithKopersZuordnung;
+      expect(personalnummerAsString).toContain(hasKopersRolle ? 'fehlt' : '---');
+    });
   });
 });

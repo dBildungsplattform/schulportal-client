@@ -26,18 +26,12 @@
     type Organisation,
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
-  import {
-    EmailStatus,
-    usePersonStore,
-    type Personendatensatz,
-    type PersonStore,
-    type PersonWithUebersicht,
-  } from '@/stores/PersonStore';
+  import { EmailStatus, usePersonStore, type Personendatensatz, type PersonStore } from '@/stores/PersonStore';
   import {
     usePersonenkontextStore,
     type PersonenkontextStore,
     type PersonenkontextWorkflowResponse,
-    type Zuordnung,
+    type ZuordnungUpdate,
   } from '@/stores/PersonenkontextStore';
   import { RollenArt, RollenMerkmal } from '@/stores/RolleStore';
   import {
@@ -46,10 +40,12 @@
     type TwoFactorAuthentificationStore,
   } from '@/stores/TwoFactorAuthentificationStore';
   import type { Person } from '@/stores/types/Person';
+  import type { PersonenUebersicht } from '@/stores/types/PersonenUebersicht';
+  import type { Zuordnung } from '@/stores/types/Zuordnung';
   import type { TranslatedObject } from '@/types';
   import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
-  import { adjustDateForTimezoneAndFormat, formatDate, formatDateToISO, getNextSchuljahresende } from '@/utils/date';
-  import { type UserLock, PersonLockOccasion, LockKeys } from '@/utils/lock';
+  import { adjustDateForTimezoneAndFormat, formatDate, getNextSchuljahresende } from '@/utils/date';
+  import { LockKeys, PersonLockOccasion, type UserLock } from '@/utils/lock';
   import { DIN_91379A, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
   import {
     getBefristungSchema,
@@ -60,6 +56,7 @@
     type PersonenkontextFieldDefinitions,
   } from '@/utils/validationPersonenkontext';
   import { toTypedSchema } from '@vee-validate/yup';
+  import { parse } from 'date-fns';
   import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
   import { computed, onBeforeMount, onMounted, onUnmounted, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
@@ -74,6 +71,10 @@
   } from 'vue-router';
   import { useDisplay } from 'vuetify';
   import { object, string, StringSchema, type AnyObject } from 'yup';
+
+  type ZuordnungWithKlasse = Zuordnung & {
+    klasse?: string;
+  };
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -92,10 +93,10 @@
   const devicePassword: Ref<string> = ref('');
   const password: Ref<string> = ref('');
 
-  const zuordnungenResult: Ref<Zuordnung[] | undefined> = ref<Zuordnung[] | undefined>(undefined);
-  const getZuordnungen: ComputedRef<Zuordnung[] | undefined> = computed(() => zuordnungenResult.value);
-  const selectedZuordnungen: Ref<Zuordnung[]> = ref<Zuordnung[]>([]);
-  const newZuordnung: Ref<Zuordnung | undefined> = ref<Zuordnung | undefined>(undefined);
+  const zuordnungenResult: Ref<ZuordnungWithKlasse[] | undefined> = ref<ZuordnungWithKlasse[] | undefined>(undefined);
+  const getZuordnungen: ComputedRef<ZuordnungWithKlasse[] | undefined> = computed(() => zuordnungenResult.value);
+  const selectedZuordnungen: Ref<ZuordnungWithKlasse[]> = ref<ZuordnungWithKlasse[]>([]);
+  const newZuordnung: Ref<ZuordnungWithKlasse | undefined> = ref<ZuordnungWithKlasse | undefined>(undefined);
   const finalZuordnungen: Ref<Zuordnung[]> = ref<Zuordnung[]>([]);
   const originalZuordnungenResult: Ref<Zuordnung[] | undefined> = ref(undefined);
   const hasKlassenZuordnung: Ref<boolean | undefined> = ref(false);
@@ -144,6 +145,16 @@
         (lock: UserLock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT,
       ) ?? false // Default to false if userLock is undefined
     );
+  });
+
+  const finalZuordnungenUpdate: ComputedRef<ZuordnungUpdate[]> = computed(() => {
+    return finalZuordnungen.value.map((zuordnung: Zuordnung) => {
+      return {
+        sskId: zuordnung.sskId,
+        rolleId: zuordnung.rolleId,
+        befristung: zuordnung.befristung?.toISOString(),
+      };
+    });
   });
 
   function navigateToPersonTable(): void {
@@ -346,8 +357,8 @@
     }
 
     // The remaining Zuordnungen that were not selected for deletion
-    const remainingZuordnungen: Zuordnung[] | undefined = zuordnungenResult.value?.filter(
-      (zuordnung: Zuordnung) => !selectedZuordnungen.value.includes(zuordnung),
+    const remainingZuordnungen: ZuordnungWithKlasse[] | undefined = zuordnungenResult.value?.filter(
+      (zuordnung: ZuordnungWithKlasse) => !selectedZuordnungen.value.includes(zuordnung),
     );
 
     // Get all Klassen Zuordnungen
@@ -372,7 +383,7 @@
     const klassenToKeep: Zuordnung[] = [];
 
     // For each remaining Zuordnung that is a Schule, keep its associated Klassen
-    remainingZuordnungen?.forEach((zuordnung: Zuordnung) => {
+    remainingZuordnungen?.forEach((zuordnung: ZuordnungWithKlasse) => {
       const associatedKlassen: Zuordnung[] =
         schuleToKlasseMap.get(zuordnung.sskId + zuordnung.klasse + zuordnung.rolle) || [];
       klassenToKeep.push(...associatedKlassen);
@@ -381,8 +392,16 @@
     // Combine remaining Zuordnungen with Klassen that should be kept
     const combinedZuordnungen: Zuordnung[] | undefined = remainingZuordnungen?.concat(klassenToKeep);
 
+    const zuordnungenUpdate: ZuordnungUpdate[] | undefined = combinedZuordnungen?.map((zuordnung: Zuordnung) => {
+      return {
+        sskId: zuordnung.sskId,
+        rolleId: zuordnung.rolleId,
+        befristung: zuordnung.befristung?.toISOString(),
+      };
+    });
+
     // Update the personenkontexte with the filtered list
-    await personenkontextStore.updatePersonenkontexte(combinedZuordnungen, currentPersonId);
+    await personenkontextStore.updatePersonenkontexte(zuordnungenUpdate, currentPersonId);
     zuordnungenResult.value = remainingZuordnungen;
     selectedZuordnungen.value = [];
 
@@ -421,7 +440,7 @@
     }
   });
 
-  function getSskName(sskDstNr: string | undefined, sskName: string): string {
+  function getSskName(sskDstNr: string | undefined | null, sskName: string): string {
     /* truncate ssk name */
     const truncatededSskName: string = sskName.length > 30 ? `${sskName.substring(0, 30)}...` : sskName;
 
@@ -434,12 +453,12 @@
   }
 
   // Add the Klasse to it's corresponding Schule
-  function computeZuordnungen(personenuebersicht: PersonWithUebersicht | null): Zuordnung[] | undefined {
+  function computeZuordnungen(personenuebersicht: PersonenUebersicht | null): ZuordnungWithKlasse[] | undefined {
     const zuordnungen: Zuordnung[] | undefined = personenuebersicht?.zuordnungen;
 
     if (!zuordnungen) return;
 
-    const result: Zuordnung[] = [];
+    const result: ZuordnungWithKlasse[] = [];
 
     // Extract all Klassen from the Zuordnungen
     const klassen: Zuordnung[] = zuordnungen.filter(
@@ -473,11 +492,13 @@
     }
     // Sort by klasse, rolle and SSK (optional)
     result
-      .sort((a: Zuordnung, b: Zuordnung) => (a.klasse && b.klasse ? a.klasse.localeCompare(b.klasse) : 0))
-      .sort((a: Zuordnung, b: Zuordnung) => a.rolle.localeCompare(b.rolle))
-      .sort((a: Zuordnung, b: Zuordnung) => {
-        if (a.sskDstNr === undefined) return 1;
-        if (b.sskDstNr === undefined) return -1;
+      .sort((a: ZuordnungWithKlasse, b: ZuordnungWithKlasse) =>
+        a.klasse && b.klasse ? a.klasse.localeCompare(b.klasse) : 0,
+      )
+      .sort((a: ZuordnungWithKlasse, b: ZuordnungWithKlasse) => a.rolle.localeCompare(b.rolle))
+      .sort((a: ZuordnungWithKlasse, b: ZuordnungWithKlasse) => {
+        if (a.sskDstNr == undefined) return 1;
+        if (b.sskDstNr == undefined) return -1;
         return a.sskDstNr.localeCompare(b.sskDstNr);
       });
     return result;
@@ -837,7 +858,7 @@
   async function confirmAddition(): Promise<void> {
     if (selectedKopersNr.value !== null) {
       await personenkontextStore.updatePersonenkontexte(
-        finalZuordnungen.value,
+        finalZuordnungenUpdate.value,
         currentPersonId,
         selectedKopersNr.value,
       );
@@ -849,14 +870,14 @@
 
   // This will send the updated list of Zuordnungen to the Backend with the selected Zuordnung but with the new Klasse.
   async function confirmChangeKlasse(): Promise<void> {
-    await personenkontextStore.updatePersonenkontexte(finalZuordnungen.value, currentPersonId);
+    await personenkontextStore.updatePersonenkontexte(finalZuordnungenUpdate.value, currentPersonId);
     changeKlasseSuccessDialogVisible.value = !personenkontextStore.errorCode;
     selectedZuordnungen.value = [];
     resetChangeKlasseForm();
   }
 
   async function confirmChangeBefristung(): Promise<void> {
-    await personenkontextStore.updatePersonenkontexte(finalZuordnungen.value, currentPersonId);
+    await personenkontextStore.updatePersonenkontexte(finalZuordnungenUpdate.value, currentPersonId);
     changeBefristungSuccessDialogVisible.value = !personenkontextStore.errorCode;
     selectedZuordnungen.value = [];
     changeBefristungFormContext.resetForm();
@@ -997,7 +1018,7 @@
   const onSubmitChangeBefristung: (e?: Event | undefined) => Promise<void | undefined> =
     changeBefristungFormContext.handleSubmit(() => {
       const befristungDate: string | undefined = selectedChangeBefristung.value ?? calculatedBefristung.value;
-      const oldBefristung: string | undefined = selectedZuordnungen.value[0]?.befristung;
+      const oldBefristung: ZuordnungWithKlasse['befristung'] | undefined = selectedZuordnungen.value[0]?.befristung;
       let oldBefristungdFormatted: string;
       if (oldBefristung) {
         oldBefristungdFormatted = adjustDateForTimezoneAndFormat(oldBefristung);
@@ -1028,15 +1049,12 @@
     const befristungDate: string | undefined = selectedBefristung.value
       ? selectedBefristung.value
       : calculatedBefristung.value;
-
-    // Format the date in ISO 8601 format if it exists
-    const formattedBefristung: string | undefined = befristungDate ? formatDateToISO(befristungDate) : undefined;
+    const befristung: Date | null = befristungDate ? new Date(befristungDate) : null;
 
     if (organisation) {
       newZuordnung.value = {
         sskId: organisation.id,
         rolleId: selectedRolle.value ?? '',
-        klasse: klasse?.name,
         sskDstNr: organisation.kennung ?? '',
         sskName: organisation.name,
         rolle:
@@ -1045,9 +1063,10 @@
           ?.rollenart as RollenArt,
         administriertVon: organisation.administriertVon ?? '',
         editable: true,
-        merkmale: [] as unknown as RollenMerkmal,
+        merkmale: [],
         typ: OrganisationsTyp.Schule,
-        befristung: formattedBefristung,
+        befristung: befristung,
+        admins: [],
       };
       if (zuordnungenResult.value) {
         finalZuordnungen.value = zuordnungenResult.value;
@@ -1068,8 +1087,9 @@
           administriertVon: klasse.administriertVon ?? '',
           editable: true,
           typ: OrganisationsTyp.Klasse,
-          merkmale: [] as unknown as RollenMerkmal,
-          befristung: formattedBefristung,
+          merkmale: [],
+          befristung: befristung,
+          admins: [],
         });
       }
 
@@ -1085,9 +1105,10 @@
             rollenArt: existingKlasse.rollenArt,
             administriertVon: existingKlasse.administriertVon,
             editable: true,
-            merkmale: [] as unknown as RollenMerkmal,
+            merkmale: [],
             typ: OrganisationsTyp.Klasse,
             befristung: existingKlasse.befristung,
+            admins: [],
           });
         });
       }
@@ -1115,7 +1136,7 @@
     );
 
     // The remaining Zuordnungen that were not selected for deletion
-    const remainingZuordnungen: Zuordnung[] | undefined = zuordnungenResult.value?.filter(
+    const remainingZuordnungen: ZuordnungWithKlasse[] | undefined = zuordnungenResult.value?.filter(
       (zuordnung: Zuordnung) => !selectedZuordnungen.value.includes(zuordnung),
     );
 
@@ -1126,7 +1147,6 @@
       newZuordnung.value = {
         sskId: organisation.id,
         rolleId: selectedZuordnungen.value[0]?.rolleId ?? '',
-        klasse: newKlasse?.name,
         sskDstNr: organisation.kennung ?? '',
         sskName: organisation.name,
         rolle:
@@ -1136,8 +1156,10 @@
           ?.rollenart as RollenArt,
         administriertVon: organisation.administriertVon ?? '',
         editable: true,
-        merkmale: [] as unknown as RollenMerkmal,
+        merkmale: [],
         typ: OrganisationsTyp.Schule,
+        admins: [],
+        befristung: null,
       };
 
       if (zuordnungenResult.value) {
@@ -1166,7 +1188,7 @@
       const klassenToKeep: Zuordnung[] = [];
 
       // For each remaining Zuordnung that is a Schule, keep its associated Klassen
-      remainingZuordnungen?.forEach((zuordnung: Zuordnung) => {
+      remainingZuordnungen?.forEach((zuordnung: ZuordnungWithKlasse) => {
         const associatedKlassen: Zuordnung[] =
           schuleToKlasseMap.get(zuordnung.sskId + zuordnung.klasse + zuordnung.rolleId) || [];
         klassenToKeep.push(...associatedKlassen);
@@ -1189,8 +1211,10 @@
             ?.rollenart as RollenArt,
           administriertVon: newKlasse.administriertVon ?? '',
           editable: true,
-          merkmale: [] as unknown as RollenMerkmal,
+          merkmale: [],
           typ: OrganisationsTyp.Klasse,
+          admins: [],
+          befristung: null,
         });
       }
     }
@@ -1207,12 +1231,13 @@
     changeBefristungConfirmationDialogVisible.value = false;
 
     const befristungDate: string | undefined = selectedChangeBefristung.value ?? calculatedBefristung.value;
+    const befristung: Date | null = befristungDate ? parse(befristungDate, 'dd.MM.yyyy', new Date()) : null;
 
     // copy zuordnung from old one and update befristung
     const currentZuordnung: Zuordnung = selectedZuordnungen.value[0]!;
     newZuordnung.value = {
       ...currentZuordnung,
-      befristung: befristungDate ? formatDateToISO(befristungDate) : undefined,
+      befristung,
       editable: true,
     };
 
@@ -1237,7 +1262,7 @@
 
   watch(
     () => personStore.personenuebersicht,
-    async (newValue: PersonWithUebersicht | null) => {
+    async (newValue: PersonenUebersicht | null) => {
       zuordnungenResult.value = computeZuordnungen(newValue);
       const organisationIds: Array<string> = [...new Set(newValue?.zuordnungen.map((z: Zuordnung) => z.sskId))];
       if (organisationIds.length > 0) await organisationStore.getParentOrganisationsByIds(organisationIds);
@@ -1508,12 +1533,12 @@
       class="text-center headline"
       data-testid="admin-headline"
     >
-      {{ $t('admin.headline') }}
+      {{ t('admin.headline') }}
     </h1>
     <LayoutCard
       :closable="!personStore.errorCode && !personenkontextStore.errorCode"
       data-testid="person-details-card"
-      :header="$t('admin.person.edit')"
+      :header="t('admin.person.edit')"
       @onCloseClicked="navigateToPersonTable"
       :padded="true"
       :showCloseText="true"
@@ -1531,8 +1556,8 @@
             :closable="false"
             ref="person-store-error-alert"
             :showButton="true"
-            :text="$t(`admin.person.errors.${personStore.errorCode}`)"
-            :title="$t(`admin.person.title.${personStore.errorCode}`)"
+            :text="t(`admin.person.errors.${personStore.errorCode}`)"
+            :title="t(`admin.person.title.${personStore.errorCode}`)"
             :type="'error'"
             @update:modelValue="handleAlertClose"
           />
@@ -1571,8 +1596,8 @@
                   >
                     <SpshTooltip
                       :enabledCondition="!isEditActive"
-                      :disabledText="$t('person.finishEditFirst')"
-                      :enabledText="$t('admin.person.editPersonalInfo')"
+                      :disabledText="t('person.finishEditFirst')"
+                      :enabledText="t('admin.person.editPersonalInfo')"
                       position="start"
                     >
                       <v-btn
@@ -1582,7 +1607,7 @@
                         @click="triggerPersonMetadataEdit"
                         :block="mdAndDown"
                       >
-                        {{ $t('edit') }}
+                        {{ t('edit') }}
                       </v-btn>
                     </SpshTooltip>
                   </v-col>
@@ -1598,7 +1623,7 @@
                 sm="3"
                 cols="5"
               >
-                <span class="subtitle-2"> {{ $t('person.firstName') }}: </span>
+                <span class="subtitle-2"> {{ t('person.firstName') }}: </span>
               </v-col>
               <v-col
                 cols="auto"
@@ -1616,7 +1641,7 @@
                 sm="3"
                 cols="5"
               >
-                <span class="subtitle-2"> {{ $t('person.lastName') }}: </span>
+                <span class="subtitle-2"> {{ t('person.lastName') }}: </span>
               </v-col>
               <v-col
                 cols="auto"
@@ -1634,7 +1659,7 @@
                 sm="3"
                 cols="5"
               >
-                <span class="subtitle-2"> {{ $t('person.userName') }}: </span>
+                <span class="subtitle-2"> {{ t('person.userName') }}: </span>
               </v-col>
               <v-col
                 cols="auto"
@@ -1661,7 +1686,7 @@
                     'text-red': hasKopersRolle && !personStore.currentPerson.person.personalnummer,
                   }"
                 >
-                  {{ $t('person.kopersNr') }}:
+                  {{ t('person.kopersNr') }}:
                 </span>
               </v-col>
               <v-col
@@ -1674,13 +1699,13 @@
                     'text-red': hasKopersRolle && !personStore.currentPerson.person.personalnummer,
                   }"
                 >
-                  {{ personStore.currentPerson.person.personalnummer ?? $t('missing') }}
+                  {{ personStore.currentPerson.person.personalnummer ?? t('missing') }}
                 </span>
               </v-col>
             </v-row>
             <!-- Email -->
             <v-row
-              v-if="emailStatusText.text !== $t('person.emailStatusUnknown')"
+              v-if="emailStatusText.text !== t('person.emailStatusUnknown')"
               class="mt-0"
             >
               <v-col cols="1"></v-col>
@@ -1690,7 +1715,7 @@
                 sm="3"
                 cols="5"
               >
-                <span class="subtitle-2"> {{ $t('person.email') }}: </span>
+                <span class="subtitle-2"> {{ t('person.email') }}: </span>
               </v-col>
               <v-col
                 cols="auto"
@@ -1698,7 +1723,7 @@
               >
                 <SpshTooltip
                   :enabledCondition="!!personStore.currentPerson.person.email"
-                  :disabledText="$t('person.changePersonMetaDataDisabledDescription')"
+                  :disabledText="t('person.changePersonMetaDataDisabledDescription')"
                   :enabledText="emailStatusText.tooltip"
                   position="bottom"
                 >
@@ -1753,7 +1778,7 @@
                   @click="cancelEditPersonMetadata"
                   :block="mdAndDown"
                 >
-                  {{ $t('cancel') }}
+                  {{ t('cancel') }}
                 </v-btn>
               </v-col>
               <v-col
@@ -1764,8 +1789,8 @@
               >
                 <SpshTooltip
                   :enabledCondition="!hasSameMetadata"
-                  :disabledText="$t('person.changePersonMetaDataDisabledDescription')"
-                  :enabledText="$t('save')"
+                  :disabledText="t('person.changePersonMetaDataDisabledDescription')"
+                  :enabledText="t('save')"
                   position="start"
                 >
                   <v-btn
@@ -1775,7 +1800,7 @@
                     :block="mdAndDown"
                     type="submit"
                   >
-                    {{ $t('save') }}
+                    {{ t('save') }}
                   </v-btn>
                 </SpshTooltip>
               </v-col>
@@ -1791,7 +1816,7 @@
         <v-container class="password-reset">
           <v-row class="ml-md-16">
             <v-col>
-              <h3 class="subtitle-1">{{ $t('person.password') }}</h3>
+              <h3 class="subtitle-1">{{ t('person.password') }}</h3>
             </v-col>
             <v-col
               class="mr-lg-13"
@@ -1801,9 +1826,9 @@
             >
               <div class="d-flex justify-sm-end">
                 <PasswordReset
-                  :buttonText="$t('admin.person.changePassword')"
-                  :confirmButtonText="$t('admin.person.resetPassword')"
-                  :dialogHeader="$t('admin.person.resetPassword')"
+                  :buttonText="t('admin.person.changePassword')"
+                  :confirmButtonText="t('admin.person.resetPassword')"
+                  :dialogHeader="t('admin.person.resetPassword')"
                   :dialogText="passwordResetDialogText"
                   :disabled="isEditActive || isEditPersonMetadataActive"
                   :errorCode="personStore.errorCode"
@@ -1839,7 +1864,7 @@
               cols="12"
               sm="auto"
             >
-              <h3 class="subtitle-1">{{ $t('person.zuordnungen') }}</h3>
+              <h3 class="subtitle-1">{{ t('person.zuordnungen') }}</h3>
             </v-col>
             <v-spacer></v-spacer>
             <v-col
@@ -1855,8 +1880,8 @@
                 >
                   <SpshTooltip
                     :enabledCondition="selectedZuordnungen.length === 0 && !isEditPersonMetadataActive"
-                    :disabledText="$t('person.finishEditFirst')"
-                    :enabledText="$t('person.editZuordnungen')"
+                    :disabledText="t('person.finishEditFirst')"
+                    :enabledText="t('person.editZuordnungen')"
                     position="start"
                   >
                     <v-btn
@@ -1866,7 +1891,7 @@
                       @click="triggerEdit"
                       :block="mdAndDown"
                     >
-                      {{ $t('edit') }}
+                      {{ t('edit') }}
                     </v-btn>
                   </SpshTooltip>
                 </v-col>
@@ -1904,7 +1929,7 @@
               cols="10"
               offset="1"
             >
-              <h3 class="text-body">{{ $t('person.noZuordnungenFound') }}</h3>
+              <h3 class="text-body">{{ t('person.noZuordnungenFound') }}</h3>
             </v-col>
           </v-row>
         </v-container>
@@ -1917,7 +1942,7 @@
                 cols="12"
                 sm="auto"
               >
-                <h3 class="subtitle-1">{{ $t('person.editZuordnungen') }}: {{ $t('pleaseSelect') }}</h3>
+                <h3 class="subtitle-1">{{ t('person.editZuordnungen') }}: {{ t('pleaseSelect') }}</h3>
               </v-col>
             </v-row>
             <v-row class="ml-md-16 mb-12">
@@ -1926,7 +1951,7 @@
                 cols="12"
                 sm="auto"
               >
-                <h3 class="subtitle-1">{{ $t('person.checkAndSave') }}:</h3>
+                <h3 class="subtitle-1">{{ t('person.checkAndSave') }}:</h3>
               </v-col>
               <v-col
                 cols="12"
@@ -1990,7 +2015,7 @@
                       "
                       class="text-body text-green"
                     >
-                      ({{ $t('willBeCreated') }})</span
+                      ({{ t('willBeCreated') }})</span
                     >
                   </span>
                 </template>
@@ -2008,7 +2033,7 @@
                       v-if="selectedZuordnungen.includes(zuordnung)"
                       class="text-body text-red"
                     >
-                      ({{ $t('willBeRemoved') }})</span
+                      ({{ t('willBeRemoved') }})</span
                     >
                   </span>
                 </template>
@@ -2027,7 +2052,7 @@
                         v-if="selectedZuordnungen.includes(zuordnung)"
                         class="text-body text-red"
                       >
-                        ({{ $t('willBeRemoved') }})
+                        ({{ t('willBeRemoved') }})
                       </span>
                     </span>
 
@@ -2055,7 +2080,7 @@
                         "
                         class="text-body text-green"
                       >
-                        ({{ $t('willBeCreated') }})
+                        ({{ t('willBeCreated') }})
                       </span>
                     </span>
                   </div>
@@ -2078,7 +2103,7 @@
                         ({{
                           zuordnung?.befristung
                             ? `${formatDate(zuordnung.befristung, t)}`
-                            : $t('admin.befristung.unlimited')
+                            : t('admin.befristung.unlimited')
                         }})
                       </span>
                     </span>
@@ -2110,7 +2135,7 @@
                         ({{
                           newZuordnung?.befristung
                             ? `${formatDate(newZuordnung.befristung, t)}`
-                            : $t('admin.befristung.unlimited')
+                            : t('admin.befristung.unlimited')
                         }})
                       </span>
                     </span>
@@ -2143,8 +2168,8 @@
                   </PersonenkontextDelete>
                   <SpshTooltip
                     :enabledCondition="selectedZuordnungen.length === 0"
-                    :disabledText="$t('person.addZuordnungNotAllowed')"
-                    :enabledText="$t('person.addZuordnung')"
+                    :disabledText="t('person.addZuordnungNotAllowed')"
+                    :enabledText="t('person.addZuordnung')"
                     position="start"
                   >
                     <v-btn
@@ -2155,14 +2180,14 @@
                       :block="mdAndDown"
                       ref="zuordnung-create-button"
                     >
-                      {{ $t('person.addZuordnung') }}
+                      {{ t('person.addZuordnung') }}
                     </v-btn>
                   </SpshTooltip>
                   <template v-if="configStore.configData?.rolleBearbeitenEnabled">
                     <SpshTooltip
                       :enabledCondition="selectedZuordnungen.length > 0"
-                      :disabledText="$t('person.chooseZuordnungFirst')"
-                      :enabledText="$t('person.changeRolleDescription')"
+                      :disabledText="t('person.chooseZuordnungFirst')"
+                      :enabledText="t('person.changeRolleDescription')"
                       position="start"
                     >
                       <v-btn
@@ -2171,15 +2196,15 @@
                         :disabled="selectedZuordnungen.length === 0"
                         :block="mdAndDown"
                       >
-                        {{ $t('person.changeRolle') }}
+                        {{ t('person.changeRolle') }}
                       </v-btn>
                     </SpshTooltip>
                   </template>
                   <template v-if="configStore.configData?.befristungBearbeitenEnabled">
                     <SpshTooltip
                       :enabledCondition="selectedZuordnungen.length > 0"
-                      :disabledText="$t('person.chooseZuordnungFirst')"
-                      :enabledText="$t('person.modifyBefristungDescription')"
+                      :disabledText="t('person.chooseZuordnungFirst')"
+                      :enabledText="t('person.modifyBefristungDescription')"
                       position="start"
                     >
                       <v-btn
@@ -2189,15 +2214,15 @@
                         :disabled="selectedZuordnungen.length !== 1"
                         :block="mdAndDown"
                       >
-                        {{ $t('person.modifyBefristung') }}
+                        {{ t('person.modifyBefristung') }}
                       </v-btn>
                     </SpshTooltip>
                   </template>
                   <SpshTooltip
                     v-if="hasKlassenZuordnung"
                     :enabledCondition="canChangeKlasse"
-                    :disabledText="$t('person.chooseKlasseZuordnungFirst')"
-                    :enabledText="$t('person.changeKlasseDescription')"
+                    :disabledText="t('person.chooseKlasseZuordnungFirst')"
+                    :enabledText="t('person.changeKlasseDescription')"
                     position="start"
                   >
                     <v-btn
@@ -2207,7 +2232,7 @@
                       :disabled="!canChangeKlasse"
                       :block="mdAndDown"
                     >
-                      {{ $t('transfer') }}
+                      {{ t('transfer') }}
                     </v-btn>
                   </SpshTooltip>
                 </v-col>
@@ -2226,7 +2251,7 @@
                 cols="10"
                 offset="1"
               >
-                <h3 class="text-body">{{ $t('person.noZuordnungenFound') }}</h3>
+                <h3 class="text-body">{{ t('person.noZuordnungenFound') }}</h3>
               </v-col>
             </v-row>
             <v-row class="save-cancel-row ml-md-16 mb-3 pt-14">
@@ -2242,7 +2267,7 @@
                   @click="cancelEdit"
                   :block="mdAndDown"
                 >
-                  {{ $t('cancel') }}
+                  {{ t('cancel') }}
                 </v-btn>
               </v-col>
               <v-col
@@ -2252,8 +2277,8 @@
               >
                 <SpshTooltip
                   :enabledCondition="!isSaveButtonDisabled"
-                  :disabledText="$t('person.noChangesToSave')"
-                  :enabledText="$t('person.saveChanges')"
+                  :disabledText="t('person.noChangesToSave')"
+                  :enabledText="t('person.saveChanges')"
                 >
                   <v-btn
                     class="primary small"
@@ -2262,7 +2287,7 @@
                     :block="mdAndDown"
                     :disabled="isSaveButtonDisabled || personenkontextStore.loading"
                   >
-                    {{ $t('save') }}
+                    {{ t('save') }}
                   </v-btn>
                 </SpshTooltip>
               </v-col>
@@ -2279,7 +2304,7 @@
                   cols="12"
                   sm="auto"
                 >
-                  <h3 class="subtitle-1">{{ $t('person.addZuordnung') }}:</h3>
+                  <h3 class="subtitle-1">{{ t('person.addZuordnung') }}:</h3>
                 </v-col>
               </v-row>
               <v-container class="px-lg-16">
@@ -2337,7 +2362,7 @@
                     class="secondary"
                     @click="cancelEdit"
                     data-testid="zuordnung-creation-discard-button"
-                    >{{ $t('cancel') }}</v-btn
+                    >{{ t('cancel') }}</v-btn
                   >
                 </v-col>
                 <v-col
@@ -2351,7 +2376,7 @@
                     class="primary"
                     data-testid="zuordnung-creation-submit-button"
                     type="submit"
-                    >{{ $t('person.addZuordnung') }}</v-btn
+                    >{{ t('person.addZuordnung') }}</v-btn
                   >
                 </v-col>
               </v-row>
@@ -2368,7 +2393,7 @@
                   cols="12"
                   sm="auto"
                 >
-                  <h3 class="subtitle-1">{{ $t('transfer') }}:</h3>
+                  <h3 class="subtitle-1">{{ t('transfer') }}:</h3>
                 </v-col>
               </v-row>
               <v-container class="px-lg-16">
@@ -2397,7 +2422,7 @@
                     class="secondary"
                     @click="cancelEdit"
                     data-testid="klasse-change-discard-button"
-                    >{{ $t('cancel') }}</v-btn
+                    >{{ t('cancel') }}</v-btn
                   >
                 </v-col>
                 <v-col
@@ -2407,8 +2432,8 @@
                 >
                   <SpshTooltip
                     :enabledCondition="!isSubmitDisabled"
-                    :disabledText="$t('person.changeKlasseNotDisabledDescription')"
-                    :enabledText="$t('transfer')"
+                    :disabledText="t('person.changeKlasseNotDisabledDescription')"
+                    :enabledText="t('transfer')"
                     position="start"
                   >
                     <v-btn
@@ -2417,7 +2442,7 @@
                       data-testid="klasse-change-submit-button"
                       :disabled="isSubmitDisabled || organisationStore.loading"
                       type="submit"
-                      >{{ $t('transfer') }}</v-btn
+                      >{{ t('transfer') }}</v-btn
                     >
                   </SpshTooltip>
                 </v-col>
@@ -2454,7 +2479,7 @@
                     class="secondary"
                     @click="cancelEdit"
                     data-testid="change-befristung-discard-button"
-                    >{{ $t('cancel') }}</v-btn
+                    >{{ t('cancel') }}</v-btn
                   >
                 </v-col>
                 <v-col
@@ -2464,8 +2489,8 @@
                 >
                   <SpshTooltip
                     :enabledCondition="differentDateSelected"
-                    :disabledText="$t('person.changeBefristungDisabledDescription')"
-                    :enabledText="$t('person.changeBefristung')"
+                    :disabledText="t('person.changeBefristungDisabledDescription')"
+                    :enabledText="t('person.changeBefristung')"
                     position="start"
                   >
                     <v-btn
@@ -2474,7 +2499,7 @@
                       class="primary"
                       data-testid="change-befristung-submit-button"
                       type="submit"
-                      >{{ $t('person.changeBefristung') }}</v-btn
+                      >{{ t('person.changeBefristung') }}</v-btn
                     >
                   </SpshTooltip>
                 </v-col>
@@ -2510,7 +2535,7 @@
               </v-col>
               <template v-else>
                 <v-col>
-                  <h3 class="subtitle-1">{{ $t('admin.person.twoFactorAuthentication.header') }}</h3>
+                  <h3 class="subtitle-1">{{ t('admin.person.twoFactorAuthentication.header') }}</h3>
                   <v-row class="mt-4 text-body">
                     <v-col
                       class="text-right"
@@ -2536,7 +2561,7 @@
                             class="text-body"
                             data-testid="connection-error-text"
                           >
-                            {{ $t('admin.person.twoFactorAuthentication.errors.connection') }}
+                            {{ t('admin.person.twoFactorAuthentication.errors.connection') }}
                           </p>
                         </v-row>
                         <v-row v-else-if="twoFactorAuthentificationStore.errorCode === 'TOKEN_STATE_ERROR'">
@@ -2550,10 +2575,10 @@
                               tag="label"
                             >
                               <a
-                                :href="$t('admin.person.twoFactorAuthentication.errors.iqshHelpdeskLink')"
+                                :href="t('admin.person.twoFactorAuthentication.errors.iqshHelpdeskLink')"
                                 rel="noopener noreferrer"
                                 target="_blank"
-                                >{{ $t('admin.person.twoFactorAuthentication.errors.iqshHelpdesk') }}</a
+                                >{{ t('admin.person.twoFactorAuthentication.errors.iqshHelpdesk') }}</a
                               >
                             </i18n-t>
                           </p>
@@ -2561,10 +2586,10 @@
                       </template>
                       <template v-else-if="twoFactorAuthentificationStore.hasToken">
                         <p v-if="twoFactorAuthentificationStore.tokenKind === TokenKind.software">
-                          {{ $t('admin.person.twoFactorAuthentication.softwareTokenIsSetUp') }}
+                          {{ t('admin.person.twoFactorAuthentication.softwareTokenIsSetUp') }}
                         </p>
                         <p v-if="twoFactorAuthentificationStore.tokenKind === TokenKind.hardware">
-                          {{ $t('admin.person.twoFactorAuthentication.hardwareTokenIsSetUp') }}
+                          {{ t('admin.person.twoFactorAuthentication.hardwareTokenIsSetUp') }}
                         </p>
                         <p
                           v-if="
@@ -2573,7 +2598,7 @@
                           "
                         >
                           {{
-                            `${$t('admin.person.twoFactorAuthentication.serial')}: ` +
+                            `${t('admin.person.twoFactorAuthentication.serial')}: ` +
                             `${twoFactorAuthentificationStore.serial}`
                           }}
                         </p>
@@ -2596,13 +2621,13 @@
                     </v-col>
                     <div class="v-col">
                       <p v-if="twoFactorAuthentificationStore.hasToken && !twoFactorAuthentificationStore.required">
-                        {{ $t('admin.person.twoFactorAuthentication.noLongerNeedToken') }}
+                        {{ t('admin.person.twoFactorAuthentication.noLongerNeedToken') }}
                       </p>
                       <p v-else-if="twoFactorAuthentificationStore.hasToken">
-                        {{ $t('admin.person.twoFactorAuthentication.resetInfo') }}
+                        {{ t('admin.person.twoFactorAuthentication.resetInfo') }}
                       </p>
                       <p v-if="!twoFactorAuthentificationStore.hasToken">
-                        {{ $t('admin.person.twoFactorAuthentication.notSetUp') }}
+                        {{ t('admin.person.twoFactorAuthentication.notSetUp') }}
                       </p>
                     </div>
                   </v-row>
@@ -2621,8 +2646,8 @@
                     >
                       <SpshTooltip
                         :enabledCondition="!isEditActive && !isEditPersonMetadataActive"
-                        :disabledText="$t('person.finishEditFirst')"
-                        :enabledText="$t('admin.person.twoFactorAuthentication.tokenReset')"
+                        :disabledText="t('person.finishEditFirst')"
+                        :enabledText="t('admin.person.twoFactorAuthentication.tokenReset')"
                         position="start"
                       >
                         <TokenReset
@@ -2639,8 +2664,8 @@
                       </SpshTooltip>
                       <SpshTooltip
                         :enabledCondition="!isEditActive && !isEditPersonMetadataActive"
-                        :disabledText="$t('person.finishEditFirst')"
-                        :enabledText="$t('admin.person.twoFactorAuthentication.setUpShort')"
+                        :disabledText="t('person.finishEditFirst')"
+                        :enabledText="t('admin.person.twoFactorAuthentication.setUpShort')"
                         position="start"
                       >
                         <TwoFactorAuthenticationSetUp
@@ -2668,7 +2693,7 @@
         <v-container data-testid="person-lock">
           <v-row class="ml-md-16">
             <v-col data-testid="person-lock-info">
-              <h3 class="subtitle-1">{{ $t('admin.person.status') }}</h3>
+              <h3 class="subtitle-1">{{ t('admin.person.status') }}</h3>
               <template v-if="!personStore.loading">
                 <v-row class="mt-4 text-body">
                   <v-col
@@ -2813,7 +2838,7 @@
         >
           <v-row class="ml-md-16">
             <v-col data-testid="device-password-info">
-              <h3 class="subtitle-1">{{ $t('admin.person.devicePassword.header') }}</h3>
+              <h3 class="subtitle-1">{{ t('admin.person.devicePassword.header') }}</h3>
               <template v-if="!personStore.loading">
                 <v-row class="mt-4 text-body">
                   <v-col
@@ -2828,7 +2853,7 @@
                   </v-col>
                   <v-col>
                     <p>
-                      {{ $t('admin.person.devicePassword.infoTextPersonDetails') }}
+                      {{ t('admin.person.devicePassword.infoTextPersonDetails') }}
                     </p>
                   </v-col>
                 </v-row>
@@ -2846,9 +2871,9 @@
             >
               <div class="d-flex justify-sm-end">
                 <PasswordReset
-                  :buttonText="$t('admin.person.devicePassword.createPassword')"
-                  :confirmButtonText="$t('admin.person.devicePassword.createPassword')"
-                  :dialogHeader="$t('admin.person.devicePassword.createDevicePassword')"
+                  :buttonText="t('admin.person.devicePassword.createPassword')"
+                  :confirmButtonText="t('admin.person.devicePassword.createPassword')"
+                  :dialogHeader="t('admin.person.devicePassword.createDevicePassword')"
                   :dialogText="devicePasswordDialogText"
                   :disabled="isEditActive || isEditPersonMetadataActive"
                   :errorCode="personStore.errorCode"
@@ -2874,7 +2899,7 @@
     >
       <LayoutCard
         :closable="true"
-        :header="$t('person.editZuordnungen')"
+        :header="t('person.editZuordnungen')"
         @onCloseClicked="closeDeleteSuccessDialog"
       >
         <v-card-text>
@@ -2884,7 +2909,7 @@
                 offset="1"
                 cols="10"
               >
-                <span>{{ $t('person.deleteZuordnungSuccess') }}</span>
+                <span>{{ t('person.deleteZuordnungSuccess') }}</span>
               </v-col>
             </v-row>
           </v-container>
@@ -2902,7 +2927,7 @@
                 data-testId="close-zuordnung-delete-success-button"
                 @click.stop="closeDeleteSuccessDialog"
               >
-                {{ $t('close') }}
+                {{ t('close') }}
               </v-btn>
             </v-col>
           </v-row>
@@ -2917,14 +2942,14 @@
     >
       <LayoutCard
         :closable="true"
-        :header="$t('person.editZuordnungen')"
+        :header="t('person.editZuordnungen')"
         @onCloseClicked="closeCreateSuccessDialog"
       >
         <v-card-text>
           <v-container>
             <v-row class="text-body bold px-md-16">
               <v-col class="text-center">
-                <span>{{ $t('person.addZuordnungSuccess') }}</span>
+                <span>{{ t('person.addZuordnungSuccess') }}</span>
               </v-col>
             </v-row>
           </v-container>
@@ -2942,7 +2967,7 @@
                 data-testId="close-zuordnung-create-success-button"
                 @click.stop="closeCreateSuccessDialog"
               >
-                {{ $t('close') }}
+                {{ t('close') }}
               </v-btn>
             </v-col>
           </v-row>
@@ -2957,7 +2982,7 @@
     >
       <LayoutCard
         :closable="true"
-        :header="$t('transfer')"
+        :header="t('transfer')"
         @onCloseClicked="closeChangeKlasseSuccessDialog"
       >
         <v-card-text>
@@ -2967,7 +2992,7 @@
                 offset="1"
                 cols="10"
               >
-                <span>{{ $t('person.changeKlasseSuccess') }}</span>
+                <span>{{ t('person.changeKlasseSuccess') }}</span>
               </v-col>
             </v-row>
           </v-container>
@@ -2985,7 +3010,7 @@
                 data-testid="change-klasse-success-close"
                 @click.stop="closeChangeKlasseSuccessDialog"
               >
-                {{ $t('close') }}
+                {{ t('close') }}
               </v-btn>
             </v-col>
           </v-row>
@@ -3000,7 +3025,7 @@
     >
       <LayoutCard
         :closable="true"
-        :header="$t('admin.person.personalInfo')"
+        :header="t('admin.person.personalInfo')"
         @onCloseClicked="closeChangePersonMetadataSuccessDialog"
       >
         <v-card-text>
@@ -3027,7 +3052,7 @@
                 class="primary"
                 @click.stop="closeChangePersonMetadataSuccessDialog"
               >
-                {{ $t('close') }}
+                {{ t('close') }}
               </v-btn>
             </v-col>
           </v-row>
@@ -3042,7 +3067,7 @@
     >
       <LayoutCard
         :closable="true"
-        :header="$t('person.changeBefristung')"
+        :header="t('person.changeBefristung')"
         @onCloseClicked="closeChangeBefristungSuccessDialog"
       >
         <v-card-text>
@@ -3052,7 +3077,7 @@
                 class="text-center"
                 cols="10"
               >
-                <span>{{ $t('person.changeBefristungSuccess') }}</span>
+                <span>{{ t('person.changeBefristungSuccess') }}</span>
               </v-col>
             </v-row>
           </v-container>
@@ -3070,7 +3095,7 @@
                 data-testid="change-befristung-success-close"
                 @click.stop="closeChangeBefristungSuccessDialog"
               >
-                {{ $t('close') }}
+                {{ t('close') }}
               </v-btn>
             </v-col>
           </v-row>
@@ -3085,7 +3110,7 @@
     >
       <LayoutCard
         :closable="true"
-        :header="$t('person.editZuordnungen')"
+        :header="t('person.editZuordnungen')"
         @onCloseClicked="cancelAddition"
       >
         <v-card-text>
@@ -3113,7 +3138,7 @@
                 data-testid="confirm-zuordnung-dialog-addition"
                 @click.stop="confirmDialogAddition"
               >
-                {{ $t('yes') }}
+                {{ t('yes') }}
               </v-btn>
             </v-col>
             <v-col
@@ -3126,7 +3151,7 @@
                 class="secondary"
                 @click.stop="cancelAddition"
               >
-                {{ $t('no') }}
+                {{ t('no') }}
               </v-btn>
             </v-col>
           </v-row>
@@ -3141,7 +3166,7 @@
     >
       <LayoutCard
         :closable="true"
-        :header="$t('transfer')"
+        :header="t('transfer')"
         @onCloseClicked="cancelChangeKlasse"
       >
         <v-card-text>
@@ -3169,7 +3194,7 @@
                 data-testid="confirm-change-klasse-button"
                 @click.stop="confirmDialogChangeKlasse"
               >
-                {{ $t('yes') }}
+                {{ t('yes') }}
               </v-btn>
             </v-col>
             <v-col
@@ -3182,7 +3207,7 @@
                 class="secondary"
                 @click.stop="cancelChangeKlasse"
               >
-                {{ $t('no') }}
+                {{ t('no') }}
               </v-btn>
             </v-col>
           </v-row>
@@ -3197,7 +3222,7 @@
     >
       <LayoutCard
         :closable="true"
-        :header="$t('person.editZuordnungen')"
+        :header="t('person.editZuordnungen')"
         @onCloseClicked="closeCannotDeleteDialog"
       >
         <v-card-text>
@@ -3207,7 +3232,7 @@
                 offset="1"
                 cols="10"
               >
-                <span>{{ $t('person.cannotDeleteOwnZuordnung') }}</span>
+                <span>{{ t('person.cannotDeleteOwnZuordnung') }}</span>
               </v-col>
             </v-row>
           </v-container>
@@ -3224,7 +3249,7 @@
                 class="primary"
                 @click.stop="closeCannotDeleteDialog"
               >
-                {{ $t('close') }}
+                {{ t('close') }}
               </v-btn>
             </v-col>
           </v-row>
@@ -3239,7 +3264,7 @@
     >
       <LayoutCard
         :closable="true"
-        :header="$t('person.editZuordnungen')"
+        :header="t('person.editZuordnungen')"
         @onCloseClicked="cancelChangeBefristung"
       >
         <v-card-text>
@@ -3267,7 +3292,7 @@
                 data-testid="confirm-change-befristung-button"
                 @click.stop="confirmDialogChangeBefristung"
               >
-                {{ $t('yes') }}
+                {{ t('yes') }}
               </v-btn>
             </v-col>
             <v-col
@@ -3280,7 +3305,7 @@
                 class="secondary"
                 @click.stop="cancelChangeBefristung"
               >
-                {{ $t('no') }}
+                {{ t('no') }}
               </v-btn>
             </v-col>
           </v-row>
@@ -3295,7 +3320,7 @@
       <LayoutCard
         v-if="showNoKopersNrConfirmationDialog"
         :closable="false"
-        :header="$t('admin.person.noKopersNr')"
+        :header="t('admin.person.noKopersNr')"
       >
         <v-card-text>
           <v-container>
@@ -3305,7 +3330,7 @@
                 cols="10"
               >
                 <span data-testid="no-kopersnr-confirmation-text">
-                  {{ $t('admin.person.noKopersNrConfirmationDialogMessage') }}
+                  {{ t('admin.person.noKopersNrConfirmationDialogMessage') }}
                 </span>
               </v-col>
             </v-row>
@@ -3327,7 +3352,7 @@
                 "
                 data-testid="cancel-no-kopersnr-button"
               >
-                {{ $t('cancel') }}
+                {{ t('cancel') }}
               </v-btn>
             </v-col>
             <v-col
@@ -3341,7 +3366,7 @@
                 @click.stop="showNoKopersNrConfirmationDialog = false"
                 data-testid="confirm-no-kopersnr-button"
               >
-                {{ $t('proceed') }}
+                {{ t('proceed') }}
               </v-btn>
             </v-col>
           </v-row>
@@ -3356,13 +3381,13 @@
       persistent
       v-model="showUnsavedChangesDialog"
     >
-      <LayoutCard :header="$t('unsavedChanges.title')">
+      <LayoutCard :header="t('unsavedChanges.title')">
         <v-card-text>
           <v-container>
             <v-row class="text-body bold px-md-16">
               <v-col>
                 <p data-testid="unsaved-changes-warning-text">
-                  {{ $t('unsavedChanges.message') }}
+                  {{ t('unsavedChanges.message') }}
                 </p>
               </v-col>
             </v-row>
@@ -3381,7 +3406,7 @@
                 data-testid="confirm-unsaved-changes-button"
                 :block="mdAndDown"
               >
-                {{ $t('yes') }}
+                {{ t('yes') }}
               </v-btn>
             </v-col>
             <v-col
@@ -3395,7 +3420,7 @@
                 data-testid="close-unsaved-changes-dialog-button"
                 :block="mdAndDown"
               >
-                {{ $t('no') }}
+                {{ t('no') }}
               </v-btn>
             </v-col>
           </v-row>

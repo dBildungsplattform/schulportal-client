@@ -7,31 +7,31 @@ export class Zuordnung {
     public sskId: string,
     public rolleId: string,
     public sskName: string,
-    public sskDstNr: string,
+    public sskDstNr: string | null,
     public rolle: string,
     public rollenArt: RollenArt,
     public administriertVon: string,
     public typ: OrganisationsTyp,
     public editable: boolean,
-    public befristung: Date,
-    public merkmale: RollenMerkmal,
+    public befristung: Date | null,
+    public merkmale: Array<RollenMerkmal>,
     public admins: Array<string>,
   ) {}
 
-  public static fromPersonenzuordnung(zuordnung: DBiamPersonenzuordnungResponse): Zuordnung {
+  public static fromResponse(response: DBiamPersonenzuordnungResponse): Zuordnung {
     return new Zuordnung(
-      zuordnung.sskId,
-      zuordnung.rolleId,
-      zuordnung.sskName,
-      zuordnung.sskDstNr,
-      zuordnung.rolle,
-      zuordnung.rollenArt,
-      zuordnung.administriertVon,
-      zuordnung.typ,
-      zuordnung.editable,
-      new Date(zuordnung.befristung),
-      zuordnung.merkmale,
-      zuordnung.admins,
+      response.sskId,
+      response.rolleId,
+      response.sskName,
+      response.sskDstNr,
+      response.rolle,
+      response.rollenArt,
+      response.administriertVon,
+      response.typ,
+      response.editable,
+      response.befristung ? new Date(response.befristung) : null,
+      response.merkmale,
+      response.admins ?? [],
     );
   }
 }

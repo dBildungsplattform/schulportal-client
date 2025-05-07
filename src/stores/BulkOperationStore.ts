@@ -1,17 +1,12 @@
-import { defineStore, type Store, type StoreDefinition } from 'pinia';
-import { usePersonenkontextStore, type PersonenkontextStore, type Zuordnung } from './PersonenkontextStore';
-import { type PersonStore, usePersonStore } from './PersonStore';
-import {
-  type PersonenApiInterface,
-  OrganisationsTyp,
-  PersonenApiFactory,
-  RollenArt,
-  RollenMerkmal,
-} from '@/api-client/generated';
+import { OrganisationsTyp, PersonenApiFactory, RollenArt, type PersonenApiInterface } from '@/api-client/generated';
+import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
 import axiosApiInstance from '@/services/ApiService';
 import { getResponseErrorCode } from '@/utils/errorHandlers';
-import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
+import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import type { Organisation } from './OrganisationStore';
+import { usePersonenkontextStore, type PersonenkontextStore } from './PersonenkontextStore';
+import { usePersonStore, type PersonStore } from './PersonStore';
+import type { Zuordnung } from './types/Zuordnung';
 
 const personenApi: PersonenApiInterface = PersonenApiFactory(undefined, '', axiosApiInstance);
 
@@ -125,7 +120,14 @@ export const useBulkOperationStore: StoreDefinition<
         }
 
         // Await the processing of each ID
-        await personenkontextStore.updatePersonenkontexte(updatedZuordnungen, personId);
+        await personenkontextStore.updatePersonenkontexte(
+          updatedZuordnungen.map((z: Zuordnung) => ({
+            sskId: z.sskId,
+            rolleId: z.rolleId,
+            befristung: z.befristung?.toISOString(),
+          })),
+          personId,
+        );
 
         // Update progress for each item processed
         this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
@@ -193,7 +195,6 @@ export const useBulkOperationStore: StoreDefinition<
       const baseZuordnung: Zuordnung = {
         sskId: organisation.id,
         rolleId: selectedRolleId,
-        klasse: undefined,
         sskDstNr: organisation.kennung ?? '',
         sskName: organisation.name,
         rolle: rollen.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolleId)?.title || '',
@@ -201,9 +202,10 @@ export const useBulkOperationStore: StoreDefinition<
           ?.rollenart as RollenArt,
         administriertVon: organisation.administriertVon ?? '',
         editable: true,
-        merkmale: [] as unknown as RollenMerkmal,
+        merkmale: [],
         typ: OrganisationsTyp.Schule,
-        befristung: undefined,
+        befristung: null,
+        admins: [],
       };
 
       for (let i: number = 0; i < personIDs.length; i++) {
@@ -214,7 +216,14 @@ export const useBulkOperationStore: StoreDefinition<
         const currentZuordnungen: Zuordnung[] = personStore.personenuebersicht?.zuordnungen || [];
         const combinedZuordnungen: Zuordnung[] = [...currentZuordnungen, { ...baseZuordnung }];
 
-        await personenkontextStore.updatePersonenkontexte(combinedZuordnungen, personId);
+        await personenkontextStore.updatePersonenkontexte(
+          combinedZuordnungen.map((z: Zuordnung) => ({
+            sskId: z.sskId,
+            rolleId: z.rolleId,
+            befristung: z.befristung?.toISOString(),
+          })),
+          personId,
+        );
 
         this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
       }
@@ -296,7 +305,14 @@ export const useBulkOperationStore: StoreDefinition<
 
         const combinedZuordnungen: Zuordnung[] = [...zuordnungenToRemainUnchanged, ...newZuordnungen];
 
-        await personenkontextStore.updatePersonenkontexte(combinedZuordnungen, personId);
+        await personenkontextStore.updatePersonenkontexte(
+          combinedZuordnungen.map((z: Zuordnung) => ({
+            sskId: z.sskId,
+            rolleId: z.rolleId,
+            befristung: z.befristung?.toISOString(),
+          })),
+          personId,
+        );
         this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
       }
 

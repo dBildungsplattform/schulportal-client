@@ -1,9 +1,6 @@
 /* eslint-disable @typescript-eslint/typedef */
 import {
   EmailAddressStatus,
-  OrganisationsTyp,
-  RollenArt,
-  RollenMerkmal,
   Vertrauensstufe,
   type DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response,
   type DBiamPersonenuebersichtResponse,
@@ -20,6 +17,7 @@ import { rejects } from 'assert';
 import MockAdapter from 'axios-mock-adapter';
 import { createPinia, setActivePinia } from 'pinia';
 import { usePersonStore, type PersonStore, type Personendatensatz } from './PersonStore';
+import { PersonenUebersicht } from './types/PersonenUebersicht';
 import type { PersonWithZuordnungen } from './types/PersonWithZuordnungen';
 import { Zuordnung } from './types/Zuordnung';
 
@@ -167,7 +165,7 @@ describe('PersonStore', () => {
         expect(person).toBeDefined();
         expect(person.personalnummer).toEqual(mockPerson.person.personalnummer);
         for (const mockZuordnung of mockUebersicht.zuordnungen) {
-          expect(person.zuordnungen).toContainEqual(Zuordnung.fromPersonenzuordnung(mockZuordnung));
+          expect(person.zuordnungen).toContainEqual(Zuordnung.fromResponse(mockZuordnung));
         }
       }
     });
@@ -491,35 +489,15 @@ describe('PersonStore', () => {
 
   describe('getPersonenuebersichtById', () => {
     it('should get Personenuebersicht', async () => {
-      const mockResponse: DBiamPersonenuebersichtResponse = {
-        personId: '1',
-        vorname: 'string',
-        nachname: 'string',
-        benutzername: 'string',
-        lastModifiedZuordnungen: '08.02.2024',
-        zuordnungen: [
-          {
-            sskId: 'string',
-            rolleId: 'string',
-            sskName: 'string',
-            sskDstNr: 'string',
-            rolle: 'string',
-            rollenArt: RollenArt.Lern,
-            typ: OrganisationsTyp.Klasse,
-            administriertVon: 'string',
-            editable: true,
-            merkmale: [] as unknown as RollenMerkmal,
-            befristung: '2025-04-05',
-            admins: ['test'],
-          },
-        ],
-      };
+      const mockResponse: DBiamPersonenuebersichtResponse = DoFactory.getDBiamPersonenuebersichtResponse();
 
-      mockadapter.onGet('/api/dbiam/personenuebersicht/1').replyOnce(200, mockResponse);
-      const getPersonenuebersichtByIdPromise: Promise<void> = personStore.getPersonenuebersichtById('1');
+      mockadapter.onGet(`/api/dbiam/personenuebersicht/${mockResponse.personId}`).replyOnce(200, mockResponse);
+      const getPersonenuebersichtByIdPromise: Promise<void> = personStore.getPersonenuebersichtById(
+        mockResponse.personId,
+      );
       expect(personStore.loading).toBe(true);
       await getPersonenuebersichtByIdPromise;
-      expect(personStore.personenuebersicht).toEqual(mockResponse);
+      expect(personStore.personenuebersicht).toEqual(PersonenUebersicht.fromResponse(mockResponse));
       expect(personStore.loading).toBe(false);
     });
 
