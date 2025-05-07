@@ -75,4 +75,34 @@ describe('PersonBulkError.vue', () => {
 
     expect(downloadSpy).toHaveBeenCalledTimes(1);
   });
+
+  it('downloads passwords blob with custom filename if provided', async () => {
+    const mockBlob: Blob = new Blob(['test'], { type: 'text/csv' });
+    const customFilename: string = 'my-custom-file.csv';
+
+    const downloadSpy: MockInstance = vi.spyOn(fileUtils, 'download').mockImplementation(() => {});
+
+    wrapper = mount(PersonBulkError, {
+      attachTo: document.getElementById('app') || undefined,
+      props: {
+        bulkOperationName: 'Passwort zurücksetzen',
+        errors: errorsMock,
+        isDialogVisible: true,
+        passwords: mockBlob,
+        filename: customFilename,
+      },
+    });
+
+    await nextTick();
+
+    const passwordDownloadButton: HTMLElement = document.querySelector(
+      '[data-testid="person-bulk-error-download-passwords-button"]',
+    ) as HTMLElement;
+    expect(passwordDownloadButton).not.toBeNull();
+
+    passwordDownloadButton!.dispatchEvent(new Event('click'));
+    await nextTick();
+
+    expect(downloadSpy).toHaveBeenCalledWith(customFilename, mockBlob);
+  });
 });

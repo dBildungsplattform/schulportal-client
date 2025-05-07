@@ -98,6 +98,7 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary"
+                data-testid="person-bulk-error-download-passwords-button"
                 @click="() => passwords && download(filename ?? 'default-filename.csv', passwords)"
               >
                 {{ t('admin.person.bulk.bulkPasswordReset.downloadResult') }}
