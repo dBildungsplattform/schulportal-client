@@ -1,25 +1,26 @@
 <script setup lang="ts">
+  import type { PersonTimeLimitInfoResponse } from '@/api-client/generated';
+  import SpshBanner from '@/components/alert/SpshBanner.vue';
+  import ServiceProviderCategory from '@/components/layout/ServiceProviderCategory.vue';
+  import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+  import { useMeldungStore, type Meldung, type MeldungStore } from '@/stores/MeldungStore';
+  import { usePersonInfoStore, type PersonInfoStore } from '@/stores/PersonInfoStore';
+  import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
+  import { RollenMerkmal } from '@/stores/RolleStore';
   import {
     ServiceProviderKategorie,
     useServiceProviderStore,
     type ServiceProvider,
     type ServiceProviderStore,
   } from '@/stores/ServiceProviderStore';
-  import { computed, onBeforeMount, onMounted, ref, type ComputedRef, type Ref } from 'vue';
-  import ServiceProviderCategory from '@/components/layout/ServiceProviderCategory.vue';
-  import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import {
     useTwoFactorAuthentificationStore,
     type TwoFactorAuthentificationStore,
   } from '@/stores/TwoFactorAuthentificationStore';
-  import SpshBanner from '@/components/alert/SpshBanner.vue';
-  import { useI18n } from 'vue-i18n';
-  import { usePersonInfoStore, type PersonInfoStore } from '@/stores/PersonInfoStore';
-  import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
-  import type { DBiamPersonenzuordnungResponse, PersonTimeLimitInfoResponse } from '@/api-client/generated';
-  import { RollenMerkmal } from '@/stores/RolleStore';
+  import type { Zuordnung } from '@/stores/types/Zuordnung';
   import { adjustDateForTimezoneAndFormat } from '@/utils/date';
-  import { useMeldungStore, type Meldung, type MeldungStore } from '@/stores/MeldungStore';
+  import { computed, onBeforeMount, onMounted, ref, type ComputedRef, type Ref } from 'vue';
+  import { useI18n } from 'vue-i18n';
 
   const { t }: { t: Function } = useI18n();
 
@@ -70,7 +71,7 @@
 
   const hasKoPersMerkmal: ComputedRef<boolean> = computed(() => {
     return (
-      personStore.personenuebersicht?.zuordnungen.find((zuordnung: DBiamPersonenzuordnungResponse) => {
+      personStore.personenuebersicht?.zuordnungen.find((zuordnung: Zuordnung) => {
         return zuordnung.merkmale.includes(RollenMerkmal.KopersPflicht);
       }) !== undefined
     );

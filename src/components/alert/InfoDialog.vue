@@ -8,7 +8,7 @@
     id: string;
     isDialogVisible: boolean;
     header: string;
-    message: string;
+    messages: Array<string>;
   };
   type Emits = (event: 'update:dialogExit') => void;
 
@@ -33,13 +33,20 @@
       :data-testid="`${id}-layout-card`"
       :header="header"
     >
-      <v-container class="mt-8 mb-4">
-        <v-row class="text-body text-error justify-center">
+      <v-container
+        :data-testid="`${id}-text`"
+        class="mt-8 mb-4"
+      >
+        <v-row
+          v-for="message of messages"
+          :key="message"
+          class="text-body text-error justify-center mb-1"
+        >
           <v-icon
             class="mr-4"
             icon="mdi-alert"
           ></v-icon>
-          <span :data-testid="`${id}-text`">
+          <span>
             {{ message }}
           </span>
         </v-row>

@@ -2131,6 +2131,25 @@
         "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
       }
     },
+    "/api/cron/email-addresses-delete": {
+      "delete": {
+        "operationId": "CronController_emailAddressesDelete",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "EmailAddresses were successfully removed.",
+            "content": { "application/json": { "schema": { "type": "boolean" } } }
+          },
+          "400": { "description": "EmailAddresses not found." },
+          "401": { "description": "Not authorized to delete EmailAddresses." },
+          "403": { "description": "Insufficient permissions to delete EmailAddresses." },
+          "404": { "description": "Insufficient permissions to delete EmailAddresses." },
+          "500": { "description": "Internal server error while trying to delete EmailAddresses." }
+        },
+        "tags": ["cron"],
+        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+      }
+    },
     "/api/import/upload": {
       "post": {
         "operationId": "ImportController_uploadFile",
@@ -2717,7 +2736,10 @@
         },
         "required": ["personId", "locked_by", "created_at", "locked_until", "lock_occasion"]
       },
-      "EmailAddressStatus": { "type": "string", "enum": ["ENABLED", "DISABLED", "REQUESTED", "FAILED"] },
+      "EmailAddressStatus": {
+        "type": "string",
+        "enum": ["ENABLED", "DISABLED", "REQUESTED", "FAILED", "DELETED_LDAP", "DELETED_OX", "DELETED"]
+      },
       "PersonEmailResponse": {
         "type": "object",
         "properties": {
@@ -2906,15 +2928,15 @@
           "sskId": { "type": "string" },
           "rolleId": { "type": "string" },
           "sskName": { "type": "string" },
-          "sskDstNr": { "type": "string" },
+          "sskDstNr": { "type": "string", "nullable": true },
           "rolle": { "type": "string" },
           "rollenArt": { "nullable": false, "$ref": "#/components/schemas/RollenArt" },
           "administriertVon": { "type": "string" },
           "typ": { "nullable": true, "$ref": "#/components/schemas/OrganisationsTyp" },
           "editable": { "type": "boolean" },
-          "befristung": { "format": "date-time", "type": "string" },
-          "merkmale": { "nullable": true, "$ref": "#/components/schemas/RollenMerkmal" },
-          "admins": { "type": "array", "items": { "type": "string" } }
+          "befristung": { "format": "date-time", "type": "string", "nullable": true },
+          "merkmale": { "type": "array", "items": { "$ref": "#/components/schemas/RollenMerkmal" } },
+          "admins": { "nullable": true, "type": "array", "items": { "type": "string" } }
         },
         "required": [
           "sskId",
@@ -3025,7 +3047,29 @@
           "dienststellen"
         ]
       },
-      "PersonenInfoKontextOrganisationResponse": { "type": "object", "properties": {} },
+      "PersonenInfoKontextOrganisationResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "nullable": false },
+          "name": { "type": "string", "nullable": true },
+          "typ": {
+            "type": "string",
+            "enum": [
+              "ROOT",
+              "LAND",
+              "TRAEGER",
+              "SCHULE",
+              "KLASSE",
+              "ANBIETER",
+              "SONSTIGE ORGANISATION / EINRICHTUNG",
+              "UNBESTAETIGT"
+            ],
+            "nullable": true
+          },
+          "kennung": { "type": "string", "nullable": true }
+        },
+        "required": ["id", "name", "typ", "kennung"]
+      },
       "PersonenInfoKontextResponse": {
         "type": "object",
         "properties": {

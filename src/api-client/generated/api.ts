@@ -468,7 +468,7 @@ export interface DBiamPersonenzuordnungResponse {
      * @type {string}
      * @memberof DBiamPersonenzuordnungResponse
      */
-    'sskDstNr': string;
+    'sskDstNr': string | null;
     /**
      * 
      * @type {string}
@@ -504,19 +504,19 @@ export interface DBiamPersonenzuordnungResponse {
      * @type {string}
      * @memberof DBiamPersonenzuordnungResponse
      */
-    'befristung': string;
+    'befristung': string | null;
     /**
      * 
-     * @type {RollenMerkmal}
+     * @type {Array<RollenMerkmal>}
      * @memberof DBiamPersonenzuordnungResponse
      */
-    'merkmale': RollenMerkmal;
+    'merkmale': Array<RollenMerkmal>;
     /**
      * 
      * @type {Array<string>}
      * @memberof DBiamPersonenzuordnungResponse
      */
-    'admins': Array<string>;
+    'admins': Array<string> | null;
 }
 
 
@@ -917,7 +917,10 @@ export const EmailAddressStatus = {
     Enabled: 'ENABLED',
     Disabled: 'DISABLED',
     Requested: 'REQUESTED',
-    Failed: 'FAILED'
+    Failed: 'FAILED',
+    DeletedLdap: 'DELETED_LDAP',
+    DeletedOx: 'DELETED_OX',
+    Deleted: 'DELETED'
 } as const;
 
 export type EmailAddressStatus = typeof EmailAddressStatus[keyof typeof EmailAddressStatus];
@@ -2274,6 +2277,51 @@ export interface PersonTimeLimitInfoResponse {
 /**
  * 
  * @export
+ * @interface PersonenInfoKontextOrganisationResponse
+ */
+export interface PersonenInfoKontextOrganisationResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonenInfoKontextOrganisationResponse
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonenInfoKontextOrganisationResponse
+     */
+    'name': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonenInfoKontextOrganisationResponse
+     */
+    'typ': PersonenInfoKontextOrganisationResponseTypEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonenInfoKontextOrganisationResponse
+     */
+    'kennung': string | null;
+}
+
+export const PersonenInfoKontextOrganisationResponseTypEnum = {
+    Root: 'ROOT',
+    Land: 'LAND',
+    Traeger: 'TRAEGER',
+    Schule: 'SCHULE',
+    Klasse: 'KLASSE',
+    Anbieter: 'ANBIETER',
+    SonstigeOrganisationEinrichtung: 'SONSTIGE ORGANISATION / EINRICHTUNG',
+    Unbestaetigt: 'UNBESTAETIGT'
+} as const;
+
+export type PersonenInfoKontextOrganisationResponseTypEnum = typeof PersonenInfoKontextOrganisationResponseTypEnum[keyof typeof PersonenInfoKontextOrganisationResponseTypEnum];
+
+/**
+ * 
+ * @export
  * @interface PersonenInfoKontextResponse
  */
 export interface PersonenInfoKontextResponse {
@@ -2297,10 +2345,10 @@ export interface PersonenInfoKontextResponse {
     'mandant': string;
     /**
      * 
-     * @type {object}
+     * @type {PersonenInfoKontextOrganisationResponse}
      * @memberof PersonenInfoKontextResponse
      */
-    'organisation': object;
+    'organisation': PersonenInfoKontextOrganisationResponse;
     /**
      * 
      * @type {string}
@@ -4701,6 +4749,43 @@ export const CronApiAxiosParamCreator = function (configuration?: Configuration)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
+        cronControllerEmailAddressesDelete: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/cron/email-addresses-delete`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
         cronControllerKoPersUserLock: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/cron/kopers-lock`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -4896,6 +4981,15 @@ export const CronApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
+        async cronControllerEmailAddressesDelete(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<boolean>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.cronControllerEmailAddressesDelete(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
         async cronControllerKoPersUserLock(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<boolean>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.cronControllerKoPersUserLock(options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
@@ -4951,6 +5045,14 @@ export const CronApiFactory = function (configuration?: Configuration, basePath?
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
+        cronControllerEmailAddressesDelete(options?: any): AxiosPromise<boolean> {
+            return localVarFp.cronControllerEmailAddressesDelete(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
         cronControllerKoPersUserLock(options?: any): AxiosPromise<boolean> {
             return localVarFp.cronControllerKoPersUserLock(options).then((request) => request(axios, basePath));
         },
@@ -5001,6 +5103,14 @@ export interface CronApiInterface {
      * @throws {RequiredError}
      * @memberof CronApiInterface
      */
+    cronControllerEmailAddressesDelete(options?: AxiosRequestConfig): AxiosPromise<boolean>;
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CronApiInterface
+     */
     cronControllerKoPersUserLock(options?: AxiosRequestConfig): AxiosPromise<boolean>;
 
     /**
@@ -5044,6 +5154,16 @@ export interface CronApiInterface {
  * @extends {BaseAPI}
  */
 export class CronApi extends BaseAPI implements CronApiInterface {
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CronApi
+     */
+    public cronControllerEmailAddressesDelete(options?: AxiosRequestConfig) {
+        return CronApiFp(this.configuration).cronControllerEmailAddressesDelete(options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * 
      * @param {*} [options] Override http request option.

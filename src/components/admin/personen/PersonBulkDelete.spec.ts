@@ -1,10 +1,10 @@
-import { test, type MockInstance } from 'vitest';
-import { flushPromises, mount } from '@vue/test-utils';
-import { createRouter, createWebHistory, type Router } from 'vue-router';
 import routes from '@/router/routes';
-import PersonBulkDelete from './PersonBulkDelete.vue';
-import { nextTick } from 'vue';
 import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
+import { flushPromises, mount } from '@vue/test-utils';
+import { test, type MockInstance } from 'vitest';
+import { nextTick } from 'vue';
+import { createRouter, createWebHistory, type Router } from 'vue-router';
+import PersonBulkDelete from './PersonBulkDelete.vue';
 
 let router: Router;
 const bulkOperationStore: BulkOperationStore = useBulkOperationStore();

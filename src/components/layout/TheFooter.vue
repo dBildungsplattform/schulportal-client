@@ -129,8 +129,7 @@
 <style scoped>
   .footer {
     align-items: flex-end;
-    background-image:
-      linear-gradient(to bottom right, #ffffff 25%, transparent 25%),
+    background-image: linear-gradient(to bottom right, #ffffff 25%, transparent 25%),
       linear-gradient(180deg, rgba(229, 234, 239, 1) 100%, transparent 100%);
 
     background-repeat: no-repeat, no-repeat;

@@ -2,38 +2,33 @@
   import ResultTable, { type TableItem, type TableRow } from '@/components/admin/ResultTable.vue';
   import SearchField from '@/components/admin/SearchField.vue';
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
+  import PersonBulkChangeKlasse from '@/components/admin/personen/PersonBulkChangeKlasse.vue';
   import PersonBulkDelete from '@/components/admin/personen/PersonBulkDelete.vue';
   import PersonBulkPasswordReset from '@/components/admin/personen/PersonBulkPasswordReset.vue';
   import RolleModify from '@/components/admin/rollen/RolleModify.vue';
+  import OrganisationUnassign from '@/components/admin/schulen/OrganisationUnassign.vue';
+  import InfoDialog from '@/components/alert/InfoDialog.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { useOrganisationen } from '@/composables/useOrganisationen';
   import { type TranslatedRolleWithAttrs, useRollen } from '@/composables/useRollen';
   import { type AuthStore, useAuthStore } from '@/stores/AuthStore';
+  import { OperationType } from '@/stores/BulkOperationStore';
   import {
     type Organisation,
     type OrganisationStore,
     OrganisationsTyp,
     useOrganisationStore,
   } from '@/stores/OrganisationStore';
-  import {
-    type PersonStore,
-    type PersonenWithRolleAndZuordnung,
-    type Personendatensatz,
-    SortField,
-    SortOrder,
-    usePersonStore,
-  } from '@/stores/PersonStore';
+  import { type PersonStore, type Personendatensatz, SortField, SortOrder, usePersonStore } from '@/stores/PersonStore';
   import { type PersonenkontextStore, usePersonenkontextStore } from '@/stores/PersonenkontextStore';
   import { type RolleResponse, type RolleStore, RollenArt, RollenMerkmal, useRolleStore } from '@/stores/RolleStore';
   import { type SearchFilterStore, useSearchFilterStore } from '@/stores/SearchFilterStore';
+  import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
   import { type TranslatedObject } from '@/types.d';
   import { type ComputedRef, type Ref, computed, onMounted, ref, watch } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import { type Router, useRouter } from 'vue-router';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
-  import OrganisationUnassign from '@/components/admin/schulen/OrganisationUnassign.vue';
-  import InfoDialog from '@/components/alert/InfoDialog.vue';
-  import { OperationType } from '@/stores/BulkOperationStore';
 
   const searchFieldComponent: Ref = ref();
 
@@ -49,25 +44,54 @@
   const hasAutoSelectedOrganisation: Ref<boolean> = ref(false);
 
   const selectedPersonIds: Ref<string[]> = ref<string[]>([]);
-  const selectedPersons: ComputedRef<PersonenWithRolleAndZuordnung> = computed(() => {
-    return (
-      personStore.personenWithUebersicht?.filter((p: PersonenWithRolleAndZuordnung[number]) =>
-        selectedPersonIds.value.includes(p.person.id),
-      ) ?? []
-    );
+  const selectedPersons: ComputedRef<Map<string, PersonWithZuordnungen>> = computed(() => {
+    const persons: Map<string, PersonWithZuordnungen> = new Map();
+    for (const personId of selectedPersonIds.value) {
+      const person: PersonWithZuordnungen | undefined = personStore.allUebersichten.get(personId);
+      if (!person) continue;
+      persons.set(personId, person);
+    }
+    return persons;
   });
   const resultTable: Ref = ref(null);
 
   type ReadonlyHeaders = VDataTableServer['headers'];
+  type PersonRow = {
+    id: string;
+    familienname: string;
+    vorname: string;
+    referrer: string;
+    personalnummer: string;
+    rollen: string;
+    administrationsebenen: string;
+    klassen: string;
+  };
   const headers: ReadonlyHeaders = [
-    { title: t('person.lastName'), key: 'person.name.familienname', align: 'start' },
-    { title: t('person.firstName'), key: 'person.name.vorname', align: 'start' },
-    { title: t('person.userName'), key: 'person.referrer', align: 'start' },
-    { title: t('person.kopersNr'), key: 'person.personalnummer', align: 'start' },
+    { title: t('person.lastName'), key: 'familienname', align: 'start' },
+    { title: t('person.firstName'), key: 'vorname', align: 'start' },
+    { title: t('person.userName'), key: 'referrer', align: 'start' },
+    { title: t('person.kopersNr'), key: 'personalnummer', align: 'start' },
     { title: t('person.rolle'), key: 'rollen', align: 'start', sortable: false },
     { title: t('person.zuordnungen'), key: 'administrationsebenen', align: 'start', sortable: false },
     { title: t('person.klasse'), key: 'klassen', align: 'start', sortable: false },
   ];
+  const personRows: ComputedRef<Array<PersonRow>> = computed(() => {
+    const rows: Array<PersonRow> = [];
+    for (const personWithZuordnungen of personStore.allUebersichten.values()) {
+      const personRow: PersonRow = {
+        id: personWithZuordnungen.id,
+        familienname: personWithZuordnungen.name.familienname,
+        vorname: personWithZuordnungen.name.vorname,
+        referrer: personWithZuordnungen.referrer ?? '---',
+        personalnummer: personWithZuordnungen.personalnummerAsString,
+        rollen: personWithZuordnungen.rollenAsString,
+        administrationsebenen: personWithZuordnungen.administrationsebenenAsString,
+        klassen: personWithZuordnungen.klassenZuordnungenAsString,
+      };
+      rows.push(personRow);
+    }
+    return rows;
+  });
 
   const searchInputKlassen: Ref<string> = ref('');
   const searchInputRollen: Ref<string> = ref('');
@@ -90,7 +114,9 @@
   const benutzerDeleteDialogVisible: Ref<boolean> = ref(false);
   const passwordResetDialogVisible: Ref<boolean> = ref(false);
   const organisationUnassignDialogVisible: Ref<boolean> = ref(false);
-  const onlyOneOrganisationAlertDialogVisible: Ref<boolean> = ref(false);
+  const changeKlasseDialogVisible: Ref<boolean> = ref(false);
+  const invalidSelectionAlertDialogVisible: Ref<boolean> = ref(false);
+  const invalidSelectionAlertMessages: Ref<Array<string>> = ref([]);
 
   const selectedOption: Ref<string | null> = ref(null);
 
@@ -107,6 +133,7 @@
     if (authStore.hasPersonenverwaltungPermission) {
       actionTypeTitles.set(OperationType.RESET_PASSWORD, t('admin.person.resetPassword'));
       actionTypeTitles.set(OperationType.ORG_UNASSIGN, t('admin.person.bulkUnassignOrganisation.cancelZuordnung'));
+      actionTypeTitles.set(OperationType.CHANGE_KLASSE, t('admin.person.bulkChangeKlasse.title'));
     }
 
     return [...actionTypeTitles.entries()].map(([key, value]: [string, string]) => ({
@@ -462,11 +489,31 @@
     getPaginatedPersonen(searchFilterStore.personenPage);
   }
 
-  const singleSchoolSelected: ComputedRef<boolean> = computed(() => {
-    return selectedOrganisationIds.value.length === 1;
+  enum SelectionConstraint {
+    SINGLE_SCHOOL,
+    ONLY_LERN,
+  }
+  const selectionConstraintMessageMapping: Record<SelectionConstraint, string> = {
+    [SelectionConstraint.SINGLE_SCHOOL]: t('admin.person.invalidSelection.onlyOneSchool'),
+    [SelectionConstraint.ONLY_LERN]: t('admin.person.invalidSelection.onlyLern'),
+  };
+  const violatedSelectionConstraints: ComputedRef<Set<SelectionConstraint>> = computed(() => {
+    const newSet: Set<SelectionConstraint> = new Set();
+    if (selectedOrganisationIds.value.length !== 1) {
+      newSet.add(SelectionConstraint.SINGLE_SCHOOL);
+    }
+    for (const personId of selectedPersonIds.value) {
+      const person: PersonWithZuordnungen | undefined = personStore.allUebersichten.get(personId);
+      if (!person) continue;
+      const { rollenArten }: PersonWithZuordnungen = person;
+      if (!(rollenArten.size === 1 && rollenArten.has(RollenArt.Lern))) {
+        newSet.add(SelectionConstraint.ONLY_LERN);
+      }
+    }
+    return newSet;
   });
 
-  const singleSchoolAlertHeader: ComputedRef<string> = computed(() => {
+  const invalidSelectionAlertHeader: ComputedRef<string> = computed(() => {
     return actions.value.find((action: TranslatedObject) => action.value === selectedOption.value)?.title || '';
   });
 
@@ -474,9 +521,15 @@
     return organisationStore.allOrganisationen.find((org: Organisation) => org.id === selectedOrganisationIds.value[0]);
   });
 
-  const checkSingleOrgDisplayDialog = (dialog: Ref<boolean>): void => {
-    if (!singleSchoolSelected.value) {
-      onlyOneOrganisationAlertDialogVisible.value = true;
+  const checkInvalidSelectionDisplayDialog = (dialog: Ref<boolean>, options: Array<SelectionConstraint>): void => {
+    invalidSelectionAlertMessages.value = [];
+    for (const option of options) {
+      if (violatedSelectionConstraints.value.has(option)) {
+        invalidSelectionAlertMessages.value.push(selectionConstraintMessageMapping[option]);
+      }
+    }
+    if (invalidSelectionAlertMessages.value.length > 0) {
+      invalidSelectionAlertDialogVisible.value = true;
       return;
     }
     dialog.value = true;
@@ -494,10 +547,17 @@
         benutzerDeleteDialogVisible.value = true;
         break;
       case OperationType.RESET_PASSWORD:
-        checkSingleOrgDisplayDialog(passwordResetDialogVisible);
+        checkInvalidSelectionDisplayDialog(passwordResetDialogVisible, [SelectionConstraint.SINGLE_SCHOOL]);
         break;
       case OperationType.ORG_UNASSIGN:
-        checkSingleOrgDisplayDialog(organisationUnassignDialogVisible);
+        checkInvalidSelectionDisplayDialog(organisationUnassignDialogVisible, [SelectionConstraint.SINGLE_SCHOOL]);
+        break;
+      case OperationType.CHANGE_KLASSE:
+        checkInvalidSelectionDisplayDialog(changeKlasseDialogVisible, [
+          SelectionConstraint.SINGLE_SCHOOL,
+          SelectionConstraint.ONLY_LERN,
+        ]);
+        break;
     }
   };
 
@@ -531,6 +591,16 @@
     }
   };
 
+  const handleBulkKlasseChangeDialog = async (finished: boolean): Promise<void> => {
+    changeKlasseDialogVisible.value = false;
+    selectedOption.value = null;
+    if (finished) {
+      selectedPersonIds.value = [];
+      await getPaginatedPersonen(searchFilterStore.personenPage);
+      resultTable.value.resetSelection();
+    }
+  };
+
   function handleSelectedRows(selectedItems: TableItem[]): void {
     // Directly assign the selected items to selectedPersonIds since the emitted tableItems are always IDs of the specific rows
     selectedPersonIds.value = selectedItems as unknown as string[];
@@ -538,14 +608,11 @@
 
   // This method filters the selectedPersonIds to avoid items being selected when they are not included in the current table "items"
   function updateSelectedRowsAfterFilter(): void {
-    const visiblePersonIds: string[] | undefined = personStore.personenWithUebersicht?.map(
-      (person: Personendatensatz) => person.person.id,
-    );
-    selectedPersonIds.value = selectedPersonIds.value.filter((id: string) => visiblePersonIds?.includes(id));
+    selectedPersonIds.value = selectedPersonIds.value.filter((id: string) => personStore.allUebersichten.has(id));
   }
   // Whenever the array of items of the table (personStore.personenWithUebersicht) changes (Filters, search function, page update etc...) update the selection.
   watch(
-    () => personStore.personenWithUebersicht,
+    () => personStore.allUebersichten,
     () => {
       updateSelectedRowsAfterFilter();
     },
@@ -855,13 +922,13 @@
             ></v-select>
           </SpshTooltip>
           <InfoDialog
-            id="only-one-school-notice"
-            :isDialogVisible="onlyOneOrganisationAlertDialogVisible"
-            :header="singleSchoolAlertHeader"
-            :message="$t('admin.person.onlyOneSchoolAlert')"
+            id="invalid-selection-alert-dialog"
+            :isDialogVisible="invalidSelectionAlertDialogVisible"
+            :header="invalidSelectionAlertHeader"
+            :messages="invalidSelectionAlertMessages"
             @update:dialogExit="
               () => {
-                onlyOneOrganisationAlertDialogVisible = false;
+                invalidSelectionAlertDialogVisible = false;
                 selectedOption = null;
               }
             "
@@ -907,6 +974,19 @@
             @update:dialogExit="handleUnassignOrgDialog($event)"
           >
           </OrganisationUnassign>
+          <v-dialog
+            ref="changeKlasseBulkDialog"
+            :model-value="changeKlasseDialogVisible"
+            v-if="changeKlasseDialogVisible"
+            persistent
+          >
+            <PersonBulkChangeKlasse
+              :selectedPersonIds
+              :selectedSchuleId="selectedOrganisation?.id"
+              :availableKlassen="klassenOptions"
+              @update:dialog-exit="handleBulkKlasseChangeDialog"
+            />
+          </v-dialog>
         </v-col>
         <!-- Display the number of selected checkboxes -->
         <v-col
@@ -933,7 +1013,7 @@
         :currentPage="searchFilterStore.personenPage"
         data-testid="person-table"
         ref="resultTable"
-        :items="personStore.personenWithUebersicht || []"
+        :items="personRows"
         :itemsPerPage="searchFilterStore.personenPerPage"
         :loading="personStore.loading"
         :headers="headers"

@@ -69,7 +69,7 @@ export function formatDateDigitsToGermanDate(date: Date): string {
  * @param {string | undefined} dateString - The ISO date string to be adjusted and formatted, or undefined if no date is provided.
  * @returns {string} The formatted date in German format (dd.MM.yyyy), or an empty string if the input is invalid.
  */
-export function adjustDateForTimezoneAndFormat(dateString: string | undefined): string {
+export function adjustDateForTimezoneAndFormat(dateString: Date | string | undefined): string {
   if (!dateString) return '';
   const date: Date = new Date(dateString);
   if (isNaN(date.getTime())) return '';
@@ -85,7 +85,7 @@ export function adjustDateForTimezoneAndFormat(dateString: string | undefined): 
  * @param {string | undefined} dateString - The ISO date string to be formatted, or undefined if no date is provided.
  * @returns {string} The translated string followed by the formatted date in German format (dd.MM.yyyy), or an empty string if the input is invalid.
  */
-export function formatDate(dateString: string | undefined, t: (key: string) => string): string {
+export function formatDate(dateString: Date | string | undefined, t: (key: string) => string): string {
   if (!dateString) return '';
 
   // Return the translated string followed by the formatted date

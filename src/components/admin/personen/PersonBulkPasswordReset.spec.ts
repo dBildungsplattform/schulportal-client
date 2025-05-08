@@ -1,12 +1,15 @@
 import routes from '@/router/routes';
 import { OperationType, useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
+import type { Person } from '@/stores/types/Person';
+import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
+import type { Zuordnung } from '@/stores/types/Zuordnung';
+import { DoFactory } from '@/testing/DoFactory';
 import { download } from '@/utils/file';
 import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
-import { test, describe, expect, beforeEach, vi, type MockInstance } from 'vitest';
+import { beforeEach, describe, expect, test, vi, type MockInstance } from 'vitest';
 import { nextTick } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import PersonBulkPasswordReset from './PersonBulkPasswordReset.vue';
-import type { PersonenWithRolleAndZuordnung } from '@/stores/PersonStore';
 
 let router: Router;
 const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
@@ -14,37 +17,20 @@ const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
 type Props = {
   isDialogVisible: boolean;
   selectedSchuleKennung?: string;
-  selectedPersons: PersonenWithRolleAndZuordnung;
+  selectedPersons: Map<string, PersonWithZuordnungen>;
 };
 
+const mockPerson: Person = DoFactory.getPerson();
+
 function mountComponent(partialProps: Partial<Props> = {}): VueWrapper {
+  const selectedSchuleKennung: string = '1234567';
+  const zuordnung: Zuordnung = DoFactory.getZuordnung({
+    sskDstNr: selectedSchuleKennung,
+  });
   const props: Props = {
     isDialogVisible: true,
-    selectedSchuleKennung: '1234567',
-    selectedPersons: [
-      {
-        administrationsebenen: '',
-        klassen: '1a',
-        rollen: '',
-        person: {
-          id: 'test',
-          name: {
-            familienname: 'Pan',
-            vorname: 'Peter',
-          },
-          referrer: 'ppan',
-          revision: '1',
-          email: {
-            address: 'ppan@wunderland',
-            status: 'ENABLED',
-          },
-          isLocked: null,
-          lastModified: '',
-          personalnummer: '1234',
-          userLock: null,
-        },
-      },
-    ],
+    selectedSchuleKennung,
+    selectedPersons: new Map([[mockPerson.id, DoFactory.getPersonWithZuordnung(mockPerson, [zuordnung])]]),
     ...partialProps,
   };
 
@@ -180,7 +166,7 @@ describe('PersonBulkPasswordReset', () => {
     submitButton!.dispatchEvent(new Event('click'));
     await flushPromises();
 
-    expect(spy).toHaveBeenCalledWith(['test']);
+    expect(spy).toHaveBeenCalledWith([mockPerson.id]);
   });
 
   test('download is enabled after operation', async () => {
