@@ -85,22 +85,9 @@ export class DoFactory {
   }
 
   public static getPersonResponse(props?: Partial<PersonResponse>): PersonResponse {
+    const person: Person = DoFactory.getPerson();
     return {
-      id: faker.string.uuid(),
-      name: {
-        vorname: faker.person.firstName(),
-        familienname: faker.person.lastName(),
-      },
-      referrer: faker.internet.username(),
-      revision: faker.string.numeric(2),
-      personalnummer: faker.string.numeric(7),
-      isLocked: false,
-      userLock: null,
-      lastModified: new Date().toISOString(),
-      email: {
-        status: EmailAddressStatus.Enabled,
-        address: faker.internet.email(),
-      },
+      ...person,
       mandant: faker.string.uuid(),
       geburt: {
         datum: faker.date.birthdate().toISOString(),
