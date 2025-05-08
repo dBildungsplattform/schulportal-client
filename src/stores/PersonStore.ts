@@ -19,7 +19,6 @@ import {
   type PersonFrontendControllerFindPersons200Response,
   type PersonMetadataBodyParams,
 } from '../api-client/generated/api';
-import { type DbiamPersonenkontextBodyParams } from './PersonenkontextStore';
 import { Person } from './types/Person';
 import { PersonenUebersicht } from './types/PersonenUebersicht';
 import { PersonWithZuordnungen } from './types/PersonWithZuordnungen';
@@ -52,18 +51,9 @@ export enum SortOrder {
   Desc = 'desc',
 }
 
-export type PersonTableItem = {
-  person: Person;
-  createdAt?: string;
-  updatedAt?: string;
-};
-
 export type CreatePersonBodyParams = DbiamCreatePersonWithPersonenkontexteBodyParams;
-export type CreatedPersonenkontext = DbiamPersonenkontextBodyParams;
 
-export function mapPersonendatensatzResponseToPersonendatensatz(
-  response: PersonendatensatzResponse,
-): Personendatensatz {
+function mapPersonendatensatzResponseToPersonendatensatz(response: PersonendatensatzResponse): Personendatensatz {
   const person: Person = Person.fromResponse(response.person);
   return { person };
 }

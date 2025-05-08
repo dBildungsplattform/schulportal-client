@@ -88,7 +88,6 @@ export type {
   PersonenkontextWorkflowResponse,
   SystemrechtResponse,
 };
-export type CreatedPersonenkontext = DbiamPersonenkontextBodyParams;
 export type { DbiamCreatePersonenkontextBodyParams };
 export type UserinfoPersonenkontext = {
   organisationsId: string;
