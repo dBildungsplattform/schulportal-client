@@ -37,7 +37,7 @@ function translateWithFallback(t: Composer['t'], keys: string[], errorCode: stri
  * matches them with the provided list of persons, and translates the error codes into
  * human-readable error messages using the i18n translation system.
  *
- * @param persons - An array of PersonenWithRolleAndZuordnung objects representing the persons
+ * @param personen - An array of PersonenWithRolleAndZuordnung objects representing the persons
  *                  involved in the bulk operation.
  *
  * @returns An array of BulkErrorList objects, where each object contains:
@@ -46,13 +46,13 @@ function translateWithFallback(t: Composer['t'], keys: string[], errorCode: stri
  *          - `nachname`: The last name of the person.
  *          - `error`: The translated error message for the person.
  */
-export function useBulkErrors(persons: PersonenWithRolleAndZuordnung): BulkErrorList[] {
+export function useBulkErrors(personen: PersonenWithRolleAndZuordnung): BulkErrorList[] {
   const { t }: Composer = useI18n({ useScope: 'global' });
   const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
 
   return Array.from(bulkOperationStore.currentOperation?.errors.entries() || [])
     .map(([id, errorCode]: [string, string]) => {
-      const person: PersonWithRolleAndZuordnung | undefined = persons.find(
+      const person: PersonWithRolleAndZuordnung | undefined = personen.find(
         (p: PersonWithRolleAndZuordnung) => p.person.id === id,
       );
       if (!person) return null;
