@@ -350,4 +350,19 @@ describe('KlassenManagementView', () => {
       expect(actualText).toBe(expectedText);
     },
   );
+
+  test('it updates sorting when onTableUpdate is triggered', async () => {
+    const sortField: string = 'name';
+    const sortOrder: string = 'desc';
+
+    const resultTable: VueWrapper | undefined = wrapper?.findComponent({ ref: 'resultTable' });
+
+    await resultTable?.vm.$emit('onTableUpdate', {
+      sortField: sortField,
+      sortOrder: sortOrder,
+    });
+
+    expect(searchFilterStore.organisationenSortField).toBe(sortField);
+    expect(searchFilterStore.organisationenSortOrder).toBe(sortOrder);
+  });
 });

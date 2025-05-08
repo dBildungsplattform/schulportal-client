@@ -392,6 +392,7 @@
           </v-col>
         </v-row>
         <ResultTable
+          ref="resultTable"
           :currentPage="searchFilterStore.klassenPage"
           data-testid="klasse-table"
           :header="t('admin.klasse.management')"
