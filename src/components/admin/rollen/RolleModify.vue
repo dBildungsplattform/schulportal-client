@@ -164,9 +164,6 @@
               offset="2"
               cols="10"
             >
-              <h3 class="mb-4">
-                {{ t('admin.person.bulkRolleModify.noKopersNrInfoHeadline') }}
-              </h3>
               <p>
                 {{ t('admin.person.bulkRolleModify.noKopersNrInfoText') }}
               </p>

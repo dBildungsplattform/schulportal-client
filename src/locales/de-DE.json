@@ -168,7 +168,6 @@
         "success": "Die Passwörter wurden erfolgreich zurückgesetzt."
       },
       "bulkRolleModify": {
-        "noKopersNrInfoHeadline": "Die ausgewählte Rolle verpflichtet zur Angabe einer KoPers.-Nr. am Benutzerkonto.",
         "noKopersNrInfoText": "Bitte beachten: Alle ausgewählten Benutzerkonten müssen über eine KoPers.-Nr. verfügen. Tragen Sie diese ggf. bitte in der Gesamtübersicht des Benutzers nach, sobald sie Ihnen vorliegt. Ein Benutzerkonto mit der gewählten Rolle ohne KoPers.-Nr. wird nach spätestens 8 Wochen automatisch gesperrt."
       },
       "bulkUnassignOrganisation": {
