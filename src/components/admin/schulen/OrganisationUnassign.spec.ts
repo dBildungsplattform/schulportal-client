@@ -111,8 +111,6 @@ describe('OrganisationUnassign', () => {
     wrapper = mountComponent();
     await nextTick();
 
-
-
     const submitButton: Element | null = document.body.querySelector('[data-testid="org-unassign-submit-button"]');
     expect(submitButton).not.toBeNull();
     await nextTick();

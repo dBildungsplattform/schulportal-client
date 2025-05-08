@@ -29,7 +29,7 @@
     rollen: TranslatedRolleWithAttrs[] | undefined;
     isLoading: boolean;
     isDialogVisible: boolean;
-    selectedPersons: PersonenWithRolleAndZuordnung;
+    selectedPersonen: PersonenWithRolleAndZuordnung;
   };
 
   type Emits = {
@@ -49,7 +49,7 @@
   );
 
   // Define the error list for the selected persons using the useBulkErrors composable
-  const bulkErrorList: ComputedRef<BulkErrorList[]> = computed(() => useBulkErrors(props.selectedPersons));
+  const bulkErrorList: ComputedRef<BulkErrorList[]> = computed(() => useBulkErrors(props.selectedPersonen));
 
   // Define the form validation schema for the Personenkontext
   export type ZuordnungCreationForm = {
@@ -237,7 +237,7 @@
               :block="mdAndDown"
               :disabled="!canCommit || bulkOperationStore.currentOperation.isRunning"
               class="primary"
-              @click="handleModifyRolle(props.selectedPersons.map((person) => person.person.id))"
+              @click="handleModifyRolle(props.selectedPersonen.map((person) => person.person.id))"
               data-testid="rolle-modify-submit-button"
               type="submit"
             >

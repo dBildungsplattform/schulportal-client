@@ -9,7 +9,7 @@
   import { type BulkErrorList, useBulkErrors } from '@/composables/useBulkErrors';
   import type { PersonenWithRolleAndZuordnung } from '@/stores/PersonStore';
   import PersonBulkError from '@/components/admin/personen/PersonBulkError.vue';
-import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
+  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
@@ -21,7 +21,7 @@ import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/Per
 
   type Props = {
     isDialogVisible: boolean;
-    selectedPersons: PersonenWithRolleAndZuordnung;
+    selectedPersonen: PersonenWithRolleAndZuordnung;
     selectedOrganisation: Organisation;
   };
 
@@ -39,12 +39,12 @@ import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/Per
   const showErrorDialog: Ref<boolean, boolean> = ref(false);
 
   // Define the error list for the selected persons using the useBulkErrors composable
-  const bulkErrorList: ComputedRef<BulkErrorList[]> = computed(() => useBulkErrors(props.selectedPersons));
+  const bulkErrorList: ComputedRef<BulkErrorList[]> = computed(() => useBulkErrors(props.selectedPersonen));
 
   async function handleOrgUnassign(): Promise<void> {
     await bulkOperationStore.bulkUnassignPersonenFromOrg(
       props.selectedOrganisation.id,
-      props.selectedPersons.map((person: PersonWithRolleAndZuordnung) => person.person.id),
+      props.selectedPersonen.map((person: PersonWithRolleAndZuordnung) => person.person.id),
     );
 
     if (bulkOperationStore.currentOperation?.errors && bulkOperationStore.currentOperation.errors.size > 0) {

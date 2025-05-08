@@ -23,7 +23,7 @@ function translateWithFallback(t: Composer['t'], keys: string[], errorCode: stri
   }
   // Fallback to a generic message with the error code appended
   const fallbackBase: string = t(
-    'admin.personenkontext.errors..fallbackError',
+    'admin.personenkontext.errors.fallbackError',
     {},
     { default: 'Es ist ein Fehler aufgetreten.' },
   );

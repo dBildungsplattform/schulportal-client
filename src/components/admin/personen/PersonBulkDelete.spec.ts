@@ -128,7 +128,7 @@ describe('PersonBulkDelete', () => {
     }
 
     await flushPromises();
-    expect(bulkPersonenDeleteSpy).toHaveBeenCalledTimes(1); 
+    expect(bulkPersonenDeleteSpy).toHaveBeenCalledTimes(1);
 
     const errorDialog: Element | null = document.body.querySelector('.v-dialog');
     expect(errorDialog).not.toBeNull();
