@@ -1,5 +1,7 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import type { RolleResponse } from './RolleStore';
+import type { SortField } from './OrganisationStore';
+import type { SortOrder } from '@/utils/sorting';
 
 type SearchFilterState = {
   klassenPage: number;
@@ -18,8 +20,10 @@ type SearchFilterState = {
   selectedRollen: Array<string> | null;
   selectedRollenObjects: RolleResponse[];
   selectedOrganisationen: Array<string> | null;
-  sortField: string | null;
-  sortOrder: string | null;
+  personenSortField: string | null;
+  personenSortOrder: string | null;
+  organisationenSortField: SortField | null;
+  organisationenSortOrder: SortOrder | null;
   currentSort: { key: string; order: 'asc' | 'desc' } | null;
   selectedSchuleForKlassen: string | null;
   selectedKlassenForKlassen: Array<string> | null;
@@ -70,8 +74,10 @@ export const useSearchFilterStore: StoreDefinition<
     selectedRollen: [],
     selectedRollenObjects: [],
     selectedOrganisationen: [],
-    sortField: '',
-    sortOrder: '',
+    personenSortField: '',
+    personenSortOrder: '',
+    organisationenSortField: null,
+    organisationenSortOrder: null,
     currentSort: null,
     selectedSchuleForKlassen: null,
     selectedKlassenForKlassen: [],
@@ -98,11 +104,11 @@ export const useSearchFilterStore: StoreDefinition<
     },
 
     async setSortFieldForPersonen(sortField: string | null) {
-      this.sortField = sortField;
+      this.personenSortField = sortField;
     },
 
     async setSortOrderForPersonen(sortOrder: string | null) {
-      this.sortOrder = sortOrder;
+      this.personenSortOrder = sortOrder;
     },
 
     async setCurrentSortForPersonen(currentSort: { key: string; order: 'asc' | 'desc' } | null) {

@@ -20,7 +20,6 @@
     type PersonenWithRolleAndZuordnung,
     type Personendatensatz,
     SortField,
-    SortOrder,
     usePersonStore,
   } from '@/stores/PersonStore';
   import { type PersonenkontextStore, usePersonenkontextStore } from '@/stores/PersonenkontextStore';
@@ -34,6 +33,7 @@
   import OrganisationUnassign from '@/components/admin/schulen/OrganisationUnassign.vue';
   import InfoDialog from '@/components/alert/InfoDialog.vue';
   import { OperationType } from '@/stores/BulkOperationStore';
+  import { SortOrder } from '@/utils/sorting';
 
   const searchFieldComponent: Ref = ref();
 
@@ -195,8 +195,8 @@
         : searchFilterStore.selectedOrganisationen || [],
       rolleIDs: searchFilterStore.selectedRollen || [],
       searchFilter: searchFilterStore.searchFilterPersonen || '',
-      sortField: searchFilterStore.sortField as SortField,
-      sortOrder: searchFilterStore.sortOrder as SortOrder,
+      sortField: searchFilterStore.personenSortField as SortField,
+      sortOrder: searchFilterStore.personenSortOrder as SortOrder,
     });
   }
 
@@ -208,8 +208,8 @@
       organisationIDs: selectedKlassen.value.length ? selectedKlassen.value : selectedOrganisationIds.value,
       rolleIDs: searchFilterStore.selectedRollen || selectedRollen.value,
       searchFilter: searchFilterStore.searchFilterPersonen || searchFilter.value,
-      sortField: searchFilterStore.sortField as SortField,
-      sortOrder: searchFilterStore.sortOrder as SortOrder,
+      sortField: searchFilterStore.personenSortField as SortField,
+      sortOrder: searchFilterStore.personenSortOrder as SortOrder,
     });
 
     await applySearchAndFilters();

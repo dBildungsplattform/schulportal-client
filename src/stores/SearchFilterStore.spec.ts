@@ -41,11 +41,11 @@ describe('SearchFilterStore', () => {
 
     // it sets sortOrder
     searchFilterStore.setSortOrderForPersonen('desc');
-    expect(searchFilterStore.sortOrder).toEqual('desc');
+    expect(searchFilterStore.personenSortOrder).toEqual('desc');
 
     // it sets sortField
     searchFilterStore.setSortFieldForPersonen(SortField.Vorname);
-    expect(searchFilterStore.sortField).toEqual(SortField.Vorname);
+    expect(searchFilterStore.personenSortField).toEqual(SortField.Vorname);
 
     // it sets currentSort
     searchFilterStore.setCurrentSortForPersonen({ key: SortField.Vorname, order: 'desc' });
