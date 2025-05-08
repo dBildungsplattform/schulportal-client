@@ -31,7 +31,7 @@ export class Zuordnung {
       response.editable,
       response.befristung ? new Date(response.befristung) : null,
       response.merkmale,
-      response.admins ?? [],
+      response.admins ? response.admins : [],
     );
   }
 }

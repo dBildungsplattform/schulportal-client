@@ -18,6 +18,7 @@ describe('PersonWithZuordnungen', () => {
       DoFactory.getZuordnung({ rollenArt: RollenArt.Lern }, { organisation: schule }),
       DoFactory.getZuordnung({ rollenArt: RollenArt.Lern, typ: OrganisationsTyp.Klasse, administriertVon: schule.id }),
       DoFactory.getZuordnung({ rollenArt: RollenArt.Lern, typ: OrganisationsTyp.Klasse, administriertVon: schule.id }),
+      DoFactory.getZuordnung({ rollenArt: RollenArt.Lern, typ: OrganisationsTyp.Land, sskDstNr: null }),
     ];
     personWithZuordnungen = new PersonWithZuordnungen(person, zuordnungen);
   });

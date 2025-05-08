@@ -121,6 +121,24 @@ export class DoFactory {
     };
   }
 
+  public static getOrganisation(props?: Partial<Organisation>): Organisation {
+    const organisationsTypen: Array<OrganisationsTyp> = [
+      OrganisationsTyp.Schule,
+      OrganisationsTyp.Klasse,
+      OrganisationsTyp.Anbieter,
+      OrganisationsTyp.Land,
+      OrganisationsTyp.Traeger,
+    ];
+    return {
+      id: faker.string.uuid(),
+      name: faker.company.name(),
+      kennung: faker.string.numeric(7),
+      typ: faker.helpers.arrayElement<OrganisationsTyp>(organisationsTypen),
+      administriertVon: faker.string.uuid(),
+      ...props,
+    };
+  }
+
   public static getSchule(props?: Partial<Organisation>): Organisation {
     return {
       id: faker.string.uuid(),
@@ -254,7 +272,7 @@ export class DoFactory {
       organisation?: Organisation;
     },
   ): DBiamPersonenzuordnungResponse {
-    const organisation: Organisation = DoFactory.getSchule(nested?.organisation);
+    const organisation: Organisation = DoFactory.getOrganisation(nested?.organisation);
     return {
       sskId: organisation.id,
       rolleId: faker.string.uuid(),
@@ -262,7 +280,7 @@ export class DoFactory {
       sskDstNr: organisation.kennung!,
       rolle: faker.string.alpha(5),
       rollenArt: RollenArt.Lern,
-      administriertVon: faker.string.uuid(),
+      administriertVon: organisation.administriertVon ?? faker.string.uuid(),
       typ: organisation.typ,
       editable: true,
       befristung: faker.date.soon().toISOString(),

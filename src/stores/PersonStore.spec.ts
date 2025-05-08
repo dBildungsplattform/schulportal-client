@@ -146,11 +146,17 @@ describe('PersonStore', () => {
         }),
       };
 
+      // add extra response for statement coverage; this can't happen in real life
+      const mockUebersichtenResponse: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response = {
+        ...mockUebersichten,
+        items: [...mockUebersichten.items, DoFactory.getDBiamPersonenuebersichtResponse()],
+      };
+
       mockadapter.onGet('/api/personen-frontend').replyOnce(200, mockPersonsResponse);
 
       // Update the mock POST request with the appropriate body
       const personIds: string[] = mockPersons.map((person: PersonendatensatzResponse) => person.person.id);
-      mockadapter.onPost('/api/dbiam/personenuebersicht', { personIds }).replyOnce(200, mockUebersichten);
+      mockadapter.onPost('/api/dbiam/personenuebersicht', { personIds }).replyOnce(200, mockUebersichtenResponse);
 
       const getAllPersonsPromise: Promise<void> = personStore.getAllPersons({});
       expect(personStore.loading).toBe(true);
