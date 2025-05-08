@@ -14,14 +14,14 @@ const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
 
 type Props = {
   isDialogVisible: boolean;
-  selectedPersons: PersonenWithRolleAndZuordnung;
+  selectedPersonen: PersonenWithRolleAndZuordnung;
   selectedOrganisation: Organisation;
 };
 
 function mountComponent(partialProps: Partial<Props> = {}): VueWrapper {
   const props: Props = {
     isDialogVisible: true,
-    selectedPersons: [
+    selectedPersonen: [
       {
         administrationsebenen: '',
         klassen: '1a',
