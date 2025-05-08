@@ -917,7 +917,10 @@ export const EmailAddressStatus = {
     Enabled: 'ENABLED',
     Disabled: 'DISABLED',
     Requested: 'REQUESTED',
-    Failed: 'FAILED'
+    Failed: 'FAILED',
+    DeletedLdap: 'DELETED_LDAP',
+    DeletedOx: 'DELETED_OX',
+    Deleted: 'DELETED'
 } as const;
 
 export type EmailAddressStatus = typeof EmailAddressStatus[keyof typeof EmailAddressStatus];
@@ -2274,6 +2277,51 @@ export interface PersonTimeLimitInfoResponse {
 /**
  * 
  * @export
+ * @interface PersonenInfoKontextOrganisationResponse
+ */
+export interface PersonenInfoKontextOrganisationResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonenInfoKontextOrganisationResponse
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonenInfoKontextOrganisationResponse
+     */
+    'name': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonenInfoKontextOrganisationResponse
+     */
+    'typ': PersonenInfoKontextOrganisationResponseTypEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonenInfoKontextOrganisationResponse
+     */
+    'kennung': string | null;
+}
+
+export const PersonenInfoKontextOrganisationResponseTypEnum = {
+    Root: 'ROOT',
+    Land: 'LAND',
+    Traeger: 'TRAEGER',
+    Schule: 'SCHULE',
+    Klasse: 'KLASSE',
+    Anbieter: 'ANBIETER',
+    SonstigeOrganisationEinrichtung: 'SONSTIGE ORGANISATION / EINRICHTUNG',
+    Unbestaetigt: 'UNBESTAETIGT'
+} as const;
+
+export type PersonenInfoKontextOrganisationResponseTypEnum = typeof PersonenInfoKontextOrganisationResponseTypEnum[keyof typeof PersonenInfoKontextOrganisationResponseTypEnum];
+
+/**
+ * 
+ * @export
  * @interface PersonenInfoKontextResponse
  */
 export interface PersonenInfoKontextResponse {
@@ -2297,10 +2345,10 @@ export interface PersonenInfoKontextResponse {
     'mandant': string;
     /**
      * 
-     * @type {object}
+     * @type {PersonenInfoKontextOrganisationResponse}
      * @memberof PersonenInfoKontextResponse
      */
-    'organisation': object;
+    'organisation': PersonenInfoKontextOrganisationResponse;
     /**
      * 
      * @type {string}
@@ -4701,6 +4749,43 @@ export const CronApiAxiosParamCreator = function (configuration?: Configuration)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
+        cronControllerEmailAddressesDelete: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/cron/email-addresses-delete`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
         cronControllerKoPersUserLock: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/cron/kopers-lock`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -4896,6 +4981,15 @@ export const CronApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
+        async cronControllerEmailAddressesDelete(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<boolean>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.cronControllerEmailAddressesDelete(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
         async cronControllerKoPersUserLock(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<boolean>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.cronControllerKoPersUserLock(options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
@@ -4951,6 +5045,14 @@ export const CronApiFactory = function (configuration?: Configuration, basePath?
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
+        cronControllerEmailAddressesDelete(options?: any): AxiosPromise<boolean> {
+            return localVarFp.cronControllerEmailAddressesDelete(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
         cronControllerKoPersUserLock(options?: any): AxiosPromise<boolean> {
             return localVarFp.cronControllerKoPersUserLock(options).then((request) => request(axios, basePath));
         },
@@ -5001,6 +5103,14 @@ export interface CronApiInterface {
      * @throws {RequiredError}
      * @memberof CronApiInterface
      */
+    cronControllerEmailAddressesDelete(options?: AxiosRequestConfig): AxiosPromise<boolean>;
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CronApiInterface
+     */
     cronControllerKoPersUserLock(options?: AxiosRequestConfig): AxiosPromise<boolean>;
 
     /**
@@ -5044,6 +5154,16 @@ export interface CronApiInterface {
  * @extends {BaseAPI}
  */
 export class CronApi extends BaseAPI implements CronApiInterface {
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CronApi
+     */
+    public cronControllerEmailAddressesDelete(options?: AxiosRequestConfig) {
+        return CronApiFp(this.configuration).cronControllerEmailAddressesDelete(options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * 
      * @param {*} [options] Override http request option.
@@ -6982,10 +7102,12 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
          * @param {Array<string>} [administriertVon] 
          * @param {Array<string>} [zugehoerigZu] Liefert die Kind-Organisationen, die den angegebenen IDs zugehörig sind.
          * @param {Array<string>} [organisationIds] Liefert Organisationen mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
+         * @param {'asc' | 'desc'} [sortOrder] Order to sort by.
+         * @param {'name' | 'kennung'} [sortField] Field to sort by.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerFindOrganizations: async (offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        organisationControllerFindOrganizations: async (offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, sortOrder?: 'asc' | 'desc', sortField?: 'name' | 'kennung', options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/organisationen`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -7048,6 +7170,14 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
 
             if (organisationIds) {
                 localVarQueryParameter['organisationIds'] = organisationIds;
+            }
+
+            if (sortOrder !== undefined) {
+                localVarQueryParameter['sortOrder'] = sortOrder;
+            }
+
+            if (sortField !== undefined) {
+                localVarQueryParameter['sortField'] = sortField;
             }
 
 
@@ -7444,11 +7574,13 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
          * @param {Array<string>} [administriertVon] 
          * @param {Array<string>} [zugehoerigZu] Liefert die Kind-Organisationen, die den angegebenen IDs zugehörig sind.
          * @param {Array<string>} [organisationIds] Liefert Organisationen mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
+         * @param {'asc' | 'desc'} [sortOrder] Order to sort by.
+         * @param {'name' | 'kennung'} [sortField] Field to sort by.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OrganisationResponse>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, systemrechte, excludeTyp, administriertVon, zugehoerigZu, organisationIds, options);
+        async organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, sortOrder?: 'asc' | 'desc', sortField?: 'name' | 'kennung', options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OrganisationResponse>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, systemrechte, excludeTyp, administriertVon, zugehoerigZu, organisationIds, sortOrder, sortField, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -7594,11 +7726,13 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
          * @param {Array<string>} [administriertVon] 
          * @param {Array<string>} [zugehoerigZu] Liefert die Kind-Organisationen, die den angegebenen IDs zugehörig sind.
          * @param {Array<string>} [organisationIds] Liefert Organisationen mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
+         * @param {'asc' | 'desc'} [sortOrder] Order to sort by.
+         * @param {'name' | 'kennung'} [sortField] Field to sort by.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, options?: any): AxiosPromise<Array<OrganisationResponse>> {
-            return localVarFp.organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, systemrechte, excludeTyp, administriertVon, zugehoerigZu, organisationIds, options).then((request) => request(axios, basePath));
+        organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, sortOrder?: 'asc' | 'desc', sortField?: 'name' | 'kennung', options?: any): AxiosPromise<Array<OrganisationResponse>> {
+            return localVarFp.organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, systemrechte, excludeTyp, administriertVon, zugehoerigZu, organisationIds, sortOrder, sortField, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -7735,11 +7869,13 @@ export interface OrganisationenApiInterface {
      * @param {Array<string>} [administriertVon] 
      * @param {Array<string>} [zugehoerigZu] Liefert die Kind-Organisationen, die den angegebenen IDs zugehörig sind.
      * @param {Array<string>} [organisationIds] Liefert Organisationen mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
+     * @param {'asc' | 'desc'} [sortOrder] Order to sort by.
+     * @param {'name' | 'kennung'} [sortField] Field to sort by.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganisationenApiInterface
      */
-    organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, options?: AxiosRequestConfig): AxiosPromise<Array<OrganisationResponse>>;
+    organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, sortOrder?: 'asc' | 'desc', sortField?: 'name' | 'kennung', options?: AxiosRequestConfig): AxiosPromise<Array<OrganisationResponse>>;
 
     /**
      * 
@@ -7886,12 +8022,14 @@ export class OrganisationenApi extends BaseAPI implements OrganisationenApiInter
      * @param {Array<string>} [administriertVon] 
      * @param {Array<string>} [zugehoerigZu] Liefert die Kind-Organisationen, die den angegebenen IDs zugehörig sind.
      * @param {Array<string>} [organisationIds] Liefert Organisationen mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
+     * @param {'asc' | 'desc'} [sortOrder] Order to sort by.
+     * @param {'name' | 'kennung'} [sortField] Field to sort by.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganisationenApi
      */
-    public organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, options?: AxiosRequestConfig) {
-        return OrganisationenApiFp(this.configuration).organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, systemrechte, excludeTyp, administriertVon, zugehoerigZu, organisationIds, options).then((request) => request(this.axios, this.basePath));
+    public organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, sortOrder?: 'asc' | 'desc', sortField?: 'name' | 'kennung', options?: AxiosRequestConfig) {
+        return OrganisationenApiFp(this.configuration).organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, systemrechte, excludeTyp, administriertVon, zugehoerigZu, organisationIds, sortOrder, sortField, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
