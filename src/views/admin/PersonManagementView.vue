@@ -56,7 +56,7 @@
   const resultTable: Ref = ref(null);
 
   type ReadonlyHeaders = VDataTableServer['headers'];
-  type PersonRow = {
+  export type PersonRow = {
     id: string;
     familienname: string;
     vorname: string;
@@ -324,8 +324,8 @@
     applySearchAndFilters();
   }
 
-  function navigateToPersonDetails(_$event: PointerEvent, { item }: { item: Personendatensatz }): void {
-    router.push({ name: 'person-details', params: { id: item.person.id } });
+  function navigateToPersonDetails(_$event: PointerEvent, { item }: { item: PersonRow }): void {
+    router.push({ name: 'person-details', params: { id: item.id } });
   }
 
   function resetSearchAndFilter(): void {
@@ -1019,8 +1019,7 @@
         :headers="headers"
         :currentSort="searchFilterStore.currentSort"
         @onHandleRowClick="
-          (event: PointerEvent, item: TableRow<unknown>) =>
-            navigateToPersonDetails(event, item as TableRow<Personendatensatz>)
+          (event: PointerEvent, item: TableRow<unknown>) => navigateToPersonDetails(event, item as TableRow<PersonRow>)
         "
         @onItemsPerPageUpdate="getPaginatedPersonenWithLimit"
         @onPageUpdate="getPaginatedPersonen"
@@ -1028,7 +1027,7 @@
         @update:selectedRows="handleSelectedRows"
         :modelValue="selectedPersonIds as unknown as TableItem[]"
         :totalItems="personStore.totalPersons"
-        item-value-path="person.id"
+        item-value-path="id"
         ><template v-slot:[`item.rollen`]="{ item }">
           <div
             class="ellipsis-wrapper"

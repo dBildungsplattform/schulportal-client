@@ -1,4 +1,5 @@
 import { RollenArt, RollenSystemRecht, type FindRollenResponse } from '@/api-client/generated/api';
+import routes from '@/router/routes';
 import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 import { OperationType } from '@/stores/BulkOperationStore';
 import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
@@ -14,6 +15,7 @@ import { DOMWrapper, VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
 import { expect, test, type Mock, type MockInstance } from 'vitest';
 import { nextTick } from 'vue';
+import { createRouter, createWebHistory, type Router } from 'vue-router';
 import PersonManagementView from './PersonManagementView.vue';
 
 let wrapper: VueWrapper | null = null;
@@ -23,9 +25,11 @@ let personenkontextStore: PersonenkontextStore;
 let rolleStore: RolleStore;
 let searchFilterStore: SearchFilterStore;
 let authStore: AuthStore;
+let router: Router;
+
 vi.useFakeTimers();
 
-beforeEach(() => {
+beforeEach(async () => {
   document.body.innerHTML = `
     <div>
       <div id="app"></div>
@@ -122,6 +126,14 @@ beforeEach(() => {
     canCommit: true,
   };
 
+  router = createRouter({
+    history: createWebHistory(),
+    routes,
+  });
+
+  router.push('/');
+  await router.isReady();
+
   wrapper = mount(PersonManagementView, {
     attachTo: document.getElementById('app') || '',
     global: {
@@ -141,6 +153,7 @@ beforeEach(() => {
         searchFilterStore,
         authStore,
       },
+      plugins: [router],
     },
   });
 });
@@ -168,6 +181,38 @@ describe('PersonManagementView', () => {
     expect(wrapper?.getComponent({ name: 'ResultTable' })).toBeTruthy();
     expect(wrapper?.find('[data-testid="person-table"]').isVisible()).toBe(true);
     expect(wrapper?.findAll('.v-data-table__tr').length).toBe(personStore.allUebersichten.size);
+  });
+
+  test('it navigates to details view', async () => {
+    const spy: MockInstance = vi.spyOn(router, 'push');
+    const person: Person = DoFactory.getPerson();
+    const zuordnung: Zuordnung = DoFactory.getZuordnung({ rollenArt: RollenArt.Lern });
+    const personWithZuordnungen: PersonWithZuordnungen = DoFactory.getPersonWithZuordnung(person, [zuordnung]);
+    personStore.allUebersichten.clear();
+    personStore.allUebersichten.set(personWithZuordnungen.id, personWithZuordnungen);
+    await flushPromises();
+
+    const row: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-table"] .v-data-table__tr');
+    await row?.trigger('click');
+    const personRow: Record<string, string | null> = {
+      id: personWithZuordnungen.id,
+      familienname: personWithZuordnungen.name.familienname,
+      vorname: personWithZuordnungen.name.vorname,
+      referrer: personWithZuordnungen.referrer,
+      personalnummer: personWithZuordnungen.personalnummer,
+      rollen: personWithZuordnungen.rollenAsString,
+      administrationsebenen: personWithZuordnungen.administrationsebenenAsString,
+      klassen: personWithZuordnungen.klassenZuordnungenAsString,
+    };
+    await wrapper?.getComponent({ name: 'ResultTable' }).vm.$emit('onHandleRowClick', undefined, { item: personRow });
+    await nextTick();
+
+    expect(spy).toHaveBeenCalledWith({
+      name: 'person-details',
+      params: {
+        id: personWithZuordnungen.id,
+      },
+    });
   });
 
   test('it autoselects orga if only one is available', async () => {
