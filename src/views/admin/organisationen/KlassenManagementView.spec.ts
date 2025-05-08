@@ -108,11 +108,17 @@ describe('KlassenManagementView', () => {
       DoFactory.getKlasse(schule2, { name: '9b', schuleDetails: schule2.name }),
     ];
 
+    organisationStore.errorCode = '';
+
     organisationStore.allOrganisationen = [schule1, schule2];
 
     organisationStore.allSchulen = [schule1, schule2];
 
     organisationStore.totalKlassen = 2;
+
+    organisationStore.getKlassenByOrganisationId = vi.fn();
+    organisationStore.getAllOrganisationen = vi.fn();
+    organisationStore.deleteOrganisationById = vi.fn();
 
     authStore.currentUser = authUser;
 
