@@ -16,7 +16,7 @@
   type Props = {
     isDialogVisible: boolean;
     selectedSchuleKennung?: string;
-    selectedPersons: PersonenWithRolleAndZuordnung;
+    selectedPersonen: PersonenWithRolleAndZuordnung;
   };
 
   type Emits = (event: 'update:dialogExit', finished: boolean) => void;
@@ -39,7 +39,7 @@
   const showErrorDialog: Ref<boolean, boolean> = ref(false);
 
   // Define the error list for the selected persons using the useBulkErrors composable
-  const bulkErrorList: ComputedRef<BulkErrorList[]> = computed(() => useBulkErrors(props.selectedPersons));
+  const bulkErrorList: ComputedRef<BulkErrorList[]> = computed(() => useBulkErrors(props.selectedPersonen));
 
   // Computed that determines the state of the operation. Could either be initial (Progress === 0) or Progressing (progress > 0) or finished (operation is complete)
   const progressState: ComputedRef<State> = computed(() => {
@@ -72,7 +72,7 @@
 
     // For every password in the Map find the corresponding person (using the key) and merge them together in the file.
     for (const [id, password] of operation.data.entries()) {
-      const personWithRolleAndZuordnung: PersonWithRolleAndZuordnung | undefined = props.selectedPersons.find(
+      const personWithRolleAndZuordnung: PersonWithRolleAndZuordnung | undefined = props.selectedPersonen.find(
         (p: PersonWithRolleAndZuordnung) => p.person.id === id,
       );
 
@@ -228,7 +228,7 @@
               :block="mdAndDown"
               :disabled="bulkOperationStore.currentOperation?.isRunning"
               class="primary"
-              @click="handleResetPassword(props.selectedPersons.map((p: PersonWithRolleAndZuordnung) => p.person.id))"
+              @click="handleResetPassword(props.selectedPersonen.map((p: PersonWithRolleAndZuordnung) => p.person.id))"
               data-testid="password-reset-submit-button"
               type="submit"
             >

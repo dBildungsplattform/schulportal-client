@@ -24,7 +24,7 @@
     errorCode: string;
     isLoading: boolean;
     isDialogVisible: boolean;
-    selectedPersons: PersonenWithRolleAndZuordnung;
+    selectedPersonen: PersonenWithRolleAndZuordnung;
   };
 
   type Emits = (event: 'update:dialogExit', finished: boolean) => void;
@@ -34,7 +34,7 @@
   const showDeletePersonDialog: Ref<boolean> = ref(props.isDialogVisible);
 
   // Define the error list for the selected persons using the useBulkErrors composable
-  const bulkErrorList: ComputedRef<BulkErrorList[]> = computed(() => useBulkErrors(props.selectedPersons));
+  const bulkErrorList: ComputedRef<BulkErrorList[]> = computed(() => useBulkErrors(props.selectedPersonen));
 
   async function closeDeletePersonDialog(finished: boolean): Promise<void> {
     if (bulkOperationStore.currentOperation) {
@@ -154,7 +154,7 @@
               :block="mdAndDown"
               :disabled="bulkOperationStore.currentOperation?.isRunning"
               class="primary"
-              @click="handleDeletePerson(props.selectedPersons.map((person) => person.person.id))"
+              @click="handleDeletePerson(props.selectedPersonen.map((person) => person.person.id))"
               data-testid="person-delete-submit-button"
               type="submit"
             >

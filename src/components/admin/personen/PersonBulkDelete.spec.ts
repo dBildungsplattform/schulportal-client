@@ -31,7 +31,7 @@ beforeEach(async () => {
       isLoading: false,
       errorCode: '',
       isDialogVisible: true,
-      selectedPersons: [
+      selectedPersonen: [
         {
           administrationsebenen: '',
           klassen: '1a',
