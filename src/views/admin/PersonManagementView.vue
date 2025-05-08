@@ -874,7 +874,7 @@
             :isLoading="personenkontextStore.loading"
             :isDialogVisible="rolleModifiyDialogVisible"
             :errorCode="personenkontextStore.errorCode"
-            :selectedPersonen="selectedPersonen"
+            :selectedPersonen
             @update:isDialogVisible="handleRolleModifyDialog($event)"
             @update:getUebersichten="getPaginatedPersonen(searchFilterStore.personenPage)"
           >
