@@ -16,15 +16,10 @@ import {
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 import { useSearchFilterStore, type SearchFilterStore } from './SearchFilterStore';
-import type { SortOrder } from '@/utils/sorting';
+import type { OrganisationSortField, SortOrder } from '@/utils/sorting';
 
 const organisationApi: OrganisationenApiInterface = OrganisationenApiFactory(undefined, '', axiosApiInstance);
 const searchFilterStore: SearchFilterStore = useSearchFilterStore();
-
-export enum SortField {
-  Name = 'name',
-  Kennung = 'kennung',
-}
 
 export type Organisation = {
   id: string;
@@ -128,7 +123,7 @@ export type OrganisationenFilter = {
   zugehoerigZu?: Array<string>;
   organisationIds?: Array<string>;
   sortOrder?: SortOrder;
-  sortField?: SortField;
+  sortField?: OrganisationSortField;
 };
 
 export type GetAdministrierteOrganisationenFilter = {

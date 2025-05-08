@@ -138,7 +138,10 @@
   onMounted(() => {
     // If the sortField in the store has a value then we don't trigger this logic. This logic should only be triggered when the table was first opened without any changes to sorting.
     if (!props.currentSort?.key) {
-      if (props.headers && props.headers.filter((header: { sortable?: boolean }) => header.sortable != false)[0]?.key) {
+      if (
+        props.headers &&
+        props.headers.filter((header: { sortable?: boolean }) => header.sortable !== false)[0]?.key
+      ) {
         emit('onTableUpdate', {
           sortField: props.headers[0]?.key,
           sortOrder: SortOrder.Asc,
@@ -171,7 +174,7 @@
     select-strategy="page"
     :showCurrentPage="true"
     show-select
-    :sort-by="currentSort ? [currentSort] : []"
+    :sortBy="currentSort ? [currentSort] : []"
     v-model="selectedItems"
     @update:sort-by="onUpdateOptions"
     @update:page="(page: number) => $emit('onPageUpdate', page)"

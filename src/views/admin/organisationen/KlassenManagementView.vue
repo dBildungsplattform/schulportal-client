@@ -7,13 +7,12 @@
   import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
   import {
     OrganisationsTyp,
-    SortField,
     useOrganisationStore,
     type Organisation,
     type OrganisationenFilter,
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
-  import { SortOrder } from '@/utils/sorting';
+  import { OrganisationSortField, SortOrder } from '@/utils/sorting';
   import { RollenSystemRecht } from '@/stores/RolleStore';
   import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
   import { type Mutable, type TranslatedObject } from '@/types.d';
@@ -198,8 +197,8 @@
     sortField: string | undefined;
     sortOrder: 'asc' | 'desc';
   }): Promise<void> {
-    if (update.sortField && Object.values(SortField).includes(update.sortField as SortField)) {
-      searchFilterStore.organisationenSortField = update.sortField as SortField;
+    if (update.sortField && Object.values(OrganisationSortField).includes(update.sortField as OrganisationSortField)) {
+      searchFilterStore.organisationenSortField = update.sortField as OrganisationSortField;
       searchFilterStore.organisationenSortOrder = update.sortOrder as SortOrder;
     }
   }

@@ -1,7 +1,6 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import type { RolleResponse } from './RolleStore';
-import type { SortField } from './OrganisationStore';
-import type { SortOrder } from '@/utils/sorting';
+import type { SortOrder, OrganisationSortField } from '@/utils/sorting';
 
 type SearchFilterState = {
   klassenPage: number;
@@ -22,7 +21,7 @@ type SearchFilterState = {
   selectedOrganisationen: Array<string> | null;
   personenSortField: string | null;
   personenSortOrder: string | null;
-  organisationenSortField: SortField | null;
+  organisationenSortField: OrganisationSortField | null;
   organisationenSortOrder: SortOrder | null;
   currentSort: { key: string; order: 'asc' | 'desc' } | null;
   selectedSchuleForKlassen: string | null;
