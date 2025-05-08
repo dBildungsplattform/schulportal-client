@@ -169,7 +169,7 @@
       },
       "bulkRolleModify": {
         "noKopersNrInfoHeadline": "Die ausgewählte Rolle verpflichtet zur Angabe einer KoPers.-Nr. am Benutzerkonto.",
-        "noKopersNrInfoText": "Bitte beachten Sie, dass ein Benutzerkonto ohne KoPers.-Nr. nach 8 Wochen automatisch gesperrt wird. Tragen Sie daher die KoPers.-Nr. bitte in der Gesamtübersicht des Benutzers nach, falls diese nicht bereits eingetragen ist."
+        "noKopersNrInfoText": "Bitte beachten: Alle ausgewählten Benutzerkonten müssen über eine KoPers.-Nr. verfügen. Tragen Sie diese ggf. bitte in der Gesamtübersicht des Benutzers nach, sobald sie Ihnen vorliegt. Ein Benutzerkonto mit der gewählten Rolle ohne KoPers.-Nr. wird nach spätestens 8 Wochen automatisch gesperrt."
       },
       "bulkUnassignOrganisation": {
         "cancelZuordnung": "Schulzuordnung aufheben",
