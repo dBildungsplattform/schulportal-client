@@ -49,7 +49,7 @@
   const hasAutoSelectedOrganisation: Ref<boolean> = ref(false);
 
   const selectedPersonIds: Ref<string[]> = ref<string[]>([]);
-  const selectedPersons: ComputedRef<PersonenWithRolleAndZuordnung> = computed(() => {
+  const selectedPersonen: ComputedRef<PersonenWithRolleAndZuordnung> = computed(() => {
     return (
       personStore.personenWithUebersicht?.filter((p: PersonenWithRolleAndZuordnung[number]) =>
         selectedPersonIds.value.includes(p.person.id),
@@ -874,7 +874,7 @@
             :isLoading="personenkontextStore.loading"
             :isDialogVisible="rolleModifiyDialogVisible"
             :errorCode="personenkontextStore.errorCode"
-            :personIDs="selectedPersonIds"
+            :selectedPersonen
             @update:isDialogVisible="handleRolleModifyDialog($event)"
             @update:getUebersichten="getPaginatedPersonen(searchFilterStore.personenPage)"
           >
@@ -885,7 +885,7 @@
             :errorCode="personStore.errorCode"
             :isLoading="personStore.loading"
             :isDialogVisible="benutzerDeleteDialogVisible"
-            :personIDs="selectedPersonIds"
+            :selectedPersonen
             @update:dialogExit="handleBulkDeleteDialog($event)"
           >
           </PersonBulkDelete>
@@ -894,7 +894,7 @@
             v-if="passwordResetDialogVisible"
             :isDialogVisible="passwordResetDialogVisible"
             :selectedSchuleKennung="selectedOrganisationKennung"
-            :selectedPersons
+            :selectedPersonen
             @update:dialogExit="handleBulkPasswordResetDialog($event)"
           >
           </PersonBulkPasswordReset>
@@ -902,7 +902,7 @@
             ref="organisation-unassign"
             v-if="organisationUnassignDialogVisible && selectedOrganisation"
             :isDialogVisible="organisationUnassignDialogVisible"
-            :selectedPersonenIds="selectedPersonIds"
+            :selectedPersonen
             :selectedOrganisation="selectedOrganisation"
             @update:dialogExit="handleUnassignOrgDialog($event)"
           >
