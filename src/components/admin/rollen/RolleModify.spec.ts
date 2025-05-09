@@ -98,7 +98,7 @@ describe('RolleModify', () => {
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'organisation-select' });
     await organisationAutocomplete?.setValue('O1');
-    await organisationAutocomplete?.vm.$emit('update:search', 'O1');
+    organisationAutocomplete?.vm.$emit('update:search', 'O1');
     await nextTick();
 
     // Set rolle value
@@ -106,7 +106,7 @@ describe('RolleModify', () => {
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'rolle-select' });
     await rolleAutocomplete?.setValue('54321');
-    await rolleAutocomplete?.vm.$emit('update:search', '54321');
+    rolleAutocomplete?.vm.$emit('update:search', '54321');
 
     await nextTick();
 
@@ -122,6 +122,30 @@ describe('RolleModify', () => {
 
     await flushPromises();
     expect(bulkModifyPersonenRolleSpy).toHaveBeenCalledTimes(1);
+  });
+
+  test('renders the hint when selected rolle has KOPERS_PFLICHT', async () => {
+    await nextTick();
+    // Set organisation value
+    const organisationAutocomplete: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'personenkontext-create' })
+      .findComponent({ ref: 'organisation-select' });
+    await organisationAutocomplete?.setValue('O1');
+    organisationAutocomplete?.vm.$emit('update:search', 'O1');
+    await nextTick();
+
+    // Set rolle value
+    const rolleAutocomplete: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'personenkontext-create' })
+      .findComponent({ ref: 'rolle-select' });
+    await rolleAutocomplete?.setValue('54329');
+    rolleAutocomplete?.vm.$emit('update:search', '54329');
+    await nextTick();
+
+    const kopersInfo: Element | null = document.body.querySelector('[data-testid="no-kopersnr-information"]');
+
+    expect(kopersInfo).not.toBeNull();
+    expect(kopersInfo?.textContent).toContain('KoPers.-Nr.');
   });
 
   test('renders the dialog when isDialogVisible is true', async () => {
