@@ -7,7 +7,7 @@
   import type { TranslatedObject } from '@/types';
   import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
   import { formatDateToISO, getNextSchuljahresende } from '@/utils/date';
-  import { befristungSchema } from '@/utils/validationPersonenkontext';
+  import { befristungSchema, isKopersRolle } from '@/utils/validationPersonenkontext';
   import { toTypedSchema } from '@vee-validate/yup';
   import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
   import { computed, ref, type ComputedRef, type Ref } from 'vue';
@@ -96,6 +96,14 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = formContext.defineField('selectedRolle', getVuetifyConfig);
 
+  const selectedRollen: ComputedRef<Array<string>> = computed(() => {
+    return selectedRolle.value ? [selectedRolle.value] : [];
+  });
+
+  const showKopersHint: ComputedRef<boolean> = computed(() => {
+    return isKopersRolle(selectedRollen.value, props.rollen);
+  });
+
   const [selectedBefristung, selectedBefristungProps]: [
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
@@ -108,10 +116,6 @@
 
   const isBefristungRequired: ComputedRef<boolean> = computed(() => {
     return selectedRolle.value ? isBefristungspflichtRolle([selectedRolle.value]) : false;
-  });
-
-  const selectedRollen: ComputedRef<Array<string>> = computed(() => {
-    return selectedRolle.value ? [selectedRolle.value] : [];
   });
 
   const {
@@ -173,37 +177,53 @@
     <LayoutCard
       data-testid="rolle-modify-layout-card"
       :closable="false"
-      :header="$t('admin.rolle.assignRolle')"
+      :header="t('admin.rolle.assignRolle')"
       @onCloseClicked="closeModifyRolleDeleteDialog()"
     >
       <v-container>
         <!-- Form Component -->
-        <PersonenkontextCreate
-          v-if="bulkOperationStore.currentOperation?.progress === 0"
-          ref="personenkontext-create"
-          :showHeadline="false"
-          :organisationen="organisationen"
-          :rollen="rollen"
-          :selectedOrganisationProps="selectedOrganisationProps"
-          :selectedRolleProps="selectedRolleProps"
-          :befristungInputProps="{
-            befristungProps: selectedBefristungProps,
-            befristungOptionProps: selectedBefristungOptionProps,
-            isUnbefristetDisabled: isBefristungRequired,
-            isBefristungRequired,
-            nextSchuljahresende: getNextSchuljahresende(),
-            befristung: selectedBefristung,
-            befristungOption: selectedBefristungOption,
-          }"
-          v-model:selectedOrganisation="selectedOrganisation"
-          v-model:selectedRolle="selectedRolle"
-          @update:selectedOrganisation="(value?: string) => (selectedOrganisation = value)"
-          @update:selectedRolle="(value?: string) => (selectedRolle = value)"
-          @update:canCommit="canCommit = $event"
-          @update:befristung="handleBefristungUpdate"
-          @update:calculatedBefristungOption="handleBefristungOptionUpdate"
-          @fieldReset="handleFieldReset"
-        />
+        <template v-if="bulkOperationStore.currentOperation?.progress === 0">
+          <PersonenkontextCreate
+            v-if="bulkOperationStore.currentOperation?.progress === 0"
+            ref="personenkontext-create"
+            :showHeadline="false"
+            :organisationen="organisationen"
+            :rollen="rollen"
+            :selectedOrganisationProps="selectedOrganisationProps"
+            :selectedRolleProps="selectedRolleProps"
+            :befristungInputProps="{
+              befristungProps: selectedBefristungProps,
+              befristungOptionProps: selectedBefristungOptionProps,
+              isUnbefristetDisabled: isBefristungRequired,
+              isBefristungRequired,
+              nextSchuljahresende: getNextSchuljahresende(),
+              befristung: selectedBefristung,
+              befristungOption: selectedBefristungOption,
+            }"
+            v-model:selectedOrganisation="selectedOrganisation"
+            v-model:selectedRolle="selectedRolle"
+            @update:selectedOrganisation="(value?: string) => (selectedOrganisation = value)"
+            @update:selectedRolle="(value?: string) => (selectedRolle = value)"
+            @update:canCommit="canCommit = $event"
+            @update:befristung="handleBefristungUpdate"
+            @update:calculatedBefristungOption="handleBefristungOptionUpdate"
+            @fieldReset="handleFieldReset"
+          />
+          <v-row
+            v-if="showKopersHint"
+            class="text-body bold px-md-16"
+            data-testid="no-kopersnr-information"
+          >
+            <v-col
+              offset="2"
+              cols="10"
+            >
+              <p>
+                {{ t('admin.person.bulkRolleModify.noKopersNrInfoText') }}
+              </p>
+            </v-col>
+          </v-row>
+        </template>
 
         <!-- Progress Bar -->
         <div
@@ -237,7 +257,7 @@
                 size="small"
               ></v-icon>
               <span class="subtitle-2">
-                {{ $t('admin.doNotCloseBrowserNotice') }}
+                {{ t('admin.doNotCloseBrowserNotice') }}
               </span>
             </v-col>
           </v-row>
@@ -271,7 +291,7 @@
               @click="closeModifyRolleDeleteDialog"
               data-testid="rolle-modify-discard-button"
             >
-              {{ $t('cancel') }}
+              {{ t('cancel') }}
             </v-btn>
           </v-col>
           <v-col
@@ -287,7 +307,7 @@
               data-testid="rolle-modify-submit-button"
               type="submit"
             >
-              {{ $t('admin.rolle.assignRolle') }}
+              {{ t('admin.rolle.assignRolle') }}
             </v-btn>
           </v-col>
         </v-row>
@@ -306,7 +326,7 @@
               @click="closeModifyRolleDeleteDialog"
               data-testid="rolle-modify-close-button"
             >
-              {{ $t('close') }}
+              {{ t('close') }}
             </v-btn>
           </v-col>
         </v-row>

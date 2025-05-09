@@ -72,6 +72,8 @@ beforeEach(async () => {
       plugins: [router],
     },
   });
+
+  await nextTick();
 });
 personenkontextStore.workflowStepResponse = DoFactory.getPersonenkontextWorkflowResponse({
   organisations: [organisation],
@@ -81,8 +83,6 @@ personenkontextStore.workflowStepResponse = DoFactory.getPersonenkontextWorkflow
 
 describe('RolleModify', () => {
   test('renders form and triggers submit', async () => {
-    await nextTick();
-
     // Set organisation value
     const organisationAutocomplete: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
@@ -114,9 +114,30 @@ describe('RolleModify', () => {
     expect(bulkModifyPersonenRolleSpy).toHaveBeenCalledTimes(1);
   });
 
-  test('renders the dialog when isDialogVisible is true', async () => {
+  test('renders the hint when selected rolle has KOPERS_PFLICHT', async () => {
+    // Set organisation value
+    const organisationAutocomplete: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'personenkontext-create' })
+      .findComponent({ ref: 'organisation-select' });
+    await organisationAutocomplete?.setValue(organisation.id);
+    organisationAutocomplete?.vm.$emit('update:search', organisation.id);
     await nextTick();
 
+    // Set rolle value
+    const rolleAutocomplete: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'personenkontext-create' })
+      .findComponent({ ref: 'rolle-select' });
+    await rolleAutocomplete?.setValue(kopersRolle.id);
+    rolleAutocomplete?.vm.$emit('update:search', kopersRolle.id);
+    await nextTick();
+
+    const kopersInfo: Element | null = document.body.querySelector('[data-testid="no-kopersnr-information"]');
+
+    expect(kopersInfo).not.toBeNull();
+    expect(kopersInfo?.textContent).toContain('KoPers.-Nr.');
+  });
+
+  test('renders the dialog when isDialogVisible is true', async () => {
     // Find the teleported content in the document body
     const dialogContent: Element | null = document.body.querySelector('[data-testid="rolle-modify-layout-card"]');
     expect(dialogContent).not.toBeNull();
@@ -132,8 +153,6 @@ describe('RolleModify', () => {
   });
 
   test('renders the dialog when isDialogVisible and closes it', async () => {
-    await nextTick();
-
     const dialogContent: Element | null = document.body.querySelector('[data-testid="rolle-modify-layout-card"]');
     expect(dialogContent).not.toBeNull();
 
