@@ -105,6 +105,12 @@ export const useBulkOperationStore: StoreDefinition<
         // Fetch the Zuordnungen for this specific user (To send alongside the new one)
         await personStore.getPersonenuebersichtById(personId);
 
+        if (personStore.errorCode) {
+          this.currentOperation.errors.set(personId, personStore.errorCode);
+          this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
+          continue;
+        }
+
         // Extract the current Zuordnungen for this person
         const existingZuordnungen: Zuordnung[] = personStore.personenuebersicht?.zuordnungen ?? [];
 
@@ -128,6 +134,12 @@ export const useBulkOperationStore: StoreDefinition<
           })),
           personId,
         );
+
+        if (personenkontextStore.errorCode) {
+          this.currentOperation.errors.set(personId, personenkontextStore.errorCode);
+          this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
+          continue;
+        }
 
         // Update progress for each item processed
         this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
@@ -213,6 +225,13 @@ export const useBulkOperationStore: StoreDefinition<
 
         await personStore.getPersonenuebersichtById(personId);
 
+        if (personStore.errorCode) {
+          this.currentOperation.errors.set(personId, personStore.errorCode);
+          this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
+          personStore.errorCode = '';
+          continue;
+        }
+
         const currentZuordnungen: Zuordnung[] = personStore.personenuebersicht?.zuordnungen || [];
         const combinedZuordnungen: Zuordnung[] = [...currentZuordnungen, { ...baseZuordnung }];
 
@@ -225,16 +244,21 @@ export const useBulkOperationStore: StoreDefinition<
           personId,
         );
 
+        if (personenkontextStore.errorCode) {
+          this.currentOperation.errors.set(personId, personenkontextStore.errorCode);
+          this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
+          personenkontextStore.errorCode = '';
+          continue;
+        }
+
         this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
       }
 
       this.currentOperation.isRunning = false;
       this.currentOperation.complete = true;
 
-      this.currentOperation.successMessage = 'admin.rolle.rollenAssignedSuccessfully';
-
-      if (personenkontextStore.errorCode === 'INVALID_PERSONENKONTEXT_FOR_PERSON_WITH_ROLLENART_LERN') {
-        personenkontextStore.errorCode = '';
+      if (this.currentOperation.errors.size === 0) {
+        this.currentOperation.successMessage = 'admin.rolle.rollenAssignedSuccessfully';
       }
     },
 
@@ -256,13 +280,21 @@ export const useBulkOperationStore: StoreDefinition<
 
         await personStore.deletePersonById(personId);
 
+        if (personStore.errorCode) {
+          this.currentOperation.errors.set(personId, personStore.errorCode);
+          this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
+          continue;
+        }
+
         this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
       }
 
       this.currentOperation.isRunning = false;
       this.currentOperation.complete = true;
 
-      this.currentOperation.successMessage = 'admin.person.deletePersonBulkSuccessMessage';
+      if (this.currentOperation.errors.size === 0) {
+        this.currentOperation.successMessage = 'admin.person.deletePersonBulkSuccessMessage';
+      }
     },
 
     async bulkChangeKlasse(personIDs: string[], selectedOrganisationId: string, newKlasseId: string) {

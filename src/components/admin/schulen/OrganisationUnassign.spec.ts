@@ -1,11 +1,15 @@
-import type { Organisation } from '@/stores/OrganisationStore';
-import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
-import OrganisationUnassign from './OrganisationUnassign.vue';
-import { createRouter, createWebHistory, type Router } from 'vue-router';
 import routes from '@/router/routes';
-import { nextTick } from 'vue';
-import type { MockInstance } from 'vitest';
 import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
+import type { Organisation } from '@/stores/OrganisationStore';
+import type { Person } from '@/stores/types/Person';
+import { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
+import type { Zuordnung } from '@/stores/types/Zuordnung';
+import { DoFactory } from '@/testing/DoFactory';
+import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
+import type { MockInstance } from 'vitest';
+import { nextTick } from 'vue';
+import { createRouter, createWebHistory, type Router } from 'vue-router';
+import OrganisationUnassign from './OrganisationUnassign.vue';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -13,19 +17,21 @@ const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
 
 type Props = {
   isDialogVisible: boolean;
-  selectedPersonenIds: string[];
+  selectedPersonen: Map<string, PersonWithZuordnungen>;
   selectedOrganisation: Organisation;
 };
+
+const schule: Organisation = DoFactory.getSchule();
+const person: Person = DoFactory.getPerson();
+const zuordnung: Zuordnung = DoFactory.getZuordnung({}, { organisation: schule });
 
 function mountComponent(partialProps: Partial<Props> = {}): VueWrapper {
   const props: Props = {
     isDialogVisible: true,
-    selectedPersonenIds: ['1'],
-    selectedOrganisation: {
-      id: '1234567',
-      name: 'Testorganisation',
-      typ: 'SCHULE',
-    },
+    selectedPersonen: new Map<string, PersonWithZuordnungen>([
+      [person.id, new PersonWithZuordnungen(person, [zuordnung])],
+    ]),
+    selectedOrganisation: schule,
     ...partialProps,
   };
 
@@ -83,6 +89,27 @@ describe('OrganisationUnassign', () => {
     expect(unassignPersonenkontexteSpy).toHaveBeenCalledTimes(1);
   });
 
+  test('displays confirmation form and trigger submit with errors', async () => {
+    wrapper = mountComponent();
+    await nextTick();
+
+    const submitButton: Element | null = document.body.querySelector('[data-testid="org-unassign-submit-button"]');
+    expect(submitButton).not.toBeNull();
+    await nextTick();
+
+    const unassignPersonenkontexteSpy: MockInstance = vi.spyOn(bulkOperationStore, 'bulkUnassignPersonenFromOrg');
+
+    if (submitButton) {
+      submitButton.dispatchEvent(new Event('click'));
+    }
+
+    await flushPromises();
+    expect(unassignPersonenkontexteSpy).toHaveBeenCalledTimes(1);
+
+    const errorDialog: Element | null = document.body.querySelector('.v-dialog');
+    expect(errorDialog).not.toBeNull();
+  });
+
   test('cancel button closes dialog and resets store', async () => {
     wrapper = mountComponent();
     const cancelButton: Element | null = document.body.querySelector('[data-testid="org-unassign-discard-button"]');
@@ -105,5 +132,17 @@ describe('OrganisationUnassign', () => {
 
     const progressBar: Element | null = document.body.querySelector('[data-testid="org-unassign-progressbar"]');
     expect(progressBar).not.toBeNull();
+  });
+
+  test('shows error dialog when showErrorDialog is true', async () => {
+    await nextTick();
+
+    // Manually set showErrorDialog to true
+    (wrapper?.vm as unknown as { showErrorDialog: boolean }).showErrorDialog = true;
+
+    await nextTick();
+
+    const errorDialog: VueWrapper | undefined = wrapper?.findComponent({ name: 'PersonBulkError' });
+    expect(errorDialog?.exists()).toBe(true);
   });
 });

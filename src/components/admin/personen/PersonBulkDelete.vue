@@ -1,24 +1,31 @@
 <script setup lang="ts">
-  import { computed, type ComputedRef, type Ref, ref } from 'vue';
-  import { type Composer, useI18n } from 'vue-i18n';
-  import { useDisplay } from 'vuetify';
+  import PersonBulkError from '@/components/admin/personen/PersonBulkError.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import { useBulkErrors, type BulkErrorList } from '@/composables/useBulkErrors';
   import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
+  import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
+  import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
+  import { computed, ref, type ComputedRef, type Ref } from 'vue';
+  import { useI18n, type Composer } from 'vue-i18n';
+  import { useDisplay } from 'vuetify';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
+  const personStore: PersonStore = usePersonStore();
 
   const successMessage: ComputedRef<string> = computed(() =>
     bulkOperationStore.currentOperation?.successMessage ? t(bulkOperationStore.currentOperation.successMessage) : '',
   );
 
+  const showErrorDialog: Ref<boolean, boolean> = ref(false);
+
   type Props = {
     errorCode: string;
     isLoading: boolean;
     isDialogVisible: boolean;
-    personIDs: string[];
+    selectedPersonen: Map<string, PersonWithZuordnungen>;
   };
 
   type Emits = (event: 'update:dialogExit', finished: boolean) => void;
@@ -27,16 +34,24 @@
   const emit: Emits = defineEmits<Emits>();
   const showDeletePersonDialog: Ref<boolean> = ref(props.isDialogVisible);
 
+  // Define the error list for the selected persons using the useBulkErrors composable
+  const bulkErrorList: ComputedRef<BulkErrorList[]> = computed(() => useBulkErrors(props.selectedPersonen));
+
   async function closeDeletePersonDialog(finished: boolean): Promise<void> {
     if (bulkOperationStore.currentOperation) {
       bulkOperationStore.resetState();
     }
+    personStore.errorCode = '';
     showDeletePersonDialog.value = false;
     emit('update:dialogExit', finished);
   }
 
   async function handleDeletePerson(personIDs: string[]): Promise<void> {
     await bulkOperationStore.bulkPersonenDelete(personIDs);
+
+    if (bulkOperationStore.currentOperation?.errors && bulkOperationStore.currentOperation.errors.size > 0) {
+      showErrorDialog.value = true;
+    }
   }
 </script>
 
@@ -140,7 +155,7 @@
               :block="mdAndDown"
               :disabled="bulkOperationStore.currentOperation?.isRunning"
               class="primary"
-              @click="handleDeletePerson(props.personIDs)"
+              @click="handleDeletePerson(Array.from(props.selectedPersonen.keys()))"
               data-testid="person-delete-submit-button"
               type="submit"
             >
@@ -170,4 +185,19 @@
       </v-card-actions>
     </LayoutCard>
   </v-dialog>
+  <template v-if="showErrorDialog">
+    <PersonBulkError
+      :bulkOperationName="$t('admin.person.deletePerson')"
+      :isDialogVisible="showErrorDialog"
+      @update:isDialogVisible="
+        (val: boolean) => {
+          showErrorDialog = val;
+          if (!val) {
+            closeDeletePersonDialog(true);
+          }
+        }
+      "
+      :errors="bulkErrorList"
+    />
+  </template>
 </template>

@@ -17,7 +17,7 @@ const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
 type Props = {
   isDialogVisible: boolean;
   selectedSchuleKennung?: string;
-  selectedPersons: Map<string, PersonWithZuordnungen>;
+  selectedPersonen: Map<string, PersonWithZuordnungen>;
 };
 
 const mockPerson: Person = DoFactory.getPerson();
@@ -30,7 +30,7 @@ function mountComponent(partialProps: Partial<Props> = {}): VueWrapper {
   const props: Props = {
     isDialogVisible: true,
     selectedSchuleKennung,
-    selectedPersons: new Map([[mockPerson.id, DoFactory.getPersonWithZuordnung(mockPerson, [zuordnung])]]),
+    selectedPersonen: new Map([[mockPerson.id, DoFactory.getPersonWithZuordnung(mockPerson, [zuordnung])]]),
     ...partialProps,
   };
 
@@ -219,4 +219,17 @@ describe('PersonBulkPasswordReset', () => {
       expect(download).toHaveBeenCalledWith(filename, expect.any(Blob));
     },
   );
+
+  test('shows error dialog when showErrorDialog is true', async () => {
+    const wrapper: VueWrapper | undefined = mountComponent();
+    await nextTick();
+
+    // Manually set showErrorDialog to true
+    (wrapper.vm as unknown as { showErrorDialog: boolean }).showErrorDialog = true;
+
+    await nextTick();
+
+    const errorDialog: VueWrapper | undefined = wrapper.findComponent({ name: 'PersonBulkError' });
+    expect(errorDialog.exists()).toBe(true);
+  });
 });

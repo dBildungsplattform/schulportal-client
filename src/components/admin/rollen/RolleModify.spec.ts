@@ -1,17 +1,21 @@
-import { test, type MockInstance } from 'vitest';
-import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
-import { RollenArt, RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
-import { createRouter, createWebHistory, type Router } from 'vue-router';
 import routes from '@/router/routes';
-import RolleModify from './RolleModify.vue';
-import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
-import { nextTick } from 'vue';
 import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
+import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
+import { RollenArt, RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
+import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
+import { test, type MockInstance } from 'vitest';
+import { nextTick } from 'vue';
+import { createRouter, createWebHistory, type Router } from 'vue-router';
+import RolleModify from './RolleModify.vue';
+import { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
+import { DoFactory } from '@/testing/DoFactory';
+import type { Person } from '@/stores/types/Person';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
 const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
 const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
+const person: Person = DoFactory.getPerson({ id: 'test' });
 
 beforeEach(async () => {
   // Create a container for the app and append it to the document body
@@ -33,7 +37,9 @@ beforeEach(async () => {
       isLoading: false,
       errorCode: '',
       isDialogVisible: true,
-      personIDs: ['person1', 'person2'],
+      selectedPersonen: new Map([
+        ['test', new PersonWithZuordnungen(person, [DoFactory.getZuordnung({ sskName: '1a' })])],
+      ]),
       organisationen: [
         { title: 'orga', value: 'O1' },
         { title: 'orga1', value: '1133' },
@@ -98,7 +104,7 @@ describe('RolleModify', () => {
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'organisation-select' });
     await organisationAutocomplete?.setValue('O1');
-    await organisationAutocomplete?.vm.$emit('update:search', 'O1');
+    organisationAutocomplete?.vm.$emit('update:search', 'O1');
     await nextTick();
 
     // Set rolle value
@@ -106,7 +112,7 @@ describe('RolleModify', () => {
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'rolle-select' });
     await rolleAutocomplete?.setValue('54321');
-    await rolleAutocomplete?.vm.$emit('update:search', '54321');
+    rolleAutocomplete?.vm.$emit('update:search', '54321');
 
     await nextTick();
 
@@ -122,6 +128,52 @@ describe('RolleModify', () => {
 
     await flushPromises();
     expect(bulkModifyPersonenRolleSpy).toHaveBeenCalledTimes(1);
+  });
+
+  test('shows error dialog if bulk operation has errors', async () => {
+    await nextTick();
+
+    // Mock the bulk operation with an error
+    bulkOperationStore.currentOperation = {
+      type: null,
+      isRunning: false,
+      progress: 0,
+      complete: false,
+      errors: new Map([['someId', 'Some error message']]),
+      data: new Map(),
+      successMessage: '',
+    };
+
+    const organisationAutocomplete: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'personenkontext-create' })
+      .findComponent({ ref: 'organisation-select' });
+    await organisationAutocomplete?.setValue('O1');
+    organisationAutocomplete?.vm.$emit('update:search', 'O1');
+    await nextTick();
+
+    const rolleAutocomplete: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'personenkontext-create' })
+      .findComponent({ ref: 'rolle-select' });
+    await rolleAutocomplete?.setValue('54321');
+    rolleAutocomplete?.vm.$emit('update:search', '54321');
+    await nextTick();
+
+    const submitButton: Element | null = document.body.querySelector('[data-testid="rolle-modify-submit-button"]');
+    expect(submitButton).not.toBeNull();
+    await nextTick();
+
+    const bulkModifyPersonenRolleSpy: MockInstance = vi.spyOn(bulkOperationStore, 'bulkModifyPersonenRolle');
+
+    if (submitButton) {
+      submitButton.dispatchEvent(new Event('click'));
+    }
+
+    await flushPromises();
+
+    expect(bulkModifyPersonenRolleSpy).toHaveBeenCalledTimes(1);
+
+    const errorDialog: Element | null = document.body.querySelector('.v-dialog');
+    expect(errorDialog).not.toBeNull();
   });
 
   test('renders the dialog when isDialogVisible is true', async () => {
@@ -154,5 +206,17 @@ describe('RolleModify', () => {
     if (discardButton) {
       discardButton.dispatchEvent(new Event('click'));
     }
+  });
+
+  test('shows error dialog when showErrorDialog is true', async () => {
+    await nextTick();
+
+    // Manually set showErrorDialog to true
+    (wrapper?.vm as unknown as { showErrorDialog: boolean }).showErrorDialog = true;
+
+    await nextTick();
+
+    const errorDialog: VueWrapper | undefined = wrapper?.findComponent({ name: 'PersonBulkError' });
+    expect(errorDialog?.exists()).toBe(true);
   });
 });
