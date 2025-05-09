@@ -19,7 +19,7 @@
     OrganisationsTyp,
     useOrganisationStore,
   } from '@/stores/OrganisationStore';
-  import { type PersonStore, type Personendatensatz, SortField, SortOrder, usePersonStore } from '@/stores/PersonStore';
+  import { type PersonStore, SortField, SortOrder, usePersonStore } from '@/stores/PersonStore';
   import { type PersonenkontextStore, usePersonenkontextStore } from '@/stores/PersonenkontextStore';
   import { type RolleResponse, type RolleStore, RollenArt, RollenMerkmal, useRolleStore } from '@/stores/RolleStore';
   import { type SearchFilterStore, useSearchFilterStore } from '@/stores/SearchFilterStore';
