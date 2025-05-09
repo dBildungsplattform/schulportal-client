@@ -5,10 +5,13 @@
   import PersonBulkDelete from '@/components/admin/personen/PersonBulkDelete.vue';
   import PersonBulkPasswordReset from '@/components/admin/personen/PersonBulkPasswordReset.vue';
   import RolleModify from '@/components/admin/rollen/RolleModify.vue';
+  import OrganisationUnassign from '@/components/admin/schulen/OrganisationUnassign.vue';
+  import InfoDialog from '@/components/alert/InfoDialog.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { useOrganisationen } from '@/composables/useOrganisationen';
   import { type TranslatedRolleWithAttrs, useRollen } from '@/composables/useRollen';
   import { type AuthStore, useAuthStore } from '@/stores/AuthStore';
+  import { OperationType } from '@/stores/BulkOperationStore';
   import {
     type Organisation,
     type OrganisationStore,
@@ -24,16 +27,13 @@
     usePersonStore,
   } from '@/stores/PersonStore';
   import { type PersonenkontextStore, usePersonenkontextStore } from '@/stores/PersonenkontextStore';
-  import { type RolleResponse, type RolleStore, RollenArt, RollenMerkmal, useRolleStore } from '@/stores/RolleStore';
+  import { type RolleResponse, type RolleStore, RollenArt, useRolleStore } from '@/stores/RolleStore';
   import { type SearchFilterStore, useSearchFilterStore } from '@/stores/SearchFilterStore';
   import { type TranslatedObject } from '@/types.d';
   import { type ComputedRef, type Ref, computed, onMounted, ref, watch } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import { type Router, useRouter } from 'vue-router';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
-  import OrganisationUnassign from '@/components/admin/schulen/OrganisationUnassign.vue';
-  import InfoDialog from '@/components/alert/InfoDialog.vue';
-  import { OperationType } from '@/stores/BulkOperationStore';
 
   const searchFieldComponent: Ref = ref();
 
@@ -165,12 +165,9 @@
 
   const rollenForForm: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
 
-  // Only Rollen from type LEHR and without any Befristungspflicht wil be offered for now
+  // Only Rollen from type LEHR
   const lehrRollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = computed(() => {
-    return rollenForForm.value?.filter(
-      (rolle: TranslatedRolleWithAttrs) =>
-        rolle.rollenart === RollenArt.Lehr && !rolle.merkmale?.has(RollenMerkmal.BefristungPflicht),
-    );
+    return rollenForForm.value?.filter((rolle: TranslatedRolleWithAttrs) => rolle.rollenart === RollenArt.Lehr);
   });
 
   const statuses: Array<string> = ['Aktiv', 'Inaktiv'];
