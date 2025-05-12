@@ -153,6 +153,11 @@
       },
       "unknownOrganisation": "Unbekannte Organisation"
     },
+    "addPerson": {
+      "management":"Person hinzufügen",
+      "searchStateEmployee":"Landesbediensteter (Nur Suche)",
+      "createNew":"Andere Person (Neuanlage)"
+    },
     "person": {
       "addedSuccessfully": "{firstname} {lastname} wurde erfolgreich hinzugefügt.",
       "addNew": "Neuen Benutzer hinzufügen",

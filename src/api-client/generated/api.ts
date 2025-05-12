@@ -2832,6 +2832,8 @@ export const RollenSystemRecht = {
     RollenVerwalten: 'ROLLEN_VERWALTEN',
     PersonenSofortLoeschen: 'PERSONEN_SOFORT_LOESCHEN',
     PersonenVerwalten: 'PERSONEN_VERWALTEN',
+    LandesbediensteteSuchenUndHinzufuegen: 'LANDESBEDIENSTETE_SUCHEN_UND_HINZUFUEGEN',
+    EingeschraenktNeueBenutzerErstellen: 'EINGESCHRAENKT_NEUE_BENUTZER_ERSTELLEN',
     SchulenVerwalten: 'SCHULEN_VERWALTEN',
     KlassenVerwalten: 'KLASSEN_VERWALTEN',
     SchultraegerVerwalten: 'SCHULTRAEGER_VERWALTEN',
