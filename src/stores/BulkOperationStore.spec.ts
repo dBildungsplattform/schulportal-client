@@ -508,8 +508,12 @@ describe('BulkOperationStore', () => {
         faker.string.uuid(),
       );
 
-      mockAdapter.onGet(`/api/dbiam/personenuebersicht/${personId}`).replyOnce(200, []);
-      mockAdapter.onPut(`/api/personenkontext-workflow/${personId}`).replyOnce(200, []);
+      mockAdapter
+        .onGet(`/api/dbiam/personenuebersicht/${personId}`)
+        .replyOnce(200, DoFactory.getDBiamPersonenuebersichtResponse({ personId }));
+      mockAdapter
+        .onPut(`/api/personenkontext-workflow/${personId}`)
+        .replyOnce(200, DoFactory.getPersonenkontextUpdateResponse());
 
       expect(bulkOperationStore.currentOperation?.isRunning).toBe(true);
       expect(bulkOperationStore.currentOperation?.progress).toBe(0);
@@ -617,6 +621,28 @@ describe('BulkOperationStore', () => {
         ]),
         mockPersonIds[1],
       );
+    });
+
+    it('should handle errors if endpoint replies with 500', async () => {
+      const personIds: string[] = [faker.string.uuid(), faker.string.uuid()];
+
+      mockAdapter.onGet(`/api/dbiam/personenuebersicht/${personIds[0]}`).replyOnce(500, { i18nKey: 'getError' });
+      mockAdapter
+        .onGet(`/api/dbiam/personenuebersicht/${personIds[1]}`)
+        .replyOnce(200, DoFactory.getDBiamPersonenuebersichtResponse({ personId: personIds[1] }));
+      mockAdapter.onPut(`/api/personenkontext-workflow/${personIds[1]}`).replyOnce(500, { i18nKey: 'putError' });
+
+      const bulkChangeKlassePromise: Promise<void> = bulkOperationStore.bulkChangeKlasse(
+        personIds,
+        faker.string.uuid(),
+        faker.string.uuid(),
+      );
+
+      await bulkChangeKlassePromise;
+
+      expect(bulkOperationStore.currentOperation?.errors.size).toBe(2);
+      expect(bulkOperationStore.currentOperation?.errors.get(personIds[0]!)).toBe('getError');
+      expect(bulkOperationStore.currentOperation?.errors.get(personIds[1]!)).toBe('putError');
     });
   });
 });

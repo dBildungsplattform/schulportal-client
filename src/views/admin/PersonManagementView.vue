@@ -981,7 +981,7 @@
             persistent
           >
             <PersonBulkChangeKlasse
-              :selectedPersonIds
+              :selectedPersonen
               :selectedSchuleId="selectedOrganisation?.id"
               :availableKlassen="klassenOptions"
               @update:dialog-exit="handleBulkKlasseChangeDialog"

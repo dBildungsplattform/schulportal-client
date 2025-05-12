@@ -313,6 +313,12 @@ export const useBulkOperationStore: StoreDefinition<
       for (let i: number = 0; i < personIDs.length; i++) {
         const personId: string = personIDs[i]!;
         await personStore.getPersonenuebersichtById(personId);
+        if (personStore.errorCode) {
+          this.currentOperation.errors.set(personId, personStore.errorCode);
+          personStore.errorCode = '';
+          this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
+          continue;
+        }
 
         const existingZuordnungen: Zuordnung[] = personStore.personenuebersicht?.zuordnungen ?? [];
         const zuordnungenToBeUpdated: Zuordnung[] = [];
@@ -346,6 +352,11 @@ export const useBulkOperationStore: StoreDefinition<
           personId,
         );
         this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
+
+        if (personenkontextStore.errorCode) {
+          this.currentOperation.errors.set(personId, personenkontextStore.errorCode);
+          personenkontextStore.errorCode = '';
+        }
       }
 
       this.currentOperation.isRunning = false;

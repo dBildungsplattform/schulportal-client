@@ -1,6 +1,9 @@
 <script setup lang="ts">
+  import PersonBulkError from '@/components/admin/personen/PersonBulkError.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import { type BulkErrorList, useBulkErrors } from '@/composables/useBulkErrors';
   import { type BulkOperationStore, useBulkOperationStore } from '@/stores/BulkOperationStore';
+  import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
   import type { TranslatedObject } from '@/types';
   import { computed, type ComputedRef, type Ref, ref } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
@@ -13,7 +16,7 @@
 
   type Props = {
     selectedSchuleId?: string;
-    selectedPersonIds?: string[];
+    selectedPersonen: Map<string, PersonWithZuordnungen>;
     availableKlassen?: TranslatedObject[];
   };
   const props: Props = defineProps<Props>();
@@ -25,12 +28,14 @@
   const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
 
   const selectedKlasse: Ref<string | null> = ref(null);
+  const showErrorDialog: Ref<boolean, boolean> = ref(false);
 
   const state: ComputedRef<State> = computed(() => {
     if (bulkOperationStore.currentOperation?.complete) return State.FINISHED;
     if (bulkOperationStore.currentOperation?.isRunning) return State.PROGRESSING;
     return State.INITIAL;
   });
+
   const progress: ComputedRef<number> = computed(() => {
     if (!bulkOperationStore.currentOperation?.progress) return 0;
     return bulkOperationStore.currentOperation.progress;
@@ -41,13 +46,20 @@
     return false;
   });
 
+  // Define the error list for the selected persons using the useBulkErrors composable
+  const bulkErrorList: ComputedRef<BulkErrorList[]> = computed(() => useBulkErrors(props.selectedPersonen));
+
   const bulkChangeKlasse = async (): Promise<void> => {
     if (!selectedKlasse.value) return;
     await bulkOperationStore.bulkChangeKlasse(
-      props.selectedPersonIds ?? [],
+      Array.from(props.selectedPersonen.keys()),
       props.selectedSchuleId ?? '',
       selectedKlasse.value,
     );
+
+    if (bulkOperationStore.currentOperation?.errors && bulkOperationStore.currentOperation.errors.size > 0) {
+      showErrorDialog.value = true;
+    }
   };
 
   const handleCloseDialog = (): void => {
@@ -198,4 +210,19 @@
       </v-row>
     </v-card-actions>
   </LayoutCard>
+  <template v-if="showErrorDialog">
+    <PersonBulkError
+      :bulkOperationName="t('admin.person.bulkChangeKlasse')"
+      :isDialogVisible="showErrorDialog"
+      @update:isDialogVisible="
+        (val: boolean) => {
+          showErrorDialog = val;
+          if (!val) {
+            emit('update:dialogExit', true);
+          }
+        }
+      "
+      :errors="bulkErrorList"
+    />
+  </template>
 </template>

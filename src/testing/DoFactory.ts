@@ -5,10 +5,12 @@ import {
   RollenSystemRecht,
   TraegerschaftTyp,
   Vertrauensstufe,
+  type DBiamPersonenkontextResponse,
   type DBiamPersonenuebersichtResponse,
   type DBiamPersonenzuordnungResponse,
   type OrganisationResponse,
   type PersonendatensatzResponse,
+  type PersonenkontexteUpdateResponse,
   type PersonenkontextRolleFieldsResponse,
   type PersonResponse,
   type RollenSystemRechtServiceProviderIDResponse,
@@ -203,6 +205,31 @@ export class DoFactory {
           },
         },
       ],
+      ...props,
+    };
+  }
+
+  public static getPersonenkontextUpdateResponse(
+    props?: Partial<PersonenkontexteUpdateResponse>,
+  ): PersonenkontexteUpdateResponse {
+    const person: Person = DoFactory.getPerson();
+    return {
+      dBiamPersonenkontextResponses: [
+        DoFactory.getDBiamPersonenkontextResponse({ personId: person.id }),
+        DoFactory.getDBiamPersonenkontextResponse({ personId: person.id }),
+      ],
+      ...props,
+    };
+  }
+
+  public static getDBiamPersonenkontextResponse(
+    props?: Partial<DBiamPersonenkontextResponse>,
+  ): DBiamPersonenkontextResponse {
+    return {
+      personId: faker.string.uuid(),
+      organisationId: faker.string.uuid(),
+      rolleId: faker.string.uuid(),
+      befristung: faker.date.soon().toISOString(),
       ...props,
     };
   }

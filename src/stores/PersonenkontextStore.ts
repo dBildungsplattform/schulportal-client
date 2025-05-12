@@ -202,6 +202,7 @@ export const usePersonenkontextStore: StoreDefinition<
         this.loading = false;
       }
     },
+
     async createPersonWithKontexte(
       params: DbiamCreatePersonWithPersonenkontexteBodyParams,
     ): Promise<DBiamPersonResponse> {

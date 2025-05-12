@@ -1,6 +1,10 @@
 import routes from '@/router/routes';
 import { OperationType, useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
 import type { Organisation } from '@/stores/OrganisationStore';
+import { RollenArt } from '@/stores/RolleStore';
+import type { Person } from '@/stores/types/Person';
+import { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
+import type { Zuordnung } from '@/stores/types/Zuordnung';
 import { DoFactory } from '@/testing/DoFactory';
 import type { TranslatedObject } from '@/types';
 import { faker } from '@faker-js/faker';
@@ -14,7 +18,14 @@ import PersonBulkChangeKlasse from './PersonBulkChangeKlasse.vue';
 let router: Router;
 const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
 const mockPersonIds: string[] = [faker.string.uuid(), faker.string.uuid(), faker.string.uuid(), faker.string.uuid()];
+const mockPersons: Map<string, PersonWithZuordnungen> = new Map();
 const mockSchule: Organisation = DoFactory.getSchule();
+mockPersonIds.forEach((id: string) => {
+  const person: Person = DoFactory.getPerson({ id });
+  const klasse: Organisation = DoFactory.getKlasse(mockSchule);
+  const zuordnung: Zuordnung = DoFactory.getZuordnung({ rollenArt: RollenArt.Lern }, { organisation: klasse });
+  mockPersons.set(id, new PersonWithZuordnungen(person, [zuordnung]));
+});
 const mockKlassen: Array<Organisation> = [
   DoFactory.getKlasse(mockSchule),
   DoFactory.getKlasse(mockSchule),
@@ -28,14 +39,14 @@ const mockAvailableKlassen: Array<TranslatedObject> = mockKlassen.map((klasse: O
 
 type Props = {
   selectedSchuleId?: string;
-  selectedPersonIds?: string[];
+  selectedPersonen: Map<string, PersonWithZuordnungen>;
   availableKlassen?: TranslatedObject[];
 };
 
 function mountComponent(partialProps: Partial<Props> = {}): VueWrapper {
   const props: Props = {
     selectedSchuleId: mockSchule.id,
-    selectedPersonIds: mockPersonIds,
+    selectedPersonen: mockPersons,
     availableKlassen: mockAvailableKlassen,
     ...partialProps,
   };
@@ -98,6 +109,28 @@ describe('PersonBulkChangeKlasse', () => {
     await button.trigger('click');
 
     expect(spy).toHaveBeenCalledWith(mockPersonIds, mockSchule.id, mockKlassen[0]!.id);
+  });
+
+  test('if there are errors, it should display error dialog', async () => {
+    const spy: MockInstance = vi.spyOn(bulkOperationStore, 'bulkChangeKlasse');
+    spy.mockImplementationOnce(() => {
+      mockPersonIds.forEach((id: string) => {
+        bulkOperationStore.currentOperation?.errors.set(id, 'error');
+      });
+    });
+    const wrapper: VueWrapper = mountComponent();
+    await nextTick();
+
+    expect(spy).not.toHaveBeenCalled();
+
+    await wrapper.findComponent('[data-testid="bulk-change-klasse-select"]').setValue(mockKlassen[0]!.id);
+    const button: DOMWrapper<HTMLButtonElement> = wrapper.find('[data-testid="bulk-change-klasse-button"]');
+    await button.trigger('click');
+
+    await nextTick();
+
+    const errorDialog: VueWrapper = wrapper.findComponent({ name: 'PersonBulkError' });
+    expect(errorDialog.exists()).toBe(true);
   });
 
   test('clicking the close-button should emit close-event', async () => {
