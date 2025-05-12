@@ -173,6 +173,9 @@
         "closeList": "Liste schließen",
         "saveList": "Liste speichern"
       },
+      "bulkRolleModify": {
+        "noKopersNrInfoText": "Bitte beachten: Alle ausgewählten Benutzerkonten müssen über eine KoPers.-Nr. verfügen. Tragen Sie diese ggf. bitte in der Gesamtübersicht des Benutzers nach, sobald sie Ihnen vorliegt. Ein Benutzerkonto mit der gewählten Rolle ohne KoPers.-Nr. wird nach spätestens 8 Wochen automatisch gesperrt."
+      },
       "bulkUnassignOrganisation": {
         "cancelZuordnung": "Schulzuordnung aufheben",
         "confirmation": "Möchten Sie wirklich die Schulzuordnungen der ausgewählten Benutzer aufheben?",

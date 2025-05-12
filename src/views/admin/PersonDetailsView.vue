@@ -41,7 +41,7 @@
   } from '@/stores/TwoFactorAuthentificationStore';
   import type { Person } from '@/stores/types/Person';
   import type { PersonenUebersicht } from '@/stores/types/PersonenUebersicht';
-  import type { Zuordnung } from '@/stores/types/Zuordnung';
+  import { Zuordnung } from '@/stores/types/Zuordnung';
   import type { TranslatedObject } from '@/types';
   import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
   import { adjustDateForTimezoneAndFormat, formatDate, getNextSchuljahresende } from '@/utils/date';
@@ -473,10 +473,9 @@
       );
       // If the parent is found then add the Klasse property to it
       if (administrierendeZuordnung) {
-        result.push({
-          ...administrierendeZuordnung,
-          klasse: klasse.sskName,
-        });
+        const newZuordnungWithKlasse: ZuordnungWithKlasse = Zuordnung.from(administrierendeZuordnung);
+        newZuordnungWithKlasse.klasse = klasse.sskName;
+        result.push(newZuordnungWithKlasse);
       }
     }
     // Other Zuordnungen not of typ Klasse
@@ -1052,22 +1051,21 @@
     const befristung: Date | null = befristungDate ? new Date(befristungDate) : null;
 
     if (organisation) {
-      newZuordnung.value = {
-        sskId: organisation.id,
-        rolleId: selectedRolle.value ?? '',
-        sskDstNr: organisation.kennung ?? '',
-        sskName: organisation.name,
-        rolle:
-          rollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolle.value)?.title || '',
-        rollenArt: rollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolle.value)
+      newZuordnung.value = new Zuordnung(
+        organisation.id,
+        selectedRolle.value ?? '',
+        organisation.name,
+        organisation.kennung ?? '',
+        rollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolle.value)?.title || '',
+        rollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolle.value)
           ?.rollenart as RollenArt,
-        administriertVon: organisation.administriertVon ?? '',
-        editable: true,
-        merkmale: [],
-        typ: OrganisationsTyp.Schule,
-        befristung: befristung,
-        admins: [],
-      };
+        organisation.administriertVon ?? '',
+        OrganisationsTyp.Schule,
+        true,
+        befristung,
+        [],
+        [],
+      );
       if (zuordnungenResult.value) {
         finalZuordnungen.value = zuordnungenResult.value;
         finalZuordnungen.value.push(newZuordnung.value);
@@ -1075,41 +1073,29 @@
 
       // Add the new selected Klasse to finalZuordnungen
       if (klasse) {
-        finalZuordnungen.value.push({
-          sskId: klasse.id,
-          rolleId: selectedRolle.value ?? '',
-          sskDstNr: klasse.kennung ?? '',
-          sskName: klasse.name,
-          rolle:
+        finalZuordnungen.value.push(
+          new Zuordnung(
+            klasse.id,
+            selectedRolle.value ?? '',
+            klasse.name,
+            klasse.kennung ?? '',
             rollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolle.value)?.title || '',
-          rollenArt: rollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolle.value)
-            ?.rollenart as RollenArt,
-          administriertVon: klasse.administriertVon ?? '',
-          editable: true,
-          typ: OrganisationsTyp.Klasse,
-          merkmale: [],
-          befristung: befristung,
-          admins: [],
-        });
+            rollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolle.value)
+              ?.rollenart as RollenArt,
+            klasse.administriertVon ?? '',
+            OrganisationsTyp.Klasse,
+            true,
+            befristung,
+            [],
+            [],
+          ),
+        );
       }
 
       // Add all existing Klassenzuordnungen to finalZuordnungen
       if (existingKlassen) {
         existingKlassen.forEach((existingKlasse: Zuordnung) => {
-          finalZuordnungen.value.push({
-            sskId: existingKlasse.sskId,
-            rolleId: existingKlasse.rolleId,
-            sskDstNr: existingKlasse.sskDstNr,
-            sskName: existingKlasse.sskName,
-            rolle: existingKlasse.rolle,
-            rollenArt: existingKlasse.rollenArt,
-            administriertVon: existingKlasse.administriertVon,
-            editable: true,
-            merkmale: [],
-            typ: OrganisationsTyp.Klasse,
-            befristung: existingKlasse.befristung,
-            admins: [],
-          });
+          finalZuordnungen.value.push(Zuordnung.from(existingKlasse));
         });
       }
     }
@@ -1144,23 +1130,22 @@
       // Used to build the Zuordnung of type Schule and keep track of it (Only use it in the template)
       // This is basically the old Zuordnung in the Schule but since it is already available in ZuordnungenResult we won't be adding this to the finalZuordnungen
       // It's just better to use this since using an array of Zuordnung (selectedZuordnungen) in the template is not so fun
-      newZuordnung.value = {
-        sskId: organisation.id,
-        rolleId: selectedZuordnungen.value[0]?.rolleId ?? '',
-        sskDstNr: organisation.kennung ?? '',
-        sskName: organisation.name,
-        rolle:
-          rollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedZuordnungen.value[0]?.rolleId)
-            ?.title || '',
-        rollenArt: rollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolle.value)
+      newZuordnung.value = new Zuordnung(
+        organisation.id,
+        selectedZuordnungen.value[0]?.rolleId ?? '',
+        organisation.name,
+        organisation.kennung ?? '',
+        rollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedZuordnungen.value[0]?.rolleId)
+          ?.title || '',
+        rollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolle.value)
           ?.rollenart as RollenArt,
-        administriertVon: organisation.administriertVon ?? '',
-        editable: true,
-        merkmale: [],
-        typ: OrganisationsTyp.Schule,
-        admins: [],
-        befristung: null,
-      };
+        organisation.administriertVon ?? '',
+        OrganisationsTyp.Schule,
+        true,
+        null,
+        [],
+        [],
+      );
 
       if (zuordnungenResult.value) {
         finalZuordnungen.value = zuordnungenResult.value;
@@ -1198,24 +1183,25 @@
 
       // Add the new Klasse Zuordnung
       if (newKlasse) {
-        finalZuordnungen.value.push({
-          sskId: newKlasse.id,
-          rolleId: selectedZuordnungen.value[0]?.rolleId ?? '',
-          sskDstNr: newKlasse.kennung ?? '',
-          sskName: newKlasse.name,
-          rolle:
+        finalZuordnungen.value.push(
+          new Zuordnung(
+            newKlasse.id,
+            selectedZuordnungen.value[0]?.rolleId ?? '',
+            newKlasse.name,
+            newKlasse.kennung ?? '',
             rollen.value?.find(
               (rolle: TranslatedRolleWithAttrs) => rolle.value === selectedZuordnungen.value[0]?.rolleId,
             )?.title || '',
-          rollenArt: rollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolle.value)
-            ?.rollenart as RollenArt,
-          administriertVon: newKlasse.administriertVon ?? '',
-          editable: true,
-          merkmale: [],
-          typ: OrganisationsTyp.Klasse,
-          admins: [],
-          befristung: null,
-        });
+            rollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolle.value)
+              ?.rollenart as RollenArt,
+            newKlasse.administriertVon ?? '',
+            OrganisationsTyp.Klasse,
+            true,
+            null,
+            [],
+            [],
+          ),
+        );
       }
     }
 
@@ -1235,11 +1221,9 @@
 
     // copy zuordnung from old one and update befristung
     const currentZuordnung: Zuordnung = selectedZuordnungen.value[0]!;
-    newZuordnung.value = {
-      ...currentZuordnung,
-      befristung,
-      editable: true,
-    };
+    newZuordnung.value = Zuordnung.from(currentZuordnung);
+    newZuordnung.value.befristung = befristung;
+    newZuordnung.value.editable = true;
 
     finalZuordnungen.value = (zuordnungenResult.value ?? [])
       .map((zuordnung: Zuordnung | undefined) => (zuordnung === currentZuordnung ? newZuordnung.value : zuordnung))

@@ -4,11 +4,11 @@ import type {
   DBiamPersonenzuordnungResponse,
   PersonenkontexteUpdateResponse,
 } from '@/api-client/generated';
-import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
 import ApiService from '@/services/ApiService';
 import { DoFactory } from '@/testing/DoFactory';
 import { faker } from '@faker-js/faker';
 import MockAdapter from 'axios-mock-adapter';
+import { isBefore } from 'date-fns';
 import { createPinia, setActivePinia } from 'pinia';
 import type { MockInstance } from 'vitest';
 import { OperationType, useBulkOperationStore, type BulkOperationStore } from './BulkOperationStore';
@@ -50,6 +50,7 @@ describe('BulkOperationStore', () => {
     personenkontextStore.$reset();
     bulkOperationStore.$reset();
     personStore.personenuebersicht = person;
+    vi.restoreAllMocks();
   });
 
   describe('bulkUnassignPersonenFromOrg', () => {
@@ -245,14 +246,6 @@ describe('BulkOperationStore', () => {
         } as Organisation,
       ];
 
-      const rollen: TranslatedRolleWithAttrs[] = [
-        {
-          title: 'Lehrer',
-          value: 'rolle-456',
-          rollenart: RollenArt.Lern,
-        },
-      ];
-
       const mockPersonResponse: DBiamPersonenuebersichtResponse = {
         personId: '1',
         vorname: 'John',
@@ -282,7 +275,6 @@ describe('BulkOperationStore', () => {
         personIds,
         selectedOrganisationId,
         selectedRolleId,
-        rollen,
         workflowStepResponseOrganisations,
       );
 
@@ -309,19 +301,10 @@ describe('BulkOperationStore', () => {
         } as Organisation,
       ];
 
-      const rollen: TranslatedRolleWithAttrs[] = [
-        {
-          title: 'Lehrer',
-          value: 'rolle-456',
-          rollenart: RollenArt.Lern,
-        },
-      ];
-
       const modifyPromise: Promise<void> = bulkOperationStore.bulkModifyPersonenRolle(
         personIds,
         selectedOrganisationId,
         selectedRolleId,
-        rollen,
         workflowStepResponseOrganisations,
       );
 
@@ -345,14 +328,6 @@ describe('BulkOperationStore', () => {
           kennung: null,
           administriertVon: null,
         } as Organisation,
-      ];
-
-      const rollen: TranslatedRolleWithAttrs[] = [
-        {
-          title: 'Lehrer',
-          value: 'rolle-457',
-          rollenart: RollenArt.Lern,
-        },
       ];
 
       const mockPersonResponse: DBiamPersonenuebersichtResponse = {
@@ -384,7 +359,6 @@ describe('BulkOperationStore', () => {
         personIds,
         selectedOrganisationId,
         selectedRolleId,
-        rollen,
         workflowStepResponseOrganisations,
       );
       expect(bulkOperationStore.currentOperation?.isRunning).toBe(true);
@@ -394,6 +368,122 @@ describe('BulkOperationStore', () => {
       expect(bulkOperationStore.currentOperation?.isRunning).toBe(false);
       expect(bulkOperationStore.currentOperation?.complete).toBe(true);
       expect(bulkOperationStore.currentOperation?.progress).toBe(100);
+    });
+
+    it('should correctly handle befristungen', async () => {
+      const selectedOrganisationId: string = faker.string.uuid();
+      const selectedRolleTitle: string = 'Lehrer';
+      const selectedRolleId: string = faker.string.uuid();
+      const befristung: Date = faker.date.future();
+      const spy: MockInstance = vi.spyOn(personenkontextStore, 'updatePersonenkontexte');
+
+      const selectedOrganisation: Organisation = DoFactory.getOrganisationResponse({ id: selectedOrganisationId });
+      const workflowStepResponseOrganisations: Organisation[] = [selectedOrganisation];
+
+      const mockBefristungen: (Date | null)[] = [
+        null,
+        faker.date.between({ from: new Date(), to: befristung }),
+        befristung,
+        faker.date.past({ refDate: befristung }),
+      ];
+
+      const mockZuordnungen: Array<DBiamPersonenzuordnungResponse> = mockBefristungen.map(
+        (mockBefristung: Date | null) =>
+          DoFactory.getDBiamPersonenzuordnungResponse(
+            {
+              befristung: mockBefristung ? mockBefristung.toISOString() : null,
+              rolleId: selectedRolleId,
+              rolle: selectedRolleTitle,
+              editable: true,
+              merkmale: [],
+              rollenArt: RollenArt.Lern,
+              admins: [faker.person.fullName()],
+            },
+            { organisation: selectedOrganisation },
+          ),
+      );
+      const mockPersonResponses: Array<DBiamPersonenuebersichtResponse> = mockZuordnungen.map(
+        (zuordnung: DBiamPersonenzuordnungResponse) => ({
+          ...DoFactory.getDBiamPersonenuebersichtResponse({ zuordnungen: [zuordnung] }),
+        }),
+      );
+      const personIds: string[] = mockPersonResponses.map(
+        (response: DBiamPersonenuebersichtResponse) => response.personId,
+      );
+
+      const mockUpdateResponses: Array<PersonenkontexteUpdateResponse> = mockPersonResponses.map(
+        (response: DBiamPersonenuebersichtResponse) => {
+          const zuordnungen: Array<DBiamPersonenkontextResponse> = response.zuordnungen.map(
+            (zuordnung: DBiamPersonenzuordnungResponse) => {
+              return {
+                personId: response.personId,
+                organisationId: zuordnung.sskId,
+                rolleId: zuordnung.rolleId,
+                befristung: zuordnung.befristung,
+              };
+            },
+          );
+          zuordnungen.push(
+            DoFactory.getDBiamPersonenkontextResponse({
+              personId: response.personId,
+              organisationId: selectedOrganisationId,
+              rolleId: selectedRolleId,
+              befristung: isBefore(response.zuordnungen[0]!.befristung!, befristung)
+                ? response.zuordnungen[0]!.befristung
+                : befristung.toISOString(),
+            }),
+          );
+          return DoFactory.getPersonenkontextUpdateResponse({ dBiamPersonenkontextResponses: zuordnungen });
+        },
+      );
+      mockPersonResponses.forEach((response: DBiamPersonenuebersichtResponse) => {
+        mockAdapter.onGet(`/api/dbiam/personenuebersicht/${response.personId}`).replyOnce(200, response);
+      });
+      mockUpdateResponses.forEach((response: PersonenkontexteUpdateResponse) => {
+        mockAdapter
+          .onPut(`/api/personenkontext-workflow/${response.dBiamPersonenkontextResponses[0]!.personId}`)
+          .replyOnce(200, response);
+      });
+
+      const modifyPromise: Promise<void> = bulkOperationStore.bulkModifyPersonenRolle(
+        personIds,
+        selectedOrganisationId,
+        selectedRolleId,
+        workflowStepResponseOrganisations,
+        befristung,
+      );
+
+      expect(bulkOperationStore.currentOperation?.isRunning).toBe(true);
+
+      await modifyPromise;
+
+      expect(personenkontextStore.errorCode).toBe('');
+      expect(bulkOperationStore.currentOperation?.isRunning).toBe(false);
+      expect(bulkOperationStore.currentOperation?.complete).toBe(true);
+      expect(bulkOperationStore.currentOperation?.progress).toBe(100);
+      expect(bulkOperationStore.currentOperation?.successMessage).toBe('admin.rolle.rollenAssignedSuccessfully');
+      expect(bulkOperationStore.currentOperation?.errors).toEqual(new Map());
+      mockPersonResponses.forEach((response: DBiamPersonenuebersichtResponse) => {
+        const personId: string = response.personId;
+        const correctBefristung: string = isBefore(response.zuordnungen[0]!.befristung!, befristung)
+          ? response.zuordnungen[0]!.befristung!
+          : befristung.toISOString();
+        expect(spy).toHaveBeenCalledWith(
+          [
+            ...response.zuordnungen.map((zuordnung: DBiamPersonenzuordnungResponse) => ({
+              sskId: zuordnung.sskId,
+              rolleId: zuordnung.rolleId,
+              befristung: zuordnung.befristung ?? undefined,
+            })),
+            {
+              befristung: correctBefristung,
+              sskId: selectedOrganisationId,
+              rolleId: selectedRolleId,
+            },
+          ],
+          personId,
+        );
+      });
     });
 
     it('should handle errors from both endpoints gracefully', async () => {
@@ -410,14 +500,6 @@ describe('BulkOperationStore', () => {
         } as Organisation,
       ];
 
-      const rollen: TranslatedRolleWithAttrs[] = [
-        {
-          title: 'Lehrer',
-          value: 'rolle-456',
-          rollenart: RollenArt.Lern,
-        },
-      ];
-
       mockAdapter.onGet('/api/dbiam/personenuebersicht/1').replyOnce(500, { i18nKey: 'mockGetError' });
       mockAdapter
         .onGet('/api/dbiam/personenuebersicht/2')
@@ -429,7 +511,6 @@ describe('BulkOperationStore', () => {
         personIds,
         selectedOrganisationId,
         selectedRolleId,
-        rollen,
         workflowStepResponseOrganisations,
       );
 
@@ -546,7 +627,7 @@ describe('BulkOperationStore', () => {
               DoFactory.getDBiamPersonenzuordnungResponse({ rollenArt: RollenArt.Lern }, { organisation: mockSchule }),
               DoFactory.getDBiamPersonenzuordnungResponse(
                 { rollenArt: RollenArt.Lern, administriertVon: mockSchule.id },
-                { organisation: mockKlassen[0] },
+                { organisation: mockKlassen[0]! },
               ),
               DoFactory.getDBiamPersonenzuordnungResponse(
                 { rollenArt: RollenArt.Lern },

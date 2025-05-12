@@ -13,7 +13,7 @@
     useTwoFactorAuthentificationStore,
     type TwoFactorAuthentificationStore,
   } from '@/stores/TwoFactorAuthentificationStore';
-  import type { Zuordnung } from '@/stores/types/Zuordnung';
+  import { Zuordnung } from '@/stores/types/Zuordnung';
   import { adjustDateForTimezoneAndFormat } from '@/utils/date';
   import { computed, onBeforeMount, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n } from 'vue-i18n';
@@ -112,7 +112,8 @@
             .join(', ') || null;
         const schule: string | null =
           zuordnungen.find((z: Zuordnung) => z.typ === OrganisationsTyp.Schule)?.sskName || null;
-        const composedZuordnung: ComposedZuordnung = { ...zuordnungen[0], rolle: composedRoles };
+        const composedZuordnung: ComposedZuordnung = Zuordnung.from(zuordnungen[0]);
+        composedZuordnung.rolle = composedRoles;
         if (schule) composedZuordnung.sskName = schule;
         if (klasse) composedZuordnung.klasse = klasse;
         composedZuordnung.befristung = befristung ?? null;

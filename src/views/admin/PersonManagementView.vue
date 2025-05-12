@@ -21,7 +21,7 @@
   } from '@/stores/OrganisationStore';
   import { type PersonStore, SortField, SortOrder, usePersonStore } from '@/stores/PersonStore';
   import { type PersonenkontextStore, usePersonenkontextStore } from '@/stores/PersonenkontextStore';
-  import { type RolleResponse, type RolleStore, RollenArt, RollenMerkmal, useRolleStore } from '@/stores/RolleStore';
+  import { type RolleResponse, type RolleStore, RollenArt, useRolleStore } from '@/stores/RolleStore';
   import { type SearchFilterStore, useSearchFilterStore } from '@/stores/SearchFilterStore';
   import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
   import { type TranslatedObject } from '@/types.d';
@@ -192,12 +192,9 @@
 
   const rollenForForm: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
 
-  // Only Rollen from type LEHR and without any Befristungspflicht wil be offered for now
+  // Only Rollen from type LEHR
   const lehrRollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = computed(() => {
-    return rollenForForm.value?.filter(
-      (rolle: TranslatedRolleWithAttrs) =>
-        rolle.rollenart === RollenArt.Lehr && !rolle.merkmale?.has(RollenMerkmal.BefristungPflicht),
-    );
+    return rollenForForm.value?.filter((rolle: TranslatedRolleWithAttrs) => rolle.rollenart === RollenArt.Lehr);
   });
 
   const statuses: Array<string> = ['Aktiv', 'Inaktiv'];

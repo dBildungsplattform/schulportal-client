@@ -1,6 +1,7 @@
 import type { DBiamPersonenzuordnungResponse } from '@/api-client/generated';
 import type { OrganisationsTyp } from '../OrganisationStore';
 import type { RollenArt, RollenMerkmal } from '../RolleStore';
+import type { ZuordnungUpdate } from '../PersonenkontextStore';
 
 export class Zuordnung {
   public constructor(
@@ -18,6 +19,23 @@ export class Zuordnung {
     public admins: Array<string>,
   ) {}
 
+  public static from(zuordnung: Zuordnung): Zuordnung {
+    return new Zuordnung(
+      zuordnung.sskId,
+      zuordnung.rolleId,
+      zuordnung.sskName,
+      zuordnung.sskDstNr,
+      zuordnung.rolle,
+      zuordnung.rollenArt,
+      zuordnung.administriertVon,
+      zuordnung.typ,
+      zuordnung.editable,
+      zuordnung.befristung,
+      zuordnung.merkmale,
+      zuordnung.admins,
+    );
+  }
+
   public static fromResponse(response: DBiamPersonenzuordnungResponse): Zuordnung {
     return new Zuordnung(
       response.sskId,
@@ -31,7 +49,15 @@ export class Zuordnung {
       response.editable,
       response.befristung ? new Date(response.befristung) : null,
       response.merkmale,
-      response.admins ? response.admins : [],
+      response.admins ?? [],
     );
+  }
+
+  public toUpdate(): ZuordnungUpdate {
+    return {
+      sskId: this.sskId,
+      rolleId: this.rolleId,
+      befristung: this.befristung ? this.befristung.toISOString() : undefined,
+    };
   }
 }

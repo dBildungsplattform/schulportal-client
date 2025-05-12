@@ -16,81 +16,14 @@ import { PersonLockOccasion } from '@/utils/lock';
 import { rejects } from 'assert';
 import MockAdapter from 'axios-mock-adapter';
 import { createPinia, setActivePinia } from 'pinia';
+import type { Organisation } from './OrganisationStore';
 import { usePersonStore, type PersonStore, type Personendatensatz } from './PersonStore';
+import type { Person } from './types/Person';
 import { PersonenUebersicht } from './types/PersonenUebersicht';
 import type { PersonWithZuordnungen } from './types/PersonWithZuordnungen';
 import { Zuordnung } from './types/Zuordnung';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
-function getMockPersonendatensatz(): Personendatensatz {
-  return {
-    person: {
-      id: '123456',
-      name: {
-        familienname: 'Vimes',
-        vorname: 'Susan',
-      },
-      referrer: '6978',
-      personalnummer: '9183756',
-      isLocked: false,
-      userLock: [
-        {
-          personId: '1',
-          created_at: '2024-12-22',
-          lock_occasion: PersonLockOccasion.MANUELL_GESPERRT,
-          locked_by: 'ME',
-          locked_until: '2024-12-22',
-        },
-        {
-          personId: '2',
-          created_at: '2024-12-22',
-          lock_occasion: PersonLockOccasion.KOPERS_GESPERRT,
-          locked_by: 'Cron',
-          locked_until: '2024-12-22',
-        },
-      ],
-      revision: '1',
-      lastModified: '2024-12-22',
-      email: {
-        address: 'email',
-        status: EmailAddressStatus.Requested,
-      },
-    },
-  };
-}
-
-function getMockPersonendatensatzResponse(): PersonendatensatzResponse {
-  return {
-    person: {
-      ...getMockPersonendatensatz().person,
-      mandant: '',
-      geburt: {},
-      stammorganisation: '',
-      geschlecht: '',
-      lokalisierung: '',
-      vertrauensstufe: Vertrauensstufe.Teil,
-      revision: '1',
-      startpasswort: '',
-      lastModified: '2024-12-22',
-      userLock: [
-        {
-          personId: '1',
-          created_at: '2024-12-22',
-          lock_occasion: PersonLockOccasion.MANUELL_GESPERRT,
-          locked_by: 'ME',
-          locked_until: '2024-12-22',
-        },
-        {
-          personId: '2',
-          created_at: '2024-12-22',
-          lock_occasion: PersonLockOccasion.KOPERS_GESPERRT,
-          locked_by: 'Cron',
-          locked_until: '2024-12-22',
-        },
-      ],
-    },
-  };
-}
 
 function getUserLockBodyParams(lock: boolean): LockUserBodyParams {
   return {
@@ -100,11 +33,29 @@ function getUserLockBodyParams(lock: boolean): LockUserBodyParams {
   };
 }
 
+function getMockPersonendatensatz(): Personendatensatz {
+  const person: Person = DoFactory.getPerson();
+  person.userLock = [
+    DoFactory.getUserLockEntry({
+      personId: person.id,
+      lock_occasion: PersonLockOccasion.MANUELL_GESPERRT,
+    }),
+    DoFactory.getUserLockEntry({
+      personId: person.id,
+      lock_occasion: PersonLockOccasion.KOPERS_GESPERRT,
+    }),
+  ];
+  return {
+    person,
+  };
+}
+
 describe('PersonStore', () => {
   let personStore: PersonStore;
   beforeEach(() => {
     setActivePinia(createPinia());
     personStore = usePersonStore();
+    personStore.$reset();
     mockadapter.reset();
   });
 
@@ -115,6 +66,7 @@ describe('PersonStore', () => {
 
   describe('getAllPersons', () => {
     it('should load persons and their overviews, and update state', async () => {
+      const mockSchule: Organisation = DoFactory.getOrganisation();
       // Mock data for persons
       const mockPersons: PersonendatensatzResponse[] = [
         DoFactory.getPersonendatensatzResponse(),
@@ -137,12 +89,17 @@ describe('PersonStore', () => {
         offset: 0,
         limit: mockPersons.length,
         items: mockPersons.map((person: PersonendatensatzResponse) => {
-          return DoFactory.getDBiamPersonenuebersichtResponse({
-            personId: person.person.id,
-            vorname: person.person.name.vorname,
-            nachname: person.person.name.familienname,
-            benutzername: person.person.referrer ?? '---',
-          });
+          return DoFactory.getDBiamPersonenuebersichtResponse(
+            {
+              personId: person.person.id,
+              vorname: person.person.name.vorname,
+              nachname: person.person.name.familienname,
+              benutzername: person.person.referrer ?? '---',
+            },
+            {
+              organisation: mockSchule,
+            },
+          );
         }),
       };
 
@@ -314,8 +271,13 @@ describe('PersonStore', () => {
 
   describe('getPersonById', () => {
     it('should load Person and update state', async () => {
+      const dateOptions: Intl.DateTimeFormatOptions = {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      };
       const mockPerson: Personendatensatz = getMockPersonendatensatz();
-      const mockResponse: PersonendatensatzResponse = getMockPersonendatensatzResponse();
+      const mockResponse: PersonendatensatzResponse = DoFactory.getPersonendatensatzResponse(mockPerson.person);
 
       mockadapter.onGet('/api/personen/1234').replyOnce(200, mockResponse);
       const getPersonByIdPromise: Promise<Personendatensatz> = personStore.getPersonById('1234');
@@ -328,8 +290,8 @@ describe('PersonStore', () => {
           lockDate.setDate(lockDate.getDate() - 1);
         }
         const createdAt = new Date(lock.created_at);
-        lock.locked_until = lockDate.toLocaleDateString('de-DE');
-        lock.created_at = createdAt.toLocaleDateString('de-DE');
+        lock.locked_until = lockDate.toLocaleDateString('de-DE', dateOptions);
+        lock.created_at = createdAt.toLocaleDateString('de-DE', dateOptions);
       });
       expect(currentPerson).toEqual(
         expect.objectContaining({
@@ -528,8 +490,7 @@ describe('PersonStore', () => {
 
   describe('lockPerson', () => {
     it('should lock the person and update state', async () => {
-      const mockPerson: PersonendatensatzResponse = getMockPersonendatensatzResponse();
-
+      const mockPerson: PersonendatensatzResponse = DoFactory.getPersonendatensatzResponse();
       const mockResponse: PersonLockResponse = {
         message: 'User has been successfully locked.',
       };
