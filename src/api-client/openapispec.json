@@ -67,128 +67,6 @@
         "tags": ["Keycloakinternal"]
       }
     },
-    "/api/personen": {
-      "post": {
-        "operationId": "PersonController_createPersonMigration",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": { "schema": { "$ref": "#/components/schemas/CreatePersonMigrationBodyParams" } }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "The person was successfully created.",
-            "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/PersonendatensatzResponse" } }
-            }
-          },
-          "400": { "description": "A username was given. Creation with username is not supported." },
-          "401": { "description": "Not authorized to create the person." },
-          "403": { "description": "Insufficient permissions to create the person." },
-          "404": { "description": "Insufficient permissions to create the person." },
-          "500": { "description": "Internal server error while creating the person." }
-        },
-        "tags": ["personen"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
-      },
-      "get": {
-        "operationId": "PersonController_findPersons",
-        "parameters": [
-          {
-            "name": "offset",
-            "required": false,
-            "in": "query",
-            "description": "The offset of the paginated list.",
-            "schema": { "type": "number" }
-          },
-          {
-            "name": "limit",
-            "required": false,
-            "in": "query",
-            "description": "The requested limit for the page size.",
-            "schema": { "type": "number" }
-          },
-          { "name": "referrer", "required": false, "in": "query", "schema": { "nullable": true, "type": "string" } },
-          {
-            "name": "familienname",
-            "required": false,
-            "in": "query",
-            "schema": { "nullable": true, "type": "string" }
-          },
-          { "name": "vorname", "required": false, "in": "query", "schema": { "nullable": true, "type": "string" } },
-          {
-            "name": "sichtfreigabe",
-            "required": false,
-            "in": "query",
-            "schema": { "nullable": true, "default": "nein", "enum": ["ja", "nein"], "type": "string" }
-          },
-          {
-            "name": "organisationIDs",
-            "required": false,
-            "in": "query",
-            "description": "List of Organisation ID used to filter for Persons.",
-            "schema": { "type": "array", "items": { "type": "string" } }
-          },
-          {
-            "name": "rolleIDs",
-            "required": false,
-            "in": "query",
-            "description": "List of Role ID used to filter for Persons.",
-            "schema": { "type": "array", "items": { "type": "string" } }
-          },
-          {
-            "name": "suchFilter",
-            "required": false,
-            "in": "query",
-            "description": "Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.",
-            "schema": { "nullable": true, "type": "string" }
-          },
-          {
-            "name": "sortOrder",
-            "required": false,
-            "in": "query",
-            "description": "Order to sort by.",
-            "schema": { "nullable": true, "enum": ["asc", "desc"], "type": "string" }
-          },
-          {
-            "name": "sortField",
-            "required": false,
-            "in": "query",
-            "description": "Field to sort by.",
-            "schema": {
-              "nullable": true,
-              "enum": ["familienname", "vorname", "personalnummer", "referrer"],
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The persons were successfully returned. WARNING: This endpoint returns all persons as default when no paging parameters were set.",
-            "headers": {
-              "X-Paging-Offset": {
-                "description": "The offset of the first item from the list. List starts with index 0."
-              },
-              "X-Paging-Limit": { "description": "The maximum amount of items returned in one request." },
-              "X-Paging-Total": { "description": "The total amount of items in the list." },
-              "X-Paging-pageTotal": { "description": "The total amount of items in the paginated list." }
-            },
-            "content": {
-              "application/json": {
-                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/PersonendatensatzResponse" } }
-              }
-            }
-          },
-          "401": { "description": "Not authorized to get persons." },
-          "403": { "description": "Insufficient permissions to get persons." },
-          "500": { "description": "Internal server error while getting all persons." }
-        },
-        "tags": ["personen"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
-      }
-    },
     "/api/personen/{personId}": {
       "delete": {
         "operationId": "PersonController_deletePersonById",
@@ -361,6 +239,103 @@
           "403": { "description": "Insufficient permissions to get personenkontexte." },
           "404": { "description": "No personenkontexte were found." },
           "500": { "description": "Internal server error while getting all personenkontexte." }
+        },
+        "tags": ["personen"],
+        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+      }
+    },
+    "/api/personen": {
+      "get": {
+        "operationId": "PersonController_findPersons",
+        "parameters": [
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "description": "The offset of the paginated list.",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "The requested limit for the page size.",
+            "schema": { "type": "number" }
+          },
+          { "name": "referrer", "required": false, "in": "query", "schema": { "nullable": true, "type": "string" } },
+          {
+            "name": "familienname",
+            "required": false,
+            "in": "query",
+            "schema": { "nullable": true, "type": "string" }
+          },
+          { "name": "vorname", "required": false, "in": "query", "schema": { "nullable": true, "type": "string" } },
+          {
+            "name": "sichtfreigabe",
+            "required": false,
+            "in": "query",
+            "schema": { "nullable": true, "default": "nein", "enum": ["ja", "nein"], "type": "string" }
+          },
+          {
+            "name": "organisationIDs",
+            "required": false,
+            "in": "query",
+            "description": "List of Organisation ID used to filter for Persons.",
+            "schema": { "type": "array", "items": { "type": "string" } }
+          },
+          {
+            "name": "rolleIDs",
+            "required": false,
+            "in": "query",
+            "description": "List of Role ID used to filter for Persons.",
+            "schema": { "type": "array", "items": { "type": "string" } }
+          },
+          {
+            "name": "suchFilter",
+            "required": false,
+            "in": "query",
+            "description": "Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.",
+            "schema": { "nullable": true, "type": "string" }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "description": "Order to sort by.",
+            "schema": { "nullable": true, "enum": ["asc", "desc"], "type": "string" }
+          },
+          {
+            "name": "sortField",
+            "required": false,
+            "in": "query",
+            "description": "Field to sort by.",
+            "schema": {
+              "nullable": true,
+              "enum": ["familienname", "vorname", "personalnummer", "referrer"],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The persons were successfully returned. WARNING: This endpoint returns all persons as default when no paging parameters were set.",
+            "headers": {
+              "X-Paging-Offset": {
+                "description": "The offset of the first item from the list. List starts with index 0."
+              },
+              "X-Paging-Limit": { "description": "The maximum amount of items returned in one request." },
+              "X-Paging-Total": { "description": "The total amount of items in the list." },
+              "X-Paging-pageTotal": { "description": "The total amount of items in the paginated list." }
+            },
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/PersonendatensatzResponse" } }
+              }
+            }
+          },
+          "401": { "description": "Not authorized to get persons." },
+          "403": { "description": "Insufficient permissions to get persons." },
+          "500": { "description": "Internal server error while getting all persons." }
         },
         "tags": ["personen"],
         "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
@@ -1691,66 +1666,6 @@
         "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
       }
     },
-    "/api/dbiam/personenkontext/{personId}": {
-      "get": {
-        "operationId": "DBiamPersonenkontextController_findPersonenkontextsByPerson",
-        "parameters": [
-          {
-            "name": "personId",
-            "required": true,
-            "in": "path",
-            "description": "The ID for the person.",
-            "schema": { "type": "string" }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The personenkontexte were successfully returned.",
-            "content": {
-              "application/json": {
-                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/DBiamPersonenkontextResponse" } }
-              }
-            }
-          },
-          "401": { "description": "Not authorized to get available personenkontexte." },
-          "403": { "description": "Insufficient permission to get personenkontexte for this user." },
-          "500": { "description": "Internal server error while getting personenkontexte." }
-        },
-        "tags": ["dbiam-personenkontexte"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
-      }
-    },
-    "/api/dbiam/personenkontext": {
-      "post": {
-        "operationId": "DBiamPersonenkontextController_createPersonenkontextMigration",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": { "schema": { "$ref": "#/components/schemas/DbiamPersonenkontextMigrationBodyParams" } }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Personenkontext was successfully created.",
-            "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/DBiamPersonenkontextResponse" } }
-            }
-          },
-          "400": {
-            "description": "The personenkontext could not be created, may due to unsatisfied specifications.",
-            "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/DbiamPersonenkontextError" } }
-            }
-          },
-          "401": { "description": "Not authorized to create personenkontext." },
-          "403": { "description": "Insufficient permission to create personenkontext." },
-          "500": { "description": "Internal server error while creating personenkontext." }
-        },
-        "tags": ["dbiam-personenkontexte"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
-      }
-    },
     "/api/personenkontext-workflow/step": {
       "get": {
         "operationId": "DbiamPersonenkontextWorkflowController_processStep",
@@ -2126,6 +2041,25 @@
           "403": { "description": "Insufficient permissions to update VIDIS Angebote." },
           "404": { "description": "Insufficient permissions to update VIDIS Angebote." },
           "500": { "description": "Internal server error while trying to update VIDIS Angebote." }
+        },
+        "tags": ["cron"],
+        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
+      }
+    },
+    "/api/cron/email-addresses-delete": {
+      "delete": {
+        "operationId": "CronController_emailAddressesDelete",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "EmailAddresses were successfully removed.",
+            "content": { "application/json": { "schema": { "type": "boolean" } } }
+          },
+          "400": { "description": "EmailAddresses not found." },
+          "401": { "description": "Not authorized to delete EmailAddresses." },
+          "403": { "description": "Insufficient permissions to delete EmailAddresses." },
+          "404": { "description": "Insufficient permissions to delete EmailAddresses." },
+          "500": { "description": "Internal server error while trying to delete EmailAddresses." }
         },
         "tags": ["cron"],
         "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
@@ -2673,18 +2607,6 @@
         },
         "required": ["ox", "itslearning", "vidis", "opsh", "onlineDateiablage"]
       },
-      "CreatePersonMigrationBodyParams": {
-        "type": "object",
-        "properties": {
-          "personId": { "type": "string" },
-          "familienname": { "type": "string" },
-          "vorname": { "type": "string" },
-          "hashedPassword": { "type": "string" },
-          "username": { "type": "string" },
-          "personalnummer": { "type": "string" }
-        },
-        "required": ["personId", "familienname", "vorname"]
-      },
       "PersonNameParams": {
         "type": "object",
         "properties": {
@@ -2717,7 +2639,10 @@
         },
         "required": ["personId", "locked_by", "created_at", "locked_until", "lock_occasion"]
       },
-      "EmailAddressStatus": { "type": "string", "enum": ["ENABLED", "DISABLED", "REQUESTED", "FAILED"] },
+      "EmailAddressStatus": {
+        "type": "string",
+        "enum": ["ENABLED", "DISABLED", "REQUESTED", "FAILED", "DELETED_LDAP", "DELETED_OX", "DELETED"]
+      },
       "PersonEmailResponse": {
         "type": "object",
         "properties": {
@@ -3025,7 +2950,29 @@
           "dienststellen"
         ]
       },
-      "PersonenInfoKontextOrganisationResponse": { "type": "object", "properties": {} },
+      "PersonenInfoKontextOrganisationResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "nullable": false },
+          "name": { "type": "string", "nullable": true },
+          "typ": {
+            "type": "string",
+            "enum": [
+              "ROOT",
+              "LAND",
+              "TRAEGER",
+              "SCHULE",
+              "KLASSE",
+              "ANBIETER",
+              "SONSTIGE ORGANISATION / EINRICHTUNG",
+              "UNBESTAETIGT"
+            ],
+            "nullable": true
+          },
+          "kennung": { "type": "string", "nullable": true }
+        },
+        "required": ["id", "name", "typ", "kennung"]
+      },
       "PersonenInfoKontextResponse": {
         "type": "object",
         "properties": {
@@ -3175,7 +3122,6 @@
           "SCHULEN_VERWALTEN",
           "KLASSEN_VERWALTEN",
           "SCHULTRAEGER_VERWALTEN",
-          "MIGRATION_DURCHFUEHREN",
           "PERSON_SYNCHRONISIEREN",
           "CRON_DURCHFUEHREN",
           "PERSONEN_ANLEGEN",
@@ -3486,49 +3432,6 @@
         },
         "required": ["revision"]
       },
-      "DBiamPersonenkontextResponse": {
-        "type": "object",
-        "properties": {
-          "personId": { "type": "string" },
-          "organisationId": { "type": "string" },
-          "rolleId": { "type": "string" },
-          "befristung": { "type": "string" }
-        },
-        "required": ["personId", "organisationId", "rolleId", "befristung"]
-      },
-      "PersonenkontextMigrationRuntype": { "type": "string", "enum": ["ITSLEARNING", "STANDARD"] },
-      "DbiamPersonenkontextMigrationBodyParams": {
-        "type": "object",
-        "properties": {
-          "personId": { "type": "string" },
-          "username": { "type": "string" },
-          "organisationId": { "type": "string" },
-          "rolleId": { "type": "string" },
-          "befristung": { "format": "date-time", "type": "string" },
-          "email": { "type": "string" },
-          "migrationRunType": { "$ref": "#/components/schemas/PersonenkontextMigrationRuntype" }
-        },
-        "required": ["personId", "organisationId", "rolleId", "migrationRunType"]
-      },
-      "DbiamPersonenkontextError": {
-        "type": "object",
-        "properties": {
-          "i18nKey": {
-            "type": "string",
-            "enum": [
-              "PERSONENKONTEXT_SPECIFICATION_ERROR",
-              "NUR_LEHR_UND_LERN_AN_KLASSE",
-              "GLEICHE_ROLLE_AN_KLASSE_WIE_SCHULE",
-              "ORGANISATION_MATCHES_ROLLENART",
-              "PERSONENKONTEXT_ANLAGE_ERROR",
-              "ROLLE_NUR_AN_PASSENDE_ORGANISATION",
-              "PERSONALNUMMER_NICHT_EINDEUTIG"
-            ]
-          },
-          "code": { "type": "number", "description": "Corresponds to HTTP Status code like 200, 404, 500" }
-        },
-        "required": ["i18nKey", "code"]
-      },
       "PersonenkontextWorkflowResponse": {
         "type": "object",
         "properties": {
@@ -3580,6 +3483,16 @@
           }
         },
         "required": ["count", "personenkontexte"]
+      },
+      "DBiamPersonenkontextResponse": {
+        "type": "object",
+        "properties": {
+          "personId": { "type": "string" },
+          "organisationId": { "type": "string" },
+          "rolleId": { "type": "string" },
+          "befristung": { "type": "string" }
+        },
+        "required": ["personId", "organisationId", "rolleId", "befristung"]
       },
       "PersonenkontexteUpdateResponse": {
         "type": "object",
@@ -3642,6 +3555,25 @@
           }
         },
         "required": ["person", "dBiamPersonenkontextResponses"]
+      },
+      "DbiamPersonenkontextError": {
+        "type": "object",
+        "properties": {
+          "i18nKey": {
+            "type": "string",
+            "enum": [
+              "PERSONENKONTEXT_SPECIFICATION_ERROR",
+              "NUR_LEHR_UND_LERN_AN_KLASSE",
+              "GLEICHE_ROLLE_AN_KLASSE_WIE_SCHULE",
+              "ORGANISATION_MATCHES_ROLLENART",
+              "PERSONENKONTEXT_ANLAGE_ERROR",
+              "ROLLE_NUR_AN_PASSENDE_ORGANISATION",
+              "PERSONALNUMMER_NICHT_EINDEUTIG"
+            ]
+          },
+          "code": { "type": "number", "description": "Corresponds to HTTP Status code like 200, 404, 500" }
+        },
+        "required": ["i18nKey", "code"]
       },
       "FindRollenResponse": {
         "type": "object",
