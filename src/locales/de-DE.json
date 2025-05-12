@@ -365,6 +365,12 @@
       "assignRollenart": "Rollenart zuordnen",
       "assignSystemrechte": "Systemrechte zuordnen",
       "backToCreateRolle": "Zurück zur Rollenanlage",
+      "bulkRollenzuordnung": {
+        "unassignRolleZuordnung": "Rollenzuordnung entziehen",
+        "confirmation": "Möchten Sie wirklich die Rollenzuordnung der ausgewählten Benutzer entziehen?",
+        "affectedSchool": "Betroffene Schule: {schule}",
+        "success": "Die Rollenzuordnung wurden erfolgreich entfernt."
+      },
       "create": "Rolle anlegen",
       "createAnother": "Weitere Rolle anlegen",
       "createNew": "Neue Rolle anlegen",

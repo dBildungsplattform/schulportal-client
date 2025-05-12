@@ -19,6 +19,7 @@ export enum OperationType {
   MODIFY_ROLLE = 'MODIFY_ROLLE',
   DELETE_PERSON = 'DELETE_PERSON',
   RESET_PASSWORD = 'RESET_PASSWORD',
+  ROLLE_UNASSIGN = 'ROLLE_UNASSIGN',
   ORG_UNASSIGN = 'ORG_UNASSIGN',
 }
 
@@ -50,6 +51,7 @@ type BulkOperationActions = {
     workflowStepResponseOrganisations: Organisation[],
   ): Promise<void>;
   bulkPersonenDelete(personIDs: string[]): Promise<void>;
+  bulkUnassignPersonenFromRolle(organisationId: string, rolleId: string, personIDs: string[]): Promise<void>;
 };
 
 export type BulkOperationStore = Store<
@@ -253,6 +255,62 @@ export const useBulkOperationStore: StoreDefinition<
       this.currentOperation.complete = true;
 
       this.currentOperation.successMessage = 'admin.person.deletePersonBulkSuccessMessage';
+    },
+
+    async bulkUnassignPersonenFromRolle(organisationId: string, rolleId: string, personIDs: string[]): Promise<void> {
+      const personStore: PersonStore = usePersonStore();
+      const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
+
+      this.currentOperation = {
+        type: OperationType.ROLLE_UNASSIGN,
+        isRunning: true,
+        progress: 0,
+        complete: false,
+        errors: new Map(),
+        data: new Map(),
+        successMessage: undefined,
+      };
+
+      for (let i: number = 0; i < personIDs.length; i++) {
+        const personId: string = personIDs[i]!;
+
+        await personStore.getPersonenuebersichtById(personId);
+
+        if (personStore.errorCode) {
+          this.currentOperation.errors.set(personId, personStore.errorCode);
+          this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
+          continue;
+        }
+
+        const existingZuordnungen: Zuordnung[] = personStore.personenuebersicht?.zuordnungen ?? [];
+
+        // Remove Zuordnungen matching both organisationId and rolleId
+        const updatedZuordnungen: Zuordnung[] = existingZuordnungen.filter(
+          (zuordnung: Zuordnung) => !(zuordnung.sskId === organisationId && zuordnung.rolleId === rolleId),
+        );
+
+        if (updatedZuordnungen.length === existingZuordnungen.length) {
+          this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
+          continue;
+        }
+
+        await personenkontextStore.updatePersonenkontexte(updatedZuordnungen, personId);
+
+        if (personenkontextStore.errorCode) {
+          this.currentOperation.errors.set(personId, personenkontextStore.errorCode);
+          this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
+          continue;
+        }
+
+        this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
+      }
+
+      this.currentOperation.isRunning = false;
+      this.currentOperation.complete = true;
+
+      if (this.currentOperation.errors.size === 0) {
+        this.currentOperation.successMessage = 'admin.rolle.rollenUnassignedSuccessfully';
+      }
     },
   },
 });

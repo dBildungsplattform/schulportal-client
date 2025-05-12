@@ -34,6 +34,7 @@
   import OrganisationUnassign from '@/components/admin/schulen/OrganisationUnassign.vue';
   import InfoDialog from '@/components/alert/InfoDialog.vue';
   import { OperationType } from '@/stores/BulkOperationStore';
+  import RolleUnassign from '@/components/admin/rollen/RolleUnassign.vue';
 
   const searchFieldComponent: Ref = ref();
 
@@ -90,7 +91,10 @@
   const benutzerDeleteDialogVisible: Ref<boolean> = ref(false);
   const passwordResetDialogVisible: Ref<boolean> = ref(false);
   const organisationUnassignDialogVisible: Ref<boolean> = ref(false);
+  const rolleUnassignDialogVisible: Ref<boolean> = ref(false);
+
   const onlyOneOrganisationAlertDialogVisible: Ref<boolean> = ref(false);
+  const onlyOneOrganisationAndRolleAlertDialogVisible: Ref<boolean> = ref(false);
 
   const selectedOption: Ref<string | null> = ref(null);
 
@@ -462,11 +466,15 @@
     getPaginatedPersonen(searchFilterStore.personenPage);
   }
 
-  const singleSchoolSelected: ComputedRef<boolean> = computed(() => {
+  const singleSchuleSelected: ComputedRef<boolean> = computed(() => {
     return selectedOrganisationIds.value.length === 1;
   });
 
-  const singleSchoolAlertHeader: ComputedRef<string> = computed(() => {
+  const singleRolleSelected: ComputedRef<boolean> = computed(() => {
+    return selectedRollenObjects.value.length === 1;
+  });
+
+  const singleSchuleAlertHeader: ComputedRef<string> = computed(() => {
     return actions.value.find((action: TranslatedObject) => action.value === selectedOption.value)?.title || '';
   });
 
@@ -474,9 +482,21 @@
     return organisationStore.allOrganisationen.find((org: Organisation) => org.id === selectedOrganisationIds.value[0]);
   });
 
+  const selectedRolle: ComputedRef<RolleResponse | undefined> = computed(() => {
+    return selectedRollenObjects.value.find((rolle: RolleResponse) => rolle.id === selectedRollen.value[0]);
+  });
+
   const checkSingleOrgDisplayDialog = (dialog: Ref<boolean>): void => {
-    if (!singleSchoolSelected.value) {
+    if (!singleSchuleSelected.value) {
       onlyOneOrganisationAlertDialogVisible.value = true;
+      return;
+    }
+    dialog.value = true;
+  };
+
+  const checkSingleOrgAndRolleDisplayDialog = (dialog: Ref<boolean>): void => {
+    if (!singleSchuleSelected.value && !singleRolleSelected.value) {
+      onlyOneOrganisationAndRolleAlertDialogVisible.value = true;
       return;
     }
     dialog.value = true;
@@ -498,6 +518,10 @@
         break;
       case OperationType.ORG_UNASSIGN:
         checkSingleOrgDisplayDialog(organisationUnassignDialogVisible);
+        break;
+      case OperationType.ROLLE_UNASSIGN:
+        checkSingleOrgAndRolleDisplayDialog(organisationUnassignDialogVisible);
+        break;
     }
   };
 
@@ -521,6 +545,7 @@
     passwordResetDialogVisible.value = false;
     selectedOption.value = null;
   };
+
   const handleUnassignOrgDialog = async (finished: boolean): Promise<void> => {
     organisationUnassignDialogVisible.value = false;
     selectedOption.value = null;
@@ -529,6 +554,11 @@
       await getPaginatedPersonen(searchFilterStore.personenPage);
       resultTable.value.resetSelection();
     }
+  };
+
+  const handleUnassignRolleDialog = (isDialogVisible: boolean): void => {
+    rolleUnassignDialogVisible.value = isDialogVisible;
+    selectedOption.value = null;
   };
 
   function handleSelectedRows(selectedItems: TableItem[]): void {
@@ -857,7 +887,7 @@
           <InfoDialog
             id="only-one-school-notice"
             :isDialogVisible="onlyOneOrganisationAlertDialogVisible"
-            :header="singleSchoolAlertHeader"
+            :header="singleSchuleAlertHeader"
             :message="$t('admin.person.onlyOneSchoolAlert')"
             @update:dialogExit="
               () => {
@@ -907,6 +937,16 @@
             @update:dialogExit="handleUnassignOrgDialog($event)"
           >
           </OrganisationUnassign>
+          <RolleUnassign
+            ref="rolle-unassign"
+            v-if="organisationUnassignDialogVisible && selectedOrganisation"
+            :isDialogVisible="organisationUnassignDialogVisible"
+            :selectedPersonen
+            :selectedOrganisation="selectedOrganisation"
+            :selectedRolle="selectedRolle"
+            @update:dialogExit="handleUnassignRolleDialog($event)"
+          >
+          </RolleUnassign>
         </v-col>
         <!-- Display the number of selected checkboxes -->
         <v-col
