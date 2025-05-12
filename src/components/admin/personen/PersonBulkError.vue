@@ -71,12 +71,17 @@
     <LayoutCard
       data-testid="person-bulk-error-layout-card"
       :closable="false"
-      :header="$t('admin.person.bulk.bulkErrorTitle')"
+      :header="
+        props.bulkOperationName === t('admin.person.resetPassword') && passwords
+          ? t('admin.person.resetPassword')
+          : $t('admin.person.bulk.bulkErrorTitle')
+      "
       @onCloseClicked="closeBulkErrorDialogDialogVisible = true"
     >
-      <v-container>
-        <!-- Success Section in case there were passwords successfully generated while others resulted in an error -->
+      <!-- This container is scrollable because of the max height -->
+      <v-container style="max-height: 60vh; overflow-y: auto">
         <template v-if="props.bulkOperationName === t('admin.person.resetPassword') && passwords">
+          <!-- Success message and download -->
           <v-row
             class="my-4"
             justify="center"
@@ -89,7 +94,9 @@
               />
             </v-col>
           </v-row>
-          <p class="mt-2 text-center">{{ t('admin.person.bulk.bulkPasswordReset.success') }}</p>
+          <p class="mt-2 text-center">
+            {{ t('admin.person.bulk.bulkPasswordReset.success') }}
+          </p>
           <v-row class="mt-4 justify-center">
             <v-col
               cols="12"
@@ -110,8 +117,10 @@
             class="border-opacity-100 rounded my-8"
             thickness="5px"
             color="#E5EAEF"
-          ></v-divider>
+          />
         </template>
+
+        <!-- Error list -->
         <p class="text-body bold pre-line">
           {{
             t('admin.person.bulk.bulkErrorMessage', {
@@ -119,6 +128,7 @@
             })
           }}
         </p>
+
         <ol>
           <li
             v-for="(entry, index) in props.errors"
@@ -140,7 +150,11 @@
         </ol>
       </v-container>
 
-      <v-card-actions class="justify-center">
+      <!-- Actions remain fixed -->
+      <v-card-actions
+        class="justify-center"
+        style="border-top: 1px solid #e5eaef"
+      >
         <v-row class="py-3 px-2 justify-center">
           <v-spacer class="hidden-sm-and-down"></v-spacer>
 
@@ -195,7 +209,7 @@
               class="text-center"
               cols="10"
             >
-              <span>{{ t('person.bulk.closeBulkErrorDialogConfirmationMessage') }}</span>
+              <span>{{ t('admin.person.bulk.closeBulkErrorDialogConfirmationMessage') }}</span>
             </v-col>
           </v-row>
         </v-container>
