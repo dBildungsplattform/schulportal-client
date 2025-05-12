@@ -186,18 +186,18 @@ describe('RolleModify', () => {
   test('renders the dialog when isDialogVisible is true', async () => {
     await nextTick();
 
-    // Set rolle value
-    const rolleAutocomplete: VueWrapper | undefined = wrapper
-      ?.findComponent({ ref: 'personenkontext-create' })
-      .findComponent({ ref: 'rolle-select' });
-    await rolleAutocomplete?.setValue(kopersRolle.id);
-    rolleAutocomplete?.vm.$emit('update:search', kopersRolle.id);
-    await nextTick();
+    // Find the teleported content in the document body
+    const dialogContent: Element | null = document.body.querySelector('[data-testid="rolle-modify-layout-card"]');
+    expect(dialogContent).not.toBeNull();
 
-    const kopersInfo: Element | null = document.body.querySelector('[data-testid="no-kopersnr-information"]');
+    // Find buttons within the teleported content
+    const discardButton: Element | null = document.body.querySelector('[data-testid="rolle-modify-discard-button"]');
+    const submitButton: Element | null = document.body.querySelector('[data-testid="rolle-modify-submit-button"]');
 
-    expect(kopersInfo).not.toBeNull();
-    expect(kopersInfo?.textContent).toContain('KoPers.-Nr.');
+    expect(discardButton).not.toBeNull();
+    expect(submitButton).not.toBeNull();
+
+    expect(document.querySelector('[data-testid="rolle-modify-layout-card"]')).not.toBeNull();
   });
 
   test('renders the hint when selected rolle has KOPERS_PFLICHT', async () => {

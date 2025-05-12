@@ -16,6 +16,7 @@
   import { useI18n, type Composer } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
   import { object, string } from 'yup';
+  import PersonBulkError from '@/components/admin/personen/PersonBulkError.vue';
 
   type Props = {
     errorCode: string;
