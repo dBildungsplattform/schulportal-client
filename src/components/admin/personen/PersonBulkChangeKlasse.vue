@@ -30,6 +30,9 @@
   const selectedKlasse: Ref<string | null> = ref(null);
   const showErrorDialog: Ref<boolean, boolean> = ref(false);
 
+  // Define the error list for the selected persons using the useBulkErrors composable
+  const bulkErrorList: ComputedRef<BulkErrorList[]> = computed(() => useBulkErrors(t, props.selectedPersonen));
+
   const state: ComputedRef<State> = computed(() => {
     if (bulkOperationStore.currentOperation?.complete) return State.FINISHED;
     if (bulkOperationStore.currentOperation?.isRunning) return State.PROGRESSING;
@@ -45,9 +48,6 @@
     if (selectedKlasse.value) return true;
     return false;
   });
-
-  // Define the error list for the selected persons using the useBulkErrors composable
-  const bulkErrorList: ComputedRef<BulkErrorList[]> = computed(() => useBulkErrors(props.selectedPersonen));
 
   const bulkChangeKlasse = async (): Promise<void> => {
     if (!selectedKlasse.value) return;

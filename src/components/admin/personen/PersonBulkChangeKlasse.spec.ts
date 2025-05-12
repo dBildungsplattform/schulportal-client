@@ -55,6 +55,9 @@ function mountComponent(partialProps: Partial<Props> = {}): VueWrapper {
     attachTo: document.getElementById('app') || '',
     props,
     global: {
+      components: {
+        PersonBulkChangeKlasse,
+      },
       plugins: [router],
     },
   });
@@ -75,7 +78,6 @@ beforeEach(async () => {
   await router.push('/');
   await router.isReady();
 
-  bulkOperationStore.$reset();
   bulkOperationStore.resetState();
   vi.restoreAllMocks();
 });

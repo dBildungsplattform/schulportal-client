@@ -35,7 +35,7 @@
   const showDeletePersonDialog: Ref<boolean> = ref(props.isDialogVisible);
 
   // Define the error list for the selected persons using the useBulkErrors composable
-  const bulkErrorList: ComputedRef<BulkErrorList[]> = computed(() => useBulkErrors(props.selectedPersonen));
+  const bulkErrorList: ComputedRef<BulkErrorList[]> = computed(() => useBulkErrors(t, props.selectedPersonen));
 
   async function closeDeletePersonDialog(finished: boolean): Promise<void> {
     if (bulkOperationStore.currentOperation) {

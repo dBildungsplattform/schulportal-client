@@ -1,6 +1,6 @@
-import { useI18n, type Composer } from 'vue-i18n';
 import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
 import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
+import { type Composer } from 'vue-i18n';
 
 export type BulkErrorList = {
   id: string;
@@ -44,8 +44,7 @@ function translateWithFallback(t: Composer['t'], keys: string[], errorCode: stri
  *          - `nachname`: The last name of the person.
  *          - `error`: The translated error message for the person.
  */
-export function useBulkErrors(personen: Map<string, PersonWithZuordnungen>): BulkErrorList[] {
-  const { t }: Composer = useI18n({ useScope: 'global' });
+export function useBulkErrors(t: Composer['t'], personen: Map<string, PersonWithZuordnungen>): BulkErrorList[] {
   const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
 
   return Array.from(bulkOperationStore.currentOperation?.errors.entries() || [])

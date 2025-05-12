@@ -37,7 +37,7 @@
   const showErrorDialog: Ref<boolean, boolean> = ref(false);
 
   // Define the error list for the selected persons using the useBulkErrors composable
-  const bulkErrorList: ComputedRef<BulkErrorList[]> = computed(() => useBulkErrors(props.selectedPersonen));
+  const bulkErrorList: ComputedRef<BulkErrorList[]> = computed(() => useBulkErrors(t, props.selectedPersonen));
 
   async function handleOrgUnassign(): Promise<void> {
     await bulkOperationStore.bulkUnassignPersonenFromOrg(
