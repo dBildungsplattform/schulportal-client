@@ -158,14 +158,20 @@
       "addNew": "Neuen Benutzer hinzufügen",
       "backToCreatePerson": "Zurück zur Benutzeranlage",
       "backToInput": "Zurück zur Eingabe",
-      "bulkPasswordReset": {
-        "confirmation": "Sind Sie sicher, dass Sie das Passwort für die ausgewählten Benutzer zurücksetzen möchten?",
-        "downloadResult": "Benutzerdaten herunterladen",
-        "error": {
-          "onlyOneSchool": "Bitte wählen Sie im Filter genau eine Schule aus, um die Aktion durchzuführen."
+      "bulk": {
+        "bulkErrorMessage": "Die Aktion {bulkOperationName} konnte für die folgenden Benutzer nicht ausgeführt werden. \n\nSie können sich die Liste für eine spätere Bearbeitung abspeichern. Die Daten stehen nach dem Schließen dieses Dialogs nicht mehr zur Verfügung. Sollten Sie Hilfe benötigen, eröffnen Sie ein Störungsticket über den IQSH-Helpdesk und fügen Sie die Liste als Anhang an.",
+        "bulkErrorTitle": "Fehler bei der Mehrfachbearbeitung",
+        "bulkPasswordReset": {
+          "confirmation": "Sind Sie sicher, dass Sie das Passwort für die ausgewählten Benutzer zurücksetzen möchten?",
+          "downloadResult": "Benutzerdaten herunterladen",
+          "error": {
+            "onlyOneSchool": "Bitte wählen Sie im Filter genau eine Schule aus, um die Aktion durchzuführen."
+          },
+          "info": "Bitte laden Sie die Datei mit den temporären Passwörtern herunter und teilen Sie den Benutzern die Passwörter mit. Nach dem Schließen des Dialogs ist ein Herunterladen aus Sicherheitsgründen nicht mehr möglich.",
+          "success": "Die Passwörter wurden erfolgreich zurückgesetzt."
         },
-        "info": "Bitte laden Sie die Datei mit den temporären Passwörtern herunter und teilen Sie den Benutzern die Passwörter mit. Nach dem Schließen des Dialogs ist ein Herunterladen aus Sicherheitsgründen nicht mehr möglich.",
-        "success": "Die Passwörter wurden erfolgreich zurückgesetzt."
+      "closeList": "Liste schließen",
+      "saveList": "Liste speichern"
       },
       "bulkRolleModify": {
         "noKopersNrInfoText": "Bitte beachten: Alle ausgewählten Benutzerkonten müssen über eine KoPers.-Nr. verfügen. Tragen Sie diese ggf. bitte in der Gesamtübersicht des Benutzers nach, sobald sie Ihnen vorliegt. Ein Benutzerkonto mit der gewählten Rolle ohne KoPers.-Nr. wird nach spätestens 8 Wochen automatisch gesperrt."
@@ -209,6 +215,7 @@
       "edit": "Benutzer bearbeiten",
       "editPersonalInfo": "Persönliche Informationen bearbeiten",
       "errors": {
+        "404": "Der Benutzer konnte nicht gefunden werden.",
         "PERSONALNUMMER_NICHT_EINDEUTIG": "Die eingegebene KoPers.-Nr. ist bereits vergeben. Bitte korrigieren Sie Ihre Eingabe.",
         "ERROR_LOADING_USER": "Es konnten keine Benutzerdaten geladen werden.",
         "PERSONALNUMMER_REQUIRED": "Die Änderungen wurden nicht gespeichert, da keine KoPers.-Nr. eingegeben wurde.",
@@ -347,7 +354,11 @@
         "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Zwei-Faktor-Authentifizierung (2FA) erforderlich"
       },
       "errors": {
+        "fallbackError": "Es ist ein Fehler aufgetreten.",
+        "500": "Es ist ein technischer Fehler aufgetreten.",
+        "404": "Der Benutzer konnte nicht gefunden werden.",
         "COUNT_MISMATCHING": "Der Benutzer wurde zwischenzeitlich von einer anderen Administratorin oder einem anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut.",
+        "INVALID_PERSONENKONTEXT_FOR_PERSON_WITH_ROLLENART_LERN": "Eine Rolle mit dieser Rollenart kann diesem Benutzer nicht zugeordnet werden.",
         "NEWER_VERSION_OF_PERSONENKONTEXTE_AVAILABLE": "Der Benutzer wurde zwischenzeitlich von einer anderen Administratorin oder einem anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut.",
         "GLEICHE_ROLLE_AN_KLASSE_WIE_SCHULE": "Mindestens eine Rolle des Benutzers ist an der Schule nicht bekannt.",
         "NUR_LEHR_UND_LERN_AN_KLASSE": "Nur Schüler dürfen einer Klasse zugeordnet werden.",

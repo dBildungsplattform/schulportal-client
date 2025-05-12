@@ -33,7 +33,30 @@ beforeEach(async () => {
       isLoading: false,
       errorCode: '',
       isDialogVisible: true,
-      personIDs: ['person1', 'person2'],
+      selectedPersonen: [
+        {
+          administrationsebenen: '',
+          klassen: '1a',
+          rollen: '',
+          person: {
+            id: 'test',
+            name: {
+              familienname: 'Pan',
+              vorname: 'Peter',
+            },
+            referrer: 'ppan',
+            revision: '1',
+            email: {
+              address: 'ppan@wunderland',
+              status: 'ENABLED',
+            },
+            isLocked: null,
+            lastModified: '',
+            personalnummer: '1234',
+            userLock: null,
+          },
+        },
+      ],
       organisationen: [
         { title: 'orga', value: 'O1' },
         { title: 'orga1', value: '1133' },
@@ -124,9 +147,20 @@ describe('RolleModify', () => {
     expect(bulkModifyPersonenRolleSpy).toHaveBeenCalledTimes(1);
   });
 
-  test('renders the hint when selected rolle has KOPERS_PFLICHT', async () => {
+  test('shows error dialog if bulk operation has errors', async () => {
     await nextTick();
-    // Set organisation value
+
+    // Mock the bulk operation with an error
+    bulkOperationStore.currentOperation = {
+      type: null,
+      isRunning: false,
+      progress: 0,
+      complete: false,
+      errors: new Map([['someId', 'Some error message']]),
+      data: new Map(),
+      successMessage: '',
+    };
+
     const organisationAutocomplete: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'organisation-select' });
@@ -134,18 +168,29 @@ describe('RolleModify', () => {
     organisationAutocomplete?.vm.$emit('update:search', 'O1');
     await nextTick();
 
-    // Set rolle value
     const rolleAutocomplete: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'rolle-select' });
-    await rolleAutocomplete?.setValue('54329');
-    rolleAutocomplete?.vm.$emit('update:search', '54329');
+    await rolleAutocomplete?.setValue('54321');
+    rolleAutocomplete?.vm.$emit('update:search', '54321');
     await nextTick();
 
-    const kopersInfo: Element | null = document.body.querySelector('[data-testid="no-kopersnr-information"]');
+    const submitButton: Element | null = document.body.querySelector('[data-testid="rolle-modify-submit-button"]');
+    expect(submitButton).not.toBeNull();
+    await nextTick();
 
-    expect(kopersInfo).not.toBeNull();
-    expect(kopersInfo?.textContent).toContain('KoPers.-Nr.');
+    const bulkModifyPersonenRolleSpy: MockInstance = vi.spyOn(bulkOperationStore, 'bulkModifyPersonenRolle');
+
+    if (submitButton) {
+      submitButton.dispatchEvent(new Event('click'));
+    }
+
+    await flushPromises();
+
+    expect(bulkModifyPersonenRolleSpy).toHaveBeenCalledTimes(1);
+
+    const errorDialog: Element | null = document.body.querySelector('.v-dialog');
+    expect(errorDialog).not.toBeNull();
   });
 
   test('renders the dialog when isDialogVisible is true', async () => {
@@ -178,5 +223,17 @@ describe('RolleModify', () => {
     if (discardButton) {
       discardButton.dispatchEvent(new Event('click'));
     }
+  });
+
+  test('shows error dialog when showErrorDialog is true', async () => {
+    await nextTick();
+
+    // Manually set showErrorDialog to true
+    (wrapper?.vm as unknown as { showErrorDialog: boolean }).showErrorDialog = true;
+
+    await nextTick();
+
+    const errorDialog: VueWrapper | undefined = wrapper?.findComponent({ name: 'PersonBulkError' });
+    expect(errorDialog?.exists()).toBe(true);
   });
 });

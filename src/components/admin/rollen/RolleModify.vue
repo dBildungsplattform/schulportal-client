@@ -12,6 +12,9 @@
   import { useI18n, type Composer } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
   import { object, string } from 'yup';
+  import type { PersonenWithRolleAndZuordnung } from '@/stores/PersonStore';
+  import PersonBulkError from '@/components/admin/personen/PersonBulkError.vue';
+  import { useBulkErrors, type BulkErrorList } from '@/composables/useBulkErrors';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
@@ -27,7 +30,7 @@
     rollen: TranslatedRolleWithAttrs[] | undefined;
     isLoading: boolean;
     isDialogVisible: boolean;
-    personIDs: string[];
+    selectedPersonen: PersonenWithRolleAndZuordnung;
   };
 
   type Emits = {
@@ -40,9 +43,14 @@
 
   const showModifyRolleDialog: Ref<boolean> = ref(props.isDialogVisible);
 
+  const showErrorDialog: Ref<boolean, boolean> = ref(false);
+
   const successMessage: ComputedRef<string> = computed(() =>
     bulkOperationStore.currentOperation?.successMessage ? t(bulkOperationStore.currentOperation.successMessage) : '',
   );
+
+  // Define the error list for the selected persons using the useBulkErrors composable
+  const bulkErrorList: ComputedRef<BulkErrorList[]> = computed(() => useBulkErrors(props.selectedPersonen));
 
   // Define the form validation schema for the Personenkontext
   export type ZuordnungCreationForm = {
@@ -102,6 +110,7 @@
       bulkOperationStore.resetState();
     }
     showModifyRolleDialog.value = false;
+    personenkontextStore.errorCode = '';
     emit('update:isDialogVisible', false);
   }
 
@@ -122,6 +131,10 @@
     );
 
     emit('update:getUebersichten');
+
+    if (bulkOperationStore.currentOperation?.errors && bulkOperationStore.currentOperation.errors.size > 0) {
+      showErrorDialog.value = true;
+    }
   }
 </script>
 
@@ -249,7 +262,7 @@
               :block="mdAndDown"
               :disabled="!canCommit || bulkOperationStore.currentOperation.isRunning"
               class="primary"
-              @click="handleModifyRolle(props.personIDs)"
+              @click="handleModifyRolle(props.selectedPersonen.map((person) => person.person.id))"
               data-testid="rolle-modify-submit-button"
               type="submit"
             >
@@ -279,6 +292,21 @@
       </v-card-actions>
     </LayoutCard>
   </v-dialog>
+  <template v-if="showErrorDialog">
+    <PersonBulkError
+      :bulkOperationName="t('admin.rolle.assignRolle')"
+      :isDialogVisible="showErrorDialog"
+      @update:isDialogVisible="
+        (val: boolean) => {
+          showErrorDialog = val;
+          if (!val) {
+            closeModifyRolleDeleteDialog();
+          }
+        }
+      "
+      :errors="bulkErrorList"
+    />
+  </template>
 </template>
 
 <style></style>
