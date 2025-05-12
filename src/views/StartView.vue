@@ -118,10 +118,12 @@
   }
 
   async function initializeStores(): Promise<void> {
-    await authStore.initializeAuthStatus();
-    await personInfoStore.initPersonInfo();
+    await Promise.all([
+      authStore.initializeAuthStatus(),
+      personInfoStore.initPersonInfo(),
+      meldungStore.getCurrentMeldung(),
+    ]);
     await personStore.getPersonenuebersichtById(personInfoStore.personInfo?.person.id ?? '');
-    await meldungStore.getCurrentMeldung();
   }
 
   const closedAlerts: Ref<Set<string>> = ref(new Set());
