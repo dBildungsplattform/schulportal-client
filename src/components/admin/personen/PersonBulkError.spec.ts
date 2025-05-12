@@ -58,6 +58,12 @@ describe('PersonBulkError.vue', () => {
     closeButton.click();
     await nextTick();
 
+    const confirmationCloseButton: HTMLElement = document.querySelector(
+      '[data-testid="confirm-close-bulk-error-dialog-button"]',
+    ) as HTMLElement;
+    confirmationCloseButton.click();
+    await nextTick();
+
     expect(wrapper?.emitted('update:isDialogVisible')).toBeTruthy();
     expect(wrapper?.emitted('update:isDialogVisible')?.[0]).toEqual([false]);
   });
