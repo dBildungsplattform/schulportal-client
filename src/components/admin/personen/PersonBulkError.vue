@@ -9,6 +9,7 @@
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   const progress: Ref<number> = ref<number>(0);
+  const closeBulkErrorDialogDialogVisible: Ref<boolean> = ref(false);
 
   type ErrorEntry = {
     error: string;
@@ -71,7 +72,7 @@
       data-testid="person-bulk-error-layout-card"
       :closable="false"
       :header="$t('admin.person.bulk.bulkErrorTitle')"
-      @onCloseClicked="closeBulkErrorDialog()"
+      @onCloseClicked="closeBulkErrorDialogDialogVisible = true"
     >
       <v-container>
         <!-- Success Section in case there were passwords successfully generated while others resulted in an error -->
@@ -108,6 +109,7 @@
           <v-divider
             class="border-opacity-100 rounded my-8"
             thickness="5px"
+            color="#E5EAEF"
           ></v-divider>
         </template>
         <p class="text-body bold pre-line">
@@ -150,7 +152,7 @@
             <v-btn
               :block="mdAndDown"
               class="secondary"
-              @click="closeBulkErrorDialog"
+              @click="closeBulkErrorDialogDialogVisible = true"
               data-testid="person-bulk-error-discard-button"
             >
               {{ t('admin.person.bulk.closeList') }}
@@ -169,6 +171,63 @@
               data-testid="person-bulk-error-save-button"
             >
               {{ t('admin.person.bulk.saveList') }}
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-card-actions>
+    </LayoutCard>
+  </v-dialog>
+
+  <v-dialog
+    v-model="closeBulkErrorDialogDialogVisible"
+    persistent
+    max-width="600px"
+  >
+    <LayoutCard
+      :closable="true"
+      :header="$t('admin.person.bulk.bulkErrorTitle')"
+      @onCloseClicked="closeBulkErrorDialogDialogVisible = false"
+    >
+      <v-card-text>
+        <v-container>
+          <v-row class="text-body bold justify-center">
+            <v-col
+              class="text-center"
+              cols="10"
+            >
+              <span>{{ t('person.bulk.closeBulkErrorDialogConfirmationMessage') }}</span>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-card-text>
+      <v-card-actions class="justify-center">
+        <v-row class="justify-center">
+          <v-col
+            cols="12"
+            sm="6"
+            md="4"
+          >
+            <v-btn
+              :block="mdAndDown"
+              class="primary"
+              data-testid="confirm-close-bulk-error-dialog-button"
+              @click.stop="closeBulkErrorDialog"
+            >
+              {{ $t('yes') }}
+            </v-btn>
+          </v-col>
+          <v-col
+            cols="12"
+            sm="6"
+            md="4"
+          >
+            <v-btn
+              :block="mdAndDown"
+              class="secondary"
+              data-testid="cancel-close-bulk-error-dialog-button"
+              @click.stop="closeBulkErrorDialogDialogVisible = false"
+            >
+              {{ $t('no') }}
             </v-btn>
           </v-col>
         </v-row>

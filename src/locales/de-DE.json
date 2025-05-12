@@ -171,7 +171,8 @@
           "success": "Die Passwörter wurden erfolgreich zurückgesetzt."
         },
       "closeList": "Liste schließen",
-      "saveList": "Liste speichern"
+      "saveList": "Liste speichern",
+      "closeBulkErrorDialogConfirmationMessage" :"Bevor Sie den Dialog schließen, stellen Sie bitte sicher, dass Sie die Liste der Fehlermeldungen gespeichert haben. Die Daten stehen nach dem Schließen dieses Dialogs nicht mehr zur Verfügung."
       },
       "bulkUnassignOrganisation": {
         "cancelZuordnung": "Schulzuordnung aufheben",
@@ -351,11 +352,11 @@
         "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Zwei-Faktor-Authentifizierung (2FA) erforderlich"
       },
       "errors": {
-        "fallbackError": "Es ist ein Fehler aufgetreten.",
+        "fallbackError": "Es ist ein technischer Fehler aufgetreten.",
         "500": "Es ist ein technischer Fehler aufgetreten.",
         "404": "Der Benutzer konnte nicht gefunden werden.",
         "COUNT_MISMATCHING": "Der Benutzer wurde zwischenzeitlich von einer anderen Administratorin oder einem anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut.",
-        "INVALID_PERSONENKONTEXT_FOR_PERSON_WITH_ROLLENART_LERN": "Eine Rolle mit dieser Rollenart kann diesem Benutzer nicht zugeordnet werden.",
+        "INVALID_PERSONENKONTEXT_FOR_PERSON_WITH_ROLLENART_LERN": "Die neue Rolle kann diesem Benutzer aufgrund seiner bestehenden Rolle nicht zugeordnet werden.",
         "NEWER_VERSION_OF_PERSONENKONTEXTE_AVAILABLE": "Der Benutzer wurde zwischenzeitlich von einer anderen Administratorin oder einem anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut.",
         "GLEICHE_ROLLE_AN_KLASSE_WIE_SCHULE": "Mindestens eine Rolle des Benutzers ist an der Schule nicht bekannt.",
         "NUR_LEHR_UND_LERN_AN_KLASSE": "Nur Schüler dürfen einer Klasse zugeordnet werden.",
