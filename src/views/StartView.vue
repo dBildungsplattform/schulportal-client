@@ -129,17 +129,24 @@
   let hinweise: Ref<Meldung[]> = ref([]);
 
   onMounted(async () => {
+    sessionStorage.setItem('previousUrl', window.location.pathname + window.location.search);
+
     await authStore.initializeAuthStatus();
     const personId: string | null | undefined = authStore.currentUser?.personId;
-    if (personId) await twoFactorAuthentificationStore.get2FAState(personId);
-    await serviceProviderStore.getAvailableServiceProviders();
-    for (const provider of serviceProviderStore.availableServiceProviders) {
-      if (provider.hasLogo) {
-        const logoUrl: string = `/api/provider/${provider.id}/logo`;
-        provider.logoUrl = logoUrl;
+
+    const providersPromise: Promise<void> = serviceProviderStore.getAvailableServiceProviders().then(() => {
+      for (const provider of serviceProviderStore.availableServiceProviders) {
+        if (provider.hasLogo) {
+          provider.logoUrl = `/api/provider/${provider.id}/logo`;
+        }
       }
-    }
-    sessionStorage.setItem('previousUrl', window.location.pathname + window.location.search);
+    });
+
+    const twoFAStatePromise: Promise<void> = personId
+      ? twoFactorAuthentificationStore.get2FAState(personId)
+      : Promise.resolve();
+
+    await Promise.all([providersPromise, twoFAStatePromise]);
   });
 
   onBeforeMount(async () => {
