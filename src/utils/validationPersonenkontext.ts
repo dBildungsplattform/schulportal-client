@@ -1,11 +1,11 @@
-import type { ComputedRef, Ref } from 'vue';
-import { object, string, StringSchema, type AnyObject } from 'yup';
-import { toTypedSchema } from '@vee-validate/yup';
-import { DDMMYYYY, NO_LEADING_TRAILING_SPACES } from '@/utils/validation'; // Assuming you have this validation in place
-import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
-import { isBefristungspflichtRolle } from './befristung';
 import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
 import { RollenArt, RollenMerkmal } from '@/stores/RolleStore';
+import { DDMMYYYY, NO_LEADING_TRAILING_SPACES } from '@/utils/validation'; // Assuming you have this validation in place
+import { toTypedSchema } from '@vee-validate/yup';
+import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
+import type { ComputedRef, Ref } from 'vue';
+import { object, string, StringSchema, type AnyObject } from 'yup';
+import { isBefristungspflichtRolle } from './befristung';
 import { isValidDate, notInPast } from './date';
 
 // Define the form validation schema for the Personenkontext
@@ -64,7 +64,7 @@ export function isKopersRolle(
   );
 }
 
-const bestfristungSchema = (t: (key: string) => string): StringSchema =>
+export const befristungSchema = (t: (key: string) => string): StringSchema =>
   string()
     .test('notInPast', t('admin.befristung.rules.pastDateNotAllowed'), notInPast) // Custom rule to prevent past dates
     .test('isValidDate', t('admin.befristung.rules.invalidDateNotAllowed'), isValidDate)
@@ -107,7 +107,7 @@ export const getValidationSchema = (
               ? schema // If the user checked "I don't have one" checkbox, KopersNr is not required
               : schema.required(t('admin.person.rules.kopersNr.required')), // KopersNr is required if "I don't have one" is not checked
         }),
-      selectedBefristung: bestfristungSchema(t),
+      selectedBefristung: befristungSchema(t),
     }),
   );
 };
@@ -115,7 +115,7 @@ export const getValidationSchema = (
 export const getBefristungSchema = (t: (key: string) => string): TypedSchema<ChangeBefristungForm> => {
   return toTypedSchema(
     object({
-      selectedBefristung: bestfristungSchema(t),
+      selectedBefristung: befristungSchema(t),
     }),
   );
 };
