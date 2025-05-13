@@ -66,30 +66,27 @@ export function formatDateDigitsToGermanDate(date: Date): string {
 /**
  * Adjusts the given date string for timezone differences and formats it to the German date format.
  * If the timezone offset is greater than or equal to -120 minutes, the date is adjusted by subtracting one hour.
- * @param {string | undefined} dateString - The ISO date string to be adjusted and formatted, or undefined if no date is provided.
+ * @param {string | undefined} date - The ISO date string to be adjusted and formatted, or undefined if no date is provided.
  * @returns {string} The formatted date in German format (dd.MM.yyyy), or an empty string if the input is invalid.
  */
-export function adjustDateForTimezoneAndFormat(dateString: Date | string | undefined): string {
-  if (!dateString) return '';
-  const date: Date = new Date(dateString);
+export function adjustDateForTimezoneAndFormat(date: Date | undefined): string {
+  if (!date) return '';
   if (isNaN(date.getTime())) return '';
-  if (date.getTimezoneOffset() >= -120) {
-    date.setHours(date.getHours() - 1);
-  }
+
   return formatDateDigitsToGermanDate(date);
 }
 
 /**
  * Formats a date string to the German format and prepends it with a translated message.
  * The input date is adjusted by subtracting one day before formatting.
- * @param {string | undefined} dateString - The ISO date string to be formatted, or undefined if no date is provided.
+ * @param {string | undefined} date - The ISO date string to be formatted, or undefined if no date is provided.
  * @returns {string} The translated string followed by the formatted date in German format (dd.MM.yyyy), or an empty string if the input is invalid.
  */
-export function formatDate(dateString: Date | string | undefined, t: (key: string) => string): string {
-  if (!dateString) return '';
+export function formatDate(date: Date | undefined, t: (key: string) => string): string {
+  if (!date) return '';
 
   // Return the translated string followed by the formatted date
-  return `${t('admin.befristung.limitedUntil')} ${adjustDateForTimezoneAndFormat(dateString)}`;
+  return `${t('admin.befristung.limitedUntil')} ${adjustDateForTimezoneAndFormat(date)}`;
 }
 
 /**
