@@ -1,21 +1,36 @@
 import {
+  EmailAddressStatus,
   OrganisationsTyp,
+  RollenArt,
+  RollenMerkmal,
   RollenSystemRecht,
   TraegerschaftTyp,
+  Vertrauensstufe,
+  type DBiamPersonenuebersichtResponse,
+  type DBiamPersonenzuordnungResponse,
   type OrganisationResponse,
+  type OrganisationResponseLegacy,
+  type PersonendatensatzResponse,
   type PersonenkontextRolleFieldsResponse,
   type RollenSystemRechtServiceProviderIDResponse,
   type UserinfoResponse,
 } from '@/api-client/generated';
 import type { Organisation } from '@/stores/OrganisationStore';
+import type { PersonenkontextWorkflowResponse, Zuordnung } from '@/stores/PersonenkontextStore';
+import { PersonLockOccasion, type Person, type Personendatensatz, type UserLock } from '@/stores/PersonStore';
+import type { Rolle, RolleResponse } from '@/stores/RolleStore';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { faker } from '@faker-js/faker';
 
 export class DoFactory {
+  private static getFakeSchuleName(): string {
+    return `${faker.person.firstName()}-${faker.person.lastName()}-Schule`;
+  }
+
   public static getSchule(props?: Partial<Organisation>): Organisation {
     return {
       id: faker.string.uuid(),
-      name: `${faker.person.firstName()}-${faker.person.lastName()}-Schule`,
+      name: DoFactory.getFakeSchuleName(),
       kennung: faker.string.numeric(7),
       typ: OrganisationsTyp.Schule,
       administriertVon: faker.string.uuid(),
@@ -33,6 +48,19 @@ export class DoFactory {
       kuerzel: faker.string.alpha(4),
       typ: OrganisationsTyp.Klasse,
       administriertVon: parentSchule?.id ?? faker.string.uuid(),
+      ...props,
+    };
+  }
+
+  public static getOrganisationenResponseLegacy(
+    props?: Partial<OrganisationResponseLegacy>,
+  ): OrganisationResponseLegacy {
+    return {
+      ...DoFactory.getSchule(),
+      administriertVon: faker.string.uuid(),
+      kennung: faker.string.numeric(7),
+      kuerzel: 'Schulkürzel',
+      namensergaenzung: null,
       ...props,
     };
   }
@@ -114,6 +142,162 @@ export class DoFactory {
         RollenSystemRecht.PersonSynchronisieren,
       ],
       serviceProviderIds: [faker.string.uuid()],
+      ...props,
+    };
+  }
+
+  public static getRolle(props?: Partial<Rolle>): Rolle {
+    return {
+      administeredBySchulstrukturknoten: faker.string.uuid(),
+      id: faker.string.uuid(),
+      name: faker.string.alpha(4),
+      merkmale: new Set<RollenMerkmal>(),
+      rollenart: RollenArt.Lehr,
+      systemrechte: new Set<RollenSystemRecht>(),
+      version: 1,
+      ...props,
+    };
+  }
+
+  public static getRolleResponse(props?: Partial<RolleResponse>): RolleResponse {
+    return {
+      ...this.getRolle(),
+      createdAt: faker.date.past().toISOString(),
+      updatedAt: faker.date.recent().toISOString(),
+      merkmale: new Set<RollenMerkmal>(),
+      systemrechte: new Set<RollenSystemRecht>(),
+      administeredBySchulstrukturknotenName: this.getFakeSchuleName(),
+      administeredBySchulstrukturknotenKennung: faker.string.numeric(7),
+      ...props,
+    };
+  }
+
+  public static getPersonenkontextWorkflowResponse(
+    props?: Partial<PersonenkontextWorkflowResponse>,
+  ): PersonenkontextWorkflowResponse {
+    const organisation: OrganisationResponseLegacy = this.getOrganisationenResponseLegacy();
+    return {
+      organisations: [organisation],
+      rollen: [
+        this.getRolleResponse({
+          administeredBySchulstrukturknoten: organisation.id,
+          administeredBySchulstrukturknotenName: organisation.name,
+          administeredBySchulstrukturknotenKennung: organisation.kennung,
+        }),
+      ],
+      selectedOrganisation: null,
+      selectedRollen: null,
+      canCommit: false,
+      ...props,
+    };
+  }
+
+  public static getDBiamPersonenuebersichtResponse(
+    props?: Partial<DBiamPersonenuebersichtResponse>,
+  ): DBiamPersonenuebersichtResponse {
+    return {
+      personId: faker.string.uuid(),
+      vorname: faker.person.firstName(),
+      nachname: faker.person.lastName(),
+      benutzername: faker.internet.username(),
+      lastModifiedZuordnungen: faker.date.recent().toISOString(),
+      zuordnungen: [],
+      ...props,
+    };
+  }
+
+  public static getDBiamPersonenzuordnungResponse(
+    props?: Partial<DBiamPersonenzuordnungResponse>,
+  ): DBiamPersonenzuordnungResponse {
+    return {
+      sskId: faker.string.uuid(),
+      sskName: DoFactory.getFakeSchuleName(),
+      sskDstNr: faker.string.numeric(7),
+      rolleId: faker.string.uuid(),
+      rolle: faker.string.alpha(4),
+      rollenArt: RollenArt.Lehr,
+      befristung: faker.date.future().toISOString(),
+      administriertVon: faker.string.uuid(),
+      editable: true,
+      merkmale: [] as unknown as RollenMerkmal,
+      admins: [faker.person.fullName()],
+      typ: OrganisationsTyp.Schule,
+      ...props,
+    };
+  }
+
+  public static getZuordnung(props?: Partial<Zuordnung>): Zuordnung {
+    return {
+      sskId: faker.string.uuid(),
+      rolleId: faker.string.uuid(),
+      sskName: DoFactory.getFakeSchuleName(),
+      sskDstNr: faker.string.numeric(7),
+      rolle: faker.string.alpha(4),
+      rollenArt: RollenArt.Lehr,
+      befristung: faker.date.future().toISOString(),
+      klasse: undefined,
+      administriertVon: faker.string.uuid(),
+      editable: true,
+      merkmale: [] as unknown as RollenMerkmal,
+      typ: OrganisationsTyp.Schule,
+      ...props,
+    };
+  }
+
+  public static getUserLockEntry(props?: Partial<UserLock>): UserLock {
+    return {
+      personId: faker.string.uuid(),
+      locked_by: faker.string.uuid(),
+      created_at: faker.date.recent().toISOString(),
+      locked_until: faker.date.future().toISOString(),
+      lock_occasion: PersonLockOccasion.MANUELL_GESPERRT,
+      ...props,
+    };
+  }
+
+  public static getPerson(props?: Partial<Person>): Person {
+    return {
+      id: faker.string.uuid(),
+      name: {
+        vorname: faker.person.firstName(),
+        familienname: faker.person.lastName(),
+      },
+      referrer: faker.internet.username(),
+      revision: faker.string.numeric(),
+      personalnummer: faker.string.numeric(7),
+      isLocked: false,
+      userLock: null,
+      lastModified: faker.date.recent().toISOString(),
+      email: {
+        status: EmailAddressStatus.Enabled,
+        address: faker.internet.email(),
+      },
+      ...props,
+    };
+  }
+
+  public static getPersonendatensatz(props?: Partial<Personendatensatz>): Personendatensatz {
+    return {
+      person: this.getPerson(),
+      ...props,
+    };
+  }
+
+  public static getPersonendatensatzResponse(
+    props?: Partial<PersonendatensatzResponse>,
+    person?: Person,
+  ): PersonendatensatzResponse {
+    return {
+      person: {
+        ...(person ?? this.getPersonendatensatz().person),
+        mandant: '',
+        geburt: {},
+        stammorganisation: '',
+        geschlecht: '',
+        lokalisierung: '',
+        vertrauensstufe: Vertrauensstufe.Teil,
+        startpasswort: '',
+      },
       ...props,
     };
   }

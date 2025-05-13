@@ -5,21 +5,15 @@
   import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
   import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
   import type { TranslatedObject } from '@/types';
-  import { isKopersRolle } from '@/utils/validationPersonenkontext';
+  import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
+  import { formatDateToISO, getNextSchuljahresende } from '@/utils/date';
+  import { befristungSchema, isKopersRolle } from '@/utils/validationPersonenkontext';
   import { toTypedSchema } from '@vee-validate/yup';
   import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
   import { computed, ref, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
   import { object, string } from 'yup';
-
-  const { t }: Composer = useI18n({ useScope: 'global' });
-  const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
-
-  const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
-  const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
-
-  const canCommit: Ref<boolean> = ref(false);
 
   type Props = {
     errorCode: string;
@@ -38,7 +32,17 @@
   const props: Props = defineProps<Props>();
   const emit: Emits = defineEmits<Emits>();
 
+  const { t }: Composer = useI18n({ useScope: 'global' });
+  const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
+
+  const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
+  const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
+
+  const canCommit: Ref<boolean> = ref(false);
+
   const showModifyRolleDialog: Ref<boolean> = ref(props.isDialogVisible);
+
+  const calculatedBefristung: Ref<string | undefined> = ref('');
 
   const successMessage: ComputedRef<string> = computed(() =>
     bulkOperationStore.currentOperation?.successMessage ? t(bulkOperationStore.currentOperation.successMessage) : '',
@@ -48,6 +52,8 @@
   export type ZuordnungCreationForm = {
     selectedRolle: string;
     selectedOrganisation: string;
+    selectedBefristung: Date;
+    selectedBefristungOption: string;
   };
 
   export type PersonenkontextFieldDefinitions = {
@@ -62,6 +68,7 @@
       object({
         selectedRolle: string().required(t('admin.rolle.rules.rolle.required')),
         selectedOrganisation: string().required(t('admin.organisation.rules.organisation.required')),
+        selectedBefristung: befristungSchema(t),
       }),
     );
   };
@@ -97,6 +104,35 @@
     return isKopersRolle(selectedRollen.value, props.rollen);
   });
 
+  const [selectedBefristung, selectedBefristungProps]: [
+    Ref<string | undefined>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = formContext.defineField('selectedBefristung', getVuetifyConfig);
+
+  const [selectedBefristungOption, selectedBefristungOptionProps]: [
+    Ref<string | undefined>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = formContext.defineField('selectedBefristungOption', getVuetifyConfig);
+
+  const isBefristungRequired: ComputedRef<boolean> = computed(() => {
+    return selectedRolle.value ? isBefristungspflichtRolle([selectedRolle.value]) : false;
+  });
+
+  const {
+    handleBefristungUpdate,
+    handleBefristungOptionUpdate,
+    setupRolleWatcher,
+    setupWatchers,
+  }: BefristungUtilsType = useBefristungUtils({
+    formContext,
+    selectedBefristung,
+    selectedBefristungOption,
+    calculatedBefristung,
+    selectedRollen,
+  });
+  setupRolleWatcher();
+  setupWatchers();
+
   async function closeModifyRolleDeleteDialog(): Promise<void> {
     if (bulkOperationStore.currentOperation) {
       bulkOperationStore.resetState();
@@ -113,12 +149,20 @@
 
   // Creates a new Personenkontext for an array of Person IDs. For each processed ID the progress bar will increment according to the total number of items to process
   async function handleModifyRolle(personIDs: string[]): Promise<void> {
+    const befristungDate: string | undefined = selectedBefristung.value
+      ? selectedBefristung.value
+      : calculatedBefristung.value;
+
+    // Format the date in ISO 8601 format if it exists
+    const formattedBefristung: string | undefined = befristungDate ? formatDateToISO(befristungDate) : undefined;
+
     await bulkOperationStore.bulkModifyPersonenRolle(
       personIDs,
       selectedOrganisation.value!,
       selectedRolle.value!,
       props.rollen || [],
       personenkontextStore.workflowStepResponse?.organisations || [],
+      formattedBefristung,
     );
 
     emit('update:getUebersichten');
@@ -143,16 +187,26 @@
             v-if="bulkOperationStore.currentOperation?.progress === 0"
             ref="personenkontext-create"
             :showHeadline="false"
-            :isModifyRolleDialog="showModifyRolleDialog"
             :organisationen="organisationen"
             :rollen="rollen"
             :selectedOrganisationProps="selectedOrganisationProps"
             :selectedRolleProps="selectedRolleProps"
+            :befristungInputProps="{
+              befristungProps: selectedBefristungProps,
+              befristungOptionProps: selectedBefristungOptionProps,
+              isUnbefristetDisabled: isBefristungRequired,
+              isBefristungRequired,
+              nextSchuljahresende: getNextSchuljahresende(),
+              befristung: selectedBefristung,
+              befristungOption: selectedBefristungOption,
+            }"
             v-model:selectedOrganisation="selectedOrganisation"
             v-model:selectedRolle="selectedRolle"
             @update:selectedOrganisation="(value?: string) => (selectedOrganisation = value)"
             @update:selectedRolle="(value?: string) => (selectedRolle = value)"
             @update:canCommit="canCommit = $event"
+            @update:befristung="handleBefristungUpdate"
+            @update:calculatedBefristungOption="handleBefristungOptionUpdate"
             @fieldReset="handleFieldReset"
           />
           <v-row
