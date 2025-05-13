@@ -195,7 +195,6 @@
   <v-dialog
     v-model="closeBulkErrorDialogDialogVisible"
     persistent
-    max-width="600px"
   >
     <LayoutCard
       :closable="true"
@@ -203,13 +202,22 @@
       @onCloseClicked="closeBulkErrorDialogDialogVisible = false"
     >
       <v-card-text>
-        <v-container>
-          <v-row class="text-body bold justify-center">
+        <v-container class="my-4">
+          <v-row
+            class="text-body text-error justify-center"
+            align="center"
+          >
             <v-col
               class="text-center"
-              cols="10"
+              cols="12"
             >
-              <span>{{ t('admin.person.bulk.closeBulkErrorDialogConfirmationMessage') }}</span>
+              <v-icon
+                class="mr-2"
+                icon="mdi-alert"
+              />
+              <span>
+                {{ t('admin.person.bulk.closeBulkErrorDialogConfirmationMessage') }}
+              </span>
             </v-col>
           </v-row>
         </v-container>
@@ -223,11 +231,11 @@
           >
             <v-btn
               :block="mdAndDown"
-              class="primary"
-              data-testid="confirm-close-bulk-error-dialog-button"
-              @click.stop="closeBulkErrorDialog"
+              class="secondary"
+              data-testid="cancel-close-bulk-error-dialog-button"
+              @click.stop="closeBulkErrorDialogDialogVisible = false"
             >
-              {{ $t('yes') }}
+              {{ $t('cancel') }}
             </v-btn>
           </v-col>
           <v-col
@@ -237,11 +245,11 @@
           >
             <v-btn
               :block="mdAndDown"
-              class="secondary"
-              data-testid="cancel-close-bulk-error-dialog-button"
-              @click.stop="closeBulkErrorDialogDialogVisible = false"
+              class="primary"
+              data-testid="confirm-close-bulk-error-dialog-button"
+              @click.stop="closeBulkErrorDialog"
             >
-              {{ $t('no') }}
+              {{ $t('close') }}
             </v-btn>
           </v-col>
         </v-row>
