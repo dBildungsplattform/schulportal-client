@@ -257,11 +257,6 @@ export const useBulkOperationStore: StoreDefinition<
         }
 
         this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
-
-        if (personenkontextStore.errorCode) {
-          this.currentOperation.errors.set(personId, personenkontextStore.errorCode);
-          personenkontextStore.errorCode = '';
-        }
       }
 
       this.currentOperation.isRunning = false;
