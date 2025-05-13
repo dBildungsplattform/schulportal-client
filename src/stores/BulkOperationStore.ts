@@ -354,6 +354,8 @@ export const useBulkOperationStore: StoreDefinition<
           this.currentOperation.errors.set(personId, personenkontextStore.errorCode);
           personenkontextStore.errorCode = '';
         }
+
+        this.currentOperation.errors.set(personId, 'UNSPECIFIED_ERROR');
       }
 
       this.currentOperation.isRunning = false;

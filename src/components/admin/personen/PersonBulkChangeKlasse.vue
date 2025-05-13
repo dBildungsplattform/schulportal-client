@@ -212,7 +212,7 @@
   </LayoutCard>
   <template v-if="showErrorDialog">
     <PersonBulkError
-      :bulkOperationName="t('admin.person.bulkChangeKlasse')"
+      :bulkOperationName="t('admin.person.bulkChangeKlasse.title')"
       :isDialogVisible="showErrorDialog"
       @update:isDialogVisible="
         (val: boolean) => {
