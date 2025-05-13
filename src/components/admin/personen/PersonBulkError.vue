@@ -200,6 +200,7 @@
   <v-dialog
     v-model="closeBulkErrorDialogDialogVisible"
     persistent
+    max-width="900"
   >
     <LayoutCard
       :header="$t('admin.person.bulk.bulkErrorTitle')"
@@ -216,7 +217,7 @@
               cols="12"
             >
               <v-icon
-                class="mr-2"
+                class="mr-2 pb-1"
                 icon="mdi-alert"
               />
               <span>
