@@ -116,11 +116,11 @@
           <v-divider
             class="border-opacity-100 rounded my-8"
             thickness="5px"
-            color="#E5EAEF"
           />
         </template>
 
         <!-- Error list -->
+        <p class="headline-2 mb-4">{{ $t('admin.person.bulk.bulkErrorTitle') }}</p>
         <p class="text-body bold pre-line">
           {{
             t('admin.person.bulk.bulkErrorMessage', {
@@ -197,7 +197,6 @@
     persistent
   >
     <LayoutCard
-      :closable="true"
       :header="$t('admin.person.bulk.bulkErrorTitle')"
       @onCloseClicked="closeBulkErrorDialogDialogVisible = false"
     >
