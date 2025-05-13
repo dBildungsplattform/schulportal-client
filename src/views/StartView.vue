@@ -148,7 +148,7 @@
       ? twoFactorAuthentificationStore.get2FAState(personId)
       : Promise.resolve();
 
-    await Promise.all([providersPromise, twoFAStatePromise]);
+    await Promise.allSettled([providersPromise, twoFAStatePromise]);
   });
 
   onBeforeMount(async () => {
