@@ -124,6 +124,7 @@ beforeEach(() => {
 
   authStore = useAuthStore();
   serviceProviderStore = useServiceProviderStore();
+  serviceProviderStore.getAvailableServiceProviders = vi.fn(() => Promise.resolve());
   personStore = usePersonStore();
   personInfoStore = usePersonInfoStore();
   meldungStore = useMeldungStore();
