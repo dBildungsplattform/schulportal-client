@@ -120,7 +120,12 @@
         </template>
 
         <!-- Error list -->
-        <p class="headline-2 mb-4">{{ $t('admin.person.bulk.bulkErrorTitle') }}</p>
+        <p
+          v-if="props.bulkOperationName === t('admin.person.resetPassword') && passwords"
+          class="headline-2 mb-4"
+        >
+          {{ $t('admin.person.bulk.bulkErrorTitle') }}
+        </p>
         <p class="text-body bold pre-line">
           {{
             t('admin.person.bulk.bulkErrorMessage', {
