@@ -28,10 +28,11 @@
   } from '@/stores/OrganisationStore';
   import { EmailStatus, usePersonStore, type Personendatensatz, type PersonStore } from '@/stores/PersonStore';
   import {
+    mapZuordnungToPersonenkontextUpdate,
     usePersonenkontextStore,
     type PersonenkontextStore,
+    type PersonenkontextUpdate,
     type PersonenkontextWorkflowResponse,
-    type ZuordnungUpdate,
   } from '@/stores/PersonenkontextStore';
   import { RollenArt, RollenMerkmal } from '@/stores/RolleStore';
   import {
@@ -147,14 +148,8 @@
     );
   });
 
-  const finalZuordnungenUpdate: ComputedRef<ZuordnungUpdate[]> = computed(() => {
-    return finalZuordnungen.value.map((zuordnung: Zuordnung) => {
-      return {
-        sskId: zuordnung.sskId,
-        rolleId: zuordnung.rolleId,
-        befristung: zuordnung.befristung?.toISOString(),
-      };
-    });
+  const finalZuordnungenUpdate: ComputedRef<PersonenkontextUpdate[]> = computed(() => {
+    return finalZuordnungen.value.map(mapZuordnungToPersonenkontextUpdate);
   });
 
   function navigateToPersonTable(): void {
@@ -392,13 +387,9 @@
     // Combine remaining Zuordnungen with Klassen that should be kept
     const combinedZuordnungen: Zuordnung[] | undefined = remainingZuordnungen?.concat(klassenToKeep);
 
-    const zuordnungenUpdate: ZuordnungUpdate[] | undefined = combinedZuordnungen?.map((zuordnung: Zuordnung) => {
-      return {
-        sskId: zuordnung.sskId,
-        rolleId: zuordnung.rolleId,
-        befristung: zuordnung.befristung?.toISOString(),
-      };
-    });
+    const zuordnungenUpdate: PersonenkontextUpdate[] | undefined = combinedZuordnungen?.map(
+      mapZuordnungToPersonenkontextUpdate,
+    );
 
     // Update the personenkontexte with the filtered list
     await personenkontextStore.updatePersonenkontexte(zuordnungenUpdate, currentPersonId);

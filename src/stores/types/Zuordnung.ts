@@ -1,7 +1,6 @@
 import type { DBiamPersonenzuordnungResponse } from '@/api-client/generated';
 import type { OrganisationsTyp } from '../OrganisationStore';
 import type { RollenArt, RollenMerkmal } from '../RolleStore';
-import type { ZuordnungUpdate } from '../PersonenkontextStore';
 
 export class Zuordnung {
   public constructor(
@@ -51,13 +50,5 @@ export class Zuordnung {
       response.merkmale,
       response.admins ?? [],
     );
-  }
-
-  public toUpdate(): ZuordnungUpdate {
-    return {
-      sskId: this.sskId,
-      rolleId: this.rolleId,
-      befristung: this.befristung ? this.befristung.toISOString() : undefined,
-    };
   }
 }

@@ -21,6 +21,7 @@ import {
   type SystemrechtResponse,
 } from '../api-client/generated/api';
 import { usePersonStore, type PersonStore } from './PersonStore';
+import type { Zuordnung } from './types/Zuordnung';
 
 const personenKontextApi: PersonenkontextApiInterface = PersonenkontextApiFactory(undefined, '', axiosApiInstance);
 const personenKontexteApi: PersonenkontexteApiInterface = PersonenkontexteApiFactory(undefined, '', axiosApiInstance);
@@ -40,11 +41,7 @@ export enum PersonenKontextTyp {
   Klasse = 'KLASSE',
 }
 
-export type ZuordnungUpdate = {
-  sskId: string;
-  rolleId: string;
-  befristung?: string;
-};
+export type PersonenkontextUpdate = Pick<DbiamPersonenkontextBodyParams, 'organisationId' | 'rolleId' | 'befristung'>;
 
 export type WorkflowFilter = {
   organisationId?: string;
@@ -53,6 +50,17 @@ export type WorkflowFilter = {
   organisationName?: string;
   limit?: number;
 };
+
+export function mapZuordnungToPersonenkontextUpdate(
+  zuordnung: Pick<Zuordnung, 'sskId' | 'rolleId' | 'befristung'>,
+): PersonenkontextUpdate {
+  const befristung: string | undefined = zuordnung.befristung?.toISOString();
+  return {
+    organisationId: zuordnung.sskId,
+    rolleId: zuordnung.rolleId,
+    befristung,
+  };
+}
 
 type PersonenkontextState = {
   updatedPersonenkontexte: PersonenkontexteUpdateResponse | null;
@@ -71,7 +79,7 @@ type PersonenkontextActions = {
   processWorkflowStep: (filter?: WorkflowFilter) => Promise<PersonenkontextWorkflowResponse>;
   getPersonenkontextRolleWithFilter: (rolleName: string, limit?: number) => Promise<void>;
   updatePersonenkontexte: (
-    combinedZuordnungen: ZuordnungUpdate[] | undefined,
+    updatedPersonenkontexte: PersonenkontextUpdate[] | undefined,
     personId: string,
     personalnummer?: string,
   ) => Promise<void>;
@@ -174,7 +182,7 @@ export const usePersonenkontextStore: StoreDefinition<
     },
 
     async updatePersonenkontexte(
-      combinedZuordnungen: ZuordnungUpdate[] | undefined,
+      updatedPersonenkontexte: PersonenkontextUpdate[] | undefined,
       personId: string,
       personalnummer?: string,
     ): Promise<void> {
@@ -186,11 +194,9 @@ export const usePersonenkontextStore: StoreDefinition<
           lastModified: personStore.personenuebersicht?.lastModifiedZuordnungen ?? undefined,
           count: personStore.personenuebersicht?.zuordnungen.length ?? 0,
           personenkontexte:
-            combinedZuordnungen?.map((zuordnung: ZuordnungUpdate) => ({
+            updatedPersonenkontexte?.map((personenkontextUpdate: PersonenkontextUpdate) => ({
               personId: personId,
-              organisationId: zuordnung.sskId,
-              rolleId: zuordnung.rolleId,
-              befristung: zuordnung.befristung,
+              ...personenkontextUpdate,
             })) ?? [],
         };
         const { data }: { data: PersonenkontexteUpdateResponse } =

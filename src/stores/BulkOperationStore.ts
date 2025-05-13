@@ -4,7 +4,12 @@ import { getResponseErrorCode } from '@/utils/errorHandlers';
 import { isBefore } from 'date-fns';
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import type { Organisation } from './OrganisationStore';
-import { usePersonenkontextStore, type PersonenkontextStore, type ZuordnungUpdate } from './PersonenkontextStore';
+import {
+  mapZuordnungToPersonenkontextUpdate,
+  usePersonenkontextStore,
+  type PersonenkontextStore,
+  type PersonenkontextUpdate,
+} from './PersonenkontextStore';
 import { usePersonStore, type PersonStore } from './PersonStore';
 import { Zuordnung } from './types/Zuordnung';
 
@@ -127,11 +132,7 @@ export const useBulkOperationStore: StoreDefinition<
 
         // Await the processing of each ID
         await personenkontextStore.updatePersonenkontexte(
-          updatedZuordnungen.map((z: Zuordnung) => ({
-            sskId: z.sskId,
-            rolleId: z.rolleId,
-            befristung: z.befristung?.toISOString(),
-          })),
+          updatedZuordnungen.map(mapZuordnungToPersonenkontextUpdate),
           personId,
         );
 
@@ -229,11 +230,11 @@ export const useBulkOperationStore: StoreDefinition<
           }, befristung);
         }
 
-        const zuordnungUpdates: Array<ZuordnungUpdate> = currentZuordnungen.map((zuordnung: Zuordnung) =>
-          zuordnung.toUpdate(),
+        const zuordnungUpdates: Array<PersonenkontextUpdate> = currentZuordnungen.map(
+          mapZuordnungToPersonenkontextUpdate,
         );
         zuordnungUpdates.push({
-          sskId: selectedOrganisation.id,
+          organisationId: selectedOrganisation.id,
           rolleId: selectedRolleId,
           befristung: earliestBefristung ? earliestBefristung.toISOString() : undefined,
         });
@@ -341,11 +342,7 @@ export const useBulkOperationStore: StoreDefinition<
         const combinedZuordnungen: Zuordnung[] = [...zuordnungenToRemainUnchanged, ...newZuordnungen];
 
         await personenkontextStore.updatePersonenkontexte(
-          combinedZuordnungen.map((z: Zuordnung) => ({
-            sskId: z.sskId,
-            rolleId: z.rolleId,
-            befristung: z.befristung?.toISOString(),
-          })),
+          combinedZuordnungen.map(mapZuordnungToPersonenkontextUpdate),
           personId,
         );
         this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);

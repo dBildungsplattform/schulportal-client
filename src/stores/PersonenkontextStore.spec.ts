@@ -15,7 +15,7 @@ import {
   type PersonenkontexteUpdateResponse,
   type PersonenkontextStore,
   type PersonenkontextWorkflowResponse,
-  type ZuordnungUpdate,
+  type PersonenkontextUpdate,
 } from './PersonenkontextStore';
 import { type PersonendatensatzResponse } from './PersonStore';
 
@@ -195,9 +195,9 @@ describe('PersonenkontextStore', () => {
   });
 
   describe('updatePersonenkontexte', () => {
-    const mockZuordnungUpdates: ZuordnungUpdate[] = [
+    const mockZuordnungUpdates: PersonenkontextUpdate[] = [
       {
-        sskId: '67890',
+        organisationId: '67890',
         rolleId: '54321',
       },
     ];

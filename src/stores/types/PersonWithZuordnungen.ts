@@ -33,9 +33,12 @@ export class PersonWithZuordnungen extends Person {
         art: zuordnung.rollenArt,
         merkmale: zuordnung.merkmale,
       });
-      if (zuordnung.typ !== OrganisationsTyp.Klasse)
-        this.administrationsebenen.add(zuordnung.sskDstNr || zuordnung.sskName);
-      else this.klassenZuordnungen.add(zuordnung.sskName);
+      if (zuordnung.typ !== OrganisationsTyp.Klasse) {
+        if (zuordnung.sskDstNr != null && zuordnung.sskDstNr != '') this.administrationsebenen.add(zuordnung.sskDstNr);
+        else this.administrationsebenen.add(zuordnung.sskName);
+      } else {
+        this.klassenZuordnungen.add(zuordnung.sskName);
+      }
     }
   }
 

@@ -19,6 +19,7 @@ describe('PersonWithZuordnungen', () => {
       DoFactory.getZuordnung({ rollenArt: RollenArt.Lern, typ: OrganisationsTyp.Klasse, administriertVon: schule.id }),
       DoFactory.getZuordnung({ rollenArt: RollenArt.Lern, typ: OrganisationsTyp.Klasse, administriertVon: schule.id }),
       DoFactory.getZuordnung({ rollenArt: RollenArt.Lern, typ: OrganisationsTyp.Land, sskDstNr: null }),
+      DoFactory.getZuordnung({ rollenArt: RollenArt.Lern, typ: OrganisationsTyp.Land, sskDstNr: '' }),
     ];
     personWithZuordnungen = new PersonWithZuordnungen(person, zuordnungen);
   });
@@ -45,7 +46,8 @@ describe('PersonWithZuordnungen', () => {
     const { administrationsebenenAsString, klassenZuordnungenAsString }: PersonWithZuordnungen = personWithZuordnungen;
     for (const zuordnung of zuordnungen) {
       if (zuordnung.typ !== OrganisationsTyp.Klasse) {
-        expect(administrationsebenenAsString).toContain(zuordnung.sskDstNr || zuordnung.sskName);
+        if (zuordnung.sskDstNr) expect(administrationsebenenAsString).toContain(zuordnung.sskDstNr);
+        else expect(administrationsebenenAsString).toContain(zuordnung.sskName);
       } else {
         expect(klassenZuordnungenAsString).toContain(zuordnung.sskName);
       }

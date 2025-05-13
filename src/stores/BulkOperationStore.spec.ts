@@ -124,7 +124,7 @@ describe('BulkOperationStore', () => {
       expect(spy).toHaveBeenCalledTimes(1);
       expect(spy).toHaveBeenLastCalledWith(
         expect.arrayContaining([
-          { sskId: remaining.sskId, rolleId: remaining.rolleId, befristung: remaining.befristung },
+          { organisationId: remaining.sskId, rolleId: remaining.rolleId, befristung: remaining.befristung },
         ]),
         mockPersonId,
       );
@@ -471,13 +471,13 @@ describe('BulkOperationStore', () => {
         expect(spy).toHaveBeenCalledWith(
           [
             ...response.zuordnungen.map((zuordnung: DBiamPersonenzuordnungResponse) => ({
-              sskId: zuordnung.sskId,
+              organisationId: zuordnung.sskId,
               rolleId: zuordnung.rolleId,
               befristung: zuordnung.befristung ?? undefined,
             })),
             {
               befristung: correctBefristung,
-              sskId: selectedOrganisationId,
+              organisationId: selectedOrganisationId,
               rolleId: selectedRolleId,
             },
           ],
@@ -671,15 +671,15 @@ describe('BulkOperationStore', () => {
       expect(spy).toHaveBeenCalledWith(
         expect.arrayContaining([
           expect.objectContaining({
-            sskId: mockSchule.id,
+            organisationId: mockSchule.id,
             rolleId: mockKontexte.get(mockPersonIds[0]!)?.zuordnungen[0]?.rolleId,
           }),
           expect.objectContaining({
-            sskId: klassenId,
+            organisationId: klassenId,
             rolleId: mockKontexte.get(mockPersonIds[0]!)?.zuordnungen[1]?.rolleId,
           }),
           expect.objectContaining({
-            sskId: unchangedKlassenId,
+            organisationId: unchangedKlassenId,
             rolleId: mockKontexte.get(mockPersonIds[0]!)?.zuordnungen[2]?.rolleId,
           }),
         ]),
@@ -688,15 +688,15 @@ describe('BulkOperationStore', () => {
       expect(spy).toHaveBeenCalledWith(
         expect.arrayContaining([
           expect.objectContaining({
-            sskId: mockSchule.id,
+            organisationId: mockSchule.id,
             rolleId: mockKontexte.get(mockPersonIds[1]!)?.zuordnungen[0]?.rolleId,
           }),
           expect.objectContaining({
-            sskId: klassenId,
+            organisationId: klassenId,
             rolleId: mockKontexte.get(mockPersonIds[1]!)?.zuordnungen[1]?.rolleId,
           }),
           expect.objectContaining({
-            sskId: klassenId,
+            organisationId: klassenId,
             rolleId: mockKontexte.get(mockPersonIds[1]!)?.zuordnungen[2]?.rolleId,
           }),
         ]),
