@@ -49,6 +49,7 @@
     for (const personId of selectedPersonIds.value) {
       const person: PersonWithZuordnungen | undefined = personStore.allUebersichten.get(personId);
       if (!person) continue;
+
       persons.set(personId, person);
     }
     return persons;
