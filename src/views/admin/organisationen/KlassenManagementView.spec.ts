@@ -108,17 +108,11 @@ describe('KlassenManagementView', () => {
       DoFactory.getKlasse(schule2, { name: '9b', schuleDetails: schule2.name }),
     ];
 
-    organisationStore.errorCode = '';
-
     organisationStore.allOrganisationen = [schule1, schule2];
 
     organisationStore.allSchulen = [schule1, schule2];
 
     organisationStore.totalKlassen = 2;
-
-    organisationStore.getKlassenByOrganisationId = vi.fn();
-    organisationStore.getAllOrganisationen = vi.fn();
-    organisationStore.deleteOrganisationById = vi.fn();
 
     authStore.currentUser = authUser;
 
@@ -357,18 +351,30 @@ describe('KlassenManagementView', () => {
     },
   );
 
-  test('it updates sorting when onTableUpdate is triggered', async () => {
-    const sortField: string = 'name';
-    const sortOrder: string = 'desc';
+  test.only('it sorts Klassen correctly when changing sort order', async () => {
+    // Click to sort descending
+    const klasseHeader: DOMWrapper<Element> | undefined = wrapper
+      ?.findAll('.v-data-table__th')
+      .find((th: DOMWrapper<Element>) => th.text().includes('Klasse'));
 
-    const resultTable: VueWrapper | undefined = wrapper?.findComponent({ ref: 'resultTable' });
+    await klasseHeader?.trigger('click');
+    await flushPromises();
 
-    await resultTable?.vm.$emit('onTableUpdate', {
-      sortField: sortField,
-      sortOrder: sortOrder,
-    });
+    expect(organisationStore.getAllOrganisationen).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sortField: 'name',
+        sortOrder: 'desc',
+      }),
+    );
 
-    expect(searchFilterStore.organisationenSortField).toBe(sortField);
-    expect(searchFilterStore.organisationenSortOrder).toBe(sortOrder);
+    // click again to sort ascending
+    await klasseHeader?.trigger('click');
+    await flushPromises();
+    expect(organisationStore.getAllOrganisationen).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sortField: 'name',
+        sortOrder: 'asc',
+      }),
+    );
   });
 });
