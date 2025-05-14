@@ -687,7 +687,7 @@ describe('BulkOperationStore', () => {
   });
 
   describe('bulkUnassignPersonenFromRolle', () => {
-    it('should unassign person from role successfully', async () => {
+    it('should unassign person from rolle successfully', async () => {
       const organisationId: string = '1234';
       const rolleId: string = '5678';
       const personId: string = '1';
@@ -804,17 +804,36 @@ describe('BulkOperationStore', () => {
       expect(bulkOperationStore.currentOperation?.successMessage).toBe('admin.rolle.rollenUnassignedSuccessfully');
     });
 
-    it('should handle errors from personenuebersicht and personenkontext-workflow endpoints', async () => {
+    it('should handle errors from personenuebersicht endpoint', async () => {
       const organisationId: string = '1234';
       const rolleId: string = '5678';
-      const personIds: string[] = ['1', '2'];
+      const personId: string = '1';
 
-      // Person 1: Error in personenuebersicht (GET) call
-      mockAdapter.onGet(`/api/dbiam/personenuebersicht/${personIds[0]}`).replyOnce(500, { i18nKey: 'mockGetError' });
+      // Mock error in personenuebersicht (GET) call
+      mockAdapter.onGet(`/api/dbiam/personenuebersicht/${personId}`).replyOnce(500, { i18nKey: 'mockGetError' });
 
-      // Person 2: Success in GET but error in personenkontext-workflow (PUT) call
-      const mockPersonResponse2: DBiamPersonenuebersichtResponse = {
-        personId: personIds[1]!,
+      const unassignPromise: Promise<void> = bulkOperationStore.bulkUnassignPersonenFromRolle(organisationId, rolleId, [
+        personId,
+      ]);
+
+      await unassignPromise;
+
+      expect(bulkOperationStore.currentOperation?.isRunning).toBe(false);
+      expect(bulkOperationStore.currentOperation?.complete).toBe(true);
+      expect(bulkOperationStore.currentOperation?.progress).toBe(100);
+      expect(bulkOperationStore.currentOperation?.errors.size).toBe(1);
+      expect(bulkOperationStore.currentOperation?.errors.get(personId)).toBe('mockGetError');
+      expect(bulkOperationStore.currentOperation?.successMessage).toBeUndefined();
+    });
+
+    it('should handle errors from personenkontext-workflow endpoint', async () => {
+      const organisationId: string = '1234';
+      const rolleId: string = '5678';
+      const personId: string = '2';
+
+      // Mock successful GET but error in personenkontext-workflow (PUT) call
+      const mockPersonResponse: DBiamPersonenuebersichtResponse = {
+        personId: personId,
         vorname: 'Jane',
         nachname: 'Doe',
         benutzername: 'jdoe2',
@@ -836,24 +855,31 @@ describe('BulkOperationStore', () => {
           },
         ],
       };
-      mockAdapter.onGet(`/api/dbiam/personenuebersicht/${personIds[1]}`).replyOnce(200, mockPersonResponse2);
-      mockAdapter.onPut(`/api/personenkontext-workflow/${personIds[1]}`).replyOnce(500, { i18nKey: 'mockPutError' });
+      mockAdapter.onGet(`/api/dbiam/personenuebersicht/${personId}`).replyOnce(200, mockPersonResponse);
+      mockAdapter.onPut(`/api/personenkontext-workflow/${personId}`).replyOnce(500, { i18nKey: 'mockPutError' });
 
-      const unassignPromise: Promise<void> = bulkOperationStore.bulkUnassignPersonenFromRolle(
-        organisationId,
-        rolleId,
-        personIds,
-      );
+      const unassignPromise: Promise<void> = bulkOperationStore.bulkUnassignPersonenFromRolle(organisationId, rolleId, [
+        personId,
+      ]);
 
       await unassignPromise;
 
       expect(bulkOperationStore.currentOperation?.isRunning).toBe(false);
       expect(bulkOperationStore.currentOperation?.complete).toBe(true);
       expect(bulkOperationStore.currentOperation?.progress).toBe(100);
-      expect(bulkOperationStore.currentOperation?.errors.size).toBe(2);
-      expect(bulkOperationStore.currentOperation?.errors.get(personIds[0]!)).toBe('mockGetError');
-      expect(bulkOperationStore.currentOperation?.errors.get(personIds[1]!)).toBe('mockGetError');
-      expect(bulkOperationStore.currentOperation?.successMessage).toBeUndefined(); // No success message because there are errors
+      expect(bulkOperationStore.currentOperation?.errors.size).toBe(1);
+      expect(bulkOperationStore.currentOperation?.errors.get(personId)).toBe('mockPutError');
+      expect(bulkOperationStore.currentOperation?.successMessage).toBeUndefined();
+    });
+
+    it('should skip if person has no zuordnungen', async () => {
+      mockAdapter.onGet('/api/dbiam/personenuebersicht/1').replyOnce(200, []);
+
+      await bulkOperationStore.bulkUnassignPersonenFromRolle('1234', '1', [mockPersonId]);
+
+      expect(personStore.personenuebersicht).not.toBeNull();
+      expect(personStore.personenuebersicht).toEqual([]);
+      expect(bulkOperationStore.currentOperation?.progress).toBe(100);
     });
   });
 

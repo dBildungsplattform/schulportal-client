@@ -344,6 +344,7 @@ export const useBulkOperationStore: StoreDefinition<
         await personenkontextStore.updatePersonenkontexte(updatedZuordnungen, personId);
 
         if (personenkontextStore.errorCode) {
+          console.log("haha");
           this.currentOperation.errors.set(personId, personenkontextStore.errorCode);
           this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
           continue;
