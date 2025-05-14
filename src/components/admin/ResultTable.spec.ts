@@ -145,8 +145,8 @@ describe('Sorting', () => {
     const sortOptions: { key: string; order: string }[] = [{ key: 'kennung', order: 'asc' }];
     const table: VueWrapper | undefined = wrapper?.findComponent({ ref: 'v-data-table-server' });
 
-    // Simulate the update:sort-by event
-    await table?.vm.$emit('update:sort-by', sortOptions);
+    // Simulate the update:sortBy event
+    await table?.vm.$emit('update:sortBy', sortOptions);
 
     // Verify the emitted event
     expect(wrapper?.emitted('onTableUpdate')).toBeTruthy();
@@ -156,8 +156,8 @@ describe('Sorting', () => {
   test('onUpdateOptions emits default sort options when no options are provided', async () => {
     const table: VueWrapper | undefined = wrapper?.findComponent({ ref: 'v-data-table-server' });
 
-    // Simulate the update:sort-by event with an empty array
-    await table?.vm.$emit('update:sort-by', []);
+    // Simulate the update:sortBy event with an empty array
+    await table?.vm.$emit('update:sortBy', []);
 
     // Verify the emitted event
     expect(wrapper?.emitted('onTableUpdate')).toBeTruthy();

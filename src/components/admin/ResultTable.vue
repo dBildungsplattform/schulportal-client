@@ -2,8 +2,6 @@
   /* this block is necessary to introduce a table header type for defining table headers
       watch source for updates: https://stackoverflow.com/a/75993081/4790594
    */
-  /// <reference types="../../../node_modules/.vue-global-types/vue_3.5_0_0_0.d.ts" />
-
   import { SortOrder } from '@/utils/sorting';
   import { onMounted, onUnmounted, ref, watch, type Ref } from 'vue';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
@@ -176,7 +174,7 @@
     show-select
     :sortBy="currentSort ? [currentSort] : []"
     v-model="selectedItems"
-    @update:sort-by="onUpdateOptions"
+    @update:sortBy="onUpdateOptions"
     @update:page="(page: number) => $emit('onPageUpdate', page)"
     @update:itemsPerPage="(limit: number) => $emit('onItemsPerPageUpdate', limit)"
     @update:modelValue="emitSelectedRows"
