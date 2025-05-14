@@ -63,10 +63,11 @@
   };
 
   const handleCloseDialog = (): void => {
-    emit('update:dialogExit', state.value === State.FINISHED);
+    showErrorDialog.value = false;
     if (bulkOperationStore.currentOperation) {
       bulkOperationStore.resetState();
     }
+    emit('update:dialogExit', state.value === State.FINISHED);
   };
 </script>
 
@@ -214,14 +215,7 @@
     <PersonBulkError
       :bulkOperationName="t('admin.person.bulkChangeKlasse.title')"
       :isDialogVisible="showErrorDialog"
-      @update:isDialogVisible="
-        (val: boolean) => {
-          showErrorDialog = val;
-          if (!val) {
-            emit('update:dialogExit', true);
-          }
-        }
-      "
+      @update:isDialogVisible="handleCloseDialog"
       :errors="bulkErrorList"
     />
   </template>
