@@ -39,7 +39,7 @@ type SearchFilterActions = {
   setSortOrderForPersonen: (sortOrder: string | null) => Promise<void>;
   setCurrentSortForPersonen: (currentSort: { key: string; order: 'asc' | 'desc' } | null) => Promise<void>;
   setSchuleFilterForKlassen: (selectedSchuleForKlassen: string | null) => Promise<void>;
-  setKlasseFilterForKlassen: (selectedKlassenForKlassen: Array<string> | null) => Promise<void>;
+  setKlasseFilterForKlassen: (selectedKlassenForKlassen: Array<string> | null) => void;
 };
 
 type SearchFilterGetters = {};
@@ -118,7 +118,7 @@ export const useSearchFilterStore: StoreDefinition<
       this.selectedSchuleForKlassen = selectedSchuleForKlassen;
     },
 
-    async setKlasseFilterForKlassen(selectedKlassenForKlassen: Array<string> | null) {
+    setKlasseFilterForKlassen(selectedKlassenForKlassen: Array<string> | null) {
       this.selectedKlassenForKlassen = selectedKlassenForKlassen;
     },
   },

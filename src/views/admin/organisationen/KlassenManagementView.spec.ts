@@ -62,6 +62,25 @@ async function selectSchule(schule?: Partial<Organisation> | null): Promise<Orga
   return schuleWithDefaults;
 }
 
+async function selectKlasse(
+  klasse: Partial<Organisation> | null,
+  schule?: Organisation,
+): Promise<Organisation | undefined> {
+  const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' }).findComponent({
+    name: 'v-autocomplete',
+  });
+
+  if (klasse === null) {
+    await klasseAutocomplete?.setValue(null);
+    return;
+  }
+
+  const klasseWithDefaults: Organisation = DoFactory.getKlasse(schule, klasse);
+  organisationStore.klassenFilter.filterResult = [klasseWithDefaults];
+  await klasseAutocomplete?.setValue([klasseWithDefaults.id]);
+  return klasseWithDefaults;
+}
+
 const schule1: Organisation = DoFactory.getSchule();
 const schule2: Organisation = DoFactory.getSchule();
 const personenkontexte: UserInfo['personenkontexte'] = [
@@ -281,22 +300,25 @@ describe('KlassenManagementView', () => {
   });
 
   test('it searches for klasse', async () => {
-    const searchString: string = organisationStore.allKlassen[0]!.name.substring(0, 1);
-    const schule: Organisation = (await selectSchule())!;
-    const klasseSearchInput: ReturnType<VueWrapper['findComponent']> | undefined = wrapper?.find('#klasse-select');
+    const schule: Organisation = (await selectSchule(schule1))!;
+    const klasse: Organisation = organisationStore.allKlassen.find(
+      (k: Organisation) => k.administriertVon === schule.id,
+    )!;
+    await selectKlasse(klasse);
 
-    await klasseSearchInput?.setValue(searchString);
     await flushPromises();
     vi.runAllTimers();
 
-    expect(klasseSearchInput?.html()).includes(searchString);
-    expect(organisationStore.getKlassenByOrganisationId).toHaveBeenCalledWith({
-      searchString,
-      administriertVon: [schule.id],
-      limit: 200,
-      offset: 0,
-      organisationIds: [],
+    const text: string | undefined = wrapper?.text();
+
+    expect(text).toContain(klasse.name);
+    expect(organisationStore.getAllOrganisationen).toHaveBeenCalledWith({
+      includeTyp: OrganisationsTyp.Klasse,
       systemrechte: [RollenSystemRecht.KlassenVerwalten],
+      offset: 0,
+      limit: searchFilterStore.klassenPerPage,
+      organisationIds: [klasse.id],
+      administriertVon: [schule.id],
     });
   });
 

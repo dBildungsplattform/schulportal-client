@@ -18,6 +18,7 @@ let personenkontextStore: PersonenkontextStore;
 let rolleStore: RolleStore;
 let searchFilterStore: SearchFilterStore;
 let authStore: AuthStore;
+
 vi.useFakeTimers();
 
 beforeEach(() => {
@@ -277,28 +278,20 @@ describe('PersonManagementView', () => {
     ];
   });
 
-  test('it reloads data after changing page', async () => {
+  test('it calls getAllPersons with correct arguments', async () => {
     const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
     await schuleAutocomplete?.setValue(['9876']);
     await nextTick();
 
-    const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
+    const klasseAutocomplete: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'klasse-select' })
+      .findComponent({ name: 'v-autocomplete' });
     await klasseAutocomplete?.setValue(['123456']);
+    klasseAutocomplete?.vm.$emit('update:selectedKlassen', ['123456']);
     await nextTick();
+    await flushPromises();
 
-    // Mock the getAllPersons method to capture its arguments
     const getAllPersonsSpy: MockInstance = vi.spyOn(personStore, 'getAllPersons');
-
-    expect(wrapper?.find('.v-pagination__next button.v-btn--disabled').isVisible()).toBe(true);
-    expect(wrapper?.find('.v-data-table-footer__info').text()).toContain('1-2');
-
-    personStore.totalPersons = 50;
-    await nextTick();
-
-    expect(wrapper?.find('.v-data-table-footer__info').text()).toContain('1-30');
-    expect(wrapper?.find('.v-pagination__next button:not(.v-btn--disabled)').isVisible()).toBe(true);
-    await wrapper?.find('.v-pagination__next button:not(.v-btn--disabled)').trigger('click');
-    expect(wrapper?.find('.v-data-table-footer__info').text()).toContain('31-50');
     // Check if getAllPersons was called with the correct arguments
     expect(getAllPersonsSpy).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -315,6 +308,28 @@ describe('PersonManagementView', () => {
     expect(getAllPersonsSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         organisationIDs: ['9876'], // This should be the selectedSchulen value
+      }),
+    );
+  });
+
+  test('it reloads data after changing page', async () => {
+    // Mock the getAllPersons method to capture its arguments
+    const getAllPersonsSpy: MockInstance = vi.spyOn(personStore, 'getAllPersons');
+
+    expect(wrapper?.find('.v-pagination__next button.v-btn--disabled').isVisible()).toBe(true);
+    expect(wrapper?.find('.v-data-table-footer__info').text()).toContain('1-2');
+
+    personStore.totalPersons = 50;
+    await nextTick();
+
+    expect(wrapper?.find('.v-data-table-footer__info').text()).toContain('1-30');
+    expect(wrapper?.find('.v-pagination__next button:not(.v-btn--disabled)').isVisible()).toBe(true);
+    await wrapper?.find('.v-pagination__next button:not(.v-btn--disabled)').trigger('click');
+    expect(wrapper?.find('.v-data-table-footer__info').text()).toContain('31-50');
+
+    expect(getAllPersonsSpy).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        offset: 30,
       }),
     );
   });

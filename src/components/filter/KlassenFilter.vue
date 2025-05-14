@@ -204,7 +204,7 @@
         >{{ item.title }}</span
       >
       <span v-else-if="selectedKlassen && index === 0">
-        {{ $t('admin.klasse.klassenSelected', { count: selectedKlassen.length }) }}
+        {{ t('admin.klasse.klassenSelected', { count: selectedKlassen.length }) }}
       </span>
     </template>
   </v-autocomplete>

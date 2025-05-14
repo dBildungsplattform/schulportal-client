@@ -17,16 +17,14 @@ import { nextTick, ref, type Ref } from 'vue';
 import KlassenFilter from './KlassenFilter.vue';
 
 type Props = {
-  includeTraeger?: boolean;
+  hideDetails?: boolean;
   systemrechteForSearch?: Array<RollenSystemRecht>;
   multiple: boolean;
   readonly?: boolean;
-  initialIds?: Array<string> | string;
   selectedKlasseProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
   highlightSelection?: boolean;
-  texts?: {
-    placeholder?: string;
-  };
+  placeholderText?: string;
+  administriertVon?: string[] | undefined;
 };
 
 function mountComponent(props: Partial<Props> = {}): VueWrapper {
@@ -63,7 +61,7 @@ beforeEach(() => {
 });
 
 describe('KlassenFilter', async () => {
-  describe.each([[false]])('when multiple is %s', (multiple: boolean) => {
+  describe.each([[true], [false]])('when multiple is %s', (multiple: boolean) => {
     describe.each([[true], [false]])('when readonly is %s', (readonly: boolean) => {
       const defaultProps: Props = { multiple, readonly };
 
@@ -193,11 +191,11 @@ describe('KlassenFilter', async () => {
       ])('when the parent $label the selection', ({ id }: { id?: string }) => {
         test('it correctly initializes input', async () => {
           const mockKlasse: Organisation = DoFactory.getKlasse();
-          const selectionRef: Ref<string | undefined> = ref(undefined);
+          const selectionRef: Ref<Array<string> | undefined> = ref(undefined);
           if (id) mockKlasse.id = id;
           organisationStore.loadKlassenForFilter = vi.fn(async () => {
             organisationStore.klassenFilter.filterResult = [mockKlasse];
-            selectionRef.value = id;
+            selectionRef.value = id ? [id] : [];
           });
           const wrapper: VueWrapper = mountComponent({ ...defaultProps });
           vi.runAllTimers();

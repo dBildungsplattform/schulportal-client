@@ -3,8 +3,8 @@
   import ResultTable, { type TableRow } from '@/components/admin/ResultTable.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import SchulenFilter from '@/components/filter/SchulenFilter.vue';
   import KlassenFilter from '@/components/filter/KlassenFilter.vue';
+  import SchulenFilter from '@/components/filter/SchulenFilter.vue';
   import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
   import {
     OrganisationsTyp,
@@ -16,6 +16,8 @@
   import { RollenSystemRecht } from '@/stores/RolleStore';
   import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
   import { type Mutable } from '@/types.d';
+  import type { BlobOptions } from 'buffer';
+  import { readonly } from 'vue';
   import { computed, ref, watch, watchEffect, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { onBeforeRouteLeave, useRouter, type Router } from 'vue-router';
@@ -56,21 +58,21 @@
   );
 
   const selectedSchule: Ref<string | undefined> = ref(searchFilterStore.selectedSchuleForKlassen || undefined);
+  const hasSelectedSchule: ComputedRef<boolean> = computed(
+    () => (selectedSchule.value !== undefined && selectedSchule.value !== '') || hasAutoselectedSchule.value,
+  );
+  const selectedKlassen: Ref<Array<string>> = ref(searchFilterStore.selectedKlassenForKlassen || []);
   const klassenListFilter: ComputedRef<OrganisationenFilter> = computed(() => {
     const initialFilter: OrganisationenFilter = {
       includeTyp: OrganisationsTyp.Klasse,
       systemrechte: [RollenSystemRecht.KlassenVerwalten],
       offset: pageOffset.value,
       limit: searchFilterStore.klassenPerPage,
-      organisationIds: searchFilterStore.selectedKlassenForKlassen || [],
+      organisationIds: selectedKlassen.value,
     };
     if (selectedSchule.value) initialFilter.administriertVon = [selectedSchule.value];
     return initialFilter;
   });
-
-  const selectedKlassen: Ref<Array<string>> = ref(searchFilterStore.selectedKlassenForKlassen || []);
-
-
 
   const finalKlassen: ComputedRef<Organisation[]> = computed(() => {
     // If there are selected Klassen, filter the w to show only those
@@ -147,7 +149,7 @@
 
   async function updateKlassenSelection(ids: string[] | undefined): Promise<void> {
     selectedKlassen.value = ids ?? [];
-    await searchFilterStore.setKlasseFilterForKlassen(ids ?? null);
+    searchFilterStore.setKlasseFilterForKlassen(ids ?? null);
   }
 
   async function deleteKlasse(organisationId: string): Promise<void> {
@@ -278,13 +280,14 @@
             class="py-md-0"
           >
             <v-tooltip
-              :disabled="!!selectedSchule"
+              :disabled="!hasSelectedSchule"
               location="top"
             >
               <template v-slot:activator="">
                 <KlassenFilter
                   :systemrechte-for-search="[RollenSystemRecht.KlassenVerwalten]"
                   :multiple="true"
+                  :readonly="!hasSelectedSchule"
                   :hideDetails="true"
                   :highlightSelection="true"
                   :selectedKlassen="selectedKlassen"
