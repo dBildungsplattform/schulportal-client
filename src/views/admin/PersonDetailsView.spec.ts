@@ -82,7 +82,7 @@ const mockCurrentUser: UserInfo = {
   ],
   password_updated_at: null,
 };
-const befristung: Date = new Date('2099-08-12T13:03:53.802Z');
+const befristung: string = '2099-08-12T13:03:53.802Z';
 const mockPersonenuebersicht: PersonenUebersicht = DoFactory.getPersonenUebersicht(
   DoFactory.getPerson({
     id: '1',
@@ -103,7 +103,7 @@ const mockPersonenuebersicht: PersonenUebersicht = DoFactory.getPersonenUebersic
       typ: OrganisationsTyp.Schule,
       administriertVon: '2',
       editable: true,
-      befristung: befristung,
+      befristung: new Date(befristung),
       admins: ['test'],
     }),
     DoFactory.getZuordnung({
@@ -148,7 +148,7 @@ const getMockPersonenuebersichtLehr = (): PersonenUebersicht => {
       administriertVon: '2',
       editable: true,
       merkmale: [],
-      befristung: befristung,
+      befristung: new Date(befristung),
       admins: [],
     }),
   ]);

@@ -88,7 +88,7 @@
     );
     lockInfos.forEach((lockInfo: PersonTimeLimitInfoResponse) => {
       const message: string = t(messageKey, {
-        date: adjustDateForTimezoneAndFormat(new Date(lockInfo.deadline!)),
+        date: adjustDateForTimezoneAndFormat(lockInfo.deadline!),
         ...(occasion === 'PERSONENKONTEXT_EXPIRES' && { schule: lockInfo.school, rolle: lockInfo.rolle }),
       });
 

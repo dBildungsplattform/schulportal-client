@@ -11,6 +11,7 @@ export enum LockKeys {
   CreatedAt = 'created_at',
   LockedUntil = 'locked_until',
   LockOccasion = 'lock_occasion',
+  MANUELL_GESPERRT = PersonLockOccasion.MANUELL_GESPERRT,
 }
 export type UserLock = {
   personId: string;
