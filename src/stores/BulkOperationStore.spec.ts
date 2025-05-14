@@ -447,24 +447,24 @@ describe('BulkOperationStore', () => {
       const selectedOrganisationId: string = faker.string.uuid();
       const selectedRolleTitle: string = 'Lehrer';
       const selectedRolleId: string = faker.string.uuid();
-      const befristung: Date = faker.date.future();
+      const befristung: string = faker.date.future().toISOString();
       const spy: MockInstance = vi.spyOn(personenkontextStore, 'updatePersonenkontexte');
 
       const selectedOrganisation: Organisation = DoFactory.getOrganisationResponse({ id: selectedOrganisationId });
       const workflowStepResponseOrganisations: Organisation[] = [selectedOrganisation];
 
-      const mockBefristungen: (Date | null)[] = [
+      const mockBefristungen: (string | null)[] = [
         null,
-        faker.date.between({ from: new Date(), to: befristung }),
+        faker.date.between({ from: new Date(), to: befristung }).toISOString(),
         befristung,
-        faker.date.past({ refDate: befristung }),
+        faker.date.past({ refDate: befristung }).toISOString(),
       ];
 
       const mockZuordnungen: Array<DBiamPersonenzuordnungResponse> = mockBefristungen.map(
-        (mockBefristung: Date | null) =>
+        (mockBefristung: string | null) =>
           DoFactory.getDBiamPersonenzuordnungResponse(
             {
-              befristung: mockBefristung ? mockBefristung.toISOString() : null,
+              befristung: mockBefristung,
               rolleId: selectedRolleId,
               rolle: selectedRolleTitle,
               editable: true,
@@ -503,7 +503,7 @@ describe('BulkOperationStore', () => {
               rolleId: selectedRolleId,
               befristung: isBefore(response.zuordnungen[0]!.befristung!, befristung)
                 ? response.zuordnungen[0]!.befristung
-                : befristung.toISOString(),
+                : befristung,
             }),
           );
           return DoFactory.getPersonenkontextUpdateResponse({ dBiamPersonenkontextResponses: zuordnungen });
@@ -540,7 +540,7 @@ describe('BulkOperationStore', () => {
         const personId: string = response.personId;
         const correctBefristung: string = isBefore(response.zuordnungen[0]!.befristung!, befristung)
           ? response.zuordnungen[0]!.befristung!
-          : befristung.toISOString();
+          : befristung;
         expect(spy).toHaveBeenCalledWith(
           [
             ...response.zuordnungen.map((zuordnung: DBiamPersonenzuordnungResponse) => ({

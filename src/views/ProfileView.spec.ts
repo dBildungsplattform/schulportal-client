@@ -132,7 +132,7 @@ const mockLehrerUebersicht: PersonenUebersicht = new PersonenUebersicht(
       typ: OrganisationsTyp.Schule,
       editable: true,
       merkmale: [RollenMerkmal.KopersPflicht],
-      befristung: faker.date.future(),
+      befristung: faker.date.future().toISOString(),
       admins: ['test'],
     }),
   ],
@@ -149,13 +149,13 @@ const mockLehrerUebersichtWith2Zuordnungen: PersonenUebersicht = new PersonenUeb
       rollenArt: RollenArt.Lern,
       typ: OrganisationsTyp.Schule,
       merkmale: [RollenMerkmal.KopersPflicht],
-      befristung: faker.date.future(),
+      befristung: faker.date.future().toISOString(),
     }),
     DoFactory.getZuordnung({
       rollenArt: RollenArt.Lern,
       typ: OrganisationsTyp.Schule,
       merkmale: [RollenMerkmal.KopersPflicht],
-      befristung: faker.date.future(),
+      befristung: faker.date.future().toISOString(),
     }),
   ],
 );
@@ -173,14 +173,14 @@ const mockSchuelerUebersicht: PersonenUebersicht = new PersonenUebersicht(
     DoFactory.getZuordnung(
       {
         rollenArt: RollenArt.Lern,
-        befristung: faker.date.future(),
+        befristung: faker.date.future().toISOString(),
       },
       { organisation: mockSchule },
     ),
     DoFactory.getZuordnung(
       {
         rollenArt: RollenArt.Lern,
-        befristung: faker.date.future(),
+        befristung: faker.date.future().toISOString(),
       },
       { organisation: mockKlasse },
     ),

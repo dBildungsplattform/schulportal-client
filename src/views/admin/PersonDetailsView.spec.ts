@@ -103,7 +103,7 @@ const mockPersonenuebersicht: PersonenUebersicht = DoFactory.getPersonenUebersic
       typ: OrganisationsTyp.Schule,
       administriertVon: '2',
       editable: true,
-      befristung: new Date(befristung),
+      befristung,
       admins: ['test'],
     }),
     DoFactory.getZuordnung({
@@ -148,7 +148,7 @@ const getMockPersonenuebersichtLehr = (): PersonenUebersicht => {
       administriertVon: '2',
       editable: true,
       merkmale: [],
-      befristung: new Date(befristung),
+      befristung,
       admins: [],
     }),
   ]);
@@ -1044,10 +1044,10 @@ describe('PersonDetailsView', () => {
         personStore.personenuebersicht = getMockPersonenuebersichtLehr();
         if (personStore.personenuebersicht.zuordnungen[0]) {
           if (existingBefristung) {
-            personStore.personenuebersicht.zuordnungen[0].befristung = new Date(existingBefristung);
+            personStore.personenuebersicht.zuordnungen[0].befristung = existingBefristung;
           } else if (existingBefristungOption) {
             personStore.personenuebersicht.zuordnungen[0].befristung =
-              existingBefristungOption === 'schuljahresende' ? new Date(getNextSchuljahresende()) : null;
+              existingBefristungOption === 'schuljahresende' ? getNextSchuljahresende() : null;
           }
         }
 

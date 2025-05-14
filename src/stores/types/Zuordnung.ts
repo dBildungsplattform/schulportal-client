@@ -13,7 +13,7 @@ export class Zuordnung {
     public administriertVon: string,
     public typ: OrganisationsTyp,
     public editable: boolean,
-    public befristung: Date | null,
+    public befristung: string | null,
     public merkmale: Array<RollenMerkmal>,
     public admins: Array<string>,
   ) {}
@@ -46,7 +46,7 @@ export class Zuordnung {
       response.administriertVon,
       response.typ,
       response.editable,
-      response.befristung ? new Date(response.befristung) : null,
+      response.befristung != '' ? response.befristung : null,
       response.merkmale,
       response.admins ?? [],
     );

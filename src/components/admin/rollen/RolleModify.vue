@@ -167,7 +167,7 @@
       selectedOrganisation.value!,
       selectedRolle.value!,
       personenkontextStore.workflowStepResponse?.organisations || [],
-      formattedBefristung ? new Date(formattedBefristung) : undefined,
+      formattedBefristung,
     );
 
     emit('update:getUebersichten');

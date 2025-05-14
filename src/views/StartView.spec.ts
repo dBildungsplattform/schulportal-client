@@ -96,13 +96,13 @@ const mockPersonenUebersicht: PersonenUebersicht = new PersonenUebersicht(
     DoFactory.getZuordnung({
       typ: OrganisationsTyp.Schule,
       merkmale: [RollenMerkmal.KopersPflicht],
-      befristung: faker.date.soon(),
+      befristung: faker.date.soon().toISOString(),
       rollenArt: RollenArt.Lehr,
     }),
     DoFactory.getZuordnung({
       typ: OrganisationsTyp.Schule,
       merkmale: [RollenMerkmal.KopersPflicht],
-      befristung: faker.date.soon(),
+      befristung: faker.date.soon().toISOString(),
       rollenArt: RollenArt.Lehr,
     }),
   ],

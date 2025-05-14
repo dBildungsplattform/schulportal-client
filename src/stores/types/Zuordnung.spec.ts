@@ -12,7 +12,7 @@ describe('Zuordnung', () => {
       const expectedProperties: Partial<DBiamPersonenzuordnungResponse> = { ...response };
       delete expectedProperties.befristung;
       expect(zuordnung).toEqual(expect.objectContaining(expectedProperties));
-      expect(zuordnung.befristung).toEqual(response.befristung ? new Date(response.befristung) : '');
+      expect(zuordnung.befristung).toEqual(response.befristung ?? '');
     });
 
     it('should set nullable fields', () => {

@@ -75,7 +75,7 @@ export class DoFactory {
       props?.administriertVon ?? schule.administriertVon!,
       props?.typ ?? schule.typ,
       props?.editable ?? true,
-      props?.befristung ?? faker.date.soon(),
+      props?.befristung ?? faker.date.soon().toISOString(),
       props?.merkmale ?? [],
       props?.admins ?? [faker.person.fullName()],
     );

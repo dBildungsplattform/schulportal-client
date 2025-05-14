@@ -54,7 +54,7 @@ export type WorkflowFilter = {
 export function mapZuordnungToPersonenkontextUpdate(
   zuordnung: Pick<Zuordnung, 'sskId' | 'rolleId' | 'befristung'>,
 ): PersonenkontextUpdate {
-  const befristung: string | undefined = zuordnung.befristung?.toISOString();
+  const befristung: string | undefined = zuordnung.befristung ?? undefined;
   return {
     organisationId: zuordnung.sskId,
     rolleId: zuordnung.rolleId,

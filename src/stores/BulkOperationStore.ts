@@ -48,7 +48,7 @@ type BulkOperationActions = {
     selectedOrganisationId: string,
     selectedRolleId: string,
     workflowStepResponseOrganisations: Organisation[],
-    befristung?: Date,
+    befristung?: string,
   ): Promise<void>;
   bulkPersonenDelete(personIDs: string[]): Promise<void>;
   bulkChangeKlasse(personIDs: string[], selectedOrganisationId: string, newKlasseId: string): Promise<void>;
@@ -184,7 +184,7 @@ export const useBulkOperationStore: StoreDefinition<
       selectedOrganisationId: string,
       selectedRolleId: string,
       workflowStepResponseOrganisations: Organisation[],
-      befristung?: Date,
+      befristung?: string,
     ): Promise<void> {
       const personStore: PersonStore = usePersonStore();
       const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
@@ -220,9 +220,9 @@ export const useBulkOperationStore: StoreDefinition<
         const currentZuordnungen: Zuordnung[] = personStore.personenuebersicht?.zuordnungen || [];
 
         // If the new kontext is befristet, we use the earliest possible befristung out of all befristungen at the selected organisation and the specified befristung
-        let earliestBefristung: Date | null = null;
+        let earliestBefristung: string | undefined = undefined;
         if (befristung) {
-          earliestBefristung = currentZuordnungen.reduce((earliest: Date, zuordnung: Zuordnung) => {
+          earliestBefristung = currentZuordnungen.reduce((earliest: string, zuordnung: Zuordnung) => {
             if (zuordnung.sskId === selectedOrganisation.id && zuordnung.befristung) {
               return isBefore(zuordnung.befristung, earliest) ? zuordnung.befristung : earliest;
             }
@@ -236,7 +236,7 @@ export const useBulkOperationStore: StoreDefinition<
         zuordnungUpdates.push({
           organisationId: selectedOrganisation.id,
           rolleId: selectedRolleId,
-          befristung: earliestBefristung ? earliestBefristung.toISOString() : undefined,
+          befristung: earliestBefristung,
         });
 
         await personenkontextStore.updatePersonenkontexte(zuordnungUpdates, personId);

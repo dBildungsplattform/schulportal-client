@@ -45,7 +45,7 @@
   import { Zuordnung } from '@/stores/types/Zuordnung';
   import type { TranslatedObject } from '@/types';
   import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
-  import { adjustDateForTimezoneAndFormat, formatDate, getNextSchuljahresende } from '@/utils/date';
+  import { adjustDateForTimezoneAndFormat, formatDate, formatDateToISO, getNextSchuljahresende } from '@/utils/date';
   import { LockKeys, PersonLockOccasion, type UserLock } from '@/utils/lock';
   import { DIN_91379A, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
   import {
@@ -57,7 +57,6 @@
     type PersonenkontextFieldDefinitions,
   } from '@/utils/validationPersonenkontext';
   import { toTypedSchema } from '@vee-validate/yup';
-  import { parse } from 'date-fns';
   import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
   import { computed, onBeforeMount, onMounted, onUnmounted, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
@@ -1039,7 +1038,7 @@
     const befristungDate: string | undefined = selectedBefristung.value
       ? selectedBefristung.value
       : calculatedBefristung.value;
-    const befristung: Date | null = befristungDate ? new Date(befristungDate) : null;
+    const formattedBefristung: string | null = formatDateToISO(befristungDate) ?? null;
 
     if (organisation) {
       newZuordnung.value = new Zuordnung(
@@ -1053,7 +1052,7 @@
         organisation.administriertVon ?? '',
         OrganisationsTyp.Schule,
         true,
-        befristung,
+        formattedBefristung,
         [],
         [],
       );
@@ -1076,7 +1075,7 @@
             klasse.administriertVon ?? '',
             OrganisationsTyp.Klasse,
             true,
-            befristung,
+            formattedBefristung,
             [],
             [],
           ),
@@ -1208,12 +1207,12 @@
     changeBefristungConfirmationDialogVisible.value = false;
 
     const befristungDate: string | undefined = selectedChangeBefristung.value ?? calculatedBefristung.value;
-    const befristung: Date | null = befristungDate ? parse(befristungDate, 'dd.MM.yyyy', new Date()) : null;
+    const formattedBefristung: string | null = formatDateToISO(befristungDate) ?? null;
 
     // copy zuordnung from old one and update befristung
     const currentZuordnung: Zuordnung = selectedZuordnungen.value[0]!;
     newZuordnung.value = Zuordnung.from(currentZuordnung);
-    newZuordnung.value.befristung = befristung;
+    newZuordnung.value.befristung = formattedBefristung;
     newZuordnung.value.editable = true;
 
     finalZuordnungen.value = (zuordnungenResult.value ?? [])
