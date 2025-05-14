@@ -107,12 +107,17 @@ describe('KlassenManagementView', () => {
       DoFactory.getKlasse(schule1, { name: '9a', schuleDetails: schule1.name }),
       DoFactory.getKlasse(schule2, { name: '9b', schuleDetails: schule2.name }),
     ];
+    organisationStore.errorCode = '';
 
     organisationStore.allOrganisationen = [schule1, schule2];
 
     organisationStore.allSchulen = [schule1, schule2];
 
     organisationStore.totalKlassen = 2;
+
+    organisationStore.getAllOrganisationen = vi.fn();
+    organisationStore.getKlassenByOrganisationId = vi.fn();
+    organisationStore.deleteOrganisationById = vi.fn();
 
     authStore.currentUser = authUser;
 
@@ -351,7 +356,7 @@ describe('KlassenManagementView', () => {
     },
   );
 
-  test.only('it sorts Klassen correctly when changing sort order', async () => {
+  test('it sorts Klassen correctly when changing sort order', async () => {
     // Click to sort descending
     const klasseHeader: DOMWrapper<Element> | undefined = wrapper
       ?.findAll('.v-data-table__th')
