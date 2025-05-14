@@ -38,9 +38,6 @@ type SearchFilterActions = {
   setOrganisationFilterForPersonen: (selectedOrganisationen: Array<string> | null) => Promise<void>;
   setSearchFilterForPersonen: (searchFilter: string | null) => Promise<void>;
   setSearchFilterForSchulen: (searchFilter: string | null) => Promise<void>;
-  setSortFieldForPersonen: (sortField: string | null) => Promise<void>;
-  setSortOrderForPersonen: (sortOrder: string | null) => Promise<void>;
-  setCurrentSortForPersonen: (currentSort: { key: string; order: 'asc' | 'desc' } | null) => Promise<void>;
   setSchuleFilterForKlassen: (selectedSchuleForKlassen: string | null) => Promise<void>;
   setKlasseFilterForKlassen: (selectedKlassenForKlassen: Array<string> | null) => Promise<void>;
 };
@@ -100,18 +97,6 @@ export const useSearchFilterStore: StoreDefinition<
 
     async setSearchFilterForSchulen(searchFilterSchulen: string | null) {
       this.searchFilterSchulen = searchFilterSchulen || '';
-    },
-
-    async setSortFieldForPersonen(sortField: string | null) {
-      this.personenSortField = sortField;
-    },
-
-    async setSortOrderForPersonen(sortOrder: string | null) {
-      this.personenSortOrder = sortOrder;
-    },
-
-    async setCurrentSortForPersonen(currentSort: { key: string; order: 'asc' | 'desc' } | null) {
-      this.currentSort = currentSort;
     },
 
     async setRolleFilterWithObjectsForPersonen(selectedRollen: Array<string> | null, rollenObjects: RolleResponse[]) {

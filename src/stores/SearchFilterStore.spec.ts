@@ -1,4 +1,3 @@
-import { SortField } from './PersonStore';
 import type { RolleResponse } from './RolleStore';
 import { useSearchFilterStore, type SearchFilterStore } from './SearchFilterStore';
 import { setActivePinia, createPinia } from 'pinia';
@@ -38,18 +37,6 @@ describe('SearchFilterStore', () => {
     // it sets the searchFilter for schulen
     searchFilterStore.setSearchFilterForSchulen('search');
     expect(searchFilterStore.searchFilterPersonen).toEqual('search');
-
-    // it sets sortOrder
-    searchFilterStore.setSortOrderForPersonen('desc');
-    expect(searchFilterStore.personenSortOrder).toEqual('desc');
-
-    // it sets sortField
-    searchFilterStore.setSortFieldForPersonen(SortField.Vorname);
-    expect(searchFilterStore.personenSortField).toEqual(SortField.Vorname);
-
-    // it sets currentSort
-    searchFilterStore.setCurrentSortForPersonen({ key: SortField.Vorname, order: 'desc' });
-    expect(searchFilterStore.currentSort).toEqual({ key: SortField.Vorname, order: 'desc' });
 
     // it sets the selectedRolleFilterWithObjects
     searchFilterStore.setRolleFilterWithObjectsForPersonen(['5'], [

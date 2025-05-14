@@ -442,18 +442,17 @@
   }): Promise<void> {
     if (update.sortField) {
       sortField.value = mapKeyToBackend(update.sortField);
-
-      await searchFilterStore.setCurrentSortForPersonen({
+      searchFilterStore.currentSort = {
         key: update.sortField,
         order: update.sortOrder,
-      });
+      };
     }
 
     sortOrder.value = update.sortOrder as SortOrder;
 
     // Save the sorting values in the store
-    searchFilterStore.setSortFieldForPersonen(sortField.value);
-    searchFilterStore.setSortOrderForPersonen(sortOrder.value);
+    searchFilterStore.personenSortField = sortField.value;
+    searchFilterStore.personenSortOrder = sortOrder.value;
 
     // Fetch the sorted data
     getPaginatedPersonen(searchFilterStore.personenPage);
