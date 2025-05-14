@@ -9,14 +9,12 @@
   import { type BulkErrorList, useBulkErrors } from '@/composables/useBulkErrors';
   import type { PersonenWithRolleAndZuordnung } from '@/stores/PersonStore';
   import PersonBulkError from '@/components/admin/personen/PersonBulkError.vue';
-  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
   import type { RolleResponse } from '@/stores/RolleStore';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
-  const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
 
   type PersonWithRolleAndZuordnung = PersonenWithRolleAndZuordnung[number];
 
@@ -34,7 +32,6 @@
 
   async function closeDialog(finished: boolean): Promise<void> {
     bulkOperationStore.resetState();
-    personenkontextStore.$reset();
     emit('update:dialogExit', finished);
   }
 

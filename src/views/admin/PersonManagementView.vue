@@ -940,7 +940,7 @@
             :isDialogVisible="organisationUnassignDialogVisible"
             :selectedPersonen
             :selectedOrganisation="selectedOrganisation"
-            :selectedRolle="selectedRolle"
+            :selectedRolle="selectedRolle!"
             @update:dialogExit="handleUnassignRolleDialog($event)"
           >
           </RolleUnassign>

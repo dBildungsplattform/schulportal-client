@@ -685,6 +685,178 @@ describe('BulkOperationStore', () => {
       expect(bulkOperationStore.currentOperation?.successMessage).toBeUndefined();
     });
   });
+
+  describe('bulkUnassignPersonenFromRolle', () => {
+    it('should unassign person from role successfully', async () => {
+      const organisationId: string = '1234';
+      const rolleId: string = '5678';
+      const personId: string = '1';
+
+      const mockPersonResponse: DBiamPersonenuebersichtResponse = {
+        personId: personId,
+        vorname: 'John',
+        nachname: 'Doe',
+        benutzername: 'jdoe',
+        lastModifiedZuordnungen: '2024-04-01T00:00:00.000Z',
+        zuordnungen: [
+          {
+            sskId: organisationId, // matches organisation ID
+            rolleId: rolleId, // matches rolle ID
+            sskName: 'Test School',
+            sskDstNr: '123',
+            rolle: 'Test Role',
+            rollenArt: RollenArt.Lern,
+            administriertVon: 'admin-org-id',
+            typ: OrganisationsTyp.Schule,
+            editable: true,
+            befristung: 'unbefristet',
+            merkmale: [] as unknown as RollenMerkmal,
+            admins: ['admin1'],
+          },
+          {
+            sskId: '5678', // different organisation ID
+            rolleId: rolleId,
+            sskName: 'Another School',
+            sskDstNr: '456',
+            rolle: 'Test Role',
+            rollenArt: RollenArt.Lern,
+            administriertVon: 'admin-org-id',
+            typ: OrganisationsTyp.Schule,
+            editable: true,
+            befristung: 'unbefristet',
+            merkmale: [] as unknown as RollenMerkmal,
+            admins: ['admin1'],
+          },
+        ],
+      };
+
+      const mockUpdateResponse: PersonenkontexteUpdateResponse = {
+        dBiamPersonenkontextResponses: [
+          {
+            personId: personId,
+            organisationId: '5678', // Only the non-matching zuordnung remains
+            rolleId: rolleId,
+          } as DBiamPersonenkontextResponse,
+        ],
+      };
+
+      mockAdapter.onGet(`/api/dbiam/personenuebersicht/${personId}`).replyOnce(200, mockPersonResponse);
+      mockAdapter.onPut(`/api/personenkontext-workflow/${personId}`).replyOnce(200, mockUpdateResponse);
+
+      const unassignPromise: Promise<void> = bulkOperationStore.bulkUnassignPersonenFromRolle(organisationId, rolleId, [
+        personId,
+      ]);
+
+      expect(bulkOperationStore.currentOperation?.type).toBe(OperationType.ROLLE_UNASSIGN);
+      expect(bulkOperationStore.currentOperation?.isRunning).toBe(true);
+      expect(bulkOperationStore.currentOperation?.progress).toBe(0);
+
+      await unassignPromise;
+
+      expect(bulkOperationStore.currentOperation?.isRunning).toBe(false);
+      expect(bulkOperationStore.currentOperation?.complete).toBe(true);
+      expect(bulkOperationStore.currentOperation?.progress).toBe(100);
+      expect(bulkOperationStore.currentOperation?.errors.size).toBe(0);
+      expect(bulkOperationStore.currentOperation?.successMessage).toBe('admin.rolle.rollenUnassignedSuccessfully');
+    });
+
+    it('should skip if no matching zuordnung exists', async () => {
+      const organisationId: string = '1234';
+      const rolleId: string = '5678';
+      const personId: string = '1';
+
+      const mockPersonResponse: DBiamPersonenuebersichtResponse = {
+        personId: personId,
+        vorname: 'John',
+        nachname: 'Doe',
+        benutzername: 'jdoe',
+        lastModifiedZuordnungen: '2024-04-01T00:00:00.000Z',
+        zuordnungen: [
+          {
+            sskId: '9999', // Different from the requested organisationId
+            rolleId: '9999', // Different from the requested rolleId
+            sskName: 'Another School',
+            sskDstNr: '456',
+            rolle: 'Test Role',
+            rollenArt: RollenArt.Lern,
+            administriertVon: 'admin-org-id',
+            typ: OrganisationsTyp.Schule,
+            editable: true,
+            befristung: 'unbefristet',
+            merkmale: [] as unknown as RollenMerkmal,
+            admins: ['admin1'],
+          },
+        ],
+      };
+
+      mockAdapter.onGet(`/api/dbiam/personenuebersicht/${personId}`).replyOnce(200, mockPersonResponse);
+
+      const unassignPromise: Promise<void> = bulkOperationStore.bulkUnassignPersonenFromRolle(organisationId, rolleId, [
+        personId,
+      ]);
+
+      await unassignPromise;
+
+      expect(bulkOperationStore.currentOperation?.isRunning).toBe(false);
+      expect(bulkOperationStore.currentOperation?.complete).toBe(true);
+      expect(bulkOperationStore.currentOperation?.progress).toBe(100);
+      expect(bulkOperationStore.currentOperation?.errors.size).toBe(0);
+      expect(bulkOperationStore.currentOperation?.successMessage).toBe('admin.rolle.rollenUnassignedSuccessfully');
+    });
+
+    it('should handle errors from personenuebersicht and personenkontext-workflow endpoints', async () => {
+      const organisationId: string = '1234';
+      const rolleId: string = '5678';
+      const personIds: string[] = ['1', '2'];
+
+      // Person 1: Error in personenuebersicht (GET) call
+      mockAdapter.onGet(`/api/dbiam/personenuebersicht/${personIds[0]}`).replyOnce(500, { i18nKey: 'mockGetError' });
+
+      // Person 2: Success in GET but error in personenkontext-workflow (PUT) call
+      const mockPersonResponse2: DBiamPersonenuebersichtResponse = {
+        personId: personIds[1]!,
+        vorname: 'Jane',
+        nachname: 'Doe',
+        benutzername: 'jdoe2',
+        lastModifiedZuordnungen: '2024-04-01T00:00:00.000Z',
+        zuordnungen: [
+          {
+            sskId: organisationId,
+            rolleId: rolleId,
+            sskName: 'Test School',
+            sskDstNr: '123',
+            rolle: 'Test Role',
+            rollenArt: RollenArt.Lern,
+            administriertVon: 'admin-org-id',
+            typ: OrganisationsTyp.Schule,
+            editable: true,
+            befristung: 'unbefristet',
+            merkmale: [] as unknown as RollenMerkmal,
+            admins: ['admin1'],
+          },
+        ],
+      };
+      mockAdapter.onGet(`/api/dbiam/personenuebersicht/${personIds[1]}`).replyOnce(200, mockPersonResponse2);
+      mockAdapter.onPut(`/api/personenkontext-workflow/${personIds[1]}`).replyOnce(500, { i18nKey: 'mockPutError' });
+
+      const unassignPromise: Promise<void> = bulkOperationStore.bulkUnassignPersonenFromRolle(
+        organisationId,
+        rolleId,
+        personIds,
+      );
+
+      await unassignPromise;
+
+      expect(bulkOperationStore.currentOperation?.isRunning).toBe(false);
+      expect(bulkOperationStore.currentOperation?.complete).toBe(true);
+      expect(bulkOperationStore.currentOperation?.progress).toBe(100);
+      expect(bulkOperationStore.currentOperation?.errors.size).toBe(2);
+      expect(bulkOperationStore.currentOperation?.errors.get(personIds[0]!)).toBe('mockGetError');
+      expect(bulkOperationStore.currentOperation?.errors.get(personIds[1]!)).toBe('mockGetError');
+      expect(bulkOperationStore.currentOperation?.successMessage).toBeUndefined(); // No success message because there are errors
+    });
+  });
+
   describe('resetState', () => {
     it('should reset the currentOperation state', () => {
       bulkOperationStore.currentOperation = {
