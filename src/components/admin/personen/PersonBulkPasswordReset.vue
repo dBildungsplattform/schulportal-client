@@ -1,11 +1,13 @@
 <script setup lang="ts">
   import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import { type BulkErrorList, useBulkErrors } from '@/composables/useBulkErrors';
   import { useBulkOperationStore, type BulkOperationStore, type CurrentOperation } from '@/stores/BulkOperationStore';
-  import { type PersonenWithRolleAndZuordnung } from '@/stores/PersonStore';
+  import { usePersonStore, type PersonenWithRolleAndZuordnung, type PersonStore } from '@/stores/PersonStore';
   import { buildCSV, download } from '@/utils/file';
-  import { computed, type ComputedRef, type Ref } from 'vue';
+  import { computed, ref, type ComputedRef, type Ref } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
+  import PersonBulkError from '@/components/admin/personen/PersonBulkError.vue';
 
   type PersonWithRolleAndZuordnung = PersonenWithRolleAndZuordnung[number];
   type CSVHeaders = 'Klasse' | 'Nachname' | 'Vorname' | 'Benutzername' | 'Passwort';
@@ -14,7 +16,7 @@
   type Props = {
     isDialogVisible: boolean;
     selectedSchuleKennung?: string;
-    selectedPersons: PersonenWithRolleAndZuordnung;
+    selectedPersonen: PersonenWithRolleAndZuordnung;
   };
 
   type Emits = (event: 'update:dialogExit', finished: boolean) => void;
@@ -32,6 +34,12 @@
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
+  const personStore: PersonStore = usePersonStore();
+
+  const showErrorDialog: Ref<boolean, boolean> = ref(false);
+
+  // Define the error list for the selected persons using the useBulkErrors composable
+  const bulkErrorList: ComputedRef<BulkErrorList[]> = computed(() => useBulkErrors(props.selectedPersonen));
 
   // Computed that determines the state of the operation. Could either be initial (Progress === 0) or Progressing (progress > 0) or finished (operation is complete)
   const progressState: ComputedRef<State> = computed(() => {
@@ -64,7 +72,7 @@
 
     // For every password in the Map find the corresponding person (using the key) and merge them together in the file.
     for (const [id, password] of operation.data.entries()) {
-      const personWithRolleAndZuordnung: PersonWithRolleAndZuordnung | undefined = props.selectedPersons.find(
+      const personWithRolleAndZuordnung: PersonWithRolleAndZuordnung | undefined = props.selectedPersonen.find(
         (p: PersonWithRolleAndZuordnung) => p.person.id === id,
       );
 
@@ -86,11 +94,16 @@
 
   async function closePasswordResetDialog(finished: boolean): Promise<void> {
     bulkOperationStore.resetState();
+    personStore.errorCode = '';
     emit('update:dialogExit', finished);
   }
 
   async function handleResetPassword(personIDs: string[]): Promise<void> {
     await bulkOperationStore.bulkResetPassword(personIDs);
+
+    if (bulkOperationStore.currentOperation?.errors && bulkOperationStore.currentOperation.errors.size > 0) {
+      showErrorDialog.value = true;
+    }
   }
 
   function downloadFile(blob: Blob): void {
@@ -116,7 +129,7 @@
       >
         <v-row class="text-body bold justify-center">
           <span data-testid="password-reset-confirmation-text">
-            {{ t('admin.person.bulkPasswordReset.confirmation') }}
+            {{ t('admin.person.bulk.bulkPasswordReset.confirmation') }}
           </span>
         </v-row>
       </v-container>
@@ -174,7 +187,7 @@
           class="mt-2 text-center"
           data-testid="password-reset-success-text"
         >
-          {{ t('admin.person.bulkPasswordReset.success') }}
+          {{ t('admin.person.bulk.bulkPasswordReset.success') }}
         </p>
         <p class="mt-2 text-center"></p>
       </v-container>
@@ -215,7 +228,7 @@
               :block="mdAndDown"
               :disabled="bulkOperationStore.currentOperation?.isRunning"
               class="primary"
-              @click="handleResetPassword(props.selectedPersons.map((p: PersonWithRolleAndZuordnung) => p.person.id))"
+              @click="handleResetPassword(props.selectedPersonen.map((p: PersonWithRolleAndZuordnung) => p.person.id))"
               data-testid="password-reset-submit-button"
               type="submit"
             >
@@ -229,11 +242,28 @@
               data-testid="download-result-button"
               :disabled="bulkOperationStore.currentOperation?.isRunning"
             >
-              {{ t('admin.person.bulkPasswordReset.downloadResult') }}
+              {{ t('admin.person.bulk.bulkPasswordReset.downloadResult') }}
             </v-btn>
           </v-col>
         </v-row>
       </v-card-actions>
     </LayoutCard>
   </v-dialog>
+  <template v-if="showErrorDialog">
+    <PersonBulkError
+      :bulkOperationName="t('admin.person.resetPassword')"
+      :isDialogVisible="showErrorDialog"
+      :passwords="resultFile"
+      :filename="props.selectedSchuleKennung ? `PW_${props.selectedSchuleKennung}.txt` : 'PW.txt'"
+      @update:isDialogVisible="
+        (val: boolean) => {
+          showErrorDialog = val;
+          if (!val) {
+            closePasswordResetDialog(true);
+          }
+        }
+      "
+      :errors="bulkErrorList"
+    />
+  </template>
 </template>
