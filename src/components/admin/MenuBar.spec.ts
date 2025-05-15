@@ -54,6 +54,8 @@ function setPermissions(hasPermission: boolean): void {
   authStore.hasSchultraegerverwaltungPermission = hasPermission;
   authStore.hasPortalVerwaltungPermission = hasPermission;
   authStore.hasHinweiseBearbeitenPermission = hasPermission;
+  authStore.hasLandesbediensteteSuchenUndHinzufügenPermission = hasPermission;
+  authStore.hasEingeschränktNeueBenutzerErstellenPermission = hasPermission;
 }
 
 beforeEach(async () => {
@@ -103,6 +105,10 @@ describe('MenuBar', () => {
 
       expect(wrapper?.find('[data-testid="portal-management-title"]').exists()).toBe(hasPermission);
       expect(wrapper?.find('[data-testid="hinweise-edit-menu-item"]').exists()).toBe(hasPermission);
+
+      expect(wrapper?.find('[data-testid="add-person-title"]').exists()).toBe(hasPermission);
+      expect(wrapper?.find('[data-testid="search-person-menu-item"]').exists()).toBe(hasPermission);
+      expect(wrapper?.find('[data-testid="add-person-menu-item"]').exists()).toBe(hasPermission);
     },
   );
 
@@ -136,7 +142,13 @@ describe('MenuBar', () => {
     await wrapper.find('[data-testid="schule-management-menu-item"]').trigger('click');
     await nextTick();
 
-    expect(push).toHaveBeenCalledTimes(5);
+    await wrapper.find('[data-testid="search-person-menu-item"]').trigger('click');
+    await nextTick();
+
+    await wrapper.find('[data-testid="add-person-menu-item"]').trigger('click');
+    await nextTick();
+
+    expect(push).toHaveBeenCalledTimes(7);
   });
 
   test('it refreshes when navigating to current route', async () => {
