@@ -563,7 +563,7 @@ describe('PersonManagementView', () => {
     expect(document.body.querySelector('[data-testid="person-delete-layout-card"]')).toBeNull();
   });
 
-    test('it checks a checkbox in the table, selects the unassign rolle option and triggers dialog then cancels it', async () => {
+  test('it checks a checkbox in the table, selects the unassign rolle option and triggers dialog then cancels it', async () => {
     authStore.hasPersonenverwaltungPermission = true;
     // Find the first checkbox in the table
     const checkbox: DOMWrapper<Element> | undefined = wrapper?.find(
@@ -692,7 +692,7 @@ describe('PersonManagementView', () => {
     });
   });
 
-    test('rolle unassign isnt shown if user has no permission', async () => {
+  test('rolle unassign isnt shown if user has no permission', async () => {
     authStore.hasPersonenverwaltungPermission = false;
 
     wrapper = mount(PersonManagementView, {
