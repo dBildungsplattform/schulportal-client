@@ -10,6 +10,7 @@ import { expect, test, type Mock, type MockInstance } from 'vitest';
 import { nextTick } from 'vue';
 import PersonManagementView from './PersonManagementView.vue';
 import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+import { OperationType } from '@/stores/BulkOperationStore';
 
 let wrapper: VueWrapper | null = null;
 let organisationStore: OrganisationStore;
@@ -503,13 +504,13 @@ describe('PersonManagementView', () => {
 
     // eslint-disable-next-line @typescript-eslint/dot-notation
     const hasUnassingOrgOption: boolean = (benutzerEditSelect?.props() as { items: { value: string }[] }).items.some(
-      (item: { value: string }) => item.value === 'ORG_UNASSIGN',
+      (item: { value: string }) => item.value === OperationType.ORG_UNASSIGN,
     );
     expect(hasUnassingOrgOption).toBe(true);
 
-    benutzerEditSelect?.setValue('ORG_UNASSIGN');
+    benutzerEditSelect?.setValue(OperationType.ORG_UNASSIGN);
 
-    benutzerEditSelect?.vm.$emit('input', 'ORG_UNASSIGN');
+    benutzerEditSelect?.vm.$emit('input', OperationType.ORG_UNASSIGN);
     await nextTick();
     await flushPromises();
 
@@ -544,13 +545,13 @@ describe('PersonManagementView', () => {
 
     // eslint-disable-next-line @typescript-eslint/dot-notation
     const hasPasswordResetOption: boolean = (benutzerEditSelect?.props() as { items: { value: string }[] }).items.some(
-      (item: { value: string }) => item.value === 'RESET_PASSWORD',
+      (item: { value: string }) => item.value === OperationType.RESET_PASSWORD,
     );
     expect(hasPasswordResetOption).toBe(true);
 
-    benutzerEditSelect?.setValue('RESET_PASSWORD');
+    benutzerEditSelect?.setValue(OperationType.RESET_PASSWORD);
 
-    benutzerEditSelect?.vm.$emit('input', 'RESET_PASSWORD');
+    benutzerEditSelect?.vm.$emit('input', OperationType.RESET_PASSWORD);
     await nextTick();
 
     expect(document.body.querySelector('[data-testid="password-reset-layout-card"]')).not.toBeNull();
@@ -560,6 +561,51 @@ describe('PersonManagementView', () => {
     await nextTick();
 
     expect(document.body.querySelector('[data-testid="person-delete-layout-card"]')).toBeNull();
+  });
+
+    test('it checks a checkbox in the table, selects the unassign rolle option and triggers dialog then cancels it', async () => {
+    authStore.hasPersonenverwaltungPermission = true;
+    // Find the first checkbox in the table
+    const checkbox: DOMWrapper<Element> | undefined = wrapper?.find(
+      '[data-testid="person-table"] .v-selection-control',
+    );
+
+    // Initial state check (optional)
+    expect(checkbox?.classes()).not.toContain('v-selection-control--selected');
+
+    const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
+    await schuleAutocomplete?.setValue(['9876']);
+    await nextTick();
+
+    const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+    await rolleAutocomplete?.setValue(['10']);
+    await nextTick();
+
+    // Trigger the checkbox click
+    await checkbox?.trigger('click');
+    await nextTick();
+
+    const benutzerEditSelect: VueWrapper | undefined = wrapper?.findComponent({ ref: 'benutzer-bulk-edit-select' });
+
+    // eslint-disable-next-line @typescript-eslint/dot-notation
+    const hasUnassingRolleOption: boolean = (benutzerEditSelect?.props() as { items: { value: string }[] }).items.some(
+      (item: { value: string }) => item.value === OperationType.ROLLE_UNASSIGN,
+    );
+    expect(hasUnassingRolleOption).toBe(true);
+
+    benutzerEditSelect?.setValue(OperationType.ROLLE_UNASSIGN);
+
+    benutzerEditSelect?.vm.$emit('input', OperationType.ROLLE_UNASSIGN);
+    await nextTick();
+    await flushPromises();
+
+    expect(document.body.querySelector('[data-testid="rolle-unassign-layout-card"]')).not.toBeNull();
+
+    const cancelButton: Element | null = document.querySelector('[data-testid="rolle-unassign-discard-button"]');
+    cancelButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    await nextTick();
+
+    expect(document.body.querySelector('[data-testid="rolle-unassign-layout-card"]')).toBeNull();
   });
 
   test('person delete isnt shown if user has no permission', async () => {
@@ -600,7 +646,7 @@ describe('PersonManagementView', () => {
 
     // eslint-disable-next-line @typescript-eslint/dot-notation
     (benutzerEditSelect.props() as { items: { value: string }[] })['items'].forEach((item: { value: string }) => {
-      expect(item.value).not.toBe('DELETE_PERSON');
+      expect(item.value).not.toBe(OperationType.DELETE_PERSON);
     });
   });
 
@@ -642,7 +688,49 @@ describe('PersonManagementView', () => {
 
     // eslint-disable-next-line @typescript-eslint/dot-notation
     (benutzerEditSelect.props() as { items: { value: string }[] })['items'].forEach((item: { value: string }) => {
-      expect(item.value).not.toBe('RESET_PASSWORD');
+      expect(item.value).not.toBe(OperationType.RESET_PASSWORD);
+    });
+  });
+
+    test('rolle unassign isnt shown if user has no permission', async () => {
+    authStore.hasPersonenverwaltungPermission = false;
+
+    wrapper = mount(PersonManagementView, {
+      attachTo: document.getElementById('app') || '',
+      global: {
+        components: {
+          PersonManagementView,
+        },
+        mocks: {
+          route: {
+            fullPath: 'full/path',
+          },
+        },
+        provide: {
+          organisationStore,
+          personStore,
+          personenkontextStore,
+          rolleStore,
+          searchFilterStore,
+          authStore,
+        },
+      },
+    });
+
+    // Find the first checkbox in the table
+    const checkbox: DOMWrapper<Element> | undefined = wrapper.find('[data-testid="person-table"] .v-selection-control');
+    // Initial state check (optional)
+    expect(checkbox.classes()).not.toContain('v-selection-control--selected');
+
+    // Trigger the checkbox click
+    await checkbox.trigger('click');
+    await nextTick();
+
+    const benutzerEditSelect: VueWrapper | undefined = wrapper.findComponent({ ref: 'benutzer-bulk-edit-select' });
+
+    // eslint-disable-next-line @typescript-eslint/dot-notation
+    (benutzerEditSelect.props() as { items: { value: string }[] })['items'].forEach((item: { value: string }) => {
+      expect(item.value).not.toBe(OperationType.ROLLE_UNASSIGN);
     });
   });
 
