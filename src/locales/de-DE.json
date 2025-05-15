@@ -183,7 +183,8 @@
         "affectedSchool": "Betroffene Schule: {schule}",
         "success": "Die Schulzuordnungen wurden erfolgreich entfernt."
       },
-      "onlyOneSchoolAlert": "Bitte wählen Sie im Filter genau eine Schule aus, um die Aktion durchzuführen.",
+      "onlyOneSchuleAlert": "Bitte wählen Sie im Filter genau eine Schule aus, um die Aktion durchzuführen.",
+      "onlyOneSchuleAndRolleAlert": "Bitte wählen Sie im Filter genau eine Schule und eine Rolle aus, um die Aktion durchzuführen.",
       "changePassword": "Passwort ändern",
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
       "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",
@@ -380,7 +381,8 @@
       "bulkRollenzuordnung": {
         "unassignRolleZuordnung": "Rollenzuordnung entziehen",
         "confirmation": "Möchten Sie wirklich die Rollenzuordnung der ausgewählten Benutzer entziehen?",
-        "affectedSchool": "Betroffene Schule: {schule}",
+        "affectedSchule": "Betroffene Schule: {schule}",
+        "affectedRolle": "Betroffene Rolle: {rolle}",
         "success": "Die Rollenzuordnung wurden erfolgreich entfernt."
       },
       "create": "Rolle anlegen",

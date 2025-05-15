@@ -25,8 +25,9 @@
     selectedRolle: RolleResponse;
   };
 
-  type Emits = (event: 'update:dialogExit', finished: boolean) => void;
-
+  type Emits = {
+    (event: 'update:dialogExit', finished: boolean): void;
+  };
   const props: Props = defineProps<Props>();
   const emit: Emits = defineEmits<Emits>();
 
@@ -73,14 +74,23 @@
             cols="10"
           >
             <div data-testid="rolle-unassign-confirmation-text">
-              {{ t('admin.rolle.bulkRollenzuordnung.confirmation') }}
+              <p>{{ t('admin.rolle.bulkRollenzuordnung.confirmation') }}</p>
             </div>
             <div data-testid="rolle-unassign-affected-school">
-              {{
-                t('admin.rolle.bulkRollenzuordnung.affectedSchool', {
-                  schule: getDisplayNameForOrg(selectedOrganisation),
-                })
-              }}
+              <p>
+                {{
+                  t('admin.rolle.bulkRollenzuordnung.affectedSchule', {
+                    schule: getDisplayNameForOrg(selectedOrganisation),
+                  })
+                }}
+              </p>
+              <p>
+                {{
+                  t('admin.rolle.bulkRollenzuordnung.affectedRolle', {
+                    rolle: selectedRolle.name,
+                  })
+                }}
+              </p>
             </div>
           </v-col>
         </v-row>

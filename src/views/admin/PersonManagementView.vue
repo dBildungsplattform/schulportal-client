@@ -103,14 +103,16 @@
   // Computed property for generating options dynamically for v-selects
   const actions: ComputedRef<TranslatedObject[]> = computed(() => {
     const actionTypeTitles: Map<OperationType, string> = new Map();
-    actionTypeTitles.set(OperationType.MODIFY_ROLLE, t('admin.rolle.assignRolle'));
+
     if (authStore.hasPersonenLoeschenPermission) {
       actionTypeTitles.set(OperationType.DELETE_PERSON, t('admin.person.deletePerson'));
     }
 
     if (authStore.hasPersonenverwaltungPermission) {
+      actionTypeTitles.set(OperationType.MODIFY_ROLLE, t('admin.rolle.assignRolle'));
       actionTypeTitles.set(OperationType.RESET_PASSWORD, t('admin.person.resetPassword'));
       actionTypeTitles.set(OperationType.ORG_UNASSIGN, t('admin.person.bulkUnassignOrganisation.cancelZuordnung'));
+      actionTypeTitles.set(OperationType.ROLLE_UNASSIGN, t('admin.rolle.bulkRollenzuordnung.unassignRolleZuordnung'));
     }
 
     return [...actionTypeTitles.entries()].map(([key, value]: [string, string]) => ({
@@ -471,7 +473,7 @@
     return selectedRollenObjects.value.length === 1;
   });
 
-  const singleSchuleAlertHeader: ComputedRef<string> = computed(() => {
+  const singleSelectionAlertHeader: ComputedRef<string> = computed(() => {
     return actions.value.find((action: TranslatedObject) => action.value === selectedOption.value)?.title || '';
   });
 
@@ -492,7 +494,8 @@
   };
 
   const checkSingleOrgAndRolleDisplayDialog = (dialog: Ref<boolean>): void => {
-    if (!singleSchuleSelected.value && !singleRolleSelected.value) {
+    // Check if both a single organisation and a single rolle are selected
+    if (!singleSchuleSelected.value || !singleRolleSelected.value) {
       onlyOneOrganisationAndRolleAlertDialogVisible.value = true;
       return;
     }
@@ -517,7 +520,7 @@
         checkSingleOrgDisplayDialog(organisationUnassignDialogVisible);
         break;
       case OperationType.ROLLE_UNASSIGN:
-        checkSingleOrgAndRolleDisplayDialog(organisationUnassignDialogVisible);
+        checkSingleOrgAndRolleDisplayDialog(rolleUnassignDialogVisible);
         break;
     }
   };
@@ -553,9 +556,14 @@
     }
   };
 
-  const handleUnassignRolleDialog = (isDialogVisible: boolean): void => {
-    rolleUnassignDialogVisible.value = isDialogVisible;
+  const handleUnassignRolleDialog = async (finished: boolean): Promise<void> => {
+    rolleUnassignDialogVisible.value = false;
     selectedOption.value = null;
+    if (finished) {
+      selectedPersonIds.value = [];
+      await getPaginatedPersonen(searchFilterStore.personenPage);
+      resultTable.value.resetSelection();
+    }
   };
 
   function handleSelectedRows(selectedItems: TableItem[]): void {
@@ -884,11 +892,23 @@
           <InfoDialog
             id="only-one-school-notice"
             :isDialogVisible="onlyOneOrganisationAlertDialogVisible"
-            :header="singleSchuleAlertHeader"
-            :message="$t('admin.person.onlyOneSchoolAlert')"
+            :header="singleSelectionAlertHeader"
+            :message="$t('admin.person.onlyOneSchuleAlert')"
             @update:dialogExit="
               () => {
                 onlyOneOrganisationAlertDialogVisible = false;
+                selectedOption = null;
+              }
+            "
+          />
+          <InfoDialog
+            id="only-one-school-and-rolle-notice"
+            :isDialogVisible="onlyOneOrganisationAndRolleAlertDialogVisible"
+            :header="singleSelectionAlertHeader"
+            :message="$t('admin.person.onlyOneSchuleAndRolleAlert')"
+            @update:dialogExit="
+              () => {
+                onlyOneOrganisationAndRolleAlertDialogVisible = false;
                 selectedOption = null;
               }
             "
@@ -936,8 +956,8 @@
           </OrganisationUnassign>
           <RolleUnassign
             ref="rolle-unassign"
-            v-if="organisationUnassignDialogVisible && selectedOrganisation"
-            :isDialogVisible="organisationUnassignDialogVisible"
+            v-if="rolleUnassignDialogVisible && selectedOrganisation && selectedRolle"
+            :isDialogVisible="rolleUnassignDialogVisible"
             :selectedPersonen
             :selectedOrganisation="selectedOrganisation"
             :selectedRolle="selectedRolle!"

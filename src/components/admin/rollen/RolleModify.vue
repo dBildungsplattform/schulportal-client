@@ -173,11 +173,11 @@
       formattedBefristung,
     );
 
-    emit('update:getUebersichten');
-
     if (bulkOperationStore.currentOperation?.errors && bulkOperationStore.currentOperation.errors.size > 0) {
       showErrorDialog.value = true;
     }
+
+    emit('update:getUebersichten');
   }
 </script>
 

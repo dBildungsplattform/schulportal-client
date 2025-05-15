@@ -74,7 +74,7 @@
             </div>
             <div data-testid="org-unassign-affected-school">
               {{
-                t('admin.person.bulkUnassignOrganisation.affectedSchool', {
+                t('admin.person.bulkUnassignOrganisation.affectedSchule', {
                   schule: getDisplayNameForOrg(selectedOrganisation),
                 })
               }}
