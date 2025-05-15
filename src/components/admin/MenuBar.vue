@@ -165,20 +165,20 @@
       <v-list-item
         v-if="authStore.hasLandesbediensteteSuchenUndHinzufügenPermission"
         class="menu-bar-sub-item caption"
-        @click="closeMenuOnMobile"
+        @click="handleMenuItemClick('/start')"
         data-testid="search-person-menu-item"
         prepend-icon="mdi-plus-circle-outline"
         :title="$t('admin.addPerson.searchStateEmployee')"
-        to="/admin/personen"
+        to="/start"
       ></v-list-item>
       <v-list-item
         v-if="authStore.hasEingeschränktNeueBenutzerErstellenPermission"
         class="menu-bar-sub-item caption"
-        @click="closeMenuOnMobile"
+        @click="handleMenuItemClick('/start')"
         data-testid="add-person-menu-item"
         prepend-icon="mdi-plus-circle-outline"
         :title="$t('admin.addPerson.createNew')"
-        to="/admin/personen"
+        to="/start"
       ></v-list-item>
     </div>
 
