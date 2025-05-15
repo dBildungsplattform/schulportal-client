@@ -1,17 +1,18 @@
-import { defineStore, type Store, type StoreDefinition } from 'pinia';
-import { usePersonenkontextStore, type PersonenkontextStore, type Zuordnung } from './PersonenkontextStore';
-import { type PersonStore, usePersonStore } from './PersonStore';
 import {
-  type PersonenApiInterface,
   OrganisationsTyp,
   PersonenApiFactory,
   RollenArt,
   RollenMerkmal,
+  type PersonenApiInterface,
 } from '@/api-client/generated';
+import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
 import axiosApiInstance from '@/services/ApiService';
 import { getResponseErrorCode } from '@/utils/errorHandlers';
-import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
+import { isBefore } from 'date-fns';
+import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import type { Organisation } from './OrganisationStore';
+import { usePersonenkontextStore, type PersonenkontextStore, type Zuordnung } from './PersonenkontextStore';
+import { usePersonStore, type PersonStore } from './PersonStore';
 
 const personenApi: PersonenApiInterface = PersonenApiFactory(undefined, '', axiosApiInstance);
 
@@ -48,6 +49,7 @@ type BulkOperationActions = {
     selectedRolleId: string,
     rollen: TranslatedRolleWithAttrs[],
     workflowStepResponseOrganisations: Organisation[],
+    befristung?: string,
   ): Promise<void>;
   bulkPersonenDelete(personIDs: string[]): Promise<void>;
 };
@@ -109,6 +111,12 @@ export const useBulkOperationStore: StoreDefinition<
         // Fetch the Zuordnungen for this specific user (To send alongside the new one)
         await personStore.getPersonenuebersichtById(personId);
 
+        if (personStore.errorCode) {
+          this.currentOperation.errors.set(personId, personStore.errorCode);
+          this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
+          continue;
+        }
+
         // Extract the current Zuordnungen for this person
         const existingZuordnungen: Zuordnung[] = personStore.personenuebersicht?.zuordnungen ?? [];
 
@@ -125,6 +133,12 @@ export const useBulkOperationStore: StoreDefinition<
 
         // Await the processing of each ID
         await personenkontextStore.updatePersonenkontexte(updatedZuordnungen, personId);
+
+        if (personenkontextStore.errorCode) {
+          this.currentOperation.errors.set(personId, personenkontextStore.errorCode);
+          this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
+          continue;
+        }
 
         // Update progress for each item processed
         this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
@@ -169,6 +183,7 @@ export const useBulkOperationStore: StoreDefinition<
       selectedRolleId: string,
       rollen: TranslatedRolleWithAttrs[],
       workflowStepResponseOrganisations: Organisation[],
+      befristung?: string,
     ): Promise<void> {
       const personStore: PersonStore = usePersonStore();
       const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
@@ -183,26 +198,26 @@ export const useBulkOperationStore: StoreDefinition<
         successMessage: undefined,
       };
 
-      const organisation: Organisation | undefined = workflowStepResponseOrganisations.find(
+      const selectedOrganisation: Organisation | undefined = workflowStepResponseOrganisations.find(
         (orga: Organisation) => orga.id === selectedOrganisationId,
       );
 
-      if (!organisation) return;
+      if (!selectedOrganisation) return;
 
       const baseZuordnung: Zuordnung = {
-        sskId: organisation.id,
+        sskId: selectedOrganisation.id,
         rolleId: selectedRolleId,
         klasse: undefined,
-        sskDstNr: organisation.kennung ?? '',
-        sskName: organisation.name,
-        rolle: rollen.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolleId)?.title || '',
+        sskDstNr: selectedOrganisation.kennung ?? '',
+        sskName: selectedOrganisation.name,
+        rolle: rollen.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolleId)?.title ?? '',
         rollenArt: rollen.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolleId)
           ?.rollenart as RollenArt,
-        administriertVon: organisation.administriertVon ?? '',
+        administriertVon: selectedOrganisation.administriertVon ?? '',
         editable: true,
         merkmale: [] as unknown as RollenMerkmal,
         typ: OrganisationsTyp.Schule,
-        befristung: undefined,
+        befristung,
       };
 
       for (let i: number = 0; i < personIDs.length; i++) {
@@ -210,10 +225,36 @@ export const useBulkOperationStore: StoreDefinition<
 
         await personStore.getPersonenuebersichtById(personId);
 
+        if (personStore.errorCode) {
+          this.currentOperation.errors.set(personId, personStore.errorCode);
+          this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
+          continue;
+        }
+
         const currentZuordnungen: Zuordnung[] = personStore.personenuebersicht?.zuordnungen || [];
-        const combinedZuordnungen: Zuordnung[] = [...currentZuordnungen, { ...baseZuordnung }];
+        const newZuordnung: Zuordnung = {
+          ...baseZuordnung,
+        };
+
+        // If the new kontext is befristet, we use the earliest possible befristung out of all befristungen at the selected organisation and the specified befristung
+        if (befristung) {
+          newZuordnung.befristung = currentZuordnungen.reduce((earliest: string, zuordnung: Zuordnung) => {
+            if (zuordnung.sskId === selectedOrganisation.id && zuordnung.befristung) {
+              return isBefore(zuordnung.befristung, earliest) ? zuordnung.befristung : earliest;
+            }
+            return earliest;
+          }, befristung);
+        }
+
+        const combinedZuordnungen: Zuordnung[] = [...currentZuordnungen, newZuordnung];
 
         await personenkontextStore.updatePersonenkontexte(combinedZuordnungen, personId);
+
+        if (personenkontextStore.errorCode) {
+          this.currentOperation.errors.set(personId, personenkontextStore.errorCode);
+          this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
+          continue;
+        }
 
         this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
       }
@@ -221,10 +262,8 @@ export const useBulkOperationStore: StoreDefinition<
       this.currentOperation.isRunning = false;
       this.currentOperation.complete = true;
 
-      this.currentOperation.successMessage = 'admin.rolle.rollenAssignedSuccessfully';
-
-      if (personenkontextStore.errorCode === 'INVALID_PERSONENKONTEXT_FOR_PERSON_WITH_ROLLENART_LERN') {
-        personenkontextStore.errorCode = '';
+      if (this.currentOperation.errors.size === 0) {
+        this.currentOperation.successMessage = 'admin.rolle.rollenAssignedSuccessfully';
       }
     },
 
@@ -246,13 +285,21 @@ export const useBulkOperationStore: StoreDefinition<
 
         await personStore.deletePersonById(personId);
 
+        if (personStore.errorCode) {
+          this.currentOperation.errors.set(personId, personStore.errorCode);
+          this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
+          continue;
+        }
+
         this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
       }
 
       this.currentOperation.isRunning = false;
       this.currentOperation.complete = true;
 
-      this.currentOperation.successMessage = 'admin.person.deletePersonBulkSuccessMessage';
+      if (this.currentOperation.errors.size === 0) {
+        this.currentOperation.successMessage = 'admin.person.deletePersonBulkSuccessMessage';
+      }
     },
   },
 });
