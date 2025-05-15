@@ -152,6 +152,8 @@
     searchFilterStore.setSchuleFilterForKlassen(null);
     searchFilterStore.setKlasseFilterForKlassen([]);
     searchFilterStore.klassenPage = 1;
+    searchFilterStore.organisationenSortField = null;
+    searchFilterStore.organisationenSortOrder = null;
 
     // If the user has an autoselected Schule, do not reset it
     if (!hasAutoselectedSchule.value) {
