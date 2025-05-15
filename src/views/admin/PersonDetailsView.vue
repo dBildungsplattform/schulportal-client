@@ -59,6 +59,7 @@
     getPersonenkontextFieldDefinitions,
     getValidationSchema,
     isKopersRolle,
+    isLernRolle,
     type PersonenkontextFieldDefinitions,
   } from '@/utils/validationPersonenkontext';
   import { toTypedSchema } from '@vee-validate/yup';
@@ -515,14 +516,6 @@
     selectedRolle: string;
   };
 
-  // Define a method to check if the selected Rolle is of type "Lern"
-  function isLernRolle(selectedRolleId: string): boolean {
-    const rolle: TranslatedRolleWithAttrs | undefined = rollen.value?.find(
-      (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
-    );
-    return !!rolle && rolle.rollenart === RollenArt.Lern;
-  }
-
   const hasKopersNummer: ComputedRef<boolean> = computed(() => {
     return !!personStore.currentPerson?.person.personalnummer;
   });
@@ -552,7 +545,7 @@
     const rolleId: string | undefined = selectedZuordnungen.value[0]?.rolleId;
 
     // Check if rolleId exists and if it's of type LERN
-    if (rolleId && isLernRolle(rolleId) && hasOneSelectedZuordnung) {
+    if (rolleId && isLernRolle([rolleId]) && hasOneSelectedZuordnung) {
       return true;
     }
     return false;
@@ -982,7 +975,7 @@
 
   const onSubmitCreateZuordnung: (e?: Event | undefined) => Promise<void | undefined> = formContext.handleSubmit(() => {
     if (selectedRolle.value) {
-      if (isLernRolle(selectedRolle.value)) {
+      if (isLernRolle([selectedRolle.value])) {
         createZuordnungConfirmationDialogMessage.value = t('person.addZuordnungKlasseConfirmation', {
           rollenname: selectedRolleTitle.value,
           klassenname: selectedKlasseTitle.value,
