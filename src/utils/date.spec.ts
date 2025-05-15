@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { formatDateDigitsToGermanDate, formatDateToISO, getNextSchuljahresende, isValidDate, notInPast } from './date';
+import { formatDateDigitsToGermanDate, getNextSchuljahresende, isValidDate, notInPast } from './date';
 
 describe('getNextSchuljahresende', () => {
   describe.each([
