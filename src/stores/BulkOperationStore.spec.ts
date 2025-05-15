@@ -5,11 +5,11 @@ import type {
   PersonenkontexteUpdateResponse,
 } from '@/api-client/generated';
 import ApiService from '@/services/ApiService';
-import { DoFactory } from '@/testing/DoFactory';
 import { faker } from '@faker-js/faker';
 import MockAdapter from 'axios-mock-adapter';
 import { isBefore } from 'date-fns';
 import { createPinia, setActivePinia } from 'pinia';
+import { DoFactory } from 'test/DoFactory';
 import type { MockInstance } from 'vitest';
 import { OperationType, useBulkOperationStore, type BulkOperationStore } from './BulkOperationStore';
 import { type Organisation } from './OrganisationStore';

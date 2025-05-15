@@ -10,7 +10,7 @@ import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFil
 import type { Person } from '@/stores/types/Person';
 import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
 import type { Zuordnung } from '@/stores/types/Zuordnung';
-import { DoFactory } from '@/testing/DoFactory';
+import { DoFactory } from 'test/DoFactory';
 import { DOMWrapper, VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
 import { expect, test, type Mock, type MockInstance } from 'vitest';

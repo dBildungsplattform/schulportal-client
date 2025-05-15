@@ -1,6 +1,6 @@
-import { DoFactory } from '@/testing/DoFactory';
-import { Zuordnung } from './Zuordnung';
 import type { DBiamPersonenzuordnungResponse } from '@/api-client/generated';
+import { DoFactory } from 'test/DoFactory';
+import { Zuordnung } from './Zuordnung';
 
 describe('Zuordnung', () => {
   describe('fromResponse', () => {

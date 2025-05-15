@@ -3,8 +3,8 @@ import { useOrganisationStore, type OrganisationStore } from '@/stores/Organisat
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
 import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
 import { PersonenUebersicht } from '@/stores/types/PersonenUebersicht';
-import { DoFactory } from '@/testing/DoFactory';
 import { VueWrapper, mount } from '@vue/test-utils';
+import { DoFactory } from 'test/DoFactory';
 import { expect, test } from 'vitest';
 import { nextTick } from 'vue';
 import type { BefristungProps } from './BefristungInput.vue';

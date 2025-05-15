@@ -10,9 +10,9 @@ import {
 } from '@/stores/TwoFactorAuthentificationStore';
 import { PersonenUebersicht } from '@/stores/types/PersonenUebersicht';
 import type { Zuordnung } from '@/stores/types/Zuordnung';
-import { DoFactory } from '@/testing/DoFactory';
 import { faker } from '@faker-js/faker';
 import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
+import { DoFactory } from 'test/DoFactory';
 import { beforeEach, describe, expect, test, type MockInstance } from 'vitest';
 import { nextTick } from 'vue';
 import { createMemoryHistory, createRouter, useRoute, type Router } from 'vue-router';

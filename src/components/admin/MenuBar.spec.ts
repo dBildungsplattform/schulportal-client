@@ -1,6 +1,6 @@
 import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
-import { DoFactory } from '@/testing/DoFactory';
 import { VueWrapper, mount } from '@vue/test-utils';
+import { DoFactory } from 'test/DoFactory';
 import { expect, test, type Mock, type MockInstance } from 'vitest';
 import { h, nextTick } from 'vue';
 import { useRoute, useRouter } from 'vue-router';

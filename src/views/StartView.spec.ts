@@ -9,10 +9,10 @@ import {
   type ServiceProviderStore,
 } from '@/stores/ServiceProviderStore';
 import { PersonenUebersicht } from '@/stores/types/PersonenUebersicht';
-import { DoFactory } from '@/testing/DoFactory';
 import { faker } from '@faker-js/faker';
 import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
+import { DoFactory } from 'test/DoFactory';
 import { expect, test, type Mock } from 'vitest';
 import { nextTick } from 'vue';
 import StartView from './StartView.vue';

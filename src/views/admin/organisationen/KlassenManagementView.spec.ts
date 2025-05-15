@@ -9,9 +9,9 @@ import {
   type OrganisationStore,
 } from '@/stores/OrganisationStore';
 import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
-import { DoFactory } from '@/testing/DoFactory';
 import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
+import { DoFactory } from 'test/DoFactory';
 import { expect, test, type MockInstance } from 'vitest';
 import { nextTick } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';

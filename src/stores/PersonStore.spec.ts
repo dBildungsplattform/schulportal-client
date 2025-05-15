@@ -11,11 +11,11 @@ import {
   type PersonendatensatzResponse,
 } from '@/api-client/generated';
 import ApiService from '@/services/ApiService';
-import { DoFactory } from '@/testing/DoFactory';
 import { PersonLockOccasion } from '@/utils/lock';
 import { rejects } from 'assert';
 import MockAdapter from 'axios-mock-adapter';
 import { createPinia, setActivePinia } from 'pinia';
+import { DoFactory } from 'test/DoFactory';
 import type { Organisation } from './OrganisationStore';
 import { usePersonStore, type PersonStore, type Personendatensatz } from './PersonStore';
 import type { Person } from './types/Person';

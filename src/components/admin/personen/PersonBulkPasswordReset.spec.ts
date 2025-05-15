@@ -3,9 +3,9 @@ import { OperationType, useBulkOperationStore, type BulkOperationStore } from '@
 import type { Person } from '@/stores/types/Person';
 import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
 import type { Zuordnung } from '@/stores/types/Zuordnung';
-import { DoFactory } from '@/testing/DoFactory';
 import { download } from '@/utils/file';
 import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
+import { DoFactory } from 'test/DoFactory';
 import { beforeEach, describe, expect, test, vi, type MockInstance } from 'vitest';
 import { nextTick } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';

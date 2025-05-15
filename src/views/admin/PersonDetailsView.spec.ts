@@ -12,10 +12,10 @@ import {
   type TwoFactorAuthentificationStore,
 } from '@/stores/TwoFactorAuthentificationStore';
 import { PersonenUebersicht } from '@/stores/types/PersonenUebersicht';
-import { DoFactory } from '@/testing/DoFactory';
 import { adjustDateForTimezoneAndFormat } from '@/utils/date';
 import { parseUserLock, PersonLockOccasion, type UserLock } from '@/utils/lock';
 import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
+import { DoFactory } from 'test/DoFactory';
 import { expect, test, type MockInstance } from 'vitest';
 import { nextTick, type ComputedRef, type DefineComponent } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';

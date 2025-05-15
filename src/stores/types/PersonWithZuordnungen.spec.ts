@@ -1,4 +1,4 @@
-import { DoFactory } from '@/testing/DoFactory';
+import { DoFactory } from 'test/DoFactory';
 import { OrganisationsTyp, type Organisation } from '../OrganisationStore';
 import { RollenArt, RollenMerkmal } from '../RolleStore';
 import { Person } from './Person';

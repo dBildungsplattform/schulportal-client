@@ -5,8 +5,8 @@ import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/Per
 import { RollenArt, RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
 import type { Person } from '@/stores/types/Person';
 import { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
-import { DoFactory } from '@/testing/DoFactory';
 import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
+import { DoFactory } from 'test/DoFactory';
 import { test, type MockInstance } from 'vitest';
 import { nextTick } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';

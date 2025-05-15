@@ -1,8 +1,8 @@
 import routes from '@/router/routes';
 import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
 import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
-import { DoFactory } from '@/testing/DoFactory';
 import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
+import { DoFactory } from 'test/DoFactory';
 import { test, type MockInstance } from 'vitest';
 import { nextTick } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
