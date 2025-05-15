@@ -349,7 +349,7 @@ describe('BulkOperationStore', () => {
       expect(bulkOperationStore.currentOperation?.progress).toBe(100);
     });
 
-    it.only('should return early if organisation is not found', async () => {
+    it('should return early if organisation is not found', async () => {
       const personIds: string[] = ['1', '2'];
       const selectedOrganisationId: string = 'non-existing-org';
       const selectedRolleId: string = 'rolle-456';
