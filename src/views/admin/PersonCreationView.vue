@@ -19,11 +19,16 @@
   import { RollenArt } from '@/stores/RolleStore';
   import { type TranslatedObject } from '@/types.d';
   import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
-  import { formatDateToISO, getNextSchuljahresende, isValidDate, notInPast } from '@/utils/date';
-  import { DDMMYYYY, DIN_91379A, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
-  import { isKopersRolle } from '@/utils/validationPersonenkontext';
-  import { toTypedSchema } from '@vee-validate/yup';
-  import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
+  import { formatDateToISO, getNextSchuljahresende } from '@/utils/date';
+  import {
+    getPersonFieldDefinitions,
+    getValidationSchema,
+    isFormDirty,
+    type PersonCreationForm,
+    type PersonFieldDefinitions,
+  } from '@/utils/validationPerson';
+  import { isKopersRolle, isLernRolle } from '@/utils/validationPersonenkontext';
+  import { useForm, type FormContext, type TypedSchema } from 'vee-validate';
   import { computed, onMounted, onUnmounted, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import {
@@ -34,7 +39,6 @@
     type Router,
   } from 'vue-router';
   import { useDisplay } from 'vuetify';
-  import { array, object, string, StringSchema, type AnyObject } from 'yup';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
@@ -61,113 +65,30 @@
     [],
   );
 
-  // Define a method to check if the selected Rolle is of type "Lern"
-  function isLernRolle(selectedRolleIds?: string[]): boolean | undefined {
-    if (!Array.isArray(selectedRolleIds)) return false;
-
-    return filteredRollenCache.value?.some(
-      (rolle: TranslatedRolleWithAttrs) => selectedRolleIds.includes(rolle.value) && rolle.rollenart === RollenArt.Lern,
-    );
-  }
-
-  const validationSchema: TypedSchema = toTypedSchema(
-    object({
-      selectedRollen: array()
-        .of(string().required(t('admin.rolle.rules.rolle.required')))
-        .min(1, t('admin.rolle.rules.rolle.required')),
-      selectedVorname: string()
-        .matches(DIN_91379A, t('admin.person.rules.vorname.matches'))
-        .matches(NO_LEADING_TRAILING_SPACES, t('admin.person.rules.vorname.noLeadingTrailingSpaces'))
-        .min(2, t('admin.person.rules.vorname.min'))
-        .required(t('admin.person.rules.vorname.required')),
-      selectedFamilienname: string()
-        .matches(DIN_91379A, t('admin.person.rules.familienname.matches'))
-        .matches(NO_LEADING_TRAILING_SPACES, t('admin.person.rules.familienname.noLeadingTrailingSpaces'))
-        .min(2, t('admin.person.rules.familienname.min'))
-        .required(t('admin.person.rules.familienname.required')),
-      selectedOrganisation: string().required(t('admin.organisation.rules.organisation.required')),
-      selectedKlasse: string().when('selectedRollen', {
-        is: (selectedRolleIds: string[]) => isLernRolle(selectedRolleIds),
-        then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
-          schema.required(t('admin.klasse.rules.klasse.required')),
-      }),
-      selectedKopersNr: string()
-        .matches(NO_LEADING_TRAILING_SPACES, t('admin.person.rules.kopersNr.noLeadingTrailingSpaces'))
-        .when('selectedRollen', {
-          is: (selectedRolleIds: string[]) =>
-            isKopersRolle(selectedRolleIds, filteredRollen.value) && !hasNoKopersNr.value,
-          then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
-            schema.required(t('admin.person.rules.kopersNr.required')),
-        }),
-      selectedBefristung: string()
-        .test('notInPast', t('admin.befristung.rules.pastDateNotAllowed'), notInPast)
-        .test('isValidDate', t('admin.befristung.rules.invalidDateNotAllowed'), isValidDate)
-        .matches(DDMMYYYY, t('admin.befristung.rules.format'))
-        .when(['selectedRolle', 'selectedBefristungOption'], {
-          is: (selectedRolleIds: string[], selectedBefristungOption: string | undefined) =>
-            isBefristungspflichtRolle(selectedRolleIds) && selectedBefristungOption === undefined,
-          then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
-            schema.required(t('admin.befristung.rules.required')),
-        }),
-    }),
-  );
-
-  const vuetifyConfig = (state: {
-    errors: Array<string>;
-  }): { props: { error: boolean; 'error-messages': Array<string> } } => ({
-    props: {
-      error: !!state.errors.length,
-      'error-messages': state.errors,
-    },
-  });
-
-  type PersonCreationForm = {
-    selectedOrganisation: string;
-    selectedRollen: string[];
-    selectedVorname: string;
-    selectedFamilienname: string;
-    selectedKlasse: string;
-    selectedBefristung: Date;
-    selectedBefristungOption: string;
-    selectedKopersNr: string;
-  };
+  const validationSchema: TypedSchema<PersonCreationForm> = getValidationSchema(t, hasNoKopersNr);
 
   const formContext: FormContext<PersonCreationForm, PersonCreationForm> = useForm<PersonCreationForm>({
     validationSchema,
   });
 
-  const [selectedOrganisation, selectedOrganisationProps]: [
-    Ref<string | undefined>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = formContext.defineField('selectedOrganisation', vuetifyConfig);
-  const [selectedRollen, selectedRollenProps]: [
-    Ref<string[] | undefined>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = formContext.defineField('selectedRollen', vuetifyConfig);
-  const [selectedVorname, selectedVornameProps]: [
-    Ref<string>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = formContext.defineField('selectedVorname', vuetifyConfig);
-  const [selectedFamilienname, selectedFamiliennameProps]: [
-    Ref<string>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = formContext.defineField('selectedFamilienname', vuetifyConfig);
-  const [selectedKlasse, selectedKlasseProps]: [
-    Ref<string | undefined>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = formContext.defineField('selectedKlasse', vuetifyConfig);
-  const [selectedBefristung, selectedBefristungProps]: [
-    Ref<string | undefined>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = formContext.defineField('selectedBefristung', vuetifyConfig);
-  const [selectedBefristungOption, selectedBefristungOptionProps]: [
-    Ref<string | undefined>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = formContext.defineField('selectedBefristungOption', vuetifyConfig);
-  const [selectedKopersNr, selectedKopersNrProps]: [
-    Ref<string | undefined | null>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = formContext.defineField('selectedKopersNr', vuetifyConfig);
+  const {
+    selectedOrganisation,
+    selectedOrganisationProps,
+    selectedRollen,
+    selectedRollenProps,
+    selectedVorname,
+    selectedVornameProps,
+    selectedFamilienname,
+    selectedFamiliennameProps,
+    selectedKlasse,
+    selectedKlasseProps,
+    selectedBefristung,
+    selectedBefristungProps,
+    selectedBefristungOption,
+    selectedBefristungOptionProps,
+    selectedKopersNr,
+    selectedKopersNrProps,
+  }: PersonFieldDefinitions = getPersonFieldDefinitions(formContext);
 
   const {
     handleBefristungUpdate,
@@ -287,18 +208,6 @@
   });
 
   const creationErrorText: Ref<string> = ref('');
-
-  function isFormDirty(): boolean {
-    return (
-      formContext.isFieldDirty('selectedOrganisation') ||
-      formContext.isFieldDirty('selectedRollen') ||
-      formContext.isFieldDirty('selectedKlasse') ||
-      formContext.isFieldDirty('selectedKopersNr') ||
-      formContext.isFieldDirty('selectedVorname') ||
-      formContext.isFieldDirty('selectedFamilienname') ||
-      formContext.isFieldDirty('selectedBefristung')
-    );
-  }
 
   async function navigateToPersonTable(): Promise<void> {
     if (
@@ -426,14 +335,14 @@
   }
 
   function preventNavigation(event: BeforeUnloadEvent): void {
-    if (!isFormDirty()) return;
+    if (!isFormDirty(formContext)) return;
     event.preventDefault();
     /* Chrome requires returnValue to be set. */
     event.returnValue = '';
   }
 
   onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
-    if (isFormDirty()) {
+    if (isFormDirty(formContext)) {
       showUnsavedChangesDialog.value = true;
       blockedNext = next;
     } else {
