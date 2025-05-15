@@ -1,5 +1,6 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import type { RolleResponse } from './RolleStore';
+import type { SortOrder, OrganisationSortField } from '@/utils/sorting';
 
 type SearchFilterState = {
   klassenPage: number;
@@ -18,8 +19,10 @@ type SearchFilterState = {
   selectedRollen: Array<string> | null;
   selectedRollenObjects: RolleResponse[];
   selectedOrganisationen: Array<string> | null;
-  sortField: string | null;
-  sortOrder: string | null;
+  personenSortField: string | null;
+  personenSortOrder: string | null;
+  organisationenSortField: OrganisationSortField | null;
+  organisationenSortOrder: SortOrder | null;
   currentSort: { key: string; order: 'asc' | 'desc' } | null;
   selectedSchuleForKlassen: string | null;
   selectedKlassenForKlassen: Array<string> | null;
@@ -35,9 +38,6 @@ type SearchFilterActions = {
   setOrganisationFilterForPersonen: (selectedOrganisationen: Array<string> | null) => Promise<void>;
   setSearchFilterForPersonen: (searchFilter: string | null) => Promise<void>;
   setSearchFilterForSchulen: (searchFilter: string | null) => Promise<void>;
-  setSortFieldForPersonen: (sortField: string | null) => Promise<void>;
-  setSortOrderForPersonen: (sortOrder: string | null) => Promise<void>;
-  setCurrentSortForPersonen: (currentSort: { key: string; order: 'asc' | 'desc' } | null) => Promise<void>;
   setSchuleFilterForKlassen: (selectedSchuleForKlassen: string | null) => Promise<void>;
   setKlasseFilterForKlassen: (selectedKlassenForKlassen: Array<string> | null) => Promise<void>;
 };
@@ -70,8 +70,10 @@ export const useSearchFilterStore: StoreDefinition<
     selectedRollen: [],
     selectedRollenObjects: [],
     selectedOrganisationen: [],
-    sortField: '',
-    sortOrder: '',
+    personenSortField: '',
+    personenSortOrder: '',
+    organisationenSortField: null,
+    organisationenSortOrder: null,
     currentSort: null,
     selectedSchuleForKlassen: null,
     selectedKlassenForKlassen: [],
@@ -95,18 +97,6 @@ export const useSearchFilterStore: StoreDefinition<
 
     async setSearchFilterForSchulen(searchFilterSchulen: string | null) {
       this.searchFilterSchulen = searchFilterSchulen || '';
-    },
-
-    async setSortFieldForPersonen(sortField: string | null) {
-      this.sortField = sortField;
-    },
-
-    async setSortOrderForPersonen(sortOrder: string | null) {
-      this.sortOrder = sortOrder;
-    },
-
-    async setCurrentSortForPersonen(currentSort: { key: string; order: 'asc' | 'desc' } | null) {
-      this.currentSort = currentSort;
     },
 
     async setRolleFilterWithObjectsForPersonen(selectedRollen: Array<string> | null, rollenObjects: RolleResponse[]) {
