@@ -589,7 +589,7 @@
                 v-model:selectedKopersNr="selectedKopersNr"
                 ref="kopers-input"
                 :selectedKopersNrProps="selectedKopersNrProps"
-                @update:selectedKopersNr="(value?: string | null) => (selectedKopersNr = value)"
+                @update:selectedKopersNr="(value?: string | undefined) => (selectedKopersNr = value)"
                 @update:hasNoKopersNr="(value: boolean | undefined) => (hasNoKopersNr = value)"
               ></KopersInput>
             </div>
