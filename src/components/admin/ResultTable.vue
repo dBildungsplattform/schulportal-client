@@ -2,14 +2,11 @@
   /* this block is necessary to introduce a table header type for defining table headers
       watch source for updates: https://stackoverflow.com/a/75993081/4790594
    */
-  import { SortOrder } from '@/stores/PersonStore';
-  import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
+  import { SortOrder } from '@/utils/sorting';
   import { onMounted, onUnmounted, ref, watch, type Ref } from 'vue';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
 
   type Headers = VDataTableServer['headers'];
-
-  const searchFilterStore: SearchFilterStore = useSearchFilterStore();
 
   export type TableItem = Record<string, unknown>;
 
@@ -103,14 +100,14 @@
     order?: boolean | 'asc' | 'desc';
   };
 
-  type UpdateOptions = {
-    sortBy: VDataTableServer['sortBy'];
-  };
-
-  // This takes the table options as a parameter (the options include the sorting informations) and send an event to the parent to apply the sorting.
-  function onUpdateOptions(options: UpdateOptions): void {
-    if (options.sortBy.length > 0) {
-      const sortItem: SortItem | undefined = options.sortBy[0];
+  function onUpdateOptions(options: SortItem[]): void {
+    if (options.length === 0) {
+      emit('onTableUpdate', {
+        sortField: props.currentSort?.key,
+        sortOrder: props.currentSort?.key === SortOrder.Asc ? SortOrder.Desc : SortOrder.Asc,
+      });
+    } else if (options.length > 0) {
+      const sortItem: SortItem | undefined = options[0];
       if (sortItem?.key !== props.currentSort?.key || sortItem?.order !== props.currentSort?.order) {
         emit('onTableUpdate', {
           sortField: sortItem?.key,
@@ -138,8 +135,11 @@
   // On Mount we emit an event to the parent to sort the table by first column and ASC.
   onMounted(() => {
     // If the sortField in the store has a value then we don't trigger this logic. This logic should only be triggered when the table was first opened without any changes to sorting.
-    if (searchFilterStore.sortField === '') {
-      if (props.headers && props.headers[0]?.key) {
+    if (!props.currentSort?.key) {
+      if (
+        props.headers &&
+        props.headers.filter((header: { sortable?: boolean }) => header.sortable !== false)[0]?.key
+      ) {
         emit('onTableUpdate', {
           sortField: props.headers[0]?.key,
           sortOrder: SortOrder.Asc,
@@ -172,9 +172,9 @@
     select-strategy="page"
     :showCurrentPage="true"
     show-select
-    :sort-by="currentSort ? [currentSort] : []"
+    :sortBy="currentSort ? [currentSort] : []"
     v-model="selectedItems"
-    @update:options="onUpdateOptions"
+    @update:sortBy="onUpdateOptions"
     @update:page="(page: number) => $emit('onPageUpdate', page)"
     @update:itemsPerPage="(limit: number) => $emit('onItemsPerPageUpdate', limit)"
     @update:modelValue="emitSelectedRows"

@@ -12,6 +12,7 @@
     type OrganisationenFilter,
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
+  import { OrganisationSortField, SortOrder } from '@/utils/sorting';
   import { RollenSystemRecht } from '@/stores/RolleStore';
   import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
   import { type Mutable, type TranslatedObject } from '@/types.d';
@@ -28,10 +29,12 @@
 
   type TableHeaders = VDataTableServer['headers'];
 
+  const klasseColumnKey: string = 'name';
+
   const defaultHeaders: TableHeaders = [
     {
       title: t('admin.klasse.klasse'),
-      key: 'name',
+      key: klasseColumnKey,
       align: 'start',
       width: '250px',
     },
@@ -62,6 +65,8 @@
       offset: pageOffset.value,
       limit: searchFilterStore.klassenPerPage,
       organisationIds: searchFilterStore.selectedKlassenForKlassen || [],
+      sortField: searchFilterStore.organisationenSortField ?? undefined,
+      sortOrder: searchFilterStore.organisationenSortOrder ?? undefined,
     };
     if (selectedSchule.value) initialFilter.administriertVon = [selectedSchule.value];
     return initialFilter;
@@ -147,6 +152,8 @@
     searchFilterStore.setSchuleFilterForKlassen(null);
     searchFilterStore.setKlasseFilterForKlassen([]);
     searchFilterStore.klassenPage = 1;
+    searchFilterStore.organisationenSortField = null;
+    searchFilterStore.organisationenSortOrder = null;
 
     // If the user has an autoselected Schule, do not reset it
     if (!hasAutoselectedSchule.value) {
@@ -188,6 +195,16 @@
     router.push({ name: 'klasse-details', params: { id: item.id } });
   }
 
+  async function handleTableSorting(update: {
+    sortField: string | undefined;
+    sortOrder: 'asc' | 'desc';
+  }): Promise<void> {
+    if (update.sortField && Object.values(OrganisationSortField).includes(update.sortField as OrganisationSortField)) {
+      searchFilterStore.organisationenSortField = update.sortField as OrganisationSortField;
+      searchFilterStore.organisationenSortOrder = update.sortOrder as SortOrder;
+    }
+  }
+
   watch(
     hasAutoselectedSchule,
     () => {
@@ -199,6 +216,7 @@
             title: t('admin.schule.dienststellennummer'),
             key: 'schuleDetails',
             align: 'start',
+            sortable: false,
             width: '350px',
           },
           ...defaultHeaders,
@@ -376,18 +394,24 @@
           </v-col>
         </v-row>
         <ResultTable
+          ref="resultTable"
           :currentPage="searchFilterStore.klassenPage"
           data-testid="klasse-table"
           :header="t('admin.klasse.management')"
           :items="finalKlassen || []"
           :loading="organisationStore.loading"
           :headers="headers"
+          :currentSort="{
+            key: searchFilterStore.organisationenSortField ?? klasseColumnKey,
+            order: searchFilterStore.organisationenSortOrder ?? SortOrder.Asc,
+          }"
           @onHandleRowClick="
             (event: PointerEvent, item: TableRow<unknown>) =>
               navigateToKlassenDetails(event, item as TableRow<Organisation>)
           "
           @onItemsPerPageUpdate="getPaginatedKlassenWithLimit"
           @onPageUpdate="getPaginatedKlassen"
+          @onTableUpdate="handleTableSorting"
           :totalItems="organisationStore.totalKlassen"
           :itemsPerPage="searchFilterStore.klassenPerPage"
           item-value-path="id"
