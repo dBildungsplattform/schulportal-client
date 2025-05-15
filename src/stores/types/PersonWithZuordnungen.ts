@@ -62,9 +62,9 @@ export class PersonWithZuordnungen extends Person {
     return this.stringifyArray(Array.from(this.klassenZuordnungen.values()));
   }
 
-  public get personalnummerAsString(): string {
+  public getPersonalnummerAsString(replacementForMissing: string = 'fehlt'): string {
     if (!this.personalnummer) {
-      if (this.hasKopersRolle()) return 'fehlt';
+      if (this.hasKopersRolle()) return replacementForMissing;
       return '---';
     }
     return this.personalnummer;

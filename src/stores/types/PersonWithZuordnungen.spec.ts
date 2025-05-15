@@ -55,7 +55,7 @@ describe('PersonWithZuordnungen', () => {
   });
 
   it('should return personalnummerAsString', () => {
-    const { personalnummerAsString }: PersonWithZuordnungen = personWithZuordnungen;
+    const personalnummerAsString: string = personWithZuordnungen.getPersonalnummerAsString();
     expect(personalnummerAsString).toBe(person.personalnummer);
   });
 
@@ -68,7 +68,7 @@ describe('PersonWithZuordnungen', () => {
       });
       const personWithKopersZuordnung: PersonWithZuordnungen = new PersonWithZuordnungen(person, [zuordnung]);
       personWithKopersZuordnung.personalnummer = null;
-      const { personalnummerAsString }: PersonWithZuordnungen = personWithKopersZuordnung;
+      const personalnummerAsString: string = personWithKopersZuordnung.getPersonalnummerAsString();
       expect(personalnummerAsString).toContain(hasKopersRolle ? 'fehlt' : '---');
     });
   });
