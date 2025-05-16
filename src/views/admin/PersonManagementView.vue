@@ -117,7 +117,7 @@
   const passwordResetDialogVisible: Ref<boolean> = ref(false);
   const organisationUnassignDialogVisible: Ref<boolean> = ref(false);
   const changeKlasseDialogVisible: Ref<boolean> = ref(false);
-  const invalidSelectionAlertDialogVisible: Ref<boolean> = ref(false);
+  const onlyOneOrganisationAlertDialogVisible: Ref<boolean> = ref(false);
   const invalidSelectionAlertMessages: Ref<Array<string>> = ref([]);
 
   const selectedOption: Ref<string | null> = ref(null);
@@ -487,30 +487,6 @@
     getPaginatedPersonen(searchFilterStore.personenPage);
   }
 
-  enum SelectionConstraint {
-    SINGLE_SCHOOL,
-    ONLY_LERN,
-  }
-  const selectionConstraintMessageMapping: Record<SelectionConstraint, string> = {
-    [SelectionConstraint.SINGLE_SCHOOL]: t('admin.person.invalidSelection.onlyOneSchool'),
-    [SelectionConstraint.ONLY_LERN]: t('admin.person.invalidSelection.onlyLern'),
-  };
-  const violatedSelectionConstraints: ComputedRef<Set<SelectionConstraint>> = computed(() => {
-    const newSet: Set<SelectionConstraint> = new Set();
-    if (selectedOrganisationIds.value.length !== 1) {
-      newSet.add(SelectionConstraint.SINGLE_SCHOOL);
-    }
-    for (const personId of selectedPersonIds.value) {
-      const person: PersonWithZuordnungen | undefined = personStore.allUebersichten.get(personId);
-      if (!person) continue;
-      const { rollenArten }: PersonWithZuordnungen = person;
-      if (!(rollenArten.size === 1 && rollenArten.has(RollenArt.Lern))) {
-        newSet.add(SelectionConstraint.ONLY_LERN);
-      }
-    }
-    return newSet;
-  });
-
   const invalidSelectionAlertHeader: ComputedRef<string> = computed(() => {
     return actions.value.find((action: TranslatedObject) => action.value === selectedOption.value)?.title || '';
   });
@@ -519,15 +495,38 @@
     return organisationStore.allOrganisationen.find((org: Organisation) => org.id === selectedOrganisationIds.value[0]);
   });
 
-  const checkInvalidSelectionDisplayDialog = (dialog: Ref<boolean>, options: Array<SelectionConstraint>): void => {
-    invalidSelectionAlertMessages.value = [];
-    for (const option of options) {
-      if (violatedSelectionConstraints.value.has(option)) {
-        invalidSelectionAlertMessages.value.push(selectionConstraintMessageMapping[option]);
+  const onlyLernRollenSelected: ComputedRef<boolean> = computed(() => {
+    for (const personId of selectedPersonIds.value) {
+      const person: PersonWithZuordnungen | undefined = personStore.allUebersichten.get(personId);
+      if (!person) continue;
+      const { rollenArten }: PersonWithZuordnungen = person;
+      if (!(rollenArten.size === 1 && rollenArten.has(RollenArt.Lern))) {
+        return false;
       }
     }
-    if (invalidSelectionAlertMessages.value.length > 0) {
-      invalidSelectionAlertDialogVisible.value = true;
+    return true;
+  });
+
+  const singleSchuleSelected: ComputedRef<boolean> = computed(() => {
+    return selectedOrganisationIds.value.length === 1;
+  });
+
+  const checkSingleOrgDisplayDialog = (dialog: Ref<boolean>): void => {
+    if (!singleSchuleSelected.value) {
+      onlyOneOrganisationAlertDialogVisible.value = true;
+      invalidSelectionAlertMessages.value = [t('admin.person.onlyOneSchuleAlert')];
+      return;
+    }
+    dialog.value = true;
+  };
+
+  const checkSingleOrgAndOnlyLernDisplayDialog = (dialog: Ref<boolean>): void => {
+    const messages: Array<string> = [];
+    if (!singleSchuleSelected.value) messages.push(t('admin.person.onlyOneSchuleAlert'));
+    if (!onlyLernRollenSelected.value) messages.push(t('admin.person.onlyLernRollenAlert'));
+    if (messages.length > 0) {
+      onlyOneOrganisationAlertDialogVisible.value = true;
+      invalidSelectionAlertMessages.value = messages;
       return;
     }
     dialog.value = true;
@@ -545,16 +544,13 @@
         benutzerDeleteDialogVisible.value = true;
         break;
       case OperationType.RESET_PASSWORD:
-        checkInvalidSelectionDisplayDialog(passwordResetDialogVisible, [SelectionConstraint.SINGLE_SCHOOL]);
+        checkSingleOrgDisplayDialog(passwordResetDialogVisible);
         break;
       case OperationType.ORG_UNASSIGN:
-        checkInvalidSelectionDisplayDialog(organisationUnassignDialogVisible, [SelectionConstraint.SINGLE_SCHOOL]);
+        checkSingleOrgDisplayDialog(organisationUnassignDialogVisible);
         break;
       case OperationType.CHANGE_KLASSE:
-        checkInvalidSelectionDisplayDialog(changeKlasseDialogVisible, [
-          SelectionConstraint.SINGLE_SCHOOL,
-          SelectionConstraint.ONLY_LERN,
-        ]);
+        checkSingleOrgAndOnlyLernDisplayDialog(changeKlasseDialogVisible);
         break;
     }
   };
@@ -921,12 +917,12 @@
           </SpshTooltip>
           <InfoDialog
             id="invalid-selection-alert-dialog"
-            :isDialogVisible="invalidSelectionAlertDialogVisible"
+            :isDialogVisible="onlyOneOrganisationAlertDialogVisible"
             :header="invalidSelectionAlertHeader"
             :messages="invalidSelectionAlertMessages"
             @update:dialogExit="
               () => {
-                invalidSelectionAlertDialogVisible = false;
+                onlyOneOrganisationAlertDialogVisible = false;
                 selectedOption = null;
               }
             "
