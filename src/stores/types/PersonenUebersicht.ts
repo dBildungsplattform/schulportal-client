@@ -5,6 +5,9 @@ import type {
 } from '@/api-client/generated';
 import { Zuordnung } from './Zuordnung';
 
+/**
+ * @deprecated Prefer {@link PersonWithZuordnungen}
+ */
 export class PersonenUebersicht {
   public constructor(
     public personId: string,
