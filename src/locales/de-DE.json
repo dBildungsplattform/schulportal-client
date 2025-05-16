@@ -153,16 +153,16 @@
       },
       "unknownOrganisation": "Unbekannte Organisation"
     },
-    "addPerson": {
-      "management":"Person hinzufügen",
-      "searchStateEmployee":"Landesbediensteter (Nur Suche)",
-      "createNew":"Andere Person (Neuanlage)"
-    },
     "person": {
       "addedSuccessfully": "{firstname} {lastname} wurde erfolgreich hinzugefügt.",
       "addNew": "Neuen Benutzer hinzufügen",
       "backToCreatePerson": "Zurück zur Benutzeranlage",
       "backToInput": "Zurück zur Eingabe",
+      "stateEmployeeSearch": {
+        "addPerson":"Person hinzufügen",
+        "search":"Landesbediensteter (Nur Suche)",
+        "anotherPerson":"Andere Person (Neuanlage)"
+      },
       "bulk": {
         "bulkErrorMessage": "Die Aktion {bulkOperationName} konnte für die folgenden Benutzer nicht ausgeführt werden. \n\nSie können sich die Liste für eine spätere Bearbeitung abspeichern. Die Daten stehen nach dem Schließen dieses Dialogs nicht mehr zur Verfügung. Sollten Sie Hilfe benötigen, eröffnen Sie ein Störungsticket über den IQSH-Helpdesk und fügen Sie die Liste als Anhang an.",
         "bulkErrorTitle": "Fehler bei der Mehrfachbearbeitung",

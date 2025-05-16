@@ -160,25 +160,21 @@
       <v-list-item
         class="menu-bar-main-item headline-2"
         data-testid="add-person-title"
-        :title="$t('admin.addPerson.management')"
+        :title="$t('admin.person.stateEmployeeSearch.addPerson')"
       ></v-list-item>
       <v-list-item
         v-if="authStore.hasLandesbediensteteSuchenUndHinzufügenPermission"
         class="menu-bar-sub-item caption"
-        @click="handleMenuItemClick('/start')"
         data-testid="search-person-menu-item"
         prepend-icon="mdi-plus-circle-outline"
-        :title="$t('admin.addPerson.searchStateEmployee')"
-        to="/start"
+        :title="$t('admin.person.stateEmployeeSearch.search')"
       ></v-list-item>
       <v-list-item
         v-if="authStore.hasEingeschränktNeueBenutzerErstellenPermission"
         class="menu-bar-sub-item caption"
-        @click="handleMenuItemClick('/start')"
         data-testid="add-person-menu-item"
         prepend-icon="mdi-plus-circle-outline"
-        :title="$t('admin.addPerson.createNew')"
-        to="/start"
+        :title="$t('admin.person.stateEmployeeSearch.anotherPerson')"
       ></v-list-item>
     </div>
 
