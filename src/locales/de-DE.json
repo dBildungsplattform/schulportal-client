@@ -180,7 +180,7 @@
       "bulkUnassignOrganisation": {
         "cancelZuordnung": "Schulzuordnung aufheben",
         "confirmation": "Möchten Sie wirklich die Schulzuordnungen der ausgewählten Benutzer aufheben?",
-        "affectedSchool": "Betroffene Schule: {schule}",
+        "affectedSchule": "Betroffene Schule: {schule}",
         "success": "Die Schulzuordnungen wurden erfolgreich entfernt."
       },
       "onlyOneSchuleAlert": "Bitte wählen Sie im Filter genau eine Schule aus, um die Aktion durchzuführen.",

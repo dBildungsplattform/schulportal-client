@@ -146,6 +146,8 @@ export const useBulkOperationStore: StoreDefinition<
       const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
 
       await this.processPersonOperation(OperationType.ORG_UNASSIGN, personIDs, async (personId: string) => {
+        personStore.errorCode = '';
+        personenkontextStore.errorCode = '';
         // Fetch the Zuordnungen for this specific user (To send alongside the new one)
         await personStore.getPersonenuebersichtById(personId);
 
@@ -224,6 +226,8 @@ export const useBulkOperationStore: StoreDefinition<
         OperationType.MODIFY_ROLLE,
         personIDs,
         async (personId: string) => {
+          personStore.errorCode = '';
+          personenkontextStore.errorCode = '';
           await personStore.getPersonenuebersichtById(personId);
 
           if (personStore.errorCode) {
@@ -265,6 +269,7 @@ export const useBulkOperationStore: StoreDefinition<
         OperationType.DELETE_PERSON,
         personIDs,
         async (personId: string) => {
+          personStore.errorCode = '';
           await personStore.deletePersonById(personId);
 
           if (personStore.errorCode) {
@@ -283,6 +288,8 @@ export const useBulkOperationStore: StoreDefinition<
         OperationType.ROLLE_UNASSIGN,
         personIDs,
         async (personId: string) => {
+          personStore.errorCode = '';
+          personenkontextStore.errorCode = '';
           await personStore.getPersonenuebersichtById(personId);
 
           if (personStore.errorCode) {
