@@ -23,7 +23,6 @@
     type PersonenWithRolleAndZuordnung,
     type Personendatensatz,
     SortField,
-    SortOrder,
     usePersonStore,
   } from '@/stores/PersonStore';
   import { type PersonenkontextStore, usePersonenkontextStore } from '@/stores/PersonenkontextStore';
@@ -34,6 +33,7 @@
   import { type Composer, useI18n } from 'vue-i18n';
   import { type Router, useRouter } from 'vue-router';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
+  import { SortOrder } from '@/utils/sorting';
 
   const searchFieldComponent: Ref = ref();
 
@@ -192,8 +192,8 @@
         : searchFilterStore.selectedOrganisationen || [],
       rolleIDs: searchFilterStore.selectedRollen || [],
       searchFilter: searchFilterStore.searchFilterPersonen || '',
-      sortField: searchFilterStore.sortField as SortField,
-      sortOrder: searchFilterStore.sortOrder as SortOrder,
+      sortField: searchFilterStore.personenSortField as SortField,
+      sortOrder: searchFilterStore.personenSortOrder as SortOrder,
     });
   }
 
@@ -205,8 +205,8 @@
       organisationIDs: selectedKlassen.value.length ? selectedKlassen.value : selectedOrganisationIds.value,
       rolleIDs: searchFilterStore.selectedRollen || selectedRollen.value,
       searchFilter: searchFilterStore.searchFilterPersonen || searchFilter.value,
-      sortField: searchFilterStore.sortField as SortField,
-      sortOrder: searchFilterStore.sortOrder as SortOrder,
+      sortField: searchFilterStore.personenSortField as SortField,
+      sortOrder: searchFilterStore.personenSortOrder as SortOrder,
     });
 
     await applySearchAndFilters();
@@ -442,18 +442,17 @@
   }): Promise<void> {
     if (update.sortField) {
       sortField.value = mapKeyToBackend(update.sortField);
-
-      await searchFilterStore.setCurrentSortForPersonen({
+      searchFilterStore.currentSort = {
         key: update.sortField,
         order: update.sortOrder,
-      });
+      };
     }
 
     sortOrder.value = update.sortOrder as SortOrder;
 
     // Save the sorting values in the store
-    searchFilterStore.setSortFieldForPersonen(sortField.value);
-    searchFilterStore.setSortOrderForPersonen(sortOrder.value);
+    searchFilterStore.personenSortField = sortField.value;
+    searchFilterStore.personenSortOrder = sortOrder.value;
 
     // Fetch the sorted data
     getPaginatedPersonen(searchFilterStore.personenPage);
