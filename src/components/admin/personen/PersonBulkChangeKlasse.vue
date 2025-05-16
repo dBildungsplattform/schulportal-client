@@ -172,7 +172,7 @@
 
     <v-card-actions class="justify-center">
       <v-row class="py-3 px-2 justify-center">
-        <v-spacer />
+        <v-spacer v-if="state === State.INITIAL" />
         <v-col
           cols="12"
           sm="6"
@@ -187,7 +187,7 @@
           >
           <v-btn
             v-else-if="state === State.FINISHED"
-            class="secondary"
+            class="primary"
             @click="handleCloseDialog"
             data-testid="bulk-change-klasse-close-button"
           >
