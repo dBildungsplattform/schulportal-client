@@ -1,39 +1,35 @@
 import {
+  OrganisationsTyp,
+  RollenMerkmal,
+  RollenSystemRecht,
   type DBiamPersonenkontextResponse,
   type FindRollenResponse,
   type SystemrechtResponse,
-  OrganisationsTyp,
-  RollenArt,
-  RollenMerkmal,
-  RollenSystemRecht,
 } from '@/api-client/generated';
 import ApiService from '@/services/ApiService';
-import MockAdapter from 'axios-mock-adapter';
-import { setActivePinia, createPinia } from 'pinia';
 import { rejects } from 'assert';
+import MockAdapter from 'axios-mock-adapter';
+import { createPinia, setActivePinia } from 'pinia';
 import {
   usePersonenkontextStore,
   type PersonenkontexteUpdateResponse,
   type PersonenkontextStore,
   type PersonenkontextWorkflowResponse,
-  type Zuordnung,
+  type PersonenkontextUpdate,
 } from './PersonenkontextStore';
-import { usePersonStore, type PersonendatensatzResponse, type PersonStore } from './PersonStore';
+import { type PersonendatensatzResponse } from './PersonStore';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 
 describe('PersonenkontextStore', () => {
-  let personStore: PersonStore;
   let personenkontextStore: PersonenkontextStore;
   beforeEach(() => {
     setActivePinia(createPinia());
-    personStore = usePersonStore();
     personenkontextStore = usePersonenkontextStore();
     mockadapter.reset();
   });
 
   it('should initalize state correctly', () => {
-    expect(personStore.personenWithUebersicht).toEqual(null);
     expect(personenkontextStore.errorCode).toEqual('');
     expect(personenkontextStore.loading).toBe(false);
   });
@@ -199,6 +195,13 @@ describe('PersonenkontextStore', () => {
   });
 
   describe('updatePersonenkontexte', () => {
+    const mockZuordnungUpdates: PersonenkontextUpdate[] = [
+      {
+        organisationId: '67890',
+        rolleId: '54321',
+      },
+    ];
+
     it('should update Personenkontexte', async () => {
       const mockResponse: PersonenkontexteUpdateResponse = {
         dBiamPersonenkontextResponses: [
@@ -210,25 +213,10 @@ describe('PersonenkontextStore', () => {
         ],
       };
 
-      const mockZuordnungen: Zuordnung[] = [
-        {
-          sskId: '67890',
-          rolleId: '54321',
-          sskName: 'some ssk name',
-          sskDstNr: '123',
-          rolle: 'some role',
-          rollenArt: RollenArt.Lern,
-          administriertVon: 'some admin',
-          typ: OrganisationsTyp.Schule,
-          editable: true,
-          merkmale: [] as unknown as RollenMerkmal,
-        },
-      ];
-
       mockadapter.onPut('/api/personenkontext-workflow/1').replyOnce(200, mockResponse);
 
       const updatePersonenkontextePromise: Promise<void> = personenkontextStore.updatePersonenkontexte(
-        mockZuordnungen,
+        mockZuordnungUpdates,
         '1',
       );
       expect(personenkontextStore.loading).toBe(true);
@@ -238,24 +226,9 @@ describe('PersonenkontextStore', () => {
     });
 
     it('should handle string error', async () => {
-      const mockZuordnungen: Zuordnung[] = [
-        {
-          sskId: '67890',
-          rolleId: '54321',
-          sskName: 'some ssk name',
-          sskDstNr: '123',
-          rolle: 'some role',
-          rollenArt: RollenArt.Lern,
-          administriertVon: 'some admin',
-          typ: OrganisationsTyp.Schule,
-          editable: true,
-          merkmale: [] as unknown as RollenMerkmal,
-        },
-      ];
-
       mockadapter.onPut('/api/personenkontext-workflow/1').replyOnce(500, 'some error');
       const updatePersonenkontextePromise: Promise<void> = personenkontextStore.updatePersonenkontexte(
-        mockZuordnungen,
+        mockZuordnungUpdates,
         '1',
       );
       expect(personenkontextStore.loading).toBe(true);
@@ -265,24 +238,9 @@ describe('PersonenkontextStore', () => {
     });
 
     it('should handle error code', async () => {
-      const mockZuordnungen: Zuordnung[] = [
-        {
-          sskId: '67890',
-          rolleId: '54321',
-          sskName: 'some ssk name',
-          sskDstNr: '123',
-          rolle: 'some role',
-          rollenArt: RollenArt.Lern,
-          administriertVon: 'some admin',
-          typ: OrganisationsTyp.Schule,
-          editable: true,
-          merkmale: [] as unknown as RollenMerkmal,
-        },
-      ];
-
       mockadapter.onPut('/api/personenkontext-workflow/1').replyOnce(500, { i18nKey: 'SOME_MOCK_SERVER_ERROR' });
       const updatePersonenkontextePromise: Promise<void> = personenkontextStore.updatePersonenkontexte(
-        mockZuordnungen,
+        mockZuordnungUpdates,
         '1',
       );
       expect(personenkontextStore.loading).toBe(true);

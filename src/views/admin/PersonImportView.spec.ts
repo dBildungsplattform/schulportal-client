@@ -9,10 +9,10 @@ import {
   type RolleStore,
   type RolleWithServiceProvidersResponse,
 } from '@/stores/RolleStore';
-import { DoFactory } from '@/testing/DoFactory';
 import { getDisplayNameForOrg } from '@/utils/formatting';
 import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
+import { DoFactory } from 'test/DoFactory';
 import { expect, test, type Mock, type MockInstance } from 'vitest';
 import { nextTick } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';

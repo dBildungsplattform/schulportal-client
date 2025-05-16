@@ -4,24 +4,18 @@ import routes from '@/router/routes';
 import { useAuthStore, type AuthStore, type PersonenkontextRolleFields, type UserInfo } from '@/stores/AuthStore';
 import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
-import {
-  parseUserLock,
-  PersonLockOccasion,
-  usePersonStore,
-  type Personendatensatz,
-  type PersonStore,
-  type PersonWithUebersicht,
-  type UserLock,
-} from '@/stores/PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
+import { usePersonStore, type Personendatensatz, type PersonStore } from '@/stores/PersonStore';
 import { RollenArt, RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
 import {
   useTwoFactorAuthentificationStore,
   type TwoFactorAuthentificationStore,
 } from '@/stores/TwoFactorAuthentificationStore';
-import { DoFactory } from '@/testing/DoFactory';
+import { PersonenUebersicht } from '@/stores/types/PersonenUebersicht';
 import { adjustDateForTimezoneAndFormat } from '@/utils/date';
+import { parseUserLock, PersonLockOccasion, type UserLock } from '@/utils/lock';
 import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
+import { DoFactory } from 'test/DoFactory';
 import { expect, test, type MockInstance } from 'vitest';
 import { nextTick, type ComputedRef, type DefineComponent } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
@@ -38,23 +32,7 @@ const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
 const twoFactorAuthenticationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
 
 const mockPerson: Personendatensatz = {
-  person: {
-    id: '1',
-    name: {
-      familienname: 'Orton',
-      vorname: 'John',
-    },
-    referrer: 'jorton',
-    personalnummer: '263578',
-    isLocked: false,
-    userLock: null,
-    revision: '1',
-    lastModified: '2024-05-22T08:20:33.758Z',
-    email: {
-      address: 'email@email.com',
-      status: EmailAddressStatus.Enabled,
-    },
-  },
+  person: DoFactory.getPerson(),
 };
 
 const mockCurrentUser: UserInfo = {
@@ -89,14 +67,17 @@ const mockCurrentUser: UserInfo = {
   password_updated_at: null,
 };
 const befristung: string = '2099-08-12T13:03:53.802Z';
-const mockPersonenuebersicht: PersonWithUebersicht = {
-  personId: '1',
-  vorname: 'John',
-  nachname: 'Orton',
-  benutzername: 'jorton',
-  lastModifiedZuordnungen: Date.now().toLocaleString(),
-  zuordnungen: [
-    {
+const mockPersonenuebersicht: PersonenUebersicht = DoFactory.getPersonenUebersicht(
+  DoFactory.getPerson({
+    id: '1',
+    name: {
+      vorname: 'John',
+      familienname: 'Orton',
+    },
+    referrer: 'jorton',
+  }),
+  [
+    DoFactory.getZuordnung({
       sskId: '1',
       rolleId: '1',
       sskName: 'Testschule Birmingham',
@@ -106,11 +87,10 @@ const mockPersonenuebersicht: PersonWithUebersicht = {
       typ: OrganisationsTyp.Schule,
       administriertVon: '2',
       editable: true,
-      merkmale: [] as unknown as RollenMerkmal,
-      befristung: befristung,
+      befristung,
       admins: ['test'],
-    },
-    {
+    }),
+    DoFactory.getZuordnung({
       sskId: '3',
       rolleId: '4',
       sskName: 'Testschule London',
@@ -120,11 +100,10 @@ const mockPersonenuebersicht: PersonWithUebersicht = {
       typ: OrganisationsTyp.Schule,
       administriertVon: '2',
       editable: true,
-      merkmale: [] as unknown as RollenMerkmal,
-      befristung: '',
+      befristung: null,
       admins: ['test'],
-    },
-    {
+    }),
+    DoFactory.getZuordnung({
       sskId: '2',
       rolleId: '1',
       sskName: '9a',
@@ -134,21 +113,15 @@ const mockPersonenuebersicht: PersonWithUebersicht = {
       typ: OrganisationsTyp.Klasse,
       administriertVon: '1',
       editable: true,
-      merkmale: [] as unknown as RollenMerkmal,
-      befristung: '',
+      befristung: null,
       admins: ['test'],
-    },
+    }),
   ],
-};
+);
 
-const mockPersonenuebersichtLehr: PersonWithUebersicht = {
-  personId: '22',
-  vorname: 'Randy',
-  nachname: 'Cena',
-  benutzername: 'rcena',
-  lastModifiedZuordnungen: Date.now().toLocaleString(),
-  zuordnungen: [
-    {
+const getMockPersonenuebersichtLehr = (): PersonenUebersicht => {
+  return new PersonenUebersicht('22', 'Randy', 'Cena', 'rcena', Date.now().toLocaleString(), [
+    DoFactory.getZuordnung({
       sskId: '1',
       rolleId: '1',
       sskName: 'Testschule Birmingham',
@@ -158,12 +131,14 @@ const mockPersonenuebersichtLehr: PersonWithUebersicht = {
       typ: OrganisationsTyp.Schule,
       administriertVon: '2',
       editable: true,
-      merkmale: [] as unknown as RollenMerkmal,
-      befristung: befristung,
+      merkmale: [],
+      befristung,
       admins: [],
-    },
-  ],
+    }),
+  ]);
 };
+
+const mockPersonenuebersichtLehr: PersonenUebersicht = getMockPersonenuebersichtLehr();
 
 describe('PersonDetailsView', () => {
   beforeEach(async () => {
@@ -267,7 +242,7 @@ describe('PersonDetailsView', () => {
 
     authStore.currentUser = { ...mockCurrentUser };
     personStore.currentPerson = { ...mockPerson };
-    personStore.personenuebersicht = { ...mockPersonenuebersicht };
+    personStore.personenuebersicht = mockPersonenuebersicht;
 
     configStore.configData = {
       befristungBearbeitenEnabled: true,
@@ -310,7 +285,7 @@ describe('PersonDetailsView', () => {
         referrer: '6978',
         personalnummer: '9183756',
         isLocked: false,
-        userLock: null,
+        userLock: [],
         revision: '1',
         lastModified: '2024-12-22T13:03:53.802Z',
         email: {
@@ -324,10 +299,10 @@ describe('PersonDetailsView', () => {
   test('it renders the person details page and shows person data', async () => {
     expect(wrapper).toBeTruthy();
     expect(wrapper?.find('[data-testid="person-details-card"]').isVisible()).toBe(true);
-    expect(wrapper?.find('[data-testid="person-vorname"]').text()).toBe('John');
-    expect(wrapper?.find('[data-testid="person-familienname"]').text()).toBe('Orton');
-    expect(wrapper?.find('[data-testid="person-username"]').text()).toBe('jorton');
-    expect(wrapper?.find('[data-testid="person-email"]').text()).toBe('email@email.com');
+    expect(wrapper?.find('[data-testid="person-vorname"]').text()).toBe(mockPerson.person.name.vorname);
+    expect(wrapper?.find('[data-testid="person-familienname"]').text()).toBe(mockPerson.person.name.familienname);
+    expect(wrapper?.find('[data-testid="person-username"]').text()).toBe(mockPerson.person.referrer);
+    expect(wrapper?.find('[data-testid="person-email"]').text()).toBe(mockPerson.person.email?.address);
     expect(wrapper?.find('[data-testid="person-zuordnung-1"]').text()).toBe(
       `123456 (Testschule Birmingham): SuS 9a  (befristet bis ${adjustDateForTimezoneAndFormat(befristung)})`,
     );
@@ -740,14 +715,7 @@ describe('PersonDetailsView', () => {
     personenkontextStore.updatePersonenkontexte = vi.fn().mockResolvedValue(undefined);
 
     // No existing Zuordnungen for the user for easier testing
-    const mockPersonenuebersichtForAddZuordnung: PersonWithUebersicht = {
-      personId: '1',
-      vorname: 'John',
-      nachname: 'Orton',
-      benutzername: 'jorton',
-      lastModifiedZuordnungen: Date.now().toLocaleString(),
-      zuordnungen: [],
-    };
+    const mockPersonenuebersichtForAddZuordnung: PersonenUebersicht = DoFactory.getPersonenUebersicht(undefined, []);
     personStore.personenuebersicht = mockPersonenuebersichtForAddZuordnung;
 
     wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
@@ -770,7 +738,7 @@ describe('PersonDetailsView', () => {
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'rolle-select' });
     await rolleAutocomplete?.setValue('54321');
-    await rolleAutocomplete?.vm.$emit('update:search', '54321');
+    rolleAutocomplete?.vm.$emit('update:search', '54321');
     await nextTick();
     // Set klasse value
     const klasseAutocomplete: VueWrapper | undefined = wrapper
@@ -951,7 +919,7 @@ describe('PersonDetailsView', () => {
   test('it submits the form to lock the user', async () => {
     if (personStore.currentPerson) {
       personStore.currentPerson.person.isLocked = false;
-      personStore.currentPerson.person.userLock = null;
+      personStore.currentPerson.person.userLock = [];
     }
     const openLockDialogButton: DOMWrapper<Element> | undefined = wrapper?.find(
       '[data-testid="open-lock-dialog-button"]',
@@ -980,7 +948,7 @@ describe('PersonDetailsView', () => {
 
     expect(personStore.lockPerson).toHaveBeenCalled();
     // reset personenuebersicht
-    personStore.personenuebersicht = { ...mockPersonenuebersicht };
+    personStore.personenuebersicht = mockPersonenuebersicht;
   });
 
   describe('change befristung', () => {
@@ -1057,13 +1025,13 @@ describe('PersonDetailsView', () => {
         personenkontextStore.processWorkflowStep = vi.fn().mockResolvedValue(undefined);
         personenkontextStore.updatePersonenkontexte = vi.fn().mockResolvedValue(undefined);
 
-        personStore.personenuebersicht = mockPersonenuebersichtLehr;
+        personStore.personenuebersicht = getMockPersonenuebersichtLehr();
         if (personStore.personenuebersicht.zuordnungen[0]) {
           if (existingBefristung) {
             personStore.personenuebersicht.zuordnungen[0].befristung = existingBefristung;
           } else if (existingBefristungOption) {
             personStore.personenuebersicht.zuordnungen[0].befristung =
-              existingBefristungOption === 'schuljahresende' ? getNextSchuljahresende() : '';
+              existingBefristungOption === 'schuljahresende' ? getNextSchuljahresende() : null;
           }
         }
 
@@ -1121,26 +1089,24 @@ describe('PersonDetailsView', () => {
           () => document.body.querySelector('[data-testid="confirm-change-befristung-button"]') != null,
         );
 
-        const confirmDialogButton: Element | null = document.body.querySelector(
+        const confirmDialogButton: Element = document.body.querySelector(
           '[data-testid="confirm-change-befristung-button"]',
-        );
+        )!;
         expect(confirmDialogButton).not.toBeNull();
-
-        if (confirmDialogButton) {
-          confirmDialogButton.dispatchEvent(new Event('click'));
-        }
+        confirmDialogButton.dispatchEvent(new Event('click'));
         await flushPromises();
 
-        const saveButton: Element | null = document.body.querySelector('[data-testid="zuordnung-changes-save"]');
+        const saveButton: Element = document.body.querySelector('[data-testid="zuordnung-changes-save"]')!;
         expect(saveButton).not.toBeNull();
-
-        if (saveButton) {
-          saveButton.dispatchEvent(new Event('click'));
-        }
+        saveButton.dispatchEvent(new Event('click'));
         await flushPromises();
 
         const closeSuccessButton: Element | null = document.body.querySelector(
           '[data-testid="change-befristung-success-close"]',
+        );
+        // wait for vuetify animation to complete
+        await vi.waitUntil(
+          () => document.body.querySelector('[data-testid="change-befristung-success-close"]') != null,
         );
         expect(closeSuccessButton).not.toBeNull();
 

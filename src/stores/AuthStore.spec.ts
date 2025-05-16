@@ -1,9 +1,9 @@
 import type { UserinfoResponse } from '@/api-client/generated';
-import { useAuthStore, type AuthStore } from './AuthStore';
 import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
-import { setActivePinia, createPinia } from 'pinia';
-import { DoFactory } from '@/testing/DoFactory';
+import { createPinia, setActivePinia } from 'pinia';
+import { DoFactory } from 'test/DoFactory';
+import { useAuthStore, type AuthStore } from './AuthStore';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 

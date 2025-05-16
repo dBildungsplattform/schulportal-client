@@ -1,12 +1,14 @@
-import { expect, test } from 'vitest';
-import { VueWrapper, mount } from '@vue/test-utils';
-import PersonenkontextCreate from './PersonenkontextCreate.vue';
-import { nextTick } from 'vue';
 import { RollenArt, RollenMerkmal, RollenSystemRecht } from '@/api-client/generated';
-import { type PersonenkontextStore, usePersonenkontextStore } from '@/stores/PersonenkontextStore';
-import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
+import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
+import { PersonenUebersicht } from '@/stores/types/PersonenUebersicht';
+import { VueWrapper, mount } from '@vue/test-utils';
+import { DoFactory } from 'test/DoFactory';
+import { expect, test } from 'vitest';
+import { nextTick } from 'vue';
 import type { BefristungProps } from './BefristungInput.vue';
-import { usePersonStore, type PersonStore, type PersonWithUebersicht } from '@/stores/PersonStore';
+import PersonenkontextCreate from './PersonenkontextCreate.vue';
 
 let wrapper: VueWrapper | null = null;
 let personenkontextStore: PersonenkontextStore;
@@ -153,70 +155,17 @@ beforeEach(() => {
     canCommit: true,
   };
 
-  const mockPersonenuebersicht: PersonWithUebersicht = {
-    personId: '1',
-    vorname: 'John',
-    nachname: 'Orton',
-    benutzername: 'jorton',
-    lastModifiedZuordnungen: Date.now().toLocaleString(),
-    zuordnungen: [
-      {
-        sskId: '1',
-        rolleId: '1',
-        sskName: 'Testschule Birmingham',
-        sskDstNr: '123456',
-        rolle: 'SuS',
-        rollenArt: RollenArt.Lern,
-        typ: OrganisationsTyp.Schule,
-        administriertVon: '2',
-        editable: true,
-        merkmale: [] as unknown as RollenMerkmal,
-        befristung: '',
-        admins: ['test'],
-      },
-      {
-        sskId: '3',
-        rolleId: '4',
-        sskName: 'Testschule London',
-        sskDstNr: '123459',
-        rolle: 'SuS',
-        rollenArt: RollenArt.Lern,
-        typ: OrganisationsTyp.Schule,
-        administriertVon: '2',
-        editable: true,
-        merkmale: [] as unknown as RollenMerkmal,
-        befristung: '',
-        admins: ['test'],
-      },
-      {
-        sskId: '2',
-        rolleId: '1',
-        sskName: '9a',
-        sskDstNr: '123459',
-        rolle: 'SuS',
-        rollenArt: RollenArt.Lern,
-        typ: OrganisationsTyp.Klasse,
-        administriertVon: '01',
-        editable: true,
-        merkmale: [] as unknown as RollenMerkmal,
-        befristung: '',
-        admins: ['test'],
-      },
-    ],
-  };
+  const mockPersonenuebersicht: PersonenUebersicht = new PersonenUebersicht(
+    '1',
+    'John',
+    'Orton',
+    'jorton',
+    Date.now().toLocaleString(),
+    [DoFactory.getZuordnung(), DoFactory.getZuordnung(), DoFactory.getZuordnung()],
+  );
 
   personStore.personenuebersicht = mockPersonenuebersicht;
-  organisationStore.klassen = [
-    {
-      id: '2',
-      name: '11b',
-      kennung: '9356494-11b',
-      namensergaenzung: 'Klasse',
-      kuerzel: '11b',
-      typ: OrganisationsTyp.Klasse,
-      administriertVon: '1',
-    },
-  ];
+  organisationStore.klassen = [DoFactory.getKlasse()];
 });
 
 describe('PersonenkontextCreate', () => {
@@ -226,7 +175,7 @@ describe('PersonenkontextCreate', () => {
 
   test('it updates search and sets values selected rolle, organisation and klasse', async () => {
     const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
-    await organisationAutocomplete?.vm.$emit('update:search', '01');
+    organisationAutocomplete?.vm.$emit('update:search', '01');
     await organisationAutocomplete?.setValue('O1');
     await nextTick();
 

@@ -1,30 +1,33 @@
 <script setup lang="ts">
-  import { RollenArt, RollenMerkmal, type DBiamPersonenzuordnungResponse } from '@/api-client/generated/api';
+  import { RollenArt, RollenMerkmal } from '@/api-client/generated/api';
+  import PasswordReset from '@/components/admin/personen/PasswordReset.vue';
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import PasswordReset from '@/components/admin/personen/PasswordReset.vue';
   import SelfServiceWorkflow from '@/components/two-factor-authentication/SelfServiceWorkflow.vue';
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import { OrganisationsTyp } from '@/stores/OrganisationStore';
   import { usePersonInfoStore, type PersonInfoStore } from '@/stores/PersonInfoStore';
   import { EmailStatus, usePersonStore, type PersonStore } from '@/stores/PersonStore';
-  import { type Zuordnung } from '@/stores/PersonenkontextStore';
   import {
     TokenKind,
     useTwoFactorAuthentificationStore,
     type TwoFactorAuthentificationStore,
   } from '@/stores/TwoFactorAuthentificationStore';
+  import { Zuordnung } from '@/stores/types/Zuordnung';
+  import { adjustDateForTimezoneAndFormat } from '@/utils/date';
   import { computed, onBeforeMount, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
   import { useDisplay } from 'vuetify';
-  import { adjustDateForTimezoneAndFormat } from '@/utils/date';
 
   const { t }: { t: Function } = useI18n();
 
   enum ItemType {
     KO_PERS = 'KO_PERS',
   }
+  type ComposedZuordnung = Zuordnung & {
+    klasse?: string | null;
+  };
   type LabelValue = {
     label: string;
     labelAbbr?: string;
@@ -91,15 +94,17 @@
    *                             jeder Wert ein Array von Zuordnungen mit diesem Schlüssel.
    * @returns Ein Array von zusammengesetzten Zuordnungen.
    */
-  function createComposedZuordnungen(groupedZuordnungen: Map<string, Zuordnung[]>): Zuordnung[] {
-    const composedZuordnungen: Zuordnung[] = [];
+  function createComposedZuordnungen(groupedZuordnungen: Map<string, Zuordnung[]>): ComposedZuordnung[] {
+    const composedZuordnungen: ComposedZuordnung[] = [];
     for (const [, zuordnungen] of groupedZuordnungen) {
       if (zuordnungen.length === 0 || zuordnungen[0] === undefined) continue;
       if (zuordnungen.length > 1) {
         const aggregatedRoles: string[] = zuordnungen.map((z: Zuordnung) => z.rolle);
         const uniqueRoles: string[] = [...new Set(aggregatedRoles)];
         const composedRoles: string = uniqueRoles.join(', ');
-        const befristungen: (string | undefined)[] = zuordnungen.map((z: Zuordnung) => z.befristung);
+        const befristung: Zuordnung['befristung'] | undefined = zuordnungen.find(
+          (z: Zuordnung) => z.befristung,
+        )?.befristung;
         const klasse: string | null =
           zuordnungen
             .filter((z: Zuordnung) => z.typ === OrganisationsTyp.Klasse)
@@ -107,10 +112,11 @@
             .join(', ') || null;
         const schule: string | null =
           zuordnungen.find((z: Zuordnung) => z.typ === OrganisationsTyp.Schule)?.sskName || null;
-        const composedZuordnung: Zuordnung = { ...zuordnungen[0], rolle: composedRoles };
+        const composedZuordnung: ComposedZuordnung = Zuordnung.from(zuordnungen[0]);
+        composedZuordnung.rolle = composedRoles;
         if (schule) composedZuordnung.sskName = schule;
         if (klasse) composedZuordnung.klasse = klasse;
-        composedZuordnung.befristung = [...new Set(befristungen)].at(0);
+        composedZuordnung.befristung = befristung ?? null;
         composedZuordnungen.push(composedZuordnung);
       } else {
         composedZuordnungen.push(zuordnungen[0]);
@@ -119,7 +125,7 @@
     return composedZuordnungen;
   }
 
-  function createZuordnungsSchuleDaten(zuordnungen: Zuordnung[]): SchulDaten[] {
+  function createZuordnungsSchuleDaten(zuordnungen: ComposedZuordnung[]): SchulDaten[] {
     const result: SchulDaten[] = [];
     for (const [index, zuordnung] of zuordnungen.entries()) {
       const tempSchulDaten: SchulDaten = {
@@ -178,11 +184,7 @@
   }
 
   const hasKoPersMerkmal: ComputedRef<boolean> = computed(() => {
-    return (
-      personStore.personenuebersicht?.zuordnungen.find((zuordnung: DBiamPersonenzuordnungResponse) => {
-        return zuordnung.merkmale.includes(RollenMerkmal.KopersPflicht);
-      }) !== undefined
-    );
+    return personStore.personenuebersicht?.hasRollenMerkmale([RollenMerkmal.KopersPflicht]) || false;
   });
 
   // Used to show device password block
@@ -292,7 +294,7 @@
       ),
     );
 
-    const composedZuordnungen: Zuordnung[] = createComposedZuordnungen(groupedZuordnungen);
+    const composedZuordnungen: ComposedZuordnung[] = createComposedZuordnungen(groupedZuordnungen);
     return createZuordnungsSchuleDaten(composedZuordnungen);
   });
 

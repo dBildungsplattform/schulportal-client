@@ -1,18 +1,19 @@
 <script setup lang="ts">
-  import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
-  import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import type { Organisation } from '@/stores/OrganisationStore';
+  import { type Personendatensatz } from '@/stores/PersonStore';
+  import type { TranslatedObject } from '@/types';
+  import { formatDateToISO, isValidDate, notInPast } from '@/utils/date';
+  import { PersonLockOccasion, type UserLock } from '@/utils/lock';
   import { DDMMYYYY } from '@/utils/validation';
   import { toTypedSchema } from '@vee-validate/yup';
-  import { object, string, StringSchema, type AnyObject } from 'yup';
-  import PersonLockInput from './PersonLockInput.vue';
-  import { formatDateToISO, isValidDate, notInPast } from '@/utils/date';
-  import { PersonLockOccasion, type Personendatensatz, type UserLock } from '@/stores/PersonStore';
-  import type { TranslatedObject } from '@/types';
+  import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
   import { computed, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
-  import type { Organisation } from '@/stores/OrganisationStore';
+  import { object, string, StringSchema, type AnyObject } from 'yup';
+  import PersonLockInput from './PersonLockInput.vue';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
@@ -83,7 +84,7 @@
   const selectedOrganisation: Ref<string | null> = ref(null);
   const errorMessage: ComputedRef<string> = computed(() => {
     if (!props.errorCode) return '';
-    return !props.person.person.userLock?.some(
+    return !props.person.person.userLock.some(
       (lock: UserLock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT,
     )
       ? t('person.lockError')
@@ -101,10 +102,8 @@
   });
 
   const isManuallyLocked: ComputedRef<boolean> = computed<boolean>(() => {
-    return (
-      props.person.person.userLock?.some(
-        (lock: UserLock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT,
-      ) ?? false // Default to false if userLock is undefined;
+    return props.person.person.userLock.some(
+      (lock: UserLock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT,
     );
   });
 
@@ -122,7 +121,7 @@
   async function handleOnLockUser(): Promise<void> {
     // Find the "MANUELL_GESPERRT" lock if it exists
     const manualLock: UserLock | null =
-      props.person.person.userLock?.find(
+      props.person.person.userLock.find(
         (lock: UserLock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT,
       ) ?? null;
 
@@ -175,7 +174,7 @@
     }
 
     const manualLock: UserLock | null =
-      props.person.person.userLock?.find(
+      props.person.person.userLock.find(
         (lock: UserLock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT,
       ) ?? null;
 

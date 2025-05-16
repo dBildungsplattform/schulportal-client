@@ -175,9 +175,9 @@
           "info": "Bitte laden Sie die Datei mit den temporären Passwörtern herunter und teilen Sie den Benutzern die Passwörter mit. Nach dem Schließen des Dialogs ist ein Herunterladen aus Sicherheitsgründen nicht mehr möglich.",
           "success": "Die Passwörter wurden erfolgreich zurückgesetzt."
         },
-      "closeList": "Liste schließen",
-      "saveList": "Liste speichern",
-      "closeBulkErrorDialogConfirmationMessage" :"Bevor Sie den Dialog schließen, stellen Sie bitte sicher, dass Sie die Liste der Fehlermeldungen gespeichert haben. Die Daten stehen nach dem Schließen dieses Dialogs nicht mehr zur Verfügung."
+        "closeList": "Liste schließen",
+        "saveList": "Liste speichern",
+        "closeBulkErrorDialogConfirmationMessage": "Bevor Sie den Dialog schließen, stellen Sie bitte sicher, dass Sie die Liste der Fehlermeldungen gespeichert haben. Die Daten stehen nach dem Schließen dieses Dialogs nicht mehr zur Verfügung."
       },
       "bulkRolleModify": {
         "noKopersNrInfoText": "Bitte beachten: Alle ausgewählten Benutzerkonten müssen über eine KoPers.-Nr. verfügen. Tragen Sie diese ggf. bitte in der Gesamtübersicht des Benutzers nach, sobald sie Ihnen vorliegt. Ein Benutzerkonto mit der gewählten Rolle ohne KoPers.-Nr. wird nach spätestens 8 Wochen automatisch gesperrt."
@@ -188,7 +188,14 @@
         "affectedSchool": "Betroffene Schule: {schule}",
         "success": "Die Schulzuordnungen wurden erfolgreich entfernt."
       },
-      "onlyOneSchoolAlert": "Bitte wählen Sie im Filter genau eine Schule aus, um die Aktion durchzuführen.",
+      "bulkChangeKlasse": {
+        "transfer": "Versetzen",
+        "nextKlasse": "Neue Klasse",
+        "success": "Die ausgewählten Schülerinnen und Schüler wurden erfolgreich versetzt.",
+        "error": {
+          "onlySus": "Bitte wählen Sie nur Benutzer mit einer Schülerrolle aus, um die Aktion durchzuführen"
+        }
+      },
       "changePassword": "Passwort ändern",
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
       "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",
@@ -239,6 +246,8 @@
       "management": "Benutzerverwaltung",
       "noKopersNr": "KoPers.-Nr. nicht vorhanden",
       "noKopersNrConfirmationDialogMessage": "Bitte beachten Sie, dass ein Benutzerkonto ohne KoPers.-Nr. nach 8 Wochen automatisch gesperrt wird. Tragen Sie daher die KoPers.-Nr. bitte in der Gesamtübersicht des Benutzers nach, sobald diese Ihnen vorliegt.",
+      "onlyOneSchuleAlert": "Bitte wählen Sie im Filter genau eine Schule aus, um die Aktion durchzuführen.",
+      "onlyLernRollenAlert": "Bitte wählen Sie nur Benutzer mit einer Schülerrolle aus, um die Aktion durchzuführen",
       "personalInfo": "Persönliche Informationen",
       "personalInfoChangeNotice": "Namensänderungen haben unmittelbare Auswirkungen auf den Benutzernamen im Schulportal SH und auf die E-Mail-Adresse! \n\nWeitere Informationen finden Sie auf der Homepage der IQSH-Medienberatung.",
       "personalInfoChangeNotice2": "Weitere Informationen finden Sie auf der ",

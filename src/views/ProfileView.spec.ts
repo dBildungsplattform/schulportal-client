@@ -1,19 +1,22 @@
+import { EmailAddressStatus, RollenArt } from '@/api-client/generated';
 import { useAuthStore, type AuthStore, type UserInfo } from '@/stores/AuthStore';
-import { OrganisationsTyp } from '@/stores/OrganisationStore';
+import { OrganisationsTyp, type Organisation } from '@/stores/OrganisationStore';
 import { usePersonInfoStore, type PersonInfoResponse, type PersonInfoStore } from '@/stores/PersonInfoStore';
-import { usePersonStore, type PersonStore, type PersonWithUebersicht } from '@/stores/PersonStore';
-import type { RollenMerkmal } from '@/stores/RolleStore';
+import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
+import { RollenMerkmal } from '@/stores/RolleStore';
 import {
   useTwoFactorAuthentificationStore,
   type TwoFactorAuthentificationStore,
 } from '@/stores/TwoFactorAuthentificationStore';
+import { PersonenUebersicht } from '@/stores/types/PersonenUebersicht';
+import type { Zuordnung } from '@/stores/types/Zuordnung';
+import { faker } from '@faker-js/faker';
 import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
+import { DoFactory } from 'test/DoFactory';
 import { beforeEach, describe, expect, test, type MockInstance } from 'vitest';
 import { nextTick } from 'vue';
 import { createMemoryHistory, createRouter, useRoute, type Router } from 'vue-router';
 import ProfileView from './ProfileView.vue';
-import type { Zuordnung } from '@/stores/PersonenkontextStore';
-import { EmailAddressStatus, RollenArt } from '@/api-client/generated';
 
 let wrapper: VueWrapper | null = null;
 let personInfoStore: PersonInfoStore;
@@ -22,7 +25,7 @@ let authStore: AuthStore;
 let twoFactorAuthenticationStore: TwoFactorAuthentificationStore;
 let router: Router;
 
-const mockLehrer: PersonInfoResponse = {
+const mockPersonInfoResponse: PersonInfoResponse = {
   person: {
     id: '1234',
     name: {
@@ -88,7 +91,7 @@ const mockSchueler: PersonInfoResponse = {
 
 const passwordUpdatedAt: Date = new Date(2024, 9, 9);
 const mockCurrentUser: UserInfo = {
-  sub: mockLehrer.person.id,
+  sub: mockPersonInfoResponse.person.id,
   name: null,
   given_name: null,
   family_name: null,
@@ -111,14 +114,14 @@ const mockCurrentUser: UserInfo = {
   password_updated_at: passwordUpdatedAt.toISOString(),
 };
 
-const mockLehrerUebersicht: PersonWithUebersicht = {
-  personId: '1234',
-  vorname: 'Samuel',
-  nachname: 'Vimes',
-  benutzername: 'samuelvimes',
-  lastModifiedZuordnungen: '2021-09-01T12:00:00Z',
-  zuordnungen: [
-    {
+const mockLehrerUebersicht: PersonenUebersicht = new PersonenUebersicht(
+  mockPersonInfoResponse.person.id,
+  mockPersonInfoResponse.person.name.vorname,
+  mockPersonInfoResponse.person.name.familiennamen,
+  mockPersonInfoResponse.person.referrer!,
+  '2021-09-01T12:00:00Z',
+  [
+    DoFactory.getZuordnung({
       sskId: '1',
       rolleId: '1',
       sskName: 'Muster-Schule',
@@ -128,98 +131,69 @@ const mockLehrerUebersicht: PersonWithUebersicht = {
       administriertVon: 'root-sh',
       typ: OrganisationsTyp.Schule,
       editable: true,
-      merkmale: ['KOPERS_PFLICHT'] as unknown as RollenMerkmal,
-      befristung: '2024-05-06',
+      merkmale: [RollenMerkmal.KopersPflicht],
+      befristung: faker.date.future().toISOString(),
       admins: ['test'],
-    },
+    }),
   ],
-};
+);
 
-const mockLehrerUebersichtWith2Zuordnungen: PersonWithUebersicht = {
-  personId: '1234',
-  vorname: 'Samuel',
-  nachname: 'Vimes',
-  benutzername: 'samuelvimes',
-  lastModifiedZuordnungen: '2021-09-01T12:00:00Z',
-  zuordnungen: [
-    {
-      sskId: '1',
-      rolleId: '1',
-      sskName: 'Muster-Schule',
-      sskDstNr: '123456',
-      rolle: 'Lehrer',
+const mockLehrerUebersichtWith2Zuordnungen: PersonenUebersicht = new PersonenUebersicht(
+  mockPersonInfoResponse.person.id,
+  mockPersonInfoResponse.person.name.vorname,
+  mockPersonInfoResponse.person.name.familiennamen,
+  mockPersonInfoResponse.person.referrer!,
+  '2021-09-01T12:00:00Z',
+  [
+    DoFactory.getZuordnung({
       rollenArt: RollenArt.Lern,
-      administriertVon: 'root-sh',
       typ: OrganisationsTyp.Schule,
-      editable: true,
-      merkmale: ['KOPERS_PFLICHT'] as unknown as RollenMerkmal,
-      befristung: '2024-05-06',
-      admins: ['test'],
-    },
-    {
-      sskId: '2',
-      rolleId: '1',
-      sskName: 'Anders-Sonderlich-Schule',
-      sskDstNr: '789101112',
-      rolle: 'Lehrer',
+      merkmale: [RollenMerkmal.KopersPflicht],
+      befristung: faker.date.future().toISOString(),
+    }),
+    DoFactory.getZuordnung({
       rollenArt: RollenArt.Lern,
-      administriertVon: 'root-sh',
       typ: OrganisationsTyp.Schule,
-      editable: true,
-      merkmale: ['KOPERS_PFLICHT'] as unknown as RollenMerkmal,
-      befristung: '2024-05-06',
-      admins: ['test'],
-    },
+      merkmale: [RollenMerkmal.KopersPflicht],
+      befristung: faker.date.future().toISOString(),
+    }),
   ],
-};
+);
 
-const mockSchuelerUebersicht: PersonWithUebersicht = {
-  personId: '1234',
-  vorname: 'Samuel',
-  nachname: 'Vimes',
-  benutzername: 'samuelvimes',
-  lastModifiedZuordnungen: '2021-09-01T12:00:00Z',
-  zuordnungen: [
-    {
-      sskId: '1',
-      rolleId: '1',
-      sskName: 'Astrid-Lindgren-Schule',
-      sskDstNr: '123456',
-      rolle: 'SuS',
-      rollenArt: RollenArt.Lern,
-      administriertVon: 'root-sh',
-      typ: OrganisationsTyp.Schule,
-      editable: true,
-      merkmale: [] as unknown as RollenMerkmal,
-      befristung: '2024-05-06',
-      admins: ['test'],
-    },
-    {
-      klasse: '9A',
-      sskId: '2',
-      rolleId: '1',
-      sskName: '9A',
-      sskDstNr: '123456-9A',
-      rolle: 'SuS',
-      rollenArt: RollenArt.Lern,
-      administriertVon: '1',
-      typ: OrganisationsTyp.Klasse,
-      editable: true,
-      merkmale: [] as unknown as RollenMerkmal,
-      befristung: '2024-05-06',
-      admins: ['test'],
-    },
+const mockSchule: Organisation = DoFactory.getSchule();
+const mockKlasse: Organisation = DoFactory.getKlasse(mockSchule);
+
+const mockSchuelerUebersicht: PersonenUebersicht = new PersonenUebersicht(
+  mockPersonInfoResponse.person.id,
+  mockPersonInfoResponse.person.name.vorname,
+  mockPersonInfoResponse.person.name.familiennamen,
+  mockPersonInfoResponse.person.referrer!,
+  '2021-09-01T12:00:00Z',
+  [
+    DoFactory.getZuordnung(
+      {
+        rollenArt: RollenArt.Lern,
+        befristung: faker.date.future().toISOString(),
+      },
+      { organisation: mockSchule },
+    ),
+    DoFactory.getZuordnung(
+      {
+        rollenArt: RollenArt.Lern,
+        befristung: faker.date.future().toISOString(),
+      },
+      { organisation: mockKlasse },
+    ),
   ],
-};
-const uebersichtWithoutZuordnungen: PersonWithUebersicht = {
-  personId: '1234',
-  vorname: 'Samuel',
-  nachname: 'Vimes',
-  benutzername: 'samuelvimes',
-  lastModifiedZuordnungen: '2021-09-01T12:00:00Z',
-  zuordnungen: [],
-};
-
+);
+const uebersichtWithoutZuordnungen: PersonenUebersicht = new PersonenUebersicht(
+  mockPersonInfoResponse.person.id,
+  mockPersonInfoResponse.person.name.vorname,
+  mockPersonInfoResponse.person.name.familiennamen,
+  mockPersonInfoResponse.person.referrer!,
+  '2021-09-01T12:00:00Z',
+  [],
+);
 describe('ProfileView', () => {
   beforeAll(() => {
     personInfoStore = usePersonInfoStore();
@@ -245,7 +219,7 @@ describe('ProfileView', () => {
     </div>
   `;
 
-    personInfoStore.personInfo = mockLehrer;
+    personInfoStore.personInfo = mockPersonInfoResponse;
     personStore.personenuebersicht = mockLehrerUebersicht;
 
     authStore.currentUser = mockCurrentUser;
@@ -273,7 +247,7 @@ describe('ProfileView', () => {
   });
 
   test('it renders the profile headline', () => {
-    personInfoStore.personInfo = mockLehrer;
+    personInfoStore.personInfo = mockPersonInfoResponse;
     personStore.personenuebersicht = mockLehrerUebersicht;
     expect(wrapper?.find('[data-testid="profile-headline"]').isVisible()).toBe(true);
   });
@@ -287,24 +261,24 @@ describe('ProfileView', () => {
   });
 
   test('it displays personal data', () => {
-    personInfoStore.personInfo = mockLehrer;
+    personInfoStore.personInfo = mockPersonInfoResponse;
     personStore.personenuebersicht = mockLehrerUebersicht;
     const personalData: DOMWrapper<HTMLTableRowElement>[] | undefined = wrapper?.findAll('tr');
     expect(personalData?.length).toBeGreaterThan(0);
     expect(personalData?.at(0)?.text()).toContain('Vor- und Nachname:Samuel Vimes');
     expect(personalData?.at(1)?.text()).toContain('Benutzername:samuelvimes');
-    if (mockLehrer.person.personalnummer) {
-      expect(personalData?.at(2)?.text()).toContain(mockLehrer.person.personalnummer);
+    if (mockPersonInfoResponse.person.personalnummer) {
+      expect(personalData?.at(2)?.text()).toContain(mockPersonInfoResponse.person.personalnummer);
     }
   });
 
   test.each([
-    { personInfo: mockLehrer, uebersicht: mockLehrerUebersicht },
-    { personInfo: mockLehrer, uebersicht: mockLehrerUebersichtWith2Zuordnungen },
-    { personInfo: mockLehrer, uebersicht: uebersichtWithoutZuordnungen },
+    { personInfo: mockPersonInfoResponse, uebersicht: mockLehrerUebersicht },
+    { personInfo: mockPersonInfoResponse, uebersicht: mockLehrerUebersichtWith2Zuordnungen },
+    { personInfo: mockPersonInfoResponse, uebersicht: uebersichtWithoutZuordnungen },
   ])(
     'it displays Schule data with zuordnungen $uebersicht.zuordnungen',
-    async ({ personInfo, uebersicht }: { personInfo: PersonInfoResponse; uebersicht: PersonWithUebersicht }) => {
+    async ({ personInfo, uebersicht }: { personInfo: PersonInfoResponse; uebersicht: PersonenUebersicht }) => {
       personInfoStore.personInfo = personInfo;
       personStore.personenuebersicht = uebersicht!;
       await nextTick();
@@ -381,7 +355,7 @@ describe('ProfileView', () => {
 
   describe('device password', () => {
     test('it opens device password change dialog', async () => {
-      personInfoStore.personInfo = mockLehrer;
+      personInfoStore.personInfo = mockPersonInfoResponse;
       personStore.personenuebersicht = mockLehrerUebersicht;
       await nextTick();
       if (!wrapper) return;
@@ -443,7 +417,7 @@ describe('ProfileView', () => {
 
   describe('email', () => {
     test('displays correct email status for enabled', async () => {
-      personInfoStore.personInfo = mockLehrer;
+      personInfoStore.personInfo = mockPersonInfoResponse;
       personInfoStore.personInfo.email = {
         address: 'test@example.com',
         status: EmailAddressStatus.Enabled,
@@ -456,7 +430,7 @@ describe('ProfileView', () => {
     });
 
     test('displays correct email status for requested', async () => {
-      personInfoStore.personInfo = mockLehrer;
+      personInfoStore.personInfo = mockPersonInfoResponse;
       personInfoStore.personInfo.email = {
         address: 'test@example.com',
         status: EmailAddressStatus.Requested,
@@ -469,7 +443,7 @@ describe('ProfileView', () => {
     });
 
     test('displays correct email status for disabled', async () => {
-      personInfoStore.personInfo = mockLehrer;
+      personInfoStore.personInfo = mockPersonInfoResponse;
       personInfoStore.personInfo.email = {
         address: 'test@example.com',
         status: EmailAddressStatus.Disabled,
@@ -482,7 +456,7 @@ describe('ProfileView', () => {
     });
 
     test('displays correct email status for failed', async () => {
-      personInfoStore.personInfo = mockLehrer;
+      personInfoStore.personInfo = mockPersonInfoResponse;
       personInfoStore.personInfo.email = {
         address: 'test@example.com',
         status: EmailAddressStatus.Failed,
@@ -495,7 +469,7 @@ describe('ProfileView', () => {
     });
 
     test('hides email when its not set', async () => {
-      personInfoStore.personInfo = mockLehrer;
+      personInfoStore.personInfo = mockPersonInfoResponse;
       personInfoStore.personInfo.email = null;
 
       await nextTick();

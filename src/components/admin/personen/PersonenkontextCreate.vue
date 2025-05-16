@@ -1,21 +1,22 @@
 <script setup lang="ts">
-  import { computed, type ComputedRef, type Ref, ref, watch } from 'vue';
-  import { RollenArt } from '@/stores/RolleStore';
-  import { useI18n } from 'vue-i18n';
+  import type { BefristungProps } from '@/components/admin/personen/BefristungInput.vue';
+  import BefristungInput from '@/components/admin/personen/BefristungInput.vue';
   import FormRow from '@/components/form/FormRow.vue';
-  import { usePersonenkontextStore, type PersonenkontextStore, type Zuordnung } from '@/stores/PersonenkontextStore';
+  import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
   import {
     OrganisationsTyp,
     useOrganisationStore,
     type Organisation,
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
+  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
+  import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
+  import { RollenArt } from '@/stores/RolleStore';
+  import type { Zuordnung } from '@/stores/types/Zuordnung';
   import { type TranslatedObject } from '@/types.d';
   import type { BaseFieldProps } from 'vee-validate';
-  import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
-  import BefristungInput from '@/components/admin/personen/BefristungInput.vue';
-  import type { BefristungProps } from '@/components/admin/personen/BefristungInput.vue';
-  import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
+  import { computed, ref, watch, type ComputedRef, type Ref } from 'vue';
+  import { useI18n } from 'vue-i18n';
 
   useI18n({ useScope: 'global' });
 

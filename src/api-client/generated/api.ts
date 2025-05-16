@@ -307,7 +307,7 @@ export interface DBiamPersonenkontextResponse {
      * @type {string}
      * @memberof DBiamPersonenkontextResponse
      */
-    'befristung': string;
+    'befristung': string | null;
 }
 /**
  * 
@@ -425,7 +425,7 @@ export interface DBiamPersonenzuordnungResponse {
      * @type {string}
      * @memberof DBiamPersonenzuordnungResponse
      */
-    'sskDstNr': string;
+    'sskDstNr': string | null;
     /**
      * 
      * @type {string}
@@ -461,19 +461,19 @@ export interface DBiamPersonenzuordnungResponse {
      * @type {string}
      * @memberof DBiamPersonenzuordnungResponse
      */
-    'befristung': string;
+    'befristung': string | null;
     /**
      * 
-     * @type {RollenMerkmal}
+     * @type {Array<RollenMerkmal>}
      * @memberof DBiamPersonenzuordnungResponse
      */
-    'merkmale': RollenMerkmal;
+    'merkmale': Array<RollenMerkmal>;
     /**
      * 
      * @type {Array<string>}
      * @memberof DBiamPersonenzuordnungResponse
      */
-    'admins': Array<string>;
+    'admins': Array<string> | null;
 }
 
 

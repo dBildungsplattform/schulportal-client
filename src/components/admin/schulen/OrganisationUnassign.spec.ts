@@ -1,12 +1,15 @@
-import type { Organisation } from '@/stores/OrganisationStore';
-import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
-import OrganisationUnassign from './OrganisationUnassign.vue';
-import { createRouter, createWebHistory, type Router } from 'vue-router';
 import routes from '@/router/routes';
-import { nextTick } from 'vue';
-import type { MockInstance } from 'vitest';
 import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
-import type { PersonenWithRolleAndZuordnung } from '@/stores/PersonStore';
+import type { Organisation } from '@/stores/OrganisationStore';
+import type { Person } from '@/stores/types/Person';
+import { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
+import type { Zuordnung } from '@/stores/types/Zuordnung';
+import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
+import { DoFactory } from 'test/DoFactory';
+import type { MockInstance } from 'vitest';
+import { nextTick } from 'vue';
+import { createRouter, createWebHistory, type Router } from 'vue-router';
+import OrganisationUnassign from './OrganisationUnassign.vue';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -14,42 +17,21 @@ const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
 
 type Props = {
   isDialogVisible: boolean;
-  selectedPersonen: PersonenWithRolleAndZuordnung;
+  selectedPersonen: Map<string, PersonWithZuordnungen>;
   selectedOrganisation: Organisation;
 };
+
+const schule: Organisation = DoFactory.getSchule();
+const person: Person = DoFactory.getPerson();
+const zuordnung: Zuordnung = DoFactory.getZuordnung({}, { organisation: schule });
 
 function mountComponent(partialProps: Partial<Props> = {}): VueWrapper {
   const props: Props = {
     isDialogVisible: true,
-    selectedPersonen: [
-      {
-        administrationsebenen: '',
-        klassen: '1a',
-        rollen: '',
-        person: {
-          id: 'test',
-          name: {
-            familienname: 'Pan',
-            vorname: 'Peter',
-          },
-          referrer: 'ppan',
-          revision: '1',
-          email: {
-            address: 'ppan@wunderland',
-            status: 'ENABLED',
-          },
-          isLocked: null,
-          lastModified: '',
-          personalnummer: '1234',
-          userLock: null,
-        },
-      },
-    ],
-    selectedOrganisation: {
-      id: '1234567',
-      name: 'Testorganisation',
-      typ: 'SCHULE',
-    },
+    selectedPersonen: new Map<string, PersonWithZuordnungen>([
+      [person.id, new PersonWithZuordnungen(person, [zuordnung])],
+    ]),
+    selectedOrganisation: schule,
     ...partialProps,
   };
 

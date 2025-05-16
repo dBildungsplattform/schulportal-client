@@ -1,12 +1,12 @@
-import { VueWrapper, mount, DOMWrapper } from '@vue/test-utils';
-import { nextTick } from 'vue';
-import TwoFactorAuthenticationSetUp from './TwoFactorAuthenticationSetUp.vue';
 import {
   TokenKind,
   useTwoFactorAuthentificationStore,
   type TwoFactorAuthentificationStore,
 } from '@/stores/TwoFactorAuthentificationStore';
-import { EmailAddressStatus } from '@/api-client/generated/api';
+import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
+import { DoFactory } from 'test/DoFactory';
+import { nextTick } from 'vue';
+import TwoFactorAuthenticationSetUp from './TwoFactorAuthenticationSetUp.vue';
 
 let wrapper: VueWrapper<InstanceType<typeof TwoFactorAuthenticationSetUp>> | null = null;
 let twoFactorAuthenticationStore: TwoFactorAuthentificationStore;
@@ -25,25 +25,7 @@ beforeEach(() => {
       isLoading: false,
       disabled: false,
       errorCode: '',
-      person: {
-        person: {
-          id: '2',
-          name: {
-            vorname: 'Albert',
-            familienname: 'Test',
-          },
-          referrer: 'atest',
-          personalnummer: null,
-          isLocked: null,
-          userLock: null,
-          revision: '1',
-          lastModified: '2024-05-22',
-          email: {
-            address: 'email',
-            status: EmailAddressStatus.Requested,
-          },
-        },
-      },
+      person: DoFactory.getPersonendatensatz(),
     },
     global: {
       components: {
