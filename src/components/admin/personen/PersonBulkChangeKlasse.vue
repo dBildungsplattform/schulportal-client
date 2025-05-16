@@ -49,7 +49,7 @@
     return false;
   });
 
-  const bulkChangeKlasse = async (): Promise<void> => {
+  const handleChangeKlasse = async (): Promise<void> => {
     if (!selectedKlasse.value) return;
     await bulkOperationStore.bulkChangeKlasse(
       Array.from(props.selectedPersonen.keys()),
@@ -74,7 +74,7 @@
 <template>
   <LayoutCard
     data-testid="change-klasse-layout-card"
-    :header="t('admin.person.bulkChangeKlasse.title')"
+    :header="t('admin.person.bulkChangeKlasse.transfer')"
   >
     <v-container>
       <template v-if="state === State.INITIAL">
@@ -204,8 +204,8 @@
             class="primary"
             :disabled="!canCommit"
             data-testid="bulk-change-klasse-button"
-            @click.stop="bulkChangeKlasse"
-            >{{ t('admin.person.bulkChangeKlasse.title') }}</v-btn
+            @click.stop="handleChangeKlasse"
+            >{{ t('admin.person.bulkChangeKlasse.transfer') }}</v-btn
           >
         </v-col>
       </v-row>
@@ -213,7 +213,7 @@
   </LayoutCard>
   <template v-if="showErrorDialog">
     <PersonBulkError
-      :bulkOperationName="t('admin.person.bulkChangeKlasse.title')"
+      :bulkOperationName="t('admin.person.bulkChangeKlasse.transfer')"
       :isDialogVisible="showErrorDialog"
       @update:isDialogVisible="handleCloseDialog"
       :errors="bulkErrorList"

@@ -135,7 +135,7 @@
     if (authStore.hasPersonenverwaltungPermission) {
       actionTypeTitles.set(OperationType.RESET_PASSWORD, t('admin.person.resetPassword'));
       actionTypeTitles.set(OperationType.ORG_UNASSIGN, t('admin.person.bulkUnassignOrganisation.cancelZuordnung'));
-      actionTypeTitles.set(OperationType.CHANGE_KLASSE, t('admin.person.bulkChangeKlasse.title'));
+      actionTypeTitles.set(OperationType.CHANGE_KLASSE, t('admin.person.bulkChangeKlasse.transfer'));
     }
 
     return [...actionTypeTitles.entries()].map(([key, value]: [string, string]) => ({
