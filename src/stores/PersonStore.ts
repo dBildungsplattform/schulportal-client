@@ -1,5 +1,6 @@
 import axiosApiInstance from '@/services/ApiService';
 import { getResponseErrorCode } from '@/utils/errorHandlers';
+import type { SortOrder } from '@/utils/sorting';
 import { type AxiosResponse } from 'axios';
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import {
@@ -46,11 +47,6 @@ export enum SortField {
   Referrer = 'referrer',
 }
 
-export enum SortOrder {
-  Asc = 'asc',
-  Desc = 'desc',
-}
-
 export type CreatePersonBodyParams = DbiamCreatePersonWithPersonenkontexteBodyParams;
 
 function mapPersonendatensatzResponseToPersonendatensatz(response: PersonendatensatzResponse): Personendatensatz {
@@ -62,7 +58,7 @@ export type Personendatensatz = {
   person: Person;
 };
 
-export type { PersonendatensatzResponse };
+export type { PersonendatensatzResponse, SortOrder };
 
 type PersonState = {
   allUebersichten: Map<string, PersonWithZuordnungen>;

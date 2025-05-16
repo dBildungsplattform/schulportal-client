@@ -19,12 +19,13 @@
     OrganisationsTyp,
     useOrganisationStore,
   } from '@/stores/OrganisationStore';
-  import { type PersonStore, SortField, SortOrder, usePersonStore } from '@/stores/PersonStore';
+  import { type PersonStore, SortField, usePersonStore } from '@/stores/PersonStore';
   import { type PersonenkontextStore, usePersonenkontextStore } from '@/stores/PersonenkontextStore';
   import { type RolleResponse, type RolleStore, RollenArt, useRolleStore } from '@/stores/RolleStore';
   import { type SearchFilterStore, useSearchFilterStore } from '@/stores/SearchFilterStore';
   import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
   import { type TranslatedObject } from '@/types.d';
+  import { SortOrder } from '@/utils/sorting';
   import { type ComputedRef, type Ref, computed, onMounted, ref, watch } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import { type Router, useRouter } from 'vue-router';
@@ -220,8 +221,8 @@
         : searchFilterStore.selectedOrganisationen || [],
       rolleIDs: searchFilterStore.selectedRollen || [],
       searchFilter: searchFilterStore.searchFilterPersonen || '',
-      sortField: searchFilterStore.sortField as SortField,
-      sortOrder: searchFilterStore.sortOrder as SortOrder,
+      sortField: searchFilterStore.personenSortField as SortField,
+      sortOrder: searchFilterStore.personenSortOrder as SortOrder,
     });
   }
 
@@ -233,8 +234,8 @@
       organisationIDs: selectedKlassen.value.length ? selectedKlassen.value : selectedOrganisationIds.value,
       rolleIDs: searchFilterStore.selectedRollen || selectedRollen.value,
       searchFilter: searchFilterStore.searchFilterPersonen || searchFilter.value,
-      sortField: searchFilterStore.sortField as SortField,
-      sortOrder: searchFilterStore.sortOrder as SortOrder,
+      sortField: searchFilterStore.personenSortField as SortField,
+      sortOrder: searchFilterStore.personenSortOrder as SortOrder,
     });
 
     await applySearchAndFilters();
@@ -470,18 +471,17 @@
   }): Promise<void> {
     if (update.sortField) {
       sortField.value = mapKeyToBackend(update.sortField);
-
-      await searchFilterStore.setCurrentSortForPersonen({
+      searchFilterStore.currentSort = {
         key: update.sortField,
         order: update.sortOrder,
-      });
+      };
     }
 
     sortOrder.value = update.sortOrder as SortOrder;
 
     // Save the sorting values in the store
-    searchFilterStore.setSortFieldForPersonen(sortField.value);
-    searchFilterStore.setSortOrderForPersonen(sortOrder.value);
+    searchFilterStore.personenSortField = sortField.value;
+    searchFilterStore.personenSortOrder = sortOrder.value;
 
     // Fetch the sorted data
     getPaginatedPersonen(searchFilterStore.personenPage);

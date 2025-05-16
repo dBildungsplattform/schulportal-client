@@ -758,6 +758,20 @@
             "in": "query",
             "description": "Liefert Organisationen mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).",
             "schema": { "type": "array", "items": { "type": "string" } }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "description": "Order to sort by.",
+            "schema": { "nullable": true, "enum": ["asc", "desc"], "type": "string" }
+          },
+          {
+            "name": "sortField",
+            "required": false,
+            "in": "query",
+            "description": "Field to sort by.",
+            "schema": { "nullable": true, "enum": ["name", "kennung"], "type": "string" }
           }
         ],
         "responses": {
