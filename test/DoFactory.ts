@@ -53,7 +53,7 @@ export class DoFactory {
       revision: faker.string.numeric(2),
       personalnummer: faker.string.numeric(7),
       isLocked: false,
-      userLock: null,
+      userLock: [],
       lastModified: new Date().toISOString(),
       email: {
         status: EmailAddressStatus.Enabled,

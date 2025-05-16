@@ -1,65 +1,30 @@
-import { EmailAddressStatus } from '@/api-client/generated';
-import { OrganisationsTyp, type Organisation } from '@/stores/OrganisationStore';
+import { type Organisation } from '@/stores/OrganisationStore';
 import { type Personendatensatz } from '@/stores/PersonStore';
 import type { Person } from '@/stores/types/Person';
-import { PersonLockOccasion } from '@/utils/lock';
+import { PersonLockOccasion, type UserLock } from '@/utils/lock';
 import PersonDetailsView from '@/views/admin/PersonDetailsView.vue';
 import { mount, VueWrapper } from '@vue/test-utils';
+import { DoFactory } from 'test/DoFactory';
 import { expect, test, type Mock } from 'vitest';
 import { nextTick } from 'vue';
 import PersonLock from './PersonLock.vue';
 
 let wrapper: VueWrapper | null = null;
 
-const parentOrganisationen: Array<Organisation> = [
-  {
-    id: '1',
-    kennung: '1',
-    name: 'Peter-Pille-Palle-Schule',
-    namensergaenzung: null,
-    kuerzel: undefined,
-    typ: OrganisationsTyp.Schule,
-    administriertVon: null,
-  },
-  {
-    id: '2',
-    kennung: '2',
-    name: 'Sarah-Sanddorn-Schule',
-    namensergaenzung: null,
-    kuerzel: undefined,
-    typ: OrganisationsTyp.Schule,
-    administriertVon: null,
-  },
-];
+const parentOrganisationen: Array<Organisation> = [DoFactory.getSchule(), DoFactory.getSchule()];
 
 function getPersonendatensatz(locked: boolean): Personendatensatz {
-  const person: Person = {
-    id: 'testid',
-    name: {
-      familienname: 'tester',
-      vorname: 'theo',
-    },
-    referrer: null,
-    personalnummer: null,
-    isLocked: locked,
-    revision: '1',
-    lastModified: '2024-05-22',
-    userLock: locked
-      ? [
-          {
-            personId: '123',
-            locked_by: 'Amanda Admin',
-            locked_until: Date.now().toString(),
-            lock_occasion: PersonLockOccasion.MANUELL_GESPERRT,
-            created_at: Date.now().toString(),
-          },
-        ]
-      : null,
-    email: {
-      address: 'email',
-      status: EmailAddressStatus.Requested,
-    },
+  const lock: UserLock = {
+    personId: '123',
+    locked_by: 'Amanda Admin',
+    locked_until: Date.now().toString(),
+    lock_occasion: PersonLockOccasion.MANUELL_GESPERRT,
+    created_at: Date.now().toString(),
   };
+  const person: Person = DoFactory.getPerson({
+    isLocked: locked,
+  });
+  if (locked) person.userLock.push(lock);
   return { person };
 }
 

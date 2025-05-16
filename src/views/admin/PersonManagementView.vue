@@ -83,7 +83,7 @@
         id: personWithZuordnungen.id,
         familienname: personWithZuordnungen.name.familienname,
         vorname: personWithZuordnungen.name.vorname,
-        referrer: personWithZuordnungen.referrer ?? '---',
+        referrer: personWithZuordnungen.referrer,
         personalnummer: personWithZuordnungen.getPersonalnummerAsString(t('missing')),
         rollen: personWithZuordnungen.rollenAsString,
         administrationsebenen: personWithZuordnungen.administrationsebenenAsString,

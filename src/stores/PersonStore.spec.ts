@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/typedef */
 import {
-  EmailAddressStatus,
-  Vertrauensstufe,
   type DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response,
   type DBiamPersonenuebersichtResponse,
   type LockUserBodyParams,
@@ -153,17 +151,7 @@ describe('PersonStore', () => {
     });
 
     it('should load persons according to filter', async () => {
-      const mockPersons: PersonendatensatzResponse[] = [
-        {
-          person: {
-            id: '123456',
-            name: {
-              familienname: 'Vimes',
-              vorname: 'Susan',
-            },
-          },
-        },
-      ] as PersonendatensatzResponse[];
+      const mockPersons: PersonendatensatzResponse[] = [DoFactory.getPersonendatensatzResponse()];
 
       const mockPersonsResponse: PersonFrontendControllerFindPersons200Response = {
         offset: 0,
@@ -186,25 +174,9 @@ describe('PersonStore', () => {
 
     it('should handle error code in response', async () => {
       const mockPersons: PersonendatensatzResponse[] = [
-        {
-          person: {
-            id: '1234',
-            name: {
-              familienname: 'Vimes',
-              vorname: 'Samuel',
-            },
-          },
-        },
-        {
-          person: {
-            id: '5678',
-            name: {
-              familienname: 'von Lipwig',
-              vorname: 'Moist',
-            },
-          },
-        },
-      ] as PersonendatensatzResponse[];
+        DoFactory.getPersonendatensatzResponse(),
+        DoFactory.getPersonendatensatzResponse(),
+      ];
 
       // Mock response for persons
       const mockPersonsResponse: PersonFrontendControllerFindPersons200Response = {
@@ -229,25 +201,9 @@ describe('PersonStore', () => {
 
     it('should handle string error response', async () => {
       const mockPersons: PersonendatensatzResponse[] = [
-        {
-          person: {
-            id: '1234',
-            name: {
-              familienname: 'Vimes',
-              vorname: 'Samuel',
-            },
-          },
-        },
-        {
-          person: {
-            id: '5678',
-            name: {
-              familienname: 'von Lipwig',
-              vorname: 'Moist',
-            },
-          },
-        },
-      ] as PersonendatensatzResponse[];
+        DoFactory.getPersonendatensatzResponse(),
+        DoFactory.getPersonendatensatzResponse(),
+      ];
 
       const mockPersonsResponse: PersonFrontendControllerFindPersons200Response = {
         offset: 0,
@@ -283,7 +239,7 @@ describe('PersonStore', () => {
       const getPersonByIdPromise: Promise<Personendatensatz> = personStore.getPersonById('1234');
       expect(personStore.loading).toBe(true);
       const currentPerson: Personendatensatz = await getPersonByIdPromise;
-      mockPerson.person.userLock!.forEach((lock) => {
+      mockPerson.person.userLock.forEach((lock) => {
         const lockDate = new Date(lock.locked_until);
         // Adjust date for MESZ (German summer time) if necessary
         if (lockDate.getTimezoneOffset() >= -120) {
@@ -304,9 +260,9 @@ describe('PersonStore', () => {
             userLock: expect.arrayContaining([
               expect.objectContaining({
                 lock_occasion: PersonLockOccasion.MANUELL_GESPERRT,
-                locked_by: mockPerson.person.userLock![0]!.locked_by,
-                locked_until: mockPerson.person.userLock![0]!.locked_until,
-                created_at: mockPerson.person.userLock![0]!.created_at,
+                locked_by: mockPerson.person.userLock[0]!.locked_by,
+                locked_until: mockPerson.person.userLock[0]!.locked_until,
+                created_at: mockPerson.person.userLock[0]!.created_at,
               }),
               expect.objectContaining({
                 lock_occasion: PersonLockOccasion.KOPERS_GESPERRT,
@@ -571,16 +527,7 @@ describe('PersonStore', () => {
       personStore.errorCode = 'some error';
       personStore.loading = true;
       personStore.totalPersons = 1;
-      personStore.currentPerson = {
-        person: {
-          id: '1234',
-          name: {
-            familienname: 'Vimes',
-            vorname: 'Samuel',
-          },
-        },
-      } as Personendatensatz;
-
+      personStore.currentPerson = DoFactory.getPersonendatensatz();
       personStore.resetState();
       expect(personStore.errorCode).toEqual('');
       expect(personStore.loading).toBe(false);
@@ -597,60 +544,30 @@ describe('PersonStore', () => {
       const personalnummer = '9876';
 
       const mockCurrentPerson: Personendatensatz = {
-        person: {
+        person: DoFactory.getPerson({
           id: personId,
-          name: {
-            familienname: 'Old',
-            vorname: 'Name',
-          },
-          revision: '1',
-          lastModified: '2099-01-01',
-          referrer: '6978',
           personalnummer: personalnummer,
-          isLocked: false,
-          userLock: null,
-          email: {
-            address: 'email',
-            status: EmailAddressStatus.Requested,
-          },
-        },
+        }),
       };
 
       personStore.currentPerson = mockCurrentPerson;
 
-      const mockResponse: PersonendatensatzResponse = {
-        person: {
-          id: personId,
-          name: {
-            familienname,
-            vorname,
-          },
-          personalnummer,
-          revision: '2',
-          lastModified: '2099-01-02',
-          referrer: '6978',
-          isLocked: false,
-          userLock: null,
-          mandant: '',
-          geburt: {},
-          stammorganisation: '',
-          geschlecht: '',
-          lokalisierung: '',
-          vertrauensstufe: Vertrauensstufe.Teil,
-          startpasswort: '',
-          email: {
-            address: 'email',
-            status: EmailAddressStatus.Requested,
-          },
+      const mockResponse: PersonendatensatzResponse = DoFactory.getPersonendatensatzResponse({
+        ...mockCurrentPerson.person,
+        id: personId,
+        name: {
+          familienname,
+          vorname,
         },
-      };
+        personalnummer,
+      });
 
       const expectedBodyParams: PersonMetadataBodyParams = {
         vorname,
         familienname,
         personalnummer,
-        revision: '1',
-        lastModified: '2099-01-01',
+        revision: mockCurrentPerson.person.revision,
+        lastModified: mockCurrentPerson.person.lastModified,
       };
 
       mockadapter.onPatch(`/api/personen/${personId}/metadata`).reply((config) => {

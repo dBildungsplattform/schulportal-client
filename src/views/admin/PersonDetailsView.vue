@@ -140,10 +140,8 @@
   const loading: Ref<boolean> = ref(true);
 
   const isManuallyLocked: ComputedRef<boolean> = computed<boolean>(() => {
-    return (
-      personStore.currentPerson!.person.userLock?.some(
-        (lock: UserLock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT,
-      ) ?? false // Default to false if userLock is undefined
+    return personStore.currentPerson!.person.userLock.some(
+      (lock: UserLock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT,
     );
   });
 
@@ -227,7 +225,7 @@
     if (!personStore.currentPerson) return undefined;
 
     const { userLock }: Person = personStore.currentPerson.person;
-    if (!userLock) return undefined;
+    if (userLock.length === 0) return undefined;
 
     // Find the manualLock entry if it exists
     const specifiedLock: UserLock | undefined = userLock.find(
@@ -287,7 +285,7 @@
   watch(
     () => personStore.currentPerson?.person,
     async (person: Person | undefined) => {
-      if (!(person && person.isLocked && person.userLock)) return;
+      if (!(person && person.isLocked)) return;
       const manualLock: UserLock | undefined = person.userLock.find(
         (lock: UserLock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT,
       );

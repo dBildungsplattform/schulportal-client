@@ -84,7 +84,7 @@
   const selectedOrganisation: Ref<string | null> = ref(null);
   const errorMessage: ComputedRef<string> = computed(() => {
     if (!props.errorCode) return '';
-    return !props.person.person.userLock?.some(
+    return !props.person.person.userLock.some(
       (lock: UserLock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT,
     )
       ? t('person.lockError')
@@ -102,10 +102,8 @@
   });
 
   const isManuallyLocked: ComputedRef<boolean> = computed<boolean>(() => {
-    return (
-      props.person.person.userLock?.some(
-        (lock: UserLock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT,
-      ) ?? false // Default to false if userLock is undefined;
+    return props.person.person.userLock.some(
+      (lock: UserLock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT,
     );
   });
 
@@ -123,7 +121,7 @@
   async function handleOnLockUser(): Promise<void> {
     // Find the "MANUELL_GESPERRT" lock if it exists
     const manualLock: UserLock | null =
-      props.person.person.userLock?.find(
+      props.person.person.userLock.find(
         (lock: UserLock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT,
       ) ?? null;
 
@@ -176,7 +174,7 @@
     }
 
     const manualLock: UserLock | null =
-      props.person.person.userLock?.find(
+      props.person.person.userLock.find(
         (lock: UserLock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT,
       ) ?? null;
 

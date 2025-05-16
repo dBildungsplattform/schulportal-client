@@ -32,23 +32,7 @@ const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
 const twoFactorAuthenticationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
 
 const mockPerson: Personendatensatz = {
-  person: {
-    id: '1',
-    name: {
-      familienname: 'Orton',
-      vorname: 'John',
-    },
-    referrer: 'jorton',
-    personalnummer: '263578',
-    isLocked: false,
-    userLock: null,
-    revision: '1',
-    lastModified: '2024-05-22T08:20:33.758Z',
-    email: {
-      address: 'email@email.com',
-      status: EmailAddressStatus.Enabled,
-    },
-  },
+  person: DoFactory.getPerson(),
 };
 
 const mockCurrentUser: UserInfo = {
@@ -301,7 +285,7 @@ describe('PersonDetailsView', () => {
         referrer: '6978',
         personalnummer: '9183756',
         isLocked: false,
-        userLock: null,
+        userLock: [],
         revision: '1',
         lastModified: '2024-12-22T13:03:53.802Z',
         email: {
@@ -315,10 +299,10 @@ describe('PersonDetailsView', () => {
   test('it renders the person details page and shows person data', async () => {
     expect(wrapper).toBeTruthy();
     expect(wrapper?.find('[data-testid="person-details-card"]').isVisible()).toBe(true);
-    expect(wrapper?.find('[data-testid="person-vorname"]').text()).toBe('John');
-    expect(wrapper?.find('[data-testid="person-familienname"]').text()).toBe('Orton');
-    expect(wrapper?.find('[data-testid="person-username"]').text()).toBe('jorton');
-    expect(wrapper?.find('[data-testid="person-email"]').text()).toBe('email@email.com');
+    expect(wrapper?.find('[data-testid="person-vorname"]').text()).toBe(mockPerson.person.name.vorname);
+    expect(wrapper?.find('[data-testid="person-familienname"]').text()).toBe(mockPerson.person.name.familienname);
+    expect(wrapper?.find('[data-testid="person-username"]').text()).toBe(mockPerson.person.referrer);
+    expect(wrapper?.find('[data-testid="person-email"]').text()).toBe(mockPerson.person.email?.address);
     expect(wrapper?.find('[data-testid="person-zuordnung-1"]').text()).toBe(
       `123456 (Testschule Birmingham): SuS 9a  (befristet bis ${adjustDateForTimezoneAndFormat(befristung)})`,
     );
@@ -935,7 +919,7 @@ describe('PersonDetailsView', () => {
   test('it submits the form to lock the user', async () => {
     if (personStore.currentPerson) {
       personStore.currentPerson.person.isLocked = false;
-      personStore.currentPerson.person.userLock = null;
+      personStore.currentPerson.person.userLock = [];
     }
     const openLockDialogButton: DOMWrapper<Element> | undefined = wrapper?.find(
       '[data-testid="open-lock-dialog-button"]',
