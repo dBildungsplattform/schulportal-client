@@ -158,6 +158,11 @@
       "addNew": "Neuen Benutzer hinzufügen",
       "backToCreatePerson": "Zurück zur Benutzeranlage",
       "backToInput": "Zurück zur Eingabe",
+      "stateEmployeeSearch": {
+        "addPerson":"Person hinzufügen",
+        "search":"Landesbediensteter (Nur Suche)",
+        "anotherPerson":"Andere Person (Neuanlage)"
+      },
       "bulk": {
         "bulkErrorMessage": "Die Aktion {bulkOperationName} konnte für die folgenden Benutzer nicht ausgeführt werden. \n\nSie können sich die Liste für eine spätere Bearbeitung abspeichern. Die Daten stehen nach dem Schließen dieses Dialogs nicht mehr zur Verfügung. Sollten Sie Hilfe benötigen, eröffnen Sie ein Störungsticket über den IQSH-Helpdesk und fügen Sie die Liste als Anhang an.",
         "bulkErrorTitle": "Fehler bei der Mehrfachbearbeitung",
@@ -429,7 +434,9 @@
           "PERSONEN_ANLEGEN": "Darf Benutzer anlegen",
           "BULK_VERWALTEN": "Darf Mehrfachbearbeitung ausführen",
           "SCHULPORTAL_VERWALTEN": "Darf Portal verwalten",
-          "HINWEISE_BEARBEITEN": "Darf Hinweise bearbeiten"
+          "HINWEISE_BEARBEITEN": "Darf Hinweise bearbeiten",
+          "LANDESBEDIENSTETE_SUCHEN_UND_HINZUFUEGEN":"Darf Landesbedienstete suchen und hinzufügen",
+          "EINGESCHRAENKT_NEUE_BENUTZER_ERSTELLEN":"Darf eingeschränkt neue Benutzer erstellen"
         },
         "rollenarten": {
           "LERN": "Lern",
