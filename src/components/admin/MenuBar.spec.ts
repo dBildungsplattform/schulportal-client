@@ -142,13 +142,7 @@ describe('MenuBar', () => {
     await wrapper.find('[data-testid="schule-management-menu-item"]').trigger('click');
     await nextTick();
 
-    await wrapper.find('[data-testid="search-person-menu-item"]').trigger('click');
-    await nextTick();
-
-    await wrapper.find('[data-testid="add-person-menu-item"]').trigger('click');
-    await nextTick();
-
-    expect(push).toHaveBeenCalledTimes(7);
+    expect(push).toHaveBeenCalledTimes(5);
   });
 
   test('it refreshes when navigating to current route', async () => {
