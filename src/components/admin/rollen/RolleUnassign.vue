@@ -9,6 +9,7 @@
   import { type BulkErrorList, useBulkErrors } from '@/composables/useBulkErrors';
   import type { PersonenWithRolleAndZuordnung } from '@/stores/PersonStore';
   import PersonBulkError from '@/components/admin/personen/PersonBulkError.vue';
+  import type { RolleResponse } from '@/stores/RolleStore';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
@@ -21,10 +22,12 @@
     isDialogVisible: boolean;
     selectedPersonen: PersonenWithRolleAndZuordnung;
     selectedOrganisation: Organisation;
+    selectedRolle: RolleResponse;
   };
 
-  type Emits = (event: 'update:dialogExit', finished: boolean) => void;
-
+  type Emits = {
+    (event: 'update:dialogExit', finished: boolean): void;
+  };
   const props: Props = defineProps<Props>();
   const emit: Emits = defineEmits<Emits>();
 
@@ -38,9 +41,10 @@
   // Define the error list for the selected persons using the useBulkErrors composable
   const bulkErrorList: ComputedRef<BulkErrorList[]> = computed(() => useBulkErrors(props.selectedPersonen));
 
-  async function handleOrgUnassign(): Promise<void> {
-    await bulkOperationStore.bulkUnassignPersonenFromOrg(
+  async function handleRolleUnassign(): Promise<void> {
+    await bulkOperationStore.bulkUnassignPersonenFromRolle(
       props.selectedOrganisation.id,
+      props.selectedRolle.id,
       props.selectedPersonen.map((person: PersonWithRolleAndZuordnung) => person.person.id),
     );
 
@@ -56,8 +60,8 @@
     persistent
   >
     <LayoutCard
-      data-testid="org-unassign-layout-card"
-      :header="$t('admin.person.bulkUnassignOrganisation.cancelZuordnung')"
+      data-testid="rolle-unassign-layout-card"
+      :header="$t('admin.rolle.bulkRollenzuordnung.unassignRolleZuordnung')"
     >
       <!-- Initial block -->
       <v-container
@@ -69,15 +73,24 @@
             class="text-center"
             cols="10"
           >
-            <div data-testid="org-unassign-confirmation-text">
-              {{ t('admin.person.bulkUnassignOrganisation.confirmation') }}
+            <div data-testid="rolle-unassign-confirmation-text">
+              <p>{{ t('admin.rolle.bulkRollenzuordnung.confirmation') }}</p>
             </div>
-            <div data-testid="org-unassign-affected-school">
-              {{
-                t('admin.person.bulkUnassignOrganisation.affectedSchule', {
-                  schule: getDisplayNameForOrg(selectedOrganisation),
-                })
-              }}
+            <div data-testid="rolle-unassign-affected-school">
+              <p>
+                {{
+                  t('admin.rolle.bulkRollenzuordnung.affectedSchule', {
+                    schule: getDisplayNameForOrg(selectedOrganisation),
+                  })
+                }}
+              </p>
+              <p>
+                {{
+                  t('admin.rolle.bulkRollenzuordnung.affectedRolle', {
+                    rolle: selectedRolle.name,
+                  })
+                }}
+              </p>
             </div>
           </v-col>
         </v-row>
@@ -102,7 +115,7 @@
             </v-col>
           </v-row>
           <p class="mt-2 text-center">
-            {{ $t('admin.person.bulkUnassignOrganisation.success') }}
+            {{ $t('admin.rolle.bulkRollenzuordnung.success') }}
           </p>
         </v-container>
         <v-row
@@ -122,7 +135,7 @@
             ></v-icon>
             <span
               class="subtitle-2"
-              data-testid="org-unassign-progressing-notice"
+              data-testid="rolle-unassign-progressing-notice"
             >
               {{ t('admin.doNotCloseBrowserNotice') }}
             </span>
@@ -134,7 +147,7 @@
           :modelValue="bulkOperationStore.currentOperation?.progress"
           color="primary"
           height="25"
-          data-testid="org-unassign-progressbar"
+          data-testid="rolle-unassign-progressbar"
         >
           <template v-slot:default="{ value }">
             <strong class="text-white">{{ Math.ceil(value) }}%</strong>
@@ -154,7 +167,7 @@
               :block="mdAndDown"
               class="secondary"
               @click="closeDialog(true)"
-              data-testid="org-unassign-close-button"
+              data-testid="rolle-unassign-close-button"
             >
               {{ t('close') }}
             </v-btn>
@@ -163,7 +176,7 @@
               :block="mdAndDown"
               class="secondary"
               @click="closeDialog(false)"
-              data-testid="org-unassign-discard-button"
+              data-testid="rolle-unassign-discard-button"
             >
               {{ t('cancel') }}
             </v-btn>
@@ -178,11 +191,11 @@
               :block="mdAndDown"
               :disabled="bulkOperationStore.currentOperation?.isRunning"
               class="primary"
-              @click="handleOrgUnassign()"
-              data-testid="org-unassign-submit-button"
+              @click="handleRolleUnassign()"
+              data-testid="rolle-unassign-submit-button"
               type="submit"
             >
-              {{ t('admin.person.bulkUnassignOrganisation.cancelZuordnung') }}
+              {{ t('admin.rolle.bulkRollenzuordnung.unassignRolleZuordnung') }}
             </v-btn>
           </v-col>
         </v-row>
@@ -191,7 +204,7 @@
   </v-dialog>
   <template v-if="showErrorDialog">
     <PersonBulkError
-      :bulkOperationName="$t('admin.person.bulkUnassignOrganisation.cancelZuordnung')"
+      :bulkOperationName="$t('admin.rolle.bulkRollenzuordnung.unassignRolleZuordnung')"
       :isDialogVisible="showErrorDialog"
       @update:isDialogVisible="
         (val: boolean) => {
