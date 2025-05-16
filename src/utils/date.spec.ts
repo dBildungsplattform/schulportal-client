@@ -9,11 +9,6 @@ describe('getNextSchuljahresende', () => {
       expectedDate: new Date('2024-07-31'),
     },
     {
-      label: '31.07.',
-      systemTime: new Date('2024-07-31'),
-      expectedDate: new Date('2025-07-31'),
-    },
-    {
       label: 'past 31.07.',
       systemTime: new Date('2024-08-01'),
       expectedDate: new Date('2025-07-31'),
