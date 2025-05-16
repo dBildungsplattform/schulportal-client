@@ -5,7 +5,11 @@
   box-shadow: 0px 3px 6px #001e4940;
   color: variables.$bodyFontColor;
   margin-top: 10px;
-  min-width: 340px;
+
+
+  @media (min-width: 1280px) {
+    min-width: 330px;
+  }
 
   .v-list-item {
     padding: 15px 20px;
