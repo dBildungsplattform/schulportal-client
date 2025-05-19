@@ -1,28 +1,36 @@
 <script setup lang="ts">
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { type Organisation } from '@/stores/OrganisationStore';
-  import { computed, ref, type ComputedRef, type Ref } from 'vue';
+  import { computed, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
-  import { getDisplayNameForOrg } from '@/utils/formatting';
   import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
   import { type BulkErrorList, useBulkErrors } from '@/composables/useBulkErrors';
   import type { PersonenWithRolleAndZuordnung } from '@/stores/PersonStore';
   import PersonBulkError from '@/components/admin/personen/PersonBulkError.vue';
   import type { RolleResponse } from '@/stores/RolleStore';
+  import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
+  import type { TranslatedObject } from '@/types';
+  import { toTypedSchema } from '@vee-validate/yup';
+  import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
+  import { object, string } from 'yup';
+  import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
+  import { type PersonenkontextStore, usePersonenkontextStore } from '@/stores/PersonenkontextStore';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
+  const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
 
   type PersonWithRolleAndZuordnung = PersonenWithRolleAndZuordnung[number];
 
   type Props = {
     isDialogVisible: boolean;
+    organisationen: TranslatedObject[] | undefined;
     selectedPersonen: PersonenWithRolleAndZuordnung;
-    selectedOrganisation: Organisation;
-    selectedRolle: RolleResponse;
+    selectedOrganisationFromFilter: Organisation;
+    selectedRolleFromFilter?: RolleResponse;
   };
 
   type Emits = {
@@ -35,16 +43,61 @@
     bulkOperationStore.resetState();
     emit('update:dialogExit', finished);
   }
-
   const showErrorDialog: Ref<boolean, boolean> = ref(false);
+
+  // Local state for selectedOrganisation to avoid mutating the prop directly
+  const selectedOrganisationFromFilterId: Ref<string> = ref<string>(props.selectedOrganisationFromFilter.id);
+
+  const rollenForForm: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
 
   // Define the error list for the selected persons using the useBulkErrors composable
   const bulkErrorList: ComputedRef<BulkErrorList[]> = computed(() => useBulkErrors(props.selectedPersonen));
 
+  export type RolleUnassignForm = {
+    selectedRolle: string;
+  };
+
+  export type PersonenkontextFieldDefinitions = {
+    selectedRolle: Ref<string | undefined>;
+    selectedRolleProps: Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>;
+  };
+
+  const validationSchema = (): TypedSchema<RolleUnassignForm> => {
+    return toTypedSchema(
+      object({
+        selectedRolle: string().required(t('admin.rolle.rules.rolle.required')),
+      }),
+    );
+  };
+
+  const getVuetifyConfig = (state: {
+    errors: Array<string>;
+  }): { props: { error: boolean; 'error-messages': Array<string> } } => ({
+    props: {
+      error: !!state.errors.length,
+      'error-messages': state.errors,
+    },
+  });
+
+  const formContext: ReturnType<typeof useForm> = useForm<RolleUnassignForm>({
+    validationSchema,
+  });
+
+  const [selectedRolle, selectedRolleProps]: [
+    Ref<string | undefined>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = formContext.defineField('selectedRolle', getVuetifyConfig);
+
+  function handleFieldReset(field: string): void {
+    if (field === 'selectedRolle') {
+      selectedRolle.value = undefined;
+    }
+  }
+
   async function handleRolleUnassign(): Promise<void> {
     await bulkOperationStore.bulkUnassignPersonenFromRolle(
-      props.selectedOrganisation.id,
-      props.selectedRolle.id,
+      selectedOrganisationFromFilterId.value,
+      selectedRolle.value ?? props.selectedRolleFromFilter?.id ?? '',
       props.selectedPersonen.map((person: PersonWithRolleAndZuordnung) => person.person.id),
     );
 
@@ -52,6 +105,18 @@
       showErrorDialog.value = true;
     }
   }
+
+  watch(
+    () => props.selectedOrganisationFromFilter.id,
+    async (newValue: string) => {
+      await personenkontextStore.processWorkflowStep({
+        organisationId: newValue,
+        rollenIds: props.selectedRolleFromFilter ? [props.selectedRolleFromFilter.id] : [],
+        limit: 25,
+      });
+    },
+    { immediate: true },
+  );
 </script>
 
 <template>
@@ -68,32 +133,21 @@
         class="mt-8 mb-4"
         v-if="bulkOperationStore.currentOperation?.progress === 0"
       >
-        <v-row class="text-body bold justify-center">
-          <v-col
-            class="text-center"
-            cols="10"
-          >
-            <div data-testid="rolle-unassign-confirmation-text">
-              <p>{{ t('admin.rolle.bulkRollenzuordnung.confirmation') }}</p>
-            </div>
-            <div data-testid="rolle-unassign-affected-school">
-              <p>
-                {{
-                  t('admin.rolle.bulkRollenzuordnung.affectedSchule', {
-                    schule: getDisplayNameForOrg(selectedOrganisation),
-                  })
-                }}
-              </p>
-              <p>
-                {{
-                  t('admin.rolle.bulkRollenzuordnung.affectedRolle', {
-                    rolle: selectedRolle.name,
-                  })
-                }}
-              </p>
-            </div>
-          </v-col>
-        </v-row>
+        <template v-if="bulkOperationStore.currentOperation?.progress === 0">
+          <PersonenkontextCreate
+            v-if="bulkOperationStore.currentOperation?.progress === 0"
+            ref="personenkontext-create"
+            :showHeadline="false"
+            :selectedOrganisation="selectedOrganisationFromFilterId"
+            :organisationen="props.organisationen"
+            :rollen="rollenForForm"
+            :selectedRolleProps="selectedRolleProps"
+            :isRolleUnassignForm="true"
+            :selectedRolle="props.selectedRolleFromFilter ? props.selectedRolleFromFilter.id : undefined"
+            @update:selectedRolle="(value?: string) => (selectedRolle = value)"
+            @fieldReset="handleFieldReset"
+          />
+        </template>
       </v-container>
 
       <!-- In progress -->
@@ -156,7 +210,7 @@
       </v-container>
 
       <v-card-actions class="justify-center">
-        <v-row class="py-3 px-2 justify-center">
+        <v-row class="py-3 px-2 justify-end">
           <v-col
             cols="12"
             sm="6"

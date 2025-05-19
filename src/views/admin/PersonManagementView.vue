@@ -464,12 +464,12 @@
     getPaginatedPersonen(searchFilterStore.personenPage);
   }
 
-  const singleSchuleSelected: ComputedRef<boolean> = computed(() => {
-    return selectedOrganisationIds.value.length === 1;
+  const singleRolleSelected: ComputedRef<boolean> = computed(() => {
+    return selectedRollenObjects.value.length <= 1;
   });
 
-  const singleRolleSelected: ComputedRef<boolean> = computed(() => {
-    return selectedRollenObjects.value.length === 1;
+  const singleSchuleSelected: ComputedRef<boolean> = computed(() => {
+    return selectedOrganisationIds.value.length === 1;
   });
 
   const singleSelectionAlertHeader: ComputedRef<string> = computed(() => {
@@ -484,18 +484,19 @@
     return selectedRollenObjects.value.find((rolle: RolleResponse) => rolle.id === selectedRollen.value[0]);
   });
 
-  const checkSingleOrgDisplayDialog = (dialog: Ref<boolean>): void => {
-    if (!singleSchuleSelected.value) {
-      onlyOneOrganisationAlertDialogVisible.value = true;
+  
+  const checkSingleOrgAndRolleDisplayDialog = (dialog: Ref<boolean>): void => {
+    // Check if both a single organisation and a single rolle are selected
+    if (!singleSchuleSelected.value || !singleRolleSelected.value) {
+      onlyOneOrganisationAndRolleAlertDialogVisible.value = true;
       return;
     }
     dialog.value = true;
   };
 
-  const checkSingleOrgAndRolleDisplayDialog = (dialog: Ref<boolean>): void => {
-    // Check if both a single organisation and a single rolle are selected
-    if (!singleSchuleSelected.value || !singleRolleSelected.value) {
-      onlyOneOrganisationAndRolleAlertDialogVisible.value = true;
+  const checkSingleOrgDisplayDialog = (dialog: Ref<boolean>): void => {
+    if (!singleSchuleSelected.value) {
+      onlyOneOrganisationAlertDialogVisible.value = true;
       return;
     }
     dialog.value = true;
@@ -955,11 +956,12 @@
           </OrganisationUnassign>
           <RolleUnassign
             ref="rolle-unassign"
-            v-if="rolleUnassignDialogVisible && selectedOrganisation && selectedRolle"
+            v-if="rolleUnassignDialogVisible && selectedOrganisation"
             :isDialogVisible="rolleUnassignDialogVisible"
+            :organisationen="organisationenForForm"
             :selectedPersonen
-            :selectedOrganisation="selectedOrganisation"
-            :selectedRolle="selectedRolle!"
+            :selectedOrganisationFromFilter="selectedOrganisation"
+            :selectedRolleFromFilter="selectedRolle!"
             @update:dialogExit="handleUnassignRolleDialog($event)"
           >
           </RolleUnassign>
