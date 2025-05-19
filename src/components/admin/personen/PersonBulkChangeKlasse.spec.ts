@@ -7,7 +7,7 @@ import { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
 import type { Zuordnung } from '@/stores/types/Zuordnung';
 import type { TranslatedObject } from '@/types';
 import { faker } from '@faker-js/faker';
-import { DOMWrapper, VueWrapper, flushPromises, mount } from '@vue/test-utils';
+import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
 import { DoFactory } from 'test/DoFactory';
 import type { MockInstance } from 'vitest';
@@ -86,7 +86,7 @@ beforeEach(async () => {
 
 describe('PersonBulkChangeKlasse', () => {
   test('commit button should be disabled initially', async () => {
-    const wrapper: VueWrapper = mountComponent();
+    mountComponent();
     await nextTick();
     const button: Element = document.querySelector('[data-testid="bulk-change-klasse-button"]')!;
     expect(button).not.toBeNull();

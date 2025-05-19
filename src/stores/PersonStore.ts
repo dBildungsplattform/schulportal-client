@@ -143,9 +143,11 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
 
         // Store the fetched persons
         const allPersons: Map<string, Person> = new Map();
+        const personIds: string[] = []; // keep ids in an array, so we do not need to rely on the order of the map
         for (const personendatensatz of data.items) {
           const person: Person = Person.fromResponse(personendatensatz.person);
           allPersons.set(person.id, person);
+          personIds.push(person.id);
         }
         this.totalPersons = +data.total;
 
@@ -155,15 +157,23 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
           return;
         }
         const bodyParams: PersonenuebersichtBodyParams = {
-          personIds: [...allPersons.keys()],
+          personIds,
         };
         const { data: uebersichten }: { data: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response } =
           await personenuebersichtApi.dBiamPersonenuebersichtControllerFindPersonenuebersichten(bodyParams);
+        const tempUebersichtenMap: Map<string, DBiamPersonenuebersichtResponse> = new Map(
+          uebersichten.items.map((uebersicht: DBiamPersonenuebersichtResponse) => {
+            return [uebersicht.personId, uebersicht];
+          }),
+        );
         this.allUebersichten = new Map<string, PersonWithZuordnungen>();
         // Aggregate the personen with their uebersichten
-        for (const uebersicht of uebersichten.items) {
-          const person: Person | undefined = allPersons.get(uebersicht.personId);
-          if (!person) continue;
+        for (const personId of personIds) {
+          const person: Person = allPersons.get(personId)!;
+
+          const uebersicht: DBiamPersonenuebersichtResponse | undefined = tempUebersichtenMap.get(personId);
+          if (!uebersicht) continue;
+
           const zuordnungen: Zuordnung[] = uebersicht.zuordnungen.map(
             (zuordnungResponse: DBiamPersonenzuordnungResponse) => Zuordnung.fromResponse(zuordnungResponse),
           );

@@ -131,6 +131,61 @@ describe('PersonStore', () => {
       }
     });
 
+    it('should skip, if persons or their overviews are missing', async () => {
+      const mockSchule: Organisation = DoFactory.getOrganisation();
+      // Mock data for persons
+      const mockPersons: PersonendatensatzResponse[] = [
+        DoFactory.getPersonendatensatzResponse(),
+        DoFactory.getPersonendatensatzResponse(),
+      ];
+
+      // Mock response for persons
+      const mockPersonsResponse: PersonFrontendControllerFindPersons200Response = {
+        offset: 0,
+        limit: mockPersons.length,
+        total: mockPersons.length,
+        items: mockPersons,
+      };
+
+      // Mock data for person overviews
+      const mockUebersichten: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response = {
+        total: mockPersons.length,
+        offset: 0,
+        limit: mockPersons.length,
+        items: [
+          DoFactory.getDBiamPersonenuebersichtResponse(
+            {
+              personId: mockPersons[0]!.person.id,
+              vorname: mockPersons[0]!.person.name.vorname,
+              nachname: mockPersons[0]!.person.name.familienname,
+              benutzername: mockPersons[0]!.person.referrer ?? '---',
+            },
+            {
+              organisation: mockSchule,
+            },
+          ),
+        ],
+      };
+
+      // add extra response for statement coverage; this can't happen in real life
+      const mockUebersichtenResponse: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response = {
+        ...mockUebersichten,
+      };
+
+      mockadapter.onGet('/api/personen-frontend').replyOnce(200, mockPersonsResponse);
+
+      // Update the mock POST request with the appropriate body
+      const personIds: string[] = mockPersons.map((person: PersonendatensatzResponse) => person.person.id);
+      mockadapter.onPost('/api/dbiam/personenuebersicht', { personIds }).replyOnce(200, mockUebersichtenResponse);
+
+      const getAllPersonsPromise: Promise<void> = personStore.getAllPersons({});
+      expect(personStore.loading).toBe(true);
+      await getAllPersonsPromise;
+      expect(personStore.loading).toBe(false);
+
+      expect(personStore.allUebersichten.size).toEqual(1);
+    });
+
     it('should return empty map if no persons were found', async () => {
       // Mock response for persons
       const mockPersonsResponse: PersonFrontendControllerFindPersons200Response = {
