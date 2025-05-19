@@ -64,10 +64,10 @@
 
   const handleCloseDialog = (): void => {
     showErrorDialog.value = false;
+    emit('update:dialogExit', state.value === State.FINISHED);
     if (bulkOperationStore.currentOperation) {
       bulkOperationStore.resetState();
     }
-    emit('update:dialogExit', state.value === State.FINISHED);
   };
 </script>
 
