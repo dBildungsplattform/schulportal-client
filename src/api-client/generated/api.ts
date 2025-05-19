@@ -223,49 +223,6 @@ export interface CreateOrganisationBodyParams {
 /**
  * 
  * @export
- * @interface CreatePersonMigrationBodyParams
- */
-export interface CreatePersonMigrationBodyParams {
-    /**
-     * 
-     * @type {string}
-     * @memberof CreatePersonMigrationBodyParams
-     */
-    'personId': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CreatePersonMigrationBodyParams
-     */
-    'familienname': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CreatePersonMigrationBodyParams
-     */
-    'vorname': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CreatePersonMigrationBodyParams
-     */
-    'hashedPassword'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CreatePersonMigrationBodyParams
-     */
-    'username'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CreatePersonMigrationBodyParams
-     */
-    'personalnummer'?: string;
-}
-/**
- * 
- * @export
  * @interface CreateRolleBodyParams
  */
 export interface CreateRolleBodyParams {
@@ -755,57 +712,6 @@ export type DbiamPersonenkontextErrorI18nKeyEnum = typeof DbiamPersonenkontextEr
 /**
  * 
  * @export
- * @interface DbiamPersonenkontextMigrationBodyParams
- */
-export interface DbiamPersonenkontextMigrationBodyParams {
-    /**
-     * 
-     * @type {string}
-     * @memberof DbiamPersonenkontextMigrationBodyParams
-     */
-    'personId': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof DbiamPersonenkontextMigrationBodyParams
-     */
-    'username'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof DbiamPersonenkontextMigrationBodyParams
-     */
-    'organisationId': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof DbiamPersonenkontextMigrationBodyParams
-     */
-    'rolleId': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof DbiamPersonenkontextMigrationBodyParams
-     */
-    'befristung'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof DbiamPersonenkontextMigrationBodyParams
-     */
-    'email'?: string;
-    /**
-     * 
-     * @type {PersonenkontextMigrationRuntype}
-     * @memberof DbiamPersonenkontextMigrationBodyParams
-     */
-    'migrationRunType': PersonenkontextMigrationRuntype;
-}
-
-
-/**
- * 
- * @export
  * @interface DbiamPersonenkontexteUpdateError
  */
 export interface DbiamPersonenkontexteUpdateError {
@@ -917,7 +823,10 @@ export const EmailAddressStatus = {
     Enabled: 'ENABLED',
     Disabled: 'DISABLED',
     Requested: 'REQUESTED',
-    Failed: 'FAILED'
+    Failed: 'FAILED',
+    DeletedLdap: 'DELETED_LDAP',
+    DeletedOx: 'DELETED_OX',
+    Deleted: 'DELETED'
 } as const;
 
 export type EmailAddressStatus = typeof EmailAddressStatus[keyof typeof EmailAddressStatus];
@@ -2274,6 +2183,51 @@ export interface PersonTimeLimitInfoResponse {
 /**
  * 
  * @export
+ * @interface PersonenInfoKontextOrganisationResponse
+ */
+export interface PersonenInfoKontextOrganisationResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonenInfoKontextOrganisationResponse
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonenInfoKontextOrganisationResponse
+     */
+    'name': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonenInfoKontextOrganisationResponse
+     */
+    'typ': PersonenInfoKontextOrganisationResponseTypEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonenInfoKontextOrganisationResponse
+     */
+    'kennung': string | null;
+}
+
+export const PersonenInfoKontextOrganisationResponseTypEnum = {
+    Root: 'ROOT',
+    Land: 'LAND',
+    Traeger: 'TRAEGER',
+    Schule: 'SCHULE',
+    Klasse: 'KLASSE',
+    Anbieter: 'ANBIETER',
+    SonstigeOrganisationEinrichtung: 'SONSTIGE ORGANISATION / EINRICHTUNG',
+    Unbestaetigt: 'UNBESTAETIGT'
+} as const;
+
+export type PersonenInfoKontextOrganisationResponseTypEnum = typeof PersonenInfoKontextOrganisationResponseTypEnum[keyof typeof PersonenInfoKontextOrganisationResponseTypEnum];
+
+/**
+ * 
+ * @export
  * @interface PersonenInfoKontextResponse
  */
 export interface PersonenInfoKontextResponse {
@@ -2297,10 +2251,10 @@ export interface PersonenInfoKontextResponse {
     'mandant': string;
     /**
      * 
-     * @type {object}
+     * @type {PersonenInfoKontextOrganisationResponse}
      * @memberof PersonenInfoKontextResponse
      */
-    'organisation': object;
+    'organisation': PersonenInfoKontextOrganisationResponse;
     /**
      * 
      * @type {string}
@@ -2403,20 +2357,6 @@ export interface PersonendatensatzResponseAutomapper {
      */
     'personenkontexte': Array<PersonenkontextResponse>;
 }
-/**
- * 
- * @export
- * @enum {string}
- */
-
-export const PersonenkontextMigrationRuntype = {
-    Itslearning: 'ITSLEARNING',
-    Standard: 'STANDARD'
-} as const;
-
-export type PersonenkontextMigrationRuntype = typeof PersonenkontextMigrationRuntype[keyof typeof PersonenkontextMigrationRuntype];
-
-
 /**
  * 
  * @export
@@ -2892,10 +2832,11 @@ export const RollenSystemRecht = {
     RollenVerwalten: 'ROLLEN_VERWALTEN',
     PersonenSofortLoeschen: 'PERSONEN_SOFORT_LOESCHEN',
     PersonenVerwalten: 'PERSONEN_VERWALTEN',
+    LandesbediensteteSuchenUndHinzufuegen: 'LANDESBEDIENSTETE_SUCHEN_UND_HINZUFUEGEN',
+    EingeschraenktNeueBenutzerErstellen: 'EINGESCHRAENKT_NEUE_BENUTZER_ERSTELLEN',
     SchulenVerwalten: 'SCHULEN_VERWALTEN',
     KlassenVerwalten: 'KLASSEN_VERWALTEN',
     SchultraegerVerwalten: 'SCHULTRAEGER_VERWALTEN',
-    MigrationDurchfuehren: 'MIGRATION_DURCHFUEHREN',
     PersonSynchronisieren: 'PERSON_SYNCHRONISIEREN',
     CronDurchfuehren: 'CRON_DURCHFUEHREN',
     PersonenAnlegen: 'PERSONEN_ANLEGEN',
@@ -4701,6 +4642,43 @@ export const CronApiAxiosParamCreator = function (configuration?: Configuration)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
+        cronControllerEmailAddressesDelete: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/cron/email-addresses-delete`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
         cronControllerKoPersUserLock: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/cron/kopers-lock`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -4896,6 +4874,15 @@ export const CronApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
+        async cronControllerEmailAddressesDelete(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<boolean>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.cronControllerEmailAddressesDelete(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
         async cronControllerKoPersUserLock(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<boolean>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.cronControllerKoPersUserLock(options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
@@ -4951,6 +4938,14 @@ export const CronApiFactory = function (configuration?: Configuration, basePath?
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
+        cronControllerEmailAddressesDelete(options?: any): AxiosPromise<boolean> {
+            return localVarFp.cronControllerEmailAddressesDelete(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
         cronControllerKoPersUserLock(options?: any): AxiosPromise<boolean> {
             return localVarFp.cronControllerKoPersUserLock(options).then((request) => request(axios, basePath));
         },
@@ -4995,6 +4990,14 @@ export const CronApiFactory = function (configuration?: Configuration, basePath?
  * @interface CronApi
  */
 export interface CronApiInterface {
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CronApiInterface
+     */
+    cronControllerEmailAddressesDelete(options?: AxiosRequestConfig): AxiosPromise<boolean>;
+
     /**
      * 
      * @param {*} [options] Override http request option.
@@ -5050,6 +5053,16 @@ export class CronApi extends BaseAPI implements CronApiInterface {
      * @throws {RequiredError}
      * @memberof CronApi
      */
+    public cronControllerEmailAddressesDelete(options?: AxiosRequestConfig) {
+        return CronApiFp(this.configuration).cronControllerEmailAddressesDelete(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CronApi
+     */
     public cronControllerKoPersUserLock(options?: AxiosRequestConfig) {
         return CronApiFp(this.configuration).cronControllerKoPersUserLock(options).then((request) => request(this.axios, this.basePath));
     }
@@ -5092,214 +5105,6 @@ export class CronApi extends BaseAPI implements CronApiInterface {
      */
     public cronControllerUpdateServiceProvidersForVidisAngebote(options?: AxiosRequestConfig) {
         return CronApiFp(this.configuration).cronControllerUpdateServiceProvidersForVidisAngebote(options).then((request) => request(this.axios, this.basePath));
-    }
-}
-
-
-/**
- * DbiamPersonenkontexteApi - axios parameter creator
- * @export
- */
-export const DbiamPersonenkontexteApiAxiosParamCreator = function (configuration?: Configuration) {
-    return {
-        /**
-         * 
-         * @param {DbiamPersonenkontextMigrationBodyParams} dbiamPersonenkontextMigrationBodyParams 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        dBiamPersonenkontextControllerCreatePersonenkontextMigration: async (dbiamPersonenkontextMigrationBodyParams: DbiamPersonenkontextMigrationBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'dbiamPersonenkontextMigrationBodyParams' is not null or undefined
-            assertParamExists('dBiamPersonenkontextControllerCreatePersonenkontextMigration', 'dbiamPersonenkontextMigrationBodyParams', dbiamPersonenkontextMigrationBodyParams)
-            const localVarPath = `/api/dbiam/personenkontext`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication bearer required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            // authentication oauth2 required
-            // oauth required
-            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(dbiamPersonenkontextMigrationBodyParams, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @param {string} personId The ID for the person.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        dBiamPersonenkontextControllerFindPersonenkontextsByPerson: async (personId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'personId' is not null or undefined
-            assertParamExists('dBiamPersonenkontextControllerFindPersonenkontextsByPerson', 'personId', personId)
-            const localVarPath = `/api/dbiam/personenkontext/{personId}`
-                .replace(`{${"personId"}}`, encodeURIComponent(String(personId)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication bearer required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            // authentication oauth2 required
-            // oauth required
-            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-    }
-};
-
-/**
- * DbiamPersonenkontexteApi - functional programming interface
- * @export
- */
-export const DbiamPersonenkontexteApiFp = function(configuration?: Configuration) {
-    const localVarAxiosParamCreator = DbiamPersonenkontexteApiAxiosParamCreator(configuration)
-    return {
-        /**
-         * 
-         * @param {DbiamPersonenkontextMigrationBodyParams} dbiamPersonenkontextMigrationBodyParams 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async dBiamPersonenkontextControllerCreatePersonenkontextMigration(dbiamPersonenkontextMigrationBodyParams: DbiamPersonenkontextMigrationBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DBiamPersonenkontextResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.dBiamPersonenkontextControllerCreatePersonenkontextMigration(dbiamPersonenkontextMigrationBodyParams, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * 
-         * @param {string} personId The ID for the person.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async dBiamPersonenkontextControllerFindPersonenkontextsByPerson(personId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<DBiamPersonenkontextResponse>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.dBiamPersonenkontextControllerFindPersonenkontextsByPerson(personId, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-    }
-};
-
-/**
- * DbiamPersonenkontexteApi - factory interface
- * @export
- */
-export const DbiamPersonenkontexteApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
-    const localVarFp = DbiamPersonenkontexteApiFp(configuration)
-    return {
-        /**
-         * 
-         * @param {DbiamPersonenkontextMigrationBodyParams} dbiamPersonenkontextMigrationBodyParams 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        dBiamPersonenkontextControllerCreatePersonenkontextMigration(dbiamPersonenkontextMigrationBodyParams: DbiamPersonenkontextMigrationBodyParams, options?: any): AxiosPromise<DBiamPersonenkontextResponse> {
-            return localVarFp.dBiamPersonenkontextControllerCreatePersonenkontextMigration(dbiamPersonenkontextMigrationBodyParams, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @param {string} personId The ID for the person.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        dBiamPersonenkontextControllerFindPersonenkontextsByPerson(personId: string, options?: any): AxiosPromise<Array<DBiamPersonenkontextResponse>> {
-            return localVarFp.dBiamPersonenkontextControllerFindPersonenkontextsByPerson(personId, options).then((request) => request(axios, basePath));
-        },
-    };
-};
-
-/**
- * DbiamPersonenkontexteApi - interface
- * @export
- * @interface DbiamPersonenkontexteApi
- */
-export interface DbiamPersonenkontexteApiInterface {
-    /**
-     * 
-     * @param {DbiamPersonenkontextMigrationBodyParams} dbiamPersonenkontextMigrationBodyParams 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DbiamPersonenkontexteApiInterface
-     */
-    dBiamPersonenkontextControllerCreatePersonenkontextMigration(dbiamPersonenkontextMigrationBodyParams: DbiamPersonenkontextMigrationBodyParams, options?: AxiosRequestConfig): AxiosPromise<DBiamPersonenkontextResponse>;
-
-    /**
-     * 
-     * @param {string} personId The ID for the person.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DbiamPersonenkontexteApiInterface
-     */
-    dBiamPersonenkontextControllerFindPersonenkontextsByPerson(personId: string, options?: AxiosRequestConfig): AxiosPromise<Array<DBiamPersonenkontextResponse>>;
-
-}
-
-/**
- * DbiamPersonenkontexteApi - object-oriented interface
- * @export
- * @class DbiamPersonenkontexteApi
- * @extends {BaseAPI}
- */
-export class DbiamPersonenkontexteApi extends BaseAPI implements DbiamPersonenkontexteApiInterface {
-    /**
-     * 
-     * @param {DbiamPersonenkontextMigrationBodyParams} dbiamPersonenkontextMigrationBodyParams 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DbiamPersonenkontexteApi
-     */
-    public dBiamPersonenkontextControllerCreatePersonenkontextMigration(dbiamPersonenkontextMigrationBodyParams: DbiamPersonenkontextMigrationBodyParams, options?: AxiosRequestConfig) {
-        return DbiamPersonenkontexteApiFp(this.configuration).dBiamPersonenkontextControllerCreatePersonenkontextMigration(dbiamPersonenkontextMigrationBodyParams, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @param {string} personId The ID for the person.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DbiamPersonenkontexteApi
-     */
-    public dBiamPersonenkontextControllerFindPersonenkontextsByPerson(personId: string, options?: AxiosRequestConfig) {
-        return DbiamPersonenkontexteApiFp(this.configuration).dBiamPersonenkontextControllerFindPersonenkontextsByPerson(personId, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -6982,10 +6787,12 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
          * @param {Array<string>} [administriertVon] 
          * @param {Array<string>} [zugehoerigZu] Liefert die Kind-Organisationen, die den angegebenen IDs zugehörig sind.
          * @param {Array<string>} [organisationIds] Liefert Organisationen mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
+         * @param {'asc' | 'desc'} [sortOrder] Order to sort by.
+         * @param {'name' | 'kennung'} [sortField] Field to sort by.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerFindOrganizations: async (offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        organisationControllerFindOrganizations: async (offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, sortOrder?: 'asc' | 'desc', sortField?: 'name' | 'kennung', options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/organisationen`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -7048,6 +6855,14 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
 
             if (organisationIds) {
                 localVarQueryParameter['organisationIds'] = organisationIds;
+            }
+
+            if (sortOrder !== undefined) {
+                localVarQueryParameter['sortOrder'] = sortOrder;
+            }
+
+            if (sortField !== undefined) {
+                localVarQueryParameter['sortField'] = sortField;
             }
 
 
@@ -7444,11 +7259,13 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
          * @param {Array<string>} [administriertVon] 
          * @param {Array<string>} [zugehoerigZu] Liefert die Kind-Organisationen, die den angegebenen IDs zugehörig sind.
          * @param {Array<string>} [organisationIds] Liefert Organisationen mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
+         * @param {'asc' | 'desc'} [sortOrder] Order to sort by.
+         * @param {'name' | 'kennung'} [sortField] Field to sort by.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OrganisationResponse>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, systemrechte, excludeTyp, administriertVon, zugehoerigZu, organisationIds, options);
+        async organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, sortOrder?: 'asc' | 'desc', sortField?: 'name' | 'kennung', options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OrganisationResponse>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, systemrechte, excludeTyp, administriertVon, zugehoerigZu, organisationIds, sortOrder, sortField, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -7594,11 +7411,13 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
          * @param {Array<string>} [administriertVon] 
          * @param {Array<string>} [zugehoerigZu] Liefert die Kind-Organisationen, die den angegebenen IDs zugehörig sind.
          * @param {Array<string>} [organisationIds] Liefert Organisationen mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
+         * @param {'asc' | 'desc'} [sortOrder] Order to sort by.
+         * @param {'name' | 'kennung'} [sortField] Field to sort by.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, options?: any): AxiosPromise<Array<OrganisationResponse>> {
-            return localVarFp.organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, systemrechte, excludeTyp, administriertVon, zugehoerigZu, organisationIds, options).then((request) => request(axios, basePath));
+        organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, sortOrder?: 'asc' | 'desc', sortField?: 'name' | 'kennung', options?: any): AxiosPromise<Array<OrganisationResponse>> {
+            return localVarFp.organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, systemrechte, excludeTyp, administriertVon, zugehoerigZu, organisationIds, sortOrder, sortField, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -7735,11 +7554,13 @@ export interface OrganisationenApiInterface {
      * @param {Array<string>} [administriertVon] 
      * @param {Array<string>} [zugehoerigZu] Liefert die Kind-Organisationen, die den angegebenen IDs zugehörig sind.
      * @param {Array<string>} [organisationIds] Liefert Organisationen mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
+     * @param {'asc' | 'desc'} [sortOrder] Order to sort by.
+     * @param {'name' | 'kennung'} [sortField] Field to sort by.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganisationenApiInterface
      */
-    organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, options?: AxiosRequestConfig): AxiosPromise<Array<OrganisationResponse>>;
+    organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, sortOrder?: 'asc' | 'desc', sortField?: 'name' | 'kennung', options?: AxiosRequestConfig): AxiosPromise<Array<OrganisationResponse>>;
 
     /**
      * 
@@ -7886,12 +7707,14 @@ export class OrganisationenApi extends BaseAPI implements OrganisationenApiInter
      * @param {Array<string>} [administriertVon] 
      * @param {Array<string>} [zugehoerigZu] Liefert die Kind-Organisationen, die den angegebenen IDs zugehörig sind.
      * @param {Array<string>} [organisationIds] Liefert Organisationen mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
+     * @param {'asc' | 'desc'} [sortOrder] Order to sort by.
+     * @param {'name' | 'kennung'} [sortField] Field to sort by.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganisationenApi
      */
-    public organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, options?: AxiosRequestConfig) {
-        return OrganisationenApiFp(this.configuration).organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, systemrechte, excludeTyp, administriertVon, zugehoerigZu, organisationIds, options).then((request) => request(this.axios, this.basePath));
+    public organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRecht>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, sortOrder?: 'asc' | 'desc', sortField?: 'name' | 'kennung', options?: AxiosRequestConfig) {
+        return OrganisationenApiFp(this.configuration).organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, systemrechte, excludeTyp, administriertVon, zugehoerigZu, organisationIds, sortOrder, sortField, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -8241,49 +8064,6 @@ export class PersonInfoApi extends BaseAPI implements PersonInfoApiInterface {
  */
 export const PersonenApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
-        /**
-         * 
-         * @param {CreatePersonMigrationBodyParams} createPersonMigrationBodyParams 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        personControllerCreatePersonMigration: async (createPersonMigrationBodyParams: CreatePersonMigrationBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'createPersonMigrationBodyParams' is not null or undefined
-            assertParamExists('personControllerCreatePersonMigration', 'createPersonMigrationBodyParams', createPersonMigrationBodyParams)
-            const localVarPath = `/api/personen`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication bearer required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            // authentication oauth2 required
-            // oauth required
-            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(createPersonMigrationBodyParams, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
         /**
          * 
          * @summary 
@@ -8885,16 +8665,6 @@ export const PersonenApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
-         * @param {CreatePersonMigrationBodyParams} createPersonMigrationBodyParams 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async personControllerCreatePersonMigration(createPersonMigrationBodyParams: CreatePersonMigrationBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonendatensatzResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.personControllerCreatePersonMigration(createPersonMigrationBodyParams, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * 
          * @summary 
          * @param {string} personId 
          * @param {*} [options] Override http request option.
@@ -9045,15 +8815,6 @@ export const PersonenApiFactory = function (configuration?: Configuration, baseP
     return {
         /**
          * 
-         * @param {CreatePersonMigrationBodyParams} createPersonMigrationBodyParams 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        personControllerCreatePersonMigration(createPersonMigrationBodyParams: CreatePersonMigrationBodyParams, options?: any): AxiosPromise<PersonendatensatzResponse> {
-            return localVarFp.personControllerCreatePersonMigration(createPersonMigrationBodyParams, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
          * @summary 
          * @param {string} personId 
          * @param {*} [options] Override http request option.
@@ -9191,15 +8952,6 @@ export const PersonenApiFactory = function (configuration?: Configuration, baseP
 export interface PersonenApiInterface {
     /**
      * 
-     * @param {CreatePersonMigrationBodyParams} createPersonMigrationBodyParams 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof PersonenApiInterface
-     */
-    personControllerCreatePersonMigration(createPersonMigrationBodyParams: CreatePersonMigrationBodyParams, options?: AxiosRequestConfig): AxiosPromise<PersonendatensatzResponse>;
-
-    /**
-     * 
      * @summary 
      * @param {string} personId 
      * @param {*} [options] Override http request option.
@@ -9335,17 +9087,6 @@ export interface PersonenApiInterface {
  * @extends {BaseAPI}
  */
 export class PersonenApi extends BaseAPI implements PersonenApiInterface {
-    /**
-     * 
-     * @param {CreatePersonMigrationBodyParams} createPersonMigrationBodyParams 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof PersonenApi
-     */
-    public personControllerCreatePersonMigration(createPersonMigrationBodyParams: CreatePersonMigrationBodyParams, options?: AxiosRequestConfig) {
-        return PersonenApiFp(this.configuration).personControllerCreatePersonMigration(createPersonMigrationBodyParams, options).then((request) => request(this.axios, this.basePath));
-    }
-
     /**
      * 
      * @summary 

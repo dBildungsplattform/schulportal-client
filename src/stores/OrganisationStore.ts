@@ -16,6 +16,7 @@ import {
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 import { useSearchFilterStore, type SearchFilterStore } from './SearchFilterStore';
+import type { OrganisationSortField, SortOrder } from '@/utils/sorting';
 
 const organisationApi: OrganisationenApiInterface = OrganisationenApiFactory(undefined, '', axiosApiInstance);
 const searchFilterStore: SearchFilterStore = useSearchFilterStore();
@@ -109,6 +110,7 @@ type OrganisationState = {
   parentOrganisationen: Array<Organisation>;
   schultraeger: Array<Organisation>;
   activatedItslearningOrganisation: Organisation | null;
+  cachedSchulenMap: Map<string, string>;
 };
 
 export type OrganisationenFilter = {
@@ -121,6 +123,8 @@ export type OrganisationenFilter = {
   administriertVon?: Array<string>;
   zugehoerigZu?: Array<string>;
   organisationIds?: Array<string>;
+  sortOrder?: SortOrder;
+  sortField?: OrganisationSortField;
 };
 
 export type GetAdministrierteOrganisationenFilter = {
@@ -217,6 +221,7 @@ export const useOrganisationStore: StoreDefinition<
       parentOrganisationen: [],
       schultraeger: [],
       activatedItslearningOrganisation: null,
+      cachedSchulenMap: new Map<string, string>(),
     };
   },
 
@@ -236,6 +241,8 @@ export const useOrganisationStore: StoreDefinition<
           filter?.administriertVon,
           filter?.zugehoerigZu,
           filter?.organisationIds,
+          filter?.sortOrder,
+          filter?.sortField,
         );
         if (filter?.includeTyp === OrganisationsTyp.Klasse) {
           this.allKlassen = response.data;
@@ -266,20 +273,34 @@ export const useOrganisationStore: StoreDefinition<
     },
 
     async fetchSchuleDetailsForKlassen(filterActive: boolean): Promise<void> {
-      let administriertVonSet: Set<string> = new Set();
-      if (filterActive) {
-        administriertVonSet = new Set(
-          this.klassen
+      const getAdministriertVonSet = (klassen: Organisation[]): Set<string> => {
+        return new Set(
+          klassen
             .map((klasse: Organisation) => klasse.administriertVon)
             .filter((id: string | undefined | null): id is string => id !== null && id !== undefined),
         );
-      } else {
-        administriertVonSet = new Set(
-          this.allKlassen
-            .map((klasse: Organisation) => klasse.administriertVon)
-            .filter((id: string | undefined | null): id is string => id !== null && id !== undefined),
-        );
-      }
+      };
+
+      const updateSchuleDetails = (klassen: Organisation[]): Organisation[] => {
+        return klassen.map((klasse: Organisation) => ({
+          ...klasse,
+          schuleDetails: this.cachedSchulenMap.get(klasse.administriertVon ?? '') ?? '---',
+        }));
+      };
+
+      const administriertVonSet: Set<string> = filterActive
+        ? getAdministriertVonSet(this.klassen)
+        : getAdministriertVonSet(this.allKlassen);
+
+      const uncachedIds: string[] = Array.from(administriertVonSet).filter(
+        (id: string) => !this.cachedSchulenMap.has(id),
+      );
+
+      // Use cached values for schuleDetails
+      this.allKlassen = updateSchuleDetails(this.allKlassen);
+      this.klassen = updateSchuleDetails(this.klassen);
+
+      if (uncachedIds.length === 0) return; // Skip API call if all IDs are cached
 
       this.loading = true;
       try {
@@ -294,23 +315,21 @@ export const useOrganisationStore: StoreDefinition<
           undefined,
           undefined,
           undefined,
-          // Here we get the parents by filling the property organisationIds with the administriertVon array extracted from the Klassen above.
-          Array.from(administriertVonSet),
+          uncachedIds,
         );
 
-        const schulenMap: Map<string, string> = new Map(
+        const newSchulenMap: Map<string, string> = new Map(
           response.data.map((org: Organisation) => [org.id, `${org.kennung} (${org.name.trim()})`]),
         );
 
-        this.allKlassen = this.allKlassen.map((klasse: Organisation) => ({
-          ...klasse,
-          schuleDetails: schulenMap.get(klasse.administriertVon ?? '') ?? '---',
-        }));
+        // Update the cache
+        newSchulenMap.forEach((value: string, key: string) => {
+          this.cachedSchulenMap.set(key, value);
+        });
 
-        this.klassen = this.klassen.map((klasse: Organisation) => ({
-          ...klasse,
-          schuleDetails: schulenMap.get(klasse.administriertVon ?? '') ?? '---',
-        }));
+        // Update schuleDetails with newly fetched data
+        this.allKlassen = updateSchuleDetails(this.allKlassen);
+        this.klassen = updateSchuleDetails(this.klassen);
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
@@ -463,6 +482,8 @@ export const useOrganisationStore: StoreDefinition<
           filter?.administriertVon,
           undefined,
           filter?.organisationIds,
+          filter?.sortOrder,
+          filter?.sortField,
         );
 
         this.klassen = response.data;

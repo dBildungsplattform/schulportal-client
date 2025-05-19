@@ -1,24 +1,22 @@
 <script setup lang="ts">
-  import { computed, ref, type ComputedRef, type Ref } from 'vue';
-  import { useI18n, type Composer } from 'vue-i18n';
-  import { useDisplay } from 'vuetify';
-  import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import type { TranslatedObject } from '@/types';
-  import { toTypedSchema } from '@vee-validate/yup';
-  import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
-  import { object, string } from 'yup';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import { useBulkErrors, type BulkErrorList } from '@/composables/useBulkErrors';
   import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
   import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
   import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
-
-  const { t }: Composer = useI18n({ useScope: 'global' });
-  const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
-
-  const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
-  const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
-
-  const canCommit: Ref<boolean> = ref(false);
+  import type { PersonenWithRolleAndZuordnung } from '@/stores/PersonStore';
+  import type { TranslatedObject } from '@/types';
+  import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
+  import { formatDateToISO, getNextSchuljahresende } from '@/utils/date';
+  import { befristungSchema, isKopersRolle } from '@/utils/validationPersonenkontext';
+  import { toTypedSchema } from '@vee-validate/yup';
+  import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
+  import { computed, ref, type ComputedRef, type Ref } from 'vue';
+  import { useI18n, type Composer } from 'vue-i18n';
+  import { useDisplay } from 'vuetify';
+  import { object, string } from 'yup';
+  import PersonBulkError from '@/components/admin/personen/PersonBulkError.vue';
 
   type Props = {
     errorCode: string;
@@ -26,7 +24,7 @@
     rollen: TranslatedRolleWithAttrs[] | undefined;
     isLoading: boolean;
     isDialogVisible: boolean;
-    personIDs: string[];
+    selectedPersonen: PersonenWithRolleAndZuordnung;
   };
 
   type Emits = {
@@ -37,16 +35,32 @@
   const props: Props = defineProps<Props>();
   const emit: Emits = defineEmits<Emits>();
 
+  const { t }: Composer = useI18n({ useScope: 'global' });
+  const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
+
+  const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
+  const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
+
+  const canCommit: Ref<boolean> = ref(false);
+
   const showModifyRolleDialog: Ref<boolean> = ref(props.isDialogVisible);
+
+  const showErrorDialog: Ref<boolean, boolean> = ref(false);
+  const calculatedBefristung: Ref<string | undefined> = ref('');
 
   const successMessage: ComputedRef<string> = computed(() =>
     bulkOperationStore.currentOperation?.successMessage ? t(bulkOperationStore.currentOperation.successMessage) : '',
   );
 
+  // Define the error list for the selected persons using the useBulkErrors composable
+  const bulkErrorList: ComputedRef<BulkErrorList[]> = computed(() => useBulkErrors(props.selectedPersonen));
+
   // Define the form validation schema for the Personenkontext
   export type ZuordnungCreationForm = {
     selectedRolle: string;
     selectedOrganisation: string;
+    selectedBefristung: Date;
+    selectedBefristungOption: string;
   };
 
   export type PersonenkontextFieldDefinitions = {
@@ -61,6 +75,7 @@
       object({
         selectedRolle: string().required(t('admin.rolle.rules.rolle.required')),
         selectedOrganisation: string().required(t('admin.organisation.rules.organisation.required')),
+        selectedBefristung: befristungSchema(t),
       }),
     );
   };
@@ -88,11 +103,49 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = formContext.defineField('selectedRolle', getVuetifyConfig);
 
+  const selectedRollen: ComputedRef<Array<string>> = computed(() => {
+    return selectedRolle.value ? [selectedRolle.value] : [];
+  });
+
+  const showKopersHint: ComputedRef<boolean> = computed(() => {
+    return isKopersRolle(selectedRollen.value, props.rollen);
+  });
+
+  const [selectedBefristung, selectedBefristungProps]: [
+    Ref<string | undefined>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = formContext.defineField('selectedBefristung', getVuetifyConfig);
+
+  const [selectedBefristungOption, selectedBefristungOptionProps]: [
+    Ref<string | undefined>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = formContext.defineField('selectedBefristungOption', getVuetifyConfig);
+
+  const isBefristungRequired: ComputedRef<boolean> = computed(() => {
+    return selectedRolle.value ? isBefristungspflichtRolle([selectedRolle.value]) : false;
+  });
+
+  const {
+    handleBefristungUpdate,
+    handleBefristungOptionUpdate,
+    setupRolleWatcher,
+    setupWatchers,
+  }: BefristungUtilsType = useBefristungUtils({
+    formContext,
+    selectedBefristung,
+    selectedBefristungOption,
+    calculatedBefristung,
+    selectedRollen,
+  });
+  setupRolleWatcher();
+  setupWatchers();
+
   async function closeModifyRolleDeleteDialog(): Promise<void> {
     if (bulkOperationStore.currentOperation) {
       bulkOperationStore.resetState();
     }
     showModifyRolleDialog.value = false;
+    personenkontextStore.errorCode = '';
     emit('update:isDialogVisible', false);
   }
 
@@ -104,15 +157,27 @@
 
   // Creates a new Personenkontext for an array of Person IDs. For each processed ID the progress bar will increment according to the total number of items to process
   async function handleModifyRolle(personIDs: string[]): Promise<void> {
+    const befristungDate: string | undefined = selectedBefristung.value
+      ? selectedBefristung.value
+      : calculatedBefristung.value;
+
+    // Format the date in ISO 8601 format if it exists
+    const formattedBefristung: string | undefined = befristungDate ? formatDateToISO(befristungDate) : undefined;
+
     await bulkOperationStore.bulkModifyPersonenRolle(
       personIDs,
       selectedOrganisation.value!,
       selectedRolle.value!,
       props.rollen || [],
       personenkontextStore.workflowStepResponse?.organisations || [],
+      formattedBefristung,
     );
 
     emit('update:getUebersichten');
+
+    if (bulkOperationStore.currentOperation?.errors && bulkOperationStore.currentOperation.errors.size > 0) {
+      showErrorDialog.value = true;
+    }
   }
 </script>
 
@@ -124,27 +189,53 @@
     <LayoutCard
       data-testid="rolle-modify-layout-card"
       :closable="false"
-      :header="$t('admin.rolle.assignRolle')"
+      :header="t('admin.rolle.assignRolle')"
       @onCloseClicked="closeModifyRolleDeleteDialog()"
     >
       <v-container>
         <!-- Form Component -->
-        <PersonenkontextCreate
-          v-if="bulkOperationStore.currentOperation?.progress === 0"
-          ref="personenkontext-create"
-          :showHeadline="false"
-          :isModifyRolleDialog="showModifyRolleDialog"
-          :organisationen="organisationen"
-          :rollen="rollen"
-          :selectedOrganisationProps="selectedOrganisationProps"
-          :selectedRolleProps="selectedRolleProps"
-          v-model:selectedOrganisation="selectedOrganisation"
-          v-model:selectedRolle="selectedRolle"
-          @update:selectedOrganisation="(value?: string) => (selectedOrganisation = value)"
-          @update:selectedRolle="(value?: string) => (selectedRolle = value)"
-          @update:canCommit="canCommit = $event"
-          @fieldReset="handleFieldReset"
-        />
+        <template v-if="bulkOperationStore.currentOperation?.progress === 0">
+          <PersonenkontextCreate
+            v-if="bulkOperationStore.currentOperation?.progress === 0"
+            ref="personenkontext-create"
+            :showHeadline="false"
+            :organisationen="organisationen"
+            :rollen="rollen"
+            :selectedOrganisationProps="selectedOrganisationProps"
+            :selectedRolleProps="selectedRolleProps"
+            :befristungInputProps="{
+              befristungProps: selectedBefristungProps,
+              befristungOptionProps: selectedBefristungOptionProps,
+              isUnbefristetDisabled: isBefristungRequired,
+              isBefristungRequired,
+              nextSchuljahresende: getNextSchuljahresende(),
+              befristung: selectedBefristung,
+              befristungOption: selectedBefristungOption,
+            }"
+            v-model:selectedOrganisation="selectedOrganisation"
+            v-model:selectedRolle="selectedRolle"
+            @update:selectedOrganisation="(value?: string) => (selectedOrganisation = value)"
+            @update:selectedRolle="(value?: string) => (selectedRolle = value)"
+            @update:canCommit="canCommit = $event"
+            @update:befristung="handleBefristungUpdate"
+            @update:calculatedBefristungOption="handleBefristungOptionUpdate"
+            @fieldReset="handleFieldReset"
+          />
+          <v-row
+            v-if="showKopersHint"
+            class="text-body bold px-md-16"
+            data-testid="no-kopersnr-information"
+          >
+            <v-col
+              offset="2"
+              cols="10"
+            >
+              <p>
+                {{ t('admin.person.bulkRolleModify.noKopersNrInfoText') }}
+              </p>
+            </v-col>
+          </v-row>
+        </template>
 
         <!-- Progress Bar -->
         <div
@@ -178,7 +269,7 @@
                 size="small"
               ></v-icon>
               <span class="subtitle-2">
-                {{ $t('admin.doNotCloseBrowserNotice') }}
+                {{ t('admin.doNotCloseBrowserNotice') }}
               </span>
             </v-col>
           </v-row>
@@ -212,7 +303,7 @@
               @click="closeModifyRolleDeleteDialog"
               data-testid="rolle-modify-discard-button"
             >
-              {{ $t('cancel') }}
+              {{ t('cancel') }}
             </v-btn>
           </v-col>
           <v-col
@@ -224,11 +315,11 @@
               :block="mdAndDown"
               :disabled="!canCommit || bulkOperationStore.currentOperation.isRunning"
               class="primary"
-              @click="handleModifyRolle(props.personIDs)"
+              @click="handleModifyRolle(props.selectedPersonen.map((person) => person.person.id))"
               data-testid="rolle-modify-submit-button"
               type="submit"
             >
-              {{ $t('admin.rolle.assignRolle') }}
+              {{ t('admin.rolle.assignRolle') }}
             </v-btn>
           </v-col>
         </v-row>
@@ -247,13 +338,28 @@
               @click="closeModifyRolleDeleteDialog"
               data-testid="rolle-modify-close-button"
             >
-              {{ $t('close') }}
+              {{ t('close') }}
             </v-btn>
           </v-col>
         </v-row>
       </v-card-actions>
     </LayoutCard>
   </v-dialog>
+  <template v-if="showErrorDialog">
+    <PersonBulkError
+      :bulkOperationName="t('admin.rolle.assignRolle')"
+      :isDialogVisible="showErrorDialog"
+      @update:isDialogVisible="
+        (val: boolean) => {
+          showErrorDialog = val;
+          if (!val) {
+            closeModifyRolleDeleteDialog();
+          }
+        }
+      "
+      :errors="bulkErrorList"
+    />
+  </template>
 </template>
 
 <style></style>

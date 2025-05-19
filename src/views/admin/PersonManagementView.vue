@@ -24,7 +24,6 @@
     type PersonenWithRolleAndZuordnung,
     type Personendatensatz,
     SortField,
-    SortOrder,
     usePersonStore,
   } from '@/stores/PersonStore';
   import { type PersonenkontextStore, usePersonenkontextStore } from '@/stores/PersonenkontextStore';
@@ -32,12 +31,12 @@
     type RolleResponse,
     type RolleStore,
     RollenArt,
-    RollenMerkmal,
     RollenSystemRecht,
     useRolleStore,
   } from '@/stores/RolleStore';
   import { type SearchFilterStore, useSearchFilterStore } from '@/stores/SearchFilterStore';
   import { type TranslatedObject } from '@/types.d';
+  import { SortOrder } from '@/utils/sorting';
   import { type ComputedRef, type Ref, computed, onMounted, ref, watch } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import { type Router, useRouter } from 'vue-router';
@@ -57,7 +56,7 @@
   const hasAutoSelectedOrganisation: Ref<boolean> = ref(false);
 
   const selectedPersonIds: Ref<string[]> = ref<string[]>([]);
-  const selectedPersons: ComputedRef<PersonenWithRolleAndZuordnung> = computed(() => {
+  const selectedPersonen: ComputedRef<PersonenWithRolleAndZuordnung> = computed(() => {
     return (
       personStore.personenWithUebersicht?.filter((p: PersonenWithRolleAndZuordnung[number]) =>
         selectedPersonIds.value.includes(p.person.id),
@@ -169,12 +168,9 @@
 
   const rollenForForm: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
 
-  // Only Rollen from type LEHR and without any Befristungspflicht wil be offered for now
+  // Only Rollen from type LEHR
   const lehrRollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = computed(() => {
-    return rollenForForm.value?.filter(
-      (rolle: TranslatedRolleWithAttrs) =>
-        rolle.rollenart === RollenArt.Lehr && !rolle.merkmale?.has(RollenMerkmal.BefristungPflicht),
-    );
+    return rollenForForm.value?.filter((rolle: TranslatedRolleWithAttrs) => rolle.rollenart === RollenArt.Lehr);
   });
 
   const statuses: Array<string> = ['Aktiv', 'Inaktiv'];
@@ -188,8 +184,8 @@
         : searchFilterStore.selectedOrganisationen || [],
       rolleIDs: searchFilterStore.selectedRollen || [],
       searchFilter: searchFilterStore.searchFilterPersonen || '',
-      sortField: searchFilterStore.sortField as SortField,
-      sortOrder: searchFilterStore.sortOrder as SortOrder,
+      sortField: searchFilterStore.personenSortField as SortField,
+      sortOrder: searchFilterStore.personenSortOrder as SortOrder,
     });
   }
 
@@ -201,8 +197,8 @@
       organisationIDs: selectedKlassen.value.length ? selectedKlassen.value : selectedOrganisationIds.value,
       rolleIDs: searchFilterStore.selectedRollen || selectedRollen.value,
       searchFilter: searchFilterStore.searchFilterPersonen || searchFilter.value,
-      sortField: searchFilterStore.sortField as SortField,
-      sortOrder: searchFilterStore.sortOrder as SortOrder,
+      sortField: searchFilterStore.personenSortField as SortField,
+      sortOrder: searchFilterStore.personenSortOrder as SortOrder,
     });
 
     await applySearchAndFilters();
@@ -361,18 +357,17 @@
   }): Promise<void> {
     if (update.sortField) {
       sortField.value = mapKeyToBackend(update.sortField);
-
-      await searchFilterStore.setCurrentSortForPersonen({
+      searchFilterStore.currentSort = {
         key: update.sortField,
         order: update.sortOrder,
-      });
+      };
     }
 
     sortOrder.value = update.sortOrder as SortOrder;
 
     // Save the sorting values in the store
-    searchFilterStore.setSortFieldForPersonen(sortField.value);
-    searchFilterStore.setSortOrderForPersonen(sortOrder.value);
+    searchFilterStore.personenSortField = sortField.value;
+    searchFilterStore.personenSortOrder = sortOrder.value;
 
     // Fetch the sorted data
     getPaginatedPersonen(searchFilterStore.personenPage);
@@ -756,7 +751,7 @@
             :isLoading="personenkontextStore.loading"
             :isDialogVisible="rolleModifiyDialogVisible"
             :errorCode="personenkontextStore.errorCode"
-            :personIDs="selectedPersonIds"
+            :selectedPersonen
             @update:isDialogVisible="handleRolleModifyDialog($event)"
             @update:getUebersichten="getPaginatedPersonen(searchFilterStore.personenPage)"
           >
@@ -767,7 +762,7 @@
             :errorCode="personStore.errorCode"
             :isLoading="personStore.loading"
             :isDialogVisible="benutzerDeleteDialogVisible"
-            :personIDs="selectedPersonIds"
+            :selectedPersonen
             @update:dialogExit="handleBulkDeleteDialog($event)"
           >
           </PersonBulkDelete>
@@ -776,7 +771,7 @@
             v-if="passwordResetDialogVisible"
             :isDialogVisible="passwordResetDialogVisible"
             :selectedSchuleKennung="selectedOrganisationKennung"
-            :selectedPersons
+            :selectedPersonen
             @update:dialogExit="handleBulkPasswordResetDialog($event)"
           >
           </PersonBulkPasswordReset>
@@ -784,7 +779,7 @@
             ref="organisation-unassign"
             v-if="organisationUnassignDialogVisible && selectedOrganisation"
             :isDialogVisible="organisationUnassignDialogVisible"
-            :selectedPersonenIds="selectedPersonIds"
+            :selectedPersonen
             :selectedOrganisation="selectedOrganisation"
             @update:dialogExit="handleUnassignOrgDialog($event)"
           >

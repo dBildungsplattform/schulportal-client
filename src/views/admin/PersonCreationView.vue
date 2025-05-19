@@ -1,42 +1,42 @@
 <script setup lang="ts">
-  import { usePersonStore, type CreatePersonBodyParams, type PersonStore } from '@/stores/PersonStore';
-  import { RollenArt } from '@/stores/RolleStore';
-  import { type ComputedRef, computed, onMounted, onUnmounted, type Ref, ref, watch } from 'vue';
-  import {
-    onBeforeRouteLeave,
-    type Router,
-    useRouter,
-    type RouteLocationNormalized,
-    type NavigationGuardNext,
-  } from 'vue-router';
-  import { type Composer, useI18n } from 'vue-i18n';
-  import { useForm, type TypedSchema, type BaseFieldProps, type FormContext } from 'vee-validate';
-  import { array, object, string, StringSchema, type AnyObject } from 'yup';
-  import { toTypedSchema } from '@vee-validate/yup';
+  import KopersInput from '@/components/admin/personen/KopersInput.vue';
+  import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import PasswordOutput from '@/components/form/PasswordOutput.vue';
-  import FormWrapper from '@/components/form/FormWrapper.vue';
   import FormRow from '@/components/form/FormRow.vue';
+  import FormWrapper from '@/components/form/FormWrapper.vue';
+  import PasswordOutput from '@/components/form/PasswordOutput.vue';
+  import { useKlassen } from '@/composables/useKlassen';
+  import { useOrganisationen } from '@/composables/useOrganisationen';
+  import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
   import {
     usePersonenkontextStore,
     type DbiamCreatePersonenkontextBodyParams,
     type DBiamPersonenkontextResponse,
     type PersonenkontextStore,
   } from '@/stores/PersonenkontextStore';
+  import { usePersonStore, type CreatePersonBodyParams, type PersonStore } from '@/stores/PersonStore';
+  import { RollenArt } from '@/stores/RolleStore';
+  import { type TranslatedObject } from '@/types.d';
+  import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
+  import { formatDateToISO, getNextSchuljahresende, isValidDate, notInPast } from '@/utils/date';
+  import { DDMMYYYY, DIN_91379A, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
+  import { isKopersRolle } from '@/utils/validationPersonenkontext';
+  import { toTypedSchema } from '@vee-validate/yup';
+  import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
+  import { computed, onMounted, onUnmounted, ref, watch, type ComputedRef, type Ref } from 'vue';
+  import { useI18n, type Composer } from 'vue-i18n';
+  import {
+    onBeforeRouteLeave,
+    useRouter,
+    type NavigationGuardNext,
+    type RouteLocationNormalized,
+    type Router,
+  } from 'vue-router';
   import { useDisplay } from 'vuetify';
+  import { array, object, string, StringSchema, type AnyObject } from 'yup';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
-  import { DDMMYYYY, DIN_91379A, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
-  import { useOrganisationen } from '@/composables/useOrganisationen';
-  import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
-  import { useKlassen } from '@/composables/useKlassen';
-  import KopersInput from '@/components/admin/personen/KopersInput.vue';
-  import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
-  import { type TranslatedObject } from '@/types.d';
-  import { getNextSchuljahresende, formatDateToISO, notInPast, isValidDate } from '@/utils/date';
-  import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
-  import { isKopersRolle } from '@/utils/validationPersonenkontext';
 
   const router: Router = useRouter();
   const personStore: PersonStore = usePersonStore();
