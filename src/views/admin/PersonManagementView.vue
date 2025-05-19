@@ -484,7 +484,6 @@
     return selectedRollenObjects.value.find((rolle: RolleResponse) => rolle.id === selectedRollen.value[0]);
   });
 
-  
   const checkSingleOrgAndRolleDisplayDialog = (dialog: Ref<boolean>): void => {
     // Check if both a single organisation and a single rolle are selected
     if (!singleSchuleSelected.value || !singleRolleSelected.value) {
