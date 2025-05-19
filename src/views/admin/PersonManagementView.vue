@@ -575,6 +575,7 @@
     passwordResetDialogVisible.value = false;
     selectedOption.value = null;
   };
+
   const handleUnassignOrgDialog = async (finished: boolean): Promise<void> => {
     organisationUnassignDialogVisible.value = false;
     selectedOption.value = null;
@@ -968,19 +969,14 @@
             @update:dialogExit="handleUnassignOrgDialog($event)"
           >
           </OrganisationUnassign>
-          <v-dialog
-            ref="changeKlasseBulkDialog"
-            :model-value="changeKlasseDialogVisible"
+          <PersonBulkChangeKlasse
             v-if="changeKlasseDialogVisible"
-            persistent
-          >
-            <PersonBulkChangeKlasse
-              :selectedPersonen
-              :selectedSchuleId="selectedOrganisation?.id"
-              :availableKlassen="klassenOptions"
-              @update:dialog-exit="handleBulkKlasseChangeDialog"
-            />
-          </v-dialog>
+            :isDialogVisible="changeKlasseDialogVisible"
+            :selectedPersonen
+            :selectedSchuleId="selectedOrganisation?.id"
+            :availableKlassen="klassenOptions"
+            @update:dialog-exit="handleBulkKlasseChangeDialog"
+          />
         </v-col>
         <!-- Display the number of selected checkboxes -->
         <v-col
