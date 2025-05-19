@@ -94,7 +94,7 @@
   const rolleUnassignDialogVisible: Ref<boolean> = ref(false);
 
   const onlyOneOrganisationAlertDialogVisible: Ref<boolean> = ref(false);
-  const onlyOneOrganisationAndRolleAlertDialogVisible: Ref<boolean> = ref(false);
+  const onlyOneRolleAlertDialogVisible: Ref<boolean> = ref(false);
 
   const selectedOption: Ref<string | null> = ref(null);
 
@@ -464,10 +464,6 @@
     getPaginatedPersonen(searchFilterStore.personenPage);
   }
 
-  const singleRolleSelected: ComputedRef<boolean> = computed(() => {
-    return selectedRollenObjects.value.length <= 1;
-  });
-
   const singleSchuleSelected: ComputedRef<boolean> = computed(() => {
     return selectedOrganisationIds.value.length === 1;
   });
@@ -484,21 +480,20 @@
     return selectedRollenObjects.value.find((rolle: RolleResponse) => rolle.id === selectedRollen.value[0]);
   });
 
-  const checkSingleOrgAndRolleDisplayDialog = (dialog: Ref<boolean>): void => {
-    // Check if both a single organisation and a single rolle are selected
-    if (!singleSchuleSelected.value || !singleRolleSelected.value) {
-      onlyOneOrganisationAndRolleAlertDialogVisible.value = true;
-      return;
-    }
-    dialog.value = true;
-  };
-
-  const checkSingleOrgDisplayDialog = (dialog: Ref<boolean>): void => {
+  const validateSingleSchuleSelection = (): boolean => {
     if (!singleSchuleSelected.value) {
       onlyOneOrganisationAlertDialogVisible.value = true;
-      return;
+      return false;
     }
-    dialog.value = true;
+    return true;
+  };
+
+  const validateSingleRolleSelection = (): boolean => {
+    if (selectedRollen.value.length > 1) {
+      onlyOneRolleAlertDialogVisible.value = true;
+      return false;
+    }
+    return true;
   };
 
   // Handle the selected action
@@ -509,17 +504,26 @@
       case OperationType.MODIFY_ROLLE:
         rolleModifiyDialogVisible.value = true;
         break;
+
       case OperationType.DELETE_PERSON:
         benutzerDeleteDialogVisible.value = true;
         break;
+
       case OperationType.RESET_PASSWORD:
-        checkSingleOrgDisplayDialog(passwordResetDialogVisible);
-        break;
       case OperationType.ORG_UNASSIGN:
-        checkSingleOrgDisplayDialog(organisationUnassignDialogVisible);
+        if (validateSingleSchuleSelection()) {
+          if (newValue === OperationType.RESET_PASSWORD) {
+            passwordResetDialogVisible.value = true;
+          } else {
+            organisationUnassignDialogVisible.value = true;
+          }
+        }
         break;
+
       case OperationType.ROLLE_UNASSIGN:
-        checkSingleOrgAndRolleDisplayDialog(rolleUnassignDialogVisible);
+        if (!validateSingleSchuleSelection()) return;
+        if (!validateSingleRolleSelection()) return;
+        rolleUnassignDialogVisible.value = true;
         break;
     }
   };
@@ -901,13 +905,13 @@
             "
           />
           <InfoDialog
-            id="only-one-school-and-rolle-notice"
-            :isDialogVisible="onlyOneOrganisationAndRolleAlertDialogVisible"
+            id="only-one-rolle-notice"
+            :isDialogVisible="onlyOneRolleAlertDialogVisible"
             :header="singleSelectionAlertHeader"
-            :message="$t('admin.person.onlyOneSchuleAndRolleAlert')"
+            :message="$t('admin.person.onlyOneRolleAlert')"
             @update:dialogExit="
               () => {
-                onlyOneOrganisationAndRolleAlertDialogVisible = false;
+                onlyOneRolleAlertDialogVisible = false;
                 selectedOption = null;
               }
             "

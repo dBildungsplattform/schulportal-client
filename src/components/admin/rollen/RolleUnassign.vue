@@ -232,7 +232,7 @@
           </template>
 
           <!-- In-progress or initial state -->
-          <template v-else>
+          <template v-else-if="bulkOperationStore.currentOperation?.progress === 0">
             <v-col
               cols="12"
               sm="6"
