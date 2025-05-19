@@ -150,6 +150,34 @@
       ></v-list-item>
     </div>
 
+    <!-- Person Hinzufügen -->
+    <div
+      v-if="
+        authStore.hasLandesbediensteteSuchenUndHinzufügenPermission ||
+        authStore.hasEingeschränktNeueBenutzerErstellenPermission
+      "
+    >
+      <v-list-item
+        class="menu-bar-main-item headline-2"
+        data-testid="add-person-title"
+        :title="$t('admin.person.stateEmployeeSearch.addPerson')"
+      ></v-list-item>
+      <v-list-item
+        v-if="authStore.hasLandesbediensteteSuchenUndHinzufügenPermission"
+        class="menu-bar-sub-item caption"
+        data-testid="search-person-menu-item"
+        prepend-icon="mdi-plus-circle-outline"
+        :title="$t('admin.person.stateEmployeeSearch.search')"
+      ></v-list-item>
+      <v-list-item
+        v-if="authStore.hasEingeschränktNeueBenutzerErstellenPermission"
+        class="menu-bar-sub-item caption"
+        data-testid="add-person-menu-item"
+        prepend-icon="mdi-plus-circle-outline"
+        :title="$t('admin.person.stateEmployeeSearch.anotherPerson')"
+      ></v-list-item>
+    </div>
+
     <!-- Klassenverwaltung -->
     <div v-if="authStore.hasKlassenverwaltungPermission">
       <v-list-item

@@ -24,6 +24,7 @@ import {
 import axiosApiInstance from '@/services/ApiService';
 import { type DbiamPersonenkontextBodyParams, type Zuordnung } from './PersonenkontextStore';
 import { formatDateDigitsToGermanDate } from '@/utils/date';
+import type { SortOrder } from '@/utils/sorting';
 
 const personenApi: PersonenApiInterface = PersonenApiFactory(undefined, '', axiosApiInstance);
 const personenFrontendApi: PersonenFrontendApiInterface = PersonenFrontendApiFactory(undefined, '', axiosApiInstance);
@@ -45,11 +46,6 @@ export enum SortField {
   Vorname = 'vorname',
   Personalnummer = 'personalnummer',
   Referrer = 'referrer',
-}
-
-export enum SortOrder {
-  Asc = 'asc',
-  Desc = 'desc',
 }
 
 export enum PersonLockOccasion {
@@ -190,7 +186,7 @@ export type Personendatensatz = {
   person: Person;
 };
 
-export type { PersonendatensatzResponse };
+export type { PersonendatensatzResponse, SortOrder };
 
 type PersonState = {
   currentPerson: Personendatensatz | null;

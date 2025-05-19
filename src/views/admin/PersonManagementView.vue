@@ -23,7 +23,6 @@
     type PersonenWithRolleAndZuordnung,
     type Personendatensatz,
     SortField,
-    SortOrder,
     usePersonStore,
   } from '@/stores/PersonStore';
   import { type PersonenkontextStore, usePersonenkontextStore } from '@/stores/PersonenkontextStore';
@@ -34,6 +33,7 @@
   import { type Composer, useI18n } from 'vue-i18n';
   import { type Router, useRouter } from 'vue-router';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
+  import { SortOrder } from '@/utils/sorting';
 
   const searchFieldComponent: Ref = ref();
 
@@ -49,7 +49,7 @@
   const hasAutoSelectedOrganisation: Ref<boolean> = ref(false);
 
   const selectedPersonIds: Ref<string[]> = ref<string[]>([]);
-  const selectedPersons: ComputedRef<PersonenWithRolleAndZuordnung> = computed(() => {
+  const selectedPersonen: ComputedRef<PersonenWithRolleAndZuordnung> = computed(() => {
     return (
       personStore.personenWithUebersicht?.filter((p: PersonenWithRolleAndZuordnung[number]) =>
         selectedPersonIds.value.includes(p.person.id),
@@ -192,8 +192,8 @@
         : searchFilterStore.selectedOrganisationen || [],
       rolleIDs: searchFilterStore.selectedRollen || [],
       searchFilter: searchFilterStore.searchFilterPersonen || '',
-      sortField: searchFilterStore.sortField as SortField,
-      sortOrder: searchFilterStore.sortOrder as SortOrder,
+      sortField: searchFilterStore.personenSortField as SortField,
+      sortOrder: searchFilterStore.personenSortOrder as SortOrder,
     });
   }
 
@@ -205,8 +205,8 @@
       organisationIDs: selectedKlassen.value.length ? selectedKlassen.value : selectedOrganisationIds.value,
       rolleIDs: searchFilterStore.selectedRollen || selectedRollen.value,
       searchFilter: searchFilterStore.searchFilterPersonen || searchFilter.value,
-      sortField: searchFilterStore.sortField as SortField,
-      sortOrder: searchFilterStore.sortOrder as SortOrder,
+      sortField: searchFilterStore.personenSortField as SortField,
+      sortOrder: searchFilterStore.personenSortOrder as SortOrder,
     });
 
     await applySearchAndFilters();
@@ -442,18 +442,17 @@
   }): Promise<void> {
     if (update.sortField) {
       sortField.value = mapKeyToBackend(update.sortField);
-
-      await searchFilterStore.setCurrentSortForPersonen({
+      searchFilterStore.currentSort = {
         key: update.sortField,
         order: update.sortOrder,
-      });
+      };
     }
 
     sortOrder.value = update.sortOrder as SortOrder;
 
     // Save the sorting values in the store
-    searchFilterStore.setSortFieldForPersonen(sortField.value);
-    searchFilterStore.setSortOrderForPersonen(sortOrder.value);
+    searchFilterStore.personenSortField = sortField.value;
+    searchFilterStore.personenSortOrder = sortOrder.value;
 
     // Fetch the sorted data
     getPaginatedPersonen(searchFilterStore.personenPage);
@@ -871,7 +870,7 @@
             :isLoading="personenkontextStore.loading"
             :isDialogVisible="rolleModifiyDialogVisible"
             :errorCode="personenkontextStore.errorCode"
-            :personIDs="selectedPersonIds"
+            :selectedPersonen
             @update:isDialogVisible="handleRolleModifyDialog($event)"
             @update:getUebersichten="getPaginatedPersonen(searchFilterStore.personenPage)"
           >
@@ -882,7 +881,7 @@
             :errorCode="personStore.errorCode"
             :isLoading="personStore.loading"
             :isDialogVisible="benutzerDeleteDialogVisible"
-            :personIDs="selectedPersonIds"
+            :selectedPersonen
             @update:dialogExit="handleBulkDeleteDialog($event)"
           >
           </PersonBulkDelete>
@@ -891,7 +890,7 @@
             v-if="passwordResetDialogVisible"
             :isDialogVisible="passwordResetDialogVisible"
             :selectedSchuleKennung="selectedOrganisationKennung"
-            :selectedPersons
+            :selectedPersonen
             @update:dialogExit="handleBulkPasswordResetDialog($event)"
           >
           </PersonBulkPasswordReset>
@@ -899,7 +898,7 @@
             ref="organisation-unassign"
             v-if="organisationUnassignDialogVisible && selectedOrganisation"
             :isDialogVisible="organisationUnassignDialogVisible"
-            :selectedPersonenIds="selectedPersonIds"
+            :selectedPersonen
             :selectedOrganisation="selectedOrganisation"
             @update:dialogExit="handleUnassignOrgDialog($event)"
           >

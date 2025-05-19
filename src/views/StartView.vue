@@ -118,10 +118,12 @@
   }
 
   async function initializeStores(): Promise<void> {
-    await authStore.initializeAuthStatus();
-    await personInfoStore.initPersonInfo();
+    await Promise.all([
+      authStore.initializeAuthStatus(),
+      personInfoStore.initPersonInfo(),
+      meldungStore.getCurrentMeldung(),
+    ]);
     await personStore.getPersonenuebersichtById(personInfoStore.personInfo?.person.id ?? '');
-    await meldungStore.getCurrentMeldung();
   }
 
   const closedAlerts: Ref<Set<string>> = ref(new Set());
@@ -129,17 +131,24 @@
   let hinweise: Ref<Meldung[]> = ref([]);
 
   onMounted(async () => {
+    sessionStorage.setItem('previousUrl', window.location.pathname + window.location.search);
+
     await authStore.initializeAuthStatus();
     const personId: string | null | undefined = authStore.currentUser?.personId;
-    if (personId) await twoFactorAuthentificationStore.get2FAState(personId);
-    await serviceProviderStore.getAvailableServiceProviders();
-    for (const provider of serviceProviderStore.availableServiceProviders) {
-      if (provider.hasLogo) {
-        const logoUrl: string = `/api/provider/${provider.id}/logo`;
-        provider.logoUrl = logoUrl;
+
+    const providersPromise: Promise<void> = serviceProviderStore.getAvailableServiceProviders().then(() => {
+      for (const provider of serviceProviderStore.availableServiceProviders) {
+        if (provider.hasLogo) {
+          provider.logoUrl = `/api/provider/${provider.id}/logo`;
+        }
       }
-    }
-    sessionStorage.setItem('previousUrl', window.location.pathname + window.location.search);
+    });
+
+    const twoFAStatePromise: Promise<void> = personId
+      ? twoFactorAuthentificationStore.get2FAState(personId)
+      : Promise.resolve();
+
+    await Promise.allSettled([providersPromise, twoFAStatePromise]);
   });
 
   onBeforeMount(async () => {

@@ -6,6 +6,11 @@
   color: variables.$bodyFontColor;
   margin-top: 10px;
 
+
+  @media (min-width: 1280px) {
+    min-width: 330px;
+  }
+
   .v-list-item {
     padding: 15px 20px;
 

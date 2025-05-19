@@ -61,6 +61,8 @@ type AuthState = {
   hasPersonenBulkPermission: boolean;
   hasPortalVerwaltungPermission: boolean;
   hasHinweiseBearbeitenPermission: boolean;
+  hasLandesbediensteteSuchenUndHinzufügenPermission: boolean;
+  hasEingeschränktNeueBenutzerErstellenPermission: boolean;
   isAuthenticated: boolean;
   acr: StepUpLevel;
   timeLimitInfos: PersonTimeLimitInfoResponse[];
@@ -93,6 +95,8 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
     hasPersonenBulkPermission: false,
     hasPortalVerwaltungPermission: false,
     hasHinweiseBearbeitenPermission: false,
+    hasLandesbediensteteSuchenUndHinzufügenPermission: false,
+    hasEingeschränktNeueBenutzerErstellenPermission: false,
     isAuthenticated: false,
     acr: StepUpLevel.NONE,
     timeLimitInfos: [],
@@ -134,6 +138,12 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
           this.hasPersonenBulkPermission = this.currentUserPermissions.includes('BULK_VERWALTEN');
           this.hasPortalVerwaltungPermission = this.currentUserPermissions.includes('SCHULPORTAL_VERWALTEN');
           this.hasHinweiseBearbeitenPermission = this.currentUserPermissions.includes('HINWEISE_BEARBEITEN');
+          this.hasLandesbediensteteSuchenUndHinzufügenPermission = this.currentUserPermissions.includes(
+            'LANDESBEDIENSTETE_SUCHEN_UND_HINZUFUEGEN',
+          );
+          this.hasEingeschränktNeueBenutzerErstellenPermission = this.currentUserPermissions.includes(
+            'EINGESCHRAENKT_NEUE_BENUTZER_ERSTELLEN',
+          );
         } else {
           throw new Error('User info could not be retrieved.');
         }
@@ -153,6 +163,8 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
         this.hasPersonenBulkPermission = false;
         this.hasPortalVerwaltungPermission = false;
         this.hasHinweiseBearbeitenPermission = false;
+        this.hasLandesbediensteteSuchenUndHinzufügenPermission = false;
+        this.hasEingeschränktNeueBenutzerErstellenPermission = false;
         this.isAuthenticated = false;
         this.acr = StepUpLevel.NONE;
         this.timeLimitInfos = [];

@@ -38,6 +38,12 @@ beforeEach(() => {
   authStore.hasPersonenLoeschenPermission = true;
   authStore.hasPersonenverwaltungPermission = true;
 
+  personStore.getAllPersons = vi.fn();
+  organisationStore.getFilteredKlassen = vi.fn();
+  organisationStore.getAllOrganisationen = vi.fn();
+  personenkontextStore.getPersonenkontextRolleWithFilter = vi.fn();
+  personenkontextStore.processWorkflowStep = vi.fn();
+
   organisationStore.klassen = [
     {
       id: '123456',
@@ -638,5 +644,63 @@ describe('PersonManagementView', () => {
     (benutzerEditSelect.props() as { items: { value: string }[] })['items'].forEach((item: { value: string }) => {
       expect(item.value).not.toBe('RESET_PASSWORD');
     });
+  });
+
+  test('it sorts Personen correctly when changing sort order', async () => {
+    // Find the table header for "Nachname" (last name)
+    const nachnameHeader: DOMWrapper<Element> | undefined = wrapper
+      ?.findAll('.v-data-table__th')
+      .find((th: DOMWrapper<Element>) => th.text().includes('Nachname'));
+
+    // Click to sort descending
+    await nachnameHeader?.trigger('click');
+    await flushPromises();
+    await nextTick();
+
+    expect(personStore.getAllPersons).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sortField: 'familienname',
+        sortOrder: 'desc',
+      }),
+    );
+
+    // Click again to sort ascending
+    await nachnameHeader?.trigger('click');
+    await flushPromises();
+
+    expect(personStore.getAllPersons).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sortField: 'familienname',
+        sortOrder: 'asc',
+      }),
+    );
+
+    // Find the table header for "Nachname" (last name)
+    const vornameHeader: DOMWrapper<Element> | undefined = wrapper
+      ?.findAll('.v-data-table__th')
+      .find((th: DOMWrapper<Element>) => th.text().includes('Vorname'));
+
+    // Click to sort asc
+    await vornameHeader?.trigger('click');
+    await flushPromises();
+    await nextTick();
+
+    expect(personStore.getAllPersons).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sortField: 'vorname',
+        sortOrder: 'asc',
+      }),
+    );
+
+    // Click again to sort desc
+    await vornameHeader?.trigger('click');
+    await flushPromises();
+    await nextTick();
+    expect(personStore.getAllPersons).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sortField: 'vorname',
+        sortOrder: 'desc',
+      }),
+    );
   });
 });
