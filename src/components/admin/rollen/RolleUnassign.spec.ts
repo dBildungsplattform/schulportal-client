@@ -10,21 +10,31 @@ import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOpe
 import { OrganisationsTyp, type Organisation } from '@/stores/OrganisationStore';
 import type { PersonenWithRolleAndZuordnung } from '@/stores/PersonStore';
 import { RollenArt, RollenMerkmal, type RolleResponse } from '@/stores/RolleStore';
+import type { TranslatedObject } from '@/types';
+import { DoFactory } from '@/testing/DoFactory';
+import type { OrganisationResponseLegacy } from '@/api-client/generated';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
 const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
 
+const organisation: OrganisationResponseLegacy = DoFactory.getOrganisationenResponseLegacy();
+
 type Props = {
   isDialogVisible: boolean;
+  organisationen: TranslatedObject[] | undefined;
   selectedPersonen: PersonenWithRolleAndZuordnung;
-  selectedOrganisation: Organisation;
-  selectedRolle: RolleResponse;
+  selectedOrganisationFromFilter: Organisation;
+  selectedRolleFromFilter?: RolleResponse;
 };
 
 function mountComponent(partialProps: Partial<Props> = {}): VueWrapper {
   const props: Props = {
     isDialogVisible: true,
+    organisationen: [
+      { title: organisation.name, value: organisation.id },
+      { title: 'orga1', value: '1133' },
+    ],
     selectedPersonen: [
       {
         administrationsebenen: '',
@@ -49,12 +59,12 @@ function mountComponent(partialProps: Partial<Props> = {}): VueWrapper {
         },
       },
     ],
-    selectedOrganisation: {
+    selectedOrganisationFromFilter: {
       id: '1234567',
       name: 'Testschule',
       typ: OrganisationsTyp.Schule,
     },
-    selectedRolle: {
+    selectedRolleFromFilter: {
       id: 'rolle-id-123',
       name: 'Lehrer',
       createdAt: '',

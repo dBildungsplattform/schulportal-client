@@ -209,49 +209,62 @@
         </v-progress-linear>
       </v-container>
 
-      <v-card-actions class="justify-center">
-        <v-row class="py-3 px-2 justify-end">
-          <v-col
-            cols="12"
-            sm="6"
-            md="auto"
-          >
-            <v-btn
-              v-if="bulkOperationStore.currentOperation?.progress === 100"
-              :block="mdAndDown"
-              class="secondary"
-              @click="closeDialog(true)"
-              data-testid="rolle-unassign-close-button"
+      <v-card-actions>
+        <v-row
+          class="py-3 px-2"
+          justify="end"
+        >
+          <!-- Success state: -->
+          <template v-if="bulkOperationStore.currentOperation?.progress === 100">
+            <v-col
+              cols="12"
+              class="d-flex justify-center"
             >
-              {{ t('close') }}
-            </v-btn>
-            <v-btn
-              v-else-if="bulkOperationStore.currentOperation?.progress === 0"
-              :block="mdAndDown"
-              class="secondary"
-              @click="closeDialog(false)"
-              data-testid="rolle-unassign-discard-button"
+              <v-btn
+                :block="mdAndDown"
+                class="primary"
+                @click="closeDialog(true)"
+                data-testid="rolle-unassign-close-button"
+              >
+                {{ t('close') }}
+              </v-btn>
+            </v-col>
+          </template>
+
+          <!-- In-progress or initial state -->
+          <template v-else>
+            <v-col
+              cols="12"
+              sm="6"
+              md="auto"
             >
-              {{ t('cancel') }}
-            </v-btn>
-          </v-col>
-          <v-col
-            cols="12"
-            sm="6"
-            md="auto"
-          >
-            <v-btn
-              v-if="bulkOperationStore.currentOperation?.progress === 0"
-              :block="mdAndDown"
-              :disabled="bulkOperationStore.currentOperation?.isRunning"
-              class="primary"
-              @click="handleRolleUnassign()"
-              data-testid="rolle-unassign-submit-button"
-              type="submit"
+              <v-btn
+                :block="mdAndDown"
+                class="secondary"
+                @click="closeDialog(false)"
+                data-testid="rolle-unassign-discard-button"
+              >
+                {{ t('cancel') }}
+              </v-btn>
+            </v-col>
+
+            <v-col
+              cols="12"
+              sm="6"
+              md="auto"
             >
-              {{ t('admin.rolle.bulkRollenzuordnung.unassignRolleZuordnung') }}
-            </v-btn>
-          </v-col>
+              <v-btn
+                :block="mdAndDown"
+                :disabled="bulkOperationStore.currentOperation?.isRunning"
+                class="primary"
+                @click="handleRolleUnassign()"
+                data-testid="rolle-unassign-submit-button"
+                type="submit"
+              >
+                {{ t('admin.rolle.bulkRollenzuordnung.unassignRolleZuordnung') }}
+              </v-btn>
+            </v-col>
+          </template>
         </v-row>
       </v-card-actions>
     </LayoutCard>
