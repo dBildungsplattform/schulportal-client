@@ -118,19 +118,24 @@
           </v-col>
         </v-row>
       </template>
-      <template v-if="state === State.PROGRESSING">
-        <v-row
-          align="center"
-          justify="center"
-        >
+      <template v-else>
+        <v-row justify="center">
           <v-col cols="auto">
             <v-icon
+              v-if="state === State.PROGRESSING"
               aria-hidden="true"
               class="mr-2"
               icon="mdi-alert-circle-outline"
               size="small"
             ></v-icon>
+            <v-icon
+              v-if="state === State.FINISHED"
+              small
+              color="#1EAE9C"
+              icon="mdi-check-circle"
+            ></v-icon>
             <span
+              v-if="state === State.PROGRESSING"
               class="subtitle-2"
               data-testid="bulk-change-klasse-progressing-notice"
             >
@@ -138,6 +143,13 @@
             </span>
           </v-col>
         </v-row>
+        <p
+          v-if="state === State.FINISHED"
+          class="mt-2 text-center"
+          data-testid="bulk-change-klasse-success-text"
+        >
+          {{ t('admin.person.bulkChangeKlasse.success') }}
+        </p>
         <!-- Progress Bar -->
         <v-progress-linear
           class="mt-5"
@@ -150,23 +162,6 @@
             <strong class="text-white">{{ Math.ceil(value) }}%</strong>
           </template>
         </v-progress-linear>
-      </template>
-      <template v-if="state === State.FINISHED">
-        <v-row justify="center">
-          <v-col cols="auto">
-            <v-icon
-              small
-              color="#1EAE9C"
-              icon="mdi-check-circle"
-            ></v-icon>
-          </v-col>
-        </v-row>
-        <p
-          class="mt-2 text-center"
-          data-testid="bulk-change-klasse-success-text"
-        >
-          {{ t('admin.person.bulkChangeKlasse.success') }}
-        </p>
       </template>
     </v-container>
 
