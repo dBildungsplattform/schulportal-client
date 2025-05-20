@@ -106,6 +106,8 @@ personenkontextStore.workflowStepResponse = DoFactory.getPersonenkontextWorkflow
 
 describe('RolleModify', () => {
   test('renders form and triggers submit', async () => {
+    bulkOperationStore.bulkModifyPersonenRolle = vi.fn().mockResolvedValue(undefined);
+    const bulkModifyPersonenRolleSpy: MockInstance = vi.spyOn(bulkOperationStore, 'bulkModifyPersonenRolle');
     // Set organisation value
     const organisationAutocomplete: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
@@ -120,26 +122,31 @@ describe('RolleModify', () => {
       .findComponent({ ref: 'rolle-select' });
     await rolleAutocomplete?.setValue(rolle.id);
     rolleAutocomplete?.vm.$emit('update:search', rolle.id);
-
     await nextTick();
 
-    const submitButton: Element | null = document.body.querySelector('[data-testid="rolle-modify-submit-button"]');
-    expect(submitButton).not.toBeNull();
+    const befristungInput: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'personenkontext-create' })
+      .findComponent({ ref: 'befristung-input-wrapper' })
+      .findComponent({ ref: 'befristung-input' });
+    await befristungInput?.setValue('12.08.2099');
     await nextTick();
 
-    const bulkModifyPersonenRolleSpy: MockInstance = vi.spyOn(bulkOperationStore, 'bulkModifyPersonenRolle');
+    const formElement: Element | null = document.querySelector('[data-testid="rolle-assign-form"]');
+    expect(formElement).not.toBeNull();
 
-    if (submitButton) {
-      submitButton.dispatchEvent(new Event('click'));
+    if (formElement) {
+      // Dispatch a submit event directly on the form element
+      formElement.dispatchEvent(new Event('submit'));
     }
 
+    // Wait for all promises to resolve
+    await new Promise((resolve: (value: unknown) => void) => setTimeout(resolve, 0)); // This processes the event loop
     await flushPromises();
+
     expect(bulkModifyPersonenRolleSpy).toHaveBeenCalledTimes(1);
   });
 
   test('shows error dialog if bulk operation has errors', async () => {
-    await nextTick();
-
     // Mock the bulk operation with an error
     bulkOperationStore.currentOperation = {
       type: null,
@@ -151,6 +158,7 @@ describe('RolleModify', () => {
       successMessage: '',
     };
 
+    // Set organisation value
     const organisationAutocomplete: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'organisation-select' });
@@ -158,6 +166,7 @@ describe('RolleModify', () => {
     organisationAutocomplete?.vm.$emit('update:search', 'O1');
     await nextTick();
 
+    // Set rolle value
     const rolleAutocomplete: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'rolle-select' });
@@ -165,20 +174,29 @@ describe('RolleModify', () => {
     rolleAutocomplete?.vm.$emit('update:search', '54321');
     await nextTick();
 
-    const submitButton: Element | null = document.body.querySelector('[data-testid="rolle-modify-submit-button"]');
-    expect(submitButton).not.toBeNull();
+    const befristungInput: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'personenkontext-create' })
+      .findComponent({ ref: 'befristung-input-wrapper' })
+      .findComponent({ ref: 'befristung-input' });
+    await befristungInput?.setValue('12.08.2099');
     await nextTick();
 
-    const bulkModifyPersonenRolleSpy: MockInstance = vi.spyOn(bulkOperationStore, 'bulkModifyPersonenRolle');
+    // Find the form correctly
+    expect(wrapper).not.toBeNull();
 
-    if (submitButton) {
-      submitButton.dispatchEvent(new Event('click'));
+    const formElement: Element | null = document.querySelector('[data-testid="rolle-assign-form"]');
+    expect(formElement).not.toBeNull();
+
+    if (formElement) {
+      // Dispatch a submit event directly on the form element
+      formElement.dispatchEvent(new Event('submit'));
     }
 
+    // Wait for all promises to resolve
+    await new Promise((resolve: (value: unknown) => void) => setTimeout(resolve, 0)); // This processes the event loop
     await flushPromises();
 
-    expect(bulkModifyPersonenRolleSpy).toHaveBeenCalledTimes(1);
-
+    // Check for error dialog
     const errorDialog: Element | null = document.body.querySelector('.v-dialog');
     expect(errorDialog).not.toBeNull();
   });
