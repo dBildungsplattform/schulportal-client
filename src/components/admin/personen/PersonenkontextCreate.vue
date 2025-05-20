@@ -39,17 +39,18 @@
     rollen: TranslatedRolleWithAttrs[] | undefined;
     selectedOrganisation: string | undefined;
     showHeadline: boolean;
-    selectedOrganisationProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     klassen?: TranslatedObject[] | undefined;
     selectedRolle?: string | undefined;
     selectedRollen?: string[] | undefined;
     selectedKlasse?: string | undefined;
+    selectedOrganisationProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedKlasseProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedRolleProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedRollenProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     isModifyRolleDialog?: boolean;
     befristungInputProps?: BefristungProps;
     allowMultipleRollen?: boolean;
+    isRolleUnassignForm?: boolean;
   };
 
   const props: Props = defineProps<Props>();
@@ -350,7 +351,7 @@
     <!-- Organisation zuordnen -->
     <FormRow
       ref="form-row"
-      :errorLabel="selectedOrganisationProps['error']"
+      :errorLabel="selectedOrganisationProps?.['error'] ?? false"
       :isRequired="true"
       labelForId="organisation-select"
       :label="$t('admin.organisation.organisation')"
@@ -358,12 +359,15 @@
       <v-autocomplete
         class="mb-5"
         autocomplete="off"
-        :class="[{ 'filter-dropdown mb-4': hasAutoselectedSchule }, { selected: selectedOrganisation }]"
+        :class="[
+          { 'filter-dropdown mb-4': hasAutoselectedSchule || isRolleUnassignForm },
+          { selected: selectedOrganisation },
+        ]"
         clearable
         :click:clear="clearSelectedOrganisation"
         data-testid="organisation-select"
         density="compact"
-        :disabled="hasAutoselectedSchule"
+        :disabled="hasAutoselectedSchule || isRolleUnassignForm"
         id="organisation-select"
         ref="organisation-select"
         hide-details
@@ -441,7 +445,7 @@
         v-if="
           allowMultipleRollen
             ? isLernRolle(selectedRollen) && selectedOrganisation
-            : isLernRolle(selectedRolle) && selectedOrganisation
+            : isLernRolle(selectedRolle) && selectedOrganisation && !isRolleUnassignForm
         "
         :errorLabel="selectedKlasseProps?.['error'] || false"
         :isRequired="true"
@@ -480,7 +484,8 @@
         v-if="
           selectedOrganisation &&
           (allowMultipleRollen ? (selectedRollen?.length ?? 0) > 0 : selectedRolle) &&
-          !isModifyRolleDialog
+          !isModifyRolleDialog &&
+          props.befristungInputProps
         "
         :befristungProps="befristungInputProps?.befristungProps"
         :befristungOptionProps="befristungInputProps?.befristungOptionProps"

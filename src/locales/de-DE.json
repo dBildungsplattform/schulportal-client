@@ -185,7 +185,7 @@
       "bulkUnassignOrganisation": {
         "cancelZuordnung": "Schulzuordnung aufheben",
         "confirmation": "Möchten Sie wirklich die Schulzuordnungen der ausgewählten Benutzer aufheben?",
-        "affectedSchool": "Betroffene Schule: {schule}",
+        "affectedSchule": "Betroffene Schule: {schule}",
         "success": "Die Schulzuordnungen wurden erfolgreich entfernt."
       },
       "bulkChangeKlasse": {
@@ -196,6 +196,8 @@
           "onlySus": "Bitte wählen Sie nur Benutzer mit einer Schülerrolle aus, um die Aktion durchzuführen"
         }
       },
+      "onlyOneSchuleAlert": "Bitte wählen Sie im Filter genau eine Schule aus, um die Aktion durchzuführen.",
+      "onlyOneRolleAlert": "Bitte wählen Sie im Filter genau eine Rolle aus, um die Aktion durchzuführen.",
       "changePassword": "Passwort ändern",
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
       "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",
@@ -391,6 +393,10 @@
       "assignRollenart": "Rollenart zuordnen",
       "assignSystemrechte": "Systemrechte zuordnen",
       "backToCreateRolle": "Zurück zur Rollenanlage",
+      "bulkRollenzuordnung": {
+        "unassignRolleZuordnung": "Rolle entziehen",
+        "success": "Die Rollen wurde erfolgreich entfernt."
+      },
       "create": "Rolle anlegen",
       "createAnother": "Weitere Rolle anlegen",
       "createNew": "Neue Rolle anlegen",

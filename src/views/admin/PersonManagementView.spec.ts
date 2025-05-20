@@ -430,6 +430,11 @@ describe('PersonManagementView', () => {
       layoutCardTestId: 'password-reset-layout-card',
       discardButtonTestId: 'password-reset-discard-button',
     },
+    {
+      operationType: OperationType.ROLLE_UNASSIGN,
+      layoutCardTestId: 'rolle-unassign-layout-card',
+      discardButtonTestId: 'rolle-unassign-discard-button',
+    },
   ])(
     'it checks a checkbox in the table, selects $operationType, triggers dialog then cancels it',
     async ({ operationType, layoutCardTestId, discardButtonTestId }: BulkOperationTestParams) => {
@@ -466,6 +471,7 @@ describe('PersonManagementView', () => {
     // [OperationType.MODIFY_ROLLE],
     [OperationType.ORG_UNASSIGN],
     [OperationType.RESET_PASSWORD],
+    [OperationType.ROLLE_UNASSIGN],
   ])('%s is not shown if user has no permission', async (operationType: OperationType) => {
     authStore.hasPersonenLoeschenPermission = false;
     authStore.hasPersonenverwaltungPermission = false;

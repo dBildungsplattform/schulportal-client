@@ -6,6 +6,7 @@
   import PersonBulkDelete from '@/components/admin/personen/PersonBulkDelete.vue';
   import PersonBulkPasswordReset from '@/components/admin/personen/PersonBulkPasswordReset.vue';
   import RolleModify from '@/components/admin/rollen/RolleModify.vue';
+  import RolleUnassign from '@/components/admin/rollen/RolleUnassign.vue';
   import OrganisationUnassign from '@/components/admin/schulen/OrganisationUnassign.vue';
   import InfoDialog from '@/components/alert/InfoDialog.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
@@ -117,8 +118,11 @@
   const passwordResetDialogVisible: Ref<boolean> = ref(false);
   const organisationUnassignDialogVisible: Ref<boolean> = ref(false);
   const changeKlasseDialogVisible: Ref<boolean> = ref(false);
+  const rolleUnassignDialogVisible: Ref<boolean> = ref(false);
+
   const onlyOneOrganisationAlertDialogVisible: Ref<boolean> = ref(false);
   const invalidSelectionAlertMessages: Ref<Array<string>> = ref([]);
+  const onlyOneRolleAlertDialogVisible: Ref<boolean> = ref(false);
 
   const selectedOption: Ref<string | null> = ref(null);
 
@@ -127,15 +131,17 @@
   // Computed property for generating options dynamically for v-selects
   const actions: ComputedRef<TranslatedObject[]> = computed(() => {
     const actionTypeTitles: Map<OperationType, string> = new Map();
-    actionTypeTitles.set(OperationType.MODIFY_ROLLE, t('admin.rolle.assignRolle'));
+
     if (authStore.hasPersonenLoeschenPermission) {
       actionTypeTitles.set(OperationType.DELETE_PERSON, t('admin.person.deletePerson'));
     }
 
     if (authStore.hasPersonenverwaltungPermission) {
+      actionTypeTitles.set(OperationType.MODIFY_ROLLE, t('admin.rolle.assignRolle'));
       actionTypeTitles.set(OperationType.RESET_PASSWORD, t('admin.person.resetPassword'));
       actionTypeTitles.set(OperationType.ORG_UNASSIGN, t('admin.person.bulkUnassignOrganisation.cancelZuordnung'));
       actionTypeTitles.set(OperationType.CHANGE_KLASSE, t('admin.person.bulkChangeKlasse.transfer'));
+      actionTypeTitles.set(OperationType.ROLLE_UNASSIGN, t('admin.rolle.bulkRollenzuordnung.unassignRolleZuordnung'));
     }
 
     return [...actionTypeTitles.entries()].map(([key, value]: [string, string]) => ({
@@ -511,14 +517,9 @@
     return selectedOrganisationIds.value.length === 1;
   });
 
-  const checkSingleOrgDisplayDialog = (dialog: Ref<boolean>): void => {
-    if (!singleSchuleSelected.value) {
-      onlyOneOrganisationAlertDialogVisible.value = true;
-      invalidSelectionAlertMessages.value = [t('admin.person.onlyOneSchuleAlert')];
-      return;
-    }
-    dialog.value = true;
-  };
+  const selectedRolle: ComputedRef<RolleResponse | undefined> = computed(() => {
+    return selectedRollenObjects.value.find((rolle: RolleResponse) => rolle.id === selectedRollen.value[0]);
+  });
 
   const checkSingleOrgAndOnlyLernDisplayDialog = (dialog: Ref<boolean>): void => {
     const messages: Array<string> = [];
@@ -532,6 +533,22 @@
     dialog.value = true;
   };
 
+  const validateSingleSchuleSelection = (): boolean => {
+    if (!singleSchuleSelected.value) {
+      onlyOneOrganisationAlertDialogVisible.value = true;
+      return false;
+    }
+    return true;
+  };
+
+  const validateSingleRolleSelection = (): boolean => {
+    if (selectedRollen.value.length > 1) {
+      onlyOneRolleAlertDialogVisible.value = true;
+      return false;
+    }
+    return true;
+  };
+
   // Handle the selected action
   const handleOption = (newValue: string | null): void => {
     if (!newValue) return;
@@ -540,14 +557,26 @@
       case OperationType.MODIFY_ROLLE:
         rolleModifiyDialogVisible.value = true;
         break;
+
       case OperationType.DELETE_PERSON:
         benutzerDeleteDialogVisible.value = true;
         break;
+
       case OperationType.RESET_PASSWORD:
-        checkSingleOrgDisplayDialog(passwordResetDialogVisible);
-        break;
       case OperationType.ORG_UNASSIGN:
-        checkSingleOrgDisplayDialog(organisationUnassignDialogVisible);
+        if (validateSingleSchuleSelection()) {
+          if (newValue === OperationType.RESET_PASSWORD) {
+            passwordResetDialogVisible.value = true;
+          } else {
+            organisationUnassignDialogVisible.value = true;
+          }
+        }
+        break;
+
+      case OperationType.ROLLE_UNASSIGN:
+        if (!validateSingleSchuleSelection()) return;
+        if (!validateSingleRolleSelection()) return;
+        rolleUnassignDialogVisible.value = true;
         break;
       case OperationType.CHANGE_KLASSE:
         checkSingleOrgAndOnlyLernDisplayDialog(changeKlasseDialogVisible);
@@ -578,6 +607,16 @@
 
   const handleUnassignOrgDialog = async (finished: boolean): Promise<void> => {
     organisationUnassignDialogVisible.value = false;
+    selectedOption.value = null;
+    if (finished) {
+      selectedPersonIds.value = [];
+      await getPaginatedPersonen(searchFilterStore.personenPage);
+      resultTable.value.resetSelection();
+    }
+  };
+
+  const handleUnassignRolleDialog = async (finished: boolean): Promise<void> => {
+    rolleUnassignDialogVisible.value = false;
     selectedOption.value = null;
     if (finished) {
       selectedPersonIds.value = [];
@@ -928,6 +967,18 @@
               }
             "
           />
+          <InfoDialog
+            id="only-one-rolle-notice"
+            :isDialogVisible="onlyOneRolleAlertDialogVisible"
+            :header="invalidSelectionAlertHeader"
+            :messages="[$t('admin.person.onlyOneRolleAlert')]"
+            @update:dialogExit="
+              () => {
+                onlyOneRolleAlertDialogVisible = false;
+                selectedOption = null;
+              }
+            "
+          />
           <RolleModify
             ref="person-bulk-rolle-modify"
             v-if="rolleModifiyDialogVisible"
@@ -969,6 +1020,17 @@
             @update:dialogExit="handleUnassignOrgDialog($event)"
           >
           </OrganisationUnassign>
+          <RolleUnassign
+            ref="rolle-unassign"
+            v-if="rolleUnassignDialogVisible && selectedOrganisation"
+            :isDialogVisible="rolleUnassignDialogVisible"
+            :organisationen="organisationenForForm"
+            :selectedPersonen
+            :selectedOrganisationFromFilter="selectedOrganisation"
+            :selectedRolleFromFilter="selectedRolle!"
+            @update:dialogExit="handleUnassignRolleDialog($event)"
+          >
+          </RolleUnassign>
           <PersonBulkChangeKlasse
             v-if="changeKlasseDialogVisible"
             :isDialogVisible="changeKlasseDialogVisible"

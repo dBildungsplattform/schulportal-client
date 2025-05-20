@@ -4,7 +4,6 @@
   import { useBulkErrors, type BulkErrorList } from '@/composables/useBulkErrors';
   import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
   import { type Organisation } from '@/stores/OrganisationStore';
-  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
   import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
   import { getDisplayNameForOrg } from '@/utils/formatting';
   import { computed, ref, type ComputedRef, type Ref } from 'vue';
@@ -15,7 +14,6 @@
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
-  const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
 
   type Props = {
     isDialogVisible: boolean;
@@ -30,7 +28,6 @@
 
   async function closeDialog(finished: boolean): Promise<void> {
     bulkOperationStore.resetState();
-    personenkontextStore.$reset();
     emit('update:dialogExit', finished);
   }
 
@@ -75,7 +72,7 @@
             </div>
             <div data-testid="org-unassign-affected-school">
               {{
-                t('admin.person.bulkUnassignOrganisation.affectedSchool', {
+                t('admin.person.bulkUnassignOrganisation.affectedSchule', {
                   schule: getDisplayNameForOrg(selectedOrganisation),
                 })
               }}

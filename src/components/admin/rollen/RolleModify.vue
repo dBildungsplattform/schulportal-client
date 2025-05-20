@@ -61,13 +61,6 @@
     selectedBefristungOption: string;
   };
 
-  export type PersonenkontextFieldDefinitions = {
-    selectedRolle: Ref<string | undefined>;
-    selectedRolleProps: Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>;
-    selectedOrganisation: Ref<string | undefined>;
-    selectedOrganisationProps: Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>;
-  };
-
   const validationSchema = (): TypedSchema<ZuordnungCreationForm> => {
     return toTypedSchema(
       object({
@@ -88,7 +81,7 @@
   });
 
   const formContext: ReturnType<typeof useForm> = useForm<ZuordnungCreationForm>({
-    validationSchema,
+    validationSchema: validationSchema(),
   });
 
   const [selectedOrganisation, selectedOrganisationProps]: [
@@ -170,11 +163,11 @@
       formattedBefristung,
     );
 
-    emit('update:getUebersichten');
-
     if (bulkOperationStore.currentOperation?.errors && bulkOperationStore.currentOperation.errors.size > 0) {
       showErrorDialog.value = true;
     }
+
+    emit('update:getUebersichten');
   }
 </script>
 

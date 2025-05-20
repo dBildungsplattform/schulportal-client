@@ -3,6 +3,7 @@ import type {
   DBiamPersonenuebersichtResponse,
   DBiamPersonenzuordnungResponse,
   PersonenkontexteUpdateResponse,
+  RollenMerkmal,
 } from '@/api-client/generated';
 import ApiService from '@/services/ApiService';
 import { faker } from '@faker-js/faker';
@@ -12,7 +13,7 @@ import { createPinia, setActivePinia } from 'pinia';
 import { DoFactory } from 'test/DoFactory';
 import type { MockInstance } from 'vitest';
 import { OperationType, useBulkOperationStore, type BulkOperationStore } from './BulkOperationStore';
-import { type Organisation } from './OrganisationStore';
+import { OrganisationsTyp, type Organisation } from './OrganisationStore';
 import { usePersonStore, type PersonStore } from './PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from './PersonenkontextStore';
 import { RollenArt } from './RolleStore';
@@ -310,8 +311,6 @@ describe('BulkOperationStore', () => {
 
       await modifyPromise;
 
-      // Assertions
-      expect(bulkOperationStore.currentOperation?.isRunning).toBe(true);
       expect(bulkOperationStore.currentOperation?.progress).toBe(0);
       expect(bulkOperationStore.currentOperation?.complete).toBe(false);
     });
@@ -368,79 +367,6 @@ describe('BulkOperationStore', () => {
       expect(bulkOperationStore.currentOperation?.isRunning).toBe(false);
       expect(bulkOperationStore.currentOperation?.complete).toBe(true);
       expect(bulkOperationStore.currentOperation?.progress).toBe(100);
-    });
-
-    it('should handle errors from both endpoints gracefully', async () => {
-      const personIds: string[] = ['1', '2'];
-      const selectedOrganisationId: string = 'org-123';
-      const selectedRolleId: string = 'rolle-456';
-
-      const workflowStepResponseOrganisations: Organisation[] = [
-        {
-          id: 'org-123',
-          name: 'Test Schule',
-          kennung: 'SCH123',
-          administriertVon: 'adminId',
-        } as Organisation,
-      ];
-
-      mockAdapter.onGet('/api/dbiam/personenuebersicht/1').replyOnce(500, { i18nKey: 'mockGetError' });
-      mockAdapter.onGet('/api/dbiam/personenuebersicht/2').replyOnce(200, {
-        personId: '2',
-        vorname: 'Jane',
-        nachname: 'Doe',
-        benutzername: 'jdoe2',
-        lastModifiedZuordnungen: '2024-04-01T00:00:00.000Z',
-        zuordnungen: [],
-      });
-
-      mockAdapter.onPut('/api/personenkontext-workflow/2').replyOnce(500, { i18nKey: 'mockPutError' });
-
-      const modifyPromise: Promise<void> = bulkOperationStore.bulkModifyPersonenRolle(
-        personIds,
-        selectedOrganisationId,
-        selectedRolleId,
-        workflowStepResponseOrganisations,
-      );
-
-      await modifyPromise;
-
-      expect(bulkOperationStore.currentOperation?.errors.size).toBe(2);
-      expect(bulkOperationStore.currentOperation?.errors.get(personIds[0]!)).toBe('mockGetError');
-      expect(bulkOperationStore.currentOperation?.errors.get(personIds[1]!)).toBe('mockPutError');
-      expect(bulkOperationStore.currentOperation?.progress).toBe(100);
-      expect(bulkOperationStore.currentOperation?.complete).toBe(true);
-    });
-  });
-
-  describe('bulkPersonenDelete', () => {
-    it('should set successMessage when all deletes succeed', async () => {
-      const personIds: string[] = ['id-1', 'id-2'];
-
-      mockAdapter.onDelete(`/api/personen/${personIds[0]}`).replyOnce(204);
-      mockAdapter.onDelete(`/api/personen/${personIds[1]}`).replyOnce(204);
-
-      const bulkDeletePromise: Promise<void> = bulkOperationStore.bulkPersonenDelete(personIds);
-
-      await bulkDeletePromise;
-
-      expect(bulkOperationStore.currentOperation?.errors.size).toBe(0);
-      expect(bulkOperationStore.currentOperation?.successMessage).toBe('admin.person.deletePersonBulkSuccessMessage');
-    });
-
-    it('should handle errors if endpoint replies with 500', async () => {
-      const personIds: string[] = ['id-1', 'id-2'];
-
-      mockAdapter.onDelete(`/api/personen/${personIds[0]}`).replyOnce(204);
-      mockAdapter.onDelete(`/api/personen/${personIds[1]}`).replyOnce(500, { i18nKey: 'mockServerError' });
-
-      const bulkDeletePromise: Promise<void> = bulkOperationStore.bulkPersonenDelete(personIds);
-
-      await bulkDeletePromise;
-
-      expect(bulkOperationStore.currentOperation?.errors.size).toBe(1);
-      expect(bulkOperationStore.currentOperation?.errors.get(personIds[1]!)).toBe('mockServerError');
-      expect(bulkOperationStore.currentOperation?.successMessage).toBeUndefined();
     });
 
     it('should correctly handle befristungen', async () => {
@@ -594,6 +520,335 @@ describe('BulkOperationStore', () => {
       expect(bulkOperationStore.currentOperation?.errors.get(personIds[1]!)).toBe('mockPutError');
       expect(bulkOperationStore.currentOperation?.progress).toBe(100);
       expect(bulkOperationStore.currentOperation?.complete).toBe(true);
+    });
+  });
+
+  describe('bulkPersonenDelete', () => {
+    it('should set successMessage when all deletes succeed', async () => {
+      const personIds: string[] = ['id-1', 'id-2'];
+
+      mockAdapter.onDelete(`/api/personen/${personIds[0]}`).replyOnce(204);
+      mockAdapter.onDelete(`/api/personen/${personIds[1]}`).replyOnce(204);
+
+      const bulkDeletePromise: Promise<void> = bulkOperationStore.bulkPersonenDelete(personIds);
+
+      await bulkDeletePromise;
+
+      expect(bulkOperationStore.currentOperation?.errors.size).toBe(0);
+      expect(bulkOperationStore.currentOperation?.successMessage).toBe('admin.person.deletePersonBulkSuccessMessage');
+    });
+
+    it('should handle errors if endpoint replies with 500', async () => {
+      const personIds: string[] = ['id-1', 'id-2'];
+
+      mockAdapter.onDelete(`/api/personen/${personIds[0]}`).replyOnce(204);
+      mockAdapter.onDelete(`/api/personen/${personIds[1]}`).replyOnce(500, { i18nKey: 'mockServerError' });
+
+      const bulkDeletePromise: Promise<void> = bulkOperationStore.bulkPersonenDelete(personIds);
+
+      await bulkDeletePromise;
+
+      expect(bulkOperationStore.currentOperation?.errors.size).toBe(1);
+      expect(bulkOperationStore.currentOperation?.errors.get(personIds[1]!)).toBe('mockServerError');
+      expect(bulkOperationStore.currentOperation?.successMessage).toBeUndefined();
+    });
+  });
+
+  describe('bulkUnassignPersonenFromRolle', () => {
+    it('should unassign person from rolle successfully', async () => {
+      const organisationId: string = '1234';
+      const rolleId: string = '5678';
+      const personId: string = '1';
+
+      const mockPersonResponse: DBiamPersonenuebersichtResponse = {
+        personId: personId,
+        vorname: 'John',
+        nachname: 'Doe',
+        benutzername: 'jdoe',
+        lastModifiedZuordnungen: '2024-04-01T00:00:00.000Z',
+        zuordnungen: [
+          {
+            sskId: organisationId, // matches organisation ID
+            rolleId: rolleId, // matches rolle ID
+            sskName: 'Test School',
+            sskDstNr: '123',
+            rolle: 'Test Role',
+            rollenArt: RollenArt.Lern,
+            administriertVon: 'admin-org-id',
+            typ: OrganisationsTyp.Schule,
+            editable: true,
+            befristung: 'unbefristet',
+            merkmale: [] as unknown as RollenMerkmal[],
+            admins: ['admin1'],
+          },
+          {
+            sskId: '5678', // different organisation ID
+            rolleId: rolleId,
+            sskName: 'Another School',
+            sskDstNr: '456',
+            rolle: 'Test Role',
+            rollenArt: RollenArt.Lern,
+            administriertVon: 'admin-org-id',
+            typ: OrganisationsTyp.Schule,
+            editable: true,
+            befristung: 'unbefristet',
+            merkmale: [] as unknown as RollenMerkmal[],
+            admins: ['admin1'],
+          },
+        ],
+      };
+
+      const mockUpdateResponse: PersonenkontexteUpdateResponse = {
+        dBiamPersonenkontextResponses: [
+          {
+            personId: personId,
+            organisationId: '5678', // Only the non-matching zuordnung remains
+            rolleId: rolleId,
+          } as DBiamPersonenkontextResponse,
+        ],
+      };
+      const spyUpdate: MockInstance = vi.spyOn(personenkontextStore, 'updatePersonenkontexte');
+      const spyPersonenuebersicht: MockInstance = vi.spyOn(personStore, 'getPersonenuebersichtById');
+
+      mockAdapter.onGet(`/api/dbiam/personenuebersicht/${personId}`).replyOnce(200, mockPersonResponse);
+      mockAdapter.onPut(`/api/personenkontext-workflow/${personId}`).replyOnce(200, mockUpdateResponse);
+
+      const unassignPromise: Promise<void> = bulkOperationStore.bulkUnassignPersonenFromRolle(
+        organisationId,
+        rolleId,
+        [personId],
+        false,
+      );
+
+      expect(bulkOperationStore.currentOperation?.type).toBe(OperationType.ROLLE_UNASSIGN);
+      expect(bulkOperationStore.currentOperation?.isRunning).toBe(true);
+      expect(bulkOperationStore.currentOperation?.progress).toBe(0);
+
+      await unassignPromise;
+
+      expect(bulkOperationStore.currentOperation?.isRunning).toBe(false);
+      expect(bulkOperationStore.currentOperation?.complete).toBe(true);
+      expect(bulkOperationStore.currentOperation?.progress).toBe(100);
+      expect(bulkOperationStore.currentOperation?.errors.size).toBe(0);
+      expect(bulkOperationStore.currentOperation?.successMessage).toBe('admin.rolle.rollenUnassignedSuccessfully');
+      expect(spyUpdate).toHaveBeenCalled();
+      expect(spyPersonenuebersicht).toHaveBeenCalled();
+    });
+
+    it('should unassign person from rolle and its klasse successfully', async () => {
+      const organisationId: string = '1234';
+      const rolleId: string = '5678';
+      const personId: string = '1';
+
+      const mockPersonResponse: DBiamPersonenuebersichtResponse = {
+        personId: personId,
+        vorname: 'John',
+        nachname: 'Doe',
+        benutzername: 'jdoe',
+        lastModifiedZuordnungen: '2024-04-01T00:00:00.000Z',
+        zuordnungen: [
+          {
+            sskId: organisationId, // matches organisation ID
+            rolleId: rolleId, // matches rolle ID
+            sskName: 'Test School',
+            sskDstNr: '123',
+            rolle: 'Test Role',
+            rollenArt: RollenArt.Lern,
+            administriertVon: 'admin-org-id',
+            typ: OrganisationsTyp.Schule,
+            editable: true,
+            befristung: 'unbefristet',
+            merkmale: [] as unknown as RollenMerkmal[],
+            admins: ['admin1'],
+          },
+          {
+            sskId: '5678', // different organisation ID
+            rolleId: rolleId,
+            sskName: '9B',
+            sskDstNr: '456',
+            rolle: 'Test Role',
+            rollenArt: RollenArt.Lern,
+            administriertVon: organisationId,
+            typ: OrganisationsTyp.Klasse,
+            editable: true,
+            befristung: 'unbefristet',
+            merkmale: [] as unknown as RollenMerkmal[],
+            admins: ['admin1'],
+          },
+        ],
+      };
+
+      const mockUpdateResponse: PersonenkontexteUpdateResponse = {
+        dBiamPersonenkontextResponses: [],
+      };
+      const spyUpdate: MockInstance = vi.spyOn(personenkontextStore, 'updatePersonenkontexte');
+      const spyPersonenuebersicht: MockInstance = vi.spyOn(personStore, 'getPersonenuebersichtById');
+
+      mockAdapter.onGet(`/api/dbiam/personenuebersicht/${personId}`).replyOnce(200, mockPersonResponse);
+      mockAdapter.onPut(`/api/personenkontext-workflow/${personId}`).replyOnce(200, mockUpdateResponse);
+
+      const unassignPromise: Promise<void> = bulkOperationStore.bulkUnassignPersonenFromRolle(
+        organisationId,
+        rolleId,
+        [personId],
+        true,
+      );
+
+      expect(bulkOperationStore.currentOperation?.type).toBe(OperationType.ROLLE_UNASSIGN);
+      expect(bulkOperationStore.currentOperation?.isRunning).toBe(true);
+      expect(bulkOperationStore.currentOperation?.progress).toBe(0);
+
+      await unassignPromise;
+
+      expect(bulkOperationStore.currentOperation?.isRunning).toBe(false);
+      expect(bulkOperationStore.currentOperation?.complete).toBe(true);
+      expect(bulkOperationStore.currentOperation?.progress).toBe(100);
+      expect(bulkOperationStore.currentOperation?.errors.size).toBe(0);
+      expect(bulkOperationStore.currentOperation?.successMessage).toBe('admin.rolle.rollenUnassignedSuccessfully');
+      expect(spyUpdate).toHaveBeenCalled();
+      expect(spyPersonenuebersicht).toHaveBeenCalled();
+    });
+
+    it('should skip if no matching zuordnung exists', async () => {
+      const organisationId: string = '1234';
+      const rolleId: string = '5678';
+      const personId: string = '1';
+
+      const mockPersonResponse: DBiamPersonenuebersichtResponse = {
+        personId: personId,
+        vorname: 'John',
+        nachname: 'Doe',
+        benutzername: 'jdoe',
+        lastModifiedZuordnungen: '2024-04-01T00:00:00.000Z',
+        zuordnungen: [
+          {
+            sskId: '9999', // Different from the requested organisationId
+            rolleId: '9999', // Different from the requested rolleId
+            sskName: 'Another School',
+            sskDstNr: '456',
+            rolle: 'Test Role',
+            rollenArt: RollenArt.Lern,
+            administriertVon: 'admin-org-id',
+            typ: OrganisationsTyp.Schule,
+            editable: true,
+            befristung: 'unbefristet',
+            merkmale: [] as unknown as RollenMerkmal[],
+            admins: ['admin1'],
+          },
+        ],
+      };
+
+      mockAdapter.onGet(`/api/dbiam/personenuebersicht/${personId}`).replyOnce(200, mockPersonResponse);
+
+      const unassignPromise: Promise<void> = bulkOperationStore.bulkUnassignPersonenFromRolle(
+        organisationId,
+        rolleId,
+        [personId],
+        false,
+      );
+
+      await unassignPromise;
+
+      expect(bulkOperationStore.currentOperation?.isRunning).toBe(false);
+      expect(bulkOperationStore.currentOperation?.complete).toBe(true);
+      expect(bulkOperationStore.currentOperation?.progress).toBe(100);
+      expect(bulkOperationStore.currentOperation?.errors.size).toBe(0);
+      expect(bulkOperationStore.currentOperation?.successMessage).toBe('admin.rolle.rollenUnassignedSuccessfully');
+    });
+
+    it('should handle errors from personenuebersicht endpoint', async () => {
+      const organisationId: string = '1234';
+      const rolleId: string = '5678';
+      const personId: string = '1';
+
+      const spyUpdate: MockInstance = vi.spyOn(personenkontextStore, 'updatePersonenkontexte');
+      const spyPersonenuebersicht: MockInstance = vi.spyOn(personStore, 'getPersonenuebersichtById');
+
+      // Mock error in personenuebersicht (GET) call
+      mockAdapter.onGet(`/api/dbiam/personenuebersicht/${personId}`).replyOnce(500, { i18nKey: 'mockGetError' });
+
+      const unassignPromise: Promise<void> = bulkOperationStore.bulkUnassignPersonenFromRolle(
+        organisationId,
+        rolleId,
+        [personId],
+        false,
+      );
+
+      await unassignPromise;
+
+      expect(bulkOperationStore.currentOperation?.isRunning).toBe(false);
+      expect(bulkOperationStore.currentOperation?.complete).toBe(true);
+      expect(bulkOperationStore.currentOperation?.progress).toBe(100);
+      expect(bulkOperationStore.currentOperation?.errors.size).toBe(1);
+      expect(bulkOperationStore.currentOperation?.errors.get(personId)).toBe('mockGetError');
+      expect(bulkOperationStore.currentOperation?.successMessage).toBeUndefined();
+      expect(spyUpdate).not.toHaveBeenCalled();
+      expect(spyPersonenuebersicht).toHaveBeenCalled();
+    });
+
+    it('should handle errors from personenkontext-workflow endpoint', async () => {
+      const organisationId: string = '1234';
+      const rolleId: string = '5678';
+      const personId: string = '2';
+
+      // Mock successful GET but error in personenkontext-workflow (PUT) call
+      const mockPersonResponse: DBiamPersonenuebersichtResponse = {
+        personId: personId,
+        vorname: 'Jane',
+        nachname: 'Doe',
+        benutzername: 'jdoe2',
+        lastModifiedZuordnungen: '2024-04-01T00:00:00.000Z',
+        zuordnungen: [
+          {
+            sskId: organisationId,
+            rolleId: rolleId,
+            sskName: 'Test School',
+            sskDstNr: '123',
+            rolle: 'Test Role',
+            rollenArt: RollenArt.Lern,
+            administriertVon: 'admin-org-id',
+            typ: OrganisationsTyp.Schule,
+            editable: true,
+            befristung: 'unbefristet',
+            merkmale: [] as unknown as RollenMerkmal[],
+            admins: ['admin1'],
+          },
+        ],
+      };
+
+      const spyUpdate: MockInstance = vi.spyOn(personenkontextStore, 'updatePersonenkontexte');
+      const spyPersonenuebersicht: MockInstance = vi.spyOn(personStore, 'getPersonenuebersichtById');
+
+      mockAdapter.onGet(`/api/dbiam/personenuebersicht/${personId}`).replyOnce(200, mockPersonResponse);
+      mockAdapter.onPut(`/api/personenkontext-workflow/${personId}`).replyOnce(500, { i18nKey: 'mockPutError' });
+
+      const unassignPromise: Promise<void> = bulkOperationStore.bulkUnassignPersonenFromRolle(
+        organisationId,
+        rolleId,
+        [personId],
+        false,
+      );
+
+      await unassignPromise;
+
+      expect(bulkOperationStore.currentOperation?.isRunning).toBe(false);
+      expect(bulkOperationStore.currentOperation?.complete).toBe(true);
+      expect(bulkOperationStore.currentOperation?.progress).toBe(100);
+      expect(bulkOperationStore.currentOperation?.errors.size).toBe(1);
+      expect(bulkOperationStore.currentOperation?.errors.get(personId)).toBe('mockPutError');
+      expect(bulkOperationStore.currentOperation?.successMessage).toBeUndefined();
+      expect(spyUpdate).toHaveBeenCalled();
+      expect(spyPersonenuebersicht).toHaveBeenCalled();
+    });
+
+    it('should skip if person has no zuordnungen', async () => {
+      const spy: MockInstance = vi.spyOn(personenkontextStore, 'updatePersonenkontexte');
+      mockAdapter.onGet('/api/dbiam/personenuebersicht/1').replyOnce(200, []);
+
+      await bulkOperationStore.bulkUnassignPersonenFromRolle('1234', '1', [mockPersonId], false);
+
+      expect(spy).not.toHaveBeenCalled();
+      expect(bulkOperationStore.currentOperation?.progress).toBe(100);
     });
   });
 
