@@ -133,7 +133,6 @@
             })
           }}
         </p>
-
         <ol>
           <li
             v-for="(entry, index) in props.errors"
