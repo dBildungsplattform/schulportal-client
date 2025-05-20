@@ -765,6 +765,86 @@ describe('BulkOperationStore', () => {
       expect(spyPersonenuebersicht).toHaveBeenCalled();
     });
 
+    it('should unassign person from rolle and its klasse successfully', async () => {
+      const organisationId: string = '1234';
+      const rolleId: string = '5678';
+      const personId: string = '1';
+
+      const mockPersonResponse: DBiamPersonenuebersichtResponse = {
+        personId: personId,
+        vorname: 'John',
+        nachname: 'Doe',
+        benutzername: 'jdoe',
+        lastModifiedZuordnungen: '2024-04-01T00:00:00.000Z',
+        zuordnungen: [
+          {
+            sskId: organisationId, // matches organisation ID
+            rolleId: rolleId, // matches rolle ID
+            sskName: 'Test School',
+            sskDstNr: '123',
+            rolle: 'Test Role',
+            rollenArt: RollenArt.Lern,
+            administriertVon: 'admin-org-id',
+            typ: OrganisationsTyp.Schule,
+            editable: true,
+            befristung: 'unbefristet',
+            merkmale: [] as unknown as RollenMerkmal,
+            admins: ['admin1'],
+          },
+          {
+            sskId: '5678', // different organisation ID
+            rolleId: rolleId,
+            sskName: '9B',
+            sskDstNr: '456',
+            rolle: 'Test Role',
+            rollenArt: RollenArt.Lern,
+            administriertVon: 'admin-org-id',
+            typ: OrganisationsTyp.Schule,
+            editable: true,
+            befristung: 'unbefristet',
+            merkmale: [] as unknown as RollenMerkmal,
+            admins: ['admin1'],
+          },
+        ],
+      };
+
+      const mockUpdateResponse: PersonenkontexteUpdateResponse = {
+        dBiamPersonenkontextResponses: [
+          {
+            personId: personId,
+            organisationId: '5678', // Only the non-matching zuordnung remains
+            rolleId: rolleId,
+          } as DBiamPersonenkontextResponse,
+        ],
+      };
+      const spyUpdate: MockInstance = vi.spyOn(personenkontextStore, 'updatePersonenkontexte');
+      const spyPersonenuebersicht: MockInstance = vi.spyOn(personStore, 'getPersonenuebersichtById');
+
+      mockAdapter.onGet(`/api/dbiam/personenuebersicht/${personId}`).replyOnce(200, mockPersonResponse);
+      mockAdapter.onPut(`/api/personenkontext-workflow/${personId}`).replyOnce(200, mockUpdateResponse);
+
+      const unassignPromise: Promise<void> = bulkOperationStore.bulkUnassignPersonenFromRolle(
+        organisationId,
+        rolleId,
+        [personId],
+        true,
+      );
+
+      expect(bulkOperationStore.currentOperation?.type).toBe(OperationType.ROLLE_UNASSIGN);
+      expect(bulkOperationStore.currentOperation?.isRunning).toBe(true);
+      expect(bulkOperationStore.currentOperation?.progress).toBe(0);
+
+      await unassignPromise;
+
+      expect(bulkOperationStore.currentOperation?.isRunning).toBe(false);
+      expect(bulkOperationStore.currentOperation?.complete).toBe(true);
+      expect(bulkOperationStore.currentOperation?.progress).toBe(100);
+      expect(bulkOperationStore.currentOperation?.errors.size).toBe(0);
+      expect(bulkOperationStore.currentOperation?.successMessage).toBe('admin.rolle.rollenUnassignedSuccessfully');
+      expect(spyUpdate).toHaveBeenCalled();
+      expect(spyPersonenuebersicht).toHaveBeenCalled();
+    });
+
     it('should skip if no matching zuordnung exists', async () => {
       const organisationId: string = '1234';
       const rolleId: string = '5678';
