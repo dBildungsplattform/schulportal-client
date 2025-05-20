@@ -189,7 +189,7 @@
         "success": "Die Schulzuordnungen wurden erfolgreich entfernt."
       },
       "bulkChangeKlasse": {
-        "transfer": "Versetzen",
+        "transfer": "Schüler versetzen",
         "nextKlasse": "Neue Klasse",
         "success": "Die ausgewählten Schülerinnen und Schüler wurden erfolgreich versetzt.",
         "error": {
