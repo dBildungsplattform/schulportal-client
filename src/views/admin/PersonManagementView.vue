@@ -33,6 +33,7 @@
   import { type Composer, useI18n } from 'vue-i18n';
   import { type Router, useRouter } from 'vue-router';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
+  import RolleUnassign from '@/components/admin/rollen/RolleUnassign.vue';
   import { SortOrder } from '@/utils/sorting';
 
   const searchFieldComponent: Ref = ref();
@@ -90,7 +91,10 @@
   const benutzerDeleteDialogVisible: Ref<boolean> = ref(false);
   const passwordResetDialogVisible: Ref<boolean> = ref(false);
   const organisationUnassignDialogVisible: Ref<boolean> = ref(false);
+  const rolleUnassignDialogVisible: Ref<boolean> = ref(false);
+
   const onlyOneOrganisationAlertDialogVisible: Ref<boolean> = ref(false);
+  const onlyOneRolleAlertDialogVisible: Ref<boolean> = ref(false);
 
   const selectedOption: Ref<string | null> = ref(null);
 
@@ -99,14 +103,16 @@
   // Computed property for generating options dynamically for v-selects
   const actions: ComputedRef<TranslatedObject[]> = computed(() => {
     const actionTypeTitles: Map<OperationType, string> = new Map();
-    actionTypeTitles.set(OperationType.MODIFY_ROLLE, t('admin.rolle.assignRolle'));
+
     if (authStore.hasPersonenLoeschenPermission) {
       actionTypeTitles.set(OperationType.DELETE_PERSON, t('admin.person.deletePerson'));
     }
 
     if (authStore.hasPersonenverwaltungPermission) {
+      actionTypeTitles.set(OperationType.MODIFY_ROLLE, t('admin.rolle.assignRolle'));
       actionTypeTitles.set(OperationType.RESET_PASSWORD, t('admin.person.resetPassword'));
       actionTypeTitles.set(OperationType.ORG_UNASSIGN, t('admin.person.bulkUnassignOrganisation.cancelZuordnung'));
+      actionTypeTitles.set(OperationType.ROLLE_UNASSIGN, t('admin.rolle.bulkRollenzuordnung.unassignRolleZuordnung'));
     }
 
     return [...actionTypeTitles.entries()].map(([key, value]: [string, string]) => ({
@@ -458,11 +464,11 @@
     getPaginatedPersonen(searchFilterStore.personenPage);
   }
 
-  const singleSchoolSelected: ComputedRef<boolean> = computed(() => {
+  const singleSchuleSelected: ComputedRef<boolean> = computed(() => {
     return selectedOrganisationIds.value.length === 1;
   });
 
-  const singleSchoolAlertHeader: ComputedRef<string> = computed(() => {
+  const singleSelectionAlertHeader: ComputedRef<string> = computed(() => {
     return actions.value.find((action: TranslatedObject) => action.value === selectedOption.value)?.title || '';
   });
 
@@ -470,12 +476,24 @@
     return organisationStore.allOrganisationen.find((org: Organisation) => org.id === selectedOrganisationIds.value[0]);
   });
 
-  const checkSingleOrgDisplayDialog = (dialog: Ref<boolean>): void => {
-    if (!singleSchoolSelected.value) {
+  const selectedRolle: ComputedRef<RolleResponse | undefined> = computed(() => {
+    return selectedRollenObjects.value.find((rolle: RolleResponse) => rolle.id === selectedRollen.value[0]);
+  });
+
+  const validateSingleSchuleSelection = (): boolean => {
+    if (!singleSchuleSelected.value) {
       onlyOneOrganisationAlertDialogVisible.value = true;
-      return;
+      return false;
     }
-    dialog.value = true;
+    return true;
+  };
+
+  const validateSingleRolleSelection = (): boolean => {
+    if (selectedRollen.value.length > 1) {
+      onlyOneRolleAlertDialogVisible.value = true;
+      return false;
+    }
+    return true;
   };
 
   // Handle the selected action
@@ -486,14 +504,27 @@
       case OperationType.MODIFY_ROLLE:
         rolleModifiyDialogVisible.value = true;
         break;
+
       case OperationType.DELETE_PERSON:
         benutzerDeleteDialogVisible.value = true;
         break;
+
       case OperationType.RESET_PASSWORD:
-        checkSingleOrgDisplayDialog(passwordResetDialogVisible);
-        break;
       case OperationType.ORG_UNASSIGN:
-        checkSingleOrgDisplayDialog(organisationUnassignDialogVisible);
+        if (validateSingleSchuleSelection()) {
+          if (newValue === OperationType.RESET_PASSWORD) {
+            passwordResetDialogVisible.value = true;
+          } else {
+            organisationUnassignDialogVisible.value = true;
+          }
+        }
+        break;
+
+      case OperationType.ROLLE_UNASSIGN:
+        if (!validateSingleSchuleSelection()) return;
+        if (!validateSingleRolleSelection()) return;
+        rolleUnassignDialogVisible.value = true;
+        break;
     }
   };
 
@@ -517,8 +548,19 @@
     passwordResetDialogVisible.value = false;
     selectedOption.value = null;
   };
+
   const handleUnassignOrgDialog = async (finished: boolean): Promise<void> => {
     organisationUnassignDialogVisible.value = false;
+    selectedOption.value = null;
+    if (finished) {
+      selectedPersonIds.value = [];
+      await getPaginatedPersonen(searchFilterStore.personenPage);
+      resultTable.value.resetSelection();
+    }
+  };
+
+  const handleUnassignRolleDialog = async (finished: boolean): Promise<void> => {
+    rolleUnassignDialogVisible.value = false;
     selectedOption.value = null;
     if (finished) {
       selectedPersonIds.value = [];
@@ -853,11 +895,23 @@
           <InfoDialog
             id="only-one-school-notice"
             :isDialogVisible="onlyOneOrganisationAlertDialogVisible"
-            :header="singleSchoolAlertHeader"
-            :message="$t('admin.person.onlyOneSchoolAlert')"
+            :header="singleSelectionAlertHeader"
+            :message="$t('admin.person.onlyOneSchuleAlert')"
             @update:dialogExit="
               () => {
                 onlyOneOrganisationAlertDialogVisible = false;
+                selectedOption = null;
+              }
+            "
+          />
+          <InfoDialog
+            id="only-one-rolle-notice"
+            :isDialogVisible="onlyOneRolleAlertDialogVisible"
+            :header="singleSelectionAlertHeader"
+            :message="$t('admin.person.onlyOneRolleAlert')"
+            @update:dialogExit="
+              () => {
+                onlyOneRolleAlertDialogVisible = false;
                 selectedOption = null;
               }
             "
@@ -903,6 +957,17 @@
             @update:dialogExit="handleUnassignOrgDialog($event)"
           >
           </OrganisationUnassign>
+          <RolleUnassign
+            ref="rolle-unassign"
+            v-if="rolleUnassignDialogVisible && selectedOrganisation"
+            :isDialogVisible="rolleUnassignDialogVisible"
+            :organisationen="organisationenForForm"
+            :selectedPersonen
+            :selectedOrganisationFromFilter="selectedOrganisation"
+            :selectedRolleFromFilter="selectedRolle!"
+            @update:dialogExit="handleUnassignRolleDialog($event)"
+          >
+          </RolleUnassign>
         </v-col>
         <!-- Display the number of selected checkboxes -->
         <v-col
