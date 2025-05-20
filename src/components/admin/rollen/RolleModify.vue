@@ -32,6 +32,8 @@
     (event: 'update:getUebersichten'): void;
   };
 
+  type PersonWithRolleAndZuordnung = PersonenWithRolleAndZuordnung[number];
+
   const props: Props = defineProps<Props>();
   const emit: Emits = defineEmits<Emits>();
 
@@ -172,6 +174,11 @@
 
     emit('update:getUebersichten');
   }
+
+  const onSubmitModifyRolle: (e?: Event) => Promise<Promise<void> | undefined> = formContext.handleSubmit(async () => {
+    const personIDs: string[] = props.selectedPersonen.map((person: PersonWithRolleAndZuordnung) => person.person.id);
+    await handleModifyRolle(personIDs);
+  });
 </script>
 
 <template>
@@ -279,63 +286,70 @@
         </div>
       </v-container>
 
-      <v-card-actions class="justify-center">
-        <v-row
-          v-if="bulkOperationStore.currentOperation?.progress === 0"
-          class="py-3 px-2 justify-center"
-        >
-          <v-spacer class="hidden-sm-and-down"></v-spacer>
-          <v-col
-            cols="12"
-            sm="6"
-            md="auto"
+      <v-form
+        data-testid="zuordnung-creation-form"
+        @submit.prevent="onSubmitModifyRolle"
+      >
+        <v-card-actions class="justify-center">
+          <v-row
+            v-if="bulkOperationStore.currentOperation?.progress === 0"
+            class="py-3 px-2 justify-center"
           >
-            <v-btn
-              :block="mdAndDown"
-              class="secondary"
-              @click="closeModifyRolleDeleteDialog"
-              data-testid="rolle-modify-discard-button"
+            <v-spacer class="hidden-sm-and-down"></v-spacer>
+
+            <v-col
+              cols="12"
+              sm="6"
+              md="auto"
             >
-              {{ t('cancel') }}
-            </v-btn>
-          </v-col>
-          <v-col
-            cols="12"
-            sm="6"
-            md="auto"
+              <v-btn
+                :block="mdAndDown"
+                class="secondary"
+                @click="closeModifyRolleDeleteDialog"
+                data-testid="rolle-modify-discard-button"
+              >
+                {{ t('cancel') }}
+              </v-btn>
+            </v-col>
+
+            <v-col
+              cols="12"
+              sm="6"
+              md="auto"
+            >
+              <v-btn
+                :block="mdAndDown"
+                type="submit"
+                class="primary"
+                :disabled="!canCommit || bulkOperationStore.currentOperation.isRunning"
+                data-testid="rolle-modify-submit-button"
+              >
+                {{ t('admin.rolle.assignRolle') }}
+              </v-btn>
+            </v-col>
+          </v-row>
+
+          <v-row
+            v-if="bulkOperationStore.currentOperation?.progress === 100"
+            class="py-3 px-2 justify-center"
           >
-            <v-btn
-              :block="mdAndDown"
-              :disabled="!canCommit || bulkOperationStore.currentOperation.isRunning"
-              class="primary"
-              @click="handleModifyRolle(props.selectedPersonen.map((person) => person.person.id))"
-              data-testid="rolle-modify-submit-button"
-              type="submit"
+            <v-col
+              cols="12"
+              sm="6"
+              md="auto"
             >
-              {{ t('admin.rolle.assignRolle') }}
-            </v-btn>
-          </v-col>
-        </v-row>
-        <v-row
-          v-if="bulkOperationStore.currentOperation?.progress === 100"
-          class="py-3 px-2 justify-center"
-        >
-          <v-col
-            cols="12"
-            sm="6"
-            md="auto"
-          >
-            <v-btn
-              :block="mdAndDown"
-              class="primary"
-              @click="closeModifyRolleDeleteDialog"
-              data-testid="rolle-modify-close-button"
-            >
-              {{ t('close') }}
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-card-actions>
+              <v-btn
+                :block="mdAndDown"
+                class="primary"
+                @click="closeModifyRolleDeleteDialog"
+                data-testid="rolle-modify-close-button"
+              >
+                {{ t('close') }}
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-card-actions>
+      </v-form>
     </LayoutCard>
   </v-dialog>
   <template v-if="showErrorDialog">
