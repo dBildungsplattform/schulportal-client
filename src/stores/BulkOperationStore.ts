@@ -53,7 +53,12 @@ type BulkOperationActions = {
     befristung?: string,
   ): Promise<void>;
   bulkPersonenDelete(personIDs: string[]): Promise<void>;
-  bulkUnassignPersonenFromRolle(organisationId: string, rolleId: string, personIDs: string[]): Promise<void>;
+  bulkUnassignPersonenFromRolle(
+    organisationId: string,
+    rolleId: string,
+    personIDs: string[],
+    isRolleLern: boolean,
+  ): Promise<void>;
   processPersonOperation<T>(
     operationType: OperationType,
     personIDs: string[],
@@ -280,7 +285,12 @@ export const useBulkOperationStore: StoreDefinition<
       );
     },
 
-    async bulkUnassignPersonenFromRolle(organisationId: string, rolleId: string, personIDs: string[]): Promise<void> {
+    async bulkUnassignPersonenFromRolle(
+      organisationId: string,
+      rolleId: string,
+      personIDs: string[],
+      isRolleLern: boolean,
+    ): Promise<void> {
       const personStore: PersonStore = usePersonStore();
       const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
 
@@ -299,12 +309,18 @@ export const useBulkOperationStore: StoreDefinition<
 
           const existingZuordnungen: Zuordnung[] = personStore.personenuebersicht?.zuordnungen ?? [];
 
-          // Remove Zuordnungen matching both organisationId and rolleId and it's children
-          const updatedZuordnungen: Zuordnung[] = existingZuordnungen.filter(
-            (zuordnung: Zuordnung) =>
-              !(zuordnung.sskId === organisationId && zuordnung.rolleId === rolleId) &&
-              zuordnung.administriertVon !== organisationId,
-          );
+          const updatedZuordnungen: Zuordnung[] = existingZuordnungen.filter((zuordnung: Zuordnung) => {
+            const isExactMatch: boolean = zuordnung.sskId === organisationId && zuordnung.rolleId === rolleId;
+            const isChildOfOrganisation: boolean = zuordnung.administriertVon === organisationId;
+
+            // If "lern" type, remove both exact matches and children
+            // Otherwise, only remove exact matches
+            if (isRolleLern) {
+              return !(isExactMatch || isChildOfOrganisation);
+            } else {
+              return !isExactMatch;
+            }
+          });
 
           if (updatedZuordnungen.length === existingZuordnungen.length) {
             return; // No changes needed

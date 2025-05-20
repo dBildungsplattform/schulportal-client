@@ -8,7 +8,7 @@
   import { type BulkErrorList, useBulkErrors } from '@/composables/useBulkErrors';
   import type { PersonenWithRolleAndZuordnung } from '@/stores/PersonStore';
   import PersonBulkError from '@/components/admin/personen/PersonBulkError.vue';
-  import type { RolleResponse } from '@/stores/RolleStore';
+  import { RollenArt, type RolleResponse } from '@/stores/RolleStore';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
   import type { TranslatedObject } from '@/types';
   import { toTypedSchema } from '@vee-validate/yup';
@@ -94,11 +94,28 @@
     }
   }
 
+  function isLernRolle(selectedRolleId: string | undefined): boolean {
+    if (!selectedRolleId) return false;
+
+    const rolle: TranslatedRolleWithAttrs | undefined = rollenForForm.value?.find(
+      (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
+    );
+
+    return rolle?.rollenart === RollenArt.Lern;
+  }
+
   async function handleRolleUnassign(): Promise<void> {
+    const rolleId: string = selectedRolle.value ?? props.selectedRolleFromFilter?.id ?? '';
+    const isRolleLern: boolean =
+      selectedRolle.value != null
+        ? isLernRolle(selectedRolle.value)
+        : props.selectedRolleFromFilter?.rollenart === RollenArt.Lern;
+
     await bulkOperationStore.bulkUnassignPersonenFromRolle(
       selectedOrganisationFromFilterId.value,
-      selectedRolle.value ?? props.selectedRolleFromFilter?.id ?? '',
+      rolleId,
       props.selectedPersonen.map((person: PersonWithRolleAndZuordnung) => person.person.id),
+      isRolleLern,
     );
 
     if (bulkOperationStore.currentOperation?.errors && bulkOperationStore.currentOperation.errors.size > 0) {

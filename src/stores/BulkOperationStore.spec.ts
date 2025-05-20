@@ -743,9 +743,12 @@ describe('BulkOperationStore', () => {
       mockAdapter.onGet(`/api/dbiam/personenuebersicht/${personId}`).replyOnce(200, mockPersonResponse);
       mockAdapter.onPut(`/api/personenkontext-workflow/${personId}`).replyOnce(200, mockUpdateResponse);
 
-      const unassignPromise: Promise<void> = bulkOperationStore.bulkUnassignPersonenFromRolle(organisationId, rolleId, [
-        personId,
-      ]);
+      const unassignPromise: Promise<void> = bulkOperationStore.bulkUnassignPersonenFromRolle(
+        organisationId,
+        rolleId,
+        [personId],
+        false,
+      );
 
       expect(bulkOperationStore.currentOperation?.type).toBe(OperationType.ROLLE_UNASSIGN);
       expect(bulkOperationStore.currentOperation?.isRunning).toBe(true);
@@ -793,9 +796,12 @@ describe('BulkOperationStore', () => {
 
       mockAdapter.onGet(`/api/dbiam/personenuebersicht/${personId}`).replyOnce(200, mockPersonResponse);
 
-      const unassignPromise: Promise<void> = bulkOperationStore.bulkUnassignPersonenFromRolle(organisationId, rolleId, [
-        personId,
-      ]);
+      const unassignPromise: Promise<void> = bulkOperationStore.bulkUnassignPersonenFromRolle(
+        organisationId,
+        rolleId,
+        [personId],
+        false,
+      );
 
       await unassignPromise;
 
@@ -817,9 +823,12 @@ describe('BulkOperationStore', () => {
       // Mock error in personenuebersicht (GET) call
       mockAdapter.onGet(`/api/dbiam/personenuebersicht/${personId}`).replyOnce(500, { i18nKey: 'mockGetError' });
 
-      const unassignPromise: Promise<void> = bulkOperationStore.bulkUnassignPersonenFromRolle(organisationId, rolleId, [
-        personId,
-      ]);
+      const unassignPromise: Promise<void> = bulkOperationStore.bulkUnassignPersonenFromRolle(
+        organisationId,
+        rolleId,
+        [personId],
+        false,
+      );
 
       await unassignPromise;
 
@@ -869,9 +878,12 @@ describe('BulkOperationStore', () => {
       mockAdapter.onGet(`/api/dbiam/personenuebersicht/${personId}`).replyOnce(200, mockPersonResponse);
       mockAdapter.onPut(`/api/personenkontext-workflow/${personId}`).replyOnce(500, { i18nKey: 'mockPutError' });
 
-      const unassignPromise: Promise<void> = bulkOperationStore.bulkUnassignPersonenFromRolle(organisationId, rolleId, [
-        personId,
-      ]);
+      const unassignPromise: Promise<void> = bulkOperationStore.bulkUnassignPersonenFromRolle(
+        organisationId,
+        rolleId,
+        [personId],
+        false,
+      );
 
       await unassignPromise;
 
@@ -888,7 +900,7 @@ describe('BulkOperationStore', () => {
     it('should skip if person has no zuordnungen', async () => {
       mockAdapter.onGet('/api/dbiam/personenuebersicht/1').replyOnce(200, []);
 
-      await bulkOperationStore.bulkUnassignPersonenFromRolle('1234', '1', [mockPersonId]);
+      await bulkOperationStore.bulkUnassignPersonenFromRolle('1234', '1', [mockPersonId], false);
 
       expect(personStore.personenuebersicht).not.toBeNull();
       expect(personStore.personenuebersicht).toEqual([]);
