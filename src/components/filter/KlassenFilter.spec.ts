@@ -24,7 +24,7 @@ type Props = {
   selectedKlasseProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
   highlightSelection?: boolean;
   placeholderText?: string;
-  administriertVon?: string[] | undefined;
+  administriertVon?: string[];
 };
 
 function mountComponent(props: Partial<Props> = {}): VueWrapper {
@@ -203,7 +203,7 @@ describe('KlassenFilter', async () => {
           vi.runAllTimers();
           await nextTick();
           const actualText: string = wrapper.find('[data-testid="klasse-select"]').text();
-          if (id) expect(actualText).toContain(getDisplayNameForOrg(mockKlasse));
+          if (id) expect(actualText).toContain(mockKlasse.name);
           else expect(actualText).toBe('');
         });
       });

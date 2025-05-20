@@ -79,7 +79,7 @@
   const searchInputRollen: Ref<string> = ref('');
   const searchInputOrganisationen: Ref<string> = ref('');
 
-  const selectedKlassen: Ref<Array<string>> = ref([]);
+  const selectedKlassen: Ref<Array<string> | undefined> = ref([]);
   const selectedRollen: Ref<Array<string>> = ref([]);
   const selectedOrganisationIds: Ref<Array<string>> = ref([]);
   const selectedStatus: Ref<string | null> = ref(null);
@@ -125,7 +125,7 @@
       !!searchFilterStore.selectedOrganisationen?.length ||
       !!searchFilterStore.selectedRollen?.length ||
       !!searchFilterStore.searchFilterPersonen ||
-      selectedKlassen.value.length > 0 ||
+      (selectedKlassen.value && selectedKlassen.value.length > 0) ||
       !!selectedStatus.value,
   );
 
@@ -176,7 +176,7 @@
   const statuses: Array<string> = ['Aktiv', 'Inaktiv'];
 
   async function applySearchAndFilters(): Promise<void> {
-    personStore.getAllPersons({
+    await personStore.getAllPersons({
       offset: (searchFilterStore.personenPage - 1) * searchFilterStore.personenPerPage,
       limit: searchFilterStore.personenPerPage,
       organisationIDs: searchFilterStore.selectedKlassen?.length
@@ -194,7 +194,7 @@
     await personStore.getAllPersons({
       offset: (searchFilterStore.personenPage - 1) * searchFilterStore.personenPerPage,
       limit: searchFilterStore.personenPerPage,
-      organisationIDs: selectedKlassen.value.length ? selectedKlassen.value : selectedOrganisationIds.value,
+      organisationIDs: selectedKlassen.value?.length ? selectedKlassen.value : selectedOrganisationIds.value,
       rolleIDs: searchFilterStore.selectedRollen || selectedRollen.value,
       searchFilter: searchFilterStore.searchFilterPersonen || searchFilter.value,
       sortField: searchFilterStore.personenSortField as SortField,
@@ -253,7 +253,7 @@
   }
 
   async function setOrganisationFilter(newValue: Array<string>): Promise<void> {
-    await searchFilterStore.setOrganisationFilterForPersonen(newValue);
+    searchFilterStore.setOrganisationFilterForPersonen(newValue);
     await searchFilterStore.setKlasseFilterForPersonen([]);
     selectedKlassen.value = [];
     applySearchAndFilters();

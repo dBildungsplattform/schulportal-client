@@ -1241,6 +1241,53 @@ describe('OrganisationStore', () => {
       expect(organisationStore.schulenFilter.loading).toBe(false);
     });
   });
+
+  describe('loadKlassenForFilter', () => {
+    test('should load klassen for filter', async () => {
+      const mockResponse: Organisation[] = [DoFactory.getSchule()];
+
+      mockadapter.onGet('/api/organisationen?offset=0&limit=30&typ=KLASSE').replyOnce(200, mockResponse, {
+        'x-paging-total': '1',
+      });
+      const promise: Promise<void> = organisationStore.loadKlassenForFilter({
+        offset: 0,
+        limit: 30,
+      });
+      await promise;
+      expect(organisationStore.klassenFilter.filterResult).toEqual(mockResponse);
+      expect(organisationStore.klassenFilter.total).toEqual(1);
+      expect(organisationStore.klassenFilter.loading).toBe(false);
+    });
+
+    it('should handle string error', async () => {
+      mockadapter.onGet('/api/organisationen?offset=0&limit=30&typ=KLASSE').replyOnce(500, 'some mock server error');
+      const getAllOrganisationenPromise: Promise<void> = organisationStore.loadKlassenForFilter({
+        offset: 0,
+        limit: 30,
+      });
+      expect(organisationStore.klassenFilter.loading).toBe(true);
+      await getAllOrganisationenPromise;
+      expect(organisationStore.klassenFilter.filterResult).toEqual([]);
+      expect(organisationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(organisationStore.klassenFilter.loading).toBe(false);
+    });
+
+    it('should handle error code', async () => {
+      mockadapter
+        .onGet('/api/organisationen?offset=0&limit=30&typ=KLASSE')
+        .replyOnce(500, { code: 'some mock server error' });
+      const getAllOrganisationenPromise: Promise<void> = organisationStore.loadKlassenForFilter({
+        offset: 0,
+        limit: 30,
+      });
+      expect(organisationStore.klassenFilter.loading).toBe(true);
+      await getAllOrganisationenPromise;
+      expect(organisationStore.klassenFilter.filterResult).toEqual([]);
+      expect(organisationStore.errorCode).toEqual('some mock server error');
+      expect(organisationStore.klassenFilter.loading).toBe(false);
+    });
+  });
+
   describe('resetSchulFilter', () => {
     test('should reset filter', () => {
       organisationStore.schulenFilter = {
@@ -1255,6 +1302,23 @@ describe('OrganisationStore', () => {
       };
       organisationStore.resetSchulFilter();
       expect(organisationStore.schulenFilter).toEqual(expected);
+    });
+  });
+
+  describe('resetKlasseFilter', () => {
+    test('should reset filter', () => {
+      organisationStore.klassenFilter = {
+        filterResult: [DoFactory.getKlasse()],
+        loading: true,
+        total: 1,
+      };
+      const expected: AutoCompleteStore<Organisation> = {
+        filterResult: [],
+        loading: false,
+        total: 0,
+      };
+      organisationStore.resetKlasseFilter();
+      expect(organisationStore.klassenFilter).toEqual(expected);
     });
   });
 });

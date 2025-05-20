@@ -1,21 +1,22 @@
 <script setup lang="ts">
-  import { computed, type ComputedRef, type Ref, ref, watch } from 'vue';
-  import { RollenArt } from '@/stores/RolleStore';
-  import { useI18n } from 'vue-i18n';
+  import type { BefristungProps } from '@/components/admin/personen/BefristungInput.vue';
+  import BefristungInput from '@/components/admin/personen/BefristungInput.vue';
+  import KlassenFilter from '@/components/filter/KlassenFilter.vue';
   import FormRow from '@/components/form/FormRow.vue';
-  import { usePersonenkontextStore, type PersonenkontextStore, type Zuordnung } from '@/stores/PersonenkontextStore';
+  import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
   import {
     OrganisationsTyp,
     useOrganisationStore,
     type Organisation,
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
+  import { usePersonenkontextStore, type PersonenkontextStore, type Zuordnung } from '@/stores/PersonenkontextStore';
+  import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
+  import { RollenArt } from '@/stores/RolleStore';
   import { type TranslatedObject } from '@/types.d';
   import type { BaseFieldProps } from 'vee-validate';
-  import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
-  import BefristungInput from '@/components/admin/personen/BefristungInput.vue';
-  import type { BefristungProps } from '@/components/admin/personen/BefristungInput.vue';
-  import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
+  import { computed, ref, watch, type ComputedRef, type Ref } from 'vue';
+  import { useI18n } from 'vue-i18n';
 
   useI18n({ useScope: 'global' });
 
@@ -39,7 +40,6 @@
     selectedOrganisation: string | undefined;
     showHeadline: boolean;
     selectedOrganisationProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
-    klassen?: TranslatedObject[] | undefined;
     selectedRolle?: string | undefined;
     selectedRollen?: string[] | undefined;
     selectedKlasse?: string | undefined;
@@ -78,11 +78,6 @@
   // Computed property to get the title of the selected role
   const selectedRolleTitle: ComputedRef<string | undefined> = computed(() => {
     return props.rollen?.find((rolle: TranslatedObject) => rolle.value === selectedRolle.value)?.title;
-  });
-
-  // Computed property to get the title of the selected class
-  const selectedKlasseTitle: ComputedRef<string | undefined> = computed(() => {
-    return props.klassen?.find((klasse: TranslatedObject | undefined) => klasse?.value === selectedKlasse.value)?.title;
   });
 
   function isLernRolle(selectedRolleIds: string | string[] | undefined): boolean {
@@ -204,10 +199,6 @@
     { deep: true },
   );
 
-  watch(selectedKlasse, (newValue: string | undefined) => {
-    emits('update:selectedKlasse', newValue);
-  });
-
   // Using a watcher instead of modelUpdate since we need the old Value as well.
   // Default behavior of the autocomplete is to reset the newValue to empty string and that causes another request to be made
   watch(searchInputOrganisation, async (newValue: string, oldValue: string) => {
@@ -276,33 +267,9 @@
     },
   );
 
-  function updateKlassenSearch(searchValue: string): void {
-    clearTimeout(timerId.value);
-    const organisationId: string | undefined = selectedOrganisation.value;
-
-    if (!organisationId) {
-      return;
-    }
-    if (searchValue === '' && !selectedKlasse.value) {
-      timerId.value = setTimeout(() => {
-        organisationStore.getKlassenByOrganisationId({
-          searchString: searchValue,
-          limit: 25,
-          administriertVon: [organisationId],
-        });
-      }, 500);
-    } else if (searchValue && searchValue !== selectedKlasseTitle.value) {
-      /* cancel pending call */
-      clearTimeout(timerId.value);
-      /* delay new call 500ms */
-      timerId.value = setTimeout(() => {
-        organisationStore.getKlassenByOrganisationId({
-          searchString: searchValue,
-          limit: 25,
-          administriertVon: [organisationId],
-        });
-      }, 500);
-    }
+  function updateKlasseSelection(selectedKlassen: string | undefined): void {
+    selectedKlasse.value = selectedKlassen;
+    emits('update:selectedKlasse', selectedKlassen);
   }
 
   // Clear the selected Organisation once the input field is cleared (This is the only way to fetch all Orgas again)
@@ -447,23 +414,16 @@
         labelForId="klasse-select"
         :label="$t('admin.klasse.klasse')"
       >
-        <v-autocomplete
-          autocomplete="off"
-          clearable
-          data-testid="klasse-select"
-          density="compact"
-          id="klasse-select"
+        <KlassenFilter
+          :multiple="false"
+          :hideDetails="false"
+          :highlightSelection="false"
+          :selectedKlassen="selectedKlasse"
+          @update:selectedKlassen="updateKlasseSelection"
+          :placeholderText="$t('admin.klasse.selectKlasse')"
           ref="klasse-select"
-          :items="klassen"
-          item-value="value"
-          item-text="title"
-          :no-data-text="$t('noDataFound')"
-          :placeholder="$t('admin.klasse.selectKlasse')"
-          @update:search="updateKlassenSearch"
-          variant="outlined"
-          v-bind="selectedKlasseProps"
-          v-model="selectedKlasse"
-        ></v-autocomplete>
+          :administriertVon="selectedOrganisation ? [selectedOrganisation] : undefined"
+        />
       </FormRow>
       <!-- Befristung -->
       <v-row

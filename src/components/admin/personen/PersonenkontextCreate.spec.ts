@@ -1,12 +1,18 @@
-import { expect, test } from 'vitest';
-import { VueWrapper, mount } from '@vue/test-utils';
-import PersonenkontextCreate from './PersonenkontextCreate.vue';
-import { nextTick } from 'vue';
 import { RollenArt, RollenMerkmal, RollenSystemRecht } from '@/api-client/generated';
-import { type PersonenkontextStore, usePersonenkontextStore } from '@/stores/PersonenkontextStore';
-import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
-import type { BefristungProps } from './BefristungInput.vue';
+import {
+  OrganisationsTyp,
+  useOrganisationStore,
+  type Organisation,
+  type OrganisationStore,
+} from '@/stores/OrganisationStore';
+import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
 import { usePersonStore, type PersonStore, type PersonWithUebersicht } from '@/stores/PersonStore';
+import { VueWrapper, mount } from '@vue/test-utils';
+import { expect, test } from 'vitest';
+import { nextTick } from 'vue';
+import type { BefristungProps } from './BefristungInput.vue';
+import PersonenkontextCreate from './PersonenkontextCreate.vue';
+import { DoFactory } from '@/testing/DoFactory';
 
 let wrapper: VueWrapper | null = null;
 let personenkontextStore: PersonenkontextStore;
@@ -44,16 +50,6 @@ beforeEach(() => {
           title: 'Lehr',
           merkmale: new Set<RollenMerkmal>(['KOPERS_PFLICHT']),
           rollenart: RollenArt.Lehr,
-        },
-      ],
-      klassen: [
-        {
-          value: '1',
-          title: 'Org1',
-        },
-        {
-          value: '2',
-          title: 'Org2',
         },
       ],
       selectedOrganisationProps: {
@@ -112,24 +108,6 @@ beforeEach(() => {
 
   personenkontextStore = usePersonenkontextStore();
   organisationStore = useOrganisationStore();
-
-  personenkontextStore.workflowStepResponse = {
-    organisations: [
-      {
-        id: 'string',
-        kennung: '',
-        name: 'Organisation1',
-        namensergaenzung: 'string',
-        kuerzel: 'string',
-        typ: 'TRAEGER',
-        administriertVon: '1',
-      },
-    ],
-    rollen: [],
-    selectedOrganisation: null,
-    selectedRollen: null,
-    canCommit: true,
-  };
 
   personenkontextStore.workflowStepResponse = {
     rollen: [
@@ -226,20 +204,22 @@ describe('PersonenkontextCreate', () => {
 
   test('it updates search and sets values selected rolle, organisation and klasse', async () => {
     const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
-    await organisationAutocomplete?.vm.$emit('update:search', '01');
+    organisationAutocomplete?.vm.$emit('update:search', '01');
     await organisationAutocomplete?.setValue('O1');
     await nextTick();
 
     const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
-    await rolleAutocomplete?.vm.$emit('update:search', '54321');
+    rolleAutocomplete?.vm.$emit('update:search', '54321');
     await rolleAutocomplete?.setValue('54321');
     await nextTick();
 
     expect(organisationAutocomplete?.text()).toEqual('O1');
     await nextTick();
 
-    const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
-    await klasseAutocomplete?.vm.$emit('update:search', '55555');
+    const klasseAutocomplete: VueWrapper | undefined = wrapper
+      ?.findComponent({ name: 'KlassenFilter' })
+      .findComponent({ ref: 'klasse-select' });
+    klasseAutocomplete?.vm.$emit('update:search', '55555');
     await klasseAutocomplete?.setValue('55555');
     await nextTick();
 

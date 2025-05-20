@@ -770,11 +770,12 @@ describe('PersonDetailsView', () => {
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'rolle-select' });
     await rolleAutocomplete?.setValue('54321');
-    await rolleAutocomplete?.vm.$emit('update:search', '54321');
+    rolleAutocomplete?.vm.$emit('update:search', '54321');
     await nextTick();
     // Set klasse value
     const klasseAutocomplete: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
+      .findComponent({ name: 'KlassenFilter' })
       .findComponent({ ref: 'klasse-select' });
     await klasseAutocomplete?.setValue('9a');
     klasseAutocomplete?.vm.$emit('update:search', '9a');

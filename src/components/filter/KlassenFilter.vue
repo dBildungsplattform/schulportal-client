@@ -48,7 +48,7 @@
 
   const translateKlasse = (klasse: Organisation): TranslatedObject => ({
     value: klasse.id,
-    title: getDisplayNameForOrg(klasse),
+    title: klasse.name,
   });
   const translatedKlassen: ComputedRef<Array<TranslatedObject>> = computed(() => {
     const options: Array<TranslatedObject> = organisationStore.klassenFilter.filterResult.map(translateKlasse);
@@ -96,18 +96,18 @@
     }
   };
 
-  const updateOrganisationenIds = (ids: SelectedKlassenIds): void => {
+  const updateKlassenIds = (ids: SelectedKlassenIds): void => {
     const tempIds: Array<string> = wrapSelectedKlassenIds(ids);
     klassenFilter.organisationIds = dedup(tempIds.filter(Boolean));
   };
 
   const handleSelectionUpdate = (selection: SelectedKlassenIds): void => {
     if (isEmptySelection(selection)) {
-      updateOrganisationenIds([]);
+      updateKlassenIds([]);
       updateSearchString(undefined);
       clearInput();
     } else {
-      updateOrganisationenIds(selection);
+      updateKlassenIds(selection);
     }
   };
 
@@ -198,14 +198,22 @@
       <slot name="prepend-item"></slot>
     </template>
     <template v-slot:selection="{ item, index }">
-      <span
-        v-if="selectedKlassen && selectedKlassen.length < 2"
-        class="v-autocomplete__selection-text"
-        >{{ item.title }}</span
-      >
-      <span v-else-if="selectedKlassen && index === 0">
-        {{ t('admin.klasse.klassenSelected', { count: selectedKlassen.length }) }}
-      </span>
+      <template v-if="props.multiple">
+        <span
+          v-if="selectedKlassen && selectedKlassen.length < 2"
+          class="v-autocomplete__selection-text"
+        >
+          {{ item.title }}
+        </span>
+        <span v-else-if="selectedKlassen && index === 0">
+          {{ t('admin.klasse.klassenSelected', { count: selectedKlassen.length }) }}
+        </span>
+      </template>
+      <template v-else>
+        <span class="v-autocomplete__selection-text">
+          {{ item.title }}
+        </span>
+      </template>
     </template>
   </v-autocomplete>
 </template>

@@ -715,6 +715,7 @@ export const useOrganisationStore: StoreDefinition<
         this.klassenFilter.loading = false;
       }
     },
+
     resetKlasseFilter(): void {
       this.klassenFilter = {
         filterResult: [],
