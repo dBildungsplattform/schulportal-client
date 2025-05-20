@@ -798,8 +798,8 @@ describe('BulkOperationStore', () => {
             sskDstNr: '456',
             rolle: 'Test Role',
             rollenArt: RollenArt.Lern,
-            administriertVon: 'admin-org-id',
-            typ: OrganisationsTyp.Schule,
+            administriertVon: organisationId,
+            typ: OrganisationsTyp.Klasse,
             editable: true,
             befristung: 'unbefristet',
             merkmale: [] as unknown as RollenMerkmal,
@@ -809,13 +809,7 @@ describe('BulkOperationStore', () => {
       };
 
       const mockUpdateResponse: PersonenkontexteUpdateResponse = {
-        dBiamPersonenkontextResponses: [
-          {
-            personId: personId,
-            organisationId: '5678', // Only the non-matching zuordnung remains
-            rolleId: rolleId,
-          } as DBiamPersonenkontextResponse,
-        ],
+        dBiamPersonenkontextResponses: [],
       };
       const spyUpdate: MockInstance = vi.spyOn(personenkontextStore, 'updatePersonenkontexte');
       const spyPersonenuebersicht: MockInstance = vi.spyOn(personStore, 'getPersonenuebersichtById');
