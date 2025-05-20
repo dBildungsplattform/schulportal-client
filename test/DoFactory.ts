@@ -6,25 +6,136 @@ import {
   RollenSystemRecht,
   TraegerschaftTyp,
   Vertrauensstufe,
+  type DBiamPersonenkontextResponse,
   type DBiamPersonenuebersichtResponse,
   type DBiamPersonenzuordnungResponse,
   type OrganisationResponse,
   type OrganisationResponseLegacy,
   type PersonendatensatzResponse,
+  type PersonenkontexteUpdateResponse,
   type PersonenkontextRolleFieldsResponse,
+  type PersonResponse,
   type RollenSystemRechtServiceProviderIDResponse,
   type UserinfoResponse,
 } from '@/api-client/generated';
 import type { Organisation } from '@/stores/OrganisationStore';
-import type { PersonenkontextWorkflowResponse, Zuordnung } from '@/stores/PersonenkontextStore';
-import { PersonLockOccasion, type Person, type Personendatensatz, type UserLock } from '@/stores/PersonStore';
+import type { PersonenkontextWorkflowResponse } from '@/stores/PersonenkontextStore';
+import { type Personendatensatz } from '@/stores/PersonStore';
 import type { Rolle, RolleResponse } from '@/stores/RolleStore';
+import type { Person } from '@/stores/types/Person';
+import { PersonenUebersicht } from '@/stores/types/PersonenUebersicht';
+import { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
+import { Zuordnung } from '@/stores/types/Zuordnung';
+import { PersonLockOccasion, type UserLock } from '@/utils/lock';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { faker } from '@faker-js/faker';
 
 export class DoFactory {
   private static getFakeSchuleName(): string {
     return `${faker.person.firstName()}-${faker.person.lastName()}-Schule`;
+  }
+
+  public static getPersonWithZuordnung(
+    person?: Partial<Person>,
+    zuordnungen?: Array<Zuordnung>,
+  ): PersonWithZuordnungen {
+    return new PersonWithZuordnungen(this.getPerson(person), zuordnungen ?? [this.getZuordnung()]);
+  }
+
+  public static getPerson(props?: Partial<Person>): Person {
+    return {
+      id: faker.string.uuid(),
+      name: {
+        vorname: faker.person.firstName(),
+        familienname: faker.person.lastName(),
+      },
+      referrer: faker.internet.username(),
+      revision: faker.string.numeric(2),
+      personalnummer: faker.string.numeric(7),
+      isLocked: false,
+      userLock: [],
+      lastModified: new Date().toISOString(),
+      email: {
+        status: EmailAddressStatus.Enabled,
+        address: faker.internet.email(),
+      },
+      ...props,
+    };
+  }
+
+  public static getZuordnung(props?: Partial<Zuordnung>, nested?: { organisation: Partial<Organisation> }): Zuordnung {
+    const schule: Organisation = DoFactory.getSchule(nested?.organisation);
+    const zuordnung: Zuordnung = new Zuordnung(
+      props?.sskId ?? schule.id,
+      props?.rolleId ?? faker.string.uuid(),
+      props?.sskName ?? schule.name,
+      props?.sskDstNr ?? schule.kennung!,
+      props?.rolle ?? faker.string.alpha(5),
+      props?.rollenArt ?? faker.helpers.arrayElement<RollenArt>([RollenArt.Lern, RollenArt.Lehr]),
+      props?.administriertVon ?? schule.administriertVon!,
+      props?.typ ?? schule.typ,
+      props?.editable ?? true,
+      props?.befristung ?? faker.date.soon().toISOString(),
+      props?.merkmale ?? [],
+      props?.admins ?? [faker.person.fullName()],
+    );
+    return zuordnung;
+  }
+
+  public static getPersonenUebersicht(
+    person: Person = DoFactory.getPerson(),
+    zuordnungen: Array<Zuordnung> = [DoFactory.getZuordnung()],
+  ): PersonenUebersicht {
+    return new PersonenUebersicht(
+      person.id,
+      person.name.vorname,
+      person.name.familienname,
+      person.referrer!,
+      faker.date.recent().toISOString(),
+      zuordnungen,
+    );
+  }
+
+  public static getPersonResponse(props?: Partial<PersonResponse>): PersonResponse {
+    const person: Person = DoFactory.getPerson();
+    return {
+      ...person,
+      mandant: faker.string.uuid(),
+      geburt: {
+        datum: faker.date.birthdate().toISOString(),
+        geburtsort: faker.location.city(),
+      },
+      stammorganisation: faker.string.uuid(),
+      geschlecht: faker.person.gender(),
+      lokalisierung: faker.location.language().alpha2,
+      startpasswort: faker.string.alpha(10),
+      vertrauensstufe: Vertrauensstufe.Voll,
+      ...props,
+    };
+  }
+
+  public static getPersonendatensatzResponse(props?: Partial<PersonResponse>): PersonendatensatzResponse {
+    return {
+      person: this.getPersonResponse(props),
+    };
+  }
+
+  public static getOrganisation(props?: Partial<Organisation>): Organisation {
+    const organisationsTypen: Array<OrganisationsTyp> = [
+      OrganisationsTyp.Schule,
+      OrganisationsTyp.Klasse,
+      OrganisationsTyp.Anbieter,
+      OrganisationsTyp.Land,
+      OrganisationsTyp.Traeger,
+    ];
+    return {
+      id: faker.string.uuid(),
+      name: faker.company.name(),
+      kennung: faker.string.numeric(7),
+      typ: faker.helpers.arrayElement<OrganisationsTyp>(organisationsTypen),
+      administriertVon: faker.string.uuid(),
+      ...props,
+    };
   }
 
   public static getSchule(props?: Partial<Organisation>): Organisation {
@@ -121,6 +232,31 @@ export class DoFactory {
     };
   }
 
+  public static getPersonenkontextUpdateResponse(
+    props?: Partial<PersonenkontexteUpdateResponse>,
+  ): PersonenkontexteUpdateResponse {
+    const person: Person = DoFactory.getPerson();
+    return {
+      dBiamPersonenkontextResponses: [
+        DoFactory.getDBiamPersonenkontextResponse({ personId: person.id }),
+        DoFactory.getDBiamPersonenkontextResponse({ personId: person.id }),
+      ],
+      ...props,
+    };
+  }
+
+  public static getDBiamPersonenkontextResponse(
+    props?: Partial<DBiamPersonenkontextResponse>,
+  ): DBiamPersonenkontextResponse {
+    return {
+      personId: faker.string.uuid(),
+      organisationId: faker.string.uuid(),
+      rolleId: faker.string.uuid(),
+      befristung: faker.date.soon().toISOString(),
+      ...props,
+    };
+  }
+
   public static getPersonenkontextRolleFieldsResponse(
     props?: Partial<PersonenkontextRolleFieldsResponse>,
   ): PersonenkontextRolleFieldsResponse {
@@ -194,52 +330,39 @@ export class DoFactory {
 
   public static getDBiamPersonenuebersichtResponse(
     props?: Partial<DBiamPersonenuebersichtResponse>,
+    nested?: Partial<{ organisation: Organisation }>,
   ): DBiamPersonenuebersichtResponse {
+    const zuordnung: DBiamPersonenzuordnungResponse | undefined = nested?.organisation
+      ? DoFactory.getDBiamPersonenzuordnungResponse({}, { organisation: nested.organisation })
+      : undefined;
     return {
       personId: faker.string.uuid(),
       vorname: faker.person.firstName(),
       nachname: faker.person.lastName(),
       benutzername: faker.internet.username(),
       lastModifiedZuordnungen: faker.date.recent().toISOString(),
-      zuordnungen: [],
+      zuordnungen: zuordnung ? [zuordnung] : [],
       ...props,
     };
   }
 
   public static getDBiamPersonenzuordnungResponse(
     props?: Partial<DBiamPersonenzuordnungResponse>,
+    nested?: Partial<{ organisation: Organisation }>,
   ): DBiamPersonenzuordnungResponse {
     return {
-      sskId: faker.string.uuid(),
-      sskName: DoFactory.getFakeSchuleName(),
-      sskDstNr: faker.string.numeric(7),
+      sskId: nested?.organisation?.id ?? faker.string.uuid(),
+      sskName: nested?.organisation?.name ?? DoFactory.getFakeSchuleName(),
+      sskDstNr: nested?.organisation?.kennung ?? faker.string.numeric(7),
       rolleId: faker.string.uuid(),
       rolle: faker.string.alpha(4),
       rollenArt: RollenArt.Lehr,
       befristung: faker.date.future().toISOString(),
       administriertVon: faker.string.uuid(),
       editable: true,
-      merkmale: [] as unknown as RollenMerkmal,
+      merkmale: [],
       admins: [faker.person.fullName()],
-      typ: OrganisationsTyp.Schule,
-      ...props,
-    };
-  }
-
-  public static getZuordnung(props?: Partial<Zuordnung>): Zuordnung {
-    return {
-      sskId: faker.string.uuid(),
-      rolleId: faker.string.uuid(),
-      sskName: DoFactory.getFakeSchuleName(),
-      sskDstNr: faker.string.numeric(7),
-      rolle: faker.string.alpha(4),
-      rollenArt: RollenArt.Lehr,
-      befristung: faker.date.future().toISOString(),
-      klasse: undefined,
-      administriertVon: faker.string.uuid(),
-      editable: true,
-      merkmale: [] as unknown as RollenMerkmal,
-      typ: OrganisationsTyp.Schule,
+      typ: nested?.organisation?.typ ?? OrganisationsTyp.Schule,
       ...props,
     };
   }
@@ -255,49 +378,9 @@ export class DoFactory {
     };
   }
 
-  public static getPerson(props?: Partial<Person>): Person {
-    return {
-      id: faker.string.uuid(),
-      name: {
-        vorname: faker.person.firstName(),
-        familienname: faker.person.lastName(),
-      },
-      referrer: faker.internet.username(),
-      revision: faker.string.numeric(),
-      personalnummer: faker.string.numeric(7),
-      isLocked: false,
-      userLock: null,
-      lastModified: faker.date.recent().toISOString(),
-      email: {
-        status: EmailAddressStatus.Enabled,
-        address: faker.internet.email(),
-      },
-      ...props,
-    };
-  }
-
   public static getPersonendatensatz(props?: Partial<Personendatensatz>): Personendatensatz {
     return {
       person: this.getPerson(),
-      ...props,
-    };
-  }
-
-  public static getPersonendatensatzResponse(
-    props?: Partial<PersonendatensatzResponse>,
-    person?: Person,
-  ): PersonendatensatzResponse {
-    return {
-      person: {
-        ...(person ?? this.getPersonendatensatz().person),
-        mandant: '',
-        geburt: {},
-        stammorganisation: '',
-        geschlecht: '',
-        lokalisierung: '',
-        vertrauensstufe: Vertrauensstufe.Teil,
-        startpasswort: '',
-      },
       ...props,
     };
   }

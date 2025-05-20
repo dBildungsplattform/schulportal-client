@@ -1,29 +1,29 @@
-import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
-import { createRouter, createWebHistory, type Router } from 'vue-router';
+import type { OrganisationResponseLegacy } from '@/api-client/generated';
 import routes from '@/router/routes';
-import { nextTick } from 'vue';
-import { vi, type MockInstance } from 'vitest';
-
-import RolleUnassign from './RolleUnassign.vue';
-
 import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
 import { OrganisationsTyp, type Organisation } from '@/stores/OrganisationStore';
-import type { PersonenWithRolleAndZuordnung } from '@/stores/PersonStore';
 import { RollenArt, RollenMerkmal, type RolleResponse } from '@/stores/RolleStore';
+import type { Person } from '@/stores/types/Person';
+import { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
 import type { TranslatedObject } from '@/types';
-import { DoFactory } from '@/testing/DoFactory';
-import type { OrganisationResponseLegacy } from '@/api-client/generated';
+import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
+import { DoFactory } from 'test/DoFactory';
+import { vi, type MockInstance } from 'vitest';
+import { nextTick } from 'vue';
+import { createRouter, createWebHistory, type Router } from 'vue-router';
+import RolleUnassign from './RolleUnassign.vue';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
 const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
 
 const organisation: OrganisationResponseLegacy = DoFactory.getOrganisationenResponseLegacy();
+const person: Person = DoFactory.getPerson();
 
 type Props = {
   isDialogVisible: boolean;
   organisationen: TranslatedObject[] | undefined;
-  selectedPersonen: PersonenWithRolleAndZuordnung;
+  selectedPersonen: Map<string, PersonWithZuordnungen>;
   selectedOrganisationFromFilter: Organisation;
   selectedRolleFromFilter?: RolleResponse;
 };
@@ -35,30 +35,9 @@ function mountComponent(partialProps: Partial<Props> = {}): VueWrapper {
       { title: organisation.name, value: organisation.id },
       { title: 'orga1', value: '1133' },
     ],
-    selectedPersonen: [
-      {
-        administrationsebenen: '',
-        klassen: '1a',
-        rollen: '',
-        person: {
-          id: 'test',
-          name: {
-            familienname: 'Pan',
-            vorname: 'Peter',
-          },
-          referrer: 'ppan',
-          revision: '1',
-          email: {
-            address: 'ppan@wunderland',
-            status: 'ENABLED',
-          },
-          isLocked: null,
-          lastModified: '',
-          personalnummer: '1234',
-          userLock: null,
-        },
-      },
-    ],
+    selectedPersonen: new Map<string, PersonWithZuordnungen>([
+      [person.id, new PersonWithZuordnungen(person, [DoFactory.getZuordnung()])],
+    ]),
     selectedOrganisationFromFilter: {
       id: '1234567',
       name: 'Testschule',

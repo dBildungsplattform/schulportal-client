@@ -17,7 +17,7 @@ beforeEach(() => {
       id: 'test-id',
       isDialogVisible: true,
       header: 'Test Header',
-      message: 'Test Message',
+      messages: ['Test Message'],
     },
 
     global: {

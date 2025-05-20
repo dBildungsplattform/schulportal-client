@@ -1,11 +1,12 @@
 <script setup lang="ts">
+  import PersonBulkError from '@/components/admin/personen/PersonBulkError.vue';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { useBulkErrors, type BulkErrorList } from '@/composables/useBulkErrors';
   import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
   import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
   import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
-  import type { PersonenWithRolleAndZuordnung } from '@/stores/PersonStore';
+  import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
   import type { TranslatedObject } from '@/types';
   import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
   import { formatDateToISO, getNextSchuljahresende } from '@/utils/date';
@@ -16,7 +17,6 @@
   import { useI18n, type Composer } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
   import { object, string } from 'yup';
-  import PersonBulkError from '@/components/admin/personen/PersonBulkError.vue';
 
   type Props = {
     errorCode: string;
@@ -24,15 +24,13 @@
     rollen: TranslatedRolleWithAttrs[] | undefined;
     isLoading: boolean;
     isDialogVisible: boolean;
-    selectedPersonen: PersonenWithRolleAndZuordnung;
+    selectedPersonen: Map<string, PersonWithZuordnungen>;
   };
 
   type Emits = {
     (event: 'update:isDialogVisible', isDialogVisible: boolean): void;
     (event: 'update:getUebersichten'): void;
   };
-
-  type PersonWithRolleAndZuordnung = PersonenWithRolleAndZuordnung[number];
 
   const props: Props = defineProps<Props>();
   const emit: Emits = defineEmits<Emits>();
@@ -44,9 +42,7 @@
   const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
 
   const canCommit: Ref<boolean> = ref(false);
-
   const showModifyRolleDialog: Ref<boolean> = ref(props.isDialogVisible);
-
   const showErrorDialog: Ref<boolean, boolean> = ref(false);
   const calculatedBefristung: Ref<string | undefined> = ref('');
 
@@ -55,7 +51,7 @@
   );
 
   // Define the error list for the selected persons using the useBulkErrors composable
-  const bulkErrorList: ComputedRef<BulkErrorList[]> = computed(() => useBulkErrors(props.selectedPersonen));
+  const bulkErrorList: ComputedRef<BulkErrorList[]> = computed(() => useBulkErrors(t, props.selectedPersonen));
 
   // Define the form validation schema for the Personenkontext
   export type ZuordnungCreationForm = {
@@ -163,7 +159,6 @@
       personIDs,
       selectedOrganisation.value!,
       selectedRolle.value!,
-      props.rollen || [],
       personenkontextStore.workflowStepResponse?.organisations || [],
       formattedBefristung,
     );
@@ -176,7 +171,7 @@
   }
 
   const onSubmitModifyRolle: (e?: Event) => Promise<Promise<void> | undefined> = formContext.handleSubmit(async () => {
-    const personIDs: string[] = props.selectedPersonen.map((person: PersonWithRolleAndZuordnung) => person.person.id);
+    const personIDs: string[] = [...props.selectedPersonen.keys()];
     await handleModifyRolle(personIDs);
   });
 </script>
@@ -371,5 +366,3 @@
     />
   </template>
 </template>
-
-<style></style>

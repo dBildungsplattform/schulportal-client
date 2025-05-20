@@ -11,10 +11,10 @@ import {
   type OrganisationenFilter,
   type OrganisationStore,
 } from '@/stores/OrganisationStore';
-import { DoFactory } from '@/testing/DoFactory';
 import { getDisplayNameForOrg } from '@/utils/formatting';
 import { faker } from '@faker-js/faker';
 import { flushPromises, mount, type VueWrapper } from '@vue/test-utils';
+import { DoFactory } from 'test/DoFactory';
 import type { BaseFieldProps } from 'vee-validate';
 import type { MockInstance } from 'vitest';
 import { nextTick, ref, type Ref } from 'vue';

@@ -5,12 +5,17 @@
     "src/specs/request-handlers.ts",
     "vite.config.ts",
     "vitest.config.ts",
-    "vitest.setup.ts"
+    "vitest.setup.ts",
+    "test/**/*.ts"
   ],
   "compilerOptions": {
     "composite": true,
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "types": ["node"]
+    "types": ["node"],
+    "paths": {
+      "@/*": ["./src/*"],
+      "test/*": ["./test/*"]
+    }
   }
 }

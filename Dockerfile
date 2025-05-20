@@ -13,6 +13,7 @@ COPY vite*.ts ./
 COPY index.html ./
 COPY env*.ts ./
 COPY src/ src/
+COPY test/ test/
 COPY public/ public/
 
 RUN npm ci

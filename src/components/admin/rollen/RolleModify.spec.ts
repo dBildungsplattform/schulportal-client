@@ -3,8 +3,10 @@ import routes from '@/router/routes';
 import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
 import { RollenArt, RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
-import { DoFactory } from '@/testing/DoFactory';
+import type { Person } from '@/stores/types/Person';
+import { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
 import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
+import { DoFactory } from 'test/DoFactory';
 import { test, type MockInstance } from 'vitest';
 import { nextTick } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
@@ -14,6 +16,7 @@ let wrapper: VueWrapper | null = null;
 let router: Router;
 const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
 const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
+const person: Person = DoFactory.getPerson({ id: 'test' });
 
 const organisation: OrganisationResponseLegacy = DoFactory.getOrganisationenResponseLegacy();
 const rolle: RolleResponse = DoFactory.getRolleResponse({
@@ -48,30 +51,9 @@ beforeEach(async () => {
       isLoading: false,
       errorCode: '',
       isDialogVisible: true,
-      selectedPersonen: [
-        {
-          administrationsebenen: '',
-          klassen: '1a',
-          rollen: '',
-          person: {
-            id: 'test',
-            name: {
-              familienname: 'Pan',
-              vorname: 'Peter',
-            },
-            referrer: 'ppan',
-            revision: '1',
-            email: {
-              address: 'ppan@wunderland',
-              status: 'ENABLED',
-            },
-            isLocked: null,
-            lastModified: '',
-            personalnummer: '1234',
-            userLock: null,
-          },
-        },
-      ],
+      selectedPersonen: new Map([
+        ['test', new PersonWithZuordnungen(person, [DoFactory.getZuordnung({ sskName: '1a' })])],
+      ]),
       organisationen: [
         { title: organisation.name, value: organisation.id },
         { title: 'orga1', value: '1133' },
@@ -239,6 +221,52 @@ describe('RolleModify', () => {
 
     expect(kopersInfo).not.toBeNull();
     expect(kopersInfo?.textContent).toContain('KoPers.-Nr.');
+  });
+
+  test('shows error dialog if bulk operation has errors', async () => {
+    await nextTick();
+
+    // Mock the bulk operation with an error
+    bulkOperationStore.currentOperation = {
+      type: null,
+      isRunning: false,
+      progress: 0,
+      complete: false,
+      errors: new Map([['someId', 'Some error message']]),
+      data: new Map(),
+      successMessage: '',
+    };
+
+    const organisationAutocomplete: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'personenkontext-create' })
+      .findComponent({ ref: 'organisation-select' });
+    await organisationAutocomplete?.setValue('O1');
+    organisationAutocomplete?.vm.$emit('update:search', 'O1');
+    await nextTick();
+
+    const rolleAutocomplete: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'personenkontext-create' })
+      .findComponent({ ref: 'rolle-select' });
+    await rolleAutocomplete?.setValue('54321');
+    rolleAutocomplete?.vm.$emit('update:search', '54321');
+    await nextTick();
+
+    const submitButton: Element | null = document.body.querySelector('[data-testid="rolle-modify-submit-button"]');
+    expect(submitButton).not.toBeNull();
+    await nextTick();
+
+    const bulkModifyPersonenRolleSpy: MockInstance = vi.spyOn(bulkOperationStore, 'bulkModifyPersonenRolle');
+
+    if (submitButton) {
+      submitButton.dispatchEvent(new Event('click'));
+    }
+
+    await flushPromises();
+
+    expect(bulkModifyPersonenRolleSpy).toHaveBeenCalledTimes(1);
+
+    const errorDialog: Element | null = document.body.querySelector('.v-dialog');
+    expect(errorDialog).not.toBeNull();
   });
 
   test('renders the dialog when isDialogVisible is true', async () => {

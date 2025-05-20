@@ -1,13 +1,12 @@
-import { mount, VueWrapper } from '@vue/test-utils';
-import HardwareTokenWorkflow from './HardwareTokenWorkflow.vue';
 import {
   useTwoFactorAuthentificationStore,
   type TwoFactorAuthentificationStore,
 } from '@/stores/TwoFactorAuthentificationStore';
+import { mount, VueWrapper } from '@vue/test-utils';
+import { DoFactory } from 'test/DoFactory';
 import { vi } from 'vitest';
-import type { Personendatensatz } from '@/stores/PersonStore';
 import { nextTick } from 'vue';
-import { EmailAddressStatus } from '@/api-client/generated/api';
+import HardwareTokenWorkflow from './HardwareTokenWorkflow.vue';
 
 vi.mock('vue-i18n', () => ({
   useI18n: (): { t: (key: string) => string } => ({
@@ -19,28 +18,6 @@ let twoFactorAuthenticationStore: TwoFactorAuthentificationStore;
 
 describe('HardwareTokenWorkflow.vue', () => {
   let wrapper: VueWrapper | null = null;
-
-  function getMockPersonendatensatz(): Personendatensatz {
-    return {
-      person: {
-        id: '123456',
-        name: {
-          familienname: 'Vimes',
-          vorname: 'Susan',
-        },
-        referrer: '6978',
-        personalnummer: '9183756',
-        isLocked: false,
-        userLock: null,
-        revision: '1',
-        lastModified: '2024-12-22',
-        email: {
-          address: 'email',
-          status: EmailAddressStatus.Requested,
-        },
-      },
-    };
-  }
 
   beforeEach(() => {
     document.body.innerHTML = `
@@ -56,7 +33,7 @@ describe('HardwareTokenWorkflow.vue', () => {
     wrapper = mount(HardwareTokenWorkflow, {
       props: {
         errorCode: '',
-        person: getMockPersonendatensatz(),
+        person: DoFactory.getPersonendatensatz(),
       },
       attachTo: document.getElementById('app') || '',
       global: {
@@ -93,7 +70,7 @@ describe('HardwareTokenWorkflow.vue', () => {
     wrapper?.find('[data-testid="hardware-token-form-submit-button"]').trigger('click');
     await nextTick();
 
-    await document.querySelectorAll('.v-messages__message').forEach((error: Element) => {
+    document.querySelectorAll('.v-messages__message').forEach((error: Element) => {
       expect(error.textContent).toBeTruthy();
     });
   });
@@ -138,16 +115,16 @@ describe('HardwareTokenWorkflow.vue', () => {
     twoFactorAuthenticationStore.errorCode = 'HARDWARE_TOKEN_SERVICE_FEHLER';
     await nextTick();
 
-    await document.querySelector('[data-testid="hardware-token-dialog-error-text"]');
+    document.querySelector('[data-testid="hardware-token-dialog-error-text"]');
     expect(document.querySelector('[data-testid="hardware-token-dialog-error-text"]')).not.toBeNull();
 
-    await document.querySelector('[data-testid="close-two-way-authentification-dialog-button"]');
+    document.querySelector('[data-testid="close-two-way-authentification-dialog-button"]');
     expect(document.querySelector('[data-testid="close-two-way-authentification-dialog-button"]')).not.toBeNull();
 
     twoFactorAuthenticationStore.errorCode = 'error';
     await nextTick();
 
-    await document.querySelector('[data-testid="hardware-token-dialog-error-text"]');
+    document.querySelector('[data-testid="hardware-token-dialog-error-text"]');
     expect(document.querySelector('[data-testid="hardware-token-dialog-error-text"]')).not.toBeNull();
   });
 

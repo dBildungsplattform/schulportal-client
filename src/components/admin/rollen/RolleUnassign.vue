@@ -1,21 +1,21 @@
 <script setup lang="ts">
-  import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { type Organisation } from '@/stores/OrganisationStore';
-  import { computed, ref, watch, type ComputedRef, type Ref } from 'vue';
-  import { type Composer, useI18n } from 'vue-i18n';
-  import { useDisplay } from 'vuetify';
-  import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
-  import { type BulkErrorList, useBulkErrors } from '@/composables/useBulkErrors';
-  import type { PersonenWithRolleAndZuordnung } from '@/stores/PersonStore';
   import PersonBulkError from '@/components/admin/personen/PersonBulkError.vue';
-  import { RollenArt, type RolleResponse } from '@/stores/RolleStore';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import { useBulkErrors, type BulkErrorList } from '@/composables/useBulkErrors';
+  import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
+  import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
+  import { type Organisation } from '@/stores/OrganisationStore';
+  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
+  import { RollenArt, type RolleResponse } from '@/stores/RolleStore';
+  import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
   import type { TranslatedObject } from '@/types';
   import { toTypedSchema } from '@vee-validate/yup';
   import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
+  import { computed, ref, watch, type ComputedRef, type Ref } from 'vue';
+  import { useI18n, type Composer } from 'vue-i18n';
+  import { useDisplay } from 'vuetify';
   import { object, string } from 'yup';
-  import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
-  import { type PersonenkontextStore, usePersonenkontextStore } from '@/stores/PersonenkontextStore';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
@@ -23,12 +23,10 @@
   const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
   const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
 
-  type PersonWithRolleAndZuordnung = PersonenWithRolleAndZuordnung[number];
-
   type Props = {
     isDialogVisible: boolean;
     organisationen: TranslatedObject[] | undefined;
-    selectedPersonen: PersonenWithRolleAndZuordnung;
+    selectedPersonen: Map<string, PersonWithZuordnungen>;
     selectedOrganisationFromFilter: Organisation;
     selectedRolleFromFilter?: RolleResponse;
   };
@@ -51,7 +49,7 @@
   const rollenForForm: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
 
   // Define the error list for the selected persons using the useBulkErrors composable
-  const bulkErrorList: ComputedRef<BulkErrorList[]> = computed(() => useBulkErrors(props.selectedPersonen));
+  const bulkErrorList: ComputedRef<BulkErrorList[]> = computed(() => useBulkErrors(t, props.selectedPersonen));
 
   export type RolleUnassignForm = {
     selectedRolle: string;
@@ -114,7 +112,7 @@
     await bulkOperationStore.bulkUnassignPersonenFromRolle(
       selectedOrganisationFromFilterId.value,
       rolleId,
-      props.selectedPersonen.map((person: PersonWithRolleAndZuordnung) => person.person.id),
+      [...props.selectedPersonen.keys()],
       isRolleLern,
     );
 
