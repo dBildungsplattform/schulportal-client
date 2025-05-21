@@ -172,6 +172,13 @@
     }));
   });
 
+  const availableKlassen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
+    return organisationStore.klassenFilter.filterResult.map((klasse: Organisation) => ({
+      value: klasse.id,
+      title: klasse.name,
+    }));
+  });
+
   const selectedOrganisationKennung: ComputedRef<string> = computed(() => {
     if (selectedOrganisationIds.value.length !== 1) {
       return '';
@@ -917,7 +924,7 @@
             :isDialogVisible="changeKlasseDialogVisible"
             :selectedPersonen
             :selectedSchuleId="selectedOrganisation?.id"
-            :availableKlassen="klassenOptions"
+            :availableKlassen
             @update:dialog-exit="handleBulkKlasseChangeDialog"
           />
         </v-col>
