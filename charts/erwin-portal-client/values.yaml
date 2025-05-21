@@ -4,7 +4,7 @@ namespaceOverride: ""
 
 replicaCount: 1
 image:
-  repository: ghcr.io/dbildungsplattform/schulportal-client
+  repository: ghcr.io/dbildungsplattform/erwin-portal-client
   tag: ""
   pullPolicy: Always
 

@@ -1,0 +1,6 @@
+apiVersion: v2
+name: erwin-portal-client
+description: Helm-Chart for erwin-portal-client
+type: application
+version: 0.1.1
+appVersion: ""
