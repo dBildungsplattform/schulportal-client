@@ -1,18 +1,22 @@
-import { EmailAddressStatus, RollenArt, RollenSystemRecht, type FindRollenResponse } from '@/api-client/generated/api';
+import { RollenArt, RollenSystemRecht, type FindRollenResponse } from '@/api-client/generated/api';
 import routes from '@/router/routes';
 import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
-import { OrganisationsTyp, useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
+import { OperationType } from '@/stores/BulkOperationStore';
+import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
 import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
-import { useRolleStore, type RolleResponse, type RolleStore, type RollenMerkmal } from '@/stores/RolleStore';
+import { type RolleResponse, type RollenMerkmal } from '@/stores/RolleStore';
 import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
+import type { Person } from '@/stores/types/Person';
+import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
+import type { Zuordnung } from '@/stores/types/Zuordnung';
 import { DOMWrapper, VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
+import { DoFactory } from 'test/DoFactory';
 import { expect, test, type Mock, type MockInstance } from 'vitest';
 import { nextTick } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import PersonManagementView from './PersonManagementView.vue';
-import { DoFactory } from '@/testing/DoFactory';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -20,7 +24,6 @@ let router: Router;
 let organisationStore: OrganisationStore;
 let personStore: PersonStore;
 let personenkontextStore: PersonenkontextStore;
-let rolleStore: RolleStore;
 let searchFilterStore: SearchFilterStore;
 let authStore: AuthStore;
 
@@ -56,7 +59,6 @@ beforeEach(async () => {
   organisationStore = useOrganisationStore();
   personStore = usePersonStore();
   personenkontextStore = usePersonenkontextStore();
-  rolleStore = useRolleStore();
   searchFilterStore = useSearchFilterStore();
   authStore = useAuthStore();
 
@@ -110,85 +112,15 @@ beforeEach(async () => {
     },
   ];
 
-  personenkontextStore.allUebersichten = {
-    total: 0,
-    offset: 0,
-    limit: 0,
-    items: [
-      {
-        personId: '1234',
-        vorname: 'Samuel',
-        nachname: 'Vimes',
-        benutzername: 'string',
-        lastModifiedZuordnungen: null,
-        zuordnungen: [
-          {
-            sskId: 'string',
-            rolleId: 'string',
-            sskName: 'string',
-            sskDstNr: 'string',
-            rolle: 'string',
-            rollenArt: RollenArt.Lern,
-            typ: OrganisationsTyp.Klasse,
-            administriertVon: 'string',
-            editable: true,
-            merkmale: [] as unknown as RollenMerkmal,
-            befristung: '2024-05-06',
-            admins: ['test'],
-          },
-        ],
-      },
-    ],
-  };
+  personStore.allUebersichten = new Map();
+  for (let index: number = 0; index < 5; index++) {
+    const person: Person = DoFactory.getPerson();
+    const zuordnung: Zuordnung = DoFactory.getZuordnung({ rollenArt: RollenArt.Lern });
+    const personWithZuordnungen: PersonWithZuordnungen = DoFactory.getPersonWithZuordnung(person, [zuordnung]);
+    personStore.allUebersichten.set(personWithZuordnungen.id, personWithZuordnungen);
+  }
 
-  personStore.personenWithUebersicht = [
-    {
-      rollen: 'Admin',
-      administrationsebenen: 'Level1',
-      klassen: 'Class1',
-      person: {
-        id: '1234',
-        name: {
-          familienname: 'Vimes',
-          vorname: 'Samuel',
-        },
-        referrer: '123',
-        personalnummer: '46465',
-        isLocked: false,
-        userLock: null,
-        revision: '1',
-        lastModified: '2024-05-22',
-        email: {
-          address: 'email',
-          status: EmailAddressStatus.Requested,
-        },
-      },
-    },
-    {
-      rollen: 'User',
-      administrationsebenen: 'Level2',
-      klassen: 'Class2',
-      person: {
-        id: '5678',
-        name: {
-          familienname: 'von Lipwig',
-          vorname: 'Moist',
-        },
-        referrer: '1234',
-        personalnummer: '46471',
-        isLocked: false,
-        userLock: null,
-        revision: '1',
-        lastModified: '2024-05-22',
-        email: {
-          address: 'email',
-          status: EmailAddressStatus.Requested,
-        },
-      },
-    },
-  ];
-
-  personStore.totalPersons = 2;
+  personStore.totalPersons = personStore.allUebersichten.size;
 
   personenkontextStore.filteredRollen = {
     moeglicheRollen: [
@@ -233,7 +165,7 @@ describe('PersonManagementView', () => {
   test('it renders person management table', () => {
     expect(wrapper?.getComponent({ name: 'ResultTable' })).toBeTruthy();
     expect(wrapper?.find('[data-testid="person-table"]').isVisible()).toBe(true);
-    expect(wrapper?.findAll('.v-data-table__tr').length).toBe(2);
+    expect(wrapper?.findAll('.v-data-table__tr').length).toBe(personStore.allUebersichten.size);
   });
 
   test('it renders person management table with active orga filter', () => {
@@ -242,7 +174,7 @@ describe('PersonManagementView', () => {
     searchFilterStore.selectedKlassen = null;
     expect(wrapper?.getComponent({ name: 'ResultTable' })).toBeTruthy();
     expect(wrapper?.find('[data-testid="person-table"]').isVisible()).toBe(true);
-    expect(wrapper?.findAll('.v-data-table__tr').length).toBe(2);
+    expect(wrapper?.findAll('.v-data-table__tr').length).toBe(personStore.allUebersichten.size);
   });
 
   test('it renders person management table with active rolle filter', () => {
@@ -251,7 +183,39 @@ describe('PersonManagementView', () => {
     searchFilterStore.selectedKlassen = null;
     expect(wrapper?.getComponent({ name: 'ResultTable' })).toBeTruthy();
     expect(wrapper?.find('[data-testid="person-table"]').isVisible()).toBe(true);
-    expect(wrapper?.findAll('.v-data-table__tr').length).toBe(2);
+    expect(wrapper?.findAll('.v-data-table__tr').length).toBe(personStore.allUebersichten.size);
+  });
+
+  test('it navigates to details view', async () => {
+    const spy: MockInstance = vi.spyOn(router, 'push');
+    const person: Person = DoFactory.getPerson();
+    const zuordnung: Zuordnung = DoFactory.getZuordnung({ rollenArt: RollenArt.Lern });
+    const personWithZuordnungen: PersonWithZuordnungen = DoFactory.getPersonWithZuordnung(person, [zuordnung]);
+    personStore.allUebersichten.clear();
+    personStore.allUebersichten.set(personWithZuordnungen.id, personWithZuordnungen);
+    await flushPromises();
+
+    const row: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-table"] .v-data-table__tr');
+    await row?.trigger('click');
+    const personRow: Record<string, string | null> = {
+      id: personWithZuordnungen.id,
+      familienname: personWithZuordnungen.name.familienname,
+      vorname: personWithZuordnungen.name.vorname,
+      referrer: personWithZuordnungen.referrer,
+      personalnummer: personWithZuordnungen.personalnummer,
+      rollen: personWithZuordnungen.rollenAsString,
+      administrationsebenen: personWithZuordnungen.administrationsebenenAsString,
+      klassen: personWithZuordnungen.klassenZuordnungenAsString,
+    };
+    await wrapper?.getComponent({ name: 'ResultTable' }).vm.$emit('onHandleRowClick', undefined, { item: personRow });
+    await nextTick();
+
+    expect(spy).toHaveBeenCalledWith({
+      name: 'person-details',
+      params: {
+        id: personWithZuordnungen.id,
+      },
+    });
   });
 
   test('it autoselects orga if only one is available', async () => {
@@ -349,7 +313,7 @@ describe('PersonManagementView', () => {
     const getAllPersonsSpy: MockInstance = vi.spyOn(personStore, 'getAllPersons');
 
     expect(wrapper?.find('.v-pagination__next button.v-btn--disabled').isVisible()).toBe(true);
-    expect(wrapper?.find('.v-data-table-footer__info').text()).toContain('1-2');
+    expect(wrapper?.find('.v-data-table-footer__info').text()).toContain(`1-${personStore.allUebersichten.size}`);
 
     personStore.totalPersons = 50;
     await nextTick();
@@ -463,173 +427,82 @@ describe('PersonManagementView', () => {
     expect(personenkontextStore.filteredRollen?.moeglicheRollen).toHaveLength(1);
   });
 
-  test('it checks a checkbox in the table, selects the Rolle zuordnen option and triggers dialog then cancels it', async () => {
-    // Find the first checkbox in the table
-    const checkbox: DOMWrapper<Element> | undefined = wrapper?.find(
-      '[data-testid="person-table"] .v-selection-control',
-    );
+  type BulkOperationTestParams = {
+    operationType: OperationType;
+    layoutCardTestId: string;
+    discardButtonTestId: string;
+  };
 
-    // Initial state check (optional)
-    expect(checkbox?.classes()).not.toContain('v-selection-control--selected');
+  test.each([
+    {
+      operationType: OperationType.CHANGE_KLASSE,
+      layoutCardTestId: 'change-klasse-layout-card',
+      discardButtonTestId: 'bulk-change-klasse-discard-button',
+    },
+    {
+      operationType: OperationType.DELETE_PERSON,
+      layoutCardTestId: 'person-delete-layout-card',
+      discardButtonTestId: 'person-delete-discard-button',
+    },
+    {
+      operationType: OperationType.MODIFY_ROLLE,
+      layoutCardTestId: 'rolle-modify-layout-card',
+      discardButtonTestId: 'rolle-modify-discard-button',
+    },
+    {
+      operationType: OperationType.ORG_UNASSIGN,
+      layoutCardTestId: 'org-unassign-layout-card',
+      discardButtonTestId: 'org-unassign-discard-button',
+    },
+    {
+      operationType: OperationType.RESET_PASSWORD,
+      layoutCardTestId: 'password-reset-layout-card',
+      discardButtonTestId: 'password-reset-discard-button',
+    },
+    {
+      operationType: OperationType.ROLLE_UNASSIGN,
+      layoutCardTestId: 'rolle-unassign-layout-card',
+      discardButtonTestId: 'rolle-unassign-discard-button',
+    },
+  ])(
+    'it checks a checkbox in the table, selects $operationType, triggers dialog then cancels it',
+    async ({ operationType, layoutCardTestId, discardButtonTestId }: BulkOperationTestParams) => {
+      const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
+      await schuleAutocomplete?.setValue(['9876']);
+      await nextTick();
+      // Find the first checkbox in the table
+      const checkbox: DOMWrapper<Element> | undefined = wrapper?.find(
+        '[data-testid="person-table"] .v-selection-control',
+      );
+      // Initial state check (optional)
+      expect(checkbox?.classes()).not.toContain('v-selection-control--selected');
+      // Trigger the checkbox click
+      await checkbox?.trigger('click');
+      await nextTick();
 
-    // Trigger the checkbox click
-    await checkbox?.trigger('click');
-    await nextTick();
+      const benutzerEditSelect: VueWrapper | undefined = wrapper?.findComponent({ ref: 'benutzer-bulk-edit-select' });
+      benutzerEditSelect?.setValue(operationType);
+      await nextTick();
 
-    const benutzerEditSelect: VueWrapper | undefined = wrapper?.findComponent({ ref: 'benutzer-bulk-edit-select' });
-    benutzerEditSelect?.setValue('MODIFY_ROLLE');
-    await nextTick();
+      expect(document.body.querySelector(`[data-testid="${layoutCardTestId}"]`)).not.toBeNull();
 
-    expect(wrapper?.findComponent({ ref: 'personenkontext-create' })).not.toBeNull();
-    expect(document.body.querySelector('[data-testid="rolle-modify-layout-card"]')).not.toBeNull();
+      const cancelButton: Element | null = document.querySelector(`[data-testid="${discardButtonTestId}"]`);
+      cancelButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await nextTick();
 
-    const cancelButton: Element | null = document.querySelector('[data-testid="rolle-modify-discard-button"]');
-    cancelButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-    await nextTick();
+      expect(document.body.querySelector(`[data-testid="${layoutCardTestId}"]`)).toBeNull();
+    },
+  );
 
-    expect(document.body.querySelector('[data-testid="rolle-modify-layout-card"]')).toBeNull();
-  });
-
-  test('it checks a checkbox in the table, selects the delete person option and triggers dialog then cancels it', async () => {
-    authStore.hasPersonenLoeschenPermission = true;
-    // Find the first checkbox in the table
-    const checkbox: DOMWrapper<Element> | undefined = wrapper?.find(
-      '[data-testid="person-table"] .v-selection-control',
-    );
-
-    // Initial state check (optional)
-    expect(checkbox?.classes()).not.toContain('v-selection-control--selected');
-
-    // Trigger the checkbox click
-    await checkbox?.trigger('click');
-    await nextTick();
-
-    const benutzerEditSelect: VueWrapper | undefined = wrapper?.findComponent({ ref: 'benutzer-bulk-edit-select' });
-
-    // eslint-disable-next-line @typescript-eslint/dot-notation
-    const hasDeletePersonOption: boolean = (benutzerEditSelect?.props() as { items: { value: string }[] }).items.some(
-      (item: { value: string }) => item.value === 'DELETE_PERSON',
-    );
-    expect(hasDeletePersonOption).toBe(true);
-
-    benutzerEditSelect?.setValue('DELETE_PERSON');
-
-    benutzerEditSelect?.vm.$emit('input', 'DELETE_PERSON');
-    await nextTick();
-
-    expect(document.body.querySelector('[data-testid="person-delete-layout-card"]')).not.toBeNull();
-
-    const cancelButton: Element | null = document.querySelector('[data-testid="person-delete-discard-button"]');
-    cancelButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-    await nextTick();
-
-    expect(document.body.querySelector('[data-testid="person-delete-layout-card"]')).toBeNull();
-  });
-
-  test('it checks a checkbox in the table, selects the unassign org option and triggers dialog then cancels it', async () => {
-    authStore.hasPersonenverwaltungPermission = true;
-    // Find the first checkbox in the table
-    const checkbox: DOMWrapper<Element> | undefined = wrapper?.find(
-      '[data-testid="person-table"] .v-selection-control',
-    );
-
-    // Initial state check (optional)
-    expect(checkbox?.classes()).not.toContain('v-selection-control--selected');
-
-    const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
-    await schuleAutocomplete?.setValue(['9876']);
-    await nextTick();
-
-    // Trigger the checkbox click
-    await checkbox?.trigger('click');
-    await nextTick();
-
-    const benutzerEditSelect: VueWrapper | undefined = wrapper?.findComponent({ ref: 'benutzer-bulk-edit-select' });
-
-    // eslint-disable-next-line @typescript-eslint/dot-notation
-    const hasUnassingOrgOption: boolean = (benutzerEditSelect?.props() as { items: { value: string }[] }).items.some(
-      (item: { value: string }) => item.value === 'ORG_UNASSIGN',
-    );
-    expect(hasUnassingOrgOption).toBe(true);
-
-    benutzerEditSelect?.setValue('ORG_UNASSIGN');
-
-    benutzerEditSelect?.vm.$emit('input', 'ORG_UNASSIGN');
-    await nextTick();
-    await flushPromises();
-
-    expect(document.body.querySelector('[data-testid="org-unassign-layout-card"]')).not.toBeNull();
-
-    const cancelButton: Element | null = document.querySelector('[data-testid="org-unassign-discard-button"]');
-    cancelButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-    await nextTick();
-
-    expect(document.body.querySelector('[data-testid="org-unassign-layout-card"]')).toBeNull();
-  });
-
-  test('it checks a checkbox in the table, selects the reset password option and triggers dialog then cancels it', async () => {
-    authStore.hasPersonenverwaltungPermission = true;
-    // Find the first checkbox in the table
-    const checkbox: DOMWrapper<Element> | undefined = wrapper?.find(
-      '[data-testid="person-table"] .v-selection-control',
-    );
-
-    // Initial state check (optional)
-    expect(checkbox?.classes()).not.toContain('v-selection-control--selected');
-
-    const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
-    await schuleAutocomplete?.setValue(['9876']);
-    await nextTick();
-
-    // Trigger the checkbox click
-    await checkbox?.trigger('click');
-    await nextTick();
-
-    const benutzerEditSelect: VueWrapper | undefined = wrapper?.findComponent({ ref: 'benutzer-bulk-edit-select' });
-
-    // eslint-disable-next-line @typescript-eslint/dot-notation
-    const hasPasswordResetOption: boolean = (benutzerEditSelect?.props() as { items: { value: string }[] }).items.some(
-      (item: { value: string }) => item.value === 'RESET_PASSWORD',
-    );
-    expect(hasPasswordResetOption).toBe(true);
-
-    benutzerEditSelect?.setValue('RESET_PASSWORD');
-
-    benutzerEditSelect?.vm.$emit('input', 'RESET_PASSWORD');
-    await nextTick();
-
-    expect(document.body.querySelector('[data-testid="password-reset-layout-card"]')).not.toBeNull();
-
-    const cancelButton: Element | null = document.querySelector('[data-testid="password-reset-discard-button"]');
-    cancelButton?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-    await nextTick();
-
-    expect(document.body.querySelector('[data-testid="person-delete-layout-card"]')).toBeNull();
-  });
-
-  test('person delete isnt shown if user has no permission', async () => {
+  test.each([
+    [OperationType.CHANGE_KLASSE],
+    [OperationType.DELETE_PERSON],
+    // [OperationType.MODIFY_ROLLE],
+    [OperationType.ORG_UNASSIGN],
+    [OperationType.RESET_PASSWORD],
+    [OperationType.ROLLE_UNASSIGN],
+  ])('%s is not shown if user has no permission', async (operationType: OperationType) => {
     authStore.hasPersonenLoeschenPermission = false;
-
-    wrapper = mountComponent();
-
-    // Find the first checkbox in the table
-    const checkbox: DOMWrapper<Element> | undefined = wrapper.find('[data-testid="person-table"] .v-selection-control');
-    // Initial state check (optional)
-    expect(checkbox.classes()).not.toContain('v-selection-control--selected');
-
-    // Trigger the checkbox click
-    await checkbox.trigger('click');
-    await nextTick();
-
-    const benutzerEditSelect: VueWrapper | undefined = wrapper.findComponent({ ref: 'benutzer-bulk-edit-select' });
-
-    // eslint-disable-next-line @typescript-eslint/dot-notation
-    (benutzerEditSelect.props() as { items: { value: string }[] })['items'].forEach((item: { value: string }) => {
-      expect(item.value).not.toBe('DELETE_PERSON');
-    });
-  });
-
-  test('password reset isnt shown if user has no permission', async () => {
     authStore.hasPersonenverwaltungPermission = false;
 
     wrapper = mountComponent();
@@ -647,8 +520,45 @@ describe('PersonManagementView', () => {
 
     // eslint-disable-next-line @typescript-eslint/dot-notation
     (benutzerEditSelect.props() as { items: { value: string }[] })['items'].forEach((item: { value: string }) => {
-      expect(item.value).not.toBe('RESET_PASSWORD');
+      expect(item.value).not.toBe(operationType);
     });
+  });
+
+  test('it shows the error dialog, when the selection is invalid', async () => {
+    // don't select schule and select a person without LERN-rolle
+    personStore.allUebersichten = new Map();
+    const person: Person = DoFactory.getPerson();
+    const zuordnung: Zuordnung = DoFactory.getZuordnung({ rollenArt: RollenArt.Leit });
+    personStore.allUebersichten.set(person.id, DoFactory.getPersonWithZuordnung(person, [zuordnung]));
+
+    await flushPromises();
+
+    const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
+    await schuleAutocomplete?.setValue([]);
+    await nextTick();
+
+    const checkbox: DOMWrapper<Element> | undefined = wrapper?.find(
+      '[data-testid="person-table"] .v-selection-control',
+    );
+    // Initial state check (optional)
+    expect(checkbox?.classes()).not.toContain('v-selection-control--selected');
+    // Trigger the checkbox click
+    await checkbox?.trigger('click');
+    await nextTick();
+    wrapper?.findComponent({ name: 'ResultTable' }).vm.$emit('update:selectedRows', [person.id]);
+    await nextTick();
+
+    const benutzerEditSelect: VueWrapper | undefined = wrapper?.findComponent({ ref: 'benutzer-bulk-edit-select' });
+    benutzerEditSelect?.setValue(OperationType.CHANGE_KLASSE);
+    await nextTick();
+
+    expect(document.body.querySelector(`[data-testid="invalid-selection-alert-dialog-layout-card"]`)).not.toBeNull();
+    expect(
+      document.body.querySelector(`[data-testid="invalid-selection-alert-dialog-layout-card"]`)?.textContent,
+    ).toContain('genau eine Schule');
+    expect(
+      document.body.querySelector(`[data-testid="invalid-selection-alert-dialog-layout-card"]`)?.textContent,
+    ).toContain('Schülerrolle');
   });
 
   test('it sorts Personen correctly when changing sort order', async () => {

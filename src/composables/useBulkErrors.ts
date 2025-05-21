@@ -1,6 +1,6 @@
-import { useI18n, type Composer } from 'vue-i18n';
 import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
-import type { PersonenWithRolleAndZuordnung } from '@/stores/PersonStore';
+import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
+import { type Composer } from 'vue-i18n';
 
 export type BulkErrorList = {
   id: string;
@@ -8,8 +8,6 @@ export type BulkErrorList = {
   nachname: string;
   error: string;
 };
-
-type PersonWithRolleAndZuordnung = PersonenWithRolleAndZuordnung[number];
 
 /**
  * Helper to translate with fallback keys.
@@ -46,15 +44,12 @@ function translateWithFallback(t: Composer['t'], keys: string[], errorCode: stri
  *          - `nachname`: The last name of the person.
  *          - `error`: The translated error message for the person.
  */
-export function useBulkErrors(personen: PersonenWithRolleAndZuordnung): BulkErrorList[] {
-  const { t }: Composer = useI18n({ useScope: 'global' });
+export function useBulkErrors(t: Composer['t'], personen: Map<string, PersonWithZuordnungen>): BulkErrorList[] {
   const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
 
   return Array.from(bulkOperationStore.currentOperation?.errors.entries() || [])
     .map(([id, errorCode]: [string, string]) => {
-      const person: PersonWithRolleAndZuordnung | undefined = personen.find(
-        (p: PersonWithRolleAndZuordnung) => p.person.id === id,
-      );
+      const person: PersonWithZuordnungen | undefined = personen.get(id);
       if (!person) return null;
 
       const errorTranslation: string = translateWithFallback(
@@ -65,8 +60,8 @@ export function useBulkErrors(personen: PersonenWithRolleAndZuordnung): BulkErro
 
       return {
         id,
-        nachname: person.person.name.familienname,
-        vorname: person.person.name.vorname,
+        nachname: person.name.familienname,
+        vorname: person.name.vorname,
         error: errorTranslation,
       };
     })

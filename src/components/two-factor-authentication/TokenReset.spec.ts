@@ -1,14 +1,13 @@
-import { VueWrapper, DOMWrapper, mount } from '@vue/test-utils';
-import { describe, beforeEach, test, expect, vi } from 'vitest';
-import { nextTick } from 'vue';
 import TokenReset from '@/components/two-factor-authentication/TokenReset.vue';
 import {
   TokenKind,
   useTwoFactorAuthentificationStore,
   type TwoFactorAuthentificationStore,
 } from '@/stores/TwoFactorAuthentificationStore';
-import type { Personendatensatz } from '@/stores/PersonStore';
-import { EmailAddressStatus } from '@/api-client/generated/api';
+import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
+import { DoFactory } from 'test/DoFactory';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
+import { nextTick } from 'vue';
 
 vi.mock('vue-i18n', () => ({
   useI18n: (): { t: (key: string) => string } => ({
@@ -20,28 +19,6 @@ let twoFactorAuthenticationStore: TwoFactorAuthentificationStore;
 
 describe('TokenResetComponent', () => {
   let wrapper: VueWrapper | null = null;
-
-  function getMockPersonendatensatz(): Personendatensatz {
-    return {
-      person: {
-        id: '123456',
-        name: {
-          familienname: 'Vimes',
-          vorname: 'Susan',
-        },
-        referrer: '6978',
-        personalnummer: '9183756',
-        isLocked: false,
-        userLock: null,
-        revision: '1',
-        lastModified: '2024-12-22',
-        email: {
-          address: 'email',
-          status: EmailAddressStatus.Requested,
-        },
-      },
-    };
-  }
 
   beforeAll((): void => {
     twoFactorAuthenticationStore = useTwoFactorAuthentificationStore();
@@ -62,7 +39,7 @@ describe('TokenResetComponent', () => {
       props: {
         errorCode: '',
         disabled: false,
-        person: getMockPersonendatensatz(),
+        person: DoFactory.getPersonendatensatz(),
         tokenType: TokenKind.software,
         isLoading: false,
       },
@@ -88,8 +65,8 @@ describe('TokenResetComponent', () => {
     const resetButton: HTMLElement = document.querySelector(
       '[data-testid="two-way-authentification-set-up-button"]',
     ) as HTMLElement;
-    await resetButton.click();
-    await nextTick();
+    resetButton.click();
+    await flushPromises();
 
     const dialogText: HTMLElement = document.querySelector('[data-testid="dialog-text"]') as HTMLElement;
     expect(dialogText).not.toBeNull();
@@ -104,7 +81,7 @@ describe('TokenResetComponent', () => {
     const closeButton: HTMLElement = document.querySelector(
       '[data-testid="close-two-way-authentification-dialog-button"]',
     ) as HTMLElement;
-    await closeButton.click();
+    closeButton.click();
     await nextTick();
 
     const overlayContent: HTMLElement = document.querySelector('.v-overlay__content') as HTMLElement;
@@ -119,7 +96,7 @@ describe('TokenResetComponent', () => {
     const actionCloseButton: HTMLElement = document.querySelector(
       '[data-testid="two-way-authentification-set-up-button"]',
     ) as HTMLElement;
-    await actionCloseButton.click();
+    actionCloseButton.click();
     await nextTick();
 
     const overlayContent: HTMLElement = document.querySelector('.v-overlay__content') as HTMLElement;
@@ -135,8 +112,8 @@ describe('TokenResetComponent', () => {
       '[data-testid="two-way-authentification-set-up-button"]',
     ) as HTMLElement;
     twoFactorAuthenticationStore.errorCode = 'connection_error';
-    await resetButton.click();
-    await nextTick();
+    resetButton.click();
+    await flushPromises();
 
     const errorDialogText: HTMLElement = document.querySelector(
       '[data-testid="token-reset-dialog-error-text"]',
@@ -152,7 +129,7 @@ describe('TokenResetComponent', () => {
     const stopCloseButton: HTMLElement = document.querySelector(
       '[data-testid="two-way-authentification-set-up-button"]',
     ) as HTMLElement;
-    await stopCloseButton.click();
+    stopCloseButton.click();
     await nextTick();
 
     const overlayContent: HTMLElement = document.querySelector('.v-overlay__content') as HTMLElement;

@@ -1,18 +1,17 @@
-import {
-  OrganisationsTyp,
-  PersonenApiFactory,
-  RollenArt,
-  RollenMerkmal,
-  type PersonenApiInterface,
-} from '@/api-client/generated';
-import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
+import { OrganisationsTyp, PersonenApiFactory, RollenArt, type PersonenApiInterface } from '@/api-client/generated';
 import axiosApiInstance from '@/services/ApiService';
 import { getResponseErrorCode } from '@/utils/errorHandlers';
 import { isBefore } from 'date-fns';
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import type { Organisation } from './OrganisationStore';
-import { usePersonenkontextStore, type PersonenkontextStore, type Zuordnung } from './PersonenkontextStore';
+import {
+  mapZuordnungToPersonenkontextUpdate,
+  usePersonenkontextStore,
+  type PersonenkontextStore,
+  type PersonenkontextUpdate,
+} from './PersonenkontextStore';
 import { usePersonStore, type PersonStore } from './PersonStore';
+import { Zuordnung } from './types/Zuordnung';
 
 const personenApi: PersonenApiInterface = PersonenApiFactory(undefined, '', axiosApiInstance);
 
@@ -20,7 +19,9 @@ export enum OperationType {
   MODIFY_ROLLE = 'MODIFY_ROLLE',
   DELETE_PERSON = 'DELETE_PERSON',
   RESET_PASSWORD = 'RESET_PASSWORD',
+  ROLLE_UNASSIGN = 'ROLLE_UNASSIGN',
   ORG_UNASSIGN = 'ORG_UNASSIGN',
+  CHANGE_KLASSE = 'CHANGE_KLASSE',
 }
 
 export type CurrentOperation = {
@@ -47,11 +48,23 @@ type BulkOperationActions = {
     personIDs: string[],
     selectedOrganisationId: string,
     selectedRolleId: string,
-    rollen: TranslatedRolleWithAttrs[],
     workflowStepResponseOrganisations: Organisation[],
     befristung?: string,
   ): Promise<void>;
   bulkPersonenDelete(personIDs: string[]): Promise<void>;
+  bulkChangeKlasse(personIDs: string[], selectedOrganisationId: string, newKlasseId: string): Promise<void>;
+  bulkUnassignPersonenFromRolle(
+    organisationId: string,
+    rolleId: string,
+    personIDs: string[],
+    isRolleLern: boolean,
+  ): Promise<void>;
+  processPersonOperation<T>(
+    operationType: OperationType,
+    personIDs: string[],
+    processFunction: (personId: string, index: number) => Promise<T>,
+    successMessage?: string,
+  ): Promise<void>;
 };
 
 export type BulkOperationStore = Store<
@@ -66,8 +79,7 @@ export const useBulkOperationStore: StoreDefinition<
   BulkOperationState,
   BulkOperationGetters,
   BulkOperationActions
-> = defineStore({
-  id: 'bulkOperationStore',
+> = defineStore('bulkOperationStore', {
   state: (): BulkOperationState => ({
     currentOperation: {
       type: null,
@@ -91,12 +103,21 @@ export const useBulkOperationStore: StoreDefinition<
       };
     },
 
-    async bulkUnassignPersonenFromOrg(organisationId: string, personIDs: string[]): Promise<void> {
-      const personStore: PersonStore = usePersonStore();
-      const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
-
+    /**
+     * Generic processor function for bulk person operations
+     * @param operationType The type of operation being performed
+     * @param personIDs Array of person IDs to process
+     * @param processFunction Function to process each person ID
+     * @param successMessage Optional success message to set when operation completes with no errors
+     */
+    async processPersonOperation<T>(
+      operationType: OperationType,
+      personIDs: string[],
+      processFunction: (personId: string, index: number) => Promise<T>,
+      successMessage?: string,
+    ): Promise<void> {
       this.currentOperation = {
-        type: OperationType.ORG_UNASSIGN,
+        type: operationType,
         isRunning: true,
         progress: 0,
         complete: false,
@@ -108,95 +129,82 @@ export const useBulkOperationStore: StoreDefinition<
       for (let i: number = 0; i < personIDs.length; i++) {
         const personId: string = personIDs[i]!;
 
+        try {
+          await processFunction(personId, i);
+        } finally {
+          // Always update progress even if there was an error
+          this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
+        }
+      }
+
+      this.currentOperation.isRunning = false;
+      this.currentOperation.complete = true;
+
+      if (this.currentOperation.errors.size === 0 && successMessage) {
+        this.currentOperation.successMessage = successMessage;
+      }
+    },
+
+    async bulkUnassignPersonenFromOrg(organisationId: string, personIDs: string[]): Promise<void> {
+      const personStore: PersonStore = usePersonStore();
+      const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
+
+      await this.processPersonOperation(OperationType.ORG_UNASSIGN, personIDs, async (personId: string) => {
+        personStore.errorCode = '';
+        personenkontextStore.errorCode = '';
         // Fetch the Zuordnungen for this specific user (To send alongside the new one)
         await personStore.getPersonenuebersichtById(personId);
 
         if (personStore.errorCode) {
-          this.currentOperation.errors.set(personId, personStore.errorCode);
-          this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
-          continue;
+          this.currentOperation?.errors.set(personId, personStore.errorCode);
+          return;
         }
 
         // Extract the current Zuordnungen for this person
         const existingZuordnungen: Zuordnung[] = personStore.personenuebersicht?.zuordnungen ?? [];
 
         // Remove the selected Organisation and it's children from the existing Zuordnungen
-        // This is done by filtering out any Zuordnung that has the same sskId or administriertVon as the selected organisationId
         const updatedZuordnungen: Zuordnung[] = existingZuordnungen.filter(
           (zuordnung: Zuordnung) => zuordnung.sskId !== organisationId && zuordnung.administriertVon !== organisationId,
         );
 
         if (updatedZuordnungen.length === existingZuordnungen.length) {
-          this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
-          continue;
+          return; // No changes needed
         }
 
         // Await the processing of each ID
-        await personenkontextStore.updatePersonenkontexte(updatedZuordnungen, personId);
+        await personenkontextStore.updatePersonenkontexte(
+          updatedZuordnungen.map(mapZuordnungToPersonenkontextUpdate),
+          personId,
+        );
 
         if (personenkontextStore.errorCode) {
-          this.currentOperation.errors.set(personId, personenkontextStore.errorCode);
-          this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
-          continue;
+          this.currentOperation?.errors.set(personId, personenkontextStore.errorCode);
         }
-
-        // Update progress for each item processed
-        this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
-      }
-
-      this.currentOperation.isRunning = false;
-      this.currentOperation.complete = true;
+      });
     },
 
     async bulkResetPassword(personIds: string[]): Promise<void> {
-      this.currentOperation = {
-        type: OperationType.RESET_PASSWORD,
-        isRunning: true,
-        progress: 0,
-        complete: false,
-        errors: new Map(),
-        data: new Map(),
-        successMessage: undefined,
-      };
-
-      for (let i: number = 0; i < personIds.length; i++) {
-        const id: string = personIds[i]!;
-
+      await this.processPersonOperation(OperationType.RESET_PASSWORD, personIds, async (id: string) => {
         try {
           const { data }: { data: string } = await personenApi.personControllerResetPasswordByPersonId(id);
-          this.currentOperation.data.set(id, data);
+          this.currentOperation?.data.set(id, data);
         } catch (error: unknown) {
           const errorCode: string = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
-          this.currentOperation.errors.set(id, errorCode);
-        } finally {
-          this.currentOperation.progress = Math.ceil(((i + 1) / personIds.length) * 100);
+          this.currentOperation?.errors.set(id, errorCode);
         }
-      }
-
-      this.currentOperation.isRunning = false;
-      this.currentOperation.complete = true;
+      });
     },
 
     async bulkModifyPersonenRolle(
       personIDs: string[],
       selectedOrganisationId: string,
       selectedRolleId: string,
-      rollen: TranslatedRolleWithAttrs[],
       workflowStepResponseOrganisations: Organisation[],
       befristung?: string,
     ): Promise<void> {
       const personStore: PersonStore = usePersonStore();
       const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
-
-      this.currentOperation = {
-        type: OperationType.MODIFY_ROLLE,
-        isRunning: true,
-        progress: 0,
-        complete: false,
-        errors: new Map(),
-        data: new Map(),
-        successMessage: undefined,
-      };
 
       const selectedOrganisation: Organisation | undefined = workflowStepResponseOrganisations.find(
         (orga: Organisation) => orga.id === selectedOrganisationId,
@@ -204,102 +212,174 @@ export const useBulkOperationStore: StoreDefinition<
 
       if (!selectedOrganisation) return;
 
-      const baseZuordnung: Zuordnung = {
-        sskId: selectedOrganisation.id,
-        rolleId: selectedRolleId,
-        klasse: undefined,
-        sskDstNr: selectedOrganisation.kennung ?? '',
-        sskName: selectedOrganisation.name,
-        rolle: rollen.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolleId)?.title ?? '',
-        rollenArt: rollen.find((rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolleId)
-          ?.rollenart as RollenArt,
-        administriertVon: selectedOrganisation.administriertVon ?? '',
-        editable: true,
-        merkmale: [] as unknown as RollenMerkmal,
-        typ: OrganisationsTyp.Schule,
-        befristung,
-      };
+      await this.processPersonOperation(
+        OperationType.MODIFY_ROLLE,
+        personIDs,
+        async (personId: string) => {
+          personStore.errorCode = '';
+          personenkontextStore.errorCode = '';
+          await personStore.getPersonenuebersichtById(personId);
 
-      for (let i: number = 0; i < personIDs.length; i++) {
-        const personId: string = personIDs[i]!;
+          if (personStore.errorCode) {
+            this.currentOperation?.errors.set(personId, personStore.errorCode);
+            return;
+          }
 
-        await personStore.getPersonenuebersichtById(personId);
+          const currentZuordnungen: PersonenkontextUpdate[] =
+            personStore.personenuebersicht?.zuordnungen.map(mapZuordnungToPersonenkontextUpdate) || [];
+          const newZuordnung: PersonenkontextUpdate = {
+            organisationId: selectedOrganisation.id,
+            rolleId: selectedRolleId,
+          };
 
-        if (personStore.errorCode) {
-          this.currentOperation.errors.set(personId, personStore.errorCode);
-          this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
-          continue;
-        }
+          // If the new kontext is befristet, we use the earliest possible befristung
+          if (befristung) {
+            newZuordnung.befristung = currentZuordnungen.reduce(
+              (earliest: string, zuordnung: PersonenkontextUpdate) => {
+                if (zuordnung.organisationId === selectedOrganisation.id && zuordnung.befristung) {
+                  return isBefore(zuordnung.befristung, earliest) ? zuordnung.befristung : earliest;
+                }
+                return earliest;
+              },
+              befristung,
+            );
+          }
 
-        const currentZuordnungen: Zuordnung[] = personStore.personenuebersicht?.zuordnungen || [];
-        const newZuordnung: Zuordnung = {
-          ...baseZuordnung,
-        };
+          const combinedZuordnungen: PersonenkontextUpdate[] = [...currentZuordnungen, newZuordnung];
 
-        // If the new kontext is befristet, we use the earliest possible befristung out of all befristungen at the selected organisation and the specified befristung
-        if (befristung) {
-          newZuordnung.befristung = currentZuordnungen.reduce((earliest: string, zuordnung: Zuordnung) => {
-            if (zuordnung.sskId === selectedOrganisation.id && zuordnung.befristung) {
-              return isBefore(zuordnung.befristung, earliest) ? zuordnung.befristung : earliest;
-            }
-            return earliest;
-          }, befristung);
-        }
+          await personenkontextStore.updatePersonenkontexte(combinedZuordnungen, personId);
 
-        const combinedZuordnungen: Zuordnung[] = [...currentZuordnungen, newZuordnung];
-
-        await personenkontextStore.updatePersonenkontexte(combinedZuordnungen, personId);
-
-        if (personenkontextStore.errorCode) {
-          this.currentOperation.errors.set(personId, personenkontextStore.errorCode);
-          this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
-          continue;
-        }
-
-        this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
-      }
-
-      this.currentOperation.isRunning = false;
-      this.currentOperation.complete = true;
-
-      if (this.currentOperation.errors.size === 0) {
-        this.currentOperation.successMessage = 'admin.rolle.rollenAssignedSuccessfully';
-      }
+          if (personenkontextStore.errorCode) {
+            this.currentOperation?.errors.set(personId, personenkontextStore.errorCode);
+          }
+        },
+        'admin.rolle.rollenAssignedSuccessfully',
+      );
     },
 
     async bulkPersonenDelete(personIDs: string[]): Promise<void> {
       const personStore: PersonStore = usePersonStore();
 
-      this.currentOperation = {
-        type: OperationType.DELETE_PERSON,
-        isRunning: true,
-        progress: 0,
-        complete: false,
-        errors: new Map(),
-        data: new Map(),
-        successMessage: undefined,
-      };
+      await this.processPersonOperation(
+        OperationType.DELETE_PERSON,
+        personIDs,
+        async (personId: string) => {
+          personStore.errorCode = '';
+          await personStore.deletePersonById(personId);
 
-      for (let i: number = 0; i < personIDs.length; i++) {
-        const personId: string = personIDs[i]!;
+          if (personStore.errorCode) {
+            this.currentOperation?.errors.set(personId, personStore.errorCode);
+          }
+        },
+        'admin.person.deletePersonBulkSuccessMessage',
+      );
+    },
 
-        await personStore.deletePersonById(personId);
+    async bulkUnassignPersonenFromRolle(
+      organisationId: string,
+      rolleId: string,
+      personIDs: string[],
+      isRolleLern: boolean,
+    ): Promise<void> {
+      const personStore: PersonStore = usePersonStore();
+      const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
 
-        if (personStore.errorCode) {
-          this.currentOperation.errors.set(personId, personStore.errorCode);
-          this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
-          continue;
-        }
+      await this.processPersonOperation(
+        OperationType.ROLLE_UNASSIGN,
+        personIDs,
+        async (personId: string) => {
+          personStore.errorCode = '';
+          personenkontextStore.errorCode = '';
+          await personStore.getPersonenuebersichtById(personId);
 
-        this.currentOperation.progress = Math.ceil(((i + 1) / personIDs.length) * 100);
-      }
+          if (personStore.errorCode) {
+            this.currentOperation?.errors.set(personId, personStore.errorCode);
+            return;
+          }
 
-      this.currentOperation.isRunning = false;
-      this.currentOperation.complete = true;
+          const existingZuordnungen: Zuordnung[] = personStore.personenuebersicht?.zuordnungen ?? [];
 
-      if (this.currentOperation.errors.size === 0) {
-        this.currentOperation.successMessage = 'admin.person.deletePersonBulkSuccessMessage';
-      }
+          const updatedZuordnungen: Zuordnung[] = existingZuordnungen.filter((zuordnung: Zuordnung) => {
+            const isExactMatch: boolean = zuordnung.sskId === organisationId && zuordnung.rolleId === rolleId;
+            const isChildOfOrganisation: boolean = zuordnung.administriertVon === organisationId;
+
+            // If "lern" type, remove both exact matches and children
+            // Otherwise, only remove exact matches
+            if (isRolleLern) {
+              return !(isExactMatch || isChildOfOrganisation);
+            } else {
+              return !isExactMatch;
+            }
+          });
+
+          if (updatedZuordnungen.length === existingZuordnungen.length) {
+            return; // No changes needed
+          }
+
+          await personenkontextStore.updatePersonenkontexte(
+            updatedZuordnungen.map(mapZuordnungToPersonenkontextUpdate),
+            personId,
+          );
+
+          if (personenkontextStore.errorCode) {
+            this.currentOperation?.errors.set(personId, personenkontextStore.errorCode);
+          }
+        },
+        'admin.rolle.rollenUnassignedSuccessfully',
+      );
+    },
+
+    async bulkChangeKlasse(personIDs: string[], selectedOrganisationId: string, newKlasseId: string) {
+      const personStore: PersonStore = usePersonStore();
+      const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
+
+      await this.processPersonOperation(
+        OperationType.CHANGE_KLASSE,
+        personIDs,
+        async (personId: string) => {
+          await personStore.getPersonenuebersichtById(personId);
+          if (personStore.errorCode) {
+            this.currentOperation?.errors.set(personId, personStore.errorCode);
+            personStore.errorCode = '';
+            return;
+          }
+
+          const existingZuordnungen: Zuordnung[] = personStore.personenuebersicht?.zuordnungen ?? [];
+          const zuordnungenToBeUpdated: Zuordnung[] = [];
+          const zuordnungenToRemainUnchanged: Zuordnung[] = [];
+
+          for (const zuordnung of existingZuordnungen) {
+            if (
+              zuordnung.administriertVon === selectedOrganisationId &&
+              zuordnung.typ === OrganisationsTyp.Klasse &&
+              zuordnung.rollenArt === RollenArt.Lern
+            ) {
+              zuordnungenToBeUpdated.push(zuordnung);
+            } else {
+              zuordnungenToRemainUnchanged.push(zuordnung);
+            }
+          }
+
+          const newZuordnungen: Zuordnung[] = zuordnungenToBeUpdated.map((zuordnung: Zuordnung) => {
+            const newZuordnung: Zuordnung = Zuordnung.from(zuordnung);
+            newZuordnung.sskId = newKlasseId;
+            return newZuordnung;
+          });
+
+          const combinedZuordnungen: Zuordnung[] = [...zuordnungenToRemainUnchanged, ...newZuordnungen];
+
+          await personenkontextStore.updatePersonenkontexte(
+            combinedZuordnungen.map(mapZuordnungToPersonenkontextUpdate),
+            personId,
+          );
+
+          if (personenkontextStore.errorCode) {
+            this.currentOperation?.errors.set(personId, personenkontextStore.errorCode);
+            personenkontextStore.errorCode = '';
+          }
+        },
+        'admin.person.bulkChangeKlasse.success',
+      );
     },
   },
 });
