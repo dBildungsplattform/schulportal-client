@@ -1243,48 +1243,80 @@ describe('OrganisationStore', () => {
   });
 
   describe('loadKlassenForFilter', () => {
-    test('should load klassen for filter', async () => {
+    test('it initializes the field, if it does not exist', async () => {
       const mockResponse: Organisation[] = [DoFactory.getSchule()];
-
       mockadapter.onGet('/api/organisationen?offset=0&limit=30&typ=KLASSE').replyOnce(200, mockResponse, {
         'x-paging-total': '1',
       });
-      const promise: Promise<void> = organisationStore.loadKlassenForFilter({
-        offset: 0,
-        limit: 30,
-      });
-      await promise;
-      expect(organisationStore.klassenFilter.filterResult).toEqual(mockResponse);
-      expect(organisationStore.klassenFilter.total).toEqual(1);
-      expect(organisationStore.klassenFilter.loading).toBe(false);
+      await organisationStore.loadKlassenForFilter(
+        {
+          offset: 0,
+          limit: 30,
+        },
+        'unknownKey',
+      );
+      expect(organisationStore.klassenFilters.get('unknownKey')).toBeDefined();
     });
 
-    it('should handle string error', async () => {
-      mockadapter.onGet('/api/organisationen?offset=0&limit=30&typ=KLASSE').replyOnce(500, 'some mock server error');
-      const getAllOrganisationenPromise: Promise<void> = organisationStore.loadKlassenForFilter({
-        offset: 0,
-        limit: 30,
-      });
-      expect(organisationStore.klassenFilter.loading).toBe(true);
-      await getAllOrganisationenPromise;
-      expect(organisationStore.klassenFilter.filterResult).toEqual([]);
-      expect(organisationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
-      expect(organisationStore.klassenFilter.loading).toBe(false);
-    });
+    describe.each([['', undefined, 'something']])('when store key is %s', (storeKey: string | undefined) => {
+      test('should load klassen for filter', async () => {
+        const mockResponse: Organisation[] = [DoFactory.getSchule()];
 
-    it('should handle error code', async () => {
-      mockadapter
-        .onGet('/api/organisationen?offset=0&limit=30&typ=KLASSE')
-        .replyOnce(500, { code: 'some mock server error' });
-      const getAllOrganisationenPromise: Promise<void> = organisationStore.loadKlassenForFilter({
-        offset: 0,
-        limit: 30,
+        mockadapter.onGet('/api/organisationen?offset=0&limit=30&typ=KLASSE').replyOnce(200, mockResponse, {
+          'x-paging-total': '1',
+        });
+        const promise: Promise<void> = organisationStore.loadKlassenForFilter(
+          {
+            offset: 0,
+            limit: 30,
+          },
+          storeKey,
+        );
+        await promise;
+        const klassenFilter: AutoCompleteStore<Organisation> = organisationStore.klassenFilters.get(storeKey ?? '')!;
+        expect(klassenFilter).toBeDefined();
+        expect(klassenFilter.filterResult).toEqual(mockResponse);
+        expect(klassenFilter.total).toEqual(1);
+        expect(klassenFilter.loading).toBe(false);
       });
-      expect(organisationStore.klassenFilter.loading).toBe(true);
-      await getAllOrganisationenPromise;
-      expect(organisationStore.klassenFilter.filterResult).toEqual([]);
-      expect(organisationStore.errorCode).toEqual('some mock server error');
-      expect(organisationStore.klassenFilter.loading).toBe(false);
+
+      it('should handle string error', async () => {
+        mockadapter.onGet('/api/organisationen?offset=0&limit=30&typ=KLASSE').replyOnce(500, 'some mock server error');
+        const getAllOrganisationenPromise: Promise<void> = organisationStore.loadKlassenForFilter(
+          {
+            offset: 0,
+            limit: 30,
+          },
+          storeKey,
+        );
+        const klassenFilter: AutoCompleteStore<Organisation> = organisationStore.klassenFilters.get(storeKey ?? '')!;
+        expect(klassenFilter).toBeDefined();
+        expect(klassenFilter.loading).toBe(true);
+        await getAllOrganisationenPromise;
+        expect(klassenFilter.filterResult).toEqual([]);
+        expect(organisationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+        expect(klassenFilter.loading).toBe(false);
+      });
+
+      it('should handle error code', async () => {
+        mockadapter
+          .onGet('/api/organisationen?offset=0&limit=30&typ=KLASSE')
+          .replyOnce(500, { code: 'some mock server error' });
+        const getAllOrganisationenPromise: Promise<void> = organisationStore.loadKlassenForFilter(
+          {
+            offset: 0,
+            limit: 30,
+          },
+          storeKey,
+        );
+        const klassenFilter: AutoCompleteStore<Organisation> = organisationStore.klassenFilters.get(storeKey ?? '')!;
+        expect(klassenFilter).toBeDefined();
+        expect(klassenFilter.loading).toBe(true);
+        await getAllOrganisationenPromise;
+        expect(klassenFilter.filterResult).toEqual([]);
+        expect(organisationStore.errorCode).toEqual('some mock server error');
+        expect(klassenFilter.loading).toBe(false);
+      });
     });
   });
 
@@ -1306,19 +1338,31 @@ describe('OrganisationStore', () => {
   });
 
   describe('resetKlasseFilter', () => {
-    test('should reset filter', () => {
-      organisationStore.klassenFilter = {
-        filterResult: [DoFactory.getKlasse()],
-        loading: true,
-        total: 1,
-      };
-      const expected: AutoCompleteStore<Organisation> = {
-        filterResult: [],
-        loading: false,
-        total: 0,
-      };
-      organisationStore.resetKlasseFilter();
-      expect(organisationStore.klassenFilter).toEqual(expected);
+    describe.each([['', undefined, 'something']])('when store key is %s', (storeKey: string | undefined) => {
+      test('should reset filter', () => {
+        organisationStore.klassenFilters = new Map([
+          [storeKey ?? '', { filterResult: [DoFactory.getKlasse()], loading: true, total: 1 }],
+        ]);
+        const expected: AutoCompleteStore<Organisation> = {
+          filterResult: [],
+          loading: false,
+          total: 0,
+        };
+        organisationStore.resetKlasseFilter(storeKey);
+        expect(organisationStore.klassenFilters.get(storeKey ?? '')).toEqual(expected);
+      });
+    });
+  });
+
+  describe('clearKlasseFilter', () => {
+    describe.each([['', undefined, 'something']])('when store key is %s', (storeKey: string | undefined) => {
+      test('should delete the filter', () => {
+        organisationStore.klassenFilters = new Map([
+          [storeKey ?? '', { filterResult: [DoFactory.getKlasse()], loading: true, total: 1 }],
+        ]);
+        organisationStore.clearKlasseFilter(storeKey);
+        expect(organisationStore.klassenFilters.get(storeKey ?? '')).toBeUndefined();
+      });
     });
   });
 });

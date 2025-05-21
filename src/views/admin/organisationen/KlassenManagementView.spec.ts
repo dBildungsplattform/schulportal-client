@@ -66,6 +66,7 @@ async function selectKlasse(
   klasse: Partial<Organisation> | null,
   schule?: Organisation,
 ): Promise<Organisation | undefined> {
+  const klasseFilterStoreKey: string = '';
   const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' }).findComponent({
     name: 'v-autocomplete',
   });
@@ -75,8 +76,13 @@ async function selectKlasse(
     return;
   }
 
+  organisationStore.klassenFilters.set(klasseFilterStoreKey, {
+    filterResult: [],
+    total: 0,
+    loading: false,
+  });
   const klasseWithDefaults: Organisation = DoFactory.getKlasse(schule, klasse);
-  organisationStore.klassenFilter.filterResult = [klasseWithDefaults];
+  organisationStore.klassenFilters.get(klasseFilterStoreKey)!.filterResult = [klasseWithDefaults];
   await klasseAutocomplete?.setValue([klasseWithDefaults.id]);
   return klasseWithDefaults;
 }
@@ -291,7 +297,7 @@ describe('KlassenManagementView', () => {
     const schule: Organisation = (await selectSchule())!;
     const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
 
-    await klasseAutocomplete?.vm.$emit('update:search', '');
+    klasseAutocomplete?.vm.$emit('update:search', '');
     await flushPromises();
     const expectedFilter: OrganisationenFilter = {
       administriertVon: [schule.id],
@@ -334,7 +340,7 @@ describe('KlassenManagementView', () => {
     const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
 
     await klasseSearchInput?.setValue(searchString);
-    await klasseAutocomplete?.vm.$emit('update:search', searchString);
+    klasseAutocomplete?.vm.$emit('update:search', searchString);
 
     await flushPromises();
     vi.runAllTimers();

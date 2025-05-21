@@ -17,6 +17,7 @@ import PersonBulkChangeKlasse from './PersonBulkChangeKlasse.vue';
 
 let router: Router;
 const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
+const storeKey: string = 'bulk-change-klasse';
 const mockPersonIds: string[] = [faker.string.uuid(), faker.string.uuid(), faker.string.uuid(), faker.string.uuid()];
 const mockPersons: Map<string, PersonWithZuordnungen> = new Map();
 const mockSchule: Organisation = DoFactory.getSchule();
@@ -32,16 +33,11 @@ const mockKlassen: Array<Organisation> = [
   DoFactory.getKlasse(mockSchule),
   DoFactory.getKlasse(mockSchule),
 ];
-const mockAvailableKlassen: Array<TranslatedObject> = mockKlassen.map((klasse: Organisation) => ({
-  value: klasse.id,
-  title: klasse.name,
-}));
 
 type Props = {
   isDialogVisible: boolean;
   selectedPersonen: Map<string, PersonWithZuordnungen>;
   selectedSchuleId?: string;
-  availableKlassen?: TranslatedObject[];
 };
 
 function mountComponent(partialProps: Partial<Props> = {}): VueWrapper {
@@ -49,7 +45,6 @@ function mountComponent(partialProps: Partial<Props> = {}): VueWrapper {
     isDialogVisible: true,
     selectedSchuleId: mockSchule.id,
     selectedPersonen: mockPersons,
-    availableKlassen: mockAvailableKlassen,
     ...partialProps,
   };
 
@@ -96,7 +91,10 @@ describe('PersonBulkChangeKlasse', () => {
   test('button should be enabled when a new klasse is selected', async () => {
     const wrapper: VueWrapper = mountComponent();
     await nextTick();
-    await wrapper.findComponent('[data-testid="bulk-change-klasse-select"]').setValue(mockKlassen[0]!.id);
+    await wrapper
+      .findComponent({ name: 'KlassenFilter' })
+      .findComponent('[data-testid="bulk-change-klasse-klasse-select"]')
+      .setValue(mockKlassen[0]!.id);
     const button: Element = document.querySelector('[data-testid="bulk-change-klasse-button"]')!;
     expect(button).not.toBeNull();
     expect(button.hasAttribute('disabled')).toBe(false);
@@ -109,7 +107,10 @@ describe('PersonBulkChangeKlasse', () => {
 
     expect(spy).not.toHaveBeenCalled();
 
-    await wrapper.findComponent('[data-testid="bulk-change-klasse-select"]').setValue(mockKlassen[0]!.id);
+    await wrapper
+      .findComponent({ name: 'KlassenFilter' })
+      .findComponent('[data-testid="bulk-change-klasse-klasse-select"]')
+      .setValue(mockKlassen[0]!.id);
 
     const button: Element = document.body.querySelector('[data-testid="bulk-change-klasse-button"]')!;
     expect(button).not.toBeNull();
@@ -131,7 +132,10 @@ describe('PersonBulkChangeKlasse', () => {
 
     expect(spy).not.toHaveBeenCalled();
 
-    await wrapper.findComponent('[data-testid="bulk-change-klasse-select"]').setValue(mockKlassen[0]!.id);
+    await wrapper
+      .findComponent({ name: 'KlassenFilter' })
+      .findComponent('[data-testid="bulk-change-klasse-klasse-select"]')
+      .setValue(mockKlassen[0]!.id);
     const button: Element = document.body.querySelector('[data-testid="bulk-change-klasse-button"]')!;
     expect(button).not.toBeNull();
     button.dispatchEvent(new Event('click'));

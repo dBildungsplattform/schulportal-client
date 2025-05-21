@@ -84,7 +84,7 @@ type OrganisationState = {
   allKlassen: Array<Organisation>;
   allSchulen: Array<Organisation>;
   allSchultraeger: Array<Organisation>;
-  klassenFilter: AutoCompleteStore<Organisation>;
+  klassenFilters: Map<string, AutoCompleteStore<Organisation>>;
   schulenFilter: AutoCompleteStore<Organisation>;
   currentOrganisation: Organisation | null;
   currentKlasse: Organisation | null;
@@ -167,8 +167,9 @@ type OrganisationActions = {
   setItsLearningForSchule: (organisationId: string) => Promise<void>;
   loadSchulenForFilter(filter?: OrganisationenFilter): Promise<void>;
   resetSchulFilter(): void;
-  loadKlassenForFilter(filter?: OrganisationenFilter): Promise<void>;
-  resetKlasseFilter(): void;
+  loadKlassenForFilter(filter?: OrganisationenFilter, storeKey?: string): Promise<void>;
+  resetKlasseFilter(storeKey?: string): void;
+  clearKlasseFilter(storeKey?: string): void;
 };
 
 export { OrganisationsTyp };
@@ -179,8 +180,7 @@ export const useOrganisationStore: StoreDefinition<
   OrganisationState,
   OrganisationGetters,
   OrganisationActions
-> = defineStore({
-  id: 'organisationStore',
+> = defineStore('organisationStore', {
   state: (): OrganisationState => {
     return {
       allOrganisationen: [],
@@ -191,11 +191,7 @@ export const useOrganisationStore: StoreDefinition<
         total: 0,
         loading: false,
       },
-      klassenFilter: {
-        filterResult: [],
-        total: 0,
-        loading: false,
-      },
+      klassenFilters: new Map(),
       allSchultraeger: [],
       currentOrganisation: null,
       currentKlasse: null,
@@ -690,9 +686,20 @@ export const useOrganisationStore: StoreDefinition<
       };
     },
 
-    async loadKlassenForFilter(filter?: OrganisationenFilter): Promise<void> {
+    async loadKlassenForFilter(filter?: OrganisationenFilter, storeKey: string = ''): Promise<void> {
       this.errorCode = '';
-      this.klassenFilter.loading = true;
+
+      if (!this.klassenFilters.has(storeKey)) {
+        this.klassenFilters.set(storeKey, {
+          filterResult: [],
+          loading: false,
+          total: 0,
+        });
+      }
+      const klassenFilter: AutoCompleteStore<Organisation> | undefined = this.klassenFilters.get(storeKey);
+      if (!klassenFilter) return;
+
+      klassenFilter.loading = true;
       try {
         const response: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations(
           filter?.offset,
@@ -707,21 +714,25 @@ export const useOrganisationStore: StoreDefinition<
           filter?.zugehoerigZu,
           filter?.organisationIds,
         );
-        this.klassenFilter.filterResult = response.data;
-        this.klassenFilter.total = +response.headers['x-paging-total'];
+        klassenFilter.filterResult = response.data;
+        klassenFilter.total = +response.headers['x-paging-total'];
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
-        this.klassenFilter.loading = false;
+        klassenFilter.loading = false;
       }
     },
 
-    resetKlasseFilter(): void {
-      this.klassenFilter = {
+    resetKlasseFilter(storeKey: string = ''): void {
+      this.klassenFilters.set(storeKey, {
         filterResult: [],
         loading: false,
         total: 0,
-      };
+      });
+    },
+
+    clearKlasseFilter(storeKey: string = ''): void {
+      this.klassenFilters.delete(storeKey);
     },
   },
 });

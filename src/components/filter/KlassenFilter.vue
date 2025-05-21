@@ -3,6 +3,7 @@
   import {
     OrganisationsTyp,
     useOrganisationStore,
+    type AutoCompleteStore,
     type Organisation,
     type OrganisationenFilter,
     type OrganisationStore,
@@ -10,6 +11,7 @@
   import type { TranslatedObject } from '@/types';
   import { dedup, sameContent } from '@/utils/arrays';
   import type { BaseFieldProps } from 'vee-validate';
+  import { onUnmounted, onMounted } from 'vue';
   import { computed, reactive, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
 
@@ -23,6 +25,7 @@
     highlightSelection?: boolean;
     placeholderText?: string;
     administriertVon?: string[] | undefined;
+    storeKey?: string;
   };
   const props: Props = defineProps<Props>();
   const selectedKlassen: Ref<SelectedKlassenIds> = defineModel('selectedKlassen');
@@ -36,6 +39,13 @@
   const organisationStore: OrganisationStore = useOrganisationStore();
 
   const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
+  const testId: ComputedRef<string> = computed(() => {
+    return props.storeKey ? `${props.storeKey}-klasse-select` : 'klasse-select';
+  });
+  const storeReference: ComputedRef<AutoCompleteStore<Organisation> | undefined> = computed(() => {
+    return organisationStore.klassenFilters.get(props.storeKey ?? '');
+  });
+
   const klassenFilter: OrganisationenFilter = reactive({
     includeTyp: OrganisationsTyp.Klasse,
     systemrechte: props.systemrechteForSearch,
@@ -50,7 +60,7 @@
     title: klasse.name,
   });
   const translatedKlassen: ComputedRef<Array<TranslatedObject>> = computed(() => {
-    const options: Array<TranslatedObject> = organisationStore.klassenFilter.filterResult.map(translateKlasse);
+    const options: Array<TranslatedObject> = storeReference.value?.filterResult.map(translateKlasse) ?? [];
     return options;
   });
 
@@ -146,7 +156,7 @@
       const delay: number = oldFilter ? 500 : 0;
 
       timerId.value = setTimeout(async () => {
-        await organisationStore.loadKlassenForFilter(newFilter);
+        await organisationStore.loadKlassenForFilter(newFilter, props.storeKey);
       }, delay);
     },
     { immediate: true },
@@ -165,6 +175,16 @@
       selectedKlassen.value = undefined;
     },
   );
+
+  onMounted(() => {
+    if (organisationStore.klassenFilters.has(props.storeKey ?? ''))
+      console.warn(`KlassenFilter initialized twice with id ${props.storeKey}`);
+    organisationStore.resetKlasseFilter(props.storeKey);
+  });
+
+  onUnmounted(() => {
+    organisationStore.clearKlasseFilter(props.storeKey);
+  });
 </script>
 
 <template>
@@ -172,22 +192,22 @@
     autocomplete="off"
     :class="['filter-dropdown', { selected: shouldHighlightSelection }]"
     clearable
-    data-testid="klasse-select"
+    :data-testid="testId"
     density="compact"
     :disabled="props.readonly"
-    id="klasse-select"
-    ref="klasse-select"
+    :id="testId"
+    :ref="testId"
     :items="translatedKlassen"
     item-value="value"
     item-text="title"
-    :loading="organisationStore.klassenFilter.loading"
+    :loading="storeReference?.loading"
     :multiple="props.multiple"
     :no-data-text="'noDataFound'"
     :placeholder="props.placeholderText ?? t('admin.klasse.assignKlasse')"
     required="true"
     variant="outlined"
     @update:search="updateSearchString"
-    @click:clear="organisationStore.resetKlasseFilter"
+    @click:clear="organisationStore.resetKlasseFilter(storeKey)"
     v-bind="selectedKlasseProps"
     v-model="selectedKlassen"
     v-model:search="searchInputKlassen"

@@ -346,7 +346,12 @@ describe('PersonManagementView', () => {
 
   test('it sets and resets filters', async () => {
     const klasse: Organisation = DoFactory.getKlasse(undefined, {});
-    organisationStore.klassenFilter.filterResult = [klasse];
+    organisationStore.klassenFilters.set('', {
+      filterResult: [klasse],
+      total: 1,
+      loading: false,
+    });
+
     const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
     await schuleAutocomplete?.setValue(['9876']);
     await nextTick();
@@ -411,13 +416,13 @@ describe('PersonManagementView', () => {
 
     // Trigger the search
     await rollenAutocomplete?.setValue(['name']);
-    await rollenAutocomplete?.vm.$emit('update:search', 'name');
+    rollenAutocomplete?.vm.$emit('update:search', 'name');
 
     // Fast-forward timers
     vi.runAllTimers();
 
     // Wait for all promises to resolve
-    await vi.runAllTicks();
+    vi.runAllTicks();
 
     // Assert that the method was called
     expect(mockGetPersonenkontextRolleWithFilter).toHaveBeenCalledWith('name', 25);

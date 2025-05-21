@@ -24,6 +24,7 @@ type Props = {
   highlightSelection?: boolean;
   placeholderText?: string;
   administriertVon?: string[];
+  storeKey?: string;
 };
 
 function mountComponent(props: Partial<Props> = {}): VueWrapper {
@@ -60,172 +61,183 @@ beforeEach(() => {
 });
 
 describe('KlassenFilter', async () => {
-  describe.each([[true], [false]])('when multiple is %s', (multiple: boolean) => {
-    describe.each([[true], [false]])('when readonly is %s', (readonly: boolean) => {
-      const defaultProps: Props = { multiple, readonly };
+  describe.each([[undefined], ['test-component']])('when storeKey is %s', (storeKey: string | undefined) => {
+    describe.each([[true], [false]])('when multiple is %s', (multiple: boolean) => {
+      describe.each([[true], [false]])('when readonly is %s', (readonly: boolean) => {
+        const defaultProps: Props = { multiple, readonly, storeKey };
+        const testId: string = storeKey ? `${storeKey}-klasse-select` : 'klasse-select';
 
-      test('it renders', () => {
-        const wrapper: VueWrapper = mountComponent(defaultProps);
-        expect(wrapper.find('[data-testid="klasse-select"]').isVisible()).toBe(true);
-      });
-
-      describe.each([
-        [[RollenSystemRecht.KlassenVerwalten]],
-        [[RollenSystemRecht.KlassenVerwalten, RollenSystemRecht.KlassenVerwalten]],
-        [[]],
-        [undefined],
-      ])('when systemrechteForSearch are %s', (systemrechteForSearch: Array<RollenSystemRecht> | undefined) => {
-        const expectedIdsInFilter: OrganisationenFilter['organisationIds'] =
-          ((): OrganisationenFilter['organisationIds'] => {
-            return [];
-          })();
-        const expectedFilter: OrganisationenFilter = {
-          ...defaultFilter,
-          systemrechte: systemrechteForSearch,
-          organisationIds: expectedIdsInFilter,
-        };
-
-        test('it initializes store', async () => {
-          const spy: MockInstance = vi.spyOn(organisationStore, 'loadKlassenForFilter');
-          mountComponent({
-            ...defaultProps,
-            systemrechteForSearch,
-          });
-          vi.runAllTimers();
-
-          expect(spy).toHaveBeenCalledOnce();
-          expect(spy).toHaveBeenLastCalledWith(expectedFilter);
+        test('it renders', () => {
+          const wrapper: VueWrapper = mountComponent(defaultProps);
+          expect(wrapper.exists()).toBe(true);
+          expect(wrapper.find(`[data-testid="${testId}"]`).isVisible()).toBe(true);
         });
 
-        describe.each([[''], ['string']])('when searching for %s', (searchString: string) => {
-          test.runIf(readonly)('it does not trigger search', async () => {
-            const loadSpy: MockInstance = vi.spyOn(organisationStore, 'loadKlassenForFilter');
-            const wrapper: VueWrapper = mountComponent({
-              ...defaultProps,
-              systemrechteForSearch,
-            });
-            // clear initial loading from mock
-            vi.runAllTimers();
-            loadSpy.mockClear();
+        describe.each([
+          [[RollenSystemRecht.KlassenVerwalten]],
+          [[RollenSystemRecht.KlassenVerwalten, RollenSystemRecht.KlassenVerwalten]],
+          [[]],
+          [undefined],
+        ])('when systemrechteForSearch are %s', (systemrechteForSearch: Array<RollenSystemRecht> | undefined) => {
+          const expectedIdsInFilter: OrganisationenFilter['organisationIds'] =
+            ((): OrganisationenFilter['organisationIds'] => {
+              return [];
+            })();
+          const expectedFilter: OrganisationenFilter = {
+            ...defaultFilter,
+            systemrechte: systemrechteForSearch,
+            organisationIds: expectedIdsInFilter,
+          };
 
-            const klasseSearchInput: ReturnType<VueWrapper['findComponent']> = wrapper.find('#klasse-select');
-            await klasseSearchInput.setValue(searchString);
-            vi.runAllTimers();
-            await flushPromises();
-            expect(loadSpy).not.toHaveBeenCalled();
-          });
-          test.runIf(!readonly)('it triggers search', async () => {
-            const expected: OrganisationenFilter = {
-              ...expectedFilter,
-            };
-            if (searchString.length > 0) expected.searchString = searchString;
-            const loadSpy: MockInstance = vi.spyOn(organisationStore, 'loadKlassenForFilter');
-            const wrapper: VueWrapper = mountComponent({
-              ...defaultProps,
-              systemrechteForSearch,
-            });
-            const klasseSearchInput: ReturnType<VueWrapper['findComponent']> = wrapper.find('#klasse-select');
-            await klasseSearchInput.setValue(searchString);
-            vi.runAllTimers();
-            await flushPromises();
-            expect(loadSpy).toHaveBeenLastCalledWith(expected);
-          });
-        });
-
-        describe.runIf(!readonly)('when selecting', () => {
-          async function setup(): Promise<VueWrapper> {
-            const wrapper: VueWrapper = mountComponent({
+          test('it initializes store', async () => {
+            const spy: MockInstance = vi.spyOn(organisationStore, 'loadKlassenForFilter');
+            mountComponent({
               ...defaultProps,
               systemrechteForSearch,
             });
             vi.runAllTimers();
-            await flushPromises();
-            return wrapper;
-          }
-          async function selectKlasse(wrapper: VueWrapper, id: string | undefined): Promise<void> {
-            const klasseAutoComplete: ReturnType<VueWrapper['findComponent']> = wrapper.findComponent({
-              name: 'v-autocomplete',
-            });
-            await klasseAutoComplete.setValue(id);
-            vi.runAllTimers();
-            await flushPromises();
-          }
 
-          test('it triggers search', async () => {
-            const selectedKlasseId: string = faker.string.uuid();
-            const wrapper: VueWrapper = await setup();
-            const loadSpy: MockInstance = vi.spyOn(organisationStore, 'loadKlassenForFilter');
-            await selectKlasse(wrapper, selectedKlasseId);
-            const expected: OrganisationenFilter = {
-              ...expectedFilter,
-              organisationIds: [...(expectedIdsInFilter ?? []), selectedKlasseId],
-            };
-            expect(loadSpy).toHaveBeenLastCalledWith(expected);
+            expect(spy).toHaveBeenCalledOnce();
+            expect(spy).toHaveBeenLastCalledWith(expect.objectContaining(expectedFilter), storeKey);
           });
 
-          describe('and clearing selection', async () => {
-            test('it triggers search', async () => {
-              const wrapper: VueWrapper = await setup();
-              await selectKlasse(wrapper, faker.string.uuid());
+          describe.each([[''], ['string']])('when searching for %s', (searchString: string) => {
+            test.runIf(readonly)('it does not trigger search', async () => {
               const loadSpy: MockInstance = vi.spyOn(organisationStore, 'loadKlassenForFilter');
-              await selectKlasse(wrapper, undefined);
+              const wrapper: VueWrapper = mountComponent({
+                ...defaultProps,
+                systemrechteForSearch,
+              });
+              // clear initial loading from mock
+              vi.runAllTimers();
+              loadSpy.mockClear();
+
+              const klasseSearchInput: ReturnType<VueWrapper['findComponent']> = wrapper.find(`#${testId}`);
+              await klasseSearchInput.setValue(searchString);
+              vi.runAllTimers();
+              await flushPromises();
+              expect(loadSpy).not.toHaveBeenCalled();
+            });
+
+            test.runIf(!readonly)('it triggers search', async () => {
               const expected: OrganisationenFilter = {
                 ...expectedFilter,
-                organisationIds: [...(expectedIdsInFilter ?? [])],
               };
-              expect(loadSpy).toHaveBeenLastCalledWith(expected);
+              if (searchString.length > 0) expected.searchString = searchString;
+              const loadSpy: MockInstance = vi.spyOn(organisationStore, 'loadKlassenForFilter');
+              const wrapper: VueWrapper = mountComponent({
+                ...defaultProps,
+                systemrechteForSearch,
+              });
+              const klasseSearchInput: ReturnType<VueWrapper['findComponent']> = wrapper.find(`#${testId}`);
+              await klasseSearchInput.setValue(searchString);
+              vi.runAllTimers();
+              await flushPromises();
+              expect(loadSpy).toHaveBeenLastCalledWith(expected, storeKey);
+            });
+          });
+
+          describe.runIf(!readonly)('when selecting', () => {
+            async function setup(): Promise<VueWrapper> {
+              const wrapper: VueWrapper = mountComponent({
+                ...defaultProps,
+                systemrechteForSearch,
+              });
+              vi.runAllTimers();
+              await flushPromises();
+              return wrapper;
+            }
+            async function selectKlasse(wrapper: VueWrapper, id: string | undefined): Promise<void> {
+              const klasseAutoComplete: ReturnType<VueWrapper['findComponent']> = wrapper.findComponent({
+                name: 'v-autocomplete',
+              });
+              await klasseAutoComplete.setValue(id);
+              vi.runAllTimers();
+              await flushPromises();
+            }
+
+            test('it triggers search', async () => {
+              const selectedKlasseId: string = faker.string.uuid();
+              const wrapper: VueWrapper = await setup();
+              const loadSpy: MockInstance = vi.spyOn(organisationStore, 'loadKlassenForFilter');
+              await selectKlasse(wrapper, selectedKlasseId);
+              const expected: OrganisationenFilter = {
+                ...expectedFilter,
+                organisationIds: [...(expectedIdsInFilter ?? []), selectedKlasseId],
+              };
+              expect(loadSpy).toHaveBeenLastCalledWith(expect.objectContaining(expected), storeKey);
+            });
+
+            describe('and clearing selection', async () => {
+              test('it triggers search', async () => {
+                const wrapper: VueWrapper = await setup();
+                await selectKlasse(wrapper, faker.string.uuid());
+                const loadSpy: MockInstance = vi.spyOn(organisationStore, 'loadKlassenForFilter');
+                await selectKlasse(wrapper, undefined);
+                const expected: OrganisationenFilter = {
+                  ...expectedFilter,
+                  organisationIds: [...(expectedIdsInFilter ?? [])],
+                };
+                expect(loadSpy).toHaveBeenLastCalledWith(expect.objectContaining(expected), storeKey);
+              });
             });
           });
         });
-      });
 
-      describe.each([
-        {
-          label: 'overrides',
-          id: faker.string.uuid(),
-        },
-        {
-          label: 'does not override',
-        },
-      ])('when the parent $label the selection', ({ id }: { id?: string }) => {
-        test('it correctly initializes input', async () => {
-          const mockKlasse: Organisation = DoFactory.getKlasse();
-          const selectionRef: Ref<Array<string> | undefined> = ref(undefined);
-          if (id) mockKlasse.id = id;
-          organisationStore.loadKlassenForFilter = vi.fn(async () => {
-            organisationStore.klassenFilter.filterResult = [mockKlasse];
-            selectionRef.value = id ? [id] : [];
+        describe.each([
+          {
+            label: 'overrides',
+            id: faker.string.uuid(),
+          },
+          {
+            label: 'does not override',
+          },
+        ])('when the parent $label the selection', ({ id }: { id?: string }) => {
+          test('it correctly initializes input', async () => {
+            const mockKlasse: Organisation = DoFactory.getKlasse();
+            const selectionRef: Ref<Array<string> | undefined> = ref(undefined);
+            if (id) mockKlasse.id = id;
+            organisationStore.loadKlassenForFilter = vi.fn(async () => {
+              if (!organisationStore.klassenFilters.has(storeKey ?? ''))
+                organisationStore.klassenFilters.set(storeKey ?? '', {
+                  filterResult: [],
+                  total: 0,
+                  loading: false,
+                });
+              organisationStore.klassenFilters.get(storeKey ?? '')!.filterResult = [mockKlasse];
+              selectionRef.value = id ? [id] : [];
+            });
+            const wrapper: VueWrapper = mountComponent({ ...defaultProps });
+            vi.runAllTimers();
+            await wrapper.setProps({ selectedKlassen: selectionRef });
+            vi.runAllTimers();
+            await nextTick();
+            const actualText: string = wrapper.find(`[data-testid="${testId}"]`).text();
+            if (id) expect(actualText).toContain(mockKlasse.name);
+            else expect(actualText).toBe('');
           });
-          const wrapper: VueWrapper = mountComponent({ ...defaultProps });
-          vi.runAllTimers();
-          await wrapper.setProps({ selectedKlassen: selectionRef });
-          vi.runAllTimers();
-          await nextTick();
-          const actualText: string = wrapper.find('[data-testid="klasse-select"]').text();
-          if (id) expect(actualText).toContain(mockKlasse.name);
-          else expect(actualText).toBe('');
         });
-      });
 
-      describe.each([[true], [false]])('when highlightSelection is %s', async (highlightSelection: boolean) => {
-        test('it correctly displays highlight', async () => {
-          const selectedKlasseId: string = faker.string.uuid();
-          const wrapper: VueWrapper = mountComponent({
-            ...defaultProps,
-            highlightSelection,
+        describe.each([[true], [false]])('when highlightSelection is %s', async (highlightSelection: boolean) => {
+          test('it correctly displays highlight', async () => {
+            const selectedKlasseId: string = faker.string.uuid();
+            const wrapper: VueWrapper = mountComponent({
+              ...defaultProps,
+              highlightSelection,
+            });
+            await wrapper
+              .findComponent({
+                name: 'v-autocomplete',
+              })
+              .setValue(selectedKlasseId);
+
+            const classes: Array<string> = wrapper.findComponent({ ref: testId }).classes();
+            if (highlightSelection) {
+              expect(classes).toContain('selected');
+            } else {
+              expect(classes).not.toContain('selected');
+            }
           });
-          await wrapper
-            .findComponent({
-              name: 'v-autocomplete',
-            })
-            .setValue(selectedKlasseId);
-
-          const classes: Array<string> = wrapper.findComponent({ ref: 'klasse-select' }).classes();
-          if (highlightSelection) {
-            expect(classes).toContain('selected');
-          } else {
-            expect(classes).not.toContain('selected');
-          }
         });
       });
     });
