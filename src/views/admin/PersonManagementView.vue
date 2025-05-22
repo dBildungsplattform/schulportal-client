@@ -756,7 +756,7 @@
           class="py-md-0"
         >
           <v-tooltip
-            :disabled="selectedOrganisationIds.length == 0"
+            :disabled="selectedOrganisationIds.length > 0"
             location="top"
           >
             <template v-slot:activator="{ props }">
