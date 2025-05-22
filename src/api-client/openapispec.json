@@ -3381,6 +3381,15 @@
               "nullable": false,
               "type": "number"
             }
+          },
+          {
+            "name": "requestedWithSystemrecht",
+            "required": false,
+            "in": "query",
+            "description": "The systemrecht used to filter for rollen in personenkontext.",
+            "schema": {
+              "$ref": "#/components/schemas/RollenSystemRecht"
+            }
           }
         ],
         "responses": {
