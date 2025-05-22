@@ -225,7 +225,11 @@
           limit: 25,
         });
       }, 500);
-    } else if (newValue && newValue !== selectedOrganisationTitle.value) {
+    } else if (
+      newValue &&
+      newValue !== selectedOrganisationTitle.value &&
+      (oldValue as string | undefined) === undefined
+    ) {
       // If searchValue is not empty and different from the current title, proceed with the search
       // Reset selectedRolle only if it's a new search and not when selecting an organization
       selectedRolle.value = undefined;
