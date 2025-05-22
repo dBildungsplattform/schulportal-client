@@ -164,15 +164,8 @@
 
   watch(
     () => props.administriertVon,
-    (newValue: string[] | undefined, oldValue: string[] | undefined) => {
-      if (
-        (newValue == undefined && oldValue === undefined) ||
-        (newValue !== undefined && oldValue !== undefined && sameContent(newValue, oldValue))
-      ) {
-        return;
-      }
-      klassenFilter.administriertVon = props.administriertVon;
-      selectedKlassen.value = undefined;
+    (newValue: string[] | undefined) => {
+      klassenFilter.administriertVon = newValue;
     },
   );
 

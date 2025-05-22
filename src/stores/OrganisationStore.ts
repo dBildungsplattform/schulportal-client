@@ -689,15 +689,11 @@ export const useOrganisationStore: StoreDefinition<
     async loadKlassenForFilter(filter?: OrganisationenFilter, storeKey: string = ''): Promise<void> {
       this.errorCode = '';
 
-      if (!this.klassenFilters.has(storeKey)) {
-        this.klassenFilters.set(storeKey, {
-          filterResult: [],
-          loading: false,
-          total: 0,
-        });
-      }
-      const klassenFilter: AutoCompleteStore<Organisation> | undefined = this.klassenFilters.get(storeKey);
-      if (!klassenFilter) return;
+      const klassenFilter: AutoCompleteStore<Organisation> = {
+        filterResult: [],
+        loading: false,
+        total: 0,
+      };
 
       klassenFilter.loading = true;
       try {
@@ -716,6 +712,7 @@ export const useOrganisationStore: StoreDefinition<
         );
         klassenFilter.filterResult = response.data;
         klassenFilter.total = +response.headers['x-paging-total'];
+        this.klassenFilters.set(storeKey, klassenFilter);
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
