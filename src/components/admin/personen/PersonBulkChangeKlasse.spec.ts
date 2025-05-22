@@ -5,7 +5,6 @@ import { RollenArt } from '@/stores/RolleStore';
 import type { Person } from '@/stores/types/Person';
 import { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
 import type { Zuordnung } from '@/stores/types/Zuordnung';
-import type { TranslatedObject } from '@/types';
 import { faker } from '@faker-js/faker';
 import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
@@ -17,7 +16,7 @@ import PersonBulkChangeKlasse from './PersonBulkChangeKlasse.vue';
 
 let router: Router;
 const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
-const storeKey: string = 'bulk-change-klasse';
+const storeKey: string = 'bulk-change-klasse'; // to find KlassenFilter components
 const mockPersonIds: string[] = [faker.string.uuid(), faker.string.uuid(), faker.string.uuid(), faker.string.uuid()];
 const mockPersons: Map<string, PersonWithZuordnungen> = new Map();
 const mockSchule: Organisation = DoFactory.getSchule();
@@ -134,7 +133,7 @@ describe('PersonBulkChangeKlasse', () => {
 
     await wrapper
       .findComponent({ name: 'KlassenFilter' })
-      .findComponent('[data-testid="bulk-change-klasse-klasse-select"]')
+      .findComponent(`[data-testid="${storeKey}-klasse-select"]`)
       .setValue(mockKlassen[0]!.id);
     const button: Element = document.body.querySelector('[data-testid="bulk-change-klasse-button"]')!;
     expect(button).not.toBeNull();

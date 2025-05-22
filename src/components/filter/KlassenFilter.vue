@@ -177,8 +177,10 @@
   );
 
   onMounted(() => {
-    if (organisationStore.klassenFilters.has(props.storeKey ?? ''))
+    if (organisationStore.klassenFilters.has(props.storeKey ?? '')) {
+      // eslint-disable-next-line no-console
       console.warn(`KlassenFilter initialized twice with id ${props.storeKey}`);
+    }
     organisationStore.resetKlasseFilter(props.storeKey);
   });
 
