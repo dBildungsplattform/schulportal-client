@@ -16,7 +16,7 @@
     type PersonenkontextStore,
   } from '@/stores/PersonenkontextStore';
   import { usePersonStore, type CreatePersonBodyParams, type PersonStore } from '@/stores/PersonStore';
-  import { RollenArt } from '@/stores/RolleStore';
+  import { RollenArt, RollenSystemRecht } from '@/stores/RolleStore';
   import { type TranslatedObject } from '@/types.d';
   import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
   import { formatDateToISO, getNextSchuljahresende, isValidDate, notInPast } from '@/utils/date';
@@ -24,10 +24,11 @@
   import { isKopersRolle } from '@/utils/validationPersonenkontext';
   import { toTypedSchema } from '@vee-validate/yup';
   import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
-  import { computed, onMounted, onUnmounted, ref, watch, type ComputedRef, type Ref } from 'vue';
+  import { computed, onBeforeMount, onMounted, onUnmounted, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import {
     onBeforeRouteLeave,
+    useRoute,
     useRouter,
     type NavigationGuardNext,
     type RouteLocationNormalized,
@@ -37,6 +38,9 @@
   import { array, object, string, StringSchema, type AnyObject } from 'yup';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
+
+  const route: RouteLocationNormalized = useRoute();
+  const createType: string = route.meta['createType'] as string;
 
   const router: Router = useRouter();
   const personStore: PersonStore = usePersonStore();
@@ -69,6 +73,11 @@
       (rolle: TranslatedRolleWithAttrs) => selectedRolleIds.includes(rolle.value) && rolle.rollenart === RollenArt.Lern,
     );
   }
+
+  const headerLabel: Ref<string> = ref(t('admin.person.addNew'));
+  const createButtonLabel: Ref<string> = ref(t('admin.person.create'));
+  const discardButtonLabel: Ref<string> = ref(t('admin.person.discard'));
+  const createAnotherButtonLabel: Ref<string> = ref(t('admin.person.createAnother'));
 
   const validationSchema: TypedSchema = toTypedSchema(
     object({
@@ -165,7 +174,7 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = formContext.defineField('selectedBefristungOption', vuetifyConfig);
   const [selectedKopersNr, selectedKopersNrProps]: [
-    Ref<string | undefined | null>,
+    Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = formContext.defineField('selectedKopersNr', vuetifyConfig);
 
@@ -388,19 +397,28 @@
     createPerson();
   });
 
+  function navigateToCreatePersonRoute(reload: boolean = false): void | Promise<void> {
+    const routeName: string = createType === 'limited' ? 'create-person-limited' : 'create-person';
+    if (reload) {
+      return router.push({ name: routeName }).then(() => {
+        router.go(0);
+      });
+    } else {
+      router.push({ name: routeName });
+    }
+  }
+
   async function navigateBackToPersonForm(): Promise<void> {
     if (
       personStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET' ||
       personenkontextStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET'
     ) {
       formContext.resetForm();
-      await router.push({ name: 'create-person' }).then(() => {
-        router.go(0);
-      });
+      await navigateToCreatePersonRoute(true);
     } else {
       personenkontextStore.errorCode = '';
       personStore.errorCode = '';
-      await router.push({ name: 'create-person' });
+      navigateToCreatePersonRoute();
     }
   }
 
@@ -411,7 +429,7 @@
     // Re-trigger the watchers after resetting the form to auto-select the Befristung since the component isn't remounted
     // Because we navigate to the same route.
     setupWatchers();
-    router.push({ name: 'create-person' });
+    navigateToCreatePersonRoute();
   };
 
   // Computed property to check if the second radio button should be disabled
@@ -437,12 +455,29 @@
       showUnsavedChangesDialog.value = true;
       blockedNext = next;
     } else {
+      personenkontextStore.requestedWithSystemrecht = undefined;
       next();
     }
   });
 
+  onBeforeMount(() => {
+    switch (createType) {
+      case 'limited':
+        headerLabel.value = t('admin.person.addNewLimited');
+        createButtonLabel.value = t('admin.person.addNewLimited');
+        discardButtonLabel.value = t('cancel');
+        createAnotherButtonLabel.value = t('admin.person.addAnotherLimited');
+        break;
+    }
+
+    personenkontextStore.requestedWithSystemrecht =
+      createType === 'limited' ? RollenSystemRecht.EingeschraenktNeueBenutzerErstellen : undefined;
+  });
+
   onMounted(async () => {
-    await personenkontextStore.processWorkflowStep({ limit: 25 });
+    await personenkontextStore.processWorkflowStep({
+      limit: 25,
+    });
     personStore.errorCode = '';
     personenkontextStore.createdPersonWithKontext = null;
 
@@ -451,6 +486,7 @@
   });
 
   onUnmounted(() => {
+    personenkontextStore.requestedWithSystemrecht = undefined;
     window.removeEventListener('beforeunload', preventNavigation);
   });
 </script>
@@ -461,11 +497,11 @@
       class="text-center headline"
       data-testid="admin-headline"
     >
-      {{ $t('admin.headline') }}
+      {{ headerLabel }}
     </h1>
     <LayoutCard
       :closable="!personenkontextStore.errorCode && !personStore.errorCode"
-      :header="$t('admin.person.addNew')"
+      :header="headerLabel"
       @onCloseClicked="navigateToPersonTable"
       :padded="true"
       :showCloseText="true"
@@ -475,8 +511,8 @@
         <FormWrapper
           :canCommit="canCommit"
           :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
-          :createButtonLabel="$t('admin.person.create')"
-          :discardButtonLabel="$t('admin.person.discard')"
+          :createButtonLabel="createButtonLabel"
+          :discardButtonLabel="discardButtonLabel"
           :hideActions="!!personenkontextStore.errorCode || !!personStore.errorCode"
           id="person-creation-form"
           :isLoading="personenkontextStore.loading"
@@ -783,7 +819,7 @@
                 data-testid="create-another-person-button"
                 :block="mdAndDown"
               >
-                {{ $t('admin.person.createAnother') }}
+                {{ createAnotherButtonLabel }}
               </v-btn>
             </v-col>
           </v-row>

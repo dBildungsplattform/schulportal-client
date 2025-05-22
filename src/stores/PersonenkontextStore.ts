@@ -22,6 +22,7 @@ import {
   RollenMerkmal,
   RollenArt,
   type DbiamCreatePersonenkontextBodyParams,
+  RollenSystemRecht,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 import { usePersonStore, type PersonStore } from './PersonStore';
@@ -78,6 +79,7 @@ type PersonenkontextState = {
   loading: boolean;
   totalFilteredRollen: number;
   totalPaginatedRollen: number;
+  requestedWithSystemrecht: RollenSystemRecht | undefined;
 };
 
 type PersonenkontextGetters = {};
@@ -138,6 +140,7 @@ export const usePersonenkontextStore: StoreDefinition<
       loading: false,
       totalFilteredRollen: 0,
       totalPaginatedRollen: 0,
+      requestedWithSystemrecht: undefined,
     };
   },
   actions: {
@@ -165,6 +168,7 @@ export const usePersonenkontextStore: StoreDefinition<
             filter?.rolleName,
             filter?.organisationName,
             filter?.limit,
+            this.requestedWithSystemrecht,
           );
         this.workflowStepResponse = data;
         return data;

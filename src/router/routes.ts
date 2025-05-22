@@ -46,6 +46,18 @@ const routes: readonly RouteRecordRaw[] = [
     },
   },
   {
+    path: '/admin/personen/new-limited',
+    name: 'create-person-limited',
+    component: () => import('../views/admin/PersonCreationView.vue'),
+    meta: {
+      layout: 'AdminLayout',
+      requiresAuth: true,
+      requiredStepUpLevel: StepUpLevel.GOLD,
+      requiresPermission: ['personenverwaltung', 'limitedpersonenanlegen'],
+      createType: 'limited',
+    },
+  },
+  {
     path: '/admin/personen/import',
     name: 'person-import',
     component: () => import('../views/admin/PersonImportView.vue'),

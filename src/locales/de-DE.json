@@ -196,6 +196,8 @@
       "create": "Benutzer anlegen",
       "createAnother": "Weiteren Benutzer anlegen",
       "createNew": "Neue Benutzer anlegen",
+      "addNewLimited": "Person hinzufügen",
+      "addAnotherLimited": "Weitere Person hinzufügen",
       "creationErrorText": "",
       "creationErrorTitle": "Fehler beim Anlegen des Benutzers",
       "deletePerson": "Benutzer löschen",
