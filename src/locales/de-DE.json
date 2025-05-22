@@ -394,7 +394,7 @@
       "backToCreateRolle": "Zurück zur Rollenanlage",
       "bulkRollenzuordnung": {
         "unassignRolleZuordnung": "Rolle entziehen",
-        "success": "Die Rollen wurde erfolgreich entfernt."
+        "success": "Die Rolle wurde erfolgreich entfernt."
       },
       "create": "Rolle anlegen",
       "createAnother": "Weitere Rolle anlegen",
