@@ -106,7 +106,7 @@
   const searchInputRollen: Ref<string> = ref('');
   const searchInputOrganisationen: Ref<string> = ref('');
 
-  const selectedKlassen: Ref<Array<string> | undefined> = ref(searchFilterStore.selectedKlassen);
+  const selectedKlassen: Ref<Array<string> | undefined> = ref(searchFilterStore.selectedKlassen ?? []);
   const selectedRollen: Ref<Array<string>> = ref([]);
   const selectedOrganisationIds: Ref<Array<string>> = ref([]);
   const selectedStatus: Ref<string | null> = ref(null);
