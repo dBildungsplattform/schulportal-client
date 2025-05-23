@@ -11,8 +11,7 @@
   import type { TranslatedObject } from '@/types';
   import { dedup, sameContent } from '@/utils/arrays';
   import type { BaseFieldProps } from 'vee-validate';
-  import { onUnmounted, onMounted } from 'vue';
-  import { computed, reactive, ref, watch, type ComputedRef, type Ref } from 'vue';
+  import { computed, onMounted, onUnmounted, reactive, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
 
   type SelectedKlassenIds = Array<string> | string | undefined;

@@ -296,22 +296,24 @@
             class="py-md-0"
           >
             <v-tooltip
-              :disabled="!hasSelectedSchule"
+              :disabled="hasSelectedSchule"
               location="top"
             >
-              <template v-slot:activator="">
-                <KlassenFilter
-                  :systemrechte-for-search="[RollenSystemRecht.KlassenVerwalten]"
-                  :multiple="true"
-                  :readonly="!hasSelectedSchule"
-                  :hideDetails="true"
-                  :highlightSelection="true"
-                  :selectedKlassen="selectedKlassen"
-                  @update:selectedKlassen="updateKlassenSelection"
-                  :placeholderText="t('admin.klasse.klassen')"
-                  ref="klasse-select"
-                  :administriertVon="selectedSchule ? [selectedSchule] : undefined"
-                ></KlassenFilter>
+              <template v-slot:activator="{ props }">
+                <div v-bind="props">
+                  <KlassenFilter
+                    :systemrechte-for-search="[RollenSystemRecht.KlassenVerwalten]"
+                    :multiple="true"
+                    :readonly="!hasSelectedSchule"
+                    :hideDetails="true"
+                    :highlightSelection="true"
+                    :selectedKlassen="selectedKlassen"
+                    @update:selectedKlassen="updateKlassenSelection"
+                    :placeholderText="t('admin.klasse.klassen')"
+                    ref="klasse-select"
+                    :administriertVon="selectedSchule ? [selectedSchule] : undefined"
+                  ></KlassenFilter>
+                </div>
               </template>
               <span>{{ t('admin.schule.selectSchuleFirst') }}</span>
             </v-tooltip>
