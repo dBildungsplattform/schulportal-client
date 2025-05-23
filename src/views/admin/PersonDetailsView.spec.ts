@@ -743,6 +743,7 @@ describe('PersonDetailsView', () => {
     // Set klasse value
     const klasseAutocomplete: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
+      .findComponent({ name: 'KlassenFilter' })
       .findComponent({ ref: 'klasse-select' });
     await klasseAutocomplete?.setValue('9a');
     klasseAutocomplete?.vm.$emit('update:search', '9a');
