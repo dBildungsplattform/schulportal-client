@@ -25,7 +25,7 @@ function translateWithFallback(t: Composer['t'], keys: string[], errorCode: stri
     {},
     { default: 'Es ist ein Fehler aufgetreten.' },
   );
-  return `${fallbackBase} (FehlerCode: ${errorCode})`;
+  return `${fallbackBase} (Fehlercode: ${errorCode})`;
 }
 
 /**

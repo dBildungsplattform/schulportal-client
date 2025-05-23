@@ -142,7 +142,7 @@
 
   function handleFieldReset(field: string): void {
     if (field === 'selectedRolle') {
-      selectedRolle.value = undefined;
+      formContext.resetField('selectedRolle');
     }
   }
 

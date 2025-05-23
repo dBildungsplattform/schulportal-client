@@ -451,6 +451,7 @@
   const validateSingleSchuleSelection = (): boolean => {
     if (!singleSchuleSelected.value) {
       onlyOneOrganisationAlertDialogVisible.value = true;
+      invalidSelectionAlertMessages.value = [t('admin.person.onlyOneSchuleAlert')];
       return false;
     }
     return true;

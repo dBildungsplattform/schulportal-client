@@ -39,7 +39,7 @@ describe('useBulkErrors', () => {
         id: person.id,
         vorname: person.name.vorname,
         nachname: person.name.familienname,
-        error: 'admin.personenkontext.errors.fallbackError (FehlerCode: errorCode)',
+        error: 'admin.personenkontext.errors.fallbackError (Fehlercode: errorCode)',
       });
     }
   });
