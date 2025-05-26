@@ -47,17 +47,9 @@
   const { hasAutoselectedSchule, autoselectedSchule }: ReturnType<typeof useAutoselectedSchule> = useAutoselectedSchule(
     props.systemrechteForSearch ?? [],
   );
+
   const isInputDisabled: ComputedRef<boolean> = computed(() => {
     return props.readonly || hasAutoselectedSchule.value;
-  });
-  const translateSchule = (schule: Organisation): TranslatedObject => ({
-    value: schule.id,
-    title: getDisplayNameForOrg(schule),
-  });
-  const translatedSchulen: ComputedRef<Array<TranslatedObject>> = computed(() => {
-    const options: Array<TranslatedObject> = organisationStore.schulenFilter.filterResult.map(translateSchule);
-    if (autoselectedSchule.value) return options.concat(translateSchule(autoselectedSchule.value));
-    return options;
   });
 
   // selection is represented as an array internally
@@ -67,11 +59,37 @@
     if (selectedIds) return [selectedIds];
     return [];
   };
+
   const unwrapSelectedSchulenIds = (selectedIds: Array<string>): SelectedSchulenIds => {
     if (selectedIds.length === 0) return undefined;
     else if (selectedIds.length === 1) return selectedIds.at(0);
     else return selectedIds;
   };
+
+  const isEmptySelection = (selection: SelectedSchulenIds): boolean => {
+    if (!selection) return true;
+    return wrapSelectedSchulenIds(selection).filter(Boolean).length === 0;
+  };
+
+  const translateSchule = (schule: Organisation): TranslatedObject => ({
+    value: schule.id,
+    title: getDisplayNameForOrg(schule),
+  });
+  const translatedSchulen: ComputedRef<Array<TranslatedObject>> = computed(() => {
+    const options: Array<TranslatedObject> = organisationStore.schulenFilter.filterResult.map(translateSchule);
+    if (autoselectedSchule.value) return options.concat(translateSchule(autoselectedSchule.value));
+    const selectedIds: Array<string> = wrapSelectedSchulenIds(selectedSchulen.value);
+    if (!isEmptySelection(selectedIds)) {
+      selectedIds.forEach((selectedId: string) => {
+        if (options.find((option: TranslatedObject) => option.value === selectedId) === undefined)
+          options.push({
+            value: selectedId,
+            title: '...',
+          });
+      });
+    }
+    return options;
+  });
 
   const canDisplaySelection = (selection: SelectedSchulenIds): boolean => {
     const result: boolean = wrapSelectedSchulenIds(selection).every((selectedSchuleId: string) =>
@@ -85,10 +103,6 @@
     return result;
   };
 
-  const isEmptySelection = (selection: SelectedSchulenIds): boolean => {
-    if (!selection) return true;
-    return wrapSelectedSchulenIds(selection).filter(Boolean).length === 0;
-  };
   const shouldHighlightSelection: ComputedRef<boolean> = computed(() => {
     if (hasAutoselectedSchule.value) return true;
     if (props.highlightSelection && !isEmptySelection(selectedSchulen.value)) return true;

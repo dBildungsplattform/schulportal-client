@@ -58,10 +58,6 @@
     value: klasse.id,
     title: klasse.name,
   });
-  const translatedKlassen: ComputedRef<Array<TranslatedObject>> = computed(() => {
-    const options: Array<TranslatedObject> = storeReference.value?.filterResult.map(translateKlasse) ?? [];
-    return options;
-  });
 
   // selection is represented as an array internally
   // wrap/unwrap is used to convert between internal and vuetify representation
@@ -70,6 +66,30 @@
     if (selectedIds) return [selectedIds];
     return [];
   };
+
+  const isEmptySelection = (selection: SelectedKlassenIds): boolean => {
+    if (!selection) return true;
+    return wrapSelectedKlassenIds(selection).filter(Boolean).length === 0;
+  };
+
+  const placeholderText: ComputedRef<string> = computed(() => {
+    return props.placeholderText ?? t('admin.klasse.assignKlasse');
+  });
+
+  const translatedKlassen: ComputedRef<Array<TranslatedObject>> = computed(() => {
+    const options: Array<TranslatedObject> = storeReference.value?.filterResult.map(translateKlasse) ?? [];
+    const selectedIds: Array<string> = wrapSelectedKlassenIds(selectedKlassen.value);
+    if (!isEmptySelection(selectedIds)) {
+      selectedIds.forEach((selectedId: string) => {
+        if (options.find((option: TranslatedObject) => option.value === selectedId) === undefined)
+          options.push({
+            value: selectedId,
+            title: '...',
+          });
+      });
+    }
+    return options;
+  });
 
   const canDisplaySelection = (selection: SelectedKlassenIds): boolean => {
     const result: boolean = wrapSelectedKlassenIds(selection).every((selectedKlasseId: string) =>
@@ -83,10 +103,6 @@
     return result;
   };
 
-  const isEmptySelection = (selection: SelectedKlassenIds): boolean => {
-    if (!selection) return true;
-    return wrapSelectedKlassenIds(selection).filter(Boolean).length === 0;
-  };
   const shouldHighlightSelection: ComputedRef<boolean> = computed(() => {
     if (props.highlightSelection && !isEmptySelection(selectedKlassen.value)) return true;
     return false;
@@ -197,7 +213,7 @@
     :loading="storeReference?.loading"
     :multiple="props.multiple"
     :no-data-text="'noDataFound'"
-    :placeholder="props.placeholderText ?? t('admin.klasse.assignKlasse')"
+    :placeholder="placeholderText"
     required="true"
     variant="outlined"
     @update:search="updateSearchString"

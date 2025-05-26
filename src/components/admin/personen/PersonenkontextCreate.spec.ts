@@ -14,6 +14,7 @@ let wrapper: VueWrapper | null = null;
 let personenkontextStore: PersonenkontextStore;
 let organisationStore: OrganisationStore;
 const personStore: PersonStore = usePersonStore();
+const klassenFilterRef: string = 'personenkontext-create-klasse-select';
 vi.useFakeTimers();
 
 beforeEach(() => {
@@ -161,9 +162,19 @@ describe('PersonenkontextCreate', () => {
     expect(organisationAutocomplete?.text()).toEqual('O1');
     await nextTick();
 
+    organisationStore.klassenFilters.set('personenkontext-create', {
+      loading: false,
+      total: 1,
+      filterResult: [
+        DoFactory.getKlasse(undefined, {
+          id: '55555',
+          name: '55555',
+        }),
+      ],
+    });
     const klasseAutocomplete: VueWrapper | undefined = wrapper
       ?.findComponent({ name: 'KlassenFilter' })
-      .findComponent({ ref: 'klasse-select' });
+      .findComponent({ ref: klassenFilterRef });
     klasseAutocomplete?.vm.$emit('update:search', '55555');
     await klasseAutocomplete?.setValue('55555');
     await nextTick();
@@ -195,7 +206,9 @@ describe('PersonenkontextCreate', () => {
     await rolleAutocomplete?.setValue('54321');
     await nextTick();
 
-    const klassenAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
+    const klassenAutocomplete: VueWrapper | undefined = wrapper
+      ?.findComponent({ name: 'KlassenFilter' })
+      .findComponent({ ref: klassenFilterRef });
     await klassenAutocomplete?.setValue('O1');
     await nextTick();
 
@@ -217,7 +230,7 @@ describe('PersonenkontextCreate', () => {
 
     const klassenAutocomplete: VueWrapper | undefined = wrapper
       ?.findComponent({ name: 'KlassenFilter' })
-      .findComponent({ ref: 'klasse-select' });
+      .findComponent({ ref: klassenFilterRef });
     await klassenAutocomplete?.setValue('');
     klassenAutocomplete?.vm.$emit('update:search', '');
     await nextTick();
@@ -361,8 +374,10 @@ describe('PersonenkontextCreate', () => {
     await rolleAutocomplete?.setValue('54321');
     await nextTick();
 
-    const klassenAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
-    await klassenAutocomplete?.vm.$emit('update:search', '');
+    const klassenAutocomplete: VueWrapper | undefined = wrapper
+      ?.findComponent({ name: 'KlassenFilter' })
+      .findComponent({ ref: klassenFilterRef });
+    klassenAutocomplete?.vm.$emit('update:search', '');
     await nextTick();
 
     await organisationAutocomplete?.setValue(undefined);

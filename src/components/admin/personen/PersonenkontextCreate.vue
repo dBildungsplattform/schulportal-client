@@ -406,6 +406,7 @@
           :placeholderText="$t('admin.klasse.selectKlasse')"
           ref="klasse-select"
           :administriertVon="selectedOrganisation ? [selectedOrganisation] : undefined"
+          :storeKey="'personenkontext-create'"
         />
       </FormRow>
       <!-- Befristung -->
