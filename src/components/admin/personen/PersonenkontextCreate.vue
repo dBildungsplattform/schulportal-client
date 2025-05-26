@@ -225,19 +225,6 @@
           limit: 25,
         });
       }, 500);
-    } else if (newValue && newValue !== selectedOrganisationTitle.value) {
-      // If searchValue is not empty and different from the current title, proceed with the search
-      // Reset selectedRolle only if it's a new search and not when selecting an organization
-      selectedRolle.value = undefined;
-      emits('fieldReset', 'selectedRolle');
-      emits('update:selectedRolle', undefined);
-
-      timerId.value = setTimeout(async () => {
-        await personenkontextStore.processWorkflowStep({
-          organisationName: newValue,
-          limit: 25,
-        });
-      }, 500);
     } else if (newValue === '' && selectedOrganisation.value) {
       // If searchValue is empty and an organization is selected, fetch roles for the selected organization
       timerId.value = setTimeout(async () => {
