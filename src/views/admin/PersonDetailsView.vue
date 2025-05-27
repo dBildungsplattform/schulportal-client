@@ -843,7 +843,7 @@
 
   // This will send the updated list of Zuordnungen to the Backend on TOP of the new added one through the form.
   async function confirmAddition(): Promise<void> {
-    if (selectedKopersNr.value !== null) {
+    if (selectedKopersNr.value) {
       await personenkontextStore.updatePersonenkontexte(
         finalZuordnungenUpdate.value,
         currentPersonId,
@@ -1731,7 +1731,7 @@
               :selectedFamiliennameProps="selectedFamiliennameProps"
               :selectedFamilienname="personStore.currentPerson?.person.name.familienname"
               :selectedKopersNrMetadataProps="selectedKopersNrMetadataProps"
-              :selectedKopersNrMetadata="personStore.currentPerson?.person.personalnummer"
+              :selectedKopersNrMetadata="personStore.currentPerson?.person.personalnummer ?? undefined"
               :hasKopersRolle="hasKopersRolle"
               @update:selectedKopersNrMetadata="handleSelectedKopersNrUpdate"
               @update:selectedVorname="handleSelectedVorname"
@@ -2325,7 +2325,7 @@
                   :hasNoKopersNr="hasNoKopersNr"
                   v-model:selectedKopersNr="selectedKopersNr"
                   :selectedKopersNrProps="selectedKopersNrProps"
-                  @update:selectedKopersNr="(value?: string | null) => (selectedKopersNr = value)"
+                  @update:selectedKopersNr="(value?: string | undefined) => (selectedKopersNr = value)"
                   @update:hasNoKopersNr="(value: boolean | undefined) => (hasNoKopersNr = value)"
                 ></KopersInput>
               </v-container>

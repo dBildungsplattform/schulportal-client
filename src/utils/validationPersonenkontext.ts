@@ -44,7 +44,7 @@ export type PersonenkontextFieldDefinitions = {
   selectedBefristungProps: Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>;
   selectedBefristungOption: Ref<string | undefined>;
   selectedBefristungOptionProps: Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>;
-  selectedKopersNr: Ref<string | undefined | null>;
+  selectedKopersNr: Ref<string | undefined>;
   selectedKopersNrProps: Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>;
 };
 

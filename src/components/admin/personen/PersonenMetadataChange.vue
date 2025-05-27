@@ -10,7 +10,7 @@
   type Props = {
     hasKopersRolle: boolean;
     selectedKopersNrMetadataProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
-    selectedKopersNrMetadata: string | null | undefined;
+    selectedKopersNrMetadata: string | undefined;
     selectedVornameProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedVorname: string | undefined;
     selectedFamiliennameProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
