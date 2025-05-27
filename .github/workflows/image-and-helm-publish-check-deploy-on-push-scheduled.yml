@@ -165,8 +165,8 @@ jobs:
 
           for i in {1..30}; do
             echo "Attempt $i..."
-            if helm search repo dbildungsplattform/$CHART_NAME --version $CHART_VERSION --output json | jq -e '.[] | select(.name == "myrepo/'"$CHART_NAME"'")' > /dev/null; then
-              echo "Chart $CHART_NAME:$CHART_VERSION found!"
+            if helm search repo dbildungsplattform/$CHART_NAME --version $CHART_VERSION | grep -qw "$CHART_VERSION"; then
+              echo "Chart $CHART_NAME-$CHART_VERSION found!"
               exit 0
             fi
             echo "Chart not found yet. Waiting 30 seconds..."
