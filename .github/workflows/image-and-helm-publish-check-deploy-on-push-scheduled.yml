@@ -158,13 +158,14 @@ jobs:
 
           echo "Adding Helm repository $REPO_URL"
           helm repo add dbildungsplattform $REPO_URL
-          helm repo update
+          
 
           echo "Checking for chart $CHART_NAME version $CHART_VERSION in $REPO_URL"
           echo "$(helm search repo dbildungsplattform/$CHART_NAME --version $CHART_VERSION)"
 
           for i in {1..30}; do
             echo "Attempt $i..."
+            helm repo update
             if helm search repo dbildungsplattform/$CHART_NAME --version $CHART_VERSION | grep -qw "$CHART_VERSION"; then
               echo "Chart $CHART_NAME-$CHART_VERSION found!"
               exit 0
