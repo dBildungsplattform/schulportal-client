@@ -157,6 +157,13 @@ jobs:
 
           echo "Checking for chart $CHART_NAME version $CHART_VERSION in $REPO_URL"
 
+          
+          echo "Downloading index.yaml from $REPO_URL"
+          curl -v -s "$REPO_URL/index.yaml" -o index.yaml
+          echo "Contents of index.yaml:"
+          cat index.yaml
+
+
           for i in {1..30}; do
             echo "Attempt $i..."
             curl -s "$REPO_URL/index.yaml" -o index.yaml
@@ -166,8 +173,8 @@ jobs:
               echo "Chart $CHART_NAME:$CHART_VERSION found!"
               exit 0
             fi
-            echo "Chart not found yet. Waiting 60 seconds..."
-            sleep 60
+            echo "Chart not found yet. Waiting 30 seconds..."
+            sleep 30
           done
 
           echo "Chart $CHART_NAME:$CHART_VERSION not found after waiting."
