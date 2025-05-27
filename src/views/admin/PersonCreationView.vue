@@ -461,13 +461,11 @@
   });
 
   onBeforeMount(() => {
-    switch (createType) {
-      case 'limited':
-        headerLabel.value = t('admin.person.addNewLimited');
-        createButtonLabel.value = t('admin.person.addNewLimited');
-        discardButtonLabel.value = t('cancel');
-        createAnotherButtonLabel.value = t('admin.person.addAnotherLimited');
-        break;
+    if (createType === 'limited') {
+      headerLabel.value = t('admin.person.addNewLimited');
+      createButtonLabel.value = t('admin.person.addNewLimited');
+      discardButtonLabel.value = t('cancel');
+      createAnotherButtonLabel.value = t('admin.person.addAnotherLimited');
     }
 
     personenkontextStore.requestedWithSystemrecht =
