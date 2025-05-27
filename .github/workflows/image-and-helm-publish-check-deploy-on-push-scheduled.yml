@@ -154,17 +154,17 @@ jobs:
         run: |
           CHART_NAME=schulportal-client
           CHART_VERSION="${{ github.ref_name == 'main' && '' || needs.create_branch_identifier.outputs.chart_version_from_branch }}"
-          REPO_URL="https://github.com/dBildungsplattform/helm-charts-registry"
+          REPO_URL="https://dbildungsplattform.github.io/helm-charts-registry/"
 
           echo "Adding Helm repository $REPO_URL"
-          helm repo add myrepo $REPO_URL
+          helm repo add dbildungsplattform $REPO_URL
           helm repo update
 
           echo "Checking for chart $CHART_NAME version $CHART_VERSION in $REPO_URL"
 
           for i in {1..30}; do
             echo "Attempt $i..."
-            if helm search repo myrepo/$CHART_NAME --version $CHART_VERSION | grep -q "$CHART_NAME"; then
+            if helm search repo dbildungsplattform/$CHART_NAME --version $CHART_VERSION | grep -q "$CHART_NAME"; then
               echo "Chart $CHART_NAME:$CHART_VERSION found!"
               exit 0
             fi
