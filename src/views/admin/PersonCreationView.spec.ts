@@ -325,6 +325,25 @@ describe('PersonCreationView', () => {
     expect(wrapper?.getComponent({ name: 'PersonenkontextCreate' })).toBeTruthy();
   });
 
+  test('onBeforeMount sets labels and systemrecht for createType limited', async () => {
+    await router.push({ name: 'create-person-limited' });
+    await router.isReady();
+
+    wrapper = mount(PersonCreationView, {
+      attachTo: document.getElementById('app') || '',
+      global: {
+        components: {
+          PersonCreationView,
+        },
+        plugins: [router],
+      },
+    });
+
+    await nextTick();
+    // Check that the systemrecht is set
+    expect(personenkontextStore.requestedWithSystemrecht).toBe(RollenSystemRecht.EingeschraenktNeueBenutzerErstellen);
+  });
+
   it('emits update:calculatedBefristungOption event with a value', async () => {
     const organisationSelect: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
