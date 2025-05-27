@@ -143,6 +143,32 @@ jobs:
       helm_chart_version_generation: ${{ needs.select_helm_version_generation_and_image_tag_generation.outputs.SELECT_HELM_VERSION_GENERATION }}
       helm_chart_version: ${{ github.ref_name == 'main' && '' || needs.create_branch_identifier.outputs.chart_version_from_branch }}
 
+# HERE if the publishment of the new Helm Chart is delayed a older version will get rolled out. We need to fix this, by explicitly checking whether the desired Helm Chart is already published.
+  wait-for-chart:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for Helm chart
+        run: |
+          CHART_NAME=schulportal-client
+          CHART_VERSION="${{ github.ref_name == 'main' && '' || needs.create_branch_identifier.outputs.chart_version_from_branch }}"
+          REPO_URL="https://github.com/dBildungsplattform/helm-charts-registry"
+
+          echo "Checking for chart $CHART_NAME version $CHART_VERSION in $REPO_URL"
+
+          for i in {1..30}; do
+            echo "Attempt $i..."
+            curl -s "$REPO_URL/index.yaml" -o index.yaml
+            if grep -q "$CHART_NAME" index.yaml && grep -q "$CHART_VERSION" index.yaml; then
+              echo "Chart $CHART_NAME:$CHART_VERSION found!"
+              exit 0
+            fi
+            echo "Chart not found yet. Waiting 60 seconds..."
+            sleep 60
+          done
+
+          echo "Chart $CHART_NAME:$CHART_VERSION not found after waiting."
+          exit 1
+
   wait_for_helm_chart_to_get_published:
     needs:
       - release_helm
