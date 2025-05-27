@@ -154,24 +154,17 @@ jobs:
         run: |
           CHART_NAME=schulportal-client
           CHART_VERSION="${{ github.ref_name == 'main' && '' || needs.create_branch_identifier.outputs.chart_version_from_branch }}"
-          
-          REPO_URL="https://raw.githubusercontent.com/dBildungsplattform/helm-charts-registry/main"
+          REPO_URL="https://github.com/dBildungsplattform/helm-charts-registry"
+
+          echo "Adding Helm repository $REPO_URL"
+          helm repo add myrepo $REPO_URL
+          helm repo update
 
           echo "Checking for chart $CHART_NAME version $CHART_VERSION in $REPO_URL"
 
-          
-          echo "Downloading index.yaml from $REPO_URL"
-          curl -v -s "$REPO_URL/index.yaml" -o index.yaml
-          echo "Contents of index.yaml:"
-          cat index.yaml
-
-
           for i in {1..30}; do
             echo "Attempt $i..."
-            curl -s "$REPO_URL/index.yaml" -o index.yaml
-            echo curl -s "$REPO_URL/index.yaml" -o index.yaml
-            echo grep -q "$CHART_NAME" index.yaml && grep -q "$CHART_VERSION" index.yaml
-            if grep -q "$CHART_NAME" index.yaml && grep -q "$CHART_VERSION" index.yaml; then
+            if helm search repo myrepo/$CHART_NAME --version $CHART_VERSION | grep -q "$CHART_NAME"; then
               echo "Chart $CHART_NAME:$CHART_VERSION found!"
               exit 0
             fi
@@ -181,6 +174,7 @@ jobs:
 
           echo "Chart $CHART_NAME:$CHART_VERSION not found after waiting."
           exit 1
+
 
   wait_for_helm_chart_to_get_published:
     needs:
