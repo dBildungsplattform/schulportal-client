@@ -24,7 +24,7 @@
     highlightSelection?: boolean;
     placeholderText?: string;
     administriertVon?: string[] | undefined;
-    storeKey?: string;
+    filterId?: string;
   };
   const props: Props = defineProps<Props>();
   const selectedKlassen: Ref<SelectedKlassenIds> = defineModel('selectedKlassen');
@@ -39,10 +39,10 @@
 
   const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
   const testId: ComputedRef<string> = computed(() => {
-    return props.storeKey ? `${props.storeKey}-klasse-select` : 'klasse-select';
+    return props.filterId ? `${props.filterId}-klasse-select` : 'klasse-select';
   });
   const storeReference: ComputedRef<AutoCompleteStore<Organisation> | undefined> = computed(() => {
-    return organisationStore.klassenFilters.get(props.storeKey ?? '');
+    return organisationStore.klassenFilters.get(props.filterId ?? '');
   });
 
   const klassenFilter: OrganisationenFilter = reactive({
@@ -171,7 +171,7 @@
       const delay: number = oldFilter ? 500 : 0;
 
       timerId.value = setTimeout(async () => {
-        await organisationStore.loadKlassenForFilter(newFilter, props.storeKey);
+        await organisationStore.loadKlassenForFilter(newFilter, props.filterId);
       }, delay);
     },
     { immediate: true },
@@ -185,15 +185,15 @@
   );
 
   onMounted(() => {
-    if (organisationStore.klassenFilters.has(props.storeKey ?? '')) {
+    if (organisationStore.klassenFilters.has(props.filterId ?? '')) {
       // eslint-disable-next-line no-console
-      console.warn(`KlassenFilter initialized twice with id ${props.storeKey}`);
+      console.warn(`KlassenFilter initialized twice with id ${props.filterId}`);
     }
-    organisationStore.resetKlasseFilter(props.storeKey);
+    organisationStore.resetKlasseFilter(props.filterId);
   });
 
   onUnmounted(() => {
-    organisationStore.clearKlasseFilter(props.storeKey);
+    organisationStore.clearKlasseFilter(props.filterId);
   });
 </script>
 
@@ -217,7 +217,7 @@
     required="true"
     variant="outlined"
     @update:search="updateSearchString"
-    @click:clear="organisationStore.resetKlasseFilter(storeKey)"
+    @click:clear="organisationStore.resetKlasseFilter(filterId)"
     v-bind="selectedKlasseProps"
     v-model="selectedKlassen"
     v-model:search="searchInputKlassen"
