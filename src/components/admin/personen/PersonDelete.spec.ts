@@ -1,10 +1,10 @@
-import { expect, test, type MockInstance } from 'vitest';
-import { VueWrapper, mount } from '@vue/test-utils';
-import PersonDelete from './PersonDelete.vue';
-import { createRouter, createWebHistory, type Router } from 'vue-router';
 import routes from '@/router/routes';
+import { VueWrapper, mount } from '@vue/test-utils';
+import { DoFactory } from 'test/DoFactory';
+import { expect, test, type MockInstance } from 'vitest';
 import { nextTick } from 'vue';
-import { EmailAddressStatus } from '@/api-client/generated';
+import { createRouter, createWebHistory, type Router } from 'vue-router';
+import PersonDelete from './PersonDelete.vue';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -30,25 +30,7 @@ beforeEach(async () => {
       isLoading: false,
       disabled: false,
       errorCode: '',
-      person: {
-        person: {
-          id: '2',
-          name: {
-            vorname: 'Albert',
-            familienname: 'Test',
-          },
-          referrer: 'atest',
-          personalnummer: null,
-          isLocked: null,
-          userLock: null,
-          revision: '1',
-          lastModified: '2024-05-22',
-          email: {
-            address: 'email',
-            status: EmailAddressStatus.Requested,
-          },
-        },
-      },
+      person: DoFactory.getPersonendatensatz(),
     },
     global: {
       components: {
@@ -64,7 +46,7 @@ describe('PersonDelete', () => {
     wrapper?.find('[data-testid="open-person-delete-dialog-button"]').trigger('click');
     await nextTick();
 
-    await document.querySelector('[data-testid="person-delete-confirmation-text"]');
+    document.querySelector('[data-testid="person-delete-confirmation-text"]');
     expect(document.querySelector('[data-testid="person-delete-confirmation-text"]')).not.toBeNull();
   });
 
@@ -74,7 +56,7 @@ describe('PersonDelete', () => {
     wrapper?.find('[data-testid="open-person-delete-dialog-button"]').trigger('click');
     await nextTick();
 
-    await document.querySelector('[data-testid="person-delete-confirmation-text"]');
+    document.querySelector('[data-testid="person-delete-confirmation-text"]');
     expect(document.querySelector('[data-testid="person-delete-confirmation-text"]')).not.toBeNull();
 
     const personDeleteButton: HTMLElement | undefined = document.querySelector(
@@ -83,7 +65,7 @@ describe('PersonDelete', () => {
     personDeleteButton.click();
     await nextTick();
 
-    await document.querySelector('[data-testid="person-delete-success-text"]');
+    document.querySelector('[data-testid="person-delete-success-text"]');
     expect(document.querySelector('[data-testid="person-delete-success-text"]')).not.toBeNull();
 
     const closeDialogButton: HTMLElement | undefined = document.querySelector(

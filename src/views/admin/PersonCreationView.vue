@@ -273,7 +273,7 @@
 
   // Converts the ISO UTC formatted Befristung to the german local format, also ISO.
   const translatedBefristung: ComputedRef<string> = computed(() => {
-    const ISOFormattedDate: string | undefined = schuleZuordnungFromCreatedKontext.value[0]?.befristung;
+    const ISOFormattedDate: string | null | undefined = schuleZuordnungFromCreatedKontext.value[0]?.befristung;
 
     if (!ISOFormattedDate) {
       return t('admin.befristung.unlimitedLower');

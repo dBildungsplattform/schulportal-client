@@ -2,9 +2,11 @@
   import ResultTable, { type TableItem, type TableRow } from '@/components/admin/ResultTable.vue';
   import SearchField from '@/components/admin/SearchField.vue';
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
+  import PersonBulkChangeKlasse from '@/components/admin/personen/PersonBulkChangeKlasse.vue';
   import PersonBulkDelete from '@/components/admin/personen/PersonBulkDelete.vue';
   import PersonBulkPasswordReset from '@/components/admin/personen/PersonBulkPasswordReset.vue';
   import RolleModify from '@/components/admin/rollen/RolleModify.vue';
+  import RolleUnassign from '@/components/admin/rollen/RolleUnassign.vue';
   import OrganisationUnassign from '@/components/admin/schulen/OrganisationUnassign.vue';
   import InfoDialog from '@/components/alert/InfoDialog.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
@@ -18,22 +20,17 @@
     OrganisationsTyp,
     useOrganisationStore,
   } from '@/stores/OrganisationStore';
-  import {
-    type PersonStore,
-    type PersonenWithRolleAndZuordnung,
-    type Personendatensatz,
-    SortField,
-    usePersonStore,
-  } from '@/stores/PersonStore';
+  import { type PersonStore, SortField, usePersonStore } from '@/stores/PersonStore';
   import { type PersonenkontextStore, usePersonenkontextStore } from '@/stores/PersonenkontextStore';
   import { type RolleResponse, type RolleStore, RollenArt, useRolleStore } from '@/stores/RolleStore';
   import { type SearchFilterStore, useSearchFilterStore } from '@/stores/SearchFilterStore';
+  import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
   import { type TranslatedObject } from '@/types.d';
+  import { SortOrder } from '@/utils/sorting';
   import { type ComputedRef, type Ref, computed, onMounted, ref, watch } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import { type Router, useRouter } from 'vue-router';
   import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
-  import { SortOrder } from '@/utils/sorting';
 
   const searchFieldComponent: Ref = ref();
 
@@ -49,25 +46,55 @@
   const hasAutoSelectedOrganisation: Ref<boolean> = ref(false);
 
   const selectedPersonIds: Ref<string[]> = ref<string[]>([]);
-  const selectedPersonen: ComputedRef<PersonenWithRolleAndZuordnung> = computed(() => {
-    return (
-      personStore.personenWithUebersicht?.filter((p: PersonenWithRolleAndZuordnung[number]) =>
-        selectedPersonIds.value.includes(p.person.id),
-      ) ?? []
-    );
+  const selectedPersonen: ComputedRef<Map<string, PersonWithZuordnungen>> = computed(() => {
+    const persons: Map<string, PersonWithZuordnungen> = new Map();
+    for (const personId of selectedPersonIds.value) {
+      const person: PersonWithZuordnungen | undefined = personStore.allUebersichten.get(personId);
+      if (!person) continue;
+
+      persons.set(personId, person);
+    }
+    return persons;
   });
   const resultTable: Ref = ref(null);
 
   type ReadonlyHeaders = VDataTableServer['headers'];
+  export type PersonRow = {
+    id: string;
+    familienname: string;
+    vorname: string;
+    referrer: string;
+    personalnummer: string;
+    rollen: string;
+    administrationsebenen: string;
+    klassen: string;
+  };
   const headers: ReadonlyHeaders = [
-    { title: t('person.lastName'), key: 'person.name.familienname', align: 'start' },
-    { title: t('person.firstName'), key: 'person.name.vorname', align: 'start' },
-    { title: t('person.userName'), key: 'person.referrer', align: 'start' },
-    { title: t('person.kopersNr'), key: 'person.personalnummer', align: 'start' },
+    { title: t('person.lastName'), key: 'familienname', align: 'start' },
+    { title: t('person.firstName'), key: 'vorname', align: 'start' },
+    { title: t('person.userName'), key: 'referrer', align: 'start' },
+    { title: t('person.kopersNr'), key: 'personalnummer', align: 'start' },
     { title: t('person.rolle'), key: 'rollen', align: 'start', sortable: false },
     { title: t('person.zuordnungen'), key: 'administrationsebenen', align: 'start', sortable: false },
     { title: t('person.klasse'), key: 'klassen', align: 'start', sortable: false },
   ];
+  const personRows: ComputedRef<Array<PersonRow>> = computed(() => {
+    const rows: Array<PersonRow> = [];
+    for (const personWithZuordnungen of personStore.allUebersichten.values()) {
+      const personRow: PersonRow = {
+        id: personWithZuordnungen.id,
+        familienname: personWithZuordnungen.name.familienname,
+        vorname: personWithZuordnungen.name.vorname,
+        referrer: personWithZuordnungen.referrer,
+        personalnummer: personWithZuordnungen.getPersonalnummerAsString(t('missing')),
+        rollen: personWithZuordnungen.rollenAsString,
+        administrationsebenen: personWithZuordnungen.administrationsebenenAsString,
+        klassen: personWithZuordnungen.klassenZuordnungenAsString,
+      };
+      rows.push(personRow);
+    }
+    return rows;
+  });
 
   const searchInputKlassen: Ref<string> = ref('');
   const searchInputRollen: Ref<string> = ref('');
@@ -90,7 +117,12 @@
   const benutzerDeleteDialogVisible: Ref<boolean> = ref(false);
   const passwordResetDialogVisible: Ref<boolean> = ref(false);
   const organisationUnassignDialogVisible: Ref<boolean> = ref(false);
+  const changeKlasseDialogVisible: Ref<boolean> = ref(false);
+  const rolleUnassignDialogVisible: Ref<boolean> = ref(false);
+
   const onlyOneOrganisationAlertDialogVisible: Ref<boolean> = ref(false);
+  const invalidSelectionAlertMessages: Ref<Array<string>> = ref([]);
+  const onlyOneRolleAlertDialogVisible: Ref<boolean> = ref(false);
 
   const selectedOption: Ref<string | null> = ref(null);
 
@@ -99,14 +131,17 @@
   // Computed property for generating options dynamically for v-selects
   const actions: ComputedRef<TranslatedObject[]> = computed(() => {
     const actionTypeTitles: Map<OperationType, string> = new Map();
-    actionTypeTitles.set(OperationType.MODIFY_ROLLE, t('admin.rolle.assignRolle'));
+
     if (authStore.hasPersonenLoeschenPermission) {
       actionTypeTitles.set(OperationType.DELETE_PERSON, t('admin.person.deletePerson'));
     }
 
     if (authStore.hasPersonenverwaltungPermission) {
+      actionTypeTitles.set(OperationType.MODIFY_ROLLE, t('admin.rolle.assignRolle'));
       actionTypeTitles.set(OperationType.RESET_PASSWORD, t('admin.person.resetPassword'));
       actionTypeTitles.set(OperationType.ORG_UNASSIGN, t('admin.person.bulkUnassignOrganisation.cancelZuordnung'));
+      actionTypeTitles.set(OperationType.CHANGE_KLASSE, t('admin.person.bulkChangeKlasse.transfer'));
+      actionTypeTitles.set(OperationType.ROLLE_UNASSIGN, t('admin.rolle.bulkRollenzuordnung.unassignRolleZuordnung'));
     }
 
     return [...actionTypeTitles.entries()].map(([key, value]: [string, string]) => ({
@@ -294,8 +329,8 @@
     applySearchAndFilters();
   }
 
-  function navigateToPersonDetails(_$event: PointerEvent, { item }: { item: Personendatensatz }): void {
-    router.push({ name: 'person-details', params: { id: item.person.id } });
+  function navigateToPersonDetails(_$event: PointerEvent, { item }: { item: PersonRow }): void {
+    router.push({ name: 'person-details', params: { id: item.id } });
   }
 
   function resetSearchAndFilter(): void {
@@ -458,11 +493,7 @@
     getPaginatedPersonen(searchFilterStore.personenPage);
   }
 
-  const singleSchoolSelected: ComputedRef<boolean> = computed(() => {
-    return selectedOrganisationIds.value.length === 1;
-  });
-
-  const singleSchoolAlertHeader: ComputedRef<string> = computed(() => {
+  const invalidSelectionAlertHeader: ComputedRef<string> = computed(() => {
     return actions.value.find((action: TranslatedObject) => action.value === selectedOption.value)?.title || '';
   });
 
@@ -470,12 +501,53 @@
     return organisationStore.allOrganisationen.find((org: Organisation) => org.id === selectedOrganisationIds.value[0]);
   });
 
-  const checkSingleOrgDisplayDialog = (dialog: Ref<boolean>): void => {
-    if (!singleSchoolSelected.value) {
+  const onlyLernRollenSelected: ComputedRef<boolean> = computed(() => {
+    for (const personId of selectedPersonIds.value) {
+      const person: PersonWithZuordnungen | undefined = personStore.allUebersichten.get(personId);
+      if (!person) continue;
+      const { rollenArten }: PersonWithZuordnungen = person;
+      if (!(rollenArten.size === 1 && rollenArten.has(RollenArt.Lern))) {
+        return false;
+      }
+    }
+    return true;
+  });
+
+  const singleSchuleSelected: ComputedRef<boolean> = computed(() => {
+    return selectedOrganisationIds.value.length === 1;
+  });
+
+  const selectedRolle: ComputedRef<RolleResponse | undefined> = computed(() => {
+    return selectedRollenObjects.value.find((rolle: RolleResponse) => rolle.id === selectedRollen.value[0]);
+  });
+
+  const checkSingleOrgAndOnlyLernDisplayDialog = (dialog: Ref<boolean>): void => {
+    const messages: Array<string> = [];
+    if (!singleSchuleSelected.value) messages.push(t('admin.person.onlyOneSchuleAlert'));
+    if (!onlyLernRollenSelected.value) messages.push(t('admin.person.onlyLernRollenAlert'));
+    if (messages.length > 0) {
       onlyOneOrganisationAlertDialogVisible.value = true;
+      invalidSelectionAlertMessages.value = messages;
       return;
     }
     dialog.value = true;
+  };
+
+  const validateSingleSchuleSelection = (): boolean => {
+    if (!singleSchuleSelected.value) {
+      onlyOneOrganisationAlertDialogVisible.value = true;
+      invalidSelectionAlertMessages.value = [t('admin.person.onlyOneSchuleAlert')];
+      return false;
+    }
+    return true;
+  };
+
+  const validateSingleRolleSelection = (): boolean => {
+    if (selectedRollen.value.length > 1) {
+      onlyOneRolleAlertDialogVisible.value = true;
+      return false;
+    }
+    return true;
   };
 
   // Handle the selected action
@@ -486,14 +558,30 @@
       case OperationType.MODIFY_ROLLE:
         rolleModifiyDialogVisible.value = true;
         break;
+
       case OperationType.DELETE_PERSON:
         benutzerDeleteDialogVisible.value = true;
         break;
+
       case OperationType.RESET_PASSWORD:
-        checkSingleOrgDisplayDialog(passwordResetDialogVisible);
-        break;
       case OperationType.ORG_UNASSIGN:
-        checkSingleOrgDisplayDialog(organisationUnassignDialogVisible);
+        if (validateSingleSchuleSelection()) {
+          if (newValue === OperationType.RESET_PASSWORD) {
+            passwordResetDialogVisible.value = true;
+          } else {
+            organisationUnassignDialogVisible.value = true;
+          }
+        }
+        break;
+
+      case OperationType.ROLLE_UNASSIGN:
+        if (!validateSingleSchuleSelection()) return;
+        if (!validateSingleRolleSelection()) return;
+        rolleUnassignDialogVisible.value = true;
+        break;
+      case OperationType.CHANGE_KLASSE:
+        checkSingleOrgAndOnlyLernDisplayDialog(changeKlasseDialogVisible);
+        break;
     }
   };
 
@@ -517,8 +605,29 @@
     passwordResetDialogVisible.value = false;
     selectedOption.value = null;
   };
+
   const handleUnassignOrgDialog = async (finished: boolean): Promise<void> => {
     organisationUnassignDialogVisible.value = false;
+    selectedOption.value = null;
+    if (finished) {
+      selectedPersonIds.value = [];
+      await getPaginatedPersonen(searchFilterStore.personenPage);
+      resultTable.value.resetSelection();
+    }
+  };
+
+  const handleUnassignRolleDialog = async (finished: boolean): Promise<void> => {
+    rolleUnassignDialogVisible.value = false;
+    selectedOption.value = null;
+    if (finished) {
+      selectedPersonIds.value = [];
+      await getPaginatedPersonen(searchFilterStore.personenPage);
+      resultTable.value.resetSelection();
+    }
+  };
+
+  const handleBulkKlasseChangeDialog = async (finished: boolean): Promise<void> => {
+    changeKlasseDialogVisible.value = false;
     selectedOption.value = null;
     if (finished) {
       selectedPersonIds.value = [];
@@ -534,14 +643,11 @@
 
   // This method filters the selectedPersonIds to avoid items being selected when they are not included in the current table "items"
   function updateSelectedRowsAfterFilter(): void {
-    const visiblePersonIds: string[] | undefined = personStore.personenWithUebersicht?.map(
-      (person: Personendatensatz) => person.person.id,
-    );
-    selectedPersonIds.value = selectedPersonIds.value.filter((id: string) => visiblePersonIds?.includes(id));
+    selectedPersonIds.value = selectedPersonIds.value.filter((id: string) => personStore.allUebersichten.has(id));
   }
   // Whenever the array of items of the table (personStore.personenWithUebersicht) changes (Filters, search function, page update etc...) update the selection.
   watch(
-    () => personStore.personenWithUebersicht,
+    () => personStore.allUebersichten,
     () => {
       updateSelectedRowsAfterFilter();
     },
@@ -851,13 +957,25 @@
             ></v-select>
           </SpshTooltip>
           <InfoDialog
-            id="only-one-school-notice"
+            id="invalid-selection-alert-dialog"
             :isDialogVisible="onlyOneOrganisationAlertDialogVisible"
-            :header="singleSchoolAlertHeader"
-            :message="$t('admin.person.onlyOneSchoolAlert')"
+            :header="invalidSelectionAlertHeader"
+            :messages="invalidSelectionAlertMessages"
             @update:dialogExit="
               () => {
                 onlyOneOrganisationAlertDialogVisible = false;
+                selectedOption = null;
+              }
+            "
+          />
+          <InfoDialog
+            id="only-one-rolle-notice"
+            :isDialogVisible="onlyOneRolleAlertDialogVisible"
+            :header="invalidSelectionAlertHeader"
+            :messages="[$t('admin.person.onlyOneRolleAlert')]"
+            @update:dialogExit="
+              () => {
+                onlyOneRolleAlertDialogVisible = false;
                 selectedOption = null;
               }
             "
@@ -903,6 +1021,25 @@
             @update:dialogExit="handleUnassignOrgDialog($event)"
           >
           </OrganisationUnassign>
+          <RolleUnassign
+            ref="rolle-unassign"
+            v-if="rolleUnassignDialogVisible && selectedOrganisation"
+            :isDialogVisible="rolleUnassignDialogVisible"
+            :organisationen="organisationenForForm"
+            :selectedPersonen
+            :selectedOrganisationFromFilter="selectedOrganisation"
+            :selectedRolleFromFilter="selectedRolle!"
+            @update:dialogExit="handleUnassignRolleDialog($event)"
+          >
+          </RolleUnassign>
+          <PersonBulkChangeKlasse
+            v-if="changeKlasseDialogVisible"
+            :isDialogVisible="changeKlasseDialogVisible"
+            :selectedPersonen
+            :selectedSchuleId="selectedOrganisation?.id"
+            :availableKlassen="klassenOptions"
+            @update:dialog-exit="handleBulkKlasseChangeDialog"
+          />
         </v-col>
         <!-- Display the number of selected checkboxes -->
         <v-col
@@ -929,14 +1066,13 @@
         :currentPage="searchFilterStore.personenPage"
         data-testid="person-table"
         ref="resultTable"
-        :items="personStore.personenWithUebersicht || []"
+        :items="personRows"
         :itemsPerPage="searchFilterStore.personenPerPage"
         :loading="personStore.loading"
         :headers="headers"
         :currentSort="searchFilterStore.currentSort"
         @onHandleRowClick="
-          (event: PointerEvent, item: TableRow<unknown>) =>
-            navigateToPersonDetails(event, item as TableRow<Personendatensatz>)
+          (event: PointerEvent, item: TableRow<unknown>) => navigateToPersonDetails(event, item as TableRow<PersonRow>)
         "
         @onItemsPerPageUpdate="getPaginatedPersonenWithLimit"
         @onPageUpdate="getPaginatedPersonen"
@@ -944,7 +1080,7 @@
         @update:selectedRows="handleSelectedRows"
         :modelValue="selectedPersonIds as unknown as TableItem[]"
         :totalItems="personStore.totalPersons"
-        item-value-path="person.id"
+        item-value-path="id"
         ><template v-slot:[`item.rollen`]="{ item }">
           <div
             class="ellipsis-wrapper"

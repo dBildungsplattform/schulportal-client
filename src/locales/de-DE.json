@@ -159,9 +159,9 @@
       "backToCreatePerson": "Zurück zur Benutzeranlage",
       "backToInput": "Zurück zur Eingabe",
       "stateEmployeeSearch": {
-        "addPerson":"Person hinzufügen",
-        "search":"Landesbediensteter (Nur Suche)",
-        "anotherPerson":"Andere Person (Neuanlage)"
+        "addPerson": "Person hinzufügen",
+        "search": "Landesbediensteter (Nur Suche)",
+        "anotherPerson": "Andere Person (Neuanlage)"
       },
       "bulk": {
         "bulkErrorMessage": "Die Aktion {bulkOperationName} konnte für die folgenden Benutzer nicht ausgeführt werden. \n\nSie können sich die Liste für eine spätere Bearbeitung abspeichern. Die Daten stehen nach dem Schließen dieses Dialogs nicht mehr zur Verfügung. Sollten Sie Hilfe benötigen, eröffnen Sie ein Störungsticket über den IQSH-Helpdesk und fügen Sie die Liste als Anhang an.",
@@ -175,9 +175,9 @@
           "info": "Bitte laden Sie die Datei mit den temporären Passwörtern herunter und teilen Sie den Benutzern die Passwörter mit. Nach dem Schließen des Dialogs ist ein Herunterladen aus Sicherheitsgründen nicht mehr möglich.",
           "success": "Die Passwörter wurden erfolgreich zurückgesetzt."
         },
-      "closeList": "Liste schließen",
-      "saveList": "Liste speichern",
-      "closeBulkErrorDialogConfirmationMessage" :"Bevor Sie den Dialog schließen, stellen Sie bitte sicher, dass Sie die Liste der Fehlermeldungen gespeichert haben. Die Daten stehen nach dem Schließen dieses Dialogs nicht mehr zur Verfügung."
+        "closeList": "Liste schließen",
+        "saveList": "Liste speichern",
+        "closeBulkErrorDialogConfirmationMessage": "Bevor Sie den Dialog schließen, stellen Sie bitte sicher, dass Sie die Liste der Fehlermeldungen gespeichert haben. Die Daten stehen nach dem Schließen dieses Dialogs nicht mehr zur Verfügung."
       },
       "bulkRolleModify": {
         "noKopersNrInfoText": "Bitte beachten: Alle ausgewählten Benutzerkonten müssen über eine KoPers.-Nr. verfügen. Tragen Sie diese ggf. bitte in der Gesamtübersicht des Benutzers nach, sobald sie Ihnen vorliegt. Ein Benutzerkonto mit der gewählten Rolle ohne KoPers.-Nr. wird nach spätestens 8 Wochen automatisch gesperrt."
@@ -185,10 +185,20 @@
       "bulkUnassignOrganisation": {
         "cancelZuordnung": "Schulzuordnung aufheben",
         "confirmation": "Möchten Sie wirklich die Schulzuordnungen der ausgewählten Benutzer aufheben?",
-        "affectedSchool": "Betroffene Schule: {schule}",
+        "affectedSchule": "Betroffene Schule: {schule}",
         "success": "Die Schulzuordnungen wurden erfolgreich entfernt."
       },
-      "onlyOneSchoolAlert": "Bitte wählen Sie im Filter genau eine Schule aus, um die Aktion durchzuführen.",
+      "bulkChangeKlasse": {
+        "transfer": "Schüler versetzen",
+        "nextKlasse": "Neue Klasse",
+        "success": "Die ausgewählten Schülerinnen und Schüler wurden erfolgreich versetzt.",
+        "error": {
+          "onlySus": "Bitte wählen Sie nur Benutzer mit einer Schülerrolle aus, um die Aktion durchzuführen"
+        }
+      },
+      "onlyOneSchuleAlert": "Bitte wählen Sie im Filter genau eine Schule aus, um die Aktion durchzuführen.",
+      "onlyOneRolleAlert": "Bitte wählen Sie im Filter genau eine Rolle aus, um die Aktion durchzuführen.",
+      "onlyLernRollenAlert": "Bitte wählen Sie nur Benutzer mit einer Schülerrolle aus, um die Aktion durchzuführen.",
       "changePassword": "Passwort ändern",
       "copyPasswordError": "Passwort konnte nicht in die Zwischenablage kopiert werden",
       "copyPasswordSuccess": "Passwort in Zwischenablage kopiert",
@@ -384,6 +394,10 @@
       "assignRollenart": "Rollenart zuordnen",
       "assignSystemrechte": "Systemrechte zuordnen",
       "backToCreateRolle": "Zurück zur Rollenanlage",
+      "bulkRollenzuordnung": {
+        "unassignRolleZuordnung": "Rolle entziehen",
+        "success": "Die Rolle wurde erfolgreich entfernt."
+      },
       "create": "Rolle anlegen",
       "createAnother": "Weitere Rolle anlegen",
       "createNew": "Neue Rolle anlegen",
@@ -429,8 +443,8 @@
           "BULK_VERWALTEN": "Darf Mehrfachbearbeitung ausführen",
           "SCHULPORTAL_VERWALTEN": "Darf Portal verwalten",
           "HINWEISE_BEARBEITEN": "Darf Hinweise bearbeiten",
-          "LANDESBEDIENSTETE_SUCHEN_UND_HINZUFUEGEN":"Darf Landesbedienstete suchen und hinzufügen",
-          "EINGESCHRAENKT_NEUE_BENUTZER_ERSTELLEN":"Darf eingeschränkt neue Benutzer erstellen"
+          "LANDESBEDIENSTETE_SUCHEN_UND_HINZUFUEGEN": "Darf Landesbedienstete suchen und hinzufügen",
+          "EINGESCHRAENKT_NEUE_BENUTZER_ERSTELLEN": "Darf eingeschränkt neue Benutzer erstellen"
         },
         "rollenarten": {
           "LERN": "Lern",
@@ -458,7 +472,7 @@
       "rollenSelected": "{count} Rollen ausgewählt",
       "rolleAddedSuccessfully": "Die Rolle wurde erfolgreich hinzugefügt.",
       "rolleUpdatedSuccessfully": "Die Rolle wurde erfolgreich geändert.",
-      "rollenAssignedSuccessfully": "Die Rollen wurden erfolgreich zugeordnet.",
+      "rollenAssignedSuccessfully": "Die Rolle wurde erfolgreich zugeordnet.",
       "rules": {
         "rolle": {
           "required": "Die Rolle muss ausgewählt werden."

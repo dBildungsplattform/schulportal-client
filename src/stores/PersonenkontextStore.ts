@@ -1,31 +1,28 @@
-import { defineStore, type Store, type StoreDefinition } from 'pinia';
+import axiosApiInstance from '@/services/ApiService';
 import { getResponseErrorCode } from '@/utils/errorHandlers';
+import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import {
-  PersonenkontexteApiFactory,
-  type FindRollenResponse,
-  type DBiamPersonenkontextResponse,
-  type DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response,
-  type PersonenkontexteApiInterface,
-  type SystemrechtResponse,
-  PersonenkontextApiFactory,
-  type PersonenkontextApiInterface,
-  OrganisationsTyp,
-  type DbiamUpdatePersonenkontexteBodyParams,
-  type PersonenkontexteUpdateResponse,
-  type DbiamPersonenkontextBodyParams,
-  type PersonenkontextWorkflowResponse,
-  type DbiamCreatePersonWithPersonenkontexteBodyParams,
-  type DBiamPersonResponse,
-  type PersonendatensatzResponse,
-  type PersonAdministrationApiInterface,
   PersonAdministrationApiFactory,
-  RollenMerkmal,
-  RollenArt,
+  PersonenkontextApiFactory,
+  PersonenkontexteApiFactory,
   type DbiamCreatePersonenkontextBodyParams,
+  type DbiamCreatePersonWithPersonenkontexteBodyParams,
+  type DbiamPersonenkontextBodyParams,
+  type DBiamPersonenkontextResponse,
+  type DBiamPersonResponse,
+  type DbiamUpdatePersonenkontexteBodyParams,
+  type FindRollenResponse,
+  type PersonAdministrationApiInterface,
+  type PersonendatensatzResponse,
+  type PersonenkontextApiInterface,
+  type PersonenkontexteApiInterface,
+  type PersonenkontexteUpdateResponse,
+  type PersonenkontextWorkflowResponse,
+  type SystemrechtResponse,
   RollenSystemRecht,
 } from '../api-client/generated/api';
-import axiosApiInstance from '@/services/ApiService';
 import { usePersonStore, type PersonStore } from './PersonStore';
+import type { Zuordnung } from './types/Zuordnung';
 
 const personenKontextApi: PersonenkontextApiInterface = PersonenkontextApiFactory(undefined, '', axiosApiInstance);
 const personenKontexteApi: PersonenkontexteApiInterface = PersonenkontexteApiFactory(undefined, '', axiosApiInstance);
@@ -45,21 +42,7 @@ export enum PersonenKontextTyp {
   Klasse = 'KLASSE',
 }
 
-export type Zuordnung = {
-  klasse?: string | undefined;
-  sskId: string;
-  rolleId: string;
-  sskName: string;
-  sskDstNr?: string;
-  rolle: string;
-  rollenArt: RollenArt;
-  administriertVon: string;
-  typ: OrganisationsTyp;
-  editable: boolean;
-  merkmale: RollenMerkmal;
-  befristung?: string;
-  admins?: string[];
-};
+export type PersonenkontextUpdate = Pick<DbiamPersonenkontextBodyParams, 'organisationId' | 'rolleId' | 'befristung'>;
 
 export type WorkflowFilter = {
   organisationId?: string;
@@ -69,8 +52,18 @@ export type WorkflowFilter = {
   limit?: number;
 };
 
+export function mapZuordnungToPersonenkontextUpdate(
+  zuordnung: Pick<Zuordnung, 'sskId' | 'rolleId' | 'befristung'>,
+): PersonenkontextUpdate {
+  const befristung: string | undefined = zuordnung.befristung ?? undefined;
+  return {
+    organisationId: zuordnung.sskId,
+    rolleId: zuordnung.rolleId,
+    befristung,
+  };
+}
+
 type PersonenkontextState = {
-  allUebersichten: DBiamPersonenuebersichtControllerFindPersonenuebersichten200Response | null;
   updatedPersonenkontexte: PersonenkontexteUpdateResponse | null;
   workflowStepResponse: PersonenkontextWorkflowResponse | null;
   filteredRollen: FindRollenResponse | null;
@@ -88,7 +81,7 @@ type PersonenkontextActions = {
   processWorkflowStep: (filter?: WorkflowFilter) => Promise<PersonenkontextWorkflowResponse>;
   getPersonenkontextRolleWithFilter: (rolleName: string, limit?: number) => Promise<void>;
   updatePersonenkontexte: (
-    combinedZuordnungen: Zuordnung[] | undefined,
+    updatedPersonenkontexte: PersonenkontextUpdate[] | undefined,
     personId: string,
     personalnummer?: string,
   ) => Promise<void>;
@@ -98,14 +91,13 @@ type PersonenkontextActions = {
 };
 
 export type {
-  SystemrechtResponse,
-  DbiamUpdatePersonenkontexteBodyParams,
-  DBiamPersonenkontextResponse,
   DbiamPersonenkontextBodyParams,
-  PersonenkontextWorkflowResponse,
+  DBiamPersonenkontextResponse,
+  DbiamUpdatePersonenkontexteBodyParams,
   PersonenkontexteUpdateResponse,
+  PersonenkontextWorkflowResponse,
+  SystemrechtResponse,
 };
-export type CreatedPersonenkontext = DbiamPersonenkontextBodyParams;
 export type { DbiamCreatePersonenkontextBodyParams };
 export type UserinfoPersonenkontext = {
   organisationsId: string;
@@ -127,11 +119,9 @@ export const usePersonenkontextStore: StoreDefinition<
   PersonenkontextState,
   PersonenkontextGetters,
   PersonenkontextActions
-> = defineStore({
-  id: 'personenkontextStore',
+> = defineStore('personenkontextStore', {
   state: (): PersonenkontextState => {
     return {
-      allUebersichten: null,
       workflowStepResponse: null,
       updatedPersonenkontexte: null,
       filteredRollen: null,
@@ -196,7 +186,7 @@ export const usePersonenkontextStore: StoreDefinition<
     },
 
     async updatePersonenkontexte(
-      combinedZuordnungen: Zuordnung[] | undefined,
+      updatedPersonenkontexte: PersonenkontextUpdate[] | undefined,
       personId: string,
       personalnummer?: string,
     ): Promise<void> {
@@ -207,12 +197,11 @@ export const usePersonenkontextStore: StoreDefinition<
         const updateParams: DbiamUpdatePersonenkontexteBodyParams = {
           lastModified: personStore.personenuebersicht?.lastModifiedZuordnungen ?? undefined,
           count: personStore.personenuebersicht?.zuordnungen.length ?? 0,
-          personenkontexte: combinedZuordnungen?.map((zuordnung: Zuordnung) => ({
-            personId: personId,
-            organisationId: zuordnung.sskId,
-            rolleId: zuordnung.rolleId,
-            befristung: zuordnung.befristung,
-          })) as DbiamPersonenkontextBodyParams[],
+          personenkontexte:
+            updatedPersonenkontexte?.map((personenkontextUpdate: PersonenkontextUpdate) => ({
+              personId: personId,
+              ...personenkontextUpdate,
+            })) ?? [],
         };
         const { data }: { data: PersonenkontexteUpdateResponse } =
           await personenKontextApi.dbiamPersonenkontextWorkflowControllerCommit(personId, updateParams, personalnummer);
@@ -223,6 +212,7 @@ export const usePersonenkontextStore: StoreDefinition<
         this.loading = false;
       }
     },
+
     async createPersonWithKontexte(
       params: DbiamCreatePersonWithPersonenkontexteBodyParams,
     ): Promise<DBiamPersonResponse> {

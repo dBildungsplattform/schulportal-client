@@ -4054,7 +4054,7 @@
         "parameters": [],
         "responses": {
           "201": {
-            "description": "User were successfully removed.",
+            "description": "Users were successfully removed.",
             "content": {
               "application/json": {
                 "schema": {
@@ -4064,19 +4064,19 @@
             }
           },
           "400": {
-            "description": "User are not given or not found"
+            "description": "Users are not given or not found"
           },
           "401": {
-            "description": "Not authorized to remove user."
+            "description": "Not authorized to remove users."
           },
           "403": {
-            "description": "Insufficient permissions to delete user."
+            "description": "Insufficient permissions to delete users."
           },
           "404": {
-            "description": "Insufficient permissions to delete user."
+            "description": "Insufficient permissions to delete users."
           },
           "500": {
-            "description": "Internal server error while trying to remove user."
+            "description": "Internal server error while trying to remove users."
           }
         },
         "tags": [
@@ -5837,7 +5837,8 @@
             "type": "string"
           },
           "sskDstNr": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "rolle": {
             "type": "string"
@@ -5858,13 +5859,17 @@
           },
           "befristung": {
             "format": "date-time",
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "merkmale": {
-            "nullable": true,
-            "$ref": "#/components/schemas/RollenMerkmal"
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RollenMerkmal"
+            }
           },
           "admins": {
+            "nullable": true,
             "type": "array",
             "items": {
               "type": "string"
@@ -7107,7 +7112,8 @@
             "type": "string"
           },
           "befristung": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           }
         },
         "required": [

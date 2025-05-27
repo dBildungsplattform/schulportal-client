@@ -1,14 +1,18 @@
-import { test, type MockInstance } from 'vitest';
-import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
-import { createRouter, createWebHistory, type Router } from 'vue-router';
 import routes from '@/router/routes';
-import PersonBulkDelete from './PersonBulkDelete.vue';
-import { nextTick } from 'vue';
 import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
+import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
+import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
+import { DoFactory } from 'test/DoFactory';
+import { test, type MockInstance } from 'vitest';
+import { nextTick } from 'vue';
+import { createRouter, createWebHistory, type Router } from 'vue-router';
+import PersonBulkDelete from './PersonBulkDelete.vue';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
 const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
+
+const personWithZuordnungen: PersonWithZuordnungen = DoFactory.getPersonWithZuordnung();
 
 beforeEach(async () => {
   // Create a container for the app and append it to the document body
@@ -31,30 +35,7 @@ beforeEach(async () => {
       isLoading: false,
       errorCode: '',
       isDialogVisible: true,
-      selectedPersonen: [
-        {
-          administrationsebenen: '',
-          klassen: '1a',
-          rollen: '',
-          person: {
-            id: 'test',
-            name: {
-              familienname: 'Pan',
-              vorname: 'Peter',
-            },
-            referrer: 'ppan',
-            revision: '1',
-            email: {
-              address: 'ppan@wunderland',
-              status: 'ENABLED',
-            },
-            isLocked: null,
-            lastModified: '',
-            personalnummer: '1234',
-            userLock: null,
-          },
-        },
-      ],
+      selectedPersonen: new Map([[personWithZuordnungen.id, personWithZuordnungen]]),
     },
     global: {
       components: {

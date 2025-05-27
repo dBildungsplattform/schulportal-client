@@ -1,18 +1,21 @@
+import { OrganisationsTyp, RollenArt, RollenMerkmal, ServiceProviderKategorie } from '@/api-client/generated/api';
 import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+import { MeldungStatus, useMeldungStore, type MeldungStore } from '@/stores/MeldungStore';
+import { usePersonInfoStore, type PersonInfoResponse, type PersonInfoStore } from '@/stores/PersonInfoStore';
+import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
 import {
   useServiceProviderStore,
   type ServiceProvider,
   type ServiceProviderStore,
 } from '@/stores/ServiceProviderStore';
+import { PersonenUebersicht } from '@/stores/types/PersonenUebersicht';
+import { faker } from '@faker-js/faker';
 import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
+import { DoFactory } from 'test/DoFactory';
 import { expect, test, type Mock } from 'vitest';
 import { nextTick } from 'vue';
 import StartView from './StartView.vue';
-import { type PersonStore, usePersonStore, type PersonWithUebersicht } from '@/stores/PersonStore';
-import { usePersonInfoStore, type PersonInfoResponse, type PersonInfoStore } from '@/stores/PersonInfoStore';
-import { OrganisationsTyp, RollenArt, RollenMerkmal, ServiceProviderKategorie } from '@/api-client/generated/api';
-import { MeldungStatus, useMeldungStore, type MeldungStore } from '@/stores/MeldungStore';
 
 let wrapper: VueWrapper | null = null;
 let authStore: AuthStore;
@@ -83,43 +86,27 @@ const mockPerson: PersonInfoResponse = {
   email: null,
 };
 
-const mockPersonenUebersicht: PersonWithUebersicht = {
-  personId: '1234',
-  vorname: 'Samuel',
-  nachname: 'Vimes',
-  benutzername: 'samuelvimes',
-  lastModifiedZuordnungen: '2021-09-01T12:00:00Z',
-  zuordnungen: [
-    {
-      sskId: '1',
-      rolleId: '1',
-      sskName: 'Muster-Schule',
-      sskDstNr: '123456',
-      rolle: 'Lehrer',
-      administriertVon: 'root-sh',
+const mockPersonenUebersicht: PersonenUebersicht = new PersonenUebersicht(
+  '1234',
+  'Samuel',
+  'Vimes',
+  'samuelvimes',
+  '2021-09-01T12:00:00Z',
+  [
+    DoFactory.getZuordnung({
       typ: OrganisationsTyp.Schule,
-      editable: true,
-      merkmale: ['KOPERS_PFLICHT'] as unknown as RollenMerkmal,
-      befristung: '2024-05-06',
+      merkmale: [RollenMerkmal.KopersPflicht],
+      befristung: faker.date.soon().toISOString(),
       rollenArt: RollenArt.Lehr,
-      admins: [],
-    },
-    {
-      sskId: '2',
-      rolleId: '1',
-      sskName: 'Anders-Sonderlich-Schule',
-      sskDstNr: '789101112',
-      rolle: 'Lehrer',
-      administriertVon: 'root-sh',
+    }),
+    DoFactory.getZuordnung({
       typ: OrganisationsTyp.Schule,
-      editable: true,
-      merkmale: ['KOPERS_PFLICHT'] as unknown as RollenMerkmal,
-      befristung: '2024-05-06',
+      merkmale: [RollenMerkmal.KopersPflicht],
+      befristung: faker.date.soon().toISOString(),
       rollenArt: RollenArt.Lehr,
-      admins: [],
-    },
+    }),
   ],
-};
+);
 
 const locationMock: Mock = vi.fn(() => ({
   pathname: 'test',

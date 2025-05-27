@@ -1,21 +1,22 @@
 <script setup lang="ts">
-  import { computed, type ComputedRef, type Ref, ref, watch } from 'vue';
-  import { RollenArt } from '@/stores/RolleStore';
-  import { useI18n } from 'vue-i18n';
+  import type { BefristungProps } from '@/components/admin/personen/BefristungInput.vue';
+  import BefristungInput from '@/components/admin/personen/BefristungInput.vue';
   import FormRow from '@/components/form/FormRow.vue';
-  import { usePersonenkontextStore, type PersonenkontextStore, type Zuordnung } from '@/stores/PersonenkontextStore';
+  import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
   import {
     OrganisationsTyp,
     useOrganisationStore,
     type Organisation,
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
+  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
+  import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
+  import { RollenArt } from '@/stores/RolleStore';
+  import type { Zuordnung } from '@/stores/types/Zuordnung';
   import { type TranslatedObject } from '@/types.d';
   import type { BaseFieldProps } from 'vee-validate';
-  import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
-  import BefristungInput from '@/components/admin/personen/BefristungInput.vue';
-  import type { BefristungProps } from '@/components/admin/personen/BefristungInput.vue';
-  import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
+  import { computed, ref, watch, type ComputedRef, type Ref } from 'vue';
+  import { useI18n } from 'vue-i18n';
 
   useI18n({ useScope: 'global' });
 
@@ -38,17 +39,18 @@
     rollen: TranslatedRolleWithAttrs[] | undefined;
     selectedOrganisation: string | undefined;
     showHeadline: boolean;
-    selectedOrganisationProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     klassen?: TranslatedObject[] | undefined;
     selectedRolle?: string | undefined;
     selectedRollen?: string[] | undefined;
     selectedKlasse?: string | undefined;
+    selectedOrganisationProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedKlasseProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedRolleProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedRollenProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     isModifyRolleDialog?: boolean;
     befristungInputProps?: BefristungProps;
     allowMultipleRollen?: boolean;
+    isRolleUnassignForm?: boolean;
   };
 
   const props: Props = defineProps<Props>();
@@ -224,12 +226,6 @@
         });
       }, 500);
     } else if (newValue && newValue !== selectedOrganisationTitle.value) {
-      // If searchValue is not empty and different from the current title, proceed with the search
-      // Reset selectedRolle only if it's a new search and not when selecting an organization
-      selectedRolle.value = undefined;
-      emits('fieldReset', 'selectedRolle');
-      emits('update:selectedRolle', undefined);
-
       timerId.value = setTimeout(async () => {
         await personenkontextStore.processWorkflowStep({
           organisationName: newValue,
@@ -349,7 +345,7 @@
     <!-- Organisation zuordnen -->
     <FormRow
       ref="form-row"
-      :errorLabel="selectedOrganisationProps['error']"
+      :errorLabel="selectedOrganisationProps?.['error'] ?? false"
       :isRequired="true"
       labelForId="organisation-select"
       :label="$t('admin.organisation.organisation')"
@@ -357,12 +353,15 @@
       <v-autocomplete
         class="mb-5"
         autocomplete="off"
-        :class="[{ 'filter-dropdown mb-4': hasAutoselectedSchule }, { selected: selectedOrganisation }]"
+        :class="[
+          { 'filter-dropdown mb-4': hasAutoselectedSchule || isRolleUnassignForm },
+          { selected: selectedOrganisation },
+        ]"
         clearable
         :click:clear="clearSelectedOrganisation"
         data-testid="organisation-select"
         density="compact"
-        :disabled="hasAutoselectedSchule"
+        :disabled="hasAutoselectedSchule || isRolleUnassignForm"
         id="organisation-select"
         ref="organisation-select"
         hide-details
@@ -440,7 +439,7 @@
         v-if="
           allowMultipleRollen
             ? isLernRolle(selectedRollen) && selectedOrganisation
-            : isLernRolle(selectedRolle) && selectedOrganisation
+            : isLernRolle(selectedRolle) && selectedOrganisation && !isRolleUnassignForm
         "
         :errorLabel="selectedKlasseProps?.['error'] || false"
         :isRequired="true"
@@ -479,7 +478,8 @@
         v-if="
           selectedOrganisation &&
           (allowMultipleRollen ? (selectedRollen?.length ?? 0) > 0 : selectedRolle) &&
-          !isModifyRolleDialog
+          !isModifyRolleDialog &&
+          props.befristungInputProps
         "
         :befristungProps="befristungInputProps?.befristungProps"
         :befristungOptionProps="befristungInputProps?.befristungOptionProps"

@@ -1,27 +1,23 @@
 <script setup lang="ts">
-  import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { type Organisation } from '@/stores/OrganisationStore';
-  import { computed, ref, type ComputedRef, type Ref } from 'vue';
-  import { type Composer, useI18n } from 'vue-i18n';
-  import { useDisplay } from 'vuetify';
-  import { getDisplayNameForOrg } from '@/utils/formatting';
-  import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
-  import { type BulkErrorList, useBulkErrors } from '@/composables/useBulkErrors';
-  import type { PersonenWithRolleAndZuordnung } from '@/stores/PersonStore';
   import PersonBulkError from '@/components/admin/personen/PersonBulkError.vue';
-  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import { useBulkErrors, type BulkErrorList } from '@/composables/useBulkErrors';
+  import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
+  import { type Organisation } from '@/stores/OrganisationStore';
+  import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
+  import { getDisplayNameForOrg } from '@/utils/formatting';
+  import { computed, ref, type ComputedRef, type Ref } from 'vue';
+  import { useI18n, type Composer } from 'vue-i18n';
+  import { useDisplay } from 'vuetify';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
-  const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
-
-  type PersonWithRolleAndZuordnung = PersonenWithRolleAndZuordnung[number];
 
   type Props = {
     isDialogVisible: boolean;
-    selectedPersonen: PersonenWithRolleAndZuordnung;
+    selectedPersonen: Map<string, PersonWithZuordnungen>;
     selectedOrganisation: Organisation;
   };
 
@@ -32,19 +28,18 @@
 
   async function closeDialog(finished: boolean): Promise<void> {
     bulkOperationStore.resetState();
-    personenkontextStore.$reset();
     emit('update:dialogExit', finished);
   }
 
   const showErrorDialog: Ref<boolean, boolean> = ref(false);
 
   // Define the error list for the selected persons using the useBulkErrors composable
-  const bulkErrorList: ComputedRef<BulkErrorList[]> = computed(() => useBulkErrors(props.selectedPersonen));
+  const bulkErrorList: ComputedRef<BulkErrorList[]> = computed(() => useBulkErrors(t, props.selectedPersonen));
 
   async function handleOrgUnassign(): Promise<void> {
     await bulkOperationStore.bulkUnassignPersonenFromOrg(
       props.selectedOrganisation.id,
-      props.selectedPersonen.map((person: PersonWithRolleAndZuordnung) => person.person.id),
+      Array.from(props.selectedPersonen.keys()),
     );
 
     if (bulkOperationStore.currentOperation?.errors && bulkOperationStore.currentOperation.errors.size > 0) {
@@ -77,7 +72,7 @@
             </div>
             <div data-testid="org-unassign-affected-school">
               {{
-                t('admin.person.bulkUnassignOrganisation.affectedSchool', {
+                t('admin.person.bulkUnassignOrganisation.affectedSchule', {
                   schule: getDisplayNameForOrg(selectedOrganisation),
                 })
               }}

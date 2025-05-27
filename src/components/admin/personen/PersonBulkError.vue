@@ -1,9 +1,9 @@
 <script setup lang="ts">
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import { buildCSV, download } from '@/utils/file';
   import { ref, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
-  import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { buildCSV, download } from '@/utils/file';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
@@ -133,7 +133,6 @@
             })
           }}
         </p>
-
         <ol>
           <li
             v-for="(entry, index) in props.errors"

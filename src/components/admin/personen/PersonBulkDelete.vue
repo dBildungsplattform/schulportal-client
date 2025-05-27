@@ -1,12 +1,13 @@
 <script setup lang="ts">
-  import { computed, type ComputedRef, type Ref, ref } from 'vue';
-  import { type Composer, useI18n } from 'vue-i18n';
-  import { useDisplay } from 'vuetify';
-  import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
-  import { useBulkErrors, type BulkErrorList } from '@/composables/useBulkErrors';
-  import { usePersonStore, type PersonenWithRolleAndZuordnung, type PersonStore } from '@/stores/PersonStore';
   import PersonBulkError from '@/components/admin/personen/PersonBulkError.vue';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import { useBulkErrors, type BulkErrorList } from '@/composables/useBulkErrors';
+  import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
+  import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
+  import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
+  import { computed, ref, type ComputedRef, type Ref } from 'vue';
+  import { useI18n, type Composer } from 'vue-i18n';
+  import { useDisplay } from 'vuetify';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
@@ -24,7 +25,7 @@
     errorCode: string;
     isLoading: boolean;
     isDialogVisible: boolean;
-    selectedPersonen: PersonenWithRolleAndZuordnung;
+    selectedPersonen: Map<string, PersonWithZuordnungen>;
   };
 
   type Emits = (event: 'update:dialogExit', finished: boolean) => void;
@@ -34,7 +35,7 @@
   const showDeletePersonDialog: Ref<boolean> = ref(props.isDialogVisible);
 
   // Define the error list for the selected persons using the useBulkErrors composable
-  const bulkErrorList: ComputedRef<BulkErrorList[]> = computed(() => useBulkErrors(props.selectedPersonen));
+  const bulkErrorList: ComputedRef<BulkErrorList[]> = computed(() => useBulkErrors(t, props.selectedPersonen));
 
   async function closeDeletePersonDialog(finished: boolean): Promise<void> {
     if (bulkOperationStore.currentOperation) {
@@ -154,7 +155,7 @@
               :block="mdAndDown"
               :disabled="bulkOperationStore.currentOperation?.isRunning"
               class="primary"
-              @click="handleDeletePerson(props.selectedPersonen.map((person) => person.person.id))"
+              @click="handleDeletePerson(Array.from(props.selectedPersonen.keys()))"
               data-testid="person-delete-submit-button"
               type="submit"
             >
