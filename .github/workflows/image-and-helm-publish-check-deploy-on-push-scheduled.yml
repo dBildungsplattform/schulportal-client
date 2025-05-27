@@ -161,6 +161,7 @@ jobs:
           helm repo update
 
           echo "Checking for chart $CHART_NAME version $CHART_VERSION in $REPO_URL"
+          echo "$(helm search repo dbildungsplattform/$CHART_NAME --version $CHART_VERSION)"
 
           for i in {1..30}; do
             echo "Attempt $i..."
