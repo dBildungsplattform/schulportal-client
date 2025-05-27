@@ -367,7 +367,8 @@
         "PERSONALNUMMER_NICHT_EINDEUTIG": "KoPers.-Nr. nicht eindeutig",
         "PERSONENKONTEXTE_UPDATE_ERROR": "Geänderte Daten",
         "PERSON_NOT_FOUND": "Benutzer gelöscht",
-        "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Zwei-Faktor-Authentifizierung (2FA) erforderlich"
+        "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Zwei-Faktor-Authentifizierung (2FA) erforderlich",
+        "LERN_HAT_KEINE_KLASSE": "Unvollständige Zuordnung"
       },
       "errors": {
         "fallbackError": "Es ist ein technischer Fehler aufgetreten.",
@@ -382,7 +383,8 @@
         "PERSONENKONTEXT_SPECIFICATION_ERROR": "Die Zuordnung konnte nicht angelegt werden.",
         "PERSONENKONTEXTE_UPDATE_ERROR": "Die Zuordnung konnte nicht aktualisiert werden. Bitte versuchen Sie es später erneut.",
         "PERSON_NOT_FOUND": "Der Benutzer wurde seit Ihrer letzten Änderung gelöscht und kann nicht mehr bearbeitet werden.",
-        "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Die letzte Aktion konnte nicht ausgeführt werden. Aufgrund von längerer Inaktivität ist eine erneute Authentifizierung mit einem zweiten Faktor erforderlich. Um fortzufahren, klicken Sie bitte auf „Zurück zur Ergebnisliste“ oder „Schließen“. Sie werden anschließend zur Eingabe Ihres zweiten Faktors aufgefordert."
+        "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Die letzte Aktion konnte nicht ausgeführt werden. Aufgrund von längerer Inaktivität ist eine erneute Authentifizierung mit einem zweiten Faktor erforderlich. Um fortzufahren, klicken Sie bitte auf „Zurück zur Ergebnisliste“ oder „Schließen“. Sie werden anschließend zur Eingabe Ihres zweiten Faktors aufgefordert.",
+        "LERN_HAT_KEINE_KLASSE": "Eine Lernrolle kann nur in Kombination mit einer Klasse zugeordnet werden. Bitte wählen Sie eine Klasse aus."
       }
     },
     "rolle": {
