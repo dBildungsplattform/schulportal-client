@@ -160,6 +160,8 @@ jobs:
           for i in {1..30}; do
             echo "Attempt $i..."
             curl -s "$REPO_URL/index.yaml" -o index.yaml
+            echo curl -s "$REPO_URL/index.yaml" -o index.yaml
+            echo grep -q "$CHART_NAME" index.yaml && grep -q "$CHART_VERSION" index.yaml
             if grep -q "$CHART_NAME" index.yaml && grep -q "$CHART_VERSION" index.yaml; then
               echo "Chart $CHART_NAME:$CHART_VERSION found!"
               exit 0
