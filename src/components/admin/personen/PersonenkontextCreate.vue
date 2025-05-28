@@ -225,6 +225,13 @@
           limit: 25,
         });
       }, 500);
+    } else if (newValue && newValue !== selectedOrganisationTitle.value) {
+      timerId.value = setTimeout(async () => {
+        await personenkontextStore.processWorkflowStep({
+          organisationName: newValue,
+          limit: 25,
+        });
+      }, 500);
     } else if (newValue === '' && selectedOrganisation.value) {
       // If searchValue is empty and an organization is selected, fetch roles for the selected organization
       timerId.value = setTimeout(async () => {
