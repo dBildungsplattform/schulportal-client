@@ -5,7 +5,7 @@ import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
 import { PersonenUebersicht } from '@/stores/types/PersonenUebersicht';
 import { VueWrapper, mount } from '@vue/test-utils';
 import { DoFactory } from 'test/DoFactory';
-import { expect, test } from 'vitest';
+import { expect, test, type MockInstance } from 'vitest';
 import { nextTick } from 'vue';
 import type { BefristungProps } from './BefristungInput.vue';
 import PersonenkontextCreate from './PersonenkontextCreate.vue';
@@ -14,6 +14,9 @@ let wrapper: VueWrapper | null = null;
 let personenkontextStore: PersonenkontextStore;
 let organisationStore: OrganisationStore;
 const personStore: PersonStore = usePersonStore();
+const klassenFilterRef: string = 'personenkontext-create-klasse-select';
+vi.useFakeTimers();
+
 beforeEach(() => {
   document.body.innerHTML = `
     <div>
@@ -46,16 +49,6 @@ beforeEach(() => {
           title: 'Lehr',
           merkmale: new Set<RollenMerkmal>(['KOPERS_PFLICHT']),
           rollenart: RollenArt.Lehr,
-        },
-      ],
-      klassen: [
-        {
-          value: '1',
-          title: 'Org1',
-        },
-        {
-          value: '2',
-          title: 'Org2',
         },
       ],
       selectedOrganisationProps: {
@@ -116,24 +109,6 @@ beforeEach(() => {
   organisationStore = useOrganisationStore();
 
   personenkontextStore.workflowStepResponse = {
-    organisations: [
-      {
-        id: 'string',
-        kennung: '',
-        name: 'Organisation1',
-        namensergaenzung: 'string',
-        kuerzel: 'string',
-        typ: 'TRAEGER',
-        administriertVon: '1',
-      },
-    ],
-    rollen: [],
-    selectedOrganisation: null,
-    selectedRollen: null,
-    canCommit: true,
-  };
-
-  personenkontextStore.workflowStepResponse = {
     rollen: [
       {
         administeredBySchulstrukturknoten: '1234',
@@ -180,15 +155,27 @@ describe('PersonenkontextCreate', () => {
     await nextTick();
 
     const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
-    await rolleAutocomplete?.vm.$emit('update:search', '54321');
+    rolleAutocomplete?.vm.$emit('update:search', '54321');
     await rolleAutocomplete?.setValue('54321');
     await nextTick();
 
     expect(organisationAutocomplete?.text()).toEqual('O1');
     await nextTick();
 
-    const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
-    await klasseAutocomplete?.vm.$emit('update:search', '55555');
+    organisationStore.klassenFilters.set('personenkontext-create', {
+      loading: false,
+      total: 1,
+      filterResult: [
+        DoFactory.getKlasse(undefined, {
+          id: '55555',
+          name: '55555',
+        }),
+      ],
+    });
+    const klasseAutocomplete: VueWrapper | undefined = wrapper
+      ?.findComponent({ name: 'KlassenFilter' })
+      .findComponent({ ref: klassenFilterRef });
+    klasseAutocomplete?.vm.$emit('update:search', '55555');
     await klasseAutocomplete?.setValue('55555');
     await nextTick();
 
@@ -219,7 +206,9 @@ describe('PersonenkontextCreate', () => {
     await rolleAutocomplete?.setValue('54321');
     await nextTick();
 
-    const klassenAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
+    const klassenAutocomplete: VueWrapper | undefined = wrapper
+      ?.findComponent({ name: 'KlassenFilter' })
+      .findComponent({ ref: klassenFilterRef });
     await klassenAutocomplete?.setValue('O1');
     await nextTick();
 
@@ -230,6 +219,7 @@ describe('PersonenkontextCreate', () => {
   });
 
   test('Fetches all Klassen if the searchValue is empty', async () => {
+    const spy: MockInstance = vi.spyOn(organisationStore, 'loadKlassenForFilter');
     const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
     await organisationAutocomplete?.setValue('O1');
     await nextTick();
@@ -238,11 +228,15 @@ describe('PersonenkontextCreate', () => {
     await rolleAutocomplete?.setValue('54321');
     await nextTick();
 
-    const klassenAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
-    await klassenAutocomplete?.vm.$emit('update:search', '');
+    const klassenAutocomplete: VueWrapper | undefined = wrapper
+      ?.findComponent({ name: 'KlassenFilter' })
+      .findComponent({ ref: klassenFilterRef });
+    await klassenAutocomplete?.setValue('');
+    klassenAutocomplete?.vm.$emit('update:search', '');
     await nextTick();
+    vi.runAllTimers();
 
-    expect(organisationStore.getKlassenByOrganisationId).toHaveBeenCalled();
+    expect(spy).toHaveBeenCalled();
   });
 
   test('it updates Organisation search correctly', async () => {
@@ -380,8 +374,10 @@ describe('PersonenkontextCreate', () => {
     await rolleAutocomplete?.setValue('54321');
     await nextTick();
 
-    const klassenAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
-    await klassenAutocomplete?.vm.$emit('update:search', '');
+    const klassenAutocomplete: VueWrapper | undefined = wrapper
+      ?.findComponent({ name: 'KlassenFilter' })
+      .findComponent({ ref: klassenFilterRef });
+    klassenAutocomplete?.vm.$emit('update:search', '');
     await nextTick();
 
     await organisationAutocomplete?.setValue(undefined);

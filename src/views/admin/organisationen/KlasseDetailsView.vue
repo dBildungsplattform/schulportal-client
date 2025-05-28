@@ -106,12 +106,12 @@
   }
 
   async function navigateToKlasseManagement(): Promise<void> {
+    organisationStore.errorCode = '';
     await router.push({ name: 'klasse-management' });
     organisationStore.updatedOrganisation = null;
   }
 
   const handleAlertClose = (): void => {
-    organisationStore.errorCode = '';
     navigateToKlasseManagement();
   };
 
