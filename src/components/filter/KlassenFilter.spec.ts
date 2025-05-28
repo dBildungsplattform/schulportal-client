@@ -73,6 +73,17 @@ describe('KlassenFilter', async () => {
           expect(wrapper.find(`[data-testid="${testId}"]`).isVisible()).toBe(true);
         });
 
+        test('it displays the correct placeholder', async () => {
+          const mockKlasse: Organisation = DoFactory.getKlasse();
+          const selectionRef: Ref<Array<string> | string | undefined> = ref(multiple ? [mockKlasse.id] : mockKlasse.id);
+
+          const wrapper: VueWrapper = mountComponent({ ...defaultProps });
+          await wrapper.setProps({ selectedKlassen: selectionRef });
+          // no timers are run, so this is before fetching data
+          const actualText: string = wrapper.find(`[data-testid="${testId}"]`).text();
+          expect(actualText).toContain('...');
+        });
+
         describe.each([
           [[RollenSystemRecht.KlassenVerwalten]],
           [[RollenSystemRecht.KlassenVerwalten, RollenSystemRecht.KlassenVerwalten]],

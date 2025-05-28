@@ -77,17 +77,7 @@
   });
   const translatedSchulen: ComputedRef<Array<TranslatedObject>> = computed(() => {
     const options: Array<TranslatedObject> = organisationStore.schulenFilter.filterResult.map(translateSchule);
-    if (autoselectedSchule.value) return options.concat(translateSchule(autoselectedSchule.value));
-    const selectedIds: Array<string> = wrapSelectedSchulenIds(selectedSchulen.value);
-    if (!isEmptySelection(selectedIds)) {
-      selectedIds.forEach((selectedId: string) => {
-        if (options.find((option: TranslatedObject) => option.value === selectedId) === undefined)
-          options.push({
-            value: selectedId,
-            title: '...',
-          });
-      });
-    }
+    if (autoselectedSchule.value) options.push(translateSchule(autoselectedSchule.value));
     return options;
   });
 
@@ -228,6 +218,11 @@
   >
     <template v-slot:prepend-item>
       <slot name="prepend-item"></slot>
+    </template>
+    <template v-slot:selection="{ item }">
+      <span class="v-autocomplete__selection-text">
+        {{ canDisplaySelection(selectedSchulen) ? item.title : '...' }}
+      </span>
     </template>
   </v-autocomplete>
 </template>

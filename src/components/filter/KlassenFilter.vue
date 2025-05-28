@@ -227,22 +227,20 @@
       <slot name="prepend-item"></slot>
     </template>
     <template v-slot:selection="{ item, index }">
-      <template v-if="props.multiple">
-        <span
-          v-if="selectedKlassen && selectedKlassen.length < 2"
-          class="v-autocomplete__selection-text"
-        >
+      <span class="v-autocomplete__selection-text">
+        <template v-if="!canDisplaySelection(selectedKlassen)"> ... </template>
+        <template v-else-if="props.multiple">
+          <template v-if="selectedKlassen && selectedKlassen.length < 2">
+            {{ item.title }}
+          </template>
+          <template v-else-if="selectedKlassen && index === 0">
+            {{ t('admin.klasse.klassenSelected', { count: selectedKlassen.length }) }}
+          </template>
+        </template>
+        <template v-else>
           {{ item.title }}
-        </span>
-        <span v-else-if="selectedKlassen && index === 0">
-          {{ t('admin.klasse.klassenSelected', { count: selectedKlassen.length }) }}
-        </span>
-      </template>
-      <template v-else>
-        <span class="v-autocomplete__selection-text">
-          {{ item.title }}
-        </span>
-      </template>
+        </template>
+      </span>
     </template>
   </v-autocomplete>
 </template>
