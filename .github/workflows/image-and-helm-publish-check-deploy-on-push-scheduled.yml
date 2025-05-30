@@ -162,11 +162,11 @@ jobs:
           
           echo "Checking for chart $CHART_NAME version $CHART_VERSION in $REPO_URL"
 
-          for i in {1..30}; do
+          for i in {1..20}; do
             echo "Attempt $i..."
             helm repo update
             if helm search repo dbildungsplattform/$CHART_NAME --version $CHART_VERSION | grep -qw "$CHART_VERSION"; then
-              echo "Chart $CHART_NAME-$CHART_VERSION found!"
+              echo "Chart $CHART_NAME-$CHART_VERSION found after $i seconds !"
               exit 0
             fi
             echo "Chart not found yet. Waiting 30 seconds..."
