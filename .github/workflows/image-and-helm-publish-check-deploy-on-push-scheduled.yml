@@ -131,7 +131,7 @@ jobs:
           fi
 
   release_helm:
-    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/chart-release.yaml@7
+    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/chart-release.yaml@7.2.1
     needs:
       - create_branch_identifier
       - select_helm_version_generation_and_image_tag_generation
