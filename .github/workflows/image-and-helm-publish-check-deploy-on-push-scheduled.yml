@@ -142,6 +142,7 @@ jobs:
       image_tag: ${{ github.ref_name == 'main' && '' || needs.create_branch_identifier.outputs.image_tag_from_branch }}
       helm_chart_version_generation: ${{ needs.select_helm_version_generation_and_image_tag_generation.outputs.SELECT_HELM_VERSION_GENERATION }}
       helm_chart_version: ${{ github.ref_name == 'main' && '' || needs.create_branch_identifier.outputs.chart_version_from_branch }}
+    
 
   wait_for_helm_chart_to_get_published:
     runs-on: ubuntu-latest
@@ -152,8 +153,8 @@ jobs:
       - name: Check for Helm chart
         run: |
           CHART_NAME=schulportal-client
-          CHART_VERSION="${{ steps.chart_release_output.outputs.helm_chart_version }}"
-          echo "Chart Version: $CHART_VERSION"
+          CHART_VERSION="${{ needs.release_helm.outputs.helm_chart_version }}"
+          echo "CHART_VERSION=$CHART_VERSION"
           REPO_URL="https://dbildungsplattform.github.io/helm-charts-registry/"
 
           echo "Adding Helm repository $REPO_URL"
