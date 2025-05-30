@@ -166,7 +166,8 @@ jobs:
             echo "Attempt $i..."
             helm repo update
             if helm search repo dbildungsplattform/$CHART_NAME --version $CHART_VERSION | grep -qw "$CHART_VERSION"; then
-              echo "Chart $CHART_NAME-$CHART_VERSION found after $i seconds !"
+              minutes=$(echo "scale=2; $i / 60" | bc)
+              echo "Chart $CHART_NAME-$CHART_VERSION found after $minutes minutes !"
               exit 0
             fi
             echo "Chart not found yet. Waiting 30 seconds..."
