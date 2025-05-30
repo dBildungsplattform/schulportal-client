@@ -152,7 +152,7 @@ jobs:
       - name: Check for Helm chart
         run: |
           CHART_NAME=schulportal-client
-          CHART_VERSION="${{ needs.release_helm.outputs.helm_chart_version }}"
+          CHART_VERSION="${{ steps.release_helm.outputs.helm_chart_version }}"
           REPO_URL="https://dbildungsplattform.github.io/helm-charts-registry/"
 
           echo "Adding Helm repository $REPO_URL"
