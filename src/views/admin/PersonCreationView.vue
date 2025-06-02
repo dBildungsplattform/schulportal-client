@@ -40,7 +40,6 @@
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   const route: RouteLocationNormalized = useRoute();
-  const createType: string = route.meta['createType'] as string;
 
   const router: Router = useRouter();
   const personStore: PersonStore = usePersonStore();
@@ -64,6 +63,19 @@
   const filteredRollenCache: Ref<TranslatedRolleWithAttrs[] | undefined> = ref<TranslatedRolleWithAttrs[] | undefined>(
     [],
   );
+
+  enum CreationType {
+    Limited = 'limited',
+    Full = 'full',
+  }
+
+  let createType: CreationType;
+  const metaCreateType: string = route.meta['createType'] as string;
+  if (metaCreateType && Object.values(CreationType).includes(metaCreateType as CreationType)) {
+    createType = metaCreateType as CreationType;
+  } else {
+    createType = CreationType.Full;
+  }
 
   // Define a method to check if the selected Rolle is of type "Lern"
   function isLernRolle(selectedRolleIds?: string[]): boolean | undefined {
@@ -398,7 +410,7 @@
   });
 
   function navigateToCreatePersonRoute(reload: boolean = false): void | Promise<void> {
-    const routeName: string = createType === 'limited' ? 'create-person-limited' : 'create-person';
+    const routeName: string = createType === CreationType.Limited ? 'create-person-limited' : 'create-person';
     if (reload) {
       return router.push({ name: routeName }).then(() => {
         router.go(0);
@@ -461,15 +473,15 @@
   });
 
   onBeforeMount(() => {
-    if (createType === 'limited') {
-      headerLabel.value = t('admin.person.addNewLimited');
-      createButtonLabel.value = t('admin.person.addNewLimited');
+    if (createType === CreationType.Limited) {
+      headerLabel.value = t('admin.person.stateEmployeeSearch.addPerson');
+      createButtonLabel.value = t('admin.person.stateEmployeeSearch.addPerson');
       discardButtonLabel.value = t('cancel');
-      createAnotherButtonLabel.value = t('admin.person.addAnotherLimited');
+      createAnotherButtonLabel.value = t('admin.person.stateEmployeeSearch.addAnotherPerson');
     }
 
     personenkontextStore.requestedWithSystemrecht =
-      createType === 'limited' ? RollenSystemRecht.EingeschraenktNeueBenutzerErstellen : undefined;
+      createType === CreationType.Limited ? RollenSystemRecht.EingeschraenktNeueBenutzerErstellen : undefined;
   });
 
   onMounted(async () => {

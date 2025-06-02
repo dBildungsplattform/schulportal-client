@@ -172,10 +172,10 @@
       <v-list-item
         v-if="authStore.hasEingeschränktNeueBenutzerErstellenPermission"
         class="menu-bar-sub-item caption"
-        @click="handleMenuItemClick('/admin/personen/new-limited')"
         data-testid="add-person-menu-item"
         prepend-icon="mdi-plus-circle-outline"
         :title="$t('admin.person.stateEmployeeSearch.anotherPerson')"
+        to="/admin/personen/new-limited"
       ></v-list-item>
     </div>
 

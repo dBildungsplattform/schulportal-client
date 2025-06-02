@@ -160,6 +160,7 @@
       "backToInput": "Zurück zur Eingabe",
       "stateEmployeeSearch": {
         "addPerson": "Person hinzufügen",
+        "addAnotherPerson": "Weitere Person hinzufügen",
         "search": "Landesbediensteter (Nur Suche)",
         "anotherPerson": "Andere Person (Neuanlage)"
       },
@@ -206,8 +207,7 @@
       "create": "Benutzer anlegen",
       "createAnother": "Weiteren Benutzer anlegen",
       "createNew": "Neue Benutzer anlegen",
-      "addNewLimited": "Person hinzufügen",
-      "addAnotherLimited": "Weitere Person hinzufügen",
+
       "creationErrorText": "",
       "creationErrorTitle": "Fehler beim Anlegen des Benutzers",
       "deletePerson": "Benutzer löschen",
