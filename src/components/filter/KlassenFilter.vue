@@ -220,7 +220,6 @@
     :items="translatedKlassen"
     item-value="value"
     item-text="title"
-    :loading="storeReference?.loading"
     :multiple="props.multiple"
     :no-data-text="'noDataFound'"
     :placeholder="placeholderText"

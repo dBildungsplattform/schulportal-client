@@ -203,7 +203,6 @@
     :items="translatedSchulen"
     item-value="value"
     item-text="title"
-    :loading="organisationStore.schulenFilter.loading"
     :multiple="props.multiple"
     :no-data-text="'noDataFound'"
     :placeholder="props.placeholderText ?? t('admin.schule.assignSchule')"
