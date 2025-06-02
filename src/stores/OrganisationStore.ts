@@ -167,6 +167,11 @@ type OrganisationActions = {
   setItsLearningForSchule: (organisationId: string) => Promise<void>;
   loadSchulenForFilter(filter?: OrganisationenFilter): Promise<void>;
   resetSchulFilter(): void;
+  /**
+   * Loads Klassen according to filter and stores them in the klassenFilters map under the provided storeKey.
+   * @param filter
+   * @param storeKey Unique string is necessary if there is more than one KlassenFilter in use at the same time. It identifies the filter in the klassenFilters map. Defaults to an empty string.
+   */
   loadKlassenForFilter(filter?: OrganisationenFilter, storeKey?: string): Promise<void>;
   resetKlasseFilter(storeKey?: string): void;
   clearKlasseFilter(storeKey?: string): void;
