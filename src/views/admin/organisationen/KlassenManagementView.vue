@@ -78,7 +78,7 @@
   });
 
   const finalKlassen: ComputedRef<Organisation[]> = computed(() => {
-    // If there are selected Klassen, filter the w to show only those
+    // If there are selected Klassen, filter allKlassen to show only those that are selected
     if (selectedKlassen.value.length > 0) {
       return organisationStore.allKlassen.filter((klasse: Organisation) => selectedKlassen.value.includes(klasse.id));
     }
@@ -302,7 +302,7 @@
               <template v-slot:activator="{ props }">
                 <div v-bind="props">
                   <KlassenFilter
-                    :systemrechte-for-search="[RollenSystemRecht.KlassenVerwalten]"
+                    :systemrechteForSearch="[RollenSystemRecht.KlassenVerwalten]"
                     :multiple="true"
                     :readonly="!hasSelectedSchule"
                     :hideDetails="true"

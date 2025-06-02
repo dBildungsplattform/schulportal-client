@@ -72,13 +72,6 @@ beforeEach(async () => {
   personenkontextStore.getPersonenkontextRolleWithFilter = vi.fn();
   personenkontextStore.processWorkflowStep = vi.fn();
 
-  // searchFilterStore.setOrganisationFilterForPersonen = vi.fn(async (ids: Array<string> | null) => {
-  //   searchFilterStore.selectedOrganisationen = ids;
-  // });
-  // searchFilterStore.setKlasseFilterForPersonen = vi.fn(async (ids: Array<string> | null) => {
-  //   searchFilterStore.selectedKlassen = ids;
-  // });
-
   organisationStore.klassen = [
     {
       id: '123456',

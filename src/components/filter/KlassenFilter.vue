@@ -103,6 +103,16 @@
     return result;
   };
 
+  const getDisplayItem = (item: TranslatedObject, index: number): string => {
+    if (!selectedKlassen.value) return ''; // should not happen
+    if (!canDisplaySelection(selectedKlassen.value)) return '...'; // we are loading
+    if (!props.multiple) return item.title;
+
+    if (selectedKlassen.value.length < 2) return item.title;
+    if (index === 0) return t('admin.klasse.klassenSelected', { count: selectedKlassen.value.length });
+    return ''; // do not display anything for other items
+  };
+
   const shouldHighlightSelection: ComputedRef<boolean> = computed(() => {
     if (props.highlightSelection && !isEmptySelection(selectedKlassen.value)) return true;
     return false;
@@ -228,18 +238,7 @@
     </template>
     <template v-slot:selection="{ item, index }">
       <span class="v-autocomplete__selection-text">
-        <template v-if="!canDisplaySelection(selectedKlassen)"> ... </template>
-        <template v-else-if="props.multiple">
-          <template v-if="selectedKlassen && selectedKlassen.length < 2">
-            {{ item.title }}
-          </template>
-          <template v-else-if="selectedKlassen && index === 0">
-            {{ t('admin.klasse.klassenSelected', { count: selectedKlassen.length }) }}
-          </template>
-        </template>
-        <template v-else>
-          {{ item.title }}
-        </template>
+        {{ getDisplayItem(item, index) }}
       </span>
     </template>
   </v-autocomplete>

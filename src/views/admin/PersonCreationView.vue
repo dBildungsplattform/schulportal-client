@@ -500,11 +500,11 @@
           <!-- Error Message Display for error messages from the personStore -->
           <SpshAlert
             :model-value="!!personStore.errorCode"
-            :title="personStore.errorCode ? $t('admin.person.creationErrorTitle') : ''"
+            :title="$t('admin.person.creationErrorTitle')"
             :type="'error'"
             :closable="false"
             :showButton="true"
-            :buttonText="personStore.errorCode ? $t('admin.person.backToCreatePerson') : ''"
+            :buttonText="$t('admin.person.backToCreatePerson')"
             :buttonAction="navigateBackToPersonForm"
             :text="creationErrorText"
           />
