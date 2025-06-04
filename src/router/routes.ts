@@ -13,17 +13,6 @@ const routes: readonly RouteRecordRaw[] = [
     },
   },
   {
-    path: '/admin/limited/personen/suchen',
-    name: 'suche-person-limited',
-    component: () => import('../views/admin/PersonCreationView.vue'),
-    meta: {
-      layout: 'AdminLayout',
-      requiresAuth: true,
-      requiredStepUpLevel: StepUpLevel.GOLD,
-      requiresPermission: ['landesbediensteteSuchenUndHinzufügen'],
-    },
-  },
-  {
     path: '/admin/personen',
     name: 'person-management',
     component: () => import('../views/admin/PersonManagementView.vue'),
@@ -64,6 +53,17 @@ const routes: readonly RouteRecordRaw[] = [
       layout: 'AdminLayout',
       requiresAuth: true,
       requiresPermission: 'personenimport',
+    },
+  },
+  {
+    path: '/admin/limited/personen/search',
+    name: 'search-person-limited',
+    component: () => import('../views/admin/PersonSuchenView.vue'),
+    meta: {
+      layout: 'AdminLayout',
+      requiresAuth: true,
+      requiredStepUpLevel: StepUpLevel.GOLD,
+      requiresPermission: ['landesbediensteteSuchenUndHinzufügen'],
     },
   },
   {

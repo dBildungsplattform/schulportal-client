@@ -160,8 +160,14 @@
       "backToInput": "Zurück zur Eingabe",
       "stateEmployeeSearch": {
         "addPerson": "Person hinzufügen",
+        "anotherPerson": "Andere Person (Neuanlage)",
+        "searchMethodNotice": "Bitte wählen Sie wie Sie die Person suchen möchten",
         "search": "Landesbediensteter (Nur Suche)",
-        "anotherPerson": "Andere Person (Neuanlage)"
+        "searchPerson": "Person suchen",
+        "withKopers": "per Kopers.-Nr.",
+        "withEmail": "per E-Mail",
+        "withUsername": "per Benutzername",
+        "withfirstAndLastname": "per Vorname und Nachname"
       },
       "bulk": {
         "bulkErrorMessage": "Die Aktion {bulkOperationName} konnte für die folgenden Benutzer nicht ausgeführt werden. \n\nSie können sich die Liste für eine spätere Bearbeitung abspeichern. Die Daten stehen nach dem Schließen dieses Dialogs nicht mehr zur Verfügung. Sollten Sie Hilfe benötigen, eröffnen Sie ein Störungsticket über den IQSH-Helpdesk und fügen Sie die Liste als Anhang an.",

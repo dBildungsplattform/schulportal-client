@@ -1,16 +1,26 @@
 <script setup lang="ts">
-  import { ref, type Ref } from 'vue';
+  import { computed, onMounted, onUnmounted, ref, type ComputedRef, type Ref } from 'vue';
   import { useForm, type BaseFieldProps, type TypedSchema, type FormContext } from 'vee-validate';
   import { object, string } from 'yup';
   import { toTypedSchema } from '@vee-validate/yup';
   import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
-import { useRouter, type Router } from 'vue-router';
-import { type Composer, useI18n } from 'vue-i18n';
+  import {
+    onBeforeRouteLeave,
+    useRouter,
+    type NavigationGuardNext,
+    type RouteLocationNormalized,
+    type Router,
+  } from 'vue-router';
+  import { type Composer, useI18n } from 'vue-i18n';
+  import FormWrapper from '@/components/form/FormWrapper.vue';
 
-    const router: Router = useRouter();
-      const { t }: Composer = useI18n({ useScope: 'global' });
+  const router: Router = useRouter();
+  const { t }: Composer = useI18n({ useScope: 'global' });
+
+  const showUnsavedChangesDialog: Ref<boolean> = ref(false);
+  let blockedNext: () => void = () => {};
 
   const personStore: PersonStore = usePersonStore();
 
@@ -27,11 +37,11 @@ import { type Composer, useI18n } from 'vue-i18n';
   // Minimal schema, only for structure (no validation rules needed)
   const schema: TypedSchema = toTypedSchema(
     object({
-      selectedKopers: string(),
-      selectedEmail: string(),
-      selectedUsername: string(),
-      selectedVorname: string(),
-      selectedNachname: string(),
+      selectedKopers: string().optional().nullable(),
+      selectedEmail: string().optional().nullable(),
+      selectedUsername: string().optional().nullable(),
+      selectedVorname: string().optional().nullable(),
+      selectedNachname: string().optional().nullable(),
     }),
   );
 
@@ -57,39 +67,49 @@ import { type Composer, useI18n } from 'vue-i18n';
   const [selectedKopers, selectedKopersProps]: [
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = formContext.defineField('selectedOrganisation', vuetifyConfig);
+  ] = formContext.defineField('selectedKopers', vuetifyConfig);
   const [selectedEmail, selectedEmailProps]: [
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = formContext.defineField('selectedOrganisation', vuetifyConfig);
+  ] = formContext.defineField('selectedEmail', vuetifyConfig);
   const [selectedUsername, selectedUsernameProps]: [
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = formContext.defineField('selectedOrganisation', vuetifyConfig);
+  ] = formContext.defineField('selectedUsername', vuetifyConfig);
   const [selectedVorname, selectedVornameProps]: [
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = formContext.defineField('selectedOrganisation', vuetifyConfig);
+  ] = formContext.defineField('selectedVorname', vuetifyConfig);
   const [selectedNachname, selectedNachnameProps]: [
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = formContext.defineField('selectedOrganisation', vuetifyConfig);
+  ] = formContext.defineField('selectedNachname', vuetifyConfig);
+
+  const isSearchDisabled: ComputedRef<boolean> = computed(() => {
+    return !(
+      selectedKopers.value ||
+      selectedEmail.value ||
+      selectedUsername.value ||
+      selectedVorname.value ||
+      selectedNachname.value
+    );
+  });
 
   // Submission logic
   const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = formContext.handleSubmit(
-    async (values: PersonSearchForm) => {
+    (values: PersonSearchForm) => {
       switch (searchType.value) {
         case SearchType.KoPers:
-          await personStore.getLandesbedienstetePerson({ personalnummer: values.selectedKopers });
+          personStore.getLandesbedienstetePerson({ personalnummer: values.selectedKopers });
           break;
         case SearchType.Email:
-          await personStore.getLandesbedienstetePerson({ primaryEmailAddress: values.selectedEmail });
+          personStore.getLandesbedienstetePerson({ primaryEmailAddress: values.selectedEmail });
           break;
         case SearchType.Username:
-          await personStore.getLandesbedienstetePerson({ username: values.selectedUsername });
+          personStore.getLandesbedienstetePerson({ username: values.selectedUsername });
           break;
         case SearchType.Name:
-          await personStore.getLandesbedienstetePerson({
+          personStore.getLandesbedienstetePerson({
             vorname: values.selectedVorname,
             familienname: values.selectedNachname,
           });
@@ -98,19 +118,60 @@ import { type Composer, useI18n } from 'vue-i18n';
     },
   );
 
+  function isFormDirty(): boolean {
+    return (
+      formContext.isFieldDirty('selectedKopers') ||
+      formContext.isFieldDirty('selectedEmail') ||
+      formContext.isFieldDirty('selectedUsername') ||
+      formContext.isFieldDirty('selectedVorname') ||
+      formContext.isFieldDirty('selectedNachname')
+    );
+  }
+
   async function navigateBackToPersonSearchForm(): Promise<void> {
-    if (
-      personStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET' ||
-    ) {
+    if (personStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
       formContext.resetForm();
-      await router.push({ name: 'create-person' }).then(() => {
+      await router.push({ name: 'search-person-limited' }).then(() => {
         router.go(0);
       });
     } else {
       personStore.errorCode = '';
-      await router.push({ name: 'create-person' });
+      await router.push({ name: 'search-person-limited' });
     }
   }
+
+  function handleConfirmUnsavedChanges(): void {
+    blockedNext();
+    personStore.errorCode = '';
+  }
+
+  function preventNavigation(event: BeforeUnloadEvent): void {
+    if (!isFormDirty()) return;
+    event.preventDefault();
+    /* Chrome requires returnValue to be set. */
+    event.returnValue = '';
+  }
+
+  onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
+    if (isFormDirty()) {
+      showUnsavedChangesDialog.value = true;
+      blockedNext = next;
+    } else {
+      next();
+    }
+  });
+
+  onMounted(async () => {
+    personStore.errorCode = '';
+    personStore.allLandesbedienstetePersonen = [];
+
+    /* listen for browser changes and prevent them when form is dirty */
+    window.addEventListener('beforeunload', preventNavigation);
+  });
+
+  onUnmounted(() => {
+    window.removeEventListener('beforeunload', preventNavigation);
+  });
 </script>
 <template>
   <div class="admin">
@@ -118,25 +179,181 @@ import { type Composer, useI18n } from 'vue-i18n';
       class="text-center headline"
       data-testid="admin-headline"
     >
-      {{ $t('admin.headline') }}
+      {{ t('admin.headline') }}
     </h1>
     <LayoutCard
       :closable="false"
-      :header="$t('admin.person.addNew')"
+      :header="t('admin.person.stateEmployeeSearch.searchPerson')"
       :padded="true"
       :showCloseText="true"
     >
-      <!-- Error Message Display for error messages from the personStore -->
-      <SpshAlert
-        :modelValue="!!personStore.errorCode"
-            :title="t(`admin.person.title.${personStore.errorCode}`)"
-        :type="'error'"
-        :closable="false"
-        :showButton="true"
-        :buttonText="$t('admin.person.backToCreatePerson')"
-        :buttonAction="navigateBackToPersonSearchForm"
-            :text="t(`admin.person.errors.${personStore.errorCode}`)"
-      />
+      <FormWrapper
+        :canCommit="!isSearchDisabled || personStore.loading"
+        :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
+        :createButtonLabel="$t('search')"
+        :discardButtonLabel="$t('cancel')"
+        :hideActions="!!personStore.errorCode"
+        :hideNotice="true"
+        id="person-creation-form"
+        :isLoading="personStore.loading"
+        :onDiscard="() => router.go(0)"
+        @onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
+        :onSubmit="onSubmit"
+        :showUnsavedChangesDialog="showUnsavedChangesDialog"
+      >
+        <!-- Error Message Display for error messages from the personStore -->
+        <SpshAlert
+          :modelValue="!!personStore.errorCode"
+          :title="t(`admin.person.title.${personStore.errorCode}`)"
+          :type="'error'"
+          :closable="false"
+          :showButton="true"
+          :buttonText="t('admin.person.backToCreatePerson')"
+          :buttonAction="navigateBackToPersonSearchForm"
+          :text="t(`admin.person.errors.${personStore.errorCode}`)"
+        />
+
+        <v-row
+          v-if="!personStore.errorCode"
+          class="align-start"
+        >
+          <!-- notice Column -->
+          <v-col cols="3">
+            <span class="text-body bold">
+              {{ t('admin.person.stateEmployeeSearch.searchMethodNotice') }}
+            </span>
+          </v-col>
+
+          <!-- Radio Group and Inputs Column -->
+          <v-col cols="9">
+            <v-radio-group
+              v-model="searchType"
+              class="mt-0"
+            >
+              <!-- KoPers -->
+              <v-row class="align-center">
+                <v-col cols="3">
+                  <v-radio
+                    :label="t('admin.person.stateEmployeeSearch.withKopers')"
+                    :value="SearchType.KoPers"
+                  />
+                </v-col>
+                <v-col
+                  cols="9"
+                  v-if="searchType === SearchType.KoPers"
+                >
+                  <v-text-field
+                    clearable
+                    data-testid="kopers-input"
+                    density="compact"
+                    id="kopers-input"
+                    ref="kopers-input"
+                    variant="outlined"
+                    v-bind="selectedKopersProps"
+                    v-model="selectedKopers"
+                    placeholder="KoPers.-Nr. eingeben"
+                  />
+                </v-col>
+              </v-row>
+
+              <!-- Email -->
+              <v-row class="align-center">
+                <v-col cols="3">
+                  <v-radio
+                    :label="t('admin.person.stateEmployeeSearch.withEmail')"
+                    :value="SearchType.Email"
+                  />
+                </v-col>
+                <v-col
+                  cols="9"
+                  v-if="searchType === SearchType.Email"
+                >
+                  <v-text-field
+                    clearable
+                    data-testid="email-input"
+                    density="compact"
+                    id="email-input"
+                    ref="email-input"
+                    variant="outlined"
+                    v-bind="selectedEmailProps"
+                    v-model="selectedEmail"
+                    placeholder="E-Mail eingeben"
+                  />
+                </v-col>
+              </v-row>
+
+              <!-- Username -->
+              <v-row class="align-center">
+                <v-col cols="3">
+                  <v-radio
+                    :label="t('admin.person.stateEmployeeSearch.withUsername')"
+                    :value="SearchType.Username"
+                  />
+                </v-col>
+                <v-col
+                  cols="9"
+                  v-if="searchType === SearchType.Username"
+                >
+                  <v-text-field
+                    clearable
+                    data-testid="username-input"
+                    density="compact"
+                    id="username-input"
+                    ref="username-input"
+                    variant="outlined"
+                    v-bind="selectedUsernameProps"
+                    v-model="selectedUsername"
+                    placeholder="Benutzername eingeben"
+                  />
+                </v-col>
+              </v-row>
+
+              <!-- Name -->
+              <v-row class="align-center">
+                <v-col cols="3">
+                  <v-radio
+                    :label="t('admin.person.stateEmployeeSearch.withfirstAndLastname')"
+                    :value="SearchType.Name"
+                  />
+                </v-col>
+                <v-col
+                  cols="9"
+                  v-if="searchType === SearchType.Name"
+                >
+                  <v-row>
+                    <v-col cols="6">
+                      <v-text-field
+                        clearable
+                        data-testid="vorname-input"
+                        density="compact"
+                        id="vorname-input"
+                        ref="vorname-input"
+                        variant="outlined"
+                        v-bind="selectedVornameProps"
+                        v-model="selectedVorname"
+                        placeholder="Vorname eingeben"
+                      />
+                    </v-col>
+                    <v-col cols="6">
+                      <v-text-field
+                        clearable
+                        data-testid="nachname-input"
+                        density="compact"
+                        id="nachname-input"
+                        ref="nachname-input"
+                        variant="outlined"
+                        v-bind="selectedNachnameProps"
+                        v-model="selectedNachname"
+                        placeholder="Nachname eingeben"
+                      />
+                    </v-col>
+                  </v-row>
+                </v-col>
+              </v-row>
+            </v-radio-group>
+          </v-col>
+        </v-row>
+      </FormWrapper>
     </LayoutCard>
   </div>
 </template>
