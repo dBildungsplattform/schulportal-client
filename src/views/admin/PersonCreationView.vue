@@ -81,7 +81,12 @@
   function isLernRolle(selectedRolleIds?: string[]): boolean | undefined {
     if (!Array.isArray(selectedRolleIds)) return false;
 
-    return filteredRollenCache.value?.some(
+    const translatedRollenWithAttrs: Array<TranslatedRolleWithAttrs> =
+      filteredRollen.value && filteredRollen.value.length > 0
+        ? filteredRollen.value
+        : (filteredRollenCache.value ?? []);
+
+    return translatedRollenWithAttrs.some(
       (rolle: TranslatedRolleWithAttrs) => selectedRolleIds.includes(rolle.value) && rolle.rollenart === RollenArt.Lern,
     );
   }
