@@ -661,9 +661,8 @@ describe('PersonCreationView', () => {
     });
 
     test('it does not trigger if form is not dirty', async () => {
-      // TODO: why is spy called 0 times?
-      // const expectedCallsToNext: number = 1;
-      const expectedCallsToNext: number = 0;
+      // autoselected orgnisation doesnt count as dirty
+      const expectedCallsToNext: number = 1;
       vi.mock('vue-router', async (importOriginal: () => Promise<Module>) => {
         const mod: Module = await importOriginal();
         return {

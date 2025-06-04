@@ -311,7 +311,7 @@
 
   function isFormDirty(): boolean {
     return (
-      formContext.isFieldDirty('selectedOrganisation') ||
+      (organisationen.value?.length !== 1 && formContext.isFieldDirty('selectedOrganisation')) ||
       formContext.isFieldDirty('selectedRollen') ||
       formContext.isFieldDirty('selectedKlasse') ||
       formContext.isFieldDirty('selectedKopersNr') ||
