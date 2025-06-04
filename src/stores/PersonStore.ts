@@ -18,6 +18,7 @@ import {
   type PersonenFrontendApiInterface,
   type PersonenuebersichtBodyParams,
   type PersonFrontendControllerFindPersons200Response,
+  type PersonLandesbediensteterSearchResponse,
   type PersonMetadataBodyParams,
 } from '../api-client/generated/api';
 import { Person } from './types/Person';
@@ -63,6 +64,7 @@ export type { PersonendatensatzResponse, SortOrder };
 type PersonState = {
   allUebersichten: Map<string, PersonWithZuordnungen>;
   currentPerson: Personendatensatz | null;
+  allLandesbedienstetePersonen: PersonLandesbediensteterSearchResponse[] | null;
   errorCode: string;
   loading: boolean;
   newDevicePassword: string | null;
@@ -82,6 +84,14 @@ export type PersonFilter = {
   sortField?: SortField;
 };
 
+export type LandesbediensteterFilter = {
+  personalnummer?: string;
+  primaryEmailAddress?: string;
+  username?: string;
+  vorname?: string;
+  familienname?: string;
+};
+
 type PersonGetters = {};
 type PersonActions = {
   resetState: () => void;
@@ -99,6 +109,7 @@ type PersonActions = {
     familienname: string,
     personalnummer?: string,
   ) => Promise<void>;
+  getLandesbedienstetePerson: (filter?: LandesbediensteterFilter) => Promise<void>;
 };
 
 export type PersonStore = Store<'personStore', PersonState, PersonGetters, PersonActions>;
@@ -109,6 +120,7 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
     return {
       allUebersichten: new Map<string, PersonWithZuordnungen>(),
       currentPerson: null,
+      allLandesbedienstetePersonen: [],
       errorCode: '',
       loading: false,
       newDevicePassword: null,
@@ -300,6 +312,25 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
         this.patchedPerson = data;
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'ERROR_LOADING_USER');
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async getLandesbedienstetePerson(filter?: LandesbediensteterFilter): Promise<void> {
+      this.loading = true;
+      try {
+        const { data }: AxiosResponse<PersonLandesbediensteterSearchResponse[]> =
+          await personenApi.personControllerFindLandesbediensteter(
+            filter?.familienname,
+            filter?.vorname,
+            filter?.personalnummer,
+            filter?.primaryEmailAddress,
+            filter?.username,
+          );
+        this.allLandesbedienstetePersonen = data;
+      } catch (error: unknown) {
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
         this.loading = false;
       }
