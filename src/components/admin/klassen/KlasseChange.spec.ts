@@ -104,6 +104,6 @@ describe('KlasseChange', () => {
     await nextTick();
 
     const klassenAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ name: 'KlassenFilter' });
-    expect(klassenAutocomplete).toEqual(expect.objectContaining({ administriertVon: ['1'] }));
+    expect(klassenAutocomplete?.props()).toEqual(expect.objectContaining({ administriertVon: ['1'] }));
   });
 });
