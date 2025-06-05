@@ -335,9 +335,7 @@
     } else {
       personenkontextStore.createdPersonWithKontext = null;
     }
-    await router.push({ name: 'person-management' }).then(() => {
-      router.go(0);
-    });
+    await router.push({ name: 'person-management' });
   }
 
   async function navigateToPersonDetails(): Promise<void> {
