@@ -40,6 +40,9 @@ export enum EmailStatus {
   Disabled = 'DISABLED',
   Requested = 'REQUESTED',
   Failed = 'FAILED',
+  DeletedLdap = 'DELETED_LDAP',
+  DeletedOx = 'DELETED_OX',
+  Deleted = 'DELETED',
 }
 
 export enum SortField {

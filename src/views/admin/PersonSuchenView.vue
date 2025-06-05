@@ -4,6 +4,7 @@
   import { object, string } from 'yup';
   import { toTypedSchema } from '@vee-validate/yup';
   import {
+    EmailStatus,
     usePersonStore,
     type PersonLandesbediensteterSearchPersonenkontextResponse,
     type PersonLandesbediensteterSearchResponse,
@@ -246,12 +247,16 @@
       personStore.allLandesbedienstetePersonen?.[0] ?? undefined;
     if (!person) return [];
 
-    return mapToLabelValues(
+    return mapToLabelValues(t,
       {
         vorname: person.vorname,
         familienname: person.familienname,
         username: person.username,
         personalnummer: person.personalnummer,
+        emailStatus: {
+          status: EmailStatus.Enabled,
+          address: person.primaryEmailAddress,
+        },
       },
       {
         includeKoPers: true,

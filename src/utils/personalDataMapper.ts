@@ -1,6 +1,6 @@
 import { EmailStatus } from '@/stores/PersonStore';
 import type { Ref } from 'vue';
-import { useI18n, type Composer } from 'vue-i18n';
+import { type Composer } from 'vue-i18n';
 
 export enum ItemType {
   KO_PERS = 'KO_PERS',
@@ -28,6 +28,14 @@ export type EmailStatusObject = {
   address?: string;
 };
 
+export type PersonLabelValueInput = {
+  vorname: string;
+  familienname: string;
+  username?: string;
+  personalnummer: string | null;
+  emailStatus?: EmailStatusObject;
+};
+
 /**
  * Maps a person's data to an array of label-value objects for display purposes.
  *
@@ -41,42 +49,33 @@ export type EmailStatusObject = {
  * @returns An array of `LabelValue` objects representing the person's data for UI display.
  */
 export function mapToLabelValues(
-  person: {
-    vorname: string;
-    familienname: string;
-    username?: string;
-    personalnummer: string | null;
-  },
+  t: Composer['t'],
+  person: PersonLabelValueInput,
   {
     hasKoPersMerkmal,
     includeKoPers = true,
     includeEmail = false,
-    email,
-    testIdPrefix = '',
   }: {
     hasKoPersMerkmal?: Ref<boolean>;
     includeKoPers?: boolean;
     includeEmail?: boolean;
-    email?: EmailStatusObject | null;
-    testIdPrefix?: string;
   } = {},
 ): LabelValue[] {
-  const { t }: Composer = useI18n();
   const data: LabelValue[] = [];
 
   data.push({
     label: t('profile.fullName'),
     value: `${person.vorname} ${person.familienname}`,
-    testIdLabel: `${testIdPrefix}fullName-label`,
-    testIdValue: `${testIdPrefix}fullName-value`,
+    testIdLabel: 'person-fullName-label',
+    testIdValue: 'person-fullName-value',
   });
 
   if (person.username) {
     data.push({
       label: t('person.userName'),
       value: person.username,
-      testIdLabel: `${testIdPrefix}userName-label`,
-      testIdValue: `${testIdPrefix}userName-value`,
+      testIdLabel: 'person-userName-label',
+      testIdValue: 'person-userName-value',
     });
   }
 
@@ -86,18 +85,18 @@ export function mapToLabelValues(
       labelAbbr: t('profile.koPersNummerAbbr'),
       value: person.personalnummer,
       type: ItemType.KO_PERS,
-      testIdLabel: `${testIdPrefix}kopersnummer-label`,
-      testIdValue: `${testIdPrefix}kopersnummer-value`,
+      testIdLabel: 'person-kopersnummer-label',
+      testIdValue: 'person-kopersnummer-value',
     });
   }
 
-  if (includeEmail && email) {
+  if (includeEmail && person.emailStatus) {
     let value: string | null = null;
     let tooltip: string | undefined;
 
-    switch (email.status) {
+    switch (person.emailStatus.status) {
       case EmailStatus.Enabled:
-        value = email.address ?? '';
+        value = person.emailStatus.address ?? '';
         break;
       case EmailStatus.Requested:
         value = t('profile.emailStatusRequested');
@@ -113,13 +112,15 @@ export function mapToLabelValues(
         break;
     }
 
-    data.push({
-      label: t('profile.email'),
-      value,
-      tooltip,
-      testIdLabel: `${testIdPrefix}email-label`,
-      testIdValue: `${testIdPrefix}email-value`,
-    });
+    if (value) {
+      data.push({
+        label: t('profile.email'),
+        value,
+        tooltip,
+        testIdLabel: 'person-email-label',
+        testIdValue: 'person-email-value',
+      });
+    }
   }
 
   return data;

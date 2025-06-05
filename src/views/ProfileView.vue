@@ -7,7 +7,7 @@
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import { OrganisationsTyp } from '@/stores/OrganisationStore';
   import { usePersonInfoStore, type PersonInfoStore } from '@/stores/PersonInfoStore';
-  import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
+  import { EmailStatus, usePersonStore, type PersonStore } from '@/stores/PersonStore';
   import {
     TokenKind,
     useTwoFactorAuthentificationStore,
@@ -17,11 +17,11 @@
   import { adjustDateForTimezoneAndFormat } from '@/utils/date';
   import { mapToLabelValues, type LabelValue, ItemType, type SchulDaten } from '@/utils/personalDataMapper';
   import { computed, onBeforeMount, ref, watch, type ComputedRef, type Ref } from 'vue';
-  import { useI18n } from 'vue-i18n';
+  import { useI18n, type Composer } from 'vue-i18n';
   import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
   import { useDisplay } from 'vuetify';
 
-  const { t }: { t: Function } = useI18n();
+  const { t }: Composer = useI18n({ useScope: 'global' });
 
   type ComposedZuordnung = Zuordnung & {
     klasse?: string | null;
@@ -205,11 +205,16 @@
   const personalData: ComputedRef<LabelValue[]> = computed(() =>
     personInfoStore.personInfo
       ? mapToLabelValues(
+          t,
           {
             vorname: personInfoStore.personInfo.person.name.vorname,
             familienname: personInfoStore.personInfo.person.name.familiennamen,
             username: personInfoStore.personInfo.person.referrer ?? undefined,
             personalnummer: personInfoStore.personInfo.person.personalnummer ?? null,
+            emailStatus: {
+              status: personInfoStore.personInfo.email?.status as EmailStatus,
+              address: personInfoStore.personInfo.email?.address,
+            },
           },
           {
             hasKoPersMerkmal,
