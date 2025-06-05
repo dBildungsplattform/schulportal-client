@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { computed, onMounted, onUnmounted, ref, type ComputedRef, type Ref } from 'vue';
+  import { computed, onMounted, onUnmounted, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useForm, type BaseFieldProps, type TypedSchema, type FormContext } from 'vee-validate';
   import { object, string } from 'yup';
   import { toTypedSchema } from '@vee-validate/yup';
@@ -15,9 +15,11 @@
   } from 'vue-router';
   import { type Composer, useI18n } from 'vue-i18n';
   import FormWrapper from '@/components/form/FormWrapper.vue';
+  import { useDisplay } from 'vuetify';
 
   const router: Router = useRouter();
   const { t }: Composer = useI18n({ useScope: 'global' });
+  const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
   let blockedNext: () => void = () => {};
@@ -33,17 +35,43 @@
 
   // Default selection is always KoPers
   const searchType: Ref<SearchType> = ref<SearchType>(SearchType.KoPers);
+  const showPersonNotFoundDialog: Ref<boolean> = ref(false);
 
-  // Minimal schema, only for structure (no validation rules needed)
-  const schema: TypedSchema = toTypedSchema(
-    object({
-      selectedKopers: string().optional().nullable(),
-      selectedEmail: string().optional().nullable(),
-      selectedUsername: string().optional().nullable(),
-      selectedVorname: string().optional().nullable(),
-      selectedNachname: string().optional().nullable(),
-    }),
+  // eslint-disable-next-line @typescript-eslint/typedef
+  const baseSchema = object({
+    selectedKopers: string().optional().nullable(),
+    selectedEmail: string().optional().nullable(),
+    selectedUsername: string().optional().nullable(),
+    selectedVorname: string().nullable(),
+    selectedNachname: string().nullable(),
+  }).test(
+    'vorname-nachname-pair',
+    '',
+    function (values: { selectedVorname?: string | null; selectedNachname?: string | null }) {
+      const {
+        selectedVorname,
+        selectedNachname,
+      }: { selectedVorname?: string | null; selectedNachname?: string | null } = values;
+
+      if (selectedVorname && !selectedNachname) {
+        return this.createError({
+          path: 'selectedNachname',
+          message: t('admin.person.rules.familienname.required'),
+        });
+      }
+
+      if (selectedNachname && !selectedVorname) {
+        return this.createError({
+          path: 'selectedVorname',
+          message: t('admin.person.rules.vorname.required'),
+        });
+      }
+
+      return true;
+    },
   );
+
+  const schema: TypedSchema = toTypedSchema(baseSchema);
 
   const vuetifyConfig = (state: {
     errors: Array<string>;
@@ -95,28 +123,99 @@
     );
   });
 
-  // Submission logic
-  const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = formContext.handleSubmit(
-    (values: PersonSearchForm) => {
-      switch (searchType.value) {
-        case SearchType.KoPers:
-          personStore.getLandesbedienstetePerson({ personalnummer: values.selectedKopers });
-          break;
-        case SearchType.Email:
-          personStore.getLandesbedienstetePerson({ primaryEmailAddress: values.selectedEmail });
-          break;
-        case SearchType.Username:
-          personStore.getLandesbedienstetePerson({ username: values.selectedUsername });
-          break;
-        case SearchType.Name:
-          personStore.getLandesbedienstetePerson({
-            vorname: values.selectedVorname,
-            familienname: values.selectedNachname,
-          });
-          break;
-      }
-    },
-  );
+  // Watch for searchType changes to clear all fields when radio button changes
+  watch(searchType, (_newSearchType: SearchType) => {
+    // Clear all fields when switching between search types
+    selectedKopers.value = '';
+    selectedEmail.value = '';
+    selectedUsername.value = '';
+    selectedVorname.value = '';
+    selectedNachname.value = '';
+  });
+
+  // Add watchers to clear other fields when one is changed
+  watch(selectedKopers, (newValue: string | undefined) => {
+    if (newValue) {
+      selectedEmail.value = '';
+      selectedUsername.value = '';
+      selectedVorname.value = '';
+      selectedNachname.value = '';
+      searchType.value = SearchType.KoPers;
+    }
+  });
+
+  watch(selectedEmail, (newValue: string | undefined) => {
+    if (newValue) {
+      selectedKopers.value = '';
+      selectedUsername.value = '';
+      selectedVorname.value = '';
+      selectedNachname.value = '';
+      searchType.value = SearchType.Email;
+    }
+  });
+
+  watch(selectedUsername, (newValue: string | undefined) => {
+    if (newValue) {
+      selectedKopers.value = '';
+      selectedEmail.value = '';
+      selectedVorname.value = '';
+      selectedNachname.value = '';
+      searchType.value = SearchType.Username;
+    }
+  });
+
+  // For name fields, clear other fields but allow both Vorname and Nachname to coexist
+  watch(selectedVorname, (newValue: string | undefined) => {
+    if (newValue) {
+      selectedKopers.value = '';
+      selectedEmail.value = '';
+      selectedUsername.value = '';
+      searchType.value = SearchType.Name;
+    }
+  });
+
+  watch(selectedNachname, (newValue: string | undefined) => {
+    if (newValue) {
+      selectedKopers.value = '';
+      selectedEmail.value = '';
+      selectedUsername.value = '';
+      searchType.value = SearchType.Name;
+    }
+  });
+
+  const onSubmit: (e?: Event) => Promise<Promise<void> | undefined> = formContext.handleSubmit(async () => {
+    switch (searchType.value) {
+      case SearchType.KoPers:
+        await personStore.getLandesbedienstetePerson({
+          personalnummer: selectedKopers.value,
+        });
+        break;
+      case SearchType.Email:
+        await personStore.getLandesbedienstetePerson({
+          primaryEmailAddress: selectedEmail.value,
+        });
+        break;
+      case SearchType.Username:
+        await personStore.getLandesbedienstetePerson({
+          username: selectedUsername.value,
+        });
+        break;
+      case SearchType.Name:
+        await personStore.getLandesbedienstetePerson({
+          vorname: selectedVorname.value,
+          nachname: selectedNachname.value,
+        });
+        break;
+    }
+
+    // Check if the result is an empty array, if that's the case show the corresponding dialog
+    if (
+      Array.isArray(personStore.allLandesbedienstetePersonen) &&
+      personStore.allLandesbedienstetePersonen.length === 0
+    ) {
+      showPersonNotFoundDialog.value = true;
+    }
+  });
 
   function isFormDirty(): boolean {
     return (
@@ -218,28 +317,38 @@
           class="align-start"
         >
           <!-- notice Column -->
-          <v-col cols="3">
+          <v-col
+            cols="12"
+            sm="3"
+          >
+            <v-icon
+              aria-hidden="true"
+              class="mr-2"
+              icon="mdi-alert-circle-outline"
+              size="small"
+            ></v-icon>
             <span class="text-body bold">
               {{ t('admin.person.stateEmployeeSearch.searchMethodNotice') }}
             </span>
           </v-col>
 
           <!-- Radio Group and Inputs Column -->
-          <v-col cols="9">
-            <v-radio-group
-              v-model="searchType"
-              class="mt-0"
-            >
+          <v-col
+            cols="12"
+            sm="9"
+          >
+            <v-radio-group v-model="searchType">
               <!-- KoPers -->
               <v-row class="align-center">
-                <v-col cols="3">
+                <v-col cols="auto">
                   <v-radio
                     :label="t('admin.person.stateEmployeeSearch.withKopers')"
                     :value="SearchType.KoPers"
                   />
                 </v-col>
                 <v-col
-                  cols="9"
+                  cols="12"
+                  sm="9"
                   v-if="searchType === SearchType.KoPers"
                 >
                   <v-text-field
@@ -258,14 +367,15 @@
 
               <!-- Email -->
               <v-row class="align-center">
-                <v-col cols="3">
+                <v-col cols="auto">
                   <v-radio
                     :label="t('admin.person.stateEmployeeSearch.withEmail')"
                     :value="SearchType.Email"
                   />
                 </v-col>
                 <v-col
-                  cols="9"
+                  cols="12"
+                  sm="9"
                   v-if="searchType === SearchType.Email"
                 >
                   <v-text-field
@@ -284,14 +394,15 @@
 
               <!-- Username -->
               <v-row class="align-center">
-                <v-col cols="3">
+                <v-col cols="auto">
                   <v-radio
                     :label="t('admin.person.stateEmployeeSearch.withUsername')"
                     :value="SearchType.Username"
                   />
                 </v-col>
                 <v-col
-                  cols="9"
+                  cols="12"
+                  sm="8"
                   v-if="searchType === SearchType.Username"
                 >
                   <v-text-field
@@ -310,18 +421,22 @@
 
               <!-- Name -->
               <v-row class="align-center">
-                <v-col cols="3">
+                <v-col cols="auto">
                   <v-radio
                     :label="t('admin.person.stateEmployeeSearch.withfirstAndLastname')"
                     :value="SearchType.Name"
                   />
                 </v-col>
                 <v-col
-                  cols="9"
+                  cols="12"
+                  sm="9"
                   v-if="searchType === SearchType.Name"
                 >
                   <v-row>
-                    <v-col cols="6">
+                    <v-col
+                      cols="12"
+                      sm="6"
+                    >
                       <v-text-field
                         clearable
                         data-testid="vorname-input"
@@ -334,7 +449,10 @@
                         placeholder="Vorname eingeben"
                       />
                     </v-col>
-                    <v-col cols="6">
+                    <v-col
+                      cols="12"
+                      sm="6"
+                    >
                       <v-text-field
                         clearable
                         data-testid="nachname-input"
@@ -355,5 +473,53 @@
         </v-row>
       </FormWrapper>
     </LayoutCard>
+    <v-dialog
+      v-model="showPersonNotFoundDialog"
+      persistent
+    >
+      <LayoutCard
+        v-if="showPersonNotFoundDialog"
+        :closable="false"
+        :header="t('admin.person.stateEmployeeSearch.searchResult')"
+      >
+        <v-card-text>
+          <v-container>
+            <v-row class="text-body bold px-md-16">
+              <v-col
+                class="text-center"
+                cols="12"
+              >
+                <span data-testid="no-person-found-text">
+                  {{ t('admin.person.stateEmployeeSearch.noPersonFoundMessage') }}
+                </span>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions class="justify-center">
+          <v-row class="justify-center">
+            <v-col
+              cols="12"
+              class="d-flex justify-center"
+            >
+              <v-btn
+                :block="mdAndDown"
+                class="primary"
+                @click.stop="showPersonNotFoundDialog = false"
+                data-testid="cancel-no-person-found-button"
+              >
+                {{ t('cancel') }}
+              </v-btn>
+            </v-col>
+            <v-col
+              cols="12"
+              sm="6"
+              md="4"
+            >
+            </v-col>
+          </v-row>
+        </v-card-actions>
+      </LayoutCard>
+    </v-dialog>
   </div>
 </template>

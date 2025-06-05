@@ -89,7 +89,7 @@ export type LandesbediensteterFilter = {
   primaryEmailAddress?: string;
   username?: string;
   vorname?: string;
-  familienname?: string;
+  nachname?: string;
 };
 
 type PersonGetters = {};
@@ -322,11 +322,11 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       try {
         const { data }: AxiosResponse<PersonLandesbediensteterSearchResponse[]> =
           await personenApi.personControllerFindLandesbediensteter(
-            filter?.familienname,
-            filter?.vorname,
             filter?.personalnummer,
             filter?.primaryEmailAddress,
             filter?.username,
+            filter?.vorname,
+            filter?.nachname,
           );
         this.allLandesbedienstetePersonen = data;
       } catch (error: unknown) {

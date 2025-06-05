@@ -161,7 +161,9 @@
       "stateEmployeeSearch": {
         "addPerson": "Person hinzufügen",
         "anotherPerson": "Andere Person (Neuanlage)",
-        "searchMethodNotice": "Bitte wählen Sie wie Sie die Person suchen möchten",
+        "noPersonFoundMessage": "Es wurde leider kein Treffer gefunden. Sollten Sie Hilfe benötigen, eröffnen Sie ein Störungsticket über den IQSH-Helpdesk.",
+        "searchResult": "Suchergebnis",
+        "searchMethodNotice": "Bitte wählen Sie wie Sie die Person suchen möchten.",
         "search": "Landesbediensteter (Nur Suche)",
         "searchPerson": "Person suchen",
         "withKopers": "per Kopers.-Nr.",
