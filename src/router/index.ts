@@ -14,7 +14,8 @@ type Permission =
   | 'schulverwaltung'
   | 'schultraegerverwaltung'
   | 'portalverwaltung'
-  | 'hinweisebearbeiten';
+  | 'hinweisebearbeiten'
+  | 'limitedpersonenanlegen';
 const router: Router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
@@ -104,6 +105,8 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
           return authStore.hasPortalVerwaltungPermission;
         case 'hinweisebearbeiten':
           return authStore.hasHinweiseBearbeitenPermission;
+        case 'limitedpersonenanlegen':
+          return authStore.hasEingeschränktNeueBenutzerErstellenPermission;
         default:
           return false;
       }
