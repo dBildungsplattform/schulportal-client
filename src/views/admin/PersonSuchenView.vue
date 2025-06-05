@@ -3,7 +3,7 @@
   import { useForm, type BaseFieldProps, type TypedSchema, type FormContext } from 'vee-validate';
   import { object, string } from 'yup';
   import { toTypedSchema } from '@vee-validate/yup';
-  import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
+  import { usePersonStore, type PersonLandesbediensteterSearchPersonenkontextResponse, type PersonLandesbediensteterSearchResponse, type PersonStore } from '@/stores/PersonStore';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import {
@@ -35,7 +35,7 @@
 
   // Default selection is always KoPers
   const searchType: Ref<SearchType> = ref<SearchType>(SearchType.KoPers);
-  const showPersonNotFoundDialog: Ref<boolean> = ref(false);
+  const showErrorDialog: Ref<boolean> = ref(false);
   const errorDialogMessage: Ref<string> = ref('');
 
   // eslint-disable-next-line @typescript-eslint/typedef
@@ -212,18 +212,115 @@
     // Check if the result is an empty array, if that's the case show the corresponding dialog
     if (
       Array.isArray(personStore.allLandesbedienstetePersonen) &&
-      personStore.allLandesbedienstetePersonen.length === 0 
+      personStore.allLandesbedienstetePersonen.length === 0
     ) {
       errorDialogMessage.value = t('admin.person.stateEmployeeSearch.noPersonFoundMessage');
-      showPersonNotFoundDialog.value = true;
+      showErrorDialog.value = true;
     }
-    // Check if multiple persons were found
-    if (personStore.errorCode === 'LANDESBEDIENSTETER_SEARCH_MULTIPLE_PERSONS_FOUND') {
+
+    // If the search was successful but the person has no Kopers number, we get an error Code.
+    if (personStore.errorCode === 'LANDESBEDIENSTETER_SEARCH_NO_PERSON_FOUND') {
+      // Set the error code to empty to avoid showing the error message in the alert
+      personStore.errorCode = '';
+      errorDialogMessage.value = t('admin.person.stateEmployeeSearch.noPersonFoundMessage');
+      showErrorDialog.value = true;
+    }
+    // Check if multiple persons were found we get an error Code.
+    else if (personStore.errorCode === 'LANDESBEDIENSTETER_SEARCH_MULTIPLE_PERSONS_FOUND') {
       // Set the error code to empty to avoid showing the error message in the alert
       personStore.errorCode = '';
       errorDialogMessage.value = t('admin.person.stateEmployeeSearch.multiplePersonsFoundMessage');
-
+      showErrorDialog.value = true;
     }
+  });
+
+  enum ItemType {
+    KO_PERS = 'KO_PERS',
+  }
+
+  type LabelValue = {
+    label: string;
+    labelAbbr?: string;
+    value: string | null;
+    type?: ItemType;
+    testIdLabel: string;
+    testIdValue: string;
+  };
+
+  const personalData: ComputedRef<LabelValue[]> = computed(() => {
+    const data: LabelValue[] = [];
+    const person: PersonLandesbediensteterSearchResponse | undefined =
+      personStore.allLandesbedienstetePersonen?.[0] ?? undefined;
+    if (!person) {
+      return data;
+    }
+    data.push({
+      label: t('profile.fullName'),
+      value: person.vorname + ' ' + person.familienname,
+      testIdLabel: 'fullName-label',
+      testIdValue: 'fullName-value',
+    });
+
+    data.push({
+      label: t('person.userName'),
+      value: person.username,
+      testIdLabel: 'userName-label',
+      testIdValue: 'userName-value',
+    });
+
+    data.push({
+      label: t('profile.koPersNummer'),
+      labelAbbr: t('profile.koPersNummerAbbr'),
+      value: person.personalnummer,
+      type: ItemType.KO_PERS,
+      testIdLabel: 'kopersnummer-label',
+      testIdValue: 'kopersnummer-value',
+    });
+
+    data.push({
+      label: t('profile.email'),
+      value: person.primaryEmailAddress,
+      testIdLabel: 'email-label',
+      testIdValue: 'email-value',
+    });
+
+    return data;
+  });
+
+  interface SchulDaten {
+    title: string;
+    labelAndValues: LabelValue[];
+  }
+
+  const organisationenDaten: ComputedRef<SchulDaten[]> = computed(() => {
+    const person: PersonLandesbediensteterSearchResponse | undefined =
+      personStore.allLandesbedienstetePersonen?.[0] ?? undefined;
+    if (!person) {
+      return [];
+    }
+    return person.personenkontexte.map(
+      (kontext: PersonLandesbediensteterSearchPersonenkontextResponse, index: number) => {
+        const labelAndValues: LabelValue[] = [
+          {
+            label: t('profile.schule'),
+            value: kontext.organisationName,
+            testIdLabel: `organisation-label-${index + 1}`,
+            testIdValue: `organisation-value-${index + 1}`,
+          },
+          {
+            label: t('admin.rolle.rolle'),
+            value: kontext.rolleName,
+            testIdLabel: `rolle-label-${index + 1}`,
+            testIdValue: `rolle-value-${index + 1}`,
+          },
+        ];
+
+        return {
+          title: kontext.organisationName,
+          labelAndValues,
+        };
+      },
+    );
   });
 
   function isFormDirty(): boolean {
@@ -482,13 +579,106 @@
           </v-col>
         </v-row>
       </FormWrapper>
+      <template v-if="!personStore.errorCode && personStore.allLandesbedienstetePersonen?.length === 1">
+        <v-row class="ma-4">
+          <v-col
+            cols="12"
+            sm="12"
+            md="6"
+            class="d-flex flex-column ga-8"
+          >
+            <LayoutCard
+              :header="$t('profile.personalData')"
+              :headline-test-id="'layout-card-headline-personal-data'"
+            >
+              <v-row class="ma-4">
+                <v-col cols="12">
+                  <v-table class="text-body-1">
+                    <template v-slot:default>
+                      <tbody>
+                        <tr
+                          v-for="item in personalData"
+                          :key="item.label"
+                        >
+                          <td>
+                            <span v-if="item.labelAbbr">
+                              <abbr :title="item.label">
+                                <strong :data-testid="item.testIdLabel">{{ item.labelAbbr }}:</strong>
+                              </abbr>
+                            </span>
+                            <strong
+                              v-else
+                              :data-testid="item.testIdLabel"
+                            >
+                              {{ item.label }}:
+                            </strong>
+                          </td>
+                          <td :data-testid="item.testIdValue">
+                            {{ item.value }}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </template>
+                  </v-table>
+                </v-col>
+              </v-row>
+            </LayoutCard>
+          </v-col>
+
+          <v-col
+            cols="12"
+            sm="12"
+            md="6"
+            class="d-flex flex-column ga-8"
+          >
+            <LayoutCard
+              v-for="(orgData, index) in organisationenDaten"
+              :key="orgData.title"
+              :header="$t('person.zuordnung') + ' ' + (organisationenDaten.length > 1 ? (index + 1).toString() : '')"
+              :headline-test-id="'zuordung-card-' + (index + 1)"
+            >
+              <v-row class="ma-3 p-4">
+                <v-col cols="12">
+                  <v-table class="text-body-1">
+                    <template v-slot:default>
+                      <tbody>
+                        <tr
+                          v-for="item in orgData.labelAndValues"
+                          :key="item.label"
+                        >
+                          <td>
+                            <span v-if="item.labelAbbr">
+                              <abbr :title="item.label">
+                                <strong :data-testid="item.testIdLabel">{{ item.labelAbbr }}:</strong>
+                              </abbr>
+                            </span>
+                            <strong
+                              v-else
+                              :data-testid="item.testIdLabel"
+                            >
+                              {{ item.label }}:
+                            </strong>
+                          </td>
+                          <td :data-testid="item.testIdValue">
+                            {{ item.value }}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </template>
+                  </v-table>
+                </v-col>
+              </v-row>
+            </LayoutCard>
+          </v-col>
+        </v-row>
+      </template>
     </LayoutCard>
     <v-dialog
-      v-model="showPersonNotFoundDialog"
+      v-model="showErrorDialog"
       persistent
     >
       <LayoutCard
-        v-if="showPersonNotFoundDialog"
+        v-if="showErrorDialog"
         :closable="false"
         :header="t('admin.person.stateEmployeeSearch.searchResult')"
       >
@@ -515,7 +705,7 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary"
-                @click.stop="showPersonNotFoundDialog = false"
+                @click.stop="showErrorDialog = false"
                 data-testid="cancel-no-person-found-button"
               >
                 {{ t('cancel') }}

@@ -18,6 +18,7 @@ import {
   type PersonenFrontendApiInterface,
   type PersonenuebersichtBodyParams,
   type PersonFrontendControllerFindPersons200Response,
+  type PersonLandesbediensteterSearchPersonenkontextResponse,
   type PersonLandesbediensteterSearchResponse,
   type PersonMetadataBodyParams,
 } from '../api-client/generated/api';
@@ -59,7 +60,12 @@ export type Personendatensatz = {
   person: Person;
 };
 
-export type { PersonendatensatzResponse, SortOrder };
+export type {
+  PersonendatensatzResponse,
+  SortOrder,
+  PersonLandesbediensteterSearchResponse,
+  PersonLandesbediensteterSearchPersonenkontextResponse,
+};
 
 type PersonState = {
   allUebersichten: Map<string, PersonWithZuordnungen>;
