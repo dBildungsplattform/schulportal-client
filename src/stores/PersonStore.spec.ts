@@ -4,6 +4,7 @@ import {
   type DBiamPersonenuebersichtResponse,
   type LockUserBodyParams,
   type PersonFrontendControllerFindPersons200Response,
+  type PersonLandesbediensteterSearchResponse,
   type PersonLockResponse,
   type PersonMetadataBodyParams,
   type PersonendatensatzResponse,
@@ -663,4 +664,74 @@ describe('PersonStore', () => {
       expect(personStore.errorCode).toEqual('ERROR_LOADING_USER');
     });
   });
+
+  describe('getLandesbedienstetePerson', () => {
+  it('should load Landesbedienstete persons and update state', async () => {
+    const mockLandesbedienstetePersonen: PersonLandesbediensteterSearchResponse[] = [
+      {
+        vorname: 'John',
+        familienname: 'Doe',
+        username: 'john.doe',
+        personalnummer: '12345',
+        primaryEmailAddress: 'john.doe@example.com',
+        personenkontexte: [
+          {
+            rolleId: 'role-1',
+            rolleName: 'Teacher',
+            organisationId: 'org-1',
+            organisationName: 'Test School'
+          }
+        ]
+      },
+      {
+        vorname: 'Jane',
+        familienname: 'Smith',
+        username: 'jane.smith',
+        personalnummer: '67890',
+        primaryEmailAddress: 'jane.smith@example.com',
+        personenkontexte: [
+          {
+            rolleId: 'role-2',
+            rolleName: 'Administrator',
+            organisationId: 'org-2',
+            organisationName: 'Test Administration'
+          }
+        ]
+      }
+    ];
+
+    const filter = {
+      personalnummer: '12345',
+    };
+
+    mockadapter.onGet('/api/personen/landesbediensteter?personalnummer=12345').replyOnce(200, mockLandesbedienstetePersonen);
+
+    const getLandesbedienstetePersonPromise: Promise<void> = personStore.getLandesbedienstetePerson(filter);
+    expect(personStore.loading).toBe(true);
+    await getLandesbedienstetePersonPromise;
+    expect(personStore.loading).toBe(false);
+    expect(personStore.allLandesbedienstetePersonen).toEqual(mockLandesbedienstetePersonen);
+    expect(personStore.errorCode).toEqual('');
+  });
+
+  it('should handle string error', async () => {
+    mockadapter.onGet('/api/personen/landesbediensteter').replyOnce(500, 'some mock server error');
+    
+    const getLandesbedienstetePersonPromise: Promise<void> = personStore.getLandesbedienstetePerson();
+    expect(personStore.loading).toBe(true);
+    await getLandesbedienstetePersonPromise;
+    expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+    expect(personStore.loading).toBe(false);
+  });
+
+  it('should handle error code', async () => {
+    mockadapter.onGet('/api/personen/landesbediensteter').replyOnce(500, { code: 'some mock server error' });
+    
+    const getLandesbedienstetePersonPromise: Promise<void> = personStore.getLandesbedienstetePerson();
+    expect(personStore.loading).toBe(true);
+    await getLandesbedienstetePersonPromise;
+    expect(personStore.errorCode).toEqual('some mock server error');
+    expect(personStore.loading).toBe(false);
+  });
+});
 });
