@@ -2,7 +2,8 @@
   import KlassenFilter from '@/components/filter/KlassenFilter.vue';
   import FormRow from '@/components/form/FormRow.vue';
   import { type BaseFieldProps } from 'vee-validate';
-  import { type ModelRef } from 'vue';
+  import { type Ref, ref, type ModelRef } from 'vue';
+  import { watch } from 'vue';
 
   type Props = {
     schulen?: Array<{ value: string; title: string }>;
@@ -16,6 +17,18 @@
 
   const selectedSchule: ModelRef<string | undefined, string> = defineModel('selectedSchule');
   const selectedNewKlasse: ModelRef<string | undefined, string> = defineModel('selectedNewKlasse');
+
+  // we need to cast the selectedSchule into an array
+  // doing it this way prevents an issue where the reactive system constantly re-runs which causes requests to be issued in a loop
+  const administriertVon: Ref<string[] | undefined> = ref();
+  watch(
+    selectedSchule,
+    (newValue: string | undefined) => {
+      if (!newValue) administriertVon.value = [];
+      else if (!administriertVon.value?.includes(newValue)) administriertVon.value = [newValue];
+    },
+    { immediate: true },
+  );
 </script>
 
 <template>
@@ -68,7 +81,7 @@
         :selectedKlassen="selectedNewKlasse"
         :placeholderText="$t('admin.klasse.selectKlasse')"
         ref="klasse-select"
-        :administriertVon="selectedSchule ? [selectedSchule] : undefined"
+        :administriertVon
         :filterId="'klasse-change'"
         @update:selectedKlassen="(newValue: string | undefined) => (selectedNewKlasse = newValue)"
       />
