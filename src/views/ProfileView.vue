@@ -7,7 +7,7 @@
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import { OrganisationsTyp } from '@/stores/OrganisationStore';
   import { usePersonInfoStore, type PersonInfoStore } from '@/stores/PersonInfoStore';
-  import { EmailStatus, usePersonStore, type PersonStore } from '@/stores/PersonStore';
+  import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
   import {
     TokenKind,
     useTwoFactorAuthentificationStore,
@@ -214,43 +214,11 @@
           {
             hasKoPersMerkmal,
             includeKoPers: true,
+            includeEmail: true,
           },
         )
       : [],
   );
-
-  // Computed property to define what will be shown in the field Email depending on the returned status.
-  const emailStatus: ComputedRef<
-    | {
-        text: string;
-        tooltip?: string;
-      }
-    | undefined
-  > = computed(() => {
-    switch (personInfoStore.personInfo?.email?.status) {
-      case EmailStatus.Enabled:
-        return {
-          text: personInfoStore.personInfo.email.address,
-        };
-      case EmailStatus.Requested:
-        return {
-          text: t('profile.emailStatusRequested'),
-          tooltip: t('profile.emailStatusRequestedHover'),
-        };
-      case EmailStatus.Disabled:
-        return {
-          text: t('profile.emailStatusDisabled'),
-          tooltip: t('profile.emailStatusDisabledHover'),
-        };
-      case EmailStatus.Failed:
-        return {
-          text: t('profile.emailStatusFailed'),
-          tooltip: t('profile.emailStatusFailedHover'),
-        };
-      default:
-        return undefined;
-    }
-  });
 
   const schulDaten: ComputedRef<SchulDaten[]> = computed(() => {
     if (!personStore.personenuebersicht) return [];
@@ -433,19 +401,14 @@
                         :data-testid="item.testIdValue"
                         v-else
                       >
-                        {{ item.value }}
-                      </td>
-                    </tr>
-                    <tr v-if="!!emailStatus">
-                      <td>
-                        <strong> {{ $t('profile.email') }}: </strong>
-                      </td>
-                      <td>
-                        <v-row no-gutters>
+                        <v-row
+                          no-gutters
+                          align="center"
+                        >
                           <SpshTooltip
-                            v-if="!!emailStatus.tooltip"
+                            v-if="item.tooltip"
                             enabledCondition
-                            :enabledText="emailStatus.tooltip"
+                            :enabledText="item.tooltip"
                             position="bottom"
                           >
                             <v-icon
@@ -453,9 +416,9 @@
                               class="mr-2"
                               icon="mdi-alert-circle-outline"
                               size="small"
-                            ></v-icon>
+                            />
                           </SpshTooltip>
-                          <span data-testid="person-email-text">{{ emailStatus.text }}</span>
+                          <span>{{ item.value }}</span>
                         </v-row>
                       </td>
                     </tr>

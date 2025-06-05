@@ -22,6 +22,7 @@
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import { useDisplay } from 'vuetify';
   import { mapToLabelValues, type LabelValue, type SchulDaten } from '@/utils/personalDataMapper';
+  import SpshTooltip from '@/components/admin/SpshTooltip.vue';
 
   const router: Router = useRouter();
   const { t }: Composer = useI18n({ useScope: 'global' });
@@ -254,6 +255,7 @@
       },
       {
         includeKoPers: true,
+        includeEmail: true,
       },
     );
   });
@@ -392,7 +394,7 @@
           <v-col
             cols="12"
             sm="3"
-            class="d-flex align-start"
+            class="d-flex align-start ml-n5"
           >
             <v-icon
               aria-hidden="true"
@@ -580,7 +582,25 @@
                             </strong>
                           </td>
                           <td :data-testid="item.testIdValue">
-                            {{ item.value }}
+                            <v-row
+                              no-gutters
+                              align="center"
+                            >
+                              <SpshTooltip
+                                v-if="item.tooltip"
+                                enabledCondition
+                                :enabledText="item.tooltip"
+                                position="bottom"
+                              >
+                                <v-icon
+                                  aria-hidden="true"
+                                  class="mr-2"
+                                  icon="mdi-alert-circle-outline"
+                                  size="small"
+                                />
+                              </SpshTooltip>
+                              <span>{{ item.value }}</span>
+                            </v-row>
                           </td>
                         </tr>
                       </tbody>

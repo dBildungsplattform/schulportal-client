@@ -1,3 +1,4 @@
+import { EmailStatus } from '@/stores/PersonStore';
 import type { Ref } from 'vue';
 import { useI18n, type Composer } from 'vue-i18n';
 
@@ -12,6 +13,7 @@ export type LabelValue = {
   type?: ItemType;
   testIdLabel: string;
   testIdValue: string;
+  tooltip?: string;
 };
 
 export type SchulDaten = {
@@ -21,6 +23,11 @@ export type SchulDaten = {
   schulAdmins?: string[];
 };
 
+export type EmailStatusObject = {
+  status: EmailStatus;
+  address?: string;
+};
+
 /**
  * Maps a person's data to an array of label-value objects for display purposes.
  *
@@ -28,12 +35,10 @@ export type SchulDaten = {
  * @param options - Optional configuration object.
  * @param options.hasKoPersMerkmal - A Vue ref indicating if the person has the KoPersMerkmal attribute.
  * @param options.includeKoPers - Whether to include the KoPers number in the result (default: true).
+ * @param options.includeEmail - Whether to include the email field.
+ * @param options.email - Optional email object with status and address.
  * @param options.testIdPrefix - Prefix for test IDs used in the label-value objects.
  * @returns An array of `LabelValue` objects representing the person's data for UI display.
- *
- * @remarks
- * - Uses i18n for label translations.
- * - Optionally includes username and KoPers number based on input and options.
  */
 export function mapToLabelValues(
   person: {
@@ -45,10 +50,14 @@ export function mapToLabelValues(
   {
     hasKoPersMerkmal,
     includeKoPers = true,
+    includeEmail = false,
+    email,
     testIdPrefix = '',
   }: {
     hasKoPersMerkmal?: Ref<boolean>;
     includeKoPers?: boolean;
+    includeEmail?: boolean;
+    email?: EmailStatusObject | null;
     testIdPrefix?: string;
   } = {},
 ): LabelValue[] {
@@ -79,6 +88,37 @@ export function mapToLabelValues(
       type: ItemType.KO_PERS,
       testIdLabel: `${testIdPrefix}kopersnummer-label`,
       testIdValue: `${testIdPrefix}kopersnummer-value`,
+    });
+  }
+
+  if (includeEmail && email) {
+    let value: string | null = null;
+    let tooltip: string | undefined;
+
+    switch (email.status) {
+      case EmailStatus.Enabled:
+        value = email.address ?? '';
+        break;
+      case EmailStatus.Requested:
+        value = t('profile.emailStatusRequested');
+        tooltip = t('profile.emailStatusRequestedHover');
+        break;
+      case EmailStatus.Disabled:
+        value = t('profile.emailStatusDisabled');
+        tooltip = t('profile.emailStatusDisabledHover');
+        break;
+      case EmailStatus.Failed:
+        value = t('profile.emailStatusFailed');
+        tooltip = t('profile.emailStatusFailedHover');
+        break;
+    }
+
+    data.push({
+      label: t('profile.email'),
+      value,
+      tooltip,
+      testIdLabel: `${testIdPrefix}email-label`,
+      testIdValue: `${testIdPrefix}email-value`,
     });
   }
 
