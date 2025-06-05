@@ -19,6 +19,7 @@ import {
   type PersonenkontexteUpdateResponse,
   type PersonenkontextWorkflowResponse,
   type SystemrechtResponse,
+  RollenSystemRecht,
 } from '../api-client/generated/api';
 import { usePersonStore, type PersonStore } from './PersonStore';
 import type { Zuordnung } from './types/Zuordnung';
@@ -71,6 +72,7 @@ type PersonenkontextState = {
   loading: boolean;
   totalFilteredRollen: number;
   totalPaginatedRollen: number;
+  requestedWithSystemrecht: RollenSystemRecht | undefined;
 };
 
 type PersonenkontextGetters = {};
@@ -128,6 +130,7 @@ export const usePersonenkontextStore: StoreDefinition<
       loading: false,
       totalFilteredRollen: 0,
       totalPaginatedRollen: 0,
+      requestedWithSystemrecht: undefined,
     };
   },
   actions: {
@@ -155,6 +158,7 @@ export const usePersonenkontextStore: StoreDefinition<
             filter?.rolleName,
             filter?.organisationName,
             filter?.limit,
+            this.requestedWithSystemrecht,
           );
         this.workflowStepResponse = data;
         return data;
