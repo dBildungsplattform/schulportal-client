@@ -1,11 +1,9 @@
-import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
-import KlasseChange from './KlasseChange.vue';
+import { expect, test } from 'vitest';
 import { nextTick } from 'vue';
-import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+import KlasseChange from './KlasseChange.vue';
 
 let wrapper: VueWrapper | null = null;
-const organisationStore: OrganisationStore = useOrganisationStore();
 const schulen: Array<{ value: string; title: string }> = [
   {
     value: '1',
@@ -14,17 +12,6 @@ const schulen: Array<{ value: string; title: string }> = [
   {
     value: '2',
     title: 'Schule 2',
-  },
-];
-
-const klassen: Array<{ value: string; title: string }> = [
-  {
-    value: '1',
-    title: 'Klasse 1',
-  },
-  {
-    value: '2',
-    title: 'Klasse 2',
   },
 ];
 
@@ -40,7 +27,6 @@ beforeEach(() => {
     attachTo: document.getElementById('app') || '',
     props: {
       schulen,
-      klassen,
       readonly: false,
       selectedSchuleProps: {
         error: false,
@@ -82,8 +68,14 @@ describe('KlasseChange', () => {
     await wrapper?.find('[data-testid="schule-select"]').trigger('change');
     await nextTick();
 
-    await wrapper?.findComponent({ ref: 'klasse-select' }).setValue('2');
-    await wrapper?.findComponent({ ref: 'klasse-select' }).trigger('change');
+    await wrapper
+      ?.findComponent({ name: 'KlassenFilter' })
+      .findComponent({ ref: 'klasse-change-klasse-select' })
+      .setValue('2');
+    await wrapper
+      ?.findComponent({ name: 'KlassenFilter' })
+      .findComponent({ ref: 'klasse-change-klasse-select' })
+      .trigger('change');
 
     await wrapper?.find('[data-testid="klasse-change-form"]').trigger('submit');
     expect(wrapper?.emitted('submit')).toBeTruthy();
@@ -94,8 +86,10 @@ describe('KlasseChange', () => {
     await organisationAutocomplete?.setValue('1');
     await nextTick();
 
-    const klassenAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
-    await klassenAutocomplete?.vm.$emit('update:search', '');
+    const klassenAutocomplete: VueWrapper | undefined = wrapper
+      ?.findComponent({ name: 'KlassenFilter' })
+      .findComponent({ ref: 'klasse-change-klasse-select' });
+    klassenAutocomplete?.vm.$emit('update:search', '');
     await nextTick();
 
     await organisationAutocomplete?.setValue(undefined);
@@ -104,64 +98,12 @@ describe('KlasseChange', () => {
     expect(klassenAutocomplete?.text()).toBeFalsy();
   });
 
-  test('Trigger Klassen search if the klasse was set', async () => {
+  test('Make sure selected organisation is sent to KlassenFilter', async () => {
     const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
     await organisationAutocomplete?.setValue('1');
     await nextTick();
 
-    const klassenAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
-    await klassenAutocomplete?.setValue('1');
-    await nextTick();
-
-    expect(klassenAutocomplete?.text()).toBeTruthy();
-  });
-
-  test('should not call getKlassenByOrganisationId when no organisation is selected', async () => {
-    const klassenAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
-    await klassenAutocomplete?.vm.$emit('update:search', 'test');
-    vi.advanceTimersByTime(500);
-    await nextTick();
-
-    expect(organisationStore.getKlassenByOrganisationId).not.toHaveBeenCalled();
-  });
-  test('should not search when search value matches selected class title', async () => {
-    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
-    await organisationAutocomplete?.setValue('1');
-
-    const klassenAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
-    await klassenAutocomplete?.setValue('1'); // Select Klasse 1
-    await klassenAutocomplete?.vm.$emit('update:search', 'Klasse 1'); // Search with same title
-
-    vi.advanceTimersByTime(500);
-    expect(organisationStore.getKlassenByOrganisationId).not.toHaveBeenCalled();
-  });
-
-  test('should update selectedNewKlasse value when set to a new value', async () => {
-    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
-    await organisationAutocomplete?.setValue('1');
-    await nextTick();
-
-    const klassenAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
-
-    await klassenAutocomplete?.setValue('2');
-    await nextTick();
-
-    expect(organisationStore.getKlassenByOrganisationId).not.toHaveBeenCalled();
-  });
-
-  test('should call getKlassenByOrganisationId when selectedNewKlasse is set to undefined', async () => {
-    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
-    await organisationAutocomplete?.setValue('1');
-    await nextTick();
-
-    const klassenAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
-
-    await klassenAutocomplete?.setValue('1');
-    await nextTick();
-
-    await klassenAutocomplete?.setValue(undefined);
-    await nextTick();
-
-    expect(organisationStore.getKlassenByOrganisationId).toHaveBeenCalledWith({ limit: 200, administriertVon: ['1'] });
+    const klassenAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ name: 'KlassenFilter' });
+    expect(klassenAutocomplete).toEqual(expect.objectContaining({ administriertVon: ['1'] }));
   });
 });

@@ -828,7 +828,7 @@ describe('PersonDetailsView', () => {
 
     const klasseInput: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'klasse-change-form' })
-      .findComponent({ ref: 'klasse-select' });
+      .findComponent({ name: 'KlassenFilter' });
     await klasseInput?.setValue('9a');
     await nextTick();
 

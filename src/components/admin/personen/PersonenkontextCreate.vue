@@ -407,6 +407,7 @@
         <KlassenFilter
           :multiple="false"
           :hideDetails="false"
+          :selectedKlasseProps="selectedKlasseProps"
           :highlightSelection="false"
           :selectedKlassen="selectedKlasse"
           @update:selectedKlassen="updateKlasseSelection"

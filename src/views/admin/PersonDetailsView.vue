@@ -15,7 +15,6 @@
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import TokenReset from '@/components/two-factor-authentication/TokenReset.vue';
   import TwoFactorAuthenticationSetUp from '@/components/two-factor-authentication/TwoFactorAuthenticationSetUp.vue';
-  import { useKlassen } from '@/composables/useKlassen';
   import { useOrganisationen } from '@/composables/useOrganisationen';
   import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
   import { useAuthStore, type AuthStore, type PersonenkontextRolleFields } from '@/stores/AuthStore';
@@ -23,6 +22,7 @@
   import {
     OrganisationsTyp,
     useOrganisationStore,
+    type AutoCompleteStore,
     type Organisation,
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
@@ -493,7 +493,16 @@
 
   const rollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
   const organisationen: ComputedRef<TranslatedObject[] | undefined> = useOrganisationen();
-  const klassen: ComputedRef<TranslatedObject[] | undefined> = useKlassen();
+  const klassen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
+    const activeStore: AutoCompleteStore<Organisation> | undefined =
+      organisationStore.klassenFilters.get('personenkontext-create') ??
+      organisationStore.klassenFilters.get('klasse-change');
+    if (!activeStore) return [];
+    return activeStore.filterResult.map((klasse: Organisation) => ({
+      value: klasse.id,
+      title: klasse.name,
+    }));
+  });
 
   type ZuordnungCreationForm = {
     selectedRolle: string;
@@ -766,33 +775,14 @@
 
   // Triggers the template to change the Klasse. Also pre-select the Schule and Klasse.
   const triggerChangeKlasse = async (): Promise<void> => {
-    // Get the Klasse from the parent using the parent's ID and the klasse name
-    if (selectedZuordnungen.value[0]?.sskId) {
-      await organisationStore.getAllOrganisationen({
-        administriertVon: [selectedZuordnungen.value[0]?.sskId],
-        includeTyp: OrganisationsTyp.Klasse,
-        systemrechte: ['KLASSEN_VERWALTEN'],
-        limit: 200,
-      });
-
-      await organisationStore.getKlassenByOrganisationId({
-        searchString: selectedZuordnungen.value[0].klasse,
-        limit: 25,
-        administriertVon: [selectedZuordnungen.value[0]?.sskId],
-      });
-
-      // Combine arrays and remove duplicates based on id
-      const combined: Organisation[] = [...organisationStore.klassen, ...organisationStore.allKlassen];
-      organisationStore.klassen = Array.from(new Map(combined.map((item: Organisation) => [item.id, item])).values());
-    }
     // Auto select the new Schule
     selectedSchule.value = selectedZuordnungen.value[0]?.sskId;
     // Retrieves the new Klasse from the selected Zuordnung
-    const newKlasse: Organisation | undefined = organisationStore.klassen.find(
-      (k: Organisation) => k.name === selectedZuordnungen.value[0]?.klasse,
+    const klassenZuordnung: Zuordnung | undefined = personStore.personenuebersicht?.zuordnungen.find(
+      (z: Zuordnung) => z.sskName === selectedZuordnungen.value[0]?.klasse,
     );
     // Auto select the new Klasse
-    selectedNewKlasse.value = newKlasse?.id;
+    selectedNewKlasse.value = klassenZuordnung?.sskId;
     isChangeKlasseFormActive.value = true;
   };
 
@@ -2294,7 +2284,6 @@
                   :organisationen="organisationen"
                   :rollen="filteredRollen"
                   ref="personenkontext-create"
-                  :klassen="klassen"
                   :selectedOrganisationProps="selectedOrganisationProps"
                   :selectedRolleProps="selectedRolleProps"
                   :selectedKlasseProps="selectedKlasseProps"
