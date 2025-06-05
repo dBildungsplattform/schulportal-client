@@ -3,7 +3,12 @@
   import { useForm, type BaseFieldProps, type TypedSchema, type FormContext } from 'vee-validate';
   import { object, string } from 'yup';
   import { toTypedSchema } from '@vee-validate/yup';
-  import { usePersonStore, type PersonLandesbediensteterSearchPersonenkontextResponse, type PersonLandesbediensteterSearchResponse, type PersonStore } from '@/stores/PersonStore';
+  import {
+    usePersonStore,
+    type PersonLandesbediensteterSearchPersonenkontextResponse,
+    type PersonLandesbediensteterSearchResponse,
+    type PersonStore,
+  } from '@/stores/PersonStore';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import {
@@ -16,6 +21,7 @@
   import { type Composer, useI18n } from 'vue-i18n';
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import { useDisplay } from 'vuetify';
+  import { mapToLabelValues, type LabelValue, type SchulDaten } from '@/utils/personalDataMapper';
 
   const router: Router = useRouter();
   const { t }: Composer = useI18n({ useScope: 'global' });
@@ -218,7 +224,7 @@
       showErrorDialog.value = true;
     }
 
-    // If the search was successful but the person has no Kopers number, we get an error Code.
+    // If the search was successful but the person has no Kopers number or is manually locked, we get this error Code.
     if (personStore.errorCode === 'LANDESBEDIENSTETER_SEARCH_NO_PERSON_FOUND') {
       // Set the error code to empty to avoid showing the error message in the alert
       personStore.errorCode = '';
@@ -234,63 +240,23 @@
     }
   });
 
-  enum ItemType {
-    KO_PERS = 'KO_PERS',
-  }
-
-  type LabelValue = {
-    label: string;
-    labelAbbr?: string;
-    value: string | null;
-    type?: ItemType;
-    testIdLabel: string;
-    testIdValue: string;
-  };
-
   const personalData: ComputedRef<LabelValue[]> = computed(() => {
-    const data: LabelValue[] = [];
     const person: PersonLandesbediensteterSearchResponse | undefined =
       personStore.allLandesbedienstetePersonen?.[0] ?? undefined;
-    if (!person) {
-      return data;
-    }
-    data.push({
-      label: t('profile.fullName'),
-      value: person.vorname + ' ' + person.familienname,
-      testIdLabel: 'fullName-label',
-      testIdValue: 'fullName-value',
-    });
+    if (!person) return [];
 
-    data.push({
-      label: t('person.userName'),
-      value: person.username,
-      testIdLabel: 'userName-label',
-      testIdValue: 'userName-value',
-    });
-
-    data.push({
-      label: t('profile.koPersNummer'),
-      labelAbbr: t('profile.koPersNummerAbbr'),
-      value: person.personalnummer,
-      type: ItemType.KO_PERS,
-      testIdLabel: 'kopersnummer-label',
-      testIdValue: 'kopersnummer-value',
-    });
-
-    data.push({
-      label: t('profile.email'),
-      value: person.primaryEmailAddress,
-      testIdLabel: 'email-label',
-      testIdValue: 'email-value',
-    });
-
-    return data;
+    return mapToLabelValues(
+      {
+        vorname: person.vorname,
+        familienname: person.familienname,
+        username: person.username,
+        personalnummer: person.personalnummer,
+      },
+      {
+        includeKoPers: true,
+      },
+    );
   });
-
-  interface SchulDaten {
-    title: string;
-    labelAndValues: LabelValue[];
-  }
 
   const organisationenDaten: ComputedRef<SchulDaten[]> = computed(() => {
     const person: PersonLandesbediensteterSearchResponse | undefined =

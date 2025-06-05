@@ -15,6 +15,7 @@
   } from '@/stores/TwoFactorAuthentificationStore';
   import { Zuordnung } from '@/stores/types/Zuordnung';
   import { adjustDateForTimezoneAndFormat } from '@/utils/date';
+  import { mapToLabelValues, type LabelValue, ItemType, type SchulDaten } from '@/utils/personalDataMapper';
   import { computed, onBeforeMount, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
@@ -22,25 +23,8 @@
 
   const { t }: { t: Function } = useI18n();
 
-  enum ItemType {
-    KO_PERS = 'KO_PERS',
-  }
   type ComposedZuordnung = Zuordnung & {
     klasse?: string | null;
-  };
-  type LabelValue = {
-    label: string;
-    labelAbbr?: string;
-    value: string | null;
-    type?: ItemType;
-    testIdLabel: string;
-    testIdValue: string;
-  };
-  type SchulDaten = {
-    title: string;
-    info?: string | null;
-    schulAdmins?: string[];
-    labelAndValues: LabelValue[];
   };
 
   const { xs }: { xs: Ref<boolean> } = useDisplay();
@@ -218,35 +202,22 @@
     devicePassword.value = personStore.newDevicePassword || '';
   }
 
-  const personalData: ComputedRef<LabelValue[]> = computed(() => {
-    const data: LabelValue[] = [];
-    if (!personInfoStore.personInfo) return data;
-    data.push({
-      label: t('profile.fullName'),
-      value:
-        personInfoStore.personInfo.person.name.vorname + ' ' + personInfoStore.personInfo.person.name.familiennamen,
-      testIdLabel: 'fullName-label',
-      testIdValue: 'fullName-value',
-    });
-    if (personInfoStore.personInfo.person.referrer)
-      data.push({
-        label: t('person.userName'),
-        value: personInfoStore.personInfo.person.referrer,
-        testIdLabel: 'userName-label',
-        testIdValue: 'userName-value',
-      });
-
-    if (!personInfoStore.personInfo.person.personalnummer && !hasKoPersMerkmal.value) return data;
-    data.push({
-      label: t('profile.koPersNummer'),
-      labelAbbr: t('profile.koPersNummerAbbr'),
-      value: personInfoStore.personInfo.person.personalnummer,
-      type: ItemType.KO_PERS,
-      testIdLabel: 'kopersnummer-label',
-      testIdValue: 'kopersnummer-value',
-    });
-    return data;
-  });
+  const personalData: ComputedRef<LabelValue[]> = computed(() =>
+    personInfoStore.personInfo
+      ? mapToLabelValues(
+          {
+            vorname: personInfoStore.personInfo.person.name.vorname,
+            familienname: personInfoStore.personInfo.person.name.familiennamen,
+            username: personInfoStore.personInfo.person.referrer ?? undefined,
+            personalnummer: personInfoStore.personInfo.person.personalnummer ?? null,
+          },
+          {
+            hasKoPersMerkmal,
+            includeKoPers: true,
+          },
+        )
+      : [],
+  );
 
   // Computed property to define what will be shown in the field Email depending on the returned status.
   const emailStatus: ComputedRef<
