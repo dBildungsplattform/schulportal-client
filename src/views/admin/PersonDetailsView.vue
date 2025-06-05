@@ -1095,9 +1095,9 @@
     );
 
     // Find the Orga object for the selected new Klasse
-    const newKlasse: Organisation | undefined = organisationStore.klassen.find(
-      (k: Organisation) => k.id === selectedNewKlasse.value,
-    );
+    const newKlasse: Organisation | undefined = organisationStore.klassenFilters
+      .get('klasse-change')
+      ?.filterResult.find((k: Organisation) => k.id === selectedNewKlasse.value);
 
     // The remaining Zuordnungen that were not selected for deletion
     const remainingZuordnungen: ZuordnungWithKlasse[] | undefined = zuordnungenResult.value?.filter(
