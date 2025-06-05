@@ -36,6 +36,7 @@
   // Default selection is always KoPers
   const searchType: Ref<SearchType> = ref<SearchType>(SearchType.KoPers);
   const showPersonNotFoundDialog: Ref<boolean> = ref(false);
+  const errorDialogMessage: Ref<string> = ref('');
 
   // eslint-disable-next-line @typescript-eslint/typedef
   const baseSchema = object({
@@ -211,9 +212,17 @@
     // Check if the result is an empty array, if that's the case show the corresponding dialog
     if (
       Array.isArray(personStore.allLandesbedienstetePersonen) &&
-      personStore.allLandesbedienstetePersonen.length === 0
+      personStore.allLandesbedienstetePersonen.length === 0 
     ) {
+      errorDialogMessage.value = t('admin.person.stateEmployeeSearch.noPersonFoundMessage');
       showPersonNotFoundDialog.value = true;
+    }
+    // Check if multiple persons were found
+    if (personStore.errorCode === 'LANDESBEDIENSTETER_SEARCH_MULTIPLE_PERSONS_FOUND') {
+      // Set the error code to empty to avoid showing the error message in the alert
+      personStore.errorCode = '';
+      errorDialogMessage.value = t('admin.person.stateEmployeeSearch.multiplePersonsFoundMessage');
+
     }
   });
 
@@ -490,7 +499,7 @@
                 cols="12"
               >
                 <span data-testid="no-person-found-text">
-                  {{ t('admin.person.stateEmployeeSearch.noPersonFoundMessage') }}
+                  {{ errorDialogMessage }}
                 </span>
               </v-col>
             </v-row>
