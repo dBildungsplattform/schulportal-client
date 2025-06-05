@@ -159,6 +159,7 @@
       "backToCreatePerson": "Zurück zur Benutzeranlage",
       "backToInput": "Zurück zur Eingabe",
       "stateEmployeeSearch": {
+        "addAnotherPerson": "Weitere Person hinzufügen",
         "addPerson": "Person hinzufügen",
         "anotherPerson": "Andere Person (Neuanlage)",
         "noPersonFoundMessage": "Es wurde leider kein Treffer gefunden. Sollten Sie Hilfe benötigen, eröffnen Sie ein Störungsticket über den IQSH-Helpdesk.",
@@ -215,6 +216,7 @@
       "create": "Benutzer anlegen",
       "createAnother": "Weiteren Benutzer anlegen",
       "createNew": "Neue Benutzer anlegen",
+
       "creationErrorText": "",
       "creationErrorTitle": "Fehler beim Anlegen des Benutzers",
       "deletePerson": "Benutzer löschen",

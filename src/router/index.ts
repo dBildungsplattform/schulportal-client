@@ -16,7 +16,8 @@ type Permission =
   | 'schultraegerverwaltung'
   | 'portalverwaltung'
   | 'hinweisebearbeiten'
-  | 'landesbediensteteSuchenUndHinzufügen';
+  | 'landesbediensteteSuchenUndHinzufügen'
+  | 'limitedpersonenanlegen';
 
 const router: Router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -109,6 +110,8 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
           return authStore.hasHinweiseBearbeitenPermission;
         case 'landesbediensteteSuchenUndHinzufügen':
           return authStore.hasLandesbediensteteSuchenUndHinzufügenPermission;
+        case 'limitedpersonenanlegen':
+          return authStore.hasEingeschränktNeueBenutzerErstellenPermission;
         default:
           return false;
       }

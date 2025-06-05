@@ -325,6 +325,25 @@ describe('PersonCreationView', () => {
     expect(wrapper?.getComponent({ name: 'PersonenkontextCreate' })).toBeTruthy();
   });
 
+  test('onBeforeMount sets labels and systemrecht for createType limited', async () => {
+    await router.push({ name: 'create-person-limited' });
+    await router.isReady();
+
+    wrapper = mount(PersonCreationView, {
+      attachTo: document.getElementById('app') || '',
+      global: {
+        components: {
+          PersonCreationView,
+        },
+        plugins: [router],
+      },
+    });
+
+    await nextTick();
+    // Check that the systemrecht is set
+    expect(personenkontextStore.requestedWithSystemrecht).toBe(RollenSystemRecht.EingeschraenktNeueBenutzerErstellen);
+  });
+
   it('emits update:calculatedBefristungOption event with a value', async () => {
     const organisationSelect: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
@@ -642,9 +661,8 @@ describe('PersonCreationView', () => {
     });
 
     test('it does not trigger if form is not dirty', async () => {
-      // TODO: why is spy called 0 times?
-      // const expectedCallsToNext: number = 1;
-      const expectedCallsToNext: number = 0;
+      // autoselected orgnisation doesnt count as dirty
+      const expectedCallsToNext: number = 1;
       vi.mock('vue-router', async (importOriginal: () => Promise<Module>) => {
         const mod: Module = await importOriginal();
         return {

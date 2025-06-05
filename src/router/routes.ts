@@ -63,7 +63,19 @@ const routes: readonly RouteRecordRaw[] = [
       layout: 'AdminLayout',
       requiresAuth: true,
       requiredStepUpLevel: StepUpLevel.GOLD,
-      requiresPermission: ['landesbediensteteSuchenUndHinzufügen'],
+      requiresPermission: ['personenverwaltung, landesbediensteteSuchenUndHinzufügen'],
+    },
+  },
+  {
+    path: '/admin/limited/personen/new',
+    name: 'create-person-limited',
+    component: () => import('../views/admin/PersonCreationView.vue'),
+    meta: {
+      layout: 'AdminLayout',
+      requiresAuth: true,
+      requiredStepUpLevel: StepUpLevel.GOLD,
+      requiresPermission: ['personenverwaltung', 'limitedpersonenanlegen'],
+      createType: 'limited',
     },
   },
   {
