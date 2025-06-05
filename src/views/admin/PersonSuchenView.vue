@@ -329,6 +329,7 @@
           <v-col
             cols="12"
             sm="3"
+            class="d-flex align-start"
           >
             <v-icon
               aria-hidden="true"
