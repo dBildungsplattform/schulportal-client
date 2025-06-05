@@ -149,6 +149,13 @@
     return sameContent(wrapSelectedKlassenIds(a), wrapSelectedKlassenIds(b));
   };
 
+  const handleFocusChange = (focused: boolean): void => {
+    if (!props.multiple) return;
+    if (!focused) {
+      searchInputKlassen.value = undefined;
+    }
+  };
+
   watch(
     selectedKlassen,
     (currentSelection: SelectedKlassenIds, oldSelection: SelectedKlassenIds) => {
@@ -227,6 +234,7 @@
     variant="outlined"
     @update:search="updateSearchString"
     @click:clear="organisationStore.resetKlasseFilter(filterId)"
+    @update:focused="handleFocusChange"
     v-bind="selectedKlasseProps"
     v-model="selectedKlassen"
     v-model:search="searchInputKlassen"

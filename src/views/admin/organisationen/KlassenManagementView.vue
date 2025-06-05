@@ -87,6 +87,13 @@
     return organisationStore.allKlassen;
   });
 
+  const totalKlassenCount: ComputedRef<number> = computed(() => {
+    if (selectedKlassen.value.length > 0) {
+      return finalKlassen.value.length;
+    }
+    return organisationStore.totalKlassen;
+  });
+
   const errorTitle: ComputedRef<string> = computed(() => {
     if (!organisationStore.errorCode) {
       return '';
@@ -338,7 +345,7 @@
           @onItemsPerPageUpdate="getPaginatedKlassenWithLimit"
           @onPageUpdate="getPaginatedKlassen"
           @onTableUpdate="handleTableSorting"
-          :totalItems="organisationStore.totalKlassen"
+          :totalItems="totalKlassenCount"
           :itemsPerPage="searchFilterStore.klassenPerPage"
           item-value-path="id"
         >
