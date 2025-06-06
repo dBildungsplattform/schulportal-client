@@ -586,6 +586,7 @@
                 data-testid="personal-data-card"
                 :header="$t('profile.personalData')"
                 :headline-test-id="'layout-card-headline-personal-data'"
+                :subCards="true"
               >
                 <v-row>
                   <v-col cols="12">
@@ -650,8 +651,9 @@
               <LayoutCard
                 :header="$t('person.zuordnung') + ' ' + (organisationenDaten.length > 1 ? (index + 1).toString() : '')"
                 :headline-test-id="'zuordung-card-' + (index + 1)"
+                :subCards="true"
               >
-                <v-row >
+                <v-row>
                   <v-col cols="12">
                     <v-table class="text-body-1">
                       <template v-slot:default>
