@@ -1,4 +1,4 @@
-import { expect, test, type Mock } from 'vitest';
+import { expect, test, type Mock, type MockInstance } from 'vitest';
 import { DOMWrapper, VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import {
   createRouter,
@@ -94,7 +94,7 @@ describe('PersonSearchView', () => {
       routes,
     });
 
-    router.push({ name: 'search-person-limited' }); // Adjust route name as needed
+    router.push({ name: 'search-person-limited' });
     await router.isReady();
 
     wrapper = mountComponent();
@@ -501,8 +501,8 @@ describe('PersonSearchView', () => {
   });
 
   test('it sets up and removes beforeunload event listener', () => {
-    const addEventListener = vi.spyOn(window, 'addEventListener');
-    const removeEventListener = vi.spyOn(window, 'removeEventListener');
+    const addEventListener: MockInstance = vi.spyOn(window, 'addEventListener');
+    const removeEventListener: MockInstance = vi.spyOn(window, 'removeEventListener');
 
     wrapper = mountComponent();
 
@@ -517,13 +517,13 @@ describe('PersonSearchView', () => {
 
   test('it navigates back correctly for step up error', async () => {
     personStore.errorCode = 'REQUIRED_STEP_UP_LEVEL_NOT_MET';
-    const routerPush = vi.spyOn(router, 'push').mockResolvedValue();
-    const routerGo = vi.spyOn(router, 'go');
+    const routerPush: MockInstance = vi.spyOn(router, 'push').mockResolvedValue();
+    const routerGo: MockInstance = vi.spyOn(router, 'go');
 
     await nextTick();
 
     // Click back button (assuming it exists in SpshAlert)
-    const backButton = wrapper?.find('[data-testid="alert-button"]');
+    const backButton: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="alert-button"]');
     await backButton?.trigger('click');
     await flushPromises();
 
