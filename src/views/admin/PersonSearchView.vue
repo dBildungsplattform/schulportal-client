@@ -421,9 +421,12 @@
             cols="12"
             sm="9"
           >
-            <v-radio-group v-model="searchType">
+            <v-radio-group
+              v-model="searchType"
+              density="compact"
+            >
               <!-- KoPers -->
-              <v-row class="align-center">
+              <v-row class="align-center dense">
                 <v-col cols="auto">
                   <v-radio
                     data-testid="kopers-radio"
@@ -451,7 +454,7 @@
               </v-row>
 
               <!-- Email -->
-              <v-row class="align-center">
+              <v-row class="align-center dense">
                 <v-col cols="auto">
                   <v-radio
                     data-testid="email-radio"
@@ -479,7 +482,7 @@
               </v-row>
 
               <!-- Username -->
-              <v-row class="align-center">
+              <v-row class="align-center dense">
                 <v-col cols="auto">
                   <v-radio
                     data-testid="username-radio"
@@ -507,7 +510,7 @@
               </v-row>
 
               <!-- Name -->
-              <v-row class="align-center">
+              <v-row class="align-center dense">
                 <v-col cols="auto">
                   <v-radio
                     data-testid="name-radio"
