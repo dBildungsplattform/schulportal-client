@@ -570,7 +570,7 @@
           data-testid="personal-data-card"
           :header="$t('admin.person.stateEmployeeSearch.searchResult')"
           :headline-test-id="'layout-card-headline-personal-data'"
-          class="mx-5 my-5"
+          class="ma-5"
         >
           <v-row
             class="ma-4"
@@ -587,7 +587,7 @@
                 :header="$t('profile.personalData')"
                 :headline-test-id="'layout-card-headline-personal-data'"
               >
-                <v-row class="ma-4">
+                <v-row>
                   <v-col cols="12">
                     <v-table class="text-body-1">
                       <template v-slot:default>
@@ -651,7 +651,7 @@
                 :header="$t('person.zuordnung') + ' ' + (organisationenDaten.length > 1 ? (index + 1).toString() : '')"
                 :headline-test-id="'zuordung-card-' + (index + 1)"
               >
-                <v-row class="ma-3 p-4">
+                <v-row >
                   <v-col cols="12">
                     <v-table class="text-body-1">
                       <template v-slot:default>
