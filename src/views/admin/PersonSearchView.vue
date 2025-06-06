@@ -247,7 +247,8 @@
       personStore.allLandesbedienstetePersonen?.[0] ?? undefined;
     if (!person) return [];
 
-    return mapToLabelValues(t,
+    return mapToLabelValues(
+      t,
       {
         vorname: person.vorname,
         familienname: person.familienname,
@@ -372,7 +373,7 @@
         :discardButtonLabel="$t('cancel')"
         :hideActions="!!personStore.errorCode"
         :hideNotice="true"
-        id="person-creation-form"
+        id="person-search-form"
         :isLoading="personStore.loading"
         :onDiscard="() => router.go(0)"
         @onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
@@ -422,6 +423,7 @@
               <v-row class="align-center">
                 <v-col cols="auto">
                   <v-radio
+                    data-testid="kopers-radio"
                     :label="t('admin.person.stateEmployeeSearch.withKopers')"
                     :value="SearchType.KoPers"
                   />
@@ -449,6 +451,7 @@
               <v-row class="align-center">
                 <v-col cols="auto">
                   <v-radio
+                    data-testid="email-radio"
                     :label="t('admin.person.stateEmployeeSearch.withEmail')"
                     :value="SearchType.Email"
                   />
@@ -476,6 +479,7 @@
               <v-row class="align-center">
                 <v-col cols="auto">
                   <v-radio
+                    data-testid="username-radio"
                     :label="t('admin.person.stateEmployeeSearch.withUsername')"
                     :value="SearchType.Username"
                   />
@@ -503,6 +507,7 @@
               <v-row class="align-center">
                 <v-col cols="auto">
                   <v-radio
+                    data-testid="name-radio"
                     :label="t('admin.person.stateEmployeeSearch.withfirstAndLastname')"
                     :value="SearchType.Name"
                   />
@@ -561,6 +566,7 @@
             class="d-flex flex-column ga-8"
           >
             <LayoutCard
+              data-testid="personal-data-card"
               :header="$t('profile.personalData')"
               :headline-test-id="'layout-card-headline-personal-data'"
             >
@@ -665,6 +671,7 @@
       </template>
     </LayoutCard>
     <v-dialog
+      data-testid="person-search-error-dialog"
       v-model="showErrorDialog"
       persistent
     >
@@ -697,7 +704,7 @@
                 :block="mdAndDown"
                 class="primary"
                 @click.stop="showErrorDialog = false"
-                data-testid="cancel-no-person-found-button"
+                data-testid="cancel-person-search-error-button"
               >
                 {{ t('cancel') }}
               </v-btn>

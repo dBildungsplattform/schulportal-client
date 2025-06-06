@@ -58,7 +58,7 @@ const routes: readonly RouteRecordRaw[] = [
   {
     path: '/admin/limited/personen/search',
     name: 'search-person-limited',
-    component: () => import('../views/admin/PersonSuchenView.vue'),
+    component: () => import('../views/admin/PersonSearchView.vue'),
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
