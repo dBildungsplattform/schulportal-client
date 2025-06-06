@@ -159,13 +159,12 @@
             limit: 25,
           });
           canCommit.value = personenkontextStore.workflowStepResponse?.canCommit ?? false;
-          emits('update:canCommit', canCommit.value);
         } else {
           // No roles selected, reset values
           selectedKlasse.value = undefined;
           emits('fieldReset', 'selectedKlasse');
           emits('fieldReset', 'selectedRollen');
-          emits('update:canCommit', false);
+          canCommit.value = false;
         }
         emits('update:selectedRollen', newRollen);
       } else {
@@ -178,11 +177,10 @@
             limit: 25,
           });
           canCommit.value = personenkontextStore.workflowStepResponse?.canCommit ?? false;
-          emits('update:canCommit', canCommit.value);
         }
         if (!newRolle) {
           // Reset when no rolle is selected
-          emits('update:canCommit', false);
+          canCommit.value = false;
           selectedKlasse.value = undefined;
           emits('fieldReset', 'selectedKlasse');
         }
@@ -293,6 +291,14 @@
   const handleCalculatedBefristungOptionChange = (value: string | undefined): void => {
     emits('update:calculatedBefristungOption', value);
   };
+
+  watch(
+    canCommit,
+    (newValue: boolean) => {
+      emits('update:canCommit', newValue);
+    },
+    { immediate: true },
+  );
 </script>
 
 <template>
