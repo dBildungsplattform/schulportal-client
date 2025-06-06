@@ -244,7 +244,10 @@
       <slot name="prepend-item"></slot>
     </template>
     <template v-slot:selection="{ item, index }">
-      <span class="v-autocomplete__selection-text">
+      <span
+        v-if="getDisplayItem(item, index)"
+        class="v-autocomplete__selection-text"
+      >
         {{ getDisplayItem(item, index) }}
       </span>
     </template>
