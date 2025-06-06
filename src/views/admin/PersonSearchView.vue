@@ -224,6 +224,7 @@
     ) {
       errorDialogMessage.value = t('admin.person.stateEmployeeSearch.noPersonFoundMessage');
       showErrorDialog.value = true;
+      personStore.allLandesbedienstetePersonen = [];
     }
 
     // If the search was successful but the person has no Kopers number or is manually locked, we get this error Code.
@@ -232,6 +233,7 @@
       personStore.errorCode = '';
       errorDialogMessage.value = t('admin.person.stateEmployeeSearch.noPersonFoundMessage');
       showErrorDialog.value = true;
+      personStore.allLandesbedienstetePersonen = [];
     }
     // Check if multiple persons were found we get an error Code.
     else if (personStore.errorCode === 'LANDESBEDIENSTETER_SEARCH_MULTIPLE_PERSONS_FOUND') {
@@ -239,6 +241,7 @@
       personStore.errorCode = '';
       errorDialogMessage.value = t('admin.person.stateEmployeeSearch.multiplePersonsFoundMessage');
       showErrorDialog.value = true;
+      personStore.allLandesbedienstetePersonen = [];
     }
   });
 
@@ -558,116 +561,131 @@
         </v-row>
       </FormWrapper>
       <template v-if="!personStore.errorCode && personStore.allLandesbedienstetePersonen?.length === 1">
-        <v-row class="ma-4">
-          <v-col
-            cols="12"
-            sm="12"
-            md="6"
-            class="d-flex flex-column ga-8"
+        <v-divider
+          class="border-opacity-100 rounded"
+          color="#E5EAEF"
+          thickness="5px"
+        ></v-divider>
+        <LayoutCard
+          data-testid="personal-data-card"
+          :header="$t('admin.person.stateEmployeeSearch.searchResult')"
+          :headline-test-id="'layout-card-headline-personal-data'"
+          class="mx-5 my-5"
+        >
+          <v-row
+            class="ma-4"
+            dense
           >
-            <LayoutCard
-              data-testid="personal-data-card"
-              :header="$t('profile.personalData')"
-              :headline-test-id="'layout-card-headline-personal-data'"
+            <!-- PERSONAL DATA COLUMN -->
+            <v-col
+              cols="12"
+              md="4"
+              class="d-flex flex-column ga-8"
             >
-              <v-row class="ma-4">
-                <v-col cols="12">
-                  <v-table class="text-body-1">
-                    <template v-slot:default>
-                      <tbody>
-                        <tr
-                          v-for="item in personalData"
-                          :key="item.label"
-                        >
-                          <td>
-                            <span v-if="item.labelAbbr">
-                              <abbr :title="item.label">
-                                <strong :data-testid="item.testIdLabel">{{ item.labelAbbr }}:</strong>
-                              </abbr>
-                            </span>
-                            <strong
-                              v-else
-                              :data-testid="item.testIdLabel"
-                            >
-                              {{ item.label }}:
-                            </strong>
-                          </td>
-                          <td :data-testid="item.testIdValue">
-                            <v-row
-                              no-gutters
-                              align="center"
-                            >
-                              <SpshTooltip
-                                v-if="item.tooltip"
-                                enabledCondition
-                                :enabledText="item.tooltip"
-                                position="bottom"
+              <LayoutCard
+                data-testid="personal-data-card"
+                :header="$t('profile.personalData')"
+                :headline-test-id="'layout-card-headline-personal-data'"
+              >
+                <v-row class="ma-4">
+                  <v-col cols="12">
+                    <v-table class="text-body-1">
+                      <template v-slot:default>
+                        <tbody>
+                          <tr
+                            v-for="item in personalData"
+                            :key="item.label"
+                          >
+                            <td>
+                              <span v-if="item.labelAbbr">
+                                <abbr :title="item.label">
+                                  <strong :data-testid="item.testIdLabel">{{ item.labelAbbr }}:</strong>
+                                </abbr>
+                              </span>
+                              <strong
+                                v-else
+                                :data-testid="item.testIdLabel"
                               >
-                                <v-icon
-                                  aria-hidden="true"
-                                  class="mr-2"
-                                  icon="mdi-alert-circle-outline"
-                                  size="small"
-                                />
-                              </SpshTooltip>
-                              <span>{{ item.value }}</span>
-                            </v-row>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </template>
-                  </v-table>
-                </v-col>
-              </v-row>
-            </LayoutCard>
-          </v-col>
+                                {{ item.label }}:
+                              </strong>
+                            </td>
+                            <td :data-testid="item.testIdValue">
+                              <v-row
+                                no-gutters
+                                align="center"
+                              >
+                                <SpshTooltip
+                                  v-if="item.tooltip"
+                                  enabledCondition
+                                  :enabledText="item.tooltip"
+                                  position="bottom"
+                                >
+                                  <v-icon
+                                    aria-hidden="true"
+                                    class="mr-2"
+                                    icon="mdi-alert-circle-outline"
+                                    size="small"
+                                  />
+                                </SpshTooltip>
+                                <span>{{ item.value }}</span>
+                              </v-row>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </template>
+                    </v-table>
+                  </v-col>
+                </v-row>
+              </LayoutCard>
+            </v-col>
 
-          <v-col
-            cols="12"
-            sm="12"
-            md="6"
-            class="d-flex flex-column ga-8"
-          >
-            <LayoutCard
+            <!-- ORGANISATION COLUMNS INLINE -->
+            <v-col
               v-for="(orgData, index) in organisationenDaten"
               :key="orgData.title"
-              :header="$t('person.zuordnung') + ' ' + (organisationenDaten.length > 1 ? (index + 1).toString() : '')"
-              :headline-test-id="'zuordung-card-' + (index + 1)"
+              cols="12"
+              md="4"
+              class="d-flex flex-column ga-8"
             >
-              <v-row class="ma-3 p-4">
-                <v-col cols="12">
-                  <v-table class="text-body-1">
-                    <template v-slot:default>
-                      <tbody>
-                        <tr
-                          v-for="item in orgData.labelAndValues"
-                          :key="item.label"
-                        >
-                          <td>
-                            <span v-if="item.labelAbbr">
-                              <abbr :title="item.label">
-                                <strong :data-testid="item.testIdLabel">{{ item.labelAbbr }}:</strong>
-                              </abbr>
-                            </span>
-                            <strong
-                              v-else
-                              :data-testid="item.testIdLabel"
-                            >
-                              {{ item.label }}:
-                            </strong>
-                          </td>
-                          <td :data-testid="item.testIdValue">
-                            {{ item.value }}
-                          </td>
-                        </tr>
-                      </tbody>
-                    </template>
-                  </v-table>
-                </v-col>
-              </v-row>
-            </LayoutCard>
-          </v-col>
-        </v-row>
+              <LayoutCard
+                :header="$t('person.zuordnung') + ' ' + (organisationenDaten.length > 1 ? (index + 1).toString() : '')"
+                :headline-test-id="'zuordung-card-' + (index + 1)"
+              >
+                <v-row class="ma-3 p-4">
+                  <v-col cols="12">
+                    <v-table class="text-body-1">
+                      <template v-slot:default>
+                        <tbody>
+                          <tr
+                            v-for="item in orgData.labelAndValues"
+                            :key="item.label"
+                          >
+                            <td>
+                              <span v-if="item.labelAbbr">
+                                <abbr :title="item.label">
+                                  <strong :data-testid="item.testIdLabel">{{ item.labelAbbr }}:</strong>
+                                </abbr>
+                              </span>
+                              <strong
+                                v-else
+                                :data-testid="item.testIdLabel"
+                              >
+                                {{ item.label }}:
+                              </strong>
+                            </td>
+                            <td :data-testid="item.testIdValue">
+                              {{ item.value }}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </template>
+                    </v-table>
+                  </v-col>
+                </v-row>
+              </LayoutCard>
+            </v-col>
+          </v-row>
+        </LayoutCard>
       </template>
     </LayoutCard>
     <v-dialog
