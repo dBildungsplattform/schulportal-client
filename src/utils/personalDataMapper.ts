@@ -66,16 +66,16 @@ export function mapToLabelValues(
   data.push({
     label: t('profile.fullName'),
     value: `${person.vorname} ${person.familienname}`,
-    testIdLabel: 'person-fullName-label',
-    testIdValue: 'person-fullName-value',
+    testIdLabel: 'fullName-label',
+    testIdValue: 'fullName-value',
   });
 
   if (person.username) {
     data.push({
       label: t('person.userName'),
       value: person.username,
-      testIdLabel: 'person-userName-label',
-      testIdValue: 'person-userName-value',
+      testIdLabel: 'userName-label',
+      testIdValue: 'userName-value',
     });
   }
 
@@ -85,8 +85,8 @@ export function mapToLabelValues(
       labelAbbr: t('profile.koPersNummerAbbr'),
       value: person.personalnummer,
       type: ItemType.KO_PERS,
-      testIdLabel: 'person-kopersnummer-label',
-      testIdValue: 'person-kopersnummer-value',
+      testIdLabel: 'kopersnummer-label',
+      testIdValue: 'kopersnummer-value',
     });
   }
 
