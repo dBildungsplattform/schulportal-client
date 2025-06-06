@@ -1017,9 +1017,9 @@
       (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
     );
     // The new selected Klasse to add as a separate Zuordnung
-    const klasse: Organisation | undefined = organisationStore.klassen.find(
-      (k: Organisation) => k.id === selectedKlasse.value,
-    );
+    const klasse: Organisation | undefined = organisationStore.klassenFilters
+      .get('personenkontext-create')
+      ?.filterResult.find((k: Organisation) => k.id === selectedKlasse.value);
 
     const befristungDate: string | undefined = selectedBefristung.value
       ? selectedBefristung.value
@@ -1049,6 +1049,7 @@
 
       // Add the new selected Klasse to finalZuordnungen
       if (klasse) {
+        newZuordnung.value.klasse = klasse.name;
         finalZuordnungen.value.push(
           new Zuordnung(
             klasse.id,
@@ -1159,6 +1160,7 @@
 
       // Add the new Klasse Zuordnung
       if (newKlasse) {
+        newZuordnung.value.klasse = newKlasse.name;
         finalZuordnungen.value.push(
           new Zuordnung(
             newKlasse.id,
