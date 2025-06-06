@@ -163,7 +163,7 @@
         "addPerson": "Person hinzufügen",
         "anotherPerson": "Andere Person (Neuanlage)",
         "noPersonFoundMessage": "Es wurde leider kein Treffer gefunden. Sollten Sie Hilfe benötigen, eröffnen Sie ein Störungsticket über den IQSH-Helpdesk.",
-        "multiplePersonsFoundMessage": "Es wurden mehr als ein Treffer gefunden. Bitte verwenden Sie zur Suche die Kopers. -Nr., die Landes-Mailadresse oder den Benutzernamen. Sollten Sie Hilfe benötigen, eröffnen Sie ein Störungsticket über den IQSH-Helpdesk.",
+        "multiplePersonsFoundMessage": "Es wurde mehr als ein Treffer gefunden. Bitte verwenden Sie zur Suche die Kopers. -Nr., die Landes-Mailadresse oder den Benutzernamen. Sollten Sie Hilfe benötigen, eröffnen Sie ein Störungsticket über den IQSH-Helpdesk.",
         "searchResult": "Suchergebnis",
         "searchMethodNotice": "Bitte wählen Sie, wie Sie nach der Person suchen möchten.",
         "search": "Landesbediensteter (Nur Suche)",
