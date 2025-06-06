@@ -5,27 +5,27 @@
 
   type Props = {
     hasNoKopersNr?: boolean;
-    selectedKopersNr: string | undefined | null;
+    selectedKopersNr: string | undefined;
     selectedKopersNrProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     hideCheckbox?: boolean;
   };
 
   type Emits = {
     (event: 'update:hasNoKopersNr', value: boolean | undefined): void;
-    (event: 'update:selectedKopersNr', value: string | undefined | null): void;
+    (event: 'update:selectedKopersNr', value: string | undefined): void;
   };
 
   const props: Props = defineProps<Props>();
   const emits: Emits = defineEmits<Emits>();
 
   const hasNoKopersNr: Ref<boolean | undefined> = ref(props.hasNoKopersNr);
-  const selectedKopersNr: Ref<string | undefined | null> = ref(props.selectedKopersNr);
+  const selectedKopersNr: Ref<string | undefined> = ref(props.selectedKopersNr);
 
   watch(hasNoKopersNr, (newValue: boolean | undefined) => {
     emits('update:hasNoKopersNr', newValue);
   });
 
-  watch(selectedKopersNr, (newValue: string | undefined | null) => {
+  watch(selectedKopersNr, (newValue: string | undefined) => {
     emits('update:selectedKopersNr', newValue);
   });
 </script>

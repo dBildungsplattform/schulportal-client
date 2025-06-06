@@ -175,6 +175,7 @@
         data-testid="add-person-menu-item"
         prepend-icon="mdi-plus-circle-outline"
         :title="$t('admin.person.stateEmployeeSearch.anotherPerson')"
+        to="/admin/limited/personen/new"
       ></v-list-item>
     </div>
 
