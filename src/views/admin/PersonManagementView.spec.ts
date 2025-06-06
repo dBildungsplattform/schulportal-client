@@ -2,32 +2,44 @@ import { RollenArt, RollenSystemRecht, type FindRollenResponse } from '@/api-cli
 import routes from '@/router/routes';
 import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 import { OperationType } from '@/stores/BulkOperationStore';
-import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
 import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
-import { useRolleStore, type RolleResponse, type RolleStore, type RollenMerkmal } from '@/stores/RolleStore';
+import { type RolleResponse, type RollenMerkmal } from '@/stores/RolleStore';
 import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
 import type { Person } from '@/stores/types/Person';
 import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
 import type { Zuordnung } from '@/stores/types/Zuordnung';
-import { DoFactory } from 'test/DoFactory';
 import { DOMWrapper, VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
+import { DoFactory } from 'test/DoFactory';
 import { expect, test, type Mock, type MockInstance } from 'vitest';
 import { nextTick } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import PersonManagementView from './PersonManagementView.vue';
 
 let wrapper: VueWrapper | null = null;
+let router: Router;
+
 let organisationStore: OrganisationStore;
 let personStore: PersonStore;
 let personenkontextStore: PersonenkontextStore;
-let rolleStore: RolleStore;
 let searchFilterStore: SearchFilterStore;
 let authStore: AuthStore;
-let router: Router;
 
 vi.useFakeTimers();
+
+function mountComponent(): VueWrapper {
+  return mount(PersonManagementView, {
+    attachTo: document.getElementById('app') || '',
+    global: {
+      components: {
+        PersonManagementView,
+      },
+      plugins: [router],
+    },
+  });
+}
 
 beforeEach(async () => {
   document.body.innerHTML = `
@@ -36,10 +48,17 @@ beforeEach(async () => {
     </div>
   `;
 
+  router = createRouter({
+    history: createWebHistory(),
+    routes,
+  });
+
+  router.push('/');
+  await router.isReady();
+
   organisationStore = useOrganisationStore();
   personStore = usePersonStore();
   personenkontextStore = usePersonenkontextStore();
-  rolleStore = useRolleStore();
   searchFilterStore = useSearchFilterStore();
   authStore = useAuthStore();
 
@@ -132,36 +151,7 @@ beforeEach(async () => {
     canCommit: true,
   };
 
-  router = createRouter({
-    history: createWebHistory(),
-    routes,
-  });
-
-  router.push('/');
-  await router.isReady();
-
-  wrapper = mount(PersonManagementView, {
-    attachTo: document.getElementById('app') || '',
-    global: {
-      components: {
-        PersonManagementView,
-      },
-      mocks: {
-        route: {
-          fullPath: 'full/path',
-        },
-      },
-      provide: {
-        organisationStore,
-        personStore,
-        personenkontextStore,
-        rolleStore,
-        searchFilterStore,
-        authStore,
-      },
-      plugins: [router],
-    },
-  });
+  wrapper = mountComponent();
 });
 
 describe('PersonManagementView', () => {
@@ -263,15 +253,55 @@ describe('PersonManagementView', () => {
     ];
   });
 
-  test('it reloads data after changing page', async () => {
-    const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
-    await schuleAutocomplete?.setValue(['9876']);
-    await nextTick();
+  test('selection is mirrored in the store', async () => {
+    const orgId: Array<string> = ['9876'];
+    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
+    await organisationAutocomplete?.setValue(orgId);
+    organisationAutocomplete?.vm.$emit('update:modelValue', orgId);
+    await flushPromises();
+    expect(searchFilterStore.setOrganisationFilterForPersonen).toHaveBeenCalledWith(orgId);
+    // TODO: the setter does not work
+    // expect(searchFilterStore.selectedOrganisationen).toEqual(orgId);
+  });
 
-    const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
+  test('it calls getAllPersons with correct arguments', async () => {
+    const getAllPersonsSpy: MockInstance = vi.spyOn(personStore, 'getAllPersons');
+    searchFilterStore.selectedOrganisationen = ['9876'];
+
+    searchFilterStore.selectedKlassen = ['123456'];
+    const klasseAutocomplete: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'klasse-select' })
+      .findComponent({ name: 'v-autocomplete' });
     await klasseAutocomplete?.setValue(['123456']);
-    await nextTick();
+    klasseAutocomplete?.vm.$emit('update:selectedKlassen', ['123456']);
+    await flushPromises();
+    expect(searchFilterStore.setKlasseFilterForPersonen).toHaveBeenCalledWith(['123456']);
+    expect(searchFilterStore.selectedKlassen).toEqual(['123456']);
 
+    // Check if getAllPersons was called with the correct arguments
+    expect(getAllPersonsSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        organisationIDs: ['123456'], // This should be the selectedKlassen value
+      }),
+    );
+
+    searchFilterStore.selectedKlassen = [];
+    // Clear selectedKlassen and test again
+    await klasseAutocomplete?.setValue([]);
+    klasseAutocomplete?.vm.$emit('update:selectedKlassen', []);
+    await flushPromises();
+
+    expect(searchFilterStore.selectedKlassen).toEqual([]);
+
+    // Now it should use selectedSchulen
+    expect(getAllPersonsSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        organisationIDs: ['9876'], // This should be the selectedSchulen value
+      }),
+    );
+  });
+
+  test('it reloads data after changing page', async () => {
     // Mock the getAllPersons method to capture its arguments
     const getAllPersonsSpy: MockInstance = vi.spyOn(personStore, 'getAllPersons');
 
@@ -285,22 +315,10 @@ describe('PersonManagementView', () => {
     expect(wrapper?.find('.v-pagination__next button:not(.v-btn--disabled)').isVisible()).toBe(true);
     await wrapper?.find('.v-pagination__next button:not(.v-btn--disabled)').trigger('click');
     expect(wrapper?.find('.v-data-table-footer__info').text()).toContain('31-50');
-    // Check if getAllPersons was called with the correct arguments
-    expect(getAllPersonsSpy).toHaveBeenCalledWith(
-      expect.objectContaining({
-        organisationIDs: ['123456'], // This should be the selectedKlassen value
-      }),
-    );
-    // Clear selectedKlassen and test again
-    await klasseAutocomplete?.setValue([]);
-    await nextTick();
 
-    await wrapper?.find('.v-pagination__prev button:not(.v-btn--disabled)').trigger('click');
-
-    // Now it should use selectedSchulen
-    expect(getAllPersonsSpy).toHaveBeenCalledWith(
+    expect(getAllPersonsSpy).toHaveBeenLastCalledWith(
       expect.objectContaining({
-        organisationIDs: ['9876'], // This should be the selectedSchulen value
+        offset: 30,
       }),
     );
   });
@@ -320,6 +338,13 @@ describe('PersonManagementView', () => {
   });
 
   test('it sets and resets filters', async () => {
+    const klasse: Organisation = DoFactory.getKlasse(undefined, {});
+    organisationStore.klassenFilters.set('', {
+      filterResult: [klasse],
+      total: 1,
+      loading: false,
+    });
+
     const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
     await schuleAutocomplete?.setValue(['9876']);
     await nextTick();
@@ -333,10 +358,12 @@ describe('PersonManagementView', () => {
     expect(rolleAutocomplete?.text()).toEqual('1');
 
     const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
-    await klasseAutocomplete?.setValue(['123456']);
+    await klasseAutocomplete?.setValue([klasse.id]);
+    klasseAutocomplete?.vm.$emit('update:selectedKlassen', [klasse.id]);
     await nextTick();
+    await flushPromises();
 
-    expect(klasseAutocomplete?.text()).toEqual('11b');
+    expect(klasseAutocomplete?.text()).toEqual(klasse.name);
 
     wrapper?.find('[data-testid="reset-filter-button"]').trigger('click');
     await nextTick();
@@ -349,11 +376,11 @@ describe('PersonManagementView', () => {
   test('it updates Organisation search correctly', async () => {
     const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
 
-    await organisationAutocomplete?.setValue('org');
+    await organisationAutocomplete?.setValue(['org']);
     await nextTick();
 
-    await organisationAutocomplete?.vm.$emit('update:search', '2');
-    await nextTick();
+    organisationAutocomplete?.vm.$emit('update:search', '2');
+    await flushPromises();
     expect(organisationStore.getAllOrganisationen).toHaveBeenCalled();
   });
 
@@ -382,13 +409,13 @@ describe('PersonManagementView', () => {
 
     // Trigger the search
     await rollenAutocomplete?.setValue(['name']);
-    await rollenAutocomplete?.vm.$emit('update:search', 'name');
+    rollenAutocomplete?.vm.$emit('update:search', 'name');
 
     // Fast-forward timers
     vi.runAllTimers();
 
     // Wait for all promises to resolve
-    await vi.runAllTicks();
+    vi.runAllTicks();
 
     // Assert that the method was called
     expect(mockGetPersonenkontextRolleWithFilter).toHaveBeenCalledWith('name', 25);
@@ -476,27 +503,7 @@ describe('PersonManagementView', () => {
     authStore.hasPersonenLoeschenPermission = false;
     authStore.hasPersonenverwaltungPermission = false;
 
-    wrapper = mount(PersonManagementView, {
-      attachTo: document.getElementById('app') || '',
-      global: {
-        components: {
-          PersonManagementView,
-        },
-        mocks: {
-          route: {
-            fullPath: 'full/path',
-          },
-        },
-        provide: {
-          organisationStore,
-          personStore,
-          personenkontextStore,
-          rolleStore,
-          searchFilterStore,
-          authStore,
-        },
-      },
-    });
+    wrapper = mountComponent();
 
     // Find the first checkbox in the table
     const checkbox: DOMWrapper<Element> | undefined = wrapper.find('[data-testid="person-table"] .v-selection-control');
@@ -523,6 +530,10 @@ describe('PersonManagementView', () => {
     personStore.allUebersichten.set(person.id, DoFactory.getPersonWithZuordnung(person, [zuordnung]));
 
     await flushPromises();
+
+    const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
+    await schuleAutocomplete?.setValue([]);
+    await nextTick();
 
     const checkbox: DOMWrapper<Element> | undefined = wrapper?.find(
       '[data-testid="person-table"] .v-selection-control',

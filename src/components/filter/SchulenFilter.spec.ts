@@ -136,6 +136,17 @@ describe('SchulenFilter', async () => {
           expectInputDisabledAttrToBe(!readonly || autoselected);
         });
 
+        test('it displays the correct placeholder', async () => {
+          const mockSchule: Organisation = DoFactory.getSchule();
+          const selectionRef: Ref<Array<string> | string | undefined> = ref(multiple ? [mockSchule.id] : mockSchule.id);
+
+          const wrapper: VueWrapper = mountComponent({ ...defaultProps });
+          await wrapper.setProps({ selectedSchulen: selectionRef });
+          // no timers are run, so this is before fetching data
+          const actualText: string = wrapper.find('[data-testid="schule-select"]').text();
+          expect(actualText).toContain('...');
+        });
+
         describe.each([
           [[RollenSystemRecht.KlassenVerwalten]],
           [[RollenSystemRecht.KlassenVerwalten, RollenSystemRecht.SchulenVerwalten]],
@@ -266,7 +277,6 @@ describe('SchulenFilter', async () => {
             });
             const selectionRef: Ref<string | undefined> = ref(id);
             const wrapper: VueWrapper = mountComponent({ ...defaultProps });
-            vi.runAllTimers();
             await wrapper.setProps({ selectedSchulen: selectionRef });
             vi.runAllTimers();
             await nextTick();
