@@ -165,13 +165,16 @@
       <v-list-item
         v-if="authStore.hasLandesbediensteteSuchenUndHinzufügenPermission"
         class="menu-bar-sub-item caption"
+        @click="closeMenuOnMobile"
         data-testid="search-person-menu-item"
         prepend-icon="mdi-plus-circle-outline"
         :title="$t('admin.person.stateEmployeeSearch.search')"
+        to="/admin/limited/personen/search"
       ></v-list-item>
       <v-list-item
         v-if="authStore.hasEingeschränktNeueBenutzerErstellenPermission"
         class="menu-bar-sub-item caption"
+        @click="closeMenuOnMobile"
         data-testid="add-person-menu-item"
         prepend-icon="mdi-plus-circle-outline"
         :title="$t('admin.person.stateEmployeeSearch.anotherPerson')"

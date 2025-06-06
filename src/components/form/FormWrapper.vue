@@ -10,6 +10,7 @@
     createButtonLabel: string;
     discardButtonLabel: string;
     hideActions?: boolean;
+    hideNotice?: boolean;
     id: string;
     isLoading?: boolean;
     onDiscard: () => void;
@@ -48,7 +49,7 @@
   >
     <v-container class="px-3 px-sm-16">
       <v-row
-        v-if="!hideActions"
+        v-if="!hideActions && !hideNotice"
         class="align-center flex-nowrap mx-auto py-6"
       >
         <v-icon

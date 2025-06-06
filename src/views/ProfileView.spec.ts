@@ -425,7 +425,7 @@ describe('ProfileView', () => {
 
       await nextTick();
 
-      const emailElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-email-text"]');
+      const emailElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-email-value"]');
       expect(emailElement?.text()).toBe('test@example.com');
     });
 
@@ -438,7 +438,7 @@ describe('ProfileView', () => {
 
       await nextTick();
 
-      const emailElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-email-text"]');
+      const emailElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-email-value"]');
       expect(emailElement?.text()).toBe('wird erzeugt');
     });
 
@@ -451,7 +451,7 @@ describe('ProfileView', () => {
 
       await nextTick();
 
-      const emailElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-email-text"]');
+      const emailElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-email-value"]');
       expect(emailElement?.text()).toBe('deaktiviert');
     });
 
@@ -464,7 +464,7 @@ describe('ProfileView', () => {
 
       await nextTick();
 
-      const emailElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-email-text"]');
+      const emailElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-email-value"]');
       expect(emailElement?.text()).toBe('fehlerhaft');
     });
 
@@ -474,7 +474,7 @@ describe('ProfileView', () => {
 
       await nextTick();
 
-      const emailElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-email-text"]');
+      const emailElement: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-email-value"]');
       expect(emailElement?.exists()).toBe(false);
     });
   });
