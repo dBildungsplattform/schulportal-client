@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import { computed, onMounted, onUnmounted, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useForm, type BaseFieldProps, type TypedSchema, type FormContext } from 'vee-validate';
-  import { object, string } from 'yup';
+  import { object, ObjectSchema, string } from 'yup';
   import { toTypedSchema } from '@vee-validate/yup';
   import {
     EmailStatus,
@@ -46,8 +46,15 @@
   const showErrorDialog: Ref<boolean> = ref(false);
   const errorDialogMessage: Ref<string> = ref('');
 
-  // eslint-disable-next-line @typescript-eslint/typedef
-  const baseSchema = object({
+  type PersonSearchForm = {
+    selectedKopers?: string | null;
+    selectedEmail?: string | null;
+    selectedUsername?: string | null;
+    selectedVorname?: string | null;
+    selectedNachname?: string | null;
+  };
+
+  const baseSchema: ObjectSchema<PersonSearchForm> = object({
     selectedKopers: string().optional().nullable(),
     selectedEmail: string().optional().nullable(),
     selectedUsername: string().optional().nullable(),
@@ -90,14 +97,6 @@
       'error-messages': state.errors,
     },
   });
-
-  type PersonSearchForm = {
-    selectedKopers: string;
-    selectedEmail: string;
-    selectedUsername: string;
-    selectedVorname: string;
-    selectedNachname: string;
-  };
 
   const formContext: FormContext<PersonSearchForm> = useForm({ validationSchema: schema });
 
