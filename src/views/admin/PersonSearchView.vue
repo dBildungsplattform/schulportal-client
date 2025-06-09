@@ -447,7 +447,7 @@
                     variant="outlined"
                     v-bind="selectedKopersProps"
                     v-model="selectedKopers"
-                    placeholder="KoPers.-Nr. eingeben"
+                    :placeholder="$t('person.enterKopersNr')"
                   />
                 </v-col>
               </v-row>
@@ -475,7 +475,7 @@
                     variant="outlined"
                     v-bind="selectedEmailProps"
                     v-model="selectedEmail"
-                    placeholder="E-Mail eingeben"
+                    :placeholder="$t('person.enterEmail')"
                   />
                 </v-col>
               </v-row>
@@ -503,7 +503,7 @@
                     variant="outlined"
                     v-bind="selectedUsernameProps"
                     v-model="selectedUsername"
-                    placeholder="Benutzername eingeben"
+                    :placeholder="$t('person.enterUsername')"
                   />
                 </v-col>
               </v-row>
@@ -536,7 +536,7 @@
                         variant="outlined"
                         v-bind="selectedVornameProps"
                         v-model="selectedVorname"
-                        placeholder="Vorname eingeben"
+                        :placeholder="$t('person.enterFirstName')"
                       />
                     </v-col>
                     <v-col
@@ -552,7 +552,7 @@
                         variant="outlined"
                         v-bind="selectedNachnameProps"
                         v-model="selectedNachname"
-                        placeholder="Nachname eingeben"
+                        :placeholder="$t('person.enterLastName')"
                       />
                     </v-col>
                   </v-row>
