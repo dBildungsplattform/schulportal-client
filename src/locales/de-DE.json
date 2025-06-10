@@ -159,10 +159,19 @@
       "backToCreatePerson": "Zurück zur Benutzeranlage",
       "backToInput": "Zurück zur Eingabe",
       "stateEmployeeSearch": {
-        "addPerson": "Person hinzufügen",
         "addAnotherPerson": "Weitere Person hinzufügen",
+        "addPerson": "Person hinzufügen",
+        "anotherPerson": "Andere Person (Neuanlage)",
+        "noPersonFoundMessage": "Es wurde leider kein Treffer gefunden. Bitte prüfen Sie Ihre Eingabe. Sollten Sie Hilfe benötigen, eröffnen Sie ein Störungsticket über den IQSH-Helpdesk.",
+        "multiplePersonsFoundMessage": "Es wurde mehr als ein Treffer gefunden. Bitte verwenden Sie zur Suche die Kopers.-Nr., die Landes-Mailadresse oder den Benutzernamen. Sollten Sie Hilfe benötigen, eröffnen Sie ein Störungsticket über den IQSH-Helpdesk.",
+        "searchResult": "Suchergebnis",
+        "searchMethodNotice": "Bitte wählen Sie, wie Sie nach der Person suchen möchten.",
         "search": "Landesbediensteter (Nur Suche)",
-        "anotherPerson": "Andere Person (Neuanlage)"
+        "searchPerson": "Person suchen",
+        "withKopers": "per Kopers.-Nr.",
+        "withEmail": "per E-Mail",
+        "withUsername": "per Benutzername",
+        "withfirstAndLastname": "per Vorname und Nachname"
       },
       "bulk": {
         "bulkErrorMessage": "Die Aktion {bulkOperationName} konnte für die folgenden Benutzer nicht ausgeführt werden. \n\nSie können sich die Liste für eine spätere Bearbeitung abspeichern. Die Daten stehen nach dem Schließen dieses Dialogs nicht mehr zur Verfügung. Sollten Sie Hilfe benötigen, eröffnen Sie ein Störungsticket über den IQSH-Helpdesk und fügen Sie die Liste als Anhang an.",
@@ -738,6 +747,8 @@
     "emailStatusFailedHover": "Bei der Erstellung des E-Mail-Kontos ist ein Fehler aufgetreten. Bitte eröffnen Sie eine Fehlermeldung im Help-Desk System.",
     "emailStatusUnknownHover": "Der Status der E-Mail-Adresse ist unbekannt.",
     "enterFirstName": "Vorname eingeben",
+    "enterEmail": "E-Mail-Adresse eingeben",
+    "enterUsername": "Benutzername eingeben",
     "enterKopersNr": "KoPers.-Nr. eingeben",
     "enterLastName": "Nachname eingeben",
     "firstName": "Vorname",
