@@ -69,7 +69,7 @@ export default defineConfig({
     coverage: {
       provider: 'istanbul',
       /* add 'html' to reporter array locally to show html report */
-      reporter: ['text', 'lcov', 'html'],
+      reporter: ['text', 'lcov'],
       include: ['src/**'],
       exclude: [
         'src/api-client/**',
