@@ -56,6 +56,17 @@ const routes: readonly RouteRecordRaw[] = [
     },
   },
   {
+    path: '/admin/limited/personen/search',
+    name: 'search-person-limited',
+    component: () => import('../views/admin/PersonSearchView.vue'),
+    meta: {
+      layout: 'AdminLayout',
+      requiresAuth: true,
+      requiredStepUpLevel: StepUpLevel.GOLD,
+      requiresPermission: ['personenverwaltung', 'landesbedienstetesuchenundhinzufügen'],
+    },
+  },
+  {
     path: '/admin/limited/personen/new',
     name: 'create-person-limited',
     component: () => import('../views/admin/PersonCreationView.vue'),
