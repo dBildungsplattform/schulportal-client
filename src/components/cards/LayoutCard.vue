@@ -5,6 +5,7 @@
     padded?: boolean;
     showCloseText?: boolean;
     headlineTestId?: string;
+    subCards?: boolean;
   }>();
 </script>
 
@@ -17,7 +18,8 @@
     >
       <v-col cols="auto">
         <h2
-          class="text-left headline-2"
+          class="text-left"
+          :class="subCards ? 'subtitle-1' : 'headline-2'"
           :data-testid="headlineTestId ?? 'layout-card-headline'"
         >
           {{ header }}

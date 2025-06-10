@@ -641,7 +641,9 @@ export const DbiamPersonErrorI18nKeyEnum = {
     PersonalnummerRequired: 'PERSONALNUMMER_REQUIRED',
     NewerVersionOfPersonAvailable: 'NEWER_VERSION_OF_PERSON_AVAILABLE',
     PersonalnummerNichtEindeutig: 'PERSONALNUMMER_NICHT_EINDEUTIG',
-    PersonUemPasswordModificationError: 'PERSON_UEM_PASSWORD_MODIFICATION_ERROR'
+    PersonUemPasswordModificationError: 'PERSON_UEM_PASSWORD_MODIFICATION_ERROR',
+    LandesbediensteterSearchNoPersonFound: 'LANDESBEDIENSTETER_SEARCH_NO_PERSON_FOUND',
+    LandesbediensteterSearchMultiplePersonsFound: 'LANDESBEDIENSTETER_SEARCH_MULTIPLE_PERSONS_FOUND'
 } as const;
 
 export type DbiamPersonErrorI18nKeyEnum = typeof DbiamPersonErrorI18nKeyEnum[keyof typeof DbiamPersonErrorI18nKeyEnum];
@@ -704,7 +706,8 @@ export const DbiamPersonenkontextErrorI18nKeyEnum = {
     OrganisationMatchesRollenart: 'ORGANISATION_MATCHES_ROLLENART',
     PersonenkontextAnlageError: 'PERSONENKONTEXT_ANLAGE_ERROR',
     RolleNurAnPassendeOrganisation: 'ROLLE_NUR_AN_PASSENDE_ORGANISATION',
-    PersonalnummerNichtEindeutig: 'PERSONALNUMMER_NICHT_EINDEUTIG'
+    PersonalnummerNichtEindeutig: 'PERSONALNUMMER_NICHT_EINDEUTIG',
+    LernHatKeineKlasse: 'LERN_HAT_KEINE_KLASSE'
 } as const;
 
 export type DbiamPersonenkontextErrorI18nKeyEnum = typeof DbiamPersonenkontextErrorI18nKeyEnum[keyof typeof DbiamPersonenkontextErrorI18nKeyEnum];
@@ -1676,6 +1679,80 @@ export interface PersonInfoResponse {
      * @memberof PersonInfoResponse
      */
     'email': PersonResponseEmail | null;
+}
+/**
+ * 
+ * @export
+ * @interface PersonLandesbediensteterSearchPersonenkontextResponse
+ */
+export interface PersonLandesbediensteterSearchPersonenkontextResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonLandesbediensteterSearchPersonenkontextResponse
+     */
+    'rolleId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonLandesbediensteterSearchPersonenkontextResponse
+     */
+    'rolleName': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonLandesbediensteterSearchPersonenkontextResponse
+     */
+    'organisationId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonLandesbediensteterSearchPersonenkontextResponse
+     */
+    'organisationName': string;
+}
+/**
+ * 
+ * @export
+ * @interface PersonLandesbediensteterSearchResponse
+ */
+export interface PersonLandesbediensteterSearchResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonLandesbediensteterSearchResponse
+     */
+    'vorname': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonLandesbediensteterSearchResponse
+     */
+    'familienname': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonLandesbediensteterSearchResponse
+     */
+    'username': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonLandesbediensteterSearchResponse
+     */
+    'personalnummer': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonLandesbediensteterSearchResponse
+     */
+    'primaryEmailAddress': string;
+    /**
+     * 
+     * @type {Array<PersonLandesbediensteterSearchPersonenkontextResponse>}
+     * @memberof PersonLandesbediensteterSearchResponse
+     */
+    'personenkontexte': Array<PersonLandesbediensteterSearchPersonenkontextResponse>;
 }
 /**
  * 
@@ -8150,6 +8227,68 @@ export const PersonenApiAxiosParamCreator = function (configuration?: Configurat
         },
         /**
          * 
+         * @param {string} [personalnummer] 
+         * @param {string} [primaryEmailAddress] 
+         * @param {string} [username] 
+         * @param {string} [vorname] 
+         * @param {string} [familienname] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        personControllerFindLandesbediensteter: async (personalnummer?: string, primaryEmailAddress?: string, username?: string, vorname?: string, familienname?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/personen/landesbediensteter`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+            if (personalnummer !== undefined) {
+                localVarQueryParameter['personalnummer'] = personalnummer;
+            }
+
+            if (primaryEmailAddress !== undefined) {
+                localVarQueryParameter['primaryEmailAddress'] = primaryEmailAddress;
+            }
+
+            if (username !== undefined) {
+                localVarQueryParameter['username'] = username;
+            }
+
+            if (vorname !== undefined) {
+                localVarQueryParameter['vorname'] = vorname;
+            }
+
+            if (familienname !== undefined) {
+                localVarQueryParameter['familienname'] = familienname;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @param {string} personId The id for the account.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -8687,6 +8826,20 @@ export const PersonenApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @param {string} [personalnummer] 
+         * @param {string} [primaryEmailAddress] 
+         * @param {string} [username] 
+         * @param {string} [vorname] 
+         * @param {string} [familienname] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async personControllerFindLandesbediensteter(personalnummer?: string, primaryEmailAddress?: string, username?: string, vorname?: string, familienname?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PersonLandesbediensteterSearchResponse>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.personControllerFindLandesbediensteter(personalnummer, primaryEmailAddress, username, vorname, familienname, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @param {string} personId The id for the account.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -8835,6 +8988,19 @@ export const PersonenApiFactory = function (configuration?: Configuration, baseP
         },
         /**
          * 
+         * @param {string} [personalnummer] 
+         * @param {string} [primaryEmailAddress] 
+         * @param {string} [username] 
+         * @param {string} [vorname] 
+         * @param {string} [familienname] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        personControllerFindLandesbediensteter(personalnummer?: string, primaryEmailAddress?: string, username?: string, vorname?: string, familienname?: string, options?: any): AxiosPromise<Array<PersonLandesbediensteterSearchResponse>> {
+            return localVarFp.personControllerFindLandesbediensteter(personalnummer, primaryEmailAddress, username, vorname, familienname, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @param {string} personId The id for the account.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -8969,6 +9135,19 @@ export interface PersonenApiInterface {
      * @memberof PersonenApiInterface
      */
     personControllerDeletePersonById(personId: string, options?: AxiosRequestConfig): AxiosPromise<void>;
+
+    /**
+     * 
+     * @param {string} [personalnummer] 
+     * @param {string} [primaryEmailAddress] 
+     * @param {string} [username] 
+     * @param {string} [vorname] 
+     * @param {string} [familienname] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonenApiInterface
+     */
+    personControllerFindLandesbediensteter(personalnummer?: string, primaryEmailAddress?: string, username?: string, vorname?: string, familienname?: string, options?: AxiosRequestConfig): AxiosPromise<Array<PersonLandesbediensteterSearchResponse>>;
 
     /**
      * 
@@ -9109,6 +9288,21 @@ export class PersonenApi extends BaseAPI implements PersonenApiInterface {
      */
     public personControllerDeletePersonById(personId: string, options?: AxiosRequestConfig) {
         return PersonenApiFp(this.configuration).personControllerDeletePersonById(personId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} [personalnummer] 
+     * @param {string} [primaryEmailAddress] 
+     * @param {string} [username] 
+     * @param {string} [vorname] 
+     * @param {string} [familienname] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonenApi
+     */
+    public personControllerFindLandesbediensteter(personalnummer?: string, primaryEmailAddress?: string, username?: string, vorname?: string, familienname?: string, options?: AxiosRequestConfig) {
+        return PersonenApiFp(this.configuration).personControllerFindLandesbediensteter(personalnummer, primaryEmailAddress, username, vorname, familienname, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
