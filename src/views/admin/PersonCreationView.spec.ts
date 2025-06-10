@@ -82,6 +82,16 @@ const mockWorkflowStepResponse: PersonenkontextWorkflowResponse = {
       typ: 'TRAEGER',
       administriertVon: '1',
     },
+    /* we need an orga with duplicate id to cover useOrganisationen composable */
+    {
+      id: '9876',
+      name: 'orga mit doppelter id',
+      kennung: '',
+      namensergaenzung: '',
+      kuerzel: 'aehg',
+      typ: 'SCHULE',
+      administriertVon: '1',
+    },
   ],
   rollen: [
     {
