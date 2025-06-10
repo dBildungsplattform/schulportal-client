@@ -520,6 +520,8 @@ export const useOrganisationStore: StoreDefinition<
           this.createdSchule = data;
         } else if (typ === OrganisationsTyp.Traeger) {
           this.createdSchultraeger = data;
+        } else {
+          this.errorCode = 'Type is not supported';
         }
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'ORGANISATION_SPECIFICATION_ERROR');
