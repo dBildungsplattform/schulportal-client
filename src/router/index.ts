@@ -16,7 +16,7 @@ type Permission =
   | 'schultraegerverwaltung'
   | 'portalverwaltung'
   | 'hinweisebearbeiten'
-  | 'landesbediensteteSuchenUndHinzufügen'
+  | 'landesbedienstetesuchenundhinzufügen'
   | 'limitedpersonenanlegen';
 
 const router: Router = createRouter({
@@ -108,7 +108,7 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
           return authStore.hasPortalVerwaltungPermission;
         case 'hinweisebearbeiten':
           return authStore.hasHinweiseBearbeitenPermission;
-        case 'landesbediensteteSuchenUndHinzufügen':
+        case 'landesbedienstetesuchenundhinzufügen':
           return authStore.hasLandesbediensteteSuchenUndHinzufügenPermission;
         case 'limitedpersonenanlegen':
           return authStore.hasEingeschränktNeueBenutzerErstellenPermission;

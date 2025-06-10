@@ -581,7 +581,7 @@
             <!-- PERSONAL DATA COLUMN -->
             <v-col
               cols="12"
-              md="4"
+              :md="organisationenDaten.length === 1 ? 6 : 4"
               class="d-flex flex-column ga-8"
             >
               <LayoutCard
@@ -647,7 +647,7 @@
               v-for="(orgData, index) in organisationenDaten"
               :key="orgData.title"
               cols="12"
-              md="4"
+              :md="organisationenDaten.length === 1 ? 6 : 4"
               class="d-flex flex-column ga-8"
             >
               <LayoutCard

@@ -63,7 +63,7 @@ const routes: readonly RouteRecordRaw[] = [
       layout: 'AdminLayout',
       requiresAuth: true,
       requiredStepUpLevel: StepUpLevel.GOLD,
-      requiresPermission: ['personenverwaltung', 'landesbediensteteSuchenUndHinzufügen'],
+      requiresPermission: ['personenverwaltung', 'landesbedienstetesuchenundhinzufügen'],
     },
   },
   {
