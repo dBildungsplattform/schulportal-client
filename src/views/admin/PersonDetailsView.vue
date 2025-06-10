@@ -494,6 +494,7 @@
   const rollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
   const organisationen: ComputedRef<TranslatedObject[] | undefined> = useOrganisationen();
   const klassen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
+    // TODO: accessing the KlassenFilter this way violates encapsulation, should be refactored (see SPSH-2185)
     const activeStore: AutoCompleteStore<Organisation> | undefined =
       organisationStore.klassenFilters.get('personenkontext-create') ??
       organisationStore.klassenFilters.get('klasse-change');
@@ -1016,6 +1017,7 @@
     const existingKlassen: Zuordnung[] | undefined = personStore.personenuebersicht?.zuordnungen.filter(
       (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse,
     );
+    // TODO: accessing the KlassenFilter this way violates encapsulation, should be refactored (see SPSH-2185)
     // The new selected Klasse to add as a separate Zuordnung
     const klasse: Organisation | undefined = organisationStore.klassenFilters
       .get('personenkontext-create')
@@ -1093,6 +1095,7 @@
       (orga: Organisation) => orga.id === selectedSchule.value,
     );
 
+    // TODO: accessing the KlassenFilter this way violates encapsulation, should be refactored (see SPSH-2185)
     // Find the Orga object for the selected new Klasse
     const newKlasse: Organisation | undefined = organisationStore.klassenFilters
       .get('klasse-change')
