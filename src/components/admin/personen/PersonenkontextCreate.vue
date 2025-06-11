@@ -9,7 +9,7 @@
     type Organisation,
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
-  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
+  import { OperationContext, usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
   import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
   import { RollenArt } from '@/stores/RolleStore';
   import type { Zuordnung } from '@/stores/types/Zuordnung';
@@ -39,6 +39,7 @@
     rollen: TranslatedRolleWithAttrs[] | undefined;
     selectedOrganisation: string | undefined;
     showHeadline: boolean;
+    operationContext: OperationContext;
     klassen?: TranslatedObject[] | undefined;
     selectedRolle?: string | undefined;
     selectedRollen?: string[] | undefined;
@@ -112,6 +113,7 @@
     if (newValue && newValue !== oldValue) {
       // Fetch the roles after selecting the organization
       await personenkontextStore.processWorkflowStep({
+        operationContext: props.operationContext,
         organisationId: newValue,
         limit: 25,
       });
@@ -168,6 +170,7 @@
         const newRollen: string[] | undefined = newValue as string[] | undefined;
         if (newRollen && newRollen.length > 0) {
           await personenkontextStore.processWorkflowStep({
+            operationContext: props.operationContext,
             organisationId: selectedOrganisation.value,
             rollenIds: newRollen,
             limit: 25,
@@ -187,6 +190,7 @@
         const newRolle: string | undefined = newValue as string | undefined;
         if (newRolle && newRolle !== oldValue) {
           await personenkontextStore.processWorkflowStep({
+            operationContext: props.operationContext,
             organisationId: selectedOrganisation.value,
             rollenIds: [newRolle], // Wrap single rolle in an array
             limit: 25,
@@ -222,12 +226,14 @@
     if (newValue === '' && !selectedOrganisation.value) {
       timerId.value = setTimeout(async () => {
         await personenkontextStore.processWorkflowStep({
+          operationContext: props.operationContext,
           limit: 25,
         });
       }, 500);
     } else if (newValue && newValue !== selectedOrganisationTitle.value) {
       timerId.value = setTimeout(async () => {
         await personenkontextStore.processWorkflowStep({
+          operationContext: props.operationContext,
           organisationName: newValue,
           limit: 25,
         });
@@ -236,6 +242,7 @@
       // If searchValue is empty and an organization is selected, fetch roles for the selected organization
       timerId.value = setTimeout(async () => {
         await personenkontextStore.processWorkflowStep({
+          operationContext: props.operationContext,
           organisationId: selectedOrganisation.value,
           limit: 25,
         });
@@ -253,6 +260,7 @@
       if (newValue === '' && !selectedRolle.value) {
         timerId.value = setTimeout(() => {
           personenkontextStore.processWorkflowStep({
+            operationContext: props.operationContext,
             organisationId: selectedOrganisation.value,
             limit: 25,
           });
@@ -262,6 +270,7 @@
       } else if (newValue && newValue !== selectedRolleTitle.value) {
         timerId.value = setTimeout(() => {
           personenkontextStore.processWorkflowStep({
+            operationContext: props.operationContext,
             organisationId: selectedOrganisation.value,
             rolleName: newValue,
             rollenIds: selectedRollen.value,

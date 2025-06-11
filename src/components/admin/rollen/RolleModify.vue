@@ -5,7 +5,11 @@
   import { useBulkErrors, type BulkErrorList } from '@/composables/useBulkErrors';
   import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
   import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
-  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
+  import {
+    usePersonenkontextStore,
+    type OperationContext,
+    type PersonenkontextStore,
+  } from '@/stores/PersonenkontextStore';
   import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
   import type { TranslatedObject } from '@/types';
   import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
@@ -196,6 +200,7 @@
           <template v-if="bulkOperationStore.currentOperation?.progress === 0">
             <PersonenkontextCreate
               ref="personenkontext-create"
+              :operationContext="OperationContext.Bearbeiten"
               :showHeadline="false"
               :organisationen="organisationen"
               :rollen="rollen"
