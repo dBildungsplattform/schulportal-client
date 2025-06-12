@@ -145,8 +145,8 @@ describe('PersonenkontextStore', () => {
       if (organisationId) {
         url += `&organisationId=${organisationId}`;
       }
-      if (rollenIds && rollenIds.length > 0) {
-        url += `&rollenIds=${rollenIds.join(',')}`;
+      if (rollenIds) {
+        rollenIds.forEach((rolleId: string) => (url += `&rollenIds=${rolleId}`));
       }
       if (rolleName) {
         url += `&rolleName=${rolleName}`;
