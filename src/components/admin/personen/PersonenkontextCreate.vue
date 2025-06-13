@@ -410,7 +410,7 @@
           variant="outlined"
           v-bind="selectedRollenProps"
           v-model="selectedRollen"
-          v-model:search="searchInputRolle"
+          v-model:search="searchInputRollen"
         ></v-autocomplete>
         <v-autocomplete
           v-else-if="!allowMultipleRollen"
