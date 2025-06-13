@@ -6,9 +6,9 @@
   import FormRow from '@/components/form/FormRow.vue';
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import PasswordOutput from '@/components/form/PasswordOutput.vue';
-  import { useKlassen } from '@/composables/useKlassen';
   import { useOrganisationen } from '@/composables/useOrganisationen';
   import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
+  import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
   import {
     OperationContext,
     usePersonenkontextStore,
@@ -57,7 +57,7 @@
   const calculatedBefristung: Ref<string | undefined> = ref('');
 
   const selectedOrgaCache: Ref<string | undefined> = ref(undefined);
-  const selectedKlasseCache: Ref<string | undefined> = ref(undefined);
+  const selectedKlasseCache: Ref<TranslatedObject | undefined> = ref(undefined);
   const selectedRolleCache: Ref<string[] | undefined> = ref(undefined);
 
   const filteredRollen: Ref<TranslatedRolleWithAttrs[] | undefined> = ref<TranslatedRolleWithAttrs[] | undefined>([]);
@@ -214,7 +214,7 @@
 
   const rollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
   const organisationen: ComputedRef<TranslatedObject[] | undefined> = useOrganisationen();
-  const klassen: ComputedRef<TranslatedObject[] | undefined> = useKlassen();
+  const organisationStore: OrganisationStore = useOrganisationStore();
 
   // Watch the selectedRollen and update filteredRollen accordingly
   watch(
@@ -242,7 +242,8 @@
 
     return personenkontextStore.createdPersonWithKontext.dBiamPersonenkontextResponses.filter(
       (kontext: DBiamPersonenkontextResponse) =>
-        kontext.organisationId === selectedKlasseCache.value && selectedRolleCache.value?.includes(kontext.rolleId),
+        kontext.organisationId === selectedKlasseCache.value?.value &&
+        selectedRolleCache.value?.includes(kontext.rolleId),
     );
   });
 
@@ -275,17 +276,6 @@
     return schuleZuordnungFromCreatedKontext.value.map(
       (kontext: DBiamPersonenkontextResponse) =>
         rollen.value?.find((rolle: TranslatedObject) => rolle.value === kontext.rolleId)?.title || '',
-    );
-  });
-
-  // We extract the first Klasse since all of the Kontexte have the same one
-  const translatedKlassenname: ComputedRef<string> = computed(() => {
-    if (!klasseZuordnungFromCreatedKontext.value.length) return '';
-
-    return (
-      klassen.value?.find(
-        (klasse: TranslatedObject) => klasse.value === klasseZuordnungFromCreatedKontext.value[0]?.organisationId,
-      )?.title || ''
     );
   });
 
@@ -386,7 +376,13 @@
       selectedRollen.value.length > 0 &&
       isLernRolle(selectedRollen.value)
     ) {
-      selectedKlasseCache.value = JSON.parse(JSON.stringify(selectedKlasse.value));
+      selectedKlasseCache.value = {
+        value: selectedKlasse.value,
+        title:
+          organisationStore.klassenFilters
+            .get('personenkontext-create')
+            ?.filterResult.find((klasse: Organisation) => klasse.id === selectedKlasse.value)?.name || '',
+      };
       for (const rolleId of selectedRollen.value)
         bodyParams.createPersonenkontexte.push({
           organisationId: selectedKlasse.value,
@@ -541,11 +537,15 @@
             :model-value="!!personenkontextStore.errorCode"
             :type="'error'"
             :closable="false"
-            :text="t(`admin.personenkontext.errors.${personenkontextStore.errorCode}`)"
+            :text="
+              personenkontextStore.errorCode ? t(`admin.personenkontext.errors.${personenkontextStore.errorCode}`) : ''
+            "
             :showButton="true"
             :buttonText="$t('admin.person.backToCreatePerson')"
             :buttonAction="navigateBackToPersonForm"
-            :title="t(`admin.personenkontext.title.${personenkontextStore.errorCode}`)"
+            :title="
+              personenkontextStore.errorCode ? t(`admin.personenkontext.title.${personenkontextStore.errorCode}`) : ''
+            "
           />
 
           <!-- Error Message Display for error messages from the personStore -->
@@ -569,7 +569,6 @@
               :organisationen="organisationen"
               ref="personenkontext-create"
               :rollen="(filteredRollen?.length ?? 0) === 0 ? rollen : filteredRollen"
-              :klassen="klassen"
               :selectedOrganisationProps="selectedOrganisationProps"
               :selectedRollenProps="selectedRollenProps"
               :selectedKlasseProps="selectedKlasseProps"
@@ -786,7 +785,7 @@
             <v-col class="text-body bold text-right"> {{ $t('admin.klasse.klasse') }}: </v-col>
             <v-col class="text-body"
               ><span data-testid="created-person-klasse">{{
-                translatedKlassenname ? translatedKlassenname : '---'
+                selectedKlasseCache ? selectedKlasseCache.title : '---'
               }}</span></v-col
             >
           </v-row>

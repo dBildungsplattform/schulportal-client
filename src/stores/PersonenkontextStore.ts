@@ -97,6 +97,7 @@ type PersonenkontextActions = {
 };
 
 export type {
+  DbiamCreatePersonenkontextBodyParams,
   DbiamPersonenkontextBodyParams,
   DBiamPersonenkontextResponse,
   DbiamUpdatePersonenkontexteBodyParams,
@@ -104,7 +105,6 @@ export type {
   PersonenkontextWorkflowResponse,
   SystemrechtResponse,
 };
-export type { DbiamCreatePersonenkontextBodyParams };
 export type UserinfoPersonenkontext = {
   organisationsId: string;
   rolle: {

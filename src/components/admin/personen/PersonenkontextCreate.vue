@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import type { BefristungProps } from '@/components/admin/personen/BefristungInput.vue';
   import BefristungInput from '@/components/admin/personen/BefristungInput.vue';
+  import KlassenFilter from '@/components/filter/KlassenFilter.vue';
   import FormRow from '@/components/form/FormRow.vue';
   import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
   import {
@@ -40,7 +41,6 @@
     selectedOrganisation: string | undefined;
     showHeadline: boolean;
     operationContext: OperationContext;
-    klassen?: TranslatedObject[] | undefined;
     selectedRolle?: string | undefined;
     selectedRollen?: string[] | undefined;
     selectedKlasse?: string | undefined;
@@ -83,11 +83,6 @@
     return props.rollen?.find((rolle: TranslatedObject) => rolle.value === selectedRolle.value)?.title;
   });
 
-  // Computed property to get the title of the selected class
-  const selectedKlasseTitle: ComputedRef<string | undefined> = computed(() => {
-    return props.klassen?.find((klasse: TranslatedObject | undefined) => klasse?.value === selectedKlasse.value)?.title;
-  });
-
   function isLernRolle(selectedRolleIds: string | string[] | undefined): boolean {
     if (!selectedRolleIds) return false;
 
@@ -118,9 +113,6 @@
         limit: 25,
       });
 
-      // Fetch all Klassen for the selected organization
-      await organisationStore.getKlassenByOrganisationId({ limit: 200, administriertVon: [newValue] });
-
       // Check that all the Klassen associated with the selectedOrga have the same Klasse for the same person.
       const klassenZuordnungen: Zuordnung[] | undefined = personStore.personenuebersicht?.zuordnungen.filter(
         (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse && zuordnung.administriertVon === newValue,
@@ -141,13 +133,7 @@
           // If the klasse was found then add it to the 25 Klassen in the dropdown and preselect it
           if (klasse) {
             selectedKlasse.value = klasse.id;
-            emits('update:selectedKlasse', newValue);
-            // Another request to limit the Klassen because beforehand we made the same request with no limit to check all possible Klassen
-            await organisationStore.getKlassenByOrganisationId({ limit: 200, administriertVon: [newValue] });
-            // Push the preselected Klasse to the array of klassen (dropdown) if its not there already (this is necessary if the Klasse isn't part of the initial 25)
-            if (!organisationStore.klassen.some((k: Organisation) => k.id === klasse.id)) {
-              organisationStore.klassen.push(klasse);
-            }
+            emits('update:selectedKlasse', klasse.id);
           }
         }
       }
@@ -176,13 +162,12 @@
             limit: 25,
           });
           canCommit.value = personenkontextStore.workflowStepResponse?.canCommit ?? false;
-          emits('update:canCommit', canCommit.value);
         } else {
           // No roles selected, reset values
           selectedKlasse.value = undefined;
           emits('fieldReset', 'selectedKlasse');
           emits('fieldReset', 'selectedRollen');
-          emits('update:canCommit', false);
+          canCommit.value = false;
         }
         emits('update:selectedRollen', newRollen);
       } else {
@@ -196,11 +181,10 @@
             limit: 25,
           });
           canCommit.value = personenkontextStore.workflowStepResponse?.canCommit ?? false;
-          emits('update:canCommit', canCommit.value);
         }
         if (!newRolle) {
           // Reset when no rolle is selected
-          emits('update:canCommit', false);
+          canCommit.value = false;
           selectedKlasse.value = undefined;
           emits('fieldReset', 'selectedKlasse');
         }
@@ -209,10 +193,6 @@
     },
     { deep: true },
   );
-
-  watch(selectedKlasse, (newValue: string | undefined) => {
-    emits('update:selectedKlasse', newValue);
-  });
 
   // Using a watcher instead of modelUpdate since we need the old Value as well.
   // Default behavior of the autocomplete is to reset the newValue to empty string and that causes another request to be made
@@ -281,33 +261,9 @@
     },
   );
 
-  function updateKlassenSearch(searchValue: string): void {
-    clearTimeout(timerId.value);
-    const organisationId: string | undefined = selectedOrganisation.value;
-
-    if (!organisationId) {
-      return;
-    }
-    if (searchValue === '' && !selectedKlasse.value) {
-      timerId.value = setTimeout(() => {
-        organisationStore.getKlassenByOrganisationId({
-          searchString: searchValue,
-          limit: 25,
-          administriertVon: [organisationId],
-        });
-      }, 500);
-    } else if (searchValue && searchValue !== selectedKlasseTitle.value) {
-      /* cancel pending call */
-      clearTimeout(timerId.value);
-      /* delay new call 500ms */
-      timerId.value = setTimeout(() => {
-        organisationStore.getKlassenByOrganisationId({
-          searchString: searchValue,
-          limit: 25,
-          administriertVon: [organisationId],
-        });
-      }, 500);
-    }
+  function updateKlasseSelection(selectedKlassen: string | undefined): void {
+    selectedKlasse.value = selectedKlassen;
+    emits('update:selectedKlasse', selectedKlassen);
   }
 
   // Clear the selected Organisation once the input field is cleared (This is the only way to fetch all Orgas again)
@@ -344,6 +300,14 @@
   const handleCalculatedBefristungOptionChange = (value: string | undefined): void => {
     emits('update:calculatedBefristungOption', value);
   };
+
+  watch(
+    canCommit,
+    (newValue: boolean) => {
+      emits('update:canCommit', newValue);
+    },
+    { immediate: true },
+  );
 </script>
 
 <template>
@@ -455,23 +419,18 @@
         labelForId="klasse-select"
         :label="$t('admin.klasse.klasse')"
       >
-        <v-autocomplete
-          autocomplete="off"
-          clearable
-          data-testid="klasse-select"
-          density="compact"
-          id="klasse-select"
+        <KlassenFilter
+          :multiple="false"
+          :hideDetails="false"
+          :selectedKlasseProps="selectedKlasseProps"
+          :highlightSelection="false"
+          :selectedKlassen="selectedKlasse"
+          @update:selectedKlassen="updateKlasseSelection"
+          :placeholderText="$t('admin.klasse.selectKlasse')"
           ref="klasse-select"
-          :items="klassen"
-          item-value="value"
-          item-text="title"
-          :no-data-text="$t('noDataFound')"
-          :placeholder="$t('admin.klasse.selectKlasse')"
-          @update:search="updateKlassenSearch"
-          variant="outlined"
-          v-bind="selectedKlasseProps"
-          v-model="selectedKlasse"
-        ></v-autocomplete>
+          :administriertVon="selectedOrganisation ? [selectedOrganisation] : undefined"
+          :filterId="'personenkontext-create'"
+        />
       </FormRow>
       <!-- Befristung -->
       <v-row

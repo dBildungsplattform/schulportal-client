@@ -47,17 +47,9 @@
   const { hasAutoselectedSchule, autoselectedSchule }: ReturnType<typeof useAutoselectedSchule> = useAutoselectedSchule(
     props.systemrechteForSearch ?? [],
   );
+
   const isInputDisabled: ComputedRef<boolean> = computed(() => {
     return props.readonly || hasAutoselectedSchule.value;
-  });
-  const translateSchule = (schule: Organisation): TranslatedObject => ({
-    value: schule.id,
-    title: getDisplayNameForOrg(schule),
-  });
-  const translatedSchulen: ComputedRef<Array<TranslatedObject>> = computed(() => {
-    const options: Array<TranslatedObject> = organisationStore.schulenFilter.filterResult.map(translateSchule);
-    if (autoselectedSchule.value) return options.concat(translateSchule(autoselectedSchule.value));
-    return options;
   });
 
   // selection is represented as an array internally
@@ -67,11 +59,27 @@
     if (selectedIds) return [selectedIds];
     return [];
   };
+
   const unwrapSelectedSchulenIds = (selectedIds: Array<string>): SelectedSchulenIds => {
     if (selectedIds.length === 0) return undefined;
     else if (selectedIds.length === 1) return selectedIds.at(0);
     else return selectedIds;
   };
+
+  const isEmptySelection = (selection: SelectedSchulenIds): boolean => {
+    if (!selection) return true;
+    return wrapSelectedSchulenIds(selection).filter(Boolean).length === 0;
+  };
+
+  const translateSchule = (schule: Organisation): TranslatedObject => ({
+    value: schule.id,
+    title: getDisplayNameForOrg(schule),
+  });
+  const translatedSchulen: ComputedRef<Array<TranslatedObject>> = computed(() => {
+    const options: Array<TranslatedObject> = organisationStore.schulenFilter.filterResult.map(translateSchule);
+    if (autoselectedSchule.value) options.push(translateSchule(autoselectedSchule.value));
+    return options;
+  });
 
   const canDisplaySelection = (selection: SelectedSchulenIds): boolean => {
     const result: boolean = wrapSelectedSchulenIds(selection).every((selectedSchuleId: string) =>
@@ -85,10 +93,6 @@
     return result;
   };
 
-  const isEmptySelection = (selection: SelectedSchulenIds): boolean => {
-    if (!selection) return true;
-    return wrapSelectedSchulenIds(selection).filter(Boolean).length === 0;
-  };
   const shouldHighlightSelection: ComputedRef<boolean> = computed(() => {
     if (hasAutoselectedSchule.value) return true;
     if (props.highlightSelection && !isEmptySelection(selectedSchulen.value)) return true;
@@ -199,7 +203,6 @@
     :items="translatedSchulen"
     item-value="value"
     item-text="title"
-    :loading="organisationStore.schulenFilter.loading"
     :multiple="props.multiple"
     :no-data-text="'noDataFound'"
     :placeholder="props.placeholderText ?? t('admin.schule.assignSchule')"
@@ -214,6 +217,11 @@
   >
     <template v-slot:prepend-item>
       <slot name="prepend-item"></slot>
+    </template>
+    <template v-slot:selection="{ item }">
+      <span class="v-autocomplete__selection-text">
+        {{ canDisplaySelection(selectedSchulen) ? item.title : '...' }}
+      </span>
     </template>
   </v-autocomplete>
 </template>

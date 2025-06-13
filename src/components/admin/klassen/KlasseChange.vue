@@ -1,70 +1,34 @@
 <script setup lang="ts">
-  import { computed, defineProps, ref, watch, type ComputedRef, type ModelRef, type Ref } from 'vue';
-  import { type BaseFieldProps } from 'vee-validate';
+  import KlassenFilter from '@/components/filter/KlassenFilter.vue';
   import FormRow from '@/components/form/FormRow.vue';
-  import { type OrganisationStore, useOrganisationStore } from '@/stores/OrganisationStore';
-  import type { TranslatedObject } from '@/types';
-
-  const organisationStore: OrganisationStore = useOrganisationStore();
+  import { type BaseFieldProps } from 'vee-validate';
+  import { type Ref, ref, type ModelRef } from 'vue';
+  import { watch } from 'vue';
 
   type Props = {
     schulen?: Array<{ value: string; title: string }>;
-    klassen?: Array<{ value: string; title: string }>;
     readonly?: boolean;
     selectedSchuleProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedNewKlasseProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
-    isEditActive?: boolean;
     onSubmit: () => void;
   };
 
-  const props: Props = defineProps<Props>();
+  defineProps<Props>();
 
   const selectedSchule: ModelRef<string | undefined, string> = defineModel('selectedSchule');
   const selectedNewKlasse: ModelRef<string | undefined, string> = defineModel('selectedNewKlasse');
 
-  const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
-
-  // Computed property to get the title of the selected klasse
-  const selectedKlasseTitle: ComputedRef<string | undefined> = computed(() => {
-    return props.klassen?.find((klasse: TranslatedObject | undefined) => klasse?.value === selectedNewKlasse.value)
-      ?.title;
-  });
-
-  watch(selectedNewKlasse, (newValue: string | undefined) => {
-    if (!selectedNewKlasse.value) {
-      organisationStore.getKlassenByOrganisationId({ limit: 200, administriertVon: [selectedSchule.value as string] });
-    }
-    selectedNewKlasse.value = newValue;
-  });
-
-  function updateKlassenSearch(searchValue: string): void {
-    clearTimeout(timerId.value);
-    const organisationId: string | undefined = selectedSchule.value;
-
-    if (!organisationId) {
-      return;
-    }
-    if (searchValue === '' && !selectedNewKlasse.value) {
-      timerId.value = setTimeout(() => {
-        organisationStore.getKlassenByOrganisationId({
-          searchString: searchValue,
-          limit: 200,
-          administriertVon: [organisationId],
-        });
-      }, 500);
-    } else if (searchValue && searchValue !== selectedKlasseTitle.value) {
-      /* cancel pending call */
-      clearTimeout(timerId.value);
-      /* delay new call 500ms */
-      timerId.value = setTimeout(() => {
-        organisationStore.getKlassenByOrganisationId({
-          searchString: searchValue,
-          limit: 200,
-          administriertVon: [organisationId],
-        });
-      }, 500);
-    }
-  }
+  // we need to cast the selectedSchule into an array
+  // doing it this way prevents an issue where the reactive system constantly re-runs which causes requests to be issued in a loop
+  const administriertVon: Ref<string[] | undefined> = ref();
+  watch(
+    selectedSchule,
+    (newValue: string | undefined) => {
+      if (!newValue) administriertVon.value = [];
+      else if (!administriertVon.value?.includes(newValue)) administriertVon.value = [newValue];
+    },
+    { immediate: true },
+  );
 </script>
 
 <template>
@@ -109,24 +73,18 @@
       :isRequired="true"
       :label="$t('admin.klasse.klasse')"
     >
-      <v-autocomplete
-        clearable
-        autocomplete="off"
-        data-testid="klassenname-input"
-        density="compact"
-        :disabled="!isEditActive"
-        id="klasse-select"
-        :items="klassen"
-        item-value="value"
-        item-text="title"
-        :placeholder="$t('admin.klasse.selectKlasse')"
+      <KlassenFilter
+        :multiple="false"
+        :hideDetails="false"
+        :selectedKlasseProps="selectedNewKlasseProps"
+        :highlightSelection="false"
+        :selectedKlassen="selectedNewKlasse"
+        :placeholderText="$t('admin.klasse.selectKlasse')"
         ref="klasse-select"
-        required="true"
-        variant="outlined"
-        @update:search="updateKlassenSearch"
-        v-bind="selectedNewKlasseProps"
-        v-model="selectedNewKlasse"
-      ></v-autocomplete>
+        :administriertVon
+        :filterId="'klasse-change'"
+        @update:selectedKlassen="(newValue: string | undefined) => (selectedNewKlasse = newValue)"
+      />
     </FormRow>
   </v-form>
 </template>
