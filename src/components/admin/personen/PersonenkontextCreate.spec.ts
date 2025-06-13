@@ -1,6 +1,6 @@
 import { RollenArt, RollenMerkmal, RollenSystemRecht } from '@/api-client/generated';
 import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
-import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
+import { OperationContext, usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
 import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
 import { PersonenUebersicht } from '@/stores/types/PersonenUebersicht';
 import { VueWrapper, mount } from '@vue/test-utils';
@@ -14,15 +14,12 @@ let wrapper: VueWrapper | null = null;
 let personenkontextStore: PersonenkontextStore;
 let organisationStore: OrganisationStore;
 const personStore: PersonStore = usePersonStore();
-beforeEach(() => {
-  document.body.innerHTML = `
-    <div>
-      <div id="app"></div>
-    </div>
-  `;
-  wrapper = mount(PersonenkontextCreate, {
+
+const mountComponent = (props: Record<string, unknown> = {}): VueWrapper => {
+  return mount(PersonenkontextCreate, {
     attachTo: document.getElementById('app') || '',
     props: {
+      operationContext: OperationContext.PERSON_ANLEGEN,
       errorCode: '',
       disabled: false,
       organisationen: [
@@ -104,6 +101,7 @@ beforeEach(() => {
         befristung: undefined,
         befristungOption: undefined,
       } as BefristungProps,
+      ...props,
     },
     global: {
       components: {
@@ -111,7 +109,14 @@ beforeEach(() => {
       },
     },
   });
+};
 
+beforeEach(() => {
+  document.body.innerHTML = `
+    <div>
+      <div id="app"></div>
+    </div>
+  `;
   personenkontextStore = usePersonenkontextStore();
   organisationStore = useOrganisationStore();
 
@@ -169,240 +174,255 @@ beforeEach(() => {
 });
 
 describe('PersonenkontextCreate', () => {
-  test('it renders the component', () => {
-    expect(wrapper?.find('[data-testid="organisation-select"]').isVisible()).toBe(true);
-  });
+  describe.each([[OperationContext.PERSON_ANLEGEN], [OperationContext.PERSON_BEARBEITEN]])(
+    'when operationContext is %s',
+    (operationContext: OperationContext) => {
+      beforeEach(() => {
+        wrapper = mountComponent({
+          operationContext,
+        });
+      });
 
-  test('it updates search and sets values selected rolle, organisation and klasse', async () => {
-    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
-    organisationAutocomplete?.vm.$emit('update:search', '01');
-    await organisationAutocomplete?.setValue('O1');
-    await nextTick();
+      test('it renders the component', () => {
+        expect(wrapper?.find('[data-testid="organisation-select"]').isVisible()).toBe(true);
+      });
 
-    const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
-    await rolleAutocomplete?.vm.$emit('update:search', '54321');
-    await rolleAutocomplete?.setValue('54321');
-    await nextTick();
+      test('it updates search and sets values selected rolle, organisation and klasse', async () => {
+        const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
+        organisationAutocomplete?.vm.$emit('update:search', '01');
+        await organisationAutocomplete?.setValue('O1');
+        await nextTick();
+
+        const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+        await rolleAutocomplete?.vm.$emit('update:search', '54321');
+        await rolleAutocomplete?.setValue('54321');
+        await nextTick();
 
-    expect(organisationAutocomplete?.text()).toEqual('O1');
-    await nextTick();
+        expect(organisationAutocomplete?.text()).toEqual('O1');
+        await nextTick();
+
+        const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
+        await klasseAutocomplete?.vm.$emit('update:search', '55555');
+        await klasseAutocomplete?.setValue('55555');
+        await nextTick();
 
-    const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
-    await klasseAutocomplete?.vm.$emit('update:search', '55555');
-    await klasseAutocomplete?.setValue('55555');
-    await nextTick();
+        expect(klasseAutocomplete?.text()).toEqual('55555');
+      });
 
-    expect(klasseAutocomplete?.text()).toEqual('55555');
-  });
+      test('it resets field Rolle when Organisation is reset after being selected', async () => {
+        const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
+        await organisationAutocomplete?.setValue('O1');
+        await nextTick();
 
-  test('it resets field Rolle when Organisation is reset after being selected', async () => {
-    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
-    await organisationAutocomplete?.setValue('O1');
-    await nextTick();
+        const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+        await rolleAutocomplete?.setValue('54321');
+        await nextTick();
 
-    const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
-    await rolleAutocomplete?.setValue('54321');
-    await nextTick();
+        await organisationAutocomplete?.setValue(undefined);
+        await nextTick();
 
-    await organisationAutocomplete?.setValue(undefined);
-    await nextTick();
+        expect(rolleAutocomplete?.exists()).toBe(false);
+      });
 
-    expect(rolleAutocomplete?.exists()).toBe(false);
-  });
+      test('it resets field Klasse when Rolle is reset after being selected', async () => {
+        const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
+        await organisationAutocomplete?.setValue('O1');
+        await nextTick();
 
-  test('it resets field Klasse when Rolle is reset after being selected', async () => {
-    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
-    await organisationAutocomplete?.setValue('O1');
-    await nextTick();
+        const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+        await rolleAutocomplete?.setValue('54321');
+        await nextTick();
 
-    const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
-    await rolleAutocomplete?.setValue('54321');
-    await nextTick();
+        const klassenAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
+        await klassenAutocomplete?.setValue('O1');
+        await nextTick();
 
-    const klassenAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
-    await klassenAutocomplete?.setValue('O1');
-    await nextTick();
+        await organisationAutocomplete?.setValue(undefined);
+        await nextTick();
 
-    await organisationAutocomplete?.setValue(undefined);
-    await nextTick();
+        expect(klassenAutocomplete?.exists()).toBe(false);
+      });
 
-    expect(klassenAutocomplete?.exists()).toBe(false);
-  });
+      test('Fetches all Klassen if the searchValue is empty', async () => {
+        const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
+        await organisationAutocomplete?.setValue('O1');
+        await nextTick();
 
-  test('Fetches all Klassen if the searchValue is empty', async () => {
-    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
-    await organisationAutocomplete?.setValue('O1');
-    await nextTick();
+        const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+        await rolleAutocomplete?.setValue('54321');
+        await nextTick();
 
-    const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
-    await rolleAutocomplete?.setValue('54321');
-    await nextTick();
+        const klassenAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
+        await klassenAutocomplete?.vm.$emit('update:search', '');
+        await nextTick();
+
+        expect(organisationStore.getKlassenByOrganisationId).toHaveBeenCalled();
+      });
 
-    const klassenAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
-    await klassenAutocomplete?.vm.$emit('update:search', '');
-    await nextTick();
+      test('it updates Organisation search correctly', async () => {
+        const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
 
-    expect(organisationStore.getKlassenByOrganisationId).toHaveBeenCalled();
-  });
+        await organisationAutocomplete?.setValue(undefined);
+        await nextTick();
 
-  test('it updates Organisation search correctly', async () => {
-    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
+        await organisationAutocomplete?.vm.$emit('update:search', '');
+        await nextTick();
+        expect(personenkontextStore.processWorkflowStep).toHaveBeenCalled();
+      });
 
-    await organisationAutocomplete?.setValue(undefined);
-    await nextTick();
+      test('it updates Rollen search correctly', async () => {
+        const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
 
-    await organisationAutocomplete?.vm.$emit('update:search', '');
-    await nextTick();
-    expect(personenkontextStore.processWorkflowStep).toHaveBeenCalled();
-  });
+        await organisationAutocomplete?.setValue('org');
+        await nextTick();
 
-  test('it updates Rollen search correctly', async () => {
-    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
+        const rollenAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
 
-    await organisationAutocomplete?.setValue('org');
-    await nextTick();
+        await rollenAutocomplete?.setValue(undefined);
+        await nextTick();
 
-    const rollenAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+        await rollenAutocomplete?.vm.$emit('update:search', '');
+        await nextTick();
+        expect(personenkontextStore.processWorkflowStep).toHaveBeenCalled();
+      });
 
-    await rollenAutocomplete?.setValue(undefined);
-    await nextTick();
+      test('it does nothing if the oldValue is equal to what is selected on Organisation', async () => {
+        const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
 
-    await rollenAutocomplete?.vm.$emit('update:search', '');
-    await nextTick();
-    expect(personenkontextStore.processWorkflowStep).toHaveBeenCalled();
-  });
+        // Set a value in orga that will match with something given by the props and so the component will calculate the selectedOrganisationTitle
+        await organisationAutocomplete?.setValue('1133');
+        await nextTick();
 
-  test('it does nothing if the oldValue is equal to what is selected on Organisation', async () => {
-    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
+        // Set the searchValue to 'orga' which matches the title before
+        await organisationAutocomplete?.vm.$emit('update:search', 'orga');
+        await nextTick();
 
-    // Set a value in orga that will match with something given by the props and so the component will calculate the selectedOrganisationTitle
-    await organisationAutocomplete?.setValue('1133');
-    await nextTick();
+        // Set the newValue to '' and the oldValue is in this case 'orga' and so the method should just return
+        await organisationAutocomplete?.vm.$emit('update:search', '');
+        await nextTick();
 
-    // Set the searchValue to 'orga' which matches the title before
-    await organisationAutocomplete?.vm.$emit('update:search', 'orga');
-    await nextTick();
+        expect(organisationAutocomplete?.text()).toEqual('orga');
+      });
 
-    // Set the newValue to '' and the oldValue is in this case 'orga' and so the method should just return
-    await organisationAutocomplete?.vm.$emit('update:search', '');
-    await nextTick();
+      test('it does nothing if the oldValue is equal to what is selected on Rolle', async () => {
+        const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
 
-    expect(organisationAutocomplete?.text()).toEqual('orga');
-  });
+        await organisationAutocomplete?.setValue('1133');
+        await nextTick();
 
-  test('it does nothing if the oldValue is equal to what is selected on Rolle', async () => {
-    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
+        // Set a value in orga that will match with something given by the props and so the component will calculate the selectedRolleTitle
+        const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+        await rolleAutocomplete?.setValue('54321');
+        await nextTick();
 
-    await organisationAutocomplete?.setValue('1133');
-    await nextTick();
+        // Set the searchValue to 'Lern' which matches the title before
+        await rolleAutocomplete?.vm.$emit('update:search', 'Lern');
+        await nextTick();
 
-    // Set a value in orga that will match with something given by the props and so the component will calculate the selectedRolleTitle
-    const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
-    await rolleAutocomplete?.setValue('54321');
-    await nextTick();
+        // Set the newValue to '' and the oldValue is in this case 'Lern' and so the method should just return
+        await rolleAutocomplete?.vm.$emit('update:search', '');
+        await nextTick();
 
-    // Set the searchValue to 'Lern' which matches the title before
-    await rolleAutocomplete?.vm.$emit('update:search', 'Lern');
-    await nextTick();
+        expect(rolleAutocomplete?.text()).toEqual('Lern');
+      });
 
-    // Set the newValue to '' and the oldValue is in this case 'Lern' and so the method should just return
-    await rolleAutocomplete?.vm.$emit('update:search', '');
-    await nextTick();
+      test('it sends a request if the newValue is empty and the selectedRolle is not defined', async () => {
+        const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
 
-    expect(rolleAutocomplete?.text()).toEqual('Lern');
-  });
+        await organisationAutocomplete?.setValue('1133');
+        await nextTick();
 
-  test('it sends a request if the newValue is empty and the selectedRolle is not defined', async () => {
-    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
+        // Set a value in orga that will match with something given by the props and so the component will calculate the selectedRolleTitle
+        const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+        await rolleAutocomplete?.setValue('54321');
+        await nextTick();
 
-    await organisationAutocomplete?.setValue('1133');
-    await nextTick();
+        // Set the searchValue to 'Lern' which matches the title before
+        await rolleAutocomplete?.vm.$emit('update:search', 'Lern');
+        await nextTick();
 
-    // Set a value in orga that will match with something given by the props and so the component will calculate the selectedRolleTitle
-    const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
-    await rolleAutocomplete?.setValue('54321');
-    await nextTick();
+        await rolleAutocomplete?.setValue(undefined);
+        await nextTick();
 
-    // Set the searchValue to 'Lern' which matches the title before
-    await rolleAutocomplete?.vm.$emit('update:search', 'Lern');
-    await nextTick();
+        // Set the newValue to '' and the oldValue is in this case 'Lern' and so the method should just return
+        await rolleAutocomplete?.vm.$emit('update:search', '');
+        await nextTick();
 
-    await rolleAutocomplete?.setValue(undefined);
-    await nextTick();
+        expect(rolleAutocomplete?.text()).toEqual('');
+        expect(personenkontextStore.processWorkflowStep).toHaveBeenCalledWith({
+          operationContext,
+          organisationId: '1133',
+          limit: 25,
+        });
+      });
 
-    // Set the newValue to '' and the oldValue is in this case 'Lern' and so the method should just return
-    await rolleAutocomplete?.vm.$emit('update:search', '');
-    await nextTick();
+      test('it sends a request if the newValue is empty and the selected Organisation is not defined', async () => {
+        const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
 
-    expect(rolleAutocomplete?.text()).toEqual('');
-    expect(personenkontextStore.processWorkflowStep).toHaveBeenCalledWith({ organisationId: '1133', limit: 25 });
-  });
+        await organisationAutocomplete?.setValue('1133');
+        await nextTick();
 
-  test('it sends a request if the newValue is empty and the selected Organisation is not defined', async () => {
-    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
+        await organisationAutocomplete?.vm.$emit('update:search', 'Lern');
+        await nextTick();
 
-    await organisationAutocomplete?.setValue('1133');
-    await nextTick();
+        await organisationAutocomplete?.setValue(undefined);
+        await nextTick();
 
-    await organisationAutocomplete?.vm.$emit('update:search', 'Lern');
-    await nextTick();
+        await organisationAutocomplete?.vm.$emit('update:search', '');
+        await nextTick();
 
-    await organisationAutocomplete?.setValue(undefined);
-    await nextTick();
+        expect(organisationAutocomplete?.text()).toEqual('');
+      });
 
-    await organisationAutocomplete?.vm.$emit('update:search', '');
-    await nextTick();
+      test('it sends a request if the newValue is empty and the selected Organisation is defined', async () => {
+        const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
 
-    expect(organisationAutocomplete?.text()).toEqual('');
-  });
+        await organisationAutocomplete?.setValue('1133');
+        await nextTick();
 
-  test('it sends a request if the newValue is empty and the selected Organisation is defined', async () => {
-    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
+        await organisationAutocomplete?.vm.$emit('update:search', 'Lern');
+        await nextTick();
 
-    await organisationAutocomplete?.setValue('1133');
-    await nextTick();
+        await organisationAutocomplete?.vm.$emit('update:search', '');
+        await nextTick();
 
-    await organisationAutocomplete?.vm.$emit('update:search', 'Lern');
-    await nextTick();
+        expect(organisationAutocomplete?.text()).toEqual('orga');
+      });
 
-    await organisationAutocomplete?.vm.$emit('update:search', '');
-    await nextTick();
+      test('Do nothing with Klassen if the orga was reset', async () => {
+        const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
+        await organisationAutocomplete?.setValue('O1');
+        await nextTick();
 
-    expect(organisationAutocomplete?.text()).toEqual('orga');
-  });
+        const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+        await rolleAutocomplete?.setValue('54321');
+        await nextTick();
 
-  test('Do nothing with Klassen if the orga was reset', async () => {
-    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'organisation-select' });
-    await organisationAutocomplete?.setValue('O1');
-    await nextTick();
+        const klassenAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
+        await klassenAutocomplete?.vm.$emit('update:search', '');
+        await nextTick();
 
-    const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
-    await rolleAutocomplete?.setValue('54321');
-    await nextTick();
+        await organisationAutocomplete?.setValue(undefined);
+        await nextTick();
 
-    const klassenAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
-    await klassenAutocomplete?.vm.$emit('update:search', '');
-    await nextTick();
+        expect(klassenAutocomplete?.text()).toBeFalsy();
+      });
 
-    await organisationAutocomplete?.setValue(undefined);
-    await nextTick();
+      it('emits update:calculatedBefristungOption event', async () => {
+        // Simulate selecting organization and role to enable Befristung input
+        await wrapper?.findComponent({ ref: 'organisation-select' }).setValue('org1');
+        await wrapper?.findComponent({ ref: 'rolle-select' }).setValue('rolle1');
 
-    expect(klassenAutocomplete?.text()).toBeFalsy();
-  });
+        // Get the BefristungInput component
+        const befristungInput: VueWrapper | undefined = wrapper?.findComponent({ name: 'BefristungInput' });
 
-  it('emits update:calculatedBefristungOption event', async () => {
-    // Simulate selecting organization and role to enable Befristung input
-    await wrapper?.findComponent({ ref: 'organisation-select' }).setValue('org1');
-    await wrapper?.findComponent({ ref: 'rolle-select' }).setValue('rolle1');
+        // Emit the event from the child component
+        await befristungInput?.vm.$emit('update:calculatedBefristungOption', 'someOption');
 
-    // Get the BefristungInput component
-    const befristungInput: VueWrapper | undefined = wrapper?.findComponent({ name: 'BefristungInput' });
-
-    // Emit the event from the child component
-    await befristungInput?.vm.$emit('update:calculatedBefristungOption', 'someOption');
-
-    // Assert that the parent component emitted the event
-    expect(wrapper?.emitted('update:calculatedBefristungOption')).toBeTruthy();
-    expect(wrapper?.emitted('update:calculatedBefristungOption')![0]).toEqual(['someOption']);
-  });
+        // Assert that the parent component emitted the event
+        expect(wrapper?.emitted('update:calculatedBefristungOption')).toBeTruthy();
+        expect(wrapper?.emitted('update:calculatedBefristungOption')![0]).toEqual(['someOption']);
+      });
+    },
+  );
 });

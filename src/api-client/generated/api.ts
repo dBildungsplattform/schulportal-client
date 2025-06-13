@@ -1174,6 +1174,74 @@ export interface ImportvorgangByIdBodyParams {
 /**
  * 
  * @export
+ * @interface LandesbediensteterWorkflowCommitBodyParams
+ */
+export interface LandesbediensteterWorkflowCommitBodyParams {
+    /**
+     * Date of the most recent changed personenkontext
+     * @type {string}
+     * @memberof LandesbediensteterWorkflowCommitBodyParams
+     */
+    'lastModified'?: string | null;
+    /**
+     * The amount of personenkontexte
+     * @type {number}
+     * @memberof LandesbediensteterWorkflowCommitBodyParams
+     */
+    'count': number;
+    /**
+     * Optional Personalnummer for the person
+     * @type {string}
+     * @memberof LandesbediensteterWorkflowCommitBodyParams
+     */
+    'personalnummer'?: string;
+    /**
+     * 
+     * @type {Array<DbiamPersonenkontextBodyParams>}
+     * @memberof LandesbediensteterWorkflowCommitBodyParams
+     */
+    'newPersonenkontexte': Array<DbiamPersonenkontextBodyParams>;
+}
+/**
+ * 
+ * @export
+ * @interface LandesbediensteterWorkflowStepResponse
+ */
+export interface LandesbediensteterWorkflowStepResponse {
+    /**
+     * List of available organisations.
+     * @type {Array<OrganisationResponseLegacy>}
+     * @memberof LandesbediensteterWorkflowStepResponse
+     */
+    'organisations': Array<OrganisationResponseLegacy>;
+    /**
+     * List of available roles.
+     * @type {Array<RolleResponse>}
+     * @memberof LandesbediensteterWorkflowStepResponse
+     */
+    'rollen': Array<RolleResponse>;
+    /**
+     * Selected organisation.
+     * @type {string}
+     * @memberof LandesbediensteterWorkflowStepResponse
+     */
+    'selectedOrganisation': string | null;
+    /**
+     * Selected rollen.
+     * @type {Array<string>}
+     * @memberof LandesbediensteterWorkflowStepResponse
+     */
+    'selectedRollen': Array<string> | null;
+    /**
+     * Indicates whether the commit action can be performed.
+     * @type {boolean}
+     * @memberof LandesbediensteterWorkflowStepResponse
+     */
+    'canCommit': boolean;
+}
+/**
+ * 
+ * @export
  * @interface LockUserBodyParams
  */
 export interface LockUserBodyParams {
@@ -1259,6 +1327,20 @@ export const MeldungResponseStatusEnum = {
 } as const;
 
 export type MeldungResponseStatusEnum = typeof MeldungResponseStatusEnum[keyof typeof MeldungResponseStatusEnum];
+
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export const OperationContext = {
+    Anlegen: 'PERSON_ANLEGEN',
+    Bearbeiten: 'PERSON_BEARBEITEN'
+} as const;
+
+export type OperationContext = typeof OperationContext[keyof typeof OperationContext];
+
 
 /**
  * 
@@ -1717,6 +1799,12 @@ export interface PersonLandesbediensteterSearchPersonenkontextResponse {
  * @interface PersonLandesbediensteterSearchResponse
  */
 export interface PersonLandesbediensteterSearchResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonLandesbediensteterSearchResponse
+     */
+    'id': string;
     /**
      * 
      * @type {string}
@@ -6235,6 +6323,259 @@ export class KeycloakinternalApi extends BaseAPI implements KeycloakinternalApiI
 
 
 /**
+ * LandesbediensteterApi - axios parameter creator
+ * @export
+ */
+export const LandesbediensteterApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @param {string} personId The ID for the person.
+         * @param {LandesbediensteterWorkflowCommitBodyParams} landesbediensteterWorkflowCommitBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        landesbediensteterControllerCommit: async (personId: string, landesbediensteterWorkflowCommitBodyParams: LandesbediensteterWorkflowCommitBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'personId' is not null or undefined
+            assertParamExists('landesbediensteterControllerCommit', 'personId', personId)
+            // verify required parameter 'landesbediensteterWorkflowCommitBodyParams' is not null or undefined
+            assertParamExists('landesbediensteterControllerCommit', 'landesbediensteterWorkflowCommitBodyParams', landesbediensteterWorkflowCommitBodyParams)
+            const localVarPath = `/api/landesbediensteter/{personId}`
+                .replace(`{${"personId"}}`, encodeURIComponent(String(personId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(landesbediensteterWorkflowCommitBodyParams, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} [organisationId] ID of the organisation to filter the rollen later
+         * @param {Array<string>} [rollenIds] IDs of the rollen.
+         * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
+         * @param {string} [organisationName] Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.
+         * @param {number} [limit] The limit of items for the request.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        landesbediensteterControllerStep: async (organisationId?: string, rollenIds?: Array<string>, rolleName?: string, organisationName?: string, limit?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/landesbediensteter/step`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+            if (organisationId !== undefined) {
+                localVarQueryParameter['organisationId'] = organisationId;
+            }
+
+            if (rollenIds) {
+                localVarQueryParameter['rollenIds'] = rollenIds;
+            }
+
+            if (rolleName !== undefined) {
+                localVarQueryParameter['rolleName'] = rolleName;
+            }
+
+            if (organisationName !== undefined) {
+                localVarQueryParameter['organisationName'] = organisationName;
+            }
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * LandesbediensteterApi - functional programming interface
+ * @export
+ */
+export const LandesbediensteterApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = LandesbediensteterApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @param {string} personId The ID for the person.
+         * @param {LandesbediensteterWorkflowCommitBodyParams} landesbediensteterWorkflowCommitBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async landesbediensteterControllerCommit(personId: string, landesbediensteterWorkflowCommitBodyParams: LandesbediensteterWorkflowCommitBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonenkontexteUpdateResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.landesbediensteterControllerCommit(personId, landesbediensteterWorkflowCommitBodyParams, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @param {string} [organisationId] ID of the organisation to filter the rollen later
+         * @param {Array<string>} [rollenIds] IDs of the rollen.
+         * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
+         * @param {string} [organisationName] Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.
+         * @param {number} [limit] The limit of items for the request.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async landesbediensteterControllerStep(organisationId?: string, rollenIds?: Array<string>, rolleName?: string, organisationName?: string, limit?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<LandesbediensteterWorkflowStepResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.landesbediensteterControllerStep(organisationId, rollenIds, rolleName, organisationName, limit, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * LandesbediensteterApi - factory interface
+ * @export
+ */
+export const LandesbediensteterApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = LandesbediensteterApiFp(configuration)
+    return {
+        /**
+         * 
+         * @param {string} personId The ID for the person.
+         * @param {LandesbediensteterWorkflowCommitBodyParams} landesbediensteterWorkflowCommitBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        landesbediensteterControllerCommit(personId: string, landesbediensteterWorkflowCommitBodyParams: LandesbediensteterWorkflowCommitBodyParams, options?: any): AxiosPromise<PersonenkontexteUpdateResponse> {
+            return localVarFp.landesbediensteterControllerCommit(personId, landesbediensteterWorkflowCommitBodyParams, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} [organisationId] ID of the organisation to filter the rollen later
+         * @param {Array<string>} [rollenIds] IDs of the rollen.
+         * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
+         * @param {string} [organisationName] Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.
+         * @param {number} [limit] The limit of items for the request.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        landesbediensteterControllerStep(organisationId?: string, rollenIds?: Array<string>, rolleName?: string, organisationName?: string, limit?: number, options?: any): AxiosPromise<LandesbediensteterWorkflowStepResponse> {
+            return localVarFp.landesbediensteterControllerStep(organisationId, rollenIds, rolleName, organisationName, limit, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * LandesbediensteterApi - interface
+ * @export
+ * @interface LandesbediensteterApi
+ */
+export interface LandesbediensteterApiInterface {
+    /**
+     * 
+     * @param {string} personId The ID for the person.
+     * @param {LandesbediensteterWorkflowCommitBodyParams} landesbediensteterWorkflowCommitBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof LandesbediensteterApiInterface
+     */
+    landesbediensteterControllerCommit(personId: string, landesbediensteterWorkflowCommitBodyParams: LandesbediensteterWorkflowCommitBodyParams, options?: AxiosRequestConfig): AxiosPromise<PersonenkontexteUpdateResponse>;
+
+    /**
+     * 
+     * @param {string} [organisationId] ID of the organisation to filter the rollen later
+     * @param {Array<string>} [rollenIds] IDs of the rollen.
+     * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
+     * @param {string} [organisationName] Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.
+     * @param {number} [limit] The limit of items for the request.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof LandesbediensteterApiInterface
+     */
+    landesbediensteterControllerStep(organisationId?: string, rollenIds?: Array<string>, rolleName?: string, organisationName?: string, limit?: number, options?: AxiosRequestConfig): AxiosPromise<LandesbediensteterWorkflowStepResponse>;
+
+}
+
+/**
+ * LandesbediensteterApi - object-oriented interface
+ * @export
+ * @class LandesbediensteterApi
+ * @extends {BaseAPI}
+ */
+export class LandesbediensteterApi extends BaseAPI implements LandesbediensteterApiInterface {
+    /**
+     * 
+     * @param {string} personId The ID for the person.
+     * @param {LandesbediensteterWorkflowCommitBodyParams} landesbediensteterWorkflowCommitBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof LandesbediensteterApi
+     */
+    public landesbediensteterControllerCommit(personId: string, landesbediensteterWorkflowCommitBodyParams: LandesbediensteterWorkflowCommitBodyParams, options?: AxiosRequestConfig) {
+        return LandesbediensteterApiFp(this.configuration).landesbediensteterControllerCommit(personId, landesbediensteterWorkflowCommitBodyParams, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} [organisationId] ID of the organisation to filter the rollen later
+     * @param {Array<string>} [rollenIds] IDs of the rollen.
+     * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
+     * @param {string} [organisationName] Organisation/SSK name used to filter for schulstrukturknoten in personenkontext.
+     * @param {number} [limit] The limit of items for the request.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof LandesbediensteterApi
+     */
+    public landesbediensteterControllerStep(organisationId?: string, rollenIds?: Array<string>, rolleName?: string, organisationName?: string, limit?: number, options?: AxiosRequestConfig) {
+        return LandesbediensteterApiFp(this.configuration).landesbediensteterControllerStep(organisationId, rollenIds, rolleName, organisationName, limit, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
  * MeldungApi - axios parameter creator
  * @export
  */
@@ -9755,6 +10096,7 @@ export const PersonenkontextApiAxiosParamCreator = function (configuration?: Con
         },
         /**
          * 
+         * @param {OperationContext} operationContext The context in which this request happens. Affects permission checks.
          * @param {string} [organisationId] ID of the organisation to filter the rollen later
          * @param {Array<string>} [rollenIds] IDs of the rollen.
          * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
@@ -9764,7 +10106,9 @@ export const PersonenkontextApiAxiosParamCreator = function (configuration?: Con
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        dbiamPersonenkontextWorkflowControllerProcessStep: async (organisationId?: string, rollenIds?: Array<string>, rolleName?: string, organisationName?: string, limit?: number, requestedWithSystemrecht?: RollenSystemRecht, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        dbiamPersonenkontextWorkflowControllerProcessStep: async (operationContext: OperationContext, organisationId?: string, rollenIds?: Array<string>, rolleName?: string, organisationName?: string, limit?: number, requestedWithSystemrecht?: RollenSystemRecht, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'operationContext' is not null or undefined
+            assertParamExists('dbiamPersonenkontextWorkflowControllerProcessStep', 'operationContext', operationContext)
             const localVarPath = `/api/personenkontext-workflow/step`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -9784,6 +10128,10 @@ export const PersonenkontextApiAxiosParamCreator = function (configuration?: Con
             // authentication oauth2 required
             // oauth required
             await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+            if (operationContext !== undefined) {
+                localVarQueryParameter['operationContext'] = operationContext;
+            }
 
             if (organisationId !== undefined) {
                 localVarQueryParameter['organisationId'] = organisationId;
@@ -9854,6 +10202,7 @@ export const PersonenkontextApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @param {OperationContext} operationContext The context in which this request happens. Affects permission checks.
          * @param {string} [organisationId] ID of the organisation to filter the rollen later
          * @param {Array<string>} [rollenIds] IDs of the rollen.
          * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
@@ -9863,8 +10212,8 @@ export const PersonenkontextApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async dbiamPersonenkontextWorkflowControllerProcessStep(organisationId?: string, rollenIds?: Array<string>, rolleName?: string, organisationName?: string, limit?: number, requestedWithSystemrecht?: RollenSystemRecht, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonenkontextWorkflowResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.dbiamPersonenkontextWorkflowControllerProcessStep(organisationId, rollenIds, rolleName, organisationName, limit, requestedWithSystemrecht, options);
+        async dbiamPersonenkontextWorkflowControllerProcessStep(operationContext: OperationContext, organisationId?: string, rollenIds?: Array<string>, rolleName?: string, organisationName?: string, limit?: number, requestedWithSystemrecht?: RollenSystemRecht, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonenkontextWorkflowResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.dbiamPersonenkontextWorkflowControllerProcessStep(operationContext, organisationId, rollenIds, rolleName, organisationName, limit, requestedWithSystemrecht, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -9899,6 +10248,7 @@ export const PersonenkontextApiFactory = function (configuration?: Configuration
         },
         /**
          * 
+         * @param {OperationContext} operationContext The context in which this request happens. Affects permission checks.
          * @param {string} [organisationId] ID of the organisation to filter the rollen later
          * @param {Array<string>} [rollenIds] IDs of the rollen.
          * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
@@ -9908,8 +10258,8 @@ export const PersonenkontextApiFactory = function (configuration?: Configuration
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        dbiamPersonenkontextWorkflowControllerProcessStep(organisationId?: string, rollenIds?: Array<string>, rolleName?: string, organisationName?: string, limit?: number, requestedWithSystemrecht?: RollenSystemRecht, options?: any): AxiosPromise<PersonenkontextWorkflowResponse> {
-            return localVarFp.dbiamPersonenkontextWorkflowControllerProcessStep(organisationId, rollenIds, rolleName, organisationName, limit, requestedWithSystemrecht, options).then((request) => request(axios, basePath));
+        dbiamPersonenkontextWorkflowControllerProcessStep(operationContext: OperationContext, organisationId?: string, rollenIds?: Array<string>, rolleName?: string, organisationName?: string, limit?: number, requestedWithSystemrecht?: RollenSystemRecht, options?: any): AxiosPromise<PersonenkontextWorkflowResponse> {
+            return localVarFp.dbiamPersonenkontextWorkflowControllerProcessStep(operationContext, organisationId, rollenIds, rolleName, organisationName, limit, requestedWithSystemrecht, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -9942,6 +10292,7 @@ export interface PersonenkontextApiInterface {
 
     /**
      * 
+     * @param {OperationContext} operationContext The context in which this request happens. Affects permission checks.
      * @param {string} [organisationId] ID of the organisation to filter the rollen later
      * @param {Array<string>} [rollenIds] IDs of the rollen.
      * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
@@ -9952,7 +10303,7 @@ export interface PersonenkontextApiInterface {
      * @throws {RequiredError}
      * @memberof PersonenkontextApiInterface
      */
-    dbiamPersonenkontextWorkflowControllerProcessStep(organisationId?: string, rollenIds?: Array<string>, rolleName?: string, organisationName?: string, limit?: number, requestedWithSystemrecht?: RollenSystemRecht, options?: AxiosRequestConfig): AxiosPromise<PersonenkontextWorkflowResponse>;
+    dbiamPersonenkontextWorkflowControllerProcessStep(operationContext: OperationContext, organisationId?: string, rollenIds?: Array<string>, rolleName?: string, organisationName?: string, limit?: number, requestedWithSystemrecht?: RollenSystemRecht, options?: AxiosRequestConfig): AxiosPromise<PersonenkontextWorkflowResponse>;
 
 }
 
@@ -9989,6 +10340,7 @@ export class PersonenkontextApi extends BaseAPI implements PersonenkontextApiInt
 
     /**
      * 
+     * @param {OperationContext} operationContext The context in which this request happens. Affects permission checks.
      * @param {string} [organisationId] ID of the organisation to filter the rollen later
      * @param {Array<string>} [rollenIds] IDs of the rollen.
      * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
@@ -9999,8 +10351,8 @@ export class PersonenkontextApi extends BaseAPI implements PersonenkontextApiInt
      * @throws {RequiredError}
      * @memberof PersonenkontextApi
      */
-    public dbiamPersonenkontextWorkflowControllerProcessStep(organisationId?: string, rollenIds?: Array<string>, rolleName?: string, organisationName?: string, limit?: number, requestedWithSystemrecht?: RollenSystemRecht, options?: AxiosRequestConfig) {
-        return PersonenkontextApiFp(this.configuration).dbiamPersonenkontextWorkflowControllerProcessStep(organisationId, rollenIds, rolleName, organisationName, limit, requestedWithSystemrecht, options).then((request) => request(this.axios, this.basePath));
+    public dbiamPersonenkontextWorkflowControllerProcessStep(operationContext: OperationContext, organisationId?: string, rollenIds?: Array<string>, rolleName?: string, organisationName?: string, limit?: number, requestedWithSystemrecht?: RollenSystemRecht, options?: AxiosRequestConfig) {
+        return PersonenkontextApiFp(this.configuration).dbiamPersonenkontextWorkflowControllerProcessStep(operationContext, organisationId, rollenIds, rolleName, organisationName, limit, requestedWithSystemrecht, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
