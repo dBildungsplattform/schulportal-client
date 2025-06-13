@@ -10,6 +10,7 @@
   import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
   import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
   import {
+    OperationContext,
     usePersonenkontextStore,
     type DbiamCreatePersonenkontextBodyParams,
     type DBiamPersonenkontextResponse,
@@ -485,6 +486,7 @@
 
   onMounted(async () => {
     await personenkontextStore.processWorkflowStep({
+      operationContext: OperationContext.PERSON_ANLEGEN,
       limit: 25,
     });
     personStore.errorCode = '';
@@ -561,6 +563,7 @@
           <template v-if="!personenkontextStore.errorCode && !personStore.errorCode">
             <!-- Organisation, Rolle, Klasse und Befristung zuordnen -->
             <PersonenkontextCreate
+              :operationContext="OperationContext.PERSON_ANLEGEN"
               :allowMultipleRollen="true"
               :showHeadline="true"
               :organisationen="organisationen"

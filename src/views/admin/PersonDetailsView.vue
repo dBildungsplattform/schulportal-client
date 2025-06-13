@@ -29,6 +29,7 @@
   import { EmailStatus, usePersonStore, type Personendatensatz, type PersonStore } from '@/stores/PersonStore';
   import {
     mapZuordnungToPersonenkontextUpdate,
+    OperationContext,
     usePersonenkontextStore,
     type PersonenkontextStore,
     type PersonenkontextUpdate,
@@ -337,7 +338,7 @@
 
   // Triggers the template to add a new Zuordnung
   const triggerAddZuordnung = async (): Promise<void> => {
-    await personenkontextStore.processWorkflowStep({ limit: 25 });
+    await personenkontextStore.processWorkflowStep({ operationContext: OperationContext.PERSON_BEARBEITEN, limit: 25 });
     isZuordnungFormActive.value = true;
   };
 
@@ -582,7 +583,12 @@
         const rollenIds: string[] | undefined = [newValue.rolleId];
 
         // Trigger the API call
-        personenkontextStore.processWorkflowStep({ organisationId, rollenIds, limit: 25 });
+        personenkontextStore.processWorkflowStep({
+          operationContext: OperationContext.PERSON_BEARBEITEN,
+          organisationId,
+          rollenIds,
+          limit: 25,
+        });
       }
     },
     { immediate: true }, // Run on initialization if there's already a selected Zuordnung
@@ -1465,6 +1471,7 @@
     const personByIdPromise: Promise<Personendatensatz> = personStore.getPersonById(currentPersonId);
     const personUebersichtPromise: Promise<void> = personStore.getPersonenuebersichtById(currentPersonId);
     const workflowStepPromise: Promise<PersonenkontextWorkflowResponse> = personenkontextStore.processWorkflowStep({
+      operationContext: OperationContext.PERSON_BEARBEITEN,
       limit: 25,
     });
     const get2FAStatePromise: Promise<void> = twoFactorAuthentificationStore.get2FAState(currentPersonId);
@@ -2282,6 +2289,7 @@
               <v-container class="px-lg-16">
                 <!-- Organisation, Rolle, Klasse zuordnen -->
                 <PersonenkontextCreate
+                  :operationContext="OperationContext.PERSON_BEARBEITEN"
                   :allowMultipleRollen="false"
                   :showHeadline="false"
                   :organisationen="organisationen"

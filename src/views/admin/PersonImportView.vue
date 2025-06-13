@@ -11,7 +11,7 @@
     type ImportedUserResponse,
     type ImportStore,
   } from '@/stores/ImportStore';
-  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
+  import { OperationContext, usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
   import { RollenArt } from '@/stores/RolleStore';
   import { toTypedSchema } from '@vee-validate/yup';
   import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
@@ -95,6 +95,7 @@
     if (newValue && newValue !== oldValue) {
       // Fetch rollen after selecting the organization
       await personenkontextStore.processWorkflowStep({
+        operationContext: OperationContext.PERSON_ANLEGEN,
         organisationId: newValue,
         limit: 25,
       });
@@ -381,7 +382,7 @@
   });
 
   onMounted(async () => {
-    await personenkontextStore.processWorkflowStep({ limit: 25 });
+    await personenkontextStore.processWorkflowStep({ operationContext: OperationContext.PERSON_ANLEGEN, limit: 25 });
     importStore.uploadResponse = null;
     importStore.importResponse = null;
     importStore.importProgress = 0;
