@@ -114,6 +114,8 @@
   const hasKlassenZuordnung: Ref<boolean | undefined> = ref(false);
   const isUnbefristetDisabled: Ref<boolean, boolean> = ref(false);
   const isBefristungRequired: Ref<boolean, boolean> = ref(false);
+  // Check if the button to change the Klasse should be active or not. Activate only if there is 1 selected Zuordnung and if it is of type LERN.
+  const isLernRolleForChangeKlasseResult: Ref<boolean> = ref(false);
 
   const isEditActive: Ref<boolean> = ref(false);
   const isZuordnungFormActive: Ref<boolean> = ref(false);
@@ -571,9 +573,6 @@
     );
   });
 
-  // Check if the button to change the Klasse should be active or not. Activate only if there is 1 selected Zuordnung and if it is of type LERN.
-  const isLernRolleForChangeKlasseResult: Ref<boolean> = ref(false);
-
   watch(
     () => selectedZuordnungen.value[0]?.rolleId,
     async (rolleId: string | undefined) => {
@@ -761,7 +760,7 @@
     selectedBefristung: selectedChangeBefristung,
     selectedBefristungOption: selectedChangeBefristungOption,
     calculatedBefristung,
-    selectedRollen: computed(() => (changeBefristungRolle.value ? [changeBefristungRolle.value] : [])),
+    selectedRollen: computed(() => (changeBefristungRolle.value ? [changeBefristungRolle.value] : [])),                       
   });
 
   async function navigateBackToKopersForm(): Promise<void> {
