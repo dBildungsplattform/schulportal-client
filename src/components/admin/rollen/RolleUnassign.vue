@@ -6,7 +6,7 @@
   import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
   import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
   import { type Organisation } from '@/stores/OrganisationStore';
-  import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
+  import { OperationContext, usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
   import { RollenArt, type RolleResponse } from '@/stores/RolleStore';
   import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
   import type { TranslatedObject } from '@/types';
@@ -125,6 +125,7 @@
     () => props.selectedOrganisationFromFilter.id,
     async (newValue: string) => {
       await personenkontextStore.processWorkflowStep({
+        operationContext: OperationContext.PERSON_BEARBEITEN,
         organisationId: newValue,
         rollenIds: props.selectedRolleFromFilter ? [props.selectedRolleFromFilter.id] : [],
         limit: 25,
@@ -151,6 +152,7 @@
         <template v-if="bulkOperationStore.currentOperation?.progress === 0">
           <PersonenkontextCreate
             v-if="bulkOperationStore.currentOperation?.progress === 0"
+            :operationContext="OperationContext.PERSON_BEARBEITEN"
             ref="personenkontext-create"
             :showHeadline="false"
             :selectedOrganisation="selectedOrganisationFromFilterId"

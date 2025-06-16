@@ -11,6 +11,7 @@ import {
 } from '@/api-client/generated';
 import ApiService from '@/services/ApiService';
 import { PersonLockOccasion } from '@/utils/lock';
+import { faker } from '@faker-js/faker';
 import { rejects } from 'assert';
 import MockAdapter from 'axios-mock-adapter';
 import { createPinia, setActivePinia } from 'pinia';
@@ -669,6 +670,7 @@ describe('PersonStore', () => {
     it('should load Landesbedienstete persons and update state', async () => {
       const mockLandesbedienstetePersonen: PersonLandesbediensteterSearchResponse[] = [
         {
+          id: faker.string.uuid(),
           vorname: 'John',
           familienname: 'Doe',
           username: 'john.doe',
@@ -684,6 +686,7 @@ describe('PersonStore', () => {
           ],
         },
         {
+          id: faker.string.uuid(),
           vorname: 'Jane',
           familienname: 'Smith',
           username: 'jane.smith',
