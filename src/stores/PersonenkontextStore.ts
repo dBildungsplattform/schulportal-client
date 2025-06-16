@@ -42,9 +42,15 @@ export enum PersonenKontextTyp {
   Klasse = 'KLASSE',
 }
 
+export enum OperationContext {
+  PERSON_ANLEGEN = 'PERSON_ANLEGEN',
+  PERSON_BEARBEITEN = 'PERSON_BEARBEITEN',
+}
+
 export type PersonenkontextUpdate = Pick<DbiamPersonenkontextBodyParams, 'organisationId' | 'rolleId' | 'befristung'>;
 
 export type WorkflowFilter = {
+  operationContext: OperationContext;
   organisationId?: string;
   rollenIds?: string[];
   rolleName?: string;
@@ -78,7 +84,7 @@ type PersonenkontextState = {
 type PersonenkontextGetters = {};
 type PersonenkontextActions = {
   hasSystemrecht: (personId: string, systemrecht: 'ROLLEN_VERWALTEN') => Promise<SystemrechtResponse>;
-  processWorkflowStep: (filter?: WorkflowFilter) => Promise<PersonenkontextWorkflowResponse>;
+  processWorkflowStep: (filter: WorkflowFilter) => Promise<PersonenkontextWorkflowResponse>;
   getPersonenkontextRolleWithFilter: (rolleName: string, limit?: number) => Promise<void>;
   updatePersonenkontexte: (
     updatedPersonenkontexte: PersonenkontextUpdate[] | undefined,
@@ -148,16 +154,17 @@ export const usePersonenkontextStore: StoreDefinition<
       }
     },
 
-    async processWorkflowStep(filter?: WorkflowFilter): Promise<PersonenkontextWorkflowResponse> {
+    async processWorkflowStep(filter: WorkflowFilter): Promise<PersonenkontextWorkflowResponse> {
       this.loading = true;
       try {
         const { data }: { data: PersonenkontextWorkflowResponse } =
           await personenKontextApi.dbiamPersonenkontextWorkflowControllerProcessStep(
-            filter?.organisationId,
-            filter?.rollenIds,
-            filter?.rolleName,
-            filter?.organisationName,
-            filter?.limit,
+            filter.operationContext,
+            filter.organisationId,
+            filter.rollenIds,
+            filter.rolleName,
+            filter.organisationName,
+            filter.limit,
             this.requestedWithSystemrecht,
           );
         this.workflowStepResponse = data;
