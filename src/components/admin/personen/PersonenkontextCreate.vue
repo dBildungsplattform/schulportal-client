@@ -66,6 +66,9 @@
   const selectedRolle: Ref<string | undefined> = ref(props.selectedRolle);
   const selectedRollen: Ref<string[] | undefined> = ref(props.selectedRollen || []);
   const selectedKlasse: Ref<string | undefined> = ref(props.selectedKlasse);
+  // we need to cast the selectedSchule into an array
+  // doing it this way prevents an issue where the reactive system constantly re-runs which causes requests to be issued in a loop
+  const administriertVon: Ref<string[] | undefined> = ref([]);
 
   // Computed property to get the title of the selected organisation
   const selectedOrganisationTitle: ComputedRef<string | undefined> = computed(() => {
@@ -106,6 +109,8 @@
         organisationId: newValue,
         limit: 25,
       });
+      administriertVon.value?.pop();
+      administriertVon.value?.push(newValue);
 
       // Check that all the Klassen associated with the selectedOrga have the same Klasse for the same person.
       const klassenZuordnungen: Zuordnung[] | undefined = personStore.personenuebersicht?.zuordnungen.filter(
@@ -127,6 +132,7 @@
       }
     } else if (!newValue) {
       // If the organization is cleared, reset selectedRolle and selectedKlasse
+      administriertVon.value?.pop();
       selectedRolle.value = undefined;
       selectedKlasse.value = undefined;
       emits('fieldReset', 'selectedRolle');
@@ -416,7 +422,7 @@
           @update:selectedKlassen="updateKlasseSelection"
           :placeholderText="$t('admin.klasse.selectKlasse')"
           ref="klasse-select"
-          :administriertVon="selectedOrganisation ? [selectedOrganisation] : undefined"
+          :administriertVon
           :filterId="'personenkontext-create'"
         />
       </FormRow>
