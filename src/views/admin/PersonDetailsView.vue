@@ -572,16 +572,23 @@
   });
 
   // Check if the button to change the Klasse should be active or not. Activate only if there is 1 selected Zuordnung and if it is of type LERN.
+  const isLernRolleForChangeKlasseResult: Ref<boolean> = ref(false);
+
+  watch(
+    () => selectedZuordnungen.value[0]?.rolleId,
+    async (rolleId: string | undefined) => {
+      if (rolleId) {
+        isLernRolleForChangeKlasseResult.value = await isLernRolleForChangeKlasse(rolleId);
+      } else {
+        isLernRolleForChangeKlasseResult.value = false;
+      }
+    },
+    { immediate: true }
+  );
+
   const canChangeKlasse: ComputedRef<boolean> = computed(() => {
     const hasOneSelectedZuordnung: boolean = selectedZuordnungen.value.length === 1;
-
-    const rolleId: string | undefined = selectedZuordnungen.value[0]?.rolleId;
-
-    // Check if rolleId exists and if it's of type LERN
-    if (rolleId && isLernRolle(rolleId) && hasOneSelectedZuordnung) {
-      return true;
-    }
-    return false;
+    return !!selectedZuordnungen.value[0]?.rolleId && isLernRolleForChangeKlasseResult.value && hasOneSelectedZuordnung;
   });
 
   watch(
@@ -2245,7 +2252,7 @@
                       class="primary mt-2"
                       @click="triggerChangeKlasse"
                       data-testid="klasse-change-button"
-                      :disabled="!isLernRolleForChangeKlasse"
+                      :disabled="!canChangeKlasse"
                       :block="mdAndDown"
                     >
                       {{ t('transfer') }}
