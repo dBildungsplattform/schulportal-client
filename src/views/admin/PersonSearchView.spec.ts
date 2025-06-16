@@ -1,5 +1,10 @@
-import { expect, test, type Mock, type MockInstance } from 'vitest';
+import routes from '@/router/routes';
+import { usePersonStore, type PersonLandesbediensteterSearchResponse, type PersonStore } from '@/stores/PersonStore';
+import { faker } from '@faker-js/faker';
 import { DOMWrapper, VueWrapper, flushPromises, mount } from '@vue/test-utils';
+import type Module from 'module';
+import { expect, test, type Mock, type MockInstance } from 'vitest';
+import { nextTick } from 'vue';
 import {
   createRouter,
   createWebHistory,
@@ -7,11 +12,7 @@ import {
   type RouteLocationNormalized,
   type Router,
 } from 'vue-router';
-import routes from '@/router/routes';
-import { nextTick } from 'vue';
-import { usePersonStore, type PersonLandesbediensteterSearchResponse, type PersonStore } from '@/stores/PersonStore';
 import PersonSearchView from './PersonSearchView.vue';
-import type Module from 'module';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -185,6 +186,7 @@ describe('PersonSearchView', () => {
 
   test('it performs KoPers search successfully', async () => {
     const mockPerson: PersonLandesbediensteterSearchResponse = {
+      id: faker.string.uuid(),
       vorname: 'John',
       familienname: 'Doe',
       username: 'john.doe',
@@ -291,6 +293,7 @@ describe('PersonSearchView', () => {
 
   test('it displays person data when search is successful', async () => {
     const mockPerson: PersonLandesbediensteterSearchResponse = {
+      id: faker.string.uuid(),
       vorname: 'John',
       familienname: 'Doe',
       username: 'john.doe',
@@ -320,6 +323,7 @@ describe('PersonSearchView', () => {
 
   test('it displays organization data when person has contexts', async () => {
     const mockPerson: PersonLandesbediensteterSearchResponse = {
+      id: faker.string.uuid(),
       vorname: 'John',
       familienname: 'Doe',
       username: 'john.doe',
