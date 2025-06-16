@@ -2476,10 +2476,8 @@
                 ref="befristung-input-wrapper"
                 :befristungProps="selectedChangeBefristungProps"
                 :befristungOptionProps="selectedChangeBefristungOptionProps"
-                :isUnbefristetDisabled:
-                isUnbefristetDisabled,
-                :isBefristungRequired:
-                isBefristungRequired,
+                :isUnbefristetDisabled="isUnbefristetDisabled"
+                :isBefristungRequired="isBefristungRequired"
                 :nextSchuljahresende="getNextSchuljahresende()"
                 :befristung="selectedChangeBefristung"
                 :befristungOption="selectedChangeBefristungOption"
