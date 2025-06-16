@@ -24,7 +24,17 @@
   import { isKopersRolle } from '@/utils/validationPersonenkontext';
   import { toTypedSchema } from '@vee-validate/yup';
   import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
-  import { computed, onBeforeMount, onMounted, onUnmounted, ref, watch, type ComputedRef, type Ref } from 'vue';
+  import {
+    computed,
+    onBeforeMount,
+    onMounted,
+    onUnmounted,
+    ref,
+    watch,
+    watchEffect,
+    type ComputedRef,
+    type Ref,
+  } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import {
     onBeforeRouteLeave,
@@ -52,6 +62,7 @@
   const canCommit: Ref<boolean> = ref(false);
   const hasNoKopersNr: Ref<boolean | undefined> = ref(false);
   const showNoKopersNrConfirmationDialog: Ref<boolean> = ref(false);
+  const isUnbefristetButtonDisabled: Ref<boolean, boolean> = ref(false);
 
   const calculatedBefristung: Ref<string | undefined> = ref('');
 
@@ -129,9 +140,11 @@
         .test('notInPast', t('admin.befristung.rules.pastDateNotAllowed'), notInPast)
         .test('isValidDate', t('admin.befristung.rules.invalidDateNotAllowed'), isValidDate)
         .matches(DDMMYYYY, t('admin.befristung.rules.format'))
-        .when(['selectedRolle', 'selectedBefristungOption'], {
-          is: (selectedRolleIds: string[], selectedBefristungOption: string | undefined) =>
-            isBefristungspflichtRolle(selectedRolleIds) && selectedBefristungOption === undefined,
+        .when(['selectedRollen', 'selectedBefristungOption'], {
+          is: async (selectedRolleIds: string[], selectedBefristungOption: string | undefined) => {
+            const result: boolean = await isBefristungspflichtRolle(selectedRolleIds);
+            return result && selectedBefristungOption === undefined;
+          },
           then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
             schema.required(t('admin.befristung.rules.required')),
         }),
@@ -447,9 +460,8 @@
     navigateToCreatePersonRoute();
   };
 
-  // Computed property to check if the second radio button should be disabled
-  const isUnbefristetButtonDisabled: ComputedRef<boolean> = computed(() => {
-    return isBefristungspflichtRolle(selectedRollen.value);
+  watchEffect(async () => {
+    isUnbefristetButtonDisabled.value = await isBefristungspflichtRolle(selectedRollen.value);
   });
 
   function handleConfirmUnsavedChanges(): void {
@@ -574,7 +586,7 @@
                 befristungProps: selectedBefristungProps,
                 befristungOptionProps: selectedBefristungOptionProps,
                 isUnbefristetDisabled: isUnbefristetButtonDisabled,
-                isBefristungRequired: isBefristungspflichtRolle(selectedRollen),
+                isBefristungRequired: isUnbefristetButtonDisabled,
                 nextSchuljahresende: getNextSchuljahresende(),
                 befristung: selectedBefristung,
                 befristungOption: selectedBefristungOption,
