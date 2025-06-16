@@ -4,12 +4,7 @@
   import KlassenFilter from '@/components/filter/KlassenFilter.vue';
   import FormRow from '@/components/form/FormRow.vue';
   import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
-  import {
-    OrganisationsTyp,
-    useOrganisationStore,
-    type Organisation,
-    type OrganisationStore,
-  } from '@/stores/OrganisationStore';
+  import { OrganisationsTyp } from '@/stores/OrganisationStore';
   import { OperationContext, usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
   import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
   import { RollenArt } from '@/stores/RolleStore';
@@ -22,7 +17,6 @@
   useI18n({ useScope: 'global' });
 
   const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
-  const organisationStore: OrganisationStore = useOrganisationStore();
   const personStore: PersonStore = usePersonStore();
 
   const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
@@ -118,24 +112,18 @@
         (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse && zuordnung.administriertVon === newValue,
       );
 
-      if (klassenZuordnungen && klassenZuordnungen.length > 0) {
-        // Check if all Zuordnungen of type Klasse have the same SSKID.
-        // We only preselect when there's a clear, unambiguous single Klasse association for the selected Orga.
-        const sameSSK: boolean = klassenZuordnungen.every(
-          (zuordnung: Zuordnung) => zuordnung.sskId === klassenZuordnungen[0]?.sskId,
-        );
-
-        if (sameSSK) {
-          await organisationStore.getKlassenByOrganisationId({ administriertVon: [newValue] });
-          const klasse: Organisation | undefined = organisationStore.klassen.find(
-            (k: Organisation) => k.id === klassenZuordnungen[0]?.sskId,
-          );
-          // If the klasse was found then add it to the 25 Klassen in the dropdown and preselect it
-          if (klasse) {
-            selectedKlasse.value = klasse.id;
-            emits('update:selectedKlasse', klasse.id);
-          }
+      // Check if all Zuordnungen of type Klasse have the same SSKID.
+      // We only preselect when there's a clear, unambiguous single Klasse association for the selected Orga.
+      const klassenIds: Set<string> = new Set(klassenZuordnungen?.map((zuordnung: Zuordnung) => zuordnung.sskId));
+      if (klassenIds.size === 1) {
+        const klasseId: string | undefined = klassenIds.values().next().value;
+        if (klasseId) {
+          selectedKlasse.value = klasseId;
+          emits('update:selectedKlasse', klasseId);
         }
+      } else {
+        selectedKlasse.value = undefined;
+        emits('fieldReset', 'selectedKlasse');
       }
     } else if (!newValue) {
       // If the organization is cleared, reset selectedRolle and selectedKlasse
