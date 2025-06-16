@@ -34,7 +34,7 @@
     type PersonenkontextUpdate,
     type PersonenkontextWorkflowResponse,
   } from '@/stores/PersonenkontextStore';
-  import { RollenArt, RollenMerkmal } from '@/stores/RolleStore';
+  import { RollenArt, RollenMerkmal, useRolleStore, type RolleStore } from '@/stores/RolleStore';
   import {
     TokenKind,
     useTwoFactorAuthentificationStore,
@@ -89,6 +89,7 @@
   const organisationStore: OrganisationStore = useOrganisationStore();
   const twoFactorAuthentificationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
   const configStore: ConfigStore = useConfigStore();
+  const rolleStore: RolleStore = useRolleStore();
 
   const devicePassword: Ref<string> = ref('');
   const password: Ref<string> = ref('');
@@ -527,6 +528,12 @@
       (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
     );
     return !!rolle && rolle.rollenart === RollenArt.Lern;
+  }
+
+  async function isLernRolleForChangeKlasse(selectedRolleId: string): Promise<boolean> {
+    await rolleStore.getRolleById(selectedRolleId);
+
+    return !!rolleStore.currentRolle && rolleStore.currentRolle.rollenart === RollenArt.Lern;
   }
 
   const hasKopersNummer: ComputedRef<boolean> = computed(() => {
@@ -2206,7 +2213,7 @@
                       class="primary mt-2"
                       @click="triggerChangeKlasse"
                       data-testid="klasse-change-button"
-                      :disabled="!canChangeKlasse"
+                      :disabled="!isLernRolleForChangeKlasse"
                       :block="mdAndDown"
                     >
                       {{ t('transfer') }}
