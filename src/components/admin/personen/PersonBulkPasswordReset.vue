@@ -37,6 +37,9 @@
   const personStore: PersonStore = usePersonStore();
 
   const showErrorDialog: Ref<boolean, boolean> = ref(false);
+  const showConfirmationDialog: Ref<boolean, boolean> = ref(false);
+
+  const hasConfirmed: Ref<boolean, boolean> = ref(false);
 
   // Define the error list for the selected persons using the useBulkErrors composable
   const bulkErrorList: ComputedRef<BulkErrorList[]> = computed(() => useBulkErrors(t, props.selectedPersonen));
@@ -92,6 +95,15 @@
     bulkOperationStore.resetState();
     personStore.errorCode = '';
     emit('update:dialogExit', finished);
+  }
+
+  async function openConfirmationDialog(): void {
+    showConfirmationDialog.value = true;
+  }
+
+  async function closeConfirmationDialog(): void {
+    showConfirmationDialog.value = false;
+    hasConfirmed.value = true;
   }
 
   async function handleResetPassword(): Promise<void> {
@@ -179,12 +191,17 @@
             ></v-icon>
           </v-col>
         </v-row>
-        <p
+        <div
           class="mt-2 text-center"
           data-testid="password-reset-success-text"
         >
-          {{ t('admin.person.bulk.bulkPasswordReset.success') }}
-        </p>
+          <p>
+            {{ t('admin.person.bulk.bulkPasswordReset.success') }}
+          </p>
+          <p>
+            {{ t('admin.person.bulk.bulkPasswordReset.info') }}
+          </p>
+        </div>
       </v-container>
 
       <v-card-actions class="justify-center">
@@ -261,4 +278,30 @@
       :errors="bulkErrorList"
     />
   </template>
+  <v-dialog v-model="showConfirmationDialog">
+    <LayoutCard
+      data-testid="password-reset-download-confirmation-layout-card"
+      :header="t('admin.person.resetPassword')"
+    >
+      <v-container>
+        <v-row class="text-body bold justify-center">
+          <span data-testid="password-reset-download-confirmation-text">
+            {{ t('admin.person.bulk.bulkPasswordReset.downloadConfirmation') }}
+          </span>
+        </v-row>
+      </v-container>
+      <v-card-actions class="justify-center">
+        <v-btn
+          v-if="progressState === State.FINISHED && resultFile"
+          :block="mdAndDown"
+          class="primary"
+          @click="downloadFile(resultFile)"
+          data-testid="download-result-button"
+          :disabled="bulkOperationStore.currentOperation?.isRunning"
+        >
+          {{ t('close') }}
+        </v-btn>
+      </v-card-actions>
+    </LayoutCard>
+  </v-dialog>
 </template>
