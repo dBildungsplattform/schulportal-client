@@ -192,13 +192,13 @@
           </v-col>
         </v-row>
         <div
-          class="mt-2 text-center"
+          class="mt-2 bold text-body text-center"
           data-testid="password-reset-success-text"
         >
           <p>
             {{ t('admin.person.bulk.bulkPasswordReset.success') }}
           </p>
-          <p class="mt-2 text-body">
+          <p class="mt-4">
             {{ t('admin.person.bulk.bulkPasswordReset.info') }}
           </p>
         </div>
@@ -288,8 +288,8 @@
       data-testid="password-reset-download-confirmation-layout-card"
       :header="t('admin.person.resetPassword')"
     >
-      <v-container>
-        <v-row class="text-body text-center">
+      <v-container class="px-md-16">
+        <v-row class="text-body bold">
           <v-col>
             <span data-testid="password-reset-download-confirmation-text">
               {{ t('admin.person.bulk.bulkPasswordReset.downloadConfirmation') }}
