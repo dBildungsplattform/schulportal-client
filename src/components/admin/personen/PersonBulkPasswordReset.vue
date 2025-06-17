@@ -192,7 +192,7 @@
           </v-col>
         </v-row>
         <div
-          class="mt-2 bold text-body text-center"
+          class="mt-2 px-md-16 bold text-body text-center"
           data-testid="password-reset-success-text"
         >
           <p>
@@ -304,7 +304,7 @@
           @click="closeConfirmationDialog()"
           data-testid="password-reset-download-confirmation-button"
         >
-          {{ t('close') }}
+          {{ t('ok') }}
         </v-btn>
       </v-card-actions>
     </LayoutCard>

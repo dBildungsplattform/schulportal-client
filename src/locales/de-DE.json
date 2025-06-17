@@ -179,7 +179,7 @@
         "bulkPasswordReset": {
           "confirmation": "Sind Sie sicher, dass Sie das Passwort für die ausgewählten Benutzer zurücksetzen möchten?",
           "downloadResult": "Benutzerdaten herunterladen",
-          "downloadConfirmation": "Bitte laden Sie die Datei mit den temporären Passwörtern herunter und teilen Sie den Benutzern die Passwörter mit. Nach dem Schließen des Dialogs ist ein Herunterladen aus Sicherheitsgründen nicht mehr möglich.",
+          "downloadConfirmation": "Bitte stellen Sie sicher, dass Sie die Datei mit den temporären Passwörtern erfolgreich heruntergeladen haben. Dies ist zu einem späteren Zeitpunkt aus Sicherheitsgründen nicht mehr möglich.",
           "error": {
             "onlyOneSchool": "Bitte wählen Sie im Filter genau eine Schule aus, um die Aktion durchzuführen."
           },
@@ -651,6 +651,7 @@
   },
   "cancel": "Abbrechen",
   "proceed": "Weiter",
+  "ok": "OK",
   "close": "Schließen",
   "edit": "Bearbeiten",
   "print": "Drucken",
