@@ -1,10 +1,10 @@
 <script setup lang="ts">
   import PersonBulkError from '@/components/admin/personen/PersonBulkError.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import KlassenFilter from '@/components/filter/KlassenFilter.vue';
   import { type BulkErrorList, useBulkErrors } from '@/composables/useBulkErrors';
   import { type BulkOperationStore, useBulkOperationStore } from '@/stores/BulkOperationStore';
   import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
-  import type { TranslatedObject } from '@/types';
   import { computed, type ComputedRef, type Ref, ref } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
 
@@ -18,7 +18,6 @@
     isDialogVisible: boolean;
     selectedPersonen: Map<string, PersonWithZuordnungen>;
     selectedSchuleId?: string;
-    availableKlassen?: TranslatedObject[];
   };
   const props: Props = defineProps<Props>();
 
@@ -30,6 +29,10 @@
 
   const selectedKlasse: Ref<string | null> = ref(null);
   const showErrorDialog: Ref<boolean, boolean> = ref(false);
+
+  const updateKlassenSelection = (selected: string | null): void => {
+    selectedKlasse.value = selected;
+  };
 
   // Define the error list for the selected persons using the useBulkErrors composable
   const bulkErrorList: ComputedRef<BulkErrorList[]> = computed(() => useBulkErrors(t, props.selectedPersonen));
@@ -105,21 +108,14 @@
               cols="12"
               sm="7"
             >
-              <v-autocomplete
-                autocomplete="off"
-                clearable
-                density="compact"
-                id="bulk-change-klasse-select"
-                ref="bulk-change-klasse-select"
-                :no-data-text="t('noDataFound')"
-                :placeholder="t('admin.klasse.selectKlasse')"
-                :hide-details="true"
-                variant="outlined"
-                data-testid="bulk-change-klasse-select"
-                :items="availableKlassen"
-                v-model="selectedKlasse"
-                required="true"
-                min-width="200"
+              <KlassenFilter
+                :multiple="false"
+                :hideDetails="true"
+                :selectedKlassen="selectedKlasse"
+                :placeholderText="t('admin.klasse.selectKlasse')"
+                :administriertVon="selectedSchuleId ? [selectedSchuleId] : undefined"
+                @update:selectedKlassen="updateKlassenSelection"
+                :filterId="'bulk-change-klasse'"
               />
             </v-col>
           </v-row>
