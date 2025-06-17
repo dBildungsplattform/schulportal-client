@@ -271,6 +271,22 @@
     { immediate: true },
   );
 
+  // Watch the rollen and update filteredRollen based on selectedRollen... This is necessary to ensure that the filteredRollen are always in sync while the user is searching.
+  watch(rollen, (newRollen: TranslatedRolleWithAttrs[] | undefined) => {
+    // Optional: adjust this logic based on selectedRollen
+    if (!selectedRollen.value || selectedRollen.value.length === 0) {
+      filteredRollen.value = newRollen;
+    } else {
+      const selectedRollenart: RollenArt | undefined = newRollen?.find((rolle: TranslatedRolleWithAttrs) =>
+        selectedRollen.value?.includes(rolle.value),
+      )?.rollenart;
+
+      filteredRollen.value = newRollen?.filter(
+        (rolle: TranslatedRolleWithAttrs) => rolle.rollenart === selectedRollenart,
+      );
+    }
+  });
+
   // Extract the created Klassenzuordnungen from the response after submission
   const klasseZuordnungFromCreatedKontext: ComputedRef<DBiamPersonenkontextResponse[]> = computed(() => {
     if (!personenkontextStore.createdPersonWithKontext) return [];

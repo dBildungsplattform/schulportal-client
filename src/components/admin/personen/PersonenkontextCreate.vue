@@ -76,11 +76,11 @@
     return props.organisationen?.find((org: TranslatedObject) => org.value === selectedOrganisation.value)?.title;
   });
 
-  const selectedRolleTitles = computed(() => {
+  const selectedRolleTitles: ComputedRef<string[]> = computed(() => {
     if (!Array.isArray(selectedRollen.value)) return [];
     return selectedRollen.value
       .map((id: string) => props.rollen?.find((rolle: TranslatedObject) => rolle.value === id)?.title)
-      .filter((title): title is string => !!title); // filters out undefined
+      .filter((title: string | undefined): title is string => !!title);
   });
 
   // Computed property to get the title of the selected role
@@ -235,6 +235,7 @@
   watch(
     props.allowMultipleRollen ? searchInputRollen : searchInputRolle,
     async (newValue: string | string[], oldValue: string | string[]) => {
+
       clearTimeout(timerId.value);
 
       // When the autocompletes loses focus we stop an extra request from being made by checking if the newValue is equal to the oldValue
