@@ -223,7 +223,7 @@ describe('RolleModify', () => {
     expect(kopersInfo?.textContent).toContain('KoPers.-Nr.');
   });
 
-  test.only('shows error dialog if bulk operation has errors', async () => {
+  test('shows error dialog if bulk operation has errors', async () => {
     await nextTick();
 
     // Mock the bulk operation with an error
