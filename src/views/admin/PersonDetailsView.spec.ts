@@ -812,7 +812,7 @@ describe('PersonDetailsView', () => {
     expect(wrapper?.find('[data-testid="zuordnung-edit-button"]').isVisible()).toBe(true);
   });
 
-  test.only('renders form to change Klasse and triggers submit', async () => {
+  test('renders form to change Klasse and triggers submit', async () => {
     organisationStore.getAllOrganisationen = vi.fn().mockResolvedValue(undefined);
     organisationStore.getKlassenByOrganisationId = vi.fn().mockResolvedValue(undefined);
     organisationStore.fetchSchuleDetailsForKlassen = vi.fn().mockResolvedValue(undefined);
