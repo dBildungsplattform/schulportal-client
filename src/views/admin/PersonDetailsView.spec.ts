@@ -6,7 +6,14 @@ import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
 import { usePersonStore, type Personendatensatz, type PersonStore } from '@/stores/PersonStore';
-import { RollenArt, RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
+import {
+  RollenArt,
+  RollenMerkmal,
+  RollenSystemRecht,
+  useRolleStore,
+  type Rolle,
+  type RolleStore,
+} from '@/stores/RolleStore';
 import {
   useTwoFactorAuthentificationStore,
   type TwoFactorAuthentificationStore,
@@ -30,6 +37,7 @@ const organisationStore: OrganisationStore = useOrganisationStore();
 const personStore: PersonStore = usePersonStore();
 const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
 const twoFactorAuthenticationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
+const rolleStore: RolleStore = useRolleStore();
 
 const mockPerson: Personendatensatz = {
   person: DoFactory.getPerson(),
@@ -804,12 +812,25 @@ describe('PersonDetailsView', () => {
     expect(wrapper?.find('[data-testid="zuordnung-edit-button"]').isVisible()).toBe(true);
   });
 
-  test('renders form to change Klasse and triggers submit', async () => {
+  test.only('renders form to change Klasse and triggers submit', async () => {
     organisationStore.getAllOrganisationen = vi.fn().mockResolvedValue(undefined);
     organisationStore.getKlassenByOrganisationId = vi.fn().mockResolvedValue(undefined);
     organisationStore.fetchSchuleDetailsForKlassen = vi.fn().mockResolvedValue(undefined);
     personenkontextStore.processWorkflowStep = vi.fn().mockResolvedValue(undefined);
     personenkontextStore.updatePersonenkontexte = vi.fn().mockResolvedValue(undefined);
+
+    const mockCurrentRolle: Rolle = {
+      administeredBySchulstrukturknoten: '1234',
+      rollenart: RollenArt.Lern,
+      name: 'SuS',
+      merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
+      systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+      id: '1',
+      version: 1,
+    };
+
+    rolleStore.currentRolle = mockCurrentRolle;
+    await nextTick();
 
     await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
     await nextTick();

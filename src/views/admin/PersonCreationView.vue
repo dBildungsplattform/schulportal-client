@@ -108,6 +108,38 @@
   const discardButtonLabel: Ref<string> = ref(t('admin.person.discard'));
   const createAnotherButtonLabel: Ref<string> = ref(t('admin.person.createAnother'));
 
+  // Extract the befristung validation into a reusable function
+  const createBefristungValidation = (): StringSchema => {
+    return string()
+      .test('notInPast', t('admin.befristung.rules.pastDateNotAllowed'), notInPast)
+      .test('isValidDate', t('admin.befristung.rules.invalidDateNotAllowed'), isValidDate)
+      .matches(DDMMYYYY, t('admin.befristung.rules.format'))
+      .test('conditionalRequired', t('admin.befristung.rules.required'), async function (value: string | undefined) {
+        const {
+          selectedRollen,
+          selectedBefristungOption,
+        }: { selectedRollen: string[]; selectedBefristungOption: string | undefined } = this.parent;
+
+        // If befristungOption is defined, befristung is not required
+        if (selectedBefristungOption !== undefined) {
+          return true;
+        }
+
+        // If no roles selected, not required
+        if (Array.isArray(selectedRollen) && selectedRollen.length === 0) {
+          return true;
+        }
+
+        const isBefristungspflichtig: boolean = await isBefristungspflichtRolle(selectedRollen);
+
+        if (isBefristungspflichtig && !value) {
+          return false; // Required but not provided
+        }
+
+        return true;
+      });
+  };
+
   const validationSchema: TypedSchema = toTypedSchema(
     object({
       selectedRollen: array()
@@ -137,18 +169,8 @@
           then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
             schema.required(t('admin.person.rules.kopersNr.required')),
         }),
-      selectedBefristung: string()
-        .test('notInPast', t('admin.befristung.rules.pastDateNotAllowed'), notInPast)
-        .test('isValidDate', t('admin.befristung.rules.invalidDateNotAllowed'), isValidDate)
-        .matches(DDMMYYYY, t('admin.befristung.rules.format'))
-        .when(['selectedRollen', 'selectedBefristungOption'], {
-          is: async (selectedRolleIds: string[], selectedBefristungOption: string | undefined) => {
-            const result: boolean = await isBefristungspflichtRolle(selectedRolleIds);
-            return result && selectedBefristungOption === undefined;
-          },
-          then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
-            schema.required(t('admin.befristung.rules.required')),
-        }),
+      // Use the extracted befristung validation
+      selectedBefristung: createBefristungValidation(),
     }),
   );
 
