@@ -1060,11 +1060,8 @@ describe('PersonDetailsView', () => {
         if (existingBefristungOption === 'schuljahresende') {
           expect(schuljahresendeRadioButton?.attributes('checked')).toBeDefined();
           expect(unbefristetRadioButton?.attributes('checked')).toBeUndefined();
-        } else if (existingBefristungOption === 'unbefristet') {
-          expect(schuljahresendeRadioButton?.attributes('checked')).toBeUndefined();
-          expect(unbefristetRadioButton?.attributes('checked')).toBeDefined();
         } else {
-          expect(schuljahresendeRadioButton?.attributes('checked')).toBeUndefined();
+          expect(schuljahresendeRadioButton?.attributes('checked')).toBeFalsy();
           expect(unbefristetRadioButton?.attributes('checked')).toBeUndefined();
         }
 

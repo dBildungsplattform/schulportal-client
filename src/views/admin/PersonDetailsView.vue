@@ -582,7 +582,7 @@
         isLernRolleForChangeKlasseResult.value = false;
       }
     },
-    { immediate: true }
+    { immediate: true },
   );
 
   const canChangeKlasse: ComputedRef<boolean> = computed(() => {
@@ -760,7 +760,7 @@
     selectedBefristung: selectedChangeBefristung,
     selectedBefristungOption: selectedChangeBefristungOption,
     calculatedBefristung,
-    selectedRollen: computed(() => (changeBefristungRolle.value ? [changeBefristungRolle.value] : [])),                       
+    selectedRollen: computed(() => (changeBefristungRolle.value ? [changeBefristungRolle.value] : [])),
   });
 
   async function navigateBackToKopersForm(): Promise<void> {
