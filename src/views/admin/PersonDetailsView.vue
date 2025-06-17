@@ -879,11 +879,12 @@
     }
   };
 
+  const hasPendingChange: ComputedRef<boolean> = computed(() => {
+    return pendingCreation.value || pendingDeletion.value || pendingChangeKlasse.value || pendingChangeBefristung.value;
+  });
+
   // The save button is always disabled if there is no pending creation, deletion nor changeKlasse.
-  const isSaveButtonDisabled: ComputedRef<boolean> = computed(
-    () =>
-      !pendingCreation.value && !pendingDeletion.value && !pendingChangeKlasse.value && !pendingChangeBefristung.value,
-  );
+  const isSaveButtonDisabled: ComputedRef<boolean> = computed(() => !hasPendingChange.value);
 
   // Helper function to determine the existing RollenArt
   function getExistingRollenArt(zuordnungen: Zuordnung[]): RollenArt | undefined {
@@ -1337,7 +1338,7 @@
   }
 
   onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
-    if (isFormDirty()) {
+    if (isFormDirty() || hasPendingChange.value) {
       showUnsavedChangesDialog.value = true;
       blockedNext = next;
     } else {
@@ -1446,12 +1447,6 @@
           tooltip: t('person.emailStatusUnknownHover'),
         };
     }
-  });
-
-  const isActionNotPending: ComputedRef<boolean> = computed(() => {
-    return (
-      !pendingCreation.value && !pendingDeletion.value && !pendingChangeKlasse.value && !pendingChangeBefristung.value
-    );
   });
 
   const differentDateSelected: ComputedRef<boolean> = computed(() => {
@@ -1910,7 +1905,7 @@
           <template v-if="!isZuordnungFormActive && !isChangeKlasseFormActive && !isChangeBefristungActive">
             <v-row class="ml-md-16">
               <v-col
-                v-if="isActionNotPending"
+                v-if="!hasPendingChange"
                 cols="12"
                 sm="auto"
               >
@@ -1933,7 +1928,7 @@
                 :title="zuordnung.sskName"
                 class="py-0 d-flex align-items-center"
               >
-                <template v-if="isActionNotPending">
+                <template v-if="!hasPendingChange">
                   <div class="checkbox-div">
                     <v-checkbox
                       :ref="`checkbox-zuordnung-${zuordnung.sskId}`"
@@ -2123,7 +2118,7 @@
               </v-col>
               <v-spacer></v-spacer>
               <v-col
-                v-if="isActionNotPending"
+                v-if="!hasPendingChange"
                 class="button-container"
                 cols="12"
                 md="auto"
