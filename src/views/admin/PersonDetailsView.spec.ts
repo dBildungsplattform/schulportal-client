@@ -751,7 +751,8 @@ describe('PersonDetailsView', () => {
     // Set klasse value
     const klasseAutocomplete: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
-      .findComponent({ ref: 'klasse-select' });
+      .findComponent({ name: 'KlassenFilter' })
+      .findComponent({ ref: 'personenkontext-create-klasse-select' });
     await klasseAutocomplete?.setValue('9a');
     klasseAutocomplete?.vm.$emit('update:search', '9a');
     await nextTick();
@@ -848,7 +849,7 @@ describe('PersonDetailsView', () => {
 
     const klasseInput: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'klasse-change-form' })
-      .findComponent({ ref: 'klasse-select' });
+      .findComponent({ name: 'KlassenFilter' });
     await klasseInput?.setValue('9a');
     await nextTick();
 

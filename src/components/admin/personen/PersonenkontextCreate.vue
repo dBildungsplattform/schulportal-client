@@ -1,14 +1,10 @@
 <script setup lang="ts">
   import type { BefristungProps } from '@/components/admin/personen/BefristungInput.vue';
   import BefristungInput from '@/components/admin/personen/BefristungInput.vue';
+  import KlassenFilter from '@/components/filter/KlassenFilter.vue';
   import FormRow from '@/components/form/FormRow.vue';
   import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
-  import {
-    OrganisationsTyp,
-    useOrganisationStore,
-    type Organisation,
-    type OrganisationStore,
-  } from '@/stores/OrganisationStore';
+  import { OrganisationsTyp } from '@/stores/OrganisationStore';
   import { OperationContext, usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
   import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
   import { RollenArt } from '@/stores/RolleStore';
@@ -21,7 +17,6 @@
   useI18n({ useScope: 'global' });
 
   const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
-  const organisationStore: OrganisationStore = useOrganisationStore();
   const personStore: PersonStore = usePersonStore();
 
   const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
@@ -40,7 +35,6 @@
     selectedOrganisation: string | undefined;
     showHeadline: boolean;
     operationContext: OperationContext;
-    klassen?: TranslatedObject[] | undefined;
     selectedRolle?: string | undefined;
     selectedRollen?: string[] | undefined;
     selectedKlasse?: string | undefined;
@@ -72,6 +66,9 @@
   const selectedRolle: Ref<string | undefined> = ref(props.selectedRolle);
   const selectedRollen: Ref<string[] | undefined> = ref(props.selectedRollen || []);
   const selectedKlasse: Ref<string | undefined> = ref(props.selectedKlasse);
+  // we need to cast the selectedSchule into an array
+  // doing it this way prevents an issue where the reactive system constantly re-runs which causes requests to be issued in a loop
+  const administriertVon: Ref<string[] | undefined> = ref([]);
 
   // Computed property to get the title of the selected organisation
   const selectedOrganisationTitle: ComputedRef<string | undefined> = computed(() => {
@@ -81,11 +78,6 @@
   // Computed property to get the title of the selected role
   const selectedRolleTitle: ComputedRef<string | undefined> = computed(() => {
     return props.rollen?.find((rolle: TranslatedObject) => rolle.value === selectedRolle.value)?.title;
-  });
-
-  // Computed property to get the title of the selected class
-  const selectedKlasseTitle: ComputedRef<string | undefined> = computed(() => {
-    return props.klassen?.find((klasse: TranslatedObject | undefined) => klasse?.value === selectedKlasse.value)?.title;
   });
 
   function isLernRolle(selectedRolleIds: string | string[] | undefined): boolean {
@@ -117,42 +109,30 @@
         organisationId: newValue,
         limit: 25,
       });
-
-      // Fetch all Klassen for the selected organization
-      await organisationStore.getKlassenByOrganisationId({ limit: 200, administriertVon: [newValue] });
+      administriertVon.value?.pop();
+      administriertVon.value?.push(newValue);
 
       // Check that all the Klassen associated with the selectedOrga have the same Klasse for the same person.
       const klassenZuordnungen: Zuordnung[] | undefined = personStore.personenuebersicht?.zuordnungen.filter(
         (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse && zuordnung.administriertVon === newValue,
       );
 
-      if (klassenZuordnungen && klassenZuordnungen.length > 0) {
-        // Check if all Zuordnungen of type Klasse have the same SSKID.
-        // We only preselect when there's a clear, unambiguous single Klasse association for the selected Orga.
-        const sameSSK: boolean = klassenZuordnungen.every(
-          (zuordnung: Zuordnung) => zuordnung.sskId === klassenZuordnungen[0]?.sskId,
-        );
-
-        if (sameSSK) {
-          await organisationStore.getKlassenByOrganisationId({ administriertVon: [newValue] });
-          const klasse: Organisation | undefined = organisationStore.klassen.find(
-            (k: Organisation) => k.id === klassenZuordnungen[0]?.sskId,
-          );
-          // If the klasse was found then add it to the 25 Klassen in the dropdown and preselect it
-          if (klasse) {
-            selectedKlasse.value = klasse.id;
-            emits('update:selectedKlasse', newValue);
-            // Another request to limit the Klassen because beforehand we made the same request with no limit to check all possible Klassen
-            await organisationStore.getKlassenByOrganisationId({ limit: 200, administriertVon: [newValue] });
-            // Push the preselected Klasse to the array of klassen (dropdown) if its not there already (this is necessary if the Klasse isn't part of the initial 25)
-            if (!organisationStore.klassen.some((k: Organisation) => k.id === klasse.id)) {
-              organisationStore.klassen.push(klasse);
-            }
-          }
+      // Check if all Zuordnungen of type Klasse have the same SSKID.
+      // We only preselect when there's a clear, unambiguous single Klasse association for the selected Orga.
+      const klassenIds: Set<string> = new Set(klassenZuordnungen?.map((zuordnung: Zuordnung) => zuordnung.sskId));
+      if (klassenIds.size === 1) {
+        const klasseId: string | undefined = klassenIds.values().next().value;
+        if (klasseId) {
+          selectedKlasse.value = klasseId;
+          emits('update:selectedKlasse', klasseId);
         }
+      } else {
+        selectedKlasse.value = undefined;
+        emits('fieldReset', 'selectedKlasse');
       }
     } else if (!newValue) {
       // If the organization is cleared, reset selectedRolle and selectedKlasse
+      administriertVon.value?.pop();
       selectedRolle.value = undefined;
       selectedKlasse.value = undefined;
       emits('fieldReset', 'selectedRolle');
@@ -176,13 +156,12 @@
             limit: 25,
           });
           canCommit.value = personenkontextStore.workflowStepResponse?.canCommit ?? false;
-          emits('update:canCommit', canCommit.value);
         } else {
           // No roles selected, reset values
           selectedKlasse.value = undefined;
           emits('fieldReset', 'selectedKlasse');
           emits('fieldReset', 'selectedRollen');
-          emits('update:canCommit', false);
+          canCommit.value = false;
         }
         emits('update:selectedRollen', newRollen);
       } else {
@@ -196,11 +175,10 @@
             limit: 25,
           });
           canCommit.value = personenkontextStore.workflowStepResponse?.canCommit ?? false;
-          emits('update:canCommit', canCommit.value);
         }
         if (!newRolle) {
           // Reset when no rolle is selected
-          emits('update:canCommit', false);
+          canCommit.value = false;
           selectedKlasse.value = undefined;
           emits('fieldReset', 'selectedKlasse');
         }
@@ -209,10 +187,6 @@
     },
     { deep: true },
   );
-
-  watch(selectedKlasse, (newValue: string | undefined) => {
-    emits('update:selectedKlasse', newValue);
-  });
 
   // Using a watcher instead of modelUpdate since we need the old Value as well.
   // Default behavior of the autocomplete is to reset the newValue to empty string and that causes another request to be made
@@ -281,33 +255,9 @@
     },
   );
 
-  function updateKlassenSearch(searchValue: string): void {
-    clearTimeout(timerId.value);
-    const organisationId: string | undefined = selectedOrganisation.value;
-
-    if (!organisationId) {
-      return;
-    }
-    if (searchValue === '' && !selectedKlasse.value) {
-      timerId.value = setTimeout(() => {
-        organisationStore.getKlassenByOrganisationId({
-          searchString: searchValue,
-          limit: 25,
-          administriertVon: [organisationId],
-        });
-      }, 500);
-    } else if (searchValue && searchValue !== selectedKlasseTitle.value) {
-      /* cancel pending call */
-      clearTimeout(timerId.value);
-      /* delay new call 500ms */
-      timerId.value = setTimeout(() => {
-        organisationStore.getKlassenByOrganisationId({
-          searchString: searchValue,
-          limit: 25,
-          administriertVon: [organisationId],
-        });
-      }, 500);
-    }
+  function updateKlasseSelection(selectedKlassen: string | undefined): void {
+    selectedKlasse.value = selectedKlassen;
+    emits('update:selectedKlasse', selectedKlassen);
   }
 
   // Clear the selected Organisation once the input field is cleared (This is the only way to fetch all Orgas again)
@@ -344,6 +294,14 @@
   const handleCalculatedBefristungOptionChange = (value: string | undefined): void => {
     emits('update:calculatedBefristungOption', value);
   };
+
+  watch(
+    canCommit,
+    (newValue: boolean) => {
+      emits('update:canCommit', newValue);
+    },
+    { immediate: true },
+  );
 </script>
 
 <template>
@@ -455,23 +413,18 @@
         labelForId="klasse-select"
         :label="$t('admin.klasse.klasse')"
       >
-        <v-autocomplete
-          autocomplete="off"
-          clearable
-          data-testid="klasse-select"
-          density="compact"
-          id="klasse-select"
+        <KlassenFilter
+          :multiple="false"
+          :hideDetails="false"
+          :selectedKlasseProps="selectedKlasseProps"
+          :highlightSelection="false"
+          :selectedKlassen="selectedKlasse"
+          @update:selectedKlassen="updateKlasseSelection"
+          :placeholderText="$t('admin.klasse.selectKlasse')"
           ref="klasse-select"
-          :items="klassen"
-          item-value="value"
-          item-text="title"
-          :no-data-text="$t('noDataFound')"
-          :placeholder="$t('admin.klasse.selectKlasse')"
-          @update:search="updateKlassenSearch"
-          variant="outlined"
-          v-bind="selectedKlasseProps"
-          v-model="selectedKlasse"
-        ></v-autocomplete>
+          :administriertVon
+          :filterId="'personenkontext-create'"
+        />
       </FormRow>
       <!-- Befristung -->
       <v-row
