@@ -263,10 +263,17 @@ describe('RolleModify', () => {
 
     await flushPromises();
 
-    expect(bulkModifyPersonenRolleSpy).toHaveBeenCalledTimes(1);
+    // Wait for error dialog to appear
+    await vi.waitFor(
+      () => {
+        const errorDialog: Element | null = document.body.querySelector('.v-dialog');
+        expect(errorDialog).not.toBeNull();
+      },
+      { timeout: 1000 },
+    );
+    await nextTick();
 
-    const errorDialog: Element | null = document.body.querySelector('.v-dialog');
-    expect(errorDialog).not.toBeNull();
+    expect(bulkModifyPersonenRolleSpy).toHaveBeenCalledTimes(1);
   });
 
   test('renders the dialog when isDialogVisible is true', async () => {
