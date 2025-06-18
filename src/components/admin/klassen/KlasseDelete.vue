@@ -69,53 +69,7 @@
 </script>
 
 <template>
-  <v-dialog
-    v-model="successDialogVisible"
-    persistent
-  >
-    <LayoutCard
-      v-if="successDialogVisible"
-      :closable="false"
-      :header="$t('admin.klasse.deleteKlasse')"
-    >
-      <v-card-text>
-        <v-container>
-          <v-row class="text-body bold justify-center">
-            <v-col
-              class="text-center"
-              cols="10"
-            >
-              <span data-testid="klasse-delete-success-text">
-                {{ deleteKlasseSuccessMessage }}
-              </span>
-            </v-col>
-          </v-row>
-        </v-container>
-      </v-card-text>
-      <v-card-actions class="justify-center">
-        <v-row class="justify-center">
-          <v-col
-            cols="12"
-            sm="6"
-            md="4"
-          >
-            <v-btn
-              :block="mdAndDown"
-              class="primary"
-              @click.stop="closeSuccessDialog()"
-              data-testid="close-klasse-delete-success-dialog-button"
-            >
-              {{ $t('close') }}
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-card-actions>
-    </LayoutCard>
-  </v-dialog>
-  <v-dialog
-    v-if="!successDialogVisible"
-    persistent
-  >
+  <v-dialog persistent>
     <template v-slot:activator="{ props }">
       <v-btn
         v-if="!useIconActivator"
@@ -136,11 +90,47 @@
       ></v-icon>
     </template>
 
-    <template
-      v-if="!successDialogVisible"
-      v-slot:default="{ isActive }"
-    >
+    <template v-slot:default="{ isActive }">
       <LayoutCard
+        v-if="successDialogVisible"
+        :closable="false"
+        :header="$t('admin.klasse.deleteKlasse')"
+      >
+        <v-card-text>
+          <v-container>
+            <v-row class="text-body bold justify-center">
+              <v-col
+                class="text-center"
+                cols="10"
+              >
+                <span data-testid="klasse-delete-success-text">
+                  {{ deleteKlasseSuccessMessage }}
+                </span>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions class="justify-center">
+          <v-row class="justify-center">
+            <v-col
+              cols="12"
+              sm="6"
+              md="4"
+            >
+              <v-btn
+                :block="mdAndDown"
+                class="primary"
+                @click.stop="closeSuccessDialog()"
+                data-testid="close-klasse-delete-success-dialog-button"
+              >
+                {{ $t('close') }}
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-card-actions>
+      </LayoutCard>
+      <LayoutCard
+        v-else
         :closable="true"
         :header="$t('admin.klasse.deleteKlasse')"
         @onCloseClicked="closeKlasseDeleteDialog(isActive)"
