@@ -1,14 +1,13 @@
 <script setup lang="ts">
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { computed, ref, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
-  import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { type Router, useRouter } from 'vue-router';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
-  const router: Router = useRouter();
+
   type Props = {
     errorCode: string;
     klassenname: string;
@@ -20,6 +19,7 @@
 
   type Emits = {
     (event: 'onDeleteKlasse', klasseId: string): void;
+    (event: 'onClose'): void;
   };
 
   const props: Props = defineProps<Props>();
@@ -38,13 +38,9 @@
     successDialogVisible.value = true;
   }
 
-  async function closeSuccessDialogAndPushToManagement(): Promise<void> {
+  async function closeSuccessDialog(): Promise<void> {
     successDialogVisible.value = false;
-    if (router.currentRoute.value.name === 'klasse-management') {
-      router.go(0);
-    } else {
-      router.push({ name: 'klasse-management' });
-    }
+    emit('onClose');
   }
 
   const deleteKlasseConfirmationMessage: ComputedRef<string> = computed(() => {
@@ -106,7 +102,7 @@
             <v-btn
               :block="mdAndDown"
               class="primary"
-              @click.stop="closeSuccessDialogAndPushToManagement()"
+              @click.stop="closeSuccessDialog()"
               data-testid="close-klasse-delete-success-dialog-button"
             >
               {{ $t('close') }}
