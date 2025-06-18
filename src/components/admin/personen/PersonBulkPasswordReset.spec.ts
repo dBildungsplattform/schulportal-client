@@ -131,7 +131,7 @@ describe('PersonBulkPasswordReset', () => {
     });
   });
 
-  test('close button closes dialog and resets store', async () => {
+  test('close button triggers confirmation and closing dialog resets store', async () => {
     bulkOperationStore.currentOperation = {
       type: OperationType.DELETE_PERSON,
       isRunning: false,
@@ -148,7 +148,18 @@ describe('PersonBulkPasswordReset', () => {
     expect(closeButton).not.toBeNull();
 
     expect(wrapper.emitted('update:dialogExit')).toBeUndefined();
-    closeButton!.dispatchEvent(new Event('click'));
+    closeButton!.dispatchEvent(new Event('click')); // opens confirmation dialog
+    await flushPromises();
+
+    const confirmationButton: Element | null = document.body.querySelector(
+      '[data-testid="password-reset-download-confirmation-button"]',
+    );
+    expect(wrapper.emitted('update:dialogExit')).toBeUndefined();
+    expect(confirmationButton).not.toBeNull();
+    confirmationButton!.dispatchEvent(new Event('click')); // closes confirmation dialog
+    await flushPromises();
+
+    closeButton!.dispatchEvent(new Event('click')); // closes dialog
     await flushPromises();
 
     expect(wrapper.emitted('update:dialogExit')).toEqual([[true]]);
