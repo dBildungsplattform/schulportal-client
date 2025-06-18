@@ -11,6 +11,7 @@
   import PersonenMetadataChange from '@/components/admin/personen/PersonenMetadataChange.vue';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
   import PersonenkontextDelete from '@/components/admin/personen/PersonenkontextDelete.vue';
+  import { PendingState } from '@/components/admin/personen/details/PersonenkontextItem.types';
   import PersonenkontextItem from '@/components/admin/personen/details/PersonenkontextItem.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
@@ -47,8 +48,7 @@
   import { Zuordnung } from '@/stores/types/Zuordnung';
   import type { TranslatedObject } from '@/types';
   import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
-  import { adjustDateForTimezoneAndFormat, formatDate, formatDateToISO, getNextSchuljahresende } from '@/utils/date';
-  import { PendingState } from '@/components/admin/personen/details/PersonenkontextItem.types';
+  import { adjustDateForTimezoneAndFormat, formatDateToISO, getNextSchuljahresende } from '@/utils/date';
   import { LockKeys, PersonLockOccasion, type UserLock } from '@/utils/lock';
   import { DIN_91379A, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
   import {
@@ -430,18 +430,6 @@
         return t('nav.backToList');
     }
   });
-
-  function getSskName(sskDstNr: string | undefined | null, sskName: string): string {
-    /* truncate ssk name */
-    const truncatededSskName: string = sskName.length > 30 ? `${sskName.substring(0, 30)}...` : sskName;
-
-    /* omit parens when there is no ssk kennung  */
-    if (sskDstNr) {
-      return `${sskDstNr} (${truncatededSskName})`;
-    } else {
-      return truncatededSskName;
-    }
-  }
 
   // Add the Klasse to it's corresponding Schule
   function computeZuordnungen(personenuebersicht: PersonenUebersicht | null): ZuordnungWithKlasse[] | undefined {
@@ -1880,16 +1868,10 @@
               :data-testid="`person-zuordnung-${zuordnung.sskId}`"
               :title="zuordnung.sskName"
             >
-              <span class="text-body">
-                {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
-                {{ zuordnung.klasse }}
-                <span
-                  v-if="zuordnung.befristung"
-                  data-testid="zuordnung-befristung-text"
-                >
-                  ({{ formatDate(zuordnung.befristung, t) }})</span
-                >
-              </span>
+              <PersonenkontextItem
+                :zuordnung="zuordnung"
+                :noMargin="true"
+              />
             </v-col>
           </v-row>
           <!-- Display 'Keine Zuordnungen gefunden' if the above condition is false -->
