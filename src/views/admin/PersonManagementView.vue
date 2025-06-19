@@ -135,16 +135,16 @@
   const actions: ComputedRef<TranslatedObject[]> = computed(() => {
     const actionTypeTitles: Map<OperationType, string> = new Map();
 
-    if (authStore.hasPersonenLoeschenPermission) {
-      actionTypeTitles.set(OperationType.DELETE_PERSON, t('admin.person.deletePerson'));
+    if (authStore.hasPersonenverwaltungPermission) {
+      actionTypeTitles.set(OperationType.RESET_PASSWORD, t('admin.person.resetPassword'));
+      actionTypeTitles.set(OperationType.CHANGE_KLASSE, t('admin.person.bulkChangeKlasse.transfer'));
+      actionTypeTitles.set(OperationType.ORG_UNASSIGN, t('admin.person.bulkUnassignOrganisation.cancelZuordnung'));
+      actionTypeTitles.set(OperationType.ROLLE_UNASSIGN, t('admin.rolle.bulkRollenzuordnung.unassignRolleZuordnung'));
+      actionTypeTitles.set(OperationType.MODIFY_ROLLE, t('admin.rolle.assignRolle'));
     }
 
-    if (authStore.hasPersonenverwaltungPermission) {
-      actionTypeTitles.set(OperationType.MODIFY_ROLLE, t('admin.rolle.assignRolle'));
-      actionTypeTitles.set(OperationType.RESET_PASSWORD, t('admin.person.resetPassword'));
-      actionTypeTitles.set(OperationType.ORG_UNASSIGN, t('admin.person.bulkUnassignOrganisation.cancelZuordnung'));
-      actionTypeTitles.set(OperationType.CHANGE_KLASSE, t('admin.person.bulkChangeKlasse.transfer'));
-      actionTypeTitles.set(OperationType.ROLLE_UNASSIGN, t('admin.rolle.bulkRollenzuordnung.unassignRolleZuordnung'));
+    if (authStore.hasPersonenLoeschenPermission) {
+      actionTypeTitles.set(OperationType.DELETE_PERSON, t('admin.person.deletePerson'));
     }
 
     return [...actionTypeTitles.entries()].map(([key, value]: [string, string]) => ({
