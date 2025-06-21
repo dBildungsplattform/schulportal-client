@@ -1,14 +1,13 @@
 <script setup lang="ts">
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { computed, ref, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
-  import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { type Router, useRouter } from 'vue-router';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
-  const router: Router = useRouter();
+
   type Props = {
     errorCode: string;
     klassenname: string;
@@ -20,6 +19,7 @@
 
   type Emits = {
     (event: 'onDeleteKlasse', klasseId: string): void;
+    (event: 'onClose'): void;
   };
 
   const props: Props = defineProps<Props>();
@@ -38,13 +38,9 @@
     successDialogVisible.value = true;
   }
 
-  async function closeSuccessDialogAndPushToManagement(): Promise<void> {
+  async function closeSuccessDialog(): Promise<void> {
     successDialogVisible.value = false;
-    if (router.currentRoute.value.name === 'klasse-management') {
-      router.go(0);
-    } else {
-      router.push({ name: 'klasse-management' });
-    }
+    emit('onClose');
   }
 
   const deleteKlasseConfirmationMessage: ComputedRef<string> = computed(() => {
@@ -73,53 +69,7 @@
 </script>
 
 <template>
-  <v-dialog
-    v-model="successDialogVisible"
-    persistent
-  >
-    <LayoutCard
-      v-if="successDialogVisible"
-      :closable="false"
-      :header="$t('admin.klasse.deleteKlasse')"
-    >
-      <v-card-text>
-        <v-container>
-          <v-row class="text-body bold justify-center">
-            <v-col
-              class="text-center"
-              cols="10"
-            >
-              <span data-testid="klasse-delete-success-text">
-                {{ deleteKlasseSuccessMessage }}
-              </span>
-            </v-col>
-          </v-row>
-        </v-container>
-      </v-card-text>
-      <v-card-actions class="justify-center">
-        <v-row class="justify-center">
-          <v-col
-            cols="12"
-            sm="6"
-            md="4"
-          >
-            <v-btn
-              :block="mdAndDown"
-              class="primary"
-              @click.stop="closeSuccessDialogAndPushToManagement()"
-              data-testid="close-klasse-delete-success-dialog-button"
-            >
-              {{ $t('close') }}
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-card-actions>
-    </LayoutCard>
-  </v-dialog>
-  <v-dialog
-    v-if="!successDialogVisible"
-    persistent
-  >
+  <v-dialog persistent>
     <template v-slot:activator="{ props }">
       <v-btn
         v-if="!useIconActivator"
@@ -140,11 +90,47 @@
       ></v-icon>
     </template>
 
-    <template
-      v-if="!successDialogVisible"
-      v-slot:default="{ isActive }"
-    >
+    <template v-slot:default="{ isActive }">
       <LayoutCard
+        v-if="successDialogVisible"
+        :closable="false"
+        :header="$t('admin.klasse.deleteKlasse')"
+      >
+        <v-card-text>
+          <v-container>
+            <v-row class="text-body bold justify-center">
+              <v-col
+                class="text-center"
+                cols="10"
+              >
+                <span data-testid="klasse-delete-success-text">
+                  {{ deleteKlasseSuccessMessage }}
+                </span>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions class="justify-center">
+          <v-row class="justify-center">
+            <v-col
+              cols="12"
+              sm="6"
+              md="4"
+            >
+              <v-btn
+                :block="mdAndDown"
+                class="primary"
+                @click.stop="closeSuccessDialog()"
+                data-testid="close-klasse-delete-success-dialog-button"
+              >
+                {{ $t('close') }}
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-card-actions>
+      </LayoutCard>
+      <LayoutCard
+        v-else
         :closable="true"
         :header="$t('admin.klasse.deleteKlasse')"
         @onCloseClicked="closeKlasseDeleteDialog(isActive)"

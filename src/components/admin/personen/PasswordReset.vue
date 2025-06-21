@@ -157,6 +157,30 @@
         <v-card-actions class="justify-center">
           <v-row class="justify-center">
             <v-col
+              cols="12"
+              sm="6"
+              md="4"
+            >
+              <v-btn
+                v-if="!!password"
+                :block="mdAndDown"
+                class="primary button"
+                @click.stop="closePasswordResetDialog(isActive)"
+                data-testid="close-password-reset-dialog-button"
+              >
+                {{ $t('close') }}
+              </v-btn>
+              <v-btn
+                v-else
+                :block="mdAndDown"
+                class="secondary button"
+                @click.stop="closePasswordResetDialog(isActive)"
+                data-testid="close-password-reset-dialog-button"
+              >
+                {{ $t('close') }}
+              </v-btn>
+            </v-col>
+            <v-col
               v-if="!errorMessage"
               cols="12"
               sm="6"
@@ -180,30 +204,6 @@
                 :disabled="!!password || isLoading"
               >
                 {{ confirmButtonText }}
-              </v-btn>
-            </v-col>
-            <v-col
-              cols="12"
-              sm="6"
-              md="4"
-            >
-              <v-btn
-                v-if="!!password"
-                :block="mdAndDown"
-                class="primary button"
-                @click.stop="closePasswordResetDialog(isActive)"
-                data-testid="close-password-reset-dialog-button"
-              >
-                {{ $t('close') }}
-              </v-btn>
-              <v-btn
-                v-else
-                :block="mdAndDown"
-                class="secondary button"
-                @click.stop="closePasswordResetDialog(isActive)"
-                data-testid="close-password-reset-dialog-button"
-              >
-                {{ $t('close') }}
               </v-btn>
             </v-col>
           </v-row>

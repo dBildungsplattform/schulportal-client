@@ -187,6 +187,10 @@
     }
   }
 
+  async function reloadData(filter: OrganisationenFilter): Promise<void> {
+    await organisationStore.getAllOrganisationen(filter);
+  }
+
   watch(
     hasAutoselectedSchule,
     () => {
@@ -209,7 +213,7 @@
   );
 
   watchEffect(async () => {
-    await organisationStore.getAllOrganisationen(klassenListFilter.value);
+    await reloadData(klassenListFilter.value);
   });
 
   onBeforeRouteLeave(async () => {
@@ -366,6 +370,7 @@
               :useIconActivator="true"
               :isLoading="organisationStore.loading"
               @onDeleteKlasse="deleteKlasse(item.id)"
+              @onClose="reloadData(klassenListFilter)"
             ></KlasseDelete>
           </template>
         </ResultTable>
