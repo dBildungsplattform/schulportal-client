@@ -25,7 +25,17 @@
   import { isKopersRolle } from '@/utils/validationPersonenkontext';
   import { toTypedSchema } from '@vee-validate/yup';
   import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
-  import { computed, onBeforeMount, onMounted, onUnmounted, ref, watch, type ComputedRef, type Ref } from 'vue';
+  import {
+    computed,
+    onBeforeMount,
+    onMounted,
+    onUnmounted,
+    ref,
+    watch,
+    watchEffect,
+    type ComputedRef,
+    type Ref,
+  } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import {
     onBeforeRouteLeave,
@@ -53,6 +63,7 @@
   const canCommit: Ref<boolean> = ref(false);
   const hasNoKopersNr: Ref<boolean | undefined> = ref(false);
   const showNoKopersNrConfirmationDialog: Ref<boolean> = ref(false);
+  const isUnbefristetButtonDisabled: Ref<boolean, boolean> = ref(false);
 
   const calculatedBefristung: Ref<string | undefined> = ref('');
 
@@ -97,6 +108,38 @@
   const discardButtonLabel: Ref<string> = ref(t('admin.person.discard'));
   const createAnotherButtonLabel: Ref<string> = ref(t('admin.person.createAnother'));
 
+  // Extract the befristung validation into a reusable function
+  const createBefristungValidation = (): StringSchema => {
+    return string()
+      .test('notInPast', t('admin.befristung.rules.pastDateNotAllowed'), notInPast)
+      .test('isValidDate', t('admin.befristung.rules.invalidDateNotAllowed'), isValidDate)
+      .matches(DDMMYYYY, t('admin.befristung.rules.format'))
+      .test('conditionalRequired', t('admin.befristung.rules.required'), async function (value: string | undefined) {
+        const {
+          selectedRollen,
+          selectedBefristungOption,
+        }: { selectedRollen: string[]; selectedBefristungOption: string | undefined } = this.parent;
+
+        // If befristungOption is defined, befristung is not required
+        if (selectedBefristungOption !== undefined) {
+          return true;
+        }
+
+        // If no roles selected, not required
+        if (Array.isArray(selectedRollen) && selectedRollen.length === 0) {
+          return true;
+        }
+
+        const isBefristungspflichtig: boolean = await isBefristungspflichtRolle(selectedRollen);
+
+        if (isBefristungspflichtig && !value) {
+          return false; // Required but not provided
+        }
+
+        return true;
+      });
+  };
+
   const validationSchema: TypedSchema = toTypedSchema(
     object({
       selectedRollen: array()
@@ -126,16 +169,8 @@
           then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
             schema.required(t('admin.person.rules.kopersNr.required')),
         }),
-      selectedBefristung: string()
-        .test('notInPast', t('admin.befristung.rules.pastDateNotAllowed'), notInPast)
-        .test('isValidDate', t('admin.befristung.rules.invalidDateNotAllowed'), isValidDate)
-        .matches(DDMMYYYY, t('admin.befristung.rules.format'))
-        .when(['selectedRolle', 'selectedBefristungOption'], {
-          is: (selectedRolleIds: string[], selectedBefristungOption: string | undefined) =>
-            isBefristungspflichtRolle(selectedRolleIds) && selectedBefristungOption === undefined,
-          then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
-            schema.required(t('admin.befristung.rules.required')),
-        }),
+      // Use the extracted befristung validation
+      selectedBefristung: createBefristungValidation(),
     }),
   );
 
@@ -235,6 +270,22 @@
     },
     { immediate: true },
   );
+
+  // Watch the rollen and update filteredRollen based on selectedRollen... This is necessary to ensure that the filteredRollen are always in sync while the user is searching.
+  watch(rollen, (newRollen: TranslatedRolleWithAttrs[] | undefined) => {
+    // Optional: adjust this logic based on selectedRollen
+    if (!selectedRollen.value || selectedRollen.value.length === 0) {
+      filteredRollen.value = newRollen;
+    } else {
+      const selectedRollenart: RollenArt | undefined = newRollen?.find((rolle: TranslatedRolleWithAttrs) =>
+        selectedRollen.value?.includes(rolle.value),
+      )?.rollenart;
+
+      filteredRollen.value = newRollen?.filter(
+        (rolle: TranslatedRolleWithAttrs) => rolle.rollenart === selectedRollenart,
+      );
+    }
+  });
 
   // Extract the created Klassenzuordnungen from the response after submission
   const klasseZuordnungFromCreatedKontext: ComputedRef<DBiamPersonenkontextResponse[]> = computed(() => {
@@ -444,9 +495,8 @@
     navigateToCreatePersonRoute();
   };
 
-  // Computed property to check if the second radio button should be disabled
-  const isUnbefristetButtonDisabled: ComputedRef<boolean> = computed(() => {
-    return isBefristungspflichtRolle(selectedRollen.value);
+  watchEffect(async () => {
+    isUnbefristetButtonDisabled.value = await isBefristungspflichtRolle(selectedRollen.value);
   });
 
   function handleConfirmUnsavedChanges(): void {
@@ -576,7 +626,7 @@
                 befristungProps: selectedBefristungProps,
                 befristungOptionProps: selectedBefristungOptionProps,
                 isUnbefristetDisabled: isUnbefristetButtonDisabled,
-                isBefristungRequired: isBefristungspflichtRolle(selectedRollen),
+                isBefristungRequired: isUnbefristetButtonDisabled,
                 nextSchuljahresende: getNextSchuljahresende(),
                 befristung: selectedBefristung,
                 befristungOption: selectedBefristungOption,

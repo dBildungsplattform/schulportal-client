@@ -2,7 +2,9 @@ import { watch, type ComputedRef, type Ref } from 'vue';
 import { getNextSchuljahresende } from './date';
 import type { useForm } from 'vee-validate';
 import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
-import { RollenMerkmal } from '@/stores/RolleStore';
+import { RollenMerkmal, useRolleStore, type RolleStore } from '@/stores/RolleStore';
+
+const rolleStore: RolleStore = useRolleStore();
 
 export enum BefristungOption {
   SCHULJAHRESENDE = 'schuljahresende',
@@ -27,15 +29,35 @@ export type BefristungUtilsType = {
 const rollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
 
 // Checks if the selected Rolle has Befristungspflicht
-export function isBefristungspflichtRolle(selectedRolleIds: string[] | undefined): boolean {
+export async function isBefristungspflichtRolle(selectedRolleIds: string[] | undefined): Promise<boolean> {
   if (!selectedRolleIds || selectedRolleIds.length === 0) return false;
 
-  return (
-    rollen.value?.some(
-      (r: TranslatedRolleWithAttrs) =>
-        selectedRolleIds.includes(r.value) && r.merkmale?.has(RollenMerkmal.BefristungPflicht),
-    ) || false
-  );
+  const existingRollen: TranslatedRolleWithAttrs[] = rollen.value ?? [];
+
+  for (const rolleId of selectedRolleIds) {
+    let rolle: TranslatedRolleWithAttrs | undefined = existingRollen.find(
+      (r: TranslatedRolleWithAttrs) => r.value === rolleId,
+    );
+
+    // Load missing rolle
+    if (!rolle) {
+      await rolleStore.getRolleById(rolleId);
+      if (rolleStore.currentRolle) {
+        // Map currentRolle to TranslatedRolleWithAttrs
+        rolle = {
+          ...rolleStore.currentRolle,
+          value: rolleStore.currentRolle.id,
+          title: rolleStore.currentRolle.name,
+        };
+      }
+    }
+
+    if (rolle?.merkmale?.has(RollenMerkmal.BefristungPflicht)) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 /**
@@ -68,9 +90,9 @@ export function useBefristungUtils(props: {
   const setupRolleWatcher = (): void => {
     watch(
       selectedRollen,
-      (newValue: string[] | undefined) => {
+      async (newValue: string[] | undefined) => {
         if (newValue) {
-          if (isBefristungspflichtRolle(newValue)) {
+          if (await isBefristungspflichtRolle(newValue)) {
             selectedBefristungOption.value = BefristungOption.SCHULJAHRESENDE;
             calculatedBefristung.value = getNextSchuljahresende();
           } else {
