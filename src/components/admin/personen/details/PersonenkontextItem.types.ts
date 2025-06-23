@@ -8,6 +8,7 @@ export enum PendingState {
 export type Props = {
   zuordnung: Zuordnung & { klasse?: string };
   pendingState?: PendingState;
+  hidePendingLabel?: boolean;
   showUnlimitedBefristung?: boolean;
   noMargin?: boolean;
 };

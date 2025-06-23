@@ -1973,22 +1973,27 @@
                 <template v-else-if="pendingChangeBefristung">
                   <div class="d-flex flex-column">
                     <PersonenkontextItem
-                      :pendingState="selectedZuordnungen.includes(zuordnung) ? PendingState.DELETED : undefined"
+                      v-if="selectedZuordnungen.includes(zuordnung)"
+                      :pendingState="PendingState.DELETED"
+                      :zuordnung="zuordnung"
+                      :showUnlimitedBefristung="true"
+                      :hidePendingLabel="true"
+                    />
+                    <PersonenkontextItem
+                      v-else
                       :zuordnung="zuordnung"
                       :showUnlimitedBefristung="true"
                     />
-
                     <PersonenkontextItem
-                      v-if="newZuordnung"
-                      :pendingState="
+                      v-if="
                         newZuordnung &&
                         zuordnung.sskId === newZuordnung.sskId &&
                         zuordnung.rolleId === newZuordnung.rolleId
-                          ? PendingState.CREATED
-                          : undefined
                       "
+                      :pendingState="PendingState.CREATED"
                       :zuordnung="newZuordnung"
                       :showUnlimitedBefristung="true"
+                      :hidePendingLabel="true"
                     />
                   </div>
                 </template>
