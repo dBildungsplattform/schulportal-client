@@ -1,6 +1,7 @@
-import { expect, test, type Mock } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
+import { expect, test, type Mock, type MockInstance } from 'vitest';
 import PasswordOutput from './PasswordOutput.vue';
+import * as print from '@/utils/print';
 
 const writeText: Mock = vi.fn(async () => {});
 const mountComponent = (props: Record<string, unknown> = {}): VueWrapper => {
@@ -18,6 +19,9 @@ const mountComponent = (props: Record<string, unknown> = {}): VueWrapper => {
   });
 };
 
+vi.mock('@/utils/print', () => ({
+  print: vi.fn(),
+}));
 Object.assign(navigator, {
   clipboard: {
     writeText,
@@ -47,5 +51,14 @@ describe('PasswordOutput', () => {
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(navigator.clipboard.writeText).toHaveBeenCalledTimes(1);
     });
+  });
+
+  test('it calls print, when the icon is clicked', async () => {
+    const mockFunction: MockInstance = vi.spyOn(print, 'print');
+    const fakePassword: string = 'fake-password';
+    const wrapper: VueWrapper = mountComponent({ password: fakePassword, showPrintIcon: true });
+    await wrapper.find('[data-testid="print-password-icon"]').trigger('click');
+    expect(mockFunction).toHaveBeenCalledTimes(1);
+    expect(mockFunction).toHaveBeenCalledWith('admin.person.password', fakePassword);
   });
 });

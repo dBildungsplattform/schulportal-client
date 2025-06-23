@@ -223,6 +223,21 @@ describe('RolleModify', () => {
     expect(kopersInfo?.textContent).toContain('KoPers.-Nr.');
   });
 
+  test('renders the dialog when isDialogVisible is true', async () => {
+    // Find the teleported content in the document body
+    const dialogContent: Element | null = document.body.querySelector('[data-testid="rolle-modify-layout-card"]');
+    expect(dialogContent).not.toBeNull();
+
+    // Find buttons within the teleported content
+    const discardButton: Element | null = document.body.querySelector('[data-testid="rolle-modify-discard-button"]');
+    const submitButton: Element | null = document.body.querySelector('[data-testid="rolle-modify-submit-button"]');
+
+    expect(discardButton).not.toBeNull();
+    expect(submitButton).not.toBeNull();
+
+    expect(document.querySelector('[data-testid="rolle-modify-layout-card"]')).not.toBeNull();
+  });
+
   test('renders the dialog when isDialogVisible and closes it', async () => {
     const dialogContent: Element | null = document.body.querySelector('[data-testid="rolle-modify-layout-card"]');
     expect(dialogContent).not.toBeNull();

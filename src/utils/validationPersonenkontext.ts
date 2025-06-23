@@ -66,13 +66,26 @@ export function isKopersRolle(
 
 export const befristungSchema = (t: (key: string) => string): StringSchema =>
   string()
-    .test('notInPast', t('admin.befristung.rules.pastDateNotAllowed'), notInPast) // Custom rule to prevent past dates
+    .test('notInPast', t('admin.befristung.rules.pastDateNotAllowed'), notInPast)
     .test('isValidDate', t('admin.befristung.rules.invalidDateNotAllowed'), isValidDate)
-    .matches(DDMMYYYY, t('admin.befristung.rules.format')) // Ensure the date matches the DDMMYYYY format
-    .when(['selectedRolle', 'selectedBefristungOption'], {
-      is: (selectedRolleId: string, selectedBefristungOption: string | undefined) =>
-        isBefristungspflichtRolle([selectedRolleId]) && selectedBefristungOption === undefined, // Conditional required
-      then: (schema: Schema) => schema.required(t('admin.befristung.rules.required')),
+    .matches(DDMMYYYY, t('admin.befristung.rules.format'))
+    .test('conditionalRequired', t('admin.befristung.rules.required'), async function (value: string | undefined) {
+      const {
+        selectedRolle,
+        selectedBefristungOption,
+      }: { selectedRolle: string | undefined; selectedBefristungOption: string | undefined } = this.parent;
+
+      if (!selectedRolle || selectedBefristungOption !== undefined) {
+        return true; // Not required in this case
+      }
+
+      const isBefristungspflichtig: boolean = await isBefristungspflichtRolle([selectedRolle]);
+
+      if (isBefristungspflichtig && !value) {
+        return false; // Required but not provided
+      }
+
+      return true;
     });
 
 // Define the validation schema for Personenkontext form fields
