@@ -407,6 +407,8 @@
       // If no editable Zuordnungen are left, navigate to person table after the dialog is closed
       closeDeleteSuccessDialog = (): void => {
         deleteSuccessDialogVisible.value = false;
+        isEditActive.value = false;
+        pendingDeletion.value = false;
         navigateToPersonTable();
       };
     }
