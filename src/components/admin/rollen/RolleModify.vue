@@ -13,7 +13,7 @@
   import { befristungSchema, isKopersRolle } from '@/utils/validationPersonenkontext';
   import { toTypedSchema } from '@vee-validate/yup';
   import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
-  import { computed, ref, type ComputedRef, type Ref } from 'vue';
+  import { computed, ref, watchEffect, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
   import { object, string } from 'yup';
@@ -45,6 +45,7 @@
   const showModifyRolleDialog: Ref<boolean> = ref(props.isDialogVisible);
   const showErrorDialog: Ref<boolean, boolean> = ref(false);
   const calculatedBefristung: Ref<string | undefined> = ref('');
+  const isBefristungRequired: Ref<boolean, boolean> = ref(false);
 
   const successMessage: ComputedRef<string> = computed(() =>
     bulkOperationStore.currentOperation?.successMessage ? t(bulkOperationStore.currentOperation.successMessage) : '',
@@ -112,8 +113,12 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = formContext.defineField('selectedBefristungOption', getVuetifyConfig);
 
-  const isBefristungRequired: ComputedRef<boolean> = computed(() => {
-    return selectedRolle.value ? isBefristungspflichtRolle([selectedRolle.value]) : false;
+  watchEffect(async () => {
+    if (selectedRolle.value) {
+      isBefristungRequired.value = await isBefristungspflichtRolle([selectedRolle.value]);
+    } else {
+      isBefristungRequired.value = false;
+    }
   });
 
   const {
