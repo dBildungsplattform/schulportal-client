@@ -37,6 +37,9 @@
   const personStore: PersonStore = usePersonStore();
 
   const showErrorDialog: Ref<boolean, boolean> = ref(false);
+  const showConfirmationDialog: Ref<boolean, boolean> = ref(false);
+
+  const hasConfirmed: Ref<boolean, boolean> = ref(false);
 
   // Define the error list for the selected persons using the useBulkErrors composable
   const bulkErrorList: ComputedRef<BulkErrorList[]> = computed(() => useBulkErrors(t, props.selectedPersonen));
@@ -92,6 +95,15 @@
     bulkOperationStore.resetState();
     personStore.errorCode = '';
     emit('update:dialogExit', finished);
+  }
+
+  async function openConfirmationDialog(): Promise<void> {
+    showConfirmationDialog.value = true;
+  }
+
+  async function closeConfirmationDialog(): Promise<void> {
+    showConfirmationDialog.value = false;
+    hasConfirmed.value = true;
   }
 
   async function handleResetPassword(): Promise<void> {
@@ -179,12 +191,17 @@
             ></v-icon>
           </v-col>
         </v-row>
-        <p
-          class="mt-2 text-center"
+        <div
+          class="mt-2 px-md-16 bold text-body text-center"
           data-testid="password-reset-success-text"
         >
-          {{ t('admin.person.bulk.bulkPasswordReset.success') }}
-        </p>
+          <p>
+            {{ t('admin.person.bulk.bulkPasswordReset.success') }}
+          </p>
+          <p class="mt-4">
+            {{ t('admin.person.bulk.bulkPasswordReset.info') }}
+          </p>
+        </div>
       </v-container>
 
       <v-card-actions class="justify-center">
@@ -198,7 +215,7 @@
               v-if="progressState === State.FINISHED"
               :block="mdAndDown"
               class="secondary"
-              @click="closePasswordResetDialog(true)"
+              @click="hasConfirmed ? closePasswordResetDialog(true) : openConfirmationDialog()"
               data-testid="password-reset-close-button"
             >
               {{ t('close') }}
@@ -261,4 +278,35 @@
       :errors="bulkErrorList"
     />
   </template>
+
+  <!-- Confirmation Dialog -->
+  <v-dialog
+    :width="'80%'"
+    v-model="showConfirmationDialog"
+  >
+    <LayoutCard
+      data-testid="password-reset-download-confirmation-layout-card"
+      :header="t('admin.person.resetPassword')"
+    >
+      <v-container class="px-md-16">
+        <v-row class="text-body bold">
+          <v-col>
+            <span data-testid="password-reset-download-confirmation-text">
+              {{ t('admin.person.bulk.bulkPasswordReset.downloadConfirmation') }}
+            </span>
+          </v-col>
+        </v-row>
+      </v-container>
+      <v-card-actions class="justify-center">
+        <v-btn
+          :block="mdAndDown"
+          class="primary"
+          @click="closeConfirmationDialog()"
+          data-testid="password-reset-download-confirmation-button"
+        >
+          {{ t('ok') }}
+        </v-btn>
+      </v-card-actions>
+    </LayoutCard>
+  </v-dialog>
 </template>

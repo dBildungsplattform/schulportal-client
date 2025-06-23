@@ -3040,11 +3040,10 @@
             >
               <v-btn
                 :block="mdAndDown"
-                class="primary"
-                data-testid="confirm-change-klasse-button"
-                @click.stop="confirmDialogChangeKlasse"
+                class="secondary"
+                @click.stop="cancelChangeKlasse"
               >
-                {{ t('yes') }}
+                {{ t('no') }}
               </v-btn>
             </v-col>
             <v-col
@@ -3054,10 +3053,11 @@
             >
               <v-btn
                 :block="mdAndDown"
-                class="secondary"
-                @click.stop="cancelChangeKlasse"
+                class="primary"
+                data-testid="confirm-change-klasse-button"
+                @click.stop="confirmDialogChangeKlasse"
               >
-                {{ t('no') }}
+                {{ t('yes') }}
               </v-btn>
             </v-col>
           </v-row>
