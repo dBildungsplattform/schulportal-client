@@ -79,7 +79,7 @@
   enum CreationType {
     Limited = 'limited',
     Full = 'full',
-    AddToOwnSchule = 'add-to-own-schule',
+    AddPersonToOwnSchule = 'add-person-to-own-schule',
   }
 
   let createType: CreationType;
@@ -541,6 +541,11 @@
       limit: 25,
     });
 
+if (createType === CreationType.AddPersonToOwnSchule) {
+  filteredRollen.value = rollen.value?.filter(
+    (rolle: TranslatedRolleWithAttrs) => rolle.rollenart === RollenArt.Lehr,
+  );
+}
     personStore.errorCode = '';
     personenkontextStore.createdPersonWithKontext = null;
 

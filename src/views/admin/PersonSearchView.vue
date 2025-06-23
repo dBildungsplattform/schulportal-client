@@ -335,7 +335,7 @@
       formContext.resetForm();
     } else {
       personStore.errorCode = '';
-      await router.push({ name: 'add-person-to-schule' });
+      await router.push({ name: 'add-person-to-own-schule' });
     }
   }
 
