@@ -68,6 +68,7 @@
   enum CreationType {
     Limited = 'limited',
     Full = 'full',
+    AddToOwnSchule = 'add-to-own-schule',
   }
 
   let createType: CreationType;
@@ -489,6 +490,7 @@
       operationContext: OperationContext.PERSON_ANLEGEN,
       limit: 25,
     });
+
     personStore.errorCode = '';
     personenkontextStore.createdPersonWithKontext = null;
 

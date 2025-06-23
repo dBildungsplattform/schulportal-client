@@ -321,6 +321,24 @@
     }
   }
 
+  async function navigateToPersonTable(): Promise<void> {
+    if (personStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
+      formContext.resetForm();
+    } else {
+      personStore.allLandesbedienstetePersonen = [];
+    }
+    await router.push({ name: 'person-management' });
+  }
+
+  async function navigateToPersonCreationForm(): Promise<void> {
+    if (personStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
+      formContext.resetForm();
+    } else {
+      personStore.errorCode = '';
+      await router.push({ name: 'add-person-to-schule' });
+    }
+  }
+
   function handleConfirmUnsavedChanges(): void {
     blockedNext();
     personStore.errorCode = '';
@@ -377,7 +395,7 @@
         :hideNotice="true"
         id="person-search-form"
         :isLoading="personStore.loading"
-        :onDiscard="() => router.go(0)"
+        :onDiscard="navigateToPersonTable"
         @onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
         :onSubmit="onSubmit"
         :showUnsavedChangesDialog="showUnsavedChangesDialog"
@@ -690,6 +708,36 @@
             </v-col>
           </v-row>
         </LayoutCard>
+        <v-row class="justify-end pr-2 pl-2">
+          <v-col
+            cols="12"
+            sm="6"
+            md="auto"
+          >
+            <v-btn
+              @click.stop="navigateToPersonTable"
+              class="secondary button"
+              data-testid="confirm-unsaved-changes-button"
+              :block="mdAndDown"
+            >
+              {{ $t('cancel') }}
+            </v-btn>
+          </v-col>
+          <v-col
+            cols="12"
+            sm="6"
+            md="auto"
+          >
+            <v-btn
+              @click.stop="navigateToPersonCreationForm"
+              class="primary button"
+              data-testid="close-unsaved-changes-dialog-button"
+              :block="mdAndDown"
+            >
+              {{ $t('admin.person.stateEmployeeSearch.addPerson') }}
+            </v-btn>
+          </v-col>
+        </v-row>
       </template>
     </LayoutCard>
     <v-dialog
