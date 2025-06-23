@@ -751,7 +751,10 @@
           </v-row>
           <v-row class="align-center">
             <v-col class="text-body bold text-right pb-8">{{ $t('admin.person.startPassword') }}: </v-col>
-            <v-col class="text-body">
+            <v-col class="text-body bold">
+              <p class="mb-4">
+                {{ t('admin.person.startPasswordInfo') }}
+              </p>
               <PasswordOutput
                 :password="personenkontextStore.createdPersonWithKontext.person.startpasswort"
               ></PasswordOutput>

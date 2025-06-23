@@ -369,6 +369,7 @@
       },
       "showAll": "Alle Benutzer anzeigen",
       "startPassword": "Einstiegs-Passwort",
+      "startPasswordInfo": "Bitte teilen Sie dem Benutzer das Einstiegs-Passwort mit. Nach dem Schließen des Dialogs wird es aus Sicherheitsgründen nicht mehr angezeigt.",
       "status": "Status"
     },
     "personenkontext": {
