@@ -35,7 +35,7 @@
     type PersonenkontextUpdate,
     type PersonenkontextWorkflowResponse,
   } from '@/stores/PersonenkontextStore';
-  import { RollenArt, RollenMerkmal } from '@/stores/RolleStore';
+  import { RollenArt, RollenMerkmal, useRolleStore, type RolleStore } from '@/stores/RolleStore';
   import {
     TokenKind,
     useTwoFactorAuthentificationStore,
@@ -59,7 +59,17 @@
   } from '@/utils/validationPersonenkontext';
   import { toTypedSchema } from '@vee-validate/yup';
   import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
-  import { computed, onBeforeMount, onMounted, onUnmounted, ref, watch, type ComputedRef, type Ref } from 'vue';
+  import {
+    computed,
+    onBeforeMount,
+    onMounted,
+    onUnmounted,
+    ref,
+    watch,
+    watchEffect,
+    type ComputedRef,
+    type Ref,
+  } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import {
     onBeforeRouteLeave,
@@ -90,6 +100,7 @@
   const organisationStore: OrganisationStore = useOrganisationStore();
   const twoFactorAuthentificationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
   const configStore: ConfigStore = useConfigStore();
+  const rolleStore: RolleStore = useRolleStore();
 
   const devicePassword: Ref<string> = ref('');
   const password: Ref<string> = ref('');
@@ -101,6 +112,10 @@
   const finalZuordnungen: Ref<Zuordnung[]> = ref<Zuordnung[]>([]);
   const originalZuordnungenResult: Ref<Zuordnung[] | undefined> = ref(undefined);
   const hasKlassenZuordnung: Ref<boolean | undefined> = ref(false);
+  const isUnbefristetDisabled: Ref<boolean, boolean> = ref(false);
+  const isBefristungRequired: Ref<boolean, boolean> = ref(false);
+  // Check if the button to change the Klasse should be active or not. Activate only if there is 1 selected Zuordnung and if it is of type LERN.
+  const isLernRolleForChangeKlasseResult: Ref<boolean> = ref(false);
 
   const isEditActive: Ref<boolean> = ref(false);
   const isZuordnungFormActive: Ref<boolean> = ref(false);
@@ -540,6 +555,12 @@
     return !!rolle && rolle.rollenart === RollenArt.Lern;
   }
 
+  async function isLernRolleForChangeKlasse(selectedRolleId: string): Promise<boolean> {
+    await rolleStore.getRolleById(selectedRolleId);
+
+    return !!rolleStore.currentRolle && rolleStore.currentRolle.rollenart === RollenArt.Lern;
+  }
+
   const hasKopersNummer: ComputedRef<boolean> = computed(() => {
     return !!personStore.currentPerson?.person.personalnummer;
   });
@@ -562,17 +583,21 @@
     );
   });
 
-  // Check if the button to change the Klasse should be active or not. Activate only if there is 1 selected Zuordnung and if it is of type LERN.
+  watch(
+    () => selectedZuordnungen.value[0]?.rolleId,
+    async (rolleId: string | undefined) => {
+      if (rolleId) {
+        isLernRolleForChangeKlasseResult.value = await isLernRolleForChangeKlasse(rolleId);
+      } else {
+        isLernRolleForChangeKlasseResult.value = false;
+      }
+    },
+    { immediate: true },
+  );
+
   const canChangeKlasse: ComputedRef<boolean> = computed(() => {
     const hasOneSelectedZuordnung: boolean = selectedZuordnungen.value.length === 1;
-
-    const rolleId: string | undefined = selectedZuordnungen.value[0]?.rolleId;
-
-    // Check if rolleId exists and if it's of type LERN
-    if (rolleId && isLernRolle(rolleId) && hasOneSelectedZuordnung) {
-      return true;
-    }
-    return false;
+    return !!selectedZuordnungen.value[0]?.rolleId && isLernRolleForChangeKlasseResult.value && hasOneSelectedZuordnung;
   });
 
   watch(
@@ -1386,9 +1411,22 @@
     return false;
   });
 
-  // Computed property to check if the second radio button should be disabled
-  const isUnbefristetButtonDisabled: ComputedRef<boolean> = computed(() => {
-    return isBefristungspflichtRolle([selectedRolle.value as string]);
+  // For changeBefristungRolle
+  watchEffect(async () => {
+    if (changeBefristungRolle.value) {
+      const result: boolean = await isBefristungspflichtRolle([changeBefristungRolle.value]);
+      isUnbefristetDisabled.value = result;
+      isBefristungRequired.value = result;
+    }
+  });
+
+  // For selectedRolle
+  watchEffect(async () => {
+    if (selectedRolle.value) {
+      const result: boolean = await isBefristungspflichtRolle([selectedRolle.value]);
+      isUnbefristetDisabled.value = result;
+      isBefristungRequired.value = result;
+    }
   });
 
   const intersectingOrganisations: ComputedRef<Set<Organisation>> = computed(() => {
@@ -2301,8 +2339,8 @@
                   :befristungInputProps="{
                     befristungProps: selectedBefristungProps,
                     befristungOptionProps: selectedBefristungOptionProps,
-                    isUnbefristetDisabled: isUnbefristetButtonDisabled,
-                    isBefristungRequired: isBefristungspflichtRolle([selectedRolle as string]),
+                    isUnbefristetDisabled: isUnbefristetDisabled,
+                    isBefristungRequired: isBefristungRequired,
                     nextSchuljahresende: getNextSchuljahresende(),
                     befristung: selectedBefristung,
                     befristungOption: selectedBefristungOption,
@@ -2438,8 +2476,8 @@
                 ref="befristung-input-wrapper"
                 :befristungProps="selectedChangeBefristungProps"
                 :befristungOptionProps="selectedChangeBefristungOptionProps"
-                :isUnbefristetDisabled="isBefristungspflichtRolle([changeBefristungRolle as string])"
-                :isBefristungRequired="isBefristungspflichtRolle([changeBefristungRolle as string])"
+                :isUnbefristetDisabled="isUnbefristetDisabled"
+                :isBefristungRequired="isBefristungRequired"
                 :nextSchuljahresende="getNextSchuljahresende()"
                 :befristung="selectedChangeBefristung"
                 :befristungOption="selectedChangeBefristungOption"

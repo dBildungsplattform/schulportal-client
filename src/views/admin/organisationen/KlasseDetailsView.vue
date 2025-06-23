@@ -258,6 +258,7 @@
                         :isLoading="organisationStore.loading"
                         :useIconActivator="false"
                         @onDeleteKlasse="deleteKlasseById(currentKlasseId)"
+                        @onClose="navigateToKlasseManagement()"
                       >
                       </KlasseDelete>
                     </div>

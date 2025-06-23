@@ -10,6 +10,7 @@
   import { RollenArt } from '@/stores/RolleStore';
   import type { Zuordnung } from '@/stores/types/Zuordnung';
   import { type TranslatedObject } from '@/types.d';
+  import { sameContent } from '@/utils/arrays';
   import type { BaseFieldProps } from 'vee-validate';
   import { computed, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n } from 'vue-i18n';
@@ -73,6 +74,13 @@
   // Computed property to get the title of the selected organisation
   const selectedOrganisationTitle: ComputedRef<string | undefined> = computed(() => {
     return props.organisationen?.find((org: TranslatedObject) => org.value === selectedOrganisation.value)?.title;
+  });
+
+  const selectedRolleTitles: ComputedRef<string[]> = computed(() => {
+    if (!Array.isArray(selectedRollen.value)) return [];
+    return selectedRollen.value
+      .map((id: string) => props.rollen?.find((rolle: TranslatedObject) => rolle.value === id)?.title)
+      .filter((title: string | undefined): title is string => !!title);
   });
 
   // Computed property to get the title of the selected role
@@ -226,27 +234,32 @@
 
   watch(
     props.allowMultipleRollen ? searchInputRollen : searchInputRolle,
-    async (newValue: string, oldValue: string) => {
+    async (newValue: string | string[], oldValue: string | string[]) => {
+
       clearTimeout(timerId.value);
-      // If the oldValue (What has been in the searchValue beforing losing focus) is equal to the selected Rolle.title then do nothing
-      if (oldValue === selectedRolleTitle.value) return;
-      // If searchValue is empty, fetch all roles for the organisationId
-      if (newValue === '' && !selectedRolle.value) {
+
+      // When the autocompletes loses focus we stop an extra request from being made by checking if the newValue is equal to the oldValue
+      const isEqual: boolean = props.allowMultipleRollen
+        ? Array.isArray(newValue) && sameContent(newValue, selectedRolleTitles.value)
+        : oldValue === selectedRolleTitle.value;
+
+      if (isEqual) return;
+
+      if (!newValue || (Array.isArray(newValue) && newValue.length === 0)) {
         timerId.value = setTimeout(() => {
           personenkontextStore.processWorkflowStep({
             operationContext: props.operationContext,
             organisationId: selectedOrganisation.value,
+            rollenIds: selectedRollen.value,
             limit: 25,
           });
         }, 500);
-        // Else fetch the Rollen that correspond to the orgaId
-        // (This stops an extra request being made once a value is selected since we check if model !== searchValue)
-      } else if (newValue && newValue !== selectedRolleTitle.value) {
+      } else {
         timerId.value = setTimeout(() => {
           personenkontextStore.processWorkflowStep({
             operationContext: props.operationContext,
             organisationId: selectedOrganisation.value,
-            rolleName: newValue,
+            rolleName: Array.isArray(newValue) ? '' : newValue,
             rollenIds: selectedRollen.value,
             limit: 25,
           });
@@ -377,7 +390,7 @@
           variant="outlined"
           v-bind="selectedRollenProps"
           v-model="selectedRollen"
-          v-model:search="searchInputRolle"
+          v-model:search="searchInputRollen"
         ></v-autocomplete>
         <v-autocomplete
           v-else-if="!allowMultipleRollen"
