@@ -1,14 +1,16 @@
 <script setup lang="ts">
   import { ref, type Ref } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
+  import { print } from '@/utils/print';
 
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
 
   type Props = {
     password: string;
+    showPrintIcon?: boolean;
   };
 
-  defineProps<Props>();
+  const props: Props = defineProps<Props>();
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const copyToClipboardError: Ref<string> = ref('');
@@ -27,6 +29,9 @@
         copyToClipboardError.value = t('admin.person.copyPasswordError');
       },
     );
+  }
+  function printPassword(): void {
+    print(t('admin.person.password'), props.password);
   }
 </script>
 
@@ -73,6 +78,22 @@
           @keyup.space="copyToClipboard(password)"
           data-testid="copy-password-icon"
           icon="mdi-content-copy"
+          tabindex="0"
+        ></v-icon>
+      </SpshTooltip>
+      <SpshTooltip
+        v-if="props.showPrintIcon"
+        :enabledCondition="true"
+        :disabledText="$t('admin.person.printPassword')"
+        :enabledText="$t('admin.person.printPassword')"
+        position="start"
+      >
+        <v-icon
+          @click.stop="printPassword()"
+          @keyup.enter="printPassword()"
+          @keyup.space="printPassword()"
+          data-testid="print-password-icon"
+          icon="mdi-printer-outline"
           tabindex="0"
         ></v-icon>
       </SpshTooltip>

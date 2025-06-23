@@ -756,6 +756,7 @@
                 {{ t('admin.person.startPasswordInfo') }}
               </p>
               <PasswordOutput
+                :showPrintIcon="true"
                 :password="personenkontextStore.createdPersonWithKontext.person.startpasswort"
               ></PasswordOutput>
             </v-col>
