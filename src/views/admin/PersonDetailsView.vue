@@ -1959,14 +1959,12 @@
                     />
 
                     <PersonenkontextItem
-                      v-if="newZuordnung"
-                      :pendingState="
+                      v-if="
                         newZuordnung &&
                         zuordnung.sskId === newZuordnung.sskId &&
                         zuordnung.rolleId === newZuordnung.rolleId
-                          ? PendingState.CREATED
-                          : undefined
                       "
+                      :pendingState="PendingState.CREATED"
                       :zuordnung="newZuordnung"
                     />
                   </div>
