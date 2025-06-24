@@ -799,7 +799,7 @@
               }}</span></v-col
             >
           </v-row>
-          <v-row class="align-center">
+          <v-row>
             <v-col class="text-body bold text-right pb-8">{{ $t('admin.person.startPassword') }}: </v-col>
             <v-col class="text-body bold">
               <p class="mb-4">

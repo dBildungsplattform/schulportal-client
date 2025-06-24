@@ -95,6 +95,7 @@
           data-testid="print-password-icon"
           icon="mdi-printer-outline"
           tabindex="0"
+          class="ml-1"
         ></v-icon>
       </SpshTooltip>
     </template>
