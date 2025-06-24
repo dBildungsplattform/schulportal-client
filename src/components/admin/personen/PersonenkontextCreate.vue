@@ -235,7 +235,6 @@
   watch(
     props.allowMultipleRollen ? searchInputRollen : searchInputRolle,
     async (newValue: string | string[], oldValue: string | string[]) => {
-
       clearTimeout(timerId.value);
 
       // When the autocompletes loses focus we stop an extra request from being made by checking if the newValue is equal to the oldValue
