@@ -16,7 +16,7 @@
     type DBiamPersonenkontextResponse,
     type PersonenkontextStore,
   } from '@/stores/PersonenkontextStore';
-  import { usePersonStore, type CreatePersonBodyParams, type PersonStore } from '@/stores/PersonStore';
+  import { usePersonStore, type CreatePersonBodyParams, type PersonLandesbediensteterSearchResponse, type PersonStore } from '@/stores/PersonStore';
   import { RollenArt, RollenSystemRecht } from '@/stores/RolleStore';
   import { type TranslatedObject } from '@/types.d';
   import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
@@ -82,6 +82,7 @@
     AddPersonToOwnSchule = 'add-person-to-own-schule',
   }
 
+  // Determine the creation type based on the route meta in routes.ts
   let createType: CreationType;
   const metaCreateType: string = route.meta['createType'] as string;
   if (metaCreateType && Object.values(CreationType).includes(metaCreateType as CreationType)) {
@@ -274,17 +275,41 @@
 
   // Watch the rollen and update filteredRollen based on selectedRollen... This is necessary to ensure that the filteredRollen are always in sync while the user is searching.
   watch(rollen, (newRollen: TranslatedRolleWithAttrs[] | undefined) => {
-    // Optional: adjust this logic based on selectedRollen
+    if (!newRollen) {
+      filteredRollen.value = [];
+      return;
+    }
+
+    // AddPersonToOwnSchule: only show Lehr roles for that createType
+    if (createType === CreationType.AddPersonToOwnSchule) {
+      filteredRollen.value = newRollen.filter((rolle: TranslatedRolleWithAttrs) => rolle.rollenart === RollenArt.Lehr);
+      return;
+    }
+
+    // Regular filtering based on selectedRollen
     if (!selectedRollen.value || selectedRollen.value.length === 0) {
       filteredRollen.value = newRollen;
     } else {
-      const selectedRollenart: RollenArt | undefined = newRollen?.find((rolle: TranslatedRolleWithAttrs) =>
+      const selectedRollenart: RollenArt | undefined = newRollen.find((rolle: TranslatedRolleWithAttrs) =>
         selectedRollen.value?.includes(rolle.value),
       )?.rollenart;
 
-      filteredRollen.value = newRollen?.filter(
+      filteredRollen.value = newRollen.filter(
         (rolle: TranslatedRolleWithAttrs) => rolle.rollenart === selectedRollenart,
       );
+    }
+  });
+
+  // This will auto-fill the fields with the Landesbediensteter found in the personStore when the createType is AddPersonToOwnSchule
+  watchEffect(() => {
+    if (createType === CreationType.AddPersonToOwnSchule) {
+      const person: PersonLandesbediensteterSearchResponse | undefined = personStore.allLandesbedienstetePersonen?.[0];
+
+      if (person) {
+        selectedVorname.value = person.vorname;
+        selectedFamilienname.value = person.familienname;
+        selectedKopersNr.value = person.personalnummer;
+      }
     }
   });
 
@@ -541,11 +566,6 @@
       limit: 25,
     });
 
-if (createType === CreationType.AddPersonToOwnSchule) {
-  filteredRollen.value = rollen.value?.filter(
-    (rolle: TranslatedRolleWithAttrs) => rolle.rollenart === RollenArt.Lehr,
-  );
-}
     personStore.errorCode = '';
     personenkontextStore.createdPersonWithKontext = null;
 
@@ -622,6 +642,7 @@ if (createType === CreationType.AddPersonToOwnSchule) {
             <PersonenkontextCreate
               :operationContext="OperationContext.PERSON_ANLEGEN"
               :allowMultipleRollen="true"
+              :createType="createType"
               :showHeadline="true"
               :organisationen="organisationen"
               ref="personenkontext-create"
@@ -661,6 +682,7 @@ if (createType === CreationType.AddPersonToOwnSchule) {
                   clearable
                   data-testid="vorname-input"
                   density="compact"
+                  :disabled="createType === CreationType.AddPersonToOwnSchule"
                   id="vorname-input"
                   ref="vorname-input"
                   :placeholder="$t('person.enterFirstName')"
@@ -682,6 +704,7 @@ if (createType === CreationType.AddPersonToOwnSchule) {
                   clearable
                   data-testid="familienname-input"
                   density="compact"
+                  :disabled="createType === CreationType.AddPersonToOwnSchule"
                   id="familienname-input"
                   ref="familienname-input"
                   :placeholder="$t('person.enterLastName')"
@@ -693,6 +716,7 @@ if (createType === CreationType.AddPersonToOwnSchule) {
               </FormRow>
               <KopersInput
                 v-if="isKopersRolle(selectedRollen, filteredRollen) && selectedOrganisation"
+                :isDisabled="createType === CreationType.AddPersonToOwnSchule"
                 :hasNoKopersNr="hasNoKopersNr"
                 v-model:selectedKopersNr="selectedKopersNr"
                 ref="kopers-input"

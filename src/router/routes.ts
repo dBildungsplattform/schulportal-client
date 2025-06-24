@@ -75,7 +75,7 @@ const routes: readonly RouteRecordRaw[] = [
       requiresAuth: true,
       requiredStepUpLevel: StepUpLevel.GOLD,
       requiresPermission: ['personenverwaltung', 'landesbedienstetesuchenundhinzufügen'],
-      createType: 'add-to-own-schule',
+      createType: 'add-person-to-own-schule',
     },
   },
   {
