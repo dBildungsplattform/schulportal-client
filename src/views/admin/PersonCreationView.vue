@@ -503,15 +503,11 @@
       befristung: formattedBefristung,
     };
 
-      await personenkontextStore.commitLandesbediensteteKontext(
-        personId,
-        [newKontext],
-        existingPerson?.personalnummer!,
-      );
-      formContext.resetForm();
-      filteredRollen.value = [];
-      selectedOrgaCache.value = selectedOrganisation.value;
-      selectedRolleCache.value = selectedRollen.value;
+    await personenkontextStore.commitLandesbediensteteKontext(personId, [newKontext], existingPerson?.personalnummer!);
+    formContext.resetForm();
+    filteredRollen.value = [];
+    selectedOrgaCache.value = selectedOrganisation.value;
+    selectedRolleCache.value = selectedRollen.value;
   }
 
   watch(hasNoKopersNr, async (newValue: boolean | undefined) => {
