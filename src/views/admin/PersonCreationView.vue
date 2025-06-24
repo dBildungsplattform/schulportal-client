@@ -15,8 +15,14 @@
     type DbiamCreatePersonenkontextBodyParams,
     type DBiamPersonenkontextResponse,
     type PersonenkontextStore,
+    type PersonenkontextUpdate,
   } from '@/stores/PersonenkontextStore';
-  import { usePersonStore, type CreatePersonBodyParams, type PersonLandesbediensteterSearchResponse, type PersonStore } from '@/stores/PersonStore';
+  import {
+    usePersonStore,
+    type CreatePersonBodyParams,
+    type PersonLandesbediensteterSearchResponse,
+    type PersonStore,
+  } from '@/stores/PersonStore';
   import { RollenArt, RollenSystemRecht } from '@/stores/RolleStore';
   import { type TranslatedObject } from '@/types.d';
   import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
@@ -476,14 +482,50 @@
     filteredRollen.value = [];
   }
 
+  async function addPersonToOwnSchule(): Promise<void> {
+    // Only adding Kontext to existing person
+    const existingPerson: PersonLandesbediensteterSearchResponse | undefined =
+      personStore.allLandesbedienstetePersonen?.[0];
+    const personId: string | undefined = existingPerson?.id;
+
+    if (!personId) {
+      return;
+    }
+    // Get latest person data
+    await personStore.getPersonenuebersichtById(personId);
+
+    const befristungDate: string | undefined = selectedBefristung.value || calculatedBefristung.value;
+    const formattedBefristung: string | undefined = befristungDate ? formatDateToISO(befristungDate) : undefined;
+
+    const newKontext: PersonenkontextUpdate = {
+      organisationId: selectedOrganisation.value as string,
+      rolleId: selectedRollen.value?.[0] as string,
+      befristung: formattedBefristung,
+    };
+
+      await personenkontextStore.commitLandesbediensteteKontext(
+        personId,
+        [newKontext],
+        existingPerson?.personalnummer!,
+      );
+      formContext.resetForm();
+      filteredRollen.value = [];
+      selectedOrgaCache.value = selectedOrganisation.value;
+      selectedRolleCache.value = selectedRollen.value;
+  }
+
   watch(hasNoKopersNr, async (newValue: boolean | undefined) => {
     if (newValue) {
       showNoKopersNrConfirmationDialog.value = true;
     }
   });
 
-  const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = formContext.handleSubmit(() => {
-    createPerson();
+  const onSubmit: (e?: Event) => Promise<Promise<void> | undefined> = formContext.handleSubmit(async () => {
+    if (createType === CreationType.AddPersonToOwnSchule) {
+      await addPersonToOwnSchule();
+    } else {
+      await createPerson();
+    }
   });
 
   function navigateToCreatePersonRoute(reload: boolean = false): void | Promise<void> {
