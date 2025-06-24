@@ -6,9 +6,9 @@ import * as fileUtils from '@/utils/file';
 
 let wrapper: VueWrapper | null = null;
 
-const errorsMock: { vorname: string; nachname: string; error: string }[] = [
-  { vorname: 'John', nachname: 'Doe', error: 'Invalid email' },
-  { vorname: 'Jane', nachname: 'Smith', error: 'Missing field' },
+const errorsMock: { vorname: string; nachname: string; username: string; error: string }[] = [
+  { vorname: 'John', nachname: 'Doe', username: 'jdoe', error: 'Invalid email' },
+  { vorname: 'Jane', nachname: 'Smith', username: 'jsmith', error: 'Missing field' },
 ];
 
 beforeEach(() => {
