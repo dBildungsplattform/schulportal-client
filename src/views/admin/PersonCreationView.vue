@@ -587,7 +587,7 @@
   });
 
   onBeforeMount(() => {
-    if (createType === CreationType.Limited) {
+    if (createType === CreationType.Limited || createType === CreationType.AddPersonToOwnSchule) {
       headerLabel.value = t('admin.person.stateEmployeeSearch.addPerson');
       createButtonLabel.value = t('admin.person.stateEmployeeSearch.addPerson');
       discardButtonLabel.value = t('cancel');
