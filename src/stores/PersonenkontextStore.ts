@@ -51,6 +51,7 @@ export type PersonenkontextUpdate = Pick<DbiamPersonenkontextBodyParams, 'organi
 
 export type WorkflowFilter = {
   operationContext: OperationContext;
+  personId?: string;
   organisationId?: string;
   rollenIds?: string[];
   rolleName?: string;
@@ -160,6 +161,7 @@ export const usePersonenkontextStore: StoreDefinition<
         const { data }: { data: PersonenkontextWorkflowResponse } =
           await personenKontextApi.dbiamPersonenkontextWorkflowControllerProcessStep(
             filter.operationContext,
+            filter.personId,
             filter.organisationId,
             filter.rollenIds,
             filter.rolleName,

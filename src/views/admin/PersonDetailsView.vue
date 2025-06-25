@@ -355,7 +355,11 @@
 
   // Triggers the template to add a new Zuordnung
   const triggerAddZuordnung = async (): Promise<void> => {
-    await personenkontextStore.processWorkflowStep({ operationContext: OperationContext.PERSON_BEARBEITEN, limit: 25 });
+    await personenkontextStore.processWorkflowStep({
+      personId: currentPersonId,
+      operationContext: OperationContext.PERSON_BEARBEITEN,
+      limit: 25,
+    });
     isZuordnungFormActive.value = true;
   };
 
@@ -601,6 +605,7 @@
 
         // Trigger the API call
         personenkontextStore.processWorkflowStep({
+          personId: currentPersonId,
           operationContext: OperationContext.PERSON_BEARBEITEN,
           organisationId,
           rollenIds,
@@ -1496,6 +1501,7 @@
     const personByIdPromise: Promise<Personendatensatz> = personStore.getPersonById(currentPersonId);
     const personUebersichtPromise: Promise<void> = personStore.getPersonenuebersichtById(currentPersonId);
     const workflowStepPromise: Promise<PersonenkontextWorkflowResponse> = personenkontextStore.processWorkflowStep({
+      personId: currentPersonId,
       operationContext: OperationContext.PERSON_BEARBEITEN,
       limit: 25,
     });
@@ -2204,6 +2210,7 @@
               <v-container class="px-lg-16">
                 <!-- Organisation, Rolle, Klasse zuordnen -->
                 <PersonenkontextCreate
+                  :personId="currentPersonId"
                   :operationContext="OperationContext.PERSON_BEARBEITEN"
                   :allowMultipleRollen="false"
                   :showHeadline="false"
