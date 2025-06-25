@@ -279,46 +279,6 @@
     { immediate: true },
   );
 
-  // Watch the rollen and update filteredRollen based on selectedRollen... This is necessary to ensure that the filteredRollen are always in sync while the user is searching.
-  watch(rollen, (newRollen: TranslatedRolleWithAttrs[] | undefined) => {
-    if (!newRollen) {
-      filteredRollen.value = [];
-      return;
-    }
-
-    // AddPersonToOwnSchule: only show Lehr roles for that createType
-    if (createType === CreationType.AddPersonToOwnSchule) {
-      filteredRollen.value = newRollen.filter((rolle: TranslatedRolleWithAttrs) => rolle.rollenart === RollenArt.Lehr);
-      return;
-    }
-
-    // Regular filtering based on selectedRollen
-    if (!selectedRollen.value || selectedRollen.value.length === 0) {
-      filteredRollen.value = newRollen;
-    } else {
-      const selectedRollenart: RollenArt | undefined = newRollen.find((rolle: TranslatedRolleWithAttrs) =>
-        selectedRollen.value?.includes(rolle.value),
-      )?.rollenart;
-
-      filteredRollen.value = newRollen.filter(
-        (rolle: TranslatedRolleWithAttrs) => rolle.rollenart === selectedRollenart,
-      );
-    }
-  });
-
-  // This will auto-fill the fields with the Landesbediensteter found in the personStore when the createType is AddPersonToOwnSchule
-  watchEffect(() => {
-    if (createType === CreationType.AddPersonToOwnSchule) {
-      const person: PersonLandesbediensteterSearchResponse | undefined = personStore.allLandesbedienstetePersonen?.[0];
-
-      if (person) {
-        selectedVorname.value = person.vorname;
-        selectedFamilienname.value = person.familienname;
-        selectedKopersNr.value = person.personalnummer;
-      }
-    }
-  });
-
   // Extract the created Klassenzuordnungen from the response after submission
   const klasseZuordnungFromCreatedKontext: ComputedRef<DBiamPersonenkontextResponse[]> = computed(() => {
     if (!personenkontextStore.createdPersonWithKontext) return [];
@@ -330,11 +290,16 @@
     );
   });
 
-  // Extract the created Schulenzuordnung from the response after submission
-  const schuleZuordnungFromCreatedKontext: ComputedRef<DBiamPersonenkontextResponse[]> = computed(() => {
-    if (!personenkontextStore.createdPersonWithKontext) return [];
+  // Extract the created Kontext responses based on the createType
+  const createdKontextResponses: ComputedRef<DBiamPersonenkontextResponse[]> = computed(() => {
+    if (createType === CreationType.AddPersonToOwnSchule) {
+      return personenkontextStore.landesbediensteteCommitResponse?.dBiamPersonenkontextResponses ?? [];
+    }
+    return personenkontextStore.createdPersonWithKontext?.dBiamPersonenkontextResponses ?? [];
+  });
 
-    return personenkontextStore.createdPersonWithKontext.dBiamPersonenkontextResponses.filter(
+  const schuleZuordnungFromCreatedKontext: ComputedRef<DBiamPersonenkontextResponse[]> = computed(() => {
+    return createdKontextResponses.value.filter(
       (kontext: DBiamPersonenkontextResponse) =>
         kontext.organisationId === selectedOrgaCache.value && selectedRolleCache.value?.includes(kontext.rolleId),
     );
@@ -344,11 +309,10 @@
   const translatedOrganisationsname: ComputedRef<string> = computed(() => {
     if (!schuleZuordnungFromCreatedKontext.value.length) return '';
 
+    const organisationId: string | undefined = schuleZuordnungFromCreatedKontext.value[0]?.organisationId;
+
     return (
-      organisationen.value?.find(
-        (organisation: TranslatedObject) =>
-          organisation.value === schuleZuordnungFromCreatedKontext.value[0]?.organisationId,
-      )?.title || ''
+      organisationen.value?.find((organisation: TranslatedObject) => organisation.value === organisationId)?.title || ''
     );
   });
 
@@ -358,32 +322,28 @@
 
     return schuleZuordnungFromCreatedKontext.value.map(
       (kontext: DBiamPersonenkontextResponse) =>
-        rollen.value?.find((rolle: TranslatedObject) => rolle.value === kontext.rolleId)?.title || '',
+        rollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === kontext.rolleId)?.title || '',
     );
   });
 
   // Converts the ISO UTC formatted Befristung to the german local format, also ISO.
   const translatedBefristung: ComputedRef<string> = computed(() => {
-    const ISOFormattedDate: string | null | undefined = schuleZuordnungFromCreatedKontext.value[0]?.befristung;
+    const zuordnungList: DBiamPersonenkontextResponse[] = schuleZuordnungFromCreatedKontext.value;
+    const ISOFormattedDate: string | null | undefined = zuordnungList[0]?.befristung;
 
     if (!ISOFormattedDate) {
       return t('admin.befristung.unlimitedLower');
     }
 
-    // Parse the UTC date
     const utcDate: Date = new Date(ISOFormattedDate);
 
-    // Subtract one day. The reason to substract it here is because when the UTC time from the backend gets converted back to the local german date here, it shows the next day
-    // It's logical since we send the date in the first place as "31-07-2024 22H" UTC TIME which is "01-08-2024" 00H of the next day in MESZ (summer german time)
-    // but the user obviously doesn't want to know that.
-    if (utcDate.getTimezoneOffset() >= -120) {
-      // Check if the timezone offset is 2 hours (indicating MESZ)
-      // Subtract one day if in summer time (MESZ)
+    // Adjust for German summer time (MESZ = UTC+2)
+    const isGermanSummerTime: boolean = utcDate.getTimezoneOffset() === -120;
+    if (isGermanSummerTime) {
       utcDate.setDate(utcDate.getDate() - 1);
     }
-    const germanDate: string = utcDate.toLocaleDateString('de-DE');
 
-    return germanDate;
+    return utcDate.toLocaleDateString('de-DE');
   });
 
   const creationErrorText: Ref<string> = ref('');
@@ -503,18 +463,12 @@
       befristung: formattedBefristung,
     };
 
+    selectedOrgaCache.value = selectedOrganisation.value;
+    selectedRolleCache.value = selectedRollen.value;
     await personenkontextStore.commitLandesbediensteteKontext(personId, [newKontext], existingPerson?.personalnummer!);
     formContext.resetForm();
     filteredRollen.value = [];
-    selectedOrgaCache.value = selectedOrganisation.value;
-    selectedRolleCache.value = selectedRollen.value;
   }
-
-  watch(hasNoKopersNr, async (newValue: boolean | undefined) => {
-    if (newValue) {
-      showNoKopersNrConfirmationDialog.value = true;
-    }
-  });
 
   const onSubmit: (e?: Event) => Promise<Promise<void> | undefined> = formContext.handleSubmit(async () => {
     if (createType === CreationType.AddPersonToOwnSchule) {
@@ -525,11 +479,16 @@
   });
 
   function navigateToCreatePersonRoute(reload: boolean = false): void | Promise<void> {
-    const routeName: string = createType === CreationType.Limited ? 'create-person-limited' : 'create-person';
+    let routeName: string;
+
+    if (createType === CreationType.AddPersonToOwnSchule) {
+      routeName = 'search-person-limited';
+    } else {
+      routeName = createType === CreationType.Limited ? 'create-person-limited' : 'create-person';
+    }
+
     if (reload) {
-      return router.push({ name: routeName }).then(() => {
-        router.go(0);
-      });
+      return router.push({ name: routeName }).then(() => router.go(0));
     } else {
       router.push({ name: routeName });
     }
@@ -549,8 +508,13 @@
     }
   }
 
+  const createAnotherButtonTestId: ComputedRef<string> = computed(() =>
+    createType === CreationType.AddPersonToOwnSchule ? 'search-another-person-button' : 'create-another-person-button',
+  );
+
   const handleCreateAnotherPerson = (): void => {
     personenkontextStore.createdPersonWithKontext = null;
+    personenkontextStore.landesbediensteteCommitResponse = null;
     formContext.resetForm();
     hasNoKopersNr.value = false;
     // Re-trigger the watchers after resetting the form to auto-select the Befristung since the component isn't remounted
@@ -558,6 +522,52 @@
     setupWatchers();
     navigateToCreatePersonRoute();
   };
+
+  // Watch the rollen and update filteredRollen based on selectedRollen... This is necessary to ensure that the filteredRollen are always in sync while the user is searching.
+  watch(rollen, (newRollen: TranslatedRolleWithAttrs[] | undefined) => {
+    if (!newRollen) {
+      filteredRollen.value = [];
+      return;
+    }
+
+    // AddPersonToOwnSchule: only show Lehr roles for that createType
+    if (createType === CreationType.AddPersonToOwnSchule) {
+      filteredRollen.value = newRollen.filter((rolle: TranslatedRolleWithAttrs) => rolle.rollenart === RollenArt.Lehr);
+      return;
+    }
+
+    // Regular filtering based on selectedRollen
+    if (!selectedRollen.value || selectedRollen.value.length === 0) {
+      filteredRollen.value = newRollen;
+    } else {
+      const selectedRollenart: RollenArt | undefined = newRollen.find((rolle: TranslatedRolleWithAttrs) =>
+        selectedRollen.value?.includes(rolle.value),
+      )?.rollenart;
+
+      filteredRollen.value = newRollen.filter(
+        (rolle: TranslatedRolleWithAttrs) => rolle.rollenart === selectedRollenart,
+      );
+    }
+  });
+
+  watch(hasNoKopersNr, async (newValue: boolean | undefined) => {
+    if (newValue) {
+      showNoKopersNrConfirmationDialog.value = true;
+    }
+  });
+
+  // This will auto-fill the fields with the Landesbediensteter found in the personStore when the createType is AddPersonToOwnSchule
+  watchEffect(() => {
+    if (createType === CreationType.AddPersonToOwnSchule) {
+      const person: PersonLandesbediensteterSearchResponse | undefined = personStore.allLandesbedienstetePersonen?.[0];
+
+      if (person) {
+        selectedVorname.value = person.vorname;
+        selectedFamilienname.value = person.familienname;
+        selectedKopersNr.value = person.personalnummer;
+      }
+    }
+  });
 
   watchEffect(async () => {
     isUnbefristetButtonDisabled.value = await isBefristungspflichtRolle(selectedRollen.value);
@@ -587,11 +597,19 @@
   });
 
   onBeforeMount(() => {
-    if (createType === CreationType.Limited || createType === CreationType.AddPersonToOwnSchule) {
+    const isLimitedOrLandesbedienstete: boolean =
+      createType === CreationType.Limited || createType === CreationType.AddPersonToOwnSchule;
+
+    if (isLimitedOrLandesbedienstete) {
       headerLabel.value = t('admin.person.stateEmployeeSearch.addPerson');
       createButtonLabel.value = t('admin.person.stateEmployeeSearch.addPerson');
       discardButtonLabel.value = t('cancel');
       createAnotherButtonLabel.value = t('admin.person.stateEmployeeSearch.addAnotherPerson');
+    }
+
+    if (createType === CreationType.AddPersonToOwnSchule) {
+      // Override the "add another person" label for this specific case
+      createAnotherButtonLabel.value = t('admin.person.stateEmployeeSearch.searchAnotherPerson');
     }
 
     personenkontextStore.requestedWithSystemrecht =
@@ -633,7 +651,9 @@
       :showCloseText="true"
     >
       <!-- The form to create a new Person  -->
-      <template v-if="!personenkontextStore.createdPersonWithKontext">
+      <template
+        v-if="!personenkontextStore.createdPersonWithKontext && !personenkontextStore.landesbediensteteCommitResponse"
+      >
         <FormWrapper
           :canCommit="canCommit"
           :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
@@ -951,6 +971,150 @@
                 class="primary button"
                 @click="handleCreateAnotherPerson"
                 data-testid="create-another-person-button"
+                :block="mdAndDown"
+              >
+                {{ createAnotherButtonLabel }}
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-container>
+      </template>
+      <!-- Result template on success after assigning the Person to a Schule   -->
+      <template
+        v-if="
+          personenkontextStore.landesbediensteteCommitResponse !== null &&
+          !personStore.errorCode &&
+          !personenkontextStore.errorCode
+        "
+      >
+        <v-container>
+          <v-row justify="center">
+            <v-col
+              class="subtitle-1"
+              cols="auto"
+            >
+              <span data-testid="person-success-text">
+                {{
+                  $t('admin.person.addedSuccessfully', {
+                    firstname: personStore.allLandesbedienstetePersonen?.[0]?.vorname,
+                    lastname: personStore.allLandesbedienstetePersonen?.[0]?.familienname,
+                  })
+                }}
+              </span>
+            </v-col>
+          </v-row>
+          <v-row justify="center">
+            <v-col cols="auto">
+              <v-icon
+                aria-hidden="true"
+                color="#1EAE9C"
+                icon="mdi-check-circle"
+                small
+              >
+              </v-icon>
+            </v-col>
+          </v-row>
+          <v-row justify="center">
+            <v-col
+              class="subtitle-2"
+              cols="auto"
+            >
+              {{ $t('admin.followingDataCreated') }}
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col class="text-body bold text-right"> {{ $t('person.firstName') }}: </v-col>
+            <v-col class="text-body"
+              ><span data-testid="created-person-vorname">{{
+                personStore.allLandesbedienstetePersonen?.[0]?.vorname
+              }}</span></v-col
+            >
+          </v-row>
+          <v-row>
+            <v-col class="text-body bold text-right"> {{ $t('person.lastName') }}: </v-col>
+            <v-col class="text-body"
+              ><span data-testid="created-person-familienname">{{
+                personStore.allLandesbedienstetePersonen?.[0]?.familienname
+              }}</span></v-col
+            >
+          </v-row>
+          <v-row>
+            <v-col class="text-body bold text-right"> {{ $t('person.kopersNr') }}: </v-col>
+            <v-col class="text-body"
+              ><span data-testid="created-person-familienname">{{
+                personStore.allLandesbedienstetePersonen?.[0]?.personalnummer
+              }}</span></v-col
+            >
+          </v-row>
+          <v-row>
+            <v-col class="text-body bold text-right"> {{ $t('person.userName') }}: </v-col>
+            <v-col class="text-body"
+              ><span data-testid="created-person-username">{{
+                personStore.allLandesbedienstetePersonen?.[0]?.username
+              }}</span></v-col
+            >
+          </v-row>
+          <v-row>
+            <v-col class="text-body bold text-right"> {{ $t('admin.organisation.organisation') }}: </v-col>
+            <v-col class="text-body"
+              ><span data-testid="created-person-organisation">{{ translatedOrganisationsname }}</span></v-col
+            >
+          </v-row>
+          <v-row>
+            <v-col class="text-body bold text-right"> {{ $t('admin.rolle.rolle') }}: </v-col>
+            <v-col class="text-body"
+              ><span data-testid="created-person-rolle">{{ translatedRollenname.join(', ') }}</span></v-col
+            >
+          </v-row>
+          <v-row>
+            <v-col class="text-body bold text-right"> {{ $t('admin.befristung.befristung') }}: </v-col>
+            <v-col class="text-body"
+              ><span data-testid="created-person-befristung">{{ translatedBefristung }}</span></v-col
+            >
+          </v-row>
+          <v-divider
+            class="border-opacity-100 rounded my-6"
+            color="#E5EAEF"
+            thickness="6"
+          ></v-divider>
+          <v-row justify="end">
+            <v-col
+              cols="12"
+              sm="6"
+              md="auto"
+            >
+              <v-btn
+                class="secondary"
+                @click.stop="navigateToPersonDetails"
+                data-testid="to-details-button"
+                :block="mdAndDown"
+              >
+                {{ $t('nav.toDetails') }}
+              </v-btn>
+            </v-col>
+            <v-col
+              cols="12"
+              sm="6"
+              md="auto"
+            >
+              <v-btn
+                class="secondary"
+                @click.stop="navigateToPersonTable"
+                data-testid="back-to-list-button"
+                :block="mdAndDown"
+              >
+                {{ $t('nav.backToList') }}
+              </v-btn>
+            </v-col>
+            <v-col
+              cols="12"
+              sm="6"
+              md="auto"
+            >
+              <v-btn
+                class="primary button"
+                @click="handleCreateAnotherPerson"
+                :data-testid="createAnotherButtonTestId"
                 :block="mdAndDown"
               >
                 {{ createAnotherButtonLabel }}

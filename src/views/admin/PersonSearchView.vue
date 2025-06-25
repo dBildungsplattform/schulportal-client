@@ -331,12 +331,9 @@
   }
 
   async function navigateToPersonCreationForm(): Promise<void> {
-    if (personStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
-      formContext.resetForm();
-    } else {
-      personStore.errorCode = '';
-      await router.push({ name: 'add-person-to-own-schule' });
-    }
+    personStore.errorCode = '';
+    formContext.resetForm();
+    await router.push({ name: 'add-person-to-own-schule' });
   }
 
   function handleConfirmUnsavedChanges(): void {
