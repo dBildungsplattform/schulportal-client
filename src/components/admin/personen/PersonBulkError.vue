@@ -15,6 +15,7 @@
     error: string;
     vorname: string;
     nachname: string;
+    username: string;
   };
 
   type Props = {
@@ -29,7 +30,7 @@
     (event: 'update:isDialogVisible', isDialogVisible: boolean): void;
   };
 
-  type CSVHeaders = 'Vorname' | 'Nachname' | 'Fehlermeldung';
+  type CSVHeaders = 'Vorname' | 'Nachname' | 'Benutzername' | 'Fehlermeldung';
   type CSVRow = Record<CSVHeaders, string | undefined>;
 
   const props: Props = defineProps<Props>();
@@ -39,17 +40,22 @@
 
   // Saves the errors as a text file
   function saveErrorsAsCSV(): void {
-    const headers: CSVHeaders[] = ['Vorname', 'Nachname', 'Fehlermeldung'];
+    const headers: CSVHeaders[] = ['Vorname', 'Nachname', 'Benutzername', 'Fehlermeldung'];
 
     const fileName: string = `Fehler-Mehrfachbearbeitung-${new Date().toLocaleDateString('de-DE').replace(/\./g, '-')}.txt`;
 
     const csvRows: CSVRow[] = props.errors.map((entry: ErrorEntry) => ({
       Vorname: entry.vorname,
       Nachname: entry.nachname,
+      Benutzername: entry.username,
       Fehlermeldung: entry.error,
     }));
 
-    const csvContent: string = buildCSV<CSVHeaders>(headers, csvRows);
+    const actionIntroText: string = t('admin.person.bulk.bulkErrorMessageShort', {
+      bulkOperationName: props.bulkOperationName,
+    });
+
+    const csvContent: string = buildCSV<CSVHeaders>(headers, csvRows, actionIntroText);
 
     const blob: Blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
 
@@ -140,7 +146,9 @@
             class="text-body font-weight-bold my-2 ml-4"
           >
             <div>
-              <span class="text-body font-weight-bold">{{ entry.vorname }} {{ entry.nachname }}</span>
+              <span class="text-body font-weight-bold"
+                >{{ entry.vorname }} {{ entry.nachname }} ({{ entry.username }})</span
+              >
             </div>
             <div class="ml-4 text-body">
               <v-alert
