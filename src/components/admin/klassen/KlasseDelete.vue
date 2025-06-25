@@ -92,6 +92,7 @@
 
     <template v-slot:default="{ isActive }">
       <LayoutCard
+        :headlineTestId="'klasse-delete-success'"
         v-if="successDialogVisible"
         :closable="false"
         :header="$t('admin.klasse.deleteKlasse')"
@@ -130,6 +131,7 @@
         </v-card-actions>
       </LayoutCard>
       <LayoutCard
+        :headlineTestId="'klasse-delete-confirmation'"
         v-else
         :closable="true"
         :header="$t('admin.klasse.deleteKlasse')"

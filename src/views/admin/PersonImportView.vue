@@ -459,7 +459,7 @@
         </v-container>
       </template>
 
-      <v-template v-else-if="isDownloadingFile">
+      <template v-else-if="isDownloadingFile">
         <v-container>
           <v-row class="justify-center">
             <v-col cols="auto">
@@ -483,7 +483,7 @@
             ></v-col>
           </v-row>
         </v-container>
-      </v-template>
+      </template>
 
       <!-- Import loading template -->
       <template v-if="importStore.importProgress > 0 && !importStore.errorCode">
