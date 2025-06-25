@@ -24,6 +24,7 @@
     type PersonStore,
   } from '@/stores/PersonStore';
   import { RollenArt, RollenSystemRecht } from '@/stores/RolleStore';
+  import type { Zuordnung } from '@/stores/types/Zuordnung';
   import { type TranslatedObject } from '@/types.d';
   import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
   import { formatDateToISO, getNextSchuljahresende, isValidDate, notInPast } from '@/utils/date';
@@ -81,6 +82,8 @@
   const filteredRollenCache: Ref<TranslatedRolleWithAttrs[] | undefined> = ref<TranslatedRolleWithAttrs[] | undefined>(
     [],
   );
+
+  const hasPreFilled: Ref<boolean> = ref(false);
 
   enum CreationType {
     Limited = 'limited',
@@ -263,16 +266,20 @@
   watch(
     selectedRollen,
     (newSelectedRollen: string[] | undefined) => {
+      // Decide which rollen list to use based on createType
+      const baseRollen: TranslatedRolleWithAttrs[] | undefined =
+        createType === CreationType.AddPersonToOwnSchule
+          ? filteredRollen.value // wherever you keep that filtered list
+          : rollen.value;
+
       if (newSelectedRollen && newSelectedRollen.length > 0) {
-        const selectedRollenart: RollenArt | undefined = rollen.value?.find((rolle: TranslatedRolleWithAttrs) =>
+        const selectedRollenart: RollenArt | undefined = baseRollen?.find((rolle: TranslatedRolleWithAttrs) =>
           newSelectedRollen.includes(rolle.value),
         )?.rollenart;
-        // Update filteredRollen based on selected rollen and their rollenart
-        filteredRollen.value = rollen.value?.filter(
-          (rolle: TranslatedRolleWithAttrs) => rolle.rollenart === selectedRollenart,
-        );
+
+        filteredRollen.value =
+          baseRollen?.filter((rolle: TranslatedRolleWithAttrs) => rolle.rollenart === selectedRollenart) || [];
       } else if (newSelectedRollen && newSelectedRollen.length === 0) {
-        // If selectedRollen is empty, display all rollen
         filteredRollen.value = [];
       }
     },
@@ -373,10 +380,17 @@
   }
 
   async function navigateToPersonDetails(): Promise<void> {
-    await router.push({
-      name: 'person-details',
-      params: { id: personenkontextStore.createdPersonWithKontext?.person.id },
-    });
+    const personId: string | undefined =
+      createType === CreationType.AddPersonToOwnSchule
+        ? personenkontextStore.landesbediensteteCommitResponse?.dBiamPersonenkontextResponses[0]?.personId
+        : personenkontextStore.createdPersonWithKontext?.person.id;
+
+    if (personId) {
+      await router.push({
+        name: 'person-details',
+        params: { personId },
+      });
+    }
   }
 
   function handleFieldReset(field: string): void {
@@ -524,7 +538,7 @@
   };
 
   // Watch the rollen and update filteredRollen based on selectedRollen... This is necessary to ensure that the filteredRollen are always in sync while the user is searching.
-  watch(rollen, (newRollen: TranslatedRolleWithAttrs[] | undefined) => {
+  watch(rollen, async (newRollen: TranslatedRolleWithAttrs[] | undefined) => {
     if (!newRollen) {
       filteredRollen.value = [];
       return;
@@ -532,7 +546,23 @@
 
     // AddPersonToOwnSchule: only show Lehr roles for that createType
     if (createType === CreationType.AddPersonToOwnSchule) {
-      filteredRollen.value = newRollen.filter((rolle: TranslatedRolleWithAttrs) => rolle.rollenart === RollenArt.Lehr);
+      const existingPerson: PersonLandesbediensteterSearchResponse | undefined =
+        personStore.allLandesbedienstetePersonen?.[0];
+      const personId: string | undefined = existingPerson?.id;
+
+      if (!personId) {
+        return;
+      }
+      // Get latest person data
+      await personStore.getPersonenuebersichtById(personId);
+      const assignedRollenIds: Set<string> = new Set(
+        personStore.personenuebersicht?.zuordnungen
+          .filter((z: Zuordnung) => z.sskId === selectedOrganisation.value)
+          .map((z: Zuordnung) => z.rolleId) || [],
+      );
+      filteredRollen.value = newRollen.filter(
+        (rolle: TranslatedRolleWithAttrs) => rolle.rollenart === RollenArt.Lehr && !assignedRollenIds.has(rolle.value),
+      );
       return;
     }
 
@@ -557,14 +587,16 @@
   });
 
   // This will auto-fill the fields with the Landesbediensteter found in the personStore when the createType is AddPersonToOwnSchule
+  // hasPrefilled will ensure that this only happens once, even if the component is re-rendered. This avoid problems with this watch retriggering when the form is reset.
   watchEffect(() => {
-    if (createType === CreationType.AddPersonToOwnSchule) {
+    if (!hasPreFilled.value && createType === CreationType.AddPersonToOwnSchule) {
       const person: PersonLandesbediensteterSearchResponse | undefined = personStore.allLandesbedienstetePersonen?.[0];
 
       if (person) {
         selectedVorname.value = person.vorname;
         selectedFamilienname.value = person.familienname;
         selectedKopersNr.value = person.personalnummer;
+        hasPreFilled.value = true;
       }
     }
   });
@@ -624,6 +656,7 @@
 
     personStore.errorCode = '';
     personenkontextStore.createdPersonWithKontext = null;
+    personenkontextStore.landesbediensteteCommitResponse = null;
 
     /* listen for browser changes and prevent them when form is dirty */
     window.addEventListener('beforeunload', preventNavigation);
