@@ -70,6 +70,8 @@
   const canCommit: Ref<boolean> = ref(false);
   const hasNoKopersNr: Ref<boolean | undefined> = ref(false);
   const showNoKopersNrConfirmationDialog: Ref<boolean> = ref(false);
+  const showAddPersonConfirmationDialog: Ref<boolean> = ref(false);
+  const addPersonConfirmationText: Ref<string> = ref('');
   const isUnbefristetButtonDisabled: Ref<boolean, boolean> = ref(false);
 
   const calculatedBefristung: Ref<string | undefined> = ref('');
@@ -268,9 +270,7 @@
     (newSelectedRollen: string[] | undefined) => {
       // Decide which rollen list to use based on createType
       const baseRollen: TranslatedRolleWithAttrs[] | undefined =
-        createType === CreationType.AddPersonToOwnSchule
-          ? filteredRollen.value // wherever you keep that filtered list
-          : rollen.value;
+        createType === CreationType.AddPersonToOwnSchule ? filteredRollen.value : rollen.value;
 
       if (newSelectedRollen && newSelectedRollen.length > 0) {
         const selectedRollenart: RollenArt | undefined = baseRollen?.find((rolle: TranslatedRolleWithAttrs) =>
@@ -457,6 +457,7 @@
   }
 
   async function addPersonToOwnSchule(): Promise<void> {
+    showAddPersonConfirmationDialog.value = false;
     // Only adding Kontext to existing person
     const existingPerson: PersonLandesbediensteterSearchResponse | undefined =
       personStore.allLandesbedienstetePersonen?.[0];
@@ -486,7 +487,12 @@
 
   const onSubmit: (e?: Event) => Promise<Promise<void> | undefined> = formContext.handleSubmit(async () => {
     if (createType === CreationType.AddPersonToOwnSchule) {
-      await addPersonToOwnSchule();
+      addPersonConfirmationText.value = t('admin.person.stateEmployeeSearch.addPersonConfirmationMessage', {
+        vorname: selectedVorname.value,
+        familienname: selectedFamilienname.value,
+        rollenname: filteredRollen.value?.map((rolle: TranslatedRolleWithAttrs) => rolle.title).join(', '),
+      });
+      showAddPersonConfirmationDialog.value = true;
     } else {
       await createPerson();
     }
@@ -715,7 +721,6 @@
               personenkontextStore.errorCode ? t(`admin.personenkontext.title.${personenkontextStore.errorCode}`) : ''
             "
           />
-
           <!-- Error Message Display for error messages from the personStore -->
           <SpshAlert
             :model-value="!!personStore.errorCode"
@@ -834,7 +839,7 @@
             >
               <span data-testid="person-success-text">
                 {{
-                  $t('admin.person.addedSuccessfully', {
+                  t('admin.person.addedSuccessfully', {
                     firstname: personenkontextStore.createdPersonWithKontext.person.name.vorname,
                     lastname: personenkontextStore.createdPersonWithKontext.person.name.familienname,
                   })
@@ -858,11 +863,11 @@
               class="subtitle-2"
               cols="auto"
             >
-              {{ $t('admin.followingDataCreated') }}
+              {{ t('admin.followingDataCreated') }}
             </v-col>
           </v-row>
           <v-row>
-            <v-col class="text-body bold text-right"> {{ $t('person.firstName') }}: </v-col>
+            <v-col class="text-body bold text-right"> {{ t('person.firstName') }}: </v-col>
             <v-col class="text-body"
               ><span data-testid="created-person-vorname">{{
                 personenkontextStore.createdPersonWithKontext.person.name.vorname
@@ -895,7 +900,7 @@
                   : 'text-body bold text-right text-red'
               }`"
             >
-              {{ $t('person.kopersNr') }}:
+              {{ t('person.kopersNr') }}:
             </v-col>
             <v-col
               :class="`${
@@ -909,7 +914,7 @@
               ><span data-testid="created-person-kopersNr">{{
                 personenkontextStore.createdPersonWithKontext.person.personalnummer
                   ? personenkontextStore.createdPersonWithKontext.person.personalnummer
-                  : $t('missing')
+                  : t('missing')
               }}</span></v-col
             >
           </v-row>
@@ -978,7 +983,7 @@
                 data-testid="to-details-button"
                 :block="mdAndDown"
               >
-                {{ $t('nav.toDetails') }}
+                {{ t('nav.toDetails') }}
               </v-btn>
             </v-col>
             <v-col
@@ -992,7 +997,7 @@
                 data-testid="back-to-list-button"
                 :block="mdAndDown"
               >
-                {{ $t('nav.backToList') }}
+                {{ t('nav.backToList') }}
               </v-btn>
             </v-col>
             <v-col
@@ -1028,7 +1033,7 @@
             >
               <span data-testid="person-success-text">
                 {{
-                  $t('admin.person.addedSuccessfully', {
+                  t('admin.person.addedSuccessfully', {
                     firstname: personStore.allLandesbedienstetePersonen?.[0]?.vorname,
                     lastname: personStore.allLandesbedienstetePersonen?.[0]?.familienname,
                   })
@@ -1052,7 +1057,7 @@
               class="subtitle-2"
               cols="auto"
             >
-              {{ $t('admin.followingDataCreated') }}
+              {{ t('admin.followingDataCreated') }}
             </v-col>
           </v-row>
           <v-row>
@@ -1080,7 +1085,7 @@
             >
           </v-row>
           <v-row>
-            <v-col class="text-body bold text-right"> {{ $t('person.userName') }}: </v-col>
+            <v-col class="text-body bold text-right"> {{ t('person.userName') }}: </v-col>
             <v-col class="text-body"
               ><span data-testid="created-person-username">{{
                 personStore.allLandesbedienstetePersonen?.[0]?.username
@@ -1088,19 +1093,19 @@
             >
           </v-row>
           <v-row>
-            <v-col class="text-body bold text-right"> {{ $t('admin.organisation.organisation') }}: </v-col>
+            <v-col class="text-body bold text-right"> {{ t('admin.organisation.organisation') }}: </v-col>
             <v-col class="text-body"
               ><span data-testid="created-person-organisation">{{ translatedOrganisationsname }}</span></v-col
             >
           </v-row>
           <v-row>
-            <v-col class="text-body bold text-right"> {{ $t('admin.rolle.rolle') }}: </v-col>
+            <v-col class="text-body bold text-right"> {{ t('admin.rolle.rolle') }}: </v-col>
             <v-col class="text-body"
               ><span data-testid="created-person-rolle">{{ translatedRollenname.join(', ') }}</span></v-col
             >
           </v-row>
           <v-row>
-            <v-col class="text-body bold text-right"> {{ $t('admin.befristung.befristung') }}: </v-col>
+            <v-col class="text-body bold text-right"> {{ t('admin.befristung.befristung') }}: </v-col>
             <v-col class="text-body"
               ><span data-testid="created-person-befristung">{{ translatedBefristung }}</span></v-col
             >
@@ -1165,7 +1170,7 @@
       <LayoutCard
         v-if="showNoKopersNrConfirmationDialog"
         :closable="false"
-        :header="$t('admin.person.noKopersNr')"
+        :header="t('admin.person.noKopersNr')"
       >
         <v-card-text>
           <v-container>
@@ -1197,7 +1202,7 @@
                 "
                 data-testid="cancel-no-kopersnr-button"
               >
-                {{ $t('cancel') }}
+                {{ t('cancel') }}
               </v-btn>
             </v-col>
             <v-col
@@ -1211,7 +1216,66 @@
                 @click.stop="showNoKopersNrConfirmationDialog = false"
                 data-testid="confirm-no-kopersnr-button"
               >
-                {{ $t('proceed') }}
+                {{ t('proceed') }}
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-card-actions>
+      </LayoutCard>
+    </v-dialog>
+    <!-- Dialog for confirmation when the admin want to proceed to add the person -->
+    <v-dialog
+      v-model="showAddPersonConfirmationDialog"
+      persistent
+    >
+      <LayoutCard
+        v-if="showAddPersonConfirmationDialog"
+        :closable="false"
+        :header="t('admin.person.stateEmployeeSearch.addPerson')"
+      >
+        <v-card-text>
+          <v-container>
+            <v-row class="text-body bold justify-center">
+              <v-col
+                class="text-center"
+                cols="10"
+              >
+                <span data-testid="add-person-confirmation-text">
+                  {{ addPersonConfirmationText }}
+                </span>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions class="justify-center">
+          <v-row class="justify-center">
+            <v-col
+              cols="12"
+              sm="6"
+              md="4"
+            >
+              <v-btn
+                :block="mdAndDown"
+                class="secondary"
+                @click.stop="showAddPersonConfirmationDialog = false"
+                data-testid="cancel-add-person-confirmation-button"
+              >
+                {{ $t('cancel') }}
+              </v-btn>
+            </v-col>
+            <v-col
+              class="text-center"
+              cols="12"
+              sm="6"
+              md="4"
+            >
+              <v-btn
+                :block="mdAndDown"
+                class="primary"
+                @click.stop="addPersonToOwnSchule"
+                data-testid="confirm-add-person-button"
+              >
+                {{ t('admin.person.stateEmployeeSearch.addPerson') }}
               </v-btn>
             </v-col>
           </v-row>
