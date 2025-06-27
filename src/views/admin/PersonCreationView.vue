@@ -611,6 +611,10 @@
     isUnbefristetButtonDisabled.value = await isBefristungspflichtRolle(selectedRollen.value);
   });
 
+  const successMessageKey: ComputedRef<string> = computed(() => {
+    return createType === CreationType.Limited ? 'admin.person.createdSuccessfully' : 'admin.person.addedSuccessfully';
+  });
+
   function handleConfirmUnsavedChanges(): void {
     blockedNext();
     personStore.errorCode = '';
@@ -635,19 +639,19 @@
   });
 
   onBeforeMount(() => {
-    const isLimitedOrLandesbedienstete: boolean =
-      createType === CreationType.Limited || createType === CreationType.AddPersonToOwnSchule;
-
-    if (isLimitedOrLandesbedienstete) {
-      headerLabel.value = t('admin.person.stateEmployeeSearch.addPerson');
-      createButtonLabel.value = t('admin.person.stateEmployeeSearch.addPerson');
+    if (createType === CreationType.Limited) {
+      headerLabel.value = t('admin.person.stateEmployeeSearch.anotherPerson');
+      createButtonLabel.value = t('admin.person.stateEmployeeSearch.createPerson');
       discardButtonLabel.value = t('cancel');
-      createAnotherButtonLabel.value = t('admin.person.stateEmployeeSearch.addAnotherPerson');
+      createAnotherButtonLabel.value = t('admin.person.stateEmployeeSearch.createAnotherPerson');
     }
 
     if (createType === CreationType.AddPersonToOwnSchule) {
       // Override the "add another person" label for this specific case
       createAnotherButtonLabel.value = t('admin.person.stateEmployeeSearch.searchAnotherPerson');
+      headerLabel.value = t('admin.person.stateEmployeeSearch.searchAndAdd');
+      createButtonLabel.value = t('admin.person.stateEmployeeSearch.addPerson');
+      discardButtonLabel.value = t('cancel');
     }
 
     personenkontextStore.requestedWithSystemrecht =
@@ -839,7 +843,7 @@
             >
               <span data-testid="person-success-text">
                 {{
-                  t('admin.person.addedSuccessfully', {
+                  t(successMessageKey, {
                     firstname: personenkontextStore.createdPersonWithKontext.person.name.vorname,
                     lastname: personenkontextStore.createdPersonWithKontext.person.name.familienname,
                   })

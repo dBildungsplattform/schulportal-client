@@ -381,12 +381,12 @@
       class="text-center headline"
       data-testid="admin-headline"
     >
-      {{ t('admin.headline') }}
+      {{ t('admin.person.stateEmployeeSearch.searchAndAdd') }}
     </h1>
     <LayoutCard
       :closable="true"
       @onCloseClicked="navigateToPersonTable"
-      :header="t('admin.person.stateEmployeeSearch.searchPerson')"
+      :header="t('admin.person.stateEmployeeSearch.searchAndAdd')"
       :padded="true"
       :showCloseText="true"
     >

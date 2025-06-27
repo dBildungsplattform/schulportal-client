@@ -168,7 +168,7 @@
         @click="closeMenuOnMobile"
         data-testid="search-person-menu-item"
         prepend-icon="mdi-plus-circle-outline"
-        :title="$t('admin.person.stateEmployeeSearch.search')"
+        :title="$t('admin.person.stateEmployeeSearch.searchAndAdd')"
         to="/admin/limited/personen/search"
       ></v-list-item>
       <v-list-item
