@@ -7,7 +7,7 @@
   margin-top: 10px;
 
   @media (min-width: 1280px) {
-    min-width: 330px;
+    min-width: 340px;
   }
 
   .v-list-item {
@@ -20,8 +20,12 @@
 
     &.v-list-item--active {
       background-color: variables.$menuBarActiveItemColor;
+      
       .v-list-item-title {
         font-weight: bold;
+        white-space: normal;
+        overflow: visible;
+        text-overflow: unset;
       }
     }
   }

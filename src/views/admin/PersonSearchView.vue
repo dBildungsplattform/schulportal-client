@@ -738,7 +738,7 @@
               data-testid="close-unsaved-changes-dialog-button"
               :block="mdAndDown"
             >
-              {{ $t('admin.person.stateEmployeeSearch.addPerson') }}
+              {{ $t('admin.person.stateEmployeeSearch.addStateEmployee') }}
             </v-btn>
           </v-col>
         </v-row>

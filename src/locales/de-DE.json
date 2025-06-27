@@ -161,7 +161,8 @@
       "backToInput": "Zurück zur Eingabe",
       "stateEmployeeSearch": {
         "addAnotherPerson": "Weiteren Landesbediensteten hinzufügen",
-        "addPerson": "Landesbediensteten hinzufügen",
+        "addPerson": "Person hinzufügen",
+        "addStateEmployee": "Landesbediensteten hinzufügen",
         "addPersonConfirmationMessage": "Wollen Sie {vorname} {nachname} als {rollenname} hinzufügen?",
         "anotherPerson": "Andere Person (neu anlegen)",
         "createPerson": "Person anlegen",
