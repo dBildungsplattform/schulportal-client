@@ -330,6 +330,12 @@
     await router.push({ name: 'person-management' });
   }
 
+  async function resetForm(): Promise<void> {
+    formContext.resetForm();
+    personStore.errorCode = '';
+    personStore.allLandesbedienstetePersonen = [];
+  }
+
   async function navigateToPersonCreationForm(): Promise<void> {
     personStore.errorCode = '';
     formContext.resetForm();
@@ -378,7 +384,8 @@
       {{ t('admin.headline') }}
     </h1>
     <LayoutCard
-      :closable="false"
+      :closable="true"
+      @onCloseClicked="navigateToPersonTable"
       :header="t('admin.person.stateEmployeeSearch.searchPerson')"
       :padded="true"
       :showCloseText="true"
@@ -387,12 +394,12 @@
         :canCommit="!isSearchDisabled || personStore.loading"
         :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
         :createButtonLabel="$t('search')"
-        :discardButtonLabel="$t('cancel')"
+        :discardButtonLabel="$t('reset')"
         :hideActions="!!personStore.errorCode"
         :hideNotice="true"
         id="person-search-form"
         :isLoading="personStore.loading"
-        :onDiscard="navigateToPersonTable"
+        :onDiscard="resetForm"
         @onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
         :onSubmit="onSubmit"
         :showUnsavedChangesDialog="showUnsavedChangesDialog"
@@ -712,12 +719,12 @@
             md="auto"
           >
             <v-btn
-              @click.stop="navigateToPersonTable"
+              @click.stop="resetForm"
               class="secondary button"
-              data-testid="confirm-unsaved-changes-button"
+              data-testid="reset-form-button"
               :block="mdAndDown"
             >
-              {{ $t('cancel') }}
+              {{ $t('reset') }}
             </v-btn>
           </v-col>
           <v-col

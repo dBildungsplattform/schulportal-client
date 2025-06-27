@@ -164,13 +164,13 @@
         "addPersonConfirmationMessage": "Wollen Sie {vorname} {nachname} als {rollenname} hinzufügen?",
         "anotherPerson": "Andere Person (Neuanlage)",
         "noPersonFoundMessage": "Es wurde leider kein Treffer gefunden. Bitte prüfen Sie Ihre Eingabe. Sollten Sie Hilfe benötigen, eröffnen Sie ein Störungsticket über den IQSH-Helpdesk.",
-        "multiplePersonsFoundMessage": "Es wurde mehr als ein Treffer gefunden. Bitte verwenden Sie zur Suche die Kopers.-Nr., die Landes-Mailadresse oder den Benutzernamen. Sollten Sie Hilfe benötigen, eröffnen Sie ein Störungsticket über den IQSH-Helpdesk.",
+        "multiplePersonsFoundMessage": "Es wurde mehr als ein Treffer gefunden. Bitte verwenden Sie zur Suche die KoPers.-Nr., die Landes-Mailadresse oder den Benutzernamen. Sollten Sie Hilfe benötigen, eröffnen Sie ein Störungsticket über den IQSH-Helpdesk.",
         "searchResult": "Suchergebnis",
         "searchMethodNotice": "Bitte wählen Sie, wie Sie nach der Person suchen möchten.",
         "search": "Landesbediensteter (Nur Suche)",
         "searchPerson": "Person suchen",
         "searchAnotherPerson": "Weitere Person suchen",
-        "withKopers": "per Kopers.-Nr.",
+        "withKopers": "per KoPers.-Nr.",
         "withEmail": "per E-Mail",
         "withUsername": "per Benutzername",
         "withfirstAndLastname": "per Vorname und Nachname"
@@ -281,10 +281,10 @@
           "required": "Der Vorname ist erforderlich."
         },
         "familienname": {
-          "matches": "Der Familienname enthält ungültige Zeichen.",
-          "noLeadingTrailingSpaces": "Der Familienname darf nicht mit Leerzeichen beginnen oder enden.",
-          "min": "Der Familienname muss mindestens 2 Zeichen lang sein.",
-          "required": "Der Familienname ist erforderlich."
+          "matches": "Der Nachname enthält ungültige Zeichen.",
+          "noLeadingTrailingSpaces": "Der Nachname darf nicht mit Leerzeichen beginnen oder enden.",
+          "min": "Der Nachname muss mindestens 2 Zeichen lang sein.",
+          "required": "Der Nachname ist erforderlich."
         },
         "kopersNr": {
           "required": "Die KoPers.-Nr. ist erforderlich.",
@@ -834,6 +834,7 @@
   "selected": "ausgewählt",
   "since": "Seit",
   "refreshData": "Daten aktualisieren",
+  "reset": "Zurücksetzen",
   "resetFilter": "Filter zurücksetzen",
   "search": "Suchen",
   "start": {
