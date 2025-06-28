@@ -388,7 +388,7 @@
     if (personId) {
       await router.push({
         name: 'person-details',
-        params: { personId },
+        params: { id: personId },
       });
     }
   }
