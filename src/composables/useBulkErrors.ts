@@ -6,6 +6,7 @@ export type BulkErrorList = {
   id: string;
   vorname: string;
   nachname: string;
+  username: string;
   error: string;
 };
 
@@ -62,6 +63,7 @@ export function useBulkErrors(t: Composer['t'], personen: Map<string, PersonWith
         id,
         nachname: person.name.familienname,
         vorname: person.name.vorname,
+        username: person.referrer,
         error: errorTranslation,
       };
     })

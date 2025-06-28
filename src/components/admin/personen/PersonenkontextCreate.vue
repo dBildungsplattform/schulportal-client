@@ -42,6 +42,7 @@
     selectedOrganisation: string | undefined;
     createType?: CreationType;
     showHeadline: boolean;
+    personId?: string;
     operationContext: OperationContext;
     selectedRolle?: string | undefined;
     selectedRollen?: string[] | undefined;
@@ -122,6 +123,7 @@
 
     if (newValue && newValue !== oldValue) {
       const filter: WorkflowFilter = {
+                personId: props.personId,
         organisationId: newValue,
         limit: 25,
       };
@@ -175,6 +177,7 @@
         const newRollen: string[] | undefined = newValue as string[] | undefined;
         if (newRollen && newRollen.length > 0) {
           const filter: WorkflowFilter = {
+                    personId: props.personId,
             organisationId: selectedOrganisation.value,
             rollenIds: newRollen,
             limit: 25,
@@ -202,6 +205,7 @@
 
         if (newRolle && newRolle !== oldValue) {
           const filter: WorkflowFilter = {
+            personId: props.personId,
             organisationId: selectedOrganisation.value,
             rollenIds: [newRolle],
             limit: 25,
@@ -259,6 +263,7 @@
       } else {
         await personenkontextStore.processWorkflowStep({
           ...filter,
+          personId: props.personId,
           operationContext: props.operationContext,
         });
       }
@@ -277,6 +282,7 @@
       if (isEqual) return;
 
       const filter: WorkflowFilter = {
+        personId: props.personId,
         organisationId: selectedOrganisation.value,
         rollenIds: selectedRollen.value,
         limit: 25,

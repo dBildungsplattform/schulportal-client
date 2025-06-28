@@ -181,6 +181,7 @@
       },
       "bulk": {
         "bulkErrorMessage": "Die Aktion {bulkOperationName} konnte für die folgenden Benutzer nicht ausgeführt werden. \n\nSie können sich die Liste für eine spätere Bearbeitung abspeichern. Die Daten stehen nach dem Schließen dieses Dialogs nicht mehr zur Verfügung. Sollten Sie Hilfe benötigen, eröffnen Sie ein Störungsticket über den IQSH-Helpdesk und fügen Sie die Liste als Anhang an.",
+        "bulkErrorMessageShort": "Die Aktion {bulkOperationName} konnte für die folgenden Benutzer nicht ausgeführt werden.",
         "bulkErrorTitle": "Fehler bei der Mehrfachbearbeitung",
         "bulkPasswordReset": {
           "confirmation": "Sind Sie sicher, dass Sie das Passwort für die ausgewählten Benutzer zurücksetzen möchten?",
@@ -375,6 +376,7 @@
       },
       "showAll": "Alle Benutzer anzeigen",
       "startPassword": "Einstiegs-Passwort",
+      "startPasswordInfo": "Bitte teilen Sie dem Benutzer das Einstiegs-Passwort mit. Nach dem Schließen des Dialogs wird es aus Sicherheitsgründen nicht mehr angezeigt.",
       "status": "Status"
     },
     "personenkontext": {
