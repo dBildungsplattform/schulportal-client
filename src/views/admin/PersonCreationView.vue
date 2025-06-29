@@ -490,7 +490,13 @@
       addPersonConfirmationText.value = t('admin.person.stateEmployeeSearch.addPersonConfirmationMessage', {
         vorname: selectedVorname.value,
         familienname: selectedFamilienname.value,
-        rollenname: filteredRollen.value?.map((rolle: TranslatedRolleWithAttrs) => rolle.title).join(', '),
+        rollenname: selectedRollen.value
+          ?.map(
+            (rolleId: string) =>
+              filteredRollen.value?.find((rolle: TranslatedRolleWithAttrs) => rolle.value === rolleId)?.title,
+          )
+          .filter(Boolean)
+          .join(', '),
       });
       showAddPersonConfirmationDialog.value = true;
     } else {

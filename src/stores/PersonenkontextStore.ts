@@ -103,7 +103,7 @@ type PersonenkontextState = {
 type PersonenkontextGetters = {};
 type PersonenkontextActions = {
   hasSystemrecht: (personId: string, systemrecht: 'ROLLEN_VERWALTEN') => Promise<SystemrechtResponse>;
-  processWorkflowStep: (filter: WorkflowFilter) => Promise<PersonenkontextWorkflowResponse>;
+  processWorkflowStep: (filter: WorkflowFilter) => Promise<void>;
   processWorkflowStepLandesbedienstete: (filter: WorkflowFilter) => Promise<void>;
   commitLandesbediensteteKontext: (
     personId: string,
@@ -181,7 +181,7 @@ export const usePersonenkontextStore: StoreDefinition<
       }
     },
 
-    async processWorkflowStep(filter: WorkflowFilter): Promise<PersonenkontextWorkflowResponse> {
+    async processWorkflowStep(filter: WorkflowFilter): Promise<void> {
       this.loading = true;
       try {
         const { data }: { data: PersonenkontextWorkflowResponse } =
@@ -196,10 +196,8 @@ export const usePersonenkontextStore: StoreDefinition<
             this.requestedWithSystemrecht,
           );
         this.workflowStepResponse = data;
-        return data;
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
-        return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
       }
