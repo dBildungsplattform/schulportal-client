@@ -657,7 +657,7 @@
       // Override the "add another person" label for this specific case
       createAnotherButtonLabel.value = t('admin.person.stateEmployeeSearch.searchAnotherPerson');
       headerLabel.value = t('admin.person.stateEmployeeSearch.searchAndAdd');
-      createButtonLabel.value = t('admin.person.stateEmployeeSearch.addPerson');
+      createButtonLabel.value = t('admin.person.stateEmployeeSearch.addStateEmployee');
       discardButtonLabel.value = t('cancel');
     }
 

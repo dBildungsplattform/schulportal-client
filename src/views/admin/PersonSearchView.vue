@@ -393,7 +393,7 @@
       <FormWrapper
         :canCommit="!isSearchDisabled || personStore.loading"
         :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
-        :createButtonLabel="$t('search')"
+        :createButtonLabel="$t('admin.person.stateEmployeeSearch.searchStateEmployee')"
         :discardButtonLabel="$t('reset')"
         :hideActions="!!personStore.errorCode"
         :hideNotice="true"
