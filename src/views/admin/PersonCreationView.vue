@@ -55,7 +55,7 @@
   import { useDisplay } from 'vuetify';
   import { array, object, string, StringSchema, type AnyObject } from 'yup';
 
-  const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
+  const { mdAndDown, mdAndUp }: { mdAndDown: Ref<boolean>; mdAndUp: Ref<boolean> } = useDisplay();
 
   const route: RouteLocationNormalized = useRoute();
 
@@ -527,7 +527,7 @@
     navigateToCreatePersonRoute();
   };
 
-    // Watch the selectedRollen and update filteredRollen accordingly
+  // Watch the selectedRollen and update filteredRollen accordingly
   watch(
     selectedRollen,
     (newSelectedRollen: string[] | undefined) => {
@@ -542,8 +542,12 @@
 
         filteredRollen.value =
           baseRollen?.filter((rolle: TranslatedRolleWithAttrs) => rolle.rollenart === selectedRollenart) || [];
-      // If no roles are selected, reset the filteredRollen to the normal rollen list and for createType AddPersonToOwnSchule nothing happens because the rollen are always filtered
-      } else if (newSelectedRollen && newSelectedRollen.length === 0 && createType !== CreationType.AddPersonToOwnSchule) {
+        // If no roles are selected, reset the filteredRollen to the normal rollen list and for createType AddPersonToOwnSchule nothing happens because the rollen are always filtered
+      } else if (
+        newSelectedRollen &&
+        newSelectedRollen.length === 0 &&
+        createType !== CreationType.AddPersonToOwnSchule
+      ) {
         filteredRollen.value = [];
       }
     },
@@ -655,7 +659,7 @@
 
     if (createType === CreationType.AddPersonToOwnSchule) {
       // Override the "add another person" label for this specific case
-      createAnotherButtonLabel.value = t('admin.person.stateEmployeeSearch.searchAnotherPerson');
+      createAnotherButtonLabel.value = t('admin.person.stateEmployeeSearch.searchAnotherStateEmployee');
       headerLabel.value = t('admin.person.stateEmployeeSearch.searchAndAdd');
       createButtonLabel.value = t('admin.person.stateEmployeeSearch.addStateEmployee');
       discardButtonLabel.value = t('cancel');
@@ -753,7 +757,11 @@
               :showHeadline="true"
               :organisationen="organisationen"
               ref="personenkontext-create"
-              :rollen="(createType === CreationType.AddPersonToOwnSchule || (filteredRollen?.length ?? 0) > 0) ? filteredRollen : rollen"
+              :rollen="
+                createType === CreationType.AddPersonToOwnSchule || (filteredRollen?.length ?? 0) > 0
+                  ? filteredRollen
+                  : rollen
+              "
               :selectedOrganisationProps="selectedOrganisationProps"
               :selectedRollenProps="selectedRollenProps"
               :selectedKlasseProps="selectedKlasseProps"
@@ -1166,6 +1174,7 @@
             >
               <v-btn
                 class="primary button"
+                :class="{ big: mdAndUp }"
                 @click="handleCreateAnotherPerson"
                 :data-testid="createAnotherButtonTestId"
                 :block="mdAndDown"
@@ -1246,7 +1255,7 @@
       <LayoutCard
         v-if="showAddPersonConfirmationDialog"
         :closable="false"
-        :header="t('admin.person.stateEmployeeSearch.addPerson')"
+        :header="t('admin.person.stateEmployeeSearch.addStateEmployee')"
       >
         <v-card-text>
           <v-container>
@@ -1282,7 +1291,7 @@
               class="text-center"
               cols="12"
               sm="6"
-              md="4"
+              md="auto"
             >
               <v-btn
                 :block="mdAndDown"
@@ -1290,7 +1299,7 @@
                 @click.stop="addPersonToOwnSchule"
                 data-testid="confirm-add-person-button"
               >
-                {{ t('admin.person.stateEmployeeSearch.addPerson') }}
+                {{ t('admin.person.stateEmployeeSearch.addStateEmployee') }}
               </v-btn>
             </v-col>
           </v-row>
