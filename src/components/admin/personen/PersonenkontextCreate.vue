@@ -123,7 +123,7 @@
 
     if (newValue && newValue !== oldValue) {
       const filter: WorkflowFilter = {
-                personId: props.personId,
+        personId: props.personId,
         organisationId: newValue,
         limit: 25,
       };
@@ -177,7 +177,7 @@
         const newRollen: string[] | undefined = newValue as string[] | undefined;
         if (newRollen && newRollen.length > 0) {
           const filter: WorkflowFilter = {
-                    personId: props.personId,
+            personId: props.personId,
             organisationId: selectedOrganisation.value,
             rollenIds: newRollen,
             limit: 25,

@@ -264,28 +264,6 @@
   const organisationen: ComputedRef<TranslatedObject[] | undefined> = useOrganisationen();
   const organisationStore: OrganisationStore = useOrganisationStore();
 
-  // Watch the selectedRollen and update filteredRollen accordingly
-  watch(
-    selectedRollen,
-    (newSelectedRollen: string[] | undefined) => {
-      // Decide which rollen list to use based on createType
-      const baseRollen: TranslatedRolleWithAttrs[] | undefined =
-        createType === CreationType.AddPersonToOwnSchule ? filteredRollen.value : rollen.value;
-
-      if (newSelectedRollen && newSelectedRollen.length > 0) {
-        const selectedRollenart: RollenArt | undefined = baseRollen?.find((rolle: TranslatedRolleWithAttrs) =>
-          newSelectedRollen.includes(rolle.value),
-        )?.rollenart;
-
-        filteredRollen.value =
-          baseRollen?.filter((rolle: TranslatedRolleWithAttrs) => rolle.rollenart === selectedRollenart) || [];
-      } else if (newSelectedRollen && newSelectedRollen.length === 0) {
-        filteredRollen.value = [];
-      }
-    },
-    { immediate: true },
-  );
-
   // Extract the created Klassenzuordnungen from the response after submission
   const klasseZuordnungFromCreatedKontext: ComputedRef<DBiamPersonenkontextResponse[]> = computed(() => {
     if (!personenkontextStore.createdPersonWithKontext) return [];
@@ -472,15 +450,15 @@
     const befristungDate: string | undefined = selectedBefristung.value || calculatedBefristung.value;
     const formattedBefristung: string | undefined = befristungDate ? formatDateToISO(befristungDate) : undefined;
 
-    const newKontext: PersonenkontextUpdate = {
+    const newKontexte: PersonenkontextUpdate[] | undefined = selectedRollen.value?.map((rolleId: string) => ({
       organisationId: selectedOrganisation.value as string,
-      rolleId: selectedRollen.value?.[0] as string,
+      rolleId: rolleId,
       befristung: formattedBefristung,
-    };
+    }));
 
     selectedOrgaCache.value = selectedOrganisation.value;
     selectedRolleCache.value = selectedRollen.value;
-    await personenkontextStore.commitLandesbediensteteKontext(personId, [newKontext], existingPerson?.personalnummer!);
+    await personenkontextStore.commitLandesbediensteteKontext(personId, newKontexte, existingPerson?.personalnummer!);
     formContext.resetForm();
     filteredRollen.value = [];
   }
@@ -548,6 +526,29 @@
     setupWatchers();
     navigateToCreatePersonRoute();
   };
+
+    // Watch the selectedRollen and update filteredRollen accordingly
+  watch(
+    selectedRollen,
+    (newSelectedRollen: string[] | undefined) => {
+      // Decide which rollen list to use based on createType
+      const baseRollen: TranslatedRolleWithAttrs[] | undefined =
+        createType === CreationType.AddPersonToOwnSchule ? filteredRollen.value : rollen.value;
+
+      if (newSelectedRollen && newSelectedRollen.length > 0) {
+        const selectedRollenart: RollenArt | undefined = baseRollen?.find((rolle: TranslatedRolleWithAttrs) =>
+          newSelectedRollen.includes(rolle.value),
+        )?.rollenart;
+
+        filteredRollen.value =
+          baseRollen?.filter((rolle: TranslatedRolleWithAttrs) => rolle.rollenart === selectedRollenart) || [];
+      // If no roles are selected, reset the filteredRollen to the normal rollen list and for createType AddPersonToOwnSchule nothing happens because the rollen are always filtered
+      } else if (newSelectedRollen && newSelectedRollen.length === 0 && createType !== CreationType.AddPersonToOwnSchule) {
+        filteredRollen.value = [];
+      }
+    },
+    { immediate: true },
+  );
 
   // Watch the rollen and update filteredRollen based on selectedRollen... This is necessary to ensure that the filteredRollen are always in sync while the user is searching.
   watch(rollen, async (newRollen: TranslatedRolleWithAttrs[] | undefined) => {
@@ -752,7 +753,7 @@
               :showHeadline="true"
               :organisationen="organisationen"
               ref="personenkontext-create"
-              :rollen="(filteredRollen?.length ?? 0) === 0 ? rollen : filteredRollen"
+              :rollen="(createType === CreationType.AddPersonToOwnSchule || (filteredRollen?.length ?? 0) > 0) ? filteredRollen : rollen"
               :selectedOrganisationProps="selectedOrganisationProps"
               :selectedRollenProps="selectedRollenProps"
               :selectedKlasseProps="selectedKlasseProps"
