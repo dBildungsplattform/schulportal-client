@@ -25,7 +25,11 @@ import {
   type RolleStore,
   type RolleWithServiceProvidersResponse,
 } from '@/stores/RolleStore';
-import { EmailAddressStatus } from '@/api-client/generated/api';
+import {
+  EmailAddressStatus,
+  type DBiamPersonenkontextResponse,
+  type PersonenkontexteUpdateResponse,
+} from '@/api-client/generated/api';
 import type Module from 'module';
 
 let wrapper: VueWrapper | null = null;
@@ -173,6 +177,16 @@ rolleStore.allRollen = [
     ],
   },
 ] as RolleWithServiceProvidersResponse[];
+
+const mockLandesbediensteteCommitResponse: PersonenkontexteUpdateResponse = {
+  dBiamPersonenkontextResponses: [
+    {
+      personId: '1',
+      organisationId: 'org-123',
+      rolleId: 'rolle-456',
+    } as DBiamPersonenkontextResponse,
+  ],
+};
 
 type OnBeforeRouteLeaveCallback = (
   _to: RouteLocationNormalized,
@@ -597,7 +611,7 @@ describe('PersonCreationView', () => {
     expect(wrapper?.find('[data-testid="person-success-text"]').isVisible()).toBe(true);
   });
 
-  test('it renders success template and navigates back to form', async () => {
+  test('it renders success template for created user and navigates back to form', async () => {
     personenkontextStore.createdPersonWithKontext = mockCreatedPersonWithKontext;
     await nextTick();
 
@@ -608,6 +622,25 @@ describe('PersonCreationView', () => {
     wrapper?.find('[data-testid="create-another-person-button"]').trigger('click');
 
     expect(wrapper?.find('[data-testid="person-success-text"]').isVisible()).toBe(true);
+  });
+
+  test('it renders success template for added Landesbediensteter and navigates back to person management', async () => {
+    await router.push({ name: 'add-person-to-own-schule' });
+    await router.isReady();
+
+    wrapper = mountComponent();
+
+    await nextTick();
+    personenkontextStore.landesbediensteteCommitResponse = mockLandesbediensteteCommitResponse;
+    await nextTick();
+
+    expect(wrapper.find('[data-testid="landesbediensteter-success-text"]').isVisible()).toBe(true);
+
+    expect(wrapper.find('[data-testid="search-another-landesbediensteter-button"]').isVisible()).toBe(true);
+
+    wrapper.find('[data-testid="search-another-landesbediensteter-button"]').trigger('click');
+
+    expect(wrapper.find('[data-testid="landesbediensteter-success-text"]').isVisible()).toBe(true);
   });
 
   test('it navigates to person details when clicking on btn in success template', async () => {

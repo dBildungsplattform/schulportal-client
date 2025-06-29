@@ -513,7 +513,9 @@
   }
 
   const createAnotherButtonTestId: ComputedRef<string> = computed(() =>
-    createType === CreationType.AddPersonToOwnSchule ? 'search-another-person-button' : 'create-another-person-button',
+    createType === CreationType.AddPersonToOwnSchule
+      ? 'search-another-landesbediensteter-button'
+      : 'create-another-person-button',
   );
 
   const handleCreateAnotherPerson = (): void => {
@@ -1040,7 +1042,7 @@
           </v-row>
         </v-container>
       </template>
-      <!-- Result template on success after assigning the Person to a Schule   -->
+      <!-- Result template on success after assigning the Landesbediensteter to a Schule   -->
       <template
         v-if="
           personenkontextStore.landesbediensteteCommitResponse !== null &&
@@ -1054,7 +1056,7 @@
               class="subtitle-1"
               cols="auto"
             >
-              <span data-testid="person-success-text">
+              <span data-testid="landesbediensteter-success-text">
                 {{
                   t('admin.person.addedSuccessfully', {
                     firstname: personStore.allLandesbedienstetePersonen?.[0]?.vorname,
@@ -1086,7 +1088,7 @@
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('person.firstName') }}: </v-col>
             <v-col class="text-body"
-              ><span data-testid="created-person-vorname">{{
+              ><span data-testid="added-landesbediensteter-forname">{{
                 personStore.allLandesbedienstetePersonen?.[0]?.vorname
               }}</span></v-col
             >
@@ -1094,7 +1096,7 @@
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('person.lastName') }}: </v-col>
             <v-col class="text-body"
-              ><span data-testid="created-person-familienname">{{
+              ><span data-testid="added-landesbediensteter-ffamilienname">{{
                 personStore.allLandesbedienstetePersonen?.[0]?.familienname
               }}</span></v-col
             >
@@ -1102,7 +1104,7 @@
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('person.kopersNr') }}: </v-col>
             <v-col class="text-body"
-              ><span data-testid="created-person-familienname">{{
+              ><span data-testid="added-landesbediensteter-familienname">{{
                 personStore.allLandesbedienstetePersonen?.[0]?.personalnummer
               }}</span></v-col
             >
@@ -1110,7 +1112,7 @@
           <v-row>
             <v-col class="text-body bold text-right"> {{ t('person.userName') }}: </v-col>
             <v-col class="text-body"
-              ><span data-testid="created-person-username">{{
+              ><span data-testid="added-landesbediensteter-username">{{
                 personStore.allLandesbedienstetePersonen?.[0]?.username
               }}</span></v-col
             >
@@ -1118,19 +1120,19 @@
           <v-row>
             <v-col class="text-body bold text-right"> {{ t('admin.organisation.organisation') }}: </v-col>
             <v-col class="text-body"
-              ><span data-testid="created-person-organisation">{{ translatedOrganisationsname }}</span></v-col
+              ><span data-testid="added-landesbediensteter-organisation">{{ translatedOrganisationsname }}</span></v-col
             >
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ t('admin.rolle.rolle') }}: </v-col>
             <v-col class="text-body"
-              ><span data-testid="created-person-rolle">{{ translatedRollenname.join(', ') }}</span></v-col
+              ><span data-testid="added-landesbediensteter-rolle">{{ translatedRollenname.join(', ') }}</span></v-col
             >
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ t('admin.befristung.befristung') }}: </v-col>
             <v-col class="text-body"
-              ><span data-testid="created-person-befristung">{{ translatedBefristung }}</span></v-col
+              ><span data-testid="added-landesbediensteter-befristung">{{ translatedBefristung }}</span></v-col
             >
           </v-row>
           <v-divider
