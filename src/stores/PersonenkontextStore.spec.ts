@@ -19,16 +19,37 @@ import {
   OperationContext,
   type WorkflowFilter,
 } from './PersonenkontextStore';
-import { type PersonendatensatzResponse } from './PersonStore';
+import { usePersonStore, type PersonendatensatzResponse, type PersonStore } from './PersonStore';
+import { DoFactory } from 'test/DoFactory';
+import { PersonenUebersicht } from './types/PersonenUebersicht';
+import type { Zuordnung } from './types/Zuordnung';
+import type { Organisation } from './OrganisationStore';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 
 describe('PersonenkontextStore', () => {
   let personenkontextStore: PersonenkontextStore;
+  let personStore: PersonStore;
+
+  const mockPersonId: string = '1';
+  const mockSchule: Organisation = DoFactory.getSchule();
+  const mockSchuleZuordnung: Zuordnung = DoFactory.getZuordnung({}, { organisation: mockSchule });
+  const person: PersonenUebersicht = new PersonenUebersicht(
+    mockPersonId,
+    'John',
+    'Doe',
+    'jdoe',
+    '2024-03-24T16:35:32.711Z',
+    [mockSchuleZuordnung],
+  );
+
   beforeEach(() => {
     setActivePinia(createPinia());
     personenkontextStore = usePersonenkontextStore();
+    personStore = usePersonStore();
     mockadapter.reset();
+
+    personStore.personenuebersicht = person;
   });
 
   it('should initalize state correctly', () => {
@@ -229,6 +250,174 @@ describe('PersonenkontextStore', () => {
         });
       },
     );
+  });
+
+  describe('processWorkflowStepLandesbedienstete', () => {
+    const getUrl = (filter: WorkflowFilter): string => {
+      const { organisationId, rollenIds, rolleName, organisationName, limit }: WorkflowFilter = filter;
+      let url: string = '/api/landesbediensteter/step';
+      const params: string[] = [];
+
+      if (organisationId) {
+        params.push(`organisationId=${organisationId}`);
+      }
+      if (rollenIds) {
+        rollenIds.forEach((rolleId: string) => params.push(`rollenIds=${rolleId}`));
+      }
+      if (rolleName) {
+        params.push(`rolleName=${rolleName}`);
+      }
+      if (organisationName) {
+        params.push(`organisationName=${organisationName}`);
+      }
+      if (limit) {
+        params.push(`limit=${limit}`);
+      }
+
+      if (params.length > 0) {
+        url += `?${params.join('&')}`;
+      }
+
+      return url;
+    };
+
+    const mockResponse: PersonenkontextWorkflowResponse = {
+      organisations: [
+        {
+          id: '1',
+          administriertVon: 'string',
+          kennung: 'string',
+          name: 'string',
+          namensergaenzung: 'string',
+          kuerzel: 'string',
+          typ: OrganisationsTyp.Schule,
+        },
+      ],
+      rollen: [],
+      selectedOrganisation: '1',
+      selectedRollen: ['1'],
+      canCommit: true,
+    };
+
+    it('should get step successfully', async () => {
+      const filter: WorkflowFilter = { organisationId: '1' };
+      mockadapter.onGet(getUrl(filter)).replyOnce(200, mockResponse);
+
+      const processWorkflowStep: Promise<void> = personenkontextStore.processWorkflowStepLandesbedienstete(filter);
+
+      expect(personenkontextStore.loading).toBe(true);
+      await processWorkflowStep;
+      expect(personenkontextStore.workflowStepResponse).toEqual(mockResponse);
+      expect(personenkontextStore.loading).toBe(false);
+    });
+
+    it('should get step with multiple parameters', async () => {
+      const filter: WorkflowFilter = {
+        organisationId: '1',
+        rollenIds: ['role1', 'role2'],
+        rolleName: 'TestRole',
+        organisationName: 'TestOrg',
+        limit: 10,
+      };
+      mockadapter.onGet(getUrl(filter)).replyOnce(200, mockResponse);
+
+      const processWorkflowStep: Promise<void> = personenkontextStore.processWorkflowStepLandesbedienstete(filter);
+
+      expect(personenkontextStore.loading).toBe(true);
+      await processWorkflowStep;
+      expect(personenkontextStore.workflowStepResponse).toEqual(mockResponse);
+      expect(personenkontextStore.loading).toBe(false);
+    });
+
+    it('should handle string error', async () => {
+      const filter: WorkflowFilter = { organisationId: '1' };
+      mockadapter.onGet(getUrl(filter)).replyOnce(500, 'some error');
+
+      const processWorkflowStep: Promise<void> = personenkontextStore.processWorkflowStepLandesbedienstete(filter);
+
+      expect(personenkontextStore.loading).toBe(true);
+      await processWorkflowStep;
+      expect(personenkontextStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(personenkontextStore.loading).toBe(false);
+    });
+
+    it('should handle error code', async () => {
+      const filter: WorkflowFilter = { organisationId: '1' };
+      mockadapter.onGet(getUrl(filter)).replyOnce(500, { code: 'some mock server error' });
+
+      const processWorkflowStep: Promise<void> = personenkontextStore.processWorkflowStepLandesbedienstete(filter);
+
+      expect(personenkontextStore.loading).toBe(true);
+      await processWorkflowStep;
+      expect(personenkontextStore.errorCode).toEqual('some mock server error');
+      expect(personenkontextStore.loading).toBe(false);
+    });
+  });
+
+  describe('commitLandesbediensteteKontext', () => {
+    const personId: string = '123';
+    const personalnummer: string = '12345';
+    const updatedPersonenkontexte: PersonenkontextUpdate[] = [
+      {
+        organisationId: 'org1',
+        rolleId: 'role1',
+      },
+    ];
+
+    const mockUpdateResponse: PersonenkontexteUpdateResponse = {
+      dBiamPersonenkontextResponses: [
+        {
+          personId: '1',
+          organisationId: 'org-123',
+          rolleId: 'rolle-456',
+        } as DBiamPersonenkontextResponse,
+      ],
+    };
+
+    it('should commit landesbedienstete kontext successfully', async () => {
+      mockadapter.onPut(`/api/landesbediensteter/${personId}`).replyOnce(200, mockUpdateResponse);
+
+      const commitPromise: Promise<void> = personenkontextStore.commitLandesbediensteteKontext(
+        personId,
+        updatedPersonenkontexte,
+        personalnummer,
+      );
+
+      expect(personenkontextStore.loading).toBe(true);
+      await commitPromise;
+      expect(personenkontextStore.landesbediensteteCommitResponse).toEqual(mockUpdateResponse);
+      expect(personenkontextStore.loading).toBe(false);
+    });
+
+    it('should handle string error', async () => {
+      mockadapter.onPut(`/api/landesbediensteter/${personId}`).replyOnce(500, 'some error');
+
+      const commitPromise: Promise<void> = personenkontextStore.commitLandesbediensteteKontext(
+        personId,
+        updatedPersonenkontexte,
+        personalnummer,
+      );
+
+      expect(personenkontextStore.loading).toBe(true);
+      await commitPromise;
+      expect(personenkontextStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(personenkontextStore.loading).toBe(false);
+    });
+
+    it('should handle error code', async () => {
+      mockadapter.onPut(`/api/landesbediensteter/${personId}`).replyOnce(500, { code: 'some mock server error' });
+
+      const commitPromise: Promise<void> = personenkontextStore.commitLandesbediensteteKontext(
+        personId,
+        updatedPersonenkontexte,
+        personalnummer,
+      );
+
+      expect(personenkontextStore.loading).toBe(true);
+      await commitPromise;
+      expect(personenkontextStore.errorCode).toEqual('some mock server error');
+      expect(personenkontextStore.loading).toBe(false);
+    });
   });
 
   describe('updatePersonenkontexte', () => {
