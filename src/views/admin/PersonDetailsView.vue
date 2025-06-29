@@ -35,7 +35,6 @@
     usePersonenkontextStore,
     type PersonenkontextStore,
     type PersonenkontextUpdate,
-    type PersonenkontextWorkflowResponse,
   } from '@/stores/PersonenkontextStore';
   import { RollenArt, RollenMerkmal, useRolleStore, type RolleStore } from '@/stores/RolleStore';
   import {
