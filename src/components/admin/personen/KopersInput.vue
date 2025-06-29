@@ -4,6 +4,7 @@
   import FormRow from '@/components/form/FormRow.vue';
 
   type Props = {
+    isDisabled?: boolean;
     hasNoKopersNr?: boolean;
     selectedKopersNr: string | undefined;
     selectedKopersNrProps: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
@@ -66,6 +67,7 @@
       data-testid="kopersnr-input"
       density="compact"
       id="kopersnr-input"
+      :disabled="props.isDisabled"
       ref="kopersnr-input"
       :placeholder="$t('person.enterKopersNr')"
       :required="!hasNoKopersNr"

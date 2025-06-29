@@ -67,6 +67,18 @@ const routes: readonly RouteRecordRaw[] = [
     },
   },
   {
+    path: '/admin/limited/personen/add',
+    name: 'add-person-to-own-schule',
+    component: () => import('../views/admin/PersonCreationView.vue'),
+    meta: {
+      layout: 'AdminLayout',
+      requiresAuth: true,
+      requiredStepUpLevel: StepUpLevel.GOLD,
+      requiresPermission: ['personenverwaltung', 'landesbedienstetesuchenundhinzufügen'],
+      createType: 'add-person-to-own-schule',
+    },
+  },
+  {
     path: '/admin/limited/personen/new',
     name: 'create-person-limited',
     component: () => import('../views/admin/PersonCreationView.vue'),
