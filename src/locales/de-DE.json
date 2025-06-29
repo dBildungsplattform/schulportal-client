@@ -172,7 +172,7 @@
         "multiplePersonsFoundMessage": "Es wurde mehr als ein Treffer gefunden. Bitte verwenden Sie zur Suche die KoPers.-Nr., die Landes-Mailadresse oder den Benutzernamen. Sollten Sie Hilfe benötigen, eröffnen Sie ein Störungsticket über den IQSH-Helpdesk.",
         "searchResult": "Suchergebnis",
         "searchMethodNotice": "Bitte wählen Sie, wie Sie nach dem Landesbediensteten suchen möchten.",
-        "searchAndAdd": "Landesbediensteter (suchen und hinzufügen)",
+        "searchAndAdd": "Landesbediensteten (suchen und hinzufügen)",
         "searchPerson": "Person suchen",
         "searchStateEmployee": "Landesbediensteten suchen",
         "searchAnotherPerson": "Weitere Person suchen",
