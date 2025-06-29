@@ -1500,7 +1500,7 @@
     const twoFARequirementPromise: Promise<void> = twoFactorAuthentificationStore.get2FARequirement(currentPersonId);
     const personByIdPromise: Promise<Personendatensatz> = personStore.getPersonById(currentPersonId);
     const personUebersichtPromise: Promise<void> = personStore.getPersonenuebersichtById(currentPersonId);
-    const workflowStepPromise: Promise<PersonenkontextWorkflowResponse> = personenkontextStore.processWorkflowStep({
+    const workflowStepPromise: Promise<void> = personenkontextStore.processWorkflowStep({
       personId: currentPersonId,
       operationContext: OperationContext.PERSON_BEARBEITEN,
       limit: 25,
