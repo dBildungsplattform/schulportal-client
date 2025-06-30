@@ -114,10 +114,23 @@
     );
   }
 
-  // Watcher for selectedOrganisation to fetch roles and classes
-  watch(selectedOrganisation, async (newValue: string | undefined, oldValue: string | undefined) => {
+  async function handleWorkflowStep(filter: WorkflowFilter): Promise<void> {
     const useLandesbediensteteWorkflow: boolean = props.createType === CreationType.AddPersonToOwnSchule;
 
+    if (useLandesbediensteteWorkflow) {
+      await personenkontextStore.processWorkflowStepLandesbedienstete(filter);
+    } else {
+      await personenkontextStore.processWorkflowStep({
+        operationContext: props.operationContext,
+        ...filter,
+      });
+    }
+
+    canCommit.value = personenkontextStore.workflowStepResponse?.canCommit ?? false;
+  }
+
+  // Watcher for selectedOrganisation to fetch roles and classes
+  watch(selectedOrganisation, async (newValue: string | undefined, oldValue: string | undefined) => {
     // Reset selected roles if oldValue existed (change event)
     if (oldValue !== undefined) {
       selectedRolle.value = undefined;
@@ -133,14 +146,7 @@
         limit: 25,
       };
 
-      if (useLandesbediensteteWorkflow) {
-        await personenkontextStore.processWorkflowStepLandesbedienstete(filter);
-      } else {
-        await personenkontextStore.processWorkflowStep({
-          operationContext: props.operationContext,
-          ...filter,
-        });
-      }
+      await handleWorkflowStep(filter);
 
       administriertVon.value?.pop();
       administriertVon.value?.push(newValue);
@@ -172,21 +178,6 @@
 
     emits('update:selectedOrganisation', newValue);
   });
-
-  async function handleWorkflowStep(filter: WorkflowFilter): Promise<void> {
-    const useLandesbediensteteWorkflow: boolean = props.createType === CreationType.AddPersonToOwnSchule;
-
-    if (useLandesbediensteteWorkflow) {
-      await personenkontextStore.processWorkflowStepLandesbedienstete(filter);
-    } else {
-      await personenkontextStore.processWorkflowStep({
-        operationContext: props.operationContext,
-        ...filter,
-      });
-    }
-
-    canCommit.value = personenkontextStore.workflowStepResponse?.canCommit ?? false;
-  }
 
   watch(
     () => (props.allowMultipleRollen ? selectedRollen.value : selectedRolle.value),
