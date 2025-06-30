@@ -936,7 +936,7 @@
                   ></v-text-field>
                 </FormRow>
                 <KopersInput
-                  v-if="selectedOrganisation"
+                  v-if="isKopersRolle(selectedRollen, filteredRollen) && selectedOrganisation"
                   :hasNoKopersNr="hasNoKopersNr"
                   v-model:selectedKopersNr="selectedKopersNr"
                   ref="kopers-input"
