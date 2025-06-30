@@ -173,11 +173,24 @@
     emits('update:selectedOrganisation', newValue);
   });
 
+  async function handleWorkflowStep(filter: WorkflowFilter): Promise<void> {
+    const useLandesbediensteteWorkflow: boolean = props.createType === CreationType.AddPersonToOwnSchule;
+
+    if (useLandesbediensteteWorkflow) {
+      await personenkontextStore.processWorkflowStepLandesbedienstete(filter);
+    } else {
+      await personenkontextStore.processWorkflowStep({
+        operationContext: props.operationContext,
+        ...filter,
+      });
+    }
+
+    canCommit.value = personenkontextStore.workflowStepResponse?.canCommit ?? false;
+  }
+
   watch(
     () => (props.allowMultipleRollen ? selectedRollen.value : selectedRolle.value),
     async (newValue: string | string[] | undefined, oldValue: string | string[] | undefined) => {
-      const useLandesbediensteteWorkflow: boolean = props.createType === CreationType.AddPersonToOwnSchule;
-
       if (props.allowMultipleRollen) {
         const newRollen: string[] | undefined = newValue as string[] | undefined;
         if (newRollen && newRollen.length > 0) {
@@ -188,14 +201,7 @@
             limit: 25,
           };
 
-          if (useLandesbediensteteWorkflow) {
-            await personenkontextStore.processWorkflowStepLandesbedienstete(filter);
-          } else {
-            await personenkontextStore.processWorkflowStep({
-              operationContext: props.operationContext,
-              ...filter,
-            });
-          }
+          await handleWorkflowStep(filter);
 
           canCommit.value = personenkontextStore.workflowStepResponse?.canCommit ?? false;
         } else {
@@ -216,14 +222,7 @@
             limit: 25,
           };
 
-          if (useLandesbediensteteWorkflow) {
-            await personenkontextStore.processWorkflowStepLandesbedienstete(filter);
-          } else {
-            await personenkontextStore.processWorkflowStep({
-              operationContext: props.operationContext,
-              ...filter,
-            });
-          }
+          await handleWorkflowStep(filter);
 
           canCommit.value = personenkontextStore.workflowStepResponse?.canCommit ?? false;
         }
