@@ -164,7 +164,7 @@
         "searchAnotherStateEmployee": "Weiteren Landesbediensteten suchen",
         "addPerson": "Person hinzufügen",
         "addStateEmployee": "Landesbediensteten hinzufügen",
-        "addPersonConfirmationMessage": "Wollen Sie {vorname} {nachname} als {rollenname} hinzufügen?",
+        "addPersonConfirmationMessage": "Wollen Sie {benutzername} als {rollenname} hinzufügen?",
         "anotherPerson": "Andere Person (neu anlegen)",
         "createPerson": "Person anlegen",
         "createAnotherPerson": "Weitere Person anlegen",

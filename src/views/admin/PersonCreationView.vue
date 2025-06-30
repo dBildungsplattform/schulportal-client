@@ -466,9 +466,11 @@
 
   const onSubmit: (e?: Event) => Promise<Promise<void> | undefined> = formContext.handleSubmit(async () => {
     if (createType === CreationType.AddPersonToOwnSchule) {
+      const existingPerson: PersonLandesbediensteterSearchResponse | undefined =
+        personStore.allLandesbedienstetePersonen?.[0];
+      const username: string | undefined = existingPerson?.username;
       addPersonConfirmationText.value = t('admin.person.stateEmployeeSearch.addPersonConfirmationMessage', {
-        vorname: selectedVorname.value,
-        familienname: selectedFamilienname.value,
+        benutzername: `${username}`,
         rollenname: selectedRollen.value
           ?.map(
             (rolleId: string) =>

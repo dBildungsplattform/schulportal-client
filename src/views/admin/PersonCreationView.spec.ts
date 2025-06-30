@@ -702,7 +702,8 @@ describe('PersonCreationView', () => {
 
 
     const confirmButton: Element | null = document.querySelector('[data-testid="confirm-add-person-button"]');
-    await vi.waitUntil(() => expect(confirmButton).not.toBeNull());
+    await vi.waitUntil(() => expect(confirmButton != null));
+
     confirmButton!.dispatchEvent(new Event('click'));
 
     // Form is resetting after submit so orga should be undefined
