@@ -386,7 +386,7 @@
     <LayoutCard
       :closable="true"
       @onCloseClicked="navigateToPersonTable"
-      :header="t('admin.person.stateEmployeeSearch.searchAndAdd')"
+      :header="t('admin.person.stateEmployeeSearch.searchStateEmployee')"
       :padded="true"
       :showCloseText="true"
     >

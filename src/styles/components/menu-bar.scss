@@ -18,14 +18,17 @@
       margin-right: 10px;
     }
 
+    .v-list-item-title {
+      white-space: normal;
+      overflow: visible;
+      text-overflow: unset;
+    }
+
     &.v-list-item--active {
       background-color: variables.$menuBarActiveItemColor;
-      
+
       .v-list-item-title {
         font-weight: bold;
-        white-space: normal;
-        overflow: visible;
-        text-overflow: unset;
       }
     }
   }

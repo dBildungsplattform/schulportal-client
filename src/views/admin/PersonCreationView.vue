@@ -117,6 +117,7 @@
   }
 
   const headerLabel: Ref<string> = ref(t('admin.person.addNew'));
+  const layoutCardLabel: Ref<string> = ref(t('admin.person.addNew'));
   const createButtonLabel: Ref<string> = ref(t('admin.person.create'));
   const discardButtonLabel: Ref<string> = ref(t('admin.person.discard'));
   const createAnotherButtonLabel: Ref<string> = ref(t('admin.person.createAnother'));
@@ -657,6 +658,7 @@
       createButtonLabel.value = t('admin.person.stateEmployeeSearch.createPerson');
       discardButtonLabel.value = t('cancel');
       createAnotherButtonLabel.value = t('admin.person.stateEmployeeSearch.createAnotherPerson');
+      layoutCardLabel.value = t('admin.person.stateEmployeeSearch.anotherPerson');
     }
 
     if (createType === CreationType.AddPersonToOwnSchule) {
@@ -665,6 +667,7 @@
       headerLabel.value = t('admin.person.stateEmployeeSearch.searchAndAdd');
       createButtonLabel.value = t('admin.person.stateEmployeeSearch.addStateEmployee');
       discardButtonLabel.value = t('cancel');
+      layoutCardLabel.value = t('admin.person.stateEmployeeSearch.addStateEmployee');
     }
 
     personenkontextStore.requestedWithSystemrecht =
@@ -701,7 +704,7 @@
     </h1>
     <LayoutCard
       :closable="!personenkontextStore.errorCode && !personStore.errorCode"
-      :header="headerLabel"
+      :header="layoutCardLabel"
       @onCloseClicked="navigateToPersonTable"
       :padded="true"
       :showCloseText="true"
