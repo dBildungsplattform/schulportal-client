@@ -29,8 +29,10 @@ import {
   EmailAddressStatus,
   type DBiamPersonenkontextResponse,
   type PersonenkontexteUpdateResponse,
+  type PersonLandesbediensteterSearchResponse,
 } from '@/api-client/generated/api';
 import type Module from 'module';
+import { faker } from '@faker-js/faker';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -622,6 +624,93 @@ describe('PersonCreationView', () => {
     wrapper?.find('[data-testid="create-another-person-button"]').trigger('click');
 
     expect(wrapper?.find('[data-testid="person-success-text"]').isVisible()).toBe(true);
+  });
+
+  test('it fills form for Landesbediensteter, triggers submit and then show success template', async () => {
+    const mockLandesbedienstetePersonen: PersonLandesbediensteterSearchResponse[] = [
+      {
+        id: faker.string.uuid(),
+        vorname: 'John',
+        familienname: 'Doe',
+        username: 'john.doe',
+        personalnummer: '12345',
+        primaryEmailAddress: 'john.doe@example.com',
+        personenkontexte: [
+          {
+            rolleId: 'role-1',
+            rolleName: 'Teacher',
+            organisationId: 'org-1',
+            organisationName: 'Test School',
+          },
+        ],
+      },
+    ];
+
+    personStore.allLandesbedienstetePersonen = mockLandesbedienstetePersonen;
+    await router.push({ name: 'add-person-to-own-schule' });
+    await router.isReady();
+
+    wrapper = mountComponent();
+    await nextTick();
+    personenkontextStore.workflowStepResponse = {
+      organisations: [
+        {
+          id: '9876',
+          kennung: '',
+          name: 'Organisation1',
+          namensergaenzung: 'string',
+          kuerzel: 'string',
+          typ: 'TRAEGER',
+          administriertVon: '1',
+        },
+      ],
+      rollen: [
+        {
+          administeredBySchulstrukturknoten: '1234',
+          rollenart: 'LERN',
+          name: 'SuS',
+          merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
+          systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+          createdAt: '2022',
+          updatedAt: '2022',
+          id: '1',
+          administeredBySchulstrukturknotenName: 'Land SH',
+          administeredBySchulstrukturknotenKennung: '',
+          version: 1,
+        },
+      ],
+      selectedOrganisation: null,
+      selectedRollen: null,
+      canCommit: true,
+    };
+
+    const organisationSelect: VueWrapper | undefined = wrapper
+      .findComponent({ ref: 'personenkontext-create' })
+      .findComponent({ ref: 'organisation-select' });
+    await organisationSelect.setValue('9876');
+    await nextTick();
+
+    const rollenSelect: VueWrapper | undefined = wrapper
+      .findComponent({ ref: 'personenkontext-create' })
+      .findComponent({ ref: 'rollen-select' });
+    await rollenSelect.setValue(['1']);
+    await nextTick();
+
+    wrapper.find('[data-testid="person-creation-form-submit-button"]').trigger('click');
+    await nextTick();
+    await flushPromises();
+
+    const confirmButton: Element | null = document.querySelector('[data-testid="confirm-add-person-button"]');
+    expect(confirmButton).not.toBeNull();
+    confirmButton!.dispatchEvent(new Event('click'));
+
+    // Form is resetting after submit so orga should be undefined
+    expect(organisationSelect.vm.$data).toStrictEqual({});
+
+    personenkontextStore.landesbediensteteCommitResponse = mockLandesbediensteteCommitResponse;
+
+    await nextTick();
+    expect(wrapper.find('[data-testid="landesbediensteter-success-text"]').isVisible()).toBe(true);
   });
 
   test('it renders success template for added Landesbediensteter and navigates back to person management', async () => {

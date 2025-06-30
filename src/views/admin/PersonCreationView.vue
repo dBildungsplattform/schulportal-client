@@ -832,7 +832,7 @@
                 ></v-text-field>
               </FormRow>
               <KopersInput
-                v-if="isKopersRolle(selectedRollen, filteredRollen) && selectedOrganisation"
+                v-if="selectedOrganisation"
                 :isDisabled="createType === CreationType.AddPersonToOwnSchule"
                 :hasNoKopersNr="hasNoKopersNr"
                 v-model:selectedKopersNr="selectedKopersNr"
