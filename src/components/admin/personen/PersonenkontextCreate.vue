@@ -365,7 +365,9 @@
 <template>
   <div>
     <v-row v-if="showHeadline">
-      <h3 class="headline-3">{{ headlineNumbers?.org ?? '1.' }} {{ $t('admin.organisation.assignOrganisation') }}</h3>
+      <h3 class="headline-3 mt-3">
+        {{ headlineNumbers?.org ?? '1.' }} {{ $t('admin.organisation.assignOrganisation') }}
+      </h3>
     </v-row>
     <!-- Organisation zuordnen -->
     <FormRow
