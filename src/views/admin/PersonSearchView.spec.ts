@@ -438,6 +438,41 @@ describe('PersonSearchView', () => {
     expect(dialog?.classList.contains('v-dialog--active')).toBe(false);
   });
 
+
+  test('it navigates back to Benutzerliste when the layout card is closed', async () => {
+    const push: MockInstance = vi.spyOn(router, 'push');
+    await wrapper?.find('[data-testid="close-layout-card-button"]').trigger('click');
+    expect(push).toHaveBeenCalledTimes(1);
+  });
+
+  test('it navigates to PersonCreationView when the button for adding the landesbediensteter is clicked', async () => {
+    const mockLandesbedienstetePersonen: PersonLandesbediensteterSearchResponse[] = [
+      {
+        id: faker.string.uuid(),
+        vorname: 'John',
+        familienname: 'Doe',
+        username: 'john.doe',
+        personalnummer: '12345',
+        primaryEmailAddress: 'john.doe@example.com',
+        personenkontexte: [
+          {
+            rolleId: 'role-1',
+            rolleName: 'Teacher',
+            organisationId: 'org-1',
+            organisationName: 'Test School',
+          },
+        ],
+      },
+    ];
+    personStore.allLandesbedienstetePersonen = mockLandesbedienstetePersonen;
+    await nextTick();
+    const push: MockInstance = vi.spyOn(router, 'push');
+
+    await wrapper?.find('[data-testid="add-state-employee-button"]').trigger('click');
+
+    expect(push).toHaveBeenCalledTimes(1);
+  });
+
   describe('navigation interception', () => {
     afterEach(() => {
       vi.unmock('vue-router');

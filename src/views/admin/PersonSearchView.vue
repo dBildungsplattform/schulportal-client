@@ -721,7 +721,7 @@
             <v-btn
               @click.stop="() => (personStore.allLandesbedienstetePersonen = [])"
               class="secondary button"
-              data-testid="reset-form-button"
+              data-testid="reset-search-button"
               :block="mdAndDown"
             >
               {{ $t('nav.backToSearch') }}
@@ -735,7 +735,7 @@
             <v-btn
               @click.stop="navigateToPersonCreationForm"
               class="primary button"
-              data-testid="close-unsaved-changes-dialog-button"
+              data-testid="add-state-employee-button"
               :block="mdAndDown"
             >
               {{ $t('admin.person.stateEmployeeSearch.addStateEmployee') }}
