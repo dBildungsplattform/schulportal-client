@@ -719,12 +719,12 @@
             md="auto"
           >
             <v-btn
-              @click.stop="resetForm"
+              @click.stop="() => (personStore.allLandesbedienstetePersonen = [])"
               class="secondary button"
               data-testid="reset-form-button"
               :block="mdAndDown"
             >
-              {{ $t('reset') }}
+              {{ $t('nav.backToSearch') }}
             </v-btn>
           </v-col>
           <v-col
