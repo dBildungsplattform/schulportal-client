@@ -712,7 +712,7 @@
             </v-col>
           </v-row>
         </LayoutCard>
-        <v-row class="justify-end pr-2 pl-2">
+        <v-row class="justify-end pr-2 pl-2 pb-2">
           <v-col
             cols="12"
             sm="6"

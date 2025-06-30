@@ -53,6 +53,11 @@
     selectedRollenProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     isModifyRolleDialog?: boolean;
     befristungInputProps?: BefristungProps;
+    headlineNumbers?: {
+      org: string;
+      rolle: string;
+      befristung: string;
+    };
     allowMultipleRollen?: boolean;
     isRolleUnassignForm?: boolean;
   };
@@ -360,7 +365,7 @@
 <template>
   <div>
     <v-row v-if="showHeadline">
-      <h3 class="headline-3">1. {{ $t('admin.organisation.assignOrganisation') }}</h3>
+      <h3 class="headline-3">{{ headlineNumbers?.org ?? '1.' }} {{ $t('admin.organisation.assignOrganisation') }}</h3>
     </v-row>
     <!-- Organisation zuordnen -->
     <FormRow
@@ -400,7 +405,7 @@
 
     <div v-if="selectedOrganisation">
       <v-row v-if="showHeadline">
-        <h3 class="headline-3">2. {{ $t('admin.rolle.assignRolle') }}</h3>
+        <h3 class="headline-3">{{ headlineNumbers?.rolle ?? '2.' }} {{ $t('admin.rolle.assignRolle') }}</h3>
       </v-row>
       <!-- Rollenzuordnung -->
       <FormRow
@@ -487,7 +492,9 @@
           showHeadline
         "
       >
-        <h3 class="headline-3">3. {{ $t('admin.befristung.assignBefristung') }}</h3>
+        <h3 class="headline-3">
+          {{ headlineNumbers?.befristung ?? '2.1' }} {{ $t('admin.befristung.assignBefristung') }}
+        </h3>
       </v-row>
       <BefristungInput
         v-if="

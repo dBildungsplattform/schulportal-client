@@ -530,6 +530,13 @@
     navigateToCreatePersonRoute();
   };
 
+  const isOwnSchule: ComputedRef<boolean> = computed(() => createType === CreationType.AddPersonToOwnSchule);
+
+  // Section numbers based on whether the createType is AddPersonToOwnSchule or not.
+  const sectionNumberOrg: ComputedRef<string> = computed(() => (isOwnSchule.value ? '2.' : '1.'));
+  const sectionNumberRolle: ComputedRef<string> = computed(() => (isOwnSchule.value ? '3.' : '2.'));
+  const sectionNumberBefristung: ComputedRef<string> = computed(() => (isOwnSchule.value ? '4.' : '2.1'));
+
   // Watch the selectedRollen and update filteredRollen accordingly
   watch(
     selectedRollen,
@@ -754,42 +761,10 @@
           />
 
           <template v-if="!personenkontextStore.errorCode && !personStore.errorCode">
-            <!-- Organisation, Rolle, Klasse und Befristung zuordnen -->
-            <PersonenkontextCreate
-              :operationContext="OperationContext.PERSON_ANLEGEN"
-              :allowMultipleRollen="true"
-              :createType="createType"
-              :showHeadline="true"
-              :organisationen="organisationen"
-              ref="personenkontext-create"
-              :rollen="
-                createType === CreationType.AddPersonToOwnSchule || (filteredRollen?.length ?? 0) > 0
-                  ? filteredRollen
-                  : rollen
-              "
-              :selectedOrganisationProps="selectedOrganisationProps"
-              :selectedRollenProps="selectedRollenProps"
-              :selectedKlasseProps="selectedKlasseProps"
-              :befristungInputProps="{
-                befristungProps: selectedBefristungProps,
-                befristungOptionProps: selectedBefristungOptionProps,
-                isUnbefristetDisabled: isUnbefristetButtonDisabled,
-                isBefristungRequired: isUnbefristetButtonDisabled,
-                nextSchuljahresende: getNextSchuljahresende(),
-                befristung: selectedBefristung,
-                befristungOption: selectedBefristungOption,
-              }"
-              v-model:selectedOrganisation="selectedOrganisation"
-              v-model:selectedRollen="selectedRollen"
-              v-model:selectedKlasse="selectedKlasse"
-              @update:canCommit="canCommit = $event"
-              @update:befristung="handleBefristungUpdate"
-              @update:calculatedBefristungOption="handleBefristungOptionUpdate"
-              @fieldReset="handleFieldReset"
-            />
-            <div v-if="selectedOrganisation">
+            <!-- If AddPersonToOwnSchule: Persönliche Info first -->
+            <template v-if="createType === CreationType.AddPersonToOwnSchule">
               <v-row>
-                <h3 class="headline-3">4. {{ $t('admin.person.personalInfo') }}</h3>
+                <h3 class="headline-3">1. {{ $t('admin.person.personalInfo') }}</h3>
               </v-row>
               <!-- Vorname -->
               <FormRow
@@ -835,7 +810,6 @@
                 ></v-text-field>
               </FormRow>
               <KopersInput
-                v-if="selectedOrganisation"
                 :isDisabled="createType === CreationType.AddPersonToOwnSchule"
                 :hasNoKopersNr="hasNoKopersNr"
                 v-model:selectedKopersNr="selectedKopersNr"
@@ -844,7 +818,132 @@
                 @update:selectedKopersNr="(value?: string | undefined) => (selectedKopersNr = value)"
                 @update:hasNoKopersNr="(value: boolean | undefined) => (hasNoKopersNr = value)"
               ></KopersInput>
-            </div>
+              <!-- Organisation, Rolle, Klasse und Befristung zuordnen -->
+              <PersonenkontextCreate
+                :operationContext="OperationContext.PERSON_ANLEGEN"
+                :allowMultipleRollen="true"
+                :createType="createType"
+                :showHeadline="true"
+                :organisationen="organisationen"
+                ref="personenkontext-create"
+                :rollen="
+                  createType === CreationType.AddPersonToOwnSchule || (filteredRollen?.length ?? 0) > 0
+                    ? filteredRollen
+                    : rollen
+                "
+                :selectedOrganisationProps="selectedOrganisationProps"
+                :selectedRollenProps="selectedRollenProps"
+                :selectedKlasseProps="selectedKlasseProps"
+                :befristungInputProps="{
+                  befristungProps: selectedBefristungProps,
+                  befristungOptionProps: selectedBefristungOptionProps,
+                  isUnbefristetDisabled: isUnbefristetButtonDisabled,
+                  isBefristungRequired: isUnbefristetButtonDisabled,
+                  nextSchuljahresende: getNextSchuljahresende(),
+                  befristung: selectedBefristung,
+                  befristungOption: selectedBefristungOption,
+                }"
+                :headlineNumbers="{
+                  org: sectionNumberOrg,
+                  rolle: sectionNumberRolle,
+                  befristung: sectionNumberBefristung,
+                }"
+                v-model:selectedOrganisation="selectedOrganisation"
+                v-model:selectedRollen="selectedRollen"
+                v-model:selectedKlasse="selectedKlasse"
+                @update:canCommit="canCommit = $event"
+                @update:befristung="handleBefristungUpdate"
+                @update:calculatedBefristungOption="handleBefristungOptionUpdate"
+                @fieldReset="handleFieldReset"
+              />
+            </template>
+            <template v-else>
+              <!-- Organisation, Rolle, Klasse und Befristung zuordnen -->
+              <PersonenkontextCreate
+                :operationContext="OperationContext.PERSON_ANLEGEN"
+                :allowMultipleRollen="true"
+                :createType="createType"
+                :showHeadline="true"
+                :organisationen="organisationen"
+                ref="personenkontext-create"
+                :rollen="(filteredRollen?.length ?? 0) > 0 ? filteredRollen : rollen"
+                :selectedOrganisationProps="selectedOrganisationProps"
+                :selectedRollenProps="selectedRollenProps"
+                :selectedKlasseProps="selectedKlasseProps"
+                :befristungInputProps="{
+                  befristungProps: selectedBefristungProps,
+                  befristungOptionProps: selectedBefristungOptionProps,
+                  isUnbefristetDisabled: isUnbefristetButtonDisabled,
+                  isBefristungRequired: isUnbefristetButtonDisabled,
+                  nextSchuljahresende: getNextSchuljahresende(),
+                  befristung: selectedBefristung,
+                  befristungOption: selectedBefristungOption,
+                }"
+                v-model:selectedOrganisation="selectedOrganisation"
+                v-model:selectedRollen="selectedRollen"
+                v-model:selectedKlasse="selectedKlasse"
+                @update:canCommit="canCommit = $event"
+                @update:befristung="handleBefristungUpdate"
+                @update:calculatedBefristungOption="handleBefristungOptionUpdate"
+                @fieldReset="handleFieldReset"
+              />
+              <!-- Else: Default Order -->
+              <div v-if="selectedOrganisation">
+                <v-row>
+                  <h3 class="headline-3">3. {{ $t('admin.person.personalInfo') }}</h3>
+                </v-row>
+                <!-- Vorname -->
+                <FormRow
+                  :errorLabel="selectedVornameProps['error']"
+                  labelForId="vorname-input"
+                  :isRequired="true"
+                  :label="$t('person.firstName')"
+                >
+                  <v-text-field
+                    clearable
+                    data-testid="vorname-input"
+                    density="compact"
+                    id="vorname-input"
+                    ref="vorname-input"
+                    :placeholder="$t('person.enterFirstName')"
+                    required="true"
+                    variant="outlined"
+                    v-bind="selectedVornameProps"
+                    v-model="selectedVorname"
+                  ></v-text-field>
+                </FormRow>
+
+                <!-- Nachname -->
+                <FormRow
+                  :errorLabel="selectedFamiliennameProps['error']"
+                  labelForId="familienname-input"
+                  :isRequired="true"
+                  :label="$t('person.lastName')"
+                >
+                  <v-text-field
+                    clearable
+                    data-testid="familienname-input"
+                    density="compact"
+                    id="familienname-input"
+                    ref="familienname-input"
+                    :placeholder="$t('person.enterLastName')"
+                    required="true"
+                    variant="outlined"
+                    v-bind="selectedFamiliennameProps"
+                    v-model="selectedFamilienname"
+                  ></v-text-field>
+                </FormRow>
+                <KopersInput
+                  v-if="selectedOrganisation"
+                  :hasNoKopersNr="hasNoKopersNr"
+                  v-model:selectedKopersNr="selectedKopersNr"
+                  ref="kopers-input"
+                  :selectedKopersNrProps="selectedKopersNrProps"
+                  @update:selectedKopersNr="(value?: string | undefined) => (selectedKopersNr = value)"
+                  @update:hasNoKopersNr="(value: boolean | undefined) => (hasNoKopersNr = value)"
+                ></KopersInput>
+              </div>
+            </template>
           </template>
         </FormWrapper>
       </template>
