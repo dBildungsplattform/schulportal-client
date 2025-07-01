@@ -16,7 +16,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-
+#Das Ergebnis wird als Output deployment_clearance gespeichert
+#true → Deployment ist erlaubt.
+#false → Deployment ist nicht erlaubt.
   check_deployment_clearance:
       name: "Check deployment clearance"
       runs-on: ubuntu-latest
@@ -55,7 +57,8 @@ jobs:
               echo "Deployment clearance: false"
               echo "deployment_clearance=false" >> "$GITHUB_OUTPUT"
             fi
-
+# Bekannte Sicherheitslücken, Logikfehler
+# Meldung in GH
   codeql_analyze:
     name: 'CodeQL'
     if: ${{ github.event_name == 'push' }}
@@ -65,6 +68,7 @@ jobs:
       contents: read
       security-events: write
 
+# Code-Style-Fehler und Formatierungsprobleme
   nest_lint:
     name: 'Linting'
     if: ${{ github.event_name == 'push' }}
@@ -73,7 +77,7 @@ jobs:
       node_version: '18'
     permissions:
       contents: read
-
+# Prüft den Code auf Fehler und führt Tests aus.
   tests_and_sonarcloud:
     name: 'Tests and Sonarcloud'
     if: ${{ github.event_name == 'push' }}
@@ -83,6 +87,13 @@ jobs:
     permissions:
       contents: read
     secrets: inherit
+
+#Baut ein Docker-Image.
+#Veröffentlicht es 
+#Führt Trivy scan durch (optional)
+#Führt ClamAV durch (optional)
+# image_tag_generation: "ticket_from_branch" The ticket is extracted from the branch name (e.g. OPS-123-testing -> OPS-123) ,image_tag:dbp-123
+# image_tag_generation: "commit_hash" Short hash of the commit is used as tag, image_tag:sh
 
   build_image_on_push:
     needs:
@@ -105,11 +116,14 @@ jobs:
       fail_on_vulnerabilites: false
       report_location: 'Dockerfile'
 
+# Führt einen Sicherheits-Scan auf einem Helm-Chart durch
   scan_helm:
     uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-helm-kics.yaml@5
     permissions:
       contents: read
-
+#Output
+# SELECT_HELM_VERSION_GENERATION
+#SELECT_IMAGE_TAG_GENERATION
   select_helm_version_generation_and_image_tag_generation:
     needs:
       - check_deployment_clearance
@@ -129,11 +143,12 @@ jobs:
             echo "SELECT_HELM_VERSION_GENERATION=specified" >> "$GITHUB_OUTPUT"
             echo "SELECT_IMAGE_TAG_GENERATION=specified" >> "$GITHUB_OUTPUT"
           fi
-
+#create_branch_identifier 
+# Output: branch,sha,ticket
   release_helm:
     uses: dBildungsplattform/dbp-github-workflows/.github/workflows/chart-release.yaml@7
     needs:
-      - create_branch_identifier
+      - create_branch_identifier 
       - select_helm_version_generation_and_image_tag_generation
     secrets: inherit
     with:
@@ -176,6 +191,8 @@ jobs:
           echo "Chart $CHART_NAME:$CHART_VERSION not found after waiting."
           exit 1 
 
+#create_branch_identifier 
+# Output: branch,sha,ticket       
   branch_meta:
     if: ${{ github.event_name == 'push' && !startsWith(github.ref_name,'dependabot/') }}
     uses: dBildungsplattform/erwin-app-deploy/.github/workflows/get-branch-meta.yml@DBP-1529-deploy-erwin-pipeline
@@ -256,4 +273,4 @@ jobs:
       with:
         type: failure
         job_name: 'Daily nightly image check failed - CVEs found so check'
-        url: ${{ secrets.RC_WEBHOOK_SPSH_DEVELOPER_CHANNEL }}
+        url: ${{ secrets.RC_WEBHOOK_SPSH_DEVELOPER_CHANNEL }} # create RC_Weebhook for erwin channel, store the secret in GH secret
