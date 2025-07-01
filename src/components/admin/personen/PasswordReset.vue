@@ -5,6 +5,7 @@
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import PasswordOutput from '@/components/form/PasswordOutput.vue';
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
+  import { print } from '@/utils/print';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
@@ -36,50 +37,7 @@
   }
 
   const printPassword = (): void => {
-    const printWindow: WindowProxy | null = window.open(
-      `${t('person.password')}`,
-      `${t('person.password')}`,
-      'height=700, width=900',
-    );
-    if (printWindow) {
-      printWindow.document.open();
-      printWindow.document.write(`
-          <!DOCTYPE html>
-          <html lang="de">
-          <head>
-            <title>${t('person.password')}</title>
-            <style nonce="${cspNonce}">
-              @media print {
-                @page {
-                  size: auto;
-                  margin: 0mm;
-                }
-                body {
-                  margin: 0;
-                }
-              }
-              p { 
-                font-size: 30px;
-                text-align: center;
-                line-height: 300px;
-              }
-            </style>
-          </head>
-          <body>
-              <p>${props.password}</p>
-          </body>
-          </html>
-      `);
-      printWindow.document.close();
-      printWindow.onafterprint = (): void => {
-        printWindow.close();
-      };
-      printWindow.print();
-      if (navigator.userAgent.includes('Firefox')) {
-        // Since Firefox does not seem to pick up "onafterprint" event
-        printWindow.close();
-      }
-    }
+    print(t('person.password'), props.password);
   };
 </script>
 

@@ -321,6 +321,27 @@
     }
   }
 
+  async function navigateToPersonTable(): Promise<void> {
+    if (personStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
+      formContext.resetForm();
+    } else {
+      personStore.allLandesbedienstetePersonen = [];
+    }
+    await router.push({ name: 'person-management' });
+  }
+
+  async function resetForm(): Promise<void> {
+    formContext.resetForm();
+    personStore.errorCode = '';
+    personStore.allLandesbedienstetePersonen = [];
+  }
+
+  async function navigateToPersonCreationForm(): Promise<void> {
+    personStore.errorCode = '';
+    formContext.resetForm();
+    await router.push({ name: 'add-person-to-own-schule' });
+  }
+
   function handleConfirmUnsavedChanges(): void {
     blockedNext();
     personStore.errorCode = '';
@@ -360,24 +381,25 @@
       class="text-center headline"
       data-testid="admin-headline"
     >
-      {{ t('admin.headline') }}
+      {{ t('admin.person.stateEmployeeSearch.searchAndAdd') }}
     </h1>
     <LayoutCard
-      :closable="false"
-      :header="t('admin.person.stateEmployeeSearch.searchPerson')"
+      :closable="true"
+      @onCloseClicked="navigateToPersonTable"
+      :header="t('admin.person.stateEmployeeSearch.searchStateEmployee')"
       :padded="true"
       :showCloseText="true"
     >
       <FormWrapper
         :canCommit="!isSearchDisabled || personStore.loading"
         :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
-        :createButtonLabel="$t('search')"
-        :discardButtonLabel="$t('cancel')"
+        :createButtonLabel="$t('admin.person.stateEmployeeSearch.searchStateEmployee')"
+        :discardButtonLabel="$t('reset')"
         :hideActions="!!personStore.errorCode"
         :hideNotice="true"
         id="person-search-form"
         :isLoading="personStore.loading"
-        :onDiscard="() => router.go(0)"
+        :onDiscard="resetForm"
         @onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
         :onSubmit="onSubmit"
         :showUnsavedChangesDialog="showUnsavedChangesDialog"
@@ -690,6 +712,36 @@
             </v-col>
           </v-row>
         </LayoutCard>
+        <v-row class="justify-end pr-2 pl-2 pb-2">
+          <v-col
+            cols="12"
+            sm="6"
+            md="auto"
+          >
+            <v-btn
+              @click.stop="() => (personStore.allLandesbedienstetePersonen = [])"
+              class="secondary button"
+              data-testid="reset-search-button"
+              :block="mdAndDown"
+            >
+              {{ $t('nav.backToSearch') }}
+            </v-btn>
+          </v-col>
+          <v-col
+            cols="12"
+            sm="6"
+            md="auto"
+          >
+            <v-btn
+              @click.stop="navigateToPersonCreationForm"
+              class="primary button"
+              data-testid="add-state-employee-button"
+              :block="mdAndDown"
+            >
+              {{ $t('admin.person.stateEmployeeSearch.addStateEmployee') }}
+            </v-btn>
+          </v-col>
+        </v-row>
       </template>
     </LayoutCard>
     <v-dialog
