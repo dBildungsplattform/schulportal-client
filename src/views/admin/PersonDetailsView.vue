@@ -3081,10 +3081,9 @@
       >
         <v-card-text>
           <v-container>
-            <v-row class="text-body bold">
+            <v-row class="text-body text-center bold">
               <v-col
-                offset="1"
-                cols="10"
+                cols="12"
               >
                 <span>{{ changeKlasseConfirmationDialogMessage }}</span>
               </v-col>
