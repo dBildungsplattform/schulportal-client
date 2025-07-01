@@ -657,6 +657,8 @@
       blockedNext = next;
     } else {
       personenkontextStore.requestedWithSystemrecht = undefined;
+      personenkontextStore.createdPersonWithKontext = null;
+      personenkontextStore.landesbediensteteCommitResponse = null;
       next();
     }
   });
