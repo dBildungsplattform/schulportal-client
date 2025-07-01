@@ -2897,7 +2897,7 @@
       >
         <v-card-text>
           <v-container>
-            <v-row class="text-body bold text-center">
+            <v-row class="text-body bold">
               <v-col
                 class="text-center"
                 cols="12"
