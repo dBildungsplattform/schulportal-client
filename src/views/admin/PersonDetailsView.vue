@@ -36,8 +36,9 @@
     type PersonenkontextStore,
     type PersonenkontextUpdate,
     type PersonenkontextWorkflowResponse,
+    type RolleResponse
   } from '@/stores/PersonenkontextStore';
-  import { RollenArt, RollenMerkmal, useRolleStore, type RolleStore } from '@/stores/RolleStore';
+  import { RollenArt, RollenMerkmal } from '@/stores/RolleStore';
   import {
     TokenKind,
     useTwoFactorAuthentificationStore,
@@ -102,7 +103,6 @@
   const organisationStore: OrganisationStore = useOrganisationStore();
   const twoFactorAuthentificationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
   const configStore: ConfigStore = useConfigStore();
-  const rolleStore: RolleStore = useRolleStore();
 
   const devicePassword: Ref<string> = ref('');
   const password: Ref<string> = ref('');
@@ -552,9 +552,18 @@
   }
 
   async function isLernRolleForChangeKlasse(selectedRolleId: string): Promise<boolean> {
-    await rolleStore.getRolleById(selectedRolleId);
+    await personenkontextStore.processWorkflowStep({
+      personId: currentPersonId,
+      operationContext: OperationContext.PERSON_BEARBEITEN,
+      organisationId: selectedZuordnungen.value[0]?.sskId,
+      rollenIds: [selectedRolleId],
+      limit: 1,
+    });
 
-    return !!rolleStore.currentRolle && rolleStore.currentRolle.rollenart === RollenArt.Lern;
+    const workflowStepResponse: PersonenkontextWorkflowResponse | null = personenkontextStore.workflowStepResponse;
+
+    const rolle: RolleResponse | undefined = workflowStepResponse?.rollen.find((r: RolleResponse) => r.id === selectedRolleId);
+    return !!rolle && rolle.rollenart === RollenArt.Lern;
   }
 
   const hasKopersNummer: ComputedRef<boolean> = computed(() => {
@@ -2890,8 +2899,8 @@
           <v-container>
             <v-row class="text-body bold">
               <v-col
-                offset="1"
-                cols="10"
+                class="text-center"
+                cols="12"
               >
                 <span>{{ t('person.changeKlasseSuccess') }}</span>
               </v-col>
@@ -3072,10 +3081,9 @@
       >
         <v-card-text>
           <v-container>
-            <v-row class="text-body bold">
+            <v-row class="text-body text-center bold">
               <v-col
-                offset="1"
-                cols="10"
+                cols="12"
               >
                 <span>{{ changeKlasseConfirmationDialogMessage }}</span>
               </v-col>
