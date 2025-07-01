@@ -24,6 +24,7 @@ import {
   type LandesbediensteterApiInterface,
   type LandesbediensteterWorkflowStepResponse,
   type LandesbediensteterWorkflowCommitBodyParams,
+  type RolleResponse,
 } from '../api-client/generated/api';
 import { usePersonStore, type PersonStore } from './PersonStore';
 import type { Zuordnung } from './types/Zuordnung';
@@ -129,7 +130,9 @@ export type {
   PersonenkontexteUpdateResponse,
   PersonenkontextWorkflowResponse,
   SystemrechtResponse,
+  RolleResponse,
 };
+
 export type UserinfoPersonenkontext = {
   organisationsId: string;
   rolle: {
