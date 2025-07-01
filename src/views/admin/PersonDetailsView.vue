@@ -561,11 +561,8 @@
     });
 
     const workflowStepResponse: PersonenkontextWorkflowResponse | null = personenkontextStore.workflowStepResponse;
-    if (!workflowStepResponse) {
-      return false;
-    }
 
-    const rolle: RolleResponse | undefined = workflowStepResponse.rollen.find((r: RolleResponse) => r.id === selectedRolleId);
+    const rolle: RolleResponse | undefined = workflowStepResponse?.rollen.find((r: RolleResponse) => r.id === selectedRolleId);
     return !!rolle && rolle.rollenart === RollenArt.Lern;
   }
 
