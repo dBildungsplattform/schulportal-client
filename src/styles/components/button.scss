@@ -55,6 +55,10 @@
     width: 220px;
   }
 
+  &.big {
+    width: 400px;
+  }
+
   /* small screen */
   @media only screen and (max-width: 600px) {
     font-size: variables.$smallButtonFontSize;
