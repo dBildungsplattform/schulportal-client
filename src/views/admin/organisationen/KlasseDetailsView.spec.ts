@@ -213,7 +213,7 @@ describe('KlassenDetailsView', () => {
     wrapper?.find('[data-testid="open-klasse-delete-dialog-button"]').trigger('click');
     await flushPromises();
 
-    await document.querySelector('[data-testid="klasse-delete-confirmation-text"]');
+    document.querySelector('[data-testid="klasse-delete-confirmation-text"]');
     expect(document.querySelector('[data-testid="klasse-delete-confirmation-text"]')).not.toBeNull();
 
     const klasseDeleteButton: HTMLElement | undefined = document.querySelectorAll<HTMLElement>(
@@ -222,7 +222,7 @@ describe('KlassenDetailsView', () => {
     klasseDeleteButton?.click();
     await nextTick();
 
-    await document.querySelector('[data-testid="klasse-delete-success-text"]');
+    document.querySelector('[data-testid="klasse-delete-success-text"]');
     expect(document.querySelector('[data-testid="klasse-delete-success-text"]')).not.toBeNull();
 
     const closeDialogButton: HTMLElement | undefined = document.querySelectorAll<HTMLElement>(
@@ -230,6 +230,10 @@ describe('KlassenDetailsView', () => {
     )[0];
     closeDialogButton?.click();
     await nextTick();
+
+    await vi.waitUntil(
+      () => document.body.querySelector('[data-testid="close-klasse-delete-success-dialog-button"]') === null,
+    );
 
     expect(push).toHaveBeenCalledTimes(1);
   });
