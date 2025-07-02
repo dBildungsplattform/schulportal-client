@@ -164,13 +164,21 @@
     searchFilterStore.setKlasseFilterForKlassen(ids ?? null);
   }
 
+  async function reloadData(filter: OrganisationenFilter): Promise<void> {
+    await organisationStore.getAllOrganisationen(filter);
+  }
+
   async function deleteKlasse(organisationId: string): Promise<void> {
     await organisationStore.deleteOrganisationById(organisationId);
   }
 
-  const handleAlertClose = (): void => {
+  const handleAlertClose = async (): Promise<void> => {
     organisationStore.errorCode = '';
-    router.go(0);
+    await reloadData(klassenListFilter.value);
+  };
+
+  const handleKlasseDeleteClose = async (): Promise<void> => {
+    await reloadData(klassenListFilter.value);
   };
 
   function navigateToKlassenDetails(_$event: PointerEvent, { item }: { item: Organisation }): void {
@@ -185,10 +193,6 @@
       searchFilterStore.organisationenSortField = update.sortField as OrganisationSortField;
       searchFilterStore.organisationenSortOrder = update.sortOrder as SortOrder;
     }
-  }
-
-  async function reloadData(filter: OrganisationenFilter): Promise<void> {
-    await organisationStore.getAllOrganisationen(filter);
   }
 
   watch(
@@ -240,7 +244,6 @@
         :showButton="true"
         :buttonText="t('nav.backToList')"
         :buttonAction="handleAlertClose"
-        @update:modelValue="handleAlertClose"
       />
       <template v-if="!organisationStore.errorCode">
         <v-row
@@ -363,14 +366,14 @@
           </template>
           <template v-slot:[`item.actions`]="{ item }">
             <KlasseDelete
-              :errorCode="organisationStore.errorCode"
               :klassenname="item.name"
               :klassenId="item.id"
               :schulname="item.schuleDetails ?? ''"
+              :error="organisationStore.errorCode"
               :useIconActivator="true"
               :isLoading="organisationStore.loading"
               @onDeleteKlasse="deleteKlasse(item.id)"
-              @onClose="reloadData(klassenListFilter)"
+              @onClose="handleKlasseDeleteClose"
             ></KlasseDelete>
           </template>
         </ResultTable>

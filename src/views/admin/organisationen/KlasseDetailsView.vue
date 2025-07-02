@@ -255,10 +255,10 @@
                         :klassenId="organisationStore.currentKlasse?.id || ''"
                         ref="klasse-delete"
                         :schulname="organisationStore.currentOrganisation.name || ''"
-                        :isLoading="organisationStore.loading"
+                        :isLoading="organisationStore.deleteKlasseAction.loading"
+                        :isCompleted="organisationStore.deleteKlasseAction.completed"
                         :useIconActivator="false"
                         @onDeleteKlasse="deleteKlasseById(currentKlasseId)"
-                        @onClose="navigateToKlasseManagement()"
                       >
                       </KlasseDelete>
                     </div>

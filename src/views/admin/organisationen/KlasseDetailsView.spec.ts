@@ -208,9 +208,7 @@ describe('KlassenDetailsView', () => {
   });
 
   test('it deletes a klasse', async () => {
-    const push: MockInstance = vi.spyOn(router, 'push');
-
-    wrapper?.find('[data-testid="open-klasse-delete-dialog-button"]').trigger('click');
+    await wrapper?.find('[data-testid="open-klasse-delete-dialog-button"]').trigger('click');
     await flushPromises();
 
     await document.querySelector('[data-testid="klasse-delete-confirmation-text"]');
@@ -222,7 +220,9 @@ describe('KlassenDetailsView', () => {
     klasseDeleteButton?.click();
     await nextTick();
 
-    await document.querySelector('[data-testid="klasse-delete-success-text"]');
+    organisationStore.deleteKlasseAction.completed = true;
+
+    await vi.waitUntil(() => document.querySelector('[data-testid="klasse-delete-success-text"]'));
     expect(document.querySelector('[data-testid="klasse-delete-success-text"]')).not.toBeNull();
 
     const closeDialogButton: HTMLElement | undefined = document.querySelectorAll<HTMLElement>(
@@ -230,8 +230,6 @@ describe('KlassenDetailsView', () => {
     )[0];
     closeDialogButton?.click();
     await nextTick();
-
-    expect(push).toHaveBeenCalledTimes(1);
   });
 
   test('displays error message correctly', async () => {
