@@ -38,11 +38,16 @@
     successDialogVisible.value = true;
   }
 
-  async function closeSuccessDialog(): Promise<void> {
-    successDialogVisible.value = false;
-    emit('onClose');
-  }
+  async function closeSuccessDialog(isActive: Ref<boolean>): Promise<void> {
+    // Thi is to close the dialog but it does not happen immediately so we add a delay to avoid flickering
+    isActive.value = false;
 
+    // Delay hiding success dialog to avoid confirmation flicker (Vue is too fast here and shows the confirmation dialog before the success dialog is closed)
+    setTimeout(() => {
+      successDialogVisible.value = false;
+      emit('onClose');
+    }, 300);
+  }
   const deleteKlasseConfirmationMessage: ComputedRef<string> = computed(() => {
     if (errorMessage.value || props.errorCode) {
       return '';
@@ -121,7 +126,7 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary"
-                @click.stop="closeSuccessDialog()"
+                @click.stop="closeSuccessDialog(isActive)"
                 data-testid="close-klasse-delete-success-dialog-button"
               >
                 {{ $t('close') }}

@@ -232,7 +232,7 @@
     <LayoutCard :header="t('admin.klasse.management')">
       <!-- Error Message Display -->
       <SpshAlert
-        :model-value="!!organisationStore.errorCode"
+        :modelValue="!!organisationStore.errorCode"
         :title="errorTitle"
         :type="'error'"
         :closable="false"
