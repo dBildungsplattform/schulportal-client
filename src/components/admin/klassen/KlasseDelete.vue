@@ -39,6 +39,7 @@
   }
 
   async function closeSuccessDialog(isActive: Ref<boolean>): Promise<void> {
+    // Thi is to close the dialog but it does not happen immediately so we add a delay to avoid flickering
     isActive.value = false;
 
     // Delay hiding success dialog to avoid confirmation flicker (Vue is too fast here and shows the confirmation dialog before the success dialog is closed)
