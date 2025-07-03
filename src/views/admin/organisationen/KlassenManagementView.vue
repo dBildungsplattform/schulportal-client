@@ -369,7 +369,7 @@
               :klassenname="item.name"
               :klassenId="item.id"
               :schulname="item.schuleDetails ?? ''"
-              :error="organisationStore.errorCode"
+              :errorCode="organisationStore.errorCode"
               :useIconActivator="true"
               :isLoading="organisationStore.loading"
               @onDeleteKlasse="deleteKlasse(item.id)"

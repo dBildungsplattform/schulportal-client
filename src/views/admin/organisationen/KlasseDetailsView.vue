@@ -256,7 +256,6 @@
                         ref="klasse-delete"
                         :schulname="organisationStore.currentOrganisation.name || ''"
                         :isLoading="organisationStore.loading"
-                        :error="organisationStore.errorCode"
                         :useIconActivator="false"
                         @onDeleteKlasse="deleteKlasseById(currentKlasseId)"
                         @onClose="navigateToKlasseManagement"

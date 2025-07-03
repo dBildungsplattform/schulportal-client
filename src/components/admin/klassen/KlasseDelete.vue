@@ -9,10 +9,10 @@
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   type Props = {
+    errorCode: string;
     klassenname: string;
     klassenId: string;
     schulname: string;
-    error: string;
     isLoading: boolean;
     useIconActivator: boolean;
   };
@@ -119,7 +119,7 @@
                 cols="10"
               >
                 <span
-                  v-if="state === State.RESULT && !props.error"
+                  v-if="state === State.RESULT && !props.errorCode"
                   data-testid="klasse-delete-success-text"
                 >
                   {{ deleteKlasseSuccessMessage }}
