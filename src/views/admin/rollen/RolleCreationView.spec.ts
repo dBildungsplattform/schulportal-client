@@ -16,7 +16,7 @@ import {
 import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import type Module from 'module';
 import { expect, test, type Mock, type MockInstance } from 'vitest';
-import { nextTick } from 'vue';
+import { nextTick, type DefineComponent } from 'vue';
 import {
   createRouter,
   createWebHistory,
@@ -47,27 +47,6 @@ let { storedBeforeRouteLeaveCallback }: { storedBeforeRouteLeaveCallback: OnBefo
     };
   },
 );
-
-organisationStore.allOrganisationen = [
-  {
-    id: '1',
-    name: 'Albert-Emil-Hansebrot-Gymnasium',
-    kennung: '9356494',
-    namensergaenzung: 'Schule',
-    kuerzel: 'aehg',
-    typ: 'SCHULE',
-    administriertVon: '1',
-  },
-  {
-    id: '2',
-    name: 'Einstein-Grundschule',
-    kennung: '123798465',
-    namensergaenzung: 'des Alberts',
-    kuerzel: 'EGS',
-    typ: 'SCHULE',
-    administriertVon: '1',
-  },
-];
 
 function mountComponent(): VueWrapper {
   return mount(RolleCreationView, {
@@ -179,6 +158,26 @@ beforeEach(async () => {
 });
 
 afterEach(() => {
+  organisationStore.allOrganisationen = [
+    {
+      id: '1',
+      name: 'Albert-Emil-Hansebrot-Gymnasium',
+      kennung: '9356494',
+      namensergaenzung: 'Schule',
+      kuerzel: 'aehg',
+      typ: 'SCHULE',
+      administriertVon: '1',
+    },
+    {
+      id: '2',
+      name: 'Einstein-Grundschule',
+      kennung: '123798465',
+      namensergaenzung: 'des Alberts',
+      kuerzel: 'EGS',
+      typ: 'SCHULE',
+      administriertVon: '1',
+    },
+  ];
   wrapper?.unmount();
   // Restore real timers
   vi.useRealTimers();
@@ -318,6 +317,35 @@ describe('RolleCreationView', () => {
       limit: 25,
       searchString: 'Carl',
     });
+  });
+
+  test('It autoselects the organisation if there is only one', async () => {
+    interface RolleCreationView extends DefineComponent {
+      autoselectAdministrationsebene: () => Promise<void>;
+    }
+
+    organisationStore.allOrganisationen = [
+      {
+        id: '1',
+        name: 'Albert-Emil-Hansebrot-Gymnasium',
+        kennung: '9356494',
+        namensergaenzung: 'Schule',
+        kuerzel: 'aehg',
+        typ: OrganisationsTyp.Schule,
+        administriertVon: '1',
+      },
+    ];
+    await nextTick();
+
+    await (wrapper?.vm as unknown as RolleCreationView).autoselectAdministrationsebene();
+
+    const administrationsebeneAutocomplete: VueWrapper | undefined = wrapper
+      ?.findComponent({
+        ref: 'rolle-creation-form',
+      })
+      .findComponent({ ref: 'administrationsebene-select' });
+
+    expect(administrationsebeneAutocomplete?.text()).toContain('Albert-Emil-Hansebrot-Gymnasium');
   });
 
   test('it fills form and triggers submit and uses correct Rolle to add serviceproviders', async () => {
