@@ -81,16 +81,6 @@
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
   let blockedNext: () => void = () => {};
 
-  onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
-    if (isFormDirty.value) {
-      showUnsavedChangesDialog.value = true;
-      blockedNext = next;
-    } else {
-      next();
-    }
-    rolleStore.createdRolle = null;
-  });
-
   const handleCreateAnotherRolle = (): void => {
     rolleStore.createdRolle = null;
     formContext.resetForm();
@@ -191,6 +181,16 @@
     /* Chrome requires returnValue to be set. */
     event.returnValue = '';
   }
+
+  onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
+    if (isFormDirty.value) {
+      showUnsavedChangesDialog.value = true;
+      blockedNext = next;
+    } else {
+      next();
+    }
+    rolleStore.createdRolle = null;
+  });
 
   onMounted(async () => {
     rolleStore.createdRolle = null;
