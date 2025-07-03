@@ -255,8 +255,8 @@
                         :klassenId="organisationStore.currentKlasse?.id || ''"
                         ref="klasse-delete"
                         :schulname="organisationStore.currentOrganisation.name || ''"
-                        :isLoading="organisationStore.deleteKlasseAction.loading"
-                        :isCompleted="organisationStore.deleteKlasseAction.completed"
+                        :isLoading="organisationStore.loading"
+                        :error="organisationStore.errorCode"
                         :useIconActivator="false"
                         @onDeleteKlasse="deleteKlasseById(currentKlasseId)"
                       >
