@@ -283,7 +283,7 @@ describe('RolleCreationView', () => {
     expect(rolleStore.createdRolle).toBe(null);
   });
 
-  test.only('it calls the correct method while searching', async () => {
+  test('it calls the correct method while searching', async () => {
     const administrationsebeneAutocomplete: VueWrapper | undefined = wrapper
       ?.findComponent({
         ref: 'rolle-creation-form',
