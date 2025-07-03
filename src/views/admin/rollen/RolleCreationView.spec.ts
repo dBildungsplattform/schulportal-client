@@ -1,4 +1,5 @@
 import {
+  OrganisationsTyp,
   ServiceProviderKategorie,
   ServiceProviderTarget,
   type ServiceProviderResponse,
@@ -175,9 +176,12 @@ beforeEach(async () => {
 
   wrapper = mountComponent();
   rolleStore.errorCode = '';
+  vi.useFakeTimers();
 });
 
 afterEach(() => {
+  // Restore real timers
+  vi.useRealTimers();
   wrapper?.unmount();
 });
 
@@ -277,6 +281,42 @@ describe('RolleCreationView', () => {
     await nextTick();
 
     expect(rolleStore.createdRolle).toBe(null);
+  });
+
+  test.only('it calls the correct method while searching', async () => {
+    const administrationsebeneAutocomplete: VueWrapper | undefined = wrapper
+      ?.findComponent({
+        ref: 'rolle-creation-form',
+      })
+      .findComponent({ ref: 'administrationsebene-select' });
+
+    await administrationsebeneAutocomplete?.setValue(undefined);
+    await nextTick();
+
+    // First search with empty string
+    administrationsebeneAutocomplete?.vm.$emit('update:search', '');
+    await nextTick();
+
+    // Fast-forward time by 500ms to simulate debounce
+    vi.advanceTimersByTime(500);
+    await nextTick();
+
+    expect(organisationStore.getAllOrganisationen).toHaveBeenCalledTimes(1);
+
+    // Second search with 'Carl'
+    administrationsebeneAutocomplete?.vm.$emit('update:search', 'Carl');
+    await nextTick();
+
+    // Fast-forward time by 500ms again
+    vi.advanceTimersByTime(500);
+    await nextTick();
+
+    expect(organisationStore.getAllOrganisationen).toHaveBeenCalledWith({
+      systemrechte: ['ROLLEN_VERWALTEN'],
+      excludeTyp: [OrganisationsTyp.Klasse],
+      limit: 25,
+      searchString: 'Carl',
+    });
   });
 
   test('it fills form and triggers submit and uses correct Rolle to add serviceproviders', async () => {
