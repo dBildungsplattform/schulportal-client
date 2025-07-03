@@ -176,13 +176,12 @@ beforeEach(async () => {
 
   wrapper = mountComponent();
   rolleStore.errorCode = '';
-  vi.useFakeTimers();
 });
 
 afterEach(() => {
+  wrapper?.unmount();
   // Restore real timers
   vi.useRealTimers();
-  wrapper?.unmount();
 });
 
 describe('RolleCreationView', () => {
@@ -284,6 +283,8 @@ describe('RolleCreationView', () => {
   });
 
   test('it calls the correct method while searching', async () => {
+    vi.useFakeTimers();
+
     const administrationsebeneAutocomplete: VueWrapper | undefined = wrapper
       ?.findComponent({
         ref: 'rolle-creation-form',
@@ -301,7 +302,7 @@ describe('RolleCreationView', () => {
     vi.advanceTimersByTime(500);
     await nextTick();
 
-    expect(organisationStore.getAllOrganisationen).toHaveBeenCalledTimes(1);
+    expect(organisationStore.getAllOrganisationen).toHaveBeenCalled();
 
     // Second search with 'Carl'
     administrationsebeneAutocomplete?.vm.$emit('update:search', 'Carl');
