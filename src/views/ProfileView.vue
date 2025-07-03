@@ -96,10 +96,13 @@
             .join(', ') || null;
         const schule: string | null =
           zuordnungen.find((z: Zuordnung) => z.typ === OrganisationsTyp.Schule)?.sskName || null;
+        const sskDstNr: string | null =
+          zuordnungen.find((z: Zuordnung) => z.typ === OrganisationsTyp.Schule && z.sskDstNr != null)?.sskDstNr || null;
         const composedZuordnung: ComposedZuordnung = Zuordnung.from(zuordnungen[0]);
         composedZuordnung.rolle = composedRoles;
         if (schule) composedZuordnung.sskName = schule;
         if (klasse) composedZuordnung.klasse = klasse;
+        if (sskDstNr) composedZuordnung.sskDstNr = sskDstNr;
         composedZuordnung.befristung = befristung ?? null;
         composedZuordnungen.push(composedZuordnung);
       } else {
