@@ -259,6 +259,7 @@
                         :error="organisationStore.errorCode"
                         :useIconActivator="false"
                         @onDeleteKlasse="deleteKlasseById(currentKlasseId)"
+                        @onClose="navigateToKlasseManagement"
                       >
                       </KlasseDelete>
                     </div>

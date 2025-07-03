@@ -17,7 +17,7 @@ beforeEach(async () => {
     props: {
       isLoading: false,
       isCompleted: false,
-      errorCode: '',
+      error: '',
       klassenId: '1',
       klassenname: '1A',
       schulname: 'schule',

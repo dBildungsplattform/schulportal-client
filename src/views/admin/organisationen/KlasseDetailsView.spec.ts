@@ -208,6 +208,7 @@ describe('KlassenDetailsView', () => {
   });
 
   test('it deletes a klasse', async () => {
+    const push: MockInstance = vi.spyOn(router, 'push');
     await wrapper?.find('[data-testid="open-klasse-delete-dialog-button"]').trigger('click');
     await flushPromises();
 
@@ -228,6 +229,7 @@ describe('KlassenDetailsView', () => {
     )[0];
     closeDialogButton?.click();
     await nextTick();
+    expect(push).toHaveBeenCalledTimes(1);
   });
 
   test('displays error message correctly', async () => {
