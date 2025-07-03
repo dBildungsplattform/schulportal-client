@@ -29,6 +29,7 @@
     translatedSystemrechte?: TranslatedObject[];
     isEditActive?: boolean;
     isLoading: boolean;
+    hasAutoselectedAdministrationsebene?: boolean;
     onHandleConfirmUnsavedChanges: () => void;
     onHandleDiscard: () => void;
     onShowDialogChange: (value?: boolean) => void;
@@ -131,9 +132,13 @@
         <v-autocomplete
           autocomplete="off"
           clearable
+          :class="[
+            { 'filter-dropdown mb-4': hasAutoselectedAdministrationsebene },
+            { selected: selectedAdministrationsebene },
+          ]"
           data-testid="administrationsebene-select"
           density="compact"
-          :disabled="readonly"
+          :disabled="readonly || hasAutoselectedAdministrationsebene"
           id="administrationsebene-select"
           :items="administrationsebenen"
           item-value="value"

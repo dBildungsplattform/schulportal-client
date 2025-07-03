@@ -76,6 +76,8 @@
     selectedSystemRechteProps,
   }: RolleFieldDefinitions = getRolleFieldDefinitions(formContext);
 
+  const hasAutoselectedAdministrationsebene: Ref<boolean> = ref(false);
+
   const isFormDirty: ComputedRef<boolean> = computed(() => getDirtyState(formContext));
 
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
@@ -182,6 +184,14 @@
     event.returnValue = '';
   }
 
+  async function autoselectAdministrationsebene(): Promise<void> {
+    // Autoselect the Orga for the current user that only has 1 Orga assigned to him.
+    if (organisationStore.allOrganisationen.length === 1) {
+      selectedAdministrationsebene.value = organisationStore.allOrganisationen[0]?.id || '';
+      hasAutoselectedAdministrationsebene.value = true;
+    }
+  }
+
   onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
     if (isFormDirty.value) {
       showUnsavedChangesDialog.value = true;
@@ -199,6 +209,7 @@
       excludeTyp: [OrganisationsTyp.Klasse],
       limit: 25,
     });
+    await autoselectAdministrationsebene();
     await serviceProviderStore.getAllServiceProviders();
 
     // Iterate over the enum values
@@ -315,6 +326,7 @@
           :translatedRollenarten="translatedRollenarten"
           :translatedMerkmale="translatedMerkmale"
           :translatedSystemrechte="translatedSystemrechte"
+          :hasAutoselectedAdministrationsebene="hasAutoselectedAdministrationsebene"
         >
           <!-- Error Message Display if error on submit -->
           <!-- To trigger unsaved changes dialog the alert has to be inside the form wrapper -->
