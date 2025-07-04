@@ -6,3 +6,5 @@ export type TranslatedObject = {
 export type Mutable<T> = {
   -readonly [P in keyof T]: T[P];
 };
+
+declare type Option<T> = T | null | undefined;
