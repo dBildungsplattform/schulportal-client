@@ -14,16 +14,18 @@
     // used to generate test ids
     index: number;
   };
-
   const props: Props = defineProps<Props>();
+
   const { t }: Composer = useI18n({ useScope: 'global' });
 
-  const sskName: ComputedRef<Option<string>> = computed(() => {
+  const parentZuordnung: ComputedRef<Option<Zuordnung>> = computed(() => {
     if (props.zuordnungen.length === 1) {
-      return props.zuordnungen[0]!.sskName;
+      return props.zuordnungen[0];
     }
-    return props.zuordnungen.find((z: Zuordnung) => z.typ === OrganisationsTyp.Schule)?.sskName;
+    return props.zuordnungen.find((z: Zuordnung) => z.typ === OrganisationsTyp.Schule);
   });
+
+  const sskName: ComputedRef<Option<string>> = computed(() => parentZuordnung.value?.sskName);
 
   const klassen: ComputedRef<string> = computed(() => {
     return props.zuordnungen
@@ -37,32 +39,19 @@
     return Array.from(uniqueRollen).join(', ');
   });
 
-  const befristung: ComputedRef<string> = computed(() => {
-    return adjustDateForTimezoneAndFormat(props.zuordnungen.find((z: Zuordnung) => z.befristung)?.befristung ?? '');
-  });
-
-  const sskDstNr: ComputedRef<Option<string>> = computed(
-    () =>
-      props.zuordnungen.find((z: Zuordnung) => z.typ === OrganisationsTyp.Schule && z.sskDstNr != null)?.sskDstNr ||
-      null,
+  const befristung: ComputedRef<string> = computed(() =>
+    adjustDateForTimezoneAndFormat(props.zuordnungen.find((z: Zuordnung) => z.befristung)?.befristung ?? ''),
   );
 
-  const admins: ComputedRef<Option<string>> = computed(
-    () =>
-      props.zuordnungen
-        .find((z: Zuordnung) => z.typ === OrganisationsTyp.Schule && z.admins.length != 0)
-        ?.admins.join(', ') || '',
-  );
+  const sskDstNr: ComputedRef<Option<string>> = computed(() => parentZuordnung.value?.sskDstNr);
 
-  const oneBasedIndex: ComputedRef<number> = computed(() => {
-    return props.index + 1;
-  });
+  const admins: ComputedRef<Option<string>> = computed(() => parentZuordnung.value?.admins.join(', '));
+
+  const oneBasedIndex: ComputedRef<number> = computed(() => props.index + 1);
 
   const header: ComputedRef<string> = computed(() => {
     let text: string = t('person.zuordnung');
-    if (props.showNumber) {
-      text += ` ${oneBasedIndex.value}`;
-    }
+    if (props.showNumber) text += ` ${oneBasedIndex.value}`;
     return text;
   });
 </script>
