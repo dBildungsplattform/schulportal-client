@@ -85,7 +85,7 @@
 
   const handleCreateAnotherRolle = (): void => {
     rolleStore.createdRolle = null;
-    // After successfully creating a Rolle, we want to reset the form, refresh the organisations and navigate to the create Rolle page.
+    // When creating another Rolle, we want to reset the form, refresh the organisations and navigate to the create Rolle page.
     formContext.resetForm();
     organisationStore.getAllOrganisationen({
       systemrechte: ['ROLLEN_VERWALTEN'],
