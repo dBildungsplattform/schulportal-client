@@ -33,8 +33,14 @@
   const emit: Emits = defineEmits<Emits>();
 
   const hasTriggeredAction: Ref<boolean> = ref(false);
+  const isClosing: Ref<boolean> = ref(false);
 
   const state: ComputedRef<State> = computed(() => {
+    // this freezes the content of the dialog in the success state, while the close-animation is running
+    // otherwise it will briefly show the initial template, because the isLoading-prop is true
+    if (isClosing.value) {
+      return State.SUCCESS;
+    }
     if (props.isLoading) {
       return State.LOADING;
     }
@@ -54,6 +60,7 @@
   }
 
   async function closeSuccessDialog(isActive: Ref<boolean>): Promise<void> {
+    isClosing.value = true;
     await closeKlasseDeleteDialog(isActive);
     emit('onClose');
   }
@@ -72,17 +79,16 @@
     });
   });
 
-  const handleOpenDialog = (newValue: boolean): void => {
-    if (newValue) {
-      hasTriggeredAction.value = false;
-    }
+  const resetState = (): void => {
+    hasTriggeredAction.value = false;
+    isClosing.value = false;
   };
 </script>
 
 <template>
   <v-dialog
     persistent
-    @update:model-value="handleOpenDialog"
+    @afterLeave="resetState"
   >
     <template v-slot:activator="{ props }">
       <v-btn
