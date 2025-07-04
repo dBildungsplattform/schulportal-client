@@ -36,6 +36,7 @@
   const isClosing: Ref<boolean> = ref(false);
 
   const state: ComputedRef<State> = computed(() => {
+    // NOTE: order of checks and the two different paths into SUCCESS are important here
     // this freezes the content of the dialog in the success state, while the close-animation is running
     // otherwise it will briefly show the initial template, because the isLoading-prop is true
     if (isClosing.value) {
@@ -44,10 +45,7 @@
     if (props.isLoading) {
       return State.LOADING;
     }
-    if (hasTriggeredAction.value) {
-      return State.SUCCESS;
-    }
-    return State.CONFIRM;
+    return hasTriggeredAction.value ? State.SUCCESS : State.CONFIRM;
   });
 
   async function closeKlasseDeleteDialog(isActive: Ref<boolean>): Promise<void> {
