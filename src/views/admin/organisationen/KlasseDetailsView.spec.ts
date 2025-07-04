@@ -209,8 +209,7 @@ describe('KlassenDetailsView', () => {
 
   test('it deletes a klasse', async () => {
     const push: MockInstance = vi.spyOn(router, 'push');
-
-    wrapper?.find('[data-testid="open-klasse-delete-dialog-button"]').trigger('click');
+    await wrapper?.find('[data-testid="open-klasse-delete-dialog-button"]').trigger('click');
     await flushPromises();
 
     document.querySelector('[data-testid="klasse-delete-confirmation-text"]');
@@ -230,11 +229,6 @@ describe('KlassenDetailsView', () => {
     )[0];
     closeDialogButton?.click();
     await nextTick();
-
-    await vi.waitUntil(
-      () => document.body.querySelector('[data-testid="close-klasse-delete-success-dialog-button"]') === null,
-    );
-
     expect(push).toHaveBeenCalledTimes(1);
   });
 

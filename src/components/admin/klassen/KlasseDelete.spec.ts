@@ -15,8 +15,8 @@ beforeEach(async () => {
   wrapper = mount(KlasseDelete, {
     attachTo: document.getElementById('app') || '',
     props: {
-      isLoading: false,
       errorCode: '',
+      isLoading: false,
       klassenId: '1',
       klassenname: '1A',
       schulname: 'schule',
@@ -74,6 +74,7 @@ describe('KlasseDelete', () => {
       '[data-testid="klasse-delete-button"]',
     )[0];
     klasseDeleteButton?.click();
+    await wrapper?.setProps({ isLoading: false });
     await nextTick();
 
     expect(document.querySelector('[data-testid="klasse-delete-success-text"]')).not.toBeNull();

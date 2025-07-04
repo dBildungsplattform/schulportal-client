@@ -22,59 +22,72 @@
     (event: 'onClose'): void;
   };
 
+  enum State {
+    CONFIRM,
+    LOADING,
+    SUCCESS,
+  }
+
   const props: Props = defineProps<Props>();
 
   const emit: Emits = defineEmits<Emits>();
 
-  const errorMessage: Ref<string> = ref('');
-  const successDialogVisible: Ref<boolean> = ref(false);
+  const hasTriggeredAction: Ref<boolean> = ref(false);
+  const isClosing: Ref<boolean> = ref(false);
+
+  const state: ComputedRef<State> = computed(() => {
+    // NOTE: order of checks and the two different paths into SUCCESS are important here
+    // this freezes the content of the dialog in the success state, while the close-animation is running
+    // otherwise it will briefly show the initial template, because the isLoading-prop is true
+    if (isClosing.value) {
+      return State.SUCCESS;
+    }
+    if (props.isLoading) {
+      return State.LOADING;
+    }
+    return hasTriggeredAction.value ? State.SUCCESS : State.CONFIRM;
+  });
 
   async function closeKlasseDeleteDialog(isActive: Ref<boolean>): Promise<void> {
     isActive.value = false;
   }
 
   async function handleKlasseDelete(klasseId: string): Promise<void> {
+    hasTriggeredAction.value = true;
     emit('onDeleteKlasse', klasseId);
-    successDialogVisible.value = true;
   }
 
   async function closeSuccessDialog(isActive: Ref<boolean>): Promise<void> {
-    // Thi is to close the dialog but it does not happen immediately so we add a delay to avoid flickering
-    isActive.value = false;
-
-    // Delay hiding success dialog to avoid confirmation flicker (Vue is too fast here and shows the confirmation dialog before the success dialog is closed)
-    setTimeout(() => {
-      successDialogVisible.value = false;
-      emit('onClose');
-    }, 300);
+    isClosing.value = true;
+    await closeKlasseDeleteDialog(isActive);
+    emit('onClose');
   }
+
   const deleteKlasseConfirmationMessage: ComputedRef<string> = computed(() => {
-    if (errorMessage.value || props.errorCode) {
-      return '';
-    }
-    let message: string = '';
-    message += `${t('admin.klasse.deleteKlasseConfirmation', {
+    return t('admin.klasse.deleteKlasseConfirmation', {
       klassenname: props.klassenname,
       schulname: props.schulname,
-    })}`;
-    return message;
+    });
   });
 
   const deleteKlasseSuccessMessage: ComputedRef<string> = computed(() => {
-    if (errorMessage.value || props.errorCode) {
-      return '';
-    }
-    let message: string = '';
-    message += `${t('admin.klasse.deleteKlasseSuccessMessage', {
+    return t('admin.klasse.deleteKlasseSuccessMessage', {
       klassenname: props.klassenname,
       schulname: props.schulname,
-    })}`;
-    return message;
+    });
   });
+
+  const resetState = (): void => {
+    hasTriggeredAction.value = false;
+    isClosing.value = false;
+  };
 </script>
 
 <template>
-  <v-dialog persistent>
+  <v-dialog
+    persistent
+    @afterLeave="resetState"
+  >
     <template v-slot:activator="{ props }">
       <v-btn
         v-if="!useIconActivator"
@@ -97,75 +110,28 @@
 
     <template v-slot:default="{ isActive }">
       <LayoutCard
-        :headlineTestId="'klasse-delete-success'"
-        v-if="successDialogVisible"
-        :closable="false"
-        :header="$t('admin.klasse.deleteKlasse')"
-      >
-        <v-card-text>
-          <v-container>
-            <v-row class="text-body bold justify-center">
-              <v-col
-                class="text-center"
-                cols="10"
-              >
-                <span data-testid="klasse-delete-success-text">
-                  {{ deleteKlasseSuccessMessage }}
-                </span>
-              </v-col>
-            </v-row>
-          </v-container>
-        </v-card-text>
-        <v-card-actions class="justify-center">
-          <v-row class="justify-center">
-            <v-col
-              cols="12"
-              sm="6"
-              md="4"
-            >
-              <v-btn
-                :block="mdAndDown"
-                class="primary"
-                @click.stop="closeSuccessDialog(isActive)"
-                data-testid="close-klasse-delete-success-dialog-button"
-              >
-                {{ $t('close') }}
-              </v-btn>
-            </v-col>
-          </v-row>
-        </v-card-actions>
-      </LayoutCard>
-      <LayoutCard
-        :headlineTestId="'klasse-delete-confirmation'"
-        v-else
-        :closable="true"
+        :headlineTestId="state === State.SUCCESS ? 'klasse-delete-success' : 'klasse-delete-confirmation'"
+        :closable="state === State.SUCCESS ? false : true"
         :header="$t('admin.klasse.deleteKlasse')"
         @onCloseClicked="closeKlasseDeleteDialog(isActive)"
       >
         <v-card-text>
           <v-container>
-            <v-row
-              v-if="errorMessage || errorCode"
-              class="text-body text-error"
-            >
-              <v-col
-                class="text-right"
-                cols="1"
-              >
-                <v-icon icon="mdi-alert"></v-icon>
-              </v-col>
-              <v-col>
-                <p data-testid="error-text">
-                  {{ errorMessage || errorCode }}
-                </p>
-              </v-col>
-            </v-row>
             <v-row class="text-body bold justify-center">
               <v-col
                 class="text-center"
                 cols="10"
               >
-                <span data-testid="klasse-delete-confirmation-text">
+                <span
+                  v-if="state === State.SUCCESS && !props.errorCode"
+                  data-testid="klasse-delete-success-text"
+                >
+                  {{ deleteKlasseSuccessMessage }}
+                </span>
+                <span
+                  v-else
+                  data-testid="klasse-delete-confirmation-text"
+                >
                   {{ deleteKlasseConfirmationMessage }}
                 </span>
               </v-col>
@@ -175,6 +141,7 @@
         <v-card-actions class="justify-center">
           <v-row class="justify-center">
             <v-col
+              v-if="state !== State.SUCCESS"
               cols="12"
               sm="6"
               md="4"
@@ -194,11 +161,21 @@
               md="4"
             >
               <v-btn
+                v-if="state === State.SUCCESS"
+                :block="mdAndDown"
+                class="primary"
+                @click.stop="closeSuccessDialog(isActive)"
+                data-testid="close-klasse-delete-success-dialog-button"
+              >
+                {{ $t('close') }}
+              </v-btn>
+              <v-btn
+                v-else
                 :block="mdAndDown"
                 class="primary button"
                 @click.stop="handleKlasseDelete(klassenId)"
                 data-testid="klasse-delete-button"
-                :disabled="isLoading"
+                :disabled="state === State.LOADING"
               >
                 {{ $t('admin.klasse.deleteKlasse') }}
               </v-btn>
@@ -209,5 +186,3 @@
     </template>
   </v-dialog>
 </template>
-
-<style></style>

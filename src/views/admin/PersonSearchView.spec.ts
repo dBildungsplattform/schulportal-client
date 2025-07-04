@@ -438,7 +438,6 @@ describe('PersonSearchView', () => {
     expect(dialog?.classList.contains('v-dialog--active')).toBe(false);
   });
 
-
   test('it navigates back to Benutzerliste when the layout card is closed', async () => {
     const push: MockInstance = vi.spyOn(router, 'push');
     await wrapper?.find('[data-testid="close-layout-card-button"]').trigger('click');
