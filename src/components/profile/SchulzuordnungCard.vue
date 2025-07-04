@@ -59,7 +59,11 @@
   });
 
   const header: ComputedRef<string> = computed(() => {
-    return `${t('person.zuordnung')} ${props.showNumber ? oneBasedIndex : ''}`;
+    let text: string = t('person.zuordnung');
+    if (props.showNumber) {
+      text += ` ${oneBasedIndex.value}`;
+    }
+    return text;
   });
 </script>
 
