@@ -25,7 +25,7 @@
   enum State {
     CONFIRM,
     LOADING,
-    RESULT,
+    SUCCESS,
   }
 
   const props: Props = defineProps<Props>();
@@ -37,11 +37,11 @@
   const state: ComputedRef<State> = computed(() => {
     if (props.isLoading) {
       return State.LOADING;
-    } else if (hasTriggeredAction.value) {
-      return State.RESULT;
-    } else {
-      return State.CONFIRM;
     }
+    if (hasTriggeredAction.value) {
+      return State.SUCCESS;
+    }
+    return State.CONFIRM;
   });
 
   async function closeKlasseDeleteDialog(isActive: Ref<boolean>): Promise<void> {
@@ -106,8 +106,8 @@
 
     <template v-slot:default="{ isActive }">
       <LayoutCard
-        :headlineTestId="state === State.RESULT ? 'klasse-delete-success' : 'klasse-delete-confirmation'"
-        :closable="state === State.RESULT ? false : true"
+        :headlineTestId="state === State.SUCCESS ? 'klasse-delete-success' : 'klasse-delete-confirmation'"
+        :closable="state === State.SUCCESS ? false : true"
         :header="$t('admin.klasse.deleteKlasse')"
         @onCloseClicked="closeKlasseDeleteDialog(isActive)"
       >
@@ -119,7 +119,7 @@
                 cols="10"
               >
                 <span
-                  v-if="state === State.RESULT && !props.errorCode"
+                  v-if="state === State.SUCCESS && !props.errorCode"
                   data-testid="klasse-delete-success-text"
                 >
                   {{ deleteKlasseSuccessMessage }}
@@ -137,7 +137,7 @@
         <v-card-actions class="justify-center">
           <v-row class="justify-center">
             <v-col
-              v-if="state !== State.RESULT"
+              v-if="state !== State.SUCCESS"
               cols="12"
               sm="6"
               md="4"
@@ -157,7 +157,7 @@
               md="4"
             >
               <v-btn
-                v-if="state === State.RESULT"
+                v-if="state === State.SUCCESS"
                 :block="mdAndDown"
                 class="primary"
                 @click.stop="closeSuccessDialog(isActive)"
@@ -171,7 +171,7 @@
                 class="primary button"
                 @click.stop="handleKlasseDelete(klassenId)"
                 data-testid="klasse-delete-button"
-                :disabled="isLoading"
+                :disabled="state === State.LOADING"
               >
                 {{ $t('admin.klasse.deleteKlasse') }}
               </v-btn>
