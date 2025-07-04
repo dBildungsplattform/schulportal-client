@@ -1,11 +1,11 @@
 <script setup lang="ts">
-  import { RollenArt, RollenMerkmal } from '@/api-client/generated/api';
+  import { OrganisationsTyp, RollenArt, RollenMerkmal } from '@/api-client/generated/api';
   import PasswordReset from '@/components/admin/personen/PasswordReset.vue';
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import SchulzuordnungCard from '@/components/profile/SchulzuordnungCard.vue';
   import SelfServiceWorkflow from '@/components/two-factor-authentication/SelfServiceWorkflow.vue';
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
-  import { OrganisationsTyp } from '@/stores/OrganisationStore';
   import { usePersonInfoStore, type PersonInfoStore } from '@/stores/PersonInfoStore';
   import { EmailStatus, usePersonStore, type PersonStore } from '@/stores/PersonStore';
   import {
@@ -14,18 +14,13 @@
     type TwoFactorAuthentificationStore,
   } from '@/stores/TwoFactorAuthentificationStore';
   import { Zuordnung } from '@/stores/types/Zuordnung';
-  import { adjustDateForTimezoneAndFormat } from '@/utils/date';
-  import { mapToLabelValues, type LabelValue, ItemType, type SchulDaten } from '@/utils/personalDataMapper';
+  import { ItemType, mapToLabelValues, type LabelValue } from '@/utils/personalDataMapper';
   import { computed, onBeforeMount, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
   import { useDisplay } from 'vuetify';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
-
-  type ComposedZuordnung = Zuordnung & {
-    klasse?: string | null;
-  };
 
   const { xs }: { xs: Ref<boolean> } = useDisplay();
   const route: RouteLocationNormalizedLoaded = useRoute();
@@ -43,20 +38,13 @@
   const devicePassword: Ref<string> = ref('');
 
   /**
-   * Gruppiert eine Liste von Zuordnungen nach dem Wert der Eigenschaft 'sskId'.
-   *
-   * Diese Funktion nimmt ein Array von Zuordnungen entgegen und organisiert diese
-   * in einer Map, wobei der Schlüssel der Wert der Eigenschaft 'sskId' ist
-   * und der Wert ein Array von Zuordnungen mit diesem Schlüssel.
-   *
-   * @param zuordnungen - Ein Array von Zuordnungen, die gruppiert werden sollen.
-   * @returns Eine Map, in der jeder Schlüssel ein Wert von 'sskId' ist und
-   *          jeder Wert ein Array von Zuordnungen mit diesem Schlüssel.
+   * Groups the given zuordnungen by their sskId.
+   * Klassen are grouped by administriertVon, so they end up in the same group as their parent Schule.
    */
   function groupZuordnungen(zuordnungen: Zuordnung[]): Map<string, Zuordnung[]> {
     const groupedZuordnungen: Map<string, Zuordnung[]> = new Map();
     for (const zuordnung of zuordnungen) {
-      const key: string = zuordnung.sskId;
+      const key: string = zuordnung.typ === OrganisationsTyp.Klasse ? zuordnung.administriertVon : zuordnung.sskId;
       if (groupedZuordnungen.has(key)) {
         groupedZuordnungen.get(key)?.push(zuordnung);
       } else {
@@ -64,110 +52,6 @@
       }
     }
     return groupedZuordnungen;
-  }
-
-  /**
-   * Erstellt eine Liste von zusammengesetzten Zuordnungen aus einer gruppierten Map von Zuordnungen.
-   *
-   * Diese Funktion nimmt eine Map von gruppierten Zuordnungen entgegen und erstellt eine neue Liste von
-   * Zuordnungen. Wenn es mehrere Zuordnungen in einer Gruppe gibt, werden die Rollen aggregiert und
-   * zusammengeführt. Für Zuordnungen des Typs "Klasse" oder "Schule" wird der Name der Klasse oder
-   * der Schule entsprechend gesetzt. Einzelne Zuordnungen ohne Gruppierung werden direkt übernommen.
-   *
-   * @param groupedZuordnungen - Eine Map, in der jeder Schlüssel ein Wert von 'sskDstNr' ist und
-   *                             jeder Wert ein Array von Zuordnungen mit diesem Schlüssel.
-   * @returns Ein Array von zusammengesetzten Zuordnungen.
-   */
-  function createComposedZuordnungen(groupedZuordnungen: Map<string, Zuordnung[]>): ComposedZuordnung[] {
-    const composedZuordnungen: ComposedZuordnung[] = [];
-    for (const [, zuordnungen] of groupedZuordnungen) {
-      if (zuordnungen.length === 0 || zuordnungen[0] === undefined) continue;
-      if (zuordnungen.length > 1) {
-        const aggregatedRoles: string[] = zuordnungen.map((z: Zuordnung) => z.rolle);
-        const uniqueRoles: string[] = [...new Set(aggregatedRoles)];
-        const composedRoles: string = uniqueRoles.join(', ');
-        const befristung: Zuordnung['befristung'] | undefined = zuordnungen.find(
-          (z: Zuordnung) => z.befristung,
-        )?.befristung;
-        const klasse: string | null =
-          zuordnungen
-            .filter((z: Zuordnung) => z.typ === OrganisationsTyp.Klasse)
-            .map((z: Zuordnung) => z.sskName)
-            .join(', ') || null;
-        const schule: string | null =
-          zuordnungen.find((z: Zuordnung) => z.typ === OrganisationsTyp.Schule)?.sskName || null;
-        const sskDstNr: string | null =
-          zuordnungen.find((z: Zuordnung) => z.typ === OrganisationsTyp.Schule && z.sskDstNr != null)?.sskDstNr || null;
-        const composedZuordnung: ComposedZuordnung = Zuordnung.from(zuordnungen[0]);
-        composedZuordnung.rolle = composedRoles;
-        if (schule) composedZuordnung.sskName = schule;
-        if (klasse) composedZuordnung.klasse = klasse;
-        if (sskDstNr) composedZuordnung.sskDstNr = sskDstNr;
-        composedZuordnung.befristung = befristung ?? null;
-        composedZuordnungen.push(composedZuordnung);
-      } else {
-        composedZuordnungen.push(zuordnungen[0]);
-      }
-    }
-    return composedZuordnungen;
-  }
-
-  function createZuordnungsSchuleDaten(zuordnungen: ComposedZuordnung[]): SchulDaten[] {
-    const result: SchulDaten[] = [];
-    for (const [index, zuordnung] of zuordnungen.entries()) {
-      const tempSchulDaten: SchulDaten = {
-        title: zuordnung.sskName,
-        info: t('profile.yourSchuleAdminsAre'),
-        schulAdmins: zuordnung.admins,
-        labelAndValues: [
-          {
-            label: t('profile.schule'),
-            value: zuordnung.sskName,
-            testIdLabel: 'schule-label-' + (index + 1),
-            testIdValue: 'schule-value-' + (index + 1),
-          },
-        ],
-      };
-
-      if (zuordnung.klasse) {
-        tempSchulDaten.labelAndValues.push({
-          label: t('profile.klasse'),
-          value: zuordnung.klasse,
-          testIdLabel: 'klasse-label-' + (index + 1),
-          testIdValue: 'klasse-value-' + (index + 1),
-        });
-      }
-
-      tempSchulDaten.labelAndValues.push({
-        label: t('admin.rolle.rolle'),
-        value: zuordnung.rolle,
-        testIdLabel: 'rolle-label-' + (index + 1),
-        testIdValue: 'rolle-value-' + (index + 1),
-      });
-
-      if (zuordnung.sskDstNr) {
-        tempSchulDaten.labelAndValues.push({
-          label: t('profile.dienstStellenNummer'),
-          labelAbbr: t('profile.dienstStellenNummerAbbr'),
-          value: zuordnung.sskDstNr,
-          testIdLabel: 'dienststellennummer-label-' + (index + 1),
-          testIdValue: 'dienststellennummer-value-' + (index + 1),
-        });
-      }
-
-      if (zuordnung.befristung) {
-        tempSchulDaten.labelAndValues.push({
-          label: t('profile.limitedUntil'),
-          value: adjustDateForTimezoneAndFormat(zuordnung.befristung),
-          testIdLabel: 'befristung-label-' + (index + 1),
-          testIdValue: 'befristung-value-' + (index + 1),
-        });
-      }
-
-      result.push(tempSchulDaten);
-    }
-
-    return result;
   }
 
   const hasKoPersMerkmal: ComputedRef<boolean> = computed(() => {
@@ -228,21 +112,9 @@
       : [],
   );
 
-  const schulDaten: ComputedRef<SchulDaten[]> = computed(() => {
-    if (!personStore.personenuebersicht) return [];
-    const personenZuordnungen: Zuordnung[] = personStore.personenuebersicht.zuordnungen;
-    const groupedZuordnungen: Map<string, Zuordnung[]> = groupZuordnungen(
-      personenZuordnungen.map(
-        (z: Zuordnung) =>
-          ({
-            ...z,
-            sskId: z.typ === OrganisationsTyp.Klasse ? z.administriertVon : z.sskId, // Nutze die ID der Schule, wenn es sich um eine Klasse handelt
-          }) as Zuordnung,
-      ),
-    );
-
-    const composedZuordnungen: ComposedZuordnung[] = createComposedZuordnungen(groupedZuordnungen);
-    return createZuordnungsSchuleDaten(composedZuordnungen);
+  const groupedZuordnungen: ComputedRef<Map<string, Zuordnung[]>> = computed(() => {
+    if (!personStore.personenuebersicht) return new Map();
+    return groupZuordnungen(personStore.personenuebersicht.zuordnungen);
   });
 
   const lastPasswordChangeDate: ComputedRef<string> = computed(() => {
@@ -719,56 +591,13 @@
         md="6"
         class="d-flex flex-column ga-8"
       >
-        <LayoutCard
-          v-for="(schuleData, index) in schulDaten"
-          :key="schuleData.title"
-          :header="$t('person.zuordnung') + ' ' + (schulDaten.length > 1 ? (index + 1).toString() : '')"
-          :headline-test-id="'zuordung-card-' + (index + 1)"
-        >
-          <v-row class="ma-3 p-4">
-            <v-col cols="12">
-              <v-table class="text-body-1">
-                <template v-slot:default>
-                  <tbody>
-                    <tr
-                      v-for="item in schuleData.labelAndValues"
-                      :key="item.label"
-                    >
-                      <td>
-                        <span v-if="item.labelAbbr"
-                          ><abbr :title="item.label"
-                            ><strong :data-testid="item.testIdLabel">{{ item.labelAbbr }}:</strong></abbr
-                          ></span
-                        >
-                        <strong
-                          :data-testid="item.testIdLabel"
-                          v-else
-                          >{{ item.label }}:</strong
-                        >
-                      </td>
-                      <td :data-testid="item.testIdValue">{{ item.value }}</td>
-                    </tr>
-                  </tbody>
-                </template>
-              </v-table>
-              <p
-                class="pt-4 text-center text-body-1 text-medium-emphasis"
-                data-testid="schuladmins-info-text-with-icon"
-                style="white-space: normal"
-                v-if="schuleData.schulAdmins && schuleData.schulAdmins.length > 0"
-              >
-                <v-icon
-                  class="mr-2"
-                  icon="mdi-information-slab-circle-outline"
-                  data-testid="schuladmins-info-icon"
-                ></v-icon>
-                <span data-testid="schulAdmins-info-text">
-                  {{ `${schuleData.info} ${schuleData.schulAdmins?.join(', ') || ''}` }}
-                </span>
-              </p>
-            </v-col>
-          </v-row>
-        </LayoutCard>
+        <SchulzuordnungCard
+          v-for="(zuordnungen, index) in Array.from(groupedZuordnungen.values())"
+          :key="`zuordnung-${index}`"
+          :zuordnungen="zuordnungen"
+          :showNumber="groupedZuordnungen.size > 1"
+          :index="index"
+        />
       </v-col>
     </v-row>
   </div>
