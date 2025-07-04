@@ -175,10 +175,6 @@
     window.location.href = url.toString();
   }
 
-  type WatchOptions = {
-    immediate: boolean;
-  };
-
   watch(
     () => personInfoStore.personInfo?.person.id,
     async (personId: string | undefined) => {
@@ -192,7 +188,7 @@
       await Promise.all([twoFARequirementPromise, personUebersichtPromise, twoFAStatePromise]);
       loading2FA.value = false;
     },
-    { immediate: true } as WatchOptions,
+    { immediate: true },
   );
 
   onBeforeMount(async () => {
