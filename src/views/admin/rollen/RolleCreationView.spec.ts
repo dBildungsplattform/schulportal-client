@@ -1,4 +1,5 @@
 import {
+  OrganisationsTyp,
   ServiceProviderKategorie,
   ServiceProviderTarget,
   type ServiceProviderResponse,
@@ -15,7 +16,7 @@ import {
 import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import type Module from 'module';
 import { expect, test, type Mock, type MockInstance } from 'vitest';
-import { nextTick } from 'vue';
+import { nextTick, type DefineComponent } from 'vue';
 import {
   createRouter,
   createWebHistory,
@@ -46,27 +47,6 @@ let { storedBeforeRouteLeaveCallback }: { storedBeforeRouteLeaveCallback: OnBefo
     };
   },
 );
-
-organisationStore.allOrganisationen = [
-  {
-    id: '1',
-    name: 'Albert-Emil-Hansebrot-Gymnasium',
-    kennung: '9356494',
-    namensergaenzung: 'Schule',
-    kuerzel: 'aehg',
-    typ: 'SCHULE',
-    administriertVon: '1',
-  },
-  {
-    id: '2',
-    name: 'Einstein-Grundschule',
-    kennung: '123798465',
-    namensergaenzung: 'des Alberts',
-    kuerzel: 'EGS',
-    typ: 'SCHULE',
-    administriertVon: '1',
-  },
-];
 
 function mountComponent(): VueWrapper {
   return mount(RolleCreationView, {
@@ -178,7 +158,29 @@ beforeEach(async () => {
 });
 
 afterEach(() => {
+  organisationStore.allOrganisationen = [
+    {
+      id: '1',
+      name: 'Albert-Emil-Hansebrot-Gymnasium',
+      kennung: '9356494',
+      namensergaenzung: 'Schule',
+      kuerzel: 'aehg',
+      typ: 'SCHULE',
+      administriertVon: '1',
+    },
+    {
+      id: '2',
+      name: 'Einstein-Grundschule',
+      kennung: '123798465',
+      namensergaenzung: 'des Alberts',
+      kuerzel: 'EGS',
+      typ: 'SCHULE',
+      administriertVon: '1',
+    },
+  ];
   wrapper?.unmount();
+  // Restore real timers
+  vi.useRealTimers();
 });
 
 describe('RolleCreationView', () => {
@@ -277,6 +279,73 @@ describe('RolleCreationView', () => {
     await nextTick();
 
     expect(rolleStore.createdRolle).toBe(null);
+  });
+
+  test('it calls the correct method while searching', async () => {
+    vi.useFakeTimers();
+
+    const administrationsebeneAutocomplete: VueWrapper | undefined = wrapper
+      ?.findComponent({
+        ref: 'rolle-creation-form',
+      })
+      .findComponent({ ref: 'administrationsebene-select' });
+
+    await administrationsebeneAutocomplete?.setValue(undefined);
+    await nextTick();
+
+    // First search with empty string
+    administrationsebeneAutocomplete?.vm.$emit('update:search', '');
+    await nextTick();
+
+    // Fast-forward time by 500ms to simulate debounce
+    vi.advanceTimersByTime(500);
+    await nextTick();
+
+    expect(organisationStore.getAllOrganisationen).toHaveBeenCalled();
+
+    // Second search with 'Carl'
+    administrationsebeneAutocomplete?.vm.$emit('update:search', 'Carl');
+    await nextTick();
+
+    // Fast-forward time by 500ms again
+    vi.advanceTimersByTime(500);
+    await nextTick();
+
+    expect(organisationStore.getAllOrganisationen).toHaveBeenCalledWith({
+      systemrechte: ['ROLLEN_VERWALTEN'],
+      excludeTyp: [OrganisationsTyp.Klasse],
+      limit: 25,
+      searchString: 'Carl',
+    });
+  });
+
+  test('It autoselects the organisation if there is only one', async () => {
+    interface RolleCreationView extends DefineComponent {
+      autoselectAdministrationsebene: () => Promise<void>;
+    }
+
+    organisationStore.allOrganisationen = [
+      {
+        id: '1',
+        name: 'Albert-Emil-Hansebrot-Gymnasium',
+        kennung: '9356494',
+        namensergaenzung: 'Schule',
+        kuerzel: 'aehg',
+        typ: OrganisationsTyp.Schule,
+        administriertVon: '1',
+      },
+    ];
+    await nextTick();
+
+    await (wrapper?.vm as unknown as RolleCreationView).autoselectAdministrationsebene();
+
+    const administrationsebeneAutocomplete: VueWrapper | undefined = wrapper
+      ?.findComponent({
+        ref: 'rolle-creation-form',
+      })
+      .findComponent({ ref: 'administrationsebene-select' });
+
+    expect(administrationsebeneAutocomplete?.text()).toContain('Albert-Emil-Hansebrot-Gymnasium');
   });
 
   test('it fills form and triggers submit and uses correct Rolle to add serviceproviders', async () => {

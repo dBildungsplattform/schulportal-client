@@ -703,7 +703,7 @@ describe('PersonCreationView', () => {
     const confirmButton: Element = await vi.waitUntil(() =>
       document.querySelector('[data-testid="confirm-add-person-button"]'),
     );
-    expect(confirmButton).not.toBeNull();
+    await nextTick();
 
     confirmButton.dispatchEvent(new Event('click'));
 
