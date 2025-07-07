@@ -107,10 +107,11 @@
   const devicePassword: Ref<string> = ref('');
   const password: Ref<string> = ref('');
 
+  // these are used to display the pending changes to zuordnungen
   const zuordnungenResult: Ref<ZuordnungWithKlasse[] | undefined> = ref<ZuordnungWithKlasse[] | undefined>(undefined);
-  const getZuordnungen: ComputedRef<ZuordnungWithKlasse[] | undefined> = computed(() => zuordnungenResult.value);
   const selectedZuordnungen: Ref<ZuordnungWithKlasse[]> = ref<ZuordnungWithKlasse[]>([]);
   const newZuordnung: Ref<ZuordnungWithKlasse | undefined> = ref<ZuordnungWithKlasse | undefined>(undefined);
+  // these are used to create the final update
   const finalZuordnungen: Ref<Zuordnung[]> = ref<Zuordnung[]>([]);
   const originalZuordnungenResult: Ref<Zuordnung[] | undefined> = ref(undefined);
   const hasKlassenZuordnung: Ref<boolean | undefined> = ref(false);
@@ -1924,7 +1925,7 @@
             <v-col
               cols="10"
               offset="1"
-              v-for="zuordnung in getZuordnungen"
+              v-for="zuordnung in zuordnungenResult"
               :key="zuordnung.sskId"
               :data-testid="`person-zuordnung-${zuordnung.sskId}`"
               :title="zuordnung.sskName"
@@ -1967,7 +1968,7 @@
               </v-col>
               <v-col
                 cols="12"
-                v-for="zuordnung in getZuordnungen?.filter((zuordnung: Zuordnung) => zuordnung.editable)"
+                v-for="zuordnung in zuordnungenResult?.filter((zuordnung: Zuordnung) => zuordnung.editable)"
                 :key="zuordnung.sskId"
                 :data-testid="`person-zuordnung-${zuordnung.sskId}`"
                 :title="zuordnung.sskName"
