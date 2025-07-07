@@ -1,10 +1,16 @@
 <script setup lang="ts">
-  import type { ModelRef } from 'vue';
+  import { computed, ref, watch, type ComputedRef, type ModelRef, type Ref } from 'vue';
   import type { BaseFieldProps } from 'vee-validate';
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import FormRow from '@/components/form/FormRow.vue';
   import { type TranslatedObject } from '@/types.d';
   import type { RollenArt, RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
+  import {
+    OrganisationsTyp,
+    useOrganisationStore,
+    type OrganisationenFilter,
+    type OrganisationStore,
+  } from '@/stores/OrganisationStore';
 
   type Props = {
     administrationsebenen?: Array<{ value: string; title: string }>;
@@ -23,6 +29,7 @@
     translatedSystemrechte?: TranslatedObject[];
     isEditActive?: boolean;
     isLoading: boolean;
+    hasAutoselectedAdministrationsebene?: boolean;
     onHandleConfirmUnsavedChanges: () => void;
     onHandleDiscard: () => void;
     onShowDialogChange: (value?: boolean) => void;
@@ -30,6 +37,10 @@
   };
 
   const props: Props = defineProps<Props>();
+  const organisationStore: OrganisationStore = useOrganisationStore();
+
+  const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
+  const searchInputAdministrationsebenen: Ref<string> = ref('');
 
   // Define the V-model for each field so the parent component can pass in the values for it.
   const selectedAdministrationsebene: ModelRef<string | undefined, string> =
@@ -39,6 +50,55 @@
   const selectedMerkmale: ModelRef<RollenMerkmal[] | undefined, string> = defineModel('selectedMerkmale');
   const selectedServiceProviders: ModelRef<string[] | undefined, string> = defineModel('selectedServiceProviders');
   const selectedSystemRechte: ModelRef<RollenSystemRecht[] | undefined, string> = defineModel('selectedSystemRechte');
+
+  const selectedAdministrationsebeneTitle: ComputedRef<string | undefined> = computed(() => {
+    return props.administrationsebenen?.find(
+      (org: TranslatedObject) => org.value === selectedAdministrationsebene.value,
+    )?.title;
+  });
+
+  // Watcher for selectedOrganisation to fetch roles and classes
+  watch(selectedAdministrationsebene, async (newValue: string | undefined, oldValue: string | undefined) => {
+    if (newValue && newValue !== oldValue) {
+      const filter: OrganisationenFilter = {
+        systemrechte: ['ROLLEN_VERWALTEN'],
+        organisationIds: [newValue],
+        excludeTyp: [OrganisationsTyp.Klasse],
+        limit: 25,
+      };
+
+      await organisationStore.getAllOrganisationen(filter);
+    }
+    selectedAdministrationsebene.value = newValue;
+  });
+
+  watch(searchInputAdministrationsebenen, async (newValue: string, oldValue: string) => {
+    clearTimeout(timerId.value);
+
+    const filter: OrganisationenFilter = {
+      systemrechte: ['ROLLEN_VERWALTEN'],
+      excludeTyp: [OrganisationsTyp.Klasse],
+      limit: 25,
+    };
+
+    if (oldValue === selectedAdministrationsebeneTitle.value) return;
+
+    if (newValue === '' && !selectedAdministrationsebene.value) {
+      // Case: Initial load
+      // nothing to add — base filter is fine
+    } else if (newValue && newValue !== selectedAdministrationsebeneTitle.value) {
+      filter.searchString = newValue;
+    } else if (newValue === '' && selectedAdministrationsebene.value) {
+      // Case: user cleared search but selected something earlier
+      filter.organisationIds = [selectedAdministrationsebene.value];
+    } else {
+      return;
+    }
+
+    timerId.value = setTimeout(async () => {
+      await organisationStore.getAllOrganisationen(filter);
+    }, 500);
+  });
 </script>
 
 <template data-test-id="rolle-form">
@@ -69,11 +129,16 @@
         :isRequired="true"
         :label="$t('admin.administrationsebene.administrationsebene')"
       >
-        <v-select
+        <v-autocomplete
+          autocomplete="off"
           clearable
+          :class="[
+            { 'filter-dropdown mb-4': hasAutoselectedAdministrationsebene },
+            { selected: selectedAdministrationsebene },
+          ]"
           data-testid="administrationsebene-select"
           density="compact"
-          :disabled="readonly"
+          :disabled="readonly || hasAutoselectedAdministrationsebene"
           id="administrationsebene-select"
           :items="administrationsebenen"
           item-value="value"
@@ -85,7 +150,8 @@
           variant="outlined"
           v-bind="selectedAdministrationsebeneProps"
           v-model="selectedAdministrationsebene"
-        ></v-select>
+          v-model:search="searchInputAdministrationsebenen"
+        ></v-autocomplete>
       </FormRow>
 
       <!-- 2. Rollenart zuordnen -->
