@@ -36,7 +36,7 @@
     type PersonenkontextStore,
     type PersonenkontextUpdate,
     type PersonenkontextWorkflowResponse,
-    type RolleResponse
+    type RolleResponse,
   } from '@/stores/PersonenkontextStore';
   import { RollenArt, RollenMerkmal } from '@/stores/RolleStore';
   import {
@@ -562,7 +562,9 @@
 
     const workflowStepResponse: PersonenkontextWorkflowResponse | null = personenkontextStore.workflowStepResponse;
 
-    const rolle: RolleResponse | undefined = workflowStepResponse?.rollen.find((r: RolleResponse) => r.id === selectedRolleId);
+    const rolle: RolleResponse | undefined = workflowStepResponse?.rollen.find(
+      (r: RolleResponse) => r.id === selectedRolleId,
+    );
     return !!rolle && rolle.rollenart === RollenArt.Lern;
   }
 
@@ -3082,9 +3084,7 @@
         <v-card-text>
           <v-container>
             <v-row class="text-body text-center bold">
-              <v-col
-                cols="12"
-              >
+              <v-col cols="12">
                 <span>{{ changeKlasseConfirmationDialogMessage }}</span>
               </v-col>
             </v-row>
