@@ -107,11 +107,15 @@
   const devicePassword: Ref<string> = ref('');
   const password: Ref<string> = ref('');
 
-  // these are used to display the pending changes to zuordnungen
+  /**
+   * These are used to display the pending changes to zuordnungen
+   */
   const zuordnungenResult: Ref<ZuordnungWithKlasse[] | undefined> = ref<ZuordnungWithKlasse[] | undefined>(undefined);
   const selectedZuordnungen: Ref<ZuordnungWithKlasse[]> = ref<ZuordnungWithKlasse[]>([]);
   const newZuordnung: Ref<ZuordnungWithKlasse | undefined> = ref<ZuordnungWithKlasse | undefined>(undefined);
-  // these are used to create the final update
+  /**
+   * These are used to create the final update
+   */
   const finalZuordnungen: Ref<Zuordnung[]> = ref<Zuordnung[]>([]);
   const originalZuordnungenResult: Ref<Zuordnung[] | undefined> = ref(undefined);
   const hasKlassenZuordnung: Ref<boolean | undefined> = ref(false);
@@ -1242,18 +1246,24 @@
     const formattedBefristung: string | null = formatDateToISO(befristungDate) ?? null;
 
     // copy zuordnung from old one and update befristung
-    const currentZuordnung: Zuordnung = selectedZuordnungen.value[0]!;
-    newZuordnung.value = Zuordnung.from(currentZuordnung);
+    const selectedZuordnung: Zuordnung = selectedZuordnungen.value[0]!;
+
+    // for the template
+    newZuordnung.value = Zuordnung.from(selectedZuordnung);
     newZuordnung.value.befristung = formattedBefristung;
     newZuordnung.value.editable = true;
 
-    finalZuordnungen.value = (zuordnungenResult.value ?? [])
-      .map((zuordnung: Zuordnung | undefined) =>
-        zuordnung?.sskId === newZuordnung.value?.sskId && zuordnung?.rolleId === newZuordnung.value?.rolleId
-          ? newZuordnung.value
-          : zuordnung,
-      )
-      .filter((zuordnung: Zuordnung | undefined): zuordnung is Zuordnung => zuordnung !== undefined);
+    finalZuordnungen.value = (personStore.personenuebersicht?.zuordnungen ?? []).map((zuordnung: Zuordnung) => {
+      const isSelectedOrgaOrChildKlasse: boolean =
+        zuordnung.sskId === selectedZuordnung.sskId ||
+        (zuordnung.typ === OrganisationsTyp.Klasse && zuordnung.administriertVon === selectedZuordnung.sskId);
+      if (isSelectedOrgaOrChildKlasse && zuordnung.rolleId === selectedZuordnung.rolleId) {
+        const updatedZuordnung: Zuordnung = Zuordnung.from(zuordnung);
+        updatedZuordnung.befristung = formattedBefristung;
+        return updatedZuordnung;
+      }
+      return zuordnung;
+    });
 
     prepareChangeBefristung();
   };
