@@ -1247,7 +1247,11 @@
     newZuordnung.value.editable = true;
 
     finalZuordnungen.value = (zuordnungenResult.value ?? [])
-      .map((zuordnung: Zuordnung | undefined) => (zuordnung === currentZuordnung ? newZuordnung.value : zuordnung))
+      .map((zuordnung: Zuordnung | undefined) =>
+        zuordnung?.sskId === newZuordnung.value?.sskId && zuordnung?.rolleId === newZuordnung.value?.rolleId
+          ? newZuordnung.value
+          : zuordnung,
+      )
       .filter((zuordnung: Zuordnung | undefined): zuordnung is Zuordnung => zuordnung !== undefined);
 
     prepareChangeBefristung();
