@@ -1084,7 +1084,7 @@ describe('PersonDetailsView', () => {
                   { rolle: rolle.name, rolleId: rolle.id, rollenArt: rolle.rollenart, befristung: localBefristung },
                   { organisation: schule },
                 ),
-                DoFactory.getZuordnung({}, { organisation: schule }),
+                DoFactory.getZuordnung(),
               ]);
             }
           });
