@@ -112,7 +112,7 @@
       : t(`admin.klasse.errors.${organisationStore.errorCode}`);
   });
 
-  function getPaginatedKlassen(page: number): void {
+  function setKlassenPage(page: number): void {
     searchFilterStore.klassenPage = page;
   }
 
@@ -350,7 +350,7 @@
               navigateToKlassenDetails(event, item as TableRow<Organisation>)
           "
           @onItemsPerPageUpdate="getPaginatedKlassenWithLimit"
-          @onPageUpdate="getPaginatedKlassen"
+          @onPageUpdate="setKlassenPage"
           @onTableUpdate="handleTableSorting"
           :totalItems="totalKlassenCount"
           :itemsPerPage="searchFilterStore.klassenPerPage"
