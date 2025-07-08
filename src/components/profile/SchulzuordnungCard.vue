@@ -122,7 +122,7 @@
             data-testid="schuladmins-info-icon"
           ></v-icon>
           <span data-testid="schulAdmins-info-text">
-            {{ `${t('profile.yourSchuleAdminsAre')} ${admins}` }}
+            {{ `${t('profile.yourSchuladminsAre')} ${admins}` }}
           </span>
         </p>
       </v-col>
