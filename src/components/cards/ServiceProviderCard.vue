@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import SchulPortalLogo from '@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg';
+  import SchulPortalLogo from '@/assets/logos/erwin_logos/Logo_ErWIn_Portal_Single.svg';
 
   defineProps<{
     href?: string;
