@@ -626,7 +626,7 @@ describe('PersonCreationView', () => {
     expect(wrapper?.find('[data-testid="person-success-text"]').isVisible()).toBe(true);
   });
 
-  test('it fills form for Landesbediensteter, triggers submit and then show success template', async () => {
+  test('it fills form for Landesbediensteter, triggers submit and then shows success template', async () => {
     const mockLandesbedienstetePersonen: PersonLandesbediensteterSearchResponse[] = [
       {
         id: faker.string.uuid(),
