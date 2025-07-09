@@ -76,6 +76,7 @@
     if (selectedSchule.value) initialFilter.administriertVon = [selectedSchule.value];
     return initialFilter;
   });
+  const administriertVonForKlassenFilter: Ref<Array<string>> = ref([]);
 
   const finalKlassen: ComputedRef<Organisation[]> = computed(() => {
     // If there are selected Klassen, filter allKlassen to show only those that are selected
@@ -216,6 +217,13 @@
     { immediate: true },
   );
 
+  watch(selectedSchule, (newValue) => {
+    administriertVonForKlassenFilter.value.shift();
+    if (newValue) {
+      administriertVonForKlassenFilter.value.push(newValue);
+    }
+  });
+
   watchEffect(async () => {
     await reloadData(klassenListFilter.value);
   });
@@ -325,7 +333,7 @@
                     @update:selectedKlassen="updateKlassenSelection"
                     :placeholderText="t('admin.klasse.klassen')"
                     ref="klasse-select"
-                    :administriertVon="selectedSchule ? [selectedSchule] : undefined"
+                    :administriertVon="administriertVonForKlassenFilter"
                   ></KlassenFilter>
                 </div>
               </template>
