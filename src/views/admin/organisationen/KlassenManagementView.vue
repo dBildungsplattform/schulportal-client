@@ -153,7 +153,7 @@
   async function updateSchuleSelection(id: string | undefined): Promise<void> {
     if (selectedSchule.value == id) return;
     selectedSchule.value = id;
-    await searchFilterStore.setSchuleFilterForKlassen(id ?? null);
+    searchFilterStore.setSchuleFilterForKlassen(id ?? null);
     searchFilterStore.klassenPage = 1;
     if (!id) {
       await resetSearchAndFilter();
@@ -217,7 +217,7 @@
     { immediate: true },
   );
 
-  watch(selectedSchule, (newValue) => {
+  watch(selectedSchule, (newValue: string | undefined) => {
     administriertVonForKlassenFilter.value.shift();
     if (newValue) {
       administriertVonForKlassenFilter.value.push(newValue);
