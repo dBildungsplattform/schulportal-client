@@ -1,4 +1,5 @@
 <script setup lang="ts">
+  import { useMasterDataStore, type MasterDataStore } from '@/stores/MasterDataStore';
   import {
     type RolleStore,
     useRolleStore,
@@ -47,6 +48,7 @@
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
+  const masterDataStore: MasterDataStore = useMasterDataStore();
   const rolleStore: RolleStore = useRolleStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
@@ -255,7 +257,7 @@
     });
 
     Object.values(RollenSystemRecht).forEach((enumValue: RollenSystemRecht) => {
-      if (!isHiddenSystemrecht(enumValue)) {
+      if (!masterDataStore.isHiddenSystemrecht(enumValue)) {
         const i18nPath: string = `admin.rolle.mappingFrontBackEnd.systemrechte.${enumValue}`;
         allSystemrechte.value.push({
           value: enumValue,

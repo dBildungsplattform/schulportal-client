@@ -5,7 +5,7 @@ import {
   RolleApiFactory,
   RollenArt,
   RollenMerkmal,
-  RollenSystemRecht,
+  RollenSystemRechtEnum,
   type RolleServiceProviderBodyParams,
   type CreateRolleBodyParams,
   type RolleApiInterface,
@@ -13,6 +13,7 @@ import {
   type RolleWithServiceProvidersResponse,
   type ServiceProviderResponse,
   type UpdateRolleBodyParams,
+  type SystemRechtResponse,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 import type { ServiceProvider } from './ServiceProviderStore';
@@ -40,7 +41,7 @@ type RolleActions = {
     administrationsebene: string,
     rollenArt: RollenArt,
     merkmale: RollenMerkmal[],
-    systemrechte: RollenSystemRecht[],
+    systemrechte: RollenSystemRechtEnum[],
   ) => Promise<RolleResponse>;
   getAllRollen: (filter: RolleFilter) => Promise<void>;
   getRolleById: (rolleId: string) => Promise<Rolle>;
@@ -48,7 +49,7 @@ type RolleActions = {
     rolleId: string,
     rollenName: string,
     merkmale: RollenMerkmal[],
-    systemrechte: RollenSystemRecht[],
+    systemrechte: RollenSystemRechtEnum[],
     serviceProviderIds: string[],
     version: number,
   ) => Promise<void>;
@@ -57,7 +58,7 @@ type RolleActions = {
 
 export { RollenArt };
 export { RollenMerkmal };
-export { RollenSystemRecht };
+export { RollenSystemRechtEnum as RollenSystemRecht };
 export type { RolleResponse };
 export type { RolleWithServiceProvidersResponse };
 
@@ -67,7 +68,7 @@ export type Rolle = {
   merkmale: Set<RollenMerkmal>;
   name: string;
   rollenart: RollenArt;
-  systemrechte?: Set<RollenSystemRecht>;
+  systemrechte?: Set<RollenSystemRechtEnum>;
   serviceProviders?: Array<ServiceProviderResponse>;
   version: number;
 };
@@ -88,7 +89,7 @@ export type RolleFormType = {
   selectedRollenName: string | undefined;
   selectedMerkmale: RollenMerkmal[] | string[];
   selectedServiceProviders: ServiceProvider[] | string[];
-  selectedSystemRechte: RollenSystemRecht[] | string[];
+  selectedSystemRechte: RollenSystemRechtEnum[] | string[];
 };
 
 export type RolleFilter = {
@@ -136,7 +137,7 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
       administrationsebene: string,
       rollenArt: RollenArt,
       merkmale: RollenMerkmal[],
-      systemrechte: RollenSystemRecht[],
+      systemrechte: RollenSystemRechtEnum[],
     ): Promise<RolleResponse> {
       this.loading = true;
       try {
@@ -147,11 +148,14 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
           rollenart: rollenArt,
           // TODO Remove casting when generator issue is fixed from the server side
           merkmale: merkmale as unknown as Set<RollenMerkmal>,
-          systemrechte: systemrechte as unknown as Set<RollenSystemRecht>,
+          systemrechte: systemrechte as unknown as Set<RollenSystemRechtEnum>,
         };
         const { data }: { data: RolleResponse } = await rolleApi.rolleControllerCreateRolle(createRolleBodyParams);
-        this.createdRolle = data;
-        this.currentRolle = data;
+        const receivedSystemrechte: Set<RollenSystemRechtEnum> = new Set(
+          Array.from(data.systemrechte).map((recht: SystemRechtResponse) => recht.name),
+        );
+        this.createdRolle = { ...data, systemrechte: receivedSystemrechte };
+        this.currentRolle = this.createdRolle;
         return data;
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'ROLLE_ERROR');
@@ -198,7 +202,7 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
       rolleId: string,
       rollenName: string,
       merkmale: RollenMerkmal[],
-      systemrechte: RollenSystemRecht[],
+      systemrechte: RollenSystemRechtEnum[],
       serviceProviderIds: string[],
       version: number,
     ): Promise<void> {
@@ -208,7 +212,7 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
         const updateRolleBodyParams: UpdateRolleBodyParams = {
           name: rollenName,
           merkmale: merkmale as unknown as Set<RollenMerkmal>,
-          systemrechte: systemrechte as unknown as Set<RollenSystemRecht>,
+          systemrechte: systemrechte as unknown as Set<RollenSystemRechtEnum>,
           serviceProviderIds: serviceProviderIds as unknown as Set<string>,
           version: version,
         };

@@ -1,5 +1,6 @@
 <script setup lang="ts">
   import { ref, type Ref, onMounted, onUnmounted, computed, type ComputedRef } from 'vue';
+  import { useMasterDataStore, type MasterDataStore } from '@/stores/MasterDataStore';
   import {
     useOrganisationStore,
     type OrganisationStore,
@@ -40,8 +41,8 @@
   } from '@/utils/validationRolle';
   import RolleSuccessTemplate from '@/components/admin/rollen/RolleSuccessTemplate.vue';
   import { type TranslatedObject } from '@/types.d';
-  import { isHiddenSystemrecht } from '@/utils/systemrechte';
 
+  const masterDataStore: MasterDataStore = useMasterDataStore();
   const rolleStore: RolleStore = useRolleStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
@@ -238,7 +239,7 @@
     });
 
     Object.values(RollenSystemRecht).forEach((enumValue: RollenSystemRecht) => {
-      if (!isHiddenSystemrecht(enumValue)) {
+      if (!masterDataStore.isHiddenSystemrecht(enumValue)) {
         const i18nPath: string = `admin.rolle.mappingFrontBackEnd.systemrechte.${enumValue}`;
         translatedSystemrechte.value.push({
           value: enumValue,
