@@ -1,0 +1,28 @@
+{{- if .Values.ingress.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ template "common.names.name" . }}-loadbalancerip-ip
+  namespace: {{ template "common.names.namespace" . }}
+  annotations:
+    nginx.ingress.kubernetes.io/limit-connections: "40"
+    nginx.ingress.kubernetes.io/limit-rpm: "400"
+    nginx.ingress.kubernetes.io/limit-whitelist: "10.0.0.0/8"
+status:
+  loadBalancer:
+    ingress:
+      - ip: 212.132.122.17 # soll insecret oder configmap
+spec:
+  ingressClassName: nginx-loadbalancerip
+  rules:
+    - host: {{ .Values.frontendHostname }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ template "common.names.name" . }}
+                port:
+                  number: 8080      
+{{- end }}
