@@ -1242,10 +1242,11 @@
     const formattedBefristung: string | null = formatDateToISO(befristungDate) ?? null;
 
     // copy zuordnung from old one and update befristung
-    const selectedZuordnung: Zuordnung = selectedZuordnungen.value[0]!;
+    const selectedZuordnung: ZuordnungWithKlasse = selectedZuordnungen.value[0]!;
 
     // for the template
     newZuordnung.value = Zuordnung.from(selectedZuordnung);
+    newZuordnung.value.klasse = selectedZuordnung.klasse;
     newZuordnung.value.befristung = formattedBefristung;
     newZuordnung.value.editable = true;
 
@@ -3208,11 +3209,10 @@
             >
               <v-btn
                 :block="mdAndDown"
-                class="primary"
-                data-testid="confirm-change-befristung-button"
-                @click.stop="confirmDialogChangeBefristung"
+                class="secondary"
+                @click.stop="cancelChangeBefristung"
               >
-                {{ t('yes') }}
+                {{ t('no') }}
               </v-btn>
             </v-col>
             <v-col
@@ -3222,10 +3222,11 @@
             >
               <v-btn
                 :block="mdAndDown"
-                class="secondary"
-                @click.stop="cancelChangeBefristung"
+                class="primary"
+                data-testid="confirm-change-befristung-button"
+                @click.stop="confirmDialogChangeBefristung"
               >
-                {{ t('no') }}
+                {{ t('yes') }}
               </v-btn>
             </v-col>
           </v-row>
