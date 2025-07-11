@@ -334,6 +334,8 @@
       "loadingErrorText": "Es konnten keine Rollendaten geladen werden.",
       "loadingErrorTitle": "Fehler beim Laden der Rolle",
       "management": "Rollenverwaltung",
+      "mapping": "Rollenmapping",
+      "showMapping": "Alle Rollen anzeigen",
       "mappingFrontBackEnd": {
         "systemrechte": {
           "IMPORT_DURCHFUEHREN": "Darf Import durchführen",
@@ -456,7 +458,10 @@
       "selectServiceProvider": "Angebote auswählen",
       "serviceProvider": "Angebote"
     },
-    "status": "Status"
+    "status": "Status",
+    "instance": "Instanz",
+    "Role": "Rolle",
+    "save": "Speichern"
   },
   "cancel": "Abbrechen",
   "proceed": "Weiter",

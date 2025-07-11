@@ -17,6 +17,11 @@
     }
   }
 
+  function handleRoleInstanceSelection(instance: string): void {
+    closeMenuOnMobile();
+    router.push({ path: `/admin/rolle/mapping/${instance.toLowerCase()}`, query: { instance } });
+  }
+
   function handleMenuItemClick(nextRoute: string): void {
     if (route.path === nextRoute) {
       // If current route is the same as the route we're navigating to,
@@ -198,6 +203,25 @@
         :title="$t('admin.rolle.createNew')"
         to="/admin/rollen/new"
       ></v-list-item>
+      <v-list-item
+        class="menu-bar-main-item headline-2"
+        data-testid="rolle-management-title"
+        :title="$t('admin.rolle.mapping')"
+      ></v-list-item>
+      <v-list-item
+        class="menu-bar-sub-item caption"
+        prepend-icon="mdi-school"
+        :title="'Schulcloud'"
+        @click="() => handleRoleInstanceSelection('Schulcloud')"
+        to="/admin/rolle/mapping/schulcloud?instance=Schulcloud"
+      />
+      <v-list-item
+        class="menu-bar-sub-item caption"
+        prepend-icon="mdi-school"
+        :title="'Moodle'"
+        @click="() => handleRoleInstanceSelection('Moodle')"
+        to="/admin/rolle/mapping/moodle?instance=Moodle"
+      />
     </div>
 
     <!-- Schulverwaltung -->

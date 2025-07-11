@@ -222,6 +222,39 @@ const routes: readonly RouteRecordRaw[] = [
     name: 'no-second-factor',
     component: () => import('../views/NoSecondFactorView.vue'),
   },
+  {
+    path: '/admin/rolle/mapping',
+    name: 'rolle-mapping',
+    component: () => import('../views/admin/RolleMappingView.vue'),
+    meta: {
+      layout: 'AdminLayout',
+      requiresAuth: true,
+      requiredStepUpLevel: StepUpLevel.GOLD,
+      requiresPermission: 'rollenverwaltung',
+    },
+  },
+  {
+    path: '/admin/rolle/mapping/schulcloud',
+    name: 'rolle-mapping-schulcloud',
+    component: () => import('../views/admin/RolleMappingView.vue'),
+    meta: {
+      layout: 'AdminLayout',
+      requiresAuth: true,
+      requiredStepUpLevel: StepUpLevel.GOLD,
+      requiresPermission: 'rollenverwaltung',
+    },
+  },
+  {
+    path: '/admin/rolle/mapping/moodle',
+    name: 'rolle-mapping-moodle',
+    component: () => import('../views/admin/RolleMappingView.vue'),
+    meta: {
+      layout: 'AdminLayout',
+      requiresAuth: true,
+      requiredStepUpLevel: StepUpLevel.GOLD,
+      requiresPermission: 'rollenverwaltung',
+    },
+  },
 ];
 
 export default routes;
