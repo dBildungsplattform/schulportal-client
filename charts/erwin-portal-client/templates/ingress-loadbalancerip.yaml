@@ -5,9 +5,9 @@ metadata:
   name: {{ template "common.names.name" . }}-loadbalancerip-ip
   namespace: {{ template "common.names.namespace" . }}
   annotations:
-    nginx.ingress.kubernetes.io/limit-connections: {{ .Values.portal_loadbalancer_ingress_client_limit_connections }}
-    nginx.ingress.kubernetes.io/limit-rpm: {{ .Values.portal_loadbalancer_ingress_client_limit_rpm }}
-    nginx.ingress.kubernetes.io/limit-whitelist: {{ .Values.portal_loadbalancer_ingress_client_limit_whitelist }}
+    nginx.ingress.kubernetes.io/limit-connections: "{{ .Values.portal_loadbalancer_ingress_client_limit_connections }}"
+    nginx.ingress.kubernetes.io/limit-rpm: "{{ .Values.portal_loadbalancer_ingress_client_limit_rpm }}"
+    nginx.ingress.kubernetes.io/limit-whitelist: "{{ .Values.portal_loadbalancer_ingress_client_limit_whitelist }}"
 spec:
   ingressClassName: nginx-loadbalancerip
   rules:
