@@ -13,5 +13,5 @@ spec:
   minAvailable: {{ .Values.podDisruptionBudget.minAvailable }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: schulportal-client
+      app.kubernetes.io/name: erwin-portal-client
 {{- end }}

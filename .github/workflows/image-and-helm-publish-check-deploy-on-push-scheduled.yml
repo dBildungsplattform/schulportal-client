@@ -8,7 +8,7 @@ on:
     branches:
       - '*'
   schedule:
-    - cron: '0 2 * * *'
+    - cron: '0 6 * * 1'
   delete:
 
 concurrency:
@@ -16,7 +16,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-
   check_deployment_clearance:
       name: "Check deployment clearance"
       runs-on: ubuntu-latest
@@ -73,7 +72,6 @@ jobs:
       node_version: '18'
     permissions:
       contents: read
-
   tests_and_sonarcloud:
     name: 'Tests and Sonarcloud'
     if: ${{ github.event_name == 'push' }}
@@ -133,7 +131,7 @@ jobs:
   release_helm:
     uses: dBildungsplattform/dbp-github-workflows/.github/workflows/chart-release.yaml@7
     needs:
-      - create_branch_identifier
+      - create_branch_identifier 
       - select_helm_version_generation_and_image_tag_generation
     secrets: inherit
     with:
@@ -142,15 +140,38 @@ jobs:
       image_tag: ${{ github.ref_name == 'main' && '' || needs.create_branch_identifier.outputs.image_tag_from_branch }}
       helm_chart_version_generation: ${{ needs.select_helm_version_generation_and_image_tag_generation.outputs.SELECT_HELM_VERSION_GENERATION }}
       helm_chart_version: ${{ github.ref_name == 'main' && '' || needs.create_branch_identifier.outputs.chart_version_from_branch }}
-
   wait_for_helm_chart_to_get_published:
+    runs-on: ubuntu-latest
     needs:
       - release_helm
-    runs-on: ubuntu-latest
     steps:
-      - shell: bash
-        run: sleep 1m 
+      - name: Check for Helm chart
+        run: |
+          CHART_NAME=erwin-portal-client
+          CHART_VERSION="${{ needs.release_helm.outputs.helm_chart_version }}"
+          echo "CHART_VERSION=$CHART_VERSION"
+          REPO_URL="https://dbildungsplattform.github.io/helm-charts-registry/"
 
+          echo "Adding Helm repository $REPO_URL"
+          helm repo add dbildungsplattform $REPO_URL
+          
+          echo "Checking for chart $CHART_NAME version $CHART_VERSION in $REPO_URL"
+
+          for i in {1..20}; do
+            echo "Attempt $i..."
+            helm repo update
+            if helm search repo dbildungsplattform/$CHART_NAME --version $CHART_VERSION | grep -qw "$CHART_VERSION"; then
+              minutes=$(echo "scale=2; $i * 30 / 60" | bc)
+              echo "Chart $CHART_NAME-$CHART_VERSION found after $minutes minutes !"
+              exit 0
+            fi
+            echo "Chart not found yet. Waiting 30 seconds..."
+            sleep 30
+          done
+
+          echo "Chart $CHART_NAME:$CHART_VERSION not found after waiting."
+          exit 1 
+      
   branch_meta:
     if: ${{ github.event_name == 'push' && !startsWith(github.ref_name,'dependabot/') }}
     uses: dBildungsplattform/erwin-app-deploy/.github/workflows/get-branch-meta.yml@1
@@ -175,7 +196,7 @@ jobs:
       erwin_portal_server_branch: ${{ needs.branch_meta.outputs.ticket }}
       erwin_portal_client_branch: ${{ needs.branch_meta.outputs.ticket }}
       erwin_portal_keycloak_branch: ${{ needs.branch_meta.outputs.ticket }}
-      erwin_portal_ldap_branch: ${{ needs.branch_meta.outputs.ticket }}
+      #erwin_portal_ldap_branch: ${{ needs.branch_meta.outputs.ticket }}
       namespace: ${{ needs.create_branch_identifier.outputs.namespace_from_branch }}
       database_recreation: "false" # to prevent database recreation this has to be set to false
     secrets: inherit
@@ -195,7 +216,7 @@ jobs:
     with:
       namespace: ${{ needs.create_branch_identifier_for_deletion.outputs.namespace_from_branch }}
     secrets:
-      ERW_DEV_KUBECONFIG: ${{ secrets.ERW_DEV_KUBECONFIG }}
+      ERWIN_DEV_KUBECONFIG: ${{ secrets.ERWIN_DEV_KUBECONFIG }}
 
   delete_successful:
     if: ${{ github.event_name == 'delete' && github.event.ref_type == 'branch' }}
@@ -227,8 +248,8 @@ jobs:
     runs-on: 'ubuntu-latest'
     steps:
     - name: Send Notification to Rocket Chat
-      uses: RocketChat/Rocket.Chat.GitHub.Action.Notification@1.1.1
+      uses: RocketChat/Rocket.Chat.GitHub.Action.Notification@2966f5f2e0313a94f965a51c08700cfecf0b6572 #1.1.1
       with:
         type: failure
         job_name: 'Daily nightly image check failed - CVEs found so check'
-        url: ${{ secrets.RC_WEBHOOK_SPSH_DEVELOPER_CHANNEL }}
+        url: ${{ secrets.RC_WEBHOOK_ERWIN_DEVELOPER_CHANNEL }}
