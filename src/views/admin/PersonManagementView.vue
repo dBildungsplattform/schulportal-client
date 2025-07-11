@@ -266,13 +266,13 @@
   }
 
   async function updateKlassenSelection(newValue: Array<string>): Promise<void> {
-    await searchFilterStore.setKlasseFilterForPersonen(newValue);
+    searchFilterStore.setKlasseFilterForPersonen(newValue);
     applySearchAndFilters();
     selectedKlassen.value = newValue;
   }
 
   async function setRolleFilter(newValue: Array<string>): Promise<void> {
-    await searchFilterStore.setRolleFilterForPersonen(newValue);
+    searchFilterStore.setRolleFilterForPersonen(newValue);
     // Update selectedRollenObjects based on the new selection
     selectedRollenObjects.value = newValue
       .map((rolleId: string) => {
@@ -283,13 +283,13 @@
       })
       .filter((rolle: RolleResponse | undefined): rolle is RolleResponse => rolle !== undefined);
 
-    await searchFilterStore.setRolleFilterWithObjectsForPersonen(newValue, selectedRollenObjects.value);
+    searchFilterStore.setRolleFilterWithObjectsForPersonen(newValue, selectedRollenObjects.value);
     applySearchAndFilters();
   }
 
   async function setOrganisationFilter(newValue: Array<string>): Promise<void> {
     searchFilterStore.setOrganisationFilterForPersonen(newValue);
-    await searchFilterStore.setKlasseFilterForPersonen([]);
+    searchFilterStore.setKlasseFilterForPersonen([]);
     selectedKlassen.value = [];
     applySearchAndFilters();
   }
@@ -328,9 +328,9 @@
   }
 
   async function handleSearchFilter(filter: string): Promise<void> {
-    await searchFilterStore.setSearchFilterForPersonen(filter);
+    searchFilterStore.setSearchFilterForPersonen(filter);
     searchFilter.value = filter;
-    applySearchAndFilters();
+    await applySearchAndFilters();
   }
 
   function updateOrganisationSearch(searchValue: string): void {

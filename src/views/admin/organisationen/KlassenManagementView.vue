@@ -76,6 +76,7 @@
     if (selectedSchule.value) initialFilter.administriertVon = [selectedSchule.value];
     return initialFilter;
   });
+  const administriertVonForKlassenFilter: Ref<Array<string>> = ref([]);
 
   const finalKlassen: ComputedRef<Organisation[]> = computed(() => {
     // If there are selected Klassen, filter allKlassen to show only those that are selected
@@ -112,7 +113,7 @@
       : t(`admin.klasse.errors.${organisationStore.errorCode}`);
   });
 
-  function getPaginatedKlassen(page: number): void {
+  function setKlassenPage(page: number): void {
     searchFilterStore.klassenPage = page;
   }
 
@@ -152,7 +153,7 @@
   async function updateSchuleSelection(id: string | undefined): Promise<void> {
     if (selectedSchule.value == id) return;
     selectedSchule.value = id;
-    await searchFilterStore.setSchuleFilterForKlassen(id ?? null);
+    searchFilterStore.setSchuleFilterForKlassen(id ?? null);
     searchFilterStore.klassenPage = 1;
     if (!id) {
       await resetSearchAndFilter();
@@ -215,6 +216,13 @@
     },
     { immediate: true },
   );
+
+  watch(selectedSchule, (newValue: string | undefined) => {
+    administriertVonForKlassenFilter.value.shift();
+    if (newValue) {
+      administriertVonForKlassenFilter.value.push(newValue);
+    }
+  });
 
   watchEffect(async () => {
     await reloadData(klassenListFilter.value);
@@ -325,7 +333,7 @@
                     @update:selectedKlassen="updateKlassenSelection"
                     :placeholderText="t('admin.klasse.klassen')"
                     ref="klasse-select"
-                    :administriertVon="selectedSchule ? [selectedSchule] : undefined"
+                    :administriertVon="administriertVonForKlassenFilter"
                   ></KlassenFilter>
                 </div>
               </template>
@@ -350,7 +358,7 @@
               navigateToKlassenDetails(event, item as TableRow<Organisation>)
           "
           @onItemsPerPageUpdate="getPaginatedKlassenWithLimit"
-          @onPageUpdate="getPaginatedKlassen"
+          @onPageUpdate="setKlassenPage"
           @onTableUpdate="handleTableSorting"
           :totalItems="totalKlassenCount"
           :itemsPerPage="searchFilterStore.klassenPerPage"
