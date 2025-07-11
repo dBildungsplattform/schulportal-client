@@ -8,7 +8,7 @@ on:
     branches:
       - '*'
   schedule:
-    - cron: '0 2 * * *'
+    - cron: '0 6 * * 1'
   delete:
 
 concurrency:
@@ -174,13 +174,13 @@ jobs:
       
   branch_meta:
     if: ${{ github.event_name == 'push' && !startsWith(github.ref_name,'dependabot/') }}
-    uses: dBildungsplattform/erwin-app-deploy/.github/workflows/get-branch-meta.yml@DBP-1529-deploy-erwin-pipeline
+    uses: dBildungsplattform/erwin-app-deploy/.github/workflows/get-branch-meta.yml@1
 
   create_branch_identifier:
     if: ${{ github.event_name == 'push' && !startsWith(github.ref_name,'dependabot/') }}
     needs:
       - branch_meta
-    uses: dBildungsplattform/erwin-app-deploy/.github/workflows/convert-branch-name.yml@DBP-1529-deploy-erwin-pipeline
+    uses: dBildungsplattform/erwin-app-deploy/.github/workflows/convert-branch-name.yml@1
     with:
       branch: ${{ needs.branch_meta.outputs.branch }}
 
@@ -191,7 +191,7 @@ jobs:
       - create_branch_identifier
       - wait_for_helm_chart_to_get_published
       - build_image_on_push
-    uses: dBildungsplattform/erwin-app-deploy/.github/workflows/deploy.yml@DBP-1529-deploy-erwin-pipeline
+    uses: dBildungsplattform/erwin-app-deploy/.github/workflows/deploy.yml@1
     with:
       erwin_portal_server_branch: ${{ needs.branch_meta.outputs.ticket }}
       erwin_portal_client_branch: ${{ needs.branch_meta.outputs.ticket }}
@@ -204,7 +204,7 @@ jobs:
   # On Delete
   create_branch_identifier_for_deletion:
     if: ${{ github.event_name == 'delete' && github.event.ref_type == 'branch' }}
-    uses: dBildungsplattform/erwin-app-deploy/.github/workflows/convert-branch-name.yml@DBP-1529-deploy-erwin-pipeline
+    uses: dBildungsplattform/erwin-app-deploy/.github/workflows/convert-branch-name.yml@1
     with:
       branch: ${{ github.event.ref }}
 
@@ -212,7 +212,7 @@ jobs:
     if: ${{ github.event_name == 'delete' && github.event.ref_type == 'branch'}}
     needs:
       - create_branch_identifier_for_deletion
-    uses: dBildungsplattform/erwin-app-deploy/.github/workflows/delete-namespace.yml@DBP-1529-deploy-erwin-pipeline
+    uses: dBildungsplattform/erwin-app-deploy/.github/workflows/delete-namespace.yml@1
     with:
       namespace: ${{ needs.create_branch_identifier_for_deletion.outputs.namespace_from_branch }}
     secrets:
@@ -248,8 +248,8 @@ jobs:
     runs-on: 'ubuntu-latest'
     steps:
     - name: Send Notification to Rocket Chat
-      uses: RocketChat/Rocket.Chat.GitHub.Action.Notification@1.1.1
+      uses: RocketChat/Rocket.Chat.GitHub.Action.Notification@2966f5f2e0313a94f965a51c08700cfecf0b6572 #1.1.1
       with:
         type: failure
         job_name: 'Daily nightly image check failed - CVEs found so check'
-        url: ${{ secrets.RC_WEBHOOK_SPSH_DEVELOPER_CHANNEL }} # create RC_Weebhook for erwin channel, store the secret in GH secret
+        url: ${{ secrets.RC_WEBHOOK_ERWIN_DEVELOPER_CHANNEL }}
