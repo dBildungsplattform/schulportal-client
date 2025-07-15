@@ -106,9 +106,7 @@
   }
 
   async function navigateToKlasseManagement(): Promise<void> {
-    organisationStore.errorCode = '';
     await router.push({ name: 'klasse-management' });
-    organisationStore.updatedOrganisation = null;
   }
 
   const handleAlertClose = (): void => {
@@ -185,6 +183,8 @@
   });
 
   onUnmounted(() => {
+    organisationStore.updatedOrganisation = null;
+    organisationStore.errorCode = '';
     window.removeEventListener('beforeunload', preventNavigation);
   });
 </script>
@@ -259,6 +259,7 @@
                         :isLoading="organisationStore.loading"
                         :useIconActivator="false"
                         @onDeleteKlasse="deleteKlasseById(currentKlasseId)"
+                        @onClose="navigateToKlasseManagement"
                       >
                       </KlasseDelete>
                     </div>

@@ -20,6 +20,11 @@ import {
   type PersonenkontextWorkflowResponse,
   type SystemrechtResponse,
   RollenSystemRecht,
+  LandesbediensteterApiFactory,
+  type LandesbediensteterApiInterface,
+  type LandesbediensteterWorkflowStepResponse,
+  type LandesbediensteterWorkflowCommitBodyParams,
+  type RolleResponse,
 } from '../api-client/generated/api';
 import { usePersonStore, type PersonStore } from './PersonStore';
 import type { Zuordnung } from './types/Zuordnung';
@@ -27,6 +32,12 @@ import type { Zuordnung } from './types/Zuordnung';
 const personenKontextApi: PersonenkontextApiInterface = PersonenkontextApiFactory(undefined, '', axiosApiInstance);
 const personenKontexteApi: PersonenkontexteApiInterface = PersonenkontexteApiFactory(undefined, '', axiosApiInstance);
 const personAdministrationApi: PersonAdministrationApiInterface = PersonAdministrationApiFactory(
+  undefined,
+  '',
+  axiosApiInstance,
+);
+
+const landesbediensteterApi: LandesbediensteterApiInterface = LandesbediensteterApiFactory(
   undefined,
   '',
   axiosApiInstance,
@@ -47,10 +58,17 @@ export enum OperationContext {
   PERSON_BEARBEITEN = 'PERSON_BEARBEITEN',
 }
 
+export enum CreationType {
+  Limited = 'limited',
+  Full = 'full',
+  AddPersonToOwnSchule = 'add-person-to-own-schule',
+}
+
 export type PersonenkontextUpdate = Pick<DbiamPersonenkontextBodyParams, 'organisationId' | 'rolleId' | 'befristung'>;
 
 export type WorkflowFilter = {
-  operationContext: OperationContext;
+  operationContext?: OperationContext;
+  personId?: string;
   organisationId?: string;
   rollenIds?: string[];
   rolleName?: string;
@@ -72,6 +90,8 @@ export function mapZuordnungToPersonenkontextUpdate(
 type PersonenkontextState = {
   updatedPersonenkontexte: PersonenkontexteUpdateResponse | null;
   workflowStepResponse: PersonenkontextWorkflowResponse | null;
+  workflowStepLandesbediensteteResponse: LandesbediensteterWorkflowStepResponse | null;
+  landesbediensteteCommitResponse: PersonenkontexteUpdateResponse | null;
   filteredRollen: FindRollenResponse | null;
   createdPersonWithKontext: DBiamPersonResponse | null;
   errorCode: string;
@@ -84,7 +104,13 @@ type PersonenkontextState = {
 type PersonenkontextGetters = {};
 type PersonenkontextActions = {
   hasSystemrecht: (personId: string, systemrecht: 'ROLLEN_VERWALTEN') => Promise<SystemrechtResponse>;
-  processWorkflowStep: (filter: WorkflowFilter) => Promise<PersonenkontextWorkflowResponse>;
+  processWorkflowStep: (filter: WorkflowFilter) => Promise<void>;
+  processWorkflowStepLandesbedienstete: (filter: WorkflowFilter) => Promise<void>;
+  commitLandesbediensteteKontext: (
+    personId: string,
+    updatedPersonenkontexte: PersonenkontextUpdate[] | undefined,
+    personalnummer: string,
+  ) => Promise<void>;
   getPersonenkontextRolleWithFilter: (rolleName: string, limit?: number) => Promise<void>;
   updatePersonenkontexte: (
     updatedPersonenkontexte: PersonenkontextUpdate[] | undefined,
@@ -104,7 +130,9 @@ export type {
   PersonenkontexteUpdateResponse,
   PersonenkontextWorkflowResponse,
   SystemrechtResponse,
+  RolleResponse,
 };
+
 export type UserinfoPersonenkontext = {
   organisationsId: string;
   rolle: {
@@ -129,6 +157,8 @@ export const usePersonenkontextStore: StoreDefinition<
   state: (): PersonenkontextState => {
     return {
       workflowStepResponse: null,
+      workflowStepLandesbediensteteResponse: null,
+      landesbediensteteCommitResponse: null,
       updatedPersonenkontexte: null,
       filteredRollen: null,
       createdPersonWithKontext: null,
@@ -154,12 +184,13 @@ export const usePersonenkontextStore: StoreDefinition<
       }
     },
 
-    async processWorkflowStep(filter: WorkflowFilter): Promise<PersonenkontextWorkflowResponse> {
+    async processWorkflowStep(filter: WorkflowFilter): Promise<void> {
       this.loading = true;
       try {
         const { data }: { data: PersonenkontextWorkflowResponse } =
           await personenKontextApi.dbiamPersonenkontextWorkflowControllerProcessStep(
-            filter.operationContext,
+            filter.operationContext!,
+            filter.personId,
             filter.organisationId,
             filter.rollenIds,
             filter.rolleName,
@@ -168,10 +199,58 @@ export const usePersonenkontextStore: StoreDefinition<
             this.requestedWithSystemrecht,
           );
         this.workflowStepResponse = data;
-        return data;
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
-        return await Promise.reject(this.errorCode);
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async processWorkflowStepLandesbedienstete(filter: WorkflowFilter): Promise<void> {
+      this.loading = true;
+      try {
+        const { data }: { data: PersonenkontextWorkflowResponse } =
+          await landesbediensteterApi.landesbediensteterControllerStep(
+            filter.organisationId,
+            filter.rollenIds,
+            filter.rolleName,
+            filter.organisationName,
+            filter.limit,
+          );
+        this.workflowStepResponse = data;
+      } catch (error: unknown) {
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async commitLandesbediensteteKontext(
+      personId: string,
+      updatedPersonenkontexte: PersonenkontextUpdate[] | undefined,
+      personalnummer: string,
+    ): Promise<void> {
+      const personStore: PersonStore = usePersonStore();
+      this.loading = true;
+
+      try {
+        const body: LandesbediensteterWorkflowCommitBodyParams = {
+          lastModified: personStore.personenuebersicht?.lastModifiedZuordnungen ?? undefined,
+          personalnummer: personalnummer,
+          count: personStore.personenuebersicht?.zuordnungen.length ?? 0,
+          newPersonenkontexte:
+            updatedPersonenkontexte?.map((personenkontextUpdate: PersonenkontextUpdate) => ({
+              personId: personId,
+              ...personenkontextUpdate,
+            })) ?? [],
+        };
+
+        const { data }: { data: PersonenkontexteUpdateResponse } =
+          await landesbediensteterApi.landesbediensteterControllerCommit(personId, body);
+
+        this.landesbediensteteCommitResponse = data;
+      } catch (error: unknown) {
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
         this.loading = false;
       }

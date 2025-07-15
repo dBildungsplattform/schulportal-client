@@ -11,6 +11,8 @@
   import PersonenMetadataChange from '@/components/admin/personen/PersonenMetadataChange.vue';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
   import PersonenkontextDelete from '@/components/admin/personen/PersonenkontextDelete.vue';
+  import { PendingState } from '@/components/admin/personen/details/PersonenkontextItem.types';
+  import PersonenkontextItem from '@/components/admin/personen/details/PersonenkontextItem.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import TokenReset from '@/components/two-factor-authentication/TokenReset.vue';
@@ -34,6 +36,7 @@
     type PersonenkontextStore,
     type PersonenkontextUpdate,
     type PersonenkontextWorkflowResponse,
+    type RolleResponse,
   } from '@/stores/PersonenkontextStore';
   import { RollenArt, RollenMerkmal } from '@/stores/RolleStore';
   import {
@@ -46,7 +49,7 @@
   import { Zuordnung } from '@/stores/types/Zuordnung';
   import type { TranslatedObject } from '@/types';
   import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
-  import { adjustDateForTimezoneAndFormat, formatDate, formatDateToISO, getNextSchuljahresende } from '@/utils/date';
+  import { adjustDateForTimezoneAndFormat, formatDateToISO, getNextSchuljahresende } from '@/utils/date';
   import { LockKeys, PersonLockOccasion, type UserLock } from '@/utils/lock';
   import { DIN_91379A, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
   import {
@@ -59,7 +62,17 @@
   } from '@/utils/validationPersonenkontext';
   import { toTypedSchema } from '@vee-validate/yup';
   import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
-  import { computed, onBeforeMount, onMounted, onUnmounted, ref, watch, type ComputedRef, type Ref } from 'vue';
+  import {
+    computed,
+    onBeforeMount,
+    onMounted,
+    onUnmounted,
+    ref,
+    watch,
+    watchEffect,
+    type ComputedRef,
+    type Ref,
+  } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import {
     onBeforeRouteLeave,
@@ -94,13 +107,18 @@
   const devicePassword: Ref<string> = ref('');
   const password: Ref<string> = ref('');
 
-  const zuordnungenResult: Ref<ZuordnungWithKlasse[] | undefined> = ref<ZuordnungWithKlasse[] | undefined>(undefined);
-  const getZuordnungen: ComputedRef<ZuordnungWithKlasse[] | undefined> = computed(() => zuordnungenResult.value);
+  const zuordnungenWithPendingChanges: Ref<ZuordnungWithKlasse[] | undefined> = ref<ZuordnungWithKlasse[] | undefined>(
+    undefined,
+  );
   const selectedZuordnungen: Ref<ZuordnungWithKlasse[]> = ref<ZuordnungWithKlasse[]>([]);
   const newZuordnung: Ref<ZuordnungWithKlasse | undefined> = ref<ZuordnungWithKlasse | undefined>(undefined);
-  const finalZuordnungen: Ref<Zuordnung[]> = ref<Zuordnung[]>([]);
-  const originalZuordnungenResult: Ref<Zuordnung[] | undefined> = ref(undefined);
+  const zuordnungenToBePersisted: Ref<Zuordnung[]> = ref<Zuordnung[]>([]);
+  const originalZuordnungen: Ref<Zuordnung[] | undefined> = ref(undefined);
   const hasKlassenZuordnung: Ref<boolean | undefined> = ref(false);
+  const isUnbefristetDisabled: Ref<boolean, boolean> = ref(false);
+  const isBefristungRequired: Ref<boolean, boolean> = ref(false);
+  // Check if the button to change the Klasse should be active or not. Activate only if there is 1 selected Zuordnung and if it is of type LERN.
+  const isLernRolleForChangeKlasseResult: Ref<boolean> = ref(false);
 
   const isEditActive: Ref<boolean> = ref(false);
   const isZuordnungFormActive: Ref<boolean> = ref(false);
@@ -147,7 +165,7 @@
   });
 
   const finalZuordnungenUpdate: ComputedRef<PersonenkontextUpdate[]> = computed(() => {
-    return finalZuordnungen.value.map(mapZuordnungToPersonenkontextUpdate);
+    return zuordnungenToBePersisted.value.map(mapZuordnungToPersonenkontextUpdate);
   });
 
   function navigateToPersonTable(): void {
@@ -338,7 +356,11 @@
 
   // Triggers the template to add a new Zuordnung
   const triggerAddZuordnung = async (): Promise<void> => {
-    await personenkontextStore.processWorkflowStep({ operationContext: OperationContext.PERSON_BEARBEITEN, limit: 25 });
+    await personenkontextStore.processWorkflowStep({
+      personId: currentPersonId,
+      operationContext: OperationContext.PERSON_BEARBEITEN,
+      limit: 25,
+    });
     isZuordnungFormActive.value = true;
   };
 
@@ -350,7 +372,7 @@
     }
 
     // The remaining Zuordnungen that were not selected for deletion
-    const remainingZuordnungen: ZuordnungWithKlasse[] | undefined = zuordnungenResult.value?.filter(
+    const remainingZuordnungen: ZuordnungWithKlasse[] | undefined = zuordnungenWithPendingChanges.value?.filter(
       (zuordnung: ZuordnungWithKlasse) => !selectedZuordnungen.value.includes(zuordnung),
     );
 
@@ -391,7 +413,7 @@
 
     // Update the personenkontexte with the filtered list
     await personenkontextStore.updatePersonenkontexte(zuordnungenUpdate, currentPersonId);
-    zuordnungenResult.value = remainingZuordnungen;
+    zuordnungenWithPendingChanges.value = remainingZuordnungen;
     selectedZuordnungen.value = [];
 
     // Filter out Zuordnungen with editable === false
@@ -405,6 +427,8 @@
       // If no editable Zuordnungen are left, navigate to person table after the dialog is closed
       closeDeleteSuccessDialog = (): void => {
         deleteSuccessDialogVisible.value = false;
+        isEditActive.value = false;
+        pendingDeletion.value = false;
         navigateToPersonTable();
       };
     }
@@ -428,18 +452,6 @@
         return t('nav.backToList');
     }
   });
-
-  function getSskName(sskDstNr: string | undefined | null, sskName: string): string {
-    /* truncate ssk name */
-    const truncatededSskName: string = sskName.length > 30 ? `${sskName.substring(0, 30)}...` : sskName;
-
-    /* omit parens when there is no ssk kennung  */
-    if (sskDstNr) {
-      return `${sskDstNr} (${truncatededSskName})`;
-    } else {
-      return truncatededSskName;
-    }
-  }
 
   // Add the Klasse to it's corresponding Schule
   function computeZuordnungen(personenuebersicht: PersonenUebersicht | null): ZuordnungWithKlasse[] | undefined {
@@ -540,6 +552,23 @@
     return !!rolle && rolle.rollenart === RollenArt.Lern;
   }
 
+  async function isLernRolleForChangeKlasse(selectedRolleId: string): Promise<boolean> {
+    await personenkontextStore.processWorkflowStep({
+      personId: currentPersonId,
+      operationContext: OperationContext.PERSON_BEARBEITEN,
+      organisationId: selectedZuordnungen.value[0]?.sskId,
+      rollenIds: [selectedRolleId],
+      limit: 1,
+    });
+
+    const workflowStepResponse: PersonenkontextWorkflowResponse | null = personenkontextStore.workflowStepResponse;
+
+    const rolle: RolleResponse | undefined = workflowStepResponse?.rollen.find(
+      (r: RolleResponse) => r.id === selectedRolleId,
+    );
+    return !!rolle && rolle.rollenart === RollenArt.Lern;
+  }
+
   const hasKopersNummer: ComputedRef<boolean> = computed(() => {
     return !!personStore.currentPerson?.person.personalnummer;
   });
@@ -547,7 +576,7 @@
   // Used on mount to check the retrieved Zuordnungen and if any of them has a Koperspflicht Merkmal
   const hasKopersRolle: ComputedRef<boolean> = computed(() => {
     return (
-      !!zuordnungenResult.value?.find((zuordnung: Zuordnung) => {
+      !!zuordnungenWithPendingChanges.value?.find((zuordnung: Zuordnung) => {
         return zuordnung.merkmale.includes(RollenMerkmal.KopersPflicht);
       }) || false
     );
@@ -556,23 +585,27 @@
   // Used to show device password block
   const hasLehrRolle: ComputedRef<boolean> = computed(() => {
     return (
-      !!zuordnungenResult.value?.find((zuordnung: Zuordnung) => {
+      !!zuordnungenWithPendingChanges.value?.find((zuordnung: Zuordnung) => {
         return zuordnung.rollenArt === RollenArt.Lehr;
       }) || false
     );
   });
 
-  // Check if the button to change the Klasse should be active or not. Activate only if there is 1 selected Zuordnung and if it is of type LERN.
+  watch(
+    () => selectedZuordnungen.value[0]?.rolleId,
+    async (rolleId: string | undefined) => {
+      if (rolleId) {
+        isLernRolleForChangeKlasseResult.value = await isLernRolleForChangeKlasse(rolleId);
+      } else {
+        isLernRolleForChangeKlasseResult.value = false;
+      }
+    },
+    { immediate: true },
+  );
+
   const canChangeKlasse: ComputedRef<boolean> = computed(() => {
     const hasOneSelectedZuordnung: boolean = selectedZuordnungen.value.length === 1;
-
-    const rolleId: string | undefined = selectedZuordnungen.value[0]?.rolleId;
-
-    // Check if rolleId exists and if it's of type LERN
-    if (rolleId && isLernRolle(rolleId) && hasOneSelectedZuordnung) {
-      return true;
-    }
-    return false;
+    return !!selectedZuordnungen.value[0]?.rolleId && isLernRolleForChangeKlasseResult.value && hasOneSelectedZuordnung;
   });
 
   watch(
@@ -584,6 +617,7 @@
 
         // Trigger the API call
         personenkontextStore.processWorkflowStep({
+          personId: currentPersonId,
           operationContext: OperationContext.PERSON_BEARBEITEN,
           organisationId,
           rollenIds,
@@ -777,7 +811,7 @@
     isEditActive.value = true;
     // Deep copy of the zuordnungenResult to keep track of the Zuordnungen before any changes were done.
     // This is necessary if a user cancels the editing at some point and the zuordnungenResult was mutated at the time.
-    originalZuordnungenResult.value = JSON.parse(JSON.stringify(zuordnungenResult.value));
+    originalZuordnungen.value = JSON.parse(JSON.stringify(zuordnungenWithPendingChanges.value));
   };
 
   // Triggers the template to change the Klasse. Also pre-select the Schule and Klasse.
@@ -823,8 +857,8 @@
     formContext.resetForm();
     resetChangeKlasseForm();
     changeBefristungFormContext.resetForm();
-    zuordnungenResult.value = originalZuordnungenResult.value
-      ? JSON.parse(JSON.stringify(originalZuordnungenResult.value))
+    zuordnungenWithPendingChanges.value = originalZuordnungen.value
+      ? JSON.parse(JSON.stringify(originalZuordnungen.value))
       : undefined;
   };
 
@@ -879,11 +913,12 @@
     }
   };
 
+  const hasPendingChange: ComputedRef<boolean> = computed(() => {
+    return pendingCreation.value || pendingDeletion.value || pendingChangeKlasse.value || pendingChangeBefristung.value;
+  });
+
   // The save button is always disabled if there is no pending creation, deletion nor changeKlasse.
-  const isSaveButtonDisabled: ComputedRef<boolean> = computed(
-    () =>
-      !pendingCreation.value && !pendingDeletion.value && !pendingChangeKlasse.value && !pendingChangeBefristung.value,
-  );
+  const isSaveButtonDisabled: ComputedRef<boolean> = computed(() => !hasPendingChange.value);
 
   // Helper function to determine the existing RollenArt
   function getExistingRollenArt(zuordnungen: Zuordnung[]): RollenArt | undefined {
@@ -1050,15 +1085,15 @@
         [],
         [],
       );
-      if (zuordnungenResult.value) {
-        finalZuordnungen.value = zuordnungenResult.value;
-        finalZuordnungen.value.push(newZuordnung.value);
+      if (zuordnungenWithPendingChanges.value) {
+        zuordnungenToBePersisted.value = zuordnungenWithPendingChanges.value;
+        zuordnungenToBePersisted.value.push(newZuordnung.value);
       }
 
       // Add the new selected Klasse to finalZuordnungen
       if (klasse) {
         newZuordnung.value.klasse = klasse.name;
-        finalZuordnungen.value.push(
+        zuordnungenToBePersisted.value.push(
           new Zuordnung(
             klasse.id,
             selectedRolle.value ?? '',
@@ -1080,13 +1115,13 @@
       // Add all existing Klassenzuordnungen to finalZuordnungen
       if (existingKlassen) {
         existingKlassen.forEach((existingKlasse: Zuordnung) => {
-          finalZuordnungen.value.push(Zuordnung.from(existingKlasse));
+          zuordnungenToBePersisted.value.push(Zuordnung.from(existingKlasse));
         });
       }
     }
 
     // Filter out existing Klassen from zuordnungenResult
-    zuordnungenResult.value = zuordnungenResult.value?.filter(
+    zuordnungenWithPendingChanges.value = zuordnungenWithPendingChanges.value?.filter(
       (zuordnung: Zuordnung) => zuordnung.typ !== OrganisationsTyp.Klasse,
     );
 
@@ -1108,7 +1143,7 @@
       ?.filterResult.find((k: Organisation) => k.id === selectedNewKlasse.value);
 
     // The remaining Zuordnungen that were not selected for deletion
-    const remainingZuordnungen: ZuordnungWithKlasse[] | undefined = zuordnungenResult.value?.filter(
+    const remainingZuordnungen: ZuordnungWithKlasse[] | undefined = zuordnungenWithPendingChanges.value?.filter(
       (zuordnung: Zuordnung) => !selectedZuordnungen.value.includes(zuordnung),
     );
 
@@ -1133,8 +1168,8 @@
         [],
       );
 
-      if (zuordnungenResult.value) {
-        finalZuordnungen.value = zuordnungenResult.value;
+      if (zuordnungenWithPendingChanges.value) {
+        zuordnungenToBePersisted.value = zuordnungenWithPendingChanges.value;
       }
 
       // Get all Klassen Zuordnungen
@@ -1165,12 +1200,12 @@
         klassenToKeep.push(...associatedKlassen);
       });
 
-      finalZuordnungen.value = [...finalZuordnungen.value, ...klassenToKeep];
+      zuordnungenToBePersisted.value = [...zuordnungenToBePersisted.value, ...klassenToKeep];
 
       // Add the new Klasse Zuordnung
       if (newKlasse) {
         newZuordnung.value.klasse = newKlasse.name;
-        finalZuordnungen.value.push(
+        zuordnungenToBePersisted.value.push(
           new Zuordnung(
             newKlasse.id,
             selectedZuordnungen.value[0]?.rolleId ?? '',
@@ -1193,7 +1228,7 @@
     }
 
     // zuordnungenResult is what we show in the UI and so Zuordnungen of type Klasse shouldn't show up (since they are merged with the ones of type Schule already)
-    zuordnungenResult.value = zuordnungenResult.value?.filter(
+    zuordnungenWithPendingChanges.value = zuordnungenWithPendingChanges.value?.filter(
       (zuordnung: Zuordnung) => zuordnung.typ !== OrganisationsTyp.Klasse,
     );
     // Proceed with the pending change Klasse operation
@@ -1207,14 +1242,25 @@
     const formattedBefristung: string | null = formatDateToISO(befristungDate) ?? null;
 
     // copy zuordnung from old one and update befristung
-    const currentZuordnung: Zuordnung = selectedZuordnungen.value[0]!;
-    newZuordnung.value = Zuordnung.from(currentZuordnung);
+    const selectedZuordnung: ZuordnungWithKlasse = selectedZuordnungen.value[0]!;
+
+    // for the template
+    newZuordnung.value = Zuordnung.from(selectedZuordnung);
+    newZuordnung.value.klasse = selectedZuordnung.klasse;
     newZuordnung.value.befristung = formattedBefristung;
     newZuordnung.value.editable = true;
 
-    finalZuordnungen.value = (zuordnungenResult.value ?? [])
-      .map((zuordnung: Zuordnung | undefined) => (zuordnung === currentZuordnung ? newZuordnung.value : zuordnung))
-      .filter((zuordnung: Zuordnung | undefined): zuordnung is Zuordnung => zuordnung !== undefined);
+    zuordnungenToBePersisted.value = (personStore.personenuebersicht?.zuordnungen ?? []).map((zuordnung: Zuordnung) => {
+      const isSelectedOrgaOrChildKlasse: boolean =
+        zuordnung.sskId === selectedZuordnung.sskId ||
+        (zuordnung.typ === OrganisationsTyp.Klasse && zuordnung.administriertVon === selectedZuordnung.sskId);
+      if (isSelectedOrgaOrChildKlasse && zuordnung.rolleId === selectedZuordnung.rolleId) {
+        const updatedZuordnung: Zuordnung = Zuordnung.from(zuordnung);
+        updatedZuordnung.befristung = formattedBefristung;
+        return updatedZuordnung;
+      }
+      return zuordnung;
+    });
 
     prepareChangeBefristung();
   };
@@ -1234,7 +1280,7 @@
   watch(
     () => personStore.personenuebersicht,
     async (newValue: PersonenUebersicht | null) => {
-      zuordnungenResult.value = computeZuordnungen(newValue);
+      zuordnungenWithPendingChanges.value = computeZuordnungen(newValue);
       const organisationIds: Array<string> = [...new Set(newValue?.zuordnungen.map((z: Zuordnung) => z.sskId))];
       if (organisationIds.length > 0) await organisationStore.getParentOrganisationsByIds(organisationIds);
     },
@@ -1337,7 +1383,7 @@
   }
 
   onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
-    if (isFormDirty()) {
+    if (isFormDirty() || hasPendingChange.value) {
       showUnsavedChangesDialog.value = true;
       blockedNext = next;
     } else {
@@ -1386,9 +1432,22 @@
     return false;
   });
 
-  // Computed property to check if the second radio button should be disabled
-  const isUnbefristetButtonDisabled: ComputedRef<boolean> = computed(() => {
-    return isBefristungspflichtRolle([selectedRolle.value as string]);
+  // For changeBefristungRolle
+  watchEffect(async () => {
+    if (changeBefristungRolle.value) {
+      const result: boolean = await isBefristungspflichtRolle([changeBefristungRolle.value]);
+      isUnbefristetDisabled.value = result;
+      isBefristungRequired.value = result;
+    }
+  });
+
+  // For selectedRolle
+  watchEffect(async () => {
+    if (selectedRolle.value) {
+      const result: boolean = await isBefristungspflichtRolle([selectedRolle.value]);
+      isUnbefristetDisabled.value = result;
+      isBefristungRequired.value = result;
+    }
   });
 
   const intersectingOrganisations: ComputedRef<Set<Organisation>> = computed(() => {
@@ -1448,12 +1507,6 @@
     }
   });
 
-  const isActionNotPending: ComputedRef<boolean> = computed(() => {
-    return (
-      !pendingCreation.value && !pendingDeletion.value && !pendingChangeKlasse.value && !pendingChangeBefristung.value
-    );
-  });
-
   const differentDateSelected: ComputedRef<boolean> = computed(() => {
     const newBefristungDate: string | undefined = selectedChangeBefristung.value ?? calculatedBefristung.value;
     const currentBefristungDate: string | undefined = selectedZuordnungen.value[0]?.befristung
@@ -1470,7 +1523,8 @@
     const twoFARequirementPromise: Promise<void> = twoFactorAuthentificationStore.get2FARequirement(currentPersonId);
     const personByIdPromise: Promise<Personendatensatz> = personStore.getPersonById(currentPersonId);
     const personUebersichtPromise: Promise<void> = personStore.getPersonenuebersichtById(currentPersonId);
-    const workflowStepPromise: Promise<PersonenkontextWorkflowResponse> = personenkontextStore.processWorkflowStep({
+    const workflowStepPromise: Promise<void> = personenkontextStore.processWorkflowStep({
+      personId: currentPersonId,
       operationContext: OperationContext.PERSON_BEARBEITEN,
       limit: 25,
     });
@@ -1878,21 +1932,15 @@
             <v-col
               cols="10"
               offset="1"
-              v-for="zuordnung in getZuordnungen"
+              v-for="zuordnung in zuordnungenWithPendingChanges"
               :key="zuordnung.sskId"
               :data-testid="`person-zuordnung-${zuordnung.sskId}`"
               :title="zuordnung.sskName"
             >
-              <span class="text-body">
-                {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
-                {{ zuordnung.klasse }}
-                <span
-                  v-if="zuordnung.befristung"
-                  data-testid="zuordnung-befristung-text"
-                >
-                  ({{ formatDate(zuordnung.befristung, t) }})</span
-                >
-              </span>
+              <PersonenkontextItem
+                :zuordnung="zuordnung"
+                :noMargin="true"
+              />
             </v-col>
           </v-row>
           <!-- Display 'Keine Zuordnungen gefunden' if the above condition is false -->
@@ -1910,7 +1958,7 @@
           <template v-if="!isZuordnungFormActive && !isChangeKlasseFormActive && !isChangeBefristungActive">
             <v-row class="ml-md-16">
               <v-col
-                v-if="isActionNotPending"
+                v-if="!hasPendingChange"
                 cols="12"
                 sm="auto"
               >
@@ -1927,13 +1975,13 @@
               </v-col>
               <v-col
                 cols="12"
-                v-for="zuordnung in getZuordnungen?.filter((zuordnung: Zuordnung) => zuordnung.editable)"
+                v-for="zuordnung in zuordnungenWithPendingChanges?.filter((zuordnung: Zuordnung) => zuordnung.editable)"
                 :key="zuordnung.sskId"
                 :data-testid="`person-zuordnung-${zuordnung.sskId}`"
                 :title="zuordnung.sskName"
                 class="py-0 d-flex align-items-center"
               >
-                <template v-if="isActionNotPending">
+                <template v-if="!hasPendingChange">
                   <div class="checkbox-div">
                     <v-checkbox
                       :ref="`checkbox-zuordnung-${zuordnung.sskId}`"
@@ -1941,189 +1989,85 @@
                       :value="zuordnung"
                     >
                       <template v-slot:label>
-                        <span class="text-body">
-                          {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
-                          {{ zuordnung.klasse }}
-                          <span
-                            v-if="zuordnung.befristung"
-                            data-testid="zuordnung-befristung-text"
-                          >
-                            ({{ formatDate(zuordnung.befristung, t) }})</span
-                          >
-                        </span>
+                        <PersonenkontextItem
+                          :zuordnung="zuordnung"
+                          :noMargin="true"
+                        />
                       </template>
                     </v-checkbox>
                   </div>
                 </template>
                 <!-- Template to show when the creation of a Zuordnung is pending -->
                 <template v-else-if="pendingCreation && !pendingDeletion">
-                  <span
-                    class="text-body my-3 ml-5"
-                    :class="{
-                      'text-green':
-                        newZuordnung &&
-                        zuordnung.sskId === newZuordnung.sskId &&
-                        zuordnung.rolleId === newZuordnung.rolleId,
-                    }"
-                  >
-                    {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
-                    {{ zuordnung.klasse }}
-                    <span
-                      v-if="zuordnung.befristung"
-                      data-testid="zuordnung-befristung-text"
-                    >
-                      ({{ formatDate(zuordnung.befristung, t) }})</span
-                    >
-                    <span
-                      v-if="
-                        newZuordnung &&
-                        zuordnung.sskId === newZuordnung.sskId &&
-                        zuordnung.rolleId === newZuordnung.rolleId
-                      "
-                      class="text-body text-green"
-                    >
-                      ({{ t('willBeCreated') }})</span
-                    >
-                  </span>
+                  <PersonenkontextItem
+                    :pendingState="
+                      newZuordnung &&
+                      zuordnung.sskId === newZuordnung.sskId &&
+                      zuordnung.rolleId === newZuordnung.rolleId
+                        ? PendingState.CREATED
+                        : undefined
+                    "
+                    :zuordnung="zuordnung"
+                  />
                 </template>
                 <!-- Template to show when the deletion of a Zuordnung is pending -->
                 <template v-else-if="pendingDeletion">
-                  <span
-                    class="text-body my-3 ml-5"
-                    :class="{
-                      'text-red': selectedZuordnungen.includes(zuordnung),
-                    }"
-                  >
-                    {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
-                    {{ zuordnung.klasse }}
-                    <span
-                      v-if="zuordnung.befristung"
-                      data-testid="zuordnung-befristung-text"
-                    >
-                      ({{ formatDate(zuordnung.befristung, t) }})</span
-                    >
-                    <span
-                      v-if="selectedZuordnungen.includes(zuordnung)"
-                      class="text-body text-red"
-                    >
-                      ({{ t('willBeRemoved') }})</span
-                    >
-                  </span>
+                  <PersonenkontextItem
+                    :pendingState="selectedZuordnungen.includes(zuordnung) ? PendingState.DELETED : undefined"
+                    :zuordnung="zuordnung"
+                  />
                 </template>
                 <!-- Template to show when the change Klasse is pending -->
                 <template v-else-if="pendingChangeKlasse">
                   <div class="d-flex flex-column">
-                    <span
-                      class="text-body my-3 ml-5"
-                      :class="{
-                        'text-red': selectedZuordnungen.includes(zuordnung),
-                      }"
-                    >
-                      {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
-                      {{ zuordnung.klasse }}
-                      <span
-                        v-if="selectedZuordnungen.includes(zuordnung)"
-                        class="text-body text-red"
-                      >
-                        ({{ t('willBeRemoved') }})
-                      </span>
-                    </span>
+                    <PersonenkontextItem
+                      :pendingState="selectedZuordnungen.includes(zuordnung) ? PendingState.DELETED : undefined"
+                      :zuordnung="zuordnung"
+                    />
 
-                    <span
+                    <PersonenkontextItem
                       v-if="
                         newZuordnung &&
                         zuordnung.sskId === newZuordnung.sskId &&
                         zuordnung.rolleId === newZuordnung.rolleId
                       "
-                      class="text-body my-3 ml-5"
-                      :class="{
-                        'text-green':
-                          newZuordnung &&
-                          zuordnung.sskId === newZuordnung.sskId &&
-                          zuordnung.rolleId === newZuordnung.rolleId,
-                      }"
-                    >
-                      {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
-                      {{ newZuordnung?.klasse }}
-                      <span
-                        v-if="
-                          newZuordnung &&
-                          zuordnung.sskId === newZuordnung.sskId &&
-                          zuordnung.rolleId === newZuordnung.rolleId
-                        "
-                        class="text-body text-green"
-                      >
-                        ({{ t('willBeCreated') }})
-                      </span>
-                    </span>
+                      :pendingState="PendingState.CREATED"
+                      :zuordnung="newZuordnung"
+                    />
                   </div>
                 </template>
                 <!-- Template to show when the change Befristung is pending -->
                 <template v-else-if="pendingChangeBefristung">
                   <div class="d-flex flex-column">
-                    <span
-                      class="text-body my-3 ml-5"
-                      :class="{
-                        'text-red': selectedZuordnungen.includes(zuordnung),
-                      }"
-                    >
-                      {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
-                      {{ zuordnung.klasse }}
-                      <span
-                        v-if="selectedZuordnungen.includes(zuordnung)"
-                        class="text-body text-red"
-                      >
-                        ({{
-                          zuordnung?.befristung
-                            ? `${formatDate(zuordnung.befristung, t)}`
-                            : t('admin.befristung.unlimited')
-                        }})
-                      </span>
-                      <span
-                        v-else-if="zuordnung.befristung"
-                        data-testid="zuordnung-befristung-text"
-                      >
-                        ({{ formatDate(zuordnung.befristung, t) }})</span
-                      >
-                    </span>
-
-                    <span
+                    <PersonenkontextItem
+                      v-if="selectedZuordnungen.includes(zuordnung)"
+                      :pendingState="PendingState.DELETED"
+                      :zuordnung="zuordnung"
+                      :showUnlimitedBefristung="true"
+                      :hidePendingLabel="true"
+                    />
+                    <PersonenkontextItem
+                      v-else
+                      :zuordnung="zuordnung"
+                      :showUnlimitedBefristung="true"
+                    />
+                    <PersonenkontextItem
                       v-if="
                         newZuordnung &&
                         zuordnung.sskId === newZuordnung.sskId &&
                         zuordnung.rolleId === newZuordnung.rolleId
                       "
-                      class="text-body my-3 ml-5"
-                      :class="{
-                        'text-green':
-                          newZuordnung &&
-                          zuordnung.sskId === newZuordnung.sskId &&
-                          zuordnung.rolleId === newZuordnung.rolleId,
-                      }"
-                    >
-                      {{ getSskName(zuordnung.sskDstNr, zuordnung.sskName) }}: {{ zuordnung.rolle }}
-                      {{ newZuordnung?.klasse }}
-                      <span
-                        v-if="
-                          newZuordnung &&
-                          zuordnung.sskId === newZuordnung.sskId &&
-                          zuordnung.rolleId === newZuordnung.rolleId
-                        "
-                        class="text-body text-green"
-                      >
-                        ({{
-                          newZuordnung?.befristung
-                            ? `${formatDate(newZuordnung.befristung, t)}`
-                            : t('admin.befristung.unlimited')
-                        }})
-                      </span>
-                    </span>
+                      :pendingState="PendingState.CREATED"
+                      :zuordnung="newZuordnung"
+                      :showUnlimitedBefristung="true"
+                      :hidePendingLabel="true"
+                    />
                   </div>
                 </template>
               </v-col>
               <v-spacer></v-spacer>
               <v-col
-                v-if="isActionNotPending"
+                v-if="!hasPendingChange"
                 class="button-container"
                 cols="12"
                 md="auto"
@@ -2139,7 +2083,7 @@
                     :person="personStore.currentPerson"
                     :disabled="selectedZuordnungen.length === 0"
                     :zuordnungCount="
-                      zuordnungenResult?.filter((zuordnung: Zuordnung) => zuordnung.editable).length ?? 0
+                      zuordnungenWithPendingChanges?.filter((zuordnung: Zuordnung) => zuordnung.editable).length ?? 0
                     "
                     ref="personenkontext-delete"
                     @onDeletePersonenkontext="prepareDeletion"
@@ -2289,6 +2233,7 @@
               <v-container class="px-lg-16">
                 <!-- Organisation, Rolle, Klasse zuordnen -->
                 <PersonenkontextCreate
+                  :personId="currentPersonId"
                   :operationContext="OperationContext.PERSON_BEARBEITEN"
                   :allowMultipleRollen="false"
                   :showHeadline="false"
@@ -2301,8 +2246,8 @@
                   :befristungInputProps="{
                     befristungProps: selectedBefristungProps,
                     befristungOptionProps: selectedBefristungOptionProps,
-                    isUnbefristetDisabled: isUnbefristetButtonDisabled,
-                    isBefristungRequired: isBefristungspflichtRolle([selectedRolle as string]),
+                    isUnbefristetDisabled: isUnbefristetDisabled,
+                    isBefristungRequired: isBefristungRequired,
                     nextSchuljahresende: getNextSchuljahresende(),
                     befristung: selectedBefristung,
                     befristungOption: selectedBefristungOption,
@@ -2438,8 +2383,8 @@
                 ref="befristung-input-wrapper"
                 :befristungProps="selectedChangeBefristungProps"
                 :befristungOptionProps="selectedChangeBefristungOptionProps"
-                :isUnbefristetDisabled="isBefristungspflichtRolle([changeBefristungRolle as string])"
-                :isBefristungRequired="isBefristungspflichtRolle([changeBefristungRolle as string])"
+                :isUnbefristetDisabled="isUnbefristetDisabled"
+                :isBefristungRequired="isBefristungRequired"
                 :nextSchuljahresende="getNextSchuljahresende()"
                 :befristung="selectedChangeBefristung"
                 :befristungOption="selectedChangeBefristungOption"
@@ -2968,8 +2913,8 @@
           <v-container>
             <v-row class="text-body bold">
               <v-col
-                offset="1"
-                cols="10"
+                class="text-center"
+                cols="12"
               >
                 <span>{{ t('person.changeKlasseSuccess') }}</span>
               </v-col>
@@ -3150,11 +3095,8 @@
       >
         <v-card-text>
           <v-container>
-            <v-row class="text-body bold">
-              <v-col
-                offset="1"
-                cols="10"
-              >
+            <v-row class="text-body text-center bold">
+              <v-col cols="12">
                 <span>{{ changeKlasseConfirmationDialogMessage }}</span>
               </v-col>
             </v-row>
@@ -3267,11 +3209,10 @@
             >
               <v-btn
                 :block="mdAndDown"
-                class="primary"
-                data-testid="confirm-change-befristung-button"
-                @click.stop="confirmDialogChangeBefristung"
+                class="secondary"
+                @click.stop="cancelChangeBefristung"
               >
-                {{ t('yes') }}
+                {{ t('no') }}
               </v-btn>
             </v-col>
             <v-col
@@ -3281,10 +3222,11 @@
             >
               <v-btn
                 :block="mdAndDown"
-                class="secondary"
-                @click.stop="cancelChangeBefristung"
+                class="primary"
+                data-testid="confirm-change-befristung-button"
+                @click.stop="confirmDialogChangeBefristung"
               >
-                {{ t('no') }}
+                {{ t('yes') }}
               </v-btn>
             </v-col>
           </v-row>

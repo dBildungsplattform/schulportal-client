@@ -19,10 +19,10 @@
     <v-main>
       <!-- TODO: Can we change the conditional layouts into a dynamic component? -->
       <AdminLayout v-if="isAdminRoute">
-        <router-view />
+        <router-view :key="$route.fullPath" />
       </AdminLayout>
       <DefaultLayout v-else>
-        <router-view />
+        <router-view :key="$route.fullPath" />
       </DefaultLayout>
     </v-main>
   </v-app>

@@ -5,11 +5,18 @@
   import FormRow from '@/components/form/FormRow.vue';
   import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
   import { OrganisationsTyp } from '@/stores/OrganisationStore';
-  import { OperationContext, usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
+  import {
+    CreationType,
+    OperationContext,
+    usePersonenkontextStore,
+    type PersonenkontextStore,
+    type WorkflowFilter,
+  } from '@/stores/PersonenkontextStore';
   import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
   import { RollenArt } from '@/stores/RolleStore';
   import type { Zuordnung } from '@/stores/types/Zuordnung';
   import { type TranslatedObject } from '@/types.d';
+  import { sameContent } from '@/utils/arrays';
   import type { BaseFieldProps } from 'vee-validate';
   import { computed, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n } from 'vue-i18n';
@@ -33,7 +40,9 @@
     organisationen: TranslatedObject[] | undefined;
     rollen: TranslatedRolleWithAttrs[] | undefined;
     selectedOrganisation: string | undefined;
+    createType?: CreationType;
     showHeadline: boolean;
+    personId?: string;
     operationContext: OperationContext;
     selectedRolle?: string | undefined;
     selectedRollen?: string[] | undefined;
@@ -44,6 +53,11 @@
     selectedRollenProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     isModifyRolleDialog?: boolean;
     befristungInputProps?: BefristungProps;
+    headlineNumbers?: {
+      org: string;
+      rolle: string;
+      befristung: string;
+    };
     allowMultipleRollen?: boolean;
     isRolleUnassignForm?: boolean;
   };
@@ -75,6 +89,13 @@
     return props.organisationen?.find((org: TranslatedObject) => org.value === selectedOrganisation.value)?.title;
   });
 
+  const selectedRolleTitles: ComputedRef<string[]> = computed(() => {
+    if (!Array.isArray(selectedRollen.value)) return [];
+    return selectedRollen.value
+      .map((id: string) => props.rollen?.find((rolle: TranslatedObject) => rolle.value === id)?.title)
+      .filter((title: string | undefined): title is string => !!title);
+  });
+
   // Computed property to get the title of the selected role
   const selectedRolleTitle: ComputedRef<string | undefined> = computed(() => {
     return props.rollen?.find((rolle: TranslatedObject) => rolle.value === selectedRolle.value)?.title;
@@ -93,32 +114,48 @@
     );
   }
 
+  async function handleWorkflowStep(filter: WorkflowFilter): Promise<void> {
+    const useLandesbediensteteWorkflow: boolean = props.createType === CreationType.AddPersonToOwnSchule;
+
+    if (useLandesbediensteteWorkflow) {
+      await personenkontextStore.processWorkflowStepLandesbedienstete(filter);
+    } else {
+      await personenkontextStore.processWorkflowStep({
+        operationContext: props.operationContext,
+        ...filter,
+      });
+    }
+
+    canCommit.value = personenkontextStore.workflowStepResponse?.canCommit ?? false;
+  }
+
   // Watcher for selectedOrganisation to fetch roles and classes
   watch(selectedOrganisation, async (newValue: string | undefined, oldValue: string | undefined) => {
-    // Reset the selectedRolle field only if oldValue was not undefined
+    // Reset selected roles if oldValue existed (change event)
     if (oldValue !== undefined) {
       selectedRolle.value = undefined;
       selectedRollen.value = undefined;
       emits('fieldReset', 'selectedRolle');
       emits('fieldReset', 'selectedRollen');
     }
+
     if (newValue && newValue !== oldValue) {
-      // Fetch the roles after selecting the organization
-      await personenkontextStore.processWorkflowStep({
-        operationContext: props.operationContext,
+      const filter: WorkflowFilter = {
+        personId: props.personId,
         organisationId: newValue,
         limit: 25,
-      });
+      };
+
+      await handleWorkflowStep(filter);
+
       administriertVon.value?.pop();
       administriertVon.value?.push(newValue);
 
-      // Check that all the Klassen associated with the selectedOrga have the same Klasse for the same person.
+      // Check if all Klassen for this orga are the same
       const klassenZuordnungen: Zuordnung[] | undefined = personStore.personenuebersicht?.zuordnungen.filter(
         (zuordnung: Zuordnung) => zuordnung.typ === OrganisationsTyp.Klasse && zuordnung.administriertVon === newValue,
       );
 
-      // Check if all Zuordnungen of type Klasse have the same SSKID.
-      // We only preselect when there's a clear, unambiguous single Klasse association for the selected Orga.
       const klassenIds: Set<string> = new Set(klassenZuordnungen?.map((zuordnung: Zuordnung) => zuordnung.sskId));
       if (klassenIds.size === 1) {
         const klasseId: string | undefined = klassenIds.values().next().value;
@@ -131,14 +168,14 @@
         emits('fieldReset', 'selectedKlasse');
       }
     } else if (!newValue) {
-      // If the organization is cleared, reset selectedRolle and selectedKlasse
+      // Clear selections if orga was cleared
       administriertVon.value?.pop();
       selectedRolle.value = undefined;
       selectedKlasse.value = undefined;
       emits('fieldReset', 'selectedRolle');
       emits('fieldReset', 'selectedKlasse');
     }
-    // Emit the new selected organization to the parent component
+
     emits('update:selectedOrganisation', newValue);
   });
 
@@ -146,18 +183,19 @@
     () => (props.allowMultipleRollen ? selectedRollen.value : selectedRolle.value),
     async (newValue: string | string[] | undefined, oldValue: string | string[] | undefined) => {
       if (props.allowMultipleRollen) {
-        // Multiple rollen selected
         const newRollen: string[] | undefined = newValue as string[] | undefined;
         if (newRollen && newRollen.length > 0) {
-          await personenkontextStore.processWorkflowStep({
-            operationContext: props.operationContext,
+          const filter: WorkflowFilter = {
+            personId: props.personId,
             organisationId: selectedOrganisation.value,
             rollenIds: newRollen,
             limit: 25,
-          });
+          };
+
+          await handleWorkflowStep(filter);
+
           canCommit.value = personenkontextStore.workflowStepResponse?.canCommit ?? false;
         } else {
-          // No roles selected, reset values
           selectedKlasse.value = undefined;
           emits('fieldReset', 'selectedKlasse');
           emits('fieldReset', 'selectedRollen');
@@ -165,24 +203,28 @@
         }
         emits('update:selectedRollen', newRollen);
       } else {
-        // Single rolle selected
         const newRolle: string | undefined = newValue as string | undefined;
+
         if (newRolle && newRolle !== oldValue) {
-          await personenkontextStore.processWorkflowStep({
-            operationContext: props.operationContext,
+          const filter: WorkflowFilter = {
+            personId: props.personId,
             organisationId: selectedOrganisation.value,
-            rollenIds: [newRolle], // Wrap single rolle in an array
+            rollenIds: [newRolle],
             limit: 25,
-          });
+          };
+
+          await handleWorkflowStep(filter);
+
           canCommit.value = personenkontextStore.workflowStepResponse?.canCommit ?? false;
         }
+
         if (!newRolle) {
-          // Reset when no rolle is selected
           canCommit.value = false;
           selectedKlasse.value = undefined;
           emits('fieldReset', 'selectedKlasse');
         }
-        emits('update:selectedRolle', newRolle); // Emit selected single rolle
+
+        emits('update:selectedRolle', newRolle);
       }
     },
     { deep: true },
@@ -193,65 +235,71 @@
   watch(searchInputOrganisation, async (newValue: string, oldValue: string) => {
     clearTimeout(timerId.value);
     isSearching = !!newValue;
-    if (oldValue === selectedOrganisationTitle.value) {
+
+    if (oldValue === selectedOrganisationTitle.value) return;
+
+    const filter: WorkflowFilter = { limit: 25 };
+
+    if (newValue === '' && !selectedOrganisation.value) {
+      // Case: Initial load
+      // nothing to add — base filter is fine
+    } else if (newValue && newValue !== selectedOrganisationTitle.value) {
+      filter.organisationName = newValue;
+    } else if (newValue === '' && selectedOrganisation.value) {
+      // Case: user cleared search but selected something earlier
+      filter.organisationId = selectedOrganisation.value;
+    } else {
       return;
     }
-    // If searchValue is empty and selectedOrganisation does not have a value, fetch initial data
-    if (newValue === '' && !selectedOrganisation.value) {
-      timerId.value = setTimeout(async () => {
+
+    timerId.value = setTimeout(async () => {
+      if (props.createType === CreationType.AddPersonToOwnSchule) {
+        await personenkontextStore.processWorkflowStepLandesbedienstete(filter);
+      } else {
         await personenkontextStore.processWorkflowStep({
+          ...filter,
+          personId: props.personId,
           operationContext: props.operationContext,
-          limit: 25,
         });
-      }, 500);
-    } else if (newValue && newValue !== selectedOrganisationTitle.value) {
-      timerId.value = setTimeout(async () => {
-        await personenkontextStore.processWorkflowStep({
-          operationContext: props.operationContext,
-          organisationName: newValue,
-          limit: 25,
-        });
-      }, 500);
-    } else if (newValue === '' && selectedOrganisation.value) {
-      // If searchValue is empty and an organization is selected, fetch roles for the selected organization
-      timerId.value = setTimeout(async () => {
-        await personenkontextStore.processWorkflowStep({
-          operationContext: props.operationContext,
-          organisationId: selectedOrganisation.value,
-          limit: 25,
-        });
-      }, 500);
-    }
+      }
+    }, 500);
   });
 
   watch(
     props.allowMultipleRollen ? searchInputRollen : searchInputRolle,
-    async (newValue: string, oldValue: string) => {
+    async (newValue: string | string[], oldValue: string | string[]) => {
       clearTimeout(timerId.value);
-      // If the oldValue (What has been in the searchValue beforing losing focus) is equal to the selected Rolle.title then do nothing
-      if (oldValue === selectedRolleTitle.value) return;
-      // If searchValue is empty, fetch all roles for the organisationId
-      if (newValue === '' && !selectedRolle.value) {
-        timerId.value = setTimeout(() => {
-          personenkontextStore.processWorkflowStep({
-            operationContext: props.operationContext,
-            organisationId: selectedOrganisation.value,
-            limit: 25,
-          });
-        }, 500);
-        // Else fetch the Rollen that correspond to the orgaId
-        // (This stops an extra request being made once a value is selected since we check if model !== searchValue)
-      } else if (newValue && newValue !== selectedRolleTitle.value) {
-        timerId.value = setTimeout(() => {
-          personenkontextStore.processWorkflowStep({
-            operationContext: props.operationContext,
-            organisationId: selectedOrganisation.value,
-            rolleName: newValue,
-            rollenIds: selectedRollen.value,
-            limit: 25,
-          });
-        }, 500);
+
+      const isEqual: boolean = props.allowMultipleRollen
+        ? Array.isArray(newValue) && sameContent(newValue, selectedRolleTitles.value)
+        : oldValue === selectedRolleTitle.value;
+
+      if (isEqual) return;
+
+      const filter: WorkflowFilter = {
+        personId: props.personId,
+        organisationId: selectedOrganisation.value,
+        rollenIds: selectedRollen.value,
+        limit: 25,
+      };
+
+      // Add rolleName if user is typing
+      if (!newValue || (Array.isArray(newValue) && newValue.length === 0)) {
+        // No rolleName (cleared)
+      } else if (!Array.isArray(newValue)) {
+        filter.rolleName = newValue;
       }
+
+      timerId.value = setTimeout(async () => {
+        if (props.createType === CreationType.AddPersonToOwnSchule) {
+          await personenkontextStore.processWorkflowStepLandesbedienstete(filter);
+        } else {
+          await personenkontextStore.processWorkflowStep({
+            ...filter,
+            operationContext: props.operationContext,
+          });
+        }
+      }, 500);
     },
   );
 
@@ -307,7 +355,9 @@
 <template>
   <div>
     <v-row v-if="showHeadline">
-      <h3 class="headline-3">1. {{ $t('admin.organisation.assignOrganisation') }}</h3>
+      <h3 class="headline-3 mt-3">
+        {{ headlineNumbers?.org ?? '1.' }} {{ $t('admin.organisation.assignOrganisation') }}
+      </h3>
     </v-row>
     <!-- Organisation zuordnen -->
     <FormRow
@@ -347,7 +397,7 @@
 
     <div v-if="selectedOrganisation">
       <v-row v-if="showHeadline">
-        <h3 class="headline-3">2. {{ $t('admin.rolle.assignRolle') }}</h3>
+        <h3 class="headline-3">{{ headlineNumbers?.rolle ?? '2.' }} {{ $t('admin.rolle.assignRolle') }}</h3>
       </v-row>
       <!-- Rollenzuordnung -->
       <FormRow
@@ -377,7 +427,7 @@
           variant="outlined"
           v-bind="selectedRollenProps"
           v-model="selectedRollen"
-          v-model:search="searchInputRolle"
+          v-model:search="searchInputRollen"
         ></v-autocomplete>
         <v-autocomplete
           v-else-if="!allowMultipleRollen"
@@ -434,7 +484,9 @@
           showHeadline
         "
       >
-        <h3 class="headline-3">3. {{ $t('admin.befristung.assignBefristung') }}</h3>
+        <h3 class="headline-3">
+          {{ headlineNumbers?.befristung ?? '2.1' }} {{ $t('admin.befristung.assignBefristung') }}
+        </h3>
       </v-row>
       <BefristungInput
         v-if="

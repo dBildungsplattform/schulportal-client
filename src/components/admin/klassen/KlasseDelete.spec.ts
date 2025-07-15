@@ -1,12 +1,9 @@
-import { expect, type MockInstance, test } from 'vitest';
-import { nextTick } from 'vue';
 import { VueWrapper, mount } from '@vue/test-utils';
+import { expect, test } from 'vitest';
+import { nextTick } from 'vue';
 import KlasseDelete from './KlasseDelete.vue';
-import { createRouter, createWebHistory, type Router } from 'vue-router';
-import routes from '@/router/routes';
 
 let wrapper: VueWrapper | null = null;
-let router: Router;
 
 beforeEach(async () => {
   document.body.innerHTML = `
@@ -15,19 +12,11 @@ beforeEach(async () => {
     </div>
   `;
 
-  router = createRouter({
-    history: createWebHistory(),
-    routes,
-  });
-
-  router.push('/');
-  await router.isReady();
-
   wrapper = mount(KlasseDelete, {
     attachTo: document.getElementById('app') || '',
     props: {
-      isLoading: false,
       errorCode: '',
+      isLoading: false,
       klassenId: '1',
       klassenname: '1A',
       schulname: 'schule',
@@ -37,7 +26,6 @@ beforeEach(async () => {
       components: {
         KlasseDelete,
       },
-      plugins: [router],
     },
   });
 });
@@ -48,7 +36,6 @@ describe('KlasseDelete', () => {
     wrapper?.find('[data-testid="open-klasse-delete-dialog-button"]').trigger('click');
     await nextTick();
 
-    await document.querySelector('[data-testid="klasse-delete-confirmation-text"]');
     expect(document.querySelector('[data-testid="klasse-delete-confirmation-text"]')).not.toBeNull();
 
     const cancelDeleteButton: HTMLElement | undefined = document.querySelectorAll<HTMLElement>(
@@ -67,32 +54,29 @@ describe('KlasseDelete', () => {
     wrapper?.find('[data-testid="open-klasse-delete-dialog-icon"]').trigger('click');
     await nextTick();
 
-    await document.querySelector('[data-testid="klasse-delete-confirmation-text"]');
     expect(document.querySelector('[data-testid="klasse-delete-confirmation-text"]')).not.toBeNull();
 
-    const closeDialogButton: HTMLElement = (await document.querySelector(
+    const closeDialogButton: HTMLElement = document.querySelector(
       '[data-testid="close-layout-card-button"]',
-    )) as HTMLElement;
+    ) as HTMLElement;
     closeDialogButton.click();
   });
 
   test('it deletes a klasse and navigates back to management', async () => {
     wrapper?.setProps({ useIconActivator: false });
-    const push: MockInstance = vi.spyOn(router, 'push');
 
     wrapper?.find('[data-testid="open-klasse-delete-dialog-button"]').trigger('click');
     await nextTick();
 
-    await document.querySelector('[data-testid="klasse-delete-confirmation-text"]');
     expect(document.querySelector('[data-testid="klasse-delete-confirmation-text"]')).not.toBeNull();
 
     const klasseDeleteButton: HTMLElement | undefined = document.querySelectorAll<HTMLElement>(
       '[data-testid="klasse-delete-button"]',
     )[0];
     klasseDeleteButton?.click();
+    await wrapper?.setProps({ isLoading: false });
     await nextTick();
 
-    await document.querySelector('[data-testid="klasse-delete-success-text"]');
     expect(document.querySelector('[data-testid="klasse-delete-success-text"]')).not.toBeNull();
 
     const closeDialogButton: HTMLElement | undefined = document.querySelectorAll<HTMLElement>(
@@ -100,7 +84,5 @@ describe('KlasseDelete', () => {
     )[0];
     closeDialogButton?.click();
     await nextTick();
-
-    expect(push).toHaveBeenCalledTimes(1);
   });
 });

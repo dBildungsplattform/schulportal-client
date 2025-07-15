@@ -1,7 +1,14 @@
 const separator: string = ';';
 
-export function buildCSV<K extends string>(headers: Array<K>, rows: Array<Record<K, string | undefined>>): string {
+export function buildCSV<K extends string>(
+  headers: Array<K>,
+  rows: Array<Record<K, string | undefined>>,
+  introText?: string,
+): string {
   let fileContent: string = '';
+  if (introText) {
+    fileContent += introText + '\n\n';
+  }
   fileContent += headers.join(separator);
   fileContent += '\n';
   for (const row of rows) {
