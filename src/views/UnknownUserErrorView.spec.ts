@@ -37,7 +37,7 @@ beforeEach(async () => {
 
 describe('UnknownUserErrorView', () => {
   test('it renders the error card', () => {
-    const alertTitle: WrapperLike | undefined = wrapper?.find('[data-testid="alert-title"]');
+    const alertTitle: WrapperLike | undefined = wrapper?.find('[data-testid$="alert-title"]');
 
     expect(alertTitle?.isVisible()).toBe(true);
     expect(alertTitle?.text()).toEqual('Unbekannter Benutzer');

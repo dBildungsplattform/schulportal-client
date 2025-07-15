@@ -35,8 +35,8 @@ beforeEach(async () => {
 
 describe('SpshAlert Component', () => {
   test('it renders the correct title and text', () => {
-    expect(wrapper?.find('[data-testid="alert-title"]').exists()).toBe(true);
-    expect(wrapper?.find('[data-testid="alert-text"]').exists()).toBe(true);
+    expect(wrapper?.find('[data-testid$="alert-title"]').exists()).toBe(true);
+    expect(wrapper?.find('[data-testid$="alert-text"]').exists()).toBe(true);
   });
 
   test('it renders the back button with correct text', async () => {

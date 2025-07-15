@@ -376,8 +376,8 @@ describe('KlassenManagementView', () => {
       organisationStore.errorCode = errorCode;
       await nextTick();
 
-      const actualTitle: string | undefined = wrapper?.find('[data-testid=alert-title]').text();
-      const actualText: string | undefined = wrapper?.find('[data-testid=alert-text]').text();
+      const actualTitle: string | undefined = wrapper?.find('[data-testid$=alert-title]').text();
+      const actualText: string | undefined = wrapper?.find('[data-testid$=alert-text]').text();
 
       expect(actualTitle).toBe(expectedTitle);
       expect(actualText).toBe(expectedText);

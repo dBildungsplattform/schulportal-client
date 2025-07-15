@@ -115,7 +115,7 @@ describe('KlassenDetailsView', () => {
     organisationStore.errorCode = 'UNSPECIFIED_ERROR';
     await nextTick();
 
-    expect(wrapper?.find('[data-testid="alert-title"]').text()).toBe('Fehler beim Laden der Klassen');
+    expect(wrapper?.find('[data-testid="klasse-details-error-alert-title"]').text()).toBe('Fehler beim Laden der Klassen');
     organisationStore.errorCode = '';
   });
 
