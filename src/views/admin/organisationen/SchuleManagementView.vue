@@ -63,9 +63,9 @@
   }
 
   async function handleSearchFilter(filter: string): Promise<void> {
-    await searchFilterStore.setSearchFilterForSchulen(filter);
+    searchFilterStore.setSearchFilterForSchulen(filter);
     searchFilter.value = filter;
-    fetchSchulen();
+    await fetchSchulen();
   }
 
   async function toggleItsLearningStatus(organisationId: string): Promise<void> {

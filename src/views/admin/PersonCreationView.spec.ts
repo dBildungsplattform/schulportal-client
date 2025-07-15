@@ -636,7 +636,7 @@ describe('PersonCreationView', () => {
     expect(wrapper?.find('[data-testid="person-success-text"]').isVisible()).toBe(true);
   });
 
-  test('it fills form for Landesbediensteter, triggers submit and then show success template', async () => {
+  test('it fills form for Landesbediensteter, triggers submit and then shows success template', async () => {
     const mockLandesbedienstetePersonen: PersonLandesbediensteterSearchResponse[] = [
       {
         id: faker.string.uuid(),
@@ -710,12 +710,12 @@ describe('PersonCreationView', () => {
     await nextTick();
     await flushPromises();
 
-
-    const confirmButton: Element | null = document.querySelector('[data-testid="confirm-add-person-button"]');
-    await vi.waitUntil(() => expect(confirmButton != null));
+    const confirmButton: Element = await vi.waitUntil(() =>
+      document.querySelector('[data-testid="confirm-add-person-button"]'),
+    );
     await nextTick();
 
-    confirmButton!.dispatchEvent(new Event('click'));
+    confirmButton.dispatchEvent(new Event('click'));
 
     // Form is resetting after submit so orga should be undefined
     expect(organisationSelect.vm.$data).toStrictEqual({});

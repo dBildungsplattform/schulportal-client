@@ -76,6 +76,7 @@
     if (selectedSchule.value) initialFilter.administriertVon = [selectedSchule.value];
     return initialFilter;
   });
+  const administriertVonForKlassenFilter: Ref<Array<string>> = ref([]);
 
   const finalKlassen: ComputedRef<Organisation[]> = computed(() => {
     // If there are selected Klassen, filter allKlassen to show only those that are selected
@@ -112,7 +113,7 @@
       : t(`admin.klasse.errors.${organisationStore.errorCode}`);
   });
 
-  function getPaginatedKlassen(page: number): void {
+  function setKlassenPage(page: number): void {
     searchFilterStore.klassenPage = page;
   }
 
@@ -152,7 +153,7 @@
   async function updateSchuleSelection(id: string | undefined): Promise<void> {
     if (selectedSchule.value == id) return;
     selectedSchule.value = id;
-    await searchFilterStore.setSchuleFilterForKlassen(id ?? null);
+    searchFilterStore.setSchuleFilterForKlassen(id ?? null);
     searchFilterStore.klassenPage = 1;
     if (!id) {
       await resetSearchAndFilter();
@@ -164,13 +165,21 @@
     searchFilterStore.setKlasseFilterForKlassen(ids ?? null);
   }
 
+  async function reloadData(filter: OrganisationenFilter): Promise<void> {
+    await organisationStore.getAllOrganisationen(filter);
+  }
+
   async function deleteKlasse(organisationId: string): Promise<void> {
     await organisationStore.deleteOrganisationById(organisationId);
   }
 
-  const handleAlertClose = (): void => {
+  const handleAlertClose = async (): Promise<void> => {
     organisationStore.errorCode = '';
-    router.go(0);
+    await reloadData(klassenListFilter.value);
+  };
+
+  const handleKlasseDeleteClose = async (): Promise<void> => {
+    await reloadData(klassenListFilter.value);
   };
 
   function navigateToKlassenDetails(_$event: PointerEvent, { item }: { item: Organisation }): void {
@@ -185,10 +194,6 @@
       searchFilterStore.organisationenSortField = update.sortField as OrganisationSortField;
       searchFilterStore.organisationenSortOrder = update.sortOrder as SortOrder;
     }
-  }
-
-  async function reloadData(filter: OrganisationenFilter): Promise<void> {
-    await organisationStore.getAllOrganisationen(filter);
   }
 
   watch(
@@ -212,6 +217,13 @@
     { immediate: true },
   );
 
+  watch(selectedSchule, (newValue: string | undefined) => {
+    administriertVonForKlassenFilter.value.shift();
+    if (newValue) {
+      administriertVonForKlassenFilter.value.push(newValue);
+    }
+  });
+
   watchEffect(async () => {
     await reloadData(klassenListFilter.value);
   });
@@ -232,7 +244,7 @@
     <LayoutCard :header="t('admin.klasse.management')">
       <!-- Error Message Display -->
       <SpshAlert
-        :model-value="!!organisationStore.errorCode"
+        :modelValue="!!organisationStore.errorCode"
         :title="errorTitle"
         :type="'error'"
         :closable="false"
@@ -240,7 +252,6 @@
         :showButton="true"
         :buttonText="t('nav.backToList')"
         :buttonAction="handleAlertClose"
-        @update:modelValue="handleAlertClose"
       />
       <template v-if="!organisationStore.errorCode">
         <v-row
@@ -322,7 +333,7 @@
                     @update:selectedKlassen="updateKlassenSelection"
                     :placeholderText="t('admin.klasse.klassen')"
                     ref="klasse-select"
-                    :administriertVon="selectedSchule ? [selectedSchule] : undefined"
+                    :administriertVon="administriertVonForKlassenFilter"
                   ></KlassenFilter>
                 </div>
               </template>
@@ -347,7 +358,7 @@
               navigateToKlassenDetails(event, item as TableRow<Organisation>)
           "
           @onItemsPerPageUpdate="getPaginatedKlassenWithLimit"
-          @onPageUpdate="getPaginatedKlassen"
+          @onPageUpdate="setKlassenPage"
           @onTableUpdate="handleTableSorting"
           :totalItems="totalKlassenCount"
           :itemsPerPage="searchFilterStore.klassenPerPage"
@@ -363,14 +374,14 @@
           </template>
           <template v-slot:[`item.actions`]="{ item }">
             <KlasseDelete
-              :errorCode="organisationStore.errorCode"
               :klassenname="item.name"
               :klassenId="item.id"
               :schulname="item.schuleDetails ?? ''"
+              :errorCode="organisationStore.errorCode"
               :useIconActivator="true"
               :isLoading="organisationStore.loading"
               @onDeleteKlasse="deleteKlasse(item.id)"
-              @onClose="reloadData(klassenListFilter)"
+              @onClose="handleKlasseDeleteClose"
             ></KlasseDelete>
           </template>
         </ResultTable>

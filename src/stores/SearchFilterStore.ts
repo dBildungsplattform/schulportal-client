@@ -29,16 +29,13 @@ type SearchFilterState = {
 };
 
 type SearchFilterActions = {
-  setKlasseFilterForPersonen: (selectedKlassen: Array<string> | null) => Promise<void>;
-  setRolleFilterForPersonen: (selectedRollen: Array<string> | null) => Promise<void>;
-  setRolleFilterWithObjectsForPersonen: (
-    selectedRollen: Array<string> | null,
-    rollenObjects: RolleResponse[],
-  ) => Promise<void>;
-  setOrganisationFilterForPersonen: (selectedOrganisationen: Array<string> | null) => Promise<void>;
-  setSearchFilterForPersonen: (searchFilter: string | null) => Promise<void>;
-  setSearchFilterForSchulen: (searchFilter: string | null) => Promise<void>;
-  setSchuleFilterForKlassen: (selectedSchuleForKlassen: string | null) => Promise<void>;
+  setKlasseFilterForPersonen: (selectedKlassen: Array<string> | null) => void;
+  setRolleFilterForPersonen: (selectedRollen: Array<string> | null) => void;
+  setRolleFilterWithObjectsForPersonen: (selectedRollen: Array<string> | null, rollenObjects: RolleResponse[]) => void;
+  setOrganisationFilterForPersonen: (selectedOrganisationen: Array<string> | null) => void;
+  setSearchFilterForPersonen: (searchFilter: string | null) => void;
+  setSearchFilterForSchulen: (searchFilter: string | null) => void;
+  setSchuleFilterForKlassen: (selectedSchuleForKlassen: string | null) => void;
   setKlasseFilterForKlassen: (selectedKlassenForKlassen: Array<string> | null) => void;
 };
 
@@ -79,32 +76,32 @@ export const useSearchFilterStore: StoreDefinition<
     selectedKlassenForKlassen: [],
   }),
   actions: {
-    async setKlasseFilterForPersonen(selectedKlassen: Array<string> | null) {
+    setKlasseFilterForPersonen(selectedKlassen: Array<string> | null) {
       this.selectedKlassen = selectedKlassen;
     },
 
-    async setRolleFilterForPersonen(selectedRollen: Array<string> | null) {
+    setRolleFilterForPersonen(selectedRollen: Array<string> | null) {
       this.selectedRollen = selectedRollen;
     },
 
-    async setOrganisationFilterForPersonen(selectedOrganisationen: Array<string> | null) {
+    setOrganisationFilterForPersonen(selectedOrganisationen: Array<string> | null) {
       this.selectedOrganisationen = selectedOrganisationen;
     },
 
-    async setSearchFilterForPersonen(searchFilterPersonen: string | null) {
-      this.searchFilterPersonen = searchFilterPersonen || '';
+    setSearchFilterForPersonen(searchFilterPersonen: string | null) {
+      this.searchFilterPersonen = searchFilterPersonen ?? '';
     },
 
-    async setSearchFilterForSchulen(searchFilterSchulen: string | null) {
-      this.searchFilterSchulen = searchFilterSchulen || '';
+    setSearchFilterForSchulen(searchFilterSchulen: string | null) {
+      this.searchFilterSchulen = searchFilterSchulen ?? '';
     },
 
-    async setRolleFilterWithObjectsForPersonen(selectedRollen: Array<string> | null, rollenObjects: RolleResponse[]) {
+    setRolleFilterWithObjectsForPersonen(selectedRollen: Array<string> | null, rollenObjects: RolleResponse[]) {
       this.selectedRollen = selectedRollen;
       this.selectedRollenObjects = rollenObjects;
     },
 
-    async setSchuleFilterForKlassen(selectedSchuleForKlassen: string | null) {
+    setSchuleFilterForKlassen(selectedSchuleForKlassen: string | null) {
       this.selectedSchuleForKlassen = selectedSchuleForKlassen;
     },
 

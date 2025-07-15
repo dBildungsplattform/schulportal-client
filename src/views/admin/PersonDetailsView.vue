@@ -36,7 +36,7 @@
     type PersonenkontextStore,
     type PersonenkontextUpdate,
     type PersonenkontextWorkflowResponse,
-    type RolleResponse
+    type RolleResponse,
   } from '@/stores/PersonenkontextStore';
   import { RollenArt, RollenMerkmal } from '@/stores/RolleStore';
   import {
@@ -107,12 +107,13 @@
   const devicePassword: Ref<string> = ref('');
   const password: Ref<string> = ref('');
 
-  const zuordnungenResult: Ref<ZuordnungWithKlasse[] | undefined> = ref<ZuordnungWithKlasse[] | undefined>(undefined);
-  const getZuordnungen: ComputedRef<ZuordnungWithKlasse[] | undefined> = computed(() => zuordnungenResult.value);
+  const zuordnungenWithPendingChanges: Ref<ZuordnungWithKlasse[] | undefined> = ref<ZuordnungWithKlasse[] | undefined>(
+    undefined,
+  );
   const selectedZuordnungen: Ref<ZuordnungWithKlasse[]> = ref<ZuordnungWithKlasse[]>([]);
   const newZuordnung: Ref<ZuordnungWithKlasse | undefined> = ref<ZuordnungWithKlasse | undefined>(undefined);
-  const finalZuordnungen: Ref<Zuordnung[]> = ref<Zuordnung[]>([]);
-  const originalZuordnungenResult: Ref<Zuordnung[] | undefined> = ref(undefined);
+  const zuordnungenToBePersisted: Ref<Zuordnung[]> = ref<Zuordnung[]>([]);
+  const originalZuordnungen: Ref<Zuordnung[] | undefined> = ref(undefined);
   const hasKlassenZuordnung: Ref<boolean | undefined> = ref(false);
   const isUnbefristetDisabled: Ref<boolean, boolean> = ref(false);
   const isBefristungRequired: Ref<boolean, boolean> = ref(false);
@@ -164,7 +165,7 @@
   });
 
   const finalZuordnungenUpdate: ComputedRef<PersonenkontextUpdate[]> = computed(() => {
-    return finalZuordnungen.value.map(mapZuordnungToPersonenkontextUpdate);
+    return zuordnungenToBePersisted.value.map(mapZuordnungToPersonenkontextUpdate);
   });
 
   function navigateToPersonTable(): void {
@@ -371,7 +372,7 @@
     }
 
     // The remaining Zuordnungen that were not selected for deletion
-    const remainingZuordnungen: ZuordnungWithKlasse[] | undefined = zuordnungenResult.value?.filter(
+    const remainingZuordnungen: ZuordnungWithKlasse[] | undefined = zuordnungenWithPendingChanges.value?.filter(
       (zuordnung: ZuordnungWithKlasse) => !selectedZuordnungen.value.includes(zuordnung),
     );
 
@@ -412,7 +413,7 @@
 
     // Update the personenkontexte with the filtered list
     await personenkontextStore.updatePersonenkontexte(zuordnungenUpdate, currentPersonId);
-    zuordnungenResult.value = remainingZuordnungen;
+    zuordnungenWithPendingChanges.value = remainingZuordnungen;
     selectedZuordnungen.value = [];
 
     // Filter out Zuordnungen with editable === false
@@ -562,7 +563,9 @@
 
     const workflowStepResponse: PersonenkontextWorkflowResponse | null = personenkontextStore.workflowStepResponse;
 
-    const rolle: RolleResponse | undefined = workflowStepResponse?.rollen.find((r: RolleResponse) => r.id === selectedRolleId);
+    const rolle: RolleResponse | undefined = workflowStepResponse?.rollen.find(
+      (r: RolleResponse) => r.id === selectedRolleId,
+    );
     return !!rolle && rolle.rollenart === RollenArt.Lern;
   }
 
@@ -573,7 +576,7 @@
   // Used on mount to check the retrieved Zuordnungen and if any of them has a Koperspflicht Merkmal
   const hasKopersRolle: ComputedRef<boolean> = computed(() => {
     return (
-      !!zuordnungenResult.value?.find((zuordnung: Zuordnung) => {
+      !!zuordnungenWithPendingChanges.value?.find((zuordnung: Zuordnung) => {
         return zuordnung.merkmale.includes(RollenMerkmal.KopersPflicht);
       }) || false
     );
@@ -582,7 +585,7 @@
   // Used to show device password block
   const hasLehrRolle: ComputedRef<boolean> = computed(() => {
     return (
-      !!zuordnungenResult.value?.find((zuordnung: Zuordnung) => {
+      !!zuordnungenWithPendingChanges.value?.find((zuordnung: Zuordnung) => {
         return zuordnung.rollenArt === RollenArt.Lehr;
       }) || false
     );
@@ -808,7 +811,7 @@
     isEditActive.value = true;
     // Deep copy of the zuordnungenResult to keep track of the Zuordnungen before any changes were done.
     // This is necessary if a user cancels the editing at some point and the zuordnungenResult was mutated at the time.
-    originalZuordnungenResult.value = JSON.parse(JSON.stringify(zuordnungenResult.value));
+    originalZuordnungen.value = JSON.parse(JSON.stringify(zuordnungenWithPendingChanges.value));
   };
 
   // Triggers the template to change the Klasse. Also pre-select the Schule and Klasse.
@@ -854,8 +857,8 @@
     formContext.resetForm();
     resetChangeKlasseForm();
     changeBefristungFormContext.resetForm();
-    zuordnungenResult.value = originalZuordnungenResult.value
-      ? JSON.parse(JSON.stringify(originalZuordnungenResult.value))
+    zuordnungenWithPendingChanges.value = originalZuordnungen.value
+      ? JSON.parse(JSON.stringify(originalZuordnungen.value))
       : undefined;
   };
 
@@ -1082,15 +1085,15 @@
         [],
         [],
       );
-      if (zuordnungenResult.value) {
-        finalZuordnungen.value = zuordnungenResult.value;
-        finalZuordnungen.value.push(newZuordnung.value);
+      if (zuordnungenWithPendingChanges.value) {
+        zuordnungenToBePersisted.value = zuordnungenWithPendingChanges.value;
+        zuordnungenToBePersisted.value.push(newZuordnung.value);
       }
 
       // Add the new selected Klasse to finalZuordnungen
       if (klasse) {
         newZuordnung.value.klasse = klasse.name;
-        finalZuordnungen.value.push(
+        zuordnungenToBePersisted.value.push(
           new Zuordnung(
             klasse.id,
             selectedRolle.value ?? '',
@@ -1112,13 +1115,13 @@
       // Add all existing Klassenzuordnungen to finalZuordnungen
       if (existingKlassen) {
         existingKlassen.forEach((existingKlasse: Zuordnung) => {
-          finalZuordnungen.value.push(Zuordnung.from(existingKlasse));
+          zuordnungenToBePersisted.value.push(Zuordnung.from(existingKlasse));
         });
       }
     }
 
     // Filter out existing Klassen from zuordnungenResult
-    zuordnungenResult.value = zuordnungenResult.value?.filter(
+    zuordnungenWithPendingChanges.value = zuordnungenWithPendingChanges.value?.filter(
       (zuordnung: Zuordnung) => zuordnung.typ !== OrganisationsTyp.Klasse,
     );
 
@@ -1140,7 +1143,7 @@
       ?.filterResult.find((k: Organisation) => k.id === selectedNewKlasse.value);
 
     // The remaining Zuordnungen that were not selected for deletion
-    const remainingZuordnungen: ZuordnungWithKlasse[] | undefined = zuordnungenResult.value?.filter(
+    const remainingZuordnungen: ZuordnungWithKlasse[] | undefined = zuordnungenWithPendingChanges.value?.filter(
       (zuordnung: Zuordnung) => !selectedZuordnungen.value.includes(zuordnung),
     );
 
@@ -1165,8 +1168,8 @@
         [],
       );
 
-      if (zuordnungenResult.value) {
-        finalZuordnungen.value = zuordnungenResult.value;
+      if (zuordnungenWithPendingChanges.value) {
+        zuordnungenToBePersisted.value = zuordnungenWithPendingChanges.value;
       }
 
       // Get all Klassen Zuordnungen
@@ -1197,12 +1200,12 @@
         klassenToKeep.push(...associatedKlassen);
       });
 
-      finalZuordnungen.value = [...finalZuordnungen.value, ...klassenToKeep];
+      zuordnungenToBePersisted.value = [...zuordnungenToBePersisted.value, ...klassenToKeep];
 
       // Add the new Klasse Zuordnung
       if (newKlasse) {
         newZuordnung.value.klasse = newKlasse.name;
-        finalZuordnungen.value.push(
+        zuordnungenToBePersisted.value.push(
           new Zuordnung(
             newKlasse.id,
             selectedZuordnungen.value[0]?.rolleId ?? '',
@@ -1225,7 +1228,7 @@
     }
 
     // zuordnungenResult is what we show in the UI and so Zuordnungen of type Klasse shouldn't show up (since they are merged with the ones of type Schule already)
-    zuordnungenResult.value = zuordnungenResult.value?.filter(
+    zuordnungenWithPendingChanges.value = zuordnungenWithPendingChanges.value?.filter(
       (zuordnung: Zuordnung) => zuordnung.typ !== OrganisationsTyp.Klasse,
     );
     // Proceed with the pending change Klasse operation
@@ -1239,14 +1242,25 @@
     const formattedBefristung: string | null = formatDateToISO(befristungDate) ?? null;
 
     // copy zuordnung from old one and update befristung
-    const currentZuordnung: Zuordnung = selectedZuordnungen.value[0]!;
-    newZuordnung.value = Zuordnung.from(currentZuordnung);
+    const selectedZuordnung: ZuordnungWithKlasse = selectedZuordnungen.value[0]!;
+
+    // for the template
+    newZuordnung.value = Zuordnung.from(selectedZuordnung);
+    newZuordnung.value.klasse = selectedZuordnung.klasse;
     newZuordnung.value.befristung = formattedBefristung;
     newZuordnung.value.editable = true;
 
-    finalZuordnungen.value = (zuordnungenResult.value ?? [])
-      .map((zuordnung: Zuordnung | undefined) => (zuordnung === currentZuordnung ? newZuordnung.value : zuordnung))
-      .filter((zuordnung: Zuordnung | undefined): zuordnung is Zuordnung => zuordnung !== undefined);
+    zuordnungenToBePersisted.value = (personStore.personenuebersicht?.zuordnungen ?? []).map((zuordnung: Zuordnung) => {
+      const isSelectedOrgaOrChildKlasse: boolean =
+        zuordnung.sskId === selectedZuordnung.sskId ||
+        (zuordnung.typ === OrganisationsTyp.Klasse && zuordnung.administriertVon === selectedZuordnung.sskId);
+      if (isSelectedOrgaOrChildKlasse && zuordnung.rolleId === selectedZuordnung.rolleId) {
+        const updatedZuordnung: Zuordnung = Zuordnung.from(zuordnung);
+        updatedZuordnung.befristung = formattedBefristung;
+        return updatedZuordnung;
+      }
+      return zuordnung;
+    });
 
     prepareChangeBefristung();
   };
@@ -1266,7 +1280,7 @@
   watch(
     () => personStore.personenuebersicht,
     async (newValue: PersonenUebersicht | null) => {
-      zuordnungenResult.value = computeZuordnungen(newValue);
+      zuordnungenWithPendingChanges.value = computeZuordnungen(newValue);
       const organisationIds: Array<string> = [...new Set(newValue?.zuordnungen.map((z: Zuordnung) => z.sskId))];
       if (organisationIds.length > 0) await organisationStore.getParentOrganisationsByIds(organisationIds);
     },
@@ -1918,7 +1932,7 @@
             <v-col
               cols="10"
               offset="1"
-              v-for="zuordnung in getZuordnungen"
+              v-for="zuordnung in zuordnungenWithPendingChanges"
               :key="zuordnung.sskId"
               :data-testid="`person-zuordnung-${zuordnung.sskId}`"
               :title="zuordnung.sskName"
@@ -1961,7 +1975,7 @@
               </v-col>
               <v-col
                 cols="12"
-                v-for="zuordnung in getZuordnungen?.filter((zuordnung: Zuordnung) => zuordnung.editable)"
+                v-for="zuordnung in zuordnungenWithPendingChanges?.filter((zuordnung: Zuordnung) => zuordnung.editable)"
                 :key="zuordnung.sskId"
                 :data-testid="`person-zuordnung-${zuordnung.sskId}`"
                 :title="zuordnung.sskName"
@@ -2069,7 +2083,7 @@
                     :person="personStore.currentPerson"
                     :disabled="selectedZuordnungen.length === 0"
                     :zuordnungCount="
-                      zuordnungenResult?.filter((zuordnung: Zuordnung) => zuordnung.editable).length ?? 0
+                      zuordnungenWithPendingChanges?.filter((zuordnung: Zuordnung) => zuordnung.editable).length ?? 0
                     "
                     ref="personenkontext-delete"
                     @onDeletePersonenkontext="prepareDeletion"
@@ -3082,9 +3096,7 @@
         <v-card-text>
           <v-container>
             <v-row class="text-body text-center bold">
-              <v-col
-                cols="12"
-              >
+              <v-col cols="12">
                 <span>{{ changeKlasseConfirmationDialogMessage }}</span>
               </v-col>
             </v-row>
@@ -3197,11 +3209,10 @@
             >
               <v-btn
                 :block="mdAndDown"
-                class="primary"
-                data-testid="confirm-change-befristung-button"
-                @click.stop="confirmDialogChangeBefristung"
+                class="secondary"
+                @click.stop="cancelChangeBefristung"
               >
-                {{ t('yes') }}
+                {{ t('no') }}
               </v-btn>
             </v-col>
             <v-col
@@ -3211,10 +3222,11 @@
             >
               <v-btn
                 :block="mdAndDown"
-                class="secondary"
-                @click.stop="cancelChangeBefristung"
+                class="primary"
+                data-testid="confirm-change-befristung-button"
+                @click.stop="confirmDialogChangeBefristung"
               >
-                {{ t('no') }}
+                {{ t('yes') }}
               </v-btn>
             </v-col>
           </v-row>

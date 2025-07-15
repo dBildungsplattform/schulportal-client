@@ -1253,7 +1253,7 @@ describe('OrganisationStore', () => {
       expect(organisationStore.schulenFilter.loading).toBe(true);
       await getAllOrganisationenPromise;
       expect(organisationStore.schulenFilter.filterResult).toEqual([]);
-      expect(organisationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(organisationStore.schulenFilter.errorCode).toEqual('UNSPECIFIED_ERROR');
       expect(organisationStore.schulenFilter.loading).toBe(false);
     });
 
@@ -1266,7 +1266,7 @@ describe('OrganisationStore', () => {
       expect(organisationStore.schulenFilter.loading).toBe(true);
       await getAllOrganisationenPromise;
       expect(organisationStore.schulenFilter.filterResult).toEqual([]);
-      expect(organisationStore.errorCode).toEqual('some mock server error');
+      expect(organisationStore.schulenFilter.errorCode).toEqual('some mock server error');
       expect(organisationStore.schulenFilter.loading).toBe(false);
     });
   });
@@ -1326,28 +1326,39 @@ describe('OrganisationStore', () => {
         expect(klassenFilter.total).toEqual(1);
         expect(klassenFilter.loading).toBe(false);
       });
-    });
 
-    it('should handle string error', async () => {
-      mockadapter.onGet('/api/organisationen?offset=0&limit=30&typ=KLASSE').replyOnce(500, 'some mock server error');
-      const getAllOrganisationenPromise: Promise<void> = organisationStore.loadKlassenForFilter({
-        offset: 0,
-        limit: 30,
-      });
-      await getAllOrganisationenPromise;
-      expect(organisationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
-    });
+      it('should handle string error', async () => {
+        mockadapter.onGet('/api/organisationen?offset=0&limit=30&typ=KLASSE').replyOnce(500, 'some mock server error');
+        const getAllOrganisationenPromise: Promise<void> = organisationStore.loadKlassenForFilter(
+          {
+            offset: 0,
+            limit: 30,
+          },
+          storeKey,
+        );
+        await getAllOrganisationenPromise;
 
-    it('should handle error code', async () => {
-      mockadapter
-        .onGet('/api/organisationen?offset=0&limit=30&typ=KLASSE')
-        .replyOnce(500, { code: 'some mock server error' });
-      const getAllOrganisationenPromise: Promise<void> = organisationStore.loadKlassenForFilter({
-        offset: 0,
-        limit: 30,
+        const klassenFilter: AutoCompleteStore<Organisation> = organisationStore.klassenFilters.get(storeKey ?? '')!;
+        expect(klassenFilter).toBeDefined();
+        expect(klassenFilter.errorCode).toEqual('UNSPECIFIED_ERROR');
       });
-      await getAllOrganisationenPromise;
-      expect(organisationStore.errorCode).toEqual('some mock server error');
+
+      it('should handle error code', async () => {
+        mockadapter
+          .onGet('/api/organisationen?offset=0&limit=30&typ=KLASSE')
+          .replyOnce(500, { code: 'some mock server error' });
+        const getAllOrganisationenPromise: Promise<void> = organisationStore.loadKlassenForFilter(
+          {
+            offset: 0,
+            limit: 30,
+          },
+          storeKey,
+        );
+        await getAllOrganisationenPromise;
+        const klassenFilter: AutoCompleteStore<Organisation> = organisationStore.klassenFilters.get(storeKey ?? '')!;
+        expect(klassenFilter).toBeDefined();
+        expect(klassenFilter.errorCode).toEqual('some mock server error');
+      });
     });
   });
 

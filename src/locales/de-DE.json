@@ -827,7 +827,7 @@
     "twoFactorAuth": "Zwei-Faktor-Authentifizierung",
     "setupTwoFactorAuth": "2-FA einrichten",
     "infoAboutChangeabilityFromPersonalData": "Persönliche Daten sind nur durch Ihre schulischen Administratorinnen und Administratoren veränderbar.",
-    "yourSchuleAdminsAre": "Ihre schulischen Administratorinnen und Administratoren sind:",
+    "yourSchuladminsAre": "Ihre schulischen Administratorinnen und Administratoren sind:",
     "koPersNummer": "Personalnummer",
     "koPersNummerAbbr": "KoPers.-Nr.",
     "koPersNummerMissing": "Bitte beachten Sie, dass Ihr Benutzerkonto ohne KoPers.-Nr. nur für einen Übergangszeitraum gültig ist und danach gesperrt wird! Lassen Sie die KoPers.-Nr. bitte durch Ihre schulischen Administratorinnen und Administratoren nachtragen, sobald diese Ihnen vorliegt.",

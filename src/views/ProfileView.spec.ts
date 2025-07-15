@@ -186,6 +186,29 @@ const mockSchuelerUebersicht: PersonenUebersicht = new PersonenUebersicht(
     ),
   ],
 );
+const mockSchuelerUebersichtWithReversedOrder: PersonenUebersicht = new PersonenUebersicht(
+  mockPersonInfoResponse.person.id,
+  mockPersonInfoResponse.person.name.vorname,
+  mockPersonInfoResponse.person.name.familiennamen,
+  mockPersonInfoResponse.person.referrer!,
+  '2021-09-01T12:00:00Z',
+  [
+    DoFactory.getZuordnung(
+      {
+        rollenArt: RollenArt.Lern,
+        befristung: faker.date.future().toISOString(),
+      },
+      { organisation: mockKlasse },
+    ),
+    DoFactory.getZuordnung(
+      {
+        rollenArt: RollenArt.Lern,
+        befristung: faker.date.future().toISOString(),
+      },
+      { organisation: mockSchule },
+    ),
+  ],
+);
 const uebersichtWithoutZuordnungen: PersonenUebersicht = new PersonenUebersicht(
   mockPersonInfoResponse.person.id,
   mockPersonInfoResponse.person.name.vorname,
@@ -293,22 +316,33 @@ describe('ProfileView', () => {
     },
   );
 
-  test('it displays Schule data for SuS', async () => {
-    personInfoStore.personInfo = mockSchueler;
-    personStore.personenuebersicht = mockSchuelerUebersicht;
-    await nextTick();
-    if (!wrapper) return;
-    const klasse: Zuordnung = mockSchuelerUebersicht.zuordnungen.find(
-      (z: Zuordnung) => z.typ == OrganisationsTyp.Klasse,
-    )!;
-    const schule: Zuordnung = mockSchuelerUebersicht.zuordnungen.find(
-      (z: Zuordnung) => z.typ == OrganisationsTyp.Schule,
-    )!;
-    expect(wrapper.find('[data-testid="schule-value-1"]').text()).toContain(schule.sskName);
-    expect(wrapper.find('[data-testid="rolle-value-1"]').text()).toContain(schule.rolle);
-    expect(wrapper.find('[data-testid="dienststellennummer-value-1"]').text()).toContain(schule.sskDstNr);
-    expect(wrapper.find('[data-testid="klasse-value-1"]').text()).toContain(klasse.sskName);
-    expect(wrapper.find('[data-testid="rolle-value-1"]').text()).toContain(klasse.rolle);
+  describe.each([
+    {
+      label: 'normal',
+      personenuebersicht: mockSchuelerUebersicht,
+    },
+    {
+      label: 'reversed',
+      personenuebersicht: mockSchuelerUebersichtWithReversedOrder,
+    },
+  ])('when order of zuordnungen is $label', ({ personenuebersicht }: { personenuebersicht: PersonenUebersicht }) => {
+    test('it displays Schule data for SuS', async () => {
+      personInfoStore.personInfo = mockSchueler;
+      personStore.personenuebersicht = personenuebersicht;
+      await nextTick();
+      if (!wrapper) return;
+      const klasse: Zuordnung = personenuebersicht.zuordnungen.find(
+        (z: Zuordnung) => z.typ == OrganisationsTyp.Klasse,
+      )!;
+      const schule: Zuordnung = personenuebersicht.zuordnungen.find(
+        (z: Zuordnung) => z.typ == OrganisationsTyp.Schule,
+      )!;
+      expect(wrapper.find('[data-testid="schule-value-1"]').text()).toContain(schule.sskName);
+      expect(wrapper.find('[data-testid="rolle-value-1"]').text()).toContain(schule.rolle);
+      expect(wrapper.find('[data-testid="dienststellennummer-value-1"]').text()).toContain(schule.sskDstNr);
+      expect(wrapper.find('[data-testid="klasse-value-1"]').text()).toContain(klasse.sskName);
+      expect(wrapper.find('[data-testid="rolle-value-1"]').text()).toContain(klasse.rolle);
+    });
   });
 
   describe('password', () => {

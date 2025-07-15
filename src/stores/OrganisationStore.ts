@@ -75,6 +75,7 @@ export type SchultraegerFormType = {
 
 export type AutoCompleteStore<T> = {
   filterResult: Array<T>;
+  errorCode?: string;
   total: number;
   loading: boolean;
 };
@@ -660,7 +661,7 @@ export const useOrganisationStore: StoreDefinition<
     },
 
     async loadSchulenForFilter(filter?: OrganisationenFilter): Promise<void> {
-      this.errorCode = '';
+      this.schulenFilter.errorCode = '';
       this.schulenFilter.loading = true;
       try {
         const response: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations(
@@ -679,7 +680,7 @@ export const useOrganisationStore: StoreDefinition<
         this.schulenFilter.filterResult = response.data;
         this.schulenFilter.total = +response.headers['x-paging-total'];
       } catch (error: unknown) {
-        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+        this.schulenFilter.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
         this.schulenFilter.loading = false;
       }
@@ -694,8 +695,6 @@ export const useOrganisationStore: StoreDefinition<
     },
 
     async loadKlassenForFilter(filter?: OrganisationenFilter, storeKey: string = ''): Promise<void> {
-      this.errorCode = '';
-
       const klassenFilter: AutoCompleteStore<Organisation> = {
         filterResult: [],
         loading: false,
@@ -719,10 +718,10 @@ export const useOrganisationStore: StoreDefinition<
         );
         klassenFilter.filterResult = response.data;
         klassenFilter.total = +response.headers['x-paging-total'];
-        this.klassenFilters.set(storeKey, klassenFilter);
       } catch (error: unknown) {
-        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+        klassenFilter.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
+        this.klassenFilters.set(storeKey, klassenFilter);
         klassenFilter.loading = false;
       }
     },
