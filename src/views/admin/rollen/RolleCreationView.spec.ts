@@ -200,7 +200,7 @@ describe('RolleCreationView', () => {
     rolleStore.errorCode = 'ERROR_ERROR';
     await nextTick();
     const push: MockInstance = vi.spyOn(router, 'push');
-    wrapper?.find('[data-testid="alert-button"]').trigger('click');
+    wrapper?.find('[data-testid$="alert-button"]').trigger('click');
     await nextTick();
     expect(push).toHaveBeenCalledTimes(1);
   });

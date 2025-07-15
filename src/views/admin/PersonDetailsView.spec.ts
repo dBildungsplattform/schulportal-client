@@ -599,7 +599,7 @@ describe('PersonDetailsView', () => {
     personStore.errorCode = 'PERSONALNUMMER_NICHT_EINDEUTIG';
     await nextTick();
 
-    await wrapper?.find('[data-testid="alert-button"]').trigger('click');
+    await wrapper?.find('[data-testid$="alert-button"]').trigger('click');
     const familienNameInput: DOMWrapper<Element> | undefined = await wrapper?.find(
       '[data-testid="person-familienname"]',
     );
