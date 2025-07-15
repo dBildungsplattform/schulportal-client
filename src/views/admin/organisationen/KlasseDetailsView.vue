@@ -224,14 +224,15 @@
             >
               <!-- Error Message Display -->
               <SpshAlert
+                :buttonAction="alertButtonAction"
+                :buttonText="alertButtonText"
+                :closable="false"
+                dataTestIdPrefix="klasse-details-error"
                 :model-value="!!organisationStore.errorCode"
+                :showButton="true"
+                :text="errorText"
                 :title="errorTitle"
                 :type="'error'"
-                :closable="false"
-                :text="errorText"
-                :showButton="true"
-                :buttonText="alertButtonText"
-                :buttonAction="alertButtonAction"
                 @update:modelValue="handleAlertClose"
               />
             </KlasseForm>
