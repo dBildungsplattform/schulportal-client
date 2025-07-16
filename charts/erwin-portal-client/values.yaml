@@ -64,5 +64,5 @@ autoscaling:
   targetCPUUtilizationPercentage: 60
 
 podDisruptionBudget:
-  enabled: true
+  enabled: false
   minAvailable: "60%"
