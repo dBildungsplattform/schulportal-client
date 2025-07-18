@@ -1,13 +1,14 @@
 <script setup lang="ts">
   defineProps<{
-    modelValue: boolean;
-    title: string;
-    text: string;
-    showButton?: boolean;
-    buttonText?: string;
     buttonAction?: Function;
-    type: 'error' | 'success' | 'warning' | 'info' | undefined;
+    buttonText?: string;
     closable?: boolean;
+    dataTestIdPrefix?: string;
+    modelValue: boolean;
+    showButton?: boolean;
+    text: string;
+    title: string;
+    type: 'error' | 'success' | 'warning' | 'info' | undefined;
   }>();
 
   type Emits = {
@@ -26,18 +27,19 @@
   <v-container v-if="modelValue">
     <v-slide-y-transition>
       <v-alert
+        @click:close="closeAlert"
+        :closable="closable"
+        :data-testid="`${dataTestIdPrefix}-alert`"
         :model-value="modelValue"
         :type="type"
         variant="outlined"
-        :closable="closable"
-        @click:close="closeAlert"
       >
         <v-row>
           <v-col
             class="primary-text-color"
             cols="auto"
           >
-            <strong data-testid="alert-title">{{ title }}</strong>
+            <strong :data-testid="`${dataTestIdPrefix}-alert-title`">{{ title }}</strong>
           </v-col>
         </v-row>
         <v-row>
@@ -45,7 +47,7 @@
             class="primary-text-color"
             cols="auto"
           >
-            <span data-testid="alert-text">{{ text }}</span>
+            <span :data-testid="`${dataTestIdPrefix}-alert-text`">{{ text }}</span>
             <slot name="text"></slot>
           </v-col>
         </v-row>
@@ -57,7 +59,7 @@
             <v-btn
               class="primary"
               @click="buttonAction"
-              data-testid="alert-button"
+              :data-testid="`${dataTestIdPrefix}-alert-button`"
             >
               {{ buttonText }}
             </v-btn>

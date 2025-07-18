@@ -389,7 +389,7 @@ describe('PersonDetailsView', () => {
       personStore.errorCode = 'ERROR_LOADING_USER';
       await nextTick();
 
-      expect(wrapper?.find('[data-testid="alert-title"]').text()).toBe('Fehler beim Laden des Benutzers');
+      expect(wrapper?.find('[data-testid$="alert-title"]').text()).toBe('Fehler beim Laden des Benutzers');
 
       personStore.errorCode = '';
       await nextTick();
@@ -402,7 +402,7 @@ describe('PersonDetailsView', () => {
 
       const alertButton: DOMWrapper<Element> | undefined = wrapper
         ?.findComponent({ ref: 'personenkontext-store-error-alert' })
-        .find('[data-testid="alert-button"]');
+        .find('[data-testid$="alert-button"]');
 
       expect(alertButton?.text()).toBe('Zurück zur Ergebnisliste');
 
@@ -599,7 +599,7 @@ describe('PersonDetailsView', () => {
     personStore.errorCode = 'PERSONALNUMMER_NICHT_EINDEUTIG';
     await nextTick();
 
-    await wrapper?.find('[data-testid="alert-button"]').trigger('click');
+    await wrapper?.find('[data-testid$="alert-button"]').trigger('click');
     const familienNameInput: DOMWrapper<Element> | undefined = await wrapper?.find(
       '[data-testid="person-familienname"]',
     );

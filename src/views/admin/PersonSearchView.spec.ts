@@ -561,7 +561,7 @@ describe('PersonSearchView', () => {
     await nextTick();
 
     // Click back button (assuming it exists in SpshAlert)
-    const backButton: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="alert-button"]');
+    const backButton: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid$="alert-button"]');
     await backButton?.trigger('click');
     await flushPromises();
 

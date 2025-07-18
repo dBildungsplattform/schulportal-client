@@ -835,7 +835,7 @@ describe('PersonCreationView', () => {
       await nextTick();
 
       const push: MockInstance = vi.spyOn(router, 'push');
-      wrapper?.find('[data-testid="alert-button"]').trigger('click');
+      wrapper?.find('[data-testid$="alert-button"]').trigger('click');
       await nextTick();
 
       expect(push).toHaveBeenCalledTimes(1);
@@ -846,9 +846,9 @@ describe('PersonCreationView', () => {
       personenkontextStore.errorCode = 'REQUIRED_STEP_UP_LEVEL_NOT_MET';
       await nextTick();
 
-      expect(wrapper?.find('[data-testid="alert-title"]').isVisible()).toBe(true);
+      expect(wrapper?.find('[data-testid$="alert-title"]').isVisible()).toBe(true);
 
-      wrapper?.find('[data-testid="alert-button"]').trigger('click');
+      wrapper?.find('[data-testid$="alert-button"]').trigger('click');
       await nextTick();
 
       personenkontextStore.errorCode = '';
