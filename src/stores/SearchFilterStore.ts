@@ -67,8 +67,9 @@ export const useSearchFilterStore: StoreDefinition<
     selectedRollen: [],
     selectedRollenObjects: [],
     selectedOrganisationen: [],
-    personenSortField: '',
-    personenSortOrder: '',
+    /* personenSortField and personenSortOrder need default values to avoid getting 400 errors from the backend */
+    personenSortField: 'familienname',
+    personenSortOrder: 'asc',
     organisationenSortField: null,
     organisationenSortOrder: null,
     currentSort: null,

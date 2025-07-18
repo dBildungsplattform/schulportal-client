@@ -113,8 +113,9 @@
   const searchFilter: Ref<string> = ref('');
 
   const selectedRollenObjects: Ref<RolleResponse[]> = ref([]);
-  const sortField: Ref<string | null> = ref(null);
-  const sortOrder: Ref<SortOrder | null> = ref(null);
+  /* sortField and sortOrder need default values to avoid getting 400 errors from the backend */
+  const sortField: Ref<string> = ref('familienname');
+  const sortOrder: Ref<SortOrder> = ref(SortOrder.Asc);
 
   const rolleModifiyDialogVisible: Ref<boolean> = ref(false);
   const benutzerDeleteDialogVisible: Ref<boolean> = ref(false);
