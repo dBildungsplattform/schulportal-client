@@ -691,7 +691,8 @@
       autoselectedSchule,
     }: {
       autoselectedSchule: ComputedRef<Organisation | null>;
-    } = useAutoselectedSchule([personenkontextStore.requestedWithSystemrecht ?? RollenSystemRecht.PersonenVerwalten]);
+    } = useAutoselectedSchule([personenkontextStore.requestedWithSystemrecht ?? RollenSystemRecht.PersonenAnlegen]);
+
     await personenkontextStore.processWorkflowStep({
       operationContext: OperationContext.PERSON_ANLEGEN,
       limit: 25,

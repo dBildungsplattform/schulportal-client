@@ -257,12 +257,15 @@
     await applySearchAndFilters();
   }
 
-  async function autoSelectOrganisation(): Promise<void> {
+  function autoSelectOrganisation(): string | undefined {
     // Autoselect the Orga for the current user that only has 1 Orga assigned to him.
     if (organisationStore.allOrganisationen.length === 1) {
-      selectedOrganisationIds.value = [organisationStore.allOrganisationen[0]?.id || ''];
+      const id: string = organisationStore.allOrganisationen[0]!.id;
+      selectedOrganisationIds.value = [id];
       hasAutoSelectedOrganisation.value = true;
+      return id;
     }
+    return undefined;
   }
 
   async function updateKlassenSelection(newValue: Array<string>): Promise<void> {
@@ -576,11 +579,6 @@
   });
 
   onMounted(async () => {
-    // to initialize bulk operations that use the personenkontextStore
-    personenkontextStore.processWorkflowStep({
-      operationContext: OperationContext.PERSON_BEARBEITEN,
-      limit: 25,
-    });
     if (filterOrSearchActive.value) {
       selectedOrganisationIds.value = searchFilterStore.selectedOrganisationen || [];
       selectedRollen.value = searchFilterStore.selectedRollen || [];
@@ -600,7 +598,13 @@
     await getPaginatedPersonen(searchFilterStore.personenPage);
     await personenkontextStore.getPersonenkontextRolleWithFilter('', 25);
 
-    autoSelectOrganisation();
+    const autoselectedSchuleId: string | undefined = autoSelectOrganisation();
+    // to initialize bulk operations that use the personenkontextStore
+    personenkontextStore.processWorkflowStep({
+      operationContext: OperationContext.PERSON_BEARBEITEN,
+      limit: 25,
+      organisationId: autoselectedSchuleId,
+    });
   });
 </script>
 
