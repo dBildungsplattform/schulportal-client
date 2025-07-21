@@ -1728,6 +1728,133 @@ export interface PersonIdResponse {
 /**
  * 
  * @export
+ * @interface PersonInfoKontextErreichbarkeitResponseV1
+ */
+export interface PersonInfoKontextErreichbarkeitResponseV1 {
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonInfoKontextErreichbarkeitResponseV1
+     */
+    'typ': PersonInfoKontextErreichbarkeitResponseV1TypEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonInfoKontextErreichbarkeitResponseV1
+     */
+    'kennung': string;
+}
+
+export const PersonInfoKontextErreichbarkeitResponseV1TypEnum = {
+    EMail: 'E-Mail'
+} as const;
+
+export type PersonInfoKontextErreichbarkeitResponseV1TypEnum = typeof PersonInfoKontextErreichbarkeitResponseV1TypEnum[keyof typeof PersonInfoKontextErreichbarkeitResponseV1TypEnum];
+
+/**
+ * 
+ * @export
+ * @interface PersonInfoKontextResponseV1
+ */
+export interface PersonInfoKontextResponseV1 {
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonInfoKontextResponseV1
+     */
+    'id': string;
+    /**
+     * 
+     * @type {PersonenInfoKontextOrganisationResponseV1}
+     * @memberof PersonInfoKontextResponseV1
+     */
+    'organisation': PersonenInfoKontextOrganisationResponseV1;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonInfoKontextResponseV1
+     */
+    'rolle': PersonInfoKontextResponseV1RolleEnum;
+    /**
+     * 
+     * @type {Array<PersonInfoKontextErreichbarkeitResponseV1>}
+     * @memberof PersonInfoKontextResponseV1
+     */
+    'erreichbarkeiten': Array<PersonInfoKontextErreichbarkeitResponseV1>;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonInfoKontextResponseV1
+     */
+    'personenstatus': PersonInfoKontextResponseV1PersonenstatusEnum;
+    /**
+     * 
+     * @type {Array<PersonenInfoKontextGruppeResponseV1>}
+     * @memberof PersonInfoKontextResponseV1
+     */
+    'gruppen': Array<PersonenInfoKontextGruppeResponseV1>;
+}
+
+export const PersonInfoKontextResponseV1RolleEnum = {
+    Lern: 'Lern',
+    Lehr: 'Lehr',
+    SorgBer: 'SorgBer',
+    Extern: 'Extern',
+    OrgAdmin: 'OrgAdmin',
+    Leit: 'Leit',
+    SysAdmin: 'SysAdmin',
+    SchB: 'SchB',
+    NLehr: 'NLehr'
+} as const;
+
+export type PersonInfoKontextResponseV1RolleEnum = typeof PersonInfoKontextResponseV1RolleEnum[keyof typeof PersonInfoKontextResponseV1RolleEnum];
+export const PersonInfoKontextResponseV1PersonenstatusEnum = {
+    Aktiv: 'Aktiv'
+} as const;
+
+export type PersonInfoKontextResponseV1PersonenstatusEnum = typeof PersonInfoKontextResponseV1PersonenstatusEnum[keyof typeof PersonInfoKontextResponseV1PersonenstatusEnum];
+
+/**
+ * 
+ * @export
+ * @interface PersonInfoPersonNameResponseV1
+ */
+export interface PersonInfoPersonNameResponseV1 {
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonInfoPersonNameResponseV1
+     */
+    'familiennamen': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonInfoPersonNameResponseV1
+     */
+    'vorname': string;
+}
+/**
+ * 
+ * @export
+ * @interface PersonInfoPersonResponseV1
+ */
+export interface PersonInfoPersonResponseV1 {
+    /**
+     * 
+     * @type {object}
+     * @memberof PersonInfoPersonResponseV1
+     */
+    'stammorganisation': object | null;
+    /**
+     * 
+     * @type {PersonInfoPersonNameResponseV1}
+     * @memberof PersonInfoPersonResponseV1
+     */
+    'name': PersonInfoPersonNameResponseV1;
+}
+/**
+ * 
+ * @export
  * @interface PersonInfoResponse
  */
 export interface PersonInfoResponse {
@@ -1765,6 +1892,37 @@ export interface PersonInfoResponse {
 /**
  * 
  * @export
+ * @interface PersonInfoResponseV1
+ */
+export interface PersonInfoResponseV1 {
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonInfoResponseV1
+     */
+    'pid': string;
+    /**
+     * 
+     * @type {PersonInfoPersonResponseV1}
+     * @memberof PersonInfoResponseV1
+     */
+    'person': PersonInfoPersonResponseV1;
+    /**
+     * 
+     * @type {Array<PersonInfoKontextResponseV1>}
+     * @memberof PersonInfoResponseV1
+     */
+    'personenkontexte': Array<PersonInfoKontextResponseV1>;
+    /**
+     * 
+     * @type {Array<object>}
+     * @memberof PersonInfoResponseV1
+     */
+    'beziehungen': Array<object>;
+}
+/**
+ * 
+ * @export
  * @interface PersonLandesbediensteterSearchPersonenkontextResponse
  */
 export interface PersonLandesbediensteterSearchPersonenkontextResponse {
@@ -1792,6 +1950,12 @@ export interface PersonLandesbediensteterSearchPersonenkontextResponse {
      * @memberof PersonLandesbediensteterSearchPersonenkontextResponse
      */
     'organisationName': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonLandesbediensteterSearchPersonenkontextResponse
+     */
+    'organisationDstNr': string;
 }
 /**
  * 
@@ -2348,6 +2512,38 @@ export interface PersonTimeLimitInfoResponse {
 /**
  * 
  * @export
+ * @interface PersonenInfoKontextGruppeResponseV1
+ */
+export interface PersonenInfoKontextGruppeResponseV1 {
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonenInfoKontextGruppeResponseV1
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonenInfoKontextGruppeResponseV1
+     */
+    'bezeichnung': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonenInfoKontextGruppeResponseV1
+     */
+    'typ': PersonenInfoKontextGruppeResponseV1TypEnum;
+}
+
+export const PersonenInfoKontextGruppeResponseV1TypEnum = {
+    Klasse: 'Klasse'
+} as const;
+
+export type PersonenInfoKontextGruppeResponseV1TypEnum = typeof PersonenInfoKontextGruppeResponseV1TypEnum[keyof typeof PersonenInfoKontextGruppeResponseV1TypEnum];
+
+/**
+ * 
+ * @export
  * @interface PersonenInfoKontextOrganisationResponse
  */
 export interface PersonenInfoKontextOrganisationResponse {
@@ -2389,6 +2585,45 @@ export const PersonenInfoKontextOrganisationResponseTypEnum = {
 } as const;
 
 export type PersonenInfoKontextOrganisationResponseTypEnum = typeof PersonenInfoKontextOrganisationResponseTypEnum[keyof typeof PersonenInfoKontextOrganisationResponseTypEnum];
+
+/**
+ * 
+ * @export
+ * @interface PersonenInfoKontextOrganisationResponseV1
+ */
+export interface PersonenInfoKontextOrganisationResponseV1 {
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonenInfoKontextOrganisationResponseV1
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonenInfoKontextOrganisationResponseV1
+     */
+    'kennung': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonenInfoKontextOrganisationResponseV1
+     */
+    'name': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonenInfoKontextOrganisationResponseV1
+     */
+    'typ': PersonenInfoKontextOrganisationResponseV1TypEnum;
+}
+
+export const PersonenInfoKontextOrganisationResponseV1TypEnum = {
+    Schule: 'Schule',
+    Sonstige: 'Sonstige'
+} as const;
+
+export type PersonenInfoKontextOrganisationResponseV1TypEnum = typeof PersonenInfoKontextOrganisationResponseV1TypEnum[keyof typeof PersonenInfoKontextOrganisationResponseV1TypEnum];
 
 /**
  * 
@@ -8397,6 +8632,44 @@ export const PersonInfoApiAxiosParamCreator = function (configuration?: Configur
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * 
+         * @summary Info about logged in person.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        personInfoControllerInfoV1: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/person-info`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -8415,6 +8688,16 @@ export const PersonInfoApiFp = function(configuration?: Configuration) {
          */
         async personInfoControllerInfo(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonInfoResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.personInfoControllerInfo(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Info about logged in person.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async personInfoControllerInfoV1(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonInfoResponseV1>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.personInfoControllerInfoV1(options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -8436,6 +8719,15 @@ export const PersonInfoApiFactory = function (configuration?: Configuration, bas
         personInfoControllerInfo(options?: any): AxiosPromise<PersonInfoResponse> {
             return localVarFp.personInfoControllerInfo(options).then((request) => request(axios, basePath));
         },
+        /**
+         * 
+         * @summary Info about logged in person.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        personInfoControllerInfoV1(options?: any): AxiosPromise<PersonInfoResponseV1> {
+            return localVarFp.personInfoControllerInfoV1(options).then((request) => request(axios, basePath));
+        },
     };
 };
 
@@ -8453,6 +8745,15 @@ export interface PersonInfoApiInterface {
      * @memberof PersonInfoApiInterface
      */
     personInfoControllerInfo(options?: AxiosRequestConfig): AxiosPromise<PersonInfoResponse>;
+
+    /**
+     * 
+     * @summary Info about logged in person.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonInfoApiInterface
+     */
+    personInfoControllerInfoV1(options?: AxiosRequestConfig): AxiosPromise<PersonInfoResponseV1>;
 
 }
 
@@ -8472,6 +8773,17 @@ export class PersonInfoApi extends BaseAPI implements PersonInfoApiInterface {
      */
     public personInfoControllerInfo(options?: AxiosRequestConfig) {
         return PersonInfoApiFp(this.configuration).personInfoControllerInfo(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Info about logged in person.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonInfoApi
+     */
+    public personInfoControllerInfoV1(options?: AxiosRequestConfig) {
+        return PersonInfoApiFp(this.configuration).personInfoControllerInfoV1(options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -9994,6 +10306,151 @@ export class PersonenFrontendApi extends BaseAPI implements PersonenFrontendApiI
 
 
 /**
+ * PersonenInfoApi - axios parameter creator
+ * @export
+ */
+export const PersonenInfoApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @summary liefert Personeninformationen basierend auf den Berechtigungen auf Service Provider des aufrufenden Nutzers
+         * @param {string} xOffset 
+         * @param {string} xLimit 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        personenInfoControllerInfoV1: async (xOffset: string, xLimit: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'xOffset' is not null or undefined
+            assertParamExists('personenInfoControllerInfoV1', 'xOffset', xOffset)
+            // verify required parameter 'xLimit' is not null or undefined
+            assertParamExists('personenInfoControllerInfoV1', 'xLimit', xLimit)
+            const localVarPath = `/api/personen-info`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+            if (xOffset != null) {
+                localVarHeaderParameter['x-offset'] = String(xOffset);
+            }
+
+            if (xLimit != null) {
+                localVarHeaderParameter['x-limit'] = String(xLimit);
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * PersonenInfoApi - functional programming interface
+ * @export
+ */
+export const PersonenInfoApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = PersonenInfoApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @summary liefert Personeninformationen basierend auf den Berechtigungen auf Service Provider des aufrufenden Nutzers
+         * @param {string} xOffset 
+         * @param {string} xLimit 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async personenInfoControllerInfoV1(xOffset: string, xLimit: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonInfoResponseV1>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.personenInfoControllerInfoV1(xOffset, xLimit, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * PersonenInfoApi - factory interface
+ * @export
+ */
+export const PersonenInfoApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = PersonenInfoApiFp(configuration)
+    return {
+        /**
+         * 
+         * @summary liefert Personeninformationen basierend auf den Berechtigungen auf Service Provider des aufrufenden Nutzers
+         * @param {string} xOffset 
+         * @param {string} xLimit 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        personenInfoControllerInfoV1(xOffset: string, xLimit: string, options?: any): AxiosPromise<PersonInfoResponseV1> {
+            return localVarFp.personenInfoControllerInfoV1(xOffset, xLimit, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * PersonenInfoApi - interface
+ * @export
+ * @interface PersonenInfoApi
+ */
+export interface PersonenInfoApiInterface {
+    /**
+     * 
+     * @summary liefert Personeninformationen basierend auf den Berechtigungen auf Service Provider des aufrufenden Nutzers
+     * @param {string} xOffset 
+     * @param {string} xLimit 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonenInfoApiInterface
+     */
+    personenInfoControllerInfoV1(xOffset: string, xLimit: string, options?: AxiosRequestConfig): AxiosPromise<PersonInfoResponseV1>;
+
+}
+
+/**
+ * PersonenInfoApi - object-oriented interface
+ * @export
+ * @class PersonenInfoApi
+ * @extends {BaseAPI}
+ */
+export class PersonenInfoApi extends BaseAPI implements PersonenInfoApiInterface {
+    /**
+     * 
+     * @summary liefert Personeninformationen basierend auf den Berechtigungen auf Service Provider des aufrufenden Nutzers
+     * @param {string} xOffset 
+     * @param {string} xLimit 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonenInfoApi
+     */
+    public personenInfoControllerInfoV1(xOffset: string, xLimit: string, options?: AxiosRequestConfig) {
+        return PersonenInfoApiFp(this.configuration).personenInfoControllerInfoV1(xOffset, xLimit, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
  * PersonenkontextApi - axios parameter creator
  * @export
  */
@@ -10097,7 +10554,7 @@ export const PersonenkontextApiAxiosParamCreator = function (configuration?: Con
         /**
          * 
          * @param {OperationContext} operationContext The context in which this request happens. Affects permission checks.
-         * @param {string} [personId] ID of the person to be modified
+         * @param {string} [personId] ID of the person to be modified, will restrict the returned roles
          * @param {string} [organisationId] ID of the organisation to filter the rollen later
          * @param {Array<string>} [rollenIds] IDs of the rollen.
          * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
@@ -10208,7 +10665,7 @@ export const PersonenkontextApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @param {OperationContext} operationContext The context in which this request happens. Affects permission checks.
-         * @param {string} [personId] ID of the person to be modified
+         * @param {string} [personId] ID of the person to be modified, will restrict the returned roles
          * @param {string} [organisationId] ID of the organisation to filter the rollen later
          * @param {Array<string>} [rollenIds] IDs of the rollen.
          * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
@@ -10255,7 +10712,7 @@ export const PersonenkontextApiFactory = function (configuration?: Configuration
         /**
          * 
          * @param {OperationContext} operationContext The context in which this request happens. Affects permission checks.
-         * @param {string} [personId] ID of the person to be modified
+         * @param {string} [personId] ID of the person to be modified, will restrict the returned roles
          * @param {string} [organisationId] ID of the organisation to filter the rollen later
          * @param {Array<string>} [rollenIds] IDs of the rollen.
          * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
@@ -10300,7 +10757,7 @@ export interface PersonenkontextApiInterface {
     /**
      * 
      * @param {OperationContext} operationContext The context in which this request happens. Affects permission checks.
-     * @param {string} [personId] ID of the person to be modified
+     * @param {string} [personId] ID of the person to be modified, will restrict the returned roles
      * @param {string} [organisationId] ID of the organisation to filter the rollen later
      * @param {Array<string>} [rollenIds] IDs of the rollen.
      * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
@@ -10349,7 +10806,7 @@ export class PersonenkontextApi extends BaseAPI implements PersonenkontextApiInt
     /**
      * 
      * @param {OperationContext} operationContext The context in which this request happens. Affects permission checks.
-     * @param {string} [personId] ID of the person to be modified
+     * @param {string} [personId] ID of the person to be modified, will restrict the returned roles
      * @param {string} [organisationId] ID of the organisation to filter the rollen later
      * @param {Array<string>} [rollenIds] IDs of the rollen.
      * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
