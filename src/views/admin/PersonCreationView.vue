@@ -6,6 +6,7 @@
   import FormRow from '@/components/form/FormRow.vue';
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import PasswordOutput from '@/components/form/PasswordOutput.vue';
+  import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
   import { useOrganisationen } from '@/composables/useOrganisationen';
   import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
   import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
@@ -686,9 +687,16 @@
   });
 
   onMounted(async () => {
+    const {
+      autoselectedSchule,
+    }: {
+      autoselectedSchule: ComputedRef<Organisation | null>;
+    } = useAutoselectedSchule([personenkontextStore.requestedWithSystemrecht ?? RollenSystemRecht.PersonenAnlegen]);
+
     await personenkontextStore.processWorkflowStep({
       operationContext: OperationContext.PERSON_ANLEGEN,
       limit: 25,
+      organisationId: autoselectedSchule.value?.id,
     });
 
     personStore.errorCode = '';
