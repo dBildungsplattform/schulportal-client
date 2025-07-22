@@ -2898,7 +2898,7 @@
         },
         "required": ["i18nKey", "code"]
       },
-      "RollenArt": { "type": "string", "enum": ["LERN", "LEHR", "EXTERN", "ORGADMIN", "LEIT", "SYSADMIN"] },
+      "RollenArt": { "type": "string", "enum": ["LERN", "LEHR", "EXTERN", "ORGADMIN", "LEIT", "SYSADMIN", "PORTALADMIN"] },
       "RollenMerkmal": { "type": "string", "enum": ["BEFRISTUNG_PFLICHT", "KOPERS_PFLICHT"] },
       "DBiamPersonenzuordnungResponse": {
         "type": "object",
