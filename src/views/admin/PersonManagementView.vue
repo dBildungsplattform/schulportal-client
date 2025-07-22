@@ -579,6 +579,22 @@
   });
 
   onMounted(async () => {
+    await organisationStore.getAllOrganisationen({
+      excludeTyp: [OrganisationsTyp.Klasse],
+      systemrechte: [RollenSystemRecht.PersonenVerwalten],
+      limit: 25,
+      organisationIds: selectedOrganisationIds.value,
+    });
+    const autoselectedSchuleId: string | undefined = autoSelectOrganisation();
+    if (authStore.hasPersonenBulkPermission) {
+      // to initialize bulk operations that use the personenkontextStore
+      await personenkontextStore.processWorkflowStep({
+        operationContext: OperationContext.PERSON_BEARBEITEN,
+        limit: 25,
+        organisationId: autoselectedSchuleId,
+      });
+    }
+
     if (filterOrSearchActive.value) {
       selectedOrganisationIds.value = searchFilterStore.selectedOrganisationen || [];
       selectedRollen.value = searchFilterStore.selectedRollen || [];
@@ -588,23 +604,8 @@
       await applySearchAndFilters();
     }
 
-    await organisationStore.getAllOrganisationen({
-      excludeTyp: [OrganisationsTyp.Klasse],
-      systemrechte: ['PERSONEN_VERWALTEN'],
-      limit: 25,
-      organisationIds: selectedOrganisationIds.value,
-    });
-
     await getPaginatedPersonen(searchFilterStore.personenPage);
     await personenkontextStore.getPersonenkontextRolleWithFilter('', 25);
-
-    const autoselectedSchuleId: string | undefined = autoSelectOrganisation();
-    // to initialize bulk operations that use the personenkontextStore
-    personenkontextStore.processWorkflowStep({
-      operationContext: OperationContext.PERSON_BEARBEITEN,
-      limit: 25,
-      organisationId: autoselectedSchuleId,
-    });
   });
 </script>
 
