@@ -359,7 +359,8 @@
         },
         "merkmale": {
           "BEFRISTUNG_PFLICHT": "Befristung ist Pflichtangabe",
-          "KOPERS_PFLICHT": "KoPers.-Nr. ist Pflichtangabe"
+          "KOPERS_PFLICHT": "KoPers.-Nr. ist Pflichtangabe",
+          "MAPPING": "Mapping"
         }
       },
       "merkmale": "Merkmale",

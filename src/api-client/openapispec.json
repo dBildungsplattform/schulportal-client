@@ -2899,7 +2899,7 @@
         "required": ["i18nKey", "code"]
       },
       "RollenArt": { "type": "string", "enum": ["LERN", "LEHR", "EXTERN", "ORGADMIN", "LEIT", "SYSADMIN", "PORTALADMIN"] },
-      "RollenMerkmal": { "type": "string", "enum": ["BEFRISTUNG_PFLICHT", "KOPERS_PFLICHT"] },
+      "RollenMerkmal": { "type": "string", "enum": ["BEFRISTUNG_PFLICHT", "KOPERS_PFLICHT", "MAPPING"] },
       "DBiamPersonenzuordnungResponse": {
         "type": "object",
         "properties": {
@@ -3025,7 +3025,29 @@
           "dienststellen"
         ]
       },
-      "PersonenInfoKontextOrganisationResponse": { "type": "object", "properties": {} },
+      "PersonenInfoKontextOrganisationResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "nullable": false },
+          "name": { "type": "string", "nullable": true },
+          "typ": {
+            "type": "string",
+            "enum": [
+              "ROOT",
+              "LAND",
+              "TRAEGER",
+              "SCHULE",
+              "KLASSE",
+              "ANBIETER",
+              "SONSTIGE ORGANISATION / EINRICHTUNG",
+              "UNBESTAETIGT"
+            ],
+            "nullable": true
+          },
+          "kennung": { "type": "string", "nullable": true }
+        },
+        "required": ["id", "name", "typ", "kennung"]
+      },
       "PersonenInfoKontextResponse": {
         "type": "object",
         "properties": {
@@ -3362,7 +3384,7 @@
       "ServiceProviderTarget": { "type": "string", "enum": ["URL", "EMAIL", "SCHULPORTAL_ADMINISTRATION"] },
       "ServiceProviderKategorie": {
         "type": "string",
-        "enum": ["EMAIL", "UNTERRICHT", "VERWALTUNG", "HINWEISE", "ANGEBOTE"]
+        "enum": ["EMAIL", "UNTERRICHT", "VERWALTUNG", "HINWEISE", "ANGEBOTE", "LMS"]
       },
       "ServiceProviderResponse": {
         "type": "object",

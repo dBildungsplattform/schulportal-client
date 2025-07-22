@@ -2274,6 +2274,51 @@ export interface PersonTimeLimitInfoResponse {
 /**
  * 
  * @export
+ * @interface PersonenInfoKontextOrganisationResponse
+ */
+export interface PersonenInfoKontextOrganisationResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonenInfoKontextOrganisationResponse
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonenInfoKontextOrganisationResponse
+     */
+    'name': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonenInfoKontextOrganisationResponse
+     */
+    'typ': PersonenInfoKontextOrganisationResponseTypEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonenInfoKontextOrganisationResponse
+     */
+    'kennung': string | null;
+}
+
+export const PersonenInfoKontextOrganisationResponseTypEnum = {
+    Root: 'ROOT',
+    Land: 'LAND',
+    Traeger: 'TRAEGER',
+    Schule: 'SCHULE',
+    Klasse: 'KLASSE',
+    Anbieter: 'ANBIETER',
+    SonstigeOrganisationEinrichtung: 'SONSTIGE ORGANISATION / EINRICHTUNG',
+    Unbestaetigt: 'UNBESTAETIGT'
+} as const;
+
+export type PersonenInfoKontextOrganisationResponseTypEnum = typeof PersonenInfoKontextOrganisationResponseTypEnum[keyof typeof PersonenInfoKontextOrganisationResponseTypEnum];
+
+/**
+ * 
+ * @export
  * @interface PersonenInfoKontextResponse
  */
 export interface PersonenInfoKontextResponse {
@@ -2297,10 +2342,10 @@ export interface PersonenInfoKontextResponse {
     'mandant': string;
     /**
      * 
-     * @type {object}
+     * @type {PersonenInfoKontextOrganisationResponse}
      * @memberof PersonenInfoKontextResponse
      */
-    'organisation': object;
+    'organisation': PersonenInfoKontextOrganisationResponse;
     /**
      * 
      * @type {string}
@@ -2877,7 +2922,8 @@ export type RollenArt = typeof RollenArt[keyof typeof RollenArt];
 
 export const RollenMerkmal = {
     BefristungPflicht: 'BEFRISTUNG_PFLICHT',
-    KopersPflicht: 'KOPERS_PFLICHT'
+    KopersPflicht: 'KOPERS_PFLICHT',
+    Mapping: 'MAPPING'
 } as const;
 
 export type RollenMerkmal = typeof RollenMerkmal[keyof typeof RollenMerkmal];
@@ -2959,7 +3005,8 @@ export const ServiceProviderKategorie = {
     Unterricht: 'UNTERRICHT',
     Verwaltung: 'VERWALTUNG',
     Hinweise: 'HINWEISE',
-    Angebote: 'ANGEBOTE'
+    Angebote: 'ANGEBOTE',
+    Lms: 'LMS'
 } as const;
 
 export type ServiceProviderKategorie = typeof ServiceProviderKategorie[keyof typeof ServiceProviderKategorie];
