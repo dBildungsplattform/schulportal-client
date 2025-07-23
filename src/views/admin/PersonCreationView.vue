@@ -686,12 +686,13 @@
   });
 
   onMounted(async () => {
+    personStore.errorCode = '';
+
     await personenkontextStore.processWorkflowStep({
       operationContext: OperationContext.PERSON_ANLEGEN,
       limit: 25,
     });
 
-    personStore.errorCode = '';
     personenkontextStore.createdPersonWithKontext = null;
     personenkontextStore.landesbediensteteCommitResponse = null;
 

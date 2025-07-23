@@ -342,18 +342,14 @@
             "required": false,
             "in": "query",
             "description": "Order to sort by.",
-            "schema": { "nullable": true, "enum": ["asc", "desc"], "type": "string" }
+            "schema": { "$ref": "#/components/schemas/ScopeOrder" }
           },
           {
             "name": "sortField",
             "required": false,
             "in": "query",
             "description": "Field to sort by.",
-            "schema": {
-              "nullable": true,
-              "enum": ["familienname", "vorname", "personalnummer", "referrer"],
-              "type": "string"
-            }
+            "schema": { "$ref": "#/components/schemas/SortFieldPerson" }
           }
         ],
         "responses": {
@@ -575,18 +571,14 @@
             "required": false,
             "in": "query",
             "description": "Order to sort by.",
-            "schema": { "nullable": true, "enum": ["asc", "desc"], "type": "string" }
+            "schema": { "$ref": "#/components/schemas/ScopeOrder" }
           },
           {
             "name": "sortField",
             "required": false,
             "in": "query",
             "description": "Field to sort by.",
-            "schema": {
-              "nullable": true,
-              "enum": ["familienname", "vorname", "personalnummer", "referrer"],
-              "type": "string"
-            }
+            "schema": { "$ref": "#/components/schemas/SortFieldPerson" }
           }
         ],
         "responses": {
@@ -2779,8 +2771,15 @@
       },
       "UserExeternalDataResponseVidis": {
         "type": "object",
-        "properties": { "dienststellenNummern": { "type": "array", "items": { "type": "string" } } },
-        "required": ["dienststellenNummern"]
+        "properties": {
+          "personId": { "type": "string" },
+          "vorname": { "type": "string" },
+          "nachname": { "type": "string" },
+          "rollenart": { "type": "string" },
+          "emailAdresse": { "type": "string" },
+          "dienststellenNummern": { "type": "array", "items": { "type": "string" } }
+        },
+        "required": ["personId", "vorname", "nachname", "rollenart", "emailAdresse", "dienststellenNummern"]
       },
       "UserExeternalDataResponseOpshPk": {
         "type": "object",
@@ -3001,6 +3000,8 @@
       },
       "Personenstatus": { "type": "string", "enum": ["AKTIV"] },
       "Sichtfreigabe": { "type": "string", "enum": ["ja", "nein"] },
+      "ScopeOrder": { "type": "string", "enum": ["asc", "desc"] },
+      "SortFieldPerson": { "type": "string", "enum": ["familienname", "vorname", "personalnummer", "referrer"] },
       "Geschlecht": { "type": "string", "enum": ["m", "w", "d", "x"] },
       "UpdatePersonBodyParams": {
         "type": "object",
