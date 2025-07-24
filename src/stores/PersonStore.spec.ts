@@ -11,7 +11,6 @@ import {
 } from '@/api-client/generated';
 import ApiService from '@/services/ApiService';
 import { PersonLockOccasion } from '@/utils/lock';
-import { faker } from '@faker-js/faker';
 import { rejects } from 'assert';
 import MockAdapter from 'axios-mock-adapter';
 import { createPinia, setActivePinia } from 'pinia';
@@ -669,38 +668,8 @@ describe('PersonStore', () => {
   describe('getLandesbedienstetePerson', () => {
     it('should load Landesbedienstete persons and update state', async () => {
       const mockLandesbedienstetePersonen: PersonLandesbediensteterSearchResponse[] = [
-        {
-          id: faker.string.uuid(),
-          vorname: 'John',
-          familienname: 'Doe',
-          username: 'john.doe',
-          personalnummer: '12345',
-          primaryEmailAddress: 'john.doe@example.com',
-          personenkontexte: [
-            {
-              rolleId: 'role-1',
-              rolleName: 'Teacher',
-              organisationId: 'org-1',
-              organisationName: 'Test School',
-            },
-          ],
-        },
-        {
-          id: faker.string.uuid(),
-          vorname: 'Jane',
-          familienname: 'Smith',
-          username: 'jane.smith',
-          personalnummer: '67890',
-          primaryEmailAddress: 'jane.smith@example.com',
-          personenkontexte: [
-            {
-              rolleId: 'role-2',
-              rolleName: 'Administrator',
-              organisationId: 'org-2',
-              organisationName: 'Test Administration',
-            },
-          ],
-        },
+        DoFactory.getPersonLandesbediensteterSearchResponse(),
+        DoFactory.getPersonLandesbediensteterSearchResponse(),
       ];
 
       const filter = {
