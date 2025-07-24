@@ -177,6 +177,7 @@
     }
 
     emits('update:selectedOrganisation', newValue);
+    searchInputOrganisation.value = '';
   });
 
   watch(
@@ -202,6 +203,7 @@
           canCommit.value = false;
         }
         emits('update:selectedRollen', newRollen);
+        searchInputRollen.value = '';
       } else {
         const newRolle: string | undefined = newValue as string | undefined;
 
@@ -225,6 +227,7 @@
         }
 
         emits('update:selectedRolle', newRolle);
+        searchInputRolle.value = '';
       }
     },
     { deep: true },
