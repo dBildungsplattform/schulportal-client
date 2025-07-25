@@ -177,7 +177,6 @@
     }
 
     emits('update:selectedOrganisation', newValue);
-    searchInputOrganisation.value = '';
   });
 
   watch(
