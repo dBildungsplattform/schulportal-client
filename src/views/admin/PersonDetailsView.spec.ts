@@ -809,7 +809,7 @@ describe('PersonDetailsView', () => {
     }
     await flushPromises();
 
-    const saveButton: Element | null = document.body.querySelector('[data-testid="zuordnung-changes-save"]');
+    const saveButton: Element | null = document.body.querySelector('[data-testid="zuordnung-changes-save-button"]');
     expect(saveButton).not.toBeNull();
 
     if (saveButton) {
@@ -881,7 +881,7 @@ describe('PersonDetailsView', () => {
     }
     await flushPromises();
 
-    const saveButton: Element | null = document.body.querySelector('[data-testid="zuordnung-changes-save"]');
+    const saveButton: Element | null = document.body.querySelector('[data-testid="zuordnung-changes-save-button"]');
     expect(saveButton).not.toBeNull();
 
     if (saveButton) {
@@ -927,7 +927,7 @@ describe('PersonDetailsView', () => {
       confirmDeleteButton.dispatchEvent(new Event('click'));
     }
 
-    const saveButton: Element | null = document.body.querySelector('[data-testid="zuordnung-changes-save"]');
+    const saveButton: Element | null = document.body.querySelector('[data-testid="zuordnung-changes-save-button"]');
     expect(saveButton).not.toBeNull();
 
     if (saveButton) {
@@ -1153,7 +1153,7 @@ describe('PersonDetailsView', () => {
             confirmDialogButton.dispatchEvent(new Event('click'));
             await flushPromises();
 
-            const saveButton: Element = document.body.querySelector('[data-testid="zuordnung-changes-save"]')!;
+            const saveButton: Element = document.body.querySelector('[data-testid="zuordnung-changes-save-button"]')!;
             expect(saveButton).not.toBeNull();
             saveButton.dispatchEvent(new Event('click'));
             await flushPromises();

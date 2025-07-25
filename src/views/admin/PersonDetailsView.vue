@@ -1884,6 +1884,7 @@
         <v-container
           v-if="!isEditActive"
           class="person-zuordnungen"
+          data-testid="person-zuordnungen-section-view"
         >
           <v-row class="ml-md-16">
             <v-col
@@ -1954,7 +1955,10 @@
           </v-row>
         </v-container>
         <!-- Show this template if the edit button is triggered-->
-        <v-container v-if="isEditActive">
+        <v-container
+          v-if="isEditActive"
+          data-testid="person-zuordnungen-section-edit"
+        >
           <template v-if="!isZuordnungFormActive && !isChangeKlasseFormActive && !isChangeBefristungActive">
             <v-row class="ml-md-16">
               <v-col
@@ -2205,7 +2209,7 @@
                 >
                   <v-btn
                     class="primary small"
-                    data-testid="zuordnung-changes-save"
+                    data-testid="zuordnung-changes-save-button"
                     @click="handleSaveClick"
                     :block="mdAndDown"
                     :disabled="isSaveButtonDisabled || personenkontextStore.loading"
