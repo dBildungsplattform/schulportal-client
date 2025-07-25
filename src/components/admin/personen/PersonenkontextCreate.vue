@@ -143,8 +143,6 @@
     }
     emits('update:selectedOrganisation', newValue);
 
-    if (hasAutoselectedSchule.value) return;
-
     if (newValue && newValue !== oldValue) {
       const filter: WorkflowFilter = {
         personId: props.personId,
@@ -152,7 +150,7 @@
         limit: 25,
       };
 
-      await handleWorkflowStep(filter);
+      if (!hasAutoselectedSchule.value) await handleWorkflowStep(filter);
 
       administriertVon.value?.pop();
       administriertVon.value?.push(newValue);
