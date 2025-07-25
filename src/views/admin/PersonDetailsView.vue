@@ -1975,6 +1975,7 @@
               </v-col>
               <v-col
                 cols="12"
+                md="7"
                 v-for="zuordnung in zuordnungenWithPendingChanges?.filter((zuordnung: Zuordnung) => zuordnung.editable)"
                 :key="zuordnung.sskId"
                 :data-testid="`person-zuordnung-${zuordnung.sskId}`"
