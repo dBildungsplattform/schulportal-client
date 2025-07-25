@@ -372,7 +372,7 @@
     }, 500);
   }
 
-    const handleFocusChange = (focused: boolean): void => {
+  const handleFocusChange = (focused: boolean): void => {
     if (!focused) {
       searchInputRollen.value = '';
     }
