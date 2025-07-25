@@ -356,11 +356,6 @@
 
   // Triggers the template to add a new Zuordnung
   const triggerAddZuordnung = async (): Promise<void> => {
-    await personenkontextStore.processWorkflowStep({
-      personId: currentPersonId,
-      operationContext: OperationContext.PERSON_BEARBEITEN,
-      limit: 25,
-    });
     isZuordnungFormActive.value = true;
   };
 
