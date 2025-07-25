@@ -33,7 +33,7 @@ describe('NotFoundView', () => {
 
   test('it navigates back on button click', async () => {
     const spy: MockInstance = vi.spyOn(window.history, 'back').mockImplementation(() => vi.fn());
-    const button: DOMWrapper<HTMLButtonElement> | undefined = wrapper?.find('[data-testid="alert-button"]');
+    const button: DOMWrapper<HTMLButtonElement> | undefined = wrapper?.find('[data-testid$="alert-button"]');
     expect(button?.isVisible()).toBe(true);
     await button?.trigger('click');
     expect(spy).toHaveBeenCalled();

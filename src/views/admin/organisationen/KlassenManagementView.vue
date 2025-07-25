@@ -241,7 +241,10 @@
     >
       {{ t('admin.headline') }}
     </h1>
-    <LayoutCard :header="t('admin.klasse.management')">
+    <LayoutCard 
+      data-testid="klasse-management-card"
+      :header="t('admin.klasse.management')"
+    >
       <!-- Error Message Display -->
       <SpshAlert
         :modelValue="!!organisationStore.errorCode"
