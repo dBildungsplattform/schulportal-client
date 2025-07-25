@@ -352,8 +352,6 @@
       personenkontextStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET'
     ) {
       formContext.resetForm();
-    } else {
-      personenkontextStore.createdPersonWithKontext = null;
     }
     await router.push({ name: 'person-management' });
   }
@@ -656,9 +654,6 @@
       showUnsavedChangesDialog.value = true;
       blockedNext = next;
     } else {
-      personenkontextStore.requestedWithSystemrecht = undefined;
-      personenkontextStore.createdPersonWithKontext = null;
-      personenkontextStore.landesbediensteteCommitResponse = null;
       next();
     }
   });
@@ -702,6 +697,8 @@
 
   onUnmounted(() => {
     personenkontextStore.requestedWithSystemrecht = undefined;
+    personenkontextStore.createdPersonWithKontext = null;
+    personenkontextStore.landesbediensteteCommitResponse = null;
     window.removeEventListener('beforeunload', preventNavigation);
   });
 </script>
