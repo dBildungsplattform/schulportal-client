@@ -223,7 +223,6 @@
           selectedKlasse.value = undefined;
           emits('fieldReset', 'selectedKlasse');
         }
-
         emits('update:selectedRolle', newRolle);
       }
     },
@@ -302,6 +301,13 @@
       }, 500);
     },
   );
+
+  const handleFocusChange = (focused: boolean): void => {
+    if (!focused) {
+      searchInputRollen.value = '';
+      searchInputRolle.value = '';
+    }
+  };
 
   function updateKlasseSelection(selectedKlassen: string | undefined): void {
     selectedKlasse.value = selectedKlassen;
@@ -389,6 +395,7 @@
         :placeholder="$t('admin.organisation.selectOrganisation')"
         required="true"
         variant="outlined"
+        @update:focused="handleFocusChange"
         v-bind="selectedOrganisationProps"
         v-model="selectedOrganisation"
         v-model:search="searchInputOrganisation"
@@ -413,6 +420,7 @@
           autocomplete="off"
           clearable
           @clear="clearSelectedRollen"
+          @update:focused="handleFocusChange"
           data-testid="rollen-select"
           density="compact"
           id="rollen-select"
