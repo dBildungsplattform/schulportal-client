@@ -2821,9 +2821,10 @@
           "rolleId": { "type": "string" },
           "rolleName": { "type": "string" },
           "organisationId": { "type": "string" },
-          "organisationName": { "type": "string" }
+          "organisationName": { "type": "string" },
+          "organisationDstNr": { "type": "string" }
         },
-        "required": ["rolleId", "rolleName", "organisationId", "organisationName"]
+        "required": ["rolleId", "rolleName", "organisationId", "organisationName", "organisationDstNr"]
       },
       "PersonLandesbediensteterSearchResponse": {
         "type": "object",

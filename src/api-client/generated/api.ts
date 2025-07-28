@@ -1950,6 +1950,12 @@ export interface PersonLandesbediensteterSearchPersonenkontextResponse {
      * @memberof PersonLandesbediensteterSearchPersonenkontextResponse
      */
     'organisationName': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonLandesbediensteterSearchPersonenkontextResponse
+     */
+    'organisationDstNr': string;
 }
 /**
  * 
