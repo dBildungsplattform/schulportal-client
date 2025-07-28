@@ -289,6 +289,13 @@
             testIdLabel: `rolle-label-${index + 1}`,
             testIdValue: `rolle-value-${index + 1}`,
           },
+          {
+            labelAbbr: t('profile.dienstStellenNummerAbbr'),
+            label: t('profile.dienstStellenNummer'),
+            value: kontext.organisationDstNr,
+            testIdLabel: `dienststellennummer-label-${index + 1}`,
+            testIdValue: `dienststellennummer-value-${index + 1}`,
+          },
         ];
 
         return {
