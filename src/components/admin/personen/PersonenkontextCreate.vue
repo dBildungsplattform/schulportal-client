@@ -126,6 +126,8 @@
       await personenkontextStore.processWorkflowStep({
         operationContext: props.operationContext,
         ...filter,
+        requestedWithSystemrecht:
+          props.createType === CreationType.Limited ? RollenSystemRecht.EingeschraenktNeueBenutzerErstellen : undefined,
       });
     }
 
