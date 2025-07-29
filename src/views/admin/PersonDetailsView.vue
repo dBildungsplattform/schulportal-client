@@ -1988,7 +1988,7 @@
                 class="py-0 d-flex align-items-center"
               >
                 <template v-if="!hasPendingChange">
-                  <div class="checkbox-div">
+                  <div class="mb-n4 checkbox-top-align">
                     <v-checkbox
                       :ref="`checkbox-zuordnung-${zuordnung.sskId}`"
                       v-model="selectedZuordnungen"
