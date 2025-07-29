@@ -1607,12 +1607,139 @@
       <template v-if="!personStore.errorCode && !personenkontextStore.errorCode">
         <v-container class="personal-info">
           <div v-if="personStore.currentPerson?.person && !isEditPersonMetadataActive">
-            <!-- Befristung -->
             <v-row class="ml-md-16">
+              <v-col>
+                <!-- Vorname -->
+                <v-row class="mt-4">
+                  <v-col
+                    class="text-right"
+                    sm="3"
+                    cols="5"
+                    offset="1"
+                  >
+                    <span class="subtitle-2">{{ t('person.firstName') }}:</span>
+                  </v-col>
+                  <v-col
+                    cols="auto"
+                    data-testid="person-vorname"
+                  >
+                    <span class="text-body">{{ personStore.currentPerson.person.name.vorname }}</span>
+                  </v-col>
+                </v-row>
+
+                <!-- Familienname -->
+                <v-row class="mt-0">
+                  <v-col
+                    class="text-right"
+                    sm="3"
+                    cols="5"
+                    offset="1"
+                  >
+                    <span class="subtitle-2">{{ t('person.lastName') }}:</span>
+                  </v-col>
+                  <v-col
+                    cols="auto"
+                    data-testid="person-familienname"
+                  >
+                    <span class="text-body">{{ personStore.currentPerson.person.name.familienname }}</span>
+                  </v-col>
+                </v-row>
+
+                <!-- Benutzername -->
+                <v-row class="mt-0">
+                  <v-col
+                    class="text-right"
+                    sm="3"
+                    cols="5"
+                    offset="1"
+                  >
+                    <span class="subtitle-2">{{ t('person.userName') }}:</span>
+                  </v-col>
+                  <v-col
+                    cols="auto"
+                    data-testid="person-username"
+                  >
+                    <span class="text-body">{{ personStore.currentPerson.person.referrer }}</span>
+                  </v-col>
+                </v-row>
+
+                <!-- KoPers.-Nr. -->
+                <v-row
+                  class="mt-0"
+                  v-if="hasKopersRolle || personStore.currentPerson.person.personalnummer"
+                >
+                  <v-col
+                    class="text-right"
+                    sm="3"
+                    cols="5"
+                  >
+                    <span
+                      :class="{
+                        'subtitle-2': true,
+                        'text-red': hasKopersRolle && !personStore.currentPerson.person.personalnummer,
+                      }"
+                    >
+                      {{ t('person.kopersNr') }}:
+                    </span>
+                  </v-col>
+                  <v-col
+                    cols="auto"
+                    data-testid="person-kopersnr"
+                  >
+                    <span
+                      :class="{
+                        'text-body': true,
+                        'text-red': hasKopersRolle && !personStore.currentPerson.person.personalnummer,
+                      }"
+                    >
+                      {{ personStore.currentPerson.person.personalnummer ?? t('missing') }}
+                    </span>
+                  </v-col>
+                </v-row>
+
+                <!-- Email -->
+                <v-row
+                  v-if="emailStatusText.text !== t('person.emailStatusUnknown')"
+                  class="mt-0"
+                >
+                  <v-col
+                    class="text-right"
+                    sm="3"
+                    cols="5"
+                  >
+                    <span class="subtitle-2">{{ t('person.email') }}:</span>
+                  </v-col>
+                  <v-col
+                    cols="auto"
+                    data-testid="person-email"
+                  >
+                    <SpshTooltip
+                      :enabledCondition="!!personStore.currentPerson.person.email"
+                      :disabledText="t('person.changePersonMetaDataDisabledDescription')"
+                      :enabledText="emailStatusText.tooltip"
+                      position="bottom"
+                    >
+                      <v-icon
+                        aria-hidden="true"
+                        class="mr-2"
+                        icon="mdi-alert-circle-outline"
+                        size="small"
+                      ></v-icon>
+                      <span
+                        data-testid="person-email-text"
+                        class="text-body"
+                      >
+                        {{ emailStatusText.text }}
+                      </span>
+                    </SpshTooltip>
+                  </v-col>
+                </v-row>
+              </v-col>
+
               <v-col
+                class="mr-lg-13"
                 cols="12"
                 md="auto"
-                class="mt-1 edit-container"
               >
                 <div class="d-flex justify-sm-end">
                   <v-col
@@ -1638,134 +1765,6 @@
                     </SpshTooltip>
                   </v-col>
                 </div>
-              </v-col>
-            </v-row>
-            <!-- Vorname -->
-            <v-row class="mt-md-6">
-              <v-col cols="1"></v-col>
-              <v-col
-                class="text-right"
-                md="2"
-                sm="3"
-                cols="5"
-              >
-                <span class="subtitle-2"> {{ t('person.firstName') }}: </span>
-              </v-col>
-              <v-col
-                cols="auto"
-                data-testid="person-vorname"
-              >
-                <span class="text-body"> {{ personStore.currentPerson.person.name.vorname }} </span>
-              </v-col>
-            </v-row>
-            <!-- Familienname -->
-            <v-row class="mt-0">
-              <v-col cols="1"></v-col>
-              <v-col
-                class="text-right"
-                md="2"
-                sm="3"
-                cols="5"
-              >
-                <span class="subtitle-2"> {{ t('person.lastName') }}: </span>
-              </v-col>
-              <v-col
-                cols="auto"
-                data-testid="person-familienname"
-              >
-                <span class="text-body"> {{ personStore.currentPerson.person.name.familienname }}</span>
-              </v-col>
-            </v-row>
-            <!-- Benutzername -->
-            <v-row class="mt-0">
-              <v-col cols="1"></v-col>
-              <v-col
-                class="text-right"
-                md="2"
-                sm="3"
-                cols="5"
-              >
-                <span class="subtitle-2"> {{ t('person.userName') }}: </span>
-              </v-col>
-              <v-col
-                cols="auto"
-                data-testid="person-username"
-              >
-                <span class="text-body">{{ personStore.currentPerson.person.referrer }} </span>
-              </v-col>
-            </v-row>
-            <!-- KoPers.-Nr. -->
-            <v-row
-              class="mt-0"
-              v-if="hasKopersRolle || personStore.currentPerson.person.personalnummer"
-            >
-              <v-col cols="1"></v-col>
-              <v-col
-                class="text-right"
-                md="2"
-                sm="3"
-                cols="5"
-              >
-                <span
-                  :class="{
-                    'subtitle-2': true,
-                    'text-red': hasKopersRolle && !personStore.currentPerson.person.personalnummer,
-                  }"
-                >
-                  {{ t('person.kopersNr') }}:
-                </span>
-              </v-col>
-              <v-col
-                cols="auto"
-                data-testid="person-kopersnr"
-              >
-                <span
-                  :class="{
-                    'text-body': true,
-                    'text-red': hasKopersRolle && !personStore.currentPerson.person.personalnummer,
-                  }"
-                >
-                  {{ personStore.currentPerson.person.personalnummer ?? t('missing') }}
-                </span>
-              </v-col>
-            </v-row>
-            <!-- Email -->
-            <v-row
-              v-if="emailStatusText.text !== t('person.emailStatusUnknown')"
-              class="mt-0"
-            >
-              <v-col cols="1"></v-col>
-              <v-col
-                class="text-right"
-                md="2"
-                sm="3"
-                cols="5"
-              >
-                <span class="subtitle-2"> {{ t('person.email') }}: </span>
-              </v-col>
-              <v-col
-                cols="auto"
-                data-testid="person-email"
-              >
-                <SpshTooltip
-                  :enabledCondition="!!personStore.currentPerson.person.email"
-                  :disabledText="t('person.changePersonMetaDataDisabledDescription')"
-                  :enabledText="emailStatusText.tooltip"
-                  position="bottom"
-                >
-                  <v-icon
-                    aria-hidden="true"
-                    class="mr-2"
-                    icon="mdi-alert-circle-outline"
-                    size="small"
-                  ></v-icon>
-                  <span
-                    data-testid="person-email-text"
-                    class="text-body"
-                  >
-                    {{ emailStatusText.text }}
-                  </span>
-                </SpshTooltip>
               </v-col>
             </v-row>
           </div>
