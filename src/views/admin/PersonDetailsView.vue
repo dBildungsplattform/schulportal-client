@@ -1886,71 +1886,77 @@
           class="person-zuordnungen"
         >
           <v-row class="ml-md-16">
-            <v-col
-              cols="12"
-              sm="auto"
-            >
-              <h3 class="subtitle-1">{{ t('person.zuordnungen') }}</h3>
+            <v-col v-if="personStore.loading">
+              <v-progress-circular indeterminate></v-progress-circular>
             </v-col>
-            <v-spacer></v-spacer>
-            <v-col
-              cols="12"
-              md="auto"
-              class="mr-lg-13"
-            >
-              <div class="d-flex justify-sm-end">
-                <v-col
-                  cols="12"
-                  sm="6"
-                  md="auto"
+            <template v-else>
+              <v-col>
+                <h3 class="subtitle-1">{{ t('person.zuordnungen') }}</h3>
+
+                <!-- Check if 'zuordnungen' array exists and has length > 0 -->
+                <template
+                  v-if="
+                    personStore.personenuebersicht?.zuordnungen &&
+                    personStore.personenuebersicht?.zuordnungen.length > 0
+                  "
                 >
-                  <SpshTooltip
-                    :enabledCondition="selectedZuordnungen.length === 0 && !isEditPersonMetadataActive"
-                    :disabledText="t('person.finishEditFirst')"
-                    :enabledText="t('person.editZuordnungen')"
-                    position="start"
+                  <v-row
+                    class="mt-4"
+                    v-for="zuordnung in zuordnungenWithPendingChanges"
+                    :key="zuordnung.sskId"
+                    :data-testid="`person-zuordnung-${zuordnung.sskId}`"
+                    :title="zuordnung.sskName"
                   >
-                    <v-btn
-                      class="primary ml-lg-8"
-                      data-testid="zuordnung-edit-button"
-                      :disabled="isEditPersonMetadataActive"
-                      @click="triggerEdit"
-                      :block="mdAndDown"
+                    <v-col offset="1">
+                      <PersonenkontextItem
+                        :zuordnung="zuordnung"
+                        :noMargin="true"
+                      />
+                    </v-col>
+                  </v-row>
+                </template>
+
+                <!-- Display 'Keine Zuordnungen gefunden' if no zuordnungen -->
+                <v-row
+                  v-else
+                  class="mt-4"
+                >
+                  <v-col offset="1">
+                    <h3 class="text-body">{{ t('person.noZuordnungenFound') }}</h3>
+                  </v-col>
+                </v-row>
+              </v-col>
+              <v-col
+                class="mr-lg-13"
+                cols="12"
+                md="auto"
+              >
+                <div class="d-flex justify-sm-end">
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="auto"
+                  >
+                    <SpshTooltip
+                      :enabledCondition="selectedZuordnungen.length === 0 && !isEditPersonMetadataActive"
+                      :disabledText="t('person.finishEditFirst')"
+                      :enabledText="t('person.editZuordnungen')"
+                      position="start"
                     >
-                      {{ t('edit') }}
-                    </v-btn>
-                  </SpshTooltip>
-                </v-col>
-              </div>
-            </v-col>
-          </v-row>
-          <!-- Check if 'zuordnungen' array exists and has length > 0 -->
-          <v-row
-            class="ml-md-3 mt-md-n8"
-            v-if="personStore.personenuebersicht?.zuordnungen && personStore.personenuebersicht?.zuordnungen.length > 0"
-          >
-            <v-col
-              cols="10"
-              offset="1"
-              v-for="zuordnung in zuordnungenWithPendingChanges"
-              :key="zuordnung.sskId"
-              :data-testid="`person-zuordnung-${zuordnung.sskId}`"
-              :title="zuordnung.sskName"
-            >
-              <PersonenkontextItem
-                :zuordnung="zuordnung"
-                :noMargin="true"
-              />
-            </v-col>
-          </v-row>
-          <!-- Display 'Keine Zuordnungen gefunden' if the above condition is false -->
-          <v-row v-else>
-            <v-col
-              cols="10"
-              offset="1"
-            >
-              <h3 class="text-body">{{ t('person.noZuordnungenFound') }}</h3>
-            </v-col>
+                      <v-btn
+                        class="primary ml-lg-8"
+                        data-testid="zuordnung-edit-button"
+                        :disabled="isEditPersonMetadataActive"
+                        @click="triggerEdit"
+                        :block="mdAndDown"
+                      >
+                        {{ t('edit') }}
+                      </v-btn>
+                    </SpshTooltip>
+                  </v-col>
+                </div>
+              </v-col>
+            </template>
           </v-row>
         </v-container>
         <!-- Show this template if the edit button is triggered-->
