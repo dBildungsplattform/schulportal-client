@@ -1089,7 +1089,7 @@ describe('PersonDetailsView', () => {
             }
           });
 
-          test.only('renders form to change befristung and triggers submit', async () => {
+          test('renders form to change befristung and triggers submit', async () => {
             await flushPromises();
             await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
             await nextTick();
