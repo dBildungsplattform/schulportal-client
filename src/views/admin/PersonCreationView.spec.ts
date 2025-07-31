@@ -1,23 +1,18 @@
-import { expect, type Mock, type MockInstance, test } from 'vitest';
-import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
-import { nextTick } from 'vue';
-import PersonCreationView from './PersonCreationView.vue';
+import { Vertrauensstufe, type DBiamPersonResponse } from '@/api-client/generated';
 import {
-  createRouter,
-  createWebHistory,
-  type NavigationGuardNext,
-  type RouteLocationNormalized,
-  type Router,
-} from 'vue-router';
+  EmailAddressStatus,
+  type DBiamPersonenkontextResponse,
+  type PersonenkontexteUpdateResponse,
+  type PersonLandesbediensteterSearchResponse,
+} from '@/api-client/generated/api';
 import routes from '@/router/routes';
+import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import {
   usePersonenkontextStore,
   type PersonenkontextStore,
   type PersonenkontextWorkflowResponse,
 } from '@/stores/PersonenkontextStore';
-import { Vertrauensstufe, type DBiamPersonResponse } from '@/api-client/generated';
-import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
-import { type PersonStore, usePersonStore } from '@/stores/PersonStore';
+import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
 import {
   RollenMerkmal,
   RollenSystemRecht,
@@ -25,14 +20,19 @@ import {
   type RolleStore,
   type RolleWithServiceProvidersResponse,
 } from '@/stores/RolleStore';
-import {
-  EmailAddressStatus,
-  type DBiamPersonenkontextResponse,
-  type PersonenkontexteUpdateResponse,
-  type PersonLandesbediensteterSearchResponse,
-} from '@/api-client/generated/api';
+import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import type Module from 'module';
-import { faker } from '@faker-js/faker';
+import { DoFactory } from 'test/DoFactory';
+import { expect, test, type Mock, type MockInstance } from 'vitest';
+import { nextTick } from 'vue';
+import {
+  createRouter,
+  createWebHistory,
+  type NavigationGuardNext,
+  type RouteLocationNormalized,
+  type Router,
+} from 'vue-router';
+import PersonCreationView from './PersonCreationView.vue';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -328,6 +328,7 @@ beforeEach(async () => {
   personStore.errorCode = '';
   personenkontextStore.errorCode = '';
   personenkontextStore.createdPersonWithKontext = null;
+  personenkontextStore.workflowStepResponse = mockWorkflowStepResponse;
 });
 
 describe('PersonCreationView', () => {
@@ -356,8 +357,13 @@ describe('PersonCreationView', () => {
     });
 
     await nextTick();
-    // Check that the systemrecht is set
-    expect(personenkontextStore.requestedWithSystemrecht).toBe(RollenSystemRecht.EingeschraenktNeueBenutzerErstellen);
+
+    expect(wrapper.find('[data-testid="admin-headline"]').text()).toBe('Andere Person (neu anlegen)');
+    expect(wrapper.find('[data-testid="layout-card-headline"]').text()).toBe('Andere Person (neu anlegen)');
+    expect(wrapper.find('[data-testid="person-creation-form-discard-button"]').text()).toBe('Abbrechen');
+    expect(wrapper.find('[data-testid="person-creation-form-submit-button"]').text()).toBe('Person anlegen');
+
+    expect(wrapper.findComponent({ name: 'PersonenkontextCreate' }).props('createType')).toBe('limited');
   });
 
   it('emits update:calculatedBefristungOption event with a value', async () => {
@@ -628,23 +634,10 @@ describe('PersonCreationView', () => {
 
   test('it fills form for Landesbediensteter, triggers submit and then shows success template', async () => {
     const mockLandesbedienstetePersonen: PersonLandesbediensteterSearchResponse[] = [
-      {
-        id: faker.string.uuid(),
-        vorname: 'John',
-        familienname: 'Doe',
-        username: 'john.doe',
-        personalnummer: '12345',
-        primaryEmailAddress: 'john.doe@example.com',
-        personenkontexte: [
-          {
-            rolleId: 'role-1',
-            rolleName: 'Teacher',
-            organisationId: 'org-1',
-            organisationName: 'Test School',
-          },
-        ],
-      },
+      DoFactory.getPersonLandesbediensteterSearchResponse(),
     ];
+    const organisationId: string = '9876';
+    const rolleId: string = '1';
 
     personStore.allLandesbedienstetePersonen = mockLandesbedienstetePersonen;
     await router.push({ name: 'add-person-to-own-schule' });
@@ -652,48 +645,26 @@ describe('PersonCreationView', () => {
 
     wrapper = mountComponent();
     await nextTick();
-    personenkontextStore.workflowStepResponse = {
+    personenkontextStore.workflowStepResponse = DoFactory.getPersonenkontextWorkflowResponse({
       organisations: [
-        {
-          id: '9876',
-          kennung: '',
-          name: 'Organisation1',
-          namensergaenzung: 'string',
-          kuerzel: 'string',
-          typ: 'TRAEGER',
-          administriertVon: '1',
-        },
+        DoFactory.getOrganisationResponse({
+          id: organisationId,
+        }),
       ],
-      rollen: [
-        {
-          administeredBySchulstrukturknoten: '1234',
-          rollenart: 'LERN',
-          name: 'SuS',
-          merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
-          systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
-          createdAt: '2022',
-          updatedAt: '2022',
-          id: '1',
-          administeredBySchulstrukturknotenName: 'Land SH',
-          administeredBySchulstrukturknotenKennung: '',
-          version: 1,
-        },
-      ],
-      selectedOrganisation: null,
-      selectedRollen: null,
+      rollen: [DoFactory.getRolleResponse({ id: rolleId })],
       canCommit: true,
-    };
+    });
 
     const organisationSelect: VueWrapper | undefined = wrapper
       .findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'organisation-select' });
-    await organisationSelect.setValue('9876');
+    await organisationSelect.setValue(organisationId);
     await nextTick();
 
     const rollenSelect: VueWrapper | undefined = wrapper
       .findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'rollen-select' });
-    await rollenSelect.setValue(['1']);
+    await rollenSelect.setValue([rolleId]);
     await nextTick();
 
     wrapper.find('[data-testid="person-creation-form-submit-button"]').trigger('click');

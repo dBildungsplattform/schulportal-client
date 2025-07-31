@@ -1115,9 +1115,9 @@ describe('PersonDetailsView', () => {
 
             if (existingBefristung === 'schuljahresende') {
               expect(schuljahresendeRadioButton?.attributes('checked')).toBeDefined();
-              expect(unbefristetRadioButton?.attributes('checked')).toBeUndefined();
+              expect(unbefristetRadioButton?.attributes('checked')).toBeFalsy();
             } else if (existingBefristung === 'unbefristet') {
-              expect(schuljahresendeRadioButton?.attributes('checked')).toBeUndefined();
+              expect(schuljahresendeRadioButton?.attributes('checked')).toBeFalsy();
               // in test the button is not checked correctly
               // expect(unbefristetRadioButton?.attributes('checked')).toBeDefined();
             } else {

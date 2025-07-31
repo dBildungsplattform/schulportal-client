@@ -1,6 +1,8 @@
 import {
   EmailAddressStatus,
   OrganisationsTyp,
+  type PersonLandesbediensteterSearchPersonenkontextResponse,
+  type PersonLandesbediensteterSearchResponse,
   RollenArt,
   RollenMerkmal,
   RollenSystemRecht,
@@ -382,6 +384,37 @@ export class DoFactory {
     return {
       person: this.getPerson(),
       ...props,
+    };
+  }
+
+  public static getPersonLandesbediensteterSearchResponse(
+    props?: Partial<PersonLandesbediensteterSearchResponse>,
+  ): PersonLandesbediensteterSearchResponse {
+    const person: Person = DoFactory.getPerson();
+    const schule: Organisation = DoFactory.getSchule();
+    const rolle: Rolle = DoFactory.getRolle({ rollenart: RollenArt.Lehr });
+    return {
+      id: person.id,
+      vorname: person.name.vorname,
+      familienname: person.name.familienname,
+      username: person.referrer,
+      personalnummer: person.personalnummer!,
+      primaryEmailAddress: person.email!.address,
+      personenkontexte: [DoFactory.getPersonLandesbediensteterSearchPersonenkontextResponse(rolle, schule)],
+      ...props,
+    };
+  }
+
+  public static getPersonLandesbediensteterSearchPersonenkontextResponse(
+    rolle: Rolle,
+    organisation: Organisation,
+  ): PersonLandesbediensteterSearchPersonenkontextResponse {
+    return {
+      rolleId: rolle.id,
+      rolleName: rolle.name,
+      organisationId: organisation.id,
+      organisationName: organisation.name,
+      organisationDstNr: organisation.kennung ?? '',
     };
   }
 }

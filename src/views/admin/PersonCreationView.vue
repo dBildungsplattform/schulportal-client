@@ -23,7 +23,7 @@
     type PersonLandesbediensteterSearchResponse,
     type PersonStore,
   } from '@/stores/PersonStore';
-  import { RollenArt, RollenSystemRecht } from '@/stores/RolleStore';
+  import { RollenArt } from '@/stores/RolleStore';
   import type { Zuordnung } from '@/stores/types/Zuordnung';
   import { type TranslatedObject } from '@/types.d';
   import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
@@ -32,17 +32,7 @@
   import { isKopersRolle } from '@/utils/validationPersonenkontext';
   import { toTypedSchema } from '@vee-validate/yup';
   import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
-  import {
-    computed,
-    onBeforeMount,
-    onMounted,
-    onUnmounted,
-    ref,
-    watch,
-    watchEffect,
-    type ComputedRef,
-    type Ref,
-  } from 'vue';
+  import { computed, onMounted, onUnmounted, ref, watch, watchEffect, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import {
     onBeforeRouteLeave,
@@ -93,14 +83,47 @@
     AddPersonToOwnSchule = 'add-person-to-own-schule',
   }
 
+  type LabelConfig = {
+    createAnotherButtonLabel: string;
+    createButtonLabel: string;
+    discardButtonLabel: string;
+    headerLabel: string;
+    layoutCardLabel: string;
+  };
+
+  const labelConfig: Record<CreationType, LabelConfig> = {
+    [CreationType.Limited]: {
+      createAnotherButtonLabel: t('admin.person.stateEmployeeSearch.createAnotherPerson'),
+      createButtonLabel: t('admin.person.stateEmployeeSearch.createPerson'),
+      discardButtonLabel: t('cancel'),
+      headerLabel: t('admin.person.stateEmployeeSearch.anotherPerson'),
+      layoutCardLabel: t('admin.person.stateEmployeeSearch.anotherPerson'),
+    },
+    [CreationType.AddPersonToOwnSchule]: {
+      createAnotherButtonLabel: t('admin.person.stateEmployeeSearch.searchAnotherStateEmployee'),
+      createButtonLabel: t('admin.person.stateEmployeeSearch.addStateEmployee'),
+      discardButtonLabel: t('cancel'),
+      headerLabel: t('admin.person.stateEmployeeSearch.searchAndAdd'),
+      layoutCardLabel: t('admin.person.stateEmployeeSearch.addStateEmployee'),
+    },
+    [CreationType.Full]: {
+      createAnotherButtonLabel: t('admin.person.createAnother'),
+      createButtonLabel: t('admin.person.create'),
+      discardButtonLabel: t('admin.person.discard'),
+      headerLabel: t('admin.person.addNew'),
+      layoutCardLabel: t('admin.person.addNew'),
+    },
+  };
+
   // Determine the creation type based on the route meta in routes.ts
-  let createType: CreationType;
-  const metaCreateType: string = route.meta['createType'] as string;
-  if (metaCreateType && Object.values(CreationType).includes(metaCreateType as CreationType)) {
-    createType = metaCreateType as CreationType;
-  } else {
-    createType = CreationType.Full;
-  }
+  const createType: ComputedRef<CreationType> = computed(() => {
+    const metaCreateType: string = route.meta['createType'] as string;
+    if (metaCreateType && Object.values(CreationType).includes(metaCreateType as CreationType)) {
+      return metaCreateType as CreationType;
+    } else {
+      return CreationType.Full;
+    }
+  });
 
   // Define a method to check if the selected Rolle is of type "Lern"
   function isLernRolle(selectedRolleIds?: string[]): boolean | undefined {
@@ -278,7 +301,7 @@
 
   // Extract the created Kontext responses based on the createType
   const createdKontextResponses: ComputedRef<DBiamPersonenkontextResponse[]> = computed(() => {
-    if (createType === CreationType.AddPersonToOwnSchule) {
+    if (createType.value === CreationType.AddPersonToOwnSchule) {
       return personenkontextStore.landesbediensteteCommitResponse?.dBiamPersonenkontextResponses ?? [];
     }
     return personenkontextStore.createdPersonWithKontext?.dBiamPersonenkontextResponses ?? [];
@@ -352,15 +375,13 @@
       personenkontextStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET'
     ) {
       formContext.resetForm();
-    } else {
-      personenkontextStore.createdPersonWithKontext = null;
     }
     await router.push({ name: 'person-management' });
   }
 
   async function navigateToPersonDetails(): Promise<void> {
     const personId: string | undefined =
-      createType === CreationType.AddPersonToOwnSchule
+      createType.value === CreationType.AddPersonToOwnSchule
         ? personenkontextStore.landesbediensteteCommitResponse?.dBiamPersonenkontextResponses[0]?.personId
         : personenkontextStore.createdPersonWithKontext?.person.id;
 
@@ -465,7 +486,7 @@
   }
 
   const onSubmit: (e?: Event) => Promise<Promise<void> | undefined> = formContext.handleSubmit(async () => {
-    if (createType === CreationType.AddPersonToOwnSchule) {
+    if (createType.value === CreationType.AddPersonToOwnSchule) {
       const existingPerson: PersonLandesbediensteterSearchResponse | undefined =
         personStore.allLandesbedienstetePersonen?.[0];
       const username: string | undefined = existingPerson?.username;
@@ -488,10 +509,10 @@
   function navigateToCreatePersonRoute(reload: boolean = false): void | Promise<void> {
     let routeName: string;
 
-    if (createType === CreationType.AddPersonToOwnSchule) {
+    if (createType.value === CreationType.AddPersonToOwnSchule) {
       routeName = 'search-person-limited';
     } else {
-      routeName = createType === CreationType.Limited ? 'create-person-limited' : 'create-person';
+      routeName = createType.value === CreationType.Limited ? 'create-person-limited' : 'create-person';
     }
 
     if (reload) {
@@ -516,7 +537,7 @@
   }
 
   const createAnotherButtonTestId: ComputedRef<string> = computed(() =>
-    createType === CreationType.AddPersonToOwnSchule
+    createType.value === CreationType.AddPersonToOwnSchule
       ? 'search-another-landesbediensteter-button'
       : 'create-another-person-button',
   );
@@ -532,7 +553,7 @@
     navigateToCreatePersonRoute();
   };
 
-  const isOwnSchule: ComputedRef<boolean> = computed(() => createType === CreationType.AddPersonToOwnSchule);
+  const isOwnSchule: ComputedRef<boolean> = computed(() => createType.value === CreationType.AddPersonToOwnSchule);
 
   // Section numbers based on whether the createType is AddPersonToOwnSchule or not.
   const sectionNumberOrg: ComputedRef<string> = computed(() => (isOwnSchule.value ? '2.' : '1.'));
@@ -545,7 +566,7 @@
     (newSelectedRollen: string[] | undefined) => {
       // Decide which rollen list to use based on createType
       const baseRollen: TranslatedRolleWithAttrs[] | undefined =
-        createType === CreationType.AddPersonToOwnSchule ? filteredRollen.value : rollen.value;
+        createType.value === CreationType.AddPersonToOwnSchule ? filteredRollen.value : rollen.value;
 
       if (newSelectedRollen && newSelectedRollen.length > 0) {
         const selectedRollenart: RollenArt | undefined = baseRollen?.find((rolle: TranslatedRolleWithAttrs) =>
@@ -558,7 +579,7 @@
       } else if (
         newSelectedRollen &&
         newSelectedRollen.length === 0 &&
-        createType !== CreationType.AddPersonToOwnSchule
+        createType.value !== CreationType.AddPersonToOwnSchule
       ) {
         filteredRollen.value = [];
       }
@@ -574,7 +595,7 @@
     }
 
     // AddPersonToOwnSchule: only show Lehr roles for that createType
-    if (createType === CreationType.AddPersonToOwnSchule) {
+    if (createType.value === CreationType.AddPersonToOwnSchule) {
       const existingPerson: PersonLandesbediensteterSearchResponse | undefined =
         personStore.allLandesbedienstetePersonen?.[0];
       const personId: string | undefined = existingPerson?.id;
@@ -618,7 +639,7 @@
   // This will auto-fill the fields with the Landesbediensteter found in the personStore when the createType is AddPersonToOwnSchule
   // hasPrefilled will ensure that this only happens once, even if the component is re-rendered. This avoid problems with this watch retriggering when the form is reset.
   watchEffect(() => {
-    if (!hasPreFilled.value && createType === CreationType.AddPersonToOwnSchule) {
+    if (!hasPreFilled.value && createType.value === CreationType.AddPersonToOwnSchule) {
       const person: PersonLandesbediensteterSearchResponse | undefined = personStore.allLandesbedienstetePersonen?.[0];
 
       if (person) {
@@ -635,7 +656,9 @@
   });
 
   const successMessageKey: ComputedRef<string> = computed(() => {
-    return createType === CreationType.Limited ? 'admin.person.createdSuccessfully' : 'admin.person.addedSuccessfully';
+    return createType.value === CreationType.Limited
+      ? 'admin.person.createdSuccessfully'
+      : 'admin.person.addedSuccessfully';
   });
 
   function handleConfirmUnsavedChanges(): void {
@@ -656,42 +679,28 @@
       showUnsavedChangesDialog.value = true;
       blockedNext = next;
     } else {
-      personenkontextStore.requestedWithSystemrecht = undefined;
-      personenkontextStore.createdPersonWithKontext = null;
-      personenkontextStore.landesbediensteteCommitResponse = null;
       next();
     }
   });
 
-  onBeforeMount(() => {
-    if (createType === CreationType.Limited) {
-      headerLabel.value = t('admin.person.stateEmployeeSearch.anotherPerson');
-      createButtonLabel.value = t('admin.person.stateEmployeeSearch.createPerson');
-      discardButtonLabel.value = t('cancel');
-      createAnotherButtonLabel.value = t('admin.person.stateEmployeeSearch.createAnotherPerson');
-      layoutCardLabel.value = t('admin.person.stateEmployeeSearch.anotherPerson');
-    }
-
-    if (createType === CreationType.AddPersonToOwnSchule) {
-      // Override the "add another person" label for this specific case
-      createAnotherButtonLabel.value = t('admin.person.stateEmployeeSearch.searchAnotherStateEmployee');
-      headerLabel.value = t('admin.person.stateEmployeeSearch.searchAndAdd');
-      createButtonLabel.value = t('admin.person.stateEmployeeSearch.addStateEmployee');
-      discardButtonLabel.value = t('cancel');
-      layoutCardLabel.value = t('admin.person.stateEmployeeSearch.addStateEmployee');
-    }
-
-    personenkontextStore.requestedWithSystemrecht =
-      createType === CreationType.Limited ? RollenSystemRecht.EingeschraenktNeueBenutzerErstellen : undefined;
-  });
+  watch(
+    createType,
+    (currentCreationType: CreationType) => {
+      const config: LabelConfig = labelConfig[currentCreationType];
+      createAnotherButtonLabel.value = config.createAnotherButtonLabel;
+      createButtonLabel.value = config.createButtonLabel;
+      discardButtonLabel.value = config.discardButtonLabel;
+      headerLabel.value = config.headerLabel;
+      layoutCardLabel.value = config.layoutCardLabel;
+    },
+    {
+      immediate: true,
+    },
+  );
 
   onMounted(async () => {
-    await personenkontextStore.processWorkflowStep({
-      operationContext: OperationContext.PERSON_ANLEGEN,
-      limit: 25,
-    });
-
     personStore.errorCode = '';
+
     personenkontextStore.createdPersonWithKontext = null;
     personenkontextStore.landesbediensteteCommitResponse = null;
 
@@ -700,7 +709,8 @@
   });
 
   onUnmounted(() => {
-    personenkontextStore.requestedWithSystemrecht = undefined;
+    personenkontextStore.createdPersonWithKontext = null;
+    personenkontextStore.landesbediensteteCommitResponse = null;
     window.removeEventListener('beforeunload', preventNavigation);
   });
 </script>

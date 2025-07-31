@@ -1,8 +1,8 @@
 import routes from '@/router/routes';
 import { usePersonStore, type PersonLandesbediensteterSearchResponse, type PersonStore } from '@/stores/PersonStore';
-import { faker } from '@faker-js/faker';
 import { DOMWrapper, VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import type Module from 'module';
+import { DoFactory } from 'test/DoFactory';
 import { expect, test, type Mock, type MockInstance } from 'vitest';
 import { nextTick } from 'vue';
 import {
@@ -185,35 +185,20 @@ describe('PersonSearchView', () => {
   });
 
   test('it performs KoPers search successfully', async () => {
-    const mockPerson: PersonLandesbediensteterSearchResponse = {
-      id: faker.string.uuid(),
-      vorname: 'John',
-      familienname: 'Doe',
-      username: 'john.doe',
-      personalnummer: '12345',
-      primaryEmailAddress: 'john.doe@example.com',
-      personenkontexte: [
-        {
-          organisationId: '1',
-          rolleId: '2',
-          organisationName: 'Test School',
-          rolleName: 'Teacher',
-        },
-      ],
-    };
+    const mockPerson: PersonLandesbediensteterSearchResponse = DoFactory.getPersonLandesbediensteterSearchResponse();
 
     personStore.allLandesbedienstetePersonen = [mockPerson];
     personStore.getLandesbedienstetePerson = vi.fn().mockResolvedValue(undefined);
 
     // Fill KoPers field
     const kopersInput: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="kopers-input"] input');
-    await kopersInput?.setValue('12345');
+    await kopersInput?.setValue(mockPerson.personalnummer);
 
     wrapper?.find('[data-testid="person-search-form-submit-button"]').trigger('click');
 
     await vi.waitFor(() => {
       expect(personStore.getLandesbedienstetePerson).toHaveBeenCalledWith({
-        personalnummer: '12345',
+        personalnummer: mockPerson.personalnummer,
       });
     });
   });
@@ -292,58 +277,25 @@ describe('PersonSearchView', () => {
   });
 
   test('it displays person data when search is successful', async () => {
-    const mockPerson: PersonLandesbediensteterSearchResponse = {
-      id: faker.string.uuid(),
-      vorname: 'John',
-      familienname: 'Doe',
-      username: 'john.doe',
-      personalnummer: '12345',
-      primaryEmailAddress: 'john.doe@example.com',
-      personenkontexte: [
-        {
-          organisationId: '1',
-          rolleId: '2',
-          organisationName: 'Test School',
-          rolleName: 'Teacher',
-        },
-      ],
-    };
+    const mockPerson: PersonLandesbediensteterSearchResponse = DoFactory.getPersonLandesbediensteterSearchResponse();
 
     personStore.allLandesbedienstetePersonen = [mockPerson];
     await nextTick();
 
     // Should display personal data card
     expect(wrapper?.find('[data-testid="layout-card-headline-personal-data"]').exists()).toBe(true);
-    expect(wrapper?.text()).toContain('John');
-    expect(wrapper?.text()).toContain('Doe');
-    expect(wrapper?.text()).toContain('john.doe');
-    expect(wrapper?.text()).toContain('12345');
-    expect(wrapper?.text()).toContain('john.doe@example.com');
+    expect(wrapper?.text()).toContain(mockPerson.vorname);
+    expect(wrapper?.text()).toContain(mockPerson.familienname);
+    expect(wrapper?.text()).toContain(mockPerson.username);
+    expect(wrapper?.text()).toContain(mockPerson.personalnummer);
+    expect(wrapper?.text()).toContain(mockPerson.primaryEmailAddress);
   });
 
   test('it displays organization data when person has contexts', async () => {
-    const mockPerson: PersonLandesbediensteterSearchResponse = {
-      id: faker.string.uuid(),
-      vorname: 'John',
-      familienname: 'Doe',
-      username: 'john.doe',
-      personalnummer: '12345',
-      primaryEmailAddress: 'john.doe@example.com',
-      personenkontexte: [
-        {
-          organisationId: '1',
-          rolleId: '2',
-          organisationName: 'Test School',
-          rolleName: 'Teacher',
-        },
-        {
-          organisationId: '2',
-          rolleId: '2',
-          organisationName: 'Another School',
-          rolleName: 'Administrator',
-        },
-      ],
-    };
+    const mockPerson: PersonLandesbediensteterSearchResponse = DoFactory.getPersonLandesbediensteterSearchResponse();
+    mockPerson.personenkontexte.push(
+      DoFactory.getPersonLandesbediensteterSearchPersonenkontextResponse(DoFactory.getRolle(), DoFactory.getSchule()),
+    );
 
     personStore.allLandesbedienstetePersonen = [mockPerson];
     await nextTick();
@@ -351,10 +303,11 @@ describe('PersonSearchView', () => {
     // Should display organization cards
     expect(wrapper?.find('[data-testid="zuordnung-card-1"]').exists()).toBe(true);
     expect(wrapper?.find('[data-testid="zuordnung-card-2"]').exists()).toBe(true);
-    expect(wrapper?.text()).toContain('Test School');
-    expect(wrapper?.text()).toContain('Teacher');
-    expect(wrapper?.text()).toContain('Another School');
-    expect(wrapper?.text()).toContain('Administrator');
+    for (const kontext of mockPerson.personenkontexte) {
+      expect(wrapper?.text()).toContain(kontext.organisationName);
+      expect(wrapper?.text()).toContain(kontext.rolleName);
+      expect(wrapper?.text()).toContain(kontext.organisationDstNr);
+    }
   });
 
   test('it shows error dialog when no person is found', async () => {
@@ -446,22 +399,7 @@ describe('PersonSearchView', () => {
 
   test('it navigates to PersonCreationView when the button for adding the landesbediensteter is clicked', async () => {
     const mockLandesbedienstetePersonen: PersonLandesbediensteterSearchResponse[] = [
-      {
-        id: faker.string.uuid(),
-        vorname: 'John',
-        familienname: 'Doe',
-        username: 'john.doe',
-        personalnummer: '12345',
-        primaryEmailAddress: 'john.doe@example.com',
-        personenkontexte: [
-          {
-            rolleId: 'role-1',
-            rolleName: 'Teacher',
-            organisationId: 'org-1',
-            organisationName: 'Test School',
-          },
-        ],
-      },
+      DoFactory.getPersonLandesbediensteterSearchResponse(),
     ];
     personStore.allLandesbedienstetePersonen = mockLandesbedienstetePersonen;
     await nextTick();
