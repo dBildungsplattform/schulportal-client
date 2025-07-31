@@ -22,7 +22,7 @@
     useOrganisationStore,
   } from '@/stores/OrganisationStore';
   import { type PersonStore, SortField, usePersonStore } from '@/stores/PersonStore';
-  import { OperationContext, type PersonenkontextStore, usePersonenkontextStore } from '@/stores/PersonenkontextStore';
+  import { type PersonenkontextStore, usePersonenkontextStore } from '@/stores/PersonenkontextStore';
   import {
     type RolleResponse,
     type RolleStore,
@@ -582,11 +582,6 @@
   });
 
   onMounted(async () => {
-    // to initialize bulk operations that use the personenkontextStore
-    personenkontextStore.processWorkflowStep({
-      operationContext: OperationContext.PERSON_BEARBEITEN,
-      limit: 25,
-    });
     if (filterOrSearchActive.value) {
       selectedOrganisationIds.value = searchFilterStore.selectedOrganisationen || [];
       selectedRollen.value = searchFilterStore.selectedRollen || [];
