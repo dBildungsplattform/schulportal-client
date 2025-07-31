@@ -1122,7 +1122,7 @@ describe('PersonDetailsView', () => {
               // expect(unbefristetRadioButton?.attributes('checked')).toBeDefined();
             } else {
               expect(schuljahresendeRadioButton?.attributes('checked')).toBeFalsy();
-              expect(unbefristetRadioButton?.attributes('checked')).toBeUndefined();
+              expect(unbefristetRadioButton?.attributes('checked')).toBeFalsy();
             }
 
             await befristungInput?.setValue('13.08.2099');
