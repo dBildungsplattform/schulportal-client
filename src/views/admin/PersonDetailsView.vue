@@ -1602,12 +1602,143 @@
       <template v-if="!personStore.errorCode && !personenkontextStore.errorCode">
         <v-container class="personal-info">
           <div v-if="personStore.currentPerson?.person && !isEditPersonMetadataActive">
-            <!-- Befristung -->
             <v-row class="ml-md-16">
+              <v-col>
+                <!-- Vorname -->
+                <v-row class="mt-4">
+                  <v-col
+                    class="text-right"
+                    sm="3"
+                    cols="5"
+                    offset="1"
+                  >
+                    <span class="subtitle-2">{{ t('person.firstName') }}:</span>
+                  </v-col>
+                  <v-col
+                    class="d-flex align-start mt-1"
+                    data-testid="person-vorname"
+                  >
+                    <span class="text-body text-break">{{ personStore.currentPerson.person.name.vorname }}</span>
+                  </v-col>
+                </v-row>
+
+                <!-- Familienname -->
+                <v-row class="mt-0">
+                  <v-col
+                    class="text-right"
+                    sm="3"
+                    cols="5"
+                    offset="1"
+                  >
+                    <span class="subtitle-2">{{ t('person.lastName') }}:</span>
+                  </v-col>
+                  <v-col
+                    class="d-flex align-start  mt-1"
+                    data-testid="person-familienname"
+                  >
+                    <span class="text-body text-break">{{ personStore.currentPerson.person.name.familienname }}</span>
+                  </v-col>
+                </v-row>
+
+                <!-- Benutzername -->
+                <v-row class="mt-0">
+                  <v-col
+                    class="text-right"
+                    sm="3"
+                    cols="5"
+                    offset="1"
+                  >
+                    <span class="subtitle-2">{{ t('person.userName') }}:</span>
+                  </v-col>
+                  <v-col
+                    class="d-flex align-start  mt-1"
+                    data-testid="person-username"
+                  >
+                    <span class="text-body text-break">{{ personStore.currentPerson.person.referrer }}</span>
+                  </v-col>
+                </v-row>
+
+                <!-- KoPers.-Nr. -->
+                <v-row
+                  class="mt-0"
+                  v-if="hasKopersRolle || personStore.currentPerson.person.personalnummer"
+                >
+                  <v-col
+                    class="text-right"
+                    sm="3"
+                    cols="5"
+                  >
+                    <span
+                      :class="{
+                        'subtitle-2': true,
+                        'text-red': hasKopersRolle && !personStore.currentPerson.person.personalnummer,
+                      }"
+                    >
+                      {{ t('person.kopersNr') }}:
+                    </span>
+                  </v-col>
+                  <v-col
+                    class="d-flex align-start"
+                    data-testid="person-kopersnr"
+                  >
+                    <span
+                      :class="{
+                        'text-body': true,
+                        'text-red': hasKopersRolle && !personStore.currentPerson.person.personalnummer,
+                        'text-break': true,
+                        'mt-1': true,
+                      }"
+                    >
+                      {{ personStore.currentPerson.person.personalnummer ?? t('missing') }}
+                    </span>
+                  </v-col>
+                </v-row>
+
+                <!-- Email -->
+                <v-row
+                  v-if="emailStatusText.text !== t('person.emailStatusUnknown')"
+                  class="mt-0"
+                >
+                  <v-col
+                    class="text-right"
+                    sm="3"
+                    cols="5"
+                  >
+                    <span class="subtitle-2">{{ t('person.email') }}:</span>
+                  </v-col>
+                  <v-col
+                    class="d-flex align-start"
+                    data-testid="person-email"
+                  >
+                    <SpshTooltip
+                      :enabledCondition="!!personStore.currentPerson.person.email"
+                      :disabledText="t('person.changePersonMetaDataDisabledDescription')"
+                      :enabledText="emailStatusText.tooltip"
+                      position="bottom"
+                    >
+                      <div class="d-flex align-start">
+                        <v-icon
+                          aria-hidden="true"
+                          class="mr-2 flex-shrink-0 mt-1"
+                          icon="mdi-alert-circle-outline"
+                          size="small"
+                        ></v-icon>
+                        <span
+                          data-testid="person-email-text"
+                          class="text-body text-break mt-1"
+                        >
+                          {{ emailStatusText.text }}
+                        </span>
+                      </div>
+                    </SpshTooltip>
+                  </v-col>
+                </v-row>
+              </v-col>
+
               <v-col
+                class="mr-lg-13"
                 cols="12"
                 md="auto"
-                class="mt-1 edit-container"
               >
                 <div class="d-flex justify-sm-end">
                   <v-col
@@ -1633,134 +1764,6 @@
                     </SpshTooltip>
                   </v-col>
                 </div>
-              </v-col>
-            </v-row>
-            <!-- Vorname -->
-            <v-row class="mt-md-6">
-              <v-col cols="1"></v-col>
-              <v-col
-                class="text-right"
-                md="2"
-                sm="3"
-                cols="5"
-              >
-                <span class="subtitle-2"> {{ t('person.firstName') }}: </span>
-              </v-col>
-              <v-col
-                cols="auto"
-                data-testid="person-vorname"
-              >
-                <span class="text-body"> {{ personStore.currentPerson.person.name.vorname }} </span>
-              </v-col>
-            </v-row>
-            <!-- Familienname -->
-            <v-row class="mt-0">
-              <v-col cols="1"></v-col>
-              <v-col
-                class="text-right"
-                md="2"
-                sm="3"
-                cols="5"
-              >
-                <span class="subtitle-2"> {{ t('person.lastName') }}: </span>
-              </v-col>
-              <v-col
-                cols="auto"
-                data-testid="person-familienname"
-              >
-                <span class="text-body"> {{ personStore.currentPerson.person.name.familienname }}</span>
-              </v-col>
-            </v-row>
-            <!-- Benutzername -->
-            <v-row class="mt-0">
-              <v-col cols="1"></v-col>
-              <v-col
-                class="text-right"
-                md="2"
-                sm="3"
-                cols="5"
-              >
-                <span class="subtitle-2"> {{ t('person.userName') }}: </span>
-              </v-col>
-              <v-col
-                cols="auto"
-                data-testid="person-username"
-              >
-                <span class="text-body">{{ personStore.currentPerson.person.referrer }} </span>
-              </v-col>
-            </v-row>
-            <!-- KoPers.-Nr. -->
-            <v-row
-              class="mt-0"
-              v-if="hasKopersRolle || personStore.currentPerson.person.personalnummer"
-            >
-              <v-col cols="1"></v-col>
-              <v-col
-                class="text-right"
-                md="2"
-                sm="3"
-                cols="5"
-              >
-                <span
-                  :class="{
-                    'subtitle-2': true,
-                    'text-red': hasKopersRolle && !personStore.currentPerson.person.personalnummer,
-                  }"
-                >
-                  {{ t('person.kopersNr') }}:
-                </span>
-              </v-col>
-              <v-col
-                cols="auto"
-                data-testid="person-kopersnr"
-              >
-                <span
-                  :class="{
-                    'text-body': true,
-                    'text-red': hasKopersRolle && !personStore.currentPerson.person.personalnummer,
-                  }"
-                >
-                  {{ personStore.currentPerson.person.personalnummer ?? t('missing') }}
-                </span>
-              </v-col>
-            </v-row>
-            <!-- Email -->
-            <v-row
-              v-if="emailStatusText.text !== t('person.emailStatusUnknown')"
-              class="mt-0"
-            >
-              <v-col cols="1"></v-col>
-              <v-col
-                class="text-right"
-                md="2"
-                sm="3"
-                cols="5"
-              >
-                <span class="subtitle-2"> {{ t('person.email') }}: </span>
-              </v-col>
-              <v-col
-                cols="auto"
-                data-testid="person-email"
-              >
-                <SpshTooltip
-                  :enabledCondition="!!personStore.currentPerson.person.email"
-                  :disabledText="t('person.changePersonMetaDataDisabledDescription')"
-                  :enabledText="emailStatusText.tooltip"
-                  position="bottom"
-                >
-                  <v-icon
-                    aria-hidden="true"
-                    class="mr-2"
-                    icon="mdi-alert-circle-outline"
-                    size="small"
-                  ></v-icon>
-                  <span
-                    data-testid="person-email-text"
-                    class="text-body"
-                  >
-                    {{ emailStatusText.text }}
-                  </span>
-                </SpshTooltip>
               </v-col>
             </v-row>
           </div>
@@ -1881,71 +1884,77 @@
           class="person-zuordnungen"
         >
           <v-row class="ml-md-16">
-            <v-col
-              cols="12"
-              sm="auto"
-            >
-              <h3 class="subtitle-1">{{ t('person.zuordnungen') }}</h3>
+            <v-col v-if="personStore.loading">
+              <v-progress-circular indeterminate></v-progress-circular>
             </v-col>
-            <v-spacer></v-spacer>
-            <v-col
-              cols="12"
-              md="auto"
-              class="mr-lg-13"
-            >
-              <div class="d-flex justify-sm-end">
-                <v-col
-                  cols="12"
-                  sm="6"
-                  md="auto"
+            <template v-else>
+              <v-col>
+                <h3 class="subtitle-1">{{ t('person.zuordnungen') }}</h3>
+
+                <!-- Check if 'zuordnungen' array exists and has length > 0 -->
+                <template
+                  v-if="
+                    personStore.personenuebersicht?.zuordnungen &&
+                    personStore.personenuebersicht?.zuordnungen.length > 0
+                  "
                 >
-                  <SpshTooltip
-                    :enabledCondition="selectedZuordnungen.length === 0 && !isEditPersonMetadataActive"
-                    :disabledText="t('person.finishEditFirst')"
-                    :enabledText="t('person.editZuordnungen')"
-                    position="start"
+                  <v-row
+                    class="mt-4"
+                    v-for="zuordnung in zuordnungenWithPendingChanges"
+                    :key="zuordnung.sskId"
+                    :data-testid="`person-zuordnung-${zuordnung.sskId}`"
+                    :title="zuordnung.sskName"
                   >
-                    <v-btn
-                      class="primary ml-lg-8"
-                      data-testid="zuordnung-edit-button"
-                      :disabled="isEditPersonMetadataActive"
-                      @click="triggerEdit"
-                      :block="mdAndDown"
+                    <v-col offset="1">
+                      <PersonenkontextItem
+                        :zuordnung="zuordnung"
+                        :noMargin="true"
+                      />
+                    </v-col>
+                  </v-row>
+                </template>
+
+                <!-- Display 'Keine Zuordnungen gefunden' if no zuordnungen -->
+                <v-row
+                  v-else
+                  class="mt-4"
+                >
+                  <v-col offset="1">
+                    <h3 class="text-body">{{ t('person.noZuordnungenFound') }}</h3>
+                  </v-col>
+                </v-row>
+              </v-col>
+              <v-col
+                class="mr-lg-13"
+                cols="12"
+                md="auto"
+              >
+                <div class="d-flex justify-sm-end">
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="auto"
+                  >
+                    <SpshTooltip
+                      :enabledCondition="selectedZuordnungen.length === 0 && !isEditPersonMetadataActive"
+                      :disabledText="t('person.finishEditFirst')"
+                      :enabledText="t('person.editZuordnungen')"
+                      position="start"
                     >
-                      {{ t('edit') }}
-                    </v-btn>
-                  </SpshTooltip>
-                </v-col>
-              </div>
-            </v-col>
-          </v-row>
-          <!-- Check if 'zuordnungen' array exists and has length > 0 -->
-          <v-row
-            class="ml-md-3 mt-md-n8"
-            v-if="personStore.personenuebersicht?.zuordnungen && personStore.personenuebersicht?.zuordnungen.length > 0"
-          >
-            <v-col
-              cols="10"
-              offset="1"
-              v-for="zuordnung in zuordnungenWithPendingChanges"
-              :key="zuordnung.sskId"
-              :data-testid="`person-zuordnung-${zuordnung.sskId}`"
-              :title="zuordnung.sskName"
-            >
-              <PersonenkontextItem
-                :zuordnung="zuordnung"
-                :noMargin="true"
-              />
-            </v-col>
-          </v-row>
-          <!-- Display 'Keine Zuordnungen gefunden' if the above condition is false -->
-          <v-row v-else>
-            <v-col
-              cols="10"
-              offset="1"
-            >
-              <h3 class="text-body">{{ t('person.noZuordnungenFound') }}</h3>
-            </v-col>
+                      <v-btn
+                        class="primary ml-lg-8"
+                        data-testid="zuordnung-edit-button"
+                        :disabled="isEditPersonMetadataActive"
+                        @click="triggerEdit"
+                        :block="mdAndDown"
+                      >
+                        {{ t('edit') }}
+                      </v-btn>
+                    </SpshTooltip>
+                  </v-col>
+                </div>
+              </v-col>
+            </template>
           </v-row>
         </v-container>
         <!-- Show this template if the edit button is triggered-->
@@ -1970,6 +1979,7 @@
               </v-col>
               <v-col
                 cols="12"
+                :md="hasPendingChange ? '12' : '7'"
                 v-for="zuordnung in zuordnungenWithPendingChanges?.filter((zuordnung: Zuordnung) => zuordnung.editable)"
                 :key="zuordnung.sskId"
                 :data-testid="`person-zuordnung-${zuordnung.sskId}`"
@@ -1977,7 +1987,7 @@
                 class="py-0 d-flex align-items-center"
               >
                 <template v-if="!hasPendingChange">
-                  <div class="checkbox-div">
+                  <div class="mb-n4 checkbox-top-align">
                     <v-checkbox
                       :ref="`checkbox-zuordnung-${zuordnung.sskId}`"
                       v-model="selectedZuordnungen"

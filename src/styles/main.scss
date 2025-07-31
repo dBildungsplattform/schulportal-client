@@ -86,8 +86,15 @@ label.v-label {
   margin-top: -50px;
 }
 
-.checkbox-div {
-  margin-bottom: -15px;
+// This targets the checkbox flex container to align the checkbox and label vertically from their baseline
+// This is necessary because the default alignment is center, which does not align the checkbox and label
+.checkbox-top-align .v-selection-control {
+  align-items: baseline !important;
+}
+
+// This is used to align the checkbox label with the checkbox itself because aligning the checkbox and label from their baseline does not align the label perfectly from the top
+.checkbox-top-align .v-label {
+  transform: translateY(-4px) !important;
 }
 
 .primary-border {
@@ -129,26 +136,5 @@ label.v-label {
 @media (min-width: 960px) {
   .v-container {
     max-width: none;
-  }
-}
-
-@media only screen and (min-width: 960px) {
-  .edit-container {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    justify-content: end;
-    align-items: flex-end;
-    right: 55px;
-  }
-}
-@media only screen and (min-width: 960px) and (max-width: 1280px) {
-  .edit-container {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    justify-content: end;
-    align-items: flex-end;
-    right: 2px;
   }
 }
