@@ -74,6 +74,7 @@ export type WorkflowFilter = {
   rolleName?: string;
   organisationName?: string;
   limit?: number;
+  requestedWithSystemrecht?: RollenSystemRecht;
 };
 
 export function mapZuordnungToPersonenkontextUpdate(
@@ -98,7 +99,6 @@ type PersonenkontextState = {
   loading: boolean;
   totalFilteredRollen: number;
   totalPaginatedRollen: number;
-  requestedWithSystemrecht: RollenSystemRecht | undefined;
 };
 
 type PersonenkontextGetters = {};
@@ -166,7 +166,6 @@ export const usePersonenkontextStore: StoreDefinition<
       loading: false,
       totalFilteredRollen: 0,
       totalPaginatedRollen: 0,
-      requestedWithSystemrecht: undefined,
     };
   },
   actions: {
@@ -196,7 +195,7 @@ export const usePersonenkontextStore: StoreDefinition<
             filter.rolleName,
             filter.organisationName,
             filter.limit,
-            this.requestedWithSystemrecht,
+            filter.requestedWithSystemrecht,
           );
         this.workflowStepResponse = data;
       } catch (error: unknown) {

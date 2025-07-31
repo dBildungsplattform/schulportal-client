@@ -22,7 +22,7 @@
     useOrganisationStore,
   } from '@/stores/OrganisationStore';
   import { type PersonStore, SortField, usePersonStore } from '@/stores/PersonStore';
-  import { OperationContext, type PersonenkontextStore, usePersonenkontextStore } from '@/stores/PersonenkontextStore';
+  import { type PersonenkontextStore, usePersonenkontextStore } from '@/stores/PersonenkontextStore';
   import {
     type RolleResponse,
     type RolleStore,
@@ -372,6 +372,12 @@
     }, 500);
   }
 
+  const handleFocusChange = (focused: boolean): void => {
+    if (!focused) {
+      searchInputRollen.value = '';
+    }
+  };
+
   // Define a mapping between complex table keys and expected backend keys
   const keyMapping: Record<string, SortField> = {
     'person.name.familienname': SortField.Familienname,
@@ -576,11 +582,6 @@
   });
 
   onMounted(async () => {
-    // to initialize bulk operations that use the personenkontextStore
-    personenkontextStore.processWorkflowStep({
-      operationContext: OperationContext.PERSON_BEARBEITEN,
-      limit: 25,
-    });
     if (filterOrSearchActive.value) {
       selectedOrganisationIds.value = searchFilterStore.selectedOrganisationen || [];
       selectedRollen.value = searchFilterStore.selectedRollen || [];
@@ -720,6 +721,7 @@
             required="true"
             @update:modelValue="setRolleFilter"
             @update:search="updateRollenSearch"
+            @update:focused="handleFocusChange"
             variant="outlined"
             v-model="selectedRollen"
             v-model:search="searchInputRollen"
