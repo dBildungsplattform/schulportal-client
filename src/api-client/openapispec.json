@@ -3384,7 +3384,8 @@
               "UPDATE_MERKMALE_ERROR",
               "ROLLENNAME_ENTHAELT_LEERZEICHEN",
               "NEWER_VERSION_OF_ROLLE_AVAILABLE",
-              "ROLLE_NAME_UNIQUE_ON_SSK"
+              "ROLLE_NAME_UNIQUE_ON_SSK",
+              "SERVICE_PROVIDER_NICHT_NACHTRAEGLICH_ZUWEISBAR"
             ]
           },
           "code": { "type": "number", "description": "Corresponds to HTTP Status code like 200, 404, 500" }
@@ -3419,6 +3420,7 @@
         "type": "string",
         "enum": ["EMAIL", "UNTERRICHT", "VERWALTUNG", "HINWEISE", "ANGEBOTE"]
       },
+      "ServiceProviderMerkmal": { "type": "string", "enum": ["NACHTRAEGLICH_ZUWEISBAR"] },
       "ServiceProviderResponse": {
         "type": "object",
         "properties": {
@@ -3428,9 +3430,10 @@
           "url": { "type": "string", "description": "Can be undefined, if `target` is not equal to `URL`" },
           "kategorie": { "$ref": "#/components/schemas/ServiceProviderKategorie" },
           "hasLogo": { "type": "boolean" },
-          "requires2fa": { "type": "boolean" }
+          "requires2fa": { "type": "boolean" },
+          "merkmale": { "type": "array", "items": { "$ref": "#/components/schemas/ServiceProviderMerkmal" } }
         },
-        "required": ["id", "name", "target", "url", "kategorie", "hasLogo", "requires2fa"]
+        "required": ["id", "name", "target", "url", "kategorie", "hasLogo", "requires2fa", "merkmale"]
       },
       "UpdateRolleBodyParams": {
         "type": "object",

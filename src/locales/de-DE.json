@@ -436,7 +436,8 @@
         "ROLLE_HAT_PERSONENKONTEXTE_ERROR": "Die Rolle kann nicht gelöscht werden, da die sie noch Benutzern zugeordnet ist. Nehmen Sie bitte zunächst alle Zuordnungen zurück.",
         "ROLLE_NAME_UNIQUE_ON_SSK": "Der Rollenname ist bereits vergeben. Bitte korrigieren Sie Ihre Eingabe.",
         "UPDATE_MERKMALE_ERROR": "Die gewünschte Bearbeitung kann nicht ausgeführt werden, da die Rolle noch Benutzern zugeordnet ist. Nehmen Sie bitte zunächst alle Zuordnungen zurück.",
-        "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Die letzte Aktion konnte nicht ausgeführt werden. Aufgrund von längerer Inaktivität ist eine erneute Authentifizierung mit einem zweiten Faktor erforderlich. Um fortzufahren, klicken Sie bitte auf „Zurück zur Ergebnisliste“ oder „Schließen“. Sie werden anschließend zur Eingabe Ihres zweiten Faktors aufgefordert."
+        "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Die letzte Aktion konnte nicht ausgeführt werden. Aufgrund von längerer Inaktivität ist eine erneute Authentifizierung mit einem zweiten Faktor erforderlich. Um fortzufahren, klicken Sie bitte auf „Zurück zur Ergebnisliste“ oder „Schließen“. Sie werden anschließend zur Eingabe Ihres zweiten Faktors aufgefordert.",
+        "SERVICE_PROVIDER_NICHT_NACHTRAEGLICH_ZUWEISBAR": "Eines der gewählten Angebote darf einer Rolle mit bereits zugewiesenen Benutzern nicht hinzugefügt oder entzogen werden."
       },
       "title": {
         "NEWER_VERSION_OF_ROLLE_AVAILABLE": "Geänderte Daten",
@@ -445,7 +446,8 @@
         "ROLLE_UPDATE_ERROR": "Die Rolle konnte nicht bearbeitet werden",
         "ROLLE_NAME_UNIQUE_ON_SSK": "Der Rollenname ist nicht eindeutig",
         "UPDATE_MERKMALE_ERROR": "Die Merkmale konnten nicht bearbeitet werden",
-        "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Zwei-Faktor-Authentifizierung (2FA) erforderlich"
+        "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Zwei-Faktor-Authentifizierung (2FA) erforderlich",
+        "SERVICE_PROVIDER_NICHT_NACHTRAEGLICH_ZUWEISBAR": "Die Angebote konnten nicht bearbeitet werden"
       },
       "isAllowedToManageRollen": "Darf Rollen verwalten",
       "loadingErrorText": "Es konnten keine Rollendaten geladen werden.",

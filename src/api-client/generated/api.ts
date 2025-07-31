@@ -773,7 +773,8 @@ export const DbiamRolleErrorI18nKeyEnum = {
     UpdateMerkmaleError: 'UPDATE_MERKMALE_ERROR',
     RollennameEnthaeltLeerzeichen: 'ROLLENNAME_ENTHAELT_LEERZEICHEN',
     NewerVersionOfRolleAvailable: 'NEWER_VERSION_OF_ROLLE_AVAILABLE',
-    RolleNameUniqueOnSsk: 'ROLLE_NAME_UNIQUE_ON_SSK'
+    RolleNameUniqueOnSsk: 'ROLLE_NAME_UNIQUE_ON_SSK',
+    ServiceProviderNichtNachtraeglichZuweisbar: 'SERVICE_PROVIDER_NICHT_NACHTRAEGLICH_ZUWEISBAR'
 } as const;
 
 export type DbiamRolleErrorI18nKeyEnum = typeof DbiamRolleErrorI18nKeyEnum[keyof typeof DbiamRolleErrorI18nKeyEnum];
@@ -3322,6 +3323,19 @@ export type ServiceProviderKategorie = typeof ServiceProviderKategorie[keyof typ
 /**
  * 
  * @export
+ * @enum {string}
+ */
+
+export const ServiceProviderMerkmal = {
+    NachtraeglichZuweisbar: 'NACHTRAEGLICH_ZUWEISBAR'
+} as const;
+
+export type ServiceProviderMerkmal = typeof ServiceProviderMerkmal[keyof typeof ServiceProviderMerkmal];
+
+
+/**
+ * 
+ * @export
  * @interface ServiceProviderResponse
  */
 export interface ServiceProviderResponse {
@@ -3367,6 +3381,12 @@ export interface ServiceProviderResponse {
      * @memberof ServiceProviderResponse
      */
     'requires2fa': boolean;
+    /**
+     * 
+     * @type {Array<ServiceProviderMerkmal>}
+     * @memberof ServiceProviderResponse
+     */
+    'merkmale': Array<ServiceProviderMerkmal>;
 }
 
 

@@ -1,20 +1,20 @@
-import { defineStore, type Store, type StoreDefinition } from 'pinia';
-import { type AxiosResponse } from 'axios';
+import axiosApiInstance from '@/services/ApiService';
 import { getResponseErrorCode } from '@/utils/errorHandlers';
+import { type AxiosResponse } from 'axios';
+import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import {
   RolleApiFactory,
   RollenArt,
   RollenMerkmal,
   RollenSystemRecht,
-  type RolleServiceProviderBodyParams,
   type CreateRolleBodyParams,
   type RolleApiInterface,
   type RolleResponse,
+  type RolleServiceProviderBodyParams,
   type RolleWithServiceProvidersResponse,
   type ServiceProviderResponse,
   type UpdateRolleBodyParams,
 } from '../api-client/generated/api';
-import axiosApiInstance from '@/services/ApiService';
 import type { ServiceProvider } from './ServiceProviderStore';
 
 const rolleApi: RolleApiInterface = RolleApiFactory(undefined, '', axiosApiInstance);
@@ -55,11 +55,8 @@ type RolleActions = {
   deleteRolleById: (rolleId: string) => Promise<void>;
 };
 
-export { RollenArt };
-export { RollenMerkmal };
-export { RollenSystemRecht };
-export type { RolleResponse };
-export type { RolleWithServiceProvidersResponse };
+export { RollenArt, RollenMerkmal, RollenSystemRecht };
+export type { RolleResponse, RolleWithServiceProvidersResponse };
 
 export type Rolle = {
   administeredBySchulstrukturknoten: string;
