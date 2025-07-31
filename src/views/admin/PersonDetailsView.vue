@@ -1620,10 +1620,10 @@
                     <span class="subtitle-2">{{ t('person.firstName') }}:</span>
                   </v-col>
                   <v-col
-                    cols="auto"
+                    class="d-flex align-start mt-1"
                     data-testid="person-vorname"
                   >
-                    <span class="text-body">{{ personStore.currentPerson.person.name.vorname }}</span>
+                    <span class="text-body text-break">{{ personStore.currentPerson.person.name.vorname }}</span>
                   </v-col>
                 </v-row>
 
@@ -1638,10 +1638,10 @@
                     <span class="subtitle-2">{{ t('person.lastName') }}:</span>
                   </v-col>
                   <v-col
-                    cols="auto"
+                    class="d-flex align-start  mt-1"
                     data-testid="person-familienname"
                   >
-                    <span class="text-body">{{ personStore.currentPerson.person.name.familienname }}</span>
+                    <span class="text-body text-break">{{ personStore.currentPerson.person.name.familienname }}</span>
                   </v-col>
                 </v-row>
 
@@ -1656,10 +1656,10 @@
                     <span class="subtitle-2">{{ t('person.userName') }}:</span>
                   </v-col>
                   <v-col
-                    cols="auto"
+                    class="d-flex align-start  mt-1"
                     data-testid="person-username"
                   >
-                    <span class="text-body">{{ personStore.currentPerson.person.referrer }}</span>
+                    <span class="text-body text-break">{{ personStore.currentPerson.person.referrer }}</span>
                   </v-col>
                 </v-row>
 
@@ -1683,13 +1683,15 @@
                     </span>
                   </v-col>
                   <v-col
-                    cols="auto"
+                    class="d-flex align-start"
                     data-testid="person-kopersnr"
                   >
                     <span
                       :class="{
                         'text-body': true,
                         'text-red': hasKopersRolle && !personStore.currentPerson.person.personalnummer,
+                        'text-break': true,
+                        'mt-1': true,
                       }"
                     >
                       {{ personStore.currentPerson.person.personalnummer ?? t('missing') }}
@@ -1710,7 +1712,7 @@
                     <span class="subtitle-2">{{ t('person.email') }}:</span>
                   </v-col>
                   <v-col
-                    cols="auto"
+                    class="d-flex align-start"
                     data-testid="person-email"
                   >
                     <SpshTooltip
@@ -1719,18 +1721,20 @@
                       :enabledText="emailStatusText.tooltip"
                       position="bottom"
                     >
-                      <v-icon
-                        aria-hidden="true"
-                        class="mr-2"
-                        icon="mdi-alert-circle-outline"
-                        size="small"
-                      ></v-icon>
-                      <span
-                        data-testid="person-email-text"
-                        class="text-body"
-                      >
-                        {{ emailStatusText.text }}
-                      </span>
+                      <div class="d-flex align-start">
+                        <v-icon
+                          aria-hidden="true"
+                          class="mr-2 flex-shrink-0 mt-1"
+                          icon="mdi-alert-circle-outline"
+                          size="small"
+                        ></v-icon>
+                        <span
+                          data-testid="person-email-text"
+                          class="text-body text-break mt-1"
+                        >
+                          {{ emailStatusText.text }}
+                        </span>
+                      </div>
                     </SpshTooltip>
                   </v-col>
                 </v-row>
