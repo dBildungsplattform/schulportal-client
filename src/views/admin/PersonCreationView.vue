@@ -83,6 +83,38 @@
     AddPersonToOwnSchule = 'add-person-to-own-schule',
   }
 
+  type LabelConfig = {
+    createAnotherButtonLabel: string;
+    createButtonLabel: string;
+    discardButtonLabel: string;
+    headerLabel: string;
+    layoutCardLabel: string;
+  };
+
+  const labelConfig: Record<CreationType, LabelConfig> = {
+    [CreationType.Limited]: {
+      createAnotherButtonLabel: t('admin.person.stateEmployeeSearch.createAnotherPerson'),
+      createButtonLabel: t('admin.person.stateEmployeeSearch.createPerson'),
+      discardButtonLabel: t('cancel'),
+      headerLabel: t('admin.person.stateEmployeeSearch.anotherPerson'),
+      layoutCardLabel: t('admin.person.stateEmployeeSearch.anotherPerson'),
+    },
+    [CreationType.AddPersonToOwnSchule]: {
+      createAnotherButtonLabel: t('admin.person.stateEmployeeSearch.searchAnotherStateEmployee'),
+      createButtonLabel: t('admin.person.stateEmployeeSearch.addStateEmployee'),
+      discardButtonLabel: t('cancel'),
+      headerLabel: t('admin.person.stateEmployeeSearch.searchAndAdd'),
+      layoutCardLabel: t('admin.person.stateEmployeeSearch.addStateEmployee'),
+    },
+    [CreationType.Full]: {
+      createAnotherButtonLabel: t('admin.person.createAnother'),
+      createButtonLabel: t('admin.person.create'),
+      discardButtonLabel: t('admin.person.discard'),
+      headerLabel: t('admin.person.addNew'),
+      layoutCardLabel: t('admin.person.addNew'),
+    },
+  };
+
   // Determine the creation type based on the route meta in routes.ts
   const createType: ComputedRef<CreationType> = computed(() => {
     const metaCreateType: string = route.meta['createType'] as string;
@@ -654,22 +686,12 @@
   watch(
     createType,
     (currentCreationType: CreationType) => {
-      if (currentCreationType === CreationType.Limited) {
-        headerLabel.value = t('admin.person.stateEmployeeSearch.anotherPerson');
-        createButtonLabel.value = t('admin.person.stateEmployeeSearch.createPerson');
-        discardButtonLabel.value = t('cancel');
-        createAnotherButtonLabel.value = t('admin.person.stateEmployeeSearch.createAnotherPerson');
-        layoutCardLabel.value = t('admin.person.stateEmployeeSearch.anotherPerson');
-      }
-
-      if (currentCreationType === CreationType.AddPersonToOwnSchule) {
-        // Override the "add another person" label for this specific case
-        createAnotherButtonLabel.value = t('admin.person.stateEmployeeSearch.searchAnotherStateEmployee');
-        headerLabel.value = t('admin.person.stateEmployeeSearch.searchAndAdd');
-        createButtonLabel.value = t('admin.person.stateEmployeeSearch.addStateEmployee');
-        discardButtonLabel.value = t('cancel');
-        layoutCardLabel.value = t('admin.person.stateEmployeeSearch.addStateEmployee');
-      }
+      const config: LabelConfig = labelConfig[currentCreationType];
+      createAnotherButtonLabel.value = config.createAnotherButtonLabel;
+      createButtonLabel.value = config.createButtonLabel;
+      discardButtonLabel.value = config.discardButtonLabel;
+      headerLabel.value = config.headerLabel;
+      layoutCardLabel.value = config.layoutCardLabel;
     },
     {
       immediate: true,
