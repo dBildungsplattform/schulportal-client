@@ -228,7 +228,7 @@
       >
         <LayoutCard
           :header="$t('profile.personalData')"
-          :headline-test-id="'layout-card-headline-persoenliche-daten'"
+          :headlineTestId="'layout-card-headline-persoenliche-daten'"
         >
           <v-row class="ma-4">
             <v-col cols="12">
@@ -320,7 +320,7 @@
         </LayoutCard>
         <LayoutCard
           data-testid="password-card"
-          :headline-test-id="'new-password-card'"
+          :headlineTestId="'new-password-card'"
           :header="$t('login.password')"
           class="text-body"
         >
@@ -431,7 +431,7 @@
         </template>
         <LayoutCard
           v-else-if="twoFactorAuthenticationStore.required"
-          :headline-test-id="'two-factor-card'"
+          :headlineTestId="'two-factor-card'"
           :header="$t('profile.twoFactorAuth')"
         >
           <v-row
@@ -534,7 +534,7 @@
         <LayoutCard
           v-if="hasLehrRolle"
           data-testid="reset-device-password-card"
-          :headline-test-id="'reset-device-password-card'"
+          :headlineTestId="'reset-device-password-card'"
           :header="$t('admin.person.devicePassword.header')"
           class="text-body"
         >

@@ -66,16 +66,16 @@ export function mapToLabelValues(
   data.push({
     label: t('profile.fullName'),
     value: `${person.vorname} ${person.familienname}`,
-    testIdLabel: 'fullName-label',
-    testIdValue: 'fullName-value',
+    testIdLabel: 'fullname-label',
+    testIdValue: 'fullname-value',
   });
 
   if (person.username) {
     data.push({
       label: t('person.userName'),
       value: person.username,
-      testIdLabel: 'userName-label',
-      testIdValue: 'userName-value',
+      testIdLabel: 'username-label',
+      testIdValue: 'username-value',
     });
   }
 

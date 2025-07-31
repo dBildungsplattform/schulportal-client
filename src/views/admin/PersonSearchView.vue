@@ -593,7 +593,7 @@
         <LayoutCard
           data-testid="personal-data-card"
           :header="$t('admin.person.stateEmployeeSearch.searchResult')"
-          :headline-test-id="'layout-card-headline-personal-data'"
+          :headlineTestId="'layout-card-headline-personal-data'"
           class="ma-5"
         >
           <v-row
@@ -609,7 +609,7 @@
               <LayoutCard
                 data-testid="personal-data-card"
                 :header="$t('profile.personalData')"
-                :headline-test-id="'layout-card-headline-personal-data'"
+                :headlineTestId="'layout-card-headline-personal-data'"
                 :subCards="true"
               >
                 <v-row>
@@ -673,8 +673,9 @@
               class="d-flex flex-column ga-8"
             >
               <LayoutCard
+                :dataTestId="`zuordnung-card-${oneBasedIndex}`"
                 :header="$t('person.zuordnung') + ' ' + (organisationenDaten.length > 1 ? (index + 1).toString() : '')"
-                :headline-test-id="'zuordung-card-' + (index + 1)"
+                :headlineTestId="`zuordnung-card-${index + 1}-headline`"
                 :subCards="true"
               >
                 <v-row>

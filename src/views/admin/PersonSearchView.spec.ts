@@ -349,8 +349,8 @@ describe('PersonSearchView', () => {
     await nextTick();
 
     // Should display organization cards
-    expect(wrapper?.find('[data-testid="zuordung-card-1"]').exists()).toBe(true);
-    expect(wrapper?.find('[data-testid="zuordung-card-2"]').exists()).toBe(true);
+    expect(wrapper?.find('[data-testid="zuordnung-card-1"]').exists()).toBe(true);
+    expect(wrapper?.find('[data-testid="zuordnung-card-2"]').exists()).toBe(true);
     expect(wrapper?.text()).toContain('Test School');
     expect(wrapper?.text()).toContain('Teacher');
     expect(wrapper?.text()).toContain('Another School');
