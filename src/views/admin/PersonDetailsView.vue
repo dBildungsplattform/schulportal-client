@@ -356,11 +356,6 @@
 
   // Triggers the template to add a new Zuordnung
   const triggerAddZuordnung = async (): Promise<void> => {
-    await personenkontextStore.processWorkflowStep({
-      personId: currentPersonId,
-      operationContext: OperationContext.PERSON_BEARBEITEN,
-      limit: 25,
-    });
     isZuordnungFormActive.value = true;
   };
 
@@ -1638,7 +1633,7 @@
                     <span class="subtitle-2">{{ t('person.lastName') }}:</span>
                   </v-col>
                   <v-col
-                    class="d-flex align-start  mt-1"
+                    class="d-flex align-start mt-1"
                     data-testid="person-familienname"
                   >
                     <span class="text-body text-break">{{ personStore.currentPerson.person.name.familienname }}</span>
@@ -1656,7 +1651,7 @@
                     <span class="subtitle-2">{{ t('person.userName') }}:</span>
                   </v-col>
                   <v-col
-                    class="d-flex align-start  mt-1"
+                    class="d-flex align-start mt-1"
                     data-testid="person-username"
                   >
                     <span class="text-body text-break">{{ personStore.currentPerson.person.referrer }}</span>
