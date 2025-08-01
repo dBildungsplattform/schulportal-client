@@ -680,7 +680,7 @@
               class="d-flex flex-column ga-8"
             >
               <LayoutCard
-                :dataTestId="`zuordnung-card-${oneBasedIndex}`"
+                :dataTestId="`zuordnung-card-${index + 1}`"
                 :header="$t('person.zuordnung') + ' ' + (organisationenDaten.length > 1 ? (index + 1).toString() : '')"
                 :headlineTestId="`zuordnung-card-${index + 1}-headline`"
                 :subCards="true"

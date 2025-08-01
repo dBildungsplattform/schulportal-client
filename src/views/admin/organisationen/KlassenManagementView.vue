@@ -241,7 +241,7 @@
     >
       {{ t('admin.headline') }}
     </h1>
-    <LayoutCard 
+    <LayoutCard
       data-testid="klasse-management-card"
       :header="t('admin.klasse.management')"
     >
