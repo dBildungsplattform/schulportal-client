@@ -41,9 +41,10 @@
     <v-row justify="center">
       <v-col cols="auto">
         <v-icon
-          small
           color="#1EAE9C"
+          data-testid="rolle-success-icon"
           icon="mdi-check-circle"
+          small
         ></v-icon>
       </v-col>
     </v-row>
