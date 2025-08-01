@@ -191,6 +191,7 @@
     </h1>
     <LayoutCard
       :closable="!organisationStore.errorCode"
+      data-testid="schule-creation-card"
       @onCloseClicked="navigateToSchuleManagement"
       :header="$t('admin.schule.addNew')"
       :padded="true"
