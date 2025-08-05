@@ -1,44 +1,44 @@
 <script setup lang="ts">
+  import RolleDelete from '@/components/admin/rollen/RolleDelete.vue';
+  import RolleForm from '@/components/admin/rollen/RolleForm.vue';
+  import RolleSuccessTemplate from '@/components/admin/rollen/RolleSuccessTemplate.vue';
+  import SpshAlert from '@/components/alert/SpshAlert.vue';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
   import {
-    type RolleStore,
-    useRolleStore,
     RollenMerkmal,
     RollenSystemRecht,
+    useRolleStore,
     type RolleFormType,
+    type RolleStore,
   } from '@/stores/RolleStore';
-  import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
   import {
     useServiceProviderStore,
     type ServiceProvider,
-    type ServiceProviderStore,
     type ServiceProviderIdNameResponse,
+    type ServiceProviderStore,
   } from '@/stores/ServiceProviderStore';
-  import { computed, onBeforeMount, onUnmounted, ref, type ComputedRef, type Ref } from 'vue';
-  import {
-    type Router,
-    useRouter,
-    type RouteLocationNormalizedLoaded,
-    useRoute,
-    onBeforeRouteLeave,
-    type RouteLocationNormalized,
-    type NavigationGuardNext,
-  } from 'vue-router';
-  import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import SpshAlert from '@/components/alert/SpshAlert.vue';
-  import RolleForm from '@/components/admin/rollen/RolleForm.vue';
-  import { type Composer, useI18n } from 'vue-i18n';
-  import { useDisplay } from 'vuetify';
-  import { useForm, type FormContext, type TypedSchema } from 'vee-validate';
+  import { type TranslatedObject } from '@/types.d';
+  import { isHiddenSystemrecht } from '@/utils/systemrechte';
   import {
     getDirtyState,
     getRolleFieldDefinitions,
     getValidationSchema,
     type RolleFieldDefinitions,
   } from '@/utils/validationRolle';
-  import RolleDelete from '@/components/admin/rollen/RolleDelete.vue';
-  import { type TranslatedObject } from '@/types.d';
-  import RolleSuccessTemplate from '@/components/admin/rollen/RolleSuccessTemplate.vue';
-  import { isHiddenSystemrecht } from '@/utils/systemrechte';
+  import { useForm, type FormContext, type TypedSchema } from 'vee-validate';
+  import { computed, onBeforeMount, onUnmounted, ref, type ComputedRef, type Ref } from 'vue';
+  import { useI18n, type Composer } from 'vue-i18n';
+  import {
+    onBeforeRouteLeave,
+    useRoute,
+    useRouter,
+    type NavigationGuardNext,
+    type RouteLocationNormalized,
+    type RouteLocationNormalizedLoaded,
+    type Router,
+  } from 'vue-router';
+  import { useDisplay } from 'vuetify';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
