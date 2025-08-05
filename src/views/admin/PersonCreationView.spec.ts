@@ -357,8 +357,13 @@ describe('PersonCreationView', () => {
     });
 
     await nextTick();
-    // Check that the systemrecht is set
-    expect(personenkontextStore.requestedWithSystemrecht).toBe(RollenSystemRecht.EingeschraenktNeueBenutzerErstellen);
+
+    expect(wrapper.find('[data-testid="admin-headline"]').text()).toBe('Andere Person (neu anlegen)');
+    expect(wrapper.find('[data-testid="layout-card-headline"]').text()).toBe('Andere Person (neu anlegen)');
+    expect(wrapper.find('[data-testid="person-creation-form-discard-button"]').text()).toBe('Abbrechen');
+    expect(wrapper.find('[data-testid="person-creation-form-submit-button"]').text()).toBe('Person anlegen');
+
+    expect(wrapper.findComponent({ name: 'PersonenkontextCreate' }).props('createType')).toBe('limited');
   });
 
   it('emits update:calculatedBefristungOption event with a value', async () => {
