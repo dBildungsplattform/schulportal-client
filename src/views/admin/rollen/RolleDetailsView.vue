@@ -358,6 +358,7 @@
             >
               <!-- Error Message Display -->
               <SpshAlert
+                dataTestIdPrefix="rolle-details-error"
                 :model-value="!!rolleStore.errorCode"
                 :title="
                   organisationStore.errorCode === 'UNSPECIFIED_ERROR'

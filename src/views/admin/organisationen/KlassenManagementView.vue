@@ -247,14 +247,15 @@
     >
       <!-- Error Message Display -->
       <SpshAlert
+        :buttonAction="handleAlertClose"
+        :buttonText="t('nav.backToList')"
+        :closable="false"
+        dataTestIdPrefix="klasse-management-error"
         :modelValue="!!organisationStore.errorCode"
+        :showButton="true"
+        :text="errorText"
         :title="errorTitle"
         :type="'error'"
-        :closable="false"
-        :text="errorText"
-        :showButton="true"
-        :buttonText="t('nav.backToList')"
-        :buttonAction="handleAlertClose"
       />
       <template v-if="!organisationStore.errorCode">
         <v-row
