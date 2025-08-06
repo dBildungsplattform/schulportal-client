@@ -13,7 +13,7 @@ import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
 import { DoFactory } from 'test/DoFactory';
 import { expect, test, type MockInstance } from 'vitest';
-import { nextTick } from 'vue';
+import { nextTick, type ComputedRef, type DefineComponent } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import KlassenManagementView from './KlassenManagementView.vue';
 
@@ -145,6 +145,12 @@ describe('KlassenManagementView', () => {
     organisationStore.deleteOrganisationById = vi.fn();
 
     authStore.currentUser = authUser;
+
+    organisationStore.klassenFilters.set('klassen-management-filter', {
+      total: 42,
+      filterResult: [],
+      loading: false,
+    });
 
     wrapper = await mountComponent();
     vi.useFakeTimers();
@@ -291,6 +297,16 @@ describe('KlassenManagementView', () => {
 
     expect(organisationAutocomplete?.text()).toEqual('');
     expect(klasseAutocomplete?.text()).toEqual('');
+  });
+
+  it.only('should return the total value from klassenFilters if present', async () => {
+    interface KlassenManagementView extends DefineComponent {
+      totalKlassen: ComputedRef<number>;
+    }
+    const vm: KlassenManagementView = wrapper?.vm as unknown as KlassenManagementView;
+    const totalKlassen: ComputedRef<number> = vm.totalKlassen;
+
+    expect(totalKlassen).toBe(42);
   });
 
   it('should fetch Klassen for selected Schule when search string is empty', async () => {

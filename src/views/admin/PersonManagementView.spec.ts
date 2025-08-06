@@ -14,7 +14,7 @@ import { DOMWrapper, VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
 import { DoFactory } from 'test/DoFactory';
 import { expect, test, type Mock, type MockInstance } from 'vitest';
-import { nextTick } from 'vue';
+import { nextTick, type ComputedRef, type DefineComponent } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import PersonManagementView from './PersonManagementView.vue';
 
@@ -150,6 +150,12 @@ beforeEach(async () => {
     selectedRollen: null,
     canCommit: true,
   };
+
+  organisationStore.klassenFilters.set('personen-management-klassen-filter', {
+    total: 42,
+    filterResult: [],
+    loading: false,
+  });
 
   wrapper = mountComponent();
 });
@@ -374,6 +380,16 @@ describe('PersonManagementView', () => {
     expect(schuleAutocomplete?.text()).toBe('');
     expect(rolleAutocomplete?.text()).toBe('');
     expect(klasseAutocomplete?.text()).toBe('');
+  });
+
+  it('should return the total value from klassenFilters if present', async () => {
+    interface PersonManagementView extends DefineComponent {
+      totalKlassen: ComputedRef<number>;
+    }
+    const vm: PersonManagementView = wrapper?.vm as unknown as PersonManagementView;
+    const totalKlassen: ComputedRef<number> = vm.totalKlassen;
+
+    expect(totalKlassen).toBe(42);
   });
 
   test('it updates Organisation search correctly', async () => {
