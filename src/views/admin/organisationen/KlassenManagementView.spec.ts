@@ -299,7 +299,7 @@ describe('KlassenManagementView', () => {
     expect(klasseAutocomplete?.text()).toEqual('');
   });
 
-  it.only('should return the total value from klassenFilters if present', async () => {
+  it('should return the total value from klassenFilters if present', async () => {
     interface KlassenManagementView extends DefineComponent {
       totalKlassen: ComputedRef<number>;
     }
