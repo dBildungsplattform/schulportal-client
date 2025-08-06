@@ -358,7 +358,9 @@ describe('PersonManagementView', () => {
     expect(rolleAutocomplete?.text()).toEqual('1');
 
     const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
-    const klassenInputElement: DOMWrapper<Element> | undefined = klasseAutocomplete?.find('input');
+    const klassenInputElement: DOMWrapper<Element> | undefined = klasseAutocomplete?.find(
+      '#personen-management-klassen-filter-klasse-select',
+    );
 
     await klassenInputElement?.setValue([klasse.name]);
     await nextTick();

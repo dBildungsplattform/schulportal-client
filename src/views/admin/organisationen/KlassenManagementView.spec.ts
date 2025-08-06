@@ -337,10 +337,10 @@ describe('KlassenManagementView', () => {
     const searchString: string = organisationStore.allKlassen[0]!.name.substring(0, 1);
     await selectSchule();
 
-    const klasseAutocomplete: DOMWrapper<Element> | undefined = wrapper?.find(
-      '[data-testid="klasse-management-filter-klasse-select"]',
+    const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
+    const klassenInputElement: DOMWrapper<Element> | undefined = klasseAutocomplete?.find(
+      '#klassen-management-filter-klasse-select',
     );
-    const klassenInputElement: DOMWrapper<Element> | undefined = klasseAutocomplete?.find('input');
 
     await klassenInputElement?.setValue(searchString);
 
