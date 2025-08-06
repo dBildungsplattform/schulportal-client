@@ -336,21 +336,22 @@ describe('KlassenManagementView', () => {
   test('it clears searchfield when losing focus', async () => {
     const searchString: string = organisationStore.allKlassen[0]!.name.substring(0, 1);
     await selectSchule();
-    const klasseSearchInput: ReturnType<VueWrapper['findComponent']> | undefined = wrapper?.find('#klasse-select');
-    const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
 
-    await klasseSearchInput?.setValue(searchString);
-    klasseAutocomplete?.vm.$emit('update:search', searchString);
+    const klasseAutocomplete: DOMWrapper<Element> | undefined = wrapper?.find(
+      '[data-testid="klasse-management-filter-klasse-select"]',
+    );
+    const klassenInputElement: DOMWrapper<Element> | undefined = klasseAutocomplete?.find('input');
+
+    await klassenInputElement?.setValue(searchString);
 
     await flushPromises();
     vi.runAllTimers();
 
-    expect(klasseSearchInput?.html()).includes(searchString);
+    expect((klassenInputElement?.element as HTMLInputElement).value).toBe(searchString);
 
-    // focus ANOTHER element, so the input loses focus and triggers the listener
-    await klasseSearchInput?.trigger('focus');
+    await klassenInputElement?.trigger('focus');
 
-    expect(klasseSearchInput?.html()).not.includes(searchString);
+    expect((klassenInputElement?.element as HTMLInputElement).value).toBe('');
   });
 
   test('it does nothing if same schule is selected again', async () => {

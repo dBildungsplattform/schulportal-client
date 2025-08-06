@@ -358,12 +358,13 @@ describe('PersonManagementView', () => {
     expect(rolleAutocomplete?.text()).toEqual('1');
 
     const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
-    await klasseAutocomplete?.setValue([klasse.id]);
-    klasseAutocomplete?.vm.$emit('update:selectedKlassen', [klasse.id]);
+    const klassenInputElement: DOMWrapper<Element> | undefined = klasseAutocomplete?.find('input');
+
+    await klassenInputElement?.setValue([klasse.name]);
     await nextTick();
     await flushPromises();
 
-    expect(klasseAutocomplete?.text()).toEqual(klasse.name);
+    expect((klassenInputElement?.element as HTMLInputElement).value).toBe(klasse.name);
 
     wrapper?.find('[data-testid="reset-filter-button"]').trigger('click');
     await nextTick();
