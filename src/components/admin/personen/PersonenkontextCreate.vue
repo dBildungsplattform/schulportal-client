@@ -255,15 +255,7 @@
     }
 
     timerId.value = setTimeout(async () => {
-      if (props.createType === CreationType.AddPersonToOwnSchule) {
-        await personenkontextStore.processWorkflowStepLandesbedienstete(filter);
-      } else {
-        await personenkontextStore.processWorkflowStep({
-          ...filter,
-          personId: props.personId,
-          operationContext: props.operationContext,
-        });
-      }
+      await handleWorkflowStep(filter);
     }, 500);
   });
 
@@ -293,14 +285,7 @@
       }
 
       timerId.value = setTimeout(async () => {
-        if (props.createType === CreationType.AddPersonToOwnSchule) {
-          await personenkontextStore.processWorkflowStepLandesbedienstete(filter);
-        } else {
-          await personenkontextStore.processWorkflowStep({
-            ...filter,
-            operationContext: props.operationContext,
-          });
-        }
+        await handleWorkflowStep(filter);
       }, 500);
     },
   );
