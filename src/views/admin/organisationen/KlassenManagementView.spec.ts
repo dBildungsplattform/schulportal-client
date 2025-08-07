@@ -344,6 +344,7 @@ describe('KlassenManagementView', () => {
   });
 
   // This test is currently not working as expected due to limitations with Vuetify's v-autocomplete
+  // TODO: Fix this test once we have a reliable way to open Vuetify's menu during tests.
   // it('shows loading spinner when organisationStore.loading is true', async () => {
   //   organisationStore.loading = true;
 
