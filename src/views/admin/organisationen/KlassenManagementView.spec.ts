@@ -309,6 +309,23 @@ describe('KlassenManagementView', () => {
     expect(totalKlassen).toBe(42);
   });
 
+  it('should return 0 if klassenFilters does not contain the key', async () => {
+    interface KlassenManagementView extends DefineComponent {
+      totalKlassen: ComputedRef<number>;
+    }
+
+    // The key 'klassen-management-filter' is not set in klassenFilters
+    organisationStore.klassenFilters.delete('klassen-management-filter');
+
+    await nextTick();
+    await flushPromises();
+
+    const vm: KlassenManagementView = wrapper?.vm as unknown as KlassenManagementView;
+    const totalKlassen: ComputedRef<number> = vm.totalKlassen;
+
+    expect(totalKlassen).toBe(0);
+  });
+
   it('should fetch Klassen for selected Schule when search string is empty', async () => {
     const schule: Organisation = (await selectSchule())!;
     const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });

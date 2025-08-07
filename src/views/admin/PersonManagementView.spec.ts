@@ -392,6 +392,23 @@ describe('PersonManagementView', () => {
     expect(totalKlassen).toBe(42);
   });
 
+  it('should return 0 if klassenFilters does not contain the key', async () => {
+    interface PersonManagementView extends DefineComponent {
+      totalKlassen: ComputedRef<number>;
+    }
+
+    // The key 'personen-management-klassen-filter' is not set in klassenFilters
+    organisationStore.klassenFilters.delete('personen-management-klassen-filter');
+
+    await nextTick();
+    await flushPromises();
+
+    const vm: PersonManagementView = wrapper?.vm as unknown as PersonManagementView;
+    const totalKlassen: ComputedRef<number> = vm.totalKlassen;
+
+    expect(totalKlassen).toBe(0);
+  });
+
   test('it updates Organisation search correctly', async () => {
     const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
 
