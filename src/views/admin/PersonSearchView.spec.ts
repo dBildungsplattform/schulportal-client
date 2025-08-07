@@ -301,8 +301,8 @@ describe('PersonSearchView', () => {
     await nextTick();
 
     // Should display organization cards
-    expect(wrapper?.find('[data-testid="zuordung-card-1"]').exists()).toBe(true);
-    expect(wrapper?.find('[data-testid="zuordung-card-2"]').exists()).toBe(true);
+    expect(wrapper?.find('[data-testid="zuordnung-card-1"]').exists()).toBe(true);
+    expect(wrapper?.find('[data-testid="zuordnung-card-2"]').exists()).toBe(true);
     for (const kontext of mockPerson.personenkontexte) {
       expect(wrapper?.text()).toContain(kontext.organisationName);
       expect(wrapper?.text()).toContain(kontext.rolleName);
@@ -499,7 +499,7 @@ describe('PersonSearchView', () => {
     await nextTick();
 
     // Click back button (assuming it exists in SpshAlert)
-    const backButton: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="alert-button"]');
+    const backButton: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid$="alert-button"]');
     await backButton?.trigger('click');
     await flushPromises();
 

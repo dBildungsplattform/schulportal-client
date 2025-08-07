@@ -358,6 +358,7 @@
             >
               <!-- Error Message Display -->
               <SpshAlert
+                dataTestIdPrefix="rolle-details-error"
                 :model-value="!!rolleStore.errorCode"
                 :title="
                   organisationStore.errorCode === 'UNSPECIFIED_ERROR'
@@ -448,7 +449,7 @@
                 >
                   <v-btn
                     class="primary"
-                    data-testid="rolle-changes-save"
+                    data-testid="rolle-changes-save-button"
                     @click="onSubmit"
                     :block="mdAndDown"
                     :disabled="rolleStore.loading"
