@@ -146,7 +146,7 @@ describe('KlassenManagementView', () => {
 
     authStore.currentUser = authUser;
 
-    organisationStore.klassenFilters.set('klassen-management-filter', {
+    organisationStore.klassenFilters.set('klassen-management-klassen-filter', {
       total: 42,
       filterResult: [],
       loading: false,
@@ -314,8 +314,8 @@ describe('KlassenManagementView', () => {
       totalKlassen: ComputedRef<number>;
     }
 
-    // The key 'klassen-management-filter' is not set in klassenFilters
-    organisationStore.klassenFilters.delete('klassen-management-filter');
+    // The key 'klassen-management-klassen-filter' is not set in klassenFilters
+    organisationStore.klassenFilters.delete('klassen-management-klassen-filter');
 
     await nextTick();
     await flushPromises();
@@ -382,7 +382,7 @@ describe('KlassenManagementView', () => {
 
     const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
     const klassenInputElement: DOMWrapper<Element> | undefined = klasseAutocomplete?.find(
-      '#klassen-management-filter-klasse-select',
+      '#klassen-management-klassen-filter-klasse-select',
     );
 
     await klassenInputElement?.setValue(searchString);
