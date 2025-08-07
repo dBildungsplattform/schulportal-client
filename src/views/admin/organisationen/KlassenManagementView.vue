@@ -346,6 +346,7 @@
                     <template v-slot:prepend-item>
                       <v-list-item>
                         <v-progress-circular
+                          data-testid="klassen-filter-progress"
                           indeterminate
                           v-if="organisationStore.loading"
                         ></v-progress-circular>
