@@ -326,6 +326,16 @@ describe('KlassenManagementView', () => {
     expect(totalKlassen).toBe(0);
   });
 
+  it('shows loading spinner when organisationStore.loading is true', async () => {
+    organisationStore.loading = true;
+
+    await nextTick();
+
+    expect(wrapper?.find('[role="progressbar"]').exists()).toBe(true);
+
+    expect(wrapper?.find('.filter-header').exists()).toBe(false);
+  });
+
   it('should fetch Klassen for selected Schule when search string is empty', async () => {
     const schule: Organisation = (await selectSchule())!;
     const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
