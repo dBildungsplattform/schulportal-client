@@ -377,87 +377,87 @@
                 @update:modelValue="handleAlertClose"
               />
             </RolleForm>
-            <v-divider
-              v-if="isEditActive"
-              class="border-opacity-100 rounded"
-              color="#E5EAEF"
-              thickness="5px"
-            ></v-divider>
-            <div
-              v-if="!isEditActive"
-              class="d-flex justify-sm-end"
-            >
-              <v-row class="pt-3 px-2 justify-end">
-                <v-col
-                  cols="12"
-                  md="auto"
-                  sm="6"
-                >
-                  <div class="d-flex justify-sm-end">
-                    <RolleDelete
-                      v-if="!rolleStore.errorCode"
-                      :errorCode="rolleStore.errorCode"
-                      :rolle="rolleStore.currentRolle"
-                      :isLoading="rolleStore.loading"
-                      @onDeleteRolle="deleteRolle(currentRolleId)"
+            <template v-if="!rolleStore.errorCode">
+              <v-divider
+                v-if="isEditActive"
+                class="border-opacity-100 rounded"
+                color="#E5EAEF"
+                thickness="5px"
+              ></v-divider>
+              <div
+                v-if="!isEditActive"
+                class="d-flex justify-sm-end"
+              >
+                <v-row class="pt-3 px-2 justify-end">
+                  <v-col
+                    cols="12"
+                    md="auto"
+                    sm="6"
+                  >
+                    <div class="d-flex justify-sm-end">
+                      <RolleDelete
+                        :errorCode="rolleStore.errorCode"
+                        :rolle="rolleStore.currentRolle"
+                        :isLoading="rolleStore.loading"
+                        @onDeleteRolle="deleteRolle(currentRolleId)"
+                      >
+                      </RolleDelete>
+                    </div>
+                  </v-col>
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="auto"
+                  >
+                    <v-btn
+                      class="primary"
+                      data-testid="rolle-edit-button"
+                      @Click="activateEditing"
+                      :block="mdAndDown"
                     >
-                    </RolleDelete>
-                  </div>
-                </v-col>
-                <v-col
-                  cols="12"
-                  sm="6"
-                  md="auto"
-                >
-                  <v-btn
-                    v-if="!rolleStore.errorCode"
-                    class="primary"
-                    data-testid="rolle-edit-button"
-                    @Click="activateEditing"
-                    :block="mdAndDown"
+                      {{ $t('edit') }}
+                    </v-btn>
+                  </v-col>
+                </v-row>
+              </div>
+              <div
+                v-else
+                class="d-flex justify-end"
+              >
+                <v-row class="pt-3 px-2 save-cancel-row justify-end">
+                  <v-col
+                    class="cancel-col"
+                    cols="12"
+                    sm="6"
+                    md="auto"
                   >
-                    {{ $t('edit') }}
-                  </v-btn>
-                </v-col>
-              </v-row>
-            </div>
-            <div
-              v-else
-              class="d-flex justify-end"
-            >
-              <v-row class="pt-3 px-2 save-cancel-row justify-end">
-                <v-col
-                  class="cancel-col"
-                  cols="12"
-                  sm="6"
-                  md="auto"
-                >
-                  <v-btn
-                    class="secondary"
-                    data-testid="rolle-edit-cancel-button"
-                    @click="handleCancel"
-                    :block="mdAndDown"
+                    <v-btn
+                      class="secondary"
+                      data-testid="rolle-edit-cancel-button"
+                      @click="handleCancel"
+                      :block="mdAndDown"
+                    >
+                      {{ $t('cancel') }}
+                    </v-btn>
+                  </v-col>
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="auto"
                   >
-                    {{ $t('cancel') }}
-                  </v-btn>
-                </v-col>
-                <v-col
-                  cols="12"
-                  sm="6"
-                  md="auto"
-                >
-                  <v-btn
-                    class="primary"
-                    data-testid="rolle-changes-save"
-                    @click="onSubmit"
-                    :block="mdAndDown"
-                    :disabled="rolleStore.loading"
-                  >
-                    {{ $t('save') }}
-                  </v-btn>
-                </v-col>
-              </v-row>
-            </div>
+                    <v-btn
+                      class="primary"
+                      data-testid="rolle-changes-save"
+                      @click="onSubmit"
+                      :block="mdAndDown"
+                      :disabled="rolleStore.loading"
+                    >
+                      {{ $t('save') }}
+                    </v-btn>
+                  </v-col>
+                </v-row>
+              </div>
+            </template>
           </div>
           <div v-else-if="rolleStore.loading">
             <v-progress-circular indeterminate></v-progress-circular>
