@@ -365,7 +365,7 @@ describe('PersonManagementView', () => {
 
     const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
     const klassenInputElement: DOMWrapper<Element> | undefined = klasseAutocomplete?.find(
-      '#personen-management-klassen-filter-klasse-select',
+      '#personen-management-klasse-select',
     );
 
     await klassenInputElement?.setValue([klasse.name]);
