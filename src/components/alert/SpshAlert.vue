@@ -29,7 +29,7 @@
       <v-alert
         @click:close="closeAlert"
         :closable="closable"
-        :data-testid="`${dataTestIdPrefix ? dataTestIdPrefix : 'spsh'}-alert`"
+        :data-testid="`${dataTestIdPrefix || 'spsh'}-alert`"
         :model-value="modelValue"
         :type="type"
         variant="outlined"
@@ -39,7 +39,7 @@
             class="primary-text-color"
             cols="auto"
           >
-            <strong :data-testid="`${dataTestIdPrefix ? dataTestIdPrefix : 'spsh'}-alert-title`">{{ title }}</strong>
+            <strong :data-testid="`${dataTestIdPrefix || 'spsh'}-alert-title`">{{ title }}</strong>
           </v-col>
         </v-row>
         <v-row>
@@ -47,7 +47,7 @@
             class="primary-text-color"
             cols="auto"
           >
-            <span :data-testid="`${dataTestIdPrefix ? dataTestIdPrefix : 'spsh'}-alert-text`">{{ text }}</span>
+            <span :data-testid="`${dataTestIdPrefix || 'spsh'}-alert-text`">{{ text }}</span>
             <slot name="text"></slot>
           </v-col>
         </v-row>
@@ -59,7 +59,7 @@
             <v-btn
               class="primary"
               @click="buttonAction"
-              :data-testid="`${dataTestIdPrefix ? dataTestIdPrefix : 'spsh'}-alert-button`"
+              :data-testid="`${dataTestIdPrefix || 'spsh'}-alert-button`"
             >
               {{ buttonText }}
             </v-btn>
