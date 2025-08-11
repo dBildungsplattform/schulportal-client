@@ -24,7 +24,7 @@
     highlightSelection?: boolean;
     placeholderText?: string;
     administriertVon?: string[] | undefined;
-    filterId?: string;
+    filterIdPrefix?: string;
   };
   const props: Props = defineProps<Props>();
   const selectedKlassen: Ref<SelectedKlassenIds> = defineModel('selectedKlassen');
@@ -39,10 +39,10 @@
 
   const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
   const testId: ComputedRef<string> = computed(() => {
-    return props.filterId ? `${props.filterId}-klasse-select` : 'klasse-select';
+    return props.filterIdPrefix ? `${props.filterIdPrefix}-klasse-select` : 'klasse-select';
   });
   const storeReference: ComputedRef<AutoCompleteStore<Organisation> | undefined> = computed(() => {
-    return organisationStore.klassenFilters.get(props.filterId ?? '');
+    return organisationStore.klassenFilters.get(props.filterIdPrefix ?? '');
   });
 
   const klassenFilter: OrganisationenFilter = reactive({
@@ -188,7 +188,7 @@
       const delay: number = oldFilter ? 500 : 0;
 
       timerId.value = setTimeout(async () => {
-        await organisationStore.loadKlassenForFilter(newFilter, props.filterId);
+        await organisationStore.loadKlassenForFilter(newFilter, props.filterIdPrefix);
       }, delay);
     },
     { immediate: true },
@@ -202,15 +202,15 @@
   );
 
   onMounted(() => {
-    if (organisationStore.klassenFilters.has(props.filterId ?? '')) {
+    if (organisationStore.klassenFilters.has(props.filterIdPrefix ?? '')) {
       // eslint-disable-next-line no-console
-      console.warn(`KlassenFilter initialized twice with id ${props.filterId}`);
+      console.warn(`KlassenFilter initialized twice with id ${props.filterIdPrefix}`);
     }
-    organisationStore.resetKlasseFilter(props.filterId);
+    organisationStore.resetKlasseFilter(props.filterIdPrefix);
   });
 
   onUnmounted(() => {
-    organisationStore.clearKlasseFilter(props.filterId);
+    organisationStore.clearKlasseFilter(props.filterIdPrefix);
   });
 </script>
 
@@ -233,7 +233,7 @@
     required="true"
     variant="outlined"
     @update:search="updateSearchString"
-    @click:clear="organisationStore.resetKlasseFilter(filterId)"
+    @click:clear="organisationStore.resetKlasseFilter(filterIdPrefix)"
     @update:focused="handleFocusChange"
     v-bind="selectedKlasseProps"
     v-model="selectedKlassen"

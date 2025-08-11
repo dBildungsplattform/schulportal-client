@@ -88,9 +88,9 @@
     return organisationStore.allKlassen;
   });
 
-  // Used for to show the number of klassen found in the filter. It uses the store key 'klasse-management-filter' to get the total count of this specific view.
+  // Used for to show the number of klassen found in the filter. It uses the store key 'klassen-management' to get the total count of this specific view.
   const totalKlassen: ComputedRef<number> = computed(
-    () => organisationStore.klassenFilters.get('klassen-management-klassen-filter')?.total ?? 0,
+    () => organisationStore.klassenFilters.get('klassen-management')?.total ?? 0,
   );
 
   // Used for the total count of Klassen in the table
@@ -330,7 +330,7 @@
               <template v-slot:activator="{ props }">
                 <div v-bind="props">
                   <KlassenFilter
-                    :filterId="'klassen-management-klassen-filter'"
+                    :filterIdPrefix="'klassen-management'"
                     :systemrechteForSearch="[RollenSystemRecht.KlassenVerwalten]"
                     :multiple="true"
                     :readonly="!hasSelectedSchule"

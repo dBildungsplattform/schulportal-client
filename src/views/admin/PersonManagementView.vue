@@ -772,7 +772,7 @@
             <template v-slot:activator="{ props }">
               <div v-bind="props">
                 <KlassenFilter
-                  :filterId="'personen-management-klassen-filter'"
+                  :filterIdPrefix="'personen-management'"
                   :systemrechteForSearch="[RollenSystemRecht.KlassenVerwalten]"
                   :multiple="true"
                   :readonly="selectedOrganisationIds.length == 0"
