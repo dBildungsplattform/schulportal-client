@@ -24,7 +24,7 @@ type Props = {
   highlightSelection?: boolean;
   placeholderText?: string;
   administriertVon?: string[];
-  filterId?: string;
+  filterIdPrefix?: string;
 };
 
 function mountComponent(props: Partial<Props> = {}): VueWrapper {
@@ -64,7 +64,7 @@ describe('KlassenFilter', async () => {
   describe.each([[undefined], ['test-component']])('when storeKey is %s', (storeKey: string | undefined) => {
     describe.each([[true], [false]])('when multiple is %s', (multiple: boolean) => {
       describe.each([[true], [false]])('when readonly is %s', (readonly: boolean) => {
-        const defaultProps: Props = { multiple, readonly, filterId: storeKey };
+        const defaultProps: Props = { multiple, readonly, filterIdPrefix: storeKey };
         const testId: string = storeKey ? `${storeKey}-klasse-select` : 'klasse-select';
 
         test('it renders', () => {
