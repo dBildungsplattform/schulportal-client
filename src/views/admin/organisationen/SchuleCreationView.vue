@@ -324,6 +324,7 @@
               <v-icon
                 small
                 color="#1EAE9C"
+                data-testid="schule-success-icon"
                 icon="mdi-check-circle"
               >
               </v-icon>
