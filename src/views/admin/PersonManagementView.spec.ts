@@ -14,7 +14,7 @@ import { DOMWrapper, VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
 import { DoFactory } from 'test/DoFactory';
 import { expect, test, type Mock, type MockInstance } from 'vitest';
-import { nextTick } from 'vue';
+import { nextTick, type ComputedRef, type DefineComponent } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import PersonManagementView from './PersonManagementView.vue';
 
@@ -150,6 +150,12 @@ beforeEach(async () => {
     selectedRollen: null,
     canCommit: true,
   };
+
+  organisationStore.klassenFilters.set('personen-management-klassen-filter', {
+    total: 42,
+    filterResult: [],
+    loading: false,
+  });
 
   wrapper = mountComponent();
 });
@@ -358,12 +364,15 @@ describe('PersonManagementView', () => {
     expect(rolleAutocomplete?.text()).toEqual('1');
 
     const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
-    await klasseAutocomplete?.setValue([klasse.id]);
-    klasseAutocomplete?.vm.$emit('update:selectedKlassen', [klasse.id]);
+    const klassenInputElement: DOMWrapper<Element> | undefined = klasseAutocomplete?.find(
+      '#personen-management-klasse-select',
+    );
+
+    await klassenInputElement?.setValue([klasse.name]);
     await nextTick();
     await flushPromises();
 
-    expect(klasseAutocomplete?.text()).toEqual(klasse.name);
+    expect((klassenInputElement?.element as HTMLInputElement).value).toBe(klasse.name);
 
     wrapper?.find('[data-testid="reset-filter-button"]').trigger('click');
     await nextTick();
@@ -371,6 +380,33 @@ describe('PersonManagementView', () => {
     expect(schuleAutocomplete?.text()).toBe('');
     expect(rolleAutocomplete?.text()).toBe('');
     expect(klasseAutocomplete?.text()).toBe('');
+  });
+
+  it('should return the total value from klassenFilters if present', async () => {
+    interface PersonManagementView extends DefineComponent {
+      totalKlassen: ComputedRef<number>;
+    }
+    const vm: PersonManagementView = wrapper?.vm as unknown as PersonManagementView;
+    const totalKlassen: ComputedRef<number> = vm.totalKlassen;
+
+    expect(totalKlassen).toBe(42);
+  });
+
+  it('should return 0 if klassenFilters does not contain the key', async () => {
+    interface PersonManagementView extends DefineComponent {
+      totalKlassen: ComputedRef<number>;
+    }
+
+    // The key 'personen-management-klassen-filter' is not set in klassenFilters
+    organisationStore.klassenFilters.delete('personen-management-klassen-filter');
+
+    await nextTick();
+    await flushPromises();
+
+    const vm: PersonManagementView = wrapper?.vm as unknown as PersonManagementView;
+    const totalKlassen: ComputedRef<number> = vm.totalKlassen;
+
+    expect(totalKlassen).toBe(0);
   });
 
   test('it updates Organisation search correctly', async () => {
