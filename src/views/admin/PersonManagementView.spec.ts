@@ -151,7 +151,7 @@ beforeEach(async () => {
     canCommit: true,
   };
 
-  organisationStore.klassenFilters.set('personen-management-klassen-filter', {
+  organisationStore.klassenFilters.set('personen-management', {
     total: 42,
     filterResult: [],
     loading: false,
