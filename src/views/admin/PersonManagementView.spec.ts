@@ -151,7 +151,7 @@ beforeEach(async () => {
     canCommit: true,
   };
 
-  organisationStore.klassenFilters.set('personen-management-klassen-filter', {
+  organisationStore.klassenFilters.set('personen-management', {
     total: 42,
     filterResult: [],
     loading: false,
@@ -398,7 +398,7 @@ describe('PersonManagementView', () => {
     }
 
     // The key 'personen-management-klassen-filter' is not set in klassenFilters
-    organisationStore.klassenFilters.delete('personen-management-klassen-filter');
+    organisationStore.klassenFilters.delete('personen-management');
 
     await nextTick();
     await flushPromises();

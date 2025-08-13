@@ -583,7 +583,7 @@
 
   // Used for to show the number of klassen found in the filter
   const totalKlassen: ComputedRef<number> = computed(
-    () => organisationStore.klassenFilters.get('personen-management-klassen-filter')?.total ?? 0,
+    () => organisationStore.klassenFilters.get('personen-management')?.total ?? 0,
   );
 
   onMounted(async () => {
