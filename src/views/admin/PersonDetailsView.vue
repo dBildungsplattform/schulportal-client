@@ -3025,7 +3025,7 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary"
-                data-testid="change-befristung-success-close"
+                data-testid="change-befristung-success-dialog-close-button"
                 @click.stop="closeChangeBefristungSuccessDialog"
               >
                 {{ t('close') }}
