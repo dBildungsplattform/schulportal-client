@@ -581,6 +581,11 @@
     }
   });
 
+  // Used for to show the number of klassen found in the filter
+  const totalKlassen: ComputedRef<number> = computed(
+    () => organisationStore.klassenFilters.get('personen-management')?.total ?? 0,
+  );
+
   onMounted(async () => {
     if (filterOrSearchActive.value) {
       selectedOrganisationIds.value = searchFilterStore.selectedOrganisationen || [];
@@ -767,6 +772,7 @@
             <template v-slot:activator="{ props }">
               <div v-bind="props">
                 <KlassenFilter
+                  :filterId="'personen-management'"
                   :systemrechteForSearch="[RollenSystemRecht.KlassenVerwalten]"
                   :multiple="true"
                   :readonly="selectedOrganisationIds.length == 0"
@@ -777,7 +783,21 @@
                   :placeholderText="t('admin.klasse.klassen')"
                   ref="klasse-select"
                   :administriertVon="selectedOrganisationIds ? selectedOrganisationIds : undefined"
-                />
+                >
+                  <template v-slot:prepend-item>
+                    <v-list-item>
+                      <v-progress-circular
+                        indeterminate
+                        v-if="organisationStore.loading"
+                      ></v-progress-circular>
+                      <span
+                        v-else
+                        class="filter-header"
+                        >{{ t('admin.klasse.klassenFound', { count: totalKlassen }, totalKlassen) }}</span
+                      >
+                    </v-list-item>
+                  </template>
+                </KlassenFilter>
               </div>
             </template>
             <span>{{ $t('admin.schule.selectSchuleFirst') }}</span>

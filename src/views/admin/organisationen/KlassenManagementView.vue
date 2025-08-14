@@ -88,6 +88,12 @@
     return organisationStore.allKlassen;
   });
 
+  // Used for to show the number of klassen found in the filter. It uses the store key 'klassen-management' to get the total count of this specific view.
+  const totalKlassen: ComputedRef<number> = computed(
+    () => organisationStore.klassenFilters.get('klassen-management')?.total ?? 0,
+  );
+
+  // Used for the total count of Klassen in the table
   const totalKlassenCount: ComputedRef<number> = computed(() => {
     if (selectedKlassen.value.length > 0) {
       return finalKlassen.value.length;
@@ -328,17 +334,34 @@
               <template v-slot:activator="{ props }">
                 <div v-bind="props">
                   <KlassenFilter
+                    :filterId="'klassen-management'"
                     :systemrechteForSearch="[RollenSystemRecht.KlassenVerwalten]"
                     :multiple="true"
                     :readonly="!hasSelectedSchule"
                     :hideDetails="true"
                     :highlightSelection="true"
                     :selectedKlassen="selectedKlassen"
+                    :totalKlassen="totalKlassen"
                     @update:selectedKlassen="updateKlassenSelection"
                     :placeholderText="t('admin.klasse.klassen')"
                     ref="klasse-select"
                     :administriertVon="administriertVonForKlassenFilter"
-                  ></KlassenFilter>
+                  >
+                    <template v-slot:prepend-item>
+                      <v-list-item>
+                        <v-progress-circular
+                          data-testid="klassen-filter-progress"
+                          indeterminate
+                          v-if="organisationStore.loading"
+                        ></v-progress-circular>
+                        <span
+                          v-else
+                          class="filter-header"
+                          >{{ t('admin.klasse.klassenFound', { count: totalKlassen }, totalKlassen) }}</span
+                        >
+                      </v-list-item>
+                    </template>
+                  </KlassenFilter>
                 </div>
               </template>
               <span>{{ t('admin.schule.selectSchuleFirst') }}</span>

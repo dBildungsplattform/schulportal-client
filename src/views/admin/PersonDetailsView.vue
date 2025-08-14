@@ -1667,6 +1667,7 @@
                     class="text-right"
                     sm="3"
                     cols="5"
+                    offset="1"
                   >
                     <span
                       :class="{
@@ -1703,6 +1704,7 @@
                     class="text-right"
                     sm="3"
                     cols="5"
+                    offset="1"
                   >
                     <span class="subtitle-2">{{ t('person.email') }}:</span>
                   </v-col>
