@@ -1244,13 +1244,14 @@ describe('OrganisationStore', () => {
 
   describe('resetSchulFilter', () => {
     test('should reset filter', () => {
+      const schule: Organisation[] = [DoFactory.getSchule()];
       organisationStore.schulenFilter = {
-        filterResult: [DoFactory.getSchule()],
+        filterResult: schule,
         loading: true,
         total: 1,
       };
       const expected: AutoCompleteStore<Organisation> = {
-        filterResult: [],
+        filterResult: schule,
         loading: false,
         total: 1,
       };
