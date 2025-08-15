@@ -1336,12 +1336,13 @@ describe('OrganisationStore', () => {
 
   describe('resetKlasseFilter', () => {
     describe.each([['', undefined, 'something']])('when store key is %s', (storeKey: string | undefined) => {
+      const klasse: Organisation[] = [DoFactory.getKlasse()];
       test('should reset filter', () => {
         organisationStore.klassenFilters = new Map([
-          [storeKey ?? '', { filterResult: [DoFactory.getKlasse()], loading: true, total: 1 }],
+          [storeKey ?? '', { filterResult: klasse, loading: true, total: 1 }],
         ]);
         const expected: AutoCompleteStore<Organisation> = {
-          filterResult: [],
+          filterResult: klasse,
           loading: false,
           total: 0,
         };
