@@ -715,7 +715,7 @@ export const useOrganisationStore: StoreDefinition<
           filter?.organisationIds,
         );
         klassenFilter.filterResult = response.data;
-        klassenFilter.total = +response.headers['x-paging-total'];
+        klassenFilter.total = +response.headers['x-paging-pagetotal'];
       } catch (error: unknown) {
         klassenFilter.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
