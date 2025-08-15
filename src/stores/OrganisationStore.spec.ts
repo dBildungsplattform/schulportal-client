@@ -1344,7 +1344,7 @@ describe('OrganisationStore', () => {
         const expected: AutoCompleteStore<Organisation> = {
           filterResult: klasse,
           loading: false,
-          total: 0,
+          total: 1,
         };
         organisationStore.resetKlasseFilter(storeKey);
         expect(organisationStore.klassenFilters.get(storeKey ?? '')).toEqual(expected);
