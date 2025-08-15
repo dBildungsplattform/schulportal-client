@@ -1281,7 +1281,7 @@ describe('OrganisationStore', () => {
         const mockResponse: Organisation[] = [DoFactory.getSchule()];
 
         mockadapter.onGet('/api/organisationen?offset=0&limit=30&typ=KLASSE').replyOnce(200, mockResponse, {
-          'x-paging-total': '1',
+          'x-paging-pagetotal': '1',
         });
         const promise: Promise<void> = organisationStore.loadKlassenForFilter(
           {
