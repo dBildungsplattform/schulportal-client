@@ -726,9 +726,9 @@ export const useOrganisationStore: StoreDefinition<
 
     resetKlasseFilter(storeKey: string = ''): void {
       this.klassenFilters.set(storeKey, {
-        filterResult: [],
+        filterResult: this.klassenFilters.get(storeKey)?.filterResult || [],
         loading: false,
-        total: 0,
+        total: this.klassenFilters.get(storeKey)?.total || 0,
       });
     },
 
