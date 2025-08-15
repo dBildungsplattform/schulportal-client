@@ -119,7 +119,7 @@
   });
 
   const updateSearchString = (searchString: string | undefined): void => {
-    if (searchString ) {
+    if (searchString) {
       klassenFilter.searchString = searchString;
     } else {
       delete klassenFilter.searchString;
