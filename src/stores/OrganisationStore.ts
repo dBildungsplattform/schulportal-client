@@ -728,7 +728,7 @@ export const useOrganisationStore: StoreDefinition<
       this.klassenFilters.set(storeKey, {
         filterResult: [],
         loading: false,
-        total: 0,
+        total: this.klassenFilters.get(storeKey)?.total || 0,
       });
     },
 
