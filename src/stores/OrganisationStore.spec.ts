@@ -1251,9 +1251,9 @@ describe('OrganisationStore', () => {
         total: 1,
       };
       const expected: AutoCompleteStore<Organisation> = {
-        filterResult: schule,
+        filterResult: [],
         loading: false,
-        total: 1,
+        total: 0,
       };
       organisationStore.resetSchulFilter();
       expect(organisationStore.schulenFilter).toEqual(expected);
