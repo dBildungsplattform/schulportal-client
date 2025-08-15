@@ -1252,7 +1252,7 @@ describe('OrganisationStore', () => {
       const expected: AutoCompleteStore<Organisation> = {
         filterResult: [],
         loading: false,
-        total: 0,
+        total: 1,
       };
       organisationStore.resetSchulFilter();
       expect(organisationStore.schulenFilter).toEqual(expected);
