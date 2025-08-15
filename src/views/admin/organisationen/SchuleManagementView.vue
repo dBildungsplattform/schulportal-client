@@ -95,7 +95,10 @@
     >
       {{ $t('admin.headline') }}
     </h1>
-    <LayoutCard :header="$t('admin.schule.management')">
+    <LayoutCard
+      data-testid="schule-management-card"
+      :header="$t('admin.schule.management')"
+    >
       <!-- Error Message Display -->
       <SpshAlert
         :model-value="!!organisationStore.errorCode"

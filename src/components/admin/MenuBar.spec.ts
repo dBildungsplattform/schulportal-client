@@ -88,7 +88,7 @@ describe('MenuBar', () => {
       expect(wrapper?.find('[data-testid="person-import-menu-item"]').exists()).toBe(hasPermission);
 
       expect(wrapper?.find('[data-testid="klasse-management-title"]').exists()).toBe(hasPermission);
-      expect(wrapper?.find('[data-testid="klassen-management-menu-item"]').exists()).toBe(hasPermission);
+      expect(wrapper?.find('[data-testid="klasse-management-menu-item"]').exists()).toBe(hasPermission);
       expect(wrapper?.find('[data-testid="klasse-creation-menu-item"]').exists()).toBe(hasPermission);
 
       expect(wrapper?.find('[data-testid="rolle-management-title"]').exists()).toBe(hasPermission);
@@ -106,9 +106,9 @@ describe('MenuBar', () => {
       expect(wrapper?.find('[data-testid="portal-management-title"]').exists()).toBe(hasPermission);
       expect(wrapper?.find('[data-testid="hinweise-edit-menu-item"]').exists()).toBe(hasPermission);
 
-      expect(wrapper?.find('[data-testid="add-person-title"]').exists()).toBe(hasPermission);
-      expect(wrapper?.find('[data-testid="search-person-menu-item"]').exists()).toBe(hasPermission);
-      expect(wrapper?.find('[data-testid="add-person-menu-item"]').exists()).toBe(hasPermission);
+      expect(wrapper?.find('[data-testid="person-add-title"]').exists()).toBe(hasPermission);
+      expect(wrapper?.find('[data-testid="person-search-menu-item"]').exists()).toBe(hasPermission);
+      expect(wrapper?.find('[data-testid="person-add-menu-item"]').exists()).toBe(hasPermission);
     },
   );
 
@@ -133,7 +133,7 @@ describe('MenuBar', () => {
     await wrapper.find('[data-testid="person-import-menu-item"]').trigger('click');
     await nextTick();
 
-    await wrapper.find('[data-testid="klassen-management-menu-item"]').trigger('click');
+    await wrapper.find('[data-testid="klasse-management-menu-item"]').trigger('click');
     await nextTick();
 
     await wrapper.find('[data-testid="rolle-management-menu-item"]').trigger('click');
