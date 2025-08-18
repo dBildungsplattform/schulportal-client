@@ -1163,7 +1163,8 @@ describe('PersonDetailsView', () => {
             );
             // wait for vuetify animation to complete
             await vi.waitUntil(
-              () => document.body.querySelector('[data-testid="change-befristung-success-dialog-close-button"]') != null,
+              () =>
+                document.body.querySelector('[data-testid="change-befristung-success-dialog-close-button"]') != null,
             );
             expect(closeSuccessButton).not.toBeNull();
 
