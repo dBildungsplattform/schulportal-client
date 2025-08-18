@@ -534,7 +534,7 @@
         <LayoutCard
           v-if="hasLehrRolle"
           data-testid="reset-device-password-card"
-          :headlineTestId="'reset-device-password-card'"
+          headlineTestId="reset-device-password-card-headline"
           :header="$t('admin.person.devicePassword.header')"
           class="text-body"
         >
@@ -572,7 +572,10 @@
                   </v-icon>
                 </v-col>
                 <v-col class="text-left">
-                  <p class="white-space-pre-wrap">
+                  <p
+                    class="white-space-pre-wrap"
+                    data-testid="device-password-info-text"
+                  >
                     {{ $t('admin.person.devicePassword.infoTextProfile') }}
                   </p>
                 </v-col>
