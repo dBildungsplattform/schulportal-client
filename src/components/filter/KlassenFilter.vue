@@ -118,12 +118,8 @@
     return false;
   });
 
-  const isDisplayName = (name: string): boolean => {
-    return translatedKlassen.value.find((klasse: TranslatedObject) => klasse.title === name) !== undefined;
-  };
-
   const updateSearchString = (searchString: string | undefined): void => {
-    if (searchString && !isDisplayName(searchString)) {
+    if (searchString) {
       klassenFilter.searchString = searchString;
     } else {
       delete klassenFilter.searchString;
