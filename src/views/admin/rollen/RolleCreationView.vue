@@ -298,6 +298,7 @@
     </h1>
     <LayoutCard
       :closable="!rolleStore.errorCode"
+      data-testid="rolle-creation-card"
       @onCloseClicked="navigateToRolleManagement"
       :header="$t('admin.rolle.addNew')"
       :padded="true"

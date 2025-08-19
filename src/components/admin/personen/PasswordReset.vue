@@ -75,6 +75,7 @@
       <LayoutCard
         :closable="true"
         :header="dialogHeader"
+        headlineTestId="password-reset-dialog-header"
         @onCloseClicked="closePasswordResetDialog(isActive)"
       >
         <v-card-text>

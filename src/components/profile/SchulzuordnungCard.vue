@@ -59,7 +59,8 @@
 <template>
   <LayoutCard
     :header="header"
-    :headline-test-id="'zuordung-card-' + oneBasedIndex"
+    :data-testid="`zuordnung-card-${oneBasedIndex}`"
+    :headlineTestId="`zuordnung-card-${oneBasedIndex}-headline`"
   >
     <v-row class="ma-3 p-4">
       <v-col cols="12">

@@ -389,7 +389,7 @@ describe('PersonDetailsView', () => {
       personStore.errorCode = 'ERROR_LOADING_USER';
       await nextTick();
 
-      expect(wrapper?.find('[data-testid="alert-title"]').text()).toBe('Fehler beim Laden des Benutzers');
+      expect(wrapper?.find('[data-testid$="alert-title"]').text()).toBe('Fehler beim Laden des Benutzers');
 
       personStore.errorCode = '';
       await nextTick();
@@ -402,7 +402,7 @@ describe('PersonDetailsView', () => {
 
       const alertButton: DOMWrapper<Element> | undefined = wrapper
         ?.findComponent({ ref: 'personenkontext-store-error-alert' })
-        .find('[data-testid="alert-button"]');
+        .find('[data-testid$="alert-button"]');
 
       expect(alertButton?.text()).toBe('Zurück zur Ergebnisliste');
 
@@ -599,7 +599,7 @@ describe('PersonDetailsView', () => {
     personStore.errorCode = 'PERSONALNUMMER_NICHT_EINDEUTIG';
     await nextTick();
 
-    await wrapper?.find('[data-testid="alert-button"]').trigger('click');
+    await wrapper?.find('[data-testid$="alert-button"]').trigger('click');
     const familienNameInput: DOMWrapper<Element> | undefined = await wrapper?.find(
       '[data-testid="person-familienname"]',
     );
@@ -809,7 +809,7 @@ describe('PersonDetailsView', () => {
     }
     await flushPromises();
 
-    const saveButton: Element | null = document.body.querySelector('[data-testid="zuordnung-changes-save"]');
+    const saveButton: Element | null = document.body.querySelector('[data-testid="zuordnung-changes-save-button"]');
     expect(saveButton).not.toBeNull();
 
     if (saveButton) {
@@ -881,7 +881,7 @@ describe('PersonDetailsView', () => {
     }
     await flushPromises();
 
-    const saveButton: Element | null = document.body.querySelector('[data-testid="zuordnung-changes-save"]');
+    const saveButton: Element | null = document.body.querySelector('[data-testid="zuordnung-changes-save-button"]');
     expect(saveButton).not.toBeNull();
 
     if (saveButton) {
@@ -927,7 +927,7 @@ describe('PersonDetailsView', () => {
       confirmDeleteButton.dispatchEvent(new Event('click'));
     }
 
-    const saveButton: Element | null = document.body.querySelector('[data-testid="zuordnung-changes-save"]');
+    const saveButton: Element | null = document.body.querySelector('[data-testid="zuordnung-changes-save-button"]');
     expect(saveButton).not.toBeNull();
 
     if (saveButton) {
@@ -1153,17 +1153,18 @@ describe('PersonDetailsView', () => {
             confirmDialogButton.dispatchEvent(new Event('click'));
             await flushPromises();
 
-            const saveButton: Element = document.body.querySelector('[data-testid="zuordnung-changes-save"]')!;
+            const saveButton: Element = document.body.querySelector('[data-testid="zuordnung-changes-save-button"]')!;
             expect(saveButton).not.toBeNull();
             saveButton.dispatchEvent(new Event('click'));
             await flushPromises();
 
             const closeSuccessButton: Element | null = document.body.querySelector(
-              '[data-testid="change-befristung-success-close"]',
+              '[data-testid="change-befristung-success-dialog-close-button"]',
             );
             // wait for vuetify animation to complete
             await vi.waitUntil(
-              () => document.body.querySelector('[data-testid="change-befristung-success-close"]') != null,
+              () =>
+                document.body.querySelector('[data-testid="change-befristung-success-dialog-close-button"]') != null,
             );
             expect(closeSuccessButton).not.toBeNull();
 

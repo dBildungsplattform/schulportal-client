@@ -35,12 +35,12 @@ beforeEach(async () => {
 
 describe('SpshAlert Component', () => {
   test('it renders the correct title and text', () => {
-    expect(wrapper?.find('[data-testid="alert-title"]').exists()).toBe(true);
-    expect(wrapper?.find('[data-testid="alert-text"]').exists()).toBe(true);
+    expect(wrapper?.find('[data-testid$="alert-title"]').exists()).toBe(true);
+    expect(wrapper?.find('[data-testid$="alert-text"]').exists()).toBe(true);
   });
 
   test('it renders the back button with correct text', async () => {
-    const backbutton: WrapperLike | undefined = wrapper?.find('[data-testid="alert-button"]');
+    const backbutton: WrapperLike | undefined = wrapper?.find('[data-testid$="alert-button"]');
 
     if (!backbutton) {
       return;
@@ -50,7 +50,7 @@ describe('SpshAlert Component', () => {
   });
 
   test('it triggers goBack action when back button is clicked', async () => {
-    const alertButton: WrapperLike | undefined = wrapper?.find('[data-testid="alert-button"]');
+    const alertButton: WrapperLike | undefined = wrapper?.find('[data-testid$="alert-button"]');
     await alertButton?.trigger('click');
     await nextTick();
 

@@ -261,7 +261,7 @@ describe('SchultraegerDetailsView', () => {
     await nextTick();
 
     const push: MockInstance = vi.spyOn(router, 'push');
-    await wrapper?.find('[data-testid="alert-button"]').trigger('click');
+    await wrapper?.find('[data-testid$="alert-button"]').trigger('click');
     await nextTick();
 
     expect(push).toHaveBeenCalledTimes(1);
