@@ -1,11 +1,11 @@
 import {
   EmailAddressStatus,
   OrganisationsTyp,
-  type PersonLandesbediensteterSearchPersonenkontextResponse,
-  type PersonLandesbediensteterSearchResponse,
   RollenArt,
   RollenMerkmal,
   RollenSystemRecht,
+  ServiceProviderKategorie,
+  ServiceProviderTarget,
   TraegerschaftTyp,
   Vertrauensstufe,
   type DBiamPersonenkontextResponse,
@@ -16,8 +16,11 @@ import {
   type PersonendatensatzResponse,
   type PersonenkontexteUpdateResponse,
   type PersonenkontextRolleFieldsResponse,
+  type PersonLandesbediensteterSearchPersonenkontextResponse,
+  type PersonLandesbediensteterSearchResponse,
   type PersonResponse,
   type RollenSystemRechtServiceProviderIDResponse,
+  type ServiceProviderResponse,
   type UserinfoResponse,
 } from '@/api-client/generated';
 import type { Organisation } from '@/stores/OrganisationStore';
@@ -415,6 +418,20 @@ export class DoFactory {
       organisationId: organisation.id,
       organisationName: organisation.name,
       organisationDstNr: organisation.kennung ?? '',
+    };
+  }
+
+  public static getServiceProviderResponse(props?: Partial<ServiceProviderResponse>): ServiceProviderResponse {
+    return {
+      id: faker.string.uuid(),
+      name: faker.company.name(),
+      target: faker.helpers.enumValue(ServiceProviderTarget),
+      url: faker.internet.url(),
+      kategorie: faker.helpers.enumValue(ServiceProviderKategorie),
+      hasLogo: true,
+      requires2fa: false,
+      merkmale: [],
+      ...props,
     };
   }
 }

@@ -149,6 +149,7 @@
     </h1>
     <LayoutCard
       :closable="!organisationStore.errorCode"
+      data-testid="klasse-creation-card"
       @onCloseClicked="navigateToKlasseManagement"
       :header="$t('admin.klasse.addNew')"
       :padded="true"

@@ -17,7 +17,6 @@
   import { RollenArt, RollenSystemRecht } from '@/stores/RolleStore';
   import type { Zuordnung } from '@/stores/types/Zuordnung';
   import { type TranslatedObject } from '@/types.d';
-  import { sameContent } from '@/utils/arrays';
   import type { BaseFieldProps } from 'vee-validate';
   import { computed, onMounted, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n } from 'vue-i18n';
@@ -30,9 +29,9 @@
   const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
   const canCommit: Ref<boolean> = ref(false);
 
-  const searchInputOrganisation: Ref<string> = ref('');
-  const searchInputRolle: Ref<string> = ref('');
-  const searchInputRollen: Ref<string> = ref('');
+  const searchInputOrganisation: Ref<string | undefined> = ref('');
+  const searchInputRolle: Ref<string | undefined> = ref('');
+  const searchInputRollen: Ref<string | undefined> = ref('');
 
   type Props = {
     organisationen: TranslatedObject[] | undefined;
@@ -195,10 +194,7 @@
             rollenIds: newRollen,
             limit: 25,
           };
-
           await handleWorkflowStep(filter);
-
-          canCommit.value = personenkontextStore.workflowStepResponse?.canCommit ?? false;
         } else {
           selectedKlasse.value = undefined;
           emits('fieldReset', 'selectedKlasse');
@@ -216,10 +212,7 @@
             rollenIds: [newRolle],
             limit: 25,
           };
-
           await handleWorkflowStep(filter);
-
-          canCommit.value = personenkontextStore.workflowStepResponse?.canCommit ?? false;
         }
 
         if (!newRolle) {
@@ -235,7 +228,7 @@
 
   // Using a watcher instead of modelUpdate since we need the old Value as well.
   // Default behavior of the autocomplete is to reset the newValue to empty string and that causes another request to be made
-  watch(searchInputOrganisation, async (newValue: string, oldValue: string) => {
+  watch(searchInputOrganisation, async (newValue: string | undefined, oldValue: string | undefined) => {
     clearTimeout(timerId.value);
 
     if (oldValue === selectedOrganisationTitle.value) return;
@@ -255,28 +248,27 @@
     }
 
     timerId.value = setTimeout(async () => {
-      if (props.createType === CreationType.AddPersonToOwnSchule) {
-        await personenkontextStore.processWorkflowStepLandesbedienstete(filter);
-      } else {
-        await personenkontextStore.processWorkflowStep({
-          ...filter,
-          personId: props.personId,
-          operationContext: props.operationContext,
-        });
-      }
+      await handleWorkflowStep(filter);
     }, 500);
   });
 
   watch(
     props.allowMultipleRollen ? searchInputRollen : searchInputRolle,
-    async (newValue: string | string[], oldValue: string | string[]) => {
+    async (newValue: string | undefined, oldValue: string | undefined) => {
       clearTimeout(timerId.value);
 
-      const isEqual: boolean = props.allowMultipleRollen
-        ? Array.isArray(newValue) && sameContent(newValue, selectedRolleTitles.value)
-        : oldValue === selectedRolleTitle.value;
+      // this prevents duplicate requests because the input value changes between "" and null
+      if (!newValue && !oldValue) return;
 
-      if (isEqual) return;
+      // this prevents duplicate requests when the user selects a value from the dropdown
+      if (
+        newValue &&
+        (props.allowMultipleRollen
+          ? selectedRolleTitles.value.includes(newValue)
+          : selectedRolleTitle.value === newValue)
+      ) {
+        return;
+      }
 
       const filter: WorkflowFilter = {
         personId: props.personId,
@@ -286,21 +278,14 @@
       };
 
       // Add rolleName if user is typing
-      if (!newValue || (Array.isArray(newValue) && newValue.length === 0)) {
+      if (!newValue) {
         // No rolleName (cleared)
-      } else if (!Array.isArray(newValue)) {
+      } else {
         filter.rolleName = newValue;
       }
 
       timerId.value = setTimeout(async () => {
-        if (props.createType === CreationType.AddPersonToOwnSchule) {
-          await personenkontextStore.processWorkflowStepLandesbedienstete(filter);
-        } else {
-          await personenkontextStore.processWorkflowStep({
-            ...filter,
-            operationContext: props.operationContext,
-          });
-        }
+        await handleWorkflowStep(filter);
       }, 500);
     },
   );

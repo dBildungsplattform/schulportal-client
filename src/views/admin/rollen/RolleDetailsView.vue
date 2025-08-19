@@ -1,44 +1,44 @@
 <script setup lang="ts">
+  import RolleDelete from '@/components/admin/rollen/RolleDelete.vue';
+  import RolleForm from '@/components/admin/rollen/RolleForm.vue';
+  import RolleSuccessTemplate from '@/components/admin/rollen/RolleSuccessTemplate.vue';
+  import SpshAlert from '@/components/alert/SpshAlert.vue';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
   import {
-    type RolleStore,
-    useRolleStore,
     RollenMerkmal,
     RollenSystemRecht,
+    useRolleStore,
     type RolleFormType,
+    type RolleStore,
   } from '@/stores/RolleStore';
-  import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
   import {
     useServiceProviderStore,
     type ServiceProvider,
-    type ServiceProviderStore,
     type ServiceProviderIdNameResponse,
+    type ServiceProviderStore,
   } from '@/stores/ServiceProviderStore';
-  import { computed, onBeforeMount, onUnmounted, ref, type ComputedRef, type Ref } from 'vue';
-  import {
-    type Router,
-    useRouter,
-    type RouteLocationNormalizedLoaded,
-    useRoute,
-    onBeforeRouteLeave,
-    type RouteLocationNormalized,
-    type NavigationGuardNext,
-  } from 'vue-router';
-  import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import SpshAlert from '@/components/alert/SpshAlert.vue';
-  import RolleForm from '@/components/admin/rollen/RolleForm.vue';
-  import { type Composer, useI18n } from 'vue-i18n';
-  import { useDisplay } from 'vuetify';
-  import { useForm, type FormContext, type TypedSchema } from 'vee-validate';
+  import { type TranslatedObject } from '@/types.d';
+  import { isHiddenSystemrecht } from '@/utils/systemrechte';
   import {
     getDirtyState,
     getRolleFieldDefinitions,
     getValidationSchema,
     type RolleFieldDefinitions,
   } from '@/utils/validationRolle';
-  import RolleDelete from '@/components/admin/rollen/RolleDelete.vue';
-  import { type TranslatedObject } from '@/types.d';
-  import RolleSuccessTemplate from '@/components/admin/rollen/RolleSuccessTemplate.vue';
-  import { isHiddenSystemrecht } from '@/utils/systemrechte';
+  import { useForm, type FormContext, type TypedSchema } from 'vee-validate';
+  import { computed, onBeforeMount, onUnmounted, ref, type ComputedRef, type Ref } from 'vue';
+  import { useI18n, type Composer } from 'vue-i18n';
+  import {
+    onBeforeRouteLeave,
+    useRoute,
+    useRouter,
+    type NavigationGuardNext,
+    type RouteLocationNormalized,
+    type RouteLocationNormalizedLoaded,
+    type Router,
+  } from 'vue-router';
+  import { useDisplay } from 'vuetify';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
@@ -358,6 +358,7 @@
             >
               <!-- Error Message Display -->
               <SpshAlert
+                dataTestIdPrefix="rolle-details-error"
                 :model-value="!!rolleStore.errorCode"
                 :title="
                   organisationStore.errorCode === 'UNSPECIFIED_ERROR'
@@ -377,87 +378,87 @@
                 @update:modelValue="handleAlertClose"
               />
             </RolleForm>
-            <v-divider
-              v-if="isEditActive"
-              class="border-opacity-100 rounded"
-              color="#E5EAEF"
-              thickness="5px"
-            ></v-divider>
-            <div
-              v-if="!isEditActive"
-              class="d-flex justify-sm-end"
-            >
-              <v-row class="pt-3 px-2 justify-end">
-                <v-col
-                  cols="12"
-                  md="auto"
-                  sm="6"
-                >
-                  <div class="d-flex justify-sm-end">
-                    <RolleDelete
-                      v-if="!rolleStore.errorCode"
-                      :errorCode="rolleStore.errorCode"
-                      :rolle="rolleStore.currentRolle"
-                      :isLoading="rolleStore.loading"
-                      @onDeleteRolle="deleteRolle(currentRolleId)"
+            <template v-if="!rolleStore.errorCode">
+              <v-divider
+                v-if="isEditActive"
+                class="border-opacity-100 rounded"
+                color="#E5EAEF"
+                thickness="5px"
+              ></v-divider>
+              <div
+                v-if="!isEditActive"
+                class="d-flex justify-sm-end"
+              >
+                <v-row class="pt-3 px-2 justify-end">
+                  <v-col
+                    cols="12"
+                    md="auto"
+                    sm="6"
+                  >
+                    <div class="d-flex justify-sm-end">
+                      <RolleDelete
+                        :errorCode="rolleStore.errorCode"
+                        :rolle="rolleStore.currentRolle"
+                        :isLoading="rolleStore.loading"
+                        @onDeleteRolle="deleteRolle(currentRolleId)"
+                      >
+                      </RolleDelete>
+                    </div>
+                  </v-col>
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="auto"
+                  >
+                    <v-btn
+                      class="primary"
+                      data-testid="rolle-edit-button"
+                      @Click="activateEditing"
+                      :block="mdAndDown"
                     >
-                    </RolleDelete>
-                  </div>
-                </v-col>
-                <v-col
-                  cols="12"
-                  sm="6"
-                  md="auto"
-                >
-                  <v-btn
-                    v-if="!rolleStore.errorCode"
-                    class="primary"
-                    data-testid="rolle-edit-button"
-                    @Click="activateEditing"
-                    :block="mdAndDown"
+                      {{ $t('edit') }}
+                    </v-btn>
+                  </v-col>
+                </v-row>
+              </div>
+              <div
+                v-else
+                class="d-flex justify-end"
+              >
+                <v-row class="pt-3 px-2 save-cancel-row justify-end">
+                  <v-col
+                    class="cancel-col"
+                    cols="12"
+                    sm="6"
+                    md="auto"
                   >
-                    {{ $t('edit') }}
-                  </v-btn>
-                </v-col>
-              </v-row>
-            </div>
-            <div
-              v-else
-              class="d-flex justify-end"
-            >
-              <v-row class="pt-3 px-2 save-cancel-row justify-end">
-                <v-col
-                  class="cancel-col"
-                  cols="12"
-                  sm="6"
-                  md="auto"
-                >
-                  <v-btn
-                    class="secondary"
-                    data-testid="rolle-edit-cancel-button"
-                    @click="handleCancel"
-                    :block="mdAndDown"
+                    <v-btn
+                      class="secondary"
+                      data-testid="rolle-edit-cancel-button"
+                      @click="handleCancel"
+                      :block="mdAndDown"
+                    >
+                      {{ $t('cancel') }}
+                    </v-btn>
+                  </v-col>
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="auto"
                   >
-                    {{ $t('cancel') }}
-                  </v-btn>
-                </v-col>
-                <v-col
-                  cols="12"
-                  sm="6"
-                  md="auto"
-                >
-                  <v-btn
-                    class="primary"
-                    data-testid="rolle-changes-save"
-                    @click="onSubmit"
-                    :block="mdAndDown"
-                    :disabled="rolleStore.loading"
-                  >
-                    {{ $t('save') }}
-                  </v-btn>
-                </v-col>
-              </v-row>
-            </div>
+                    <v-btn
+                      class="primary"
+                      data-testid="rolle-changes-save-button"
+                      @click="onSubmit"
+                      :block="mdAndDown"
+                      :disabled="rolleStore.loading"
+                    >
+                      {{ $t('save') }}
+                    </v-btn>
+                  </v-col>
+                </v-row>
+              </div>
+            </template>
           </div>
           <div v-else-if="rolleStore.loading">
             <v-progress-circular indeterminate></v-progress-circular>

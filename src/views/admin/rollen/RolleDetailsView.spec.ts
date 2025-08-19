@@ -162,7 +162,7 @@ describe('RolleDetailsView', () => {
     await wrapper?.find('[data-testid="rolle-edit-button"]').trigger('click');
     await nextTick();
 
-    expect(wrapper?.find('[data-testid="rolle-changes-save"]').isVisible()).toBe(true);
+    expect(wrapper?.find('[data-testid="rolle-changes-save-button"]').isVisible()).toBe(true);
   });
 
   test('it does not cancel editing because of unsaved changes', async () => {
@@ -200,7 +200,7 @@ describe('RolleDetailsView', () => {
     await rolleFormWrapper?.findComponent({ ref: 'rollenname-input' }).setValue('Updated Lehrer');
     await nextTick();
 
-    await wrapper?.find('[data-testid="rolle-changes-save"]').trigger('click');
+    await wrapper?.find('[data-testid="rolle-changes-save-button"]').trigger('click');
     await nextTick();
 
     rolleStore.updatedRolle = mockUpdatedRolle;

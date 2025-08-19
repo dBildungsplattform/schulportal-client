@@ -717,7 +717,7 @@ export const useOrganisationStore: StoreDefinition<
           filter?.organisationIds,
         );
         klassenFilter.filterResult = response.data;
-        klassenFilter.total = +response.headers['x-paging-total'];
+        klassenFilter.total = +response.headers['x-paging-pagetotal'];
       } catch (error: unknown) {
         klassenFilter.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
@@ -728,9 +728,9 @@ export const useOrganisationStore: StoreDefinition<
 
     resetKlasseFilter(storeKey: string = ''): void {
       this.klassenFilters.set(storeKey, {
-        filterResult: [],
+        filterResult: this.klassenFilters.get(storeKey)?.filterResult || [],
         loading: false,
-        total: 0,
+        total: this.klassenFilters.get(storeKey)?.total || 0,
       });
     },
 

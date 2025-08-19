@@ -1667,6 +1667,7 @@
                     class="text-right"
                     sm="3"
                     cols="5"
+                    offset="1"
                   >
                     <span
                       :class="{
@@ -1703,6 +1704,7 @@
                     class="text-right"
                     sm="3"
                     cols="5"
+                    offset="1"
                   >
                     <span class="subtitle-2">{{ t('person.email') }}:</span>
                   </v-col>
@@ -1882,6 +1884,7 @@
         <v-container
           v-if="!isEditActive"
           class="person-zuordnungen"
+          data-testid="person-zuordnungen-section-view"
         >
           <v-row class="ml-md-16">
             <v-col v-if="personStore.loading">
@@ -1958,7 +1961,10 @@
           </v-row>
         </v-container>
         <!-- Show this template if the edit button is triggered-->
-        <v-container v-if="isEditActive">
+        <v-container
+          v-if="isEditActive"
+          data-testid="person-zuordnungen-section-edit"
+        >
           <template v-if="!isZuordnungFormActive && !isChangeKlasseFormActive && !isChangeBefristungActive">
             <v-row class="ml-md-16">
               <v-col
@@ -2210,7 +2216,7 @@
                 >
                   <v-btn
                     class="primary small"
-                    data-testid="zuordnung-changes-save"
+                    data-testid="zuordnung-changes-save-button"
                     @click="handleSaveClick"
                     :block="mdAndDown"
                     :disabled="isSaveButtonDisabled || personenkontextStore.loading"
@@ -3021,7 +3027,7 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary"
-                data-testid="change-befristung-success-close"
+                data-testid="change-befristung-success-dialog-close-button"
                 @click.stop="closeChangeBefristungSuccessDialog"
               >
                 {{ t('close') }}

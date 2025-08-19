@@ -1,46 +1,46 @@
 <script setup lang="ts">
-  import { ref, type Ref, onMounted, onUnmounted, computed, type ComputedRef } from 'vue';
+  import RolleForm from '@/components/admin/rollen/RolleForm.vue';
+  import RolleSuccessTemplate from '@/components/admin/rollen/RolleSuccessTemplate.vue';
+  import SpshAlert from '@/components/alert/SpshAlert.vue';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
   import {
-    useOrganisationStore,
-    type OrganisationStore,
-    type Organisation,
     OrganisationsTyp,
+    useOrganisationStore,
+    type Organisation,
+    type OrganisationStore,
   } from '@/stores/OrganisationStore';
   import {
-    useRolleStore,
-    type RolleStore,
+    RollenArt,
     RollenMerkmal,
     RollenSystemRecht,
-    RollenArt,
-    type RolleResponse,
+    useRolleStore,
     type RolleFormType,
+    type RolleResponse,
+    type RolleStore,
   } from '@/stores/RolleStore';
   import {
     useServiceProviderStore,
     type ServiceProvider,
     type ServiceProviderStore,
   } from '@/stores/ServiceProviderStore';
-  import { useI18n, type Composer } from 'vue-i18n';
-  import SpshAlert from '@/components/alert/SpshAlert.vue';
-  import {
-    onBeforeRouteLeave,
-    type Router,
-    useRouter,
-    type NavigationGuardNext,
-    type RouteLocationNormalized,
-  } from 'vue-router';
-  import { useForm, type FormContext, type TypedSchema } from 'vee-validate';
-  import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import RolleForm from '@/components/admin/rollen/RolleForm.vue';
+  import { type TranslatedObject } from '@/types.d';
+  import { isHiddenSystemrecht } from '@/utils/systemrechte';
   import {
     getDirtyState,
     getRolleFieldDefinitions,
     getValidationSchema,
     type RolleFieldDefinitions,
   } from '@/utils/validationRolle';
-  import RolleSuccessTemplate from '@/components/admin/rollen/RolleSuccessTemplate.vue';
-  import { type TranslatedObject } from '@/types.d';
-  import { isHiddenSystemrecht } from '@/utils/systemrechte';
+  import { useForm, type FormContext, type TypedSchema } from 'vee-validate';
+  import { computed, onMounted, onUnmounted, ref, type ComputedRef, type Ref } from 'vue';
+  import { useI18n, type Composer } from 'vue-i18n';
+  import {
+    onBeforeRouteLeave,
+    useRouter,
+    type NavigationGuardNext,
+    type RouteLocationNormalized,
+    type Router,
+  } from 'vue-router';
 
   const rolleStore: RolleStore = useRolleStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
@@ -298,6 +298,7 @@
     </h1>
     <LayoutCard
       :closable="!rolleStore.errorCode"
+      data-testid="rolle-creation-card"
       @onCloseClicked="navigateToRolleManagement"
       :header="$t('admin.rolle.addNew')"
       :padded="true"

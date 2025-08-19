@@ -88,6 +88,12 @@
     return organisationStore.allKlassen;
   });
 
+  // Used for to show the number of klassen found in the filter. It uses the store key 'klassen-management' to get the total count of this specific view.
+  const totalKlassen: ComputedRef<number> = computed(
+    () => organisationStore.klassenFilters.get('klassen-management')?.total ?? 0,
+  );
+
+  // Used for the total count of Klassen in the table
   const totalKlassenCount: ComputedRef<number> = computed(() => {
     if (selectedKlassen.value.length > 0) {
       return finalKlassen.value.length;
@@ -241,17 +247,21 @@
     >
       {{ t('admin.headline') }}
     </h1>
-    <LayoutCard :header="t('admin.klasse.management')">
+    <LayoutCard
+      data-testid="klasse-management-card"
+      :header="t('admin.klasse.management')"
+    >
       <!-- Error Message Display -->
       <SpshAlert
+        :buttonAction="handleAlertClose"
+        :buttonText="t('nav.backToList')"
+        :closable="false"
+        dataTestIdPrefix="klasse-management-error"
         :modelValue="!!organisationStore.errorCode"
+        :showButton="true"
+        :text="errorText"
         :title="errorTitle"
         :type="'error'"
-        :closable="false"
-        :text="errorText"
-        :showButton="true"
-        :buttonText="t('nav.backToList')"
-        :buttonAction="handleAlertClose"
       />
       <template v-if="!organisationStore.errorCode">
         <v-row
@@ -324,17 +334,34 @@
               <template v-slot:activator="{ props }">
                 <div v-bind="props">
                   <KlassenFilter
+                    :filterId="'klassen-management'"
                     :systemrechteForSearch="[RollenSystemRecht.KlassenVerwalten]"
                     :multiple="true"
                     :readonly="!hasSelectedSchule"
                     :hideDetails="true"
                     :highlightSelection="true"
                     :selectedKlassen="selectedKlassen"
+                    :totalKlassen="totalKlassen"
                     @update:selectedKlassen="updateKlassenSelection"
                     :placeholderText="t('admin.klasse.klassen')"
                     ref="klasse-select"
                     :administriertVon="administriertVonForKlassenFilter"
-                  ></KlassenFilter>
+                  >
+                    <template v-slot:prepend-item>
+                      <v-list-item>
+                        <v-progress-circular
+                          data-testid="klassen-filter-progress"
+                          indeterminate
+                          v-if="organisationStore.loading"
+                        ></v-progress-circular>
+                        <span
+                          v-else
+                          class="filter-header"
+                          >{{ t('admin.klasse.klassenFound', { count: totalKlassen }, totalKlassen) }}</span
+                        >
+                      </v-list-item>
+                    </template>
+                  </KlassenFilter>
                 </div>
               </template>
               <span>{{ t('admin.schule.selectSchuleFirst') }}</span>
