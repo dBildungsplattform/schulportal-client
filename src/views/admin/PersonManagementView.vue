@@ -372,6 +372,12 @@
     }, 500);
   }
 
+  const handleFocusChange = (focused: boolean): void => {
+    if (!focused) {
+      searchInputRollen.value = '';
+    }
+  };
+
   // Define a mapping between complex table keys and expected backend keys
   const keyMapping: Record<string, SortField> = {
     'person.name.familienname': SortField.Familienname,
@@ -720,6 +726,7 @@
             required="true"
             @update:modelValue="setRolleFilter"
             @update:search="updateRollenSearch"
+            @update:focused="handleFocusChange"
             variant="outlined"
             v-model="selectedRollen"
             v-model:search="searchInputRollen"
