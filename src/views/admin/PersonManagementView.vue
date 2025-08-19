@@ -372,9 +372,10 @@
     }, 500);
   }
 
-  const handleFocusChange = (focused: boolean): void => {
-    if (!focused) {
+  const handleFocusChange = async (focused: boolean): Promise<void> => {
+    if (!focused && searchInputRollen.value) {
       searchInputRollen.value = '';
+      await updateRollenSearch(searchInputRollen.value);
     }
   };
 
