@@ -37,21 +37,21 @@ beforeEach(async () => {
 
 describe('UnknownUserErrorView', () => {
   test('it renders the error card', () => {
-    const alertTitle: WrapperLike | undefined = wrapper?.find('[data-testid="alert-title"]');
+    const alertTitle: WrapperLike | undefined = wrapper?.find('[data-testid$="alert-title"]');
 
     expect(alertTitle?.isVisible()).toBe(true);
     expect(alertTitle?.text()).toEqual('Unbekannter Benutzer');
   });
 
   test('it renders the error description', () => {
-    const alertTitle: WrapperLike | undefined = wrapper?.find('[data-testid="alert-text"]');
+    const alertTitle: WrapperLike | undefined = wrapper?.find('[data-testid$="alert-text"]');
 
     expect(alertTitle?.isVisible()).toBe(true);
     expect(alertTitle?.text()).toEqual('Der Benutzer ist im Schulportal SH nicht bekannt');
   });
 
   test('it renders the logout button', async () => {
-    const logoutButton: WrapperLike | undefined = wrapper?.find('[data-testid="alert-button"]');
+    const logoutButton: WrapperLike | undefined = wrapper?.find('[data-testid$="alert-button"]');
 
     expect(logoutButton?.isVisible()).toBe(true);
     expect(logoutButton?.text()).toEqual('Abmelden');
