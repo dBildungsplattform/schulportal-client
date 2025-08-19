@@ -303,6 +303,7 @@
     searchFieldComponent.value.searchFilter = '';
     searchFilterStore.setKlasseFilterForPersonen([]);
     searchFilterStore.setRolleFilterForPersonen([]);
+    searchFilterStore.setRolleFilterWithObjectsForPersonen([], []);
     searchFilterStore.setSearchFilterForPersonen('');
     /* do not reset orgas if orga was autoselected */
     if (!hasAutoSelectedOrganisation.value) {
@@ -357,7 +358,7 @@
 
       // If there are selected rollen not in the search results, add them to filteredRollen
       const moeglicheRollen: RolleResponse[] = personenkontextStore.filteredRollen?.moeglicheRollen || [];
-      const missingRollen: RolleResponse[] = selectedRollenObjects.value.filter(
+      const missingRollen: RolleResponse[] = searchFilterStore.selectedRollenObjects.filter(
         (rolle: RolleResponse) => !moeglicheRollen.some((r: RolleResponse) => r.id === rolle.id),
       );
 
