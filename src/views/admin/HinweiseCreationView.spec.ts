@@ -145,9 +145,9 @@ describe('HinweiseCreationView', () => {
     meldungStore.errorCode = 'MELDUNG_ERROR';
     await nextTick();
     expect(wrapper?.getComponent({ name: 'SpshAlert' })).toBeTruthy();
-    expect(wrapper?.find('[data-testid="alert-title"]').isVisible()).toBe(true);
+    expect(wrapper?.find('[data-testid$="alert-title"]').isVisible()).toBe(true);
 
-    wrapper?.find('[data-testid="alert-button"]').trigger('click');
+    wrapper?.find('[data-testid$="alert-button"]').trigger('click');
     await nextTick();
   });
 

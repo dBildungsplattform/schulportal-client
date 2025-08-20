@@ -39,15 +39,6 @@
   const isDownloadingFile: Ref<boolean> = ref(false);
 
   const allRollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
-  const lernRollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = computed(() => {
-    if (!allRollen.value) {
-      return [];
-    }
-
-    return allRollen.value.filter((rolle: TranslatedRolleWithAttrs) => {
-      return rolle.rollenart === RollenArt.Lern;
-    });
-  });
 
   const validationSchema: TypedSchema = toTypedSchema(
     object({
@@ -90,6 +81,16 @@
     Ref<File | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = formContext.defineField('selectedFiles', vuetifyConfig);
+
+  const lernRollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = computed(() => {
+    if (!allRollen.value || selectedSchule.value === undefined) {
+      return [];
+    }
+
+    return allRollen.value.filter((rolle: TranslatedRolleWithAttrs) => {
+      return rolle.rollenart === RollenArt.Lern;
+    });
+  });
 
   watch(selectedSchule, async (newValue: string | undefined, oldValue: string | undefined) => {
     if (newValue && newValue !== oldValue) {

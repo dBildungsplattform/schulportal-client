@@ -4,6 +4,8 @@ import {
   RollenArt,
   RollenMerkmal,
   RollenSystemRecht,
+  ServiceProviderKategorie,
+  ServiceProviderTarget,
   TraegerschaftTyp,
   Vertrauensstufe,
   type DBiamPersonenkontextResponse,
@@ -14,8 +16,11 @@ import {
   type PersonendatensatzResponse,
   type PersonenkontexteUpdateResponse,
   type PersonenkontextRolleFieldsResponse,
+  type PersonLandesbediensteterSearchPersonenkontextResponse,
+  type PersonLandesbediensteterSearchResponse,
   type PersonResponse,
   type RollenSystemRechtServiceProviderIDResponse,
+  type ServiceProviderResponse,
   type UserinfoResponse,
 } from '@/api-client/generated';
 import type { Organisation } from '@/stores/OrganisationStore';
@@ -381,6 +386,51 @@ export class DoFactory {
   public static getPersonendatensatz(props?: Partial<Personendatensatz>): Personendatensatz {
     return {
       person: this.getPerson(),
+      ...props,
+    };
+  }
+
+  public static getPersonLandesbediensteterSearchResponse(
+    props?: Partial<PersonLandesbediensteterSearchResponse>,
+  ): PersonLandesbediensteterSearchResponse {
+    const person: Person = DoFactory.getPerson();
+    const schule: Organisation = DoFactory.getSchule();
+    const rolle: Rolle = DoFactory.getRolle({ rollenart: RollenArt.Lehr });
+    return {
+      id: person.id,
+      vorname: person.name.vorname,
+      familienname: person.name.familienname,
+      username: person.referrer,
+      personalnummer: person.personalnummer!,
+      primaryEmailAddress: person.email!.address,
+      personenkontexte: [DoFactory.getPersonLandesbediensteterSearchPersonenkontextResponse(rolle, schule)],
+      ...props,
+    };
+  }
+
+  public static getPersonLandesbediensteterSearchPersonenkontextResponse(
+    rolle: Rolle,
+    organisation: Organisation,
+  ): PersonLandesbediensteterSearchPersonenkontextResponse {
+    return {
+      rolleId: rolle.id,
+      rolleName: rolle.name,
+      organisationId: organisation.id,
+      organisationName: organisation.name,
+      organisationDstNr: organisation.kennung ?? '',
+    };
+  }
+
+  public static getServiceProviderResponse(props?: Partial<ServiceProviderResponse>): ServiceProviderResponse {
+    return {
+      id: faker.string.uuid(),
+      name: faker.company.name(),
+      target: faker.helpers.enumValue(ServiceProviderTarget),
+      url: faker.internet.url(),
+      kategorie: faker.helpers.enumValue(ServiceProviderKategorie),
+      hasLogo: true,
+      requires2fa: false,
+      merkmale: [],
       ...props,
     };
   }

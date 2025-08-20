@@ -22,7 +22,7 @@
     useOrganisationStore,
   } from '@/stores/OrganisationStore';
   import { type PersonStore, SortField, usePersonStore } from '@/stores/PersonStore';
-  import { OperationContext, type PersonenkontextStore, usePersonenkontextStore } from '@/stores/PersonenkontextStore';
+  import { type PersonenkontextStore, usePersonenkontextStore } from '@/stores/PersonenkontextStore';
   import {
     type RolleResponse,
     type RolleStore,
@@ -266,13 +266,13 @@
   }
 
   async function updateKlassenSelection(newValue: Array<string>): Promise<void> {
-    await searchFilterStore.setKlasseFilterForPersonen(newValue);
+    searchFilterStore.setKlasseFilterForPersonen(newValue);
     applySearchAndFilters();
     selectedKlassen.value = newValue;
   }
 
   async function setRolleFilter(newValue: Array<string>): Promise<void> {
-    await searchFilterStore.setRolleFilterForPersonen(newValue);
+    searchFilterStore.setRolleFilterForPersonen(newValue);
     // Update selectedRollenObjects based on the new selection
     selectedRollenObjects.value = newValue
       .map((rolleId: string) => {
@@ -283,13 +283,13 @@
       })
       .filter((rolle: RolleResponse | undefined): rolle is RolleResponse => rolle !== undefined);
 
-    await searchFilterStore.setRolleFilterWithObjectsForPersonen(newValue, selectedRollenObjects.value);
+    searchFilterStore.setRolleFilterWithObjectsForPersonen(newValue, selectedRollenObjects.value);
     applySearchAndFilters();
   }
 
   async function setOrganisationFilter(newValue: Array<string>): Promise<void> {
     searchFilterStore.setOrganisationFilterForPersonen(newValue);
-    await searchFilterStore.setKlasseFilterForPersonen([]);
+    searchFilterStore.setKlasseFilterForPersonen([]);
     selectedKlassen.value = [];
     applySearchAndFilters();
   }
@@ -328,9 +328,9 @@
   }
 
   async function handleSearchFilter(filter: string): Promise<void> {
-    await searchFilterStore.setSearchFilterForPersonen(filter);
+    searchFilterStore.setSearchFilterForPersonen(filter);
     searchFilter.value = filter;
-    applySearchAndFilters();
+    await applySearchAndFilters();
   }
 
   function updateOrganisationSearch(searchValue: string): void {
@@ -371,6 +371,13 @@
       }
     }, 500);
   }
+
+  const handleFocusChange = async (focused: boolean): Promise<void> => {
+    if (!focused && searchInputRollen.value) {
+      searchInputRollen.value = '';
+      await updateRollenSearch(searchInputRollen.value);
+    }
+  };
 
   // Define a mapping between complex table keys and expected backend keys
   const keyMapping: Record<string, SortField> = {
@@ -575,12 +582,12 @@
     }
   });
 
+  // Used for to show the number of klassen found in the filter
+  const totalKlassen: ComputedRef<number> = computed(
+    () => organisationStore.klassenFilters.get('personen-management')?.total ?? 0,
+  );
+
   onMounted(async () => {
-    // to initialize bulk operations that use the personenkontextStore
-    personenkontextStore.processWorkflowStep({
-      operationContext: OperationContext.PERSON_BEARBEITEN,
-      limit: 25,
-    });
     if (filterOrSearchActive.value) {
       selectedOrganisationIds.value = searchFilterStore.selectedOrganisationen || [];
       selectedRollen.value = searchFilterStore.selectedRollen || [];
@@ -720,6 +727,7 @@
             required="true"
             @update:modelValue="setRolleFilter"
             @update:search="updateRollenSearch"
+            @update:focused="handleFocusChange"
             variant="outlined"
             v-model="selectedRollen"
             v-model:search="searchInputRollen"
@@ -765,6 +773,7 @@
             <template v-slot:activator="{ props }">
               <div v-bind="props">
                 <KlassenFilter
+                  :filterId="'personen-management'"
                   :systemrechteForSearch="[RollenSystemRecht.KlassenVerwalten]"
                   :multiple="true"
                   :readonly="selectedOrganisationIds.length == 0"
@@ -775,7 +784,21 @@
                   :placeholderText="t('admin.klasse.klassen')"
                   ref="klasse-select"
                   :administriertVon="selectedOrganisationIds ? selectedOrganisationIds : undefined"
-                />
+                >
+                  <template v-slot:prepend-item>
+                    <v-list-item>
+                      <v-progress-circular
+                        indeterminate
+                        v-if="organisationStore.loading"
+                      ></v-progress-circular>
+                      <span
+                        v-else
+                        class="filter-header"
+                        >{{ t('admin.klasse.klassenFound', { count: totalKlassen }, totalKlassen) }}</span
+                      >
+                    </v-list-item>
+                  </template>
+                </KlassenFilter>
               </div>
             </template>
             <span>{{ $t('admin.schule.selectSchuleFirst') }}</span>

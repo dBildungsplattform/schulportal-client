@@ -1244,8 +1244,9 @@ describe('OrganisationStore', () => {
 
   describe('resetSchulFilter', () => {
     test('should reset filter', () => {
+      const schule: Organisation[] = [DoFactory.getSchule()];
       organisationStore.schulenFilter = {
-        filterResult: [DoFactory.getSchule()],
+        filterResult: schule,
         loading: true,
         total: 1,
       };
@@ -1281,7 +1282,7 @@ describe('OrganisationStore', () => {
         const mockResponse: Organisation[] = [DoFactory.getSchule()];
 
         mockadapter.onGet('/api/organisationen?offset=0&limit=30&typ=KLASSE').replyOnce(200, mockResponse, {
-          'x-paging-total': '1',
+          'x-paging-pagetotal': '1',
         });
         const promise: Promise<void> = organisationStore.loadKlassenForFilter(
           {
@@ -1335,14 +1336,15 @@ describe('OrganisationStore', () => {
 
   describe('resetKlasseFilter', () => {
     describe.each([['', undefined, 'something']])('when store key is %s', (storeKey: string | undefined) => {
+      const klasse: Organisation[] = [DoFactory.getKlasse()];
       test('should reset filter', () => {
         organisationStore.klassenFilters = new Map([
-          [storeKey ?? '', { filterResult: [DoFactory.getKlasse()], loading: true, total: 1 }],
+          [storeKey ?? '', { filterResult: klasse, loading: true, total: 1 }],
         ]);
         const expected: AutoCompleteStore<Organisation> = {
-          filterResult: [],
+          filterResult: klasse,
           loading: false,
-          total: 0,
+          total: 1,
         };
         organisationStore.resetKlasseFilter(storeKey);
         expect(organisationStore.klassenFilters.get(storeKey ?? '')).toEqual(expected);

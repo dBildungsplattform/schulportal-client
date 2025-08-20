@@ -3,8 +3,9 @@
   import BefristungInput from '@/components/admin/personen/BefristungInput.vue';
   import KlassenFilter from '@/components/filter/KlassenFilter.vue';
   import FormRow from '@/components/form/FormRow.vue';
+  import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
   import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
-  import { OrganisationsTyp } from '@/stores/OrganisationStore';
+  import { OrganisationsTyp, type Organisation } from '@/stores/OrganisationStore';
   import {
     CreationType,
     OperationContext,
@@ -13,12 +14,11 @@
     type WorkflowFilter,
   } from '@/stores/PersonenkontextStore';
   import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
-  import { RollenArt } from '@/stores/RolleStore';
+  import { RollenArt, RollenSystemRecht } from '@/stores/RolleStore';
   import type { Zuordnung } from '@/stores/types/Zuordnung';
   import { type TranslatedObject } from '@/types.d';
-  import { sameContent } from '@/utils/arrays';
   import type { BaseFieldProps } from 'vee-validate';
-  import { computed, ref, watch, type ComputedRef, type Ref } from 'vue';
+  import { computed, onMounted, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n } from 'vue-i18n';
 
   useI18n({ useScope: 'global' });
@@ -28,13 +28,10 @@
 
   const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
   const canCommit: Ref<boolean> = ref(false);
-  const hasAutoselectedSchule: Ref<boolean> = ref(false);
 
-  const searchInputOrganisation: Ref<string> = ref('');
-  const searchInputRolle: Ref<string> = ref('');
-  const searchInputRollen: Ref<string> = ref('');
-
-  let isSearching: boolean = false;
+  const searchInputOrganisation: Ref<string | undefined> = ref('');
+  const searchInputRolle: Ref<string | undefined> = ref('');
+  const searchInputRollen: Ref<string | undefined> = ref('');
 
   type Props = {
     organisationen: TranslatedObject[] | undefined;
@@ -63,6 +60,11 @@
   };
 
   const props: Props = defineProps<Props>();
+  const {
+    hasAutoselectedSchule,
+    autoselectedSchule,
+  }: { hasAutoselectedSchule: ComputedRef<boolean>; autoselectedSchule: ComputedRef<Organisation | null> } =
+    useAutoselectedSchule([RollenSystemRecht.PersonenVerwalten]);
 
   type Emits = {
     (e: 'update:befristung', value: string | undefined): void;
@@ -123,6 +125,8 @@
       await personenkontextStore.processWorkflowStep({
         operationContext: props.operationContext,
         ...filter,
+        requestedWithSystemrecht:
+          props.createType === CreationType.Limited ? RollenSystemRecht.EingeschraenktNeueBenutzerErstellen : undefined,
       });
     }
 
@@ -138,6 +142,7 @@
       emits('fieldReset', 'selectedRolle');
       emits('fieldReset', 'selectedRollen');
     }
+    emits('update:selectedOrganisation', newValue);
 
     if (newValue && newValue !== oldValue) {
       const filter: WorkflowFilter = {
@@ -146,7 +151,7 @@
         limit: 25,
       };
 
-      await handleWorkflowStep(filter);
+      if (!hasAutoselectedSchule.value) await handleWorkflowStep(filter);
 
       administriertVon.value?.pop();
       administriertVon.value?.push(newValue);
@@ -175,8 +180,6 @@
       emits('fieldReset', 'selectedRolle');
       emits('fieldReset', 'selectedKlasse');
     }
-
-    emits('update:selectedOrganisation', newValue);
   });
 
   watch(
@@ -191,10 +194,7 @@
             rollenIds: newRollen,
             limit: 25,
           };
-
           await handleWorkflowStep(filter);
-
-          canCommit.value = personenkontextStore.workflowStepResponse?.canCommit ?? false;
         } else {
           selectedKlasse.value = undefined;
           emits('fieldReset', 'selectedKlasse');
@@ -212,10 +212,7 @@
             rollenIds: [newRolle],
             limit: 25,
           };
-
           await handleWorkflowStep(filter);
-
-          canCommit.value = personenkontextStore.workflowStepResponse?.canCommit ?? false;
         }
 
         if (!newRolle) {
@@ -223,7 +220,6 @@
           selectedKlasse.value = undefined;
           emits('fieldReset', 'selectedKlasse');
         }
-
         emits('update:selectedRolle', newRolle);
       }
     },
@@ -232,9 +228,8 @@
 
   // Using a watcher instead of modelUpdate since we need the old Value as well.
   // Default behavior of the autocomplete is to reset the newValue to empty string and that causes another request to be made
-  watch(searchInputOrganisation, async (newValue: string, oldValue: string) => {
+  watch(searchInputOrganisation, async (newValue: string | undefined, oldValue: string | undefined) => {
     clearTimeout(timerId.value);
-    isSearching = !!newValue;
 
     if (oldValue === selectedOrganisationTitle.value) return;
 
@@ -253,28 +248,27 @@
     }
 
     timerId.value = setTimeout(async () => {
-      if (props.createType === CreationType.AddPersonToOwnSchule) {
-        await personenkontextStore.processWorkflowStepLandesbedienstete(filter);
-      } else {
-        await personenkontextStore.processWorkflowStep({
-          ...filter,
-          personId: props.personId,
-          operationContext: props.operationContext,
-        });
-      }
+      await handleWorkflowStep(filter);
     }, 500);
   });
 
   watch(
     props.allowMultipleRollen ? searchInputRollen : searchInputRolle,
-    async (newValue: string | string[], oldValue: string | string[]) => {
+    async (newValue: string | undefined, oldValue: string | undefined) => {
       clearTimeout(timerId.value);
 
-      const isEqual: boolean = props.allowMultipleRollen
-        ? Array.isArray(newValue) && sameContent(newValue, selectedRolleTitles.value)
-        : oldValue === selectedRolleTitle.value;
+      // this prevents duplicate requests because the input value changes between "" and null
+      if (!newValue && !oldValue) return;
 
-      if (isEqual) return;
+      // this prevents duplicate requests when the user selects a value from the dropdown
+      if (
+        newValue &&
+        (props.allowMultipleRollen
+          ? selectedRolleTitles.value.includes(newValue)
+          : selectedRolleTitle.value === newValue)
+      ) {
+        return;
+      }
 
       const filter: WorkflowFilter = {
         personId: props.personId,
@@ -284,24 +278,24 @@
       };
 
       // Add rolleName if user is typing
-      if (!newValue || (Array.isArray(newValue) && newValue.length === 0)) {
+      if (!newValue) {
         // No rolleName (cleared)
-      } else if (!Array.isArray(newValue)) {
+      } else {
         filter.rolleName = newValue;
       }
 
       timerId.value = setTimeout(async () => {
-        if (props.createType === CreationType.AddPersonToOwnSchule) {
-          await personenkontextStore.processWorkflowStepLandesbedienstete(filter);
-        } else {
-          await personenkontextStore.processWorkflowStep({
-            ...filter,
-            operationContext: props.operationContext,
-          });
-        }
+        await handleWorkflowStep(filter);
       }, 500);
     },
   );
+
+  const handleFocusChange = (focused: boolean): void => {
+    if (!focused) {
+      searchInputRollen.value = '';
+      searchInputRolle.value = '';
+    }
+  };
 
   function updateKlasseSelection(selectedKlassen: string | undefined): void {
     selectedKlasse.value = selectedKlassen;
@@ -324,12 +318,11 @@
   }
 
   watch(
-    () => props.organisationen,
-    async (newOrganisations: TranslatedObject[] | undefined, _oldOrganisations: TranslatedObject[] | undefined) => {
-      if (!isSearching && newOrganisations && newOrganisations.length === 1) {
-        hasAutoselectedSchule.value = true;
-        selectedOrganisation.value = newOrganisations[0]?.value;
-        emits('update:selectedOrganisation', selectedOrganisation.value);
+    autoselectedSchule,
+    async (newAutoselectedSchule: Organisation | null) => {
+      if (newAutoselectedSchule) {
+        selectedOrganisation.value = newAutoselectedSchule.id;
+        emits('update:selectedOrganisation', newAutoselectedSchule.id);
       }
     },
     { immediate: true },
@@ -350,6 +343,24 @@
     },
     { immediate: true },
   );
+
+  const getPrefilledRollenAsArray = (): string[] => {
+    if (props.allowMultipleRollen) {
+      return props.selectedRollen ?? [];
+    }
+    return props.selectedRolle ? [props.selectedRolle] : [];
+  };
+
+  onMounted(async () => {
+    const prefilledRollen: string[] = getPrefilledRollenAsArray();
+    await handleWorkflowStep({
+      personId: props.personId,
+      operationContext: props.operationContext,
+      organisationId: selectedOrganisation.value,
+      rollenIds: prefilledRollen,
+      limit: 25,
+    });
+  });
 </script>
 
 <template>
@@ -389,6 +400,7 @@
         :placeholder="$t('admin.organisation.selectOrganisation')"
         required="true"
         variant="outlined"
+        @update:focused="handleFocusChange"
         v-bind="selectedOrganisationProps"
         v-model="selectedOrganisation"
         v-model:search="searchInputOrganisation"
@@ -413,6 +425,7 @@
           autocomplete="off"
           clearable
           @clear="clearSelectedRollen"
+          @update:focused="handleFocusChange"
           data-testid="rollen-select"
           density="compact"
           id="rollen-select"

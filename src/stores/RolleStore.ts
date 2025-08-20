@@ -1,6 +1,7 @@
-import { defineStore, type Store, type StoreDefinition } from 'pinia';
-import { type AxiosResponse } from 'axios';
+import axiosApiInstance from '@/services/ApiService';
 import { getResponseErrorCode } from '@/utils/errorHandlers';
+import { type AxiosResponse } from 'axios';
+import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import {
   RolleApiFactory,
   RollenArt,
@@ -15,7 +16,6 @@ import {
   type UpdateRolleBodyParams,
   type SystemRechtResponse,
 } from '../api-client/generated/api';
-import axiosApiInstance from '@/services/ApiService';
 import type { ServiceProvider } from './ServiceProviderStore';
 
 const rolleApi: RolleApiInterface = RolleApiFactory(undefined, '', axiosApiInstance);
@@ -72,6 +72,18 @@ export type Rolle = {
   serviceProviders?: Array<ServiceProviderResponse>;
   version: number;
 };
+
+function mapRolleResponseToRolle(response: RolleResponse): Rolle {
+  return {
+    administeredBySchulstrukturknoten: response.administeredBySchulstrukturknoten,
+    id: response.id,
+    merkmale: new Set(response.merkmale),
+    name: response.name,
+    rollenart: response.rollenart,
+    systemrechte: new Set(Array.from(response.systemrechte).map((recht: SystemRechtResponse) => recht.name)),
+    version: response.version,
+  };
+}
 
 export type RolleTableItem = {
   administeredBySchulstrukturknoten: string;
@@ -182,14 +194,14 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
       }
     },
 
-    async getRolleById(rolleId: string): Promise<RolleResponse> {
+    async getRolleById(rolleId: string): Promise<Rolle> {
       this.loading = true;
       this.errorCode = '';
       try {
         const { data }: { data: RolleResponse } =
           await rolleApi.rolleControllerFindRolleByIdWithServiceProviders(rolleId);
-        this.currentRolle = data;
-        return data;
+        this.currentRolle = mapRolleResponseToRolle(data);
+        return mapRolleResponseToRolle(data);
       } catch (error) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
         return await Promise.reject(this.errorCode);

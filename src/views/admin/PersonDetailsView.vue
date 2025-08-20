@@ -107,12 +107,13 @@
   const devicePassword: Ref<string> = ref('');
   const password: Ref<string> = ref('');
 
-  const zuordnungenResult: Ref<ZuordnungWithKlasse[] | undefined> = ref<ZuordnungWithKlasse[] | undefined>(undefined);
-  const getZuordnungen: ComputedRef<ZuordnungWithKlasse[] | undefined> = computed(() => zuordnungenResult.value);
+  const zuordnungenWithPendingChanges: Ref<ZuordnungWithKlasse[] | undefined> = ref<ZuordnungWithKlasse[] | undefined>(
+    undefined,
+  );
   const selectedZuordnungen: Ref<ZuordnungWithKlasse[]> = ref<ZuordnungWithKlasse[]>([]);
   const newZuordnung: Ref<ZuordnungWithKlasse | undefined> = ref<ZuordnungWithKlasse | undefined>(undefined);
-  const finalZuordnungen: Ref<Zuordnung[]> = ref<Zuordnung[]>([]);
-  const originalZuordnungenResult: Ref<Zuordnung[] | undefined> = ref(undefined);
+  const zuordnungenToBePersisted: Ref<Zuordnung[]> = ref<Zuordnung[]>([]);
+  const originalZuordnungen: Ref<Zuordnung[] | undefined> = ref(undefined);
   const hasKlassenZuordnung: Ref<boolean | undefined> = ref(false);
   const isUnbefristetDisabled: Ref<boolean, boolean> = ref(false);
   const isBefristungRequired: Ref<boolean, boolean> = ref(false);
@@ -164,7 +165,7 @@
   });
 
   const finalZuordnungenUpdate: ComputedRef<PersonenkontextUpdate[]> = computed(() => {
-    return finalZuordnungen.value.map(mapZuordnungToPersonenkontextUpdate);
+    return zuordnungenToBePersisted.value.map(mapZuordnungToPersonenkontextUpdate);
   });
 
   function navigateToPersonTable(): void {
@@ -355,11 +356,6 @@
 
   // Triggers the template to add a new Zuordnung
   const triggerAddZuordnung = async (): Promise<void> => {
-    await personenkontextStore.processWorkflowStep({
-      personId: currentPersonId,
-      operationContext: OperationContext.PERSON_BEARBEITEN,
-      limit: 25,
-    });
     isZuordnungFormActive.value = true;
   };
 
@@ -371,7 +367,7 @@
     }
 
     // The remaining Zuordnungen that were not selected for deletion
-    const remainingZuordnungen: ZuordnungWithKlasse[] | undefined = zuordnungenResult.value?.filter(
+    const remainingZuordnungen: ZuordnungWithKlasse[] | undefined = zuordnungenWithPendingChanges.value?.filter(
       (zuordnung: ZuordnungWithKlasse) => !selectedZuordnungen.value.includes(zuordnung),
     );
 
@@ -412,7 +408,7 @@
 
     // Update the personenkontexte with the filtered list
     await personenkontextStore.updatePersonenkontexte(zuordnungenUpdate, currentPersonId);
-    zuordnungenResult.value = remainingZuordnungen;
+    zuordnungenWithPendingChanges.value = remainingZuordnungen;
     selectedZuordnungen.value = [];
 
     // Filter out Zuordnungen with editable === false
@@ -575,7 +571,7 @@
   // Used on mount to check the retrieved Zuordnungen and if any of them has a Koperspflicht Merkmal
   const hasKopersRolle: ComputedRef<boolean> = computed(() => {
     return (
-      !!zuordnungenResult.value?.find((zuordnung: Zuordnung) => {
+      !!zuordnungenWithPendingChanges.value?.find((zuordnung: Zuordnung) => {
         return zuordnung.merkmale.includes(RollenMerkmal.KopersPflicht);
       }) || false
     );
@@ -584,7 +580,7 @@
   // Used to show device password block
   const hasLehrRolle: ComputedRef<boolean> = computed(() => {
     return (
-      !!zuordnungenResult.value?.find((zuordnung: Zuordnung) => {
+      !!zuordnungenWithPendingChanges.value?.find((zuordnung: Zuordnung) => {
         return zuordnung.rollenArt === RollenArt.Lehr;
       }) || false
     );
@@ -810,7 +806,7 @@
     isEditActive.value = true;
     // Deep copy of the zuordnungenResult to keep track of the Zuordnungen before any changes were done.
     // This is necessary if a user cancels the editing at some point and the zuordnungenResult was mutated at the time.
-    originalZuordnungenResult.value = JSON.parse(JSON.stringify(zuordnungenResult.value));
+    originalZuordnungen.value = JSON.parse(JSON.stringify(zuordnungenWithPendingChanges.value));
   };
 
   // Triggers the template to change the Klasse. Also pre-select the Schule and Klasse.
@@ -856,8 +852,8 @@
     formContext.resetForm();
     resetChangeKlasseForm();
     changeBefristungFormContext.resetForm();
-    zuordnungenResult.value = originalZuordnungenResult.value
-      ? JSON.parse(JSON.stringify(originalZuordnungenResult.value))
+    zuordnungenWithPendingChanges.value = originalZuordnungen.value
+      ? JSON.parse(JSON.stringify(originalZuordnungen.value))
       : undefined;
   };
 
@@ -1084,15 +1080,15 @@
         [],
         [],
       );
-      if (zuordnungenResult.value) {
-        finalZuordnungen.value = zuordnungenResult.value;
-        finalZuordnungen.value.push(newZuordnung.value);
+      if (zuordnungenWithPendingChanges.value) {
+        zuordnungenToBePersisted.value = zuordnungenWithPendingChanges.value;
+        zuordnungenToBePersisted.value.push(newZuordnung.value);
       }
 
       // Add the new selected Klasse to finalZuordnungen
       if (klasse) {
         newZuordnung.value.klasse = klasse.name;
-        finalZuordnungen.value.push(
+        zuordnungenToBePersisted.value.push(
           new Zuordnung(
             klasse.id,
             selectedRolle.value ?? '',
@@ -1114,13 +1110,13 @@
       // Add all existing Klassenzuordnungen to finalZuordnungen
       if (existingKlassen) {
         existingKlassen.forEach((existingKlasse: Zuordnung) => {
-          finalZuordnungen.value.push(Zuordnung.from(existingKlasse));
+          zuordnungenToBePersisted.value.push(Zuordnung.from(existingKlasse));
         });
       }
     }
 
     // Filter out existing Klassen from zuordnungenResult
-    zuordnungenResult.value = zuordnungenResult.value?.filter(
+    zuordnungenWithPendingChanges.value = zuordnungenWithPendingChanges.value?.filter(
       (zuordnung: Zuordnung) => zuordnung.typ !== OrganisationsTyp.Klasse,
     );
 
@@ -1142,7 +1138,7 @@
       ?.filterResult.find((k: Organisation) => k.id === selectedNewKlasse.value);
 
     // The remaining Zuordnungen that were not selected for deletion
-    const remainingZuordnungen: ZuordnungWithKlasse[] | undefined = zuordnungenResult.value?.filter(
+    const remainingZuordnungen: ZuordnungWithKlasse[] | undefined = zuordnungenWithPendingChanges.value?.filter(
       (zuordnung: Zuordnung) => !selectedZuordnungen.value.includes(zuordnung),
     );
 
@@ -1167,8 +1163,8 @@
         [],
       );
 
-      if (zuordnungenResult.value) {
-        finalZuordnungen.value = zuordnungenResult.value;
+      if (zuordnungenWithPendingChanges.value) {
+        zuordnungenToBePersisted.value = zuordnungenWithPendingChanges.value;
       }
 
       // Get all Klassen Zuordnungen
@@ -1199,12 +1195,12 @@
         klassenToKeep.push(...associatedKlassen);
       });
 
-      finalZuordnungen.value = [...finalZuordnungen.value, ...klassenToKeep];
+      zuordnungenToBePersisted.value = [...zuordnungenToBePersisted.value, ...klassenToKeep];
 
       // Add the new Klasse Zuordnung
       if (newKlasse) {
         newZuordnung.value.klasse = newKlasse.name;
-        finalZuordnungen.value.push(
+        zuordnungenToBePersisted.value.push(
           new Zuordnung(
             newKlasse.id,
             selectedZuordnungen.value[0]?.rolleId ?? '',
@@ -1227,7 +1223,7 @@
     }
 
     // zuordnungenResult is what we show in the UI and so Zuordnungen of type Klasse shouldn't show up (since they are merged with the ones of type Schule already)
-    zuordnungenResult.value = zuordnungenResult.value?.filter(
+    zuordnungenWithPendingChanges.value = zuordnungenWithPendingChanges.value?.filter(
       (zuordnung: Zuordnung) => zuordnung.typ !== OrganisationsTyp.Klasse,
     );
     // Proceed with the pending change Klasse operation
@@ -1241,14 +1237,25 @@
     const formattedBefristung: string | null = formatDateToISO(befristungDate) ?? null;
 
     // copy zuordnung from old one and update befristung
-    const currentZuordnung: Zuordnung = selectedZuordnungen.value[0]!;
-    newZuordnung.value = Zuordnung.from(currentZuordnung);
+    const selectedZuordnung: ZuordnungWithKlasse = selectedZuordnungen.value[0]!;
+
+    // for the template
+    newZuordnung.value = Zuordnung.from(selectedZuordnung);
+    newZuordnung.value.klasse = selectedZuordnung.klasse;
     newZuordnung.value.befristung = formattedBefristung;
     newZuordnung.value.editable = true;
 
-    finalZuordnungen.value = (zuordnungenResult.value ?? [])
-      .map((zuordnung: Zuordnung | undefined) => (zuordnung === currentZuordnung ? newZuordnung.value : zuordnung))
-      .filter((zuordnung: Zuordnung | undefined): zuordnung is Zuordnung => zuordnung !== undefined);
+    zuordnungenToBePersisted.value = (personStore.personenuebersicht?.zuordnungen ?? []).map((zuordnung: Zuordnung) => {
+      const isSelectedOrgaOrChildKlasse: boolean =
+        zuordnung.sskId === selectedZuordnung.sskId ||
+        (zuordnung.typ === OrganisationsTyp.Klasse && zuordnung.administriertVon === selectedZuordnung.sskId);
+      if (isSelectedOrgaOrChildKlasse && zuordnung.rolleId === selectedZuordnung.rolleId) {
+        const updatedZuordnung: Zuordnung = Zuordnung.from(zuordnung);
+        updatedZuordnung.befristung = formattedBefristung;
+        return updatedZuordnung;
+      }
+      return zuordnung;
+    });
 
     prepareChangeBefristung();
   };
@@ -1268,7 +1275,7 @@
   watch(
     () => personStore.personenuebersicht,
     async (newValue: PersonenUebersicht | null) => {
-      zuordnungenResult.value = computeZuordnungen(newValue);
+      zuordnungenWithPendingChanges.value = computeZuordnungen(newValue);
       const organisationIds: Array<string> = [...new Set(newValue?.zuordnungen.map((z: Zuordnung) => z.sskId))];
       if (organisationIds.length > 0) await organisationStore.getParentOrganisationsByIds(organisationIds);
     },
@@ -1595,12 +1602,145 @@
       <template v-if="!personStore.errorCode && !personenkontextStore.errorCode">
         <v-container class="personal-info">
           <div v-if="personStore.currentPerson?.person && !isEditPersonMetadataActive">
-            <!-- Befristung -->
             <v-row class="ml-md-16">
+              <v-col>
+                <!-- Vorname -->
+                <v-row class="mt-4">
+                  <v-col
+                    class="text-right"
+                    sm="3"
+                    cols="5"
+                    offset="1"
+                  >
+                    <span class="subtitle-2">{{ t('person.firstName') }}:</span>
+                  </v-col>
+                  <v-col
+                    class="d-flex align-start mt-1"
+                    data-testid="person-vorname"
+                  >
+                    <span class="text-body text-break">{{ personStore.currentPerson.person.name.vorname }}</span>
+                  </v-col>
+                </v-row>
+
+                <!-- Familienname -->
+                <v-row class="mt-0">
+                  <v-col
+                    class="text-right"
+                    sm="3"
+                    cols="5"
+                    offset="1"
+                  >
+                    <span class="subtitle-2">{{ t('person.lastName') }}:</span>
+                  </v-col>
+                  <v-col
+                    class="d-flex align-start mt-1"
+                    data-testid="person-familienname"
+                  >
+                    <span class="text-body text-break">{{ personStore.currentPerson.person.name.familienname }}</span>
+                  </v-col>
+                </v-row>
+
+                <!-- Benutzername -->
+                <v-row class="mt-0">
+                  <v-col
+                    class="text-right"
+                    sm="3"
+                    cols="5"
+                    offset="1"
+                  >
+                    <span class="subtitle-2">{{ t('person.userName') }}:</span>
+                  </v-col>
+                  <v-col
+                    class="d-flex align-start mt-1"
+                    data-testid="person-username"
+                  >
+                    <span class="text-body text-break">{{ personStore.currentPerson.person.referrer }}</span>
+                  </v-col>
+                </v-row>
+
+                <!-- KoPers.-Nr. -->
+                <v-row
+                  class="mt-0"
+                  v-if="hasKopersRolle || personStore.currentPerson.person.personalnummer"
+                >
+                  <v-col
+                    class="text-right"
+                    sm="3"
+                    cols="5"
+                    offset="1"
+                  >
+                    <span
+                      :class="{
+                        'subtitle-2': true,
+                        'text-red': hasKopersRolle && !personStore.currentPerson.person.personalnummer,
+                      }"
+                    >
+                      {{ t('person.kopersNr') }}:
+                    </span>
+                  </v-col>
+                  <v-col
+                    class="d-flex align-start"
+                    data-testid="person-kopersnr"
+                  >
+                    <span
+                      :class="{
+                        'text-body': true,
+                        'text-red': hasKopersRolle && !personStore.currentPerson.person.personalnummer,
+                        'text-break': true,
+                        'mt-1': true,
+                      }"
+                    >
+                      {{ personStore.currentPerson.person.personalnummer ?? t('missing') }}
+                    </span>
+                  </v-col>
+                </v-row>
+
+                <!-- Email -->
+                <v-row
+                  v-if="emailStatusText.text !== t('person.emailStatusUnknown')"
+                  class="mt-0"
+                >
+                  <v-col
+                    class="text-right"
+                    sm="3"
+                    cols="5"
+                    offset="1"
+                  >
+                    <span class="subtitle-2">{{ t('person.email') }}:</span>
+                  </v-col>
+                  <v-col
+                    class="d-flex align-start"
+                    data-testid="person-email"
+                  >
+                    <SpshTooltip
+                      :enabledCondition="!!personStore.currentPerson.person.email"
+                      :disabledText="t('person.changePersonMetaDataDisabledDescription')"
+                      :enabledText="emailStatusText.tooltip"
+                      position="bottom"
+                    >
+                      <div class="d-flex align-start">
+                        <v-icon
+                          aria-hidden="true"
+                          class="mr-2 flex-shrink-0 mt-1"
+                          icon="mdi-alert-circle-outline"
+                          size="small"
+                        ></v-icon>
+                        <span
+                          data-testid="person-email-text"
+                          class="text-body text-break mt-1"
+                        >
+                          {{ emailStatusText.text }}
+                        </span>
+                      </div>
+                    </SpshTooltip>
+                  </v-col>
+                </v-row>
+              </v-col>
+
               <v-col
+                class="mr-lg-13"
                 cols="12"
                 md="auto"
-                class="mt-1 edit-container"
               >
                 <div class="d-flex justify-sm-end">
                   <v-col
@@ -1626,134 +1766,6 @@
                     </SpshTooltip>
                   </v-col>
                 </div>
-              </v-col>
-            </v-row>
-            <!-- Vorname -->
-            <v-row class="mt-md-6">
-              <v-col cols="1"></v-col>
-              <v-col
-                class="text-right"
-                md="2"
-                sm="3"
-                cols="5"
-              >
-                <span class="subtitle-2"> {{ t('person.firstName') }}: </span>
-              </v-col>
-              <v-col
-                cols="auto"
-                data-testid="person-vorname"
-              >
-                <span class="text-body"> {{ personStore.currentPerson.person.name.vorname }} </span>
-              </v-col>
-            </v-row>
-            <!-- Familienname -->
-            <v-row class="mt-0">
-              <v-col cols="1"></v-col>
-              <v-col
-                class="text-right"
-                md="2"
-                sm="3"
-                cols="5"
-              >
-                <span class="subtitle-2"> {{ t('person.lastName') }}: </span>
-              </v-col>
-              <v-col
-                cols="auto"
-                data-testid="person-familienname"
-              >
-                <span class="text-body"> {{ personStore.currentPerson.person.name.familienname }}</span>
-              </v-col>
-            </v-row>
-            <!-- Benutzername -->
-            <v-row class="mt-0">
-              <v-col cols="1"></v-col>
-              <v-col
-                class="text-right"
-                md="2"
-                sm="3"
-                cols="5"
-              >
-                <span class="subtitle-2"> {{ t('person.userName') }}: </span>
-              </v-col>
-              <v-col
-                cols="auto"
-                data-testid="person-username"
-              >
-                <span class="text-body">{{ personStore.currentPerson.person.referrer }} </span>
-              </v-col>
-            </v-row>
-            <!-- KoPers.-Nr. -->
-            <v-row
-              class="mt-0"
-              v-if="hasKopersRolle || personStore.currentPerson.person.personalnummer"
-            >
-              <v-col cols="1"></v-col>
-              <v-col
-                class="text-right"
-                md="2"
-                sm="3"
-                cols="5"
-              >
-                <span
-                  :class="{
-                    'subtitle-2': true,
-                    'text-red': hasKopersRolle && !personStore.currentPerson.person.personalnummer,
-                  }"
-                >
-                  {{ t('person.kopersNr') }}:
-                </span>
-              </v-col>
-              <v-col
-                cols="auto"
-                data-testid="person-kopersnr"
-              >
-                <span
-                  :class="{
-                    'text-body': true,
-                    'text-red': hasKopersRolle && !personStore.currentPerson.person.personalnummer,
-                  }"
-                >
-                  {{ personStore.currentPerson.person.personalnummer ?? t('missing') }}
-                </span>
-              </v-col>
-            </v-row>
-            <!-- Email -->
-            <v-row
-              v-if="emailStatusText.text !== t('person.emailStatusUnknown')"
-              class="mt-0"
-            >
-              <v-col cols="1"></v-col>
-              <v-col
-                class="text-right"
-                md="2"
-                sm="3"
-                cols="5"
-              >
-                <span class="subtitle-2"> {{ t('person.email') }}: </span>
-              </v-col>
-              <v-col
-                cols="auto"
-                data-testid="person-email"
-              >
-                <SpshTooltip
-                  :enabledCondition="!!personStore.currentPerson.person.email"
-                  :disabledText="t('person.changePersonMetaDataDisabledDescription')"
-                  :enabledText="emailStatusText.tooltip"
-                  position="bottom"
-                >
-                  <v-icon
-                    aria-hidden="true"
-                    class="mr-2"
-                    icon="mdi-alert-circle-outline"
-                    size="small"
-                  ></v-icon>
-                  <span
-                    data-testid="person-email-text"
-                    class="text-body"
-                  >
-                    {{ emailStatusText.text }}
-                  </span>
-                </SpshTooltip>
               </v-col>
             </v-row>
           </div>
@@ -1872,77 +1884,87 @@
         <v-container
           v-if="!isEditActive"
           class="person-zuordnungen"
+          data-testid="person-zuordnungen-section-view"
         >
           <v-row class="ml-md-16">
-            <v-col
-              cols="12"
-              sm="auto"
-            >
-              <h3 class="subtitle-1">{{ t('person.zuordnungen') }}</h3>
+            <v-col v-if="personStore.loading">
+              <v-progress-circular indeterminate></v-progress-circular>
             </v-col>
-            <v-spacer></v-spacer>
-            <v-col
-              cols="12"
-              md="auto"
-              class="mr-lg-13"
-            >
-              <div class="d-flex justify-sm-end">
-                <v-col
-                  cols="12"
-                  sm="6"
-                  md="auto"
+            <template v-else>
+              <v-col>
+                <h3 class="subtitle-1">{{ t('person.zuordnungen') }}</h3>
+
+                <!-- Check if 'zuordnungen' array exists and has length > 0 -->
+                <template
+                  v-if="
+                    personStore.personenuebersicht?.zuordnungen &&
+                    personStore.personenuebersicht?.zuordnungen.length > 0
+                  "
                 >
-                  <SpshTooltip
-                    :enabledCondition="selectedZuordnungen.length === 0 && !isEditPersonMetadataActive"
-                    :disabledText="t('person.finishEditFirst')"
-                    :enabledText="t('person.editZuordnungen')"
-                    position="start"
+                  <v-row
+                    class="mt-4"
+                    v-for="zuordnung in zuordnungenWithPendingChanges"
+                    :key="zuordnung.sskId"
+                    :data-testid="`person-zuordnung-${zuordnung.sskId}`"
+                    :title="zuordnung.sskName"
                   >
-                    <v-btn
-                      class="primary ml-lg-8"
-                      data-testid="zuordnung-edit-button"
-                      :disabled="isEditPersonMetadataActive"
-                      @click="triggerEdit"
-                      :block="mdAndDown"
+                    <v-col offset="1">
+                      <PersonenkontextItem
+                        :zuordnung="zuordnung"
+                        :noMargin="true"
+                      />
+                    </v-col>
+                  </v-row>
+                </template>
+
+                <!-- Display 'Keine Zuordnungen gefunden' if no zuordnungen -->
+                <v-row
+                  v-else
+                  class="mt-4"
+                >
+                  <v-col offset="1">
+                    <h3 class="text-body">{{ t('person.noZuordnungenFound') }}</h3>
+                  </v-col>
+                </v-row>
+              </v-col>
+              <v-col
+                class="mr-lg-13"
+                cols="12"
+                md="auto"
+              >
+                <div class="d-flex justify-sm-end">
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="auto"
+                  >
+                    <SpshTooltip
+                      :enabledCondition="selectedZuordnungen.length === 0 && !isEditPersonMetadataActive"
+                      :disabledText="t('person.finishEditFirst')"
+                      :enabledText="t('person.editZuordnungen')"
+                      position="start"
                     >
-                      {{ t('edit') }}
-                    </v-btn>
-                  </SpshTooltip>
-                </v-col>
-              </div>
-            </v-col>
-          </v-row>
-          <!-- Check if 'zuordnungen' array exists and has length > 0 -->
-          <v-row
-            class="ml-md-3 mt-md-n8"
-            v-if="personStore.personenuebersicht?.zuordnungen && personStore.personenuebersicht?.zuordnungen.length > 0"
-          >
-            <v-col
-              cols="10"
-              offset="1"
-              v-for="zuordnung in getZuordnungen"
-              :key="zuordnung.sskId"
-              :data-testid="`person-zuordnung-${zuordnung.sskId}`"
-              :title="zuordnung.sskName"
-            >
-              <PersonenkontextItem
-                :zuordnung="zuordnung"
-                :noMargin="true"
-              />
-            </v-col>
-          </v-row>
-          <!-- Display 'Keine Zuordnungen gefunden' if the above condition is false -->
-          <v-row v-else>
-            <v-col
-              cols="10"
-              offset="1"
-            >
-              <h3 class="text-body">{{ t('person.noZuordnungenFound') }}</h3>
-            </v-col>
+                      <v-btn
+                        class="primary ml-lg-8"
+                        data-testid="zuordnung-edit-button"
+                        :disabled="isEditPersonMetadataActive"
+                        @click="triggerEdit"
+                        :block="mdAndDown"
+                      >
+                        {{ t('edit') }}
+                      </v-btn>
+                    </SpshTooltip>
+                  </v-col>
+                </div>
+              </v-col>
+            </template>
           </v-row>
         </v-container>
         <!-- Show this template if the edit button is triggered-->
-        <v-container v-if="isEditActive">
+        <v-container
+          v-if="isEditActive"
+          data-testid="person-zuordnungen-section-edit"
+        >
           <template v-if="!isZuordnungFormActive && !isChangeKlasseFormActive && !isChangeBefristungActive">
             <v-row class="ml-md-16">
               <v-col
@@ -1963,14 +1985,15 @@
               </v-col>
               <v-col
                 cols="12"
-                v-for="zuordnung in getZuordnungen?.filter((zuordnung: Zuordnung) => zuordnung.editable)"
+                :md="hasPendingChange ? '12' : '7'"
+                v-for="zuordnung in zuordnungenWithPendingChanges?.filter((zuordnung: Zuordnung) => zuordnung.editable)"
                 :key="zuordnung.sskId"
                 :data-testid="`person-zuordnung-${zuordnung.sskId}`"
                 :title="zuordnung.sskName"
                 class="py-0 d-flex align-items-center"
               >
                 <template v-if="!hasPendingChange">
-                  <div class="checkbox-div">
+                  <div class="mb-n4 checkbox-top-align">
                     <v-checkbox
                       :ref="`checkbox-zuordnung-${zuordnung.sskId}`"
                       v-model="selectedZuordnungen"
@@ -2071,7 +2094,7 @@
                     :person="personStore.currentPerson"
                     :disabled="selectedZuordnungen.length === 0"
                     :zuordnungCount="
-                      zuordnungenResult?.filter((zuordnung: Zuordnung) => zuordnung.editable).length ?? 0
+                      zuordnungenWithPendingChanges?.filter((zuordnung: Zuordnung) => zuordnung.editable).length ?? 0
                     "
                     ref="personenkontext-delete"
                     @onDeletePersonenkontext="prepareDeletion"
@@ -2193,7 +2216,7 @@
                 >
                   <v-btn
                     class="primary small"
-                    data-testid="zuordnung-changes-save"
+                    data-testid="zuordnung-changes-save-button"
                     @click="handleSaveClick"
                     :block="mdAndDown"
                     :disabled="isSaveButtonDisabled || personenkontextStore.loading"
@@ -3004,7 +3027,7 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary"
-                data-testid="change-befristung-success-close"
+                data-testid="change-befristung-success-dialog-close-button"
                 @click.stop="closeChangeBefristungSuccessDialog"
               >
                 {{ t('close') }}
@@ -3197,11 +3220,10 @@
             >
               <v-btn
                 :block="mdAndDown"
-                class="primary"
-                data-testid="confirm-change-befristung-button"
-                @click.stop="confirmDialogChangeBefristung"
+                class="secondary"
+                @click.stop="cancelChangeBefristung"
               >
-                {{ t('yes') }}
+                {{ t('no') }}
               </v-btn>
             </v-col>
             <v-col
@@ -3211,10 +3233,11 @@
             >
               <v-btn
                 :block="mdAndDown"
-                class="secondary"
-                @click.stop="cancelChangeBefristung"
+                class="primary"
+                data-testid="confirm-change-befristung-button"
+                @click.stop="confirmDialogChangeBefristung"
               >
-                {{ t('no') }}
+                {{ t('yes') }}
               </v-btn>
             </v-col>
           </v-row>

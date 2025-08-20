@@ -13,7 +13,7 @@ import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
 import { DoFactory } from 'test/DoFactory';
 import { expect, test, type MockInstance } from 'vitest';
-import { nextTick } from 'vue';
+import { nextTick, type ComputedRef, type DefineComponent } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import KlassenManagementView from './KlassenManagementView.vue';
 
@@ -145,6 +145,12 @@ describe('KlassenManagementView', () => {
     organisationStore.deleteOrganisationById = vi.fn();
 
     authStore.currentUser = authUser;
+
+    organisationStore.klassenFilters.set('klassen-management', {
+      total: 42,
+      filterResult: [],
+      loading: false,
+    });
 
     wrapper = await mountComponent();
     vi.useFakeTimers();
@@ -293,6 +299,33 @@ describe('KlassenManagementView', () => {
     expect(klasseAutocomplete?.text()).toEqual('');
   });
 
+  it('should return the total value from klassenFilters if present', async () => {
+    interface KlassenManagementView extends DefineComponent {
+      totalKlassen: ComputedRef<number>;
+    }
+    const vm: KlassenManagementView = wrapper?.vm as unknown as KlassenManagementView;
+    const totalKlassen: ComputedRef<number> = vm.totalKlassen;
+
+    expect(totalKlassen).toBe(42);
+  });
+
+  it('should return 0 if klassenFilters does not contain the key', async () => {
+    interface KlassenManagementView extends DefineComponent {
+      totalKlassen: ComputedRef<number>;
+    }
+
+    // The key 'klassen-management' is not set in klassenFilters
+    organisationStore.klassenFilters.delete('klassen-management');
+
+    await nextTick();
+    await flushPromises();
+
+    const vm: KlassenManagementView = wrapper?.vm as unknown as KlassenManagementView;
+    const totalKlassen: ComputedRef<number> = vm.totalKlassen;
+
+    expect(totalKlassen).toBe(0);
+  });
+
   it('should fetch Klassen for selected Schule when search string is empty', async () => {
     const schule: Organisation = (await selectSchule())!;
     const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
@@ -309,6 +342,28 @@ describe('KlassenManagementView', () => {
     };
     expect(organisationStore.getAllOrganisationen).toHaveBeenLastCalledWith(expectedFilter);
   });
+
+  // This test is currently not working as expected due to limitations with Vuetify's v-autocomplete
+  // TODO: Fix this test once we have a reliable way to open Vuetify's menu during tests.
+  // it('shows loading spinner when organisationStore.loading is true', async () => {
+  //   organisationStore.loading = true;
+
+  //   await nextTick();
+  //   await selectSchule();
+  //   await nextTick();
+
+  //   const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
+
+  //   // Try clicking on the menu icon specifically
+  //   await klasseAutocomplete?.find('.v-autocomplete__menu-icon').trigger('click');
+  //   await nextTick();
+
+  //   const progressIndicator: DOMWrapper<Element> | undefined = klasseAutocomplete?.find(
+  //     '[data-testid="klassen-filter-progress"]',
+  //   );
+
+  //   expect(progressIndicator?.exists()).toBe(true);
+  // });
 
   test('it searches for klasse', async () => {
     const schule: Organisation = (await selectSchule(schule1))!;
@@ -336,21 +391,22 @@ describe('KlassenManagementView', () => {
   test('it clears searchfield when losing focus', async () => {
     const searchString: string = organisationStore.allKlassen[0]!.name.substring(0, 1);
     await selectSchule();
-    const klasseSearchInput: ReturnType<VueWrapper['findComponent']> | undefined = wrapper?.find('#klasse-select');
-    const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
 
-    await klasseSearchInput?.setValue(searchString);
-    klasseAutocomplete?.vm.$emit('update:search', searchString);
+    const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
+    const klassenInputElement: DOMWrapper<Element> | undefined = klasseAutocomplete?.find(
+      '#klassen-management-klasse-select',
+    );
+
+    await klassenInputElement?.setValue(searchString);
 
     await flushPromises();
     vi.runAllTimers();
 
-    expect(klasseSearchInput?.html()).includes(searchString);
+    expect((klassenInputElement?.element as HTMLInputElement).value).toBe(searchString);
 
-    // focus ANOTHER element, so the input loses focus and triggers the listener
-    await klasseSearchInput?.trigger('focus');
+    await klassenInputElement?.trigger('focus');
 
-    expect(klasseSearchInput?.html()).not.includes(searchString);
+    expect((klassenInputElement?.element as HTMLInputElement).value).toBe('');
   });
 
   test('it does nothing if same schule is selected again', async () => {
@@ -376,8 +432,8 @@ describe('KlassenManagementView', () => {
       organisationStore.errorCode = errorCode;
       await nextTick();
 
-      const actualTitle: string | undefined = wrapper?.find('[data-testid=alert-title]').text();
-      const actualText: string | undefined = wrapper?.find('[data-testid=alert-text]').text();
+      const actualTitle: string | undefined = wrapper?.find('[data-testid$=alert-title]').text();
+      const actualText: string | undefined = wrapper?.find('[data-testid$=alert-text]').text();
 
       expect(actualTitle).toBe(expectedTitle);
       expect(actualText).toBe(expectedText);

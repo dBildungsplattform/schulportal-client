@@ -256,9 +256,9 @@ describe('KlasseCreationView', () => {
       organisationStore.errorCode = 'KLASSENNAME_AN_SCHULE_EINDEUTIG';
       await nextTick();
 
-      expect(wrapper?.find('[data-testid="alert-title"]').isVisible()).toBe(true);
+      expect(wrapper?.find('[data-testid$="alert-title"]').isVisible()).toBe(true);
 
-      wrapper?.find('[data-testid="alert-button"]').trigger('click');
+      wrapper?.find('[data-testid$="alert-button"]').trigger('click');
       await nextTick();
 
       expect(organisationStore.errorCode).toBe('');
@@ -268,9 +268,9 @@ describe('KlasseCreationView', () => {
       organisationStore.errorCode = 'REQUIRED_STEP_UP_LEVEL_NOT_MET';
       await nextTick();
 
-      expect(wrapper?.find('[data-testid="alert-title"]').isVisible()).toBe(true);
+      expect(wrapper?.find('[data-testid$="alert-title"]').isVisible()).toBe(true);
 
-      wrapper?.find('[data-testid="alert-button"]').trigger('click');
+      wrapper?.find('[data-testid$="alert-button"]').trigger('click');
       await nextTick();
 
       organisationStore.errorCode = '';

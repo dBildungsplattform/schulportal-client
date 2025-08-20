@@ -63,9 +63,9 @@
   }
 
   async function handleSearchFilter(filter: string): Promise<void> {
-    await searchFilterStore.setSearchFilterForSchulen(filter);
+    searchFilterStore.setSearchFilterForSchulen(filter);
     searchFilter.value = filter;
-    fetchSchulen();
+    await fetchSchulen();
   }
 
   async function toggleItsLearningStatus(organisationId: string): Promise<void> {
@@ -95,7 +95,10 @@
     >
       {{ $t('admin.headline') }}
     </h1>
-    <LayoutCard :header="$t('admin.schule.management')">
+    <LayoutCard
+      data-testid="schule-management-card"
+      :header="$t('admin.schule.management')"
+    >
       <!-- Error Message Display -->
       <SpshAlert
         :model-value="!!organisationStore.errorCode"

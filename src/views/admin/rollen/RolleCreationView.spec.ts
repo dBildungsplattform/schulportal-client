@@ -1,9 +1,4 @@
-import {
-  OrganisationsTyp,
-  ServiceProviderKategorie,
-  ServiceProviderTarget,
-  type ServiceProviderResponse,
-} from '@/api-client/generated/api';
+import { OrganisationsTyp, type ServiceProviderResponse } from '@/api-client/generated/api';
 import routes from '@/router/routes';
 import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import {
@@ -15,6 +10,7 @@ import {
 } from '@/stores/RolleStore';
 import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import type Module from 'module';
+import { DoFactory } from 'test/DoFactory';
 import { expect, test, type Mock, type MockInstance } from 'vitest';
 import { nextTick, type DefineComponent } from 'vue';
 import {
@@ -200,7 +196,7 @@ describe('RolleCreationView', () => {
     rolleStore.errorCode = 'ERROR_ERROR';
     await nextTick();
     const push: MockInstance = vi.spyOn(router, 'push');
-    wrapper?.find('[data-testid="alert-button"]').trigger('click');
+    wrapper?.find('[data-testid$="alert-button"]').trigger('click');
     await nextTick();
     expect(push).toHaveBeenCalledTimes(1);
   });
@@ -465,33 +461,9 @@ describe('RolleCreationView', () => {
     rolleStore.createdRolle = mockRolle;
 
     const testServiceProviders: Array<ServiceProviderResponse> = [
-      {
-        id: 'sp001',
-        name: 'Provider One',
-        target: ServiceProviderTarget.Email,
-        url: 'https://provider-one.com',
-        kategorie: ServiceProviderKategorie.Email,
-        hasLogo: true,
-        requires2fa: false,
-      },
-      {
-        id: 'sp002',
-        name: 'Provider Two',
-        target: ServiceProviderTarget.Email,
-        url: 'https://provider-three.com',
-        kategorie: ServiceProviderKategorie.Email,
-        hasLogo: false,
-        requires2fa: false,
-      },
-      {
-        id: 'sp003',
-        name: 'Provider Three',
-        target: ServiceProviderTarget.Email,
-        url: 'https://provider-three.com',
-        kategorie: ServiceProviderKategorie.Email,
-        hasLogo: true,
-        requires2fa: false,
-      },
+      DoFactory.getServiceProviderResponse(),
+      DoFactory.getServiceProviderResponse(),
+      DoFactory.getServiceProviderResponse(),
     ];
     rolleStore.createdRolle.serviceProviders = testServiceProviders;
     await nextTick();
@@ -507,8 +479,8 @@ describe('RolleCreationView', () => {
   test('shows error message if REQUIRED_STEP_UP_LEVEL_NOT_MET error is present and click close button', async () => {
     rolleStore.errorCode = 'REQUIRED_STEP_UP_LEVEL_NOT_MET';
     await nextTick();
-    expect(wrapper?.find('[data-testid="alert-title"]').isVisible()).toBe(true);
-    wrapper?.find('[data-testid="alert-button"]').trigger('click');
+    expect(wrapper?.find('[data-testid$="alert-title"]').isVisible()).toBe(true);
+    wrapper?.find('[data-testid$="alert-button"]').trigger('click');
     await nextTick();
   });
 

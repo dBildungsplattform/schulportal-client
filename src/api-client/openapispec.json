@@ -689,12 +689,7 @@
             "in": "query",
             "description": "Order to sort by.",
             "schema": {
-              "nullable": true,
-              "enum": [
-                "asc",
-                "desc"
-              ],
-              "type": "string"
+              "$ref": "#/components/schemas/ScopeOrder"
             }
           },
           {
@@ -703,14 +698,7 @@
             "in": "query",
             "description": "Field to sort by.",
             "schema": {
-              "nullable": true,
-              "enum": [
-                "familienname",
-                "vorname",
-                "personalnummer",
-                "referrer"
-              ],
-              "type": "string"
+              "$ref": "#/components/schemas/SortFieldPerson"
             }
           }
         ],
@@ -1181,12 +1169,7 @@
             "in": "query",
             "description": "Order to sort by.",
             "schema": {
-              "nullable": true,
-              "enum": [
-                "asc",
-                "desc"
-              ],
-              "type": "string"
+              "$ref": "#/components/schemas/ScopeOrder"
             }
           },
           {
@@ -1195,14 +1178,7 @@
             "in": "query",
             "description": "Field to sort by.",
             "schema": {
-              "nullable": true,
-              "enum": [
-                "familienname",
-                "vorname",
-                "personalnummer",
-                "referrer"
-              ],
-              "type": "string"
+              "$ref": "#/components/schemas/SortFieldPerson"
             }
           }
         ],
@@ -1377,76 +1353,6 @@
         },
         "tags": [
           "dbiam-personenuebersicht"
-        ],
-        "security": [
-          {
-            "oauth2": [
-              "openid"
-            ]
-          },
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/api/person-info": {
-      "get": {
-        "operationId": "PersonInfoController_info",
-        "summary": "Info about logged in person.",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Returns info about the person.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PersonInfoResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "person is not logged in."
-          }
-        },
-        "tags": [
-          "person-info"
-        ],
-        "security": [
-          {
-            "oauth2": [
-              "openid"
-            ]
-          },
-          {
-            "bearer": []
-          }
-        ]
-      }
-    },
-    "/api/v1/person-info": {
-      "get": {
-        "operationId": "PersonInfoController_infoV1",
-        "summary": "Info about logged in person.",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Returns info about the person.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PersonInfoResponseV1"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "person is not logged in."
-          }
-        },
-        "tags": [
-          "person-info"
         ],
         "security": [
           {
@@ -5181,6 +5087,133 @@
           }
         ]
       }
+    },
+    "/api/person-info": {
+      "get": {
+        "operationId": "PersonInfoController_info",
+        "summary": "Info about logged in person.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Returns info about the person.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonInfoResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "person is not logged in."
+          }
+        },
+        "tags": [
+          "person-info"
+        ],
+        "security": [
+          {
+            "oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/person-info": {
+      "get": {
+        "operationId": "PersonInfoController_infoV1",
+        "summary": "Info about logged in person.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Returns info about the person.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonInfoResponseV1"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "person is not logged in."
+          }
+        },
+        "tags": [
+          "person-info"
+        ],
+        "security": [
+          {
+            "oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/personen-info": {
+      "get": {
+        "operationId": "PersonenInfoController_infoV1",
+        "summary": "liefert Personeninformationen basierend auf den Berechtigungen auf Service Provider des aufrufenden Nutzers. Das Limit (x-limit) darf maximal 5000 betragen.",
+        "description": "Das Limit (x-limit) darf maximal 5000 betragen.",
+        "parameters": [
+          {
+            "name": "x-offset",
+            "required": false,
+            "in": "query",
+            "description": "Offset für die Ergebnisse (maximal 5000)",
+            "schema": {
+              "type": "integer",
+              "maximum": 5000
+            }
+          },
+          {
+            "name": "x-limit",
+            "required": false,
+            "in": "query",
+            "description": "Maximale Anzahl der Ergebnisse (maximal 5000)",
+            "schema": {
+              "type": "integer",
+              "maximum": 5000
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste von Personeninformationen",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonInfoResponseV1"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "person is not logged in."
+          }
+        },
+        "tags": [
+          "personen-info"
+        ],
+        "security": [
+          {
+            "oauth2": [
+              "openid"
+            ]
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
     }
   },
   "info": {
@@ -5505,6 +5538,21 @@
       "UserExeternalDataResponseVidis": {
         "type": "object",
         "properties": {
+          "personId": {
+            "type": "string"
+          },
+          "vorname": {
+            "type": "string"
+          },
+          "nachname": {
+            "type": "string"
+          },
+          "rollenart": {
+            "type": "string"
+          },
+          "emailAdresse": {
+            "type": "string"
+          },
           "dienststellenNummern": {
             "type": "array",
             "items": {
@@ -5513,6 +5561,11 @@
           }
         },
         "required": [
+          "personId",
+          "vorname",
+          "nachname",
+          "rollenart",
+          "emailAdresse",
           "dienststellenNummern"
         ]
       },
@@ -5609,13 +5662,17 @@
           },
           "organisationName": {
             "type": "string"
+          },
+          "organisationDstNr": {
+            "type": "string"
           }
         },
         "required": [
           "rolleId",
           "rolleName",
           "organisationId",
-          "organisationName"
+          "organisationName",
+          "organisationDstNr"
         ]
       },
       "PersonLandesbediensteterSearchResponse": {
@@ -6029,6 +6086,22 @@
           "nein"
         ]
       },
+      "ScopeOrder": {
+        "type": "string",
+        "enum": [
+          "asc",
+          "desc"
+        ]
+      },
+      "SortFieldPerson": {
+        "type": "string",
+        "enum": [
+          "familienname",
+          "vorname",
+          "personalnummer",
+          "referrer"
+        ]
+      },
       "Geschlecht": {
         "type": "string",
         "enum": [
@@ -6299,500 +6372,6 @@
         },
         "required": [
           "personIds"
-        ]
-      },
-      "PersonNameResponse": {
-        "type": "object",
-        "properties": {
-          "familiennamen": {
-            "type": "string"
-          },
-          "vorname": {
-            "type": "string"
-          },
-          "initialenfamilienname": {
-            "type": "string",
-            "nullable": true
-          },
-          "initialenvorname": {
-            "type": "string",
-            "nullable": true
-          },
-          "rufname": {
-            "type": "string",
-            "nullable": true
-          },
-          "titel": {
-            "type": "string",
-            "nullable": true
-          },
-          "anrede": {
-            "nullable": true,
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "namenspraefix": {
-            "nullable": true,
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "namenssuffix": {
-            "nullable": true,
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "sortierindex": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "required": [
-          "familiennamen",
-          "vorname",
-          "initialenfamilienname",
-          "initialenvorname",
-          "rufname",
-          "titel",
-          "anrede",
-          "namenspraefix",
-          "namenssuffix",
-          "sortierindex"
-        ]
-      },
-      "PersonBirthResponse": {
-        "type": "object",
-        "properties": {
-          "datum": {
-            "format": "date-time",
-            "type": "string",
-            "nullable": true
-          },
-          "geburtsort": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "required": [
-          "datum",
-          "geburtsort"
-        ]
-      },
-      "PersonNestedInPersonInfoResponse": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "referrer": {
-            "type": "string",
-            "nullable": true
-          },
-          "mandant": {
-            "type": "string"
-          },
-          "name": {
-            "$ref": "#/components/schemas/PersonNameResponse"
-          },
-          "geburt": {
-            "nullable": true,
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/PersonBirthResponse"
-              }
-            ]
-          },
-          "stammorganisation": {
-            "type": "string",
-            "nullable": true
-          },
-          "geschlecht": {
-            "type": "string",
-            "nullable": true
-          },
-          "lokalisierung": {
-            "type": "string",
-            "nullable": true
-          },
-          "vertrauensstufe": {
-            "nullable": true,
-            "$ref": "#/components/schemas/Vertrauensstufe"
-          },
-          "revision": {
-            "type": "string"
-          },
-          "personalnummer": {
-            "type": "string",
-            "nullable": true
-          },
-          "dienststellen": {
-            "nullable": true,
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        },
-        "required": [
-          "id",
-          "referrer",
-          "mandant",
-          "name",
-          "geburt",
-          "stammorganisation",
-          "geschlecht",
-          "lokalisierung",
-          "vertrauensstufe",
-          "revision",
-          "personalnummer",
-          "dienststellen"
-        ]
-      },
-      "PersonenInfoKontextOrganisationResponse": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "nullable": false
-          },
-          "name": {
-            "type": "string",
-            "nullable": true
-          },
-          "typ": {
-            "type": "string",
-            "enum": [
-              "ROOT",
-              "LAND",
-              "TRAEGER",
-              "SCHULE",
-              "KLASSE",
-              "ANBIETER",
-              "SONSTIGE ORGANISATION / EINRICHTUNG",
-              "UNBESTAETIGT"
-            ],
-            "nullable": true
-          },
-          "kennung": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "required": [
-          "id",
-          "name",
-          "typ",
-          "kennung"
-        ]
-      },
-      "PersonenInfoKontextResponse": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "referrer": {
-            "type": "string",
-            "nullable": true
-          },
-          "mandant": {
-            "type": "string"
-          },
-          "organisation": {
-            "$ref": "#/components/schemas/PersonenInfoKontextOrganisationResponse"
-          },
-          "rollenart": {
-            "type": "string",
-            "nullable": true
-          },
-          "rollenname": {
-            "type": "string",
-            "nullable": true
-          },
-          "personenstatus": {
-            "type": "string",
-            "enum": [
-              "AKTIV"
-            ],
-            "nullable": true
-          },
-          "jahrgangsstufe": {
-            "type": "string",
-            "enum": [
-              "01",
-              "02",
-              "03",
-              "04",
-              "05",
-              "06",
-              "07",
-              "08",
-              "09",
-              "10"
-            ],
-            "nullable": true
-          },
-          "sichtfreigabe": {
-            "type": "string",
-            "enum": [
-              "ja",
-              "nein"
-            ],
-            "nullable": true
-          },
-          "loeschung": {
-            "nullable": true,
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/LoeschungResponse"
-              }
-            ]
-          },
-          "revision": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "referrer",
-          "mandant",
-          "organisation",
-          "rollenart",
-          "rollenname",
-          "personenstatus",
-          "jahrgangsstufe",
-          "sichtfreigabe",
-          "loeschung",
-          "revision"
-        ]
-      },
-      "PersonInfoResponse": {
-        "type": "object",
-        "properties": {
-          "pid": {
-            "type": "string"
-          },
-          "person": {
-            "$ref": "#/components/schemas/PersonNestedInPersonInfoResponse"
-          },
-          "personenkontexte": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PersonenInfoKontextResponse"
-            }
-          },
-          "gruppen": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "email": {
-            "nullable": true,
-            "description": "Contains status and address. Returns email-address verified by OX (enabled) if available, otherwise returns most recently updated one (no prioritized status)",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/PersonEmailResponse"
-              }
-            ]
-          }
-        },
-        "required": [
-          "pid",
-          "person",
-          "personenkontexte",
-          "gruppen",
-          "email"
-        ]
-      },
-      "PersonInfoPersonNameResponseV1": {
-        "type": "object",
-        "properties": {
-          "familiennamen": {
-            "type": "string"
-          },
-          "vorname": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "familiennamen",
-          "vorname"
-        ]
-      },
-      "PersonInfoPersonResponseV1": {
-        "type": "object",
-        "properties": {
-          "stammorganisation": {
-            "type": "object",
-            "nullable": true
-          },
-          "name": {
-            "$ref": "#/components/schemas/PersonInfoPersonNameResponseV1"
-          }
-        },
-        "required": [
-          "stammorganisation",
-          "name"
-        ]
-      },
-      "PersonenInfoKontextOrganisationResponseV1": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "kennung": {
-            "type": "string",
-            "nullable": true
-          },
-          "name": {
-            "type": "string",
-            "nullable": true
-          },
-          "typ": {
-            "type": "string",
-            "enum": [
-              "Schule",
-              "Sonstige"
-            ],
-            "nullable": true
-          }
-        },
-        "required": [
-          "id",
-          "kennung",
-          "name",
-          "typ"
-        ]
-      },
-      "PersonInfoKontextErreichbarkeitResponseV1": {
-        "type": "object",
-        "properties": {
-          "typ": {
-            "type": "string",
-            "enum": [
-              "E-Mail"
-            ]
-          },
-          "kennung": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "typ",
-          "kennung"
-        ]
-      },
-      "PersonenInfoKontextGruppeResponseV1": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "nullable": false
-          },
-          "bezeichnung": {
-            "type": "string",
-            "nullable": false
-          },
-          "typ": {
-            "type": "string",
-            "enum": [
-              "Klasse"
-            ],
-            "nullable": false
-          }
-        },
-        "required": [
-          "id",
-          "bezeichnung",
-          "typ"
-        ]
-      },
-      "PersonInfoKontextResponseV1": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "organisation": {
-            "$ref": "#/components/schemas/PersonenInfoKontextOrganisationResponseV1"
-          },
-          "rolle": {
-            "type": "string",
-            "enum": [
-              "Lern",
-              "Lehr",
-              "SorgBer",
-              "Extern",
-              "OrgAdmin",
-              "Leit",
-              "SysAdmin",
-              "SchB",
-              "NLehr"
-            ]
-          },
-          "erreichbarkeiten": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PersonInfoKontextErreichbarkeitResponseV1"
-            }
-          },
-          "personenstatus": {
-            "type": "string",
-            "enum": [
-              "Aktiv"
-            ],
-            "nullable": true
-          },
-          "gruppen": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PersonenInfoKontextGruppeResponseV1"
-            }
-          }
-        },
-        "required": [
-          "id",
-          "organisation",
-          "rolle",
-          "erreichbarkeiten",
-          "personenstatus",
-          "gruppen"
-        ]
-      },
-      "PersonInfoResponseV1": {
-        "type": "object",
-        "properties": {
-          "pid": {
-            "type": "string"
-          },
-          "person": {
-            "$ref": "#/components/schemas/PersonInfoPersonResponseV1"
-          },
-          "personenkontexte": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PersonInfoKontextResponseV1"
-            }
-          },
-          "beziehungen": {
-            "type": "array",
-            "items": {
-              "type": "object"
-            }
-          }
-        },
-        "required": [
-          "pid",
-          "person",
-          "personenkontexte",
-          "beziehungen"
         ]
       },
       "CreateOrganisationBodyParams": {
@@ -7257,7 +6836,8 @@
               "UPDATE_MERKMALE_ERROR",
               "ROLLENNAME_ENTHAELT_LEERZEICHEN",
               "NEWER_VERSION_OF_ROLLE_AVAILABLE",
-              "ROLLE_NAME_UNIQUE_ON_SSK"
+              "ROLLE_NAME_UNIQUE_ON_SSK",
+              "SERVICE_PROVIDER_NICHT_NACHTRAEGLICH_ZUWEISBAR"
             ]
           },
           "code": {
@@ -7334,6 +6914,12 @@
           "ANGEBOTE"
         ]
       },
+      "ServiceProviderMerkmal": {
+        "type": "string",
+        "enum": [
+          "NACHTRAEGLICH_ZUWEISBAR"
+        ]
+      },
       "ServiceProviderResponse": {
         "type": "object",
         "properties": {
@@ -7358,6 +6944,12 @@
           },
           "requires2fa": {
             "type": "boolean"
+          },
+          "merkmale": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ServiceProviderMerkmal"
+            }
           }
         },
         "required": [
@@ -7367,7 +6959,8 @@
           "url",
           "kategorie",
           "hasLogo",
-          "requires2fa"
+          "requires2fa",
+          "merkmale"
         ]
       },
       "UpdateRolleBodyParams": {
@@ -8327,6 +7920,500 @@
         "required": [
           "count",
           "newPersonenkontexte"
+        ]
+      },
+      "PersonNameResponse": {
+        "type": "object",
+        "properties": {
+          "familiennamen": {
+            "type": "string"
+          },
+          "vorname": {
+            "type": "string"
+          },
+          "initialenfamilienname": {
+            "type": "string",
+            "nullable": true
+          },
+          "initialenvorname": {
+            "type": "string",
+            "nullable": true
+          },
+          "rufname": {
+            "type": "string",
+            "nullable": true
+          },
+          "titel": {
+            "type": "string",
+            "nullable": true
+          },
+          "anrede": {
+            "nullable": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "namenspraefix": {
+            "nullable": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "namenssuffix": {
+            "nullable": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "sortierindex": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "familiennamen",
+          "vorname",
+          "initialenfamilienname",
+          "initialenvorname",
+          "rufname",
+          "titel",
+          "anrede",
+          "namenspraefix",
+          "namenssuffix",
+          "sortierindex"
+        ]
+      },
+      "PersonBirthResponse": {
+        "type": "object",
+        "properties": {
+          "datum": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true
+          },
+          "geburtsort": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "datum",
+          "geburtsort"
+        ]
+      },
+      "PersonNestedInPersonInfoResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "referrer": {
+            "type": "string",
+            "nullable": true
+          },
+          "mandant": {
+            "type": "string"
+          },
+          "name": {
+            "$ref": "#/components/schemas/PersonNameResponse"
+          },
+          "geburt": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PersonBirthResponse"
+              }
+            ]
+          },
+          "stammorganisation": {
+            "type": "string",
+            "nullable": true
+          },
+          "geschlecht": {
+            "type": "string",
+            "nullable": true
+          },
+          "lokalisierung": {
+            "type": "string",
+            "nullable": true
+          },
+          "vertrauensstufe": {
+            "nullable": true,
+            "$ref": "#/components/schemas/Vertrauensstufe"
+          },
+          "revision": {
+            "type": "string"
+          },
+          "personalnummer": {
+            "type": "string",
+            "nullable": true
+          },
+          "dienststellen": {
+            "nullable": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "referrer",
+          "mandant",
+          "name",
+          "geburt",
+          "stammorganisation",
+          "geschlecht",
+          "lokalisierung",
+          "vertrauensstufe",
+          "revision",
+          "personalnummer",
+          "dienststellen"
+        ]
+      },
+      "PersonenInfoKontextOrganisationResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "nullable": false
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "typ": {
+            "type": "string",
+            "enum": [
+              "ROOT",
+              "LAND",
+              "TRAEGER",
+              "SCHULE",
+              "KLASSE",
+              "ANBIETER",
+              "SONSTIGE ORGANISATION / EINRICHTUNG",
+              "UNBESTAETIGT"
+            ],
+            "nullable": true
+          },
+          "kennung": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "typ",
+          "kennung"
+        ]
+      },
+      "PersonenInfoKontextResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "referrer": {
+            "type": "string",
+            "nullable": true
+          },
+          "mandant": {
+            "type": "string"
+          },
+          "organisation": {
+            "$ref": "#/components/schemas/PersonenInfoKontextOrganisationResponse"
+          },
+          "rollenart": {
+            "type": "string",
+            "nullable": true
+          },
+          "rollenname": {
+            "type": "string",
+            "nullable": true
+          },
+          "personenstatus": {
+            "type": "string",
+            "enum": [
+              "AKTIV"
+            ],
+            "nullable": true
+          },
+          "jahrgangsstufe": {
+            "type": "string",
+            "enum": [
+              "01",
+              "02",
+              "03",
+              "04",
+              "05",
+              "06",
+              "07",
+              "08",
+              "09",
+              "10"
+            ],
+            "nullable": true
+          },
+          "sichtfreigabe": {
+            "type": "string",
+            "enum": [
+              "ja",
+              "nein"
+            ],
+            "nullable": true
+          },
+          "loeschung": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LoeschungResponse"
+              }
+            ]
+          },
+          "revision": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "referrer",
+          "mandant",
+          "organisation",
+          "rollenart",
+          "rollenname",
+          "personenstatus",
+          "jahrgangsstufe",
+          "sichtfreigabe",
+          "loeschung",
+          "revision"
+        ]
+      },
+      "PersonInfoResponse": {
+        "type": "object",
+        "properties": {
+          "pid": {
+            "type": "string"
+          },
+          "person": {
+            "$ref": "#/components/schemas/PersonNestedInPersonInfoResponse"
+          },
+          "personenkontexte": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PersonenInfoKontextResponse"
+            }
+          },
+          "gruppen": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "email": {
+            "nullable": true,
+            "description": "Contains status and address. Returns email-address verified by OX (enabled) if available, otherwise returns most recently updated one (no prioritized status)",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PersonEmailResponse"
+              }
+            ]
+          }
+        },
+        "required": [
+          "pid",
+          "person",
+          "personenkontexte",
+          "gruppen",
+          "email"
+        ]
+      },
+      "PersonInfoPersonNameResponseV1": {
+        "type": "object",
+        "properties": {
+          "familiennamen": {
+            "type": "string"
+          },
+          "vorname": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "familiennamen",
+          "vorname"
+        ]
+      },
+      "PersonInfoPersonResponseV1": {
+        "type": "object",
+        "properties": {
+          "stammorganisation": {
+            "type": "object",
+            "nullable": true
+          },
+          "name": {
+            "$ref": "#/components/schemas/PersonInfoPersonNameResponseV1"
+          }
+        },
+        "required": [
+          "stammorganisation",
+          "name"
+        ]
+      },
+      "PersonenInfoKontextOrganisationResponseV1": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "kennung": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "typ": {
+            "type": "string",
+            "enum": [
+              "Schule",
+              "Sonstige"
+            ],
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "kennung",
+          "name",
+          "typ"
+        ]
+      },
+      "PersonInfoKontextErreichbarkeitResponseV1": {
+        "type": "object",
+        "properties": {
+          "typ": {
+            "type": "string",
+            "enum": [
+              "E-Mail"
+            ]
+          },
+          "kennung": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "typ",
+          "kennung"
+        ]
+      },
+      "PersonenInfoKontextGruppeResponseV1": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "nullable": false
+          },
+          "bezeichnung": {
+            "type": "string",
+            "nullable": false
+          },
+          "typ": {
+            "type": "string",
+            "enum": [
+              "Klasse"
+            ],
+            "nullable": false
+          }
+        },
+        "required": [
+          "id",
+          "bezeichnung",
+          "typ"
+        ]
+      },
+      "PersonInfoKontextResponseV1": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "organisation": {
+            "$ref": "#/components/schemas/PersonenInfoKontextOrganisationResponseV1"
+          },
+          "rolle": {
+            "type": "string",
+            "enum": [
+              "Lern",
+              "Lehr",
+              "SorgBer",
+              "Extern",
+              "OrgAdmin",
+              "Leit",
+              "SysAdmin",
+              "SchB",
+              "NLehr"
+            ]
+          },
+          "erreichbarkeiten": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PersonInfoKontextErreichbarkeitResponseV1"
+            }
+          },
+          "personenstatus": {
+            "type": "string",
+            "enum": [
+              "Aktiv"
+            ],
+            "nullable": true
+          },
+          "gruppen": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PersonenInfoKontextGruppeResponseV1"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "organisation",
+          "rolle",
+          "erreichbarkeiten",
+          "personenstatus",
+          "gruppen"
+        ]
+      },
+      "PersonInfoResponseV1": {
+        "type": "object",
+        "properties": {
+          "pid": {
+            "type": "string"
+          },
+          "person": {
+            "$ref": "#/components/schemas/PersonInfoPersonResponseV1"
+          },
+          "personenkontexte": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PersonInfoKontextResponseV1"
+            }
+          },
+          "beziehungen": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          }
+        },
+        "required": [
+          "pid",
+          "person",
+          "personenkontexte",
+          "beziehungen"
         ]
       }
     }
