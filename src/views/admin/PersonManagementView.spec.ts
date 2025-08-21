@@ -1,4 +1,4 @@
-import { RollenArt, RollenSystemRecht, type FindRollenResponse } from '@/api-client/generated/api';
+import { RollenArt, type FindRollenResponse } from '@/api-client/generated/api';
 import routes from '@/router/routes';
 import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 import { OperationType } from '@/stores/BulkOperationStore';

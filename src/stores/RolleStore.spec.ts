@@ -4,9 +4,9 @@ import { setActivePinia, createPinia } from 'pinia';
 import { useRolleStore, type Rolle, type RolleStore } from './RolleStore';
 import {
   RollenMerkmal,
-  RollenSystemRecht,
   type RolleResponse,
   type RolleWithServiceProvidersResponse,
+  type SystemRechtResponse,
 } from '../api-client/generated/api';
 import { rejects } from 'assert';
 import type { ServiceProvider } from './ServiceProviderStore';
@@ -30,22 +30,20 @@ describe('rolleStore', () => {
 
   describe('createRolle', () => {
     it('should create rolle and update state', async () => {
-      const mockResponse: RolleResponse[] = [
-        {
-          administeredBySchulstrukturknoten: '1234',
-          rollenart: 'LEHR',
-          name: 'Lehrer',
-          // TODO remove type casting when generator is fixed
-          merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
-          systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
-          createdAt: '2022',
-          updatedAt: '2022',
-          id: '1',
-          administeredBySchulstrukturknotenName: null,
-          administeredBySchulstrukturknotenKennung: null,
-          version: 1,
-        },
-      ];
+      const mockResponse: RolleResponse = {
+        administeredBySchulstrukturknoten: '1234',
+        rollenart: 'LEHR',
+        name: 'Lehrer',
+        // TODO remove type casting when generator is fixed
+        merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
+        systemrechte: [{ name: 'ROLLEN_VERWALTEN', isTechnical: false }] as unknown as Set<SystemRechtResponse>,
+        createdAt: '2022',
+        updatedAt: '2022',
+        id: '1',
+        administeredBySchulstrukturknotenName: null,
+        administeredBySchulstrukturknotenKennung: null,
+        version: 1,
+      };
 
       mockadapter.onPost('/api/rolle').replyOnce(200, mockResponse);
       const createRollePromise: Promise<RolleResponse> = rolleStore.createRolle(
@@ -57,8 +55,8 @@ describe('rolleStore', () => {
       );
       expect(rolleStore.loading).toBe(true);
       await createRollePromise;
-      expect(rolleStore.createdRolle).toEqual([...mockResponse]);
-      expect(rolleStore.currentRolle).toEqual([...mockResponse]);
+      expect(rolleStore.createdRolle).toEqual({ ...mockResponse, systemrechte: new Set(['ROLLEN_VERWALTEN']) });
+      expect(rolleStore.currentRolle).toEqual({ ...mockResponse, systemrechte: new Set(['ROLLEN_VERWALTEN']) });
       expect(rolleStore.loading).toBe(false);
     });
 
@@ -103,7 +101,7 @@ describe('rolleStore', () => {
           name: 'Lehrer',
           // TODO: remove type casting when generator is fixed
           merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
-          systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+          systemrechte: [{ name: 'ROLLEN_VERWALTEN', isTechnical: false }] as unknown as Set<SystemRechtResponse>,
           createdAt: '2022',
           updatedAt: '2022',
           id: '1',
@@ -231,28 +229,34 @@ describe('rolleStore', () => {
   });
   describe('getRolleById', () => {
     it('should load Rolle and update state', async () => {
-      const mockResponse: RolleResponse[] = [
-        {
-          administeredBySchulstrukturknoten: '1234',
-          rollenart: 'LEHR',
-          name: 'Lehrer',
-          // TODO: remove type casting when generator is fixed
-          merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
-          systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
-          createdAt: '2022',
-          updatedAt: '2022',
-          id: '1',
-          administeredBySchulstrukturknotenName: null,
-          administeredBySchulstrukturknotenKennung: null,
-          version: 1,
-        },
-      ];
+      const mockResponse: RolleResponse = {
+        administeredBySchulstrukturknoten: '1234',
+        rollenart: 'LEHR',
+        name: 'Lehrer',
+        // TODO: remove type casting when generator is fixed
+        merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
+        systemrechte: [{ name: 'ROLLEN_VERWALTEN', isTechnical: false }] as unknown as Set<SystemRechtResponse>,
+        createdAt: '2022',
+        updatedAt: '2022',
+        id: '1',
+        administeredBySchulstrukturknotenName: null,
+        administeredBySchulstrukturknotenKennung: null,
+        version: 1,
+      };
 
       mockadapter.onGet('/api/rolle/1').replyOnce(200, mockResponse, {});
       const getRolleByIdPromise: Promise<Rolle> = rolleStore.getRolleById('1');
       expect(rolleStore.loading).toBe(true);
       await getRolleByIdPromise;
-      expect(rolleStore.currentRolle).toEqual([...mockResponse]);
+      expect(rolleStore.currentRolle).toEqual({
+        administeredBySchulstrukturknoten: '1234',
+        rollenart: 'LEHR',
+        name: 'Lehrer',
+        merkmale: new Set(['KOPERS_PFLICHT']),
+        systemrechte: new Set(['ROLLEN_VERWALTEN']),
+        id: '1',
+        version: 1,
+      });
       expect(rolleStore.loading).toBe(false);
     });
 
@@ -283,7 +287,7 @@ describe('rolleStore', () => {
         rollenart: 'LEHR',
         name: 'Updated Lehrer',
         merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
-        systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+        systemrechte: [{ name: 'ROLLEN_VERWALTEN', isTechnical: false }] as unknown as Set<SystemRechtResponse>,
         createdAt: '2022',
         updatedAt: '2023',
         id: '1',
