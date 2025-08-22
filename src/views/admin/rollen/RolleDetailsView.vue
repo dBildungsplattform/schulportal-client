@@ -39,7 +39,7 @@
     type Router,
   } from 'vue-router';
   import { useDisplay } from 'vuetify';
-  import type { RollenSystemRechtEnum, SystemRechtResponse } from '@/api-client/generated';
+  import type { SystemRechtResponse } from '@/api-client/generated';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();

@@ -1,10 +1,9 @@
 import {
   OrganisationsTyp,
   RollenMerkmal,
-  RollenSystemRecht,
   type DBiamPersonenkontextResponse,
   type FindRollenResponse,
-  type SystemrechtResponse,
+  type SystemRechtResponse,
 } from '@/api-client/generated';
 import ApiService from '@/services/ApiService';
 import { rejects } from 'assert';
@@ -387,7 +386,7 @@ describe('PersonenkontextStore', () => {
             administeredBySchulstrukturknoten: 'string',
             rollenart: 'LERN',
             merkmale: ['BEFRISTUNG_PFLICHT'] as unknown as Set<RollenMerkmal>,
-            systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+            systemrechte: [{ name: 'ROLLEN_VERWALTEN', isTechnical: false }] as unknown as Set<SystemRechtResponse>,
             administeredBySchulstrukturknotenName: 'Land SH',
             administeredBySchulstrukturknotenKennung: '',
             version: 1,

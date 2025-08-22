@@ -5,7 +5,7 @@ import {
   type TwoFactorAuthentificationStore,
 } from '@/stores/TwoFactorAuthentificationStore';
 import routes from './routes';
-import { MasterDataStatus, useMasterDataStore, type MasterDataStore } from '@/stores/MasterDataStore';
+import { useMasterDataStore, type MasterDataStore } from '@/stores/MasterDataStore';
 
 type Permission =
   | 'klassenverwaltung'

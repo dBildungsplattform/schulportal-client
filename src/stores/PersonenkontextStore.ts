@@ -4,7 +4,6 @@ import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import {
   PersonAdministrationApiFactory,
   PersonenkontextApiFactory,
-  PersonenkontexteApiFactory,
   type DbiamCreatePersonenkontextBodyParams,
   type DbiamCreatePersonWithPersonenkontexteBodyParams,
   type DbiamPersonenkontextBodyParams,
@@ -15,7 +14,6 @@ import {
   type PersonAdministrationApiInterface,
   type PersonendatensatzResponse,
   type PersonenkontextApiInterface,
-  type PersonenkontexteApiInterface,
   type PersonenkontexteUpdateResponse,
   type PersonenkontextWorkflowResponse,
   LandesbediensteterApiFactory,
@@ -30,7 +28,6 @@ import { usePersonStore, type PersonStore } from './PersonStore';
 import type { Zuordnung } from './types/Zuordnung';
 
 const personenKontextApi: PersonenkontextApiInterface = PersonenkontextApiFactory(undefined, '', axiosApiInstance);
-const personenKontexteApi: PersonenkontexteApiInterface = PersonenkontexteApiFactory(undefined, '', axiosApiInstance);
 const personAdministrationApi: PersonAdministrationApiInterface = PersonAdministrationApiFactory(
   undefined,
   '',

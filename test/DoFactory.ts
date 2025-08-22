@@ -6,7 +6,7 @@ import {
   RollenSystemRechtEnum,
   ServiceProviderKategorie,
   ServiceProviderTarget,
-  SystemRechtResponse,
+  type SystemRechtResponse,
   TraegerschaftTyp,
   Vertrauensstufe,
   type DBiamPersonenkontextResponse,

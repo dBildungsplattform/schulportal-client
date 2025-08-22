@@ -24,7 +24,7 @@ type RolleState = {
   createdRolle: Rolle | null;
   updatedRolle: RolleWithServiceProvidersResponse | null;
   currentRolle: Rolle | null;
-  allRollen: Array<RolleResponse>;
+  allRollen: Array<RolleWithServiceProvidersResponse>;
   errorCode: string;
   loading: boolean;
   totalRollen: number;
@@ -180,11 +180,8 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
     async getAllRollen(filter: RolleFilter) {
       this.loading = true;
       try {
-        const response: AxiosResponse<Array<RolleResponse>> = await rolleApi.rolleControllerFindRollen(
-          filter.offset,
-          filter.limit,
-          filter.searchString,
-        );
+        const response: AxiosResponse<Array<RolleWithServiceProvidersResponse>> =
+          await rolleApi.rolleControllerFindRollen(filter.offset, filter.limit, filter.searchString);
         this.allRollen = response.data;
         this.totalRollen = +response.headers['x-paging-total'];
       } catch (error: unknown) {

@@ -1,17 +1,13 @@
 import { expect, test, type MockInstance } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import RolleManagementView from './RolleManagementView.vue';
-import {
-  RollenMerkmal,
-  RollenSystemRecht,
-  useRolleStore,
-  type RolleStore,
-  type RolleWithServiceProvidersResponse,
-} from '@/stores/RolleStore';
+import { RollenMerkmal, useRolleStore, type RolleStore } from '@/stores/RolleStore';
 import { nextTick } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import routes from '@/router/routes';
 import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
+import type { SystemRechtResponse } from '@/api-client/generated';
+import { RollenSystemRechtEnum } from '../../../api-client/generated/api';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -38,7 +34,9 @@ beforeEach(() => {
       name: 'Lehrer',
       // TODO: remove type casting when generator is fixed
       merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
-      systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+      systemrechte: [
+        { name: RollenSystemRechtEnum.RollenVerwalten, isTechnical: false },
+      ] as unknown as Set<SystemRechtResponse>,
       createdAt: '2022',
       updatedAt: '2022',
       id: '1',
@@ -54,6 +52,7 @@ beforeEach(() => {
       ],
       administeredBySchulstrukturknotenName: 'Land SH',
       administeredBySchulstrukturknotenKennung: '',
+      version: 1,
     },
     {
       administeredBySchulstrukturknoten: '1234',
@@ -61,7 +60,7 @@ beforeEach(() => {
       name: 'SuS',
       // TODO: remove type casting when generator is fixed
       merkmale: [] as unknown as Set<RollenMerkmal>,
-      systemrechte: [] as unknown as Set<RollenSystemRecht>,
+      systemrechte: [] as unknown as Set<SystemRechtResponse>,
       createdAt: '2022',
       updatedAt: '2022',
       id: '2',
@@ -73,6 +72,7 @@ beforeEach(() => {
       ],
       administeredBySchulstrukturknotenName: 'Land SH',
       administeredBySchulstrukturknotenKennung: '1234567',
+      version: 1,
     },
     {
       administeredBySchulstrukturknoten: '42',
@@ -80,7 +80,7 @@ beforeEach(() => {
       name: 'Rolle ohne Namen',
       // TODO: remove type casting when generator is fixed
       merkmale: [] as unknown as Set<RollenMerkmal>,
-      systemrechte: [] as unknown as Set<RollenSystemRecht>,
+      systemrechte: [] as unknown as Set<SystemRechtResponse>,
       createdAt: '2022',
       updatedAt: '2022',
       id: '2',
@@ -92,8 +92,9 @@ beforeEach(() => {
       ],
       administeredBySchulstrukturknotenName: '',
       administeredBySchulstrukturknotenKennung: '1234567',
+      version: 1,
     },
-  ] as RolleWithServiceProvidersResponse[];
+  ];
 
   rolleStore.totalRollen = 3;
 
