@@ -1,10 +1,9 @@
 import {
   OrganisationsTyp,
   RollenMerkmal,
-  RollenSystemRecht,
   type DBiamPersonenkontextResponse,
   type FindRollenResponse,
-  type SystemrechtResponse,
+  type SystemRechtResponse,
 } from '@/api-client/generated';
 import ApiService from '@/services/ApiService';
 import { rejects } from 'assert';
@@ -55,107 +54,6 @@ describe('PersonenkontextStore', () => {
   it('should initalize state correctly', () => {
     expect(personenkontextStore.errorCode).toEqual('');
     expect(personenkontextStore.loading).toBe(false);
-  });
-
-  describe('hasSystemrecht', () => {
-    it('should check for systemrecht and update state', async () => {
-      const mockResponse: SystemrechtResponse = {
-        ROLLEN_VERWALTEN: [
-          {
-            id: '1',
-            kennung: '12345',
-            name: 'Organisation 1',
-            namensergaenzung: 'Ergänzung',
-            kuerzel: 'O1',
-            administriertVon: '1',
-            typ: OrganisationsTyp.Anbieter,
-          },
-        ],
-        KLASSEN_VERWALTEN: [
-          {
-            id: '1',
-            kennung: '12345',
-            name: 'Organisation 1',
-            namensergaenzung: 'Ergänzung',
-            kuerzel: 'O1',
-            administriertVon: '1',
-            typ: OrganisationsTyp.Anbieter,
-          },
-        ],
-        SCHULEN_VERWALTEN: [
-          {
-            id: '1',
-            kennung: '12345',
-            name: 'Organisation 1',
-            namensergaenzung: 'Ergänzung',
-            kuerzel: 'O1',
-            administriertVon: '1',
-            typ: OrganisationsTyp.Anbieter,
-          },
-        ],
-        PERSONEN_VERWALTEN: [
-          {
-            id: '1',
-            kennung: '12345',
-            name: 'Organisation 1',
-            namensergaenzung: 'Ergänzung',
-            kuerzel: 'O1',
-            administriertVon: '1',
-            typ: OrganisationsTyp.Anbieter,
-          },
-        ],
-        SCHULTRAEGER_VERWALTEN: [
-          {
-            id: '1',
-            kennung: '12345',
-            name: 'Organisation 1',
-            namensergaenzung: 'Ergänzung',
-            kuerzel: 'O1',
-            administriertVon: '1',
-            typ: OrganisationsTyp.Anbieter,
-          },
-        ],
-      };
-
-      mockadapter
-        .onGet('/api/personenkontexte/1/hatSystemrecht?systemRecht=ROLLEN_VERWALTEN')
-        .replyOnce(200, mockResponse);
-      const hasSystemRechtPromise: Promise<SystemrechtResponse> = personenkontextStore.hasSystemrecht(
-        '1',
-        'ROLLEN_VERWALTEN',
-      );
-      expect(personenkontextStore.loading).toBe(true);
-      await hasSystemRechtPromise;
-      expect(personenkontextStore.loading).toBe(false);
-    });
-
-    it('should handle string error', async () => {
-      mockadapter
-        .onGet('/api/personenkontexte/1/hatSystemrecht?systemRecht=ROLLEN_VERWALTEN')
-        .replyOnce(500, 'some mock server error');
-      const hasSystemRechtPromise: Promise<SystemrechtResponse> = personenkontextStore.hasSystemrecht(
-        '1',
-        'ROLLEN_VERWALTEN',
-      );
-      expect(personenkontextStore.loading).toBe(true);
-      await rejects(hasSystemRechtPromise);
-      expect(personenkontextStore.errorCode).toEqual('UNSPECIFIED_ERROR');
-      expect(personenkontextStore.loading).toBe(false);
-    });
-
-    it('should handle error code', async () => {
-      mockadapter
-        .onGet('/api/personenkontexte/1/hatSystemrecht?systemRecht=ROLLEN_VERWALTEN')
-        .replyOnce(500, { code: 'some mock server error' });
-      const hasSystemRechtPromise: Promise<SystemrechtResponse> = personenkontextStore.hasSystemrecht(
-        '1',
-        'ROLLEN_VERWALTEN',
-      );
-      expect(personenkontextStore.loading).toBe(true);
-      await rejects(hasSystemRechtPromise);
-      expect(personenkontextStore.errorCode).toEqual('some mock server error');
-      expect(personenkontextStore.loading).toBe(false);
-    });
   });
 
   describe('processWorkflowStep', () => {
@@ -488,7 +386,7 @@ describe('PersonenkontextStore', () => {
             administeredBySchulstrukturknoten: 'string',
             rollenart: 'LERN',
             merkmale: ['BEFRISTUNG_PFLICHT'] as unknown as Set<RollenMerkmal>,
-            systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+            systemrechte: [{ name: 'ROLLEN_VERWALTEN', isTechnical: false }] as unknown as Set<SystemRechtResponse>,
             administeredBySchulstrukturknotenName: 'Land SH',
             administeredBySchulstrukturknotenKennung: '',
             version: 1,
