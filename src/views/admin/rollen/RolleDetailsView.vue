@@ -65,12 +65,6 @@
 
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
 
-  const translatedOrgName: ComputedRef<string | undefined> = computed(() => {
-    return organisationStore.currentOrganisation?.kennung
-      ? `${organisationStore.currentOrganisation.kennung} (${organisationStore.currentOrganisation.name})`
-      : organisationStore.currentOrganisation?.name;
-  });
-
   const translatedRollenart: ComputedRef<string> = computed(() => {
     return t(`admin.rolle.mappingFrontBackEnd.rollenarten.${rolleStore.currentRolle?.rollenart}`);
   });
@@ -265,7 +259,7 @@
     });
 
     // Set the initial values using the computed properties
-    formContext.setFieldValue('selectedAdministrationsebene', translatedOrgName.value);
+    formContext.setFieldValue('selectedAdministrationsebene', organisationStore.currentOrganisation?.id);
     formContext.setFieldValue('selectedRollenArt', translatedRollenart.value);
     formContext.setFieldValue('selectedRollenName', rolleStore.currentRolle?.name);
     formContext.setFieldValue(
@@ -358,6 +352,7 @@
             >
               <!-- Error Message Display -->
               <SpshAlert
+                v-if="!!rolleStore.errorCode"
                 dataTestIdPrefix="rolle-details-error"
                 :model-value="!!rolleStore.errorCode"
                 :title="
