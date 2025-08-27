@@ -4,7 +4,12 @@
   import RolleSuccessTemplate from '@/components/admin/rollen/RolleSuccessTemplate.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+  import {
+    OrganisationsTyp,
+    useOrganisationStore,
+    type Organisation,
+    type OrganisationStore,
+  } from '@/stores/OrganisationStore';
   import {
     RollenMerkmal,
     RollenSystemRecht,
@@ -19,6 +24,7 @@
     type ServiceProviderStore,
   } from '@/stores/ServiceProviderStore';
   import { type TranslatedObject } from '@/types.d';
+  import { getDisplayNameForOrg } from '@/utils/formatting';
   import { isHiddenSystemrecht } from '@/utils/systemrechte';
   import {
     getDirtyState,
@@ -64,6 +70,13 @@
   const allSystemrechte: Ref<TranslatedSystemrecht[]> = ref([]);
 
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
+
+  const administrationsebenen: ComputedRef<TranslatedObject[]> = computed(() =>
+    organisationStore.allOrganisationen.map((org: Organisation) => ({
+      value: org.id,
+      title: getDisplayNameForOrg(org),
+    })),
+  );
 
   const translatedRollenart: ComputedRef<string> = computed(() => {
     return t(`admin.rolle.mappingFrontBackEnd.rollenarten.${rolleStore.currentRolle?.rollenart}`);
@@ -324,6 +337,7 @@
         <v-container>
           <div v-if="rolleStore.currentRolle">
             <RolleForm
+              :administrationsebenen="administrationsebenen"
               :errorCode="rolleStore.errorCode"
               :onHandleConfirmUnsavedChanges="handleConfirmUnsavedChanges"
               :onHandleDiscard="navigateToRolleTable"
