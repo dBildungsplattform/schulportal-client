@@ -5,7 +5,12 @@
   import RolleSuccessTemplate from '@/components/admin/rollen/RolleSuccessTemplate.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+  import {
+    OrganisationsTyp,
+    useOrganisationStore,
+    type Organisation,
+    type OrganisationStore,
+  } from '@/stores/OrganisationStore';
   import {
     RollenMerkmal,
     RollenSystemRecht,
@@ -20,6 +25,8 @@
     type ServiceProviderStore,
   } from '@/stores/ServiceProviderStore';
   import { type TranslatedObject } from '@/types.d';
+  import { getDisplayNameForOrg } from '@/utils/formatting';
+
   import {
     getDirtyState,
     getRolleFieldDefinitions,
@@ -67,11 +74,12 @@
 
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
 
-  const translatedOrgName: ComputedRef<string | undefined> = computed(() => {
-    return organisationStore.currentOrganisation?.kennung
-      ? `${organisationStore.currentOrganisation.kennung} (${organisationStore.currentOrganisation.name})`
-      : organisationStore.currentOrganisation?.name;
-  });
+  const administrationsebenen: ComputedRef<TranslatedObject[]> = computed(() =>
+    organisationStore.allOrganisationen.map((org: Organisation) => ({
+      value: org.id,
+      title: getDisplayNameForOrg(org),
+    })),
+  );
 
   const translatedRollenart: ComputedRef<string> = computed(() => {
     return t(`admin.rolle.mappingFrontBackEnd.rollenarten.${rolleStore.currentRolle?.rollenart}`);
@@ -267,7 +275,7 @@
     });
 
     // Set the initial values using the computed properties
-    formContext.setFieldValue('selectedAdministrationsebene', translatedOrgName.value);
+    formContext.setFieldValue('selectedAdministrationsebene', organisationStore.currentOrganisation?.id);
     formContext.setFieldValue('selectedRollenArt', translatedRollenart.value);
     formContext.setFieldValue('selectedRollenName', rolleStore.currentRolle?.name);
     formContext.setFieldValue(
@@ -332,6 +340,7 @@
         <v-container>
           <div v-if="rolleStore.currentRolle">
             <RolleForm
+              :administrationsebenen="administrationsebenen"
               :errorCode="rolleStore.errorCode"
               :onHandleConfirmUnsavedChanges="handleConfirmUnsavedChanges"
               :onHandleDiscard="navigateToRolleTable"
@@ -360,6 +369,7 @@
             >
               <!-- Error Message Display -->
               <SpshAlert
+                v-if="!!rolleStore.errorCode"
                 dataTestIdPrefix="rolle-details-error"
                 :model-value="!!rolleStore.errorCode"
                 :title="
