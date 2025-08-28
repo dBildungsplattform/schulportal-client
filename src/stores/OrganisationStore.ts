@@ -4,7 +4,6 @@ import { getResponseErrorCode } from '@/utils/errorHandlers';
 import {
   OrganisationenApiFactory,
   OrganisationsTyp,
-  RollenSystemRecht,
   TraegerschaftTyp,
   type OrganisationenApiInterface,
   type CreateOrganisationBodyParams,
@@ -13,6 +12,7 @@ import {
   type OrganisationRootChildrenResponse,
   type OrganisationResponse,
   type OrganisationByIdBodyParams,
+  type RollenSystemRechtEnum,
 } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
 import { useSearchFilterStore, type SearchFilterStore } from './SearchFilterStore';
@@ -118,7 +118,7 @@ export type OrganisationenFilter = {
   limit?: number;
   offset?: number;
   searchString?: string;
-  systemrechte?: RollenSystemRecht[];
+  systemrechte?: RollenSystemRechtEnum[];
   includeTyp?: OrganisationsTyp;
   excludeTyp?: OrganisationsTyp[];
   administriertVon?: Array<string>;

@@ -14,6 +14,7 @@ import {
 } from '@/stores/RolleStore';
 import { nextTick } from 'vue';
 import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+import { RollenSystemRechtEnum, type SystemRechtResponse } from '@/api-client/generated';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -36,7 +37,9 @@ const mockUpdatedRolle: RolleWithServiceProvidersResponse = {
   rollenart: 'LEHR',
   name: 'Updated Lehrer',
   merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
-  systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+  systemrechte: [
+    { name: RollenSystemRechtEnum.RollenVerwalten, isTechnical: false },
+  ] as unknown as Set<SystemRechtResponse>,
   createdAt: '2022',
   updatedAt: '2023',
   id: '1',
@@ -127,7 +130,7 @@ describe('RolleDetailsView', () => {
       rollenart: 'LEHR',
       name: 'Updated Lehrer',
       merkmale: [] as unknown as Set<RollenMerkmal>,
-      systemrechte: [] as unknown as Set<RollenSystemRecht>,
+      systemrechte: [] as unknown as Set<SystemRechtResponse>,
       createdAt: '2022',
       updatedAt: '2023',
       id: '1',

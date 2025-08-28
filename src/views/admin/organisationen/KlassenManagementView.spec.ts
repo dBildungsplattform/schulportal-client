@@ -1,4 +1,4 @@
-import { RollenSystemRecht } from '@/api-client/generated';
+import { RollenSystemRechtEnum } from '@/api-client/generated';
 import routes from '@/router/routes';
 import { useAuthStore, type AuthStore, type UserInfo } from '@/stores/AuthStore';
 import {
@@ -99,7 +99,7 @@ const personenkontexte: UserInfo['personenkontexte'] = [
       ...schule1,
     },
     rolle: DoFactory.getRollenSystemRechtServiceProviderIDResponse({
-      systemrechte: [RollenSystemRecht.KlassenVerwalten, RollenSystemRecht.SchulenVerwalten],
+      systemrechte: [RollenSystemRechtEnum.KlassenVerwalten, RollenSystemRechtEnum.SchulenVerwalten],
     }),
   },
   {
@@ -111,7 +111,7 @@ const personenkontexte: UserInfo['personenkontexte'] = [
       ...schule2,
     },
     rolle: DoFactory.getRollenSystemRechtServiceProviderIDResponse({
-      systemrechte: [RollenSystemRecht.KlassenVerwalten, RollenSystemRecht.SchulenVerwalten],
+      systemrechte: [RollenSystemRechtEnum.KlassenVerwalten, RollenSystemRechtEnum.SchulenVerwalten],
     }),
   },
 ];
@@ -338,7 +338,7 @@ describe('KlassenManagementView', () => {
       limit: searchFilterStore.klassenPerPage,
       offset: 0,
       organisationIds: [],
-      systemrechte: [RollenSystemRecht.KlassenVerwalten],
+      systemrechte: [RollenSystemRechtEnum.KlassenVerwalten],
     };
     expect(organisationStore.getAllOrganisationen).toHaveBeenLastCalledWith(expectedFilter);
   });
@@ -380,7 +380,7 @@ describe('KlassenManagementView', () => {
     expect(text).toContain(klasse.name);
     expect(organisationStore.getAllOrganisationen).toHaveBeenCalledWith({
       includeTyp: OrganisationsTyp.Klasse,
-      systemrechte: [RollenSystemRecht.KlassenVerwalten],
+      systemrechte: [RollenSystemRechtEnum.KlassenVerwalten],
       offset: 0,
       limit: searchFilterStore.klassenPerPage,
       organisationIds: [klasse.id],

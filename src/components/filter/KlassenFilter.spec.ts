@@ -1,4 +1,4 @@
-import { RollenSystemRecht } from '@/api-client/generated';
+import { RollenSystemRechtEnum } from '@/api-client/generated';
 import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 import {
   OrganisationsTyp,
@@ -17,7 +17,7 @@ import KlassenFilter from './KlassenFilter.vue';
 
 type Props = {
   hideDetails?: boolean;
-  systemrechteForSearch?: Array<RollenSystemRecht>;
+  systemrechteForSearch?: Array<RollenSystemRechtEnum>;
   multiple: boolean;
   readonly?: boolean;
   selectedKlasseProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
@@ -43,7 +43,7 @@ vi.useFakeTimers();
 
 const defaultFilter: OrganisationenFilter = {
   includeTyp: OrganisationsTyp.Klasse,
-  systemrechte: [RollenSystemRecht.KlassenVerwalten],
+  systemrechte: [RollenSystemRechtEnum.KlassenVerwalten],
   organisationIds: [],
   limit: 200,
 };
@@ -85,11 +85,11 @@ describe('KlassenFilter', async () => {
         });
 
         describe.each([
-          [[RollenSystemRecht.KlassenVerwalten]],
-          [[RollenSystemRecht.KlassenVerwalten, RollenSystemRecht.KlassenVerwalten]],
+          [[RollenSystemRechtEnum.KlassenVerwalten]],
+          [[RollenSystemRechtEnum.KlassenVerwalten, RollenSystemRechtEnum.KlassenVerwalten]],
           [[]],
           [undefined],
-        ])('when systemrechteForSearch are %s', (systemrechteForSearch: Array<RollenSystemRecht> | undefined) => {
+        ])('when systemrechteForSearch are %s', (systemrechteForSearch: Array<RollenSystemRechtEnum> | undefined) => {
           const expectedIdsInFilter: OrganisationenFilter['organisationIds'] =
             ((): OrganisationenFilter['organisationIds'] => {
               return [];
