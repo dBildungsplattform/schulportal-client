@@ -1496,6 +1496,29 @@
         },
         "tags": ["provider"],
         "security": [{ "bearer": [] }, { "oauth2": ["openid"] }]
+      },
+      "post": {
+        "operationId": "ProviderController_createNewServiceProvider",
+        "summary": "",
+        "description": "Create a new service-provider.",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/CreateServiceProviderBodyParams" } }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The service-provider was added successfully.",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ServiceProviderResponse" } } }
+          },
+          "401": { "description": "Not authorized to create new service provider." },
+          "403": { "description": "Insufficient permissions to create a new service-provider." },
+          "500": { "description": "Internal server error while creating a new service-provider." }
+        },
+        "tags": ["provider"],
+        "security": [{ "bearer": [] }, { "oauth2": ["openid"] }]
       }
     },
     "/api/provider/{angebotId}/logo": {
@@ -1520,6 +1543,66 @@
           "403": { "description": "Insufficient permissions to get the logo." },
           "404": { "description": "The service-provider does not exist or has no logo." },
           "500": { "description": "Internal server error while getting the logo." }
+        },
+        "tags": ["provider"],
+        "security": [{ "bearer": [] }, { "oauth2": ["openid"] }]
+      }
+    },
+    "/api/provider/{angebotId}": {
+      "patch": {
+        "operationId": "ProviderController_updateServiceProvider",
+        "summary": "",
+        "description": "Update an existing service-provider.",
+        "parameters": [
+          {
+            "name": "angebotId",
+            "required": true,
+            "in": "path",
+            "description": "The id of the service provider",
+            "schema": { "nullable": false, "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/UpdateServiceProviderBodyParams" } }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The service-provider was updated successfully.",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ServiceProviderResponse" } } }
+          },
+          "401": { "description": "Not authorized to update the service provider." },
+          "403": { "description": "Insufficient permissions to update the service-provider." },
+          "404": { "description": "The service-provider with the given id was not found" },
+          "500": { "description": "Internal server error while updating the service-provider." }
+        },
+        "tags": ["provider"],
+        "security": [{ "bearer": [] }, { "oauth2": ["openid"] }]
+      },
+      "delete": {
+        "operationId": "ProviderController_deleteServiceProvider",
+        "summary": "",
+        "description": "Delete an existing service-provider.",
+        "parameters": [
+          {
+            "name": "angebotId",
+            "required": true,
+            "in": "path",
+            "description": "The id of the service provider",
+            "schema": { "nullable": false, "type": "string" }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The service-provider was deleted successfully.",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ServiceProviderResponse" } } }
+          },
+          "401": { "description": "Not authorized to delete the service provider." },
+          "403": { "description": "Insufficient permissions to delete the service-provider." },
+          "404": { "description": "The service-provider with the given id was not found" },
+          "500": { "description": "Internal server error while updating the service-provider." }
         },
         "tags": ["provider"],
         "security": [{ "bearer": [] }, { "oauth2": ["openid"] }]
@@ -2509,7 +2592,8 @@
           "KLASSE",
           "ANBIETER",
           "SONSTIGE ORGANISATION / EINRICHTUNG",
-          "UNBESTAETIGT"
+          "UNBESTAETIGT",
+          "LMS"
         ]
       },
       "TraegerschaftTyp": { "type": "string", "enum": ["01", "02", "03", "04", "05", "06"] },
@@ -2898,8 +2982,11 @@
         },
         "required": ["i18nKey", "code"]
       },
-      "RollenArt": { "type": "string", "enum": ["LERN", "LEHR", "EXTERN", "ORGADMIN", "LEIT", "SYSADMIN", "PORTALADMIN"] },
-      "RollenMerkmal": { "type": "string", "enum": ["BEFRISTUNG_PFLICHT", "KOPERS_PFLICHT", "MAPPING"] },
+      "RollenArt": {
+        "type": "string",
+        "enum": ["LERN", "LEHR", "EXTERN", "ORGADMIN", "LEIT", "SYSADMIN", "PORTALADMIN"]
+      },
+      "RollenMerkmal": { "type": "string", "enum": ["BEFRISTUNG_PFLICHT", "KOPERS_PFLICHT"] },
       "DBiamPersonenzuordnungResponse": {
         "type": "object",
         "properties": {
@@ -3040,7 +3127,8 @@
               "KLASSE",
               "ANBIETER",
               "SONSTIGE ORGANISATION / EINRICHTUNG",
-              "UNBESTAETIGT"
+              "UNBESTAETIGT",
+              "LMS"
             ],
             "nullable": true
           },
@@ -3205,7 +3293,9 @@
           "PERSONEN_LESEN",
           "BULK_VERWALTEN",
           "SCHULPORTAL_VERWALTEN",
-          "HINWEISE_BEARBEITEN"
+          "HINWEISE_BEARBEITEN",
+          "SERVICEPROVIDER_VERWALTEN",
+          "LMS_VERWALTEN"
         ]
       },
       "OrganisationByIdBodyParams": {
@@ -3417,6 +3507,60 @@
           "version": { "type": "number" }
         },
         "required": ["name", "merkmale", "systemrechte", "serviceProviderIds", "version"]
+      },
+      "ServiceProviderSystem": {
+        "type": "string",
+        "description": "The external system of the service-provider.",
+        "enum": ["NONE", "EMAIL", "ITSLEARNING"]
+      },
+      "CreateServiceProviderBodyParams": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "description": "The name of the service provider." },
+          "target": { "$ref": "#/components/schemas/ServiceProviderTarget" },
+          "url": { "type": "string", "description": "The URL of the service provider." },
+          "kategorie": { "$ref": "#/components/schemas/ServiceProviderKategorie" },
+          "providedOnSchulstrukturknoten": {
+            "type": "string",
+            "description": "The reference to the Schulstrukturknoten."
+          },
+          "logo": { "type": "string", "description": "The logo of the service-provider as a base64 encoded string." },
+          "logoMimeType": { "type": "string", "description": "The mime type of the logo." },
+          "keycloakGroup": { "type": "string", "description": "The keycloak group of the service-provider." },
+          "keycloakRole": { "type": "string", "description": "The keycloak role of the service-provider" },
+          "externalSystem": { "$ref": "#/components/schemas/ServiceProviderSystem" },
+          "requires2fa": { "type": "boolean", "description": "Indicates if the service-provider requires 2FA." },
+          "vidisAngebotId": { "type": "string", "description": "The id of the vidis angebot of this service-provider" }
+        },
+        "required": [
+          "name",
+          "target",
+          "url",
+          "kategorie",
+          "providedOnSchulstrukturknoten",
+          "externalSystem",
+          "requires2fa"
+        ]
+      },
+      "UpdateServiceProviderBodyParams": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "description": "The name of the service-provider." },
+          "target": { "$ref": "#/components/schemas/ServiceProviderTarget" },
+          "url": { "type": "string", "description": "The URL of the service-provider." },
+          "kategorie": { "$ref": "#/components/schemas/ServiceProviderKategorie" },
+          "providedOnSchulstrukturknoten": {
+            "type": "string",
+            "description": "The reference to the Schulstrukturknoten."
+          },
+          "logo": { "type": "string", "description": "The logo of the service-provider as a base64 encoded string." },
+          "logoMimeType": { "type": "string", "description": "The mime type of the logo." },
+          "keycloakGroup": { "type": "string", "description": "The keycloak group of the service-provider." },
+          "keycloakRole": { "type": "string", "description": "The keycloak role of the service-provider" },
+          "externalSystem": { "$ref": "#/components/schemas/ServiceProviderSystem" },
+          "requires2fa": { "type": "boolean", "description": "Indicates if the service-provider requires 2FA." },
+          "vidisAngebotId": { "type": "string", "description": "The id of the vidis angebot of this service-provider" }
+        }
       },
       "PersonResponseAutomapper": {
         "type": "object",
