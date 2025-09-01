@@ -821,7 +821,7 @@
     );
   };
 
-    const alertButtonAction = computed(() => {
+    const alertButtonAction: ComputedRef<() => void> = computed(() => {
     switch (personenkontextStore.errorCode) {
       case 'PERSONALNUMMER_NICHT_EINDEUTIG':
         return navigateToZuordnungForm;
