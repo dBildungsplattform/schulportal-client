@@ -3,11 +3,11 @@ import routes from '@/router/routes';
 import { useImportStore, type ImportStore } from '@/stores/ImportStore';
 import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
 import {
-  RollenMerkmal,
-  RollenSystemRecht,
-  useRolleStore,
-  type RolleStore,
-  type RolleWithServiceProvidersResponse,
+    RollenMerkmal,
+    RollenSystemRecht,
+    useRolleStore,
+    type RolleStore,
+    type RolleWithServiceProvidersResponse,
 } from '@/stores/RolleStore';
 import { getDisplayNameForOrg } from '@/utils/formatting';
 import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
@@ -26,7 +26,7 @@ const organisationStore: OrganisationStore = useOrganisationStore();
 const rolleStore: RolleStore = useRolleStore();
 
 const schule: Organisation = DoFactory.getSchule();
-organisationStore.schulenFilter.filterResult = [schule, DoFactory.getSchule()];
+organisationStore.organisationenFilters.filterResult = [schule, DoFactory.getSchule()];
 
 rolleStore.allRollen = [
   {

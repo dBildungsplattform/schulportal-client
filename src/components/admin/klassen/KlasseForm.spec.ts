@@ -1,8 +1,8 @@
 import {
-  OrganisationsTyp,
-  useOrganisationStore,
-  type Organisation,
-  type OrganisationStore,
+    OrganisationsTyp,
+    useOrganisationStore,
+    type Organisation,
+    type OrganisationStore,
 } from '@/stores/OrganisationStore';
 import type { ValidationSchema as KlasseFormSchema } from '@/utils/validationKlasse';
 import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
@@ -44,7 +44,7 @@ describe('KlasseForm', () => {
   beforeAll(() => {
     vi.useFakeTimers();
     organisationStore.$reset();
-    organisationStore.schulenFilter.filterResult = [initialValues, newValues].map(
+    organisationStore.organisationenFilters.filterResult = [initialValues, newValues].map(
       ({ selectedSchule }: KlasseFormSchema): Organisation => ({
         id: selectedSchule,
         name: selectedSchule,

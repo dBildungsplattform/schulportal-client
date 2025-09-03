@@ -1,9 +1,9 @@
 import routes from '@/router/routes';
 import {
-  OrganisationsTyp,
-  useOrganisationStore,
-  type Organisation,
-  type OrganisationStore,
+    OrganisationsTyp,
+    useOrganisationStore,
+    type Organisation,
+    type OrganisationStore,
 } from '@/stores/OrganisationStore';
 import { DOMWrapper, VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
@@ -51,7 +51,7 @@ beforeEach(async () => {
   await router.isReady();
 
   organisationStore.currentOrganisation = mockCurrentOrganisation;
-  organisationStore.schulenFilter.filterResult = [mockCurrentOrganisation];
+  organisationStore.organisationenFilters.filterResult = [mockCurrentOrganisation];
   organisationStore.currentKlasse = mockCurrentKlasse;
   vi.spyOn(organisationStore, 'getOrganisationById').mockImplementation(
     (_id: string, _typ: OrganisationsTyp): Promise<Organisation> => {

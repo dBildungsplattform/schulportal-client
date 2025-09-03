@@ -1,26 +1,26 @@
 <script setup lang="ts">
   import KlasseForm from '@/components/admin/klassen/KlasseForm.vue';
-  import KlasseSuccessTemplate from '@/components/admin/klassen/KlasseSuccessTemplate.vue';
-  import SpshAlert from '@/components/alert/SpshAlert.vue';
-  import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
-  import {
+import KlasseSuccessTemplate from '@/components/admin/klassen/KlasseSuccessTemplate.vue';
+import SpshAlert from '@/components/alert/SpshAlert.vue';
+import LayoutCard from '@/components/cards/LayoutCard.vue';
+import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
+import {
     OrganisationsTyp,
     useOrganisationStore,
     type Organisation,
     type OrganisationStore,
-  } from '@/stores/OrganisationStore';
-  import { RollenSystemRecht } from '@/stores/RolleStore';
-  import { getDisplayNameForOrg } from '@/utils/formatting';
-  import { type ValidationSchema as KlasseFormValues, type ValidationSchema } from '@/utils/validationKlasse';
-  import { computed, onMounted, onUnmounted, ref, useTemplateRef, type ComputedRef, type Ref } from 'vue';
-  import {
+} from '@/stores/OrganisationStore';
+import { RollenSystemRecht } from '@/stores/RolleStore';
+import { getDisplayNameForOrg } from '@/utils/formatting';
+import { type ValidationSchema as KlasseFormValues, type ValidationSchema } from '@/utils/validationKlasse';
+import { computed, onMounted, onUnmounted, ref, useTemplateRef, type ComputedRef, type Ref } from 'vue';
+import {
     onBeforeRouteLeave,
     useRouter,
     type NavigationGuardNext,
     type RouteLocationNormalized,
     type Router,
-  } from 'vue-router';
+} from 'vue-router';
 
   const router: Router = useRouter();
   const organisationStore: OrganisationStore = useOrganisationStore();
@@ -37,7 +37,7 @@
   ]);
 
   const translatedSchulname: ComputedRef<string> = computed(() => {
-    const schule: Organisation | undefined = organisationStore.schulenFilter.filterResult.find(
+    const schule: Organisation | undefined = organisationStore.organisationenFilters.filterResult.find(
       (s: Organisation) => s.id === organisationStore.createdKlasse?.administriertVon,
     );
     if (schule) return getDisplayNameForOrg(schule);

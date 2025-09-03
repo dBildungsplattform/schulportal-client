@@ -9,6 +9,7 @@ import {
   useOrganisationStore,
   type AutoCompleteStore,
   type Organisation,
+  type OrganisationenFilter,
   type OrganisationStore,
 } from './OrganisationStore';
 
@@ -1197,66 +1198,90 @@ describe('OrganisationStore', () => {
     });
   });
 
-  describe('loadSchulenForFilter', () => {
-    test('should load schulen for filter', async () => {
-      const mockResponse: Organisation[] = [DoFactory.getSchule()];
-
-      mockadapter.onGet('/api/organisationen?offset=0&limit=30&typ=SCHULE').replyOnce(200, mockResponse, {
-        'x-paging-total': '1',
-      });
-      const promise: Promise<void> = organisationStore.loadSchulenForFilter({
+  describe('loadOrganisationenForFilter', () => {
+    describe.each([[''], ['testId']])('with storeKey=%s', (storeKey: string) => {
+      const defaultFilter: OrganisationenFilter = {
         offset: 0,
         limit: 30,
         includeTyp: OrganisationsTyp.Schule,
-      });
-      await promise;
-      expect(organisationStore.schulenFilter.filterResult).toEqual(mockResponse);
-      expect(organisationStore.schulenFilter.total).toEqual(1);
-      expect(organisationStore.schulenFilter.loading).toBe(false);
-    });
+      };
+      const defaultUrl: string = '/api/organisationen?offset=0&limit=30&typ=SCHULE';
 
-    it('should handle string error', async () => {
-      mockadapter.onGet('/api/organisationen?offset=0&limit=30').replyOnce(500, 'some mock server error');
-      const getAllOrganisationenPromise: Promise<void> = organisationStore.loadSchulenForFilter({
-        offset: 0,
-        limit: 30,
-      });
-      expect(organisationStore.schulenFilter.loading).toBe(true);
-      await getAllOrganisationenPromise;
-      expect(organisationStore.schulenFilter.filterResult).toEqual([]);
-      expect(organisationStore.schulenFilter.errorCode).toEqual('UNSPECIFIED_ERROR');
-      expect(organisationStore.schulenFilter.loading).toBe(false);
-    });
+      test('should load organisationen for filter', async () => {
+        const mockResponse: Organisation[] = [DoFactory.getSchule()];
 
-    it('should handle error code', async () => {
-      mockadapter.onGet('/api/organisationen?offset=0&limit=30').replyOnce(500, { code: 'some mock server error' });
-      const getAllOrganisationenPromise: Promise<void> = organisationStore.loadSchulenForFilter({
-        offset: 0,
-        limit: 30,
+        mockadapter.onGet(defaultUrl).replyOnce(200, mockResponse, {
+          'x-paging-total': '1',
+        });
+        const promise: Promise<void> = organisationStore.loadOrganisationenForFilter(defaultFilter, storeKey);
+        await promise;
+        const store: AutoCompleteStore<Organisation> = organisationStore.organisationenFilters.get(storeKey)!;
+        expect(store).toBeDefined();
+        expect(store.filterResult).toEqual(mockResponse);
+        expect(store.total).toEqual(1);
+        expect(store.loading).toBe(false);
       });
-      expect(organisationStore.schulenFilter.loading).toBe(true);
-      await getAllOrganisationenPromise;
-      expect(organisationStore.schulenFilter.filterResult).toEqual([]);
-      expect(organisationStore.schulenFilter.errorCode).toEqual('some mock server error');
-      expect(organisationStore.schulenFilter.loading).toBe(false);
+
+      it('should handle string error', async () => {
+        mockadapter.onGet(defaultUrl).replyOnce(500, 'some mock server error');
+        const promise: Promise<void> = organisationStore.loadOrganisationenForFilter(defaultFilter, storeKey);
+        const store: AutoCompleteStore<Organisation> = organisationStore.organisationenFilters.get(storeKey)!;
+        expect(store).toBeDefined();
+        expect(store.loading).toBe(true);
+        await promise;
+        expect(store.filterResult).toEqual([]);
+        expect(store.errorCode).toEqual('UNSPECIFIED_ERROR');
+        expect(store.loading).toBe(false);
+      });
+
+      it('should handle error code', async () => {
+        mockadapter.onGet(defaultUrl).replyOnce(500, { code: 'some mock server error' });
+        const promise: Promise<void> = organisationStore.loadOrganisationenForFilter(defaultFilter, storeKey);
+        const store: AutoCompleteStore<Organisation> = organisationStore.organisationenFilters.get(storeKey)!;
+        expect(store).toBeDefined();
+        expect(store.loading).toBe(true);
+        await promise;
+        expect(store.filterResult).toEqual([]);
+        expect(store.errorCode).toEqual('some mock server error');
+        expect(store.loading).toBe(false);
+      });
     });
   });
 
-  describe('resetSchulFilter', () => {
-    test('should reset filter', () => {
-      const schule: Organisation[] = [DoFactory.getSchule()];
-      organisationStore.schulenFilter = {
-        filterResult: schule,
-        loading: true,
-        total: 1,
-      };
-      const expected: AutoCompleteStore<Organisation> = {
-        filterResult: [],
-        loading: false,
-        total: 0,
-      };
-      organisationStore.resetSchulFilter();
-      expect(organisationStore.schulenFilter).toEqual(expected);
+  describe('resetOrganisationenFilter', () => {
+    describe.each([['', undefined, 'something']])('when store key is %s', (storeKey: string | undefined) => {
+      test('should reset filter', () => {
+        const organisationen: Organisation[] = [DoFactory.getSchule()];
+        organisationStore.organisationenFilters = new Map([
+          [
+            storeKey ?? '',
+            {
+              filterResult: organisationen,
+              loading: true,
+              total: 1,
+            },
+          ],
+        ]);
+        const expected: AutoCompleteStore<Organisation> = {
+          filterResult: organisationen,
+          loading: false,
+          total: 1,
+        };
+        organisationStore.resetOrganisationenFilter(storeKey);
+        expect(organisationStore.organisationenFilters.get(storeKey ?? '')).toEqual(expected);
+      });
+    });
+  });
+
+  describe('clearOrganisationenFilter', () => {
+    describe.each([['', undefined, 'something']])('when store key is %s', (storeKey: string | undefined) => {
+      test('should delete the filter', () => {
+        organisationStore.organisationenFilters = new Map([
+          [storeKey ?? '', { filterResult: [DoFactory.getSchule()], loading: true, total: 1 }],
+        ]);
+        organisationStore.clearOrganisationenFilter(storeKey);
+        expect(organisationStore.organisationenFilters.get(storeKey ?? '')).toBeUndefined();
+      });
     });
   });
 
@@ -1336,13 +1361,13 @@ describe('OrganisationStore', () => {
 
   describe('resetKlasseFilter', () => {
     describe.each([['', undefined, 'something']])('when store key is %s', (storeKey: string | undefined) => {
-      const klasse: Organisation[] = [DoFactory.getKlasse()];
+      const klassen: Organisation[] = [DoFactory.getKlasse()];
       test('should reset filter', () => {
         organisationStore.klassenFilters = new Map([
-          [storeKey ?? '', { filterResult: klasse, loading: true, total: 1 }],
+          [storeKey ?? '', { filterResult: klassen, loading: true, total: 1 }],
         ]);
         const expected: AutoCompleteStore<Organisation> = {
-          filterResult: klasse,
+          filterResult: klassen,
           loading: false,
           total: 1,
         };

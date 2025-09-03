@@ -1,15 +1,15 @@
 import {
-  RollenSystemRecht,
-  type PersonenkontextRolleFieldsResponse,
-  type RollenSystemRechtServiceProviderIDResponse,
+    RollenSystemRecht,
+    type PersonenkontextRolleFieldsResponse,
+    type RollenSystemRechtServiceProviderIDResponse,
 } from '@/api-client/generated';
 import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 import {
-  OrganisationsTyp,
-  useOrganisationStore,
-  type Organisation,
-  type OrganisationenFilter,
-  type OrganisationStore,
+    OrganisationsTyp,
+    useOrganisationStore,
+    type Organisation,
+    type OrganisationenFilter,
+    type OrganisationStore,
 } from '@/stores/OrganisationStore';
 import { getDisplayNameForOrg } from '@/utils/formatting';
 import { faker } from '@faker-js/faker';
@@ -272,8 +272,8 @@ describe('SchulenFilter', async () => {
         ])('when the parent $label the selection', ({ id }: { id?: string }) => {
           test('it correctly initializes input', async () => {
             const mockSchule: Organisation = DoFactory.getSchule({ id });
-            organisationStore.loadSchulenForFilter = vi.fn(async () => {
-              organisationStore.schulenFilter.filterResult = [mockSchule];
+            organisationStore.loadOrganisationenForFilter = vi.fn(async () => {
+              organisationStore.organisationenFilters.filterResult = [mockSchule];
             });
             const selectionRef: Ref<string | undefined> = ref(id);
             const wrapper: VueWrapper = mountComponent({ ...defaultProps });

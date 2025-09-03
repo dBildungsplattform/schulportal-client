@@ -1,19 +1,20 @@
 <script setup lang="ts">
   import type { RollenSystemRecht } from '@/api-client/generated/api';
-  import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
-  import {
-    OrganisationsTyp,
-    useOrganisationStore,
-    type Organisation,
-    type OrganisationenFilter,
-    type OrganisationStore,
-  } from '@/stores/OrganisationStore';
-  import type { TranslatedObject } from '@/types';
-  import { dedup, sameContent } from '@/utils/arrays';
-  import { getDisplayNameForOrg } from '@/utils/formatting';
-  import type { BaseFieldProps } from 'vee-validate';
-  import { computed, reactive, ref, watch, type ComputedRef, type Ref } from 'vue';
-  import { useI18n, type Composer } from 'vue-i18n';
+import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
+import {
+  OrganisationsTyp,
+  useOrganisationStore,
+  type AutoCompleteStore,
+  type Organisation,
+  type OrganisationenFilter,
+  type OrganisationStore,
+} from '@/stores/OrganisationStore';
+import type { TranslatedObject } from '@/types';
+import { dedup, sameContent } from '@/utils/arrays';
+import { getDisplayNameForOrg } from '@/utils/formatting';
+import type { BaseFieldProps } from 'vee-validate';
+import { computed, onMounted, onUnmounted, reactive, ref, watch, type ComputedRef, type Ref } from 'vue';
+import { useI18n, type Composer } from 'vue-i18n';
 
   type SelectedSchulenIds = Array<string> | string | undefined;
   type Props = {
@@ -24,6 +25,8 @@
     selectedSchuleProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     highlightSelection?: boolean;
     placeholderText?: string;
+    includeAll?: boolean;
+    filterId?: string;
   };
   const props: Props = defineProps<Props>();
   const selectedSchulen: Ref<SelectedSchulenIds> = defineModel('selectedSchulen');
@@ -37,8 +40,19 @@
   const organisationStore: OrganisationStore = useOrganisationStore();
 
   const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
+  const testId: ComputedRef<string> = computed(() => {
+    const typ: string = props.includeAll ? 'organisation' : 'schule';
+    return props.filterId ? `${props.filterId}-${typ}-select` : `${typ}-select`;
+  });
+  const storeReference: ComputedRef<AutoCompleteStore<Organisation> | undefined> = computed(() => {
+    return organisationStore.organisationenFilters.get(props.filterId ?? '');
+  });
+  const typFilter: ComputedRef<Pick<OrganisationenFilter, 'includeTyp' | 'excludeTyp'>> = computed(() => {
+    if (props.includeAll) return { excludeTyp: [OrganisationsTyp.Klasse] };
+    else return { includeTyp: OrganisationsTyp.Schule };
+  });
   const schulenFilter: OrganisationenFilter = reactive({
-    includeTyp: OrganisationsTyp.Schule,
+    ...typFilter.value,
     systemrechte: props.systemrechteForSearch,
     limit: 25,
     organisationIds: [],
@@ -75,8 +89,9 @@
     value: schule.id,
     title: getDisplayNameForOrg(schule),
   });
+
   const translatedSchulen: ComputedRef<Array<TranslatedObject>> = computed(() => {
-    const options: Array<TranslatedObject> = organisationStore.schulenFilter.filterResult.map(translateSchule);
+    const options: Array<TranslatedObject> = storeReference.value?.filterResult.map(translateSchule) ?? [];
     if (autoselectedSchule.value) options.push(translateSchule(autoselectedSchule.value));
     return options;
   });
@@ -183,11 +198,23 @@
       const delay: number = oldFilter ? 500 : 0;
 
       timerId.value = setTimeout(async () => {
-        await organisationStore.loadSchulenForFilter(newFilter);
+        await organisationStore.loadOrganisationenForFilter(newFilter, props.filterId);
       }, delay);
     },
     { immediate: true },
   );
+
+  onMounted(() => {
+    if (organisationStore.organisationenFilters.has(props.filterId ?? '')) {
+      // eslint-disable-next-line no-console
+      console.warn(`SchulenFilter initialized twice with id ${props.filterId}`);
+    }
+    organisationStore.resetOrganisationenFilter(props.filterId);
+  });
+
+  onUnmounted(() => {
+    organisationStore.clearOrganisationenFilter(props.filterId);
+  });
 </script>
 
 <template>
@@ -195,7 +222,7 @@
     autocomplete="off"
     :class="['filter-dropdown', { selected: shouldHighlightSelection }]"
     clearable
-    data-testid="schule-select"
+    :data-testid="testId"
     density="compact"
     :disabled="isInputDisabled"
     id="schule-select"
@@ -209,7 +236,7 @@
     required="true"
     variant="outlined"
     @update:search="updateSearchString"
-    @click:clear="organisationStore.resetSchulFilter"
+    @click:clear="organisationStore.resetOrganisationenFilter(props.filterId)"
     v-bind="selectedSchuleProps"
     v-model="selectedSchulen"
     v-model:search="searchInputSchulen"

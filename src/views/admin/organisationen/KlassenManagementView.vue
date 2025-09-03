@@ -1,26 +1,26 @@
 <script setup lang="ts">
   import KlasseDelete from '@/components/admin/klassen/KlasseDelete.vue';
-  import ResultTable, { type TableRow } from '@/components/admin/ResultTable.vue';
-  import SpshAlert from '@/components/alert/SpshAlert.vue';
-  import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import KlassenFilter from '@/components/filter/KlassenFilter.vue';
-  import SchulenFilter from '@/components/filter/SchulenFilter.vue';
-  import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
-  import {
+import ResultTable, { type TableRow } from '@/components/admin/ResultTable.vue';
+import SpshAlert from '@/components/alert/SpshAlert.vue';
+import LayoutCard from '@/components/cards/LayoutCard.vue';
+import KlassenFilter from '@/components/filter/KlassenFilter.vue';
+import SchulenFilter from '@/components/filter/SchulenFilter.vue';
+import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
+import {
     OrganisationsTyp,
     useOrganisationStore,
     type Organisation,
     type OrganisationenFilter,
     type OrganisationStore,
-  } from '@/stores/OrganisationStore';
-  import { RollenSystemRecht } from '@/stores/RolleStore';
-  import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
-  import { type Mutable } from '@/types.d';
-  import { OrganisationSortField, SortOrder } from '@/utils/sorting';
-  import { computed, ref, watch, watchEffect, type ComputedRef, type Ref } from 'vue';
-  import { useI18n, type Composer } from 'vue-i18n';
-  import { onBeforeRouteLeave, useRouter, type Router } from 'vue-router';
-  import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
+} from '@/stores/OrganisationStore';
+import { RollenSystemRecht } from '@/stores/RolleStore';
+import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
+import { type Mutable } from '@/types.d';
+import { OrganisationSortField, SortOrder } from '@/utils/sorting';
+import { computed, ref, watch, watchEffect, type ComputedRef, type Ref } from 'vue';
+import { useI18n, type Composer } from 'vue-i18n';
+import { onBeforeRouteLeave, useRouter, type Router } from 'vue-router';
+import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
 
   const organisationStore: OrganisationStore = useOrganisationStore();
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
@@ -305,7 +305,7 @@
                 <v-list-item>
                   <v-progress-circular
                     indeterminate
-                    v-if="organisationStore.schulenFilter.loading"
+                    v-if="organisationStore.organisationenFilters.loading"
                   ></v-progress-circular>
                   <span
                     v-else
@@ -313,8 +313,8 @@
                     >{{
                       t(
                         'admin.schule.schulenFound',
-                        { count: organisationStore.schulenFilter.total },
-                        organisationStore.schulenFilter.total,
+                        { count: organisationStore.organisationenFilters.total },
+                        organisationStore.organisationenFilters.total,
                       )
                     }}</span
                   >
