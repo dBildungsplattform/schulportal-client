@@ -822,12 +822,15 @@
       (zuordnung: Zuordnung) => zuordnung != newZuordnung.value,
     );
 
-    // Scroll to form after DOM updates
+    // Scroll to form after DOM updates with setTimeout
     nextTick(() => {
-      const formElement: HTMLElement | null = document.getElementById('personenkontext-create');
-      if (formElement) {
-        formElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
+      setTimeout(() => {
+        const formElement: HTMLElement | null = document.getElementById('personenkontext-create');
+
+        if (formElement && typeof formElement.scrollIntoView === 'function') {
+          formElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
     });
   }
 
