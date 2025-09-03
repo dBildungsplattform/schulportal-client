@@ -916,13 +916,13 @@ describe('PersonDetailsView', () => {
 
     personenkontextStore.errorCode = 'PERSONALNUMMER_NICHT_EINDEUTIG';
     await nextTick();
-      // ASSERT: store error code is set
+    // ASSERT: store error code is set
     expect(personenkontextStore.errorCode).toBe('PERSONALNUMMER_NICHT_EINDEUTIG');
 
-      const alertButtonAction: DOMWrapper<Element> | undefined = wrapper
+    const alertButtonAction: DOMWrapper<Element> | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-store-error-alert' })
       .find('[data-testid="spsh-alert-button"]');
-      alertButtonAction?.trigger('click');
+    alertButtonAction?.trigger('click');
     await nextTick();
 
     expect(personenkontextStore.errorCode).toBe('');

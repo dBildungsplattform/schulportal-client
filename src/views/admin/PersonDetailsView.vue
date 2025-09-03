@@ -816,7 +816,7 @@
     formContext.setFieldValue('selectedOrganisation', cachedSelectedOrganisation.value);
     formContext.setFieldValue('selectedRolle', cachedSelectedRolle.value);
     formContext.setFieldValue('selectedKopersNr', cachedSelectedKopersNr.value);
-    
+
     // Rollback the zuordnungen to be added
     zuordnungenWithPendingChanges.value = zuordnungenToBePersisted.value.filter(
       (zuordnung: Zuordnung) => zuordnung != newZuordnung.value,
@@ -824,12 +824,12 @@
 
     // Scroll to form after DOM updates
     nextTick(() => {
-      const formElement = document.getElementById('personenkontext-create');
+      const formElement: HTMLElement | null = document.getElementById('personenkontext-create');
       if (formElement) {
         formElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     });
-  };
+  }
 
   const alertButtonAction: ComputedRef<() => void> = computed(() => {
     switch (personenkontextStore.errorCode) {
