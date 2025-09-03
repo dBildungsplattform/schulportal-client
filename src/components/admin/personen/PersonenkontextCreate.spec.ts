@@ -1,4 +1,4 @@
-import { RollenArt, RollenMerkmal, RollenSystemRecht } from '@/api-client/generated';
+import { RollenArt, RollenMerkmal, type SystemRechtResponse } from '@/api-client/generated';
 import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import { OperationContext, usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
 import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
@@ -119,7 +119,7 @@ beforeEach(() => {
         rollenart: 'LERN',
         name: 'SuS',
         merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
-        systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+        systemrechte: [{ name: 'ROLLEN_VERWALTEN', isTechnical: false }] as unknown as Set<SystemRechtResponse>,
         createdAt: '2022',
         updatedAt: '2022',
         id: '54321',

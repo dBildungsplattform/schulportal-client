@@ -1,4 +1,4 @@
-import { EmailAddressStatus } from '@/api-client/generated';
+import { EmailAddressStatus, type SystemRechtResponse } from '@/api-client/generated';
 import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
 import routes from '@/router/routes';
 import { useAuthStore, type AuthStore, type PersonenkontextRolleFields, type UserInfo } from '@/stores/AuthStore';
@@ -11,14 +11,7 @@ import {
 } from '@/stores/OrganisationStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
 import { usePersonStore, type Personendatensatz, type PersonStore } from '@/stores/PersonStore';
-import {
-  RollenArt,
-  RollenMerkmal,
-  RollenSystemRecht,
-  useRolleStore,
-  type Rolle,
-  type RolleStore,
-} from '@/stores/RolleStore';
+import { RollenArt, RollenMerkmal, useRolleStore, type Rolle, type RolleStore } from '@/stores/RolleStore';
 import {
   useTwoFactorAuthentificationStore,
   type TwoFactorAuthentificationStore,
@@ -195,7 +188,7 @@ describe('PersonDetailsView', () => {
           administeredBySchulstrukturknoten: 'string',
           rollenart: 'LERN',
           merkmale: new Set<RollenMerkmal>(['BEFRISTUNG_PFLICHT']),
-          systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+          systemrechte: [{ name: 'ROLLEN_VERWALTEN', isTechnical: false }] as unknown as Set<SystemRechtResponse>,
           administeredBySchulstrukturknotenName: 'Land SH',
           administeredBySchulstrukturknotenKennung: '',
           version: 1,
@@ -208,7 +201,7 @@ describe('PersonDetailsView', () => {
           administeredBySchulstrukturknoten: '1',
           rollenart: 'LERN',
           merkmale: new Set<RollenMerkmal>(['BEFRISTUNG_PFLICHT']),
-          systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+          systemrechte: [{ name: 'ROLLEN_VERWALTEN', isTechnical: false }] as unknown as Set<SystemRechtResponse>,
           administeredBySchulstrukturknotenName: 'Land SH',
           administeredBySchulstrukturknotenKennung: '',
           version: 1,
