@@ -64,6 +64,7 @@
   import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
   import {
     computed,
+    nextTick,
     onBeforeMount,
     onMounted,
     onUnmounted,
@@ -815,13 +816,22 @@
     formContext.setFieldValue('selectedOrganisation', cachedSelectedOrganisation.value);
     formContext.setFieldValue('selectedRolle', cachedSelectedRolle.value);
     formContext.setFieldValue('selectedKopersNr', cachedSelectedKopersNr.value);
-    // Rollback the zuordnungen to be added (This is to avoid seeing the green Zuordnung twice after going back to form => correcting the form and => submitting again)
+    
+    // Rollback the zuordnungen to be added
     zuordnungenWithPendingChanges.value = zuordnungenToBePersisted.value.filter(
       (zuordnung: Zuordnung) => zuordnung != newZuordnung.value,
     );
+
+    // Scroll to form after DOM updates
+    nextTick(() => {
+      const formElement = document.getElementById('personenkontext-create');
+      if (formElement) {
+        formElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
   };
 
-    const alertButtonAction: ComputedRef<() => void> = computed(() => {
+  const alertButtonAction: ComputedRef<() => void> = computed(() => {
     switch (personenkontextStore.errorCode) {
       case 'PERSONALNUMMER_NICHT_EINDEUTIG':
         return navigateToZuordnungForm;
@@ -2286,6 +2296,7 @@
                   :organisationen="organisationen"
                   :rollen="filteredRollen"
                   ref="personenkontext-create"
+                  id="personenkontext-create"
                   :selectedOrganisationProps="selectedOrganisationProps"
                   :selectedRolleProps="selectedRolleProps"
                   :selectedKlasseProps="selectedKlasseProps"
