@@ -64,6 +64,7 @@
   import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
   import {
     computed,
+    nextTick,
     onBeforeMount,
     onMounted,
     onUnmounted,
@@ -152,6 +153,10 @@
 
   const creationErrorText: Ref<string> = ref('');
   const creationErrorTitle: Ref<string> = ref('');
+
+  const cachedSelectedOrganisation: Ref<string> = ref('');
+  const cachedSelectedRolle: Ref<string> = ref('');
+  const cachedSelectedKopersNr: Ref<string> = ref('');
 
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
   let blockedNext: () => void = () => {};
@@ -430,11 +435,14 @@
   };
 
   const alertButtonText: ComputedRef<string> = computed(() => {
-    return personenkontextStore.errorCode === 'PERSON_NOT_FOUND' ? t('nav.backToList') : t('refreshData');
-  });
-
-  const alertButtonAction: ComputedRef<() => void> = computed(() => {
-    return personenkontextStore.errorCode === 'PERSON_NOT_FOUND' ? navigateToPersonTable : (): void => router.go(0);
+    switch (personenkontextStore.errorCode) {
+      case 'PERSONALNUMMER_NICHT_EINDEUTIG':
+        return t('admin.person.backToInput');
+      case 'PERSON_NOT_FOUND':
+        return t('nav.backToList');
+      default:
+        return t('refreshData');
+    }
   });
 
   const alertButtonTextKopers: ComputedRef<string> = computed(() => {
@@ -801,6 +809,42 @@
     }
   });
 
+  function navigateToZuordnungForm(): void {
+    personenkontextStore.errorCode = '';
+    pendingCreation.value = false;
+    isZuordnungFormActive.value = true;
+    formContext.setFieldValue('selectedOrganisation', cachedSelectedOrganisation.value);
+    formContext.setFieldValue('selectedRolle', cachedSelectedRolle.value);
+    formContext.setFieldValue('selectedKopersNr', cachedSelectedKopersNr.value);
+
+    // Rollback the zuordnungen to be added
+    zuordnungenWithPendingChanges.value = zuordnungenToBePersisted.value.filter(
+      (zuordnung: Zuordnung) => zuordnung != newZuordnung.value,
+    );
+
+    // Scroll to form after DOM updates with setTimeout
+    nextTick(() => {
+      setTimeout(() => {
+        const formElement: HTMLElement | null = document.getElementById('personenkontext-create');
+
+        if (formElement && typeof formElement.scrollIntoView === 'function') {
+          formElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+    });
+  }
+
+  const alertButtonAction: ComputedRef<() => void> = computed(() => {
+    switch (personenkontextStore.errorCode) {
+      case 'PERSONALNUMMER_NICHT_EINDEUTIG':
+        return navigateToZuordnungForm;
+      case 'PERSON_NOT_FOUND':
+        return navigateToPersonTable;
+      default:
+        return (): void => router.go(0);
+    }
+  });
+
   // Triggers the template to start editing
   const triggerEdit = (): void => {
     isEditActive.value = true;
@@ -875,6 +919,10 @@
       selectedKopersNr.value,
     );
     createSuccessDialogVisible.value = !personenkontextStore.errorCode;
+    // Cache the selected values to avoid losing them on form reset (Useful for when Kopers is already assigned and we want to redirect back to form)
+    cachedSelectedOrganisation.value = selectedOrganisation.value!;
+    cachedSelectedRolle.value = selectedRolle.value!;
+    cachedSelectedKopersNr.value = selectedKopersNr.value!;
     formContext.resetForm();
     personStore.getPersonById(currentPersonId);
   }
@@ -2251,6 +2299,7 @@
                   :organisationen="organisationen"
                   :rollen="filteredRollen"
                   ref="personenkontext-create"
+                  id="personenkontext-create"
                   :selectedOrganisationProps="selectedOrganisationProps"
                   :selectedRolleProps="selectedRolleProps"
                   :selectedKlasseProps="selectedKlasseProps"
