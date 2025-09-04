@@ -1214,9 +1214,10 @@ describe('OrganisationStore', () => {
           'x-paging-total': '1',
         });
         const promise: Promise<void> = organisationStore.loadOrganisationenForFilter(defaultFilter, storeKey);
-        await promise;
         const store: AutoCompleteStore<Organisation> = organisationStore.organisationenFilters.get(storeKey)!;
         expect(store).toBeDefined();
+        expect(store.loading).toBe(true);
+        await promise;
         expect(store.filterResult).toEqual(mockResponse);
         expect(store.total).toEqual(1);
         expect(store.loading).toBe(false);

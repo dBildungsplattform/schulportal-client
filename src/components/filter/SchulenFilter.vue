@@ -1,20 +1,20 @@
 <script setup lang="ts">
   import type { RollenSystemRecht } from '@/api-client/generated/api';
-import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
-import {
-  OrganisationsTyp,
-  useOrganisationStore,
-  type AutoCompleteStore,
-  type Organisation,
-  type OrganisationenFilter,
-  type OrganisationStore,
-} from '@/stores/OrganisationStore';
-import type { TranslatedObject } from '@/types';
-import { dedup, sameContent } from '@/utils/arrays';
-import { getDisplayNameForOrg } from '@/utils/formatting';
-import type { BaseFieldProps } from 'vee-validate';
-import { computed, onMounted, onUnmounted, reactive, ref, watch, type ComputedRef, type Ref } from 'vue';
-import { useI18n, type Composer } from 'vue-i18n';
+  import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
+  import {
+    OrganisationsTyp,
+    useOrganisationStore,
+    type AutoCompleteStore,
+    type Organisation,
+    type OrganisationenFilter,
+    type OrganisationStore,
+  } from '@/stores/OrganisationStore';
+  import type { TranslatedObject } from '@/types';
+  import { dedup, sameContent } from '@/utils/arrays';
+  import { getDisplayNameForOrg } from '@/utils/formatting';
+  import type { BaseFieldProps } from 'vee-validate';
+  import { computed, onMounted, onUnmounted, reactive, ref, watch, type ComputedRef, type Ref } from 'vue';
+  import { useI18n, type Composer } from 'vue-i18n';
 
   type SelectedSchulenIds = Array<string> | string | undefined;
   type Props = {
