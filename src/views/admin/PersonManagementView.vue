@@ -170,10 +170,7 @@
     if (selectedOrganisationIds.value.length !== 1) {
       return '';
     }
-    const id: string = selectedOrganisationIds.value[0]!;
-    const organisation: Organisation | undefined = selectedOrganisationen.value.find(
-      (org: Organisation) => org.id === id,
-    );
+    const organisation: Organisation | undefined = selectedOrganisationen.value[0];
     return organisation?.kennung ?? '';
   });
 
@@ -396,9 +393,7 @@
   });
 
   const selectedOrganisation: ComputedRef<Organisation | undefined> = computed(() => {
-    const organisation: Organisation | undefined = selectedOrganisationen.value.find(
-      (org: Organisation) => org.id === selectedOrganisationIds.value[0],
-    );
+    const organisation: Organisation | undefined = selectedOrganisationen.value[0];
     return organisation;
   });
 

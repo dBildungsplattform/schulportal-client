@@ -444,8 +444,7 @@ describe('PersonManagementView', () => {
     async ({ operationType, layoutCardTestId, discardButtonTestId }: BulkOperationTestParams) => {
       const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
       schuleAutocomplete?.vm.$emit('update:selectedSchulen', ['9876']);
-      // TODO: the setter is called, but the object is empty afterwards
-      // then selectedOrganisation is undefined and the dialogs do not open
+      await nextTick();
       schuleAutocomplete?.vm.$emit('update:selectedSchulenObjects', [DoFactory.getSchule({ id: '9876' })]);
       await nextTick();
       await flushPromises();
