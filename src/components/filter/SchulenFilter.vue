@@ -28,7 +28,11 @@
     includeAll?: boolean;
     filterId?: string;
   };
+  type Emits = {
+    (e: 'update:selectedSchulenObjects', value: Array<Organisation>): void;
+  };
   const props: Props = defineProps<Props>();
+  const emits: Emits = defineEmits<Emits>();
   const selectedSchulen: Ref<SelectedSchulenIds> = defineModel('selectedSchulen');
   const searchInputSchulen: Ref<string | undefined> = ref(undefined);
   const clearInput = (): void => {
@@ -108,6 +112,16 @@
     return result;
   };
 
+  const getDisplayItem = (item: TranslatedObject, index: number): string => {
+    if (!selectedSchulen.value) return ''; // should not happen
+    if (!canDisplaySelection(selectedSchulen.value)) return '...'; // we are loading
+    if (!props.multiple) return item.title;
+
+    if (selectedSchulen.value.length < 2) return item.title;
+    if (index === 0) return t('admin.schule.schulenSelected', { count: selectedSchulen.value.length });
+    return ''; // do not display anything for other items
+  };
+
   const shouldHighlightSelection: ComputedRef<boolean> = computed(() => {
     if (hasAutoselectedSchule.value) return true;
     if (props.highlightSelection && !isEmptySelection(selectedSchulen.value)) return true;
@@ -138,18 +152,33 @@
     schulenFilter.organisationIds = dedup(tempIds.filter(Boolean));
   };
 
+  const resolveSelection = (selection: SelectedSchulenIds): Array<Organisation> => {
+    if (isEmptySelection(selection)) return [];
+    const selectedIds: Array<string> = wrapSelectedSchulenIds(selection);
+    return storeReference.value?.filterResult.filter((org: Organisation) => selectedIds.includes(org.id)) ?? [];
+  };
+
   const handleSelectionUpdate = (selection: SelectedSchulenIds): void => {
     if (isEmptySelection(selection)) {
       updateOrganisationenIds([]);
       updateSearchString(undefined);
       clearInput();
+      emits('update:selectedSchulenObjects', []);
     } else {
       updateOrganisationenIds(selection);
+      emits('update:selectedSchulenObjects', resolveSelection(selection));
     }
   };
 
   const isSameSelection = (a: SelectedSchulenIds, b: SelectedSchulenIds): boolean => {
     return sameContent(wrapSelectedSchulenIds(a), wrapSelectedSchulenIds(b));
+  };
+
+  const handleFocusChange = (focused: boolean): void => {
+    if (!props.multiple) return;
+    if (!focused) {
+      searchInputSchulen.value = undefined;
+    }
   };
 
   type SelectionChange = [SelectedSchulenIds, boolean];
@@ -225,8 +254,8 @@
     :data-testid="testId"
     density="compact"
     :disabled="isInputDisabled"
-    id="schule-select"
-    ref="schule-select"
+    :id="testId"
+    :ref="testId"
     :items="translatedSchulen"
     item-value="value"
     item-text="title"
@@ -237,6 +266,7 @@
     variant="outlined"
     @update:search="updateSearchString"
     @click:clear="organisationStore.resetOrganisationenFilter(props.filterId)"
+    @update:focused="handleFocusChange"
     v-bind="selectedSchuleProps"
     v-model="selectedSchulen"
     v-model:search="searchInputSchulen"
@@ -245,9 +275,12 @@
     <template v-slot:prepend-item>
       <slot name="prepend-item"></slot>
     </template>
-    <template v-slot:selection="{ item }">
-      <span class="v-autocomplete__selection-text">
-        {{ canDisplaySelection(selectedSchulen) ? item.title : '...' }}
+    <template v-slot:selection="{ item, index }">
+      <span
+        v-if="getDisplayItem(item, index)"
+        class="v-autocomplete__selection-text"
+      >
+        {{ getDisplayItem(item, index) }}
       </span>
     </template>
   </v-autocomplete>

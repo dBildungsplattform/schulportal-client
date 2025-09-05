@@ -11,16 +11,13 @@
   import InfoDialog from '@/components/alert/InfoDialog.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import KlassenFilter from '@/components/filter/KlassenFilter.vue';
+  import SchulenFilter from '@/components/filter/SchulenFilter.vue';
+  import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
   import { useOrganisationen } from '@/composables/useOrganisationen';
   import { type TranslatedRolleWithAttrs, useRollen } from '@/composables/useRollen';
   import { type AuthStore, useAuthStore } from '@/stores/AuthStore';
   import { OperationType } from '@/stores/BulkOperationStore';
-  import {
-    type Organisation,
-    type OrganisationStore,
-    OrganisationsTyp,
-    useOrganisationStore,
-  } from '@/stores/OrganisationStore';
+  import { type Organisation, type OrganisationStore, useOrganisationStore } from '@/stores/OrganisationStore';
   import { type PersonStore, SortField, usePersonStore } from '@/stores/PersonStore';
   import { type PersonenkontextStore, usePersonenkontextStore } from '@/stores/PersonenkontextStore';
   import {
@@ -50,7 +47,11 @@
   const { t }: Composer = useI18n({ useScope: 'global' });
 
   let timerId: ReturnType<typeof setTimeout>;
-  const hasAutoSelectedOrganisation: Ref<boolean> = ref(false);
+  const {
+    hasAutoselectedSchule,
+  }: {
+    hasAutoselectedSchule: ComputedRef<boolean>;
+  } = useAutoselectedSchule([RollenSystemRecht.PersonenVerwalten]);
 
   const selectedPersonIds: Ref<string[]> = ref<string[]>([]);
   const selectedPersonen: ComputedRef<Map<string, PersonWithZuordnungen>> = computed(() => {
@@ -106,6 +107,7 @@
   const searchInputRollen: Ref<string> = ref('');
   const searchInputOrganisationen: Ref<string> = ref('');
 
+  const selectedOrganisationen: Ref<Array<Organisation>> = ref([]);
   const selectedKlassen: Ref<Array<string> | undefined> = ref(searchFilterStore.selectedKlassen ?? []);
   const selectedRollen: Ref<Array<string>> = ref([]);
   const selectedOrganisationIds: Ref<Array<string>> = ref([]);
@@ -155,7 +157,7 @@
 
   const filterOrSearchActive: Ref<boolean> = computed(
     () =>
-      (!hasAutoSelectedOrganisation.value && selectedOrganisationIds.value.length > 0) ||
+      (!hasAutoselectedSchule.value && selectedOrganisationIds.value.length > 0) ||
       selectedRollen.value.length > 0 ||
       !!searchFilterStore.selectedOrganisationen?.length ||
       !!searchFilterStore.selectedRollen?.length ||
@@ -164,20 +166,12 @@
       !!selectedStatus.value,
   );
 
-  const organisationen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    return organisationStore.allOrganisationen.map((org: Organisation) => ({
-      value: org.id,
-      // Only concatenate if the kennung is present (Should not be for LAND)
-      title: org.kennung ? `${org.kennung} (${org.name})` : org.name,
-    }));
-  });
-
   const selectedOrganisationKennung: ComputedRef<string> = computed(() => {
     if (selectedOrganisationIds.value.length !== 1) {
       return '';
     }
     const id: string = selectedOrganisationIds.value[0]!;
-    const organisation: Organisation | undefined = organisationStore.allOrganisationen.find(
+    const organisation: Organisation | undefined = selectedOrganisationen.value.find(
       (org: Organisation) => org.id === id,
     );
     return organisation?.kennung ?? '';
@@ -257,14 +251,6 @@
     await applySearchAndFilters();
   }
 
-  async function autoSelectOrganisation(): Promise<void> {
-    // Autoselect the Orga for the current user that only has 1 Orga assigned to him.
-    if (organisationStore.allOrganisationen.length === 1) {
-      selectedOrganisationIds.value = [organisationStore.allOrganisationen[0]?.id || ''];
-      hasAutoSelectedOrganisation.value = true;
-    }
-  }
-
   async function updateKlassenSelection(newValue: Array<string>): Promise<void> {
     searchFilterStore.setKlasseFilterForPersonen(newValue);
     applySearchAndFilters();
@@ -287,8 +273,13 @@
     applySearchAndFilters();
   }
 
-  async function setOrganisationFilter(newValue: Array<string>): Promise<void> {
-    searchFilterStore.setOrganisationFilterForPersonen(newValue);
+  function setSelectedOrganisationen(newValue: Array<Organisation>): void {
+    selectedOrganisationen.value = newValue;
+  }
+
+  async function setOrganisationFilter(newValue: Array<string> | undefined): Promise<void> {
+    selectedOrganisationIds.value = newValue ?? [];
+    searchFilterStore.setOrganisationFilterForPersonen(newValue ?? []);
     searchFilterStore.setKlasseFilterForPersonen([]);
     selectedKlassen.value = [];
     applySearchAndFilters();
@@ -306,7 +297,7 @@
     searchFilterStore.setRolleFilterWithObjectsForPersonen([], []);
     searchFilterStore.setSearchFilterForPersonen('');
     /* do not reset orgas if orga was autoselected */
-    if (!hasAutoSelectedOrganisation.value) {
+    if (!hasAutoselectedSchule.value) {
       selectedOrganisationIds.value = [];
       searchFilterStore.setOrganisationFilterForPersonen([]);
     }
@@ -332,22 +323,6 @@
     searchFilterStore.setSearchFilterForPersonen(filter);
     searchFilter.value = filter;
     await applySearchAndFilters();
-  }
-
-  function updateOrganisationSearch(searchValue: string): void {
-    /* cancel pending call */
-    clearTimeout(timerId);
-
-    /* delay new call 500ms */
-    timerId = setTimeout(() => {
-      organisationStore.getAllOrganisationen({
-        searchString: searchValue,
-        excludeTyp: [OrganisationsTyp.Klasse],
-        limit: 25,
-        systemrechte: ['PERSONEN_VERWALTEN'],
-        organisationIds: selectedOrganisationIds.value,
-      });
-    }, 500);
   }
 
   async function updateRollenSearch(searchValue: string): Promise<void> {
@@ -421,7 +396,8 @@
   });
 
   const selectedOrganisation: ComputedRef<Organisation | undefined> = computed(() => {
-    return organisationStore.allOrganisationen.find((org: Organisation) => org.id === selectedOrganisationIds.value[0]);
+    const org: Organisation | undefined = selectedOrganisationen.value.find((org: Organisation) => org.id === selectedOrganisationIds.value[0]);
+    return org;
   });
 
   const onlyLernRollenSelected: ComputedRef<boolean> = computed(() => {
@@ -487,13 +463,13 @@
         break;
 
       case OperationType.RESET_PASSWORD:
+        if (validateSingleSchuleSelection()) {
+          passwordResetDialogVisible.value = true;
+        }
+        break;
       case OperationType.ORG_UNASSIGN:
         if (validateSingleSchuleSelection()) {
-          if (newValue === OperationType.RESET_PASSWORD) {
-            passwordResetDialogVisible.value = true;
-          } else {
-            organisationUnassignDialogVisible.value = true;
-          }
+          organisationUnassignDialogVisible.value = true;
         }
         break;
 
@@ -598,17 +574,8 @@
       await applySearchAndFilters();
     }
 
-    await organisationStore.getAllOrganisationen({
-      excludeTyp: [OrganisationsTyp.Klasse],
-      systemrechte: ['PERSONEN_VERWALTEN'],
-      limit: 25,
-      organisationIds: selectedOrganisationIds.value,
-    });
-
     await getPaginatedPersonen(searchFilterStore.personenPage);
     await personenkontextStore.getPersonenkontextRolleWithFilter('', 25);
-
-    autoSelectOrganisation();
   });
 </script>
 
@@ -649,29 +616,18 @@
           md="3"
           class="py-md-0"
         >
-          <v-autocomplete
-            autocomplete="off"
-            class="filter-dropdown"
-            :class="{ selected: selectedOrganisationIds.length > 0 }"
-            clearable
-            data-testid="schule-select"
-            density="compact"
-            :disabled="hasAutoSelectedOrganisation"
-            hide-details
-            id="schule-select"
-            :items="organisationen"
-            item-value="value"
-            item-text="title"
+          <SchulenFilter
             multiple
-            :no-data-text="$t('noDataFound')"
-            :placeholder="$t('admin.schule.schule')"
+            includeAll
+            highlightSelection
+            filter-id="person-management"
             ref="schule-select"
-            required="true"
-            @update:modelValue="setOrganisationFilter"
-            @update:search="updateOrganisationSearch"
-            variant="outlined"
-            v-model="selectedOrganisationIds"
-            v-model:search="searchInputOrganisationen"
+            :systemrechteForSearch="[RollenSystemRecht.PersonenVerwalten]"
+            :selectedSchulen="selectedOrganisationIds"
+            @update:selectedSchulen="setOrganisationFilter"
+            @update:selectedSchulenObjects="setSelectedOrganisationen"
+            :placeholderText="$t('admin.schule.schule')"
+            hideDetails
           >
             <template v-slot:prepend-item>
               <v-list-item>
@@ -685,24 +641,14 @@
                   >{{
                     $t(
                       'admin.schule.schulenFound',
-                      { count: organisationStore.totalPaginatedOrganisationen },
-                      organisationStore.totalPaginatedOrganisationen,
+                      { count: organisationStore.organisationenFilters.get('person-management')?.total },
+                      organisationStore.organisationenFilters.get('person-management')?.total ?? 0,
                     )
                   }}</span
                 >
               </v-list-item>
             </template>
-            <template v-slot:selection="{ item, index }">
-              <span
-                v-if="selectedOrganisationIds.length < 2"
-                class="v-autocomplete__selection-text"
-                >{{ item.title }}</span
-              >
-              <div v-else-if="index === 0">
-                {{ $t('admin.schule.schulenSelected', { count: selectedOrganisationIds.length }) }}
-              </div>
-            </template>
-          </v-autocomplete>
+          </SchulenFilter>
         </v-col>
         <v-col
           cols="12"
@@ -987,7 +933,8 @@
         :modelValue="selectedPersonIds as unknown as TableItem[]"
         :totalItems="personStore.totalPersons"
         item-value-path="id"
-        ><template v-slot:[`item.rollen`]="{ item }">
+      >
+        <template v-slot:[`item.rollen`]="{ item }">
           <div
             class="ellipsis-wrapper"
             :title="item.rollen"
@@ -1001,8 +948,8 @@
           >
             {{ item.administrationsebenen }}
           </div>
-        </template></ResultTable
-      >
+        </template>
+      </ResultTable>
     </LayoutCard>
   </div>
 </template>

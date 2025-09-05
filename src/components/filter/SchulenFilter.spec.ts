@@ -72,7 +72,7 @@ beforeEach(() => {
 });
 
 describe('SchulenFilter', async () => {
-  describe.each([[false]])('when multiple is %s', (multiple: boolean) => {
+  describe.each([[false, true]])('when multiple is %s', (multiple: boolean) => {
     describe.each([[true], [false]])('when readonly is %s', (readonly: boolean) => {
       const defaultProps: Props = { multiple, readonly };
 
@@ -199,7 +199,7 @@ describe('SchulenFilter', async () => {
                 vi.runAllTimers();
                 loadSpy.mockClear();
 
-                const schuleSearchInput: ReturnType<VueWrapper['findComponent']> = wrapper.find('#schule-select');
+                const schuleSearchInput: ReturnType<VueWrapper['findComponent']> = wrapper.find(includeAll ? '#organisation-select' : '#schule-select');
                 await schuleSearchInput.setValue(searchString);
                 vi.runAllTimers();
                 await flushPromises();
@@ -216,7 +216,7 @@ describe('SchulenFilter', async () => {
                   includeAll,
                   systemrechteForSearch,
                 });
-                const schuleSearchInput: ReturnType<VueWrapper['findComponent']> = wrapper.find('#schule-select');
+                const schuleSearchInput: ReturnType<VueWrapper['findComponent']> = wrapper.find(includeAll ? '#organisation-select' : '#schule-select');
                 await schuleSearchInput.setValue(searchString);
                 vi.runAllTimers();
                 await flushPromises();
@@ -285,9 +285,9 @@ describe('SchulenFilter', async () => {
           test('it correctly initializes input', async () => {
             const mockSchule: Organisation = DoFactory.getSchule({ id });
             organisationStore.organisationenFilters.set('', {
-               total: 1,
-               loading: false,
-               filterResult: [mockSchule],
+              total: 1,
+              loading: false,
+              filterResult: [mockSchule],
             });
             organisationStore.loadOrganisationenForFilter = vi.fn(async () => {
               organisationStore.organisationenFilters.get('')!.filterResult = [mockSchule];

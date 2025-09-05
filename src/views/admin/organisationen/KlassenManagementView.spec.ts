@@ -2,11 +2,11 @@ import { RollenSystemRecht } from '@/api-client/generated';
 import routes from '@/router/routes';
 import { useAuthStore, type AuthStore, type UserInfo } from '@/stores/AuthStore';
 import {
-    OrganisationsTyp,
-    useOrganisationStore,
-    type Organisation,
-    type OrganisationenFilter,
-    type OrganisationStore,
+  OrganisationsTyp,
+  useOrganisationStore,
+  type Organisation,
+  type OrganisationenFilter,
+  type OrganisationStore,
 } from '@/stores/OrganisationStore';
 import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
 import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
@@ -57,7 +57,12 @@ async function selectSchule(schule?: Partial<Organisation> | null): Promise<Orga
   }
 
   const schuleWithDefaults: Organisation = DoFactory.getSchule(schule);
-  organisationStore.organisationenFilters.filterResult = [schuleWithDefaults];
+  organisationStore.organisationenFilters.set('klassen-management', {
+    filterResult: [schuleWithDefaults],
+    total: 1,
+    loading: false,
+  });
+  searchFilterStore.selectedSchuleForKlassen = schuleWithDefaults.id;
   await schuleAutocomplete?.setValue(schuleWithDefaults.id);
   return schuleWithDefaults;
 }
@@ -210,7 +215,11 @@ describe('KlassenManagementView', () => {
   describe.each([[true], [false]])('when searchFilterStore has data (%s)', (hasStoreData: boolean) => {
     test('it populates filter', async () => {
       searchFilterStore.selectedSchuleForKlassen = hasStoreData ? schule1.id : null;
-      organisationStore.organisationenFilters.filterResult = [schule1];
+      organisationStore.organisationenFilters.set('klassen-management', {
+        filterResult: [schule1],
+        total: 1,
+        loading: false,
+      });
       await flushPromises();
       wrapper = await mountComponent();
       await flushPromises();

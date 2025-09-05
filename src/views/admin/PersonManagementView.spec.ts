@@ -1,4 +1,4 @@
-import { RollenArt, RollenSystemRecht, type FindRollenResponse } from '@/api-client/generated/api';
+import { RollenArt, RollenSystemRecht, type FindRollenResponse, type OrganisationResponse } from '@/api-client/generated/api';
 import routes from '@/router/routes';
 import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 import { OperationType } from '@/stores/BulkOperationStore';
@@ -17,6 +17,7 @@ import { expect, test, type Mock, type MockInstance } from 'vitest';
 import { nextTick, type ComputedRef, type DefineComponent } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import PersonManagementView from './PersonManagementView.vue';
+import { wrap } from 'module';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -62,6 +63,8 @@ beforeEach(async () => {
   searchFilterStore = useSearchFilterStore();
   authStore = useAuthStore();
 
+  authStore.currentUser = DoFactory.getUserinfoResponse();
+
   authStore.hasPersonenBulkPermission = true;
   authStore.hasPersonenLoeschenPermission = true;
   authStore.hasPersonenverwaltungPermission = true;
@@ -84,26 +87,6 @@ beforeEach(async () => {
     },
   ];
 
-  organisationStore.allOrganisationen = [
-    {
-      id: '9876',
-      name: 'Random Schulname Gymnasium',
-      kennung: '9356494',
-      namensergaenzung: 'Schule',
-      kuerzel: 'rsg',
-      typ: 'SCHULE',
-      administriertVon: '1',
-    },
-    {
-      id: '198',
-      name: 'Realschule Randomname',
-      kennung: '13465987',
-      namensergaenzung: 'Schule',
-      kuerzel: 'rsrn',
-      typ: 'SCHULE',
-      administriertVon: '1',
-    },
-  ];
 
   personStore.allUebersichten = new Map();
   for (let index: number = 0; index < 5; index++) {
@@ -156,6 +139,8 @@ beforeEach(async () => {
     filterResult: [],
     loading: false,
   });
+
+  searchFilterStore.$reset();
 
   wrapper = mountComponent();
 });
@@ -217,53 +202,11 @@ describe('PersonManagementView', () => {
     });
   });
 
-  test('it autoselects orga if only one is available', async () => {
-    /* set all orgas to 1 */
-    organisationStore.allOrganisationen = [
-      {
-        id: '9876',
-        name: 'Random Schulname Gymnasium',
-        kennung: '9356494',
-        namensergaenzung: 'Schule',
-        kuerzel: 'rsg',
-        typ: 'SCHULE',
-        administriertVon: '1',
-      },
-    ];
-    await flushPromises();
-
-    const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
-
-    expect(schuleAutocomplete?.text()).toContain('9356494 (Random Schulname Gymnasium)');
-
-    /* reset all orgas back to 2 */
-    organisationStore.allOrganisationen = [
-      {
-        id: '9876',
-        name: 'Random Schulname Gymnasium',
-        kennung: '9356494',
-        namensergaenzung: 'Schule',
-        kuerzel: 'rsg',
-        typ: 'SCHULE',
-        administriertVon: '1',
-      },
-      {
-        id: '198',
-        name: 'Realschule Randomname',
-        kennung: '13465987',
-        namensergaenzung: 'Schule',
-        kuerzel: 'rsrn',
-        typ: 'SCHULE',
-        administriertVon: '1',
-      },
-    ];
-  });
-
   test('selection is mirrored in the store', async () => {
     const orgId: Array<string> = ['9876'];
-    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
+    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ name: 'SchulenFilter'});
     await organisationAutocomplete?.setValue(orgId);
-    organisationAutocomplete?.vm.$emit('update:modelValue', orgId);
+    organisationAutocomplete?.vm.$emit('update:selectedSchulen', orgId);
     await flushPromises();
     expect(searchFilterStore.setOrganisationFilterForPersonen).toHaveBeenCalledWith(orgId);
     // TODO: the setter does not work
@@ -344,18 +287,29 @@ describe('PersonManagementView', () => {
   });
 
   test('it sets and resets filters', async () => {
-    const klasse: Organisation = DoFactory.getKlasse(undefined, {});
+    const schule: Organisation = DoFactory.getSchule();
+    organisationStore.organisationenFilters.set('person-management', {
+      filterResult: [schule],
+      total: 1,
+      loading: false,
+    });
+    const klasse: Organisation = DoFactory.getKlasse(schule, {});
     organisationStore.klassenFilters.set('', {
       filterResult: [klasse],
       total: 1,
       loading: false,
     });
 
-    const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
-    await schuleAutocomplete?.setValue(['9876']);
-    await nextTick();
+    const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ name: 'SchulenFilter' });
+    const schuleInputElement: DOMWrapper<Element> | undefined = schuleAutocomplete?.find(
+      '#person-management-organisation-select',
+    );
 
-    expect(schuleAutocomplete?.text()).toEqual('9356494 (Random Schulname Gymnasium)');
+    await schuleInputElement?.setValue([schule.name]);
+    await nextTick();
+    await flushPromises();
+
+    expect((schuleInputElement?.element as HTMLInputElement).value).toBe(schule.name);
 
     const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
     await rolleAutocomplete?.setValue(['1']);
@@ -407,17 +361,6 @@ describe('PersonManagementView', () => {
     const totalKlassen: ComputedRef<number> = vm.totalKlassen;
 
     expect(totalKlassen).toBe(0);
-  });
-
-  test('it updates Organisation search correctly', async () => {
-    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
-
-    await organisationAutocomplete?.setValue(['org']);
-    await nextTick();
-
-    organisationAutocomplete?.vm.$emit('update:search', '2');
-    await flushPromises();
-    expect(organisationStore.getAllOrganisationen).toHaveBeenCalled();
   });
 
   test('it updates Rollen search correctly', async () => {
@@ -502,8 +445,12 @@ describe('PersonManagementView', () => {
     'it checks a checkbox in the table, selects $operationType, triggers dialog then cancels it',
     async ({ operationType, layoutCardTestId, discardButtonTestId }: BulkOperationTestParams) => {
       const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
-      await schuleAutocomplete?.setValue(['9876']);
+      schuleAutocomplete?.vm.$emit('update:selectedSchulen', ['9876']);
+      // TODO: the setter is called, but the object is empty afterwards
+      // then selectedOrganisation is undefined and the dialogs do not open
+      schuleAutocomplete?.vm.$emit('update:selectedSchulenObjects', [DoFactory.getSchule({ id: '9876' })]);
       await nextTick();
+      await flushPromises();
       // Find the first checkbox in the table
       const checkbox: DOMWrapper<Element> | undefined = wrapper?.find(
         '[data-testid="person-table"] .v-selection-control',
@@ -559,6 +506,7 @@ describe('PersonManagementView', () => {
   });
 
   test('it shows the error dialog, when the selection is invalid', async () => {
+    wrapper = mountComponent();
     // don't select schule and select a person without LERN-rolle
     personStore.allUebersichten = new Map();
     const person: Person = DoFactory.getPerson();

@@ -1,9 +1,9 @@
 import routes from '@/router/routes';
 import {
-    OrganisationsTyp,
-    useOrganisationStore,
-    type Organisation,
-    type OrganisationStore,
+  OrganisationsTyp,
+  useOrganisationStore,
+  type Organisation,
+  type OrganisationStore,
 } from '@/stores/OrganisationStore';
 import { DOMWrapper, VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
@@ -51,7 +51,12 @@ beforeEach(async () => {
   await router.isReady();
 
   organisationStore.currentOrganisation = mockCurrentOrganisation;
-  organisationStore.organisationenFilters.filterResult = [mockCurrentOrganisation];
+  organisationStore.organisationenFilters.set('klasse-form', {
+    total: 1,
+    loading: false,
+    filterResult: [mockCurrentOrganisation],
+  });
+
   organisationStore.currentKlasse = mockCurrentKlasse;
   vi.spyOn(organisationStore, 'getOrganisationById').mockImplementation(
     (_id: string, _typ: OrganisationsTyp): Promise<Organisation> => {
@@ -82,7 +87,7 @@ describe('KlassenDetailsView', () => {
     expect(wrapper?.find('[data-testid="klasse-details-card"]').isVisible()).toBe(true);
     expect(wrapper?.findComponent({ ref: 'klasse-creation-form' }).isVisible()).toBe(true);
     expect(wrapper?.findComponent({ ref: 'klasse-delete' }).isVisible()).toBe(true);
-    expect(wrapper?.find('[data-testid="schule-select"]').text()).toEqual('1234654 (BTC Schule)');
+    expect(wrapper?.find('[data-testid="klasse-form-schule-select"]').text()).toEqual('1234654 (BTC Schule)');
     expect(wrapper?.find('#klassenname-input').attributes('value')).toEqual('1a');
     expect(wrapper?.findComponent({ ref: 'klasse-delete' }).isVisible()).toBe(true);
   });
