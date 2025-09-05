@@ -3,17 +3,19 @@
   import type { BaseFieldProps } from 'vee-validate';
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import FormRow from '@/components/form/FormRow.vue';
-  import { type TranslatedObject } from '@/types.d';
-  import type { RollenArt, RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
+  import { type Option, type TranslatedObject } from '@/types.d';
+  import { type RollenArt, type RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
   import {
     OrganisationsTyp,
     useOrganisationStore,
+    type Organisation,
     type OrganisationenFilter,
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
+  import { getDisplayNameForOrg } from '@/utils/formatting';
+  import SchulenFilter from '@/components/filter/SchulenFilter.vue';
 
   type Props = {
-    administrationsebenen?: Array<{ value: string; title: string }>;
     readonly?: boolean;
     errorCode?: string;
     selectedAdministrationsebeneProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
@@ -29,7 +31,6 @@
     translatedSystemrechte?: TranslatedObject[];
     isEditActive?: boolean;
     isLoading: boolean;
-    hasAutoselectedAdministrationsebene?: boolean;
     onHandleConfirmUnsavedChanges: () => void;
     onHandleDiscard: () => void;
     onShowDialogChange: (value?: boolean) => void;
@@ -37,68 +38,16 @@
   };
 
   const props: Props = defineProps<Props>();
-  const organisationStore: OrganisationStore = useOrganisationStore();
-
-  const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
-  const searchInputAdministrationsebenen: Ref<string> = ref('');
 
   // Define the V-model for each field so the parent component can pass in the values for it.
   const selectedAdministrationsebene: ModelRef<string | undefined, string> =
     defineModel('selectedAdministrationsebene');
+  const selectedAdministrationsebeneObject: Ref<Option<Organisation>> = ref();
   const selectedRollenArt: ModelRef<RollenArt | undefined, string> = defineModel('selectedRollenArt');
   const selectedRollenName: ModelRef<string | undefined, string> = defineModel('selectedRollenName');
   const selectedMerkmale: ModelRef<RollenMerkmal[] | undefined, string> = defineModel('selectedMerkmale');
   const selectedServiceProviders: ModelRef<string[] | undefined, string> = defineModel('selectedServiceProviders');
   const selectedSystemRechte: ModelRef<RollenSystemRecht[] | undefined, string> = defineModel('selectedSystemRechte');
-
-  const selectedAdministrationsebeneTitle: ComputedRef<string | undefined> = computed(() => {
-    return props.administrationsebenen?.find(
-      (org: TranslatedObject) => org.value === selectedAdministrationsebene.value,
-    )?.title;
-  });
-
-  // Watcher for selectedOrganisation to fetch roles and classes
-  watch(selectedAdministrationsebene, async (newValue: string | undefined, oldValue: string | undefined) => {
-    if (newValue && newValue !== oldValue) {
-      const filter: OrganisationenFilter = {
-        systemrechte: ['ROLLEN_VERWALTEN'],
-        organisationIds: [newValue],
-        excludeTyp: [OrganisationsTyp.Klasse],
-        limit: 25,
-      };
-
-      await organisationStore.getAllOrganisationen(filter);
-    }
-    selectedAdministrationsebene.value = newValue;
-  });
-
-  watch(searchInputAdministrationsebenen, async (newValue: string, oldValue: string) => {
-    clearTimeout(timerId.value);
-
-    const filter: OrganisationenFilter = {
-      systemrechte: ['ROLLEN_VERWALTEN'],
-      excludeTyp: [OrganisationsTyp.Klasse],
-      limit: 25,
-    };
-
-    if (oldValue === selectedAdministrationsebeneTitle.value) return;
-
-    if (newValue === '' && !selectedAdministrationsebene.value) {
-      // Case: Initial load
-      // nothing to add — base filter is fine
-    } else if (newValue && newValue !== selectedAdministrationsebeneTitle.value) {
-      filter.searchString = newValue;
-    } else if (newValue === '' && selectedAdministrationsebene.value) {
-      // Case: user cleared search but selected something earlier
-      filter.organisationIds = [selectedAdministrationsebene.value];
-    } else {
-      return;
-    }
-
-    timerId.value = setTimeout(async () => {
-      await organisationStore.getAllOrganisationen(filter);
-    }, 500);
-  });
 </script>
 
 <template data-test-id="rolle-form">
@@ -129,29 +78,18 @@
         :isRequired="true"
         :label="$t('admin.administrationsebene.administrationsebene')"
       >
-        <v-autocomplete
-          autocomplete="off"
-          clearable
-          :class="[
-            { 'filter-dropdown mb-4': hasAutoselectedAdministrationsebene },
-            { selected: selectedAdministrationsebene },
-          ]"
-          data-testid="administrationsebene-select"
-          density="compact"
-          :disabled="readonly || hasAutoselectedAdministrationsebene"
-          id="administrationsebene-select"
-          :items="administrationsebenen"
-          item-value="value"
-          item-text="title"
-          :no-data-text="$t('noDataFound')"
-          :placeholder="$t('admin.administrationsebene.assignAdministrationsebene')"
-          ref="administrationsebene-select"
-          required="true"
-          variant="outlined"
-          v-bind="selectedAdministrationsebeneProps"
-          v-model="selectedAdministrationsebene"
-          v-model:search="searchInputAdministrationsebenen"
-        ></v-autocomplete>
+        <SchulenFilter
+          :includeAll="true"
+          :multiple="false"
+          :selectedSchulen="selectedAdministrationsebene"
+          :error="selectedAdministrationsebeneProps?.error"
+          :filterId="'rolle-form'"
+          :placeholderText="$t('admin.administrationsebene.assignAdministrationsebene')"
+          :selectedSchuleProps="selectedAdministrationsebeneProps"
+          :systemrechteForSearch="[RollenSystemRecht.RollenVerwalten]"
+          @update:selectedSchulen="selectedAdministrationsebene = $event[0]?.id"
+          @update:selectedSchulenObjects="selectedAdministrationsebeneObject = $event[0]"
+        />
       </FormRow>
 
       <!-- 2. Rollenart zuordnen -->
