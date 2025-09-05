@@ -1,4 +1,4 @@
-import { OrganisationsTyp, type ServiceProviderResponse } from '@/api-client/generated/api';
+import { type ServiceProviderResponse } from '@/api-client/generated/api';
 import routes from '@/router/routes';
 import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
 import {
@@ -8,11 +8,12 @@ import {
   type RolleResponse,
   type RolleStore,
 } from '@/stores/RolleStore';
+import { getDisplayNameForOrg } from '@/utils/formatting';
 import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import type Module from 'module';
 import { DoFactory } from 'test/DoFactory';
 import { expect, test, type Mock, type MockInstance } from 'vitest';
-import { nextTick, type DefineComponent } from 'vue';
+import { nextTick } from 'vue';
 import {
   createRouter,
   createWebHistory,
@@ -21,7 +22,6 @@ import {
   type Router,
 } from 'vue-router';
 import RolleCreationView from './RolleCreationView.vue';
-import { getDisplayNameForOrg } from '@/utils/formatting';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -102,10 +102,9 @@ async function fillForm(args: Partial<FormFields>): Promise<Partial<FormSelector
   }
 
   if (rollenname) {
-    const rollennameInput: VueWrapper | undefined =
-      wrapper
-        ?.findComponent({ ref: 'rolle-creation-form' })
-        .findComponent({ ref: 'rollenname-input' });
+    const rollennameInput: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'rolle-creation-form' })
+      .findComponent({ ref: 'rollenname-input' });
     expect(rollennameInput?.exists()).toBe(true);
     await rollennameInput?.find('input').setValue(rollenname);
     await nextTick();

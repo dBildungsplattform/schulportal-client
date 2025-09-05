@@ -1,19 +1,12 @@
 <script setup lang="ts">
-  import { computed, ref, watch, type ComputedRef, type ModelRef, type Ref } from 'vue';
-  import type { BaseFieldProps } from 'vee-validate';
-  import FormWrapper from '@/components/form/FormWrapper.vue';
-  import FormRow from '@/components/form/FormRow.vue';
-  import { type Option, type TranslatedObject } from '@/types.d';
-  import { type RollenArt, type RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
-  import {
-    OrganisationsTyp,
-    useOrganisationStore,
-    type Organisation,
-    type OrganisationenFilter,
-    type OrganisationStore,
-  } from '@/stores/OrganisationStore';
-  import { getDisplayNameForOrg } from '@/utils/formatting';
   import SchulenFilter from '@/components/filter/SchulenFilter.vue';
+  import FormRow from '@/components/form/FormRow.vue';
+  import FormWrapper from '@/components/form/FormWrapper.vue';
+  import { type Organisation } from '@/stores/OrganisationStore';
+  import { RollenSystemRecht, type RollenArt, type RollenMerkmal } from '@/stores/RolleStore';
+  import { type Option, type TranslatedObject } from '@/types.d';
+  import type { BaseFieldProps } from 'vee-validate';
+  import { ref, type ModelRef, type Ref } from 'vue';
 
   type Props = {
     readonly?: boolean;
