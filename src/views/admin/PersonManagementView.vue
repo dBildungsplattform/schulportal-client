@@ -396,8 +396,10 @@
   });
 
   const selectedOrganisation: ComputedRef<Organisation | undefined> = computed(() => {
-    const org: Organisation | undefined = selectedOrganisationen.value.find((org: Organisation) => org.id === selectedOrganisationIds.value[0]);
-    return org;
+    const organisation: Organisation | undefined = selectedOrganisationen.value.find(
+      (org: Organisation) => org.id === selectedOrganisationIds.value[0],
+    );
+    return organisation;
   });
 
   const onlyLernRollenSelected: ComputedRef<boolean> = computed(() => {

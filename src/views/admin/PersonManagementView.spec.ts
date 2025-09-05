@@ -1,4 +1,4 @@
-import { RollenArt, RollenSystemRecht, type FindRollenResponse, type OrganisationResponse } from '@/api-client/generated/api';
+import { RollenArt, RollenSystemRecht, type FindRollenResponse } from '@/api-client/generated/api';
 import routes from '@/router/routes';
 import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 import { OperationType } from '@/stores/BulkOperationStore';
@@ -17,7 +17,6 @@ import { expect, test, type Mock, type MockInstance } from 'vitest';
 import { nextTick, type ComputedRef, type DefineComponent } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import PersonManagementView from './PersonManagementView.vue';
-import { wrap } from 'module';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -86,7 +85,6 @@ beforeEach(async () => {
       administriertVon: '1',
     },
   ];
-
 
   personStore.allUebersichten = new Map();
   for (let index: number = 0; index < 5; index++) {
@@ -204,7 +202,7 @@ describe('PersonManagementView', () => {
 
   test('selection is mirrored in the store', async () => {
     const orgId: Array<string> = ['9876'];
-    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ name: 'SchulenFilter'});
+    const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ name: 'SchulenFilter' });
     await organisationAutocomplete?.setValue(orgId);
     organisationAutocomplete?.vm.$emit('update:selectedSchulen', orgId);
     await flushPromises();
@@ -515,23 +513,21 @@ describe('PersonManagementView', () => {
 
     await flushPromises();
 
-    const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
-    await schuleAutocomplete?.setValue([]);
+    const schuleAutocomplete: VueWrapper | undefined = wrapper.findComponent({ ref: 'schule-select' });
+    await schuleAutocomplete.setValue([]);
     await nextTick();
 
-    const checkbox: DOMWrapper<Element> | undefined = wrapper?.find(
-      '[data-testid="person-table"] .v-selection-control',
-    );
+    const checkbox: DOMWrapper<Element> | undefined = wrapper.find('[data-testid="person-table"] .v-selection-control');
     // Initial state check (optional)
-    expect(checkbox?.classes()).not.toContain('v-selection-control--selected');
+    expect(checkbox.classes()).not.toContain('v-selection-control--selected');
     // Trigger the checkbox click
-    await checkbox?.trigger('click');
+    await checkbox.trigger('click');
     await nextTick();
-    wrapper?.findComponent({ name: 'ResultTable' }).vm.$emit('update:selectedRows', [person.id]);
+    wrapper.findComponent({ name: 'ResultTable' }).vm.$emit('update:selectedRows', [person.id]);
     await nextTick();
 
-    const benutzerEditSelect: VueWrapper | undefined = wrapper?.findComponent({ ref: 'benutzer-bulk-edit-select' });
-    benutzerEditSelect?.setValue(OperationType.CHANGE_KLASSE);
+    const benutzerEditSelect: VueWrapper | undefined = wrapper.findComponent({ ref: 'benutzer-bulk-edit-select' });
+    benutzerEditSelect.setValue(OperationType.CHANGE_KLASSE);
     await nextTick();
 
     expect(document.body.querySelector(`[data-testid="invalid-selection-alert-dialog-layout-card"]`)).not.toBeNull();

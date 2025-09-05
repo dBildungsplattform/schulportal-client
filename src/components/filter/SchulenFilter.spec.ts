@@ -199,7 +199,9 @@ describe('SchulenFilter', async () => {
                 vi.runAllTimers();
                 loadSpy.mockClear();
 
-                const schuleSearchInput: ReturnType<VueWrapper['findComponent']> = wrapper.find(includeAll ? '#organisation-select' : '#schule-select');
+                const schuleSearchInput: ReturnType<VueWrapper['findComponent']> = wrapper.find(
+                  includeAll ? '#organisation-select' : '#schule-select',
+                );
                 await schuleSearchInput.setValue(searchString);
                 vi.runAllTimers();
                 await flushPromises();
@@ -216,7 +218,9 @@ describe('SchulenFilter', async () => {
                   includeAll,
                   systemrechteForSearch,
                 });
-                const schuleSearchInput: ReturnType<VueWrapper['findComponent']> = wrapper.find(includeAll ? '#organisation-select' : '#schule-select');
+                const schuleSearchInput: ReturnType<VueWrapper['findComponent']> = wrapper.find(
+                  includeAll ? '#organisation-select' : '#schule-select',
+                );
                 await schuleSearchInput.setValue(searchString);
                 vi.runAllTimers();
                 await flushPromises();
