@@ -304,10 +304,14 @@
       :padded="true"
       :showCloseText="true"
     >
+      <div id="debug">
+        <p>Selected Admin Ebene: {{ selectedAdministrationsebene }}</p>
+        <p>Selected RollenArt: {{ selectedRollenArt }}</p>
+        <p>Selected RollenName: {{ selectedRollenName }}</p>
+      </div>
       <!-- The form to create a new Rolle -->
       <template v-if="!rolleStore.createdRolle">
         <RolleForm
-          :administrationsebenen="administrationsebenen"
           :errorCode="rolleStore.errorCode"
           :onHandleConfirmUnsavedChanges="handleConfirmUnsavedChanges"
           :onHandleDiscard="navigateToRolleManagement"
@@ -333,7 +337,6 @@
           :translatedRollenarten="translatedRollenarten"
           :translatedMerkmale="translatedMerkmale"
           :translatedSystemrechte="translatedSystemrechte"
-          :hasAutoselectedAdministrationsebene="hasAutoselectedAdministrationsebene"
         >
           <!-- Error Message Display if error on submit -->
           <!-- To trigger unsaved changes dialog the alert has to be inside the form wrapper -->
