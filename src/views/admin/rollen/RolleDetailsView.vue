@@ -1,4 +1,5 @@
 <script setup lang="ts">
+  import { useMasterDataStore, type MasterDataStore } from '@/stores/MasterDataStore';
   import RolleDelete from '@/components/admin/rollen/RolleDelete.vue';
   import RolleForm from '@/components/admin/rollen/RolleForm.vue';
   import RolleSuccessTemplate from '@/components/admin/rollen/RolleSuccessTemplate.vue';
@@ -25,7 +26,7 @@
   } from '@/stores/ServiceProviderStore';
   import { type TranslatedObject } from '@/types.d';
   import { getDisplayNameForOrg } from '@/utils/formatting';
-  import { isHiddenSystemrecht } from '@/utils/systemrechte';
+
   import {
     getDirtyState,
     getRolleFieldDefinitions,
@@ -45,6 +46,7 @@
     type Router,
   } from 'vue-router';
   import { useDisplay } from 'vuetify';
+  import type { SystemRechtResponse } from '@/api-client/generated';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
@@ -53,6 +55,7 @@
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
+  const masterDataStore: MasterDataStore = useMasterDataStore();
   const rolleStore: RolleStore = useRolleStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
@@ -200,8 +203,8 @@
     }
 
     return Array.from(rolleStore.updatedRolle.systemrechte)
-      .map((systemrechtKey: string) => {
-        return t(`admin.rolle.mappingFrontBackEnd.systemrechte.${systemrechtKey}`);
+      .map((systemrecht: SystemRechtResponse) => {
+        return t(`admin.rolle.mappingFrontBackEnd.systemrechte.${systemrecht.name}`);
       })
       .join(', ');
   });
@@ -262,7 +265,7 @@
     });
 
     Object.values(RollenSystemRecht).forEach((enumValue: RollenSystemRecht) => {
-      if (!isHiddenSystemrecht(enumValue)) {
+      if (!masterDataStore.isHiddenSystemrecht(enumValue)) {
         const i18nPath: string = `admin.rolle.mappingFrontBackEnd.systemrechte.${enumValue}`;
         allSystemrechte.value.push({
           value: enumValue,

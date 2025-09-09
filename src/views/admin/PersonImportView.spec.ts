@@ -1,14 +1,13 @@
-import { ImportDataItemStatus, type ImportUploadResponse } from '@/api-client/generated';
+import {
+  ImportDataItemStatus,
+  RollenSystemRechtEnum,
+  type ImportUploadResponse,
+  type SystemRechtResponse,
+} from '@/api-client/generated';
 import routes from '@/router/routes';
 import { useImportStore, type ImportStore } from '@/stores/ImportStore';
 import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
-import {
-  RollenMerkmal,
-  RollenSystemRecht,
-  useRolleStore,
-  type RolleStore,
-  type RolleWithServiceProvidersResponse,
-} from '@/stores/RolleStore';
+import { RollenMerkmal, useRolleStore, type RolleStore } from '@/stores/RolleStore';
 import { getDisplayNameForOrg } from '@/utils/formatting';
 import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
@@ -35,7 +34,9 @@ rolleStore.allRollen = [
     name: 'Lehrer',
     // TODO: remove type casting when generator is fixed
     merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
-    systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+    systemrechte: [
+      { name: RollenSystemRechtEnum.RollenVerwalten, isTechnical: false },
+    ] as unknown as Set<SystemRechtResponse>,
     createdAt: '2022',
     updatedAt: '2022',
     id: '1',
@@ -51,6 +52,7 @@ rolleStore.allRollen = [
     ],
     administeredBySchulstrukturknotenName: 'Land SH',
     administeredBySchulstrukturknotenKennung: '',
+    version: 1,
   },
   {
     administeredBySchulstrukturknoten: '1234',
@@ -58,7 +60,7 @@ rolleStore.allRollen = [
     name: 'SuS',
     // TODO: remove type casting when generator is fixed
     merkmale: [] as unknown as Set<RollenMerkmal>,
-    systemrechte: [] as unknown as Set<RollenSystemRecht>,
+    systemrechte: [] as unknown as Set<SystemRechtResponse>,
     createdAt: '2022',
     updatedAt: '2022',
     id: '2',
@@ -70,8 +72,9 @@ rolleStore.allRollen = [
     ],
     administeredBySchulstrukturknotenName: 'Land SH',
     administeredBySchulstrukturknotenKennung: '1234567',
+    version: 1,
   },
-] as RolleWithServiceProvidersResponse[];
+];
 
 async function selectSchule(value: string): Promise<WrapperLike | undefined> {
   const schuleAutocomplete: WrapperLike | undefined = wrapper

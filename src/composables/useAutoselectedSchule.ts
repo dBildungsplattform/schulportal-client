@@ -1,4 +1,4 @@
-import { RollenSystemRecht } from '@/api-client/generated';
+import { RollenSystemRechtEnum } from '@/api-client/generated';
 import { useAuthStore, type AuthStore, type PersonenkontextRolleFields } from '@/stores/AuthStore';
 import { OrganisationsTyp, type Organisation } from '@/stores/OrganisationStore';
 import { computed, type ComputedRef } from 'vue';
@@ -9,16 +9,16 @@ function intersect<T>(a: Array<T>, b: Array<T>): Array<T> {
 
 function getOnlySchulenWithSystemrechte(
   pks: Array<PersonenkontextRolleFields>,
-  systemrechte: Array<RollenSystemRecht>,
+  systemrechte: Array<RollenSystemRechtEnum>,
 ): Array<Organisation> {
   const temp: Array<Organisation> = [];
   for (const pk of pks) {
     const isSchule: boolean = pk.organisation.typ === OrganisationsTyp.Schule;
     if (!isSchule) continue;
 
-    const systemrechteIntersection: Array<RollenSystemRecht> = intersect(
+    const systemrechteIntersection: Array<RollenSystemRechtEnum> = intersect(
       systemrechte,
-      pk.rolle.systemrechte as Array<RollenSystemRecht>,
+      pk.rolle.systemrechte as Array<RollenSystemRechtEnum>,
     );
     const hasMatchingSystemrechte: boolean = systemrechteIntersection.length === systemrechte.length;
     if (hasMatchingSystemrechte) {
@@ -28,7 +28,7 @@ function getOnlySchulenWithSystemrechte(
   return temp;
 }
 
-export function useAutoselectedSchule(systemrechte: Array<RollenSystemRecht>): {
+export function useAutoselectedSchule(systemrechte: Array<RollenSystemRechtEnum>): {
   hasAutoselectedSchule: ComputedRef<boolean>;
   autoselectedSchule: ComputedRef<Organisation | null>;
 } {

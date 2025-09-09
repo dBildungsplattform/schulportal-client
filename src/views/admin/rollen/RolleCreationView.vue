@@ -3,6 +3,7 @@
   import RolleSuccessTemplate from '@/components/admin/rollen/RolleSuccessTemplate.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import { useMasterDataStore, type MasterDataStore } from '@/stores/MasterDataStore';
   import {
     OrganisationsTyp,
     useOrganisationStore,
@@ -24,7 +25,6 @@
     type ServiceProviderStore,
   } from '@/stores/ServiceProviderStore';
   import { type TranslatedObject } from '@/types.d';
-  import { isHiddenSystemrecht } from '@/utils/systemrechte';
   import {
     getDirtyState,
     getRolleFieldDefinitions,
@@ -42,6 +42,7 @@
     type Router,
   } from 'vue-router';
 
+  const masterDataStore: MasterDataStore = useMasterDataStore();
   const rolleStore: RolleStore = useRolleStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
@@ -238,7 +239,7 @@
     });
 
     Object.values(RollenSystemRecht).forEach((enumValue: RollenSystemRecht) => {
-      if (!isHiddenSystemrecht(enumValue)) {
+      if (!masterDataStore.isHiddenSystemrecht(enumValue)) {
         const i18nPath: string = `admin.rolle.mappingFrontBackEnd.systemrechte.${enumValue}`;
         translatedSystemrechte.value.push({
           value: enumValue,
