@@ -4,8 +4,9 @@
   "exclude": ["src/**/__tests__/*"],
   "compilerOptions": {
     "composite": true,
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
+    "baseUrl": ".",
+    "module": "ES2020",
+    "moduleResolution": "Node",
     "paths": {
       "@/*": ["./src/*"]
     },
