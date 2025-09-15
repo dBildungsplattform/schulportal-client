@@ -37,6 +37,7 @@
     useWorkflowEndpoints?: boolean;
     useLandesbediensteteWorkflow?: boolean;
     operationContext?: OperationContext;
+    isRolleUnassignForm?: boolean;
   };
   type Emits = {
     (e: 'update:selectedSchulenObjects', value: Array<Organisation>): void;
@@ -113,8 +114,8 @@
     props.systemrechteForSearch ?? [],
   );
 
-  const isInputDisabled: ComputedRef<boolean> = computed(() => {
-    return props.readonly || hasAutoselectedSchule.value;
+  const isInputDisabled: ComputedRef<boolean | undefined> = computed(() => {
+    return props.readonly || hasAutoselectedSchule.value || props.isRolleUnassignForm;
   });
 
   // selection is represented as an array internally
@@ -181,7 +182,7 @@
   };
 
   const shouldHighlightSelection: ComputedRef<boolean> = computed(() => {
-    if (hasAutoselectedSchule.value) return true;
+    if (hasAutoselectedSchule.value || props.isRolleUnassignForm) return true;
     if (props.highlightSelection && !isEmptySelection(selectedSchulen.value)) return true;
     return false;
   });

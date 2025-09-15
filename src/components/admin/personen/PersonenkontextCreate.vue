@@ -401,8 +401,9 @@
         :useWorkflowEndpoints="true"
         :useLandesbediensteteWorkflow="useLandesbediensteteWorkflow"
         :operationContext="props.operationContext"
+        :isRolleUnassignForm="isRolleUnassignForm"
         @update:selectedSchulen="updateSchuleSelection"
-        @update:selected-schulen-objects="
+        @update:selectedSchulenObjects="
           (organisations: Array<Organisation>) =>
             emits('update:selectedOrganisation', organisations.length > 0 ? organisations[0]?.id : undefined)
         "
