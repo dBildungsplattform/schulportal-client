@@ -80,6 +80,7 @@
           :placeholderText="$t('admin.administrationsebene.assignAdministrationsebene')"
           :selectedSchuleProps="selectedAdministrationsebeneProps"
           :systemrechteForSearch="[RollenSystemRecht.RollenVerwalten]"
+          :readonly="readonly"
           @update:selectedSchulen="selectedAdministrationsebene = $event[0]?.id"
           @update:selectedSchulenObjects="selectedAdministrationsebeneObject = $event[0]"
         />

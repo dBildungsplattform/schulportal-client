@@ -28,6 +28,7 @@ import {
 } from '../api-client/generated/api';
 import { usePersonStore, type PersonStore } from './PersonStore';
 import type { Zuordnung } from './types/Zuordnung';
+import type { AxiosResponse } from 'axios';
 
 const personenKontextApi: PersonenkontextApiInterface = PersonenkontextApiFactory(undefined, '', axiosApiInstance);
 const personenKontexteApi: PersonenkontexteApiInterface = PersonenkontexteApiFactory(undefined, '', axiosApiInstance);
@@ -64,6 +65,13 @@ export enum CreationType {
   AddPersonToOwnSchule = 'add-person-to-own-schule',
 }
 
+export type WorkflowAutoCompleteStore<T> = {
+  filterResult: T | null;
+  errorCode?: string;
+  total: number;
+  loading: boolean;
+};
+
 export type PersonenkontextUpdate = Pick<DbiamPersonenkontextBodyParams, 'organisationId' | 'rolleId' | 'befristung'>;
 
 export type WorkflowFilter = {
@@ -93,6 +101,7 @@ type PersonenkontextState = {
   workflowStepResponse: PersonenkontextWorkflowResponse | null;
   workflowStepLandesbediensteteResponse: LandesbediensteterWorkflowStepResponse | null;
   landesbediensteteCommitResponse: PersonenkontexteUpdateResponse | null;
+  workflowStepResponses: Map<string, WorkflowAutoCompleteStore<PersonenkontextWorkflowResponse>>;
   filteredRollen: FindRollenResponse | null;
   createdPersonWithKontext: DBiamPersonResponse | null;
   errorCode: string;
@@ -106,6 +115,13 @@ type PersonenkontextActions = {
   hasSystemrecht: (personId: string, systemrecht: 'ROLLEN_VERWALTEN') => Promise<SystemrechtResponse>;
   processWorkflowStep: (filter: WorkflowFilter) => Promise<void>;
   processWorkflowStepLandesbedienstete: (filter: WorkflowFilter) => Promise<void>;
+  loadWorkflowOrganisationenForFilter: (
+    filter: WorkflowFilter,
+    storeKey?: string,
+    uselandesEndpoint?: boolean,
+  ) => Promise<void>;
+  resetWorkflowOrganisationenFilter: (storeKey?: string) => void;
+  clearWorkflowOrganisationenFilter: (storeKey?: string) => void;
   commitLandesbediensteteKontext: (
     personId: string,
     updatedPersonenkontexte: PersonenkontextUpdate[] | undefined,
@@ -160,6 +176,7 @@ export const usePersonenkontextStore: StoreDefinition<
       workflowStepLandesbediensteteResponse: null,
       landesbediensteteCommitResponse: null,
       updatedPersonenkontexte: null,
+      workflowStepResponses: new Map(),
       filteredRollen: null,
       createdPersonWithKontext: null,
       errorCode: '',
@@ -224,6 +241,72 @@ export const usePersonenkontextStore: StoreDefinition<
       }
     },
 
+    async loadWorkflowOrganisationenForFilter(
+      filter: WorkflowFilter,
+      storeKey: string = '',
+      uselandesEndpoint: boolean = false,
+    ): Promise<void> {
+      // Get or create the workflow response for this storeKey
+      const workflowResponse: WorkflowAutoCompleteStore<PersonenkontextWorkflowResponse> =
+        this.workflowStepResponses.get(storeKey) ?? {
+          filterResult: null,
+          loading: true,
+          total: 0,
+        };
+
+      if (!this.workflowStepResponses.has(storeKey)) {
+        this.workflowStepResponses.set(storeKey, workflowResponse);
+      }
+
+      workflowResponse.loading = true;
+
+      try {
+        let data: PersonenkontextWorkflowResponse;
+
+        if (uselandesEndpoint) {
+          const response: AxiosResponse<LandesbediensteterWorkflowStepResponse> =
+            await landesbediensteterApi.landesbediensteterControllerStep(
+              filter.organisationId,
+              filter.rollenIds,
+              filter.rolleName,
+              filter.organisationName,
+              filter.limit,
+            );
+          data = response.data;
+        } else {
+          const response: AxiosResponse<PersonenkontextWorkflowResponse> =
+            await personenKontextApi.dbiamPersonenkontextWorkflowControllerProcessStep(
+              filter.operationContext!,
+              filter.personId,
+              filter.organisationId,
+              filter.rollenIds,
+              filter.rolleName,
+              filter.organisationName,
+              filter.limit,
+              filter.requestedWithSystemrecht,
+            );
+          data = response.data;
+        }
+
+        workflowResponse.filterResult = data;
+      } catch (error: unknown) {
+        workflowResponse.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+      } finally {
+        workflowResponse.loading = false;
+      }
+    },
+
+    resetWorkflowOrganisationenFilter(storeKey: string = ''): void {
+      this.workflowStepResponses.set(storeKey, {
+        filterResult: this.workflowStepResponses.get(storeKey)?.filterResult || null,
+        loading: false,
+        total: this.workflowStepResponses.get(storeKey)?.total || 0,
+      });
+    },
+
+    clearWorkflowOrganisationenFilter(storeKey: string = ''): void {
+      this.workflowStepResponses.delete(storeKey);
+    },
     async commitLandesbediensteteKontext(
       personId: string,
       updatedPersonenkontexte: PersonenkontextUpdate[] | undefined,

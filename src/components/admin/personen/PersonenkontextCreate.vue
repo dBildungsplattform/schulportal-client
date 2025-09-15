@@ -20,6 +20,7 @@
   import type { BaseFieldProps } from 'vee-validate';
   import { computed, onMounted, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n } from 'vue-i18n';
+  import SchulenFilter from '@/components/filter/SchulenFilter.vue';
 
   useI18n({ useScope: 'global' });
 
@@ -103,6 +104,18 @@
     return props.rollen?.find((rolle: TranslatedObject) => rolle.value === selectedRolle.value)?.title;
   });
 
+  const useLandesbediensteteWorkflow: ComputedRef<boolean> = computed((): boolean => {
+    return props.createType === CreationType.AddPersonToOwnSchule;
+  });
+
+  const requestedWithSystemrecht: ComputedRef<RollenSystemRecht | undefined> = computed(
+    (): RollenSystemRecht | undefined => {
+      return props.createType === CreationType.Limited
+        ? RollenSystemRecht.EingeschraenktNeueBenutzerErstellen
+        : undefined;
+    },
+  );
+
   function isLernRolle(selectedRolleIds: string | string[] | undefined): boolean {
     if (!selectedRolleIds) return false;
 
@@ -117,9 +130,9 @@
   }
 
   async function handleWorkflowStep(filter: WorkflowFilter): Promise<void> {
-    const useLandesbediensteteWorkflow: boolean = props.createType === CreationType.AddPersonToOwnSchule;
+    const useLandesbediensteteWorkflows: boolean = props.createType === CreationType.AddPersonToOwnSchule;
 
-    if (useLandesbediensteteWorkflow) {
+    if (useLandesbediensteteWorkflows) {
       await personenkontextStore.processWorkflowStepLandesbedienstete(filter);
     } else {
       await personenkontextStore.processWorkflowStep({
@@ -302,11 +315,6 @@
     emits('update:selectedKlasse', selectedKlassen);
   }
 
-  // Clear the selected Organisation once the input field is cleared (This is the only way to fetch all Orgas again)
-  // This is also important since we only want to fetch all orgas once the selected Orga is null, otherwise an extra request is made with an empty string
-  function clearSelectedOrganisation(): void {
-    emits('fieldReset', 'selectedOrganisation');
-  }
   // Clear the selected Rolle once the input field is cleared (This is the only way to fetch all Rollen again)
   // This is also important since we only want to fetch all orgas once the selected Rolle is null, otherwise an extra request is made with an empty string
   function clearSelectedRolle(): void {
@@ -351,6 +359,11 @@
     return props.selectedRolle ? [props.selectedRolle] : [];
   };
 
+  function updateSchuleSelection(orgaId: string): void {
+    selectedOrganisation.value = orgaId;
+    emits('update:selectedOrganisation', orgaId);
+  }
+
   onMounted(async () => {
     const prefilledRollen: string[] = getPrefilledRollenAsArray();
     await handleWorkflowStep({
@@ -378,33 +391,22 @@
       labelForId="organisation-select"
       :label="$t('admin.organisation.organisation')"
     >
-      <v-autocomplete
-        class="mb-5"
-        autocomplete="off"
-        :class="[
-          { 'filter-dropdown mb-4': hasAutoselectedSchule || isRolleUnassignForm },
-          { selected: selectedOrganisation },
-        ]"
-        clearable
-        :click:clear="clearSelectedOrganisation"
-        data-testid="organisation-select"
-        density="compact"
-        :disabled="hasAutoselectedSchule || isRolleUnassignForm"
-        id="organisation-select"
-        ref="organisation-select"
-        hide-details
-        :items="organisationen"
-        item-value="value"
-        item-text="title"
-        :no-data-text="$t('noDataFound')"
-        :placeholder="$t('admin.organisation.selectOrganisation')"
-        required="true"
-        variant="outlined"
-        @update:focused="handleFocusChange"
-        v-bind="selectedOrganisationProps"
-        v-model="selectedOrganisation"
-        v-model:search="searchInputOrganisation"
-      ></v-autocomplete>
+      <SchulenFilter
+        ref="schulenFilter"
+        :filterId="'personenkontext-create'"
+        :selectedSchulen="selectedOrganisation ? [selectedOrganisation] : []"
+        :multiple="false"
+        :systemrechteForSearch="[requestedWithSystemrecht].filter((v): v is RollenSystemRecht => v !== undefined)"
+        :selectedSchuleProps="selectedOrganisationProps"
+        :useWorkflowEndpoints="true"
+        :useLandesbediensteteWorkflow="useLandesbediensteteWorkflow"
+        :operationContext="props.operationContext"
+        @update:selectedSchulen="updateSchuleSelection"
+        @update:selected-schulen-objects="
+          (organisations: Array<Organisation>) =>
+            emits('update:selectedOrganisation', organisations.length > 0 ? organisations[0]?.id : undefined)
+        "
+      ></SchulenFilter>
     </FormRow>
 
     <div v-if="selectedOrganisation">

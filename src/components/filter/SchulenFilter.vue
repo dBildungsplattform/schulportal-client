@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import type { RollenSystemRecht } from '@/api-client/generated/api';
+  import type { PersonenkontextWorkflowResponse, RollenSystemRecht } from '@/api-client/generated/api';
   import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
   import {
     OrganisationsTyp,
@@ -9,6 +9,13 @@
     type OrganisationenFilter,
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
+  import {
+    usePersonenkontextStore,
+    type OperationContext,
+    type PersonenkontextStore,
+    type WorkflowAutoCompleteStore,
+    type WorkflowFilter,
+  } from '@/stores/PersonenkontextStore';
   import type { TranslatedObject } from '@/types';
   import { dedup, sameContent } from '@/utils/arrays';
   import { getDisplayNameForOrg } from '@/utils/formatting';
@@ -27,6 +34,9 @@
     placeholderText?: string;
     includeAll?: boolean;
     filterId?: string;
+    useWorkflowEndpoints?: boolean;
+    useLandesbediensteteWorkflow?: boolean;
+    operationContext?: OperationContext;
   };
   type Emits = {
     (e: 'update:selectedSchulenObjects', value: Array<Organisation>): void;
@@ -42,24 +52,61 @@
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const organisationStore: OrganisationStore = useOrganisationStore();
+  const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
 
   const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
   const testId: ComputedRef<string> = computed(() => {
     const typ: string = props.includeAll ? 'organisation' : 'schule';
     return props.filterId ? `${props.filterId}-${typ}-select` : `${typ}-select`;
   });
-  const storeReference: ComputedRef<AutoCompleteStore<Organisation> | undefined> = computed(() => {
+
+  const organisationStoreReference: ComputedRef<AutoCompleteStore<Organisation> | undefined> = computed(() => {
     return organisationStore.organisationenFilters.get(props.filterId ?? '');
+  });
+
+  const workflowStoreReference: ComputedRef<WorkflowAutoCompleteStore<PersonenkontextWorkflowResponse> | undefined> =
+    computed(() => {
+      return personenkontextStore.workflowStepResponses.get(props.filterId ?? '');
+    });
+
+  const storeReference: ComputedRef<
+    AutoCompleteStore<Organisation> | WorkflowAutoCompleteStore<PersonenkontextWorkflowResponse> | undefined
+  > = computed(() => {
+    const isWorkflow: false | WorkflowAutoCompleteStore<PersonenkontextWorkflowResponse> | undefined =
+      props.useWorkflowEndpoints && workflowStoreReference.value;
+
+    if (isWorkflow) {
+      return {
+        ...workflowStoreReference.value!,
+        filterResult: workflowStoreReference.value!.filterResult?.organisations ?? [],
+      };
+    }
+
+    return organisationStoreReference.value;
   });
   const typFilter: ComputedRef<Pick<OrganisationenFilter, 'includeTyp' | 'excludeTyp'>> = computed(() => {
     if (props.includeAll) return { excludeTyp: [OrganisationsTyp.Klasse] };
     else return { includeTyp: OrganisationsTyp.Schule };
   });
+
+  // The filter used to load the Schulen and possibly orgas
   const schulenFilter: OrganisationenFilter = reactive({
     ...typFilter.value,
     systemrechte: props.systemrechteForSearch,
     limit: 25,
     organisationIds: [],
+  });
+
+  // Specific filter to load the organisationen in the forms that are tied to the workflow endpoints (Normal and landesbedienstete)
+  const organisationenFilter: WorkflowFilter = reactive({
+    operationContext: props.operationContext,
+    personId: undefined,
+    organisationId: undefined, // or set to a specific value if needed
+    rollenIds: [],
+    rolleName: undefined,
+    organisationName: undefined,
+    limit: 25,
+    requestedWithSystemrecht: props.systemrechteForSearch ? props.systemrechteForSearch[0] : undefined,
   });
 
   const { hasAutoselectedSchule, autoselectedSchule }: ReturnType<typeof useAutoselectedSchule> = useAutoselectedSchule(
@@ -95,7 +142,18 @@
   });
 
   const translatedSchulen: ComputedRef<Array<TranslatedObject>> = computed(() => {
-    const options: Array<TranslatedObject> = storeReference.value?.filterResult.map(translateSchule) ?? [];
+    let options: Array<TranslatedObject> = [];
+    const filterResult: Organisation[] | PersonenkontextWorkflowResponse | null | undefined =
+      storeReference.value?.filterResult;
+
+    if (Array.isArray(filterResult)) {
+      // Handle Organisation[] case
+      options = filterResult.map(translateSchule);
+    } else if (filterResult && 'organisations' in filterResult) {
+      // Handle PersonenkontextWorkflowResponse case - extract organisations array
+      options = filterResult.organisations.map(translateSchule);
+    }
+
     if (autoselectedSchule.value) options.push(translateSchule(autoselectedSchule.value));
     return options;
   });
@@ -134,9 +192,15 @@
 
   const updateSearchString = (searchString: string | undefined): void => {
     if (searchString && !isDisplayName(searchString)) {
+      // Update organisation filter
       schulenFilter.searchString = searchString;
+
+      // Update workflow filter with the corresponding property
+      organisationenFilter.organisationName = searchString;
     } else {
+      // Clear search from both filters
       delete schulenFilter.searchString;
+      delete organisationenFilter.organisationName;
     }
   };
 
@@ -155,7 +219,12 @@
   const resolveSelection = (selection: SelectedSchulenIds): Array<Organisation> => {
     if (isEmptySelection(selection)) return [];
     const selectedIds: Array<string> = wrapSelectedSchulenIds(selection);
-    return storeReference.value?.filterResult.filter((org: Organisation) => selectedIds.includes(org.id)) ?? [];
+    const filterResult: Organisation[] | PersonenkontextWorkflowResponse | null | undefined =
+      storeReference.value?.filterResult;
+    if (Array.isArray(filterResult)) {
+      return filterResult.filter((org: Organisation) => selectedIds.includes(org.id));
+    }
+    return [];
   };
 
   const handleSelectionUpdate = (selection: SelectedSchulenIds): void => {
@@ -210,27 +279,41 @@
   );
 
   watch(
-    schulenFilter,
-    async (newFilter: OrganisationenFilter | undefined, oldFilter: OrganisationenFilter | undefined) => {
-      if (timerId.value) clearTimeout(timerId.value);
-
-      // We skip if selection is disabled and we already know how to display the selection
-      // empty selection means we have to reload anyways
+    [schulenFilter, organisationenFilter],
+    async (
+      [newSchulenFilter, newOrganisationenFilter]: [OrganisationenFilter, WorkflowFilter],
+      oldValue: [OrganisationenFilter, WorkflowFilter] | undefined,
+    ) => {
+      // Existing guard clause
       if (
         !isEmptySelection(selectedSchulen.value) &&
         isInputDisabled.value &&
         canDisplaySelection(selectedSchulen.value)
-      )
+      ) {
         return;
+      }
 
-      // We apply the debounce of 500 only when there is an oldFilter (a change has been made)
-      const delay: number = oldFilter ? 500 : 0;
+      if (timerId.value) {
+        clearTimeout(timerId.value);
+      }
+
+      // Apply debounce if *either* filter already had a value (means a change was made)
+      const hasOldFilter: boolean = !!oldValue?.[0] || !!oldValue?.[1];
+      const delay: number = hasOldFilter ? 500 : 0;
 
       timerId.value = setTimeout(async () => {
-        await organisationStore.loadOrganisationenForFilter(newFilter, props.filterId);
+        // Handle first filter (existing logic)
+        await organisationStore.loadOrganisationenForFilter(newSchulenFilter, props.filterId);
+
+        // Handle second filter (new workflow filter)
+        await personenkontextStore.loadWorkflowOrganisationenForFilter(
+          newOrganisationenFilter,
+          props.filterId,
+          props.useLandesbediensteteWorkflow,
+        );
       }, delay);
     },
-    { immediate: true },
+    { deep: true, immediate: true },
   );
 
   onMounted(() => {
@@ -265,7 +348,11 @@
     required="true"
     variant="outlined"
     @update:search="updateSearchString"
-    @click:clear="organisationStore.resetOrganisationenFilter(props.filterId)"
+    @click:clear="
+      useWorkflowEndpoints
+        ? personenkontextStore.resetWorkflowOrganisationenFilter(props.filterId)
+        : organisationStore.resetOrganisationenFilter(props.filterId)
+    "
     @update:focused="handleFocusChange"
     v-bind="selectedSchuleProps"
     v-model="selectedSchulen"
