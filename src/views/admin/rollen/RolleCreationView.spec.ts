@@ -1,14 +1,11 @@
-import { type ServiceProviderResponse } from '@/api-client/generated/api';
+import {
+  RollenSystemRechtEnum,
+  type ServiceProviderResponse,
+  type SystemRechtResponse,
+} from '@/api-client/generated/api';
 import routes from '@/router/routes';
 import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
-import {
-  RollenMerkmal,
-  RollenSystemRecht,
-  useRolleStore,
-  type RolleResponse,
-  type RolleStore,
-} from '@/stores/RolleStore';
-import { getDisplayNameForOrg } from '@/utils/formatting';
+import { RollenMerkmal, useRolleStore, type RolleResponse, type RolleStore } from '@/stores/RolleStore';
 import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import type Module from 'module';
 import { DoFactory } from 'test/DoFactory';
@@ -22,6 +19,7 @@ import {
   type Router,
 } from 'vue-router';
 import RolleCreationView from './RolleCreationView.vue';
+import { getDisplayNameForOrg } from '@/utils/formatting';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -232,7 +230,9 @@ describe('RolleCreationView', () => {
       name: 'Lehrer',
       // TODO: remove type casting when generator is fixed
       merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
-      systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+      systemrechte: [
+        { name: RollenSystemRechtEnum.RollenVerwalten, isTechnical: false },
+      ] as unknown as Set<SystemRechtResponse>,
       createdAt: '2022',
       updatedAt: '2022',
       id: '1',
@@ -257,7 +257,7 @@ describe('RolleCreationView', () => {
 
     await flushPromises();
 
-    rolleStore.createdRolle = mockRolle;
+    rolleStore.createdRolle = { ...mockRolle, systemrechte: [] as unknown as Set<RollenSystemRechtEnum> };
     await nextTick();
 
     expect(wrapper?.find('[data-testid="create-another-rolle-button"]').isVisible()).toBe(true);
@@ -284,7 +284,9 @@ describe('RolleCreationView', () => {
       name: 'Lehrer',
       // TODO: remove type casting when generator is fixed
       merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
-      systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+      systemrechte: [
+        { name: RollenSystemRechtEnum.RollenVerwalten, isTechnical: false },
+      ] as unknown as Set<SystemRechtResponse>,
       createdAt: '2022',
       updatedAt: '2022',
       id: '1',
@@ -292,7 +294,7 @@ describe('RolleCreationView', () => {
       administeredBySchulstrukturknotenKennung: '',
       version: 5,
     };
-    rolleStore.createdRolle = oldmockRolle;
+    rolleStore.createdRolle = { ...oldmockRolle, systemrechte: [] as unknown as Set<RollenSystemRechtEnum> };
 
     const mockRolle: RolleResponse = {
       administeredBySchulstrukturknoten: '1234',
@@ -300,7 +302,9 @@ describe('RolleCreationView', () => {
       name: 'Lehrer',
       // TODO: remove type casting when generator is fixed
       merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
-      systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+      systemrechte: [
+        { name: RollenSystemRechtEnum.RollenVerwalten, isTechnical: false },
+      ] as unknown as Set<SystemRechtResponse>,
       createdAt: '2022',
       updatedAt: '2022',
       id: '2',
@@ -344,8 +348,8 @@ describe('RolleCreationView', () => {
       rollenart: 'LEHR',
       name: 'Lehrer',
       // TODO: remove type casting when generator is fixed
-      merkmale: new Set<RollenMerkmal>(),
-      systemrechte: new Set<RollenSystemRecht>(),
+      merkmale: [] as unknown as Set<RollenMerkmal>,
+      systemrechte: [] as unknown as Set<SystemRechtResponse>,
       createdAt: '2022',
       updatedAt: '2022',
       id: '1',
@@ -354,7 +358,7 @@ describe('RolleCreationView', () => {
       version: 1,
     };
 
-    rolleStore.createdRolle = mockRolle;
+    rolleStore.createdRolle = { ...mockRolle, systemrechte: [] as unknown as Set<RollenSystemRechtEnum> };
     rolleStore.createdRolle.serviceProviders = [];
     await nextTick();
 
@@ -373,7 +377,9 @@ describe('RolleCreationView', () => {
       name: 'Lehrer',
       // TODO: remove type casting when generator is fixed
       merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
-      systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+      systemrechte: [
+        { name: RollenSystemRechtEnum.RollenVerwalten, isTechnical: false },
+      ] as unknown as Set<SystemRechtResponse>,
       createdAt: '2022',
       updatedAt: '2022',
       id: '1',
@@ -382,7 +388,10 @@ describe('RolleCreationView', () => {
       version: 1,
     };
 
-    rolleStore.createdRolle = mockRolle;
+    rolleStore.createdRolle = {
+      ...mockRolle,
+      systemrechte: [RollenSystemRechtEnum.RollenVerwalten] as unknown as Set<RollenSystemRechtEnum>,
+    };
 
     const testServiceProviders: Array<ServiceProviderResponse> = [
       DoFactory.getServiceProviderResponse(),

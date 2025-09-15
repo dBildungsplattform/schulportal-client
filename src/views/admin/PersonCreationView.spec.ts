@@ -4,6 +4,7 @@ import {
   type DBiamPersonenkontextResponse,
   type PersonenkontexteUpdateResponse,
   type PersonLandesbediensteterSearchResponse,
+  type SystemRechtResponse,
 } from '@/api-client/generated/api';
 import routes from '@/router/routes';
 import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
@@ -15,7 +16,6 @@ import {
 import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
 import {
   RollenMerkmal,
-  RollenSystemRecht,
   useRolleStore,
   type RolleStore,
   type RolleWithServiceProvidersResponse,
@@ -95,7 +95,7 @@ const mockWorkflowStepResponse: PersonenkontextWorkflowResponse = {
       rollenart: 'LERN',
       name: 'SuS',
       merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
-      systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+      systemrechte: [{ name: 'ROLLEN_VERWALTEN', isTechnical: false }] as unknown as Set<SystemRechtResponse>,
       createdAt: '2022',
       updatedAt: '2022',
       id: '1',
@@ -146,7 +146,7 @@ rolleStore.allRollen = [
     name: 'SuS',
     // TODO: remove type casting when generator is fixed
     merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
-    systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+    systemrechte: [{ name: 'ROLLEN_VERWALTEN', isTechnical: false }] as unknown as Set<SystemRechtResponse>,
     createdAt: '2022',
     updatedAt: '2022',
     id: '1',
@@ -167,7 +167,7 @@ rolleStore.allRollen = [
     name: 'SuS',
     // TODO: remove type casting when generator is fixed
     merkmale: [] as unknown as Set<RollenMerkmal>,
-    systemrechte: [] as unknown as Set<RollenSystemRecht>,
+    systemrechte: [] as unknown as Set<SystemRechtResponse>,
     createdAt: '2022',
     updatedAt: '2022',
     id: '2',
@@ -448,7 +448,7 @@ describe('PersonCreationView', () => {
           rollenart: 'LERN',
           name: 'SuS',
           merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
-          systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+          systemrechte: [{ name: 'ROLLEN_VERWALTEN', isTechnical: false }] as unknown as Set<SystemRechtResponse>,
           createdAt: '2022',
           updatedAt: '2022',
           id: '1',
@@ -528,7 +528,7 @@ describe('PersonCreationView', () => {
           rollenart: 'LERN',
           name: 'SuS',
           merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
-          systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+          systemrechte: [{ name: 'ROLLEN_VERWALTEN', isTechnical: false }] as unknown as Set<SystemRechtResponse>,
           createdAt: '2022',
           updatedAt: '2022',
           id: '1',

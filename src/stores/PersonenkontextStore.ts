@@ -4,7 +4,6 @@ import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import {
   PersonAdministrationApiFactory,
   PersonenkontextApiFactory,
-  PersonenkontexteApiFactory,
   type DbiamCreatePersonenkontextBodyParams,
   type DbiamCreatePersonWithPersonenkontexteBodyParams,
   type DbiamPersonenkontextBodyParams,
@@ -15,23 +14,21 @@ import {
   type PersonAdministrationApiInterface,
   type PersonendatensatzResponse,
   type PersonenkontextApiInterface,
-  type PersonenkontexteApiInterface,
   type PersonenkontexteUpdateResponse,
   type PersonenkontextWorkflowResponse,
-  type SystemrechtResponse,
-  RollenSystemRecht,
   LandesbediensteterApiFactory,
   type LandesbediensteterApiInterface,
   type LandesbediensteterWorkflowStepResponse,
   type LandesbediensteterWorkflowCommitBodyParams,
   type RolleResponse,
+  type RollenSystemRechtEnum,
+  type SystemRechtResponse,
 } from '../api-client/generated/api';
 import { usePersonStore, type PersonStore } from './PersonStore';
 import type { Zuordnung } from './types/Zuordnung';
 import type { AxiosResponse } from 'axios';
 
 const personenKontextApi: PersonenkontextApiInterface = PersonenkontextApiFactory(undefined, '', axiosApiInstance);
-const personenKontexteApi: PersonenkontexteApiInterface = PersonenkontexteApiFactory(undefined, '', axiosApiInstance);
 const personAdministrationApi: PersonAdministrationApiInterface = PersonAdministrationApiFactory(
   undefined,
   '',
@@ -82,7 +79,7 @@ export type WorkflowFilter = {
   rolleName?: string;
   organisationName?: string;
   limit?: number;
-  requestedWithSystemrecht?: RollenSystemRecht;
+  requestedWithSystemrecht?: RollenSystemRechtEnum;
 };
 
 export function mapZuordnungToPersonenkontextUpdate(
@@ -112,7 +109,6 @@ type PersonenkontextState = {
 
 type PersonenkontextGetters = {};
 type PersonenkontextActions = {
-  hasSystemrecht: (personId: string, systemrecht: 'ROLLEN_VERWALTEN') => Promise<SystemrechtResponse>;
   processWorkflowStep: (filter: WorkflowFilter) => Promise<void>;
   processWorkflowStepLandesbedienstete: (filter: WorkflowFilter) => Promise<void>;
   loadWorkflowOrganisationenForFilter: (
@@ -145,7 +141,7 @@ export type {
   DbiamUpdatePersonenkontexteBodyParams,
   PersonenkontexteUpdateResponse,
   PersonenkontextWorkflowResponse,
-  SystemrechtResponse,
+  SystemRechtResponse,
   RolleResponse,
 };
 
@@ -186,20 +182,6 @@ export const usePersonenkontextStore: StoreDefinition<
     };
   },
   actions: {
-    async hasSystemrecht(personId: string, systemRecht: 'ROLLEN_VERWALTEN'): Promise<SystemrechtResponse> {
-      this.loading = true;
-      try {
-        const { data }: { data: SystemrechtResponse } =
-          await personenKontexteApi.personenkontextControllerHatSystemRecht(personId, systemRecht);
-        return data;
-      } catch (error: unknown) {
-        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
-        return await Promise.reject(this.errorCode);
-      } finally {
-        this.loading = false;
-      }
-    },
-
     async processWorkflowStep(filter: WorkflowFilter): Promise<void> {
       this.loading = true;
       try {

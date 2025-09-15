@@ -1,8 +1,8 @@
-import type { OrganisationResponseLegacy, RolleResponse } from '@/api-client/generated';
+import type { OrganisationResponseLegacy, RolleResponse, SystemRechtResponse } from '@/api-client/generated';
 import routes from '@/router/routes';
 import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
-import { RollenArt, RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
+import { RollenArt, RollenMerkmal } from '@/stores/RolleStore';
 import type { Person } from '@/stores/types/Person';
 import { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
 import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
@@ -27,7 +27,7 @@ const rolle: RolleResponse = DoFactory.getRolleResponse({
 const kopersRolle: RolleResponse = DoFactory.getRolleResponse({
   administeredBySchulstrukturknoten: organisation.id,
   merkmale: new Set<RollenMerkmal>([RollenMerkmal.KopersPflicht]),
-  systemrechte: new Set<RollenSystemRecht>([RollenSystemRecht.RollenVerwalten]),
+  systemrechte: [{ name: 'ROLLEN_VERWALTEN', isTechnical: false }] as unknown as Set<SystemRechtResponse>,
   rollenart: RollenArt.Lern,
 });
 

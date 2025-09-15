@@ -5,6 +5,7 @@ import {
   type TwoFactorAuthentificationStore,
 } from '@/stores/TwoFactorAuthentificationStore';
 import routes from './routes';
+import { useMasterDataStore, type MasterDataStore } from '@/stores/MasterDataStore';
 
 type Permission =
   | 'klassenverwaltung'
@@ -42,6 +43,13 @@ function handleGoToPreviousPage(): void {
 
 router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormalized) => {
   const authStore: AuthStore = useAuthStore();
+  const masterDataStore: MasterDataStore = useMasterDataStore();
+  if (!authStore.isAuthenticated && !masterDataStore.isInitialized()) {
+    await Promise.all([authStore.initializeAuthStatus(), masterDataStore.initialise()]);
+  }
+  if (!masterDataStore.isInitialized()) {
+    await masterDataStore.initialise();
+  }
   if (!authStore.isAuthenticated) {
     await authStore.initializeAuthStatus();
   }

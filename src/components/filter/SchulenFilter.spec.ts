@@ -1,5 +1,5 @@
 import {
-  RollenSystemRecht,
+  RollenSystemRechtEnum,
   type PersonenkontextRolleFieldsResponse,
   type RollenSystemRechtServiceProviderIDResponse,
 } from '@/api-client/generated';
@@ -21,8 +21,8 @@ import { nextTick, ref, type Ref } from 'vue';
 import SchulenFilter from './SchulenFilter.vue';
 
 type Props = {
-  hideDetails?: boolean;
-  systemrechteForSearch?: Array<RollenSystemRecht>;
+  includeTraeger?: boolean;
+  systemrechteForSearch?: Array<RollenSystemRechtEnum>;
   multiple: boolean;
   readonly?: boolean;
   selectedSchuleProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
@@ -54,7 +54,7 @@ vi.useFakeTimers();
 
 const defaultFilter: OrganisationenFilter = {
   includeTyp: OrganisationsTyp.Schule,
-  systemrechte: [RollenSystemRecht.KlassenVerwalten],
+  systemrechte: [RollenSystemRechtEnum.KlassenVerwalten],
   organisationIds: [],
   limit: 25,
 };
@@ -100,7 +100,7 @@ describe('SchulenFilter', async () => {
       ])('when schule is $label', ({ autoSelectedSchule }: AutoselectTestData) => {
         const rolle: RollenSystemRechtServiceProviderIDResponse =
           DoFactory.getRollenSystemRechtServiceProviderIDResponse({
-            systemrechte: [RollenSystemRecht.KlassenVerwalten, RollenSystemRecht.SchulenVerwalten],
+            systemrechte: [RollenSystemRechtEnum.KlassenVerwalten, RollenSystemRechtEnum.SchulenVerwalten],
           });
         beforeEach(() => {
           authStore.currentUser = DoFactory.getUserinfoResponse({
@@ -147,11 +147,11 @@ describe('SchulenFilter', async () => {
         });
 
         describe.each([
-          [[RollenSystemRecht.KlassenVerwalten]],
-          [[RollenSystemRecht.KlassenVerwalten, RollenSystemRecht.SchulenVerwalten]],
+          [[RollenSystemRechtEnum.KlassenVerwalten]],
+          [[RollenSystemRechtEnum.KlassenVerwalten, RollenSystemRechtEnum.SchulenVerwalten]],
           [[]],
           [undefined],
-        ])('when systemrechteForSearch are %s', (systemrechteForSearch: Array<RollenSystemRecht> | undefined) => {
+        ])('when systemrechteForSearch are %s', (systemrechteForSearch: Array<RollenSystemRechtEnum> | undefined) => {
           const expectedIdsInFilter: OrganisationenFilter['organisationIds'] =
             ((): OrganisationenFilter['organisationIds'] => {
               if (autoSelectedSchule) return [autoSelectedSchule.id];

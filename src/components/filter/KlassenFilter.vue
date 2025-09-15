@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import type { RollenSystemRecht } from '@/api-client/generated/api';
+  import type { RollenSystemRechtEnum } from '@/api-client/generated';
   import {
     OrganisationsTyp,
     useOrganisationStore,
@@ -17,7 +17,7 @@
   type SelectedKlassenIds = Array<string> | string | undefined;
   type Props = {
     hideDetails?: boolean;
-    systemrechteForSearch?: Array<RollenSystemRecht>;
+    systemrechteForSearch?: Array<RollenSystemRechtEnum>;
     multiple: boolean;
     readonly?: boolean;
     selectedKlasseProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };

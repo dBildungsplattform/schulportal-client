@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import type { PersonenkontextWorkflowResponse, RollenSystemRecht } from '@/api-client/generated/api';
+  import type { PersonenkontextWorkflowResponse, RollenSystemRechtEnum } from '@/api-client/generated/api';
   import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
   import {
     OrganisationsTyp,
@@ -26,7 +26,7 @@
   type SelectedSchulenIds = Array<string> | string | undefined;
   type Props = {
     hideDetails?: boolean;
-    systemrechteForSearch?: Array<RollenSystemRecht>;
+    systemrechteForSearch?: Array<RollenSystemRechtEnum>;
     multiple: boolean;
     readonly?: boolean;
     selectedSchuleProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };

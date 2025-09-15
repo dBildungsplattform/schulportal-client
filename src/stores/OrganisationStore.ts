@@ -6,7 +6,6 @@ import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import {
   OrganisationenApiFactory,
   OrganisationsTyp,
-  RollenSystemRecht,
   TraegerschaftTyp,
   type CreateOrganisationBodyParams,
   type OrganisationByIdBodyParams,
@@ -15,6 +14,7 @@ import {
   type OrganisationResponse,
   type OrganisationRootChildrenResponse,
   type ParentOrganisationenResponse,
+  type RollenSystemRechtEnum,
 } from '../api-client/generated/api';
 import { useSearchFilterStore, type SearchFilterStore } from './SearchFilterStore';
 
@@ -118,7 +118,7 @@ export type OrganisationenFilter = {
   limit?: number;
   offset?: number;
   searchString?: string;
-  systemrechte?: RollenSystemRecht[];
+  systemrechte?: RollenSystemRechtEnum[];
   includeTyp?: OrganisationsTyp;
   excludeTyp?: OrganisationsTyp[];
   administriertVon?: Array<string>;
