@@ -98,7 +98,7 @@ type PersonenkontextState = {
   workflowStepResponse: PersonenkontextWorkflowResponse | null;
   workflowStepLandesbediensteteResponse: LandesbediensteterWorkflowStepResponse | null;
   landesbediensteteCommitResponse: PersonenkontexteUpdateResponse | null;
-  workflowStepResponses: Map<string, WorkflowAutoCompleteStore<PersonenkontextWorkflowResponse>>;
+  workflowStepResponsesFilter: Map<string, WorkflowAutoCompleteStore<PersonenkontextWorkflowResponse>>;
   filteredRollen: FindRollenResponse | null;
   createdPersonWithKontext: DBiamPersonResponse | null;
   errorCode: string;
@@ -172,7 +172,7 @@ export const usePersonenkontextStore: StoreDefinition<
       workflowStepLandesbediensteteResponse: null,
       landesbediensteteCommitResponse: null,
       updatedPersonenkontexte: null,
-      workflowStepResponses: new Map(),
+      workflowStepResponsesFilter: new Map(),
       filteredRollen: null,
       createdPersonWithKontext: null,
       errorCode: '',
@@ -230,14 +230,14 @@ export const usePersonenkontextStore: StoreDefinition<
     ): Promise<void> {
       // Get or create the workflow response for this storeKey
       const workflowResponse: WorkflowAutoCompleteStore<PersonenkontextWorkflowResponse> =
-        this.workflowStepResponses.get(storeKey) ?? {
+        this.workflowStepResponsesFilter.get(storeKey) ?? {
           filterResult: null,
           loading: true,
           total: 0,
         };
 
-      if (!this.workflowStepResponses.has(storeKey)) {
-        this.workflowStepResponses.set(storeKey, workflowResponse);
+      if (!this.workflowStepResponsesFilter.has(storeKey)) {
+        this.workflowStepResponsesFilter.set(storeKey, workflowResponse);
       }
 
       workflowResponse.loading = true;
@@ -279,15 +279,15 @@ export const usePersonenkontextStore: StoreDefinition<
     },
 
     resetWorkflowOrganisationenFilter(storeKey: string = ''): void {
-      this.workflowStepResponses.set(storeKey, {
-        filterResult: this.workflowStepResponses.get(storeKey)?.filterResult || null,
+      this.workflowStepResponsesFilter.set(storeKey, {
+        filterResult: this.workflowStepResponsesFilter.get(storeKey)?.filterResult || null,
         loading: false,
-        total: this.workflowStepResponses.get(storeKey)?.total || 0,
+        total: this.workflowStepResponsesFilter.get(storeKey)?.total || 0,
       });
     },
 
     clearWorkflowOrganisationenFilter(storeKey: string = ''): void {
-      this.workflowStepResponses.delete(storeKey);
+      this.workflowStepResponsesFilter.delete(storeKey);
     },
     async commitLandesbediensteteKontext(
       personId: string,

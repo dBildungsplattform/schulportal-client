@@ -67,7 +67,7 @@
 
   const workflowStoreReference: ComputedRef<WorkflowAutoCompleteStore<PersonenkontextWorkflowResponse> | undefined> =
     computed(() => {
-      return personenkontextStore.workflowStepResponses.get(props.filterId ?? '');
+      return personenkontextStore.workflowStepResponsesFilter.get(props.filterId ?? '');
     });
 
   const storeReference: ComputedRef<
@@ -96,13 +96,14 @@
     systemrechte: props.systemrechteForSearch,
     limit: 25,
     organisationIds: [],
+    searchString: undefined,
   });
 
   // Specific filter to load the organisationen in the forms that are tied to the workflow endpoints (Normal and landesbedienstete)
   const organisationenFilter: WorkflowFilter = reactive({
     operationContext: props.operationContext,
     personId: undefined,
-    organisationId: undefined, // or set to a specific value if needed
+    organisationId: undefined,
     rollenIds: [],
     rolleName: undefined,
     organisationName: undefined,
@@ -283,9 +284,11 @@
     [schulenFilter, organisationenFilter],
     async (
       [newSchulenFilter, newOrganisationenFilter]: [OrganisationenFilter, WorkflowFilter],
-      oldValue: [OrganisationenFilter, WorkflowFilter] | undefined,
+      [oldSchulenFilter, oldOrganisationenFilter]: [OrganisationenFilter | undefined, WorkflowFilter | undefined] = [
+        undefined,
+        undefined,
+      ],
     ) => {
-      // Existing guard clause
       if (
         !isEmptySelection(selectedSchulen.value) &&
         isInputDisabled.value &&
@@ -298,35 +301,39 @@
         clearTimeout(timerId.value);
       }
 
-      // Apply debounce if *either* filter already had a value (means a change was made)
-      const hasOldFilter: boolean = !!oldValue?.[0] || !!oldValue?.[1];
+      const hasOldFilter: boolean = !!oldSchulenFilter || !!oldOrganisationenFilter;
       const delay: number = hasOldFilter ? 500 : 0;
 
       timerId.value = setTimeout(async () => {
-        // Handle first filter (existing logic)
-        await organisationStore.loadOrganisationenForFilter(newSchulenFilter, props.filterId);
-
-        // Handle second filter (new workflow filter)
-        await personenkontextStore.loadWorkflowOrganisationenForFilter(
-          newOrganisationenFilter,
-          props.filterId,
-          props.useLandesbediensteteWorkflow,
-        );
+        if (props.useWorkflowEndpoints) {
+          await personenkontextStore.loadWorkflowOrganisationenForFilter(
+            newOrganisationenFilter,
+            props.filterId,
+            props.useLandesbediensteteWorkflow,
+          );
+        } else {
+          await organisationStore.loadOrganisationenForFilter(newSchulenFilter, props.filterId);
+        }
       }, delay);
     },
     { deep: true, immediate: true },
   );
 
   onMounted(() => {
-    if (organisationStore.organisationenFilters.has(props.filterId ?? '')) {
+    if (
+      organisationStore.organisationenFilters.has(props.filterId ?? '') ||
+      personenkontextStore.workflowStepResponsesFilter.has(props.filterId ?? '')
+    ) {
       // eslint-disable-next-line no-console
       console.warn(`SchulenFilter initialized twice with id ${props.filterId}`);
     }
     organisationStore.resetOrganisationenFilter(props.filterId);
+    personenkontextStore.resetWorkflowOrganisationenFilter(props.filterId);
   });
 
   onUnmounted(() => {
     organisationStore.clearOrganisationenFilter(props.filterId);
+    personenkontextStore.clearWorkflowOrganisationenFilter(props.filterId);
   });
 </script>
 

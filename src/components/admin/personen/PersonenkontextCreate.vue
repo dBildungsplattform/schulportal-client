@@ -18,7 +18,7 @@
   import type { Zuordnung } from '@/stores/types/Zuordnung';
   import { type TranslatedObject } from '@/types.d';
   import type { BaseFieldProps } from 'vee-validate';
-  import { computed, onMounted, ref, watch, type ComputedRef, type Ref } from 'vue';
+  import { computed, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   import SchulenFilter from '@/components/filter/SchulenFilter.vue';
 
@@ -30,7 +30,6 @@
   const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
   const canCommit: Ref<boolean> = ref(false);
 
-  const searchInputOrganisation: Ref<string | undefined> = ref('');
   const searchInputRolle: Ref<string | undefined> = ref('');
   const searchInputRollen: Ref<string | undefined> = ref('');
 
@@ -86,11 +85,6 @@
   // we need to cast the selectedSchule into an array
   // doing it this way prevents an issue where the reactive system constantly re-runs which causes requests to be issued in a loop
   const administriertVon: Ref<string[] | undefined> = ref([]);
-
-  // Computed property to get the title of the selected organisation
-  const selectedOrganisationTitle: ComputedRef<string | undefined> = computed(() => {
-    return props.organisationen?.find((org: TranslatedObject) => org.value === selectedOrganisation.value)?.title;
-  });
 
   const selectedRolleTitles: ComputedRef<string[]> = computed(() => {
     if (!Array.isArray(selectedRollen.value)) return [];
@@ -239,32 +233,6 @@
     { deep: true },
   );
 
-  // Using a watcher instead of modelUpdate since we need the old Value as well.
-  // Default behavior of the autocomplete is to reset the newValue to empty string and that causes another request to be made
-  watch(searchInputOrganisation, async (newValue: string | undefined, oldValue: string | undefined) => {
-    clearTimeout(timerId.value);
-
-    if (oldValue === selectedOrganisationTitle.value) return;
-
-    const filter: WorkflowFilter = { limit: 25 };
-
-    if (newValue === '' && !selectedOrganisation.value) {
-      // Case: Initial load
-      // nothing to add — base filter is fine
-    } else if (newValue && newValue !== selectedOrganisationTitle.value) {
-      filter.organisationName = newValue;
-    } else if (newValue === '' && selectedOrganisation.value) {
-      // Case: user cleared search but selected something earlier
-      filter.organisationId = selectedOrganisation.value;
-    } else {
-      return;
-    }
-
-    timerId.value = setTimeout(async () => {
-      await handleWorkflowStep(filter);
-    }, 500);
-  });
-
   watch(
     props.allowMultipleRollen ? searchInputRollen : searchInputRolle,
     async (newValue: string | undefined, oldValue: string | undefined) => {
@@ -352,28 +320,10 @@
     { immediate: true },
   );
 
-  const getPrefilledRollenAsArray = (): string[] => {
-    if (props.allowMultipleRollen) {
-      return props.selectedRollen ?? [];
-    }
-    return props.selectedRolle ? [props.selectedRolle] : [];
-  };
-
   function updateSchuleSelection(orgaId: string): void {
     selectedOrganisation.value = orgaId;
     emits('update:selectedOrganisation', orgaId);
   }
-
-  onMounted(async () => {
-    const prefilledRollen: string[] = getPrefilledRollenAsArray();
-    await handleWorkflowStep({
-      personId: props.personId,
-      operationContext: props.operationContext,
-      organisationId: selectedOrganisation.value,
-      rollenIds: prefilledRollen,
-      limit: 25,
-    });
-  });
 </script>
 
 <template>
@@ -402,6 +352,7 @@
         :useLandesbediensteteWorkflow="useLandesbediensteteWorkflow"
         :operationContext="props.operationContext"
         :isRolleUnassignForm="isRolleUnassignForm"
+        :placeholderText="$t('admin.organisation.selectOrganisation')"
         @update:selectedSchulen="updateSchuleSelection"
         @update:selectedSchulenObjects="
           (organisations: Array<Organisation>) =>
