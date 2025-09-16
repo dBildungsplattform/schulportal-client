@@ -343,6 +343,7 @@
         :useLandesbediensteteWorkflow="useLandesbediensteteWorkflow"
         :operationContext="props.operationContext"
         :isRolleUnassignForm="isRolleUnassignForm"
+        :includeAll="true"
         :placeholderText="$t('admin.organisation.selectOrganisation')"
         :personId="props.personId"
         @update:selectedSchulen="updateSchuleSelection"
