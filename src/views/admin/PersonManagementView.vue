@@ -410,7 +410,7 @@
   });
 
   const singleSchuleSelected: ComputedRef<boolean> = computed(() => {
-    return selectedOrganisationIds.value.length === 1;
+    return [selectedOrganisationIds.value].length === 1;
   });
 
   const selectedRolle: ComputedRef<RolleResponse | undefined> = computed(() => {

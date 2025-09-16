@@ -42,6 +42,9 @@
   type Emits = {
     (e: 'update:selectedSchulenObjects', value: Array<Organisation>): void;
   };
+  type SelectionChange = [SelectedSchulenIds, boolean];
+  type PreviousSelectionChange = [SelectedSchulenIds, boolean | undefined];
+
   const props: Props = defineProps<Props>();
   const emits: Emits = defineEmits<Emits>();
   const selectedSchulen: Ref<SelectedSchulenIds> = defineModel('selectedSchulen');
@@ -185,13 +188,15 @@
   };
 
   const getDisplayItem = (item: TranslatedObject, index: number): string => {
-    if (!selectedSchulen.value) return ''; // should not happen
-    if (!canDisplaySelection(selectedSchulen.value)) return '...'; // we are loading
-    if (!props.multiple) return item.title;
+    if (!selectedSchulen.value) return '';
+    if (!canDisplaySelection(selectedSchulen.value)) return '...';
 
-    if (selectedSchulen.value.length < 2) return item.title;
-    if (index === 0) return t('admin.schule.schulenSelected', { count: selectedSchulen.value.length });
-    return ''; // do not display anything for other items
+    const selectedIds: string[] = wrapSelectedSchulenIds(selectedSchulen.value);
+
+    if (!props.multiple) return item.title;
+    if (selectedIds.length < 2) return item.title;
+    if (index === 0) return t('admin.schule.schulenSelected', { count: selectedIds.length });
+    return '';
   };
 
   const shouldHighlightSelection: ComputedRef<boolean> = computed(() => {
@@ -269,9 +274,6 @@
     }
   };
 
-  type SelectionChange = [SelectedSchulenIds, boolean];
-  type PreviousSelectionChange = [SelectedSchulenIds, boolean | undefined];
-
   async function handleWorkflowStep(filter: WorkflowFilter): Promise<void> {
     if (props.useLandesbediensteteWorkflow) {
       await personenkontextStore.processWorkflowStepLandesbedienstete(filter);
@@ -309,6 +311,7 @@
     { immediate: true },
   );
 
+  // This watches both filters and triggers loading of organisationen when they change
   watch(
     [schulenFilter, organisationenFilter],
     async (
@@ -344,12 +347,19 @@
     { deep: true, immediate: true },
   );
 
-  onMounted(() => {
+  onMounted(async () => {
     if (organisationStore.organisationenFilters.has(props.filterId ?? '')) {
       // eslint-disable-next-line no-console
       console.warn(`SchulenFilter initialized twice with id ${props.filterId}`);
     }
     organisationStore.resetOrganisationenFilter(props.filterId);
+    // Initializes the Rollen for the selected Schule (or Orga if includeAll is true)
+    await handleWorkflowStep({
+      personId: props.personId,
+      operationContext: props.operationContext,
+      organisationId: Array.isArray(selectedSchulen.value) ? selectedSchulen.value[0] : selectedSchulen.value,
+      limit: 25,
+    });
   });
 
   onUnmounted(() => {
