@@ -151,7 +151,6 @@
     emits('update:selectedOrganisation', newValue);
 
     if (newValue && newValue !== oldValue) {
-
       administriertVon.value?.pop();
       administriertVon.value?.push(newValue);
 

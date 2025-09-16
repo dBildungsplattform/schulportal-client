@@ -4,11 +4,7 @@
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { useMasterDataStore, type MasterDataStore } from '@/stores/MasterDataStore';
-  import {
-    OrganisationsTyp,
-    useOrganisationStore,
-    type OrganisationStore,
-  } from '@/stores/OrganisationStore';
+  import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
   import {
     RollenArt,
     RollenMerkmal,
