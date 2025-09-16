@@ -13,7 +13,6 @@
     usePersonenkontextStore,
     type OperationContext,
     type PersonenkontextStore,
-    type WorkflowAutoCompleteStore,
     type WorkflowFilter,
   } from '@/stores/PersonenkontextStore';
   import type { TranslatedObject } from '@/types';
@@ -38,6 +37,7 @@
     useLandesbediensteteWorkflow?: boolean;
     operationContext?: OperationContext;
     isRolleUnassignForm?: boolean;
+    personId?: string;
   };
   type Emits = {
     (e: 'update:selectedSchulenObjects', value: Array<Organisation>): void;
@@ -65,26 +65,23 @@
     return organisationStore.organisationenFilters.get(props.filterId ?? '');
   });
 
-  const workflowStoreReference: ComputedRef<WorkflowAutoCompleteStore<PersonenkontextWorkflowResponse> | undefined> =
-    computed(() => {
-      return personenkontextStore.workflowStepResponsesFilter.get(props.filterId ?? '');
-    });
+  // This will either return the store reference for the organisation store or the workflow response (A separate store reference for the workflow is not needed)
+  const storeReference: ComputedRef<AutoCompleteStore<Organisation> | PersonenkontextWorkflowResponse> = computed(
+    () => {
+      const isWorkflow: boolean | undefined = props.useWorkflowEndpoints;
 
-  const storeReference: ComputedRef<
-    AutoCompleteStore<Organisation> | WorkflowAutoCompleteStore<PersonenkontextWorkflowResponse> | undefined
-  > = computed(() => {
-    const isWorkflow: false | WorkflowAutoCompleteStore<PersonenkontextWorkflowResponse> | undefined =
-      props.useWorkflowEndpoints && workflowStoreReference.value;
+      if (isWorkflow) {
+        return {
+          ...personenkontextStore.workflowStepResponse,
+        } as PersonenkontextWorkflowResponse;
+      }
 
-    if (isWorkflow) {
-      return {
-        ...workflowStoreReference.value!,
-        filterResult: workflowStoreReference.value!.filterResult?.organisations ?? [],
-      };
-    }
-
-    return organisationStoreReference.value;
-  });
+      // Provide a fallback empty object to avoid returning undefined
+      return (
+        organisationStoreReference.value ?? ({ filterResult: [] as Organisation[] } as AutoCompleteStore<Organisation>)
+      );
+    },
+  );
   const typFilter: ComputedRef<Pick<OrganisationenFilter, 'includeTyp' | 'excludeTyp'>> = computed(() => {
     if (props.includeAll) return { excludeTyp: [OrganisationsTyp.Klasse] };
     else return { includeTyp: OrganisationsTyp.Schule };
@@ -102,7 +99,7 @@
   // Specific filter to load the organisationen in the forms that are tied to the workflow endpoints (Normal and landesbedienstete)
   const organisationenFilter: WorkflowFilter = reactive({
     operationContext: props.operationContext,
-    personId: undefined,
+    personId: props.personId,
     organisationId: undefined,
     rollenIds: [],
     rolleName: undefined,
@@ -144,20 +141,35 @@
   });
 
   const translatedSchulen: ComputedRef<Array<TranslatedObject>> = computed(() => {
-    let options: Array<TranslatedObject> = [];
-    const filterResult: Organisation[] | PersonenkontextWorkflowResponse | null | undefined =
-      storeReference.value?.filterResult;
+    const storeData: AutoCompleteStore<Organisation> | PersonenkontextWorkflowResponse = storeReference.value;
 
-    if (Array.isArray(filterResult)) {
-      // Handle Organisation[] case
-      options = filterResult.map(translateSchule);
-    } else if (filterResult && 'organisations' in filterResult) {
-      // Handle PersonenkontextWorkflowResponse case - extract organisations array
-      options = filterResult.organisations.map(translateSchule);
+    // Extract organisations based on store type
+    let organisations: Organisation[] = [];
+
+    if (props.useWorkflowEndpoints) {
+      // Handle workflow response - check if it has organisations property. If yes then we are dealing with the workflow response
+      if ('organisations' in storeData) {
+        organisations = storeData.organisations;
+      }
+    } else {
+      // Handle regular organisation store - check if filterResult exists and is an array. If yes then we are dealing with the organisation store
+      let filterResult: Organisation[] | undefined;
+      if ('filterResult' in storeData) {
+        filterResult = (storeData as AutoCompleteStore<Organisation>).filterResult;
+      }
+      if (Array.isArray(filterResult)) {
+        organisations = filterResult;
+      }
     }
 
-    if (autoselectedSchule.value) options.push(translateSchule(autoselectedSchule.value));
-    return options;
+    // Add autoselected if present
+    if (autoselectedSchule.value) {
+      organisations.push(autoselectedSchule.value);
+    }
+
+    // Deduplicate and translate
+    const uniqueOrgs: Organisation[] = dedup(organisations, (org: Organisation) => org.id);
+    return uniqueOrgs.map(translateSchule);
   });
 
   const canDisplaySelection = (selection: SelectedSchulenIds): boolean => {
@@ -216,17 +228,22 @@
   const updateOrganisationenIds = (ids: SelectedSchulenIds): void => {
     const tempIds: Array<string> = getDefaultIds().concat(wrapSelectedSchulenIds(ids));
     schulenFilter.organisationIds = dedup(tempIds.filter(Boolean));
+    organisationenFilter.organisationId = dedup(tempIds.filter(Boolean)).at(0);
   };
 
   const resolveSelection = (selection: SelectedSchulenIds): Array<Organisation> => {
     if (isEmptySelection(selection)) return [];
     const selectedIds: Array<string> = wrapSelectedSchulenIds(selection);
-    const filterResult: Organisation[] | PersonenkontextWorkflowResponse | null | undefined =
-      storeReference.value?.filterResult;
-    if (Array.isArray(filterResult)) {
-      return filterResult.filter((org: Organisation) => selectedIds.includes(org.id));
+    let organisations: Organisation[] = [];
+
+    const storeData: AutoCompleteStore<Organisation> | PersonenkontextWorkflowResponse = storeReference.value;
+    if ('filterResult' in storeData && Array.isArray(storeData.filterResult)) {
+      organisations = storeData.filterResult;
+    } else if ('organisations' in storeData && Array.isArray(storeData.organisations)) {
+      organisations = storeData.organisations;
     }
-    return [];
+
+    return organisations.filter((org: Organisation) => selectedIds.includes(org.id));
   };
 
   const handleSelectionUpdate = (selection: SelectedSchulenIds): void => {
@@ -254,6 +271,18 @@
 
   type SelectionChange = [SelectedSchulenIds, boolean];
   type PreviousSelectionChange = [SelectedSchulenIds, boolean | undefined];
+
+  async function handleWorkflowStep(filter: WorkflowFilter): Promise<void> {
+    if (props.useLandesbediensteteWorkflow) {
+      await personenkontextStore.processWorkflowStepLandesbedienstete(filter);
+    } else {
+      await personenkontextStore.processWorkflowStep({
+        operationContext: props.operationContext,
+        ...filter,
+        requestedWithSystemrecht: props.systemrechteForSearch ? props.systemrechteForSearch[0] : undefined,
+      });
+    }
+  }
 
   watch(
     [selectedSchulen, hasAutoselectedSchule],
@@ -306,11 +335,7 @@
 
       timerId.value = setTimeout(async () => {
         if (props.useWorkflowEndpoints) {
-          await personenkontextStore.loadWorkflowOrganisationenForFilter(
-            newOrganisationenFilter,
-            props.filterId,
-            props.useLandesbediensteteWorkflow,
-          );
+          await handleWorkflowStep(newOrganisationenFilter);
         } else {
           await organisationStore.loadOrganisationenForFilter(newSchulenFilter, props.filterId);
         }
@@ -320,20 +345,15 @@
   );
 
   onMounted(() => {
-    if (
-      organisationStore.organisationenFilters.has(props.filterId ?? '') ||
-      personenkontextStore.workflowStepResponsesFilter.has(props.filterId ?? '')
-    ) {
+    if (organisationStore.organisationenFilters.has(props.filterId ?? '')) {
       // eslint-disable-next-line no-console
       console.warn(`SchulenFilter initialized twice with id ${props.filterId}`);
     }
     organisationStore.resetOrganisationenFilter(props.filterId);
-    personenkontextStore.resetWorkflowOrganisationenFilter(props.filterId);
   });
 
   onUnmounted(() => {
     organisationStore.clearOrganisationenFilter(props.filterId);
-    personenkontextStore.clearWorkflowOrganisationenFilter(props.filterId);
   });
 </script>
 
@@ -358,7 +378,7 @@
     @update:search="updateSearchString"
     @click:clear="
       useWorkflowEndpoints
-        ? personenkontextStore.resetWorkflowOrganisationenFilter(props.filterId)
+        ? (personenkontextStore.workflowStepResponse = null)
         : organisationStore.resetOrganisationenFilter(props.filterId)
     "
     @update:focused="handleFocusChange"

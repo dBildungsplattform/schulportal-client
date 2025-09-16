@@ -18,7 +18,6 @@ import {
   type PersonenkontextWorkflowResponse,
   LandesbediensteterApiFactory,
   type LandesbediensteterApiInterface,
-  type LandesbediensteterWorkflowStepResponse,
   type LandesbediensteterWorkflowCommitBodyParams,
   type RolleResponse,
   type RollenSystemRechtEnum,
@@ -26,7 +25,6 @@ import {
 } from '../api-client/generated/api';
 import { usePersonStore, type PersonStore } from './PersonStore';
 import type { Zuordnung } from './types/Zuordnung';
-import type { AxiosResponse } from 'axios';
 
 const personenKontextApi: PersonenkontextApiInterface = PersonenkontextApiFactory(undefined, '', axiosApiInstance);
 const personAdministrationApi: PersonAdministrationApiInterface = PersonAdministrationApiFactory(
@@ -96,9 +94,7 @@ export function mapZuordnungToPersonenkontextUpdate(
 type PersonenkontextState = {
   updatedPersonenkontexte: PersonenkontexteUpdateResponse | null;
   workflowStepResponse: PersonenkontextWorkflowResponse | null;
-  workflowStepLandesbediensteteResponse: LandesbediensteterWorkflowStepResponse | null;
   landesbediensteteCommitResponse: PersonenkontexteUpdateResponse | null;
-  workflowStepResponsesFilter: Map<string, WorkflowAutoCompleteStore<PersonenkontextWorkflowResponse>>;
   filteredRollen: FindRollenResponse | null;
   createdPersonWithKontext: DBiamPersonResponse | null;
   errorCode: string;
@@ -111,13 +107,6 @@ type PersonenkontextGetters = {};
 type PersonenkontextActions = {
   processWorkflowStep: (filter: WorkflowFilter) => Promise<void>;
   processWorkflowStepLandesbedienstete: (filter: WorkflowFilter) => Promise<void>;
-  loadWorkflowOrganisationenForFilter: (
-    filter: WorkflowFilter,
-    storeKey?: string,
-    uselandesEndpoint?: boolean,
-  ) => Promise<void>;
-  resetWorkflowOrganisationenFilter: (storeKey?: string) => void;
-  clearWorkflowOrganisationenFilter: (storeKey?: string) => void;
   commitLandesbediensteteKontext: (
     personId: string,
     updatedPersonenkontexte: PersonenkontextUpdate[] | undefined,
@@ -169,10 +158,8 @@ export const usePersonenkontextStore: StoreDefinition<
   state: (): PersonenkontextState => {
     return {
       workflowStepResponse: null,
-      workflowStepLandesbediensteteResponse: null,
       landesbediensteteCommitResponse: null,
       updatedPersonenkontexte: null,
-      workflowStepResponsesFilter: new Map(),
       filteredRollen: null,
       createdPersonWithKontext: null,
       errorCode: '',
@@ -223,72 +210,6 @@ export const usePersonenkontextStore: StoreDefinition<
       }
     },
 
-    async loadWorkflowOrganisationenForFilter(
-      filter: WorkflowFilter,
-      storeKey: string = '',
-      uselandesEndpoint: boolean = false,
-    ): Promise<void> {
-      // Get or create the workflow response for this storeKey
-      const workflowResponse: WorkflowAutoCompleteStore<PersonenkontextWorkflowResponse> =
-        this.workflowStepResponsesFilter.get(storeKey) ?? {
-          filterResult: null,
-          loading: true,
-          total: 0,
-        };
-
-      if (!this.workflowStepResponsesFilter.has(storeKey)) {
-        this.workflowStepResponsesFilter.set(storeKey, workflowResponse);
-      }
-
-      workflowResponse.loading = true;
-
-      try {
-        let data: PersonenkontextWorkflowResponse;
-
-        if (uselandesEndpoint) {
-          const response: AxiosResponse<LandesbediensteterWorkflowStepResponse> =
-            await landesbediensteterApi.landesbediensteterControllerStep(
-              filter.organisationId,
-              filter.rollenIds,
-              filter.rolleName,
-              filter.organisationName,
-              filter.limit,
-            );
-          data = response.data;
-        } else {
-          const response: AxiosResponse<PersonenkontextWorkflowResponse> =
-            await personenKontextApi.dbiamPersonenkontextWorkflowControllerProcessStep(
-              filter.operationContext!,
-              filter.personId,
-              filter.organisationId,
-              filter.rollenIds,
-              filter.rolleName,
-              filter.organisationName,
-              filter.limit,
-              filter.requestedWithSystemrecht,
-            );
-          data = response.data;
-        }
-
-        workflowResponse.filterResult = data;
-      } catch (error: unknown) {
-        workflowResponse.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
-      } finally {
-        workflowResponse.loading = false;
-      }
-    },
-
-    resetWorkflowOrganisationenFilter(storeKey: string = ''): void {
-      this.workflowStepResponsesFilter.set(storeKey, {
-        filterResult: this.workflowStepResponsesFilter.get(storeKey)?.filterResult || null,
-        loading: false,
-        total: this.workflowStepResponsesFilter.get(storeKey)?.total || 0,
-      });
-    },
-
-    clearWorkflowOrganisationenFilter(storeKey: string = ''): void {
-      this.workflowStepResponsesFilter.delete(storeKey);
-    },
     async commitLandesbediensteteKontext(
       personId: string,
       updatedPersonenkontexte: PersonenkontextUpdate[] | undefined,

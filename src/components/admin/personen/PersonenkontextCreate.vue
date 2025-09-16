@@ -61,7 +61,6 @@
 
   const props: Props = defineProps<Props>();
   const {
-    hasAutoselectedSchule,
     autoselectedSchule,
   }: { hasAutoselectedSchule: ComputedRef<boolean>; autoselectedSchule: ComputedRef<Organisation | null> } =
     useAutoselectedSchule([RollenSystemRecht.PersonenVerwalten]);
@@ -152,13 +151,6 @@
     emits('update:selectedOrganisation', newValue);
 
     if (newValue && newValue !== oldValue) {
-      const filter: WorkflowFilter = {
-        personId: props.personId,
-        organisationId: newValue,
-        limit: 25,
-      };
-
-      if (!hasAutoselectedSchule.value) await handleWorkflowStep(filter);
 
       administriertVon.value?.pop();
       administriertVon.value?.push(newValue);
@@ -353,6 +345,7 @@
         :operationContext="props.operationContext"
         :isRolleUnassignForm="isRolleUnassignForm"
         :placeholderText="$t('admin.organisation.selectOrganisation')"
+        :personId="props.personId"
         @update:selectedSchulen="updateSchuleSelection"
         @update:selectedSchulenObjects="
           (organisations: Array<Organisation>) =>
