@@ -2,11 +2,10 @@
   import SchulenFilter from '@/components/filter/SchulenFilter.vue';
   import FormRow from '@/components/form/FormRow.vue';
   import FormWrapper from '@/components/form/FormWrapper.vue';
-  import { type Organisation } from '@/stores/OrganisationStore';
   import { RollenSystemRecht, type RollenArt, type RollenMerkmal } from '@/stores/RolleStore';
-  import { type Option, type TranslatedObject } from '@/types.d';
+  import { type TranslatedObject } from '@/types.d';
   import type { BaseFieldProps } from 'vee-validate';
-  import { ref, type ModelRef, type Ref } from 'vue';
+  import { type ModelRef } from 'vue';
 
   type Props = {
     readonly?: boolean;
@@ -35,12 +34,15 @@
   // Define the V-model for each field so the parent component can pass in the values for it.
   const selectedAdministrationsebene: ModelRef<string | undefined, string> =
     defineModel('selectedAdministrationsebene');
-  const selectedAdministrationsebeneObject: Ref<Option<Organisation>> = ref();
   const selectedRollenArt: ModelRef<RollenArt | undefined, string> = defineModel('selectedRollenArt');
   const selectedRollenName: ModelRef<string | undefined, string> = defineModel('selectedRollenName');
   const selectedMerkmale: ModelRef<RollenMerkmal[] | undefined, string> = defineModel('selectedMerkmale');
   const selectedServiceProviders: ModelRef<string[] | undefined, string> = defineModel('selectedServiceProviders');
   const selectedSystemRechte: ModelRef<RollenSystemRecht[] | undefined, string> = defineModel('selectedSystemRechte');
+
+  function updateSelectedSchule(id: string | undefined): void {
+    selectedAdministrationsebene.value = id;
+  }
 </script>
 
 <template data-test-id="rolle-form">
@@ -76,13 +78,13 @@
           :multiple="false"
           :selectedSchulen="selectedAdministrationsebene"
           :error="selectedAdministrationsebeneProps?.error"
+          ref="schulenFilter"
           :filterId="'rolle-form'"
           :placeholderText="$t('admin.administrationsebene.assignAdministrationsebene')"
           :selectedSchuleProps="selectedAdministrationsebeneProps"
           :systemrechteForSearch="[RollenSystemRecht.RollenVerwalten]"
           :readonly="readonly"
-          @update:selectedSchulen="selectedAdministrationsebene = $event[0]?.id"
-          @update:selectedSchulenObjects="selectedAdministrationsebeneObject = $event[0]"
+          @update:selectedSchulen="updateSelectedSchule"
         />
       </FormRow>
 
