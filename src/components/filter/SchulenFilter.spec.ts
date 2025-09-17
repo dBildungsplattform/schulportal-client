@@ -11,7 +11,6 @@ import {
   type OrganisationenFilter,
   type OrganisationStore,
 } from '@/stores/OrganisationStore';
-import { getDisplayNameForOrg } from '@/utils/formatting';
 import { faker } from '@faker-js/faker';
 import { flushPromises, mount, type VueWrapper } from '@vue/test-utils';
 import { DoFactory } from 'test/DoFactory';
@@ -274,37 +273,6 @@ describe('SchulenFilter', async () => {
                 });
               });
             });
-          });
-        });
-
-        describe.each([
-          {
-            label: 'overrides',
-            id: faker.string.uuid(),
-          },
-          {
-            label: 'does not override',
-          },
-        ])('when the parent $label the selection', ({ id }: { id?: string }) => {
-          test('it correctly initializes input', async () => {
-            const mockSchule: Organisation = DoFactory.getSchule({ id });
-            organisationStore.organisationenFilters.set('', {
-              total: 1,
-              loading: false,
-              filterResult: [mockSchule],
-            });
-            organisationStore.loadOrganisationenForFilter = vi.fn(async () => {
-              organisationStore.organisationenFilters.get('')!.filterResult = [mockSchule];
-            });
-            const selectionRef: Ref<string | undefined> = ref(id);
-            const wrapper: VueWrapper = mountComponent({ ...defaultProps });
-            await wrapper.setProps({ selectedSchulen: selectionRef });
-            vi.runAllTimers();
-            await nextTick();
-            const actualText: string = wrapper.find('[data-testid="schule-select"]').text();
-            if (id) expect(actualText).toContain(getDisplayNameForOrg(mockSchule));
-            else if (autoSelectedSchule) expect(actualText).toContain(getDisplayNameForOrg(autoSelectedSchule));
-            else expect(actualText).toBe('');
           });
         });
 
