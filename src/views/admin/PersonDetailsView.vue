@@ -1334,7 +1334,7 @@
     if (field === 'selectedRolle') {
       selectedRolle.value = undefined;
     } else if (field === 'selectedKlasse') {
-      selectedKlasse.value = undefined;
+      if (selectedKlasse.value) selectedKlasse.value = undefined;
     }
   }
 
