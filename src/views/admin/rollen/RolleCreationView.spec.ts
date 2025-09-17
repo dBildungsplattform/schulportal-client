@@ -1,4 +1,5 @@
 import {
+  RollenArt,
   RollenSystemRechtEnum,
   type ServiceProviderResponse,
   type SystemRechtResponse,
@@ -20,10 +21,12 @@ import {
 } from 'vue-router';
 import RolleCreationView from './RolleCreationView.vue';
 import { getDisplayNameForOrg } from '@/utils/formatting';
+import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
 const rolleStore: RolleStore = useRolleStore();
+let personenkontextStore: PersonenkontextStore;
 const organisationStore: OrganisationStore = useOrganisationStore();
 const organisationObject: Organisation = DoFactory.getOrganisation();
 
@@ -85,7 +88,7 @@ async function fillForm(args: Partial<FormFields>): Promise<Partial<FormSelector
     wrapper
       ?.findComponent({ ref: 'rolle-creation-form' })
       .findComponent({ name: 'SchulenFilter' })
-      .vm.$emit('update:selectedSchulen', [organisationStore.organisationenFilters.get('rolle-form')?.filterResult[0]]);
+      .vm.$emit('update:selectedSchulen', personenkontextStore.workflowStepResponse?.organisations[0]?.id || '');
     await nextTick();
     selectors.orgSelect = orgSelect;
   }
@@ -156,17 +159,60 @@ beforeEach(async () => {
   await router.isReady();
 
   wrapper = mountComponent();
+
+  personenkontextStore = usePersonenkontextStore();
   rolleStore.errorCode = '';
   organisationStore.organisationenFilters.set('rolle-form', {
     total: 1,
     loading: false,
     filterResult: [organisationObject],
   });
+  personenkontextStore.workflowStepResponse = {
+    rollen: [
+      {
+        administeredBySchulstrukturknoten: '1234',
+        rollenart: 'LERN',
+        name: 'SuS',
+        merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
+        systemrechte: [{ name: 'ROLLEN_VERWALTEN', isTechnical: false }] as unknown as Set<SystemRechtResponse>,
+        createdAt: '2022',
+        updatedAt: '2022',
+        id: '54321',
+        administeredBySchulstrukturknotenName: 'Land SH',
+        administeredBySchulstrukturknotenKennung: '',
+        version: 1,
+      },
+    ],
+    organisations: [
+      {
+        id: organisationObject.id,
+        administriertVon: 'string',
+        kennung: 'string',
+        name: 'orga',
+        namensergaenzung: 'string',
+        kuerzel: 'string',
+        typ: 'ROOT',
+      },
+      {
+        id: organisationObject.id,
+        administriertVon: 'string',
+        kennung: 'string',
+        name: 'orga1',
+        namensergaenzung: 'string',
+        kuerzel: 'string',
+        typ: 'ROOT',
+      },
+    ],
+    selectedOrganisation: null,
+    selectedRollen: null,
+    canCommit: true,
+  };
 });
 
 afterEach(() => {
   organisationStore.$reset();
   rolleStore.$reset();
+  personenkontextStore.$reset();
   wrapper?.unmount();
   // Restore real timers
   vi.useRealTimers();
@@ -270,8 +316,8 @@ describe('RolleCreationView', () => {
 
   test('it fills form and triggers submit and uses correct Rolle to add serviceproviders', async () => {
     const { orgSelect, rollenartSelect }: Partial<FormSelectors> = await fillForm({
-      organisation: organisationObject.id,
-      rollenart: 'LERN',
+      organisation: '1234',
+      rollenart: RollenArt.Lern,
       rollenname: 'NewRolle',
       provider: ['1'],
     });
@@ -280,7 +326,7 @@ describe('RolleCreationView', () => {
     expect(rollenartSelect?.text()).toEqual('Lern');
     const oldmockRolle: RolleResponse = {
       administeredBySchulstrukturknoten: '1234',
-      rollenart: 'LEHR',
+      rollenart: RollenArt.Lehr,
       name: 'Lehrer',
       // TODO: remove type casting when generator is fixed
       merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
@@ -294,11 +340,10 @@ describe('RolleCreationView', () => {
       administeredBySchulstrukturknotenKennung: '',
       version: 5,
     };
-    rolleStore.createdRolle = { ...oldmockRolle, systemrechte: [] as unknown as Set<RollenSystemRechtEnum> };
 
     const mockRolle: RolleResponse = {
       administeredBySchulstrukturknoten: '1234',
-      rollenart: 'LEHR',
+      rollenart: RollenArt.Lehr,
       name: 'Lehrer',
       // TODO: remove type casting when generator is fixed
       merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
@@ -317,6 +362,7 @@ describe('RolleCreationView', () => {
     expect(
       wrapper
         ?.findComponent({ ref: 'rolle-creation-form' })
+        .findComponent({ ref: 'form-wrapper' })
         .find('[data-testid="rolle-form-submit-button"]')
         .isVisible(),
     ).toBe(true);
@@ -331,7 +377,12 @@ describe('RolleCreationView', () => {
     await flushPromises();
     await flushPromises();
 
-    expect(rolleStore.createRolle).toHaveBeenCalled();
+    rolleStore.createdRolle = { ...oldmockRolle, systemrechte: [] as unknown as Set<RollenSystemRechtEnum> };
+    await nextTick();
+
+    await vi.waitFor(() => {
+      expect(rolleStore.createRolle).toHaveBeenCalled();
+    });
     expect(rolleStore.updateServiceProviderInRolle).toHaveBeenCalledWith(mockRolle.id, {
       serviceProviderIds: ['1'],
       version: mockRolle.version,
@@ -345,7 +396,7 @@ describe('RolleCreationView', () => {
   test('It display the success template with no systemrechte nor merkmale', async () => {
     const mockRolle: RolleResponse = {
       administeredBySchulstrukturknoten: '1234',
-      rollenart: 'LEHR',
+      rollenart: RollenArt.Lehr,
       name: 'Lehrer',
       // TODO: remove type casting when generator is fixed
       merkmale: [] as unknown as Set<RollenMerkmal>,
@@ -373,7 +424,7 @@ describe('RolleCreationView', () => {
   test('it displays the success template with service providers', async () => {
     const mockRolle: RolleResponse = {
       administeredBySchulstrukturknoten: '1234',
-      rollenart: 'LEHR',
+      rollenart: RollenArt.Lehr,
       name: 'Lehrer',
       // TODO: remove type casting when generator is fixed
       merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
@@ -474,7 +525,7 @@ describe('RolleCreationView', () => {
       if (isFormDirty)
         await fillForm({
           organisation: organisationObject.id,
-          rollenart: 'LERN',
+          rollenart: RollenArt.Lern,
           rollenname: 'NewRolle',
           provider: ['1'],
         });
