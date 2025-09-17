@@ -48,4 +48,3 @@ describe('provider card', () => {
     window.location.assign = assign;
   });
 });
-
