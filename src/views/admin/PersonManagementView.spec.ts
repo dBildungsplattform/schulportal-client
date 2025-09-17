@@ -133,7 +133,26 @@ beforeEach(async () => {
         version: 1,
       },
     ],
-    organisations: [],
+    organisations: [
+      {
+        id: '9876',
+        administriertVon: 'string',
+        kennung: 'string',
+        name: 'orga',
+        namensergaenzung: 'string',
+        kuerzel: 'string',
+        typ: 'ROOT',
+      },
+      {
+        id: '1134',
+        administriertVon: 'string',
+        kennung: 'string',
+        name: 'orga1',
+        namensergaenzung: 'string',
+        kuerzel: 'string',
+        typ: 'ROOT',
+      },
+    ],
     selectedOrganisation: null,
     selectedRollen: null,
     canCommit: true,
@@ -449,12 +468,16 @@ describe('PersonManagementView', () => {
   ])(
     'it checks a checkbox in the table, selects $operationType, triggers dialog then cancels it',
     async ({ operationType, layoutCardTestId, discardButtonTestId }: BulkOperationTestParams) => {
-      const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'schule-select' });
+      const schuleAutocomplete: VueWrapper | undefined = wrapper
+        ?.findComponent({ ref: 'schulenFilter' })
+        .findComponent({ ref: 'person-management-organisation-select' });
+      schuleAutocomplete?.setValue(['9876']);
       schuleAutocomplete?.vm.$emit('update:selectedSchulen', ['9876']);
       await nextTick();
       schuleAutocomplete?.vm.$emit('update:selectedSchulenObjects', [DoFactory.getSchule({ id: '9876' })]);
       await nextTick();
       await flushPromises();
+
       // Find the first checkbox in the table
       const checkbox: DOMWrapper<Element> | undefined = wrapper?.find(
         '[data-testid="person-table"] .v-selection-control',
@@ -519,7 +542,9 @@ describe('PersonManagementView', () => {
 
     await flushPromises();
 
-    const schuleAutocomplete: VueWrapper | undefined = wrapper.findComponent({ ref: 'schule-select' });
+    const schuleAutocomplete: VueWrapper | undefined = wrapper
+      .findComponent({ ref: 'schulenFilter' })
+      .findComponent({ ref: 'person-management-organisation-select' });
     await schuleAutocomplete.setValue([]);
     await nextTick();
 

@@ -270,8 +270,8 @@
     applySearchAndFilters();
   }
 
-  function setSelectedOrganisationen(newValue: Array<Organisation>): void {
-    selectedOrganisationen.value = newValue;
+  function setSelectedOrganisationen(newValue: Array<Organisation> | Organisation): void {
+    selectedOrganisationen.value = Array.isArray(newValue) ? newValue : [newValue];
   }
 
   async function setOrganisationFilter(newValue: Array<string> | undefined): Promise<void> {
@@ -392,8 +392,8 @@
     return actions.value.find((action: TranslatedObject) => action.value === selectedOption.value)?.title || '';
   });
 
-  const selectedOrganisation: ComputedRef<Organisation | undefined> = computed(() => {
-    const organisation: Organisation | undefined = selectedOrganisationen.value[0];
+  const selectedOrganisation: ComputedRef<Organisation[] | Organisation> = computed(() => {
+    const organisation: Organisation[] | Organisation = selectedOrganisationen.value;
     return organisation;
   });
 
@@ -410,7 +410,9 @@
   });
 
   const singleSchuleSelected: ComputedRef<boolean> = computed(() => {
-    return [selectedOrganisationIds.value].length === 1;
+    const val: string[] | string = selectedOrganisationIds.value;
+    if (Array.isArray(val)) return val.length === 1;
+    return true;
   });
 
   const selectedRolle: ComputedRef<RolleResponse | undefined> = computed(() => {
@@ -617,8 +619,8 @@
             multiple
             includeAll
             highlightSelection
-            filter-id="person-management"
-            ref="schule-select"
+            filterId="person-management"
+            ref="schulenFilter"
             :systemrechteForSearch="[RollenSystemRecht.PersonenVerwalten]"
             :selectedSchulen="selectedOrganisationIds"
             @update:selectedSchulen="setOrganisationFilter"
@@ -867,7 +869,11 @@
             v-if="organisationUnassignDialogVisible && selectedOrganisation"
             :isDialogVisible="organisationUnassignDialogVisible"
             :selectedPersonen
-            :selectedOrganisation="selectedOrganisation"
+            :selectedOrganisation="
+              Array.isArray(selectedOrganisation)
+                ? (selectedOrganisation[0] ?? ({} as Organisation))
+                : (selectedOrganisation ?? ({} as Organisation))
+            "
             @update:dialogExit="handleUnassignOrgDialog($event)"
           >
           </OrganisationUnassign>
@@ -876,8 +882,12 @@
             v-if="rolleUnassignDialogVisible && selectedOrganisation"
             :isDialogVisible="rolleUnassignDialogVisible"
             :organisationen="organisationenForForm"
-            :selectedPersonen
-            :selectedOrganisationFromFilter="selectedOrganisation"
+            :selectedPersonen="Array.isArray(selectedPersonen) ? selectedPersonen[0] : selectedPersonen"
+            :selectedOrganisationFromFilter="
+              Array.isArray(selectedOrganisation)
+                ? (selectedOrganisation[0] ?? ({} as Organisation))
+                : (selectedOrganisation ?? ({} as Organisation))
+            "
             :selectedRolleFromFilter="selectedRolle!"
             @update:dialogExit="handleUnassignRolleDialog($event)"
           >
@@ -886,7 +896,9 @@
             v-if="changeKlasseDialogVisible"
             :isDialogVisible="changeKlasseDialogVisible"
             :selectedPersonen
-            :selectedSchuleId="selectedOrganisation?.id"
+            :selectedSchuleId="
+              Array.isArray(selectedOrganisation) ? selectedOrganisation[0]?.id : selectedOrganisation?.id
+            "
             @update:dialog-exit="handleBulkKlasseChangeDialog"
           />
         </v-col>
