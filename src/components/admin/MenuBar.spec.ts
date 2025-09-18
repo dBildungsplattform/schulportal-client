@@ -114,6 +114,37 @@ describe('MenuBar', () => {
     expect(wrapper?.find('[data-testid="person-creation-menu-item"]').exists()).toBe(false);
   });
 
+  test('it handles role instance selection', async () => {
+    const push: MockInstance = vi.fn();
+    (useRouter as Mock).mockImplementation(() => {
+      return { push };
+    });
+    wrapper = mountComponent();
+
+    // Schulcloud Mapping
+    await wrapper
+      .findAll('.menu-bar-sub-item.caption')
+      .find((item) => item.text() === 'Schulcloud')
+      ?.trigger('click');
+    await nextTick();
+
+    // Moodle Mapping
+    await wrapper
+      .findAll('.menu-bar-sub-item.caption')
+      .find((item) => item.text() === 'Moodle')
+      ?.trigger('click');
+    await nextTick();
+
+    expect(push).toHaveBeenCalledWith({
+      path: '/admin/rolle/mapping/schulcloud',
+      query: { instance: 'Schulcloud' },
+    });
+    expect(push).toHaveBeenCalledWith({
+      path: '/admin/rolle/mapping/moodle',
+      query: { instance: 'Moodle' },
+    });
+  });
+
   test('it handles menu item click', async () => {
     const push: MockInstance = vi.fn();
     (useRouter as Mock).mockImplementation(() => {
