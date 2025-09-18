@@ -354,12 +354,14 @@
     }
     organisationStore.resetOrganisationenFilter(props.filterId);
     // Initializes the Rollen for the selected Schule (or Orga if includeAll is true)
-    await handleWorkflowStep({
-      personId: props.personId,
-      operationContext: props.operationContext,
-      organisationId: Array.isArray(selectedSchulen.value) ? selectedSchulen.value[0] : selectedSchulen.value,
-      limit: 25,
-    });
+    if (props.useWorkflowEndpoints) {
+      await handleWorkflowStep({
+        personId: props.personId,
+        operationContext: props.operationContext,
+        organisationId: Array.isArray(selectedSchulen.value) ? selectedSchulen.value[0] : selectedSchulen.value,
+        limit: 25,
+      });
+    }
   });
 
   onUnmounted(() => {

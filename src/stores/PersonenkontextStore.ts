@@ -60,13 +60,6 @@ export enum CreationType {
   AddPersonToOwnSchule = 'add-person-to-own-schule',
 }
 
-export type WorkflowAutoCompleteStore<T> = {
-  filterResult: T | null;
-  errorCode?: string;
-  total: number;
-  loading: boolean;
-};
-
 export type PersonenkontextUpdate = Pick<DbiamPersonenkontextBodyParams, 'organisationId' | 'rolleId' | 'befristung'>;
 
 export type WorkflowFilter = {
