@@ -50,7 +50,7 @@
 
   const props: Props = defineProps<Props>();
 
-  async function close2FADialog(isActive: Ref<boolean>): Promise<void> {
+  function close2FADialog(isActive: Ref<boolean>): void {
     isActive.value = false;
     twoFactorStore.qrCode = '';
     twoFactorStore.errorCode = '';
@@ -58,7 +58,7 @@
     errorMessage.value = '';
   }
 
-  async function resetErrorMessage(): Promise<void> {
+  function resetErrorMessage(): void {
     errorMessage.value = '';
     twoFactorStore.errorCode = '';
   }
@@ -97,7 +97,7 @@
 
 <template>
   <v-dialog persistent>
-    <template v-slot:activator="{ props }">
+    <template #activator="{ props }">
       <v-row class="d-flex align-center justify-center">
         <v-col class="d-flex justify-center">
           <v-btn
@@ -112,12 +112,12 @@
       </v-row>
     </template>
 
-    <template v-slot:default="{ isActive }">
+    <template #default="{ isActive }">
       <LayoutCard
         :closable="true"
         :header="dialogHeader"
-        @onCloseClicked="close2FADialog(isActive)"
         data-testid="two-factor-authentication-dialog"
+        @on-close-clicked="close2FADialog(isActive)"
       >
         <v-card-text>
           <v-container v-if="workflowStep === TwoFactorSteps.Start">
@@ -136,7 +136,7 @@
                 <v-icon
                   icon="mdi-alert-circle"
                   color="orange"
-                ></v-icon>
+                />
                 <span
                   class="ml-4"
                   data-testid="self-service-dialog-warning-text"
@@ -167,8 +167,7 @@
                   width="250"
                   indeterminate
                   data-testid="software-token-dialog-progress-bar"
-                >
-                </v-progress-circular>
+                />
               </v-row>
               <v-row
                 v-if="twoFactorStore.qrCode.length > 0"
@@ -221,11 +220,10 @@
                     ref="otpInput"
                     v-model="otp"
                     :error="errorMessage.length > 0"
+                    data-testid="self-service-otp-input"
                     @input="resetErrorMessage()"
                     @keydown.enter="proceedToNextWorkflowStep(isActive)"
-                    data-testid="self-service-otp-input"
-                  >
-                  </v-otp-input>
+                  />
                 </v-row>
 
                 <v-row
@@ -245,7 +243,9 @@
                   class="text-body bold justify-center"
                   data-testid="self-service-token-verify-error-text"
                 >
-                  <p class="justify-center">{{ $t('admin.person.twoFactorAuthentication.otp') }}</p>
+                  <p class="justify-center">
+                    {{ $t('admin.person.twoFactorAuthentication.otp') }}
+                  </p>
                 </v-row>
               </v-col>
             </v-row>
@@ -261,23 +261,23 @@
               <v-btn
                 :block="xs"
                 :class="!twoFactorStore.errorCode || workflowStep == TwoFactorSteps.Verify ? 'secondary' : 'primary'"
-                @click.stop="close2FADialog(isActive)"
                 data-testid="close-two-factor-authentication-dialog"
+                @click.stop="close2FADialog(isActive)"
               >
                 {{ $t('cancel') }}
               </v-btn>
             </v-col>
             <v-col
+              v-if="!twoFactorStore.errorCode || workflowStep == TwoFactorSteps.Verify"
               cols="12"
               sm="6"
               md="4"
-              v-if="!twoFactorStore.errorCode || workflowStep == TwoFactorSteps.Verify"
             >
               <v-btn
                 :block="xs"
                 class="primary button"
-                @click.stop="proceedToNextWorkflowStep(isActive)"
                 data-testid="proceed-two-factor-authentication-dialog"
+                @click.stop="proceedToNextWorkflowStep(isActive)"
               >
                 {{ $t('proceed') }}
               </v-btn>

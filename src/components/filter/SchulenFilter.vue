@@ -55,19 +55,29 @@
   // selection is represented as an array internally
   // wrap/unwrap is used to convert between internal and vuetify representation
   const wrapSelectedSchulenIds = (selectedIds: SelectedSchulenIds): Array<string> => {
-    if (Array.isArray(selectedIds)) return selectedIds.filter(Boolean);
-    if (selectedIds) return [selectedIds];
+    if (Array.isArray(selectedIds)) {
+      return selectedIds.filter(Boolean);
+    }
+    if (selectedIds) {
+      return [selectedIds];
+    }
     return [];
   };
 
   const unwrapSelectedSchulenIds = (selectedIds: Array<string>): SelectedSchulenIds => {
-    if (selectedIds.length === 0) return undefined;
-    else if (selectedIds.length === 1) return selectedIds.at(0);
-    else return selectedIds;
+    if (selectedIds.length === 0) {
+      return undefined;
+    } else if (selectedIds.length === 1) {
+      return selectedIds.at(0);
+    } else {
+      return selectedIds;
+    }
   };
 
   const isEmptySelection = (selection: SelectedSchulenIds): boolean => {
-    if (!selection) return true;
+    if (!selection) {
+      return true;
+    }
     return wrapSelectedSchulenIds(selection).filter(Boolean).length === 0;
   };
 
@@ -77,7 +87,9 @@
   });
   const translatedSchulen: ComputedRef<Array<TranslatedObject>> = computed(() => {
     const options: Array<TranslatedObject> = organisationStore.schulenFilter.filterResult.map(translateSchule);
-    if (autoselectedSchule.value) options.push(translateSchule(autoselectedSchule.value));
+    if (autoselectedSchule.value) {
+      options.push(translateSchule(autoselectedSchule.value));
+    }
     return options;
   });
 
@@ -94,8 +106,12 @@
   };
 
   const shouldHighlightSelection: ComputedRef<boolean> = computed(() => {
-    if (hasAutoselectedSchule.value) return true;
-    if (props.highlightSelection && !isEmptySelection(selectedSchulen.value)) return true;
+    if (hasAutoselectedSchule.value) {
+      return true;
+    }
+    if (props.highlightSelection && !isEmptySelection(selectedSchulen.value)) {
+      return true;
+    }
     return false;
   });
 
@@ -167,8 +183,10 @@
 
   watch(
     schulenFilter,
-    async (newFilter: OrganisationenFilter | undefined, oldFilter: OrganisationenFilter | undefined) => {
-      if (timerId.value) clearTimeout(timerId.value);
+    (newFilter: OrganisationenFilter | undefined, oldFilter: OrganisationenFilter | undefined) => {
+      if (timerId.value) {
+        clearTimeout(timerId.value);
+      }
 
       // We skip if selection is disabled and we already know how to display the selection
       // empty selection means we have to reload anyways
@@ -176,8 +194,9 @@
         !isEmptySelection(selectedSchulen.value) &&
         isInputDisabled.value &&
         canDisplaySelection(selectedSchulen.value)
-      )
+      ) {
         return;
+      }
 
       // We apply the debounce of 500 only when there is an oldFilter (a change has been made)
       const delay: number = oldFilter ? 500 : 0;
@@ -192,14 +211,17 @@
 
 <template>
   <v-autocomplete
+    id="schule-select"
+    ref="schule-select"
+    v-bind="selectedSchuleProps"
+    v-model="selectedSchulen"
+    v-model:search="searchInputSchulen"
     autocomplete="off"
     :class="['filter-dropdown', { selected: shouldHighlightSelection }]"
     clearable
     data-testid="schule-select"
     density="compact"
     :disabled="isInputDisabled"
-    id="schule-select"
-    ref="schule-select"
     :items="translatedSchulen"
     item-value="value"
     item-text="title"
@@ -208,17 +230,14 @@
     :placeholder="props.placeholderText ?? t('admin.schule.assignSchule')"
     required="true"
     variant="outlined"
+    :hide-details
     @update:search="updateSearchString"
     @click:clear="organisationStore.resetSchulFilter"
-    v-bind="selectedSchuleProps"
-    v-model="selectedSchulen"
-    v-model:search="searchInputSchulen"
-    :hide-details
   >
-    <template v-slot:prepend-item>
-      <slot name="prepend-item"></slot>
+    <template #prepend-item>
+      <slot name="prepend-item" />
     </template>
-    <template v-slot:selection="{ item }">
+    <template #selection="{ item }">
       <span class="v-autocomplete__selection-text">
         {{ canDisplaySelection(selectedSchulen) ? item.title : '...' }}
       </span>

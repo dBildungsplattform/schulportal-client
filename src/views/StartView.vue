@@ -88,7 +88,7 @@
     );
     lockInfos.forEach((lockInfo: PersonTimeLimitInfoResponse) => {
       const message: string = t(messageKey, {
-        date: adjustDateForTimezoneAndFormat(lockInfo.deadline!),
+        date: adjustDateForTimezoneAndFormat(lockInfo.deadline),
         ...(occasion === 'PERSONENKONTEXT_EXPIRES' && { schule: lockInfo.school, rolle: lockInfo.rolle }),
       });
 
@@ -100,7 +100,7 @@
         id: id,
         message: message,
         visible: true,
-        type: getUrgencyType(new Date(lockInfo.deadline!)),
+        type: getUrgencyType(new Date(lockInfo.deadline)),
       });
     });
   }
@@ -197,15 +197,15 @@
       <v-col cols="12">
         <!-- Banner for hinweise -->
         <SpshBanner
-          v-bind:key="hinweis.id"
           v-for="hinweis in hinweise"
           id="hinweis"
+          :key="hinweis.id"
           ref="hinweis-banner"
           type="background-grey"
           :visible="true"
           :dismissable="false"
         >
-          <template v-slot:text>
+          <template #text>
             <span class="text-body">
               <v-textarea
                 v-model="hinweis.text"
@@ -221,16 +221,16 @@
 
         <!-- Banner for alerts -->
         <SpshBanner
-          v-bind:key="alert.id"
           v-for="alert in alerts"
           :id="alert.id.toString()"
+          :key="alert.id"
           ref="spsh-banner"
           :type="alert.type"
           :visible="alert.visible"
           :dismissable="true"
-          @dismissBanner="dismissBannerForSession"
+          @dismiss-banner="dismissBannerForSession"
         >
-          <template v-slot:text>
+          <template #text>
             <span class="text-body bold">{{ $t('banner.hint') }} </span>
             <span
               class="text-body"
@@ -246,7 +246,7 @@
       class="border-opacity-100 rounded"
       color="#1EAE9C"
       thickness="5px"
-    ></v-divider>
+    />
     <v-row class="flex-nowrap my-3">
       <v-col cols="auto">
         <h2
@@ -259,7 +259,7 @@
     </v-row>
     <!-- Template to be displayed in case the providers are still being loaded -->
     <template v-if="serviceProviderStore.loading">
-      <v-progress-circular indeterminate></v-progress-circular>
+      <v-progress-circular indeterminate />
     </template>
     <!-- Template to be displayed in case loading the providers throws an error -->
     <template v-else-if="serviceProviderStore.errorCode">
@@ -274,34 +274,34 @@
     <template v-else>
       <!-- Categorie 1: Work Email -->
       <ServiceProviderCategory
-        :categoryTitle="$t('start.categories.workEmail')"
-        :serviceProviders="emailServiceProviders"
-        :hasToken="getHasToken()"
-      ></ServiceProviderCategory>
+        :category-title="$t('start.categories.workEmail')"
+        :service-providers="emailServiceProviders"
+        :has-token="getHasToken()"
+      />
       <!-- Categorie 2: Class -->
       <ServiceProviderCategory
-        :categoryTitle="$t('start.categories.class')"
-        :serviceProviders="classServiceProviders"
-        :hasToken="getHasToken()"
-      ></ServiceProviderCategory>
+        :category-title="$t('start.categories.class')"
+        :service-providers="classServiceProviders"
+        :has-token="getHasToken()"
+      />
       <!-- Categorie 3: Administration -->
       <ServiceProviderCategory
-        :categoryTitle="$t('start.categories.administration')"
-        :serviceProviders="administrationServiceProviders"
-        :hasToken="getHasToken()"
-      ></ServiceProviderCategory>
+        :category-title="$t('start.categories.administration')"
+        :service-providers="administrationServiceProviders"
+        :has-token="getHasToken()"
+      />
       <!-- Categorie 4: Hints -->
       <ServiceProviderCategory
-        :categoryTitle="$t('start.categories.hints')"
-        :serviceProviders="hintsServiceProviders"
-        :hasToken="getHasToken()"
-      ></ServiceProviderCategory>
+        :category-title="$t('start.categories.hints')"
+        :service-providers="hintsServiceProviders"
+        :has-token="getHasToken()"
+      />
       <!-- Categorie 5: School Offerings -->
       <ServiceProviderCategory
-        :categoryTitle="$t('start.categories.schoolOfferings')"
-        :serviceProviders="schoolOfferingsServiceProviders"
-        :hasToken="getHasToken()"
-      ></ServiceProviderCategory>
+        :category-title="$t('start.categories.schoolOfferings')"
+        :service-providers="schoolOfferingsServiceProviders"
+        :has-token="getHasToken()"
+      />
     </template>
   </v-card>
 </template>

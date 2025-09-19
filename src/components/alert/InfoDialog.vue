@@ -17,7 +17,7 @@
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
-  async function closeDialog(): Promise<void> {
+  function closeDialog(): void {
     emit('update:dialogExit');
   }
 </script>
@@ -25,7 +25,7 @@
 <template>
   <v-dialog
     :ref="`${id}-dialog`"
-    :modelValue="isDialogVisible"
+    :model-value="isDialogVisible"
     persistent
   >
     <LayoutCard
@@ -45,7 +45,7 @@
           <v-icon
             class="mr-4"
             icon="mdi-alert"
-          ></v-icon>
+          />
           <span>
             {{ message }}
           </span>
@@ -62,8 +62,8 @@
             <v-btn
               :block="mdAndDown"
               class="secondary"
-              @click="closeDialog()"
               :data-testid="`${id}-cancel-button`"
+              @click="closeDialog()"
             >
               {{ t('cancel') }}
             </v-btn>

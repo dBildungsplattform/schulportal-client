@@ -66,13 +66,17 @@
   defineExpose({ reset });
 
   function setInitialValues(): void {
-    if (!props.initialValues) return;
+    if (!props.initialValues) {
+      return;
+    }
     setFieldValue('selectedSchule', props.initialValues.selectedSchule ?? '');
     setFieldValue('selectedKlassenname', props.initialValues.selectedKlassenname ?? '');
   }
 
   async function submitHandler(): Promise<void> {
-    if (!selectedSchule.value) return;
+    if (!selectedSchule.value) {
+      return;
+    }
     await props.onSubmit({ selectedSchule: selectedSchule.value, selectedKlassenname: selectedKlassenname.value });
     reset();
     setInitialValues();
@@ -81,7 +85,9 @@
   watch(
     () => props.isEditActive,
     (newValue: boolean | undefined, oldValue: boolean | undefined) => {
-      if (oldValue && !newValue) setInitialValues();
+      if (oldValue && !newValue) {
+        setInitialValues();
+      }
     },
   );
 
@@ -105,8 +111,11 @@
       }) as Partial<ValidationSchema>,
     (newValues: Partial<ValidationSchema>, oldValues: Partial<ValidationSchema>) => {
       if (newValues.selectedSchule !== oldValues.selectedSchule) {
-        if (newValues.selectedKlassenname !== oldValues.selectedKlassenname) setInitialValues();
-        else setFieldValue('selectedSchule', newValues.selectedSchule ?? '');
+        if (newValues.selectedKlassenname !== oldValues.selectedKlassenname) {
+          setInitialValues();
+        } else {
+          setFieldValue('selectedSchule', newValues.selectedSchule ?? '');
+        }
       }
     },
   );
@@ -118,17 +127,17 @@
 
 <template data-test-id="klasse-form">
   <FormWrapper
-    :canCommit
-    :confirmUnsavedChangesAction="onHandleConfirmUnsavedChanges"
-    :createButtonLabel="props.editMode ? t('save') : t('admin.klasse.create')"
-    :discardButtonLabel="props.editMode ? t('cancel') : t('admin.klasse.discard')"
-    :hideActions="Boolean(errorCode) || (props.editMode && !isEditActive)"
     id="klasse-form"
-    :isLoading="isLoading"
-    :onDiscard="onHandleDiscard"
-    @onShowDialogChange="onShowDialogChange"
-    :onSubmit="submitHandler"
-    :showUnsavedChangesDialog="showUnsavedChangesDialog"
+    :can-commit
+    :confirm-unsaved-changes-action="onHandleConfirmUnsavedChanges"
+    :create-button-label="props.editMode ? t('save') : t('admin.klasse.create')"
+    :discard-button-label="props.editMode ? t('cancel') : t('admin.klasse.discard')"
+    :hide-actions="Boolean(errorCode) || (props.editMode && !isEditActive)"
+    :is-loading="isLoading"
+    :on-discard="onHandleDiscard"
+    :on-submit="submitHandler"
+    :show-unsaved-changes-dialog="showUnsavedChangesDialog"
+    @on-show-dialog-change="onShowDialogChange"
   >
     <!-- Slot for SPSH alerts -->
     <slot />
@@ -139,21 +148,21 @@
         <h3 class="headline-3">1. {{ t('admin.schule.assignSchule') }}</h3>
       </v-row>
       <FormRow
-        :errorLabel="selectedSchuleProps?.error || ''"
-        labelForId="schule-select"
-        :isRequired="true"
+        :error-label="selectedSchuleProps?.error || ''"
+        label-for-id="schule-select"
+        :is-required="true"
         :label="t('admin.schule.schule')"
       >
         <SchulenFilter
           ref="schulenFilter"
-          :selectedSchulen="selectedSchule"
+          :selected-schulen="selectedSchule"
           :multiple="false"
           :readonly="props.editMode"
-          :highlightSelection="props.editMode"
-          :systemrechteForSearch="[RollenSystemRecht.KlassenVerwalten]"
-          :selectedSchuleProps="selectedSchuleProps"
-          @update:selectedSchulen="updateSchuleSelection"
-        ></SchulenFilter>
+          :highlight-selection="props.editMode"
+          :systemrechte-for-search="[RollenSystemRecht.KlassenVerwalten]"
+          :selected-schule-props="selectedSchuleProps"
+          @update:selected-schulen="updateSchuleSelection"
+        />
       </FormRow>
 
       <!-- Klassenname eingeben -->
@@ -161,24 +170,24 @@
         <h3 class="headline-3">2. {{ t('admin.klasse.enterKlassenname') }}</h3>
       </v-row>
       <FormRow
-        :errorLabel="selectedKlassennameProps?.error || ''"
-        labelForId="klassenname-input"
-        :isRequired="true"
+        :error-label="selectedKlassennameProps?.error || ''"
+        label-for-id="klassenname-input"
+        :is-required="true"
         :label="t('admin.klasse.klassenname')"
       >
         <v-text-field
+          id="klassenname-input"
+          ref="klassenname-input"
+          v-bind="selectedKlassennameProps"
+          v-model="selectedKlassenname"
           clearable
           data-testid="klassenname-input"
           density="compact"
           :disabled="editMode && !isEditActive"
-          id="klassenname-input"
           :placeholder="t('admin.klasse.enterKlassenname')"
-          ref="klassenname-input"
           required="true"
           variant="outlined"
-          v-bind="selectedKlassennameProps"
-          v-model="selectedKlassenname"
-        ></v-text-field>
+        />
       </FormRow>
     </template>
   </FormWrapper>

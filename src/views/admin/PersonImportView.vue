@@ -166,6 +166,7 @@
         const decodedText: string = decoder.decode(buffer);
         // If it successfully decodes without errors, return the decoded text
         return decodedText;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (e) {
         // If the decoding fails, continue with the next encoding
         continue;
@@ -187,11 +188,11 @@
           const utf8Text: string = convertToUTF8(event.target?.result as ArrayBuffer);
           resolve(utf8Text);
         } catch (error) {
-          reject(error);
+          reject(error as Error);
         }
       };
 
-      reader.onerror = (error: ProgressEvent<FileReader>): void => reject(error);
+      reader.onerror = (): void => reject(new Error(`File reading error`));
 
       // Read the file as ArrayBuffer
       reader.readAsArrayBuffer(file);
@@ -215,7 +216,7 @@
     // Update selected files with the UTF-8 version
     selectedFile.value = utf8File;
     // Perform the upload with the UTF-8 encoded file
-    await importStore.uploadPersonenImportFile(selectedSchule.value as string, selectedRolle.value as string, utf8File);
+    await importStore.uploadPersonenImportFile(selectedSchule.value, selectedRolle.value, utf8File);
   }
 
   function anotherImport(): void {
@@ -310,8 +311,12 @@
 
       for (let pageIndex: number = 0; pageIndex < totalPagesNumber; pageIndex++) {
         const offset: number = pageIndex * itemsPerPage;
-        await new Promise((resolve: (value: unknown) => void) => setTimeout(resolve, pageIndex * 600));
+        // eslint-disable-next-line no-await-in-loop
+        await new Promise((resolve: (value: unknown) => void) => {
+          setTimeout(resolve, pageIndex * 600);
+        });
 
+        // eslint-disable-next-line no-await-in-loop
         await importStore.getImportedPersons(
           importStore.uploadResponse?.importvorgangId as string,
           offset,
@@ -323,6 +328,7 @@
 
       const fileContent: string = createFileContentFromUsers(allImportedUsers);
       downloadFileContent(fileContent);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       // While downloading the file, it could happen that some users can't be downloaded even though they were imported successfully...
       // In that case it makes sense to ignore errors and just go forward with the other users for better usability.
@@ -332,7 +338,7 @@
     }
   }
 
-  const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = formContext.handleSubmit(() => {
+  const onSubmit: (e?: Event) => Promise<void | undefined> = formContext.handleSubmit(() => {
     uploadFile();
   });
 
@@ -348,7 +354,9 @@
     return false;
   }
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
-  let blockedNext: () => void = () => {};
+  let blockedNext: () => void = () => {
+    /* empty */
+  };
 
   function handleConfirmUnsavedChanges(): void {
     blockedNext();
@@ -356,7 +364,9 @@
   }
 
   function preventNavigation(event: BeforeUnloadEvent): void {
-    if (!isFormDirty()) return;
+    if (!isFormDirty()) {
+      return;
+    }
     event.preventDefault();
     /* Chrome requires returnValue to be set. */
     event.returnValue = '';
@@ -408,9 +418,9 @@
       :closable="true"
       data-testid="person-import-card"
       :header="$t('admin.person.import')"
-      @onCloseClicked="navigateToPersonTable"
       :padded="true"
-      :showCloseText="true"
+      :show-close-text="true"
+      @on-close-clicked="navigateToPersonTable"
     >
       <!-- Import success template -->
       <template v-if="importStore.importProgress === 100 && !importStore.importIsLoading && !isDownloadingFile">
@@ -422,8 +432,7 @@
                 color="#1EAE9C"
                 icon="mdi-check-circle"
                 small
-              >
-              </v-icon>
+              />
             </v-col>
           </v-row>
           <v-row justify="center">
@@ -440,8 +449,8 @@
             <v-col cols="auto">
               <v-btn
                 class="secondary"
-                @click="anotherImport"
                 data-testid="another-import-button"
+                @click="anotherImport"
               >
                 {{ $t('admin.import.anotherImport') }}
               </v-btn>
@@ -449,9 +458,9 @@
             <v-col cols="auto">
               <v-btn
                 class="primary"
-                @click="downloadFile"
                 data-testid="download-all-data-button"
                 :disabled="importStore.importIsLoading || importStore.retrievalIsLoading"
+                @click="downloadFile"
               >
                 {{ $t('admin.import.downloadUserdata') }}
               </v-btn>
@@ -469,7 +478,7 @@
                 class="mr-2"
                 icon="mdi-alert-circle-outline"
                 size="small"
-              ></v-icon>
+              />
               <span class="subtitle-2">
                 {{ $t('admin.import.doNotCloseNoticeDownload') }}
               </span>
@@ -480,8 +489,8 @@
               <v-progress-circular
                 data-testid="loading-spinner"
                 indeterminate
-              ></v-progress-circular
-            ></v-col>
+              />
+            </v-col>
           </v-row>
         </v-container>
       </template>
@@ -499,7 +508,7 @@
                 class="mr-2"
                 icon="mdi-alert-circle-outline"
                 size="small"
-              ></v-icon>
+              />
               <span class="subtitle-2">
                 {{ $t('admin.import.doNotCloseNoticeImport') }}
               </span>
@@ -509,11 +518,11 @@
             <v-col cols="12">
               <v-progress-linear
                 data-testid="import-progress-bar"
-                :modelValue="importStore.importProgress"
+                :model-value="importStore.importProgress"
                 color="primary"
                 height="25"
               >
-                <template v-slot:default="{ value }">
+                <template #default="{ value }">
                   <strong class="text-white">{{ Math.ceil(value) }}%</strong>
                 </template>
               </v-progress-linear>
@@ -525,21 +534,21 @@
       <!-- Upload form -->
       <FormWrapper
         v-if="importStore.importProgress === 0"
-        :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
-        :createButtonLabel="$t('admin.import.uploadFile')"
-        :discardButtonLabel="$t('nav.backToList')"
-        :hideActions="
+        id="person-import-form"
+        :confirm-unsaved-changes-action="handleConfirmUnsavedChanges"
+        :create-button-label="$t('admin.import.uploadFile')"
+        :discard-button-label="$t('nav.backToList')"
+        :hide-actions="
           showUploadSuccessTemplate ||
           !!importStore.importResponse ||
           importStore.importIsLoading ||
           !!importStore.errorCode
         "
-        id="person-import-form"
-        :isLoading="importStore.uploadIsLoading"
-        :onDiscard="navigateToPersonTable"
-        :onSubmit="onSubmit"
-        @onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
-        :showUnsavedChangesDialog="showUnsavedChangesDialog"
+        :is-loading="importStore.uploadIsLoading"
+        :on-discard="navigateToPersonTable"
+        :on-submit="onSubmit"
+        :show-unsaved-changes-dialog="showUnsavedChangesDialog"
+        @on-show-dialog-change="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
       >
         <!-- Error Message Display for error messages from the ImportStore -->
         <SpshAlert
@@ -547,9 +556,9 @@
           :title="$t('admin.import.uploadErrorTitle')"
           :type="'error'"
           :closable="false"
-          :showButton="true"
-          :buttonText="$t('admin.import.backToUpload')"
-          :buttonAction="backToUpload"
+          :show-button="true"
+          :button-text="$t('admin.import.backToUpload')"
+          :button-action="backToUpload"
           :text="$t(`admin.import.errors.${importStore.errorCode}`)"
         />
         <!-- Upload success template -->
@@ -562,8 +571,7 @@
                   color="#1EAE9C"
                   icon="mdi-check-circle"
                   small
-                >
-                </v-icon>
+                />
               </v-col>
             </v-row>
             <v-row justify="center">
@@ -581,8 +589,8 @@
               <v-col cols="auto">
                 <v-btn
                   class="secondary"
-                  @click="backToUpload"
                   data-testid="back-to-upload-button"
+                  @click="backToUpload"
                 >
                   {{ $t('admin.import.backToUpload') }}
                 </v-btn>
@@ -590,8 +598,8 @@
               <v-col cols="auto">
                 <v-btn
                   class="primary"
-                  @click="openConfirmationDialog"
                   data-testid="open-confirmation-dialog-button"
+                  @click="openConfirmationDialog"
                 >
                   {{ $t('admin.import.executeImport') }}
                 </v-btn>
@@ -611,36 +619,37 @@
         >
           <!-- Schulauswahl -->
           <FormRow
-            :errorLabel="selectedSchuleProps['error']"
-            :isRequired="true"
-            labelForId="schule-select"
+            :error-label="selectedSchuleProps['error']"
+            :is-required="true"
+            label-for-id="schule-select"
             :label="$t('admin.schule.schule')"
           >
             <SchulenFilter
-              :multiple="false"
-              :placeholderText="t('admin.schule.selectSchule')"
-              :selectedSchuleProps="selectedSchuleProps"
-              :selectedSchulen="selectedSchule"
-              @update:selectedSchulen="updateSelectedSchule"
               ref="schule-select"
+              :multiple="false"
+              :placeholder-text="t('admin.schule.selectSchule')"
+              :selected-schule-props="selectedSchuleProps"
+              :selected-schulen="selectedSchule"
+              @update:selected-schulen="updateSelectedSchule"
             />
           </FormRow>
 
           <!-- Rollenauswahl (currently limited to SuS) -->
           <FormRow
-            :errorLabel="selectedRolleProps['error']"
-            labelForId="rolle-select"
-            :isRequired="true"
+            :error-label="selectedRolleProps['error']"
+            label-for-id="rolle-select"
+            :is-required="true"
             :label="$t('admin.rolle.rolle')"
           >
             <v-autocomplete
-              autocomplete="off"
-              clearable
-              @click:clear="clearSelectedRolle"
-              data-testid="rolle-select"
-              density="compact"
               id="rolle-select"
               ref="rolle-select"
+              v-bind="selectedRolleProps"
+              v-model="selectedRolle"
+              autocomplete="off"
+              clearable
+              data-testid="rolle-select"
+              density="compact"
               :items="lernRollen"
               item-value="value"
               item-text="title"
@@ -648,28 +657,27 @@
               :placeholder="$t('admin.rolle.selectRolle')"
               required="true"
               variant="outlined"
-              v-bind="selectedRolleProps"
-              v-model="selectedRolle"
-            ></v-autocomplete>
+              @click:clear="clearSelectedRolle"
+            />
           </FormRow>
 
           <!-- File Upload -->
           <FormRow
-            :errorLabel="selectedFilesProps['error']"
-            :isRequired="true"
-            labelForId="file-upload"
+            :error-label="selectedFilesProps['error']"
+            :is-required="true"
+            label-for-id="file-upload"
             :label="$t('admin.import.uploadFile')"
           >
             <v-file-input
+              v-model="selectedFile"
               accept=".csv"
               data-testid="file-input"
               :label="$t('admin.import.selectOrDropFile')"
               prepend-icon=""
               prepend-inner-icon="mdi-paperclip"
               variant="outlined"
-              v-model="selectedFile"
               v-bind="selectedFilesProps"
-            ></v-file-input>
+            />
           </FormRow>
         </template>
 
@@ -763,8 +771,8 @@
             <v-btn
               :block="smAndDown"
               class="secondary"
-              @click="cancelImport()"
               data-testid="cancel-import-button"
+              @click="cancelImport()"
             >
               {{ $t('cancel') }}
             </v-btn>
@@ -777,9 +785,9 @@
             <v-btn
               :block="smAndDown"
               class="primary"
-              @click="executeImport()"
               data-testid="execute-import-button"
               :disabled="importStore.importIsLoading"
+              @click="executeImport()"
             >
               {{ $t('admin.import.executeImport') }}
             </v-btn>

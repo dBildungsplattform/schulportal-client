@@ -120,8 +120,9 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
           personenkontexte?.forEach((personenkontext: PersonenkontextRolleFields) => {
             personenkontext.rolle.systemrechte.forEach((systemrecht: string) => {
               /* push unique permissions only */
-              if (systemrecht && this.currentUserPermissions.indexOf(systemrecht) === -1)
+              if (systemrecht && this.currentUserPermissions.indexOf(systemrecht) === -1) {
                 this.currentUserPermissions.push(systemrecht);
+              }
             });
           });
 

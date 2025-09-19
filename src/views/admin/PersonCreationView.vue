@@ -55,7 +55,9 @@
   const { t }: Composer = useI18n({ useScope: 'global' });
 
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
-  let blockedNext: () => void = () => {};
+  let blockedNext: () => void = () => {
+    /* empty */
+  };
 
   const canCommit: Ref<boolean> = ref(false);
   const hasNoKopersNr: Ref<boolean | undefined> = ref(false);
@@ -127,7 +129,9 @@
 
   // Define a method to check if the selected Rolle is of type "Lern"
   function isLernRolle(selectedRolleIds?: string[]): boolean | undefined {
-    if (!Array.isArray(selectedRolleIds)) return false;
+    if (!Array.isArray(selectedRolleIds)) {
+      return false;
+    }
 
     const translatedRollenWithAttrs: Array<TranslatedRolleWithAttrs> =
       filteredRollen.value && filteredRollen.value.length > 0
@@ -290,7 +294,9 @@
 
   // Extract the created Klassenzuordnungen from the response after submission
   const klasseZuordnungFromCreatedKontext: ComputedRef<DBiamPersonenkontextResponse[]> = computed(() => {
-    if (!personenkontextStore.createdPersonWithKontext) return [];
+    if (!personenkontextStore.createdPersonWithKontext) {
+      return [];
+    }
 
     return personenkontextStore.createdPersonWithKontext.dBiamPersonenkontextResponses.filter(
       (kontext: DBiamPersonenkontextResponse) =>
@@ -316,7 +322,9 @@
 
   // We extract the first Organisation since all of the Kontexte have the same one
   const translatedOrganisationsname: ComputedRef<string> = computed(() => {
-    if (!schuleZuordnungFromCreatedKontext.value.length) return '';
+    if (!schuleZuordnungFromCreatedKontext.value.length) {
+      return '';
+    }
 
     const organisationId: string | undefined = schuleZuordnungFromCreatedKontext.value[0]?.organisationId;
 
@@ -327,7 +335,9 @@
 
   // Extract all the Rollennamen
   const translatedRollenname: ComputedRef<string[]> = computed(() => {
-    if (!schuleZuordnungFromCreatedKontext.value.length) return [];
+    if (!schuleZuordnungFromCreatedKontext.value.length) {
+      return [];
+    }
 
     return schuleZuordnungFromCreatedKontext.value.map(
       (kontext: DBiamPersonenkontextResponse) =>
@@ -397,7 +407,9 @@
     if (field === 'selectedRollen') {
       selectedRollen.value = undefined;
     } else if (field === 'selectedKlasse') {
-      if (selectedKlasse.value) selectedKlasse.value = undefined;
+      if (selectedKlasse.value) {
+        selectedKlasse.value = undefined;
+      }
     }
   }
 
@@ -413,8 +425,8 @@
     filteredRollenCache.value = filteredRollen.value;
 
     const bodyParams: CreatePersonBodyParams = {
-      familienname: selectedFamilienname.value as string,
-      vorname: selectedVorname.value as string,
+      familienname: selectedFamilienname.value,
+      vorname: selectedVorname.value,
       personalnummer: selectedKopersNr.value as string,
       befristung: formattedBefristung,
       createPersonenkontexte:
@@ -440,11 +452,12 @@
             .get('personenkontext-create')
             ?.filterResult.find((klasse: Organisation) => klasse.id === selectedKlasse.value)?.name || '',
       };
-      for (const rolleId of selectedRollen.value)
+      for (const rolleId of selectedRollen.value) {
         bodyParams.createPersonenkontexte.push({
           organisationId: selectedKlasse.value,
           rolleId: rolleId,
         });
+      }
     }
     // We save a copy of the selected values because they are not available anymore since we reset the form right after submitting
     // This will then be used to display the organisation again in the success template after receiving the orga ID and rolle ID back from the BE.
@@ -461,11 +474,11 @@
     // Only adding Kontext to existing person
     const existingPerson: PersonLandesbediensteterSearchResponse | undefined =
       personStore.allLandesbedienstetePersonen?.[0];
-    const personId: string | undefined = existingPerson?.id;
 
-    if (!personId) {
+    if (!existingPerson) {
       return;
     }
+    const personId: string = existingPerson.id;
     // Get latest person data
     await personStore.getPersonenuebersichtById(personId);
 
@@ -480,7 +493,7 @@
 
     selectedOrgaCache.value = selectedOrganisation.value;
     selectedRolleCache.value = selectedRollen.value;
-    await personenkontextStore.commitLandesbediensteteKontext(personId, newKontexte, existingPerson?.personalnummer!);
+    await personenkontextStore.commitLandesbediensteteKontext(personId, newKontexte, existingPerson.personalnummer);
     formContext.resetForm();
     filteredRollen.value = [];
   }
@@ -630,7 +643,7 @@
     }
   });
 
-  watch(hasNoKopersNr, async (newValue: boolean | undefined) => {
+  watch(hasNoKopersNr, (newValue: boolean | undefined) => {
     if (newValue) {
       showNoKopersNrConfirmationDialog.value = true;
     }
@@ -668,7 +681,9 @@
   }
 
   function preventNavigation(event: BeforeUnloadEvent): void {
-    if (!isFormDirty()) return;
+    if (!isFormDirty()) {
+      return;
+    }
     event.preventDefault();
     /* Chrome requires returnValue to be set. */
     event.returnValue = '';
@@ -698,7 +713,7 @@
     },
   );
 
-  onMounted(async () => {
+  onMounted(() => {
     personStore.errorCode = '';
 
     personenkontextStore.createdPersonWithKontext = null;
@@ -727,26 +742,26 @@
       :closable="!personenkontextStore.errorCode && !personStore.errorCode"
       data-testid="person-creation-card"
       :header="layoutCardLabel"
-      @onCloseClicked="navigateToPersonTable"
       :padded="true"
-      :showCloseText="true"
+      :show-close-text="true"
+      @on-close-clicked="navigateToPersonTable"
     >
       <!-- The form to create a new Person  -->
       <template
         v-if="!personenkontextStore.createdPersonWithKontext && !personenkontextStore.landesbediensteteCommitResponse"
       >
         <FormWrapper
-          :canCommit="canCommit"
-          :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
-          :createButtonLabel="createButtonLabel"
-          :discardButtonLabel="discardButtonLabel"
-          :hideActions="!!personenkontextStore.errorCode || !!personStore.errorCode"
           id="person-creation-form"
-          :isLoading="personenkontextStore.loading"
-          :onDiscard="navigateToPersonTable"
-          @onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
-          :onSubmit="onSubmit"
-          :showUnsavedChangesDialog="showUnsavedChangesDialog"
+          :can-commit="canCommit"
+          :confirm-unsaved-changes-action="handleConfirmUnsavedChanges"
+          :create-button-label="createButtonLabel"
+          :discard-button-label="discardButtonLabel"
+          :hide-actions="!!personenkontextStore.errorCode || !!personStore.errorCode"
+          :is-loading="personenkontextStore.loading"
+          :on-discard="navigateToPersonTable"
+          :on-submit="onSubmit"
+          :show-unsaved-changes-dialog="showUnsavedChangesDialog"
+          @on-show-dialog-change="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
         >
           <!-- Error Message Display for error messages from the personenkontextStore -->
           <SpshAlert
@@ -756,9 +771,9 @@
             :text="
               personenkontextStore.errorCode ? t(`admin.personenkontext.errors.${personenkontextStore.errorCode}`) : ''
             "
-            :showButton="true"
-            :buttonText="$t('admin.person.backToCreatePerson')"
-            :buttonAction="navigateBackToPersonForm"
+            :show-button="true"
+            :button-text="$t('admin.person.backToCreatePerson')"
+            :button-action="navigateBackToPersonForm"
             :title="
               personenkontextStore.errorCode ? t(`admin.personenkontext.title.${personenkontextStore.errorCode}`) : ''
             "
@@ -769,9 +784,9 @@
             :title="$t('admin.person.creationErrorTitle')"
             :type="'error'"
             :closable="false"
-            :showButton="true"
-            :buttonText="$t('admin.person.backToCreatePerson')"
-            :buttonAction="navigateBackToPersonForm"
+            :show-button="true"
+            :button-text="$t('admin.person.backToCreatePerson')"
+            :button-action="navigateBackToPersonForm"
             :text="creationErrorText"
           />
 
@@ -783,73 +798,76 @@
               </v-row>
               <!-- Vorname -->
               <FormRow
-                :errorLabel="selectedVornameProps['error']"
-                labelForId="vorname-input"
-                :isRequired="true"
+                :error-label="selectedVornameProps['error']"
+                label-for-id="vorname-input"
+                :is-required="true"
                 :label="$t('person.firstName')"
               >
                 <v-text-field
+                  id="vorname-input"
+                  ref="vorname-input"
+                  v-bind="selectedVornameProps"
+                  v-model="selectedVorname"
                   clearable
                   data-testid="vorname-input"
                   density="compact"
                   :disabled="createType === CreationType.AddPersonToOwnSchule"
-                  id="vorname-input"
-                  ref="vorname-input"
                   :placeholder="$t('person.enterFirstName')"
                   required="true"
                   variant="outlined"
-                  v-bind="selectedVornameProps"
-                  v-model="selectedVorname"
-                ></v-text-field>
+                />
               </FormRow>
 
               <!-- Nachname -->
               <FormRow
-                :errorLabel="selectedFamiliennameProps['error']"
-                labelForId="familienname-input"
-                :isRequired="true"
+                :error-label="selectedFamiliennameProps['error']"
+                label-for-id="familienname-input"
+                :is-required="true"
                 :label="$t('person.lastName')"
               >
                 <v-text-field
+                  id="familienname-input"
+                  ref="familienname-input"
+                  v-bind="selectedFamiliennameProps"
+                  v-model="selectedFamilienname"
                   clearable
                   data-testid="familienname-input"
                   density="compact"
                   :disabled="createType === CreationType.AddPersonToOwnSchule"
-                  id="familienname-input"
-                  ref="familienname-input"
                   :placeholder="$t('person.enterLastName')"
                   required="true"
                   variant="outlined"
-                  v-bind="selectedFamiliennameProps"
-                  v-model="selectedFamilienname"
-                ></v-text-field>
+                />
               </FormRow>
               <KopersInput
-                :isDisabled="createType === CreationType.AddPersonToOwnSchule"
-                :hasNoKopersNr="hasNoKopersNr"
-                v-model:selectedKopersNr="selectedKopersNr"
                 ref="kopers-input"
-                :selectedKopersNrProps="selectedKopersNrProps"
-                @update:selectedKopersNr="(value?: string | undefined) => (selectedKopersNr = value)"
-                @update:hasNoKopersNr="(value: boolean | undefined) => (hasNoKopersNr = value)"
-              ></KopersInput>
+                v-model:selected-kopers-nr="selectedKopersNr"
+                :is-disabled="createType === CreationType.AddPersonToOwnSchule"
+                :has-no-kopers-nr="hasNoKopersNr"
+                :selected-kopers-nr-props="selectedKopersNrProps"
+                @update:selected-kopers-nr="(value?: string | undefined) => (selectedKopersNr = value)"
+                @update:has-no-kopers-nr="(value: boolean | undefined) => (hasNoKopersNr = value)"
+              />
               <!-- Organisation, Rolle, Klasse und Befristung zuordnen -->
               <PersonenkontextCreate
-                :operationContext="OperationContext.PERSON_ANLEGEN"
-                :allowMultipleRollen="true"
-                :createType="createType"
-                :showHeadline="true"
-                :organisationen="organisationen"
                 ref="personenkontext-create"
+                v-model:selected-organisation="selectedOrganisation"
+                v-model:selected-rollen="selectedRollen"
+                v-model:selected-klasse="selectedKlasse"
+                :operation-context="OperationContext.PERSON_ANLEGEN"
+                :allow-multiple-rollen="true"
+                :create-type="createType"
+                :show-headline="true"
+                :organisationen="organisationen"
                 :rollen="
                   createType === CreationType.AddPersonToOwnSchule || (filteredRollen?.length ?? 0) > 0
                     ? filteredRollen
                     : rollen
                 "
-                :selectedOrganisationProps="selectedOrganisationProps"
-                :selectedRollenProps="selectedRollenProps"
-                :selectedKlasseProps="selectedKlasseProps"
-                :befristungInputProps="{
+                :selected-organisation-props="selectedOrganisationProps"
+                :selected-rollen-props="selectedRollenProps"
+                :selected-klasse-props="selectedKlasseProps"
+                :befristung-input-props="{
                   befristungProps: selectedBefristungProps,
                   befristungOptionProps: selectedBefristungOptionProps,
                   isUnbefristetDisabled: isUnbefristetButtonDisabled,
@@ -858,34 +876,34 @@
                   befristung: selectedBefristung,
                   befristungOption: selectedBefristungOption,
                 }"
-                :headlineNumbers="{
+                :headline-numbers="{
                   org: sectionNumberOrg,
                   rolle: sectionNumberRolle,
                   befristung: sectionNumberBefristung,
                 }"
-                v-model:selectedOrganisation="selectedOrganisation"
-                v-model:selectedRollen="selectedRollen"
-                v-model:selectedKlasse="selectedKlasse"
-                @update:canCommit="canCommit = $event"
+                @update:can-commit="canCommit = $event"
                 @update:befristung="handleBefristungUpdate"
-                @update:calculatedBefristungOption="handleBefristungOptionUpdate"
-                @fieldReset="handleFieldReset"
+                @update:calculated-befristung-option="handleBefristungOptionUpdate"
+                @field-reset="handleFieldReset"
               />
             </template>
             <template v-else>
               <!-- Organisation, Rolle, Klasse und Befristung zuordnen -->
               <PersonenkontextCreate
-                :operationContext="OperationContext.PERSON_ANLEGEN"
-                :allowMultipleRollen="true"
-                :createType="createType"
-                :showHeadline="true"
-                :organisationen="organisationen"
                 ref="personenkontext-create"
+                v-model:selected-organisation="selectedOrganisation"
+                v-model:selected-rollen="selectedRollen"
+                v-model:selected-klasse="selectedKlasse"
+                :operation-context="OperationContext.PERSON_ANLEGEN"
+                :allow-multiple-rollen="true"
+                :create-type="createType"
+                :show-headline="true"
+                :organisationen="organisationen"
                 :rollen="(filteredRollen?.length ?? 0) > 0 ? filteredRollen : rollen"
-                :selectedOrganisationProps="selectedOrganisationProps"
-                :selectedRollenProps="selectedRollenProps"
-                :selectedKlasseProps="selectedKlasseProps"
-                :befristungInputProps="{
+                :selected-organisation-props="selectedOrganisationProps"
+                :selected-rollen-props="selectedRollenProps"
+                :selected-klasse-props="selectedKlasseProps"
+                :befristung-input-props="{
                   befristungProps: selectedBefristungProps,
                   befristungOptionProps: selectedBefristungOptionProps,
                   isUnbefristetDisabled: isUnbefristetButtonDisabled,
@@ -894,13 +912,10 @@
                   befristung: selectedBefristung,
                   befristungOption: selectedBefristungOption,
                 }"
-                v-model:selectedOrganisation="selectedOrganisation"
-                v-model:selectedRollen="selectedRollen"
-                v-model:selectedKlasse="selectedKlasse"
-                @update:canCommit="canCommit = $event"
+                @update:can-commit="canCommit = $event"
                 @update:befristung="handleBefristungUpdate"
-                @update:calculatedBefristungOption="handleBefristungOptionUpdate"
-                @fieldReset="handleFieldReset"
+                @update:calculated-befristung-option="handleBefristungOptionUpdate"
+                @field-reset="handleFieldReset"
               />
               <!-- Else: Default Order -->
               <div v-if="selectedOrganisation">
@@ -909,54 +924,54 @@
                 </v-row>
                 <!-- Vorname -->
                 <FormRow
-                  :errorLabel="selectedVornameProps['error']"
-                  labelForId="vorname-input"
-                  :isRequired="true"
+                  :error-label="selectedVornameProps['error']"
+                  label-for-id="vorname-input"
+                  :is-required="true"
                   :label="$t('person.firstName')"
                 >
                   <v-text-field
+                    id="vorname-input"
+                    ref="vorname-input"
+                    v-bind="selectedVornameProps"
+                    v-model="selectedVorname"
                     clearable
                     data-testid="vorname-input"
                     density="compact"
-                    id="vorname-input"
-                    ref="vorname-input"
                     :placeholder="$t('person.enterFirstName')"
                     required="true"
                     variant="outlined"
-                    v-bind="selectedVornameProps"
-                    v-model="selectedVorname"
-                  ></v-text-field>
+                  />
                 </FormRow>
 
                 <!-- Nachname -->
                 <FormRow
-                  :errorLabel="selectedFamiliennameProps['error']"
-                  labelForId="familienname-input"
-                  :isRequired="true"
+                  :error-label="selectedFamiliennameProps['error']"
+                  label-for-id="familienname-input"
+                  :is-required="true"
                   :label="$t('person.lastName')"
                 >
                   <v-text-field
+                    id="familienname-input"
+                    ref="familienname-input"
+                    v-bind="selectedFamiliennameProps"
+                    v-model="selectedFamilienname"
                     clearable
                     data-testid="familienname-input"
                     density="compact"
-                    id="familienname-input"
-                    ref="familienname-input"
                     :placeholder="$t('person.enterLastName')"
                     required="true"
                     variant="outlined"
-                    v-bind="selectedFamiliennameProps"
-                    v-model="selectedFamilienname"
-                  ></v-text-field>
+                  />
                 </FormRow>
                 <KopersInput
                   v-if="isKopersRolle(selectedRollen, filteredRollen) && selectedOrganisation"
-                  :hasNoKopersNr="hasNoKopersNr"
-                  v-model:selectedKopersNr="selectedKopersNr"
                   ref="kopers-input"
-                  :selectedKopersNrProps="selectedKopersNrProps"
-                  @update:selectedKopersNr="(value?: string | undefined) => (selectedKopersNr = value)"
-                  @update:hasNoKopersNr="(value: boolean | undefined) => (hasNoKopersNr = value)"
-                ></KopersInput>
+                  v-model:selected-kopers-nr="selectedKopersNr"
+                  :has-no-kopers-nr="hasNoKopersNr"
+                  :selected-kopers-nr-props="selectedKopersNrProps"
+                  @update:selected-kopers-nr="(value?: string | undefined) => (selectedKopersNr = value)"
+                  @update:has-no-kopers-nr="(value: boolean | undefined) => (hasNoKopersNr = value)"
+                />
               </div>
             </template>
           </template>
@@ -992,8 +1007,7 @@
                 color="#1EAE9C"
                 icon="mdi-check-circle"
                 small
-              >
-              </v-icon>
+              />
             </v-col>
           </v-row>
           <v-row justify="center">
@@ -1006,19 +1020,19 @@
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ t('person.firstName') }}: </v-col>
-            <v-col class="text-body"
-              ><span data-testid="created-person-vorname">{{
+            <v-col class="text-body">
+              <span data-testid="created-person-vorname">{{
                 personenkontextStore.createdPersonWithKontext.person.name.vorname
-              }}</span></v-col
-            >
+              }}</span>
+            </v-col>
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('person.lastName') }}: </v-col>
-            <v-col class="text-body"
-              ><span data-testid="created-person-familienname">{{
+            <v-col class="text-body">
+              <span data-testid="created-person-familienname">{{
                 personenkontextStore.createdPersonWithKontext.person.name.familienname
-              }}</span></v-col
-            >
+              }}</span>
+            </v-col>
           </v-row>
           <v-row
             v-if="
@@ -1049,50 +1063,51 @@
                   ? 'text-body'
                   : 'text-body text-red'
               }`"
-              ><span data-testid="created-person-kopersNr">{{
+            >
+              <span data-testid="created-person-kopersNr">{{
                 personenkontextStore.createdPersonWithKontext.person.personalnummer
                   ? personenkontextStore.createdPersonWithKontext.person.personalnummer
                   : t('missing')
-              }}</span></v-col
-            >
+              }}</span>
+            </v-col>
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('person.userName') }}: </v-col>
-            <v-col class="text-body"
-              ><span data-testid="created-person-username">{{
+            <v-col class="text-body">
+              <span data-testid="created-person-username">{{
                 personenkontextStore.createdPersonWithKontext.person.referrer
-              }}</span></v-col
-            >
+              }}</span>
+            </v-col>
           </v-row>
           <v-row>
-            <v-col class="text-body bold text-right pb-8">{{ $t('admin.person.startPassword') }}: </v-col>
+            <v-col class="text-body bold text-right pb-8"> {{ $t('admin.person.startPassword') }}: </v-col>
             <v-col class="text-body bold">
               <p class="mb-4">
                 {{ t('admin.person.startPasswordInfo') }}
               </p>
               <PasswordOutput
-                :showPrintIcon="true"
+                :show-print-icon="true"
                 :password="personenkontextStore.createdPersonWithKontext.person.startpasswort"
-              ></PasswordOutput>
+              />
             </v-col>
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.organisation.organisation') }}: </v-col>
-            <v-col class="text-body"
-              ><span data-testid="created-person-organisation">{{ translatedOrganisationsname }}</span></v-col
-            >
+            <v-col class="text-body">
+              <span data-testid="created-person-organisation">{{ translatedOrganisationsname }}</span>
+            </v-col>
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.rolle.rolle') }}: </v-col>
-            <v-col class="text-body"
-              ><span data-testid="created-person-rolle">{{ translatedRollenname.join(', ') }}</span></v-col
-            >
+            <v-col class="text-body">
+              <span data-testid="created-person-rolle">{{ translatedRollenname.join(', ') }}</span>
+            </v-col>
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.befristung.befristung') }}: </v-col>
-            <v-col class="text-body"
-              ><span data-testid="created-person-befristung">{{ translatedBefristung }}</span></v-col
-            >
+            <v-col class="text-body">
+              <span data-testid="created-person-befristung">{{ translatedBefristung }}</span>
+            </v-col>
           </v-row>
           <v-row
             v-if="
@@ -1102,17 +1117,17 @@
             "
           >
             <v-col class="text-body bold text-right"> {{ $t('admin.klasse.klasse') }}: </v-col>
-            <v-col class="text-body"
-              ><span data-testid="created-person-klasse">{{
+            <v-col class="text-body">
+              <span data-testid="created-person-klasse">{{
                 selectedKlasseCache ? selectedKlasseCache.title : '---'
-              }}</span></v-col
-            >
+              }}</span>
+            </v-col>
           </v-row>
           <v-divider
             class="border-opacity-100 rounded my-6"
             color="#E5EAEF"
             thickness="6"
-          ></v-divider>
+          />
           <v-row justify="end">
             <v-col
               cols="12"
@@ -1121,9 +1136,9 @@
             >
               <v-btn
                 class="secondary"
-                @click.stop="navigateToPersonDetails"
                 data-testid="to-details-button"
                 :block="mdAndDown"
+                @click.stop="navigateToPersonDetails"
               >
                 {{ t('nav.toDetails') }}
               </v-btn>
@@ -1135,9 +1150,9 @@
             >
               <v-btn
                 class="secondary"
-                @click.stop="navigateToPersonTable"
                 data-testid="back-to-list-button"
                 :block="mdAndDown"
+                @click.stop="navigateToPersonTable"
               >
                 {{ t('nav.backToList') }}
               </v-btn>
@@ -1149,9 +1164,9 @@
             >
               <v-btn
                 class="primary button"
-                @click="handleCreateAnotherPerson"
                 data-testid="create-another-person-button"
                 :block="mdAndDown"
+                @click="handleCreateAnotherPerson"
               >
                 {{ createAnotherButtonLabel }}
               </v-btn>
@@ -1190,8 +1205,7 @@
                 color="#1EAE9C"
                 icon="mdi-check-circle"
                 small
-              >
-              </v-icon>
+              />
             </v-col>
           </v-row>
           <v-row justify="center">
@@ -1204,59 +1218,59 @@
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('person.firstName') }}: </v-col>
-            <v-col class="text-body"
-              ><span data-testid="added-landesbediensteter-forname">{{
+            <v-col class="text-body">
+              <span data-testid="added-landesbediensteter-forname">{{
                 personStore.allLandesbedienstetePersonen?.[0]?.vorname
-              }}</span></v-col
-            >
+              }}</span>
+            </v-col>
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('person.lastName') }}: </v-col>
-            <v-col class="text-body"
-              ><span data-testid="added-landesbediensteter-ffamilienname">{{
+            <v-col class="text-body">
+              <span data-testid="added-landesbediensteter-ffamilienname">{{
                 personStore.allLandesbedienstetePersonen?.[0]?.familienname
-              }}</span></v-col
-            >
+              }}</span>
+            </v-col>
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('person.kopersNr') }}: </v-col>
-            <v-col class="text-body"
-              ><span data-testid="added-landesbediensteter-familienname">{{
+            <v-col class="text-body">
+              <span data-testid="added-landesbediensteter-familienname">{{
                 personStore.allLandesbedienstetePersonen?.[0]?.personalnummer
-              }}</span></v-col
-            >
+              }}</span>
+            </v-col>
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ t('person.userName') }}: </v-col>
-            <v-col class="text-body"
-              ><span data-testid="added-landesbediensteter-username">{{
+            <v-col class="text-body">
+              <span data-testid="added-landesbediensteter-username">{{
                 personStore.allLandesbedienstetePersonen?.[0]?.username
-              }}</span></v-col
-            >
+              }}</span>
+            </v-col>
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ t('admin.organisation.organisation') }}: </v-col>
-            <v-col class="text-body"
-              ><span data-testid="added-landesbediensteter-organisation">{{ translatedOrganisationsname }}</span></v-col
-            >
+            <v-col class="text-body">
+              <span data-testid="added-landesbediensteter-organisation">{{ translatedOrganisationsname }}</span>
+            </v-col>
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ t('admin.rolle.rolle') }}: </v-col>
-            <v-col class="text-body"
-              ><span data-testid="added-landesbediensteter-rolle">{{ translatedRollenname.join(', ') }}</span></v-col
-            >
+            <v-col class="text-body">
+              <span data-testid="added-landesbediensteter-rolle">{{ translatedRollenname.join(', ') }}</span>
+            </v-col>
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ t('admin.befristung.befristung') }}: </v-col>
-            <v-col class="text-body"
-              ><span data-testid="added-landesbediensteter-befristung">{{ translatedBefristung }}</span></v-col
-            >
+            <v-col class="text-body">
+              <span data-testid="added-landesbediensteter-befristung">{{ translatedBefristung }}</span>
+            </v-col>
           </v-row>
           <v-divider
             class="border-opacity-100 rounded my-6"
             color="#E5EAEF"
             thickness="6"
-          ></v-divider>
+          />
           <v-row justify="end">
             <v-col
               cols="12"
@@ -1265,9 +1279,9 @@
             >
               <v-btn
                 class="secondary"
-                @click.stop="navigateToPersonDetails"
                 data-testid="to-details-button"
                 :block="mdAndDown"
+                @click.stop="navigateToPersonDetails"
               >
                 {{ $t('nav.toDetails') }}
               </v-btn>
@@ -1279,9 +1293,9 @@
             >
               <v-btn
                 class="secondary"
-                @click.stop="navigateToPersonTable"
                 data-testid="back-to-list-button"
                 :block="mdAndDown"
+                @click.stop="navigateToPersonTable"
               >
                 {{ $t('nav.backToList') }}
               </v-btn>
@@ -1294,9 +1308,9 @@
               <v-btn
                 class="primary button"
                 :class="{ big: mdAndUp }"
-                @click="handleCreateAnotherPerson"
                 :data-testid="createAnotherButtonTestId"
                 :block="mdAndDown"
+                @click="handleCreateAnotherPerson"
               >
                 {{ createAnotherButtonLabel }}
               </v-btn>
@@ -1339,11 +1353,11 @@
               <v-btn
                 :block="mdAndDown"
                 class="secondary"
+                data-testid="cancel-no-kopersnr-button"
                 @click.stop="
                   showNoKopersNrConfirmationDialog = false;
                   hasNoKopersNr = false;
                 "
-                data-testid="cancel-no-kopersnr-button"
               >
                 {{ t('cancel') }}
               </v-btn>
@@ -1356,8 +1370,8 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary"
-                @click.stop="showNoKopersNrConfirmationDialog = false"
                 data-testid="confirm-no-kopersnr-button"
+                @click.stop="showNoKopersNrConfirmationDialog = false"
               >
                 {{ t('proceed') }}
               </v-btn>
@@ -1400,8 +1414,8 @@
               <v-btn
                 :block="mdAndDown"
                 class="secondary"
-                @click.stop="showAddPersonConfirmationDialog = false"
                 data-testid="cancel-add-person-confirmation-button"
+                @click.stop="showAddPersonConfirmationDialog = false"
               >
                 {{ $t('cancel') }}
               </v-btn>
@@ -1415,8 +1429,8 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary"
-                @click.stop="addPersonToOwnSchule"
                 data-testid="confirm-add-person-button"
+                @click.stop="addPersonToOwnSchule"
               >
                 {{ t('admin.person.stateEmployeeSearch.addStateEmployee') }}
               </v-btn>

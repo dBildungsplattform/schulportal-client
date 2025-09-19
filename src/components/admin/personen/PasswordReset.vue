@@ -31,7 +31,7 @@
   const props: Props = defineProps<Props>();
   const emit: Emits = defineEmits<Emits>();
 
-  async function closePasswordResetDialog(isActive: Ref<boolean>): Promise<void> {
+  function closePasswordResetDialog(isActive: Ref<boolean>): void {
     isActive.value = false;
     emit('onClearPassword');
   }
@@ -43,19 +43,19 @@
 
 <template>
   <v-dialog
-    persistent
     ref="password-reset-dialog"
+    persistent
   >
-    <template v-slot:activator="{ props }">
+    <template #activator="{ props }">
       <v-col
         cols="12"
         sm="6"
         md="auto"
       >
         <SpshTooltip
-          :enabledCondition="!disabled"
-          :disabledText="$t('person.finishEditFirst')"
-          :enabledText="buttonText"
+          :enabled-condition="!disabled"
+          :disabled-text="$t('person.finishEditFirst')"
+          :enabled-text="buttonText"
           position="start"
         >
           <v-btn
@@ -71,12 +71,12 @@
       </v-col>
     </template>
 
-    <template v-slot:default="{ isActive }">
+    <template #default="{ isActive }">
       <LayoutCard
         :closable="true"
         :header="dialogHeader"
-        headlineTestId="password-reset-dialog-header"
-        @onCloseClicked="closePasswordResetDialog(isActive)"
+        headline-test-id="password-reset-dialog-header"
+        @on-close-clicked="closePasswordResetDialog(isActive)"
       >
         <v-card-text>
           <v-container>
@@ -88,7 +88,7 @@
                 class="text-right"
                 cols="1"
               >
-                <v-icon icon="mdi-alert"></v-icon>
+                <v-icon icon="mdi-alert" />
               </v-col>
               <v-col>
                 <p data-testid="error-text">
@@ -97,8 +97,8 @@
               </v-col>
             </v-row>
             <v-row
-              class="text-body bold px-md-16"
               v-if="!errorMessage && !errorCode"
+              class="text-body bold px-md-16"
             >
               <v-col>
                 <p data-testid="password-reset-info-text">
@@ -108,7 +108,7 @@
             </v-row>
             <v-row class="px-md-16">
               <v-col cols="12">
-                <PasswordOutput :password="password"></PasswordOutput>
+                <PasswordOutput :password="password" />
               </v-col>
             </v-row>
           </v-container>
@@ -124,8 +124,8 @@
                 v-if="!!password"
                 :block="mdAndDown"
                 class="primary button"
-                @click.stop="closePasswordResetDialog(isActive)"
                 data-testid="close-password-reset-dialog-button"
+                @click.stop="closePasswordResetDialog(isActive)"
               >
                 {{ $t('close') }}
               </v-btn>
@@ -133,8 +133,8 @@
                 v-else
                 :block="mdAndDown"
                 class="secondary button"
-                @click.stop="closePasswordResetDialog(isActive)"
                 data-testid="close-password-reset-dialog-button"
+                @click.stop="closePasswordResetDialog(isActive)"
               >
                 {{ $t('close') }}
               </v-btn>
@@ -149,8 +149,8 @@
                 v-if="!!password"
                 :block="mdAndDown"
                 class="secondary button"
-                @click="printPassword"
                 data-testid="password-print-button"
+                @click="printPassword"
               >
                 {{ $t('admin.person.printPassword') }}
               </v-btn>
@@ -158,9 +158,9 @@
                 v-else
                 :block="mdAndDown"
                 class="primary button"
-                @click.stop="$emit('onResetPassword')"
                 data-testid="password-reset-button"
                 :disabled="!!password || isLoading"
+                @click.stop="$emit('onResetPassword')"
               >
                 {{ confirmButtonText }}
               </v-btn>

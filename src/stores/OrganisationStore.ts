@@ -302,7 +302,9 @@ export const useOrganisationStore: StoreDefinition<
       this.allKlassen = updateSchuleDetails(this.allKlassen);
       this.klassen = updateSchuleDetails(this.klassen);
 
-      if (uncachedIds.length === 0) return; // Skip API call if all IDs are cached
+      if (uncachedIds.length === 0) {
+        return;
+      } // Skip API call if all IDs are cached
 
       this.loading = true;
       try {
@@ -404,7 +406,7 @@ export const useOrganisationStore: StoreDefinition<
         this.totalPaginatedKlassen = +response.headers['x-paging-pagetotal'];
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
-        return await Promise.reject(this.errorCode);
+        return await Promise.reject(new Error(this.errorCode));
       } finally {
         this.loadingKlassen = false;
       }
@@ -425,7 +427,7 @@ export const useOrganisationStore: StoreDefinition<
         return data;
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
-        return await Promise.reject(this.errorCode);
+        return await Promise.reject(new Error(this.errorCode));
       } finally {
         this.loading = false;
       }
@@ -453,7 +455,9 @@ export const useOrganisationStore: StoreDefinition<
         let organisation: Organisation | undefined = this.parentOrganisationen.find(
           (org: Organisation) => org.id === organisationId,
         );
-        if (!organisation) organisation = this.allOrganisationen.find((org: Organisation) => org.id === organisationId);
+        if (!organisation) {
+          organisation = this.allOrganisationen.find((org: Organisation) => org.id === organisationId);
+        }
         if (organisation) {
           this.lockingOrganisation = { ...organisation };
         } else {
@@ -494,7 +498,7 @@ export const useOrganisationStore: StoreDefinition<
         await this.fetchSchuleDetailsForKlassen(true);
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
-        return await Promise.reject(this.errorCode);
+        return await Promise.reject(new Error(this.errorCode));
       } finally {
         this.loadingKlassen = false;
       }

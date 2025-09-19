@@ -30,7 +30,9 @@ const rollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
 
 // Checks if the selected Rolle has Befristungspflicht
 export async function isBefristungspflichtRolle(selectedRolleIds: string[] | undefined): Promise<boolean> {
-  if (!selectedRolleIds || selectedRolleIds.length === 0) return false;
+  if (!selectedRolleIds || selectedRolleIds.length === 0) {
+    return false;
+  }
 
   const existingRollen: TranslatedRolleWithAttrs[] = rollen.value ?? [];
 
