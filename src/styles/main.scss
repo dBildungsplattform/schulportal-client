@@ -69,6 +69,10 @@ label.v-label {
   word-break: break-word;
 }
 
+.hyphenate {
+  hyphens: auto;
+}
+
 .ellipsis-wrapper {
   text-overflow: ellipsis;
   overflow: hidden;
