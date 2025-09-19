@@ -1,6 +1,5 @@
 <script setup lang="ts">
-  import type { BefristungProps } from '@/components/admin/personen/BefristungInput.vue';
-  import BefristungInput from '@/components/admin/personen/BefristungInput.vue';
+  import BefristungInput, { type BefristungProps } from '@/components/admin/personen/BefristungInput.vue';
   import KlassenFilter from '@/components/filter/KlassenFilter.vue';
   import FormRow from '@/components/form/FormRow.vue';
   import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
@@ -92,7 +91,9 @@
   });
 
   const selectedRolleTitles: ComputedRef<string[]> = computed(() => {
-    if (!Array.isArray(selectedRollen.value)) return [];
+    if (!Array.isArray(selectedRollen.value)) {
+      return [];
+    }
     return selectedRollen.value
       .map((id: string) => props.rollen?.find((rolle: TranslatedObject) => rolle.value === id)?.title)
       .filter((title: string | undefined): title is string => !!title);
@@ -104,7 +105,9 @@
   });
 
   function isLernRolle(selectedRolleIds: string | string[] | undefined): boolean {
-    if (!selectedRolleIds) return false;
+    if (!selectedRolleIds) {
+      return false;
+    }
 
     // Ensure we always work with an array
     const rolleIdsArray: string[] = Array.isArray(selectedRolleIds) ? selectedRolleIds : [selectedRolleIds];
@@ -151,7 +154,9 @@
         limit: 25,
       };
 
-      if (!hasAutoselectedSchule.value) await handleWorkflowStep(filter);
+      if (!hasAutoselectedSchule.value) {
+        await handleWorkflowStep(filter);
+      }
 
       administriertVon.value?.pop();
       administriertVon.value?.push(newValue);
@@ -228,10 +233,12 @@
 
   // Using a watcher instead of modelUpdate since we need the old Value as well.
   // Default behavior of the autocomplete is to reset the newValue to empty string and that causes another request to be made
-  watch(searchInputOrganisation, async (newValue: string | undefined, oldValue: string | undefined) => {
+  watch(searchInputOrganisation, (newValue: string | undefined, oldValue: string | undefined) => {
     clearTimeout(timerId.value);
 
-    if (oldValue === selectedOrganisationTitle.value) return;
+    if (oldValue === selectedOrganisationTitle.value) {
+      return;
+    }
 
     const filter: WorkflowFilter = { limit: 25 };
 
@@ -254,11 +261,13 @@
 
   watch(
     props.allowMultipleRollen ? searchInputRollen : searchInputRolle,
-    async (newValue: string | undefined, oldValue: string | undefined) => {
+    (newValue: string | undefined, oldValue: string | undefined) => {
       clearTimeout(timerId.value);
 
       // this prevents duplicate requests because the input value changes between "" and null
-      if (!newValue && !oldValue) return;
+      if (!newValue && !oldValue) {
+        return;
+      }
 
       // this prevents duplicate requests when the user selects a value from the dropdown
       if (
@@ -319,7 +328,7 @@
 
   watch(
     autoselectedSchule,
-    async (newAutoselectedSchule: Organisation | null) => {
+    (newAutoselectedSchule: Organisation | null) => {
       if (newAutoselectedSchule) {
         selectedOrganisation.value = newAutoselectedSchule.id;
         emits('update:selectedOrganisation', newAutoselectedSchule.id);
@@ -373,12 +382,17 @@
     <!-- Organisation zuordnen -->
     <FormRow
       ref="form-row"
-      :errorLabel="selectedOrganisationProps?.['error'] ?? false"
-      :isRequired="true"
-      labelForId="organisation-select"
+      :error-label="selectedOrganisationProps?.['error'] ?? false"
+      :is-required="true"
+      label-for-id="organisation-select"
       :label="$t('admin.organisation.organisation')"
     >
       <v-autocomplete
+        id="organisation-select"
+        ref="organisation-select"
+        v-bind="selectedOrganisationProps"
+        v-model="selectedOrganisation"
+        v-model:search="searchInputOrganisation"
         class="mb-5"
         autocomplete="off"
         :class="[
@@ -390,8 +404,6 @@
         data-testid="organisation-select"
         density="compact"
         :disabled="hasAutoselectedSchule || isRolleUnassignForm"
-        id="organisation-select"
-        ref="organisation-select"
         hide-details
         :items="organisationen"
         item-value="value"
@@ -401,10 +413,7 @@
         required="true"
         variant="outlined"
         @update:focused="handleFocusChange"
-        v-bind="selectedOrganisationProps"
-        v-model="selectedOrganisation"
-        v-model:search="searchInputOrganisation"
-      ></v-autocomplete>
+      />
     </FormRow>
 
     <div v-if="selectedOrganisation">
@@ -413,23 +422,24 @@
       </v-row>
       <!-- Rollenzuordnung -->
       <FormRow
-        :errorLabel="
+        :error-label="
           allowMultipleRollen ? (selectedRollenProps?.['error'] ?? false) : (selectedRolleProps?.['error'] ?? false)
         "
-        labelForId="rolle-select"
-        :isRequired="true"
+        label-for-id="rolle-select"
+        :is-required="true"
         :label="$t('admin.rolle.rolle')"
       >
         <v-autocomplete
           v-if="allowMultipleRollen"
-          autocomplete="off"
-          clearable
-          @clear="clearSelectedRollen"
-          @update:focused="handleFocusChange"
-          data-testid="rollen-select"
-          density="compact"
           id="rollen-select"
           ref="rollen-select"
+          v-bind="selectedRollenProps"
+          v-model="selectedRollen"
+          v-model:search="searchInputRollen"
+          autocomplete="off"
+          clearable
+          data-testid="rollen-select"
+          density="compact"
           :items="rollen"
           item-value="value"
           item-text="title"
@@ -438,19 +448,20 @@
           :placeholder="$t('admin.rolle.selectRolle')"
           required="true"
           variant="outlined"
-          v-bind="selectedRollenProps"
-          v-model="selectedRollen"
-          v-model:search="searchInputRollen"
-        ></v-autocomplete>
+          @clear="clearSelectedRollen"
+          @update:focused="handleFocusChange"
+        />
         <v-autocomplete
           v-else-if="!allowMultipleRollen"
-          autocomplete="off"
-          clearable
-          @clear="clearSelectedRolle"
-          data-testid="rolle-select"
-          density="compact"
           id="rolle-select"
           ref="rolle-select"
+          v-bind="selectedRolleProps"
+          v-model="selectedRolle"
+          v-model:search="searchInputRolle"
+          autocomplete="off"
+          clearable
+          data-testid="rolle-select"
+          density="compact"
           :items="rollen"
           item-value="value"
           item-text="title"
@@ -458,10 +469,8 @@
           :placeholder="$t('admin.rolle.selectRolle')"
           required="true"
           variant="outlined"
-          v-bind="selectedRolleProps"
-          v-model="selectedRolle"
-          v-model:search="searchInputRolle"
-        ></v-autocomplete>
+          @clear="clearSelectedRolle"
+        />
       </FormRow>
 
       <!-- Klasse zuordnen -->
@@ -471,22 +480,22 @@
             ? isLernRolle(selectedRollen) && selectedOrganisation
             : isLernRolle(selectedRolle) && selectedOrganisation && !isRolleUnassignForm
         "
-        :errorLabel="selectedKlasseProps?.['error'] || false"
-        :isRequired="true"
-        labelForId="klasse-select"
+        :error-label="selectedKlasseProps?.['error'] || false"
+        :is-required="true"
+        label-for-id="klasse-select"
         :label="$t('admin.klasse.klasse')"
       >
         <KlassenFilter
-          :multiple="false"
-          :hideDetails="false"
-          :selectedKlasseProps="selectedKlasseProps"
-          :highlightSelection="false"
-          :selectedKlassen="selectedKlasse"
-          @update:selectedKlassen="updateKlasseSelection"
-          :placeholderText="$t('admin.klasse.selectKlasse')"
           ref="klasse-select"
-          :administriertVon
-          :filterId="'personenkontext-create'"
+          :multiple="false"
+          :hide-details="false"
+          :selected-klasse-props="selectedKlasseProps"
+          :highlight-selection="false"
+          :selected-klassen="selectedKlasse"
+          :placeholder-text="$t('admin.klasse.selectKlasse')"
+          :administriert-von
+          :filter-id="'personenkontext-create'"
+          @update:selected-klassen="updateKlasseSelection"
         />
       </FormRow>
       <!-- Befristung -->
@@ -508,16 +517,16 @@
           !isModifyRolleDialog &&
           props.befristungInputProps
         "
-        :befristungProps="befristungInputProps?.befristungProps"
-        :befristungOptionProps="befristungInputProps?.befristungOptionProps"
-        :isUnbefristetDisabled="befristungInputProps?.isUnbefristetDisabled"
-        :isBefristungRequired="befristungInputProps?.isBefristungRequired"
-        :nextSchuljahresende="befristungInputProps?.nextSchuljahresende"
-        :befristung="befristungInputProps?.befristung"
-        :befristungOption="befristungInputProps?.befristungOption"
         ref="befristung-input-wrapper"
+        :befristung-props="befristungInputProps?.befristungProps"
+        :befristung-option-props="befristungInputProps?.befristungOptionProps"
+        :is-unbefristet-disabled="befristungInputProps?.isUnbefristetDisabled"
+        :is-befristung-required="befristungInputProps?.isBefristungRequired"
+        :next-schuljahresende="befristungInputProps?.nextSchuljahresende"
+        :befristung="befristungInputProps?.befristung"
+        :befristung-option="befristungInputProps?.befristungOption"
         @update:befristung="handleBefristungChange"
-        @update:calculatedBefristungOption="handleCalculatedBefristungOptionChange"
+        @update:calculated-befristung-option="handleCalculatedBefristungOptionChange"
       />
     </div>
   </div>

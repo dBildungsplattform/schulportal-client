@@ -72,7 +72,7 @@
     allSchultraeger.value = organisationStore.allSchultraeger;
   });
 
-  onBeforeRouteLeave(async () => {
+  onBeforeRouteLeave(() => {
     organisationStore.errorCode = '';
   });
 </script>
@@ -101,36 +101,35 @@
             ? $t('admin.schultraeger.loadingErrorText')
             : $t(`admin.schultraeger.errors.${organisationStore.errorCode}`)
         "
-        :showButton="true"
-        :buttonText="$t('nav.backToList')"
-        :buttonAction="handleAlertClose"
-        @update:modelValue="handleAlertClose"
+        :show-button="true"
+        :button-text="$t('nav.backToList')"
+        :button-action="handleAlertClose"
+        @update:model-value="handleAlertClose"
       />
       <template v-if="!organisationStore.errorCode">
         <v-row
           align="center"
           class="ma-3"
           justify="end"
-        >
-        </v-row>
+        />
         <ResultTable
-          :currentPage="searchFilterStore.schultraegerPage"
+          ref="result-table"
+          :current-page="searchFilterStore.schultraegerPage"
           data-testid="schultraeger-table"
           :items="organisationStore.allSchultraeger || []"
           :loading="organisationStore.loading"
           :headers="headers"
-          @onHandleRowClick="
+          item-value-path="id"
+          :total-items="organisationStore.totalSchultraeger"
+          :items-per-page="searchFilterStore.schulentraegerPerPage"
+          @on-handle-row-click="
             (event: PointerEvent, item: TableRow<unknown>) =>
               navigateToSchultraegerDetails(event, item as TableRow<SchultraegerTableItem>)
           "
-          item-value-path="id"
-          @onItemsPerPageUpdate="getPaginatedSchultraegerWithLimit"
-          @onPageUpdate="getPaginatedSchultraeger"
-          ref="result-table"
-          :totalItems="organisationStore.totalSchultraeger"
-          :itemsPerPage="searchFilterStore.schulentraegerPerPage"
+          @on-items-per-page-update="getPaginatedSchultraegerWithLimit"
+          @on-page-update="getPaginatedSchultraeger"
         >
-          <template v-slot:[`item.name`]="{ item }">
+          <template #[`item.name`]="{ item }">
             <div
               class="ellipsis-wrapper"
               :title="item.name"
@@ -138,7 +137,7 @@
               {{ item.name }}
             </div>
           </template>
-          <template v-slot:[`item.schuleDetails`]="{ item }">
+          <template #[`item.schuleDetails`]="{ item }">
             <div
               class="ellipsis-wrapper"
               :title="item.schuleDetails"

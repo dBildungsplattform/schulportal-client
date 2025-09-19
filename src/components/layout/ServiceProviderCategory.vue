@@ -55,7 +55,7 @@
           class="border-opacity-100 rounded"
           color="#E5EAEF"
           thickness="6"
-        ></v-divider>
+        />
       </v-col>
     </v-row>
     <v-row>
@@ -68,11 +68,11 @@
       >
         <ServiceProviderCard
           :href="computeUrlAndTab(serviceProvider).url"
-          :newTab="computeUrlAndTab(serviceProvider).newTab"
-          :testId="`service-provider-card-${serviceProvider.id}`"
+          :new-tab="computeUrlAndTab(serviceProvider).newTab"
+          :test-id="`service-provider-card-${serviceProvider.id}`"
           :title="serviceProvider.name"
-          :logoUrl="serviceProvider.logoUrl"
-        ></ServiceProviderCard>
+          :logo-url="serviceProvider.logoUrl"
+        />
       </v-col>
     </v-row>
   </template>

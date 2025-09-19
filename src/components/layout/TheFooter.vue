@@ -112,8 +112,8 @@
         >
           <a
             v-for="link in footerLinks"
-            class="primary footer-link"
             :key="link.text"
+            class="primary footer-link"
             :href="link.href"
             rel="noopener noreferrer"
             :target="link.external ? '_blank' : '_self'"
@@ -121,7 +121,7 @@
           >
         </v-col>
       </v-row>
-      <div class="bottom-decoration"></div>
+      <div class="bottom-decoration" />
     </v-container>
   </v-footer>
 </template>

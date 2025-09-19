@@ -45,7 +45,7 @@
           small
           color="#1EAE9C"
           icon="mdi-check-circle"
-        ></v-icon>
+        />
       </v-col>
     </v-row>
     <v-row justify="center">
@@ -60,7 +60,7 @@
       v-for="(item, index) in changedData"
       :key="index"
     >
-      <v-col class="text-body bold text-right">{{ item.label }}:</v-col>
+      <v-col class="text-body bold text-right"> {{ item.label }}: </v-col>
       <v-col class="text-body">
         <span :data-testid="item.testId">{{ item.value }}</span>
       </v-col>
@@ -69,35 +69,37 @@
       class="border-opacity-100 rounded my-6"
       color="#E5EAEF"
       thickness="6"
-    ></v-divider>
+    />
     <v-row justify="end">
       <v-col
+        v-if="showBackButton"
         cols="12"
         sm="6"
         md="auto"
-        v-if="showBackButton"
       >
         <v-btn
           class="secondary"
           :data-testid="backButtonTestId"
           :block="mdAndDown"
           @click="navigateBack"
-          >{{ backButtonText }}</v-btn
         >
+          {{ backButtonText }}
+        </v-btn>
       </v-col>
       <v-col
+        v-if="showCreateAnotherButton"
         cols="12"
         sm="6"
         md="auto"
-        v-if="showCreateAnotherButton"
       >
         <v-btn
           class="primary"
           :data-testid="createAnotherButtonTestId"
           :block="mdAndDown"
           @click="createAnother"
-          >{{ createAnotherButtonText }}</v-btn
         >
+          {{ createAnotherButtonText }}
+        </v-btn>
       </v-col>
     </v-row>
   </v-container>

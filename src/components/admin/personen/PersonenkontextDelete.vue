@@ -22,11 +22,11 @@
   const errorMessage: Ref<string> = ref('');
   const successDialogVisible: Ref<boolean> = ref(false);
 
-  async function closeZuordnungDeleteDialog(isActive: Ref<boolean>): Promise<void> {
+  function closeZuordnungDeleteDialog(isActive: Ref<boolean>): void {
     isActive.value = false;
   }
 
-  async function handleZuordnungDelete(): Promise<void> {
+  function handleZuordnungDelete(): void {
     emit('onDeletePersonenkontext');
   }
 </script>
@@ -36,11 +36,11 @@
     v-if="!successDialogVisible"
     persistent
   >
-    <template v-slot:activator="{ props }">
+    <template #activator="{ props }">
       <SpshTooltip
-        :enabledCondition="!disabled"
-        :disabledText="$t('person.chooseZuordnungFirst')"
-        :enabledText="$t('person.removeZuordnungDescription')"
+        :enabled-condition="!disabled"
+        :disabled-text="$t('person.chooseZuordnungFirst')"
+        :enabled-text="$t('person.removeZuordnungDescription')"
         position="start"
       >
         <v-btn
@@ -57,12 +57,12 @@
 
     <template
       v-if="!successDialogVisible"
-      v-slot:default="{ isActive }"
+      #default="{ isActive }"
     >
       <LayoutCard
         :closable="true"
         :header="$t('person.editZuordnungen')"
-        @onCloseClicked="closeZuordnungDeleteDialog(isActive)"
+        @on-close-clicked="closeZuordnungDeleteDialog(isActive)"
       >
         <v-card-text>
           <v-container>
@@ -74,7 +74,7 @@
                 class="text-right"
                 cols="1"
               >
-                <v-icon icon="mdi-alert"></v-icon>
+                <v-icon icon="mdi-alert" />
               </v-col>
               <v-col>
                 <p data-testid="error-text">
@@ -114,8 +114,8 @@
               <v-btn
                 :block="mdAndDown"
                 class="secondary button"
-                @click.stop="closeZuordnungDeleteDialog(isActive)"
                 data-testid="close-zuordnung-delete-dialog-button"
+                @click.stop="closeZuordnungDeleteDialog(isActive)"
               >
                 {{ $t('no') }}
               </v-btn>
@@ -128,8 +128,8 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary button"
-                @click.stop="handleZuordnungDelete()"
                 data-testid="zuordnung-delete-button"
+                @click.stop="handleZuordnungDelete()"
               >
                 {{ $t('yes') }}
               </v-btn>

@@ -18,7 +18,9 @@ export type BulkErrorList = {
 function translateWithFallback(t: Composer['t'], keys: string[], errorCode: string): string {
   for (const key of keys) {
     const result: string = t(key);
-    if (result !== key) return result;
+    if (result !== key) {
+      return result;
+    }
   }
   // Fallback to a generic message with the error code appended
   const fallbackBase: string = t(
@@ -51,7 +53,9 @@ export function useBulkErrors(t: Composer['t'], personen: Map<string, PersonWith
   return Array.from(bulkOperationStore.currentOperation?.errors.entries() || [])
     .map(([id, errorCode]: [string, string]) => {
       const person: PersonWithZuordnungen | undefined = personen.get(id);
-      if (!person) return null;
+      if (!person) {
+        return null;
+      }
 
       const errorTranslation: string = translateWithFallback(
         t,

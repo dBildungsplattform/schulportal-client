@@ -105,22 +105,22 @@
     </h1>
     <LayoutCard :header="$t('admin.rolle.management')">
       <ResultTable
-        :currentPage="searchFilterStore.rollenPage"
+        :current-page="searchFilterStore.rollenPage"
         data-testid="rolle-table"
         :items="transformedRollenAndMerkmale || []"
-        :itemsPerPage="searchFilterStore.rollenPerPage"
+        :items-per-page="searchFilterStore.rollenPerPage"
         :loading="rolleStore.loading"
         :headers="headers"
-        @onHandleRowClick="
+        :total-items="rolleStore.totalRollen"
+        item-value-path="id"
+        @on-handle-row-click="
           (event: PointerEvent, item: TableRow<unknown>) =>
             navigateToRolleDetails(event, item as TableRow<RolleTableItem>)
         "
-        @onItemsPerPageUpdate="getPaginatedRollenWithLimit"
-        @onPageUpdate="getPaginatedRollen"
-        :totalItems="rolleStore.totalRollen"
-        item-value-path="id"
+        @on-items-per-page-update="getPaginatedRollenWithLimit"
+        @on-page-update="getPaginatedRollen"
       >
-        <template v-slot:[`item.serviceProviders`]="{ item }">
+        <template #[`item.serviceProviders`]="{ item }">
           <div class="ellipsis-wrapper">
             <span
               v-if="!item.serviceProviders.length"

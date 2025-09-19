@@ -24,7 +24,7 @@
     :disabled="!tooltipText"
     open-delay="500"
   >
-    <template v-slot:activator="{ props: tooltipProps }">
+    <template #activator="{ props: tooltipProps }">
       <div v-bind="tooltipProps">
         <slot />
       </div>

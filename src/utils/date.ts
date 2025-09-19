@@ -42,6 +42,7 @@ export function formatDateToISO(date: string | undefined): string | undefined {
 
       // Return the date in ISO format
       return updatedDate.toISOString();
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       // If parsing fails, return undefined
       return undefined;
@@ -70,9 +71,13 @@ export function formatDateDigitsToGermanDate(date: Date): string {
  * @returns {string} The formatted date in German format (dd.MM.yyyy), or an empty string if the input is invalid.
  */
 export function adjustDateForTimezoneAndFormat(dateString: string | undefined): string {
-  if (!dateString) return '';
+  if (!dateString) {
+    return '';
+  }
   const date: Date = new Date(dateString);
-  if (isNaN(date.getTime())) return '';
+  if (isNaN(date.getTime())) {
+    return '';
+  }
   if (date.getTimezoneOffset() >= -120) {
     date.setHours(date.getHours() - 1);
   }
@@ -86,7 +91,9 @@ export function adjustDateForTimezoneAndFormat(dateString: string | undefined): 
  * @returns {string} The translated string followed by the formatted date in German format (dd.MM.yyyy), or an empty string if the input is invalid.
  */
 export function formatDate(dateString: string | undefined, t: (key: string) => string): string {
-  if (!dateString) return '';
+  if (!dateString) {
+    return '';
+  }
 
   // Return the translated string followed by the formatted date
   return `${t('admin.befristung.limitedUntil')} ${adjustDateForTimezoneAndFormat(dateString)}`;
@@ -101,7 +108,9 @@ export function formatDate(dateString: string | undefined, t: (key: string) => s
  *                    and `false` if it is in the past.
  */
 export function notInPast(value: string | undefined): boolean {
-  if (!value) return true;
+  if (!value) {
+    return true;
+  }
 
   const parsedDate: Date = parse(value, 'dd.MM.yyyy', new Date());
   return !isBefore(parsedDate, new Date());
@@ -116,7 +125,9 @@ export function notInPast(value: string | undefined): boolean {
  *                    and `false` otherwise.
  */
 export function isValidDate(value: string | undefined): boolean {
-  if (!value) return true;
+  if (!value) {
+    return true;
+  }
 
   const parsedDate: Date = parse(value, 'dd.MM.yyyy', new Date());
   return isValid(parsedDate);

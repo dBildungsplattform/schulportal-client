@@ -136,7 +136,7 @@
   setupRolleWatcher();
   setupWatchers();
 
-  async function closeModifyRolleDeleteDialog(): Promise<void> {
+  function closeModifyRolleDeleteDialog(): void {
     if (bulkOperationStore.currentOperation) {
       bulkOperationStore.resetState();
     }
@@ -190,7 +190,7 @@
       data-testid="rolle-modify-layout-card"
       :closable="false"
       :header="t('admin.rolle.assignRolle')"
-      @onCloseClicked="closeModifyRolleDeleteDialog()"
+      @on-close-clicked="closeModifyRolleDeleteDialog()"
     >
       <v-form
         data-testid="rolle-assign-form"
@@ -201,13 +201,15 @@
           <template v-if="bulkOperationStore.currentOperation?.progress === 0">
             <PersonenkontextCreate
               ref="personenkontext-create"
-              :operationContext="OperationContext.PERSON_BEARBEITEN"
-              :showHeadline="false"
+              v-model:selected-organisation="selectedOrganisation"
+              v-model:selected-rolle="selectedRolle"
+              :operation-context="OperationContext.PERSON_BEARBEITEN"
+              :show-headline="false"
               :organisationen="organisationen"
               :rollen="rollen"
-              :selectedOrganisationProps="selectedOrganisationProps"
-              :selectedRolleProps="selectedRolleProps"
-              :befristungInputProps="{
+              :selected-organisation-props="selectedOrganisationProps"
+              :selected-rolle-props="selectedRolleProps"
+              :befristung-input-props="{
                 befristungProps: selectedBefristungProps,
                 befristungOptionProps: selectedBefristungOptionProps,
                 isUnbefristetDisabled: isBefristungRequired,
@@ -216,14 +218,12 @@
                 befristung: selectedBefristung,
                 befristungOption: selectedBefristungOption,
               }"
-              v-model:selectedOrganisation="selectedOrganisation"
-              v-model:selectedRolle="selectedRolle"
-              @update:selectedOrganisation="(value?: string) => (selectedOrganisation = value)"
-              @update:selectedRolle="(value?: string) => (selectedRolle = value)"
-              @update:canCommit="canCommit = $event"
+              @update:selected-organisation="(value?: string) => (selectedOrganisation = value)"
+              @update:selected-rolle="(value?: string) => (selectedRolle = value)"
+              @update:can-commit="canCommit = $event"
               @update:befristung="handleBefristungUpdate"
-              @update:calculatedBefristungOption="handleBefristungOptionUpdate"
-              @fieldReset="handleFieldReset"
+              @update:calculated-befristung-option="handleBefristungOptionUpdate"
+              @field-reset="handleFieldReset"
             />
 
             <v-row
@@ -254,7 +254,7 @@
                     small
                     color="#1EAE9C"
                     icon="mdi-check-circle"
-                  ></v-icon>
+                  />
                 </v-col>
               </v-row>
               <p class="mt-2 text-center">
@@ -272,7 +272,7 @@
                   class="mr-2"
                   icon="mdi-alert-circle-outline"
                   size="small"
-                ></v-icon>
+                />
                 <span class="subtitle-2">
                   {{ t('admin.doNotCloseBrowserNotice') }}
                 </span>
@@ -280,11 +280,11 @@
             </v-row>
             <v-progress-linear
               class="mt-5"
-              :modelValue="bulkOperationStore.currentOperation?.progress"
+              :model-value="bulkOperationStore.currentOperation?.progress"
               color="primary"
               height="25"
             >
-              <template v-slot:default="{ value }">
+              <template #default="{ value }">
                 <strong class="text-white">{{ Math.ceil(value) }}%</strong>
               </template>
             </v-progress-linear>
@@ -297,7 +297,7 @@
             v-if="bulkOperationStore.currentOperation?.progress === 0"
             class="py-3 px-2 justify-center"
           >
-            <v-spacer class="hidden-sm-and-down"></v-spacer>
+            <v-spacer class="hidden-sm-and-down" />
 
             <v-col
               cols="12"
@@ -307,8 +307,8 @@
               <v-btn
                 :block="mdAndDown"
                 class="secondary"
-                @click="closeModifyRolleDeleteDialog"
                 data-testid="rolle-modify-discard-button"
+                @click="closeModifyRolleDeleteDialog"
               >
                 {{ t('cancel') }}
               </v-btn>
@@ -343,8 +343,8 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary"
-                @click="closeModifyRolleDeleteDialog"
                 data-testid="rolle-modify-close-button"
+                @click="closeModifyRolleDeleteDialog"
               >
                 {{ t('close') }}
               </v-btn>
@@ -358,9 +358,10 @@
   <!-- Error Dialog -->
   <template v-if="showErrorDialog">
     <PersonBulkError
-      :bulkOperationName="t('admin.rolle.assignRolle')"
-      :isDialogVisible="showErrorDialog"
-      @update:isDialogVisible="
+      :bulk-operation-name="t('admin.rolle.assignRolle')"
+      :is-dialog-visible="showErrorDialog"
+      :errors="bulkErrorList"
+      @update:is-dialog-visible="
         (val: boolean) => {
           showErrorDialog = val;
           if (!val) {
@@ -368,7 +369,6 @@
           }
         }
       "
-      :errors="bulkErrorList"
     />
   </template>
 </template>

@@ -25,18 +25,18 @@
           {{ header }}
         </h2>
       </v-col>
-      <v-spacer v-if="closable"></v-spacer>
+      <v-spacer v-if="closable" />
       <v-col
-        cols="2"
         v-if="closable"
+        cols="2"
         class="text-right mr-md-3 mr-8"
       >
         <v-btn
           class="hidden-sm-and-down"
-          @click.stop="$emit('onCloseClicked')"
           data-testid="close-layout-card-button"
           :ripple="false"
           variant="text"
+          @click.stop="$emit('onCloseClicked')"
         >
           <span v-if="showCloseText">
             {{ $t('close') }}
@@ -45,7 +45,7 @@
             <v-icon
               icon="mdi-close"
               size="x-large"
-            ></v-icon>
+            />
           </template>
         </v-btn>
         <v-btn
@@ -55,10 +55,10 @@
           variant="text"
         >
           <v-icon
-            @click.stop="$emit('onCloseClicked')"
             icon="mdi-close"
             size="x-large"
-          ></v-icon>
+            @click.stop="$emit('onCloseClicked')"
+          />
         </v-btn>
       </v-col>
     </v-row>
@@ -66,7 +66,7 @@
       class="border-opacity-100 rounded"
       color="#1EAE9C"
       thickness="5px"
-    ></v-divider>
+    />
     <div>
       <slot />
     </div>

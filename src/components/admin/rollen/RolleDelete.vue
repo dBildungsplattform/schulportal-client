@@ -25,16 +25,16 @@
   const errorMessage: Ref<string> = ref('');
   const successDialogVisible: Ref<boolean> = ref(false);
 
-  async function closeRolleDeleteDialog(isActive: Ref<boolean>): Promise<void> {
+  function closeRolleDeleteDialog(isActive: Ref<boolean>): void {
     isActive.value = false;
   }
 
-  async function handleRolleDelete(rolleId: string): Promise<void> {
+  function handleRolleDelete(rolleId: string): void {
     emit('onDeleteRolle', rolleId);
     successDialogVisible.value = true;
   }
 
-  async function closeSuccessDialogAndPushToManagement(): Promise<void> {
+  function closeSuccessDialogAndPushToManagement(): void {
     successDialogVisible.value = false;
     router.push({ name: 'rolle-management' });
   }
@@ -74,8 +74,8 @@
             <v-btn
               :block="mdAndDown"
               class="primary"
-              @click.stop="closeSuccessDialogAndPushToManagement()"
               data-testid="close-rolle-delete-success-dialog-button"
+              @click.stop="closeSuccessDialogAndPushToManagement()"
             >
               {{ $t('close') }}
             </v-btn>
@@ -88,7 +88,7 @@
     v-if="!successDialogVisible"
     persistent
   >
-    <template v-slot:activator="{ props }">
+    <template #activator="{ props }">
       <v-btn
         class="secondary button"
         data-testid="open-rolle-delete-dialog-button"
@@ -101,12 +101,12 @@
 
     <template
       v-if="!successDialogVisible"
-      v-slot:default="{ isActive }"
+      #default="{ isActive }"
     >
       <LayoutCard
         :closable="true"
         :header="$t('admin.rolle.deleteRolle')"
-        @onCloseClicked="closeRolleDeleteDialog(isActive)"
+        @on-close-clicked="closeRolleDeleteDialog(isActive)"
       >
         <v-card-text>
           <v-container>
@@ -118,7 +118,7 @@
                 class="text-right"
                 cols="1"
               >
-                <v-icon icon="mdi-alert"></v-icon>
+                <v-icon icon="mdi-alert" />
               </v-col>
               <v-col>
                 <p data-testid="error-text">
@@ -148,8 +148,8 @@
               <v-btn
                 :block="mdAndDown"
                 class="secondary button"
-                @click.stop="closeRolleDeleteDialog(isActive)"
                 data-testid="cancel-rolle-delete-button"
+                @click.stop="closeRolleDeleteDialog(isActive)"
               >
                 {{ $t('cancel') }}
               </v-btn>
@@ -162,9 +162,9 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary button"
-                @click.stop="handleRolleDelete(rolle.id)"
                 data-testid="rolle-delete-button"
                 :disabled="isLoading"
+                @click.stop="handleRolleDelete(rolle.id)"
               >
                 {{ $t('admin.rolle.deleteRolle') }}
               </v-btn>

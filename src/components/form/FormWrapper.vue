@@ -57,7 +57,7 @@
           class="mr-2"
           icon="mdi-alert-circle-outline"
           size="small"
-        ></v-icon>
+        />
         <label class="subtitle-2">{{ $t('admin.mandatoryFieldsNotice') }}</label>
       </v-row>
       <v-container class="px-lg-16">
@@ -65,20 +65,19 @@
       </v-container>
     </v-container>
     <v-divider
+      v-if="!hideActions"
       class="border-opacity-100 rounded"
       color="#E5EAEF"
       thickness="5px"
-      v-if="!hideActions"
-    ></v-divider>
+    />
     <v-row
-      class="py-3 px-2 justify-center"
       v-if="!hideActions"
+      class="py-3 px-2 justify-center"
     >
       <v-spacer
-        class="hidden-sm-and-down"
         v-if="!centerButtons"
-      >
-      </v-spacer>
+        class="hidden-sm-and-down"
+      />
       <v-col
         cols="12"
         sm="6"
@@ -87,10 +86,11 @@
         <v-btn
           :block="mdAndDown"
           class="secondary"
-          @click.stop="onDiscard"
           :data-testid="`${id}-discard-button`"
-          >{{ discardButtonLabel }}</v-btn
+          @click.stop="onDiscard"
         >
+          {{ discardButtonLabel }}
+        </v-btn>
       </v-col>
       <v-col
         cols="12"
@@ -103,18 +103,19 @@
           :data-testid="`${id}-submit-button`"
           :disabled="!canCommit || isLoading"
           type="submit"
-          >{{ createButtonLabel }}</v-btn
         >
+          {{ createButtonLabel }}
+        </v-btn>
       </v-col>
     </v-row>
   </v-form>
 
   <!-- Warning dialog for unsaved changes -->
   <v-dialog
-    data-testid="unsaved-changes-dialog"
     ref="unsaved-changes-dialog"
-    persistent
     v-model="showDialogValue"
+    data-testid="unsaved-changes-dialog"
+    persistent
   >
     <LayoutCard :header="$t('unsavedChanges.title')">
       <v-card-text>
@@ -136,10 +137,10 @@
             md="auto"
           >
             <v-btn
-              @click.stop="confirmUnsavedChangesAction"
               class="secondary button"
               data-testid="confirm-unsaved-changes-button"
               :block="mdAndDown"
+              @click.stop="confirmUnsavedChangesAction"
             >
               {{ $t('yes') }}
             </v-btn>
@@ -150,10 +151,10 @@
             md="auto"
           >
             <v-btn
-              @click.stop="showDialogValue = false"
               class="primary button"
               data-testid="close-unsaved-changes-dialog-button"
               :block="mdAndDown"
+              @click.stop="showDialogValue = false"
             >
               {{ $t('no') }}
             </v-btn>

@@ -37,7 +37,7 @@
   const props: Props = defineProps<Props>();
   const emit: Emits = defineEmits<Emits>();
 
-  async function closeDialog(finished: boolean): Promise<void> {
+  function closeDialog(finished: boolean): void {
     bulkOperationStore.resetState();
     emit('update:dialogExit', finished);
   }
@@ -93,7 +93,9 @@
   }
 
   function isLernRolle(selectedRolleId: string | undefined): boolean {
-    if (!selectedRolleId) return false;
+    if (!selectedRolleId) {
+      return false;
+    }
 
     const rolle: TranslatedRolleWithAttrs | undefined = rollenForForm.value?.find(
       (r: TranslatedRolleWithAttrs) => r.value === selectedRolleId,
@@ -137,7 +139,7 @@
 
 <template>
   <v-dialog
-    :modelValue="props.isDialogVisible"
+    :model-value="props.isDialogVisible"
     persistent
   >
     <LayoutCard
@@ -146,23 +148,23 @@
     >
       <!-- Initial block -->
       <v-container
-        class="mt-8 mb-4"
         v-if="bulkOperationStore.currentOperation?.progress === 0"
+        class="mt-8 mb-4"
       >
         <template v-if="bulkOperationStore.currentOperation?.progress === 0">
           <PersonenkontextCreate
             v-if="bulkOperationStore.currentOperation?.progress === 0"
-            :operationContext="OperationContext.PERSON_BEARBEITEN"
             ref="personenkontext-create"
-            :showHeadline="false"
-            :selectedOrganisation="selectedOrganisationFromFilterId"
+            :operation-context="OperationContext.PERSON_BEARBEITEN"
+            :show-headline="false"
+            :selected-organisation="selectedOrganisationFromFilterId"
             :organisationen="props.organisationen"
             :rollen="rollenForForm"
-            :selectedRolleProps="selectedRolleProps"
-            :isRolleUnassignForm="true"
-            :selectedRolle="props.selectedRolleFromFilter ? props.selectedRolleFromFilter.id : undefined"
-            @update:selectedRolle="(value?: string) => (selectedRolle = value)"
-            @fieldReset="handleFieldReset"
+            :selected-rolle-props="selectedRolleProps"
+            :is-rolle-unassign-form="true"
+            :selected-rolle="props.selectedRolleFromFilter ? props.selectedRolleFromFilter.id : undefined"
+            @update:selected-rolle="(value?: string) => (selectedRolle = value)"
+            @field-reset="handleFieldReset"
           />
         </template>
       </v-container>
@@ -182,7 +184,7 @@
                 small
                 color="#1EAE9C"
                 icon="mdi-check-circle"
-              ></v-icon>
+              />
             </v-col>
           </v-row>
           <p class="mt-2 text-center">
@@ -203,7 +205,7 @@
               class="mr-2"
               icon="mdi-alert-circle-outline"
               size="small"
-            ></v-icon>
+            />
             <span
               class="subtitle-2"
               data-testid="rolle-unassign-progressing-notice"
@@ -215,12 +217,12 @@
         <!-- Progress Bar -->
         <v-progress-linear
           class="mt-5"
-          :modelValue="bulkOperationStore.currentOperation?.progress"
+          :model-value="bulkOperationStore.currentOperation?.progress"
           color="primary"
           height="25"
           data-testid="rolle-unassign-progressbar"
         >
-          <template v-slot:default="{ value }">
+          <template #default="{ value }">
             <strong class="text-white">{{ Math.ceil(value) }}%</strong>
           </template>
         </v-progress-linear>
@@ -240,8 +242,8 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary"
-                @click="closeDialog(true)"
                 data-testid="rolle-unassign-close-button"
+                @click="closeDialog(true)"
               >
                 {{ t('close') }}
               </v-btn>
@@ -258,8 +260,8 @@
               <v-btn
                 :block="mdAndDown"
                 class="secondary"
-                @click="closeDialog(false)"
                 data-testid="rolle-unassign-discard-button"
+                @click="closeDialog(false)"
               >
                 {{ t('cancel') }}
               </v-btn>
@@ -274,9 +276,9 @@
                 :block="mdAndDown"
                 :disabled="bulkOperationStore.currentOperation?.isRunning"
                 class="primary"
-                @click="handleRolleUnassign()"
                 data-testid="rolle-unassign-submit-button"
                 type="submit"
+                @click="handleRolleUnassign()"
               >
                 {{ t('admin.rolle.bulkRollenzuordnung.unassignRolleZuordnung') }}
               </v-btn>
@@ -288,9 +290,10 @@
   </v-dialog>
   <template v-if="showErrorDialog">
     <PersonBulkError
-      :bulkOperationName="$t('admin.rolle.bulkRollenzuordnung.unassignRolleZuordnung')"
-      :isDialogVisible="showErrorDialog"
-      @update:isDialogVisible="
+      :bulk-operation-name="$t('admin.rolle.bulkRollenzuordnung.unassignRolleZuordnung')"
+      :is-dialog-visible="showErrorDialog"
+      :errors="bulkErrorList"
+      @update:is-dialog-visible="
         (val: boolean) => {
           showErrorDialog = val;
           if (!val) {
@@ -298,7 +301,6 @@
           }
         }
       "
-      :errors="bulkErrorList"
     />
   </template>
 </template>

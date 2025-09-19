@@ -33,7 +33,7 @@ import { PersonenUebersicht } from '@/stores/types/PersonenUebersicht';
 import { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
 import { Zuordnung } from '@/stores/types/Zuordnung';
 import { PersonLockOccasion, type UserLock } from '@/utils/lock';
-// eslint-disable-next-line import/no-extraneous-dependencies
+
 import { faker } from '@faker-js/faker';
 
 export class DoFactory {
@@ -96,7 +96,7 @@ export class DoFactory {
       person.id,
       person.name.vorname,
       person.name.familienname,
-      person.referrer!,
+      person.referrer,
       faker.date.recent().toISOString(),
       zuordnungen,
     );

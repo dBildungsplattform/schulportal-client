@@ -4,7 +4,7 @@ import { createVuetify } from 'vuetify';
 import { afterAll, afterEach, beforeAll } from 'vitest';
 import { TestingPinia, createTestingPinia } from '@pinia/testing';
 // MSW will probably be removed soon anyways
-// eslint-disable-next-line import/no-extraneous-dependencies, import/named
+
 import { SetupServer, setupServer } from 'msw/node';
 import requestHandlers from './src/specs/request-handlers';
 import de_locales from './src/locales/de-DE.json';
@@ -29,7 +29,7 @@ const server: SetupServer = setupServer(...requestHandlers);
 /* Start mock server before all tests */
 beforeAll(() => {
   server.listen({ onUnhandledRequest: 'error' });
-  // @ts-ignore:
+  // @ts-expect-error: global has any type
   global.ResizeObserver = class ResizeObserver {
     public observe(): void {
       // do nothing

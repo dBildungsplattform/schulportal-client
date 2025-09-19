@@ -38,23 +38,33 @@
   const bulkErrorList: ComputedRef<BulkErrorList[]> = computed(() => useBulkErrors(t, props.selectedPersonen));
 
   const state: ComputedRef<State> = computed(() => {
-    if (bulkOperationStore.currentOperation?.complete) return State.FINISHED;
-    if (bulkOperationStore.currentOperation?.isRunning) return State.PROGRESSING;
+    if (bulkOperationStore.currentOperation?.complete) {
+      return State.FINISHED;
+    }
+    if (bulkOperationStore.currentOperation?.isRunning) {
+      return State.PROGRESSING;
+    }
     return State.INITIAL;
   });
 
   const progress: ComputedRef<number> = computed(() => {
-    if (!bulkOperationStore.currentOperation?.progress) return 0;
+    if (!bulkOperationStore.currentOperation?.progress) {
+      return 0;
+    }
     return bulkOperationStore.currentOperation.progress;
   });
 
   const canCommit: ComputedRef<boolean> = computed(() => {
-    if (selectedKlasse.value) return true;
+    if (selectedKlasse.value) {
+      return true;
+    }
     return false;
   });
 
   const handleChangeKlasse = async (): Promise<void> => {
-    if (!selectedKlasse.value) return;
+    if (!selectedKlasse.value) {
+      return;
+    }
     await bulkOperationStore.bulkChangeKlasse(
       Array.from(props.selectedPersonen.keys()),
       props.selectedSchuleId ?? '',
@@ -77,8 +87,8 @@
 
 <template>
   <v-dialog
-    :model-value="props.isDialogVisible"
     ref="changeKlasseBulkDialog"
+    :model-value="props.isDialogVisible"
     persistent
   >
     <LayoutCard
@@ -110,12 +120,12 @@
             >
               <KlassenFilter
                 :multiple="false"
-                :hideDetails="true"
-                :selectedKlassen="selectedKlasse"
-                :placeholderText="t('admin.klasse.selectKlasse')"
-                :administriertVon="selectedSchuleId ? [selectedSchuleId] : undefined"
-                @update:selectedKlassen="updateKlassenSelection"
-                :filterId="'bulk-change-klasse'"
+                :hide-details="true"
+                :selected-klassen="selectedKlasse"
+                :placeholder-text="t('admin.klasse.selectKlasse')"
+                :administriert-von="selectedSchuleId ? [selectedSchuleId] : undefined"
+                :filter-id="'bulk-change-klasse'"
+                @update:selected-klassen="updateKlassenSelection"
               />
             </v-col>
           </v-row>
@@ -129,13 +139,13 @@
                 class="mr-2"
                 icon="mdi-alert-circle-outline"
                 size="small"
-              ></v-icon>
+              />
               <v-icon
                 v-if="state === State.FINISHED"
                 small
                 color="#1EAE9C"
                 icon="mdi-check-circle"
-              ></v-icon>
+              />
               <span
                 v-if="state === State.PROGRESSING"
                 class="subtitle-2"
@@ -155,12 +165,12 @@
           <!-- Progress Bar -->
           <v-progress-linear
             class="mt-5"
-            :modelValue="progress"
+            :model-value="progress"
             color="primary"
             height="25"
             data-testid="bulk-change-klasse-progressbar"
           >
-            <template v-slot:default="{ value }">
+            <template #default="{ value }">
               <strong class="text-white">{{ Math.ceil(value) }}%</strong>
             </template>
           </v-progress-linear>
@@ -180,40 +190,42 @@
               class="secondary"
               data-testid="bulk-change-klasse-discard-button"
               @click="handleCloseDialog"
-              >{{ t('cancel') }}</v-btn
             >
+              {{ t('cancel') }}
+            </v-btn>
             <v-btn
               v-else-if="state === State.FINISHED"
               class="primary"
-              @click="handleCloseDialog"
               data-testid="bulk-change-klasse-close-button"
+              @click="handleCloseDialog"
             >
               {{ t('close') }}
             </v-btn>
           </v-col>
           <v-col
+            v-if="state === State.INITIAL"
             cols="12"
             sm="6"
             md="auto"
-            v-if="state === State.INITIAL"
           >
             <v-btn
               class="primary"
               :disabled="!canCommit"
               data-testid="bulk-change-klasse-button"
               @click.stop="handleChangeKlasse"
-              >{{ t('admin.person.bulkChangeKlasse.transfer') }}</v-btn
             >
+              {{ t('admin.person.bulkChangeKlasse.transfer') }}
+            </v-btn>
           </v-col>
         </v-row>
       </v-card-actions>
     </LayoutCard>
     <template v-if="showErrorDialog">
       <PersonBulkError
-        :bulkOperationName="t('admin.person.bulkChangeKlasse.transfer')"
-        :isDialogVisible="showErrorDialog"
-        @update:isDialogVisible="handleCloseDialog"
+        :bulk-operation-name="t('admin.person.bulkChangeKlasse.transfer')"
+        :is-dialog-visible="showErrorDialog"
         :errors="bulkErrorList"
+        @update:is-dialog-visible="handleCloseDialog"
       />
     </template>
   </v-dialog>

@@ -55,9 +55,11 @@
   const isFormDirty: ComputedRef<boolean> = computed(() => getDirtyState(formContext));
 
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
-  let blockedNext: () => void = () => {};
+  let blockedNext: () => void = () => {
+    /* empty */
+  };
 
-  const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = formContext.handleSubmit(async () => {
+  const onSubmit: (e?: Event) => Promise<Promise<void> | undefined> = formContext.handleSubmit(async () => {
     preservedSchultraegerform.value = rootChildSchultraegerList.value.find(
       (schultraeger: Organisation) => schultraeger.id === selectedSchultraegerform.value,
     )?.name;
@@ -112,7 +114,9 @@
   }
 
   function preventNavigation(event: BeforeUnloadEvent): void {
-    if (!isFormDirty.value) return;
+    if (!isFormDirty.value) {
+      return;
+    }
     event.preventDefault();
     /* Chrome requires returnValue to be set. */
     event.returnValue = '';
@@ -156,27 +160,27 @@
     </h1>
     <LayoutCard
       :closable="!organisationStore.errorCode"
-      @onCloseClicked="navigateToSchultraegerManagement"
       :header="$t('admin.schultraeger.addNew')"
       :padded="true"
-      :showCloseText="true"
+      :show-close-text="true"
+      @on-close-clicked="navigateToSchultraegerManagement"
     >
       <!-- The form to create a new Schultraeger -->
       <template v-if="!organisationStore.createdSchultraeger">
         <SchultraegerForm
-          :canCommit="!!selectedSchultraegername"
-          :errorCode="organisationStore.errorCode"
-          :isLoading="organisationStore.loading"
-          :onHandleConfirmUnsavedChanges="handleConfirmUnsavedChanges"
-          :onHandleDiscard="navigateToSchultraegerManagement"
-          :onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
-          :onSubmit="onSubmit"
           ref="schultraeger-creation-form"
-          :rootChildSchultraegerList="rootChildSchultraegerList"
-          :selectedSchultraegernameProps="selectedSchultraegernameProps"
-          :showUnsavedChangesDialog="showUnsavedChangesDialog"
-          v-model:selectedSchultraegerform="selectedSchultraegerform"
-          v-model:selectedSchultraegername="selectedSchultraegername"
+          v-model:selected-schultraegerform="selectedSchultraegerform"
+          v-model:selected-schultraegername="selectedSchultraegername"
+          :can-commit="!!selectedSchultraegername"
+          :error-code="organisationStore.errorCode"
+          :is-loading="organisationStore.loading"
+          :on-handle-confirm-unsaved-changes="handleConfirmUnsavedChanges"
+          :on-handle-discard="navigateToSchultraegerManagement"
+          :on-show-dialog-change="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
+          :on-submit="onSubmit"
+          :root-child-schultraeger-list="rootChildSchultraegerList"
+          :selected-schultraegername-props="selectedSchultraegernameProps"
+          :show-unsaved-changes-dialog="showUnsavedChangesDialog"
         >
           <!-- Error Message Display if error on submit -->
           <!-- To trigger unsaved changes dialog the alert has to be inside the form wrapper -->
@@ -186,10 +190,10 @@
             :type="'error'"
             :closable="false"
             :text="organisationStore.errorCode ? $t(`admin.schultraeger.errors.${organisationStore.errorCode}`) : ''"
-            :showButton="true"
-            :buttonText="$t('admin.schultraeger.backToCreateSchultraeger')"
-            :buttonAction="navigateBackToSchultraegerForm"
-            buttonClass="primary"
+            :show-button="true"
+            :button-text="$t('admin.schultraeger.backToCreateSchultraeger')"
+            :button-action="navigateBackToSchultraegerForm"
+            button-class="primary"
           />
         </SchultraegerForm>
       </template>
@@ -212,8 +216,7 @@
                 small
                 color="#1EAE9C"
                 icon="mdi-check-circle"
-              >
-              </v-icon>
+              />
             </v-col>
           </v-row>
           <v-row justify="center">
@@ -226,23 +229,21 @@
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.schultraeger.schultraegerform') }}: </v-col>
-            <v-col class="text-body"
-              ><span data-testid="created-schultraeger-form">{{ preservedSchultraegerform }}</span></v-col
-            >
+            <v-col class="text-body">
+              <span data-testid="created-schultraeger-form">{{ preservedSchultraegerform }}</span>
+            </v-col>
           </v-row>
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.schultraeger.schultraegername') }}: </v-col>
-            <v-col class="text-body"
-              ><span data-testid="created-schultraeger-name">{{
-                organisationStore.createdSchultraeger.name
-              }}</span></v-col
-            >
+            <v-col class="text-body">
+              <span data-testid="created-schultraeger-name">{{ organisationStore.createdSchultraeger.name }}</span>
+            </v-col>
           </v-row>
           <v-divider
             class="border-opacity-100 rounded my-6"
             color="#E5EAEF"
             thickness="6"
-          ></v-divider>
+          />
           <v-row justify="end">
             <v-col
               cols="12"
@@ -252,10 +253,11 @@
               <v-btn
                 class="secondary"
                 data-testid="back-to-list-button"
-                @click="navigateToSchultraegerManagement"
                 :block="mdAndDown"
-                >{{ $t('nav.backToList') }}</v-btn
+                @click="navigateToSchultraegerManagement"
               >
+                {{ $t('nav.backToList') }}
+              </v-btn>
             </v-col>
             <v-col
               cols="12"
@@ -265,8 +267,8 @@
               <v-btn
                 class="primary button"
                 data-testid="create-another-schultraeger-button"
-                @click="handleCreateAnotherSchultraeger"
                 :block="mdAndDown"
+                @click="handleCreateAnotherSchultraeger"
               >
                 {{ $t('admin.schultraeger.createAnother') }}
               </v-btn>

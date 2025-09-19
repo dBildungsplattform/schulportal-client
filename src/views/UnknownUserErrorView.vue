@@ -9,13 +9,13 @@
 
 <template>
   <SpshAlert
-    :modelValue="true"
+    :model-value="true"
     :title="$t('errors.UNKNOWN_USER.title')"
     :type="'warning'"
     :closable="false"
-    :showButton="true"
-    :buttonText="$t('nav.logout')"
-    :buttonAction="logout"
+    :show-button="true"
+    :button-text="$t('nav.logout')"
+    :button-action="logout"
     :text="$t('errors.UNKNOWN_USER.text')"
   />
 </template>
