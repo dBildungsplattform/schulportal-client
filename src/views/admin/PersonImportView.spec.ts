@@ -82,8 +82,8 @@ rolleStore.allRollen = [
 
 async function selectSchule(value: string): Promise<WrapperLike | undefined> {
   const schuleAutocomplete: WrapperLike | undefined = wrapper
-    ?.findComponent({ ref: 'schule-select' })
-    .findComponent('[data-testid="schule-select"]');
+    ?.findComponent({ ref: 'schulFilter' })
+    .findComponent('[data-testid="person-import-schule-select"]');
   await schuleAutocomplete?.setValue(value);
   return schuleAutocomplete;
 }
