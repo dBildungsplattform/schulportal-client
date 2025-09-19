@@ -1650,7 +1650,7 @@
       <template v-if="!personStore.errorCode && !personenkontextStore.errorCode">
         <v-container class="personal-info">
           <div v-if="personStore.currentPerson?.person && !isEditPersonMetadataActive">
-            <v-row class="ml-md-16">
+            <v-row class="flex-md-column">
               <v-col>
                 <!-- Vorname -->
                 <v-row class="mt-4">
@@ -1658,9 +1658,8 @@
                     class="text-right"
                     sm="3"
                     cols="5"
-                    offset="1"
                   >
-                    <span class="subtitle-2">{{ t('person.firstName') }}:</span>
+                    <span class="subtitle-2 hyphenate">{{ t('person.firstName') }}:</span>
                   </v-col>
                   <v-col
                     class="d-flex align-start mt-1"
@@ -1676,9 +1675,8 @@
                     class="text-right"
                     sm="3"
                     cols="5"
-                    offset="1"
                   >
-                    <span class="subtitle-2">{{ t('person.lastName') }}:</span>
+                    <span class="subtitle-2 hyphenate">{{ t('person.lastName') }}:</span>
                   </v-col>
                   <v-col
                     class="d-flex align-start mt-1"
@@ -1694,9 +1692,8 @@
                     class="text-right"
                     sm="3"
                     cols="5"
-                    offset="1"
                   >
-                    <span class="subtitle-2">{{ t('person.userName') }}:</span>
+                    <span class="subtitle-2 hyphenate">{{ t('person.userName') }}:</span>
                   </v-col>
                   <v-col
                     class="d-flex align-start mt-1"
@@ -1715,7 +1712,6 @@
                     class="text-right"
                     sm="3"
                     cols="5"
-                    offset="1"
                   >
                     <span
                       :class="{
@@ -1752,7 +1748,6 @@
                     class="text-right"
                     sm="3"
                     cols="5"
-                    offset="1"
                   >
                     <span class="subtitle-2">{{ t('person.email') }}:</span>
                   </v-col>
