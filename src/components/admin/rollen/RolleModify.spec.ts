@@ -93,7 +93,8 @@ describe('RolleModify', () => {
     // Set organisation value
     const organisationAutocomplete: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
-      .findComponent({ ref: 'organisation-select' });
+      .findComponent({ ref: 'schulenFilter' })
+      .findComponent({ ref: 'personenkontext-create-organisation-select' });
     await organisationAutocomplete?.setValue(organisation.id);
     organisationAutocomplete?.vm.$emit('update:search', organisation.id);
     await nextTick();
@@ -143,7 +144,8 @@ describe('RolleModify', () => {
     // Set organisation value
     const organisationAutocomplete: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
-      .findComponent({ ref: 'organisation-select' });
+      .findComponent({ ref: 'schulenFilter' })
+      .findComponent({ ref: 'personenkontext-create-organisation-select' });
     await organisationAutocomplete?.setValue('O1');
     organisationAutocomplete?.vm.$emit('update:search', 'O1');
     await nextTick();
@@ -204,7 +206,8 @@ describe('RolleModify', () => {
     // Set organisation value
     const organisationAutocomplete: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
-      .findComponent({ ref: 'organisation-select' });
+      .findComponent({ ref: 'schulenFilter' })
+      .findComponent({ ref: 'personenkontext-create-organisation-select' });
     await organisationAutocomplete?.setValue(organisation.id);
     organisationAutocomplete?.vm.$emit('update:search', organisation.id);
     await nextTick();

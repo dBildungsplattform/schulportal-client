@@ -191,10 +191,15 @@ describe('RolleDetailsView', () => {
     await wrapper?.find('[data-testid="rolle-edit-button"]').trigger('click');
     await nextTick();
 
-    const rolleFormWrapper: VueWrapper<never, never> | undefined = wrapper?.findComponent({ name: 'RolleForm' });
+    const rolleFormWrapper: VueWrapper<never, never> | undefined = wrapper?.findComponent({ ref: 'rolle-form' });
 
     // Set the administrationsebene and rollenart first
-    await rolleFormWrapper?.findComponent({ ref: 'administrationsebene-select' }).setValue('1');
+    const organisationAutocomplete: VueWrapper | undefined = rolleFormWrapper
+      ?.findComponent({ ref: 'schulenFilter' })
+      .findComponent({ ref: 'rolle-form-organisation-select' });
+
+    organisationAutocomplete?.setValue(['1']);
+    organisationAutocomplete?.vm.$emit('update:selectedSchulen', ['1']);
     await nextTick();
 
     await rolleFormWrapper?.findComponent({ ref: 'rollenart-select' }).setValue('LEHR');

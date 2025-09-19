@@ -11,6 +11,7 @@
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
   import { RollenSystemRecht } from '@/stores/RolleStore';
+  import type { Option } from '@/types';
   import { getDisplayNameForOrg } from '@/utils/formatting';
   import { type ValidationSchema as KlasseFormValues, type ValidationSchema } from '@/utils/validationKlasse';
   import { computed, onMounted, onUnmounted, ref, useTemplateRef, type ComputedRef, type Ref } from 'vue';
@@ -36,11 +37,10 @@
     RollenSystemRecht.KlassenVerwalten,
   ]);
 
+  const selectedSchuleObject: Ref<Option<Organisation>> = ref(null);
+
   const translatedSchulname: ComputedRef<string> = computed(() => {
-    const schule: Organisation | undefined = organisationStore.schulenFilter.filterResult.find(
-      (s: Organisation) => s.id === organisationStore.createdKlasse?.administriertVon,
-    );
-    if (schule) return getDisplayNameForOrg(schule);
+    if (selectedSchuleObject.value) return getDisplayNameForOrg(selectedSchuleObject.value);
     if (autoselectedSchule.value) return getDisplayNameForOrg(autoselectedSchule.value);
     return '';
   });
@@ -168,6 +168,7 @@
           :onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
           :onSubmit
           @formStateChanged="handleChangedFormState"
+          @update:selectedSchule="(selectedSchule) => (selectedSchuleObject = selectedSchule)"
           ref="klasse-creation-form"
         >
           <!-- Error Message Display if error on submit -->
