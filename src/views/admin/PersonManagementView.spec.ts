@@ -1,4 +1,9 @@
-import { RollenArt, RollenSystemRecht, type FindRollenResponse } from '@/api-client/generated/api';
+import {
+  RollenArt,
+  RollenSystemRechtEnum,
+  type FindRollenResponse,
+  type SystemRechtResponse,
+} from '@/api-client/generated/api';
 import routes from '@/router/routes';
 import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 import { OperationType } from '@/stores/BulkOperationStore';
@@ -136,7 +141,9 @@ beforeEach(async () => {
         rollenart: 'LEHR',
         name: 'SuS',
         merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
-        systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+        systemrechte: [
+          { name: RollenSystemRechtEnum.RollenVerwalten, isTechnical: false },
+        ] as unknown as Set<SystemRechtResponse>,
         createdAt: '2022',
         updatedAt: '2022',
         id: '54321',

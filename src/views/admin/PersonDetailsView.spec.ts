@@ -1,4 +1,4 @@
-import { EmailAddressStatus } from '@/api-client/generated';
+import { EmailAddressStatus, type SystemRechtResponse } from '@/api-client/generated';
 import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
 import routes from '@/router/routes';
 import { useAuthStore, type AuthStore, type PersonenkontextRolleFields, type UserInfo } from '@/stores/AuthStore';
@@ -11,14 +11,7 @@ import {
 } from '@/stores/OrganisationStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
 import { usePersonStore, type Personendatensatz, type PersonStore } from '@/stores/PersonStore';
-import {
-  RollenArt,
-  RollenMerkmal,
-  RollenSystemRecht,
-  useRolleStore,
-  type Rolle,
-  type RolleStore,
-} from '@/stores/RolleStore';
+import { RollenArt, RollenMerkmal, useRolleStore, type Rolle, type RolleStore } from '@/stores/RolleStore';
 import {
   useTwoFactorAuthentificationStore,
   type TwoFactorAuthentificationStore,
@@ -195,7 +188,7 @@ describe('PersonDetailsView', () => {
           administeredBySchulstrukturknoten: 'string',
           rollenart: 'LERN',
           merkmale: new Set<RollenMerkmal>(['BEFRISTUNG_PFLICHT']),
-          systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+          systemrechte: [{ name: 'ROLLEN_VERWALTEN', isTechnical: false }] as unknown as Set<SystemRechtResponse>,
           administeredBySchulstrukturknotenName: 'Land SH',
           administeredBySchulstrukturknotenKennung: '',
           version: 1,
@@ -208,7 +201,7 @@ describe('PersonDetailsView', () => {
           administeredBySchulstrukturknoten: '1',
           rollenart: 'LERN',
           merkmale: new Set<RollenMerkmal>(['BEFRISTUNG_PFLICHT']),
-          systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
+          systemrechte: [{ name: 'ROLLEN_VERWALTEN', isTechnical: false }] as unknown as Set<SystemRechtResponse>,
           administeredBySchulstrukturknotenName: 'Land SH',
           administeredBySchulstrukturknotenKennung: '',
           version: 1,
@@ -828,6 +821,104 @@ describe('PersonDetailsView', () => {
     await flushPromises();
 
     expect(wrapper?.find('[data-testid="zuordnung-edit-button"]').isVisible()).toBe(true);
+  });
+
+  test('renders form to add Zuordnung, triggers submit that results in an error and then navigates back to form and resets errorCode', async () => {
+    organisationStore.getAllOrganisationen = vi.fn().mockResolvedValue(undefined);
+    organisationStore.getKlassenByOrganisationId = vi.fn().mockResolvedValue(undefined);
+    organisationStore.fetchSchuleDetailsForKlassen = vi.fn().mockResolvedValue(undefined);
+    personenkontextStore.processWorkflowStep = vi.fn().mockResolvedValue(undefined);
+
+    // No existing Zuordnungen for the user for easier testing
+    const mockPersonenuebersichtForAddZuordnung: PersonenUebersicht = DoFactory.getPersonenUebersicht(undefined, []);
+    personStore.personenuebersicht = mockPersonenuebersichtForAddZuordnung;
+
+    wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
+    await nextTick();
+
+    wrapper?.find('[data-testid="zuordnung-create-button"]').trigger('click');
+
+    await flushPromises();
+
+    // Set organisation value
+    const organisationAutocomplete: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'personenkontext-create' })
+      .findComponent({ ref: 'organisation-select' });
+    await organisationAutocomplete?.setValue('O1');
+    organisationAutocomplete?.vm.$emit('update:search', 'O1');
+    await nextTick();
+
+    // Set rolle value
+    const rolleAutocomplete: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'personenkontext-create' })
+      .findComponent({ ref: 'rolle-select' });
+    await rolleAutocomplete?.setValue('54321');
+    rolleAutocomplete?.vm.$emit('update:search', '54321');
+    await nextTick();
+    // Set klasse value
+    const klasseAutocomplete: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'personenkontext-create' })
+      .findComponent({ name: 'KlassenFilter' })
+      .findComponent({ ref: 'personenkontext-create-klasse-select' });
+    await klasseAutocomplete?.setValue('9a');
+    klasseAutocomplete?.vm.$emit('update:search', '9a');
+    await nextTick();
+
+    const befristungInput: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'personenkontext-create' })
+      .findComponent({ ref: 'befristung-input-wrapper' })
+      .findComponent({ ref: 'befristung-input' });
+    await befristungInput?.setValue('12.08.2099');
+    await nextTick();
+
+    await nextTick();
+
+    const submitButton: Element | null = document.body.querySelector(
+      '[data-testid="zuordnung-creation-submit-button"]',
+    );
+    expect(submitButton).not.toBeNull();
+    await nextTick();
+
+    if (submitButton) {
+      submitButton.dispatchEvent(new Event('click'));
+    }
+
+    wrapper?.find('[data-testid="zuordnung-creation-submit-button"]').trigger('click');
+
+    await flushPromises();
+    // wait for vuetify animation to complete
+    await vi.waitUntil(() => document.body.querySelector('[data-testid="confirm-zuordnung-dialog-addition"]') != null);
+
+    const confirmDialogButton: Element | null = document.body.querySelector(
+      '[data-testid="confirm-zuordnung-dialog-addition"]',
+    );
+    expect(confirmDialogButton).not.toBeNull();
+
+    if (confirmDialogButton) {
+      confirmDialogButton.dispatchEvent(new Event('click'));
+    }
+    await flushPromises();
+
+    const saveButton: Element | null = document.body.querySelector('[data-testid="zuordnung-changes-save-button"]');
+    expect(saveButton).not.toBeNull();
+
+    if (saveButton) {
+      saveButton.dispatchEvent(new Event('click'));
+    }
+    await flushPromises();
+
+    personenkontextStore.errorCode = 'PERSONALNUMMER_NICHT_EINDEUTIG';
+    await nextTick();
+    // ASSERT: store error code is set
+    expect(personenkontextStore.errorCode).toBe('PERSONALNUMMER_NICHT_EINDEUTIG');
+
+    const alertButtonAction: DOMWrapper<Element> | undefined = wrapper
+      ?.findComponent({ ref: 'personenkontext-store-error-alert' })
+      .find('[data-testid="spsh-alert-button"]');
+    alertButtonAction?.trigger('click');
+    await nextTick();
+
+    expect(personenkontextStore.errorCode).toBe('');
   });
 
   test('renders form to change Klasse and triggers submit', async () => {

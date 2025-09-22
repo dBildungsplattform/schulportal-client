@@ -1,10 +1,16 @@
 <script setup lang="ts">
+  import { useMasterDataStore, type MasterDataStore } from '@/stores/MasterDataStore';
   import RolleDelete from '@/components/admin/rollen/RolleDelete.vue';
   import RolleForm from '@/components/admin/rollen/RolleForm.vue';
   import RolleSuccessTemplate from '@/components/admin/rollen/RolleSuccessTemplate.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+  import {
+    OrganisationsTyp,
+    useOrganisationStore,
+    type Organisation,
+    type OrganisationStore,
+  } from '@/stores/OrganisationStore';
   import {
     RollenMerkmal,
     RollenSystemRecht,
@@ -19,7 +25,8 @@
     type ServiceProviderStore,
   } from '@/stores/ServiceProviderStore';
   import { type TranslatedObject } from '@/types.d';
-  import { isHiddenSystemrecht } from '@/utils/systemrechte';
+  import { getDisplayNameForOrg } from '@/utils/formatting';
+
   import {
     getDirtyState,
     getRolleFieldDefinitions,
@@ -39,6 +46,7 @@
     type Router,
   } from 'vue-router';
   import { useDisplay } from 'vuetify';
+  import type { SystemRechtResponse } from '@/api-client/generated';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
@@ -47,6 +55,7 @@
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
+  const masterDataStore: MasterDataStore = useMasterDataStore();
   const rolleStore: RolleStore = useRolleStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
@@ -65,11 +74,12 @@
 
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
 
-  const translatedOrgName: ComputedRef<string | undefined> = computed(() => {
-    return organisationStore.currentOrganisation?.kennung
-      ? `${organisationStore.currentOrganisation.kennung} (${organisationStore.currentOrganisation.name})`
-      : organisationStore.currentOrganisation?.name;
-  });
+  const administrationsebenen: ComputedRef<TranslatedObject[]> = computed(() =>
+    organisationStore.allOrganisationen.map((org: Organisation) => ({
+      value: org.id,
+      title: getDisplayNameForOrg(org),
+    })),
+  );
 
   const translatedRollenart: ComputedRef<string> = computed(() => {
     return t(`admin.rolle.mappingFrontBackEnd.rollenarten.${rolleStore.currentRolle?.rollenart}`);
@@ -193,8 +203,8 @@
     }
 
     return Array.from(rolleStore.updatedRolle.systemrechte)
-      .map((systemrechtKey: string) => {
-        return t(`admin.rolle.mappingFrontBackEnd.systemrechte.${systemrechtKey}`);
+      .map((systemrecht: SystemRechtResponse) => {
+        return t(`admin.rolle.mappingFrontBackEnd.systemrechte.${systemrecht.name}`);
       })
       .join(', ');
   });
@@ -255,7 +265,7 @@
     });
 
     Object.values(RollenSystemRecht).forEach((enumValue: RollenSystemRecht) => {
-      if (!isHiddenSystemrecht(enumValue)) {
+      if (!masterDataStore.isHiddenSystemrecht(enumValue)) {
         const i18nPath: string = `admin.rolle.mappingFrontBackEnd.systemrechte.${enumValue}`;
         allSystemrechte.value.push({
           value: enumValue,
@@ -265,7 +275,7 @@
     });
 
     // Set the initial values using the computed properties
-    formContext.setFieldValue('selectedAdministrationsebene', translatedOrgName.value);
+    formContext.setFieldValue('selectedAdministrationsebene', organisationStore.currentOrganisation?.id);
     formContext.setFieldValue('selectedRollenArt', translatedRollenart.value);
     formContext.setFieldValue('selectedRollenName', rolleStore.currentRolle?.name);
     formContext.setFieldValue(
@@ -330,6 +340,7 @@
         <v-container>
           <div v-if="rolleStore.currentRolle">
             <RolleForm
+              :administrationsebenen="administrationsebenen"
               :errorCode="rolleStore.errorCode"
               :onHandleConfirmUnsavedChanges="handleConfirmUnsavedChanges"
               :onHandleDiscard="navigateToRolleTable"
@@ -358,6 +369,7 @@
             >
               <!-- Error Message Display -->
               <SpshAlert
+                v-if="!!rolleStore.errorCode"
                 dataTestIdPrefix="rolle-details-error"
                 :model-value="!!rolleStore.errorCode"
                 :title="
