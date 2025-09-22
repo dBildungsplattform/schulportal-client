@@ -1650,10 +1650,13 @@
       <template v-if="!personStore.errorCode && !personenkontextStore.errorCode">
         <v-container class="personal-info">
           <div v-if="personStore.currentPerson?.person && !isEditPersonMetadataActive">
-            <v-row class="flex-md-column">
+            <v-row
+              id="personal-info-row"
+              class="ml-md-16"
+            >
               <v-col>
                 <!-- Vorname -->
-                <v-row class="mt-4">
+                <v-row class="mt-4 align-center">
                   <v-col
                     class="text-right"
                     sm="3"
@@ -1662,7 +1665,7 @@
                     <span class="subtitle-2 hyphenate">{{ t('person.firstName') }}:</span>
                   </v-col>
                   <v-col
-                    class="d-flex align-start mt-1"
+                    class="d-flex align-center"
                     data-testid="person-vorname"
                   >
                     <span class="text-body text-break">{{ personStore.currentPerson.person.name.vorname }}</span>
@@ -1670,7 +1673,7 @@
                 </v-row>
 
                 <!-- Familienname -->
-                <v-row class="mt-0">
+                <v-row class="mt-0 align-center">
                   <v-col
                     class="text-right"
                     sm="3"
@@ -1679,7 +1682,7 @@
                     <span class="subtitle-2 hyphenate">{{ t('person.lastName') }}:</span>
                   </v-col>
                   <v-col
-                    class="d-flex align-start mt-1"
+                    class="d-flex align-center"
                     data-testid="person-familienname"
                   >
                     <span class="text-body text-break">{{ personStore.currentPerson.person.name.familienname }}</span>
@@ -1687,7 +1690,7 @@
                 </v-row>
 
                 <!-- Benutzername -->
-                <v-row class="mt-0">
+                <v-row class="mt-0 align-center">
                   <v-col
                     class="text-right"
                     sm="3"
@@ -1696,7 +1699,7 @@
                     <span class="subtitle-2 hyphenate">{{ t('person.userName') }}:</span>
                   </v-col>
                   <v-col
-                    class="d-flex align-start mt-1"
+                    class="d-flex align-center"
                     data-testid="person-username"
                   >
                     <span class="text-body text-break">{{ personStore.currentPerson.person.referrer }}</span>
@@ -1705,7 +1708,7 @@
 
                 <!-- KoPers.-Nr. -->
                 <v-row
-                  class="mt-0"
+                  class="mt-0 align-center"
                   v-if="hasKopersRolle || personStore.currentPerson.person.personalnummer"
                 >
                   <v-col
@@ -1723,7 +1726,7 @@
                     </span>
                   </v-col>
                   <v-col
-                    class="d-flex align-start"
+                    class="d-flex align-center"
                     data-testid="person-kopersnr"
                   >
                     <span
@@ -1731,7 +1734,6 @@
                         'text-body': true,
                         'text-red': hasKopersRolle && !personStore.currentPerson.person.personalnummer,
                         'text-break': true,
-                        'mt-1': true,
                       }"
                     >
                       {{ personStore.currentPerson.person.personalnummer ?? t('missing') }}
@@ -1742,7 +1744,7 @@
                 <!-- Email -->
                 <v-row
                   v-if="emailStatusText.text !== t('person.emailStatusUnknown')"
-                  class="mt-0"
+                  class="mt-0 align-center"
                 >
                   <v-col
                     class="text-right"
@@ -1751,17 +1753,14 @@
                   >
                     <span class="subtitle-2">{{ t('person.email') }}:</span>
                   </v-col>
-                  <v-col
-                    class="d-flex align-start"
-                    data-testid="person-email"
-                  >
+                  <v-col data-testid="person-email">
                     <SpshTooltip
                       :enabledCondition="!!personStore.currentPerson.person.email"
                       :disabledText="t('person.changePersonMetaDataDisabledDescription')"
                       :enabledText="emailStatusText.tooltip"
                       position="bottom"
                     >
-                      <div class="d-flex align-start">
+                      <div class="d-flex align-center">
                         <v-icon
                           aria-hidden="true"
                           class="mr-2 flex-shrink-0 mt-1"
@@ -1770,7 +1769,7 @@
                         ></v-icon>
                         <span
                           data-testid="person-email-text"
-                          class="text-body text-break mt-1"
+                          class="text-body text-break"
                         >
                           {{ emailStatusText.text }}
                         </span>
@@ -3414,6 +3413,13 @@
 
     .cancel-col {
       margin-bottom: -15px;
+    }
+  }
+
+  @media only screen and (min-width: 1280px) and (max-width: 1600px) {
+    #personal-info-row {
+      flex-direction: column;
+      margin-left: 0px !important;
     }
   }
 
