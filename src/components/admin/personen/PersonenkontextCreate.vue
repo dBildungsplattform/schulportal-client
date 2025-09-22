@@ -334,7 +334,7 @@
     >
       <SchulenFilter
         ref="schulenFilter"
-        :parentId="'personenkontext-create'"
+        parentId="personenkontext-create"
         :selectedSchulen="selectedOrganisation ? [selectedOrganisation] : []"
         :multiple="false"
         :systemrechteForSearch="[requestedWithSystemrecht].filter((v): v is RollenSystemRecht => v !== undefined)"
@@ -433,7 +433,7 @@
           :placeholderText="$t('admin.klasse.selectKlasse')"
           ref="klasse-select"
           :administriertVon
-          parentId="personenkontext-create"
+          filterId="personenkontext-create"
         />
       </FormRow>
       <!-- Befristung -->
