@@ -28,7 +28,7 @@ type Props = {
   highlightSelection?: boolean;
   placeholderText?: string;
   includeAll?: boolean;
-  filterId?: string;
+  parentId?: string;
 };
 
 function mountComponent(props: Partial<Props> = {}): VueWrapper {
@@ -71,7 +71,7 @@ beforeEach(() => {
 });
 
 describe('SchulenFilter', async () => {
-  describe.each([[false, true]])('when multiple is %s', (multiple: boolean) => {
+  describe.each([[false], [true]])('when multiple is %s', (multiple: boolean) => {
     describe.each([[true], [false]])('when readonly is %s', (readonly: boolean) => {
       const defaultProps: Props = { multiple, readonly };
 
@@ -259,7 +259,7 @@ describe('SchulenFilter', async () => {
                 expect(loadSpy).toHaveBeenLastCalledWith(expected, undefined);
               });
 
-              describe('and clearing selection', async () => {
+              describe('it triggers clearing selection', async () => {
                 test('it triggers search', async () => {
                   const wrapper: VueWrapper = await setup();
                   await selectSchule(wrapper, faker.string.uuid());

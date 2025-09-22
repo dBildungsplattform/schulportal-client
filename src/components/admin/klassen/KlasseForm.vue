@@ -149,7 +149,7 @@
       >
         <SchulenFilter
           ref="schulenFilter"
-          :filterId="'klasse-form'"
+          parentId="klasse-form"
           :selectedSchulen="selectedSchule"
           :multiple="false"
           :readonly="props.editMode"

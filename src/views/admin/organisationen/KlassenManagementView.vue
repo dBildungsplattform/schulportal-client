@@ -293,7 +293,7 @@
           >
             <SchulenFilter
               :systemrechte-for-search="[RollenSystemRecht.KlassenVerwalten]"
-              :filterId="'klassen-management'"
+              parentId="klassen-management"
               :multiple="false"
               :hideDetails="true"
               :highlightSelection="true"

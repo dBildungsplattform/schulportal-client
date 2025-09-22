@@ -32,7 +32,7 @@
     highlightSelection?: boolean;
     placeholderText?: string;
     includeAll?: boolean;
-    filterId?: string;
+    parentId?: string;
     useWorkflowEndpoints?: boolean;
     useLandesbediensteteWorkflow?: boolean;
     operationContext?: OperationContext;
@@ -61,11 +61,11 @@
   const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
   const testId: ComputedRef<string> = computed(() => {
     const typ: string = props.includeAll ? 'organisation' : 'schule';
-    return props.filterId ? `${props.filterId}-${typ}-select` : `${typ}-select`;
+    return props.parentId ? `${props.parentId}-${typ}-select` : `${typ}-select`;
   });
 
   const organisationStoreReference: ComputedRef<AutoCompleteStore<Organisation> | undefined> = computed(() => {
-    return organisationStore.organisationenFilters.get(props.filterId ?? '');
+    return organisationStore.organisationenFilters.get(props.parentId ?? '');
   });
 
   // This will either return the store reference for the organisation store or the workflow response (A separate store reference for the workflow is not needed)
@@ -340,7 +340,7 @@
         if (props.useWorkflowEndpoints) {
           await handleWorkflowStep(newOrganisationenFilter);
         } else {
-          await organisationStore.loadOrganisationenForFilter(newSchulenFilter, props.filterId);
+          await organisationStore.loadOrganisationenForFilter(newSchulenFilter, props.parentId);
         }
       }, delay);
     },
@@ -348,11 +348,11 @@
   );
 
   onMounted(async () => {
-    if (organisationStore.organisationenFilters.has(props.filterId ?? '')) {
+    if (organisationStore.organisationenFilters.has(props.parentId ?? '')) {
       // eslint-disable-next-line no-console
-      console.warn(`SchulenFilter initialized twice with id ${props.filterId}`);
+      console.warn(`SchulenFilter initialized twice with id ${props.parentId}`);
     }
-    organisationStore.resetOrganisationenFilter(props.filterId);
+    organisationStore.resetOrganisationenFilter(props.parentId);
     // Initializes the Rollen for the selected Schule (or Orga if includeAll is true)
     if (props.useWorkflowEndpoints) {
       await handleWorkflowStep({
@@ -365,7 +365,7 @@
   });
 
   onUnmounted(() => {
-    organisationStore.clearOrganisationenFilter(props.filterId);
+    organisationStore.clearOrganisationenFilter(props.parentId);
   });
 </script>
 
@@ -391,7 +391,7 @@
     @click:clear="
       useWorkflowEndpoints
         ? (personenkontextStore.workflowStepResponse = null)
-        : organisationStore.resetOrganisationenFilter(props.filterId)
+        : organisationStore.resetOrganisationenFilter(props.parentId)
     "
     @update:focused="handleFocusChange"
     v-bind="selectedSchuleProps"

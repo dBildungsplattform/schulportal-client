@@ -618,7 +618,7 @@
           >
             <SchulenFilter
               :multiple="false"
-              :filterId="'person-import'"
+              parentId="person-import"
               :placeholderText="t('admin.schule.selectSchule')"
               :selectedSchuleProps="selectedSchuleProps"
               :selectedSchulen="selectedSchule"

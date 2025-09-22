@@ -619,7 +619,7 @@
             multiple
             includeAll
             highlightSelection
-            filterId="person-management"
+            parentId="person-management"
             ref="schulenFilter"
             :systemrechteForSearch="[RollenSystemRecht.PersonenVerwalten]"
             :selectedSchulen="selectedOrganisationIds"

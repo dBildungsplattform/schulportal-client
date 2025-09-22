@@ -11,8 +11,8 @@ import { nextTick } from 'vue';
 import KlasseForm from './KlasseForm.vue';
 
 const organisationStore: OrganisationStore = useOrganisationStore();
-const schulenFilterFilterId: string = 'klasse-form';
-const schulenFilterTestId: string = `${schulenFilterFilterId}-schule-select`;
+const parentId: string = 'klasse-form';
+const schulenFilterTestId: string = `${parentId}-schule-select`;
 const initialValues: KlasseFormSchema = {
   selectedSchule: 'Ina-Initial-Schule',
   selectedKlassenname: '1a',
@@ -45,7 +45,7 @@ describe('KlasseForm', () => {
   beforeAll(() => {
     vi.useFakeTimers();
     organisationStore.$reset();
-    organisationStore.organisationenFilters.set(schulenFilterFilterId, {
+    organisationStore.organisationenFilters.set(parentId, {
       total: 2,
       loading: false,
       filterResult: [initialValues, newValues].map(
