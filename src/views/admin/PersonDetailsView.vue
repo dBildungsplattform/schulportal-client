@@ -1662,7 +1662,7 @@
                     sm="3"
                     cols="5"
                   >
-                    <span class="subtitle-2 hyphenate">{{ t('person.firstName') }}:</span>
+                    <span class="subtitle-2">{{ t('person.firstName') }}:</span>
                   </v-col>
                   <v-col
                     class="d-flex align-center"
@@ -1679,7 +1679,7 @@
                     sm="3"
                     cols="5"
                   >
-                    <span class="subtitle-2 hyphenate">{{ t('person.lastName') }}:</span>
+                    <span class="subtitle-2">{{ t('person.lastName') }}:</span>
                   </v-col>
                   <v-col
                     class="d-flex align-center"
@@ -1696,7 +1696,7 @@
                     sm="3"
                     cols="5"
                   >
-                    <span class="subtitle-2 hyphenate">{{ t('person.userName') }}:</span>
+                    <span class="subtitle-2">{{ t('person.userName') }}:</span>
                   </v-col>
                   <v-col
                     class="d-flex align-center"
@@ -1832,7 +1832,8 @@
               @update:selectedKopersNrMetadata="handleSelectedKopersNrUpdate"
               @update:selectedVorname="handleSelectedVorname"
               @update:selectedFamilienname="handleSelectedFamilienname"
-            ></PersonenMetadataChange>
+            >
+            </PersonenMetadataChange>
             <v-row class="save-cancel-row ml-md-16 pt-md-5 pt-12 justify-end">
               <v-col
                 class="cancel-col px-5"
