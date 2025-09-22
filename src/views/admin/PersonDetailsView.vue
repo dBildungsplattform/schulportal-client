@@ -1658,7 +1658,7 @@
                 <!-- Vorname -->
                 <v-row class="mt-4 align-center">
                   <v-col
-                    class="text-right"
+                    class="d-flex align-center justify-end"
                     sm="3"
                     cols="5"
                   >
@@ -1675,7 +1675,7 @@
                 <!-- Familienname -->
                 <v-row class="mt-0 align-center">
                   <v-col
-                    class="text-right"
+                    class="d-flex align-center justify-end"
                     sm="3"
                     cols="5"
                   >
@@ -1692,7 +1692,7 @@
                 <!-- Benutzername -->
                 <v-row class="mt-0 align-center">
                   <v-col
-                    class="text-right"
+                    class="d-flex align-center justify-end"
                     sm="3"
                     cols="5"
                   >
@@ -1712,7 +1712,7 @@
                   v-if="hasKopersRolle || personStore.currentPerson.person.personalnummer"
                 >
                   <v-col
-                    class="text-right"
+                    class="d-flex align-center justify-end"
                     sm="3"
                     cols="5"
                   >
@@ -1747,7 +1747,7 @@
                   class="mt-0 align-center"
                 >
                   <v-col
-                    class="text-right"
+                    class="d-flex align-center justify-end"
                     sm="3"
                     cols="5"
                   >
