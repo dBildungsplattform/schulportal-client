@@ -10,7 +10,7 @@ import {
 } from '@/stores/OrganisationStore';
 import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
 import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
-import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
+import type WrapperLike from 'node_modules/@vue/test-utils/dist/interfaces/wrapperLike';
 import { DoFactory } from 'test/DoFactory';
 import { expect, test, type MockInstance } from 'vitest';
 import { nextTick, type ComputedRef, type DefineComponent } from 'vue';

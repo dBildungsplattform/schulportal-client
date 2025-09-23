@@ -10,7 +10,7 @@ import { useOrganisationStore, type Organisation, type OrganisationStore } from 
 import { RollenMerkmal, useRolleStore, type RolleStore } from '@/stores/RolleStore';
 import { getDisplayNameForOrg } from '@/utils/formatting';
 import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
-import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
+import type WrapperLike from 'node_modules/@vue/test-utils/dist/interfaces/wrapperLike';
 import { DoFactory } from 'test/DoFactory';
 import { expect, test, type Mock, type MockInstance } from 'vitest';
 import { nextTick } from 'vue';
