@@ -454,6 +454,7 @@
     formContext.resetForm();
     hasNoKopersNr.value = false;
     filteredRollen.value = [];
+    personenkontextStore.workflowStepResponse = null;
   }
 
   async function addPersonToOwnSchule(): Promise<void> {

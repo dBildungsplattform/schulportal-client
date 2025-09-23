@@ -18,7 +18,7 @@
   import type { Zuordnung } from '@/stores/types/Zuordnung';
   import { type TranslatedObject } from '@/types.d';
   import type { BaseFieldProps } from 'vee-validate';
-  import { computed, ref, watch, type ComputedRef, type Ref } from 'vue';
+  import { computed, onMounted, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   import SchulenFilter from '@/components/filter/SchulenFilter.vue';
 
@@ -315,6 +315,11 @@
     selectedOrganisation.value = orgaId;
     emits('update:selectedOrganisation', orgaId);
   }
+
+  // If the submission of the form goes wrong and the user needs to correct something, we need to ensure that the canCommit value is updated
+  onMounted(() => {
+    emits('update:canCommit', personenkontextStore.workflowStepResponse?.canCommit ?? false);
+  });
 </script>
 
 <template>
@@ -336,6 +341,7 @@
         ref="schulenFilter"
         parentId="personenkontext-create"
         :selectedSchulen="selectedOrganisation ? [selectedOrganisation] : []"
+        :selectedRollen="selectedRollen ? selectedRollen : []"
         :multiple="false"
         :systemrechteForSearch="[requestedWithSystemrecht].filter((v): v is RollenSystemRecht => v !== undefined)"
         :selectedSchuleProps="selectedOrganisationProps"

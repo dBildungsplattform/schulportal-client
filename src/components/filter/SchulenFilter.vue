@@ -38,6 +38,7 @@
     operationContext?: OperationContext;
     isRolleUnassignForm?: boolean;
     personId?: string;
+    selectedRollen?: Array<string>;
   };
   type Emits = {
     (e: 'update:selectedSchulenObjects', value: Array<Organisation>): void;
@@ -359,6 +360,7 @@
         personId: props.personId,
         operationContext: props.operationContext,
         organisationId: Array.isArray(selectedSchulen.value) ? selectedSchulen.value[0] : selectedSchulen.value,
+        rollenIds: props.selectedRollen ?? [],
         limit: 25,
       });
     }
