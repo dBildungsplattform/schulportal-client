@@ -870,7 +870,7 @@
           </PersonBulkPasswordReset>
           <OrganisationUnassign
             ref="organisation-unassign"
-            v-if="organisationUnassignDialogVisible && selectedOrganisationen.length === 1"
+            v-if="organisationUnassignDialogVisible"
             :isDialogVisible="organisationUnassignDialogVisible"
             :selectedPersonen
             :selectedOrganisation="selectedOrganisationen[0] ?? ({} as Organisation)"
@@ -879,7 +879,7 @@
           </OrganisationUnassign>
           <RolleUnassign
             ref="rolle-unassign"
-            v-if="rolleUnassignDialogVisible && selectedOrganisationen.length === 1"
+            v-if="rolleUnassignDialogVisible"
             :isDialogVisible="rolleUnassignDialogVisible"
             :organisationen="organisationenForForm"
             :selectedPersonen="Array.isArray(selectedPersonen) ? selectedPersonen[0] : selectedPersonen"
