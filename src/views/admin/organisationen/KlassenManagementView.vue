@@ -335,7 +335,7 @@
               <template v-slot:activator="{ props }">
                 <div v-bind="props">
                   <KlassenFilter
-                    :filterId="'klassen-management'"
+                    parentId="klassen-management"
                     :systemrechteForSearch="[RollenSystemRecht.KlassenVerwalten]"
                     :multiple="true"
                     :readonly="!hasSelectedSchule"

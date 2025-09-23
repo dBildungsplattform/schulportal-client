@@ -115,7 +115,7 @@
                 :placeholderText="t('admin.klasse.selectKlasse')"
                 :administriertVon="selectedSchuleId ? [selectedSchuleId] : undefined"
                 @update:selectedKlassen="updateKlassenSelection"
-                :filterId="'bulk-change-klasse'"
+                parentId="bulk-change-klasse"
               />
             </v-col>
           </v-row>

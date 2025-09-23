@@ -78,7 +78,7 @@ describe('KlasseForm', () => {
         errorCode: 'something',
       });
       expect(wrapper.find('[data-testid="klasse-form"]').exists()).toBe(true);
-      expect(wrapper.find(`#${schulenFilterTestId}`).exists()).toBe(false);
+      expect(wrapper.find(`[data-testid="${schulenFilterTestId}"]`).exists()).toBe(false);
       expect(wrapper.find('#klassenname-input').exists()).toBe(false);
     });
 

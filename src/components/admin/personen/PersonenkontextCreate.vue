@@ -433,7 +433,7 @@
           :placeholderText="$t('admin.klasse.selectKlasse')"
           ref="klasse-select"
           :administriertVon
-          filterId="personenkontext-create"
+          parentId="personenkontext-create"
         />
       </FormRow>
       <!-- Befristung -->
