@@ -1,6 +1,7 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import type { RolleResponse } from './RolleStore';
 import type { SortOrder, OrganisationSortField } from '@/utils/sorting';
+import type { Organisation } from './OrganisationStore';
 
 type SearchFilterState = {
   klassenPage: number;
@@ -19,6 +20,7 @@ type SearchFilterState = {
   selectedRollen: Array<string> | null;
   selectedRollenObjects: RolleResponse[];
   selectedOrganisationen: Array<string> | null;
+  selectedOrgaObjects: Organisation[] | null;
   personenSortField: string | null;
   personenSortOrder: string | null;
   organisationenSortField: OrganisationSortField | null;
@@ -32,7 +34,10 @@ type SearchFilterActions = {
   setKlasseFilterForPersonen: (selectedKlassen: Array<string> | null) => void;
   setRolleFilterForPersonen: (selectedRollen: Array<string> | null) => void;
   setRolleFilterWithObjectsForPersonen: (selectedRollen: Array<string> | null, rollenObjects: RolleResponse[]) => void;
-  setOrganisationFilterForPersonen: (selectedOrganisationen: Array<string> | null) => void;
+  setOrganisationFilterForPersonen: (
+    selectedOrganisationen: Array<string> | null,
+    orgaObjects?: Organisation[],
+  ) => void;
   setSearchFilterForPersonen: (searchFilter: string | null) => void;
   setSearchFilterForSchulen: (searchFilter: string | null) => void;
   setSchuleFilterForKlassen: (selectedSchuleForKlassen: string | null) => void;
@@ -67,6 +72,7 @@ export const useSearchFilterStore: StoreDefinition<
     selectedRollen: [],
     selectedRollenObjects: [],
     selectedOrganisationen: [],
+    selectedOrgaObjects: [],
     personenSortField: null,
     personenSortOrder: null,
     organisationenSortField: null,
@@ -84,8 +90,9 @@ export const useSearchFilterStore: StoreDefinition<
       this.selectedRollen = selectedRollen;
     },
 
-    setOrganisationFilterForPersonen(selectedOrganisationen: Array<string> | null) {
+    setOrganisationFilterForPersonen(selectedOrganisationen: Array<string> | null, orgaObjects?: Organisation[]) {
       this.selectedOrganisationen = selectedOrganisationen;
+      this.selectedOrgaObjects = orgaObjects ?? [];
     },
 
     setSearchFilterForPersonen(searchFilterPersonen: string | null) {
