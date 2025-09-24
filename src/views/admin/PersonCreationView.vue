@@ -454,6 +454,10 @@
     formContext.resetForm();
     hasNoKopersNr.value = false;
     filteredRollen.value = [];
+    // Reset canCommit to false after creating the personto avoid issues when going back to the form
+    if (personenkontextStore.workflowStepResponse) {
+      personenkontextStore.workflowStepResponse.canCommit = false;
+    }
   }
 
   async function addPersonToOwnSchule(): Promise<void> {
@@ -700,10 +704,8 @@
 
   onMounted(async () => {
     personStore.errorCode = '';
-
     personenkontextStore.createdPersonWithKontext = null;
     personenkontextStore.landesbediensteteCommitResponse = null;
-
     /* listen for browser changes and prevent them when form is dirty */
     window.addEventListener('beforeunload', preventNavigation);
   });

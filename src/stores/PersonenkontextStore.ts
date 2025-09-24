@@ -18,7 +18,6 @@ import {
   type PersonenkontextWorkflowResponse,
   LandesbediensteterApiFactory,
   type LandesbediensteterApiInterface,
-  type LandesbediensteterWorkflowStepResponse,
   type LandesbediensteterWorkflowCommitBodyParams,
   type RolleResponse,
   type RollenSystemRechtEnum,
@@ -88,7 +87,6 @@ export function mapZuordnungToPersonenkontextUpdate(
 type PersonenkontextState = {
   updatedPersonenkontexte: PersonenkontexteUpdateResponse | null;
   workflowStepResponse: PersonenkontextWorkflowResponse | null;
-  workflowStepLandesbediensteteResponse: LandesbediensteterWorkflowStepResponse | null;
   landesbediensteteCommitResponse: PersonenkontexteUpdateResponse | null;
   filteredRollen: FindRollenResponse | null;
   createdPersonWithKontext: DBiamPersonResponse | null;
@@ -153,7 +151,6 @@ export const usePersonenkontextStore: StoreDefinition<
   state: (): PersonenkontextState => {
     return {
       workflowStepResponse: null,
-      workflowStepLandesbediensteteResponse: null,
       landesbediensteteCommitResponse: null,
       updatedPersonenkontexte: null,
       filteredRollen: null,

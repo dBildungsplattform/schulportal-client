@@ -618,11 +618,12 @@
           >
             <SchulenFilter
               :multiple="false"
+              parentId="person-import"
               :placeholderText="t('admin.schule.selectSchule')"
               :selectedSchuleProps="selectedSchuleProps"
               :selectedSchulen="selectedSchule"
               @update:selectedSchulen="updateSelectedSchule"
-              ref="schule-select"
+              ref="schulFilter"
             />
           </FormRow>
 

@@ -2,7 +2,9 @@
   import SchulenFilter from '@/components/filter/SchulenFilter.vue';
   import FormRow from '@/components/form/FormRow.vue';
   import FormWrapper from '@/components/form/FormWrapper.vue';
+  import type { Organisation } from '@/stores/OrganisationStore';
   import { RollenSystemRecht } from '@/stores/RolleStore';
+  import type { Option } from '@/types';
   import { getValidationSchema, getVuetifyConfig, type ValidationSchema } from '@/utils/validationKlasse';
   import { useForm, useIsFormDirty, useIsFormValid, type BaseFieldProps, type TypedSchema } from 'vee-validate';
   import { computed, watch, type ComputedRef, type Ref } from 'vue';
@@ -23,6 +25,7 @@
   const props: Props = defineProps<Props>();
   type Emits = {
     (event: 'formStateChanged', payload: { values: ValidationSchema; dirty: boolean; valid: boolean }): void;
+    (event: 'update:selectedSchule', schule: Option<Organisation>): void;
   };
   const emit: Emits = defineEmits<Emits>();
   const { t }: Composer = useI18n({ useScope: 'global' });
@@ -146,6 +149,7 @@
       >
         <SchulenFilter
           ref="schulenFilter"
+          parentId="klasse-form"
           :selectedSchulen="selectedSchule"
           :multiple="false"
           :readonly="props.editMode"
@@ -153,6 +157,10 @@
           :systemrechteForSearch="[RollenSystemRecht.KlassenVerwalten]"
           :selectedSchuleProps="selectedSchuleProps"
           @update:selectedSchulen="updateSchuleSelection"
+          @update:selected-schulen-objects="
+            (organisations: Array<Organisation>) =>
+              emit('update:selectedSchule', organisations.length > 0 ? organisations[0] : null)
+          "
         ></SchulenFilter>
       </FormRow>
 

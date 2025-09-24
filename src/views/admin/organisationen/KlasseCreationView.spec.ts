@@ -36,18 +36,6 @@ let { storedBeforeRouteLeaveCallback }: { storedBeforeRouteLeaveCallback: OnBefo
   },
 );
 
-organisationStore.allOrganisationen = [
-  {
-    id: '1',
-    name: 'Albert-Emil-Hansebrot-Gymnasium',
-    kennung: '9356494',
-    namensergaenzung: 'Schule',
-    kuerzel: 'aehg',
-    typ: 'SCHULE',
-    administriertVon: '1',
-  },
-];
-
 function mountComponent(): VueWrapper {
   return mount(KlasseCreationView, {
     attachTo: document.getElementById('app') || '',
@@ -77,7 +65,7 @@ async function fillForm(args: Partial<FormFields>): Promise<Partial<FormSelector
   const schuleSelect: VueWrapper | undefined = wrapper
     ?.findComponent({ ref: 'klasse-creation-form' })
     .findComponent({ ref: 'schulenFilter' })
-    .findComponent({ ref: 'schule-select' });
+    .findComponent({ ref: 'klasse-form-schule-select' });
   expect(schuleSelect?.exists()).toBe(true);
 
   await schuleSelect?.setValue(schule);
