@@ -293,6 +293,7 @@
           >
             <SchulenFilter
               :systemrechte-for-search="[RollenSystemRecht.KlassenVerwalten]"
+              parentId="klassen-management"
               :multiple="false"
               :hideDetails="true"
               :highlightSelection="true"
@@ -305,7 +306,7 @@
                 <v-list-item>
                   <v-progress-circular
                     indeterminate
-                    v-if="organisationStore.schulenFilter.loading"
+                    v-if="organisationStore.organisationenFilters.get('klassen-management')?.loading"
                   ></v-progress-circular>
                   <span
                     v-else
@@ -313,8 +314,8 @@
                     >{{
                       t(
                         'admin.schule.schulenFound',
-                        { count: organisationStore.schulenFilter.total },
-                        organisationStore.schulenFilter.total,
+                        { count: organisationStore.organisationenFilters.get('klassen-management')?.total },
+                        organisationStore.organisationenFilters.get('klassen-management')?.total ?? 0,
                       )
                     }}</span
                   >
@@ -334,7 +335,7 @@
               <template v-slot:activator="{ props }">
                 <div v-bind="props">
                   <KlassenFilter
-                    :filterId="'klassen-management'"
+                    parentId="klassen-management"
                     :systemrechteForSearch="[RollenSystemRecht.KlassenVerwalten]"
                     :multiple="true"
                     :readonly="!hasSelectedSchule"

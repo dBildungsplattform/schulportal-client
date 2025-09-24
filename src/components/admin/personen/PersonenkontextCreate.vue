@@ -20,6 +20,7 @@
   import type { BaseFieldProps } from 'vee-validate';
   import { computed, onMounted, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n } from 'vue-i18n';
+  import SchulenFilter from '@/components/filter/SchulenFilter.vue';
 
   useI18n({ useScope: 'global' });
 
@@ -29,7 +30,6 @@
   const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
   const canCommit: Ref<boolean> = ref(false);
 
-  const searchInputOrganisation: Ref<string | undefined> = ref('');
   const searchInputRolle: Ref<string | undefined> = ref('');
   const searchInputRollen: Ref<string | undefined> = ref('');
 
@@ -61,7 +61,6 @@
 
   const props: Props = defineProps<Props>();
   const {
-    hasAutoselectedSchule,
     autoselectedSchule,
   }: { hasAutoselectedSchule: ComputedRef<boolean>; autoselectedSchule: ComputedRef<Organisation | null> } =
     useAutoselectedSchule([RollenSystemRecht.PersonenVerwalten]);
@@ -86,11 +85,6 @@
   // doing it this way prevents an issue where the reactive system constantly re-runs which causes requests to be issued in a loop
   const administriertVon: Ref<string[] | undefined> = ref([]);
 
-  // Computed property to get the title of the selected organisation
-  const selectedOrganisationTitle: ComputedRef<string | undefined> = computed(() => {
-    return props.organisationen?.find((org: TranslatedObject) => org.value === selectedOrganisation.value)?.title;
-  });
-
   const selectedRolleTitles: ComputedRef<string[]> = computed(() => {
     if (!Array.isArray(selectedRollen.value)) return [];
     return selectedRollen.value
@@ -102,6 +96,18 @@
   const selectedRolleTitle: ComputedRef<string | undefined> = computed(() => {
     return props.rollen?.find((rolle: TranslatedObject) => rolle.value === selectedRolle.value)?.title;
   });
+
+  const useLandesbediensteteWorkflow: ComputedRef<boolean> = computed((): boolean => {
+    return props.createType === CreationType.AddPersonToOwnSchule;
+  });
+
+  const requestedWithSystemrecht: ComputedRef<RollenSystemRecht | undefined> = computed(
+    (): RollenSystemRecht | undefined => {
+      return props.createType === CreationType.Limited
+        ? RollenSystemRecht.EingeschraenktNeueBenutzerErstellen
+        : undefined;
+    },
+  );
 
   function isLernRolle(selectedRolleIds: string | string[] | undefined): boolean {
     if (!selectedRolleIds) return false;
@@ -117,9 +123,9 @@
   }
 
   async function handleWorkflowStep(filter: WorkflowFilter): Promise<void> {
-    const useLandesbediensteteWorkflow: boolean = props.createType === CreationType.AddPersonToOwnSchule;
+    const useLandesbediensteteWorkflows: boolean = props.createType === CreationType.AddPersonToOwnSchule;
 
-    if (useLandesbediensteteWorkflow) {
+    if (useLandesbediensteteWorkflows) {
       await personenkontextStore.processWorkflowStepLandesbedienstete(filter);
     } else {
       await personenkontextStore.processWorkflowStep({
@@ -145,14 +151,6 @@
     emits('update:selectedOrganisation', newValue);
 
     if (newValue && newValue !== oldValue) {
-      const filter: WorkflowFilter = {
-        personId: props.personId,
-        organisationId: newValue,
-        limit: 25,
-      };
-
-      if (!hasAutoselectedSchule.value) await handleWorkflowStep(filter);
-
       administriertVon.value?.pop();
       administriertVon.value?.push(newValue);
 
@@ -226,32 +224,6 @@
     { deep: true },
   );
 
-  // Using a watcher instead of modelUpdate since we need the old Value as well.
-  // Default behavior of the autocomplete is to reset the newValue to empty string and that causes another request to be made
-  watch(searchInputOrganisation, async (newValue: string | undefined, oldValue: string | undefined) => {
-    clearTimeout(timerId.value);
-
-    if (oldValue === selectedOrganisationTitle.value) return;
-
-    const filter: WorkflowFilter = { limit: 25 };
-
-    if (newValue === '' && !selectedOrganisation.value) {
-      // Case: Initial load
-      // nothing to add — base filter is fine
-    } else if (newValue && newValue !== selectedOrganisationTitle.value) {
-      filter.organisationName = newValue;
-    } else if (newValue === '' && selectedOrganisation.value) {
-      // Case: user cleared search but selected something earlier
-      filter.organisationId = selectedOrganisation.value;
-    } else {
-      return;
-    }
-
-    timerId.value = setTimeout(async () => {
-      await handleWorkflowStep(filter);
-    }, 500);
-  });
-
   watch(
     props.allowMultipleRollen ? searchInputRollen : searchInputRolle,
     async (newValue: string | undefined, oldValue: string | undefined) => {
@@ -302,11 +274,6 @@
     emits('update:selectedKlasse', selectedKlassen);
   }
 
-  // Clear the selected Organisation once the input field is cleared (This is the only way to fetch all Orgas again)
-  // This is also important since we only want to fetch all orgas once the selected Orga is null, otherwise an extra request is made with an empty string
-  function clearSelectedOrganisation(): void {
-    emits('fieldReset', 'selectedOrganisation');
-  }
   // Clear the selected Rolle once the input field is cleared (This is the only way to fetch all Rollen again)
   // This is also important since we only want to fetch all orgas once the selected Rolle is null, otherwise an extra request is made with an empty string
   function clearSelectedRolle(): void {
@@ -344,22 +311,14 @@
     { immediate: true },
   );
 
-  const getPrefilledRollenAsArray = (): string[] => {
-    if (props.allowMultipleRollen) {
-      return props.selectedRollen ?? [];
-    }
-    return props.selectedRolle ? [props.selectedRolle] : [];
-  };
+  function updateSchuleSelection(orgaId: string): void {
+    selectedOrganisation.value = orgaId;
+    emits('update:selectedOrganisation', orgaId);
+  }
 
-  onMounted(async () => {
-    const prefilledRollen: string[] = getPrefilledRollenAsArray();
-    await handleWorkflowStep({
-      personId: props.personId,
-      operationContext: props.operationContext,
-      organisationId: selectedOrganisation.value,
-      rollenIds: prefilledRollen,
-      limit: 25,
-    });
+  // If the submission of the form goes wrong and the user needs to correct something, we need to ensure that the canCommit value is updated
+  onMounted(() => {
+    emits('update:canCommit', personenkontextStore.workflowStepResponse?.canCommit ?? false);
   });
 </script>
 
@@ -378,33 +337,27 @@
       labelForId="organisation-select"
       :label="$t('admin.organisation.organisation')"
     >
-      <v-autocomplete
-        class="mb-5"
-        autocomplete="off"
-        :class="[
-          { 'filter-dropdown mb-4': hasAutoselectedSchule || isRolleUnassignForm },
-          { selected: selectedOrganisation },
-        ]"
-        clearable
-        :click:clear="clearSelectedOrganisation"
-        data-testid="organisation-select"
-        density="compact"
-        :disabled="hasAutoselectedSchule || isRolleUnassignForm"
-        id="organisation-select"
-        ref="organisation-select"
-        hide-details
-        :items="organisationen"
-        item-value="value"
-        item-text="title"
-        :no-data-text="$t('noDataFound')"
-        :placeholder="$t('admin.organisation.selectOrganisation')"
-        required="true"
-        variant="outlined"
-        @update:focused="handleFocusChange"
-        v-bind="selectedOrganisationProps"
-        v-model="selectedOrganisation"
-        v-model:search="searchInputOrganisation"
-      ></v-autocomplete>
+      <SchulenFilter
+        ref="schulenFilter"
+        parentId="personenkontext-create"
+        :selectedSchulen="selectedOrganisation ? [selectedOrganisation] : []"
+        :selectedRollen="selectedRollen ? selectedRollen : []"
+        :multiple="false"
+        :systemrechteForSearch="[requestedWithSystemrecht].filter((v): v is RollenSystemRecht => v !== undefined)"
+        :selectedSchuleProps="selectedOrganisationProps"
+        :useWorkflowEndpoints="true"
+        :useLandesbediensteteWorkflow="useLandesbediensteteWorkflow"
+        :operationContext="props.operationContext"
+        :isRolleUnassignForm="isRolleUnassignForm"
+        :includeAll="true"
+        :placeholderText="$t('admin.organisation.selectOrganisation')"
+        :personId="props.personId"
+        @update:selectedSchulen="updateSchuleSelection"
+        @update:selectedSchulenObjects="
+          (organisations: Array<Organisation>) =>
+            emits('update:selectedOrganisation', organisations.length > 0 ? organisations[0]?.id : undefined)
+        "
+      ></SchulenFilter>
     </FormRow>
 
     <div v-if="selectedOrganisation">
@@ -486,7 +439,7 @@
           :placeholderText="$t('admin.klasse.selectKlasse')"
           ref="klasse-select"
           :administriertVon
-          :filterId="'personenkontext-create'"
+          parentId="personenkontext-create"
         />
       </FormRow>
       <!-- Befristung -->
