@@ -3,7 +3,7 @@ import { VueWrapper, mount } from '@vue/test-utils';
 import SchuleManagementView from './SchuleManagementView.vue';
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import { nextTick } from 'vue';
-import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
+import type WrapperLike from 'node_modules/@vue/test-utils/dist/interfaces/wrapperLike';
 
 let wrapper: VueWrapper | null = null;
 let organisationStore: OrganisationStore;
