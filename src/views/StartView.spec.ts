@@ -11,7 +11,7 @@ import {
 import { PersonenUebersicht } from '@/stores/types/PersonenUebersicht';
 import { faker } from '@faker-js/faker';
 import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
-import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
+import type WrapperLike from 'node_modules/@vue/test-utils/dist/interfaces/wrapperLike';
 import { DoFactory } from 'test/DoFactory';
 import { expect, test, type Mock } from 'vitest';
 import { nextTick } from 'vue';
