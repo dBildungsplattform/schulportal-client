@@ -40,8 +40,12 @@
   const selectedSchuleObject: Ref<Option<Organisation>> = ref(null);
 
   const translatedSchulname: ComputedRef<string> = computed(() => {
-    if (selectedSchuleObject.value) return getDisplayNameForOrg(selectedSchuleObject.value);
-    if (autoselectedSchule.value) return getDisplayNameForOrg(autoselectedSchule.value);
+    if (selectedSchuleObject.value) {
+      return getDisplayNameForOrg(selectedSchuleObject.value);
+    }
+    if (autoselectedSchule.value) {
+      return getDisplayNameForOrg(autoselectedSchule.value);
+    }
     return '';
   });
 

@@ -43,6 +43,7 @@ export async function isBefristungspflichtRolle(selectedRolleIds: string[] | und
 
     // Load missing rolle
     if (!rolle) {
+      // eslint-disable-next-line no-await-in-loop
       await rolleStore.getRolleById(rolleId);
       if (rolleStore.currentRolle) {
         // Map currentRolle to TranslatedRolleWithAttrs

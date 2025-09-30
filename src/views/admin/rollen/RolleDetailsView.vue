@@ -430,7 +430,6 @@
                       data-testid="rolle-edit-button"
                       @click="activateEditing"
                       :block="mdAndDown"
-                      @click="activateEditing"
                     >
                       {{ $t('edit') }}
                     </v-btn>

@@ -250,7 +250,7 @@
     await applySearchAndFilters();
   }
 
-  async function updateKlassenSelection(newValue: Array<string>): Promise<void> {
+  function updateKlassenSelection(newValue: Array<string>): void {
     searchFilterStore.setKlasseFilterForPersonen(newValue);
     applySearchAndFilters();
     selectedKlassen.value = newValue;
@@ -284,7 +284,7 @@
     selectedOrganisationen.value = searchFilterStore.selectedOrgaObjects ?? [];
   }
 
-  async function setOrganisationFilter(newValue: Array<string> | undefined): Promise<void> {
+  function setOrganisationFilter(newValue: Array<string> | undefined): void {
     selectedOrganisationIds.value = newValue ?? [];
     searchFilterStore.setOrganisationFilterForPersonen(newValue ?? []);
     searchFilterStore.setKlasseFilterForPersonen([]);
@@ -332,7 +332,7 @@
     await applySearchAndFilters();
   }
 
-  async function updateRollenSearch(searchValue: string): Promise<void> {
+  function updateRollenSearch(searchValue: string): void {
     clearTimeout(timerId);
 
     timerId = setTimeout(async () => {
@@ -415,7 +415,9 @@
 
   const singleSchuleSelected: ComputedRef<boolean> = computed(() => {
     const val: string[] | string = selectedOrganisationIds.value;
-    if (Array.isArray(val)) return val.length === 1;
+    if (Array.isArray(val)) {
+      return val.length === 1;
+    }
     return true;
   });
 
@@ -942,9 +944,6 @@
         @onPageUpdate="getPaginatedPersonen"
         @onTableUpdate="handleTableSorting"
         @update:selectedRows="handleSelectedRows"
-        :modelValue="selectedPersonIds as unknown as TableItem[]"
-        :totalItems="personStore.totalPersons"
-        item-value-path="id"
       >
         <template v-slot:[`item.rollen`]="{ item }">
           <div

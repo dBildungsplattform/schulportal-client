@@ -144,6 +144,7 @@ export const useImportStore: StoreDefinition<'importStore', ImportState, ImportG
             this.errorCode = 'IMPORT_TIMEOUT';
             this.importProgress = 0;
           }
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error: unknown) {
           this.stopImportStatusPolling();
           this.errorCode = 'UNSPECIFIED_ERROR';

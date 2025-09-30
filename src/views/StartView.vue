@@ -20,9 +20,9 @@
   import type { Zuordnung } from '@/stores/types/Zuordnung';
   import { adjustDateForTimezoneAndFormat } from '@/utils/date';
   import { computed, onBeforeMount, onMounted, ref, type ComputedRef, type Ref } from 'vue';
-  import { useI18n } from 'vue-i18n';
+  import { useI18n, type Composer } from 'vue-i18n';
 
-  const { t }: { t: Function } = useI18n();
+  const { t }: Composer = useI18n();
 
   export type Alert = {
     id: string;
@@ -157,6 +157,7 @@
     alerts.value = getBannerAlerts();
     const closedAlertsStr: string | null = sessionStorage.getItem('closedAlerts');
     if (closedAlertsStr) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       closedAlerts.value = new Set(JSON.parse(closedAlertsStr));
       alerts.value.forEach((alert: Alert) => {
         if (closedAlerts.value.has(alert.id.toString())) {

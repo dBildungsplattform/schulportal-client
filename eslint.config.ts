@@ -77,6 +77,7 @@ const rules: Partial<Linter.RulesRecord> = {
     '@typescript-eslint/no-unsafe-call': 'warn',
     '@typescript-eslint/no-unsafe-enum-comparison': 'warn',
     '@typescript-eslint/no-empty-object-type': 'warn', // alternative pattern for empty getters in stores needed
+    '@typescript-eslint/prefer-promise-reject-errors': 'warn',
 };
 
 export default defineConfig(

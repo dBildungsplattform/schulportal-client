@@ -143,7 +143,7 @@
   }
 
   // Watcher for selectedOrganisation to fetch roles and classes
-  watch(selectedOrganisation, async (newValue: string | undefined, oldValue: string | undefined) => {
+  watch(selectedOrganisation, (newValue: string | undefined, oldValue: string | undefined) => {
     // Reset selected roles if oldValue existed (change event)
     if (oldValue !== undefined) {
       selectedRolle.value = undefined;
@@ -273,11 +273,6 @@
       searchInputRolle.value = '';
     }
   };
-
-  function updateKlasseSelection(selectedKlassen: string | undefined): void {
-    selectedKlasse.value = selectedKlassen;
-    emits('update:selectedKlasse', selectedKlassen);
-  }
 
   // Clear the selected Rolle once the input field is cleared (This is the only way to fetch all Rollen again)
   // This is also important since we only want to fetch all orgas once the selected Rolle is null, otherwise an extra request is made with an empty string

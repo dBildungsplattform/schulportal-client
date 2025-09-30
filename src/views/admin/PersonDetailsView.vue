@@ -1744,7 +1744,6 @@
                 <v-row
                   class="mt-0 align-center"
                   v-if="hasKopersRolle || personStore.currentPerson.person.personalnummer"
-                  class="mt-0"
                 >
                   <v-col
                     class="d-flex align-center justify-end"

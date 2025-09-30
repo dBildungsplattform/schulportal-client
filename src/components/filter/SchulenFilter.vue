@@ -87,8 +87,11 @@
     },
   );
   const typFilter: ComputedRef<Pick<OrganisationenFilter, 'includeTyp' | 'excludeTyp'>> = computed(() => {
-    if (props.includeAll) return { excludeTyp: [OrganisationsTyp.Klasse] };
-    else return { includeTyp: OrganisationsTyp.Schule };
+    if (props.includeAll) {
+      return { excludeTyp: [OrganisationsTyp.Klasse] };
+    } else {
+      return { includeTyp: OrganisationsTyp.Schule };
+    }
   });
 
   // The filter used to load the Schulen and possibly orgas
@@ -169,7 +172,7 @@
       // Handle regular organisation store - check if filterResult exists and is an array. If yes then we are dealing with the organisation store
       let filterResult: Organisation[] | undefined;
       if ('filterResult' in storeData) {
-        filterResult = (storeData as AutoCompleteStore<Organisation>).filterResult;
+        filterResult = storeData.filterResult;
       }
       if (Array.isArray(filterResult)) {
         organisations = filterResult;
@@ -199,20 +202,34 @@
   };
 
   const getDisplayItem = (item: TranslatedObject, index: number): string => {
-    if (!selectedSchulen.value) return '';
-    if (!canDisplaySelection(selectedSchulen.value)) return '...';
+    if (!selectedSchulen.value) {
+      return '';
+    }
+    if (!canDisplaySelection(selectedSchulen.value)) {
+      return '...';
+    }
 
     const selectedIds: string[] = wrapSelectedSchulenIds(selectedSchulen.value);
 
-    if (!props.multiple) return item.title;
-    if (selectedIds.length < 2) return item.title;
-    if (index === 0) return t('admin.schule.schulenSelected', { count: selectedIds.length });
+    if (!props.multiple) {
+      return item.title;
+    }
+    if (selectedIds.length < 2) {
+      return item.title;
+    }
+    if (index === 0) {
+      return t('admin.schule.schulenSelected', { count: selectedIds.length });
+    }
     return '';
   };
 
   const shouldHighlightSelection: ComputedRef<boolean> = computed(() => {
-    if (hasAutoselectedSchule.value || props.isRolleUnassignForm) return true;
-    if (props.highlightSelection && !isEmptySelection(selectedSchulen.value)) return true;
+    if (hasAutoselectedSchule.value || props.isRolleUnassignForm) {
+      return true;
+    }
+    if (props.highlightSelection && !isEmptySelection(selectedSchulen.value)) {
+      return true;
+    }
     return false;
   });
 
@@ -248,7 +265,9 @@
   };
 
   const resolveSelection = (selection: SelectedSchulenIds): Array<Organisation> => {
-    if (isEmptySelection(selection)) return [];
+    if (isEmptySelection(selection)) {
+      return [];
+    }
     const selectedIds: Array<string> = wrapSelectedSchulenIds(selection);
     let organisations: Organisation[] = [];
 
@@ -279,7 +298,9 @@
   };
 
   const handleFocusChange = (focused: boolean): void => {
-    if (!props.multiple) return;
+    if (!props.multiple) {
+      return;
+    }
     if (!focused) {
       searchInputSchulen.value = undefined;
     }
@@ -325,7 +346,7 @@
   // This watches both filters and triggers loading of organisationen when they change
   watch(
     [schulenFilter, organisationenFilter],
-    async (
+    (
       [newSchulenFilter, newOrganisationenFilter]: [OrganisationenFilter, WorkflowFilter],
       [oldSchulenFilter, oldOrganisationenFilter]: [OrganisationenFilter | undefined, WorkflowFilter | undefined] = [
         undefined,
@@ -383,11 +404,6 @@
 
 <template>
   <v-autocomplete
-    id="schule-select"
-    ref="schule-select"
-    v-bind="selectedSchuleProps"
-    v-model="selectedSchulen"
-    v-model:search="searchInputSchulen"
     autocomplete="off"
     :class="['filter-dropdown', { selected: shouldHighlightSelection }]"
     clearable
@@ -404,7 +420,6 @@
     :placeholder="props.placeholderText ?? t('admin.schule.assignSchule')"
     required="true"
     variant="outlined"
-    :hide-details
     @update:search="updateSearchString"
     @click:clear="
       useWorkflowEndpoints

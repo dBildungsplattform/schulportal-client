@@ -97,7 +97,7 @@ export type RolleTableItem = {
 
 export type RolleFormType = {
   selectedAdministrationsebene: string | undefined;
-  selectedRollenArt: RollenArt | string;
+  selectedRollenArt: RollenArt;
   selectedRollenName: string | undefined;
   selectedMerkmale: RollenMerkmal[] | string[];
   selectedServiceProviders: ServiceProvider[] | string[];
