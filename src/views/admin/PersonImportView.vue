@@ -625,12 +625,13 @@
             :label="$t('admin.schule.schule')"
           >
             <SchulenFilter
-              ref="schule-select"
               :multiple="false"
-              :placeholder-text="t('admin.schule.selectSchule')"
-              :selected-schule-props="selectedSchuleProps"
-              :selected-schulen="selectedSchule"
-              @update:selected-schulen="updateSelectedSchule"
+              parentId="person-import"
+              :placeholderText="t('admin.schule.selectSchule')"
+              :selectedSchuleProps="selectedSchuleProps"
+              :selectedSchulen="selectedSchule"
+              @update:selectedSchulen="updateSelectedSchule"
+              ref="schulFilter"
             />
           </FormRow>
 

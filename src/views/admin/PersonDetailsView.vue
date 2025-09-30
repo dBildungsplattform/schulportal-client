@@ -1684,20 +1684,22 @@
       <template v-if="!personStore.errorCode && !personenkontextStore.errorCode">
         <v-container class="personal-info">
           <div v-if="personStore.currentPerson?.person && !isEditPersonMetadataActive">
-            <v-row class="ml-md-16">
+            <v-row
+              id="personal-info-row"
+              class="ml-md-16"
+            >
               <v-col>
                 <!-- Vorname -->
-                <v-row class="mt-4">
+                <v-row class="mt-4 align-center">
                   <v-col
-                    class="text-right"
+                    class="d-flex align-center justify-end"
                     sm="3"
                     cols="5"
-                    offset="1"
                   >
                     <span class="subtitle-2">{{ t('person.firstName') }}:</span>
                   </v-col>
                   <v-col
-                    class="d-flex align-start mt-1"
+                    class="d-flex align-center"
                     data-testid="person-vorname"
                   >
                     <span class="text-body text-break">{{ personStore.currentPerson.person.name.vorname }}</span>
@@ -1705,17 +1707,16 @@
                 </v-row>
 
                 <!-- Familienname -->
-                <v-row class="mt-0">
+                <v-row class="mt-0 align-center">
                   <v-col
-                    class="text-right"
+                    class="d-flex align-center justify-end"
                     sm="3"
                     cols="5"
-                    offset="1"
                   >
                     <span class="subtitle-2">{{ t('person.lastName') }}:</span>
                   </v-col>
                   <v-col
-                    class="d-flex align-start mt-1"
+                    class="d-flex align-center"
                     data-testid="person-familienname"
                   >
                     <span class="text-body text-break">{{ personStore.currentPerson.person.name.familienname }}</span>
@@ -1723,17 +1724,16 @@
                 </v-row>
 
                 <!-- Benutzername -->
-                <v-row class="mt-0">
+                <v-row class="mt-0 align-center">
                   <v-col
-                    class="text-right"
+                    class="d-flex align-center justify-end"
                     sm="3"
                     cols="5"
-                    offset="1"
                   >
                     <span class="subtitle-2">{{ t('person.userName') }}:</span>
                   </v-col>
                   <v-col
-                    class="d-flex align-start mt-1"
+                    class="d-flex align-center"
                     data-testid="person-username"
                   >
                     <span class="text-body text-break">{{ personStore.currentPerson.person.referrer }}</span>
@@ -1742,14 +1742,14 @@
 
                 <!-- KoPers.-Nr. -->
                 <v-row
+                  class="mt-0 align-center"
                   v-if="hasKopersRolle || personStore.currentPerson.person.personalnummer"
                   class="mt-0"
                 >
                   <v-col
-                    class="text-right"
+                    class="d-flex align-center justify-end"
                     sm="3"
                     cols="5"
-                    offset="1"
                   >
                     <span
                       :class="{
@@ -1761,7 +1761,7 @@
                     </span>
                   </v-col>
                   <v-col
-                    class="d-flex align-start"
+                    class="d-flex align-center"
                     data-testid="person-kopersnr"
                   >
                     <span
@@ -1769,7 +1769,6 @@
                         'text-body': true,
                         'text-red': hasKopersRolle && !personStore.currentPerson.person.personalnummer,
                         'text-break': true,
-                        'mt-1': true,
                       }"
                     >
                       {{ personStore.currentPerson.person.personalnummer ?? t('missing') }}
@@ -1780,27 +1779,23 @@
                 <!-- Email -->
                 <v-row
                   v-if="emailStatusText.text !== t('person.emailStatusUnknown')"
-                  class="mt-0"
+                  class="mt-0 align-center"
                 >
                   <v-col
-                    class="text-right"
+                    class="d-flex align-center justify-end"
                     sm="3"
                     cols="5"
-                    offset="1"
                   >
                     <span class="subtitle-2">{{ t('person.email') }}:</span>
                   </v-col>
-                  <v-col
-                    class="d-flex align-start"
-                    data-testid="person-email"
-                  >
+                  <v-col data-testid="person-email">
                     <SpshTooltip
                       :enabled-condition="!!personStore.currentPerson.person.email"
                       :disabled-text="t('person.changePersonMetaDataDisabledDescription')"
                       :enabled-text="emailStatusText.tooltip"
                       position="bottom"
                     >
-                      <div class="d-flex align-start">
+                      <div class="d-flex align-center">
                         <v-icon
                           aria-hidden="true"
                           class="mr-2 flex-shrink-0 mt-1"
@@ -1809,7 +1804,7 @@
                         />
                         <span
                           data-testid="person-email-text"
-                          class="text-body text-break mt-1"
+                          class="text-body text-break"
                         >
                           {{ emailStatusText.text }}
                         </span>
@@ -1862,17 +1857,18 @@
           >
             <PersonenMetadataChange
               ref="person-metadata-change"
-              :selected-vorname-props="selectedVornameProps"
-              :selected-vorname="personStore.currentPerson?.person.name.vorname"
-              :selected-familienname-props="selectedFamiliennameProps"
-              :selected-familienname="personStore.currentPerson?.person.name.familienname"
-              :selected-kopers-nr-metadata-props="selectedKopersNrMetadataProps"
-              :selected-kopers-nr-metadata="personStore.currentPerson?.person.personalnummer ?? undefined"
-              :has-kopers-rolle="hasKopersRolle"
-              @update:selected-kopers-nr-metadata="handleSelectedKopersNrUpdate"
-              @update:selected-vorname="handleSelectedVorname"
-              @update:selected-familienname="handleSelectedFamilienname"
-            />
+              :selectedVornameProps="selectedVornameProps"
+              :selectedVorname="personStore.currentPerson?.person.name.vorname"
+              :selectedFamiliennameProps="selectedFamiliennameProps"
+              :selectedFamilienname="personStore.currentPerson?.person.name.familienname"
+              :selectedKopersNrMetadataProps="selectedKopersNrMetadataProps"
+              :selectedKopersNrMetadata="personStore.currentPerson?.person.personalnummer ?? undefined"
+              :hasKopersRolle="hasKopersRolle"
+              @update:selectedKopersNrMetadata="handleSelectedKopersNrUpdate"
+              @update:selectedVorname="handleSelectedVorname"
+              @update:selectedFamilienname="handleSelectedFamilienname"
+            >
+            </PersonenMetadataChange>
             <v-row class="save-cancel-row ml-md-16 pt-md-5 pt-12 justify-end">
               <v-col
                 class="cancel-col px-5"
@@ -3464,6 +3460,13 @@
 
     .cancel-col {
       margin-bottom: -15px;
+    }
+  }
+
+  @media only screen and (min-width: 1280px) and (max-width: 1600px) {
+    #personal-info-row {
+      flex-direction: column;
+      margin-left: 0px !important;
     }
   }
 

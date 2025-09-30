@@ -11,7 +11,8 @@ import { nextTick } from 'vue';
 import KlasseForm from './KlasseForm.vue';
 
 const organisationStore: OrganisationStore = useOrganisationStore();
-
+const parentId: string = 'klasse-form';
+const schulenFilterTestId: string = `${parentId}-schule-select`;
 const initialValues: KlasseFormSchema = {
   selectedSchule: 'Ina-Initial-Schule',
   selectedKlassenname: '1a',
@@ -44,13 +45,17 @@ describe('KlasseForm', () => {
   beforeAll(() => {
     vi.useFakeTimers();
     organisationStore.$reset();
-    organisationStore.schulenFilter.filterResult = [initialValues, newValues].map(
-      ({ selectedSchule }: KlasseFormSchema): Organisation => ({
-        id: selectedSchule,
-        name: selectedSchule,
-        typ: OrganisationsTyp.Schule,
-      }),
-    );
+    organisationStore.organisationenFilters.set(parentId, {
+      total: 2,
+      loading: false,
+      filterResult: [initialValues, newValues].map(
+        ({ selectedSchule }: KlasseFormSchema): Organisation => ({
+          id: selectedSchule,
+          name: selectedSchule,
+          typ: OrganisationsTyp.Schule,
+        }),
+      ),
+    });
   });
 
   describe.each([[true], [false]])('when editMode is %s', (editMode: boolean) => {
@@ -63,7 +68,7 @@ describe('KlasseForm', () => {
     test('it renders the Klasse form', () => {
       const wrapper: VueWrapper = mountComponent(defaultProps);
       expect(wrapper.find('[data-testid="klasse-form"]').isVisible()).toBe(true);
-      expect(wrapper.find('#schule-select').isVisible()).toBe(true);
+      expect(wrapper.find(`#${schulenFilterTestId}`).isVisible()).toBe(true);
       expect(wrapper.find('#klassenname-input').isVisible()).toBe(true);
     });
 
@@ -73,14 +78,14 @@ describe('KlasseForm', () => {
         errorCode: 'something',
       });
       expect(wrapper.find('[data-testid="klasse-form"]').exists()).toBe(true);
-      expect(wrapper.find('#schule-select').exists()).toBe(false);
+      expect(wrapper.find(`[data-testid="${schulenFilterTestId}"]`).exists()).toBe(false);
       expect(wrapper.find('#klassenname-input').exists()).toBe(false);
     });
 
     test('it contains initial values', () => {
       const wrapper: VueWrapper = mountComponent(defaultProps);
       expect(wrapper.find('[data-testid="klasse-form"]').isVisible()).toBe(true);
-      expect(wrapper.find('[data-testid="schule-select"]').text()).toContain(initialValues.selectedSchule);
+      expect(wrapper.find(`[data-testid="${schulenFilterTestId}"]`).text()).toContain(initialValues.selectedSchule);
       expect(wrapper.find('#klassenname-input').attributes('value')).toBe(initialValues.selectedKlassenname);
     });
 
@@ -89,11 +94,11 @@ describe('KlasseForm', () => {
         ...defaultProps,
         isEditActive: false,
       });
-      expect(wrapper.find('[data-testid="schule-select"]').text()).toContain(initialValues.selectedSchule);
+      expect(wrapper.find(`[data-testid="${schulenFilterTestId}"]`).text()).toContain(initialValues.selectedSchule);
       expect(wrapper.find('#klassenname-input').attributes('value')).toBe(initialValues.selectedKlassenname);
 
       await wrapper.setProps({ initialValues: newValues });
-      expect(wrapper.find('[data-testid="schule-select"]').text()).toContain(newValues.selectedSchule);
+      expect(wrapper.find(`[data-testid="${schulenFilterTestId}"]`).text()).toContain(newValues.selectedSchule);
       expect(wrapper.find('#klassenname-input').attributes('value')).toBe(newValues.selectedKlassenname);
     });
 
@@ -120,7 +125,7 @@ describe('KlasseForm', () => {
         ...defaultProps,
         isEditActive: false,
       });
-      expect(wrapper.find('[data-testid="schule-select"]').text()).toContain(initialValues.selectedSchule);
+      expect(wrapper.find(`[data-testid="${schulenFilterTestId}"]`).text()).toContain(initialValues.selectedSchule);
       expect(wrapper.find('#klassenname-input').attributes('value')).toBe(initialValues.selectedKlassenname);
       await wrapper.setProps({ isEditActive: true });
 
@@ -128,7 +133,7 @@ describe('KlasseForm', () => {
       expect(wrapper.find('#klassenname-input').attributes('value')).toBe(newValues.selectedKlassenname);
 
       await wrapper.setProps({ isEditActive: false });
-      expect(wrapper.find('[data-testid="schule-select"]').text()).toContain(initialValues.selectedSchule);
+      expect(wrapper.find(`[data-testid="${schulenFilterTestId}"]`).text()).toContain(initialValues.selectedSchule);
       expect(wrapper.find('#klassenname-input').attributes('value')).toBe(initialValues.selectedKlassenname);
     });
 
@@ -150,9 +155,9 @@ describe('KlasseForm', () => {
       test('it correctly sets "disabled"-attributes on inputs', () => {
         const wrapper: VueWrapper = mountComponent({ ...defaultProps, isEditActive });
         if (editMode) {
-          expect(wrapper.find('#schule-select').attributes('disabled')).toBe('');
+          expect(wrapper.find(`#${schulenFilterTestId}`).attributes('disabled')).toBe('');
         } else {
-          expect(wrapper.find('#schule-select').attributes('disabled')).toBeUndefined();
+          expect(wrapper.find(`#${schulenFilterTestId}`).attributes('disabled')).toBeUndefined();
         }
         if (editMode && !isEditActive) expect(wrapper.find('#klassenname-input').attributes('disabled')).toBe('');
         else expect(wrapper.find('#klassenname-input').attributes('disabled')).toBeUndefined();
@@ -163,19 +168,19 @@ describe('KlasseForm', () => {
           ...defaultProps,
           isEditActive,
         });
-        await wrapper.find('#schule-select').setValue(newValues.selectedSchule);
+        await wrapper.find(`#${schulenFilterTestId}`).setValue(newValues.selectedSchule);
         await wrapper.find('#klassenname-input').setValue(newValues.selectedKlassenname);
         vi.runAllTimers();
         await flushPromises();
         if (editMode) {
-          expect(wrapper.find('[data-testid="schule-select"]').text()).toContain(initialValues.selectedSchule);
+          expect(wrapper.find(`[data-testid="${schulenFilterTestId}"]`).text()).toContain(initialValues.selectedSchule);
           if (isEditActive) {
             expect(wrapper.find('#klassenname-input').attributes('value')).toBe(newValues.selectedKlassenname);
           } else {
             expect(wrapper.find('#klassenname-input').attributes('value')).toBe(initialValues.selectedKlassenname);
           }
         } else {
-          expect(wrapper.find('#schule-select').attributes('value')).toContain(newValues.selectedSchule);
+          expect(wrapper.find(`#${schulenFilterTestId}`).attributes('value')).toContain(newValues.selectedSchule);
           expect(wrapper.find('#klassenname-input').attributes('value')).toBe(newValues.selectedKlassenname);
         }
 
@@ -187,9 +192,9 @@ describe('KlasseForm', () => {
       test('it correctly sets "disabled"-attributes on inputs', () => {
         const wrapper: VueWrapper = mountComponent({ ...defaultProps, isEditActive });
         if (editMode) {
-          expect(wrapper.find('#schule-select').attributes('disabled')).toBe('');
+          expect(wrapper.find(`#${schulenFilterTestId}`).attributes('disabled')).toBe('');
         } else {
-          expect(wrapper.find('#schule-select').attributes('disabled')).toBeUndefined();
+          expect(wrapper.find(`#${schulenFilterTestId}`).attributes('disabled')).toBeUndefined();
         }
         if (editMode && !isEditActive) expect(wrapper.find('#klassenname-input').attributes('disabled')).toBe('');
         else expect(wrapper.find('#klassenname-input').attributes('disabled')).toBeUndefined();

@@ -77,15 +77,9 @@
     >
       <KlassenFilter
         ref="klasse-select"
-        :multiple="false"
-        :hide-details="false"
-        :selected-klasse-props="selectedNewKlasseProps"
-        :highlight-selection="false"
-        :selected-klassen="selectedNewKlasse"
-        :placeholder-text="$t('admin.klasse.selectKlasse')"
-        :administriert-von
-        :filter-id="'klasse-change'"
-        @update:selected-klassen="(newValue: string | undefined) => (selectedNewKlasse = newValue)"
+        :administriertVon
+        :parentId="'klasse-change'"
+        @update:selectedKlassen="(newValue: string | undefined) => (selectedNewKlasse = newValue)"
       />
     </FormRow>
   </v-form>

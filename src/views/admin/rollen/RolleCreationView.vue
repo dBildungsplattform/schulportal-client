@@ -4,12 +4,7 @@
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { useMasterDataStore, type MasterDataStore } from '@/stores/MasterDataStore';
-  import {
-    OrganisationsTyp,
-    useOrganisationStore,
-    type Organisation,
-    type OrganisationStore,
-  } from '@/stores/OrganisationStore';
+  import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
   import {
     RollenArt,
     RollenMerkmal,
@@ -76,8 +71,6 @@
     selectedSystemRechte,
     selectedSystemRechteProps,
   }: RolleFieldDefinitions = getRolleFieldDefinitions(formContext);
-
-  const hasAutoselectedAdministrationsebene: Ref<boolean> = ref(false);
 
   const isFormDirty: ComputedRef<boolean> = computed(() => getDirtyState(formContext));
 
@@ -171,13 +164,6 @@
       .join(', ');
   });
 
-  const administrationsebenen: ComputedRef<TranslatedObject[]> = computed(() =>
-    organisationStore.allOrganisationen.map((org: Organisation) => ({
-      value: org.id,
-      title: org.kennung ? `${org.kennung} (${org.name})` : org.name,
-    })),
-  );
-
   const serviceProviders: ComputedRef<TranslatedObject[]> = computed(() =>
     serviceProviderStore.allServiceProviders.map((provider: ServiceProvider) => ({
       value: provider.id,
@@ -197,14 +183,6 @@
     event.returnValue = '';
   }
 
-  function autoselectAdministrationsebene(): void {
-    // Autoselect the Orga for the current user that only has 1 Orga assigned to him.
-    if (organisationStore.allOrganisationen.length === 1) {
-      selectedAdministrationsebene.value = organisationStore.allOrganisationen[0]?.id || '';
-      hasAutoselectedAdministrationsebene.value = true;
-    }
-  }
-
   onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
     if (isFormDirty.value) {
       showUnsavedChangesDialog.value = true;
@@ -217,12 +195,6 @@
 
   onMounted(async () => {
     rolleStore.createdRolle = null;
-    await organisationStore.getAllOrganisationen({
-      systemrechte: ['ROLLEN_VERWALTEN'],
-      excludeTyp: [OrganisationsTyp.Klasse],
-      limit: 25,
-    });
-    autoselectAdministrationsebene();
     await serviceProviderStore.getAllServiceProviders();
 
     // Iterate over the enum values
@@ -314,33 +286,31 @@
       <!-- The form to create a new Rolle -->
       <template v-if="!rolleStore.createdRolle">
         <RolleForm
+          :errorCode="rolleStore.errorCode"
+          :onHandleConfirmUnsavedChanges="handleConfirmUnsavedChanges"
+          :onHandleDiscard="navigateToRolleManagement"
+          :onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
+          :onSubmit="onSubmit"
+          :isEditActive="true"
+          :isLoading="rolleStore.loading"
           ref="rolle-creation-form"
-          v-model:selected-administrationsebene="selectedAdministrationsebene"
-          v-model:selected-rollen-art="selectedRollenArt"
-          v-model:selected-rollen-name="selectedRollenName"
-          v-model:selected-merkmale="selectedMerkmale"
-          v-model:selected-service-providers="selectedServiceProviders"
-          v-model:selected-system-rechte="selectedSystemRechte"
-          :administrationsebenen="administrationsebenen"
-          :error-code="rolleStore.errorCode"
-          :on-handle-confirm-unsaved-changes="handleConfirmUnsavedChanges"
-          :on-handle-discard="navigateToRolleManagement"
-          :on-show-dialog-change="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
-          :on-submit="onSubmit"
-          :is-edit-active="true"
-          :is-loading="rolleStore.loading"
-          :selected-administrationsebene-props="selectedAdministrationsebeneProps"
-          :selected-rollen-art-props="selectedRollenArtProps"
-          :selected-rollen-name-props="selectedRollenNameProps"
-          :selected-merkmale-props="selectedMerkmaleProps"
-          :selected-service-providers-props="selectedServiceProvidersProps"
-          :selected-system-rechte-props="selectedSystemRechteProps"
-          :service-providers="serviceProviders"
-          :show-unsaved-changes-dialog="showUnsavedChangesDialog"
-          :translated-rollenarten="translatedRollenarten"
-          :translated-merkmale="translatedMerkmale"
-          :translated-systemrechte="translatedSystemrechte"
-          :has-autoselected-administrationsebene="hasAutoselectedAdministrationsebene"
+          v-model:selectedAdministrationsebene="selectedAdministrationsebene"
+          :selectedAdministrationsebeneProps="selectedAdministrationsebeneProps"
+          v-model:selectedRollenArt="selectedRollenArt"
+          :selectedRollenArtProps="selectedRollenArtProps"
+          v-model:selectedRollenName="selectedRollenName"
+          :selectedRollenNameProps="selectedRollenNameProps"
+          v-model:selectedMerkmale="selectedMerkmale"
+          :selectedMerkmaleProps="selectedMerkmaleProps"
+          v-model:selectedServiceProviders="selectedServiceProviders"
+          :selectedServiceProvidersProps="selectedServiceProvidersProps"
+          v-model:selectedSystemRechte="selectedSystemRechte"
+          :selectedSystemRechteProps="selectedSystemRechteProps"
+          :serviceProviders="serviceProviders"
+          :showUnsavedChangesDialog="showUnsavedChangesDialog"
+          :translatedRollenarten="translatedRollenarten"
+          :translatedMerkmale="translatedMerkmale"
+          :translatedSystemrechte="translatedSystemrechte"
         >
           <!-- Error Message Display if error on submit -->
           <!-- To trigger unsaved changes dialog the alert has to be inside the form wrapper -->

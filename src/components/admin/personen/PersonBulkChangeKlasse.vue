@@ -120,12 +120,12 @@
             >
               <KlassenFilter
                 :multiple="false"
-                :hide-details="true"
-                :selected-klassen="selectedKlasse"
-                :placeholder-text="t('admin.klasse.selectKlasse')"
-                :administriert-von="selectedSchuleId ? [selectedSchuleId] : undefined"
-                :filter-id="'bulk-change-klasse'"
-                @update:selected-klassen="updateKlassenSelection"
+                :hideDetails="true"
+                :selectedKlassen="selectedKlasse"
+                :placeholderText="t('admin.klasse.selectKlasse')"
+                :administriertVon="selectedSchuleId ? [selectedSchuleId] : undefined"
+                @update:selectedKlassen="updateKlassenSelection"
+                parentId="bulk-change-klasse"
               />
             </v-col>
           </v-row>

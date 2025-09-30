@@ -1,22 +1,22 @@
-import { defineStore, type Store, type StoreDefinition } from 'pinia';
-import { type AxiosResponse } from 'axios';
+import axiosApiInstance from '@/services/ApiService';
 import { getResponseErrorCode } from '@/utils/errorHandlers';
+import type { OrganisationSortField, SortOrder } from '@/utils/sorting';
+import { type AxiosResponse } from 'axios';
+import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import {
   OrganisationenApiFactory,
   OrganisationsTyp,
   TraegerschaftTyp,
-  type OrganisationenApiInterface,
   type CreateOrganisationBodyParams,
-  type OrganisationByNameBodyParams,
-  type ParentOrganisationenResponse,
-  type OrganisationRootChildrenResponse,
-  type OrganisationResponse,
   type OrganisationByIdBodyParams,
+  type OrganisationByNameBodyParams,
+  type OrganisationenApiInterface,
+  type OrganisationResponse,
+  type OrganisationRootChildrenResponse,
+  type ParentOrganisationenResponse,
   type RollenSystemRechtEnum,
 } from '../api-client/generated/api';
-import axiosApiInstance from '@/services/ApiService';
 import { useSearchFilterStore, type SearchFilterStore } from './SearchFilterStore';
-import type { OrganisationSortField, SortOrder } from '@/utils/sorting';
 
 const organisationApi: OrganisationenApiInterface = OrganisationenApiFactory(undefined, '', axiosApiInstance);
 const searchFilterStore: SearchFilterStore = useSearchFilterStore();
@@ -86,7 +86,7 @@ type OrganisationState = {
   allSchulen: Array<Organisation>;
   allSchultraeger: Array<Organisation>;
   klassenFilters: Map<string, AutoCompleteStore<Organisation>>;
-  schulenFilter: AutoCompleteStore<Organisation>;
+  organisationenFilters: Map<string, AutoCompleteStore<Organisation>>;
   currentOrganisation: Organisation | null;
   currentKlasse: Organisation | null;
   updatedOrganisation: Organisation | null;
@@ -166,8 +166,9 @@ type OrganisationActions = {
   fetchSchuleDetailsForKlassen: (filterActive: boolean) => Promise<void>;
   fetchSchuleDetailsForSchultraeger: () => Promise<void>;
   setItsLearningForSchule: (organisationId: string) => Promise<void>;
-  loadSchulenForFilter(filter?: OrganisationenFilter): Promise<void>;
-  resetSchulFilter(): void;
+  loadOrganisationenForFilter(filter?: OrganisationenFilter, storeKey?: string): Promise<void>;
+  resetOrganisationenFilter(storeKey?: string): void;
+  clearOrganisationenFilter(storeKey?: string): void;
   /**
    * Loads Klassen according to filter and stores them in the klassenFilters map under the provided storeKey.
    * @param filter
@@ -192,11 +193,7 @@ export const useOrganisationStore: StoreDefinition<
       allOrganisationen: [],
       allKlassen: [],
       allSchulen: [],
-      schulenFilter: {
-        filterResult: [],
-        total: 0,
-        loading: false,
-      },
+      organisationenFilters: new Map(),
       klassenFilters: new Map(),
       allSchultraeger: [],
       currentOrganisation: null,
@@ -662,9 +659,15 @@ export const useOrganisationStore: StoreDefinition<
       }
     },
 
-    async loadSchulenForFilter(filter?: OrganisationenFilter): Promise<void> {
-      this.schulenFilter.errorCode = '';
-      this.schulenFilter.loading = true;
+    async loadOrganisationenForFilter(filter?: OrganisationenFilter, storeKey: string = ''): Promise<void> {
+      const organisationenFilter: AutoCompleteStore<Organisation> = this.organisationenFilters.get(storeKey) ?? {
+        filterResult: [],
+        loading: true,
+        total: 0,
+      };
+      if (!this.organisationenFilters.has(storeKey)) {
+        this.organisationenFilters.set(storeKey, organisationenFilter);
+      }
       try {
         const response: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations(
           filter?.offset,
@@ -679,21 +682,25 @@ export const useOrganisationStore: StoreDefinition<
           filter?.zugehoerigZu,
           filter?.organisationIds,
         );
-        this.schulenFilter.filterResult = response.data;
-        this.schulenFilter.total = +response.headers['x-paging-total'];
+        organisationenFilter.filterResult = response.data;
+        organisationenFilter.total = +response.headers['x-paging-total'];
       } catch (error: unknown) {
-        this.schulenFilter.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+        organisationenFilter.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
-        this.schulenFilter.loading = false;
+        organisationenFilter.loading = false;
       }
     },
 
-    resetSchulFilter(): void {
-      this.schulenFilter = {
-        filterResult: [],
+    resetOrganisationenFilter(storeKey: string = ''): void {
+      this.organisationenFilters.set(storeKey, {
+        filterResult: this.organisationenFilters.get(storeKey)?.filterResult || [],
         loading: false,
-        total: 0,
-      };
+        total: this.organisationenFilters.get(storeKey)?.total || 0,
+      });
+    },
+
+    clearOrganisationenFilter(storeKey: string = ''): void {
+      this.organisationenFilters.delete(storeKey);
     },
 
     async loadKlassenForFilter(filter?: OrganisationenFilter, storeKey: string = ''): Promise<void> {

@@ -11,6 +11,7 @@
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
   import { RollenSystemRecht } from '@/stores/RolleStore';
+  import type { Option } from '@/types';
   import { getDisplayNameForOrg } from '@/utils/formatting';
   import { type ValidationSchema as KlasseFormValues, type ValidationSchema } from '@/utils/validationKlasse';
   import { computed, onMounted, onUnmounted, ref, useTemplateRef, type ComputedRef, type Ref } from 'vue';
@@ -36,16 +37,11 @@
     RollenSystemRecht.KlassenVerwalten,
   ]);
 
+  const selectedSchuleObject: Ref<Option<Organisation>> = ref(null);
+
   const translatedSchulname: ComputedRef<string> = computed(() => {
-    const schule: Organisation | undefined = organisationStore.schulenFilter.filterResult.find(
-      (s: Organisation) => s.id === organisationStore.createdKlasse?.administriertVon,
-    );
-    if (schule) {
-      return getDisplayNameForOrg(schule);
-    }
-    if (autoselectedSchule.value) {
-      return getDisplayNameForOrg(autoselectedSchule.value);
-    }
+    if (selectedSchuleObject.value) return getDisplayNameForOrg(selectedSchuleObject.value);
+    if (autoselectedSchule.value) return getDisplayNameForOrg(autoselectedSchule.value);
     return '';
   });
 
@@ -168,6 +164,17 @@
       <!-- The form to create a new Klasse -->
       <template v-if="!organisationStore.createdKlasse">
         <KlasseForm
+          :errorCode="organisationStore.errorCode"
+          :editMode="false"
+          :initialValues="initialFormValues"
+          :isLoading="organisationStore.loading"
+          :showUnsavedChangesDialog="showUnsavedChangesDialog"
+          :onHandleConfirmUnsavedChanges="handleConfirmUnsavedChanges"
+          :onHandleDiscard="navigateToKlasseManagement"
+          :onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
+          :onSubmit
+          @formStateChanged="handleChangedFormState"
+          @update:selectedSchule="(selectedSchule) => (selectedSchuleObject = selectedSchule)"
           ref="klasse-creation-form"
           :error-code="organisationStore.errorCode"
           :edit-mode="false"

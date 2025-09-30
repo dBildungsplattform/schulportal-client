@@ -2,7 +2,7 @@ import { expect, test, describe, beforeEach } from 'vitest';
 import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
 import ResultTable from './ResultTable.vue';
 import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
-import type { VueNode } from '@vue/test-utils/dist/types';
+import type { VueNode } from 'node_modules/@vue/test-utils/dist/types';
 
 let wrapper: VueWrapper | null = null;
 
