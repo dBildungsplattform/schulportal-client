@@ -10,8 +10,8 @@ import { useConfigStore, type ConfigStore } from './stores/ConfigStore';
 const app: VueApp<Element> = createApp(App)
   .use(i18n)
   .use(pinia)
-  .use(router)
   .use(vuetify)
+  .use(router);
 
 // Fetch feature flags on app startup
 const configStore: ConfigStore = useConfigStore();

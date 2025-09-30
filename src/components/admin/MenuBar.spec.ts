@@ -7,9 +7,11 @@ import { useRoute, useRouter } from 'vue-router';
 import { useDisplay } from 'vuetify';
 import { VApp } from 'vuetify/components';
 import MenuBar from './MenuBar.vue';
+import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 
 let wrapper: VueWrapper | null = null;
 const authStore: AuthStore = useAuthStore();
+const organisationStore: OrganisationStore = useOrganisationStore();
 
 authStore.currentUser = DoFactory.getUserinfoResponse();
 
@@ -27,6 +29,27 @@ vi.mock('vuetify', () => ({
     mobile: false,
   })),
 }));
+
+organisationStore.retrievedLmsOrganisations = [
+  {
+    id: '1',
+    name: 'Albert-Emil-Hansebrot-Gymnasium',
+    kennung: '9356494',
+    namensergaenzung: 'Schule',
+    kuerzel: 'aehg',
+    typ: 'LMS',
+    administriertVon: '1',
+  },
+  {
+    id: '2',
+    name: 'Albert-Emil-Hansebrot-Gymnasium',
+    kennung: '9356494',
+    namensergaenzung: 'Schule',
+    kuerzel: 'aehg',
+    typ: 'LMS',
+    administriertVon: '1',
+  },
+];
 
 function mountComponent(): VueWrapper {
   return mount(VApp, {
@@ -93,6 +116,21 @@ describe('MenuBar', () => {
       expect(wrapper?.find('[data-testid="rolle-management-menu-item"]').exists()).toBe(hasPermission);
       expect(wrapper?.find('[data-testid="rolle-creation-menu-item"]').exists()).toBe(hasPermission);
 
+      expect(
+        wrapper
+          ?.find(
+            `[data-testid="rolle-mapping-menu-item-${organisationStore.retrievedLmsOrganisations[0]?.name.toLowerCase()}"]`,
+          )
+          .exists(),
+      ).toBe(hasPermission);
+      expect(
+        wrapper
+          ?.find(
+            `[data-testid="rolle-mapping-menu-item-${organisationStore.retrievedLmsOrganisations[1]?.name.toLowerCase()}"]`,
+          )
+          .exists(),
+      ).toBe(hasPermission);
+
       expect(wrapper?.find('[data-testid="schule-management-title"]').exists()).toBe(hasPermission);
       expect(wrapper?.find('[data-testid="schule-management-menu-item"]').exists()).toBe(hasPermission);
       expect(wrapper?.find('[data-testid="schule-creation-menu-item"]').exists()).toBe(hasPermission);
@@ -106,43 +144,24 @@ describe('MenuBar', () => {
     },
   );
 
+  test('renders menu items for each organisation', () => {
+    const svsItem = wrapper?.find(
+      `[data-testid="rolle-mapping-menu-item-${organisationStore.retrievedLmsOrganisations[0]?.name.toLowerCase()}"]`,
+    );
+    const moodleItem = wrapper?.find(
+      `[data-testid="rolle-mapping-menu-item-${organisationStore.retrievedLmsOrganisations[1]?.name.toLowerCase()}"]`,
+    );
+
+    expect(svsItem?.exists()).toBe(true);
+    expect(moodleItem?.exists()).toBe(true);
+  });
+
   test('hides elements when permissions are false', async () => {
     // Reset permissions to false
     authStore.hasPersonenAnlegenPermission = false;
     await nextTick();
 
     expect(wrapper?.find('[data-testid="person-creation-menu-item"]').exists()).toBe(false);
-  });
-
-  test('it handles role instance selection', async () => {
-    const push: MockInstance = vi.fn();
-    (useRouter as Mock).mockImplementation(() => {
-      return { push };
-    });
-    wrapper = mountComponent();
-
-    // Schulcloud Mapping
-    await wrapper
-      .findAll('.menu-bar-sub-item.caption')
-      .find((item) => item.text() === 'Schulcloud')
-      ?.trigger('click');
-    await nextTick();
-
-    // Moodle Mapping
-    await wrapper
-      .findAll('.menu-bar-sub-item.caption')
-      .find((item) => item.text() === 'Moodle')
-      ?.trigger('click');
-    await nextTick();
-
-    expect(push).toHaveBeenCalledWith({
-      path: '/admin/rolle/mapping/schulcloud',
-      query: { instance: 'Schulcloud' },
-    });
-    expect(push).toHaveBeenCalledWith({
-      path: '/admin/rolle/mapping/moodle',
-      query: { instance: 'Moodle' },
-    });
   });
 
   test('it handles menu item click', async () => {

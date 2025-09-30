@@ -186,6 +186,39 @@ describe('OrganisationStore', () => {
     });
   });
 
+  describe('getLmsOrganisations', () => {
+    it('should fetch LMS organisations and update retrievedLmsOrganisations', async () => {
+      const mockResponse: Organisation[] = [
+        {
+          id: 'lms1',
+          kennung: 'LMS1',
+          name: 'LMS Organisation 1',
+          namensergaenzung: 'Ergänzung',
+          kuerzel: 'L1',
+          typ: OrganisationsTyp.Lms,
+        },
+      ];
+
+      mockadapter.onGet('/api/organisationen?typ=LMS').replyOnce(200, mockResponse);
+
+      await organisationStore.getLmsOrganisations();
+
+      expect(organisationStore.allOrganisationen).toEqual(mockResponse);
+      expect(organisationStore.retrievedLmsOrganisations).toEqual(mockResponse);
+      expect(organisationStore.loading).toBe(false);
+    });
+
+    it('should handle error when fetching LMS organisations', async () => {
+      mockadapter.onGet('/api/organisationen?typ=LMS').replyOnce(500, 'some mock server error');
+
+      await organisationStore.getLmsOrganisations();
+
+      expect(organisationStore.retrievedLmsOrganisations).toEqual([]);
+      expect(organisationStore.errorCode).toBe('UNSPECIFIED_ERROR');
+      expect(organisationStore.loading).toBe(false);
+    });
+  });
+
   describe('getOrganisationById', () => {
     it('should load schule and update state', async () => {
       const mockResponse: Organisation[] = [

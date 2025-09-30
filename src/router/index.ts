@@ -5,6 +5,7 @@ import {
   type TwoFactorAuthentificationStore,
 } from '@/stores/TwoFactorAuthentificationStore';
 import routes from './routes';
+
 type Permission =
   | 'klassenverwaltung'
   | 'personenanlegen'
@@ -39,6 +40,7 @@ function handleGoToPreviousPage(): void {
 router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormalized) => {
   const authStore: AuthStore = useAuthStore();
   await authStore.initializeAuthStatus();
+
   if (to.path != '/profile' && to.path != '/no-second-factor') sessionStorage.setItem('previousUrl', to.path);
 
   if (to.path === '/no-second-factor') {

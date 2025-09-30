@@ -12232,6 +12232,124 @@ export class RolleApi extends BaseAPI implements RolleApiInterface {
 
 
 /**
+ * RollenartApi - axios parameter creator
+ * @export
+ */
+export const RollenartApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rollenartControllerGetAllLmsRollenarten: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/rollenart`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * RollenartApi - functional programming interface
+ * @export
+ */
+export const RollenartApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = RollenartApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async rollenartControllerGetAllLmsRollenarten(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<string>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.rollenartControllerGetAllLmsRollenarten(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * RollenartApi - factory interface
+ * @export
+ */
+export const RollenartApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = RollenartApiFp(configuration)
+    return {
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rollenartControllerGetAllLmsRollenarten(options?: any): AxiosPromise<Array<string>> {
+            return localVarFp.rollenartControllerGetAllLmsRollenarten(options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * RollenartApi - interface
+ * @export
+ * @interface RollenartApi
+ */
+export interface RollenartApiInterface {
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RollenartApiInterface
+     */
+    rollenartControllerGetAllLmsRollenarten(options?: AxiosRequestConfig): AxiosPromise<Array<string>>;
+
+}
+
+/**
+ * RollenartApi - object-oriented interface
+ * @export
+ * @class RollenartApi
+ * @extends {BaseAPI}
+ */
+export class RollenartApi extends BaseAPI implements RollenartApiInterface {
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RollenartApi
+     */
+    public rollenartControllerGetAllLmsRollenarten(options?: AxiosRequestConfig) {
+        return RollenartApiFp(this.configuration).rollenartControllerGetAllLmsRollenarten(options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
  * StatusApi - axios parameter creator
  * @export
  */
