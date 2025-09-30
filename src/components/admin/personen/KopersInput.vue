@@ -42,38 +42,38 @@
       class="py-0 pb-sm-8 pt-sm-3 text-sm-right"
       cols="12"
       sm="5"
-    ></v-col>
+    />
     <v-checkbox
+      v-model="hasNoKopersNr"
       data-testid="has-no-kopersnr-checkbox"
       :disabled="!!selectedKopersNr"
       hide-details
       :label="$t('admin.person.noKopersNr')"
-      v-model="hasNoKopersNr"
-    ></v-checkbox>
+    />
   </v-row>
 
   <!-- KoPers.-Nr. -->
   <FormRow
     v-if="!hasNoKopersNr"
-    :errorLabel="selectedKopersNrProps?.error || ''"
-    :isRequired="!hasNoKopersNr"
+    :error-label="selectedKopersNrProps?.error || ''"
+    :is-required="!hasNoKopersNr"
     :label="$t('person.kopersNr')"
-    labelForId="kopersnr-input"
-    :noTopMargin="true"
+    label-for-id="kopersnr-input"
+    :no-top-margin="true"
   >
     <v-text-field
+      id="kopersnr-input"
+      ref="kopersnr-input"
+      v-bind="selectedKopersNrProps"
+      v-model="selectedKopersNr"
       autocomplete="off"
       clearable
       data-testid="kopersnr-input"
       density="compact"
-      id="kopersnr-input"
       :disabled="props.isDisabled"
-      ref="kopersnr-input"
       :placeholder="$t('person.enterKopersNr')"
       :required="!hasNoKopersNr"
       variant="outlined"
-      v-bind="selectedKopersNrProps"
-      v-model="selectedKopersNr"
-    ></v-text-field>
+    />
   </FormRow>
 </template>

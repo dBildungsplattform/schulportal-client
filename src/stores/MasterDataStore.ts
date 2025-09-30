@@ -44,6 +44,7 @@ export const useMasterDataStore: StoreDefinition<
         const { data }: { data: SystemRechtResponse[] } = await rolleApi.rolleControllerGetAllSystemrechte();
         this.systemrechte = data;
         this.status = MasterDataStatus.Initialized;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         this.status = MasterDataStatus.Failed;
       }

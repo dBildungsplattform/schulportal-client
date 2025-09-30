@@ -37,7 +37,7 @@
         <slot
           class="text-body"
           name="text"
-        ></slot>
+        />
       </v-col>
       <v-col
         v-if="dismissable"
@@ -47,9 +47,9 @@
         <v-icon
           class="close-icon"
           data-testid="banner-close-icon"
-          @click="dismissBanner(id)"
           icon="mdi-close"
-        ></v-icon>
+          @click="dismissBanner(id)"
+        />
       </v-col>
     </v-row>
   </v-alert>

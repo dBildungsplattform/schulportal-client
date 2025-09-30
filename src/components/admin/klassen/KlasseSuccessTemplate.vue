@@ -44,7 +44,7 @@
           data-testid="klasse-success-icon"
           icon="mdi-check-circle"
           small
-        ></v-icon>
+        />
       </v-col>
     </v-row>
     <v-row justify="center">
@@ -59,7 +59,7 @@
       v-for="(item, index) in createdData"
       :key="index"
     >
-      <v-col class="text-body bold text-right">{{ item.label }}:</v-col>
+      <v-col class="text-body bold text-right"> {{ item.label }}: </v-col>
       <v-col class="text-body">
         <span :data-testid="item.testId">{{ item.value }}</span>
       </v-col>
@@ -68,7 +68,7 @@
       class="border-opacity-100 rounded my-6"
       color="#E5EAEF"
       thickness="6"
-    ></v-divider>
+    />
     <v-row justify="end">
       <v-col
         cols="12"
@@ -85,10 +85,10 @@
         </v-btn>
       </v-col>
       <v-col
+        v-if="showCreateAnotherButton"
         cols="12"
         sm="6"
         md="auto"
-        v-if="showCreateAnotherButton"
       >
         <v-btn
           class="primary button"

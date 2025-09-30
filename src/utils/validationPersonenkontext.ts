@@ -55,7 +55,9 @@ export function isKopersRolle(
   selectedRolleIds: string[] | undefined,
   translatedRollen: TranslatedRolleWithAttrs[] | undefined,
 ): boolean {
-  if (!selectedRolleIds || selectedRolleIds.length === 0) return false;
+  if (!selectedRolleIds || selectedRolleIds.length === 0) {
+    return false;
+  }
   return (
     translatedRollen?.some(
       (r: TranslatedRolleWithAttrs) =>
