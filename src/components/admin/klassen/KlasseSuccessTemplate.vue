@@ -51,6 +51,7 @@
       <v-col
         class="subtitle-2"
         cols="auto"
+        data-testid="following-data-created-text"
       >
         {{ followingDataCreated }}
       </v-col>
@@ -59,7 +60,11 @@
       v-for="(item, index) in createdData"
       :key="index"
     >
-      <v-col class="text-body bold text-right">{{ item.label }}:</v-col>
+      <v-col
+        class="text-body bold text-right"
+        :data-testid="`${item.testId}-label`"
+        >{{ item.label }}:</v-col
+      >
       <v-col class="text-body">
         <span :data-testid="item.testId">{{ item.value }}</span>
       </v-col>
