@@ -1,14 +1,14 @@
 import ApiService from '@/services/ApiService';
+import { rejects } from 'assert';
 import MockAdapter from 'axios-mock-adapter';
-import { setActivePinia, createPinia } from 'pinia';
-import { useRolleStore, type Rolle, type RolleStore } from './RolleStore';
+import { createPinia, setActivePinia } from 'pinia';
 import {
   RollenMerkmal,
   type RolleResponse,
   type RolleWithServiceProvidersResponse,
   type SystemRechtResponse,
 } from '../api-client/generated/api';
-import { rejects } from 'assert';
+import { useRolleStore, type RolleStore } from './RolleStore';
 import type { ServiceProvider } from './ServiceProviderStore';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
@@ -227,6 +227,7 @@ describe('rolleStore', () => {
       expect(rolleStore.loading).toBe(false);
     });
   });
+
   describe('getRolleById', () => {
     it('should load Rolle and update state', async () => {
       const mockResponse: RolleResponse = {
@@ -245,7 +246,7 @@ describe('rolleStore', () => {
       };
 
       mockadapter.onGet('/api/rolle/1').replyOnce(200, mockResponse, {});
-      const getRolleByIdPromise: Promise<Rolle> = rolleStore.getRolleById('1');
+      const getRolleByIdPromise: Promise<void> = rolleStore.getRolleById('1');
       expect(rolleStore.loading).toBe(true);
       await getRolleByIdPromise;
       expect(rolleStore.currentRolle).toEqual({
@@ -262,7 +263,7 @@ describe('rolleStore', () => {
 
     it('should handle string error', async () => {
       mockadapter.onGet('/api/rolle/1').replyOnce(500, 'some mock server error');
-      const getRolleByIdPromise: Promise<Rolle> = rolleStore.getRolleById('1');
+      const getRolleByIdPromise: Promise<void> = rolleStore.getRolleById('1');
       expect(rolleStore.loading).toBe(true);
       await rejects(getRolleByIdPromise);
       expect(rolleStore.errorCode).toEqual('UNSPECIFIED_ERROR');
@@ -272,7 +273,7 @@ describe('rolleStore', () => {
 
     it('should handle error code', async () => {
       mockadapter.onGet('/api/rolle/1').replyOnce(500, { code: 'some mock server error' });
-      const getRolleByIdPromise: Promise<Rolle> = rolleStore.getRolleById('1');
+      const getRolleByIdPromise: Promise<void> = rolleStore.getRolleById('1');
       expect(rolleStore.loading).toBe(true);
       await rejects(getRolleByIdPromise);
       expect(rolleStore.errorCode).toEqual('some mock server error');
@@ -280,6 +281,7 @@ describe('rolleStore', () => {
       expect(rolleStore.loading).toBe(false);
     });
   });
+
   describe('updateRolle', () => {
     it('should update Rolle and update state', async () => {
       const mockResponse: RolleWithServiceProvidersResponse = {
