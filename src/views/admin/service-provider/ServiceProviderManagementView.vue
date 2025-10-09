@@ -1,4 +1,5 @@
 <script setup lang="ts">
+  import { computed, watchEffect, type ComputedRef } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { VDataTableServer } from 'vuetify/components';
 
@@ -11,7 +12,6 @@
     type ServiceProviderStore,
   } from '@/stores/ServiceProviderStore';
   import { getDisplayNameForOrg } from '@/utils/formatting';
-  import { computed, onBeforeMount, watchEffect, type ComputedRef } from 'vue';
 
   type ServiceProviderRow = {
     id: string;

@@ -43,17 +43,7 @@ const mockPerson: Personendatensatz = {
 };
 
 const mockCurrentUser: UserInfo = {
-  middle_name: null,
-  nickname: null,
-  profile: null,
-  picture: null,
-  website: null,
-  gender: null,
-  birthdate: null,
-  zoneinfo: null,
-  locale: null,
-  phone_number: null,
-  updated_at: null,
+  ...DoFactory.getUserinfoResponse(),
   personId: '2',
   email: 'albert@test.de',
   email_verified: true,
@@ -265,6 +255,7 @@ describe('PersonDetailsView', () => {
     configStore.configData = {
       befristungBearbeitenEnabled: true,
       rolleBearbeitenEnabled: true,
+      rolleErweiternEnabled: true,
     };
 
     document.body.innerHTML = `
@@ -1112,6 +1103,7 @@ describe('PersonDetailsView', () => {
       configStore.configData = {
         befristungBearbeitenEnabled: false,
         rolleBearbeitenEnabled: true,
+        rolleErweiternEnabled: true,
       };
       await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
       await nextTick();
