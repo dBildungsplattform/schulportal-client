@@ -1,4 +1,4 @@
-import { Vertrauensstufe, type DBiamPersonResponse } from '@/api-client/generated';
+import { type DBiamPersonResponse } from '@/api-client/generated';
 import {
   EmailAddressStatus,
   type DBiamPersonenkontextResponse,
@@ -52,11 +52,7 @@ const mockCreatedPersonWithKontext: DBiamPersonResponse = {
     referrer: 'jorton',
     personalnummer: '123456',
     mandant: '',
-    geburt: null,
     stammorganisation: null,
-    geschlecht: null,
-    lokalisierung: null,
-    vertrauensstufe: Vertrauensstufe.Kein,
     revision: '',
     startpasswort: '',
     isLocked: false,

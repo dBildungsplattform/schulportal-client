@@ -6,9 +6,7 @@ import {
   RollenSystemRechtEnum,
   ServiceProviderKategorie,
   ServiceProviderTarget,
-  type SystemRechtResponse,
   TraegerschaftTyp,
-  Vertrauensstufe,
   type DBiamPersonenkontextResponse,
   type DBiamPersonenuebersichtResponse,
   type DBiamPersonenzuordnungResponse,
@@ -17,11 +15,13 @@ import {
   type PersonendatensatzResponse,
   type PersonenkontexteUpdateResponse,
   type PersonenkontextRolleFieldsResponse,
+  type PersonInfoResponse,
   type PersonLandesbediensteterSearchPersonenkontextResponse,
   type PersonLandesbediensteterSearchResponse,
   type PersonResponse,
   type RollenSystemRechtServiceProviderIDResponse,
   type ServiceProviderResponse,
+  type SystemRechtResponse,
   type UserinfoResponse,
 } from '@/api-client/generated';
 import type { Organisation } from '@/stores/OrganisationStore';
@@ -107,15 +107,8 @@ export class DoFactory {
     return {
       ...person,
       mandant: faker.string.uuid(),
-      geburt: {
-        datum: faker.date.birthdate().toISOString(),
-        geburtsort: faker.location.city(),
-      },
       stammorganisation: faker.string.uuid(),
-      geschlecht: faker.person.gender(),
-      lokalisierung: faker.location.language().alpha2,
       startpasswort: faker.string.alpha(10),
-      vertrauensstufe: Vertrauensstufe.Voll,
       ...props,
     };
   }
@@ -199,7 +192,6 @@ export class DoFactory {
   }
 
   public static getUserinfoResponse(props?: Partial<UserinfoResponse>): UserinfoResponse {
-    const gender: string = faker.person.gender();
     const firstName: string = faker.person.firstName();
     const lastName: string = faker.person.lastName();
     return {
@@ -209,13 +201,10 @@ export class DoFactory {
       family_name: lastName,
       given_name: firstName,
       middle_name: faker.person.middleName(),
-      nickname: faker.internet.displayName({ firstName, lastName }),
       profile: null,
       picture: null,
       phone_number: faker.phone.number(),
       website: faker.internet.url(),
-      gender,
-      birthdate: faker.date.birthdate().toISOString(),
       zoneinfo: null,
       locale: faker.location.countryCode(),
       updated_at: faker.date.past().toISOString(),
@@ -432,6 +421,35 @@ export class DoFactory {
       hasLogo: true,
       requires2fa: false,
       merkmale: [],
+      ...props,
+    };
+  }
+
+  public static getPersonInfoResponse(props?: Partial<PersonInfoResponse>): PersonInfoResponse {
+    const person: Person = DoFactory.getPerson();
+    return {
+      person: {
+        id: person.id,
+        name: {
+          familiennamen: person.name.familienname,
+          vorname: person.name.vorname,
+        },
+        referrer: person.referrer,
+        personalnummer: person.personalnummer,
+        mandant: '',
+        stammorganisation: '',
+        revision: '',
+        dienststellen: [],
+      },
+      pid: faker.string.uuid(),
+      personenkontexte: [],
+      gruppen: [],
+      email: person.email
+        ? {
+            status: person.email.status,
+            address: person.email.address,
+          }
+        : null,
       ...props,
     };
   }
