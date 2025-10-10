@@ -1,30 +1,27 @@
 import {
   OrganisationsTyp,
-  RollenMerkmal,
   type DBiamPersonenkontextResponse,
   type FindRollenResponse,
   type RolleResponse,
-  type SystemRechtResponse,
 } from '@/api-client/generated';
 import ApiService from '@/services/ApiService';
 import { rejects } from 'assert';
 import MockAdapter from 'axios-mock-adapter';
 import { createPinia, setActivePinia } from 'pinia';
+import { DoFactory } from 'test/DoFactory';
+import type { Organisation } from './OrganisationStore';
 import {
+  OperationContext,
   usePersonenkontextStore,
   type PersonenkontexteUpdateResponse,
   type PersonenkontextStore,
-  type PersonenkontextWorkflowResponse,
   type PersonenkontextUpdate,
-  OperationContext,
+  type PersonenkontextWorkflowResponse,
   type WorkflowFilter,
 } from './PersonenkontextStore';
 import { usePersonStore, type PersonendatensatzResponse, type PersonStore } from './PersonStore';
-import { DoFactory } from 'test/DoFactory';
 import { PersonenUebersicht } from './types/PersonenUebersicht';
 import type { Zuordnung } from './types/Zuordnung';
-import type { Organisation } from './OrganisationStore';
-import { Person } from './types/Person';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 
