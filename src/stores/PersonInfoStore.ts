@@ -16,7 +16,7 @@ export type Person = {
     familienname: string;
     vorname: string;
   };
-  referrer: string | null;
+  username: string | null;
   personalnummer?: string | null;
 };
 

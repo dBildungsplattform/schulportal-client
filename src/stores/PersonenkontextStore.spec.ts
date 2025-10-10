@@ -438,7 +438,7 @@ describe('PersonenkontextStore', () => {
             familienname: 'Cena',
             vorname: 'Randy',
           },
-          referrer: 'rcena',
+          username: 'rcena',
         },
       } as PersonendatensatzResponse;
 

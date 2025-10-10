@@ -1062,7 +1062,7 @@
             <v-col class="text-body bold text-right"> {{ $t('person.userName') }}: </v-col>
             <v-col class="text-body"
               ><span data-testid="created-person-username">{{
-                personenkontextStore.createdPersonWithKontext.person.referrer
+                personenkontextStore.createdPersonWithKontext.person.username
               }}</span></v-col
             >
           </v-row>

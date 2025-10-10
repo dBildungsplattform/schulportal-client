@@ -39,7 +39,7 @@ describe('useBulkErrors', () => {
         id: person.id,
         vorname: person.name.vorname,
         nachname: person.name.familienname,
-        username: person.referrer,
+        username: person.username,
         error: 'admin.personenkontext.errors.fallbackError (Fehlercode: errorCode)',
       });
     }

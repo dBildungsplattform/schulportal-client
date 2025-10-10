@@ -209,7 +209,7 @@ describe('PersonManagementView', () => {
       id: personWithZuordnungen.id,
       familienname: personWithZuordnungen.name.familienname,
       vorname: personWithZuordnungen.name.vorname,
-      referrer: personWithZuordnungen.referrer,
+      username: personWithZuordnungen.username,
       personalnummer: personWithZuordnungen.personalnummer,
       rollen: personWithZuordnungen.rollenAsString,
       administrationsebenen: personWithZuordnungen.administrationsebenenAsString,
