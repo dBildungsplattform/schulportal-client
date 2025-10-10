@@ -1,3 +1,4 @@
+import { DoFactory } from 'test/DoFactory';
 import type { RolleResponse } from './RolleStore';
 import { useSearchFilterStore, type SearchFilterStore } from './SearchFilterStore';
 import { setActivePinia, createPinia } from 'pinia';
@@ -33,33 +34,19 @@ describe('SearchFilterStore', () => {
     // it sets the searchFilter for personen
     searchFilterStore.setSearchFilterForPersonen('search');
     expect(searchFilterStore.searchFilterPersonen).toEqual('search');
+    searchFilterStore.setSearchFilterForPersonen(null);
+    expect(searchFilterStore.searchFilterPersonen).toEqual('');
 
     // it sets the searchFilter for schulen
     searchFilterStore.setSearchFilterForSchulen('search');
-    expect(searchFilterStore.searchFilterPersonen).toEqual('search');
+    expect(searchFilterStore.searchFilterSchulen).toEqual('search');
+    searchFilterStore.setSearchFilterForSchulen(null);
+    expect(searchFilterStore.searchFilterSchulen).toEqual('');
 
     // it sets the selectedRolleFilterWithObjects
-    searchFilterStore.setRolleFilterWithObjectsForPersonen(['5'], [
-      {
-        id: '10',
-        administeredBySchulstrukturknoten: '1',
-        merkmale: new Set(),
-        name: 'Rolle 1',
-        rollenart: 'LERN',
-        systemrechte: new Set(),
-      },
-    ] as RolleResponse[]);
-
-    expect(searchFilterStore.selectedRollenObjects).toEqual([
-      {
-        id: '10',
-        administeredBySchulstrukturknoten: '1',
-        merkmale: new Set(),
-        name: 'Rolle 1',
-        rollenart: 'LERN',
-        systemrechte: new Set(),
-      },
-    ]);
+    const rolleFilterObject: RolleResponse = DoFactory.getRolleResponse();
+    searchFilterStore.setRolleFilterWithObjectsForPersonen(['5'], [rolleFilterObject]);
+    expect(searchFilterStore.selectedRollenObjects).toEqual([rolleFilterObject]);
 
     // it sets the selectedSchuleForKlassen
     searchFilterStore.setSchuleFilterForKlassen('10');
