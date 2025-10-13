@@ -194,9 +194,11 @@
 
   const rollenForForm: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
 
-  // Only Rollen from type LEHR
-  const lehrRollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = computed(() => {
-    return rollenForForm.value?.filter((rolle: TranslatedRolleWithAttrs) => rolle.rollenart === RollenArt.Lehr);
+  // Only Rollen from type LEHR and LERN
+  const lehrAndLernRollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = computed(() => {
+    return rollenForForm.value?.filter(
+      (rolle: TranslatedRolleWithAttrs) => rolle.rollenart === RollenArt.Lehr || rolle.rollenart === RollenArt.Lern,
+    );
   });
 
   const statuses: Array<string> = ['Aktiv', 'Inaktiv'];
@@ -840,7 +842,7 @@
             ref="person-bulk-rolle-modify"
             v-if="rolleModifiyDialogVisible"
             :organisationen="organisationenForForm"
-            :rollen="lehrRollen"
+            :rollen="lehrAndLernRollen"
             :isLoading="personenkontextStore.loading"
             :isDialogVisible="rolleModifiyDialogVisible"
             :errorCode="personenkontextStore.errorCode"

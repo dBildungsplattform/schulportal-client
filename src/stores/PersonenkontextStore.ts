@@ -39,6 +39,11 @@ const landesbediensteterApi: LandesbediensteterApiInterface = Landesbediensteter
   axiosApiInstance,
 );
 
+export enum KlassenOption {
+  KEEP_KLASSE = 'keep_klasse',
+  SELECT_NEW_KLASSE = 'select_new_klasse',
+}
+
 export enum BefristungOption {
   SCHULJAHRESENDE = 'schuljahresende',
   UNBEFRISTET = 'unbefristet',

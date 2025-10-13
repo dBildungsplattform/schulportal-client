@@ -8,6 +8,7 @@
   import { OrganisationsTyp, type Organisation } from '@/stores/OrganisationStore';
   import {
     CreationType,
+    KlassenOption,
     OperationContext,
     usePersonenkontextStore,
     type PersonenkontextStore,
@@ -32,6 +33,8 @@
 
   const searchInputRolle: Ref<string | undefined> = ref('');
   const searchInputRollen: Ref<string | undefined> = ref('');
+
+  const localKlassenOption: Ref<string | undefined> = ref(undefined);
 
   type Props = {
     organisationen: TranslatedObject[] | undefined;
@@ -316,6 +319,20 @@
     emits('update:selectedOrganisation', orgaId);
   }
 
+  // Handles any change related to the klassen radio buttons
+  function handleKlassenOption(value: string | null): void {
+    switch (value) {
+      case KlassenOption.KEEP_KLASSE: {
+        localKlassenOption.value = value;
+        break;
+      }
+      case KlassenOption.SELECT_NEW_KLASSE: {
+        localKlassenOption.value = value;
+        break;
+      }
+    }
+  }
+
   // If the submission of the form goes wrong and the user needs to correct something, we need to ensure that the canCommit value is updated
   onMounted(() => {
     emits('update:canCommit', personenkontextStore.workflowStepResponse?.canCommit ?? false);
@@ -442,6 +459,35 @@
           parentId="personenkontext-create"
         />
       </FormRow>
+      <v-row class="align-center">
+        <v-col
+          class="py-0 mt-n1"
+          cols="12"
+          sm="7"
+          offset-sm="5"
+        >
+          <v-radio-group
+            data-testid="befristung-radio-group"
+            ref="befristung-radio-group"
+            @update:modelValue="handleKlassenOption"
+            v-model="localKlassenOption"
+            v-bind="befristungOptionProps"
+          >
+            <v-radio
+              data-testid="schuljahresende-radio-button"
+              :label="$t('admin.klasse.keepKlasse')"
+              :value="KlassenOption.KEEP_KLASSE"
+              color="primary"
+            ></v-radio>
+            <v-radio
+              data-testid="unbefristet-radio-button"
+              :label="$t('admin.klasse.selectNewKlasse')"
+              :value="KlassenOption.SELECT_NEW_KLASSE"
+              :color="'primary'"
+            ></v-radio>
+          </v-radio-group>
+        </v-col>
+      </v-row>
       <!-- Befristung -->
       <v-row
         v-if="
