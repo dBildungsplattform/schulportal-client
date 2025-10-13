@@ -1885,7 +1885,12 @@
         <v-container class="password-reset">
           <v-row class="ml-md-16">
             <v-col>
-              <h3 class="subtitle-1">{{ t('person.password') }}</h3>
+              <h3
+                class="subtitle-1"
+                data-testid="password-reset-section-headline"
+              >
+                {{ t('person.password') }}
+              </h3>
             </v-col>
             <v-col
               class="mr-lg-13"
@@ -1935,7 +1940,12 @@
             </v-col>
             <template v-else>
               <v-col>
-                <h3 class="subtitle-1">{{ t('person.zuordnungen') }}</h3>
+                <h3
+                  class="subtitle-1"
+                  data-testid="zuordnungen-section-headline"
+                >
+                  {{ t('person.zuordnungen') }}
+                </h3>
 
                 <!-- Check if 'zuordnungen' array exists and has length > 0 -->
                 <template
@@ -2024,7 +2034,12 @@
                 cols="12"
                 sm="auto"
               >
-                <h3 class="subtitle-1">{{ t('person.checkAndSave') }}:</h3>
+                <h3
+                  class="subtitle-1"
+                  data-testid="check-and-save-headline"
+                >
+                  {{ t('person.checkAndSave') }}:
+                </h3>
               </v-col>
               <v-col
                 cols="12"
@@ -2511,7 +2526,12 @@
               </v-col>
               <template v-else>
                 <v-col>
-                  <h3 class="subtitle-1">{{ t('admin.person.twoFactorAuthentication.header') }}</h3>
+                  <h3
+                    class="subtitle-1"
+                    data-testid="two-factor-section-headline"
+                  >
+                    {{ t('admin.person.twoFactorAuthentication.header') }}
+                  </h3>
                   <v-row class="mt-4 text-body">
                     <v-col
                       class="text-right"
@@ -2561,10 +2581,16 @@
                         </v-row>
                       </template>
                       <template v-else-if="twoFactorAuthentificationStore.hasToken">
-                        <p v-if="twoFactorAuthentificationStore.tokenKind === TokenKind.software">
+                        <p
+                          v-if="twoFactorAuthentificationStore.tokenKind === TokenKind.software"
+                          data-testid="software-factor-setup-text"
+                        >
                           {{ t('admin.person.twoFactorAuthentication.softwareTokenIsSetUp') }}
                         </p>
-                        <p v-if="twoFactorAuthentificationStore.tokenKind === TokenKind.hardware">
+                        <p
+                          v-if="twoFactorAuthentificationStore.tokenKind === TokenKind.hardware"
+                          data-testid="hardware-factor-setup-text"
+                        >
                           {{ t('admin.person.twoFactorAuthentication.hardwareTokenIsSetUp') }}
                         </p>
                         <p
@@ -2599,10 +2625,16 @@
                       <p v-if="twoFactorAuthentificationStore.hasToken && !twoFactorAuthentificationStore.required">
                         {{ t('admin.person.twoFactorAuthentication.noLongerNeedToken') }}
                       </p>
-                      <p v-else-if="twoFactorAuthentificationStore.hasToken">
+                      <p
+                        v-else-if="twoFactorAuthentificationStore.hasToken"
+                        data-testid="two-factor-reset-info-text"
+                      >
                         {{ t('admin.person.twoFactorAuthentication.resetInfo') }}
                       </p>
-                      <p v-if="!twoFactorAuthentificationStore.hasToken">
+                      <p
+                        v-if="!twoFactorAuthentificationStore.hasToken"
+                        data-testid="two-factor-not-setup-text"
+                      >
                         {{ t('admin.person.twoFactorAuthentication.notSetUp') }}
                       </p>
                     </div>
@@ -2669,7 +2701,12 @@
         <v-container data-testid="person-lock">
           <v-row class="ml-md-16">
             <v-col data-testid="person-lock-info">
-              <h3 class="subtitle-1">{{ t('admin.person.status') }}</h3>
+              <h3
+                class="subtitle-1"
+                data-testid="status-section-headline"
+              >
+                {{ t('admin.person.status') }}
+              </h3>
               <template v-if="!personStore.loading">
                 <v-row class="mt-4 text-body">
                   <v-col
@@ -2686,7 +2723,7 @@
                     ></v-icon>
                   </v-col>
                   <v-col cols="10">
-                    <span>
+                    <span data-testid="user-lock-status-text">
                       {{
                         personStore.currentPerson?.person.userLock &&
                         personStore.currentPerson.person.userLock?.length > 0
@@ -2814,7 +2851,12 @@
         >
           <v-row class="ml-md-16">
             <v-col data-testid="device-password-info">
-              <h3 class="subtitle-1">{{ t('admin.person.devicePassword.header') }}</h3>
+              <h3
+                class="subtitle-1"
+                data-testid="device-password-section-headline"
+              >
+                {{ t('admin.person.devicePassword.header') }}
+              </h3>
               <template v-if="!personStore.loading">
                 <v-row class="mt-4 text-body">
                   <v-col
@@ -2968,7 +3010,7 @@
                 class="text-center"
                 cols="12"
               >
-                <span>{{ t('person.changeKlasseSuccess') }}</span>
+                <span data-testid="change-klasse-success-dialog-text">{{ t('person.changeKlasseSuccess') }}</span>
               </v-col>
             </v-row>
           </v-container>
@@ -2983,7 +3025,7 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary"
-                data-testid="change-klasse-success-close"
+                data-testid="change-klasse-success-dialog-close-button"
                 @click.stop="closeChangeKlasseSuccessDialog"
               >
                 {{ t('close') }}
@@ -3149,7 +3191,9 @@
           <v-container>
             <v-row class="text-body text-center bold">
               <v-col cols="12">
-                <span>{{ changeKlasseConfirmationDialogMessage }}</span>
+                <span data-testid="change-klasse-confirmation-dialog-text">{{
+                  changeKlasseConfirmationDialogMessage
+                }}</span>
               </v-col>
             </v-row>
           </v-container>
