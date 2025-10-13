@@ -249,14 +249,10 @@
               v-model:selectedRolle="selectedRolle"
               v-model:selectedKlassenOption="selectedKlassenOption"
               v-model:selectedKlasse="selectedKlasse"
-              @update:selectedOrganisation="(value?: string) => (selectedOrganisation = value)"
-              @update:selectedRolle="(value?: string) => (selectedRolle = value)"
-              @update:selectedKlassenOption="(value: string | null) => (selectedKlassenOption = value ?? undefined)"
-              @update:selectedKlasse="(value?: string) => (selectedKlasse = value)"
               @update:canCommit="canCommit = $event"
-              @update:befristung="handleBefristungUpdate"
-              @update:calculatedBefristungOption="handleBefristungOptionUpdate"
-              @fieldReset="handleFieldReset"
+              @update:befristung="handleBefristungUpdate($event)"
+              @update:calculatedBefristungOption="handleBefristungOptionUpdate($event)"
+              @fieldReset="handleFieldReset($event)"
             />
 
             <v-row
