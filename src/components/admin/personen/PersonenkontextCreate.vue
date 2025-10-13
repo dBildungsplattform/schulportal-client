@@ -34,7 +34,7 @@
   const searchInputRolle: Ref<string | undefined> = ref('');
   const searchInputRollen: Ref<string | undefined> = ref('');
 
-  const localKlassenOption: Ref<string | undefined> = ref(undefined);
+  const localKlassenOption: Ref<string | undefined> = ref(KlassenOption.KEEP_KLASSE);
 
   type Props = {
     organisationen: TranslatedObject[] | undefined;
@@ -46,11 +46,13 @@
     operationContext: OperationContext;
     selectedRolle?: string | undefined;
     selectedRollen?: string[] | undefined;
+    selectedKlassenOption?: string | null;
     selectedKlasse?: string | undefined;
     selectedOrganisationProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedKlasseProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedRolleProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedRollenProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
+    selectedKlassenOptionProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     isModifyRolleDialog?: boolean;
     befristungInputProps?: BefristungProps;
     headlineNumbers?: {
@@ -60,6 +62,7 @@
     };
     allowMultipleRollen?: boolean;
     isRolleUnassignForm?: boolean;
+    isRolleModify?: boolean;
   };
 
   const props: Props = defineProps<Props>();
@@ -75,6 +78,7 @@
     (event: 'update:selectedRolle', value: string | undefined): void;
     (event: 'update:selectedRollen', value: string[] | undefined): void;
     (event: 'update:selectedKlasse', value: string | undefined): void;
+    (event: 'update:selectedKlassenOption', value: string | null): void;
     (event: 'update:canCommit', value: boolean): void;
     (event: 'fieldReset', field: 'selectedOrganisation' | 'selectedRolle' | 'selectedKlasse' | 'selectedRollen'): void;
   };
@@ -321,16 +325,9 @@
 
   // Handles any change related to the klassen radio buttons
   function handleKlassenOption(value: string | null): void {
-    switch (value) {
-      case KlassenOption.KEEP_KLASSE: {
-        localKlassenOption.value = value;
-        break;
-      }
-      case KlassenOption.SELECT_NEW_KLASSE: {
-        localKlassenOption.value = value;
-        break;
-      }
-    }
+    if (value === null) return;
+    localKlassenOption.value = value;
+    emits('update:selectedKlassenOption', value);
   }
 
   // If the submission of the form goes wrong and the user needs to correct something, we need to ensure that the canCommit value is updated
@@ -439,7 +436,7 @@
         v-if="
           allowMultipleRollen
             ? isLernRolle(selectedRollen) && selectedOrganisation
-            : isLernRolle(selectedRolle) && selectedOrganisation && !isRolleUnassignForm
+            : isLernRolle(selectedRolle) && selectedOrganisation && !isRolleUnassignForm && !isRolleModify
         "
         :errorLabel="selectedKlasseProps?.['error'] || false"
         :isRequired="true"
@@ -459,7 +456,10 @@
           parentId="personenkontext-create"
         />
       </FormRow>
-      <v-row class="align-center">
+      <v-row
+        v-if="isLernRolle(selectedRolle) && isRolleModify"
+        class="align-center"
+      >
         <v-col
           class="py-0 mt-n1"
           cols="12"
@@ -471,7 +471,7 @@
             ref="befristung-radio-group"
             @update:modelValue="handleKlassenOption"
             v-model="localKlassenOption"
-            v-bind="befristungOptionProps"
+            v-bind="selectedKlassenOptionProps"
           >
             <v-radio
               data-testid="schuljahresende-radio-button"
@@ -488,6 +488,33 @@
           </v-radio-group>
         </v-col>
       </v-row>
+      <!-- Klasse zuordnen for RolleModify -->
+      <FormRow
+        v-if="
+          isLernRolle(selectedRolle) &&
+          selectedOrganisation &&
+          !isRolleUnassignForm &&
+          isRolleModify &&
+          localKlassenOption === KlassenOption.SELECT_NEW_KLASSE
+        "
+        :errorLabel="selectedKlasseProps?.['error'] || false"
+        :isRequired="true"
+        labelForId="klasse-select"
+        :label="$t('admin.klasse.klasse')"
+      >
+        <KlassenFilter
+          :multiple="false"
+          :hideDetails="false"
+          :selectedKlasseProps="selectedKlasseProps"
+          :highlightSelection="false"
+          :selectedKlassen="selectedKlasse"
+          @update:selectedKlassen="updateKlasseSelection"
+          :placeholderText="$t('admin.klasse.selectKlasse')"
+          ref="klasse-select"
+          :administriertVon
+          parentId="personenkontext-create"
+        />
+      </FormRow>
       <!-- Befristung -->
       <v-row
         v-if="

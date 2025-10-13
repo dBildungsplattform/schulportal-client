@@ -5,7 +5,12 @@
   import { useBulkErrors, type BulkErrorList } from '@/composables/useBulkErrors';
   import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
   import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
-  import { OperationContext, usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
+  import {
+    KlassenOption,
+    OperationContext,
+    usePersonenkontextStore,
+    type PersonenkontextStore,
+  } from '@/stores/PersonenkontextStore';
   import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
   import type { TranslatedObject } from '@/types';
   import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
@@ -16,7 +21,7 @@
   import { computed, ref, watchEffect, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
-  import { object, string } from 'yup';
+  import { object, string, StringSchema } from 'yup';
 
   type Props = {
     errorCode: string;
@@ -58,6 +63,8 @@
   export type ZuordnungCreationForm = {
     selectedRolle: string;
     selectedOrganisation: string;
+    selectedKlassenOption: string;
+    selectedKlasse: string;
     selectedBefristung: Date;
     selectedBefristungOption: string;
   };
@@ -67,6 +74,14 @@
       object({
         selectedRolle: string().required(t('admin.rolle.rules.rolle.required')),
         selectedOrganisation: string().required(t('admin.organisation.rules.organisation.required')),
+        // Optional at first, but validated dynamically
+        selectedKlassenOption: string(),
+        selectedKlasse: string().when('selectedKlassenOption', {
+          is: (selectedKlassenOption: string) => selectedKlassenOption === KlassenOption.SELECT_NEW_KLASSE,
+          then: (schema: StringSchema) => schema.required(t('admin.klasse.rules.klasse.required')),
+          otherwise: (schema: StringSchema) => schema.notRequired(),
+        }),
+
         selectedBefristung: befristungSchema(t),
       }),
     );
@@ -94,6 +109,16 @@
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = formContext.defineField('selectedRolle', getVuetifyConfig);
+
+  const [selectedKlassenOption, selectedKlassenOptionProps]: [
+    Ref<string | undefined>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = formContext.defineField('selectedKlassenOption', getVuetifyConfig);
+
+  const [selectedKlasse, selectedKlasseProps]: [
+    Ref<string | undefined>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = formContext.defineField('selectedKlasse', getVuetifyConfig);
 
   const selectedRollen: ComputedRef<Array<string>> = computed(() => {
     return selectedRolle.value ? [selectedRolle.value] : [];
@@ -207,6 +232,9 @@
               :rollen="rollen"
               :selectedOrganisationProps="selectedOrganisationProps"
               :selectedRolleProps="selectedRolleProps"
+              :selectedKlassenOptionProps="selectedKlassenOptionProps"
+              :selectedKlasseProps="selectedKlasseProps"
+              :isRolleModify="true"
               :befristungInputProps="{
                 befristungProps: selectedBefristungProps,
                 befristungOptionProps: selectedBefristungOptionProps,
@@ -218,8 +246,12 @@
               }"
               v-model:selectedOrganisation="selectedOrganisation"
               v-model:selectedRolle="selectedRolle"
+              v-model:selectedKlassenOption="selectedKlassenOption"
+              v-model:selectedKlasse="selectedKlasse"
               @update:selectedOrganisation="(value?: string) => (selectedOrganisation = value)"
               @update:selectedRolle="(value?: string) => (selectedRolle = value)"
+              @update:selectedKlassenOption="(value: string | null) => (selectedKlassenOption = value ?? undefined)"
+              @update:selectedKlasse="(value?: string) => (selectedKlasse = value)"
               @update:canCommit="canCommit = $event"
               @update:befristung="handleBefristungUpdate"
               @update:calculatedBefristungOption="handleBefristungOptionUpdate"
