@@ -983,7 +983,7 @@ describe('PersonDetailsView', () => {
     await flushPromises();
 
     const closeSuccessButton: Element | null = document.body.querySelector(
-      '[data-testid="change-klasse-success-close"]',
+      '[data-testid="change-klasse-success-dialog-close-button"]',
     );
     expect(closeSuccessButton).not.toBeNull();
 
