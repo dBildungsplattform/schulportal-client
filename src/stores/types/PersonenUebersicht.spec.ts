@@ -1,12 +1,7 @@
+import { RollenMerkmal, type DBiamPersonenuebersichtResponse } from '@/api-client/generated';
 import { DoFactory } from 'test/DoFactory';
 import { PersonenUebersicht } from './PersonenUebersicht';
 import { Zuordnung } from './Zuordnung';
-import {
-  RollenMerkmal,
-  type DBiamPersonenuebersichtResponse,
-  type DBiamPersonenzuordnungResponse,
-} from '@/api-client/generated';
-import { faker } from '@faker-js/faker';
 
 describe('PersonenUebersicht', () => {
   describe('fromResponse', () => {
