@@ -67,6 +67,10 @@ export enum CreationType {
 
 export type PersonenkontextUpdate = Pick<DbiamPersonenkontextBodyParams, 'organisationId' | 'rolleId' | 'befristung'>;
 
+export type InternalZuordnung = PersonenkontextUpdate & {
+  administriertVon?: string
+}
+
 export type WorkflowFilter = {
   operationContext?: OperationContext;
   personId?: string;

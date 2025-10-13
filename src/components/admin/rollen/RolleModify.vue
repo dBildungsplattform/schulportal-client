@@ -15,7 +15,7 @@
   import type { TranslatedObject } from '@/types';
   import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
   import { formatDateToISO, getNextSchuljahresende } from '@/utils/date';
-  import { befristungSchema, isKopersRolle } from '@/utils/validationPersonenkontext';
+  import { befristungSchema, isKopersRolle, isLernRolle } from '@/utils/validationPersonenkontext';
   import { toTypedSchema } from '@vee-validate/yup';
   import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
   import { computed, ref, watchEffect, type ComputedRef, type Ref } from 'vue';
@@ -191,6 +191,7 @@
       selectedRolle.value!,
       personenkontextStore.workflowStepResponse?.organisations || [],
       formattedBefristung,
+      selectedKlasse.value,
     );
 
     if (bulkOperationStore.currentOperation?.errors && bulkOperationStore.currentOperation.errors.size > 0) {
@@ -269,6 +270,23 @@
               >
                 <p>
                   {{ t('admin.person.bulkRolleModify.noKopersNrInfoText') }}
+                </p>
+              </v-col>
+            </v-row>
+            <v-row
+              v-if="isLernRolle(selectedRolle ?? '')"
+              class="text-body bold px-md-16"
+              data-testid="modify-Rolle-hint"
+            >
+              <v-col
+                offset="2"
+                cols="10"
+              >
+                <p v-if="selectedKlassenOption === KlassenOption.KEEP_KLASSE">
+                  {{ t('admin.person.bulkRolleModify.keepKlasseHint') }}
+                </p>
+                <p v-else-if="selectedKlassenOption === KlassenOption.SELECT_NEW_KLASSE">
+                  {{ t('admin.person.bulkRolleModify.newKlasseHint') }}
                 </p>
               </v-col>
             </v-row>

@@ -50,6 +50,7 @@ type BulkOperationActions = {
     selectedRolleId: string,
     workflowStepResponseOrganisations: Organisation[],
     befristung?: string,
+    selectedKlasseId?: string,
   ): Promise<void>;
   bulkPersonenDelete(personIDs: string[]): Promise<void>;
   bulkChangeKlasse(personIDs: string[], selectedOrganisationId: string, newKlasseId: string): Promise<void>;
@@ -202,6 +203,7 @@ export const useBulkOperationStore: StoreDefinition<
       selectedRolleId: string,
       workflowStepResponseOrganisations: Organisation[],
       befristung?: string,
+      selectedKlasseId?: string,
     ): Promise<void> {
       const personStore: PersonStore = usePersonStore();
       const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
@@ -209,7 +211,6 @@ export const useBulkOperationStore: StoreDefinition<
       const selectedOrganisation: Organisation | undefined = workflowStepResponseOrganisations.find(
         (orga: Organisation) => orga.id === selectedOrganisationId,
       );
-
       if (!selectedOrganisation) return;
 
       await this.processPersonOperation(
@@ -225,27 +226,64 @@ export const useBulkOperationStore: StoreDefinition<
             return;
           }
 
-          const currentZuordnungen: PersonenkontextUpdate[] =
-            personStore.personenuebersicht?.zuordnungen.map(mapZuordnungToPersonenkontextUpdate) || [];
-          const newZuordnung: PersonenkontextUpdate = {
+          type InternalZuordnung = PersonenkontextUpdate & { administriertVon?: string };
+
+          const currentZuordnungen: InternalZuordnung[] =
+            personStore.personenuebersicht?.zuordnungen.map((z: Zuordnung) => ({
+              organisationId: z.sskId,
+              rolleId: z.rolleId,
+              befristung: z.befristung ?? undefined,
+              administriertVon: z.administriertVon,
+            })) || [];
+
+          const newZuordnungen: InternalZuordnung[] = [];
+
+          // --- base organisation context ---
+          const orgaZuordnung: InternalZuordnung = {
             organisationId: selectedOrganisation.id,
             rolleId: selectedRolleId,
           };
 
-          // If the new kontext is befristet, we use the earliest possible befristung
           if (befristung) {
-            newZuordnung.befristung = currentZuordnungen.reduce(
-              (earliest: string, zuordnung: PersonenkontextUpdate) => {
-                if (zuordnung.organisationId === selectedOrganisation.id && zuordnung.befristung) {
-                  return isBefore(zuordnung.befristung, earliest) ? zuordnung.befristung : earliest;
-                }
-                return earliest;
-              },
-              befristung,
-            );
+            orgaZuordnung.befristung = currentZuordnungen.reduce((earliest: string, z: InternalZuordnung) => {
+              if (z.organisationId === selectedOrganisation.id && z.befristung) {
+                return isBefore(z.befristung, earliest) ? z.befristung : earliest;
+              }
+              return earliest;
+            }, befristung);
           }
 
-          const combinedZuordnungen: PersonenkontextUpdate[] = [...currentZuordnungen, newZuordnung];
+          newZuordnungen.push(orgaZuordnung);
+
+          // --- Klassen logic ---
+          if (selectedKlasseId) {
+            newZuordnungen.push({
+              organisationId: selectedKlasseId,
+              rolleId: selectedRolleId,
+              administriertVon: selectedOrganisation.id,
+            });
+          } else {
+            const klassenZuordnungen: InternalZuordnung[] = currentZuordnungen.filter(
+              (z: InternalZuordnung) => z.administriertVon === selectedOrganisation.id,
+            );
+
+            for (const klasse of klassenZuordnungen) {
+              newZuordnungen.push({
+                organisationId: klasse.organisationId,
+                rolleId: selectedRolleId,
+                administriertVon: selectedOrganisation.id,
+              });
+            }
+          }
+
+          // --- remove administriertVon before sending ---
+          const combinedZuordnungen: PersonenkontextUpdate[] = [...currentZuordnungen, ...newZuordnungen].map(
+            ({ organisationId, rolleId, befristung: b }: PersonenkontextUpdate) => ({
+              organisationId,
+              rolleId,
+              befristung: b,
+            }),
+          );
 
           await personenkontextStore.updatePersonenkontexte(combinedZuordnungen, personId);
 

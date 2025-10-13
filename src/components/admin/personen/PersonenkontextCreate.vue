@@ -326,6 +326,10 @@
   // Handles any change related to the klassen radio buttons
   function handleKlassenOption(value: string | null): void {
     if (value === null) return;
+    if (value === KlassenOption.KEEP_KLASSE) {
+      selectedKlasse.value = undefined;
+      emits('fieldReset', 'selectedKlasse');
+    }
     localKlassenOption.value = value;
     emits('update:selectedKlassenOption', value);
   }
@@ -333,6 +337,7 @@
   // If the submission of the form goes wrong and the user needs to correct something, we need to ensure that the canCommit value is updated
   onMounted(() => {
     emits('update:canCommit', personenkontextStore.workflowStepResponse?.canCommit ?? false);
+    emits('update:selectedKlassenOption', localKlassenOption.value!);
   });
 </script>
 
