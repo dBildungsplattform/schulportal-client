@@ -568,6 +568,8 @@ describe('BulkOperationStore', () => {
           rollenArt: RollenArt.Lern,
           admins: [faker.person.fullName()],
           befristung: null,
+          administriertVon: selectedOrganisationId,
+          typ: OrganisationsTyp.Klasse,
         },
         {
           organisation: DoFactory.getOrganisationResponse({

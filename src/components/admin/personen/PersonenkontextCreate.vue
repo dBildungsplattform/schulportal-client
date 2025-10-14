@@ -220,7 +220,6 @@
             rollenIds: [newRolle],
             limit: 25,
           };
-          emits('fieldReset', 'selectedKlasse');
           await handleWorkflowStep(filter);
         }
 
