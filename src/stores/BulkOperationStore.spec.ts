@@ -485,6 +485,134 @@ describe('BulkOperationStore', () => {
       });
     });
 
+    it('should add a new klassen-zuordnung when selectedKlasseId is provided', async () => {
+      const personIds: string[] = ['1'];
+      const selectedOrganisationId: string = 'org-1';
+      const selectedRolleId: string = 'rolle-1';
+      const selectedKlasseId: string = 'klasse-99';
+
+      const workflowStepResponseOrganisations: Organisation[] = [
+        {
+          id: selectedOrganisationId,
+          name: 'Test Schule',
+          kennung: 'SCH123',
+          administriertVon: 'admin-1',
+        } as Organisation,
+      ];
+
+      const mockPersonResponse: DBiamPersonenuebersichtResponse = {
+        personId: '1',
+        vorname: 'John',
+        nachname: 'Doe',
+        benutzername: 'jdoe',
+        lastModifiedZuordnungen: '2024-04-01T00:00:00.000Z',
+        zuordnungen: [],
+      };
+
+      const mockUpdateResponse: PersonenkontexteUpdateResponse = {
+        dBiamPersonenkontextResponses: [
+          {
+            personId: '1',
+            organisationId: selectedOrganisationId,
+            rolleId: selectedRolleId,
+          } as DBiamPersonenkontextResponse,
+        ],
+      };
+
+      const spy = vi.spyOn(personenkontextStore, 'updatePersonenkontexte');
+
+      mockAdapter.onGet(`/api/dbiam/personenuebersicht/1`).replyOnce(200, mockPersonResponse);
+      mockAdapter.onPut(`/api/personenkontext-workflow/1`).replyOnce(200, mockUpdateResponse);
+
+      await bulkOperationStore.bulkModifyPersonenRolle(
+        personIds,
+        selectedOrganisationId,
+        selectedRolleId,
+        workflowStepResponseOrganisations,
+        undefined,
+        selectedKlasseId,
+      );
+
+      expect(spy).toHaveBeenCalledWith(
+        [
+          { organisationId: selectedOrganisationId, rolleId: selectedRolleId },
+          { organisationId: selectedKlasseId, rolleId: selectedRolleId, befristung: undefined },
+        ],
+        '1',
+      );
+    });
+
+    it('should reuse existing klassen-zuordnungen when selectedKlasseId is undefined', async () => {
+      const personIds: string[] = ['1'];
+      const selectedOrganisationId: string = 'org-1';
+      const selectedRolleId: string = 'rolle-1';
+
+      const workflowStepResponseOrganisations: Organisation[] = [
+        {
+          id: selectedOrganisationId,
+          name: 'Test Schule',
+          kennung: 'SCH123',
+          administriertVon: 'admin-1',
+        } as Organisation,
+      ];
+
+      const mockPersonResponse: DBiamPersonenuebersichtResponse = {
+        personId: '1',
+        vorname: 'Jane',
+        nachname: 'Doe',
+        benutzername: 'jdoe',
+        lastModifiedZuordnungen: '2024-04-01T00:00:00.000Z',
+        zuordnungen: [
+          {
+            sskId: 'klasse-55',
+            rolleId: 'rolle-alt',
+            sskName: 'Another School',
+            sskDstNr: '456',
+            rolle: 'Test Role',
+            rollenArt: RollenArt.Lern,
+            administriertVon: selectedOrganisationId,
+            typ: OrganisationsTyp.Klasse,
+            editable: true,
+            befristung: 'unbefristet',
+            merkmale: [] as unknown as RollenMerkmal[],
+            admins: ['admin1'],
+          },
+        ],
+      };
+
+      const mockUpdateResponse: PersonenkontexteUpdateResponse = {
+        dBiamPersonenkontextResponses: [
+          {
+            personId: '1',
+            organisationId: selectedOrganisationId,
+            rolleId: selectedRolleId,
+          } as DBiamPersonenkontextResponse,
+        ],
+      };
+
+      const spy = vi.spyOn(personenkontextStore, 'updatePersonenkontexte');
+
+      mockAdapter.onGet(`/api/dbiam/personenuebersicht/1`).replyOnce(200, mockPersonResponse);
+      mockAdapter.onPut(`/api/personenkontext-workflow/1`).replyOnce(200, mockUpdateResponse);
+
+      await bulkOperationStore.bulkModifyPersonenRolle(
+        personIds,
+        selectedOrganisationId,
+        selectedRolleId,
+        workflowStepResponseOrganisations,
+        undefined,
+        undefined,
+      );
+
+      expect(spy).toHaveBeenCalledWith(
+        expect.arrayContaining([
+          { organisationId: 'klasse-55', rolleId: selectedRolleId, befristung: undefined },
+          { organisationId: selectedOrganisationId, rolleId: selectedRolleId, befristung: undefined },
+        ]),
+        '1',
+      );
+    });
+
     it('should handle errors from both endpoints gracefully', async () => {
       const personIds: string[] = ['1', '2'];
       const selectedOrganisationId: string = 'org-123';
