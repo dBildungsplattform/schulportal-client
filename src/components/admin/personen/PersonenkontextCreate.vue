@@ -436,7 +436,7 @@
         ></v-autocomplete>
       </FormRow>
 
-      <!-- Klasse zuordnen -->
+      <!-- Klasse zuordnen for normal flow-->
       <FormRow
         v-if="
           allowMultipleRollen
@@ -472,20 +472,20 @@
           offset-sm="5"
         >
           <v-radio-group
-            data-testid="befristung-radio-group"
-            ref="befristung-radio-group"
+            data-testid="klassen-option-radio-group"
+            ref="klassen-option-radio-group"
             @update:modelValue="handleKlassenOption"
             v-model="localKlassenOption"
             v-bind="selectedKlassenOptionProps"
           >
             <v-radio
-              data-testid="schuljahresende-radio-button"
+              data-testid="keep-klasse-radio-button"
               :label="$t('admin.klasse.keepKlasse')"
               :value="KlassenOption.KEEP_KLASSE"
               color="primary"
             ></v-radio>
             <v-radio
-              data-testid="unbefristet-radio-button"
+              data-testid="select-new-klasse-radio-button"
               :label="$t('admin.klasse.selectNewKlasse')"
               :value="KlassenOption.SELECT_NEW_KLASSE"
               :color="'primary'"
