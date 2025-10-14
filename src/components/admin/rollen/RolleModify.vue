@@ -65,7 +65,7 @@
     selectedRolle: string;
     selectedOrganisation: string;
     selectedKlassenOption: string;
-    selectedKlasse: string;
+    selectedKlasseForRadio: string;
     selectedBefristung: Date;
     selectedBefristungOption: string;
   };
@@ -77,7 +77,7 @@
         selectedOrganisation: string().required(t('admin.organisation.rules.organisation.required')),
         // Optional at first, but validated dynamically
         selectedKlassenOption: string(),
-        selectedKlasse: string().when('selectedKlassenOption', {
+        selectedKlasseForRadio: string().when('selectedKlassenOption', {
           is: (selectedKlassenOption: string) => selectedKlassenOption === KlassenOption.SELECT_NEW_KLASSE,
           then: (schema: StringSchema) => schema.required(t('admin.klasse.rules.klasse.required')),
           otherwise: (schema: StringSchema) => schema.notRequired(),
@@ -116,10 +116,10 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = formContext.defineField('selectedKlassenOption', getVuetifyConfig);
 
-  const [selectedKlasse, selectedKlasseProps]: [
+  const [selectedKlasseForRadio, selectedKlasseForRadioProps]: [
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = formContext.defineField('selectedKlasse', getVuetifyConfig);
+  ] = formContext.defineField('selectedKlasseForRadio', getVuetifyConfig);
 
   const selectedRollen: ComputedRef<Array<string>> = computed(() => {
     return selectedRolle.value ? [selectedRolle.value] : [];
@@ -175,6 +175,9 @@
     if (field === 'selectedRolle') {
       formContext.resetField('selectedRolle');
     }
+    if (field === 'selectedKlasse') {
+      formContext.resetField('selectedKlasseForRadio');
+    }
   }
 
   // Creates a new Personenkontext for an array of Person IDs. For each processed ID the progress bar will increment according to the total number of items to process
@@ -192,7 +195,7 @@
       selectedRolle.value!,
       personenkontextStore.workflowStepResponse?.organisations || [],
       formattedBefristung,
-      selectedKlasse.value,
+      selectedKlasseForRadio.value,
     );
 
     if (bulkOperationStore.currentOperation?.errors && bulkOperationStore.currentOperation.errors.size > 0) {
@@ -235,7 +238,7 @@
               :selectedOrganisationProps="selectedOrganisationProps"
               :selectedRolleProps="selectedRolleProps"
               :selectedKlassenOptionProps="selectedKlassenOptionProps"
-              :selectedKlasseProps="selectedKlasseProps"
+              :selectedKlasseForRadioProps="selectedKlasseForRadioProps"
               :rolleDialogMode="RolleDialogMode.MODIFY"
               :befristungInputProps="{
                 befristungProps: selectedBefristungProps,
@@ -249,7 +252,7 @@
               v-model:selectedOrganisation="selectedOrganisation"
               v-model:selectedRolle="selectedRolle"
               v-model:selectedKlassenOption="selectedKlassenOption"
-              v-model:selectedKlasse="selectedKlasse"
+              v-model:selectedKlasseForRadio="selectedKlasseForRadio"
               @update:canCommit="canCommit = $event"
               @update:befristung="handleBefristungUpdate($event)"
               @update:calculatedBefristungOption="handleBefristungOptionUpdate($event)"

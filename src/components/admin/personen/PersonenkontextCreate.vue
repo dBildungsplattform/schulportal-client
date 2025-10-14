@@ -49,8 +49,10 @@
     selectedRollen?: string[] | undefined;
     selectedKlassenOption?: string | null;
     selectedKlasse?: string | undefined;
+    selectedKlasseForRadio?: string | undefined;
     selectedOrganisationProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedKlasseProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
+    selectedKlasseForRadioProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedRolleProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedRollenProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedKlassenOptionProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
@@ -77,6 +79,7 @@
     (event: 'update:selectedRolle', value: string | undefined): void;
     (event: 'update:selectedRollen', value: string[] | undefined): void;
     (event: 'update:selectedKlasse', value: string | undefined): void;
+    (event: 'update:selectedKlasseForRadio', value: string | undefined): void;
     (event: 'update:selectedKlassenOption', value: string | null): void;
     (event: 'update:canCommit', value: boolean): void;
     (event: 'fieldReset', field: 'selectedOrganisation' | 'selectedRolle' | 'selectedKlasse' | 'selectedRollen'): void;
@@ -87,6 +90,7 @@
   const selectedRolle: Ref<string | undefined> = ref(props.selectedRolle);
   const selectedRollen: Ref<string[] | undefined> = ref(props.selectedRollen || []);
   const selectedKlasse: Ref<string | undefined> = ref(props.selectedKlasse);
+  const selectedKlasseForRadio: Ref<string | undefined> = ref(props.selectedKlasseForRadio);
   // we need to cast the selectedSchule into an array
   // doing it this way prevents an issue where the reactive system constantly re-runs which causes requests to be issued in a loop
   const administriertVon: Ref<string[] | undefined> = ref([]);
@@ -322,12 +326,12 @@
     selectedOrganisation.value = orgaId;
     emits('update:selectedOrganisation', orgaId);
   }
-  
+
   function handleKlassenOption(value: string | null): void {
     if (value === null) return;
     if (value === KlassenOption.KEEP_KLASSE) {
-      selectedKlasse.value = undefined;
-      emits('fieldReset', 'selectedKlasse');
+      selectedKlasseForRadio.value = undefined;
+      emits('update:selectedKlasseForRadio', undefined);
     }
     localKlassenOption.value = value;
     emits('update:selectedKlassenOption', value);
@@ -511,16 +515,16 @@
           rolleDialogMode === RolleDialogMode.MODIFY &&
           localKlassenOption === KlassenOption.SELECT_NEW_KLASSE
         "
-        :errorLabel="selectedKlasseProps?.['error'] || false"
+        :errorLabel="selectedKlasseForRadioProps?.['error'] || false"
         labelForId="klasse-select"
         class="mt-n4"
       >
         <KlassenFilter
           :multiple="false"
           :hideDetails="false"
-          :selectedKlasseProps="selectedKlasseProps"
+          :selectedKlasseProps="selectedKlasseForRadioProps"
           :highlightSelection="false"
-          :selectedKlassen="selectedKlasse"
+          :selectedKlassen="selectedKlasseForRadio"
           @update:selectedKlassen="updateKlasseSelection"
           :placeholderText="$t('admin.klasse.selectKlasse')"
           ref="klasse-select"
