@@ -8,6 +8,7 @@
   import {
     KlassenOption,
     OperationContext,
+    RolleDialogMode,
     usePersonenkontextStore,
     type PersonenkontextStore,
   } from '@/stores/PersonenkontextStore';
@@ -235,7 +236,7 @@
               :selectedRolleProps="selectedRolleProps"
               :selectedKlassenOptionProps="selectedKlassenOptionProps"
               :selectedKlasseProps="selectedKlasseProps"
-              :isRolleModify="true"
+              :rolleDialogMode="RolleDialogMode.MODIFY"
               :befristungInputProps="{
                 befristungProps: selectedBefristungProps,
                 befristungOptionProps: selectedBefristungOptionProps,

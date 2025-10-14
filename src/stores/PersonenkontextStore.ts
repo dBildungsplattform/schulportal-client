@@ -65,6 +65,11 @@ export enum CreationType {
   AddPersonToOwnSchule = 'add-person-to-own-schule',
 }
 
+export enum RolleDialogMode {
+  MODIFY = 'modify',
+  UNASSIGN = 'unassign',
+}
+
 export type PersonenkontextUpdate = Pick<DbiamPersonenkontextBodyParams, 'organisationId' | 'rolleId' | 'befristung'>;
 
 export type InternalZuordnung = PersonenkontextUpdate & {

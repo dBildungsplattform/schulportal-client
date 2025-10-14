@@ -10,6 +10,7 @@
     CreationType,
     KlassenOption,
     OperationContext,
+    RolleDialogMode,
     usePersonenkontextStore,
     type PersonenkontextStore,
     type WorkflowFilter,
@@ -53,7 +54,6 @@
     selectedRolleProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedRollenProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedKlassenOptionProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
-    isModifyRolleDialog?: boolean;
     befristungInputProps?: BefristungProps;
     headlineNumbers?: {
       org: string;
@@ -61,8 +61,7 @@
       befristung: string;
     };
     allowMultipleRollen?: boolean;
-    isRolleUnassignForm?: boolean;
-    isRolleModify?: boolean;
+    rolleDialogMode: RolleDialogMode;
   };
 
   const props: Props = defineProps<Props>();
@@ -323,8 +322,7 @@
     selectedOrganisation.value = orgaId;
     emits('update:selectedOrganisation', orgaId);
   }
-
-  // Handles any change related to the klassen radio buttons
+  
   function handleKlassenOption(value: string | null): void {
     if (value === null) return;
     if (value === KlassenOption.KEEP_KLASSE) {
@@ -368,7 +366,7 @@
         :useWorkflowEndpoints="true"
         :useLandesbediensteteWorkflow="useLandesbediensteteWorkflow"
         :operationContext="props.operationContext"
-        :isRolleUnassignForm="isRolleUnassignForm"
+        :isRolleUnassignForm="rolleDialogMode === RolleDialogMode.UNASSIGN"
         :includeAll="true"
         :placeholderText="$t('admin.organisation.selectOrganisation')"
         :personId="props.personId"
@@ -442,7 +440,10 @@
         v-if="
           allowMultipleRollen
             ? isLernRolle(selectedRollen) && selectedOrganisation
-            : isLernRolle(selectedRolle) && selectedOrganisation && !isRolleUnassignForm && !isRolleModify
+            : isLernRolle(selectedRolle) &&
+              selectedOrganisation &&
+              rolleDialogMode !== RolleDialogMode.MODIFY &&
+              rolleDialogMode !== RolleDialogMode.UNASSIGN
         "
         :errorLabel="selectedKlasseProps?.['error'] || false"
         :isRequired="true"
@@ -463,7 +464,7 @@
         />
       </FormRow>
       <v-row
-        v-if="isLernRolle(selectedRolle) && isRolleModify"
+        v-if="isLernRolle(selectedRolle) && rolleDialogMode === RolleDialogMode.MODIFY"
         :label="$t('admin.klasse.klasse')"
         :isRequired="true"
         class="mt-8"
@@ -507,8 +508,7 @@
         v-if="
           isLernRolle(selectedRolle) &&
           selectedOrganisation &&
-          !isRolleUnassignForm &&
-          isRolleModify &&
+          rolleDialogMode === RolleDialogMode.MODIFY &&
           localKlassenOption === KlassenOption.SELECT_NEW_KLASSE
         "
         :errorLabel="selectedKlasseProps?.['error'] || false"
@@ -544,7 +544,6 @@
         v-if="
           selectedOrganisation &&
           (allowMultipleRollen ? (selectedRollen?.length ?? 0) > 0 : selectedRolle) &&
-          !isModifyRolleDialog &&
           props.befristungInputProps
         "
         :befristungProps="befristungInputProps?.befristungProps"
