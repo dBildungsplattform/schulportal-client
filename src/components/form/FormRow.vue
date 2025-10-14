@@ -1,7 +1,7 @@
 <script setup lang="ts">
   type Props = {
-    errorLabel: string | boolean;
-    label: string;
+    errorLabel?: string | boolean;
+    label?: string;
     isRequired?: boolean;
     labelForId: string;
     noTopMargin?: boolean;

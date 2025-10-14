@@ -461,15 +461,16 @@
           parentId="personenkontext-create"
         />
       </FormRow>
-      <v-row
+      <FormRow
         v-if="isLernRolle(selectedRolle) && isRolleModify"
-        class="align-center"
+        labelForId="klasse-select"
+        :label="$t('admin.klasse.klasse')"
+        :isRequired="true"
       >
         <v-col
           class="py-0 mt-n1"
           cols="12"
           sm="7"
-          offset-sm="5"
         >
           <v-radio-group
             data-testid="klassen-option-radio-group"
@@ -492,7 +493,7 @@
             ></v-radio>
           </v-radio-group>
         </v-col>
-      </v-row>
+      </FormRow>
       <!-- Klasse zuordnen for RolleModify -->
       <FormRow
         v-if="
@@ -503,9 +504,7 @@
           localKlassenOption === KlassenOption.SELECT_NEW_KLASSE
         "
         :errorLabel="selectedKlasseProps?.['error'] || false"
-        :isRequired="true"
         labelForId="klasse-select"
-        :label="$t('admin.klasse.klasse')"
       >
         <KlassenFilter
           :multiple="false"
