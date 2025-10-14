@@ -82,7 +82,6 @@
           then: (schema: StringSchema) => schema.required(t('admin.klasse.rules.klasse.required')),
           otherwise: (schema: StringSchema) => schema.notRequired(),
         }),
-
         selectedBefristung: befristungSchema(t),
       }),
     );
@@ -174,9 +173,6 @@
   function handleFieldReset(field: string): void {
     if (field === 'selectedRolle') {
       formContext.resetField('selectedRolle');
-    }
-    if (field === 'selectedKlasse') {
-      formContext.resetField('selectedKlasseForRadio');
     }
   }
 

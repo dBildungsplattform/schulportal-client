@@ -285,6 +285,11 @@
     emits('update:selectedKlasse', selectedKlassen);
   }
 
+  function updateKlasseSelectionForRadio(selectedKlassen: string | undefined): void {
+    selectedKlasseForRadio.value = selectedKlassen;
+    emits('update:selectedKlasseForRadio', selectedKlassen);
+  }
+
   // Clear the selected Rolle once the input field is cleared (This is the only way to fetch all Rollen again)
   // This is also important since we only want to fetch all orgas once the selected Rolle is null, otherwise an extra request is made with an empty string
   function clearSelectedRolle(): void {
@@ -525,11 +530,11 @@
           :selectedKlasseProps="selectedKlasseForRadioProps"
           :highlightSelection="false"
           :selectedKlassen="selectedKlasseForRadio"
-          @update:selectedKlassen="updateKlasseSelection"
+          @update:selectedKlassen="updateKlasseSelectionForRadio"
           :placeholderText="$t('admin.klasse.selectKlasse')"
           ref="klasse-select"
           :administriertVon
-          parentId="personenkontext-create"
+          parentId="personenkontext-create-rolle-modify"
         />
       </FormRow>
       <!-- Befristung -->
