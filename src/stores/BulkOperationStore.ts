@@ -277,13 +277,20 @@ export const useBulkOperationStore: StoreDefinition<
           }
 
           // --- remove administriertVon before sending ---
-          const combinedZuordnungen: PersonenkontextUpdate[] = [...currentZuordnungen, ...newZuordnungen].map(
-            ({ organisationId, rolleId, befristung: b }: PersonenkontextUpdate) => ({
+          const combinedZuordnungen: PersonenkontextUpdate[] = [...currentZuordnungen, ...newZuordnungen]
+            .map(({ organisationId, rolleId, befristung: b }: PersonenkontextUpdate) => ({
               organisationId,
               rolleId,
               befristung: b,
-            }),
-          );
+            }))
+            .filter(
+              (zuordnung: InternalZuordnung, index: number, self: InternalZuordnung[]) =>
+                index ===
+                self.findIndex(
+                  (z: InternalZuordnung) =>
+                    z.organisationId === zuordnung.organisationId && z.rolleId === zuordnung.rolleId,
+                ),
+            );
 
           await personenkontextStore.updatePersonenkontexte(combinedZuordnungen, personId);
 

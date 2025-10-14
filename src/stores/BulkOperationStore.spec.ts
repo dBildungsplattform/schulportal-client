@@ -519,7 +519,7 @@ describe('BulkOperationStore', () => {
         ],
       };
 
-      const spy = vi.spyOn(personenkontextStore, 'updatePersonenkontexte');
+      const spy: MockInstance = vi.spyOn(personenkontextStore, 'updatePersonenkontexte');
 
       mockAdapter.onGet(`/api/dbiam/personenuebersicht/1`).replyOnce(200, mockPersonResponse);
       mockAdapter.onPut(`/api/personenkontext-workflow/1`).replyOnce(200, mockUpdateResponse);
@@ -590,7 +590,7 @@ describe('BulkOperationStore', () => {
         ],
       };
 
-      const spy = vi.spyOn(personenkontextStore, 'updatePersonenkontexte');
+      const spy: MockInstance = vi.spyOn(personenkontextStore, 'updatePersonenkontexte');
 
       mockAdapter.onGet(`/api/dbiam/personenuebersicht/1`).replyOnce(200, mockPersonResponse);
       mockAdapter.onPut(`/api/personenkontext-workflow/1`).replyOnce(200, mockUpdateResponse);
