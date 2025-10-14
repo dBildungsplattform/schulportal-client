@@ -486,7 +486,7 @@
             ></v-radio>
             <v-radio
               data-testid="select-new-klasse-radio-button"
-              :label="$t('admin.klasse.selectNewKlasse')"
+              :label="$t('admin.klasse.selectAnotherKlasse')"
               :value="KlassenOption.SELECT_NEW_KLASSE"
               :color="'primary'"
             ></v-radio>

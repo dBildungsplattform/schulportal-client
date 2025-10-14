@@ -121,7 +121,7 @@
       "loadingErrorTitle": "Fehler beim Laden der Klassen",
       "management": "Klassenverwaltung",
       "selectKlasse": "Klasse auswählen",
-      "selectNewKlasse": "Neue Klasse auswählen",
+      "selectAnotherKlasse": "Andere Klasse auswählen",
       "rules": {
         "klasse": {
           "required": "Die Klasse muss ausgewählt werden."
@@ -203,7 +203,7 @@
       },
       "bulkRolleModify": {
         "keepKlasseHint": "Bitte beachten: Die neue Rolle wird den ausgewählten Schülerinnen und Schülern an ihren bestehenden Klassen zusätzlich zugeordnet.",
-        "newKlasseHint": "Bitte beachten: Die neue Rolle wird den ausgewählten Schülerinnen und Schülern an der neu ausgewählten Klasse zugeordnet.",
+        "newKlasseHint": "Bitte beachten: Die neue Rolle wird den ausgewählten Schülerinnen und Schülern an der ausgewählten Klasse zugeordnet.",
         "noKopersNrInfoText": "Bitte beachten: Alle ausgewählten Benutzerkonten müssen über eine KoPers.-Nr. verfügen. Tragen Sie diese ggf. bitte in der Gesamtübersicht des Benutzers nach, sobald sie Ihnen vorliegt. Ein Benutzerkonto mit der gewählten Rolle ohne KoPers.-Nr. wird nach spätestens 8 Wochen automatisch gesperrt."
       },
       "bulkUnassignOrganisation": {
