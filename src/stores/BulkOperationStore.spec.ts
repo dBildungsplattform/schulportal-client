@@ -497,46 +497,42 @@ describe('BulkOperationStore', () => {
     });
 
     it('should add a new klassen-zuordnung when selectedKlasseId is provided', async () => {
-      const personIds: string[] = ['1'];
-      const selectedOrganisationId: string = 'org-1';
-      const selectedRolleId: string = 'rolle-1';
-      const selectedKlasseId: string = 'klasse-99';
+      const selectedOrganisationId: string = faker.string.uuid();
+      const selectedRolleId: string = faker.string.uuid();
+      const selectedKlasseId: string = faker.string.uuid();
+      const personId: string = faker.string.uuid();
 
       const workflowStepResponseOrganisations: Organisation[] = [
-        {
-          id: selectedOrganisationId,
-          name: 'Test Schule',
-          kennung: 'SCH123',
-          administriertVon: 'admin-1',
-        } as Organisation,
+        DoFactory.getOrganisationResponse({ id: selectedOrganisationId }),
       ];
 
-      const mockPersonResponse: DBiamPersonenuebersichtResponse = {
-        personId: '1',
-        vorname: 'John',
-        nachname: 'Doe',
-        benutzername: 'jdoe',
-        lastModifiedZuordnungen: '2024-04-01T00:00:00.000Z',
+      const mockPersonResponse: DBiamPersonenuebersichtResponse = DoFactory.getDBiamPersonenuebersichtResponse({
+        personId,
         zuordnungen: [],
-      };
+      });
 
-      const mockUpdateResponse: PersonenkontexteUpdateResponse = {
+      const mockUpdateResponse: PersonenkontexteUpdateResponse = DoFactory.getPersonenkontextUpdateResponse({
         dBiamPersonenkontextResponses: [
-          {
-            personId: '1',
+          DoFactory.getDBiamPersonenkontextResponse({
+            personId,
             organisationId: selectedOrganisationId,
             rolleId: selectedRolleId,
-          } as DBiamPersonenkontextResponse,
+          }),
+          DoFactory.getDBiamPersonenkontextResponse({
+            personId,
+            organisationId: selectedKlasseId,
+            rolleId: selectedRolleId,
+          }),
         ],
-      };
+      });
 
       const spy: MockInstance = vi.spyOn(personenkontextStore, 'updatePersonenkontexte');
 
-      mockAdapter.onGet(`/api/dbiam/personenuebersicht/1`).replyOnce(200, mockPersonResponse);
-      mockAdapter.onPut(`/api/personenkontext-workflow/1`).replyOnce(200, mockUpdateResponse);
+      mockAdapter.onGet(`/api/dbiam/personenuebersicht/${personId}`).replyOnce(200, mockPersonResponse);
+      mockAdapter.onPut(`/api/personenkontext-workflow/${personId}`).replyOnce(200, mockUpdateResponse);
 
       await bulkOperationStore.bulkModifyPersonenRolle(
-        personIds,
+        [personId],
         selectedOrganisationId,
         selectedRolleId,
         workflowStepResponseOrganisations,
@@ -549,65 +545,60 @@ describe('BulkOperationStore', () => {
           { organisationId: selectedOrganisationId, rolleId: selectedRolleId },
           { organisationId: selectedKlasseId, rolleId: selectedRolleId, befristung: undefined },
         ],
-        '1',
+        personId,
       );
     });
 
     it('should reuse existing klassen-zuordnungen when selectedKlasseId is undefined', async () => {
-      const personIds: string[] = ['1'];
-      const selectedOrganisationId: string = 'org-1';
-      const selectedRolleId: string = 'rolle-1';
+      const selectedOrganisationId: string = faker.string.uuid();
+      const selectedRolleId: string = faker.string.uuid();
+      const personId: string = faker.string.uuid();
+      const existingKlasseId: string = faker.string.uuid();
 
       const workflowStepResponseOrganisations: Organisation[] = [
-        {
-          id: selectedOrganisationId,
-          name: 'Test Schule',
-          kennung: 'SCH123',
-          administriertVon: 'admin-1',
-        } as Organisation,
+        DoFactory.getOrganisationResponse({ id: selectedOrganisationId }),
       ];
 
-      const mockPersonResponse: DBiamPersonenuebersichtResponse = {
-        personId: '1',
-        vorname: 'Jane',
-        nachname: 'Doe',
-        benutzername: 'jdoe',
-        lastModifiedZuordnungen: '2024-04-01T00:00:00.000Z',
-        zuordnungen: [
-          {
-            sskId: 'klasse-55',
-            rolleId: 'rolle-alt',
-            sskName: 'Another School',
-            sskDstNr: '456',
-            rolle: 'Test Role',
-            rollenArt: RollenArt.Lern,
+      const existingZuordnung: DBiamPersonenzuordnungResponse = DoFactory.getDBiamPersonenzuordnungResponse(
+        {
+          rolleId: selectedRolleId,
+          rolle: 'AltRolle',
+          editable: true,
+          merkmale: [],
+          rollenArt: RollenArt.Lern,
+          admins: [faker.person.fullName()],
+          befristung: null,
+        },
+        {
+          organisation: DoFactory.getOrganisationResponse({
+            id: existingKlasseId,
             administriertVon: selectedOrganisationId,
-            typ: OrganisationsTyp.Klasse,
-            editable: true,
-            befristung: 'unbefristet',
-            merkmale: [] as unknown as RollenMerkmal[],
-            admins: ['admin1'],
-          },
-        ],
-      };
+          }),
+        },
+      );
 
-      const mockUpdateResponse: PersonenkontexteUpdateResponse = {
+      const mockPersonResponse: DBiamPersonenuebersichtResponse = DoFactory.getDBiamPersonenuebersichtResponse({
+        personId,
+        zuordnungen: [existingZuordnung],
+      });
+
+      const mockUpdateResponse: PersonenkontexteUpdateResponse = DoFactory.getPersonenkontextUpdateResponse({
         dBiamPersonenkontextResponses: [
-          {
-            personId: '1',
+          DoFactory.getDBiamPersonenkontextResponse({
+            personId,
             organisationId: selectedOrganisationId,
             rolleId: selectedRolleId,
-          } as DBiamPersonenkontextResponse,
+          }),
         ],
-      };
+      });
 
       const spy: MockInstance = vi.spyOn(personenkontextStore, 'updatePersonenkontexte');
 
-      mockAdapter.onGet(`/api/dbiam/personenuebersicht/1`).replyOnce(200, mockPersonResponse);
-      mockAdapter.onPut(`/api/personenkontext-workflow/1`).replyOnce(200, mockUpdateResponse);
+      mockAdapter.onGet(`/api/dbiam/personenuebersicht/${personId}`).replyOnce(200, mockPersonResponse);
+      mockAdapter.onPut(`/api/personenkontext-workflow/${personId}`).replyOnce(200, mockUpdateResponse);
 
       await bulkOperationStore.bulkModifyPersonenRolle(
-        personIds,
+        [personId],
         selectedOrganisationId,
         selectedRolleId,
         workflowStepResponseOrganisations,
@@ -617,10 +608,10 @@ describe('BulkOperationStore', () => {
 
       expect(spy).toHaveBeenCalledWith(
         expect.arrayContaining([
-          { organisationId: 'klasse-55', rolleId: selectedRolleId, befristung: undefined },
+          { organisationId: existingKlasseId, rolleId: selectedRolleId, befristung: undefined },
           { organisationId: selectedOrganisationId, rolleId: selectedRolleId, befristung: undefined },
         ]),
-        '1',
+        personId,
       );
     });
 
