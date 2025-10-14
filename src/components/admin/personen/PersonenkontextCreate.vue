@@ -61,7 +61,7 @@
       befristung: string;
     };
     allowMultipleRollen?: boolean;
-    rolleDialogMode: RolleDialogMode;
+    rolleDialogMode?: RolleDialogMode;
   };
 
   const props: Props = defineProps<Props>();

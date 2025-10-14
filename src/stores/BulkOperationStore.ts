@@ -268,6 +268,7 @@ export const useBulkOperationStore: StoreDefinition<
               organisationId: selectedKlasseId,
               rolleId: selectedRolleId,
               administriertVon: selectedOrganisation.id,
+              befristung: befristung,
             });
           } else {
             const klassenZuordnungen: InternalZuordnung[] = currentZuordnungen.filter(
@@ -279,7 +280,7 @@ export const useBulkOperationStore: StoreDefinition<
                 organisationId: klasse.organisationId,
                 rolleId: selectedRolleId,
                 administriertVon: selectedOrganisation.id,
-                befristung: klasse.befristung, // preserve if exists
+                befristung: befristung,
               });
             }
           }
@@ -297,7 +298,7 @@ export const useBulkOperationStore: StoreDefinition<
 
           const combinedZuordnungen: PersonenkontextUpdate[] = [
             ...filteredCurrentZuordnungen,
-            ...newZuordnungen.map((z) => ({ ...z })), // deep copy
+            ...newZuordnungen.map((z: InternalZuordnung) => ({ ...z })), // deep copy
           ].map(({ organisationId, rolleId, befristung: b }: PersonenkontextUpdate) => ({
             organisationId,
             rolleId,

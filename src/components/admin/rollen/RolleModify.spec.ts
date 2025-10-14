@@ -56,8 +56,6 @@ beforeEach(async () => {
       isLoading: false,
       errorCode: '',
       isDialogVisible: true,
-      isRolleModify: true,
-      isRolleUnassignForm: false,
       selectedPersonen: new Map([
         ['test', new PersonWithZuordnungen(person, [DoFactory.getZuordnung({ sskName: '1a' })])],
       ]),
