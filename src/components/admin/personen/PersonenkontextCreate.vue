@@ -463,7 +463,6 @@
       </FormRow>
       <v-row
         v-if="isLernRolle(selectedRolle) && isRolleModify"
-        labelForId="klasse-select"
         :label="$t('admin.klasse.klasse')"
         :isRequired="true"
         class="mt-8"

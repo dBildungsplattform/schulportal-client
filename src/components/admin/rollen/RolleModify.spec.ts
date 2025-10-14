@@ -5,7 +5,7 @@ import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/Per
 import { RollenArt, RollenMerkmal } from '@/stores/RolleStore';
 import type { Person } from '@/stores/types/Person';
 import { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
-import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
+import { DOMWrapper, VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import { DoFactory } from 'test/DoFactory';
 import { test, type MockInstance } from 'vitest';
 import { nextTick } from 'vue';
@@ -22,6 +22,11 @@ const organisation: OrganisationResponseLegacy = DoFactory.getOrganisationenResp
 const rolle: RolleResponse = DoFactory.getRolleResponse({
   administeredBySchulstrukturknoten: organisation.id,
   rollenart: RollenArt.Lehr,
+});
+
+const rolleLern: RolleResponse = DoFactory.getRolleResponse({
+  administeredBySchulstrukturknoten: organisation.id,
+  rollenart: RollenArt.Lern,
 });
 
 const kopersRolle: RolleResponse = DoFactory.getRolleResponse({
@@ -51,6 +56,8 @@ beforeEach(async () => {
       isLoading: false,
       errorCode: '',
       isDialogVisible: true,
+      isRolleModify: true,
+      isRolleUnassignForm: false,
       selectedPersonen: new Map([
         ['test', new PersonWithZuordnungen(person, [DoFactory.getZuordnung({ sskName: '1a' })])],
       ]),
@@ -70,6 +77,12 @@ beforeEach(async () => {
           title: kopersRolle.name,
           merkmale: kopersRolle.merkmale,
           rollenart: kopersRolle.rollenart,
+        },
+        {
+          value: rolleLern.id,
+          title: rolleLern.name,
+          merkmale: rolleLern.merkmale,
+          rollenart: rolleLern.rollenart,
         },
       ],
     },
@@ -264,5 +277,37 @@ describe('RolleModify', () => {
 
     const errorDialog: VueWrapper | undefined = wrapper?.findComponent({ name: 'PersonBulkError' });
     expect(errorDialog?.exists()).toBe(true);
+  });
+
+  it('handles klassen option changes', async () => {
+    const organisationAutocomplete: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'personenkontext-create' })
+      .findComponent({ ref: 'schulenFilter' })
+      .findComponent({ ref: 'personenkontext-create-organisation-select' });
+    await organisationAutocomplete?.setValue(organisation.id);
+    organisationAutocomplete?.vm.$emit('update:search', organisation.id);
+    await nextTick();
+
+    const rolleAutocomplete: VueWrapper | undefined = wrapper
+      ?.findComponent({ ref: 'personenkontext-create' })
+      .findComponent({ ref: 'rolle-select' });
+    await rolleAutocomplete?.setValue(rolleLern.id);
+    rolleAutocomplete?.vm.$emit('update:search', rolleLern.id);
+    await nextTick();
+
+    const keepKlasseRadioButton: DOMWrapper<HTMLInputElement> | undefined = wrapper
+      ?.findComponent({ ref: 'personenkontext-create' })
+      .find('[data-testid="keep-klasse-radio-button"] input[type="radio"]');
+    const changeKlasseRadioButton: DOMWrapper<HTMLInputElement> | undefined = wrapper
+      ?.findComponent({ ref: 'personenkontext-create' })
+      .find('[data-testid="select-new-klasse-radio-button"] input[type="radio"]');
+
+    expect(keepKlasseRadioButton?.element.checked).toBe(true);
+
+    await changeKlasseRadioButton?.trigger('click');
+    await nextTick();
+
+    expect(keepKlasseRadioButton?.element.checked).toBe(false);
+    expect(changeKlasseRadioButton?.element.checked).toBe(true);
   });
 });
