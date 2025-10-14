@@ -461,14 +461,22 @@
           parentId="personenkontext-create"
         />
       </FormRow>
-      <FormRow
+      <v-row
         v-if="isLernRolle(selectedRolle) && isRolleModify"
         labelForId="klasse-select"
         :label="$t('admin.klasse.klasse')"
         :isRequired="true"
+        class="mt-8"
       >
         <v-col
-          class="py-0 mt-n1"
+          class="pb-sm-8 pt-sm-3 text-sm-right"
+          cols="12"
+          sm="5"
+        >
+          <label>{{ $t('admin.klasse.klasse') }}*</label>
+        </v-col>
+        <v-col
+          class="py-0 mt-2"
           cols="12"
           sm="7"
         >
@@ -493,7 +501,7 @@
             ></v-radio>
           </v-radio-group>
         </v-col>
-      </FormRow>
+      </v-row>
       <!-- Klasse zuordnen for RolleModify -->
       <FormRow
         v-if="
@@ -505,6 +513,7 @@
         "
         :errorLabel="selectedKlasseProps?.['error'] || false"
         labelForId="klasse-select"
+        class="mt-n4"
       >
         <KlassenFilter
           :multiple="false"
