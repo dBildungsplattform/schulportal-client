@@ -462,18 +462,29 @@ describe('BulkOperationStore', () => {
       expect(bulkOperationStore.currentOperation?.progress).toBe(100);
       expect(bulkOperationStore.currentOperation?.successMessage).toBe('admin.rolle.rollenAssignedSuccessfully');
       expect(bulkOperationStore.currentOperation?.errors).toEqual(new Map());
+
       mockPersonResponses.forEach((response: DBiamPersonenuebersichtResponse) => {
         const personId: string = response.personId;
         const correctBefristung: string = isBefore(response.zuordnungen[0]!.befristung!, befristung)
           ? response.zuordnungen[0]!.befristung!
           : befristung;
-        expect(spy).toHaveBeenCalledWith(
-          [
-            ...response.zuordnungen.map((zuordnung: DBiamPersonenzuordnungResponse) => ({
+
+        // Filter out old zuordnungen that will be replaced by the new one (same orgId + rolleId)
+        const otherZuordnungen: Array<{ organisationId: string; rolleId: string; befristung?: string }> =
+          response.zuordnungen
+            .filter(
+              (z: DBiamPersonenzuordnungResponse) =>
+                !(z.sskId === selectedOrganisationId && z.rolleId === selectedRolleId),
+            )
+            .map((zuordnung: DBiamPersonenzuordnungResponse) => ({
               organisationId: zuordnung.sskId,
               rolleId: zuordnung.rolleId,
               befristung: zuordnung.befristung ?? undefined,
-            })),
+            }));
+
+        expect(spy).toHaveBeenCalledWith(
+          [
+            ...otherZuordnungen,
             {
               befristung: correctBefristung,
               organisationId: selectedOrganisationId,

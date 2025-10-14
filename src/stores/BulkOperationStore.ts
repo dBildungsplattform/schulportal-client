@@ -1,7 +1,7 @@
 import { OrganisationsTyp, PersonenApiFactory, RollenArt, type PersonenApiInterface } from '@/api-client/generated';
 import axiosApiInstance from '@/services/ApiService';
 import { getResponseErrorCode } from '@/utils/errorHandlers';
-import { isBefore } from 'date-fns';
+import { isBefore, parseISO } from 'date-fns';
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import type { Organisation } from './OrganisationStore';
 import {
@@ -243,11 +243,12 @@ export const useBulkOperationStore: StoreDefinition<
             organisationId: selectedOrganisation.id,
             rolleId: selectedRolleId,
           };
-
           if (befristung) {
+            const parsedNew: Date = parseISO(befristung);
             orgaZuordnung.befristung = currentZuordnungen.reduce((earliest: string, z: InternalZuordnung) => {
               if (z.organisationId === selectedOrganisation.id && z.befristung) {
-                return isBefore(z.befristung, earliest) ? z.befristung : earliest;
+                const parsedOld: Date = parseISO(z.befristung);
+                return isBefore(parsedOld, parsedNew) ? z.befristung : befristung;
               }
               return earliest;
             }, befristung);
@@ -276,21 +277,23 @@ export const useBulkOperationStore: StoreDefinition<
             }
           }
 
+          // --- Filter out old zuordnungen that match new ones, then combine ---
+          const filteredCurrentZuordnungen: InternalZuordnung[] = currentZuordnungen.filter(
+            (current: InternalZuordnung) =>
+              !newZuordnungen.some(
+                (neu: InternalZuordnung) =>
+                  neu.organisationId === current.organisationId && neu.rolleId === current.rolleId,
+              ),
+          );
+
           // --- remove administriertVon before sending ---
-          const combinedZuordnungen: PersonenkontextUpdate[] = [...currentZuordnungen, ...newZuordnungen]
-            .map(({ organisationId, rolleId, befristung: b }: PersonenkontextUpdate) => ({
+          const combinedZuordnungen: PersonenkontextUpdate[] = [...filteredCurrentZuordnungen, ...newZuordnungen].map(
+            ({ organisationId, rolleId, befristung: b }: PersonenkontextUpdate) => ({
               organisationId,
               rolleId,
               befristung: b,
-            }))
-            .filter(
-              (zuordnung: InternalZuordnung, index: number, self: InternalZuordnung[]) =>
-                index ===
-                self.findIndex(
-                  (z: InternalZuordnung) =>
-                    z.organisationId === zuordnung.organisationId && z.rolleId === zuordnung.rolleId,
-                ),
-            );
+            }),
+          );
 
           await personenkontextStore.updatePersonenkontexte(combinedZuordnungen, personId);
 
