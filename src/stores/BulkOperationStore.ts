@@ -12,6 +12,7 @@ import {
 } from './PersonenkontextStore';
 import { usePersonStore, type PersonStore } from './PersonStore';
 import { Zuordnung } from './types/Zuordnung';
+import type { PersonenUebersicht } from './types/PersonenUebersicht';
 
 const personenApi: PersonenApiInterface = PersonenApiFactory(undefined, '', axiosApiInstance);
 
@@ -211,6 +212,7 @@ export const useBulkOperationStore: StoreDefinition<
       const selectedOrganisation: Organisation | undefined = workflowStepResponseOrganisations.find(
         (orga: Organisation) => orga.id === selectedOrganisationId,
       );
+
       if (!selectedOrganisation) return;
 
       await this.processPersonOperation(
@@ -219,6 +221,8 @@ export const useBulkOperationStore: StoreDefinition<
         async (personId: string) => {
           personStore.errorCode = '';
           personenkontextStore.errorCode = '';
+
+          // Fetch person data
           await personStore.getPersonenuebersichtById(personId);
 
           if (personStore.errorCode) {
@@ -226,15 +230,22 @@ export const useBulkOperationStore: StoreDefinition<
             return;
           }
 
+          // CRITICAL: Capture the current user's data immediately to avoid race conditions
+          if (!personStore.personenuebersicht) {
+            this.currentOperation?.errors.set(personId, 'PERSON_DATA_NOT_FOUND');
+            return;
+          }
+          const currentPersonData: PersonenUebersicht = personStore.personenuebersicht;
+
           type InternalZuordnung = PersonenkontextUpdate & { administriertVon?: string };
 
-          const currentZuordnungen: InternalZuordnung[] =
-            personStore.personenuebersicht?.zuordnungen.map((z: Zuordnung) => ({
-              organisationId: z.sskId,
-              rolleId: z.rolleId,
-              befristung: z.befristung ?? undefined,
-              administriertVon: z.administriertVon,
-            })) || [];
+          // Use the captured data instead of the store reference
+          const currentZuordnungen: InternalZuordnung[] = currentPersonData.zuordnungen.map((z: Zuordnung) => ({
+            organisationId: z.sskId,
+            rolleId: z.rolleId,
+            befristung: z.befristung ?? undefined,
+            administriertVon: z.administriertVon,
+          }));
 
           const newZuordnungen: InternalZuordnung[] = [];
 
@@ -243,6 +254,7 @@ export const useBulkOperationStore: StoreDefinition<
             organisationId: selectedOrganisation.id,
             rolleId: selectedRolleId,
           };
+
           if (befristung) {
             const parsedNew: Date = parseISO(befristung);
             orgaZuordnung.befristung = currentZuordnungen.reduce((earliest: string, z: InternalZuordnung) => {
@@ -264,6 +276,7 @@ export const useBulkOperationStore: StoreDefinition<
               administriertVon: selectedOrganisation.id,
             });
           } else {
+            // Find all classes administered by the selected organisation FOR THIS SPECIFIC USER
             const klassenZuordnungen: InternalZuordnung[] = currentZuordnungen.filter(
               (z: InternalZuordnung) => z.administriertVon === selectedOrganisation.id,
             );
