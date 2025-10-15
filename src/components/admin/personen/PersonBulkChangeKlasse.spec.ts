@@ -7,12 +7,12 @@ import { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
 import type { Zuordnung } from '@/stores/types/Zuordnung';
 import { faker } from '@faker-js/faker';
 import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
-import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
 import { DoFactory } from 'test/DoFactory';
 import type { MockInstance } from 'vitest';
 import { nextTick } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import PersonBulkChangeKlasse from './PersonBulkChangeKlasse.vue';
+import type WrapperLike from 'node_modules/@vue/test-utils/dist/interfaces/wrapperLike';
 
 let router: Router;
 const bulkOperationStore: BulkOperationStore = useBulkOperationStore();

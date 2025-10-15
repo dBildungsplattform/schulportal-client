@@ -4,12 +4,7 @@
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { useMasterDataStore, type MasterDataStore } from '@/stores/MasterDataStore';
-  import {
-    OrganisationsTyp,
-    useOrganisationStore,
-    type Organisation,
-    type OrganisationStore,
-  } from '@/stores/OrganisationStore';
+  import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
   import {
     RollenArt,
     RollenMerkmal,
@@ -22,6 +17,7 @@
   import {
     useServiceProviderStore,
     type ServiceProvider,
+    type ServiceProviderIdNameResponse,
     type ServiceProviderStore,
   } from '@/stores/ServiceProviderStore';
   import { type TranslatedObject } from '@/types.d';
@@ -76,8 +72,6 @@
     selectedSystemRechte,
     selectedSystemRechteProps,
   }: RolleFieldDefinitions = getRolleFieldDefinitions(formContext);
-
-  const hasAutoselectedAdministrationsebene: Ref<boolean> = ref(false);
 
   const isFormDirty: ComputedRef<boolean> = computed(() => getDirtyState(formContext));
 
@@ -151,7 +145,7 @@
     }
 
     return rolleStore.createdRolle.serviceProviders
-      .map((serviceProvider: ServiceProvider) => {
+      .map((serviceProvider: ServiceProviderIdNameResponse) => {
         return serviceProvider.name;
       })
       .join(', ');
@@ -169,13 +163,6 @@
       .join(', ');
   });
 
-  const administrationsebenen: ComputedRef<TranslatedObject[]> = computed(() =>
-    organisationStore.allOrganisationen.map((org: Organisation) => ({
-      value: org.id,
-      title: org.kennung ? `${org.kennung} (${org.name})` : org.name,
-    })),
-  );
-
   const serviceProviders: ComputedRef<TranslatedObject[]> = computed(() =>
     serviceProviderStore.allServiceProviders.map((provider: ServiceProvider) => ({
       value: provider.id,
@@ -191,14 +178,6 @@
     event.returnValue = '';
   }
 
-  async function autoselectAdministrationsebene(): Promise<void> {
-    // Autoselect the Orga for the current user that only has 1 Orga assigned to him.
-    if (organisationStore.allOrganisationen.length === 1) {
-      selectedAdministrationsebene.value = organisationStore.allOrganisationen[0]?.id || '';
-      hasAutoselectedAdministrationsebene.value = true;
-    }
-  }
-
   onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
     if (isFormDirty.value) {
       showUnsavedChangesDialog.value = true;
@@ -211,12 +190,6 @@
 
   onMounted(async () => {
     rolleStore.createdRolle = null;
-    await organisationStore.getAllOrganisationen({
-      systemrechte: ['ROLLEN_VERWALTEN'],
-      excludeTyp: [OrganisationsTyp.Klasse],
-      limit: 25,
-    });
-    await autoselectAdministrationsebene();
     await serviceProviderStore.getAllServiceProviders();
 
     // Iterate over the enum values
@@ -308,7 +281,6 @@
       <!-- The form to create a new Rolle -->
       <template v-if="!rolleStore.createdRolle">
         <RolleForm
-          :administrationsebenen="administrationsebenen"
           :errorCode="rolleStore.errorCode"
           :onHandleConfirmUnsavedChanges="handleConfirmUnsavedChanges"
           :onHandleDiscard="navigateToRolleManagement"
@@ -334,7 +306,6 @@
           :translatedRollenarten="translatedRollenarten"
           :translatedMerkmale="translatedMerkmale"
           :translatedSystemrechte="translatedSystemrechte"
-          :hasAutoselectedAdministrationsebene="hasAutoselectedAdministrationsebene"
         >
           <!-- Error Message Display if error on submit -->
           <!-- To trigger unsaved changes dialog the alert has to be inside the form wrapper -->

@@ -256,7 +256,8 @@ async function fillForm(args: Partial<FormFields>): Promise<Partial<FormSelector
 
   const organisationsebeneSelect: VueWrapper | undefined = wrapper
     ?.findComponent({ ref: 'personenkontext-create' })
-    .findComponent({ ref: 'organisation-select' });
+    .findComponent({ ref: 'schulenFilter' })
+    .findComponent({ ref: 'personenkontext-create-organisation-select' });
   expect(organisationsebeneSelect?.exists()).toBe(true);
 
   await organisationsebeneSelect?.setValue(organisationsebene);
@@ -379,7 +380,8 @@ describe('PersonCreationView', () => {
   it('emits update:calculatedBefristungOption event with a value', async () => {
     const organisationSelect: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
-      .findComponent({ ref: 'organisation-select' });
+      .findComponent({ ref: 'schulenFilter' })
+      .findComponent({ ref: 'personenkontext-create-organisation-select' });
     await organisationSelect?.setValue('9876');
     await nextTick();
 
@@ -407,7 +409,8 @@ describe('PersonCreationView', () => {
   it('emits update:calculatedBefristungOption event with no value', async () => {
     const organisationSelect: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
-      .findComponent({ ref: 'organisation-select' });
+      .findComponent({ ref: 'schulenFilter' })
+      .findComponent({ ref: 'personenkontext-create-organisation-select' });
     await organisationSelect?.setValue('9876');
     await nextTick();
 
@@ -474,7 +477,8 @@ describe('PersonCreationView', () => {
 
     const organisationSelect: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
-      .findComponent({ ref: 'organisation-select' });
+      .findComponent({ ref: 'schulenFilter' })
+      .findComponent({ ref: 'personenkontext-create-organisation-select' });
     await organisationSelect?.setValue('9876');
     await nextTick();
 
@@ -554,7 +558,8 @@ describe('PersonCreationView', () => {
 
     const organisationSelect: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
-      .findComponent({ ref: 'organisation-select' });
+      .findComponent({ ref: 'schulenFilter' })
+      .findComponent({ ref: 'personenkontext-create-organisation-select' });
     await organisationSelect?.setValue('9876');
     await nextTick();
 
@@ -667,7 +672,8 @@ describe('PersonCreationView', () => {
 
     const organisationSelect: VueWrapper | undefined = wrapper
       .findComponent({ ref: 'personenkontext-create' })
-      .findComponent({ ref: 'organisation-select' });
+      .findComponent({ ref: 'schulenFilter' })
+      .findComponent({ ref: 'personenkontext-create-organisation-select' });
     await organisationSelect.setValue(organisationId);
     await nextTick();
 

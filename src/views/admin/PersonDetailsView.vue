@@ -1650,20 +1650,22 @@
       <template v-if="!personStore.errorCode && !personenkontextStore.errorCode">
         <v-container class="personal-info">
           <div v-if="personStore.currentPerson?.person && !isEditPersonMetadataActive">
-            <v-row class="ml-md-16">
+            <v-row
+              id="personal-info-row"
+              class="ml-md-16"
+            >
               <v-col>
                 <!-- Vorname -->
-                <v-row class="mt-4">
+                <v-row class="mt-4 align-center">
                   <v-col
-                    class="text-right"
+                    class="d-flex align-center justify-end"
                     sm="3"
                     cols="5"
-                    offset="1"
                   >
                     <span class="subtitle-2">{{ t('person.firstName') }}:</span>
                   </v-col>
                   <v-col
-                    class="d-flex align-start mt-1"
+                    class="d-flex align-center"
                     data-testid="person-vorname"
                   >
                     <span class="text-body text-break">{{ personStore.currentPerson.person.name.vorname }}</span>
@@ -1671,17 +1673,16 @@
                 </v-row>
 
                 <!-- Familienname -->
-                <v-row class="mt-0">
+                <v-row class="mt-0 align-center">
                   <v-col
-                    class="text-right"
+                    class="d-flex align-center justify-end"
                     sm="3"
                     cols="5"
-                    offset="1"
                   >
                     <span class="subtitle-2">{{ t('person.lastName') }}:</span>
                   </v-col>
                   <v-col
-                    class="d-flex align-start mt-1"
+                    class="d-flex align-center"
                     data-testid="person-familienname"
                   >
                     <span class="text-body text-break">{{ personStore.currentPerson.person.name.familienname }}</span>
@@ -1689,17 +1690,16 @@
                 </v-row>
 
                 <!-- Benutzername -->
-                <v-row class="mt-0">
+                <v-row class="mt-0 align-center">
                   <v-col
-                    class="text-right"
+                    class="d-flex align-center justify-end"
                     sm="3"
                     cols="5"
-                    offset="1"
                   >
                     <span class="subtitle-2">{{ t('person.userName') }}:</span>
                   </v-col>
                   <v-col
-                    class="d-flex align-start mt-1"
+                    class="d-flex align-center"
                     data-testid="person-username"
                   >
                     <span class="text-body text-break">{{ personStore.currentPerson.person.referrer }}</span>
@@ -1708,14 +1708,13 @@
 
                 <!-- KoPers.-Nr. -->
                 <v-row
-                  class="mt-0"
+                  class="mt-0 align-center"
                   v-if="hasKopersRolle || personStore.currentPerson.person.personalnummer"
                 >
                   <v-col
-                    class="text-right"
+                    class="d-flex align-center justify-end"
                     sm="3"
                     cols="5"
-                    offset="1"
                   >
                     <span
                       :class="{
@@ -1727,7 +1726,7 @@
                     </span>
                   </v-col>
                   <v-col
-                    class="d-flex align-start"
+                    class="d-flex align-center"
                     data-testid="person-kopersnr"
                   >
                     <span
@@ -1735,7 +1734,6 @@
                         'text-body': true,
                         'text-red': hasKopersRolle && !personStore.currentPerson.person.personalnummer,
                         'text-break': true,
-                        'mt-1': true,
                       }"
                     >
                       {{ personStore.currentPerson.person.personalnummer ?? t('missing') }}
@@ -1746,27 +1744,23 @@
                 <!-- Email -->
                 <v-row
                   v-if="emailStatusText.text !== t('person.emailStatusUnknown')"
-                  class="mt-0"
+                  class="mt-0 align-center"
                 >
                   <v-col
-                    class="text-right"
+                    class="d-flex align-center justify-end"
                     sm="3"
                     cols="5"
-                    offset="1"
                   >
                     <span class="subtitle-2">{{ t('person.email') }}:</span>
                   </v-col>
-                  <v-col
-                    class="d-flex align-start"
-                    data-testid="person-email"
-                  >
+                  <v-col data-testid="person-email">
                     <SpshTooltip
                       :enabledCondition="!!personStore.currentPerson.person.email"
                       :disabledText="t('person.changePersonMetaDataDisabledDescription')"
                       :enabledText="emailStatusText.tooltip"
                       position="bottom"
                     >
-                      <div class="d-flex align-start">
+                      <div class="d-flex align-center">
                         <v-icon
                           aria-hidden="true"
                           class="mr-2 flex-shrink-0 mt-1"
@@ -1775,7 +1769,7 @@
                         ></v-icon>
                         <span
                           data-testid="person-email-text"
-                          class="text-body text-break mt-1"
+                          class="text-body text-break"
                         >
                           {{ emailStatusText.text }}
                         </span>
@@ -1838,7 +1832,8 @@
               @update:selectedKopersNrMetadata="handleSelectedKopersNrUpdate"
               @update:selectedVorname="handleSelectedVorname"
               @update:selectedFamilienname="handleSelectedFamilienname"
-            ></PersonenMetadataChange>
+            >
+            </PersonenMetadataChange>
             <v-row class="save-cancel-row ml-md-16 pt-md-5 pt-12 justify-end">
               <v-col
                 class="cancel-col px-5"
@@ -1890,7 +1885,12 @@
         <v-container class="password-reset">
           <v-row class="ml-md-16">
             <v-col>
-              <h3 class="subtitle-1">{{ t('person.password') }}</h3>
+              <h3
+                class="subtitle-1"
+                data-testid="password-reset-section-headline"
+              >
+                {{ t('person.password') }}
+              </h3>
             </v-col>
             <v-col
               class="mr-lg-13"
@@ -1940,7 +1940,12 @@
             </v-col>
             <template v-else>
               <v-col>
-                <h3 class="subtitle-1">{{ t('person.zuordnungen') }}</h3>
+                <h3
+                  class="subtitle-1"
+                  data-testid="zuordnungen-section-headline"
+                >
+                  {{ t('person.zuordnungen') }}
+                </h3>
 
                 <!-- Check if 'zuordnungen' array exists and has length > 0 -->
                 <template
@@ -2029,7 +2034,12 @@
                 cols="12"
                 sm="auto"
               >
-                <h3 class="subtitle-1">{{ t('person.checkAndSave') }}:</h3>
+                <h3
+                  class="subtitle-1"
+                  data-testid="check-and-save-headline"
+                >
+                  {{ t('person.checkAndSave') }}:
+                </h3>
               </v-col>
               <v-col
                 cols="12"
@@ -2519,7 +2529,12 @@
               </v-col>
               <template v-else>
                 <v-col>
-                  <h3 class="subtitle-1">{{ t('admin.person.twoFactorAuthentication.header') }}</h3>
+                  <h3
+                    class="subtitle-1"
+                    data-testid="two-factor-section-headline"
+                  >
+                    {{ t('admin.person.twoFactorAuthentication.header') }}
+                  </h3>
                   <v-row class="mt-4 text-body">
                     <v-col
                       class="text-right"
@@ -2569,10 +2584,16 @@
                         </v-row>
                       </template>
                       <template v-else-if="twoFactorAuthentificationStore.hasToken">
-                        <p v-if="twoFactorAuthentificationStore.tokenKind === TokenKind.software">
+                        <p
+                          v-if="twoFactorAuthentificationStore.tokenKind === TokenKind.software"
+                          data-testid="software-factor-setup-text"
+                        >
                           {{ t('admin.person.twoFactorAuthentication.softwareTokenIsSetUp') }}
                         </p>
-                        <p v-if="twoFactorAuthentificationStore.tokenKind === TokenKind.hardware">
+                        <p
+                          v-if="twoFactorAuthentificationStore.tokenKind === TokenKind.hardware"
+                          data-testid="hardware-factor-setup-text"
+                        >
                           {{ t('admin.person.twoFactorAuthentication.hardwareTokenIsSetUp') }}
                         </p>
                         <p
@@ -2607,10 +2628,16 @@
                       <p v-if="twoFactorAuthentificationStore.hasToken && !twoFactorAuthentificationStore.required">
                         {{ t('admin.person.twoFactorAuthentication.noLongerNeedToken') }}
                       </p>
-                      <p v-else-if="twoFactorAuthentificationStore.hasToken">
+                      <p
+                        v-else-if="twoFactorAuthentificationStore.hasToken"
+                        data-testid="two-factor-reset-info-text"
+                      >
                         {{ t('admin.person.twoFactorAuthentication.resetInfo') }}
                       </p>
-                      <p v-if="!twoFactorAuthentificationStore.hasToken">
+                      <p
+                        v-if="!twoFactorAuthentificationStore.hasToken"
+                        data-testid="two-factor-not-setup-text"
+                      >
                         {{ t('admin.person.twoFactorAuthentication.notSetUp') }}
                       </p>
                     </div>
@@ -2677,7 +2704,12 @@
         <v-container data-testid="person-lock">
           <v-row class="ml-md-16">
             <v-col data-testid="person-lock-info">
-              <h3 class="subtitle-1">{{ t('admin.person.status') }}</h3>
+              <h3
+                class="subtitle-1"
+                data-testid="status-section-headline"
+              >
+                {{ t('admin.person.status') }}
+              </h3>
               <template v-if="!personStore.loading">
                 <v-row class="mt-4 text-body">
                   <v-col
@@ -2694,7 +2726,7 @@
                     ></v-icon>
                   </v-col>
                   <v-col cols="10">
-                    <span>
+                    <span data-testid="user-lock-status-text">
                       {{
                         personStore.currentPerson?.person.userLock &&
                         personStore.currentPerson.person.userLock?.length > 0
@@ -2822,7 +2854,12 @@
         >
           <v-row class="ml-md-16">
             <v-col data-testid="device-password-info">
-              <h3 class="subtitle-1">{{ t('admin.person.devicePassword.header') }}</h3>
+              <h3
+                class="subtitle-1"
+                data-testid="device-password-section-headline"
+              >
+                {{ t('admin.person.devicePassword.header') }}
+              </h3>
               <template v-if="!personStore.loading">
                 <v-row class="mt-4 text-body">
                   <v-col
@@ -2976,7 +3013,7 @@
                 class="text-center"
                 cols="12"
               >
-                <span>{{ t('person.changeKlasseSuccess') }}</span>
+                <span data-testid="change-klasse-success-dialog-text">{{ t('person.changeKlasseSuccess') }}</span>
               </v-col>
             </v-row>
           </v-container>
@@ -2991,7 +3028,7 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary"
-                data-testid="change-klasse-success-close"
+                data-testid="change-klasse-success-dialog-close-button"
                 @click.stop="closeChangeKlasseSuccessDialog"
               >
                 {{ t('close') }}
@@ -3157,7 +3194,9 @@
           <v-container>
             <v-row class="text-body text-center bold">
               <v-col cols="12">
-                <span>{{ changeKlasseConfirmationDialogMessage }}</span>
+                <span data-testid="change-klasse-confirmation-dialog-text">{{
+                  changeKlasseConfirmationDialogMessage
+                }}</span>
               </v-col>
             </v-row>
           </v-container>
@@ -3419,6 +3458,13 @@
 
     .cancel-col {
       margin-bottom: -15px;
+    }
+  }
+
+  @media only screen and (min-width: 1280px) and (max-width: 1600px) {
+    #personal-info-row {
+      flex-direction: column;
+      margin-left: 0px !important;
     }
   }
 

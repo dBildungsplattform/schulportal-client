@@ -431,17 +431,28 @@
           <v-col
             cols="12"
             sm="3"
-            class="d-flex align-start ml-n5"
           >
-            <v-icon
-              aria-hidden="true"
-              class="mr-2"
-              icon="mdi-alert-circle-outline"
-              size="small"
-            ></v-icon>
-            <span class="text-body bold">
-              {{ t('admin.person.stateEmployeeSearch.searchMethodNotice') }}
-            </span>
+            <v-row>
+              <v-col
+                cols="1"
+                class="mr-2"
+              >
+                <v-icon
+                  aria-hidden="true"
+                  icon="mdi-alert-circle-outline"
+                  size="small"
+                  :start="true"
+                ></v-icon>
+              </v-col>
+              <v-col
+                cols="10"
+                sm="9"
+              >
+                <span class="text-body bold hyphenate">
+                  {{ t('admin.person.stateEmployeeSearch.searchMethodNotice') }}
+                </span>
+              </v-col>
+            </v-row>
           </v-col>
 
           <!-- Radio Group and Inputs Column -->

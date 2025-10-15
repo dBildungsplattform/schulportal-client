@@ -86,8 +86,10 @@
   });
 
   const translatedProviderNames: ComputedRef<TranslatedObject[]> = computed(() => {
-    const serviceProviders: Array<ServiceProvider> = Array.from(rolleStore.currentRolle?.serviceProviders || []);
-    return serviceProviders.map((provider: ServiceProvider) => ({
+    const serviceProviders: Array<ServiceProviderIdNameResponse> = Array.from(
+      rolleStore.currentRolle?.serviceProviders || [],
+    );
+    return serviceProviders.map((provider: ServiceProviderIdNameResponse) => ({
       value: provider.id,
       title: provider.name,
     }));
@@ -425,7 +427,7 @@
                     <v-btn
                       class="primary"
                       data-testid="rolle-edit-button"
-                      @Click="activateEditing"
+                      @click="activateEditing"
                       :block="mdAndDown"
                     >
                       {{ $t('edit') }}

@@ -2,7 +2,7 @@ import { mount, VueWrapper } from '@vue/test-utils';
 import { expect, test, describe, vi, beforeEach } from 'vitest';
 import NoSecondFactor from './NoSecondFactorView.vue';
 import type { Mock } from 'vitest';
-import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
+import type WrapperLike from 'node_modules/@vue/test-utils/dist/interfaces/wrapperLike';
 import { nextTick } from 'vue';
 
 let wrapper: VueWrapper | null = null;

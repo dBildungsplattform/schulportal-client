@@ -5,7 +5,7 @@ import { RollenMerkmal, useRolleStore, type RolleStore } from '@/stores/RolleSto
 import { nextTick } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import routes from '@/router/routes';
-import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
+import type WrapperLike from 'node_modules/@vue/test-utils/dist/interfaces/wrapperLike';
 import type { SystemRechtResponse } from '@/api-client/generated';
 import { RollenSystemRechtEnum } from '../../../api-client/generated/api';
 

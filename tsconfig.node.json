@@ -10,7 +10,7 @@
   ],
   "compilerOptions": {
     "composite": true,
-    "module": "ESNext",
+    "module": "ES2020",
     "moduleResolution": "Bundler",
     "types": ["node"],
     "paths": {

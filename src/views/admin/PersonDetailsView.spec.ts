@@ -746,7 +746,8 @@ describe('PersonDetailsView', () => {
     // Set organisation value
     const organisationAutocomplete: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
-      .findComponent({ ref: 'organisation-select' });
+      .findComponent({ ref: 'schulenFilter' })
+      .findComponent({ ref: 'personenkontext-create-organisation-select' });
     await organisationAutocomplete?.setValue('O1');
     organisationAutocomplete?.vm.$emit('update:search', 'O1');
     await nextTick();
@@ -843,7 +844,8 @@ describe('PersonDetailsView', () => {
     // Set organisation value
     const organisationAutocomplete: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
-      .findComponent({ ref: 'organisation-select' });
+      .findComponent({ ref: 'schulenFilter' })
+      .findComponent({ ref: 'personenkontext-create-organisation-select' });
     await organisationAutocomplete?.setValue('O1');
     organisationAutocomplete?.vm.$emit('update:search', 'O1');
     await nextTick();
@@ -981,7 +983,7 @@ describe('PersonDetailsView', () => {
     await flushPromises();
 
     const closeSuccessButton: Element | null = document.body.querySelector(
-      '[data-testid="change-klasse-success-close"]',
+      '[data-testid="change-klasse-success-dialog-close-button"]',
     );
     expect(closeSuccessButton).not.toBeNull();
 
