@@ -17,7 +17,7 @@ describe('Zuordnung', () => {
 
     it('should set nullable fields', () => {
       const response: DBiamPersonenzuordnungResponse = DoFactory.getDBiamPersonenzuordnungResponse();
-      response.befristung = null;
+      response.befristung = '';
       response.admins = null;
       const zuordnung: Zuordnung = Zuordnung.fromResponse(response);
 

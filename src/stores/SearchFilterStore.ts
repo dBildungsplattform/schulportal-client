@@ -14,6 +14,8 @@ type SearchFilterState = {
   schulenPerPage: number;
   schultraegerPage: number;
   schulentraegerPerPage: number;
+  serviceProviderPage: number;
+  serviceProviderPerPage: number;
   searchFilterPersonen: string | null;
   searchFilterSchulen: string | null;
   selectedKlassen: Array<string> | null;
@@ -66,6 +68,8 @@ export const useSearchFilterStore: StoreDefinition<
     schulenPerPage: 30,
     schultraegerPage: 1,
     schulentraegerPerPage: 30,
+    serviceProviderPage: 1,
+    serviceProviderPerPage: 30,
     searchFilterPersonen: '',
     searchFilterSchulen: '',
     selectedKlassen: [],

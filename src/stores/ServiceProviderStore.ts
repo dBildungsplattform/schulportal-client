@@ -1,7 +1,14 @@
-import { defineStore, type Store, type StoreDefinition } from 'pinia';
-import { getResponseErrorCode } from '@/utils/errorHandlers';
-import { ProviderApiFactory, ServiceProviderKategorie, type ProviderApiInterface } from '../api-client/generated/api';
 import axiosApiInstance from '@/services/ApiService';
+import { getResponseErrorCode } from '@/utils/errorHandlers';
+import { defineStore, type Store, type StoreDefinition } from 'pinia';
+
+import {
+  ProviderApiFactory,
+  ServiceProviderKategorie,
+  ServiceProviderMerkmal,
+  type ProviderApiInterface,
+  type ProviderControllerGetManageableServiceProviders200Response,
+} from '../api-client/generated/api';
 
 const serviceProviderApi: ProviderApiInterface = ProviderApiFactory(undefined, '', axiosApiInstance);
 
@@ -16,6 +23,20 @@ export type ServiceProvider = {
   requires2fa: boolean;
 };
 
+export { ServiceProviderMerkmal };
+
+export type ManageableServiceProvider = {};
+export type ManageableServiceProviderListEntry = {
+  id: string;
+  kategorie: ServiceProviderKategorie;
+  name: string;
+  requires2fa: boolean;
+  merkmale: Array<ServiceProviderMerkmal>;
+  administrationsebene: { id: string; name: string; kennung?: string };
+  rollen: Array<{ id: string; name: string }>;
+  hasRollenerweiterung: boolean;
+};
+
 export type ServiceProviderIdNameResponse = {
   id: string;
   name: string;
@@ -24,6 +45,8 @@ export type ServiceProviderIdNameResponse = {
 type ServiceProviderState = {
   allServiceProviders: ServiceProvider[];
   availableServiceProviders: ServiceProvider[];
+  manageableServiceProviders: ManageableServiceProviderListEntry[];
+  totalManageableServiceProviders: number;
   errorCode: string;
   loading: boolean;
 };
@@ -32,6 +55,7 @@ type ServiceProviderGetters = {};
 type ServiceProviderActions = {
   getAllServiceProviders: () => Promise<void>;
   getAvailableServiceProviders: () => Promise<void>;
+  getManageableServiceProviders: (page: number, entriesPerPage: number) => Promise<void>;
 };
 
 export { ServiceProviderKategorie };
@@ -54,6 +78,8 @@ export const useServiceProviderStore: StoreDefinition<
     return {
       allServiceProviders: [],
       availableServiceProviders: [],
+      manageableServiceProviders: [],
+      totalManageableServiceProviders: 0,
       errorCode: '',
       loading: false,
     };
@@ -78,6 +104,24 @@ export const useServiceProviderStore: StoreDefinition<
         const { data }: { data: ServiceProvider[] } =
           await serviceProviderApi.providerControllerGetAvailableServiceProviders();
         this.availableServiceProviders = data;
+      } catch (error: unknown) {
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async getManageableServiceProviders(page: number, entriesPerPage: number) {
+      this.loading = true;
+      try {
+        const limit: number = entriesPerPage;
+        const offset: number = (page - 1) * entriesPerPage;
+        const response: ProviderControllerGetManageableServiceProviders200Response = (
+          await serviceProviderApi.providerControllerGetManageableServiceProviders(offset, limit)
+        ).data;
+        const { items, total }: ProviderControllerGetManageableServiceProviders200Response = response;
+        this.manageableServiceProviders = items;
+        this.totalManageableServiceProviders = total;
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {

@@ -943,8 +943,9 @@
             :title="item.rollen"
           >
             {{ item.rollen }}
-          </div> </template
-        ><template v-slot:[`item.administrationsebenen`]="{ item }">
+          </div>
+        </template>
+        <template v-slot:[`item.administrationsebenen`]="{ item }">
           <div
             class="ellipsis-wrapper"
             :title="item.administrationsebenen"
