@@ -285,16 +285,14 @@ export const useBulkOperationStore: StoreDefinition<
             }
           }
 
-          // --- Filter out old zuordnungen that match new ones, then deep copy ---
-          const filteredCurrentZuordnungen: InternalZuordnung[] = currentZuordnungen
-            .filter(
-              (current: InternalZuordnung) =>
-                !newZuordnungen.some(
-                  (neu: InternalZuordnung) =>
-                    neu.organisationId === current.organisationId && neu.rolleId === current.rolleId,
-                ),
-            )
-            .map((z: InternalZuordnung) => ({ ...z })); // deep copy
+          // --- Filter out old zuordnungen that match new ones ---
+          const filteredCurrentZuordnungen: InternalZuordnung[] = currentZuordnungen.filter(
+            (current: InternalZuordnung) =>
+              !newZuordnungen.some(
+                (neu: InternalZuordnung) =>
+                  neu.organisationId === current.organisationId && neu.rolleId === current.rolleId,
+              ),
+          );
 
           const combinedZuordnungen: PersonenkontextUpdate[] = [
             ...filteredCurrentZuordnungen,
