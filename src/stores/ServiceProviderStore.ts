@@ -56,7 +56,6 @@ type ServiceProviderActions = {
   getAllServiceProviders: () => Promise<void>;
   getAvailableServiceProviders: () => Promise<void>;
   getManageableServiceProviders: (page: number, entriesPerPage: number) => Promise<void>;
-  // getManageableServiceProviderById: (id: string) => Promise<void>;
 };
 
 export { ServiceProviderKategorie };
