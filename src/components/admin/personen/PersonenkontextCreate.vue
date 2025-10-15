@@ -471,46 +471,35 @@
           parentId="personenkontext-create"
         />
       </FormRow>
-      <v-row
+      <FormRow
         v-if="isLernRolle(selectedRolle) && rolleDialogMode === RolleDialogMode.MODIFY"
-        :label="$t('admin.klasse.klasse')"
+        :errorLabel="selectedKlasseProps?.['error'] || false"
         :isRequired="true"
-        class="mt-8"
+        :isForRolleModify="true"
+        labelForId="klasse-select"
+        :label="$t('admin.klasse.klasse')"
       >
-        <v-col
-          class="pb-sm-8 pt-sm-3 text-sm-right"
-          cols="12"
-          sm="5"
+        <v-radio-group
+          data-testid="klassen-option-radio-group"
+          ref="klassen-option-radio-group"
+          @update:modelValue="handleKlassenOption"
+          v-model="localKlassenOption"
+          v-bind="selectedKlassenOptionProps"
         >
-          <label>{{ $t('admin.klasse.klasse') }}*</label>
-        </v-col>
-        <v-col
-          class="py-0 mt-2"
-          cols="12"
-          sm="7"
-        >
-          <v-radio-group
-            data-testid="klassen-option-radio-group"
-            ref="klassen-option-radio-group"
-            @update:modelValue="handleKlassenOption"
-            v-model="localKlassenOption"
-            v-bind="selectedKlassenOptionProps"
-          >
-            <v-radio
-              data-testid="keep-klasse-radio-button"
-              :label="$t('admin.klasse.keepKlasse')"
-              :value="KlassenOption.KEEP_KLASSE"
-              color="primary"
-            ></v-radio>
-            <v-radio
-              data-testid="select-new-klasse-radio-button"
-              :label="$t('admin.klasse.selectAnotherKlasse')"
-              :value="KlassenOption.SELECT_NEW_KLASSE"
-              :color="'primary'"
-            ></v-radio>
-          </v-radio-group>
-        </v-col>
-      </v-row>
+          <v-radio
+            data-testid="keep-klasse-radio-button"
+            :label="$t('admin.klasse.keepKlasse')"
+            :value="KlassenOption.KEEP_KLASSE"
+            color="primary"
+          ></v-radio>
+          <v-radio
+            data-testid="select-new-klasse-radio-button"
+            :label="$t('admin.klasse.selectAnotherKlasse')"
+            :value="KlassenOption.SELECT_NEW_KLASSE"
+            :color="'primary'"
+          ></v-radio>
+        </v-radio-group>
+      </FormRow>
       <!-- Klasse zuordnen for RolleModify -->
       <FormRow
         v-if="

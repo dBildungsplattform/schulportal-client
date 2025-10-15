@@ -5,6 +5,7 @@
     isRequired?: boolean;
     labelForId: string;
     noTopMargin?: boolean;
+    isForRolleModify?: boolean;
   };
 
   defineProps<Props>();
@@ -13,7 +14,7 @@
 <template>
   <v-row :class="`${noTopMargin ? 'align-center' : 'align-center mt-8'}`">
     <v-col
-      class="py-0 pb-sm-8 pt-sm-3 text-sm-right"
+      :class="`${isForRolleModify ? 'pb-sm-8 pt-sm-3 text-sm-right mb-sm-10' : 'pb-sm-8 pt-sm-3 text-sm-right'}`"
       cols="12"
       sm="5"
     >

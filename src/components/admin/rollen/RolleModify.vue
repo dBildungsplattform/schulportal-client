@@ -75,7 +75,6 @@
       object({
         selectedRolle: string().required(t('admin.rolle.rules.rolle.required')),
         selectedOrganisation: string().required(t('admin.organisation.rules.organisation.required')),
-        // Optional at first, but validated dynamically
         selectedKlassenOption: string(),
         selectedKlasseForRadio: string().when('selectedKlassenOption', {
           is: (selectedKlassenOption: string) => selectedKlassenOption === KlassenOption.SELECT_NEW_KLASSE,
