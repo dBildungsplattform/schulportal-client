@@ -1,28 +1,27 @@
 import {
   OrganisationsTyp,
-  RollenMerkmal,
   type DBiamPersonenkontextResponse,
   type FindRollenResponse,
-  type SystemRechtResponse,
+  type RolleResponse,
 } from '@/api-client/generated';
 import ApiService from '@/services/ApiService';
 import { rejects } from 'assert';
 import MockAdapter from 'axios-mock-adapter';
 import { createPinia, setActivePinia } from 'pinia';
+import { DoFactory } from 'test/DoFactory';
+import type { Organisation } from './OrganisationStore';
 import {
+  OperationContext,
   usePersonenkontextStore,
   type PersonenkontexteUpdateResponse,
   type PersonenkontextStore,
-  type PersonenkontextWorkflowResponse,
   type PersonenkontextUpdate,
-  OperationContext,
+  type PersonenkontextWorkflowResponse,
   type WorkflowFilter,
 } from './PersonenkontextStore';
 import { usePersonStore, type PersonendatensatzResponse, type PersonStore } from './PersonStore';
-import { DoFactory } from 'test/DoFactory';
 import { PersonenUebersicht } from './types/PersonenUebersicht';
 import type { Zuordnung } from './types/Zuordnung';
-import type { Organisation } from './OrganisationStore';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 
@@ -272,20 +271,24 @@ describe('PersonenkontextStore', () => {
       ],
     };
 
-    it('should commit landesbedienstete kontext successfully', async () => {
-      mockadapter.onPut(`/api/landesbediensteter/${personId}`).replyOnce(200, mockUpdateResponse);
+    it.each([[new PersonenUebersicht(personId, '', '', '', null, [])], [person], [null]])(
+      'should commit landesbedienstete kontext successfully',
+      async (uebersicht: PersonenUebersicht | null) => {
+        personStore.personenuebersicht = uebersicht;
+        mockadapter.onPut(`/api/landesbediensteter/${personId}`).replyOnce(200, mockUpdateResponse);
 
-      const commitPromise: Promise<void> = personenkontextStore.commitLandesbediensteteKontext(
-        personId,
-        updatedPersonenkontexte,
-        personalnummer,
-      );
+        const commitPromise: Promise<void> = personenkontextStore.commitLandesbediensteteKontext(
+          personId,
+          updatedPersonenkontexte,
+          personalnummer,
+        );
 
-      expect(personenkontextStore.loading).toBe(true);
-      await commitPromise;
-      expect(personenkontextStore.landesbediensteteCommitResponse).toEqual(mockUpdateResponse);
-      expect(personenkontextStore.loading).toBe(false);
-    });
+        expect(personenkontextStore.loading).toBe(true);
+        await commitPromise;
+        expect(personenkontextStore.landesbediensteteCommitResponse).toEqual(mockUpdateResponse);
+        expect(personenkontextStore.loading).toBe(false);
+      },
+    );
 
     it('should handle string error', async () => {
       mockadapter.onPut(`/api/landesbediensteter/${personId}`).replyOnce(500, 'some error');
@@ -376,23 +379,10 @@ describe('PersonenkontextStore', () => {
 
   describe('getPersonenkontextRolleWithFilter', () => {
     it('should get filtered Rollen', async () => {
+      const moeglicheRollen: RolleResponse[] = [DoFactory.getRolleResponse(), DoFactory.getRolleResponse()];
       const mockResponse: FindRollenResponse = {
-        moeglicheRollen: [
-          {
-            id: 'string',
-            createdAt: '2024-03-24T16:35:32.711Z',
-            updatedAt: '2024-03-24T16:35:32.711Z',
-            name: 'string',
-            administeredBySchulstrukturknoten: 'string',
-            rollenart: 'LERN',
-            merkmale: ['BEFRISTUNG_PFLICHT'] as unknown as Set<RollenMerkmal>,
-            systemrechte: [{ name: 'ROLLEN_VERWALTEN', isTechnical: false }] as unknown as Set<SystemRechtResponse>,
-            administeredBySchulstrukturknotenName: 'Land SH',
-            administeredBySchulstrukturknotenKennung: '',
-            version: 1,
-          },
-        ],
-        total: 0,
+        moeglicheRollen,
+        total: moeglicheRollen.length,
       };
 
       mockadapter.onGet('/api/person-administration/rollen?rolleName=str&limit=2').replyOnce(200, mockResponse);
@@ -400,7 +390,24 @@ describe('PersonenkontextStore', () => {
         personenkontextStore.getPersonenkontextRolleWithFilter('str', 2);
       expect(personenkontextStore.loading).toBe(true);
       await getPersonenkontextRolleWithFilterPromise;
-      expect(personenkontextStore.filteredRollen).toEqual(mockResponse);
+      expect(personenkontextStore.filteredRollen?.moeglicheRollen).toEqual(
+        mockResponse.moeglicheRollen.map(
+          (rr: RolleResponse): Omit<RolleResponse, 'merkmale' | 'systemrechte'> =>
+            expect.objectContaining({
+              id: rr.id,
+              createdAt: rr.createdAt,
+              updatedAt: rr.updatedAt,
+              name: rr.name,
+              administeredBySchulstrukturknoten: rr.administeredBySchulstrukturknoten,
+              rollenart: rr.rollenart,
+              administeredBySchulstrukturknotenName: rr.administeredBySchulstrukturknotenName,
+              administeredBySchulstrukturknotenKennung: rr.administeredBySchulstrukturknotenKennung,
+              version: rr.version,
+            }),
+        ),
+      );
+      expect(personenkontextStore.filteredRollen?.total).toEqual(mockResponse.total);
+      expect(personenkontextStore.totalFilteredRollen).toEqual(moeglicheRollen.length);
       expect(personenkontextStore.loading).toBe(false);
     });
 

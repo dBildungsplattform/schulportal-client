@@ -1,6 +1,9 @@
+import type { ProviderControllerGetManageableServiceProviders200Response } from '@/api-client/generated';
 import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
 import { createPinia, setActivePinia } from 'pinia';
+
+import { DoFactory } from 'test/DoFactory';
 import { useServiceProviderStore, type ServiceProvider, type ServiceProviderStore } from './ServiceProviderStore';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
@@ -118,6 +121,56 @@ describe('serviceProviderStore', () => {
       expect(serviceProviderStore.loading).toBe(true);
       await getAvailableServiceProvidersPromise;
       expect(serviceProviderStore.availableServiceProviders).toEqual([]);
+      expect(serviceProviderStore.errorCode).toEqual('some mock server error');
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+  });
+
+  describe('getManageableServiceProviders', () => {
+    const page: number = 1;
+    const itemsPerPage: number = 30;
+    const offset: number = (page - 1) * itemsPerPage;
+    const limit: number = itemsPerPage;
+    const url: string = `/api/provider/manageable?offset=${offset}&limit=${limit}`;
+
+    it('should load service providers manageable by the user', async () => {
+      const mockResponse: ProviderControllerGetManageableServiceProviders200Response = {
+        items: [
+          DoFactory.getManageableServiceProviderListEntryResponse(),
+          DoFactory.getManageableServiceProviderListEntryResponse(),
+          DoFactory.getManageableServiceProviderListEntryResponse(),
+        ],
+        offset,
+        limit,
+        total: 3,
+      };
+
+      mockadapter.onGet(url).replyOnce(200, mockResponse);
+      const promise: Promise<void> = serviceProviderStore.getManageableServiceProviders(page, itemsPerPage);
+      expect(serviceProviderStore.loading).toBe(true);
+      await promise;
+      expect(serviceProviderStore.manageableServiceProviders).toEqual(expect.arrayContaining(mockResponse.items));
+      expect(serviceProviderStore.manageableServiceProviders).toHaveLength(mockResponse.items.length);
+      expect(serviceProviderStore.totalManageableServiceProviders).toEqual(mockResponse.total);
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+
+    it('should handle string error', async () => {
+      mockadapter.onGet(url).replyOnce(500, 'some mock server error');
+      const promise: Promise<void> = serviceProviderStore.getManageableServiceProviders(page, itemsPerPage);
+      expect(serviceProviderStore.loading).toBe(true);
+      await promise;
+      expect(serviceProviderStore.manageableServiceProviders).toEqual([]);
+      expect(serviceProviderStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+
+    it('should handle error code', async () => {
+      mockadapter.onGet(url).replyOnce(500, { code: 'some mock server error' });
+      const promise: Promise<void> = serviceProviderStore.getManageableServiceProviders(page, itemsPerPage);
+      expect(serviceProviderStore.loading).toBe(true);
+      await promise;
+      expect(serviceProviderStore.manageableServiceProviders).toEqual([]);
       expect(serviceProviderStore.errorCode).toEqual('some mock server error');
       expect(serviceProviderStore.loading).toBe(false);
     });

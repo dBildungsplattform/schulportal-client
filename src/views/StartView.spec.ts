@@ -54,37 +54,8 @@ const mockProviders: Array<ServiceProvider> = [
   },
 ];
 
-const mockPerson: PersonInfoResponse = {
-  person: {
-    id: '1234',
-    name: {
-      familiennamen: 'Vimes',
-      vorname: 'Samuel',
-      initialenfamilienname: null,
-      initialenvorname: null,
-      rufname: null,
-      titel: null,
-      anrede: null,
-      namenspraefix: null,
-      namenssuffix: null,
-      sortierindex: null,
-    },
-    referrer: 'samuelvimes',
-    personalnummer: null,
-    mandant: '',
-    geburt: null,
-    stammorganisation: null,
-    geschlecht: null,
-    lokalisierung: null,
-    vertrauensstufe: 'KEIN',
-    revision: '',
-    dienststellen: [],
-  },
-  pid: '',
-  personenkontexte: [],
-  gruppen: [],
-  email: null,
-};
+const mockPerson: PersonInfoResponse = DoFactory.getPersonInfoResponse();
+mockPerson.person.personalnummer = null;
 
 const mockPersonenUebersicht: PersonenUebersicht = new PersonenUebersicht(
   '1234',
