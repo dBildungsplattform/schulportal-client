@@ -1,4 +1,18 @@
 {
+  "angebot": {
+    "name": "Name",
+    "kategorie": "Kategorie",
+    "administrationsebene": "Administrationsebene",
+    "rollen": "Rollen",
+    "schulspezifischErweitert": "Schulspezifisch erweitert",
+    "kategorien": {
+      "EMAIL": "Dienstliche Email",
+      "UNTERRICHT": "Unterricht",
+      "VERWALTUNG": "Verwaltung",
+      "HINWEISE": "Hinweise",
+      "ANGEBOTE": "Angebote"
+    }
+  },
   "action": "Aktion",
   "admin": {
     "administrationsebene": {
@@ -7,6 +21,12 @@
       "rules": {
         "required": "Die Administrationsebene muss ausgewählt werden."
       }
+    },
+    "angebot": {
+      "management": {
+        "title": "Angebotsverwaltung"
+      },
+      "showAll": "Alle Angebote anzeigen"
     },
     "befristung": {
       "assignBefristung": "Befristung zuordnen",
@@ -473,7 +493,9 @@
           "SCHULPORTAL_VERWALTEN": "Darf Portal verwalten",
           "HINWEISE_BEARBEITEN": "Darf Hinweise bearbeiten",
           "LANDESBEDIENSTETE_SUCHEN_UND_HINZUFUEGEN": "Darf Landesbedienstete suchen und hinzufügen",
-          "EINGESCHRAENKT_NEUE_BENUTZER_ERSTELLEN": "Darf eingeschränkt neue Benutzer erstellen"
+          "EINGESCHRAENKT_NEUE_BENUTZER_ERSTELLEN": "Darf eingeschränkt neue Benutzer erstellen",
+          "ROLLEN_ERWEITERN": "Darf Rollen schulspezifisch erweitern",
+          "ANGEBOTE_VERWALTEN": "Darf Angebote verwalten"
         },
         "rollenarten": {
           "LERN": "Lern",

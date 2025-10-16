@@ -232,6 +232,23 @@
       ></v-list-item>
     </div>
 
+    <!-- Angebotsverwaltung -->
+    <div v-if="authStore.hasAngeboteVerwaltenPermission">
+      <v-list-item
+        class="menu-bar-main-item headline-2"
+        data-testid="angebot-management-title"
+        :title="$t('admin.angebot.management.title')"
+      ></v-list-item>
+      <v-list-item
+        class="menu-bar-sub-item caption"
+        @click="handleMenuItemClick('/admin/angebote')"
+        data-testid="angebot-management-menu-item"
+        prepend-icon="mdi-format-list-bulleted"
+        :title="$t('admin.angebot.showAll')"
+        to="/admin/angebote"
+      ></v-list-item>
+    </div>
+
     <!-- Schulverwaltung -->
     <div v-if="authStore.hasSchulverwaltungPermission">
       <v-list-item

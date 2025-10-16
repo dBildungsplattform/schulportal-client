@@ -748,18 +748,11 @@ describe('OrganisationStore', () => {
 
   describe('fetchSchuleDetailsForSchultraeger', () => {
     const mockSchultraeger: Organisation[] = [
-      {
-        id: '999',
-        kennung: 'TR001',
-        name: 'Schulträger 1',
-        namensergaenzung: 'Zusatz',
-        kuerzel: 'ST1',
-        typ: OrganisationsTyp.Traeger,
-        administriertVon: '',
-        zugehoerigZu: '',
-        version: 1,
-      },
+      DoFactory.getOrganisation({ typ: OrganisationsTyp.Traeger }),
+      DoFactory.getOrganisation({ typ: OrganisationsTyp.Traeger }),
     ];
+    const zugehoerigZuParams: string = mockSchultraeger.map((st: Organisation) => `zugehoerigZu=${st.id}`).join('&');
+    const url: string = `/api/organisationen?limit=30&typ=SCHULE&systemrechte=SCHULTRAEGER_VERWALTEN&${zugehoerigZuParams}`;
 
     beforeEach(() => {
       organisationStore.allSchultraeger = [...mockSchultraeger];
@@ -768,26 +761,17 @@ describe('OrganisationStore', () => {
     });
 
     it('should fetch Schule details for Schulträger', async () => {
-      const mockResponse: Organisation[] = [
-        {
-          id: '1000',
-          kennung: '123456',
-          name: 'Schule A',
-          namensergaenzung: 'Zusatz A',
-          kuerzel: 'S1',
-          typ: OrganisationsTyp.Schule,
-          zugehoerigZu: '999',
-          version: 1,
-          schuleDetails: '',
-        },
-      ];
-      mockadapter
-        .onGet('/api/organisationen?limit=30&typ=SCHULE&systemrechte=SCHULTRAEGER_VERWALTEN&zugehoerigZu=999')
-        .replyOnce(200, mockResponse);
+      const mockResponse: Organisation[] = [DoFactory.getOrganisation({ zugehoerigZu: mockSchultraeger[0]!.id })];
+      mockadapter.onGet(url).replyOnce(200, mockResponse);
 
       await organisationStore.fetchSchuleDetailsForSchultraeger();
 
-      expect(organisationStore.allSchultraeger[0]?.schuleDetails).toBe('123456');
+      expect(organisationStore.allSchultraeger[0]?.schuleDetails).toBe(
+        mockResponse
+          .filter((org: Organisation) => org.zugehoerigZu === mockSchultraeger[0]!.id)
+          .map((org: Organisation) => org.kennung)
+          .join(', ') || '---',
+      );
       expect(organisationStore.loading).toBe(false);
     });
 
@@ -804,9 +788,7 @@ describe('OrganisationStore', () => {
             },
         expectedError: string,
       ) => {
-        mockadapter
-          .onGet('/api/organisationen?limit=30&typ=SCHULE&systemrechte=SCHULTRAEGER_VERWALTEN&zugehoerigZu=999')
-          .replyOnce(500, response);
+        mockadapter.onGet(url).replyOnce(500, response);
 
         await organisationStore.fetchSchuleDetailsForSchultraeger();
 
