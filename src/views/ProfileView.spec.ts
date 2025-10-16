@@ -39,7 +39,7 @@ const mockLehrerUebersicht: PersonenUebersicht = new PersonenUebersicht(
   mockPersonInfoResponse.person.id,
   mockPersonInfoResponse.person.name.vorname,
   mockPersonInfoResponse.person.name.familiennamen,
-  mockPersonInfoResponse.person.referrer!,
+  mockPersonInfoResponse.person.username!,
   '2021-09-01T12:00:00Z',
   [
     DoFactory.getZuordnung({
@@ -63,7 +63,7 @@ const mockLehrerUebersichtWith2Zuordnungen: PersonenUebersicht = new PersonenUeb
   mockPersonInfoResponse.person.id,
   mockPersonInfoResponse.person.name.vorname,
   mockPersonInfoResponse.person.name.familiennamen,
-  mockPersonInfoResponse.person.referrer!,
+  mockPersonInfoResponse.person.username!,
   '2021-09-01T12:00:00Z',
   [
     DoFactory.getZuordnung({
@@ -88,7 +88,7 @@ const mockSchuelerUebersicht: PersonenUebersicht = new PersonenUebersicht(
   mockPersonInfoResponse.person.id,
   mockPersonInfoResponse.person.name.vorname,
   mockPersonInfoResponse.person.name.familiennamen,
-  mockPersonInfoResponse.person.referrer!,
+  mockPersonInfoResponse.person.username!,
   '2021-09-01T12:00:00Z',
   [
     DoFactory.getZuordnung(
@@ -111,7 +111,7 @@ const mockSchuelerUebersichtWithReversedOrder: PersonenUebersicht = new Personen
   mockPersonInfoResponse.person.id,
   mockPersonInfoResponse.person.name.vorname,
   mockPersonInfoResponse.person.name.familiennamen,
-  mockPersonInfoResponse.person.referrer!,
+  mockPersonInfoResponse.person.username!,
   '2021-09-01T12:00:00Z',
   [
     DoFactory.getZuordnung(
@@ -134,7 +134,7 @@ const uebersichtWithoutZuordnungen: PersonenUebersicht = new PersonenUebersicht(
   mockPersonInfoResponse.person.id,
   mockPersonInfoResponse.person.name.vorname,
   mockPersonInfoResponse.person.name.familiennamen,
-  mockPersonInfoResponse.person.referrer!,
+  mockPersonInfoResponse.person.username!,
   '2021-09-01T12:00:00Z',
   [],
 );
@@ -213,7 +213,7 @@ describe('ProfileView', () => {
     expect(personalData?.at(0)?.text()).toContain(
       `Vor- und Nachname:${mockPersonInfoResponse.person.name.vorname} ${mockPersonInfoResponse.person.name.familiennamen}`,
     );
-    expect(personalData?.at(1)?.text()).toContain(`Benutzername:${mockPersonInfoResponse.person.referrer}`);
+    expect(personalData?.at(1)?.text()).toContain(`Benutzername:${mockPersonInfoResponse.person.username}`);
     if (mockPersonInfoResponse.person.personalnummer) {
       expect(personalData?.at(2)?.text()).toContain(mockPersonInfoResponse.person.personalnummer);
     }

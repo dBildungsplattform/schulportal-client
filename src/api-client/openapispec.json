@@ -231,7 +231,7 @@
             "schema": { "type": "number" }
           },
           { "name": "personId", "required": false, "in": "query", "schema": { "nullable": true, "type": "string" } },
-          { "name": "referrer", "required": false, "in": "query", "schema": { "nullable": true, "type": "string" } },
+          { "name": "username", "required": false, "in": "query", "schema": { "nullable": true, "type": "string" } },
           {
             "name": "personenstatus",
             "required": false,
@@ -279,99 +279,6 @@
           "403": { "description": "Insufficient permissions to get personenkontexte." },
           "404": { "description": "No personenkontexte were found." },
           "500": { "description": "Internal server error while getting all personenkontexte." }
-        },
-        "tags": ["personen"],
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
-      }
-    },
-    "/api/personen": {
-      "get": {
-        "operationId": "PersonController_findPersons",
-        "parameters": [
-          {
-            "name": "offset",
-            "required": false,
-            "in": "query",
-            "description": "The offset of the paginated list.",
-            "schema": { "type": "number" }
-          },
-          {
-            "name": "limit",
-            "required": false,
-            "in": "query",
-            "description": "The requested limit for the page size.",
-            "schema": { "type": "number" }
-          },
-          { "name": "referrer", "required": false, "in": "query", "schema": { "nullable": true, "type": "string" } },
-          {
-            "name": "familienname",
-            "required": false,
-            "in": "query",
-            "schema": { "nullable": true, "type": "string" }
-          },
-          { "name": "vorname", "required": false, "in": "query", "schema": { "nullable": true, "type": "string" } },
-          {
-            "name": "sichtfreigabe",
-            "required": false,
-            "in": "query",
-            "schema": { "nullable": true, "default": "nein", "enum": ["ja", "nein"], "type": "string" }
-          },
-          {
-            "name": "organisationIDs",
-            "required": false,
-            "in": "query",
-            "description": "List of Organisation ID used to filter for Persons.",
-            "schema": { "type": "array", "items": { "type": "string" } }
-          },
-          {
-            "name": "rolleIDs",
-            "required": false,
-            "in": "query",
-            "description": "List of Role ID used to filter for Persons.",
-            "schema": { "type": "array", "items": { "type": "string" } }
-          },
-          {
-            "name": "suchFilter",
-            "required": false,
-            "in": "query",
-            "description": "Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.",
-            "schema": { "nullable": true, "type": "string" }
-          },
-          {
-            "name": "sortOrder",
-            "required": false,
-            "in": "query",
-            "description": "Order to sort by.",
-            "schema": { "$ref": "#/components/schemas/ScopeOrder" }
-          },
-          {
-            "name": "sortField",
-            "required": false,
-            "in": "query",
-            "description": "Field to sort by.",
-            "schema": { "$ref": "#/components/schemas/SortFieldPerson" }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The persons were successfully returned. WARNING: This endpoint returns all persons as default when no paging parameters were set.",
-            "headers": {
-              "X-Paging-Offset": {
-                "description": "The offset of the first item from the list. List starts with index 0."
-              },
-              "X-Paging-Limit": { "description": "The maximum amount of items returned in one request." },
-              "X-Paging-Total": { "description": "The total amount of items in the list." },
-              "X-Paging-pageTotal": { "description": "The total amount of items in the paginated list." }
-            },
-            "content": {
-              "application/json": {
-                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/PersonendatensatzResponse" } }
-              }
-            }
-          },
-          "401": { "description": "Not authorized to get persons." },
-          "403": { "description": "Insufficient permissions to get persons." },
-          "500": { "description": "Internal server error while getting all persons." }
         },
         "tags": ["personen"],
         "security": [{ "oauth2": ["openid"] }, { "bearer": [] }]
@@ -531,7 +438,7 @@
             "description": "The requested limit for the page size.",
             "schema": { "type": "number" }
           },
-          { "name": "referrer", "required": false, "in": "query", "schema": { "nullable": true, "type": "string" } },
+          { "name": "username", "required": false, "in": "query", "schema": { "nullable": true, "type": "string" } },
           {
             "name": "familienname",
             "required": false,
@@ -563,7 +470,7 @@
             "name": "suchFilter",
             "required": false,
             "in": "query",
-            "description": "Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.",
+            "description": "Search filter used to filter for Persons. It could be the vorname, familienname, username or the personalnummer.",
             "schema": { "nullable": true, "type": "string" }
           },
           {
@@ -1755,7 +1662,7 @@
             "schema": { "type": "number" }
           },
           { "name": "personId", "required": false, "in": "query", "schema": { "nullable": true, "type": "string" } },
-          { "name": "referrer", "required": false, "in": "query", "schema": { "nullable": true, "type": "string" } },
+          { "name": "username", "required": false, "in": "query", "schema": { "nullable": true, "type": "string" } },
           {
             "name": "personenstatus",
             "required": false,
@@ -2992,7 +2899,7 @@
         "type": "object",
         "properties": {
           "id": { "type": "string" },
-          "referrer": { "type": "string", "nullable": true },
+          "username": { "type": "string", "nullable": true },
           "mandant": { "type": "string" },
           "name": { "$ref": "#/components/schemas/PersonNameParams" },
           "stammorganisation": { "type": "string", "nullable": true },
@@ -3017,7 +2924,7 @@
         },
         "required": [
           "id",
-          "referrer",
+          "username",
           "mandant",
           "name",
           "stammorganisation",
@@ -3055,7 +2962,7 @@
         "type": "object",
         "properties": {
           "id": { "type": "string" },
-          "referrer": { "type": "string", "nullable": true },
+          "username": { "type": "string", "nullable": true },
           "mandant": { "type": "string" },
           "organisation": { "$ref": "#/components/schemas/CreatedPersonenkontextOrganisation" },
           "rollenart": { "type": "string", "nullable": true },
@@ -3072,7 +2979,7 @@
         },
         "required": [
           "id",
-          "referrer",
+          "username",
           "mandant",
           "organisation",
           "rollenart",
@@ -3086,12 +2993,10 @@
       },
       "Personenstatus": { "type": "string", "enum": ["AKTIV"] },
       "Sichtfreigabe": { "type": "string", "enum": ["ja", "nein"] },
-      "ScopeOrder": { "type": "string", "enum": ["asc", "desc"] },
-      "SortFieldPerson": { "type": "string", "enum": ["familienname", "vorname", "personalnummer", "referrer"] },
       "UpdatePersonBodyParams": {
         "type": "object",
         "properties": {
-          "referrer": { "type": "string" },
+          "username": { "type": "string" },
           "stammorganisation": { "type": "string" },
           "name": { "$ref": "#/components/schemas/PersonNameParams" },
           "revision": { "type": "string" }
@@ -3150,6 +3055,8 @@
         },
         "required": ["i18nKey", "code"]
       },
+      "ScopeOrder": { "type": "string", "enum": ["asc", "desc"] },
+      "SortFieldPerson": { "type": "string", "enum": ["familienname", "vorname", "personalnummer", "username"] },
       "RollenArt": { "type": "string", "enum": ["LERN", "LEHR", "EXTERN", "ORGADMIN", "LEIT", "SYSADMIN"] },
       "RollenMerkmal": { "type": "string", "enum": ["BEFRISTUNG_PFLICHT", "KOPERS_PFLICHT"] },
       "DBiamPersonenzuordnungResponse": {
@@ -3641,7 +3548,7 @@
         "type": "object",
         "properties": {
           "id": { "type": "string" },
-          "referrer": { "type": "string" },
+          "username": { "type": "string" },
           "mandant": { "type": "string" },
           "name": { "$ref": "#/components/schemas/PersonNameParams" },
           "stammorganisation": { "type": "string" },
@@ -3654,7 +3561,7 @@
         },
         "required": [
           "id",
-          "referrer",
+          "username",
           "mandant",
           "name",
           "stammorganisation",
@@ -3859,10 +3766,10 @@
         "properties": {
           "serial": { "type": "string" },
           "otp": { "type": "string" },
-          "referrer": { "type": "string" },
+          "username": { "type": "string" },
           "userId": { "type": "string" }
         },
-        "required": ["serial", "otp", "referrer", "userId"]
+        "required": ["serial", "otp", "username", "userId"]
       },
       "AssignHardwareTokenResponse": {
         "type": "object",
@@ -4100,7 +4007,7 @@
         "type": "object",
         "properties": {
           "id": { "type": "string" },
-          "referrer": { "type": "string", "nullable": true },
+          "username": { "type": "string", "nullable": true },
           "mandant": { "type": "string" },
           "name": { "$ref": "#/components/schemas/PersonNameResponse" },
           "stammorganisation": { "type": "string", "nullable": true },
@@ -4110,7 +4017,7 @@
         },
         "required": [
           "id",
-          "referrer",
+          "username",
           "mandant",
           "name",
           "stammorganisation",
@@ -4146,7 +4053,7 @@
         "type": "object",
         "properties": {
           "id": { "type": "string" },
-          "referrer": { "type": "string", "nullable": true },
+          "username": { "type": "string", "nullable": true },
           "mandant": { "type": "string" },
           "organisation": { "$ref": "#/components/schemas/PersonenInfoKontextOrganisationResponse" },
           "rollenart": { "type": "string", "nullable": true },
@@ -4163,7 +4070,7 @@
         },
         "required": [
           "id",
-          "referrer",
+          "username",
           "mandant",
           "organisation",
           "rollenart",
