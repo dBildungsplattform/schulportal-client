@@ -164,7 +164,7 @@
     :items="items"
     :items-length="totalItems"
     :items-per-page="itemsPerPage"
-    :items-per-page-options="[30, 50, 100, 300]"
+    :items-per-page-options="[5, 30, 50, 100, 300]"
     :items-per-page-text="'itemsPerPage'"
     :item-value="itemValuePath"
     :page="currentPage"

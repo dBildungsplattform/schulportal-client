@@ -7,6 +7,7 @@ import {
   type UserinfoResponse,
 } from '../api-client/generated/api';
 import type { Organisation } from './OrganisationStore';
+import { RollenSystemRecht } from './RolleStore';
 
 export enum StepUpLevel {
   NONE = 'none',
@@ -60,6 +61,7 @@ type AuthState = {
   hasHinweiseBearbeitenPermission: boolean;
   hasLandesbediensteteSuchenUndHinzufügenPermission: boolean;
   hasEingeschränktNeueBenutzerErstellenPermission: boolean;
+  hasAngeboteVerwaltenPermission: boolean;
   isAuthenticated: boolean;
   acr: StepUpLevel;
   timeLimitInfos: PersonTimeLimitInfoResponse[];
@@ -94,6 +96,7 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
     hasHinweiseBearbeitenPermission: false,
     hasLandesbediensteteSuchenUndHinzufügenPermission: false,
     hasEingeschränktNeueBenutzerErstellenPermission: false,
+    hasAngeboteVerwaltenPermission: false,
     isAuthenticated: false,
     acr: StepUpLevel.NONE,
     timeLimitInfos: [],
@@ -141,6 +144,9 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
           this.hasEingeschränktNeueBenutzerErstellenPermission = this.currentUserPermissions.includes(
             'EINGESCHRAENKT_NEUE_BENUTZER_ERSTELLEN',
           );
+          this.hasAngeboteVerwaltenPermission = this.currentUserPermissions.includes(
+            RollenSystemRecht.AngeboteVerwalten,
+          );
         } else {
           throw new Error('User info could not be retrieved.');
         }
@@ -162,6 +168,7 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
         this.hasHinweiseBearbeitenPermission = false;
         this.hasLandesbediensteteSuchenUndHinzufügenPermission = false;
         this.hasEingeschränktNeueBenutzerErstellenPermission = false;
+        this.hasAngeboteVerwaltenPermission = false;
         this.isAuthenticated = false;
         this.acr = StepUpLevel.NONE;
         this.timeLimitInfos = [];
