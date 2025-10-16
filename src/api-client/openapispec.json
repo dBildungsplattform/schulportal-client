@@ -1489,6 +1489,86 @@
         "security": [{ "bearer": [] }, { "oauth2": ["openid"] }]
       }
     },
+    "/api/provider/manageable": {
+      "get": {
+        "operationId": "ProviderController_getManageableServiceProviders",
+        "summary": "",
+        "description": "Get service-providers the logged-in user is allowed to manage.",
+        "parameters": [
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "description": "The offset of the paginated list.",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "The requested limit for the page size.",
+            "schema": { "type": "number" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The service providers were successfully returned. WARNING: This endpoint returns all service providers as default when no paging parameters were set.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/RawPagedResponse" },
+                    {
+                      "required": ["items"],
+                      "properties": {
+                        "items": {
+                          "type": "array",
+                          "items": { "$ref": "#/components/schemas/ManageableServiceProviderListEntryResponse" }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": { "description": "Not authorized to get available service providers." },
+          "403": { "description": "Insufficient permissions to get service-providers." },
+          "500": { "description": "Internal server error while getting all service-providers." }
+        },
+        "tags": ["provider"],
+        "security": [{ "bearer": [] }, { "oauth2": ["openid"] }]
+      }
+    },
+    "/api/provider/manageable/{angebotId}": {
+      "get": {
+        "operationId": "ProviderController_getManageableServiceProviderById",
+        "summary": "",
+        "description": "Get service-provider the logged-in user is allowed to manage.",
+        "parameters": [
+          {
+            "name": "angebotId",
+            "required": true,
+            "in": "path",
+            "description": "The id of the service provider",
+            "schema": { "nullable": false, "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The service-provider was successfully returned.",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ManageableServiceProviderResponse" } }
+            }
+          },
+          "401": { "description": "Not authorized to get available service provider." },
+          "403": { "description": "Insufficient permissions to get service-provider." },
+          "500": { "description": "Internal server error while getting service-provider." }
+        },
+        "tags": ["provider"],
+        "security": [{ "bearer": [] }, { "oauth2": ["openid"] }]
+      }
+    },
     "/api/personenkontexte/{personenkontextId}": {
       "get": {
         "operationId": "PersonenkontextController_findPersonenkontextById",
@@ -3146,7 +3226,8 @@
           "BULK_VERWALTEN",
           "SCHULPORTAL_VERWALTEN",
           "HINWEISE_BEARBEITEN",
-          "ROLLEN_ERWEITERN"
+          "ROLLEN_ERWEITERN",
+          "ANGEBOTE_VERWALTEN"
         ]
       },
       "OrganisationByIdBodyParams": {
@@ -3395,6 +3476,73 @@
           "serviceProviderId": { "type": "string" }
         },
         "required": ["id", "createdAt", "updatedAt", "organisationId", "rolleId", "serviceProviderId"]
+      },
+      "OrganisationRefResponse": {
+        "type": "object",
+        "properties": { "id": { "type": "string" }, "name": { "type": "string" }, "kennung": { "type": "string" } },
+        "required": ["id", "name"]
+      },
+      "RolleRefResponse": {
+        "type": "object",
+        "properties": { "id": { "type": "string" }, "name": { "type": "string" } },
+        "required": ["id", "name"]
+      },
+      "ManageableServiceProviderListEntryResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "administrationsebene": { "$ref": "#/components/schemas/OrganisationRefResponse" },
+          "kategorie": { "$ref": "#/components/schemas/ServiceProviderKategorie" },
+          "requires2fa": { "type": "boolean" },
+          "merkmale": { "type": "array", "items": { "$ref": "#/components/schemas/ServiceProviderMerkmal" } },
+          "hasRollenerweiterung": { "type": "boolean" },
+          "rollen": { "type": "array", "items": { "$ref": "#/components/schemas/RolleRefResponse" } }
+        },
+        "required": [
+          "id",
+          "name",
+          "administrationsebene",
+          "kategorie",
+          "requires2fa",
+          "merkmale",
+          "hasRollenerweiterung",
+          "rollen"
+        ]
+      },
+      "RollenerweiterungForServiceProviderResponse": {
+        "type": "object",
+        "properties": {
+          "organisation": { "$ref": "#/components/schemas/OrganisationRefResponse" },
+          "rolle": { "$ref": "#/components/schemas/RolleRefResponse" }
+        },
+        "required": ["organisation", "rolle"]
+      },
+      "ManageableServiceProviderResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "administrationsebene": { "$ref": "#/components/schemas/OrganisationRefResponse" },
+          "kategorie": { "$ref": "#/components/schemas/ServiceProviderKategorie" },
+          "requires2fa": { "type": "boolean" },
+          "merkmale": { "type": "array", "items": { "$ref": "#/components/schemas/ServiceProviderMerkmal" } },
+          "rollenerweiterungen": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/RollenerweiterungForServiceProviderResponse" }
+          },
+          "rollen": { "type": "array", "items": { "$ref": "#/components/schemas/RolleRefResponse" } }
+        },
+        "required": [
+          "id",
+          "name",
+          "administrationsebene",
+          "kategorie",
+          "requires2fa",
+          "merkmale",
+          "rollenerweiterungen",
+          "rollen"
+        ]
       },
       "PersonResponseAutomapper": {
         "type": "object",

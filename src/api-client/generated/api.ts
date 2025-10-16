@@ -1298,6 +1298,120 @@ export interface LoeschungResponse {
 /**
  * 
  * @export
+ * @interface ManageableServiceProviderListEntryResponse
+ */
+export interface ManageableServiceProviderListEntryResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof ManageableServiceProviderListEntryResponse
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ManageableServiceProviderListEntryResponse
+     */
+    'name': string;
+    /**
+     * 
+     * @type {OrganisationRefResponse}
+     * @memberof ManageableServiceProviderListEntryResponse
+     */
+    'administrationsebene': OrganisationRefResponse;
+    /**
+     * 
+     * @type {ServiceProviderKategorie}
+     * @memberof ManageableServiceProviderListEntryResponse
+     */
+    'kategorie': ServiceProviderKategorie;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof ManageableServiceProviderListEntryResponse
+     */
+    'requires2fa': boolean;
+    /**
+     * 
+     * @type {Array<ServiceProviderMerkmal>}
+     * @memberof ManageableServiceProviderListEntryResponse
+     */
+    'merkmale': Array<ServiceProviderMerkmal>;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof ManageableServiceProviderListEntryResponse
+     */
+    'hasRollenerweiterung': boolean;
+    /**
+     * 
+     * @type {Array<RolleRefResponse>}
+     * @memberof ManageableServiceProviderListEntryResponse
+     */
+    'rollen': Array<RolleRefResponse>;
+}
+
+
+/**
+ * 
+ * @export
+ * @interface ManageableServiceProviderResponse
+ */
+export interface ManageableServiceProviderResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof ManageableServiceProviderResponse
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ManageableServiceProviderResponse
+     */
+    'name': string;
+    /**
+     * 
+     * @type {OrganisationRefResponse}
+     * @memberof ManageableServiceProviderResponse
+     */
+    'administrationsebene': OrganisationRefResponse;
+    /**
+     * 
+     * @type {ServiceProviderKategorie}
+     * @memberof ManageableServiceProviderResponse
+     */
+    'kategorie': ServiceProviderKategorie;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof ManageableServiceProviderResponse
+     */
+    'requires2fa': boolean;
+    /**
+     * 
+     * @type {Array<ServiceProviderMerkmal>}
+     * @memberof ManageableServiceProviderResponse
+     */
+    'merkmale': Array<ServiceProviderMerkmal>;
+    /**
+     * 
+     * @type {Array<RollenerweiterungForServiceProviderResponse>}
+     * @memberof ManageableServiceProviderResponse
+     */
+    'rollenerweiterungen': Array<RollenerweiterungForServiceProviderResponse>;
+    /**
+     * 
+     * @type {Array<RolleRefResponse>}
+     * @memberof ManageableServiceProviderResponse
+     */
+    'rollen': Array<RolleRefResponse>;
+}
+
+
+/**
+ * 
+ * @export
  * @interface MeldungResponse
  */
 export interface MeldungResponse {
@@ -1391,6 +1505,31 @@ export interface OrganisationByNameBodyParams {
      * @memberof OrganisationByNameBodyParams
      */
     'version': number;
+}
+/**
+ * 
+ * @export
+ * @interface OrganisationRefResponse
+ */
+export interface OrganisationRefResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof OrganisationRefResponse
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof OrganisationRefResponse
+     */
+    'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof OrganisationRefResponse
+     */
+    'kennung'?: string;
 }
 /**
  * 
@@ -2780,6 +2919,50 @@ export interface PersonenuebersichtBodyParams {
 /**
  * 
  * @export
+ * @interface ProviderControllerGetManageableServiceProviders200Response
+ */
+export interface ProviderControllerGetManageableServiceProviders200Response {
+    /**
+     * 
+     * @type {number}
+     * @memberof ProviderControllerGetManageableServiceProviders200Response
+     */
+    'total': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof ProviderControllerGetManageableServiceProviders200Response
+     */
+    'offset': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof ProviderControllerGetManageableServiceProviders200Response
+     */
+    'limit': number;
+    /**
+     * 
+     * @type {Array<ManageableServiceProviderListEntryResponse>}
+     * @memberof ProviderControllerGetManageableServiceProviders200Response
+     */
+    'items': Array<ManageableServiceProviderListEntryResponse>;
+}
+/**
+ * 
+ * @export
+ * @interface ProviderControllerGetManageableServiceProviders200ResponseAllOf
+ */
+export interface ProviderControllerGetManageableServiceProviders200ResponseAllOf {
+    /**
+     * 
+     * @type {Array<ManageableServiceProviderListEntryResponse>}
+     * @memberof ProviderControllerGetManageableServiceProviders200ResponseAllOf
+     */
+    'items': Array<ManageableServiceProviderListEntryResponse>;
+}
+/**
+ * 
+ * @export
  * @interface RawPagedResponse
  */
 export interface RawPagedResponse {
@@ -2807,6 +2990,25 @@ export interface RawPagedResponse {
      * @memberof RawPagedResponse
      */
     'items': Array<string>;
+}
+/**
+ * 
+ * @export
+ * @interface RolleRefResponse
+ */
+export interface RolleRefResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof RolleRefResponse
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RolleRefResponse
+     */
+    'name': string;
 }
 /**
  * 
@@ -3051,7 +3253,8 @@ export const RollenSystemRechtEnum = {
     BulkVerwalten: 'BULK_VERWALTEN',
     SchulportalVerwalten: 'SCHULPORTAL_VERWALTEN',
     HinweiseBearbeiten: 'HINWEISE_BEARBEITEN',
-    RollenErweitern: 'ROLLEN_ERWEITERN'
+    RollenErweitern: 'ROLLEN_ERWEITERN',
+    AngeboteVerwalten: 'ANGEBOTE_VERWALTEN'
 } as const;
 
 export type RollenSystemRechtEnum = typeof RollenSystemRechtEnum[keyof typeof RollenSystemRechtEnum];
@@ -3075,6 +3278,25 @@ export interface RollenSystemRechtServiceProviderIDResponse {
      * @memberof RollenSystemRechtServiceProviderIDResponse
      */
     'serviceProviderIds': Array<string>;
+}
+/**
+ * 
+ * @export
+ * @interface RollenerweiterungForServiceProviderResponse
+ */
+export interface RollenerweiterungForServiceProviderResponse {
+    /**
+     * 
+     * @type {OrganisationRefResponse}
+     * @memberof RollenerweiterungForServiceProviderResponse
+     */
+    'organisation': OrganisationRefResponse;
+    /**
+     * 
+     * @type {RolleRefResponse}
+     * @memberof RollenerweiterungForServiceProviderResponse
+     */
+    'rolle': RolleRefResponse;
 }
 /**
  * 
@@ -11011,6 +11233,96 @@ export const ProviderApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
+         * Get service-provider the logged-in user is allowed to manage.
+         * @summary 
+         * @param {string} angebotId The id of the service provider
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        providerControllerGetManageableServiceProviderById: async (angebotId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'angebotId' is not null or undefined
+            assertParamExists('providerControllerGetManageableServiceProviderById', 'angebotId', angebotId)
+            const localVarPath = `/api/provider/manageable/{angebotId}`
+                .replace(`{${"angebotId"}}`, encodeURIComponent(String(angebotId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Get service-providers the logged-in user is allowed to manage.
+         * @summary 
+         * @param {number} [offset] The offset of the paginated list.
+         * @param {number} [limit] The requested limit for the page size.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        providerControllerGetManageableServiceProviders: async (offset?: number, limit?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/provider/manageable`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+            if (offset !== undefined) {
+                localVarQueryParameter['offset'] = offset;
+            }
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @param {string} angebotId The id of the service provider
          * @param {*} [options] Override http request option.
@@ -11082,6 +11394,29 @@ export const ProviderApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * Get service-provider the logged-in user is allowed to manage.
+         * @summary 
+         * @param {string} angebotId The id of the service provider
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async providerControllerGetManageableServiceProviderById(angebotId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ManageableServiceProviderResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.providerControllerGetManageableServiceProviderById(angebotId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Get service-providers the logged-in user is allowed to manage.
+         * @summary 
+         * @param {number} [offset] The offset of the paginated list.
+         * @param {number} [limit] The requested limit for the page size.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async providerControllerGetManageableServiceProviders(offset?: number, limit?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ProviderControllerGetManageableServiceProviders200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.providerControllerGetManageableServiceProviders(offset, limit, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * 
          * @param {string} angebotId The id of the service provider
          * @param {*} [options] Override http request option.
@@ -11120,6 +11455,27 @@ export const ProviderApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.providerControllerGetAvailableServiceProviders(options).then((request) => request(axios, basePath));
         },
         /**
+         * Get service-provider the logged-in user is allowed to manage.
+         * @summary 
+         * @param {string} angebotId The id of the service provider
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        providerControllerGetManageableServiceProviderById(angebotId: string, options?: any): AxiosPromise<ManageableServiceProviderResponse> {
+            return localVarFp.providerControllerGetManageableServiceProviderById(angebotId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Get service-providers the logged-in user is allowed to manage.
+         * @summary 
+         * @param {number} [offset] The offset of the paginated list.
+         * @param {number} [limit] The requested limit for the page size.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        providerControllerGetManageableServiceProviders(offset?: number, limit?: number, options?: any): AxiosPromise<ProviderControllerGetManageableServiceProviders200Response> {
+            return localVarFp.providerControllerGetManageableServiceProviders(offset, limit, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @param {string} angebotId The id of the service provider
          * @param {*} [options] Override http request option.
@@ -11154,6 +11510,27 @@ export interface ProviderApiInterface {
      * @memberof ProviderApiInterface
      */
     providerControllerGetAvailableServiceProviders(options?: AxiosRequestConfig): AxiosPromise<Array<ServiceProviderResponse>>;
+
+    /**
+     * Get service-provider the logged-in user is allowed to manage.
+     * @summary 
+     * @param {string} angebotId The id of the service provider
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProviderApiInterface
+     */
+    providerControllerGetManageableServiceProviderById(angebotId: string, options?: AxiosRequestConfig): AxiosPromise<ManageableServiceProviderResponse>;
+
+    /**
+     * Get service-providers the logged-in user is allowed to manage.
+     * @summary 
+     * @param {number} [offset] The offset of the paginated list.
+     * @param {number} [limit] The requested limit for the page size.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProviderApiInterface
+     */
+    providerControllerGetManageableServiceProviders(offset?: number, limit?: number, options?: AxiosRequestConfig): AxiosPromise<ProviderControllerGetManageableServiceProviders200Response>;
 
     /**
      * 
@@ -11193,6 +11570,31 @@ export class ProviderApi extends BaseAPI implements ProviderApiInterface {
      */
     public providerControllerGetAvailableServiceProviders(options?: AxiosRequestConfig) {
         return ProviderApiFp(this.configuration).providerControllerGetAvailableServiceProviders(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Get service-provider the logged-in user is allowed to manage.
+     * @summary 
+     * @param {string} angebotId The id of the service provider
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProviderApi
+     */
+    public providerControllerGetManageableServiceProviderById(angebotId: string, options?: AxiosRequestConfig) {
+        return ProviderApiFp(this.configuration).providerControllerGetManageableServiceProviderById(angebotId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Get service-providers the logged-in user is allowed to manage.
+     * @summary 
+     * @param {number} [offset] The offset of the paginated list.
+     * @param {number} [limit] The requested limit for the page size.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProviderApi
+     */
+    public providerControllerGetManageableServiceProviders(offset?: number, limit?: number, options?: AxiosRequestConfig) {
+        return ProviderApiFp(this.configuration).providerControllerGetManageableServiceProviders(offset, limit, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
