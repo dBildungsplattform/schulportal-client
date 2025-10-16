@@ -475,7 +475,7 @@
         v-if="isLernRolle(selectedRolle) && rolleDialogMode === RolleDialogMode.MODIFY"
         :errorLabel="selectedKlasseProps?.['error'] || false"
         :isRequired="true"
-        :isForRolleModify="true"
+        :isAlignedWithRadio="true"
         labelForId="klasse-select"
         :label="$t('admin.klasse.klasse')"
       >

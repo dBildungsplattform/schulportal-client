@@ -5,7 +5,7 @@
     isRequired?: boolean;
     labelForId: string;
     noTopMargin?: boolean;
-    isForRolleModify?: boolean;
+    isAlignedWithRadio?: boolean;
   };
 
   defineProps<Props>();
