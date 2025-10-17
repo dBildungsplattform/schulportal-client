@@ -93,7 +93,7 @@ describe('PersonStore', () => {
               personId: person.person.id,
               vorname: person.person.name.vorname,
               nachname: person.person.name.familienname,
-              benutzername: person.person.referrer ?? '---',
+              benutzername: person.person.username ?? '---',
             },
             {
               organisation: mockSchule,
@@ -159,7 +159,7 @@ describe('PersonStore', () => {
               personId: mockPersons[0]!.person.id,
               vorname: mockPersons[0]!.person.name.vorname,
               nachname: mockPersons[0]!.person.name.familienname,
-              benutzername: mockPersons[0]!.person.referrer ?? '---',
+              benutzername: mockPersons[0]!.person.username ?? '---',
             },
             {
               organisation: mockSchule,

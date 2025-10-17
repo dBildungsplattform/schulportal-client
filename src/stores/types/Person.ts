@@ -5,7 +5,7 @@ export class Person {
   public constructor(
     public id: string,
     public name: { vorname: string; familienname: string },
-    public referrer: string,
+    public username: string,
     public revision: string,
     public personalnummer: string | null,
     public isLocked: boolean | null,
@@ -21,7 +21,7 @@ export class Person {
     return new Person(
       response.id,
       response.name,
-      response.referrer ?? '',
+      response.username ?? '',
       response.revision,
       response.personalnummer,
       response.isLocked,

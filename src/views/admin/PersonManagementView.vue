@@ -71,7 +71,7 @@
     id: string;
     familienname: string;
     vorname: string;
-    referrer: string;
+    username: string;
     personalnummer: string;
     rollen: string;
     administrationsebenen: string;
@@ -80,7 +80,7 @@
   const headers: ReadonlyHeaders = [
     { title: t('person.lastName'), key: 'familienname', align: 'start' },
     { title: t('person.firstName'), key: 'vorname', align: 'start' },
-    { title: t('person.userName'), key: 'referrer', align: 'start' },
+    { title: t('person.userName'), key: 'username', align: 'start' },
     { title: t('person.kopersNr'), key: 'personalnummer', align: 'start' },
     { title: t('person.rolle'), key: 'rollen', align: 'start', sortable: false },
     { title: t('person.zuordnungen'), key: 'administrationsebenen', align: 'start', sortable: false },
@@ -93,7 +93,7 @@
         id: personWithZuordnungen.id,
         familienname: personWithZuordnungen.name.familienname,
         vorname: personWithZuordnungen.name.vorname,
-        referrer: personWithZuordnungen.referrer,
+        username: personWithZuordnungen.username,
         personalnummer: personWithZuordnungen.getPersonalnummerAsString(t('missing')),
         rollen: personWithZuordnungen.rollenAsString,
         administrationsebenen: personWithZuordnungen.administrationsebenenAsString,
@@ -366,7 +366,7 @@
   const keyMapping: Record<string, SortField> = {
     'person.name.familienname': SortField.Familienname,
     'person.name.vorname': SortField.Vorname,
-    'person.referrer': SortField.Referrer,
+    'person.username': SortField.Username,
     'person.personalnummer': SortField.Personalnummer,
   };
 
