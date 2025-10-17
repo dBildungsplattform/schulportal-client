@@ -1,7 +1,7 @@
 import { OrganisationsTyp, PersonenApiFactory, RollenArt, type PersonenApiInterface } from '@/api-client/generated';
 import axiosApiInstance from '@/services/ApiService';
 import { getResponseErrorCode } from '@/utils/errorHandlers';
-import { isBefore } from 'date-fns';
+import { isBefore, parseISO } from 'date-fns';
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import type { Organisation } from './OrganisationStore';
 import {
@@ -12,6 +12,7 @@ import {
 } from './PersonenkontextStore';
 import { usePersonStore, type PersonStore } from './PersonStore';
 import { Zuordnung } from './types/Zuordnung';
+import type { PersonenUebersicht } from './types/PersonenUebersicht';
 
 const personenApi: PersonenApiInterface = PersonenApiFactory(undefined, '', axiosApiInstance);
 
@@ -50,6 +51,7 @@ type BulkOperationActions = {
     selectedRolleId: string,
     workflowStepResponseOrganisations: Organisation[],
     befristung?: string,
+    selectedKlasseId?: string,
   ): Promise<void>;
   bulkPersonenDelete(personIDs: string[]): Promise<void>;
   bulkChangeKlasse(personIDs: string[], selectedOrganisationId: string, newKlasseId: string): Promise<void>;
@@ -202,6 +204,7 @@ export const useBulkOperationStore: StoreDefinition<
       selectedRolleId: string,
       workflowStepResponseOrganisations: Organisation[],
       befristung?: string,
+      selectedKlasseId?: string,
     ): Promise<void> {
       const personStore: PersonStore = usePersonStore();
       const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
@@ -209,7 +212,6 @@ export const useBulkOperationStore: StoreDefinition<
       const selectedOrganisation: Organisation | undefined = workflowStepResponseOrganisations.find(
         (orga: Organisation) => orga.id === selectedOrganisationId,
       );
-
       if (!selectedOrganisation) return;
 
       await this.processPersonOperation(
@@ -218,34 +220,88 @@ export const useBulkOperationStore: StoreDefinition<
         async (personId: string) => {
           personStore.errorCode = '';
           personenkontextStore.errorCode = '';
+
+          // Fetch current person data
           await personStore.getPersonenuebersichtById(personId);
 
-          if (personStore.errorCode) {
-            this.currentOperation?.errors.set(personId, personStore.errorCode);
+          if (personStore.errorCode || !personStore.personenuebersicht) {
+            this.currentOperation?.errors.set(personId, personStore.errorCode || 'PERSON_DATA_NOT_FOUND');
             return;
           }
 
-          const currentZuordnungen: PersonenkontextUpdate[] =
-            personStore.personenuebersicht?.zuordnungen.map(mapZuordnungToPersonenkontextUpdate) || [];
-          const newZuordnung: PersonenkontextUpdate = {
+          const currentPersonData: PersonenUebersicht = personStore.personenuebersicht;
+
+          type InternalZuordnung = PersonenkontextUpdate & { administriertVon?: string };
+
+          // Deep copy current zuordnungen
+          const currentZuordnungen: InternalZuordnung[] = currentPersonData.zuordnungen.map((z: Zuordnung) => ({
+            organisationId: z.sskId,
+            rolleId: z.rolleId,
+            befristung: z.befristung ?? undefined,
+            administriertVon: z.administriertVon,
+          }));
+
+          const newZuordnungen: InternalZuordnung[] = [];
+
+          // --- base organisation context ---
+          const orgaZuordnung: InternalZuordnung = {
             organisationId: selectedOrganisation.id,
             rolleId: selectedRolleId,
           };
 
-          // If the new kontext is befristet, we use the earliest possible befristung
           if (befristung) {
-            newZuordnung.befristung = currentZuordnungen.reduce(
-              (earliest: string, zuordnung: PersonenkontextUpdate) => {
-                if (zuordnung.organisationId === selectedOrganisation.id && zuordnung.befristung) {
-                  return isBefore(zuordnung.befristung, earliest) ? zuordnung.befristung : earliest;
-                }
-                return earliest;
-              },
-              befristung,
-            );
+            const parsedNew: Date = parseISO(befristung);
+            orgaZuordnung.befristung = currentZuordnungen.reduce((earliest: string, z: InternalZuordnung) => {
+              if (z.organisationId === selectedOrganisation.id && z.befristung) {
+                const parsedOld: Date = parseISO(z.befristung);
+                return isBefore(parsedOld, parsedNew) ? z.befristung : earliest;
+              }
+              return earliest;
+            }, befristung);
           }
 
-          const combinedZuordnungen: PersonenkontextUpdate[] = [...currentZuordnungen, newZuordnung];
+          newZuordnungen.push({ ...orgaZuordnung }); // deep copy
+
+          // --- Klassen logic ---
+          if (selectedKlasseId) {
+            newZuordnungen.push({
+              organisationId: selectedKlasseId,
+              rolleId: selectedRolleId,
+              administriertVon: selectedOrganisation.id,
+              befristung: befristung,
+            });
+          } else {
+            const klassenZuordnungen: InternalZuordnung[] = currentZuordnungen.filter(
+              (z: InternalZuordnung) => z.administriertVon === selectedOrganisation.id,
+            );
+
+            for (const klasse of klassenZuordnungen) {
+              newZuordnungen.push({
+                organisationId: klasse.organisationId,
+                rolleId: selectedRolleId,
+                administriertVon: selectedOrganisation.id,
+                befristung: befristung,
+              });
+            }
+          }
+
+          // --- Filter out old zuordnungen that match new ones ---
+          const filteredCurrentZuordnungen: InternalZuordnung[] = currentZuordnungen.filter(
+            (current: InternalZuordnung) =>
+              !newZuordnungen.some(
+                (neu: InternalZuordnung) =>
+                  neu.organisationId === current.organisationId && neu.rolleId === current.rolleId,
+              ),
+          );
+
+          const combinedZuordnungen: PersonenkontextUpdate[] = [
+            ...filteredCurrentZuordnungen,
+            ...newZuordnungen.map((z: InternalZuordnung) => ({ ...z })), // deep copy
+          ].map(({ organisationId, rolleId, befristung: b }: PersonenkontextUpdate) => ({
+            organisationId,
+            rolleId,
+            befristung: b,
+          }));
 
           await personenkontextStore.updatePersonenkontexte(combinedZuordnungen, personId);
 

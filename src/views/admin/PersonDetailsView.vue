@@ -2325,13 +2325,10 @@
                   v-model:selectedOrganisation="selectedOrganisation"
                   v-model:selectedRolle="selectedRolle"
                   v-model:selectedKlasse="selectedKlasse"
-                  @update:selectedOrganisation="(value?: string) => (selectedOrganisation = value)"
-                  @update:selectedRolle="(value?: string) => (selectedRolle = value)"
-                  @update:selectedKlasse="(value?: string) => (selectedKlasse = value)"
                   @update:canCommit="canCommit = $event"
-                  @update:befristung="handleBefristungUpdate"
-                  @update:calculatedBefristungOption="handleBefristungOptionUpdate"
-                  @fieldReset="handleFieldReset"
+                  @update:befristung="handleBefristungUpdate($event)"
+                  @update:calculatedBefristungOption="handleBefristungOptionUpdate($event)"
+                  @fieldReset="handleFieldReset($event)"
                 />
                 <KopersInput
                   v-if="
