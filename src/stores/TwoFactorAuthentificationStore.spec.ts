@@ -189,7 +189,7 @@ describe('TwoFactorAuthentificationStore', () => {
     const otp: string = '987654';
     const bodyParams: AssignHardwareTokenBodyParams = {
       userId: personId,
-      referrer: personUserName,
+      username: personUserName,
       serial,
       otp,
     };
@@ -228,21 +228,21 @@ describe('TwoFactorAuthentificationStore', () => {
 
   describe('resetToken', () => {
     it('should reset token successfully', async () => {
-      const referrer: string = 'testReferrer';
+      const username: string = 'testReferrer';
 
-      mockadapter.onPut(`/api/2fa-token/reset?personId=${referrer}`).replyOnce(200);
+      mockadapter.onPut(`/api/2fa-token/reset?personId=${username}`).replyOnce(200);
 
-      const resetTokenPromise: Promise<void> = twoFactorAuthenticationStore.resetToken(referrer);
+      const resetTokenPromise: Promise<void> = twoFactorAuthenticationStore.resetToken(username);
       expect(twoFactorAuthenticationStore.loading).toBe(true);
       await resetTokenPromise;
       expect(twoFactorAuthenticationStore.loading).toBe(false);
     });
 
     it('should handle string error', async () => {
-      const referrer: string = 'testReferrer';
+      const username: string = 'testReferrer';
 
-      mockadapter.onPut(`/api/2fa-token/reset?personId=${referrer}`).replyOnce(500, 'some error');
-      const resetTokenPromise: Promise<void> = twoFactorAuthenticationStore.resetToken(referrer);
+      mockadapter.onPut(`/api/2fa-token/reset?personId=${username}`).replyOnce(500, 'some error');
+      const resetTokenPromise: Promise<void> = twoFactorAuthenticationStore.resetToken(username);
       expect(twoFactorAuthenticationStore.loading).toBe(true);
       await resetTokenPromise;
       expect(twoFactorAuthenticationStore.errorCode).toEqual('TOKEN_RESET_ERROR');
@@ -250,12 +250,12 @@ describe('TwoFactorAuthentificationStore', () => {
     });
 
     it('should handle error code', async () => {
-      const referrer: string = 'testReferrer';
+      const username: string = 'testReferrer';
 
       mockadapter
-        .onPut(`/api/2fa-token/reset?personId=${referrer}`)
+        .onPut(`/api/2fa-token/reset?personId=${username}`)
         .replyOnce(500, { code: 'some mock server error', i18nKey: 'RESET_TOKEN_ERROR' });
-      const resetTokenPromise: Promise<void> = twoFactorAuthenticationStore.resetToken(referrer);
+      const resetTokenPromise: Promise<void> = twoFactorAuthenticationStore.resetToken(username);
       expect(twoFactorAuthenticationStore.loading).toBe(true);
       await resetTokenPromise;
       expect(twoFactorAuthenticationStore.errorCode).toEqual('RESET_TOKEN_ERROR');

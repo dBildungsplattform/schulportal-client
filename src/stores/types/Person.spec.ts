@@ -5,11 +5,11 @@ import { DoFactory } from 'test/DoFactory';
 
 describe('Person', () => {
   describe('fromResponse', () => {
-    it('should set referrer to empty string, if it is null', () => {
+    it('should set username to empty string, if it is null', () => {
       const response: PersonResponse = DoFactory.getPersonResponse();
-      response.referrer = null;
+      response.username = null;
       const person: Person = Person.fromResponse(response);
-      expect(person.referrer).toBe('');
+      expect(person.username).toBe('');
     });
 
     it('should set userLock to empty array, if it is null', () => {

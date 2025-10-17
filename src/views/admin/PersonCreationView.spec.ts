@@ -49,7 +49,7 @@ const mockCreatedPersonWithKontext: DBiamPersonResponse = {
       familienname: 'Orton',
       vorname: 'John',
     },
-    referrer: 'jorton',
+    username: 'jorton',
     personalnummer: '123456',
     mandant: '',
     stammorganisation: null,

@@ -71,7 +71,7 @@ const mockPersonenuebersicht: PersonenUebersicht = DoFactory.getPersonenUebersic
       vorname: 'John',
       familienname: 'Orton',
     },
-    referrer: 'jorton',
+    username: 'jorton',
   }),
   [
     DoFactory.getZuordnung({
@@ -291,7 +291,7 @@ describe('PersonDetailsView', () => {
           familienname: 'Vimes',
           vorname: 'Susan',
         },
-        referrer: '6978',
+        username: '6978',
         personalnummer: '9183756',
         isLocked: false,
         userLock: [],
@@ -310,7 +310,7 @@ describe('PersonDetailsView', () => {
     expect(wrapper?.find('[data-testid="person-details-card"]').isVisible()).toBe(true);
     expect(wrapper?.find('[data-testid="person-vorname"]').text()).toBe(mockPerson.person.name.vorname);
     expect(wrapper?.find('[data-testid="person-familienname"]').text()).toBe(mockPerson.person.name.familienname);
-    expect(wrapper?.find('[data-testid="person-username"]').text()).toBe(mockPerson.person.referrer);
+    expect(wrapper?.find('[data-testid="person-username"]').text()).toBe(mockPerson.person.username);
     expect(wrapper?.find('[data-testid="person-email"]').text()).toBe(mockPerson.person.email?.address);
     expect(wrapper?.find('[data-testid="person-zuordnung-1"]').text()).toBe(
       `123456 (Testschule Birmingham): SuS 9a  (befristet bis ${adjustDateForTimezoneAndFormat(befristung)})`,
@@ -339,7 +339,7 @@ describe('PersonDetailsView', () => {
           familienname: 'Vimes',
           vorname: 'Samuel',
         },
-        referrer: '6978',
+        username: '6978',
         personalnummer: '9183756',
         isLocked: true,
         userLock,

@@ -1080,7 +1080,7 @@
             </v-col>
             <v-col class="text-body"
               ><span data-testid="created-person-username">{{
-                personenkontextStore.createdPersonWithKontext.person.referrer
+                personenkontextStore.createdPersonWithKontext.person.username
               }}</span></v-col
             >
           </v-row>

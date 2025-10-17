@@ -61,7 +61,7 @@ export interface AssignHardwareTokenBodyParams {
      * @type {string}
      * @memberof AssignHardwareTokenBodyParams
      */
-    'referrer': string;
+    'username': string;
     /**
      * 
      * @type {string}
@@ -2230,7 +2230,7 @@ export interface PersonNestedInPersonInfoResponse {
      * @type {string}
      * @memberof PersonNestedInPersonInfoResponse
      */
-    'referrer': string | null;
+    'username': string | null;
     /**
      * 
      * @type {string}
@@ -2285,7 +2285,7 @@ export interface PersonResponse {
      * @type {string}
      * @memberof PersonResponse
      */
-    'referrer': string | null;
+    'username': string | null;
     /**
      * 
      * @type {string}
@@ -2364,7 +2364,7 @@ export interface PersonResponseAutomapper {
      * @type {string}
      * @memberof PersonResponseAutomapper
      */
-    'referrer': string;
+    'username': string;
     /**
      * 
      * @type {string}
@@ -2587,7 +2587,7 @@ export interface PersonenInfoKontextResponse {
      * @type {string}
      * @memberof PersonenInfoKontextResponse
      */
-    'referrer': string | null;
+    'username': string | null;
     /**
      * 
      * @type {string}
@@ -2719,7 +2719,7 @@ export interface PersonenkontextResponse {
      * @type {string}
      * @memberof PersonenkontextResponse
      */
-    'referrer': string | null;
+    'username': string | null;
     /**
      * 
      * @type {string}
@@ -3501,7 +3501,7 @@ export const SortFieldPerson = {
     Familienname: 'familienname',
     Vorname: 'vorname',
     Personalnummer: 'personalnummer',
-    Referrer: 'referrer'
+    Username: 'username'
 } as const;
 
 export type SortFieldPerson = typeof SortFieldPerson[keyof typeof SortFieldPerson];
@@ -3690,7 +3690,7 @@ export interface UpdatePersonBodyParams {
      * @type {string}
      * @memberof UpdatePersonBodyParams
      */
-    'referrer'?: string;
+    'username'?: string;
     /**
      * 
      * @type {string}
@@ -9057,13 +9057,13 @@ export const PersonenApiAxiosParamCreator = function (configuration?: Configurat
          * @param {number} [offset] The offset of the paginated list.
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [personId2] 
-         * @param {string} [referrer] 
+         * @param {string} [username] 
          * @param {Personenstatus} [personenstatus] 
          * @param {Sichtfreigabe} [sichtfreigabe] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personControllerFindPersonenkontexte: async (personId: string, offset?: number, limit?: number, personId2?: string, referrer?: string, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        personControllerFindPersonenkontexte: async (personId: string, offset?: number, limit?: number, personId2?: string, username?: string, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'personId' is not null or undefined
             assertParamExists('personControllerFindPersonenkontexte', 'personId', personId)
             const localVarPath = `/api/personen/{personId}/personenkontexte`
@@ -9099,8 +9099,8 @@ export const PersonenApiAxiosParamCreator = function (configuration?: Configurat
                 localVarQueryParameter['personId'] = personId2;
             }
 
-            if (referrer !== undefined) {
-                localVarQueryParameter['referrer'] = referrer;
+            if (username !== undefined) {
+                localVarQueryParameter['username'] = username;
             }
 
             if (personenstatus !== undefined) {
@@ -9109,98 +9109,6 @@ export const PersonenApiAxiosParamCreator = function (configuration?: Configurat
 
             if (sichtfreigabe !== undefined) {
                 localVarQueryParameter['sichtfreigabe'] = sichtfreigabe;
-            }
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @param {number} [offset] The offset of the paginated list.
-         * @param {number} [limit] The requested limit for the page size.
-         * @param {string} [referrer] 
-         * @param {string} [familienname] 
-         * @param {string} [vorname] 
-         * @param {'ja' | 'nein'} [sichtfreigabe] 
-         * @param {Array<string>} [organisationIDs] List of Organisation ID used to filter for Persons.
-         * @param {Array<string>} [rolleIDs] List of Role ID used to filter for Persons.
-         * @param {string} [suchFilter] Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.
-         * @param {ScopeOrder} [sortOrder] Order to sort by.
-         * @param {SortFieldPerson} [sortField] Field to sort by.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        personControllerFindPersons: async (offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', organisationIDs?: Array<string>, rolleIDs?: Array<string>, suchFilter?: string, sortOrder?: ScopeOrder, sortField?: SortFieldPerson, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/personen`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication bearer required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            // authentication oauth2 required
-            // oauth required
-            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
-
-            if (offset !== undefined) {
-                localVarQueryParameter['offset'] = offset;
-            }
-
-            if (limit !== undefined) {
-                localVarQueryParameter['limit'] = limit;
-            }
-
-            if (referrer !== undefined) {
-                localVarQueryParameter['referrer'] = referrer;
-            }
-
-            if (familienname !== undefined) {
-                localVarQueryParameter['familienname'] = familienname;
-            }
-
-            if (vorname !== undefined) {
-                localVarQueryParameter['vorname'] = vorname;
-            }
-
-            if (sichtfreigabe !== undefined) {
-                localVarQueryParameter['sichtfreigabe'] = sichtfreigabe;
-            }
-
-            if (organisationIDs) {
-                localVarQueryParameter['organisationIDs'] = organisationIDs;
-            }
-
-            if (rolleIDs) {
-                localVarQueryParameter['rolleIDs'] = rolleIDs;
-            }
-
-            if (suchFilter !== undefined) {
-                localVarQueryParameter['suchFilter'] = suchFilter;
-            }
-
-            if (sortOrder !== undefined) {
-                localVarQueryParameter['sortOrder'] = sortOrder;
-            }
-
-            if (sortField !== undefined) {
-                localVarQueryParameter['sortField'] = sortField;
             }
 
 
@@ -9577,34 +9485,14 @@ export const PersonenApiFp = function(configuration?: Configuration) {
          * @param {number} [offset] The offset of the paginated list.
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [personId2] 
-         * @param {string} [referrer] 
+         * @param {string} [username] 
          * @param {Personenstatus} [personenstatus] 
          * @param {Sichtfreigabe} [sichtfreigabe] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async personControllerFindPersonenkontexte(personId: string, offset?: number, limit?: number, personId2?: string, referrer?: string, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonControllerFindPersonenkontexte200Response>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.personControllerFindPersonenkontexte(personId, offset, limit, personId2, referrer, personenstatus, sichtfreigabe, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * 
-         * @param {number} [offset] The offset of the paginated list.
-         * @param {number} [limit] The requested limit for the page size.
-         * @param {string} [referrer] 
-         * @param {string} [familienname] 
-         * @param {string} [vorname] 
-         * @param {'ja' | 'nein'} [sichtfreigabe] 
-         * @param {Array<string>} [organisationIDs] List of Organisation ID used to filter for Persons.
-         * @param {Array<string>} [rolleIDs] List of Role ID used to filter for Persons.
-         * @param {string} [suchFilter] Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.
-         * @param {ScopeOrder} [sortOrder] Order to sort by.
-         * @param {SortFieldPerson} [sortField] Field to sort by.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async personControllerFindPersons(offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', organisationIDs?: Array<string>, rolleIDs?: Array<string>, suchFilter?: string, sortOrder?: ScopeOrder, sortField?: SortFieldPerson, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PersonendatensatzResponse>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.personControllerFindPersons(offset, limit, referrer, familienname, vorname, sichtfreigabe, organisationIDs, rolleIDs, suchFilter, sortOrder, sortField, options);
+        async personControllerFindPersonenkontexte(personId: string, offset?: number, limit?: number, personId2?: string, username?: string, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonControllerFindPersonenkontexte200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.personControllerFindPersonenkontexte(personId, offset, limit, personId2, username, personenstatus, sichtfreigabe, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -9737,33 +9625,14 @@ export const PersonenApiFactory = function (configuration?: Configuration, baseP
          * @param {number} [offset] The offset of the paginated list.
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [personId2] 
-         * @param {string} [referrer] 
+         * @param {string} [username] 
          * @param {Personenstatus} [personenstatus] 
          * @param {Sichtfreigabe} [sichtfreigabe] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personControllerFindPersonenkontexte(personId: string, offset?: number, limit?: number, personId2?: string, referrer?: string, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options?: any): AxiosPromise<PersonControllerFindPersonenkontexte200Response> {
-            return localVarFp.personControllerFindPersonenkontexte(personId, offset, limit, personId2, referrer, personenstatus, sichtfreigabe, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @param {number} [offset] The offset of the paginated list.
-         * @param {number} [limit] The requested limit for the page size.
-         * @param {string} [referrer] 
-         * @param {string} [familienname] 
-         * @param {string} [vorname] 
-         * @param {'ja' | 'nein'} [sichtfreigabe] 
-         * @param {Array<string>} [organisationIDs] List of Organisation ID used to filter for Persons.
-         * @param {Array<string>} [rolleIDs] List of Role ID used to filter for Persons.
-         * @param {string} [suchFilter] Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.
-         * @param {ScopeOrder} [sortOrder] Order to sort by.
-         * @param {SortFieldPerson} [sortField] Field to sort by.
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        personControllerFindPersons(offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', organisationIDs?: Array<string>, rolleIDs?: Array<string>, suchFilter?: string, sortOrder?: ScopeOrder, sortField?: SortFieldPerson, options?: any): AxiosPromise<Array<PersonendatensatzResponse>> {
-            return localVarFp.personControllerFindPersons(offset, limit, referrer, familienname, vorname, sichtfreigabe, organisationIDs, rolleIDs, suchFilter, sortOrder, sortField, options).then((request) => request(axios, basePath));
+        personControllerFindPersonenkontexte(personId: string, offset?: number, limit?: number, personId2?: string, username?: string, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options?: any): AxiosPromise<PersonControllerFindPersonenkontexte200Response> {
+            return localVarFp.personControllerFindPersonenkontexte(personId, offset, limit, personId2, username, personenstatus, sichtfreigabe, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -9887,33 +9756,14 @@ export interface PersonenApiInterface {
      * @param {number} [offset] The offset of the paginated list.
      * @param {number} [limit] The requested limit for the page size.
      * @param {string} [personId2] 
-     * @param {string} [referrer] 
+     * @param {string} [username] 
      * @param {Personenstatus} [personenstatus] 
      * @param {Sichtfreigabe} [sichtfreigabe] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonenApiInterface
      */
-    personControllerFindPersonenkontexte(personId: string, offset?: number, limit?: number, personId2?: string, referrer?: string, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options?: AxiosRequestConfig): AxiosPromise<PersonControllerFindPersonenkontexte200Response>;
-
-    /**
-     * 
-     * @param {number} [offset] The offset of the paginated list.
-     * @param {number} [limit] The requested limit for the page size.
-     * @param {string} [referrer] 
-     * @param {string} [familienname] 
-     * @param {string} [vorname] 
-     * @param {'ja' | 'nein'} [sichtfreigabe] 
-     * @param {Array<string>} [organisationIDs] List of Organisation ID used to filter for Persons.
-     * @param {Array<string>} [rolleIDs] List of Role ID used to filter for Persons.
-     * @param {string} [suchFilter] Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.
-     * @param {ScopeOrder} [sortOrder] Order to sort by.
-     * @param {SortFieldPerson} [sortField] Field to sort by.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof PersonenApiInterface
-     */
-    personControllerFindPersons(offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', organisationIDs?: Array<string>, rolleIDs?: Array<string>, suchFilter?: string, sortOrder?: ScopeOrder, sortField?: SortFieldPerson, options?: AxiosRequestConfig): AxiosPromise<Array<PersonendatensatzResponse>>;
+    personControllerFindPersonenkontexte(personId: string, offset?: number, limit?: number, personId2?: string, username?: string, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options?: AxiosRequestConfig): AxiosPromise<PersonControllerFindPersonenkontexte200Response>;
 
     /**
      * 
@@ -10045,36 +9895,15 @@ export class PersonenApi extends BaseAPI implements PersonenApiInterface {
      * @param {number} [offset] The offset of the paginated list.
      * @param {number} [limit] The requested limit for the page size.
      * @param {string} [personId2] 
-     * @param {string} [referrer] 
+     * @param {string} [username] 
      * @param {Personenstatus} [personenstatus] 
      * @param {Sichtfreigabe} [sichtfreigabe] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonenApi
      */
-    public personControllerFindPersonenkontexte(personId: string, offset?: number, limit?: number, personId2?: string, referrer?: string, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options?: AxiosRequestConfig) {
-        return PersonenApiFp(this.configuration).personControllerFindPersonenkontexte(personId, offset, limit, personId2, referrer, personenstatus, sichtfreigabe, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @param {number} [offset] The offset of the paginated list.
-     * @param {number} [limit] The requested limit for the page size.
-     * @param {string} [referrer] 
-     * @param {string} [familienname] 
-     * @param {string} [vorname] 
-     * @param {'ja' | 'nein'} [sichtfreigabe] 
-     * @param {Array<string>} [organisationIDs] List of Organisation ID used to filter for Persons.
-     * @param {Array<string>} [rolleIDs] List of Role ID used to filter for Persons.
-     * @param {string} [suchFilter] Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.
-     * @param {ScopeOrder} [sortOrder] Order to sort by.
-     * @param {SortFieldPerson} [sortField] Field to sort by.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof PersonenApi
-     */
-    public personControllerFindPersons(offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', organisationIDs?: Array<string>, rolleIDs?: Array<string>, suchFilter?: string, sortOrder?: ScopeOrder, sortField?: SortFieldPerson, options?: AxiosRequestConfig) {
-        return PersonenApiFp(this.configuration).personControllerFindPersons(offset, limit, referrer, familienname, vorname, sichtfreigabe, organisationIDs, rolleIDs, suchFilter, sortOrder, sortField, options).then((request) => request(this.axios, this.basePath));
+    public personControllerFindPersonenkontexte(personId: string, offset?: number, limit?: number, personId2?: string, username?: string, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options?: AxiosRequestConfig) {
+        return PersonenApiFp(this.configuration).personControllerFindPersonenkontexte(personId, offset, limit, personId2, username, personenstatus, sichtfreigabe, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -10168,19 +9997,19 @@ export const PersonenFrontendApiAxiosParamCreator = function (configuration?: Co
          * 
          * @param {number} [offset] The offset of the paginated list.
          * @param {number} [limit] The requested limit for the page size.
-         * @param {string} [referrer] 
+         * @param {string} [username] 
          * @param {string} [familienname] 
          * @param {string} [vorname] 
          * @param {'ja' | 'nein'} [sichtfreigabe] 
          * @param {Array<string>} [organisationIDs] List of Organisation ID used to filter for Persons.
          * @param {Array<string>} [rolleIDs] List of Role ID used to filter for Persons.
-         * @param {string} [suchFilter] Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.
+         * @param {string} [suchFilter] Search filter used to filter for Persons. It could be the vorname, familienname, username or the personalnummer.
          * @param {ScopeOrder} [sortOrder] Order to sort by.
          * @param {SortFieldPerson} [sortField] Field to sort by.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personFrontendControllerFindPersons: async (offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', organisationIDs?: Array<string>, rolleIDs?: Array<string>, suchFilter?: string, sortOrder?: ScopeOrder, sortField?: SortFieldPerson, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        personFrontendControllerFindPersons: async (offset?: number, limit?: number, username?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', organisationIDs?: Array<string>, rolleIDs?: Array<string>, suchFilter?: string, sortOrder?: ScopeOrder, sortField?: SortFieldPerson, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/personen-frontend`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -10209,8 +10038,8 @@ export const PersonenFrontendApiAxiosParamCreator = function (configuration?: Co
                 localVarQueryParameter['limit'] = limit;
             }
 
-            if (referrer !== undefined) {
-                localVarQueryParameter['referrer'] = referrer;
+            if (username !== undefined) {
+                localVarQueryParameter['username'] = username;
             }
 
             if (familienname !== undefined) {
@@ -10270,20 +10099,20 @@ export const PersonenFrontendApiFp = function(configuration?: Configuration) {
          * 
          * @param {number} [offset] The offset of the paginated list.
          * @param {number} [limit] The requested limit for the page size.
-         * @param {string} [referrer] 
+         * @param {string} [username] 
          * @param {string} [familienname] 
          * @param {string} [vorname] 
          * @param {'ja' | 'nein'} [sichtfreigabe] 
          * @param {Array<string>} [organisationIDs] List of Organisation ID used to filter for Persons.
          * @param {Array<string>} [rolleIDs] List of Role ID used to filter for Persons.
-         * @param {string} [suchFilter] Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.
+         * @param {string} [suchFilter] Search filter used to filter for Persons. It could be the vorname, familienname, username or the personalnummer.
          * @param {ScopeOrder} [sortOrder] Order to sort by.
          * @param {SortFieldPerson} [sortField] Field to sort by.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async personFrontendControllerFindPersons(offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', organisationIDs?: Array<string>, rolleIDs?: Array<string>, suchFilter?: string, sortOrder?: ScopeOrder, sortField?: SortFieldPerson, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonFrontendControllerFindPersons200Response>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.personFrontendControllerFindPersons(offset, limit, referrer, familienname, vorname, sichtfreigabe, organisationIDs, rolleIDs, suchFilter, sortOrder, sortField, options);
+        async personFrontendControllerFindPersons(offset?: number, limit?: number, username?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', organisationIDs?: Array<string>, rolleIDs?: Array<string>, suchFilter?: string, sortOrder?: ScopeOrder, sortField?: SortFieldPerson, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonFrontendControllerFindPersons200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.personFrontendControllerFindPersons(offset, limit, username, familienname, vorname, sichtfreigabe, organisationIDs, rolleIDs, suchFilter, sortOrder, sortField, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -10300,20 +10129,20 @@ export const PersonenFrontendApiFactory = function (configuration?: Configuratio
          * 
          * @param {number} [offset] The offset of the paginated list.
          * @param {number} [limit] The requested limit for the page size.
-         * @param {string} [referrer] 
+         * @param {string} [username] 
          * @param {string} [familienname] 
          * @param {string} [vorname] 
          * @param {'ja' | 'nein'} [sichtfreigabe] 
          * @param {Array<string>} [organisationIDs] List of Organisation ID used to filter for Persons.
          * @param {Array<string>} [rolleIDs] List of Role ID used to filter for Persons.
-         * @param {string} [suchFilter] Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.
+         * @param {string} [suchFilter] Search filter used to filter for Persons. It could be the vorname, familienname, username or the personalnummer.
          * @param {ScopeOrder} [sortOrder] Order to sort by.
          * @param {SortFieldPerson} [sortField] Field to sort by.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personFrontendControllerFindPersons(offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', organisationIDs?: Array<string>, rolleIDs?: Array<string>, suchFilter?: string, sortOrder?: ScopeOrder, sortField?: SortFieldPerson, options?: any): AxiosPromise<PersonFrontendControllerFindPersons200Response> {
-            return localVarFp.personFrontendControllerFindPersons(offset, limit, referrer, familienname, vorname, sichtfreigabe, organisationIDs, rolleIDs, suchFilter, sortOrder, sortField, options).then((request) => request(axios, basePath));
+        personFrontendControllerFindPersons(offset?: number, limit?: number, username?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', organisationIDs?: Array<string>, rolleIDs?: Array<string>, suchFilter?: string, sortOrder?: ScopeOrder, sortField?: SortFieldPerson, options?: any): AxiosPromise<PersonFrontendControllerFindPersons200Response> {
+            return localVarFp.personFrontendControllerFindPersons(offset, limit, username, familienname, vorname, sichtfreigabe, organisationIDs, rolleIDs, suchFilter, sortOrder, sortField, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -10328,20 +10157,20 @@ export interface PersonenFrontendApiInterface {
      * 
      * @param {number} [offset] The offset of the paginated list.
      * @param {number} [limit] The requested limit for the page size.
-     * @param {string} [referrer] 
+     * @param {string} [username] 
      * @param {string} [familienname] 
      * @param {string} [vorname] 
      * @param {'ja' | 'nein'} [sichtfreigabe] 
      * @param {Array<string>} [organisationIDs] List of Organisation ID used to filter for Persons.
      * @param {Array<string>} [rolleIDs] List of Role ID used to filter for Persons.
-     * @param {string} [suchFilter] Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.
+     * @param {string} [suchFilter] Search filter used to filter for Persons. It could be the vorname, familienname, username or the personalnummer.
      * @param {ScopeOrder} [sortOrder] Order to sort by.
      * @param {SortFieldPerson} [sortField] Field to sort by.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonenFrontendApiInterface
      */
-    personFrontendControllerFindPersons(offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', organisationIDs?: Array<string>, rolleIDs?: Array<string>, suchFilter?: string, sortOrder?: ScopeOrder, sortField?: SortFieldPerson, options?: AxiosRequestConfig): AxiosPromise<PersonFrontendControllerFindPersons200Response>;
+    personFrontendControllerFindPersons(offset?: number, limit?: number, username?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', organisationIDs?: Array<string>, rolleIDs?: Array<string>, suchFilter?: string, sortOrder?: ScopeOrder, sortField?: SortFieldPerson, options?: AxiosRequestConfig): AxiosPromise<PersonFrontendControllerFindPersons200Response>;
 
 }
 
@@ -10356,21 +10185,21 @@ export class PersonenFrontendApi extends BaseAPI implements PersonenFrontendApiI
      * 
      * @param {number} [offset] The offset of the paginated list.
      * @param {number} [limit] The requested limit for the page size.
-     * @param {string} [referrer] 
+     * @param {string} [username] 
      * @param {string} [familienname] 
      * @param {string} [vorname] 
      * @param {'ja' | 'nein'} [sichtfreigabe] 
      * @param {Array<string>} [organisationIDs] List of Organisation ID used to filter for Persons.
      * @param {Array<string>} [rolleIDs] List of Role ID used to filter for Persons.
-     * @param {string} [suchFilter] Search filter used to filter for Persons. It could be the vorname, familienname, referrer or the personalnummer.
+     * @param {string} [suchFilter] Search filter used to filter for Persons. It could be the vorname, familienname, username or the personalnummer.
      * @param {ScopeOrder} [sortOrder] Order to sort by.
      * @param {SortFieldPerson} [sortField] Field to sort by.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonenFrontendApi
      */
-    public personFrontendControllerFindPersons(offset?: number, limit?: number, referrer?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', organisationIDs?: Array<string>, rolleIDs?: Array<string>, suchFilter?: string, sortOrder?: ScopeOrder, sortField?: SortFieldPerson, options?: AxiosRequestConfig) {
-        return PersonenFrontendApiFp(this.configuration).personFrontendControllerFindPersons(offset, limit, referrer, familienname, vorname, sichtfreigabe, organisationIDs, rolleIDs, suchFilter, sortOrder, sortField, options).then((request) => request(this.axios, this.basePath));
+    public personFrontendControllerFindPersons(offset?: number, limit?: number, username?: string, familienname?: string, vorname?: string, sichtfreigabe?: 'ja' | 'nein', organisationIDs?: Array<string>, rolleIDs?: Array<string>, suchFilter?: string, sortOrder?: ScopeOrder, sortField?: SortFieldPerson, options?: AxiosRequestConfig) {
+        return PersonenFrontendApiFp(this.configuration).personFrontendControllerFindPersons(offset, limit, username, familienname, vorname, sichtfreigabe, organisationIDs, rolleIDs, suchFilter, sortOrder, sortField, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -10988,13 +10817,13 @@ export const PersonenkontexteApiAxiosParamCreator = function (configuration?: Co
          * @param {number} [offset] The offset of the paginated list.
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [personId] 
-         * @param {string} [referrer] 
+         * @param {string} [username] 
          * @param {Personenstatus} [personenstatus] 
          * @param {Sichtfreigabe} [sichtfreigabe] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personenkontextControllerFindPersonenkontexte: async (offset?: number, limit?: number, personId?: string, referrer?: string, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        personenkontextControllerFindPersonenkontexte: async (offset?: number, limit?: number, personId?: string, username?: string, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/personenkontexte`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -11027,8 +10856,8 @@ export const PersonenkontexteApiAxiosParamCreator = function (configuration?: Co
                 localVarQueryParameter['personId'] = personId;
             }
 
-            if (referrer !== undefined) {
-                localVarQueryParameter['referrer'] = referrer;
+            if (username !== undefined) {
+                localVarQueryParameter['username'] = username;
             }
 
             if (personenstatus !== undefined) {
@@ -11129,14 +10958,14 @@ export const PersonenkontexteApiFp = function(configuration?: Configuration) {
          * @param {number} [offset] The offset of the paginated list.
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [personId] 
-         * @param {string} [referrer] 
+         * @param {string} [username] 
          * @param {Personenstatus} [personenstatus] 
          * @param {Sichtfreigabe} [sichtfreigabe] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async personenkontextControllerFindPersonenkontexte(offset?: number, limit?: number, personId?: string, referrer?: string, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PersonenkontextdatensatzResponse>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.personenkontextControllerFindPersonenkontexte(offset, limit, personId, referrer, personenstatus, sichtfreigabe, options);
+        async personenkontextControllerFindPersonenkontexte(offset?: number, limit?: number, personId?: string, username?: string, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PersonenkontextdatensatzResponse>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.personenkontextControllerFindPersonenkontexte(offset, limit, personId, username, personenstatus, sichtfreigabe, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -11185,14 +11014,14 @@ export const PersonenkontexteApiFactory = function (configuration?: Configuratio
          * @param {number} [offset] The offset of the paginated list.
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [personId] 
-         * @param {string} [referrer] 
+         * @param {string} [username] 
          * @param {Personenstatus} [personenstatus] 
          * @param {Sichtfreigabe} [sichtfreigabe] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personenkontextControllerFindPersonenkontexte(offset?: number, limit?: number, personId?: string, referrer?: string, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options?: any): AxiosPromise<Array<PersonenkontextdatensatzResponse>> {
-            return localVarFp.personenkontextControllerFindPersonenkontexte(offset, limit, personId, referrer, personenstatus, sichtfreigabe, options).then((request) => request(axios, basePath));
+        personenkontextControllerFindPersonenkontexte(offset?: number, limit?: number, personId?: string, username?: string, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options?: any): AxiosPromise<Array<PersonenkontextdatensatzResponse>> {
+            return localVarFp.personenkontextControllerFindPersonenkontexte(offset, limit, personId, username, personenstatus, sichtfreigabe, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -11238,14 +11067,14 @@ export interface PersonenkontexteApiInterface {
      * @param {number} [offset] The offset of the paginated list.
      * @param {number} [limit] The requested limit for the page size.
      * @param {string} [personId] 
-     * @param {string} [referrer] 
+     * @param {string} [username] 
      * @param {Personenstatus} [personenstatus] 
      * @param {Sichtfreigabe} [sichtfreigabe] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonenkontexteApiInterface
      */
-    personenkontextControllerFindPersonenkontexte(offset?: number, limit?: number, personId?: string, referrer?: string, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options?: AxiosRequestConfig): AxiosPromise<Array<PersonenkontextdatensatzResponse>>;
+    personenkontextControllerFindPersonenkontexte(offset?: number, limit?: number, personId?: string, username?: string, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options?: AxiosRequestConfig): AxiosPromise<Array<PersonenkontextdatensatzResponse>>;
 
     /**
      * 
@@ -11295,15 +11124,15 @@ export class PersonenkontexteApi extends BaseAPI implements PersonenkontexteApiI
      * @param {number} [offset] The offset of the paginated list.
      * @param {number} [limit] The requested limit for the page size.
      * @param {string} [personId] 
-     * @param {string} [referrer] 
+     * @param {string} [username] 
      * @param {Personenstatus} [personenstatus] 
      * @param {Sichtfreigabe} [sichtfreigabe] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonenkontexteApi
      */
-    public personenkontextControllerFindPersonenkontexte(offset?: number, limit?: number, personId?: string, referrer?: string, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options?: AxiosRequestConfig) {
-        return PersonenkontexteApiFp(this.configuration).personenkontextControllerFindPersonenkontexte(offset, limit, personId, referrer, personenstatus, sichtfreigabe, options).then((request) => request(this.axios, this.basePath));
+    public personenkontextControllerFindPersonenkontexte(offset?: number, limit?: number, personId?: string, username?: string, personenstatus?: Personenstatus, sichtfreigabe?: Sichtfreigabe, options?: AxiosRequestConfig) {
+        return PersonenkontexteApiFp(this.configuration).personenkontextControllerFindPersonenkontexte(offset, limit, personId, username, personenstatus, sichtfreigabe, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

@@ -1702,7 +1702,7 @@
                     class="d-flex align-center"
                     data-testid="person-username"
                   >
-                    <span class="text-body text-break">{{ personStore.currentPerson.person.referrer }}</span>
+                    <span class="text-body text-break">{{ personStore.currentPerson.person.username }}</span>
                   </v-col>
                 </v-row>
 
