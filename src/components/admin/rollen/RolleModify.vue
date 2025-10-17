@@ -5,18 +5,24 @@
   import { useBulkErrors, type BulkErrorList } from '@/composables/useBulkErrors';
   import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
   import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
-  import { OperationContext, usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
+  import {
+    KlassenOption,
+    OperationContext,
+    RolleDialogMode,
+    usePersonenkontextStore,
+    type PersonenkontextStore,
+  } from '@/stores/PersonenkontextStore';
   import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
   import type { TranslatedObject } from '@/types';
   import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
   import { formatDateToISO, getNextSchuljahresende } from '@/utils/date';
-  import { befristungSchema, isKopersRolle } from '@/utils/validationPersonenkontext';
+  import { befristungSchema, isKopersRolle, isLernRolle } from '@/utils/validationPersonenkontext';
   import { toTypedSchema } from '@vee-validate/yup';
   import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
   import { computed, ref, watchEffect, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
-  import { object, string } from 'yup';
+  import { object, string, StringSchema } from 'yup';
 
   type Props = {
     errorCode: string;
@@ -58,6 +64,8 @@
   export type ZuordnungCreationForm = {
     selectedRolle: string;
     selectedOrganisation: string;
+    selectedKlassenOption: string;
+    selectedKlasseForRadio: string;
     selectedBefristung: Date;
     selectedBefristungOption: string;
   };
@@ -67,6 +75,12 @@
       object({
         selectedRolle: string().required(t('admin.rolle.rules.rolle.required')),
         selectedOrganisation: string().required(t('admin.organisation.rules.organisation.required')),
+        selectedKlassenOption: string(),
+        selectedKlasseForRadio: string().when('selectedKlassenOption', {
+          is: (selectedKlassenOption: string) => selectedKlassenOption === KlassenOption.SELECT_NEW_KLASSE,
+          then: (schema: StringSchema) => schema.required(t('admin.klasse.rules.klasse.required')),
+          otherwise: (schema: StringSchema) => schema.notRequired(),
+        }),
         selectedBefristung: befristungSchema(t),
       }),
     );
@@ -94,6 +108,16 @@
     Ref<string | undefined>,
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = formContext.defineField('selectedRolle', getVuetifyConfig);
+
+  const [selectedKlassenOption, selectedKlassenOptionProps]: [
+    Ref<string | undefined>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = formContext.defineField('selectedKlassenOption', getVuetifyConfig);
+
+  const [selectedKlasseForRadio, selectedKlasseForRadioProps]: [
+    Ref<string | undefined>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = formContext.defineField('selectedKlasseForRadio', getVuetifyConfig);
 
   const selectedRollen: ComputedRef<Array<string>> = computed(() => {
     return selectedRolle.value ? [selectedRolle.value] : [];
@@ -166,6 +190,7 @@
       selectedRolle.value!,
       personenkontextStore.workflowStepResponse?.organisations || [],
       formattedBefristung,
+      selectedKlasseForRadio.value,
     );
 
     if (bulkOperationStore.currentOperation?.errors && bulkOperationStore.currentOperation.errors.size > 0) {
@@ -207,6 +232,9 @@
               :rollen="rollen"
               :selectedOrganisationProps="selectedOrganisationProps"
               :selectedRolleProps="selectedRolleProps"
+              :selectedKlassenOptionProps="selectedKlassenOptionProps"
+              :selectedKlasseForRadioProps="selectedKlasseForRadioProps"
+              :rolleDialogMode="RolleDialogMode.MODIFY"
               :befristungInputProps="{
                 befristungProps: selectedBefristungProps,
                 befristungOptionProps: selectedBefristungOptionProps,
@@ -218,12 +246,12 @@
               }"
               v-model:selectedOrganisation="selectedOrganisation"
               v-model:selectedRolle="selectedRolle"
-              @update:selectedOrganisation="(value?: string) => (selectedOrganisation = value)"
-              @update:selectedRolle="(value?: string) => (selectedRolle = value)"
+              v-model:selectedKlassenOption="selectedKlassenOption"
+              v-model:selectedKlasseForRadio="selectedKlasseForRadio"
               @update:canCommit="canCommit = $event"
-              @update:befristung="handleBefristungUpdate"
-              @update:calculatedBefristungOption="handleBefristungOptionUpdate"
-              @fieldReset="handleFieldReset"
+              @update:befristung="handleBefristungUpdate($event)"
+              @update:calculatedBefristungOption="handleBefristungOptionUpdate($event)"
+              @fieldReset="handleFieldReset($event)"
             />
 
             <v-row
@@ -237,6 +265,23 @@
               >
                 <p>
                   {{ t('admin.person.bulkRolleModify.noKopersNrInfoText') }}
+                </p>
+              </v-col>
+            </v-row>
+            <v-row
+              v-if="isLernRolle(selectedRolle ?? '')"
+              class="text-body bold px-md-16"
+              data-testid="modify-Rolle-hint"
+            >
+              <v-col
+                offset="2"
+                cols="10"
+              >
+                <p v-if="selectedKlassenOption === KlassenOption.KEEP_KLASSE">
+                  {{ t('admin.person.bulkRolleModify.keepKlasseHint') }}
+                </p>
+                <p v-else-if="selectedKlassenOption === KlassenOption.SELECT_NEW_KLASSE">
+                  {{ t('admin.person.bulkRolleModify.newKlasseHint') }}
                 </p>
               </v-col>
             </v-row>

@@ -869,9 +869,9 @@
                 v-model:selectedRollen="selectedRollen"
                 v-model:selectedKlasse="selectedKlasse"
                 @update:canCommit="canCommit = $event"
-                @update:befristung="handleBefristungUpdate"
-                @update:calculatedBefristungOption="handleBefristungOptionUpdate"
-                @fieldReset="handleFieldReset"
+                @update:befristung="handleBefristungUpdate($event)"
+                @update:calculatedBefristungOption="handleBefristungOptionUpdate($event)"
+                @fieldReset="handleFieldReset($event)"
               />
             </template>
             <template v-else>
@@ -900,9 +900,9 @@
                 v-model:selectedRollen="selectedRollen"
                 v-model:selectedKlasse="selectedKlasse"
                 @update:canCommit="canCommit = $event"
-                @update:befristung="handleBefristungUpdate"
-                @update:calculatedBefristungOption="handleBefristungOptionUpdate"
-                @fieldReset="handleFieldReset"
+                @update:befristung="handleBefristungUpdate($event)"
+                @update:calculatedBefristungOption="handleBefristungOptionUpdate($event)"
+                @fieldReset="handleFieldReset($event)"
               />
               <!-- Else: Default Order -->
               <div v-if="selectedOrganisation">

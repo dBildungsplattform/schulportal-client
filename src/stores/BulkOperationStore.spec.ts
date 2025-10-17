@@ -462,18 +462,29 @@ describe('BulkOperationStore', () => {
       expect(bulkOperationStore.currentOperation?.progress).toBe(100);
       expect(bulkOperationStore.currentOperation?.successMessage).toBe('admin.rolle.rollenAssignedSuccessfully');
       expect(bulkOperationStore.currentOperation?.errors).toEqual(new Map());
+
       mockPersonResponses.forEach((response: DBiamPersonenuebersichtResponse) => {
         const personId: string = response.personId;
         const correctBefristung: string = isBefore(response.zuordnungen[0]!.befristung!, befristung)
           ? response.zuordnungen[0]!.befristung!
           : befristung;
-        expect(spy).toHaveBeenCalledWith(
-          [
-            ...response.zuordnungen.map((zuordnung: DBiamPersonenzuordnungResponse) => ({
+
+        // Filter out old zuordnungen that will be replaced by the new one (same orgId + rolleId)
+        const otherZuordnungen: Array<{ organisationId: string; rolleId: string; befristung?: string }> =
+          response.zuordnungen
+            .filter(
+              (z: DBiamPersonenzuordnungResponse) =>
+                !(z.sskId === selectedOrganisationId && z.rolleId === selectedRolleId),
+            )
+            .map((zuordnung: DBiamPersonenzuordnungResponse) => ({
               organisationId: zuordnung.sskId,
               rolleId: zuordnung.rolleId,
               befristung: zuordnung.befristung ?? undefined,
-            })),
+            }));
+
+        expect(spy).toHaveBeenCalledWith(
+          [
+            ...otherZuordnungen,
             {
               befristung: correctBefristung,
               organisationId: selectedOrganisationId,
@@ -483,6 +494,127 @@ describe('BulkOperationStore', () => {
           personId,
         );
       });
+    });
+
+    it('should add a new klassen-zuordnung when selectedKlasseId is provided', async () => {
+      const selectedOrganisationId: string = faker.string.uuid();
+      const selectedRolleId: string = faker.string.uuid();
+      const selectedKlasseId: string = faker.string.uuid();
+      const personId: string = faker.string.uuid();
+
+      const workflowStepResponseOrganisations: Organisation[] = [
+        DoFactory.getOrganisationResponse({ id: selectedOrganisationId }),
+      ];
+
+      const mockPersonResponse: DBiamPersonenuebersichtResponse = DoFactory.getDBiamPersonenuebersichtResponse({
+        personId,
+        zuordnungen: [],
+      });
+
+      const mockUpdateResponse: PersonenkontexteUpdateResponse = DoFactory.getPersonenkontextUpdateResponse({
+        dBiamPersonenkontextResponses: [
+          DoFactory.getDBiamPersonenkontextResponse({
+            personId,
+            organisationId: selectedOrganisationId,
+            rolleId: selectedRolleId,
+          }),
+          DoFactory.getDBiamPersonenkontextResponse({
+            personId,
+            organisationId: selectedKlasseId,
+            rolleId: selectedRolleId,
+          }),
+        ],
+      });
+
+      const spy: MockInstance = vi.spyOn(personenkontextStore, 'updatePersonenkontexte');
+
+      mockAdapter.onGet(`/api/dbiam/personenuebersicht/${personId}`).replyOnce(200, mockPersonResponse);
+      mockAdapter.onPut(`/api/personenkontext-workflow/${personId}`).replyOnce(200, mockUpdateResponse);
+
+      await bulkOperationStore.bulkModifyPersonenRolle(
+        [personId],
+        selectedOrganisationId,
+        selectedRolleId,
+        workflowStepResponseOrganisations,
+        undefined,
+        selectedKlasseId,
+      );
+
+      expect(spy).toHaveBeenCalledWith(
+        [
+          { organisationId: selectedOrganisationId, rolleId: selectedRolleId },
+          { organisationId: selectedKlasseId, rolleId: selectedRolleId, befristung: undefined },
+        ],
+        personId,
+      );
+    });
+
+    it('should reuse existing klassen-zuordnungen when selectedKlasseId is undefined', async () => {
+      const selectedOrganisationId: string = faker.string.uuid();
+      const selectedRolleId: string = faker.string.uuid();
+      const personId: string = faker.string.uuid();
+      const existingKlasseId: string = faker.string.uuid();
+
+      const workflowStepResponseOrganisations: Organisation[] = [
+        DoFactory.getOrganisationResponse({ id: selectedOrganisationId }),
+      ];
+
+      const existingZuordnung: DBiamPersonenzuordnungResponse = DoFactory.getDBiamPersonenzuordnungResponse(
+        {
+          rolleId: selectedRolleId,
+          rolle: 'AltRolle',
+          editable: true,
+          merkmale: [],
+          rollenArt: RollenArt.Lern,
+          admins: [faker.person.fullName()],
+          befristung: null,
+          administriertVon: selectedOrganisationId,
+          typ: OrganisationsTyp.Klasse,
+        },
+        {
+          organisation: DoFactory.getOrganisationResponse({
+            id: existingKlasseId,
+            administriertVon: selectedOrganisationId,
+          }),
+        },
+      );
+
+      const mockPersonResponse: DBiamPersonenuebersichtResponse = DoFactory.getDBiamPersonenuebersichtResponse({
+        personId,
+        zuordnungen: [existingZuordnung],
+      });
+
+      const mockUpdateResponse: PersonenkontexteUpdateResponse = DoFactory.getPersonenkontextUpdateResponse({
+        dBiamPersonenkontextResponses: [
+          DoFactory.getDBiamPersonenkontextResponse({
+            personId,
+            organisationId: selectedOrganisationId,
+            rolleId: selectedRolleId,
+          }),
+        ],
+      });
+
+      const spy: MockInstance = vi.spyOn(personenkontextStore, 'updatePersonenkontexte');
+
+      mockAdapter.onGet(`/api/dbiam/personenuebersicht/${personId}`).replyOnce(200, mockPersonResponse);
+      mockAdapter.onPut(`/api/personenkontext-workflow/${personId}`).replyOnce(200, mockUpdateResponse);
+
+      await bulkOperationStore.bulkModifyPersonenRolle(
+        [personId],
+        selectedOrganisationId,
+        selectedRolleId,
+        workflowStepResponseOrganisations,
+        undefined,
+        undefined,
+      );
+
+      expect(spy).toHaveBeenCalledWith(
+        expect.arrayContaining([
+          { organisationId: existingKlasseId, rolleId: selectedRolleId, befristung: undefined },
+          { organisationId: selectedOrganisationId, rolleId: selectedRolleId, befristung: undefined },
+        ]),
+        personId,
+      );
     });
 
     it('should handle errors from both endpoints gracefully', async () => {
