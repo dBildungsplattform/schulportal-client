@@ -179,9 +179,9 @@
 
   const validationSchema: TypedSchema = toTypedSchema(
     object({
-      selectedRollen: array()
-        .of(string().required(t('admin.rolle.rules.rolle.required')))
-        .min(1, t('admin.rolle.rules.rolle.required')),
+      selectedRollen: array(string().required(t('admin.rolle.rules.rolle.required'))).required(
+        t('admin.rolle.rules.rolle.required'),
+      ),
       selectedVorname: string()
         .matches(DIN_91379A, t('admin.person.rules.vorname.matches'))
         .matches(NO_LEADING_TRAILING_SPACES, t('admin.person.rules.vorname.noLeadingTrailingSpaces'))
