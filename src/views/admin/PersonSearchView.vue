@@ -421,13 +421,13 @@
         <!-- Error Message Display for error messages from the personStore -->
         <SpshAlert
           :modelValue="!!personStore.errorCode"
-          :title="t(`admin.person.title.${personStore.errorCode}`)"
+          :title="personStore.errorCode ? t(`admin.person.title.${personStore.errorCode}`) : ''"
           :type="'error'"
           :closable="false"
           :showButton="true"
           :buttonText="t('admin.person.backToCreatePerson')"
           :buttonAction="navigateBackToPersonSearchForm"
-          :text="t(`admin.person.errors.${personStore.errorCode}`)"
+          :text="personStore.errorCode ? t(`admin.person.errors.${personStore.errorCode}`) : ''"
         />
 
         <v-row
