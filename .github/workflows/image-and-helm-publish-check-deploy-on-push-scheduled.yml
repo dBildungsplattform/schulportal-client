@@ -10,6 +10,13 @@ on:
   schedule:
     - cron: '0 2 * * *'
   delete:
+  workflow_dispatch:
+    inputs:
+      target_branch:
+        description: 'Branch to run the workflow on'
+        required: true
+        default: 'main'
+
 
 concurrency:
   group: schulportal-client-${{ github.event.ref }}
@@ -231,10 +238,10 @@ jobs:
     steps:
       - run: echo "Deletion of namespace" ${{ needs.create_branch_identifier_for_deletion.outputs.namespace_from_branch }} "done"
   
-  # Scheduled
-  scheduled_trivy_scan:
-    name: 'Scheduled trivy scan of latest image'
-    if: ${{ github.event_name == 'schedule' }}
+  # Scheduled or manual trivy scan of latest image
+  trivy_scan:
+    name: 'Scheduled or manual trivy scan of latest image'
+    if: ${{ github.event_name == 'schedule' or github.event_name == 'workflow_dispatch' }}
     permissions:
       packages: read
       security-events: write
@@ -249,7 +256,7 @@ jobs:
   trivy_scan_rocketchat_notification:
     if: github.event_name == 'schedule' && failure()
     needs:
-    - scheduled_trivy_scan
+    - trivy_scan
     runs-on: 'ubuntu-latest'
     steps:
     - name: Send Notification to Rocket Chat
