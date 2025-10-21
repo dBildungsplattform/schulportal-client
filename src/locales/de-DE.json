@@ -5,6 +5,8 @@
     "administrationsebene": "Administrationsebene",
     "rollen": "Rollen",
     "schulspezifischErweitert": "Schulspezifisch erweitert",
+    "schulspezifischeRollenerweiterung": "Schulspezifische Rollenerweiterung möglich",
+    "requires2FA": "2FA erforderlich",
     "kategorien": {
       "EMAIL": "Dienstliche Email",
       "UNTERRICHT": "Unterricht",
@@ -26,6 +28,7 @@
       "management": {
         "title": "Angebotsverwaltung"
       },
+      "edit": "Angebot bearbeiten",
       "showAll": "Alle Angebote anzeigen"
     },
     "befristung": {

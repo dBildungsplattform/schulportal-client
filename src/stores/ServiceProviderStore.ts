@@ -6,6 +6,7 @@ import {
   ProviderApiFactory,
   ServiceProviderKategorie,
   ServiceProviderMerkmal,
+  type ManageableServiceProviderResponse,
   type ProviderApiInterface,
   type ProviderControllerGetManageableServiceProviders200Response,
 } from '../api-client/generated/api';
@@ -34,7 +35,7 @@ export type ManageableServiceProviderListEntry = {
   merkmale: Array<ServiceProviderMerkmal>;
   administrationsebene: { id: string; name: string; kennung?: string };
   rollen: Array<{ id: string; name: string }>;
-  hasRollenerweiterung: boolean;
+  hasRollenerweiterung?: boolean;
 };
 
 export type ServiceProviderIdNameResponse = {
@@ -47,6 +48,7 @@ type ServiceProviderState = {
   availableServiceProviders: ServiceProvider[];
   manageableServiceProviders: ManageableServiceProviderListEntry[];
   totalManageableServiceProviders: number;
+  currentServiceProvider: ManageableServiceProviderListEntry | null;
   errorCode: string;
   loading: boolean;
 };
@@ -56,6 +58,7 @@ type ServiceProviderActions = {
   getAllServiceProviders: () => Promise<void>;
   getAvailableServiceProviders: () => Promise<void>;
   getManageableServiceProviders: (page: number, entriesPerPage: number) => Promise<void>;
+  getManageableServiceProviderById: (serviceProviderId: string) => Promise<void>;
 };
 
 export { ServiceProviderKategorie };
@@ -80,6 +83,7 @@ export const useServiceProviderStore: StoreDefinition<
       availableServiceProviders: [],
       manageableServiceProviders: [],
       totalManageableServiceProviders: 0,
+      currentServiceProvider: null,
       errorCode: '',
       loading: false,
     };
@@ -122,6 +126,19 @@ export const useServiceProviderStore: StoreDefinition<
         const { items, total }: ProviderControllerGetManageableServiceProviders200Response = response;
         this.manageableServiceProviders = items;
         this.totalManageableServiceProviders = total;
+      } catch (error: unknown) {
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async getManageableServiceProviderById(serviceProviderId: string) {
+      this.loading = true;
+      try {
+        const { data }: { data: ManageableServiceProviderResponse } =
+          await serviceProviderApi.providerControllerGetManageableServiceProviderById(serviceProviderId);
+        this.currentServiceProvider = data;
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
