@@ -241,7 +241,8 @@ jobs:
   # Scheduled or manual trivy scan of latest image
   trivy_scan:
     name: 'Scheduled or manual trivy scan of latest image'
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'push' # for testing purposes temporally changed
+    #if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     permissions:
       packages: read
       security-events: write
