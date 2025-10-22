@@ -153,8 +153,10 @@
   watch(selectedOrganisation, async (newValue: string | undefined, oldValue: string | undefined) => {
     // Reset selected roles if oldValue existed (change event)
     if (oldValue !== undefined) {
-      selectedRolle.value = undefined;
-      emits('fieldReset', 'selectedRolle');
+      if (selectedRolle.value) {
+        selectedRolle.value = undefined;
+        emits('fieldReset', 'selectedRolle');
+      }
       if (selectedRollen.value?.length) {
         selectedRollen.value = undefined;
         emits('fieldReset', 'selectedRollen');
