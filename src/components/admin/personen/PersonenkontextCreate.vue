@@ -154,9 +154,11 @@
     // Reset selected roles if oldValue existed (change event)
     if (oldValue !== undefined) {
       selectedRolle.value = undefined;
-      selectedRollen.value = undefined;
       emits('fieldReset', 'selectedRolle');
-      emits('fieldReset', 'selectedRollen');
+      if (selectedRollen.value?.length) {
+        selectedRollen.value = undefined;
+        emits('fieldReset', 'selectedRollen');
+      }
     }
     emits('update:selectedOrganisation', newValue);
 
