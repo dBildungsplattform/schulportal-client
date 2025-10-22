@@ -255,7 +255,7 @@ jobs:
 
   trivy_scan_rocketchat_notification:
     #if: github.event_name == 'schedule' && failure()
-    if: ${{ github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }} # for testing purposes temporally also on push
+    if: github.event_name == 'push' && failure() # for testing purposes temporally also on push
     needs:
     - trivy_scan
     runs-on: 'ubuntu-latest'
