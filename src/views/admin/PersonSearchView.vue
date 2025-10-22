@@ -226,21 +226,28 @@
       personStore.allLandesbedienstetePersonen = [];
     }
 
-    // If the search was successful but the person has no Kopers number or is manually locked, we get this error Code.
-    if (personStore.errorCode === 'LANDESBEDIENSTETER_SEARCH_NO_PERSON_FOUND') {
-      // Set the error code to empty to avoid showing the error message in the alert
-      personStore.errorCode = '';
-      errorDialogMessage.value = t('admin.person.stateEmployeeSearch.noPersonFoundMessage');
-      showErrorDialog.value = true;
-      personStore.allLandesbedienstetePersonen = [];
-    }
-    // Check if multiple persons were found we get an error Code.
-    else if (personStore.errorCode === 'LANDESBEDIENSTETER_SEARCH_MULTIPLE_PERSONS_FOUND') {
-      // Set the error code to empty to avoid showing the error message in the alert
-      personStore.errorCode = '';
-      errorDialogMessage.value = t('admin.person.stateEmployeeSearch.multiplePersonsFoundMessage');
-      showErrorDialog.value = true;
-      personStore.allLandesbedienstetePersonen = [];
+    if (personStore.errorCode) {
+      // If the search was successful but the person has no Kopers number or is manually locked, we get this error Code.
+      if (personStore.errorCode === 'LANDESBEDIENSTETER_SEARCH_NO_PERSON_FOUND') {
+        // Set the error code to empty to avoid showing the error message in the alert
+        personStore.errorCode = '';
+        errorDialogMessage.value = t('admin.person.stateEmployeeSearch.noPersonFoundMessage');
+        showErrorDialog.value = true;
+        personStore.allLandesbedienstetePersonen = [];
+      }
+      // Check if multiple persons were found we get an error Code.
+      else if (personStore.errorCode === 'LANDESBEDIENSTETER_SEARCH_MULTIPLE_PERSONS_FOUND') {
+        // Set the error code to empty to avoid showing the error message in the alert
+        personStore.errorCode = '';
+        errorDialogMessage.value = t('admin.person.stateEmployeeSearch.multiplePersonsFoundMessage');
+        showErrorDialog.value = true;
+        personStore.allLandesbedienstetePersonen = [];
+      } else {
+        // For any other error codes, we just show the error message in the alert
+        errorDialogMessage.value = '';
+        showErrorDialog.value = false;
+        personStore.allLandesbedienstetePersonen = [];
+      }
     }
   });
 
@@ -414,13 +421,13 @@
         <!-- Error Message Display for error messages from the personStore -->
         <SpshAlert
           :modelValue="!!personStore.errorCode"
-          :title="t(`admin.person.title.${personStore.errorCode}`)"
+          :title="personStore.errorCode ? t(`admin.person.title.${personStore.errorCode}`) : ''"
           :type="'error'"
           :closable="false"
           :showButton="true"
           :buttonText="t('admin.person.backToCreatePerson')"
           :buttonAction="navigateBackToPersonSearchForm"
-          :text="t(`admin.person.errors.${personStore.errorCode}`)"
+          :text="personStore.errorCode ? t(`admin.person.errors.${personStore.errorCode}`) : ''"
         />
 
         <v-row
