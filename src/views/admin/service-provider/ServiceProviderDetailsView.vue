@@ -98,13 +98,13 @@
                     <!-- Name -->
                     <v-row class="mt-4 align-center">
                       <v-col
-                        class="d-flex align-center justify-end"
-                        sm="4"
-                        cols="5"
+                        cols="auto"
+                        class="d-flex align-center pr-2"
                       >
                         <span class="subtitle-2">{{ t('angebot.name') }}:</span>
                       </v-col>
                       <v-col
+                        cols="auto"
                         class="d-flex align-center"
                         data-testid="service-provider-name"
                       >
@@ -117,13 +117,13 @@
                     <!-- Administrationsebene -->
                     <v-row class="mt-4 align-center">
                       <v-col
-                        class="d-flex align-center justify-end"
-                        sm="4"
-                        cols="5"
+                        cols="auto"
+                        class="d-flex align-center pr-2"
                       >
                         <span class="subtitle-2">{{ t('angebot.administrationsebene') }}:</span>
                       </v-col>
                       <v-col
+                        cols="auto"
                         class="d-flex align-center"
                         data-testid="service-provider-administrationsebene"
                       >
@@ -136,13 +136,13 @@
                     <!-- Requires 2FA -->
                     <v-row class="mt-4 align-center">
                       <v-col
-                        class="d-flex align-center justify-end"
-                        sm="4"
-                        cols="5"
+                        cols="auto"
+                        class="d-flex align-center pr-2"
                       >
                         <span class="subtitle-2">{{ t('angebot.requires2FA') }}:</span>
                       </v-col>
                       <v-col
+                        cols="auto"
                         class="d-flex align-center"
                         data-testid="service-provider-requires-2fa"
                       >
@@ -155,13 +155,13 @@
                     <!-- Kategorie -->
                     <v-row class="mt-4 align-center">
                       <v-col
-                        class="d-flex align-center justify-end"
-                        sm="4"
-                        cols="5"
+                        cols="auto"
+                        class="d-flex align-center pr-2"
                       >
                         <span class="subtitle-2">{{ t('angebot.kategorie') }}:</span>
                       </v-col>
                       <v-col
+                        cols="auto"
                         class="d-flex align-center"
                         data-testid="service-provider-kategorie"
                       >
@@ -178,16 +178,15 @@
                     md="6"
                   >
                     <!-- Rollenerweiterung -->
-                    <v-row class="mt-4 align-center">
+                    <v-row class="mt-md-4 align-center">
                       <v-col
-                        class="d-flex align-center justify-end"
-                        md="10"
-                        sm="4"
-                        cols="5"
+                        cols="auto"
+                        class="d-flex align-center pr-2"
                       >
                         <span class="subtitle-2">{{ t('angebot.schulspezifischeRollenerweiterung') }}:</span>
                       </v-col>
                       <v-col
+                        cols="auto"
                         class="d-flex align-center"
                         data-testid="service-provider-rollenerweiterung"
                       >
@@ -200,13 +199,13 @@
                     <!-- URL -->
                     <v-row class="mt-4 align-center">
                       <v-col
-                        class="d-flex align-center justify-end"
-                        sm="4"
-                        cols="5"
+                        cols="auto"
+                        class="d-flex align-center pr-2"
                       >
                         <span class="subtitle-2">{{ t('angebot.link') }}:</span>
                       </v-col>
                       <v-col
+                        cols="auto"
                         class="d-flex align-center"
                         data-testid="service-provider-link"
                       >
@@ -219,9 +218,8 @@
                     <!-- Logo -->
                     <v-row class="mt-4 align-center">
                       <v-col
-                        class="d-flex align-center justify-end"
-                        sm="4"
-                        cols="5"
+                        cols="auto"
+                        class="d-flex align-center pr-2"
                       >
                         <span class="subtitle-2">{{ t('angebot.logo') }}:</span>
                       </v-col>
@@ -229,29 +227,21 @@
                         class="d-flex align-center"
                         data-testid="service-provider-logo"
                       >
-                        <v-avatar
+                        <v-img
                           v-if="serviceProviderStore.currentServiceProviderLogo"
-                          rounded="0"
-                        >
-                          <v-img
-                            alt="provider-logo"
-                            class="service-provider-logo"
-                            :src="serviceProviderStore.currentServiceProviderLogo"
-                            contain
-                          />
-                        </v-avatar>
-                        <v-avatar
+                          alt="provider-logo"
+                          class="service-provider-logo"
+                          :src="serviceProviderStore.currentServiceProviderLogo"
+                          max-width="35"
+                        />
+                        <v-img
                           v-else
-                          rounded="0"
-                          size="80"
-                        >
-                          <v-img
-                            alt="schulportal-logo"
-                            class="service-provider-logo"
-                            :src="SchulPortalLogo"
-                            contain
-                          />
-                        </v-avatar>
+                          alt="schulportal-logo"
+                          class="service-provider-logo"
+                          :src="SchulPortalLogo"
+                          contain
+                          max-width="35"
+                        />
                       </v-col>
                     </v-row>
                   </v-col>
