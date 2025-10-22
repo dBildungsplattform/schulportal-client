@@ -1,5 +1,6 @@
 {
   "angebot": {
+    "assignedRollen": "Zugeordnete Rollen",
     "name": "Name",
     "kategorie": "Kategorie",
     "administrationsebene": "Administrationsebene",

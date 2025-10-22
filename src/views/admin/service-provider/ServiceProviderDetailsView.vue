@@ -281,6 +281,34 @@
                 </v-row>
               </v-col>
             </v-row>
+            <v-row>
+              <v-col offset="1">
+                <v-row class="mt-4 align-center">
+                  <v-col
+                    cols="auto"
+                    class="d-flex align-center pr-2"
+                  >
+                    <span class="subtitle-2">{{ t('angebot.assignedRollen') }}:</span>
+                  </v-col>
+
+                  <v-col
+                    class="d-flex align-center flex-wrap"
+                    data-testid="service-provider-rollen"
+                  >
+                    <v-chip
+                      v-for="rolle in serviceProviderStore.currentServiceProvider.rollen"
+                      :key="rolle.id"
+                      class="ma-1"
+                      color="primary"
+                      variant="tonal"
+                      label
+                    >
+                      {{ rolle.name }}
+                    </v-chip>
+                  </v-col>
+                </v-row>
+              </v-col>
+            </v-row>
           </div>
 
           <div v-else-if="serviceProviderStore.loading">
