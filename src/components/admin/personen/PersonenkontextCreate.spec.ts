@@ -297,7 +297,7 @@ describe('PersonenkontextCreate', () => {
           await organisationAutocomplete?.setValue(undefined);
           await nextTick();
 
-          await organisationAutocomplete?.vm.$emit('update:search', '');
+          organisationAutocomplete?.vm.$emit('update:search', '');
           await nextTick();
           expect(personenkontextStore.processWorkflowStep).toHaveBeenCalled();
         });
@@ -324,11 +324,11 @@ describe('PersonenkontextCreate', () => {
           await nextTick();
 
           // Set the searchValue to 'orga' which matches the title before
-          await organisationAutocomplete?.vm.$emit('update:search', 'orga');
+          organisationAutocomplete?.vm.$emit('update:search', 'orga');
           await nextTick();
 
           // Set the newValue to '' and the oldValue is in this case 'orga' and so the method should just return
-          await organisationAutocomplete?.vm.$emit('update:search', '');
+          organisationAutocomplete?.vm.$emit('update:search', '');
           await nextTick();
 
           expect(organisationAutocomplete?.text()).toEqual('string (orga)');
@@ -347,11 +347,11 @@ describe('PersonenkontextCreate', () => {
           await nextTick();
 
           // Set the searchValue to 'Lern' which matches the title before
-           rolleAutocomplete?.vm.$emit('update:search', 'Lern');
+          rolleAutocomplete?.vm.$emit('update:search', 'Lern');
           await nextTick();
 
           // Set the newValue to '' and the oldValue is in this case 'Lern' and so the method should just return
-           rolleAutocomplete?.vm.$emit('update:search', '');
+          rolleAutocomplete?.vm.$emit('update:search', '');
           await nextTick();
 
           expect(rolleAutocomplete?.text()).toEqual('Lern');
@@ -399,13 +399,13 @@ describe('PersonenkontextCreate', () => {
           await organisationAutocomplete?.setValue('1133');
           await nextTick();
 
-          await organisationAutocomplete?.vm.$emit('update:search', 'Lern');
+          organisationAutocomplete?.vm.$emit('update:search', 'Lern');
           await nextTick();
 
           await organisationAutocomplete?.setValue(undefined);
           await nextTick();
 
-          await organisationAutocomplete?.vm.$emit('update:search', '');
+          organisationAutocomplete?.vm.$emit('update:search', '');
           await nextTick();
 
           expect(organisationAutocomplete?.text()).toEqual('');
@@ -419,10 +419,10 @@ describe('PersonenkontextCreate', () => {
           await organisationAutocomplete?.setValue('1133');
           await nextTick();
 
-          await organisationAutocomplete?.vm.$emit('update:search', 'Lern');
+          organisationAutocomplete?.vm.$emit('update:search', 'Lern');
           await nextTick();
 
-          await organisationAutocomplete?.vm.$emit('update:search', '');
+          organisationAutocomplete?.vm.$emit('update:search', '');
           await nextTick();
 
           expect(organisationAutocomplete?.text()).toEqual('string (orga)');
@@ -462,7 +462,7 @@ describe('PersonenkontextCreate', () => {
           const befristungInput: VueWrapper | undefined = wrapper?.findComponent({ name: 'BefristungInput' });
 
           // Emit the event from the child component
-          await befristungInput?.vm.$emit('update:calculatedBefristungOption', 'someOption');
+          befristungInput?.vm.$emit('update:calculatedBefristungOption', 'someOption');
 
           // Assert that the parent component emitted the event
           expect(wrapper?.emitted('update:calculatedBefristungOption')).toBeTruthy();
