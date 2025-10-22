@@ -245,9 +245,9 @@
                         <span class="subtitle-2">{{ t('angebot.link') }}:</span>
                       </v-col>
                       <v-col
-                        cols="auto"
                         class="d-flex align-center"
                         data-testid="service-provider-link"
+                        style="word-break: break-all"
                       >
                         <span class="text-body text-break">
                           {{
