@@ -47,6 +47,7 @@
     await serviceProviderStore.getServiceProviderLogoById(currentServiceProviderId);
   });
 </script>
+
 <template>
   <div class="admin">
     <h1
@@ -210,7 +211,11 @@
                         data-testid="service-provider-link"
                       >
                         <span class="text-body text-break">
-                          {{ serviceProviderStore.currentServiceProvider.url }}
+                          {{
+                            serviceProviderStore.currentServiceProvider.url
+                              ? serviceProviderStore.currentServiceProvider.url
+                              : t('missing')
+                          }}
                         </span>
                       </v-col>
                     </v-row>
