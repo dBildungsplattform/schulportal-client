@@ -137,10 +137,11 @@
     await authStore.initializeAuthStatus();
     const personId: string | null | undefined = authStore.currentUser?.personId;
 
-    const providersPromise: Promise<void> = serviceProviderStore.getAvailableServiceProviders().then(() => {
+    const providersPromise: Promise<void> = serviceProviderStore.getAvailableServiceProviders().then(async () => {
       for (const provider of serviceProviderStore.availableServiceProviders) {
         if (provider.hasLogo) {
-          provider.logoUrl = `/api/provider/${provider.id}/logo`;
+          await serviceProviderStore.getServiceProviderLogoById(provider.id);
+          provider.logoUrl = serviceProviderStore.currentServiceProviderLogo ?? undefined;
         }
       }
     });
