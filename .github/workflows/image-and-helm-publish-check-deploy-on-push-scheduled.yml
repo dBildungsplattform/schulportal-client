@@ -254,8 +254,7 @@ jobs:
       scan_node_dependencies: true
 
   trivy_scan_rocketchat_notification:
-    #if: github.event_name == 'schedule' && failure()
-    if: github.event_name == 'push' && failure() # for testing purposes temporally also on push
+    if: github.event_name == 'schedule' && failure()
     needs:
     - trivy_scan
     runs-on: 'ubuntu-latest'
