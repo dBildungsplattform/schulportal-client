@@ -184,11 +184,17 @@ describe('PersonenkontextCreate', () => {
           }
           return rolleAutocomplete;
         }
+
         beforeEach(() => {
           wrapper = mountComponent({
             operationContext,
             allowMultipleRollen,
           });
+        });
+
+        afterEach(() => {
+          wrapper?.unmount();
+          organisationStore.$reset();
         });
 
         test('it renders the component', () => {
