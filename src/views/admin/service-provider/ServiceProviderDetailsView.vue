@@ -1,5 +1,9 @@
 <script setup lang="ts">
-  import { useServiceProviderStore, type ServiceProviderStore } from '@/stores/ServiceProviderStore';
+  import {
+    ServiceProviderMerkmal,
+    useServiceProviderStore,
+    type ServiceProviderStore,
+  } from '@/stores/ServiceProviderStore';
   import { useI18n, type Composer } from 'vue-i18n';
   import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
@@ -153,13 +157,13 @@
                       </v-col>
                     </v-row>
 
-                    <!-- Kategorie -->
+                    <!-- Can be assigned to Rollen? -->
                     <v-row class="mt-4 align-center">
                       <v-col
                         cols="auto"
                         class="d-flex align-center pr-2"
                       >
-                        <span class="subtitle-2">{{ t('angebot.kategorie') }}:</span>
+                        <span class="subtitle-2">{{ t('angebot.canBeAssignedToRollen') }}:</span>
                       </v-col>
                       <v-col
                         cols="auto"
@@ -167,7 +171,13 @@
                         data-testid="service-provider-kategorie"
                       >
                         <span class="text-body text-break">
-                          {{ serviceProviderStore.currentServiceProvider.kategorie.toLocaleLowerCase() }}
+                          {{
+                            serviceProviderStore.currentServiceProvider.merkmale.some(
+                              (m: ServiceProviderMerkmal) => m === ServiceProviderMerkmal.NachtraeglichZuweisbar,
+                            )
+                              ? t('yes')
+                              : t('no')
+                          }}
                         </span>
                       </v-col>
                     </v-row>
@@ -178,48 +188,6 @@
                     cols="12"
                     md="6"
                   >
-                    <!-- Rollenerweiterung -->
-                    <v-row class="mt-md-4 align-center">
-                      <v-col
-                        cols="auto"
-                        class="d-flex align-center pr-2"
-                      >
-                        <span class="subtitle-2">{{ t('angebot.schulspezifischeRollenerweiterung') }}:</span>
-                      </v-col>
-                      <v-col
-                        cols="auto"
-                        class="d-flex align-center"
-                        data-testid="service-provider-rollenerweiterung"
-                      >
-                        <span class="text-body text-break">
-                          {{ serviceProviderStore.currentServiceProvider.hasRollenerweiterung ? t('yes') : t('no') }}
-                        </span>
-                      </v-col>
-                    </v-row>
-
-                    <!-- URL -->
-                    <v-row class="mt-4 align-center">
-                      <v-col
-                        cols="auto"
-                        class="d-flex align-center pr-2"
-                      >
-                        <span class="subtitle-2">{{ t('angebot.link') }}:</span>
-                      </v-col>
-                      <v-col
-                        cols="auto"
-                        class="d-flex align-center"
-                        data-testid="service-provider-link"
-                      >
-                        <span class="text-body text-break">
-                          {{
-                            serviceProviderStore.currentServiceProvider.url
-                              ? serviceProviderStore.currentServiceProvider.url
-                              : t('missing')
-                          }}
-                        </span>
-                      </v-col>
-                    </v-row>
-
                     <!-- Logo -->
                     <v-row class="mt-4 align-center">
                       <v-col
@@ -247,6 +215,66 @@
                           contain
                           max-width="35"
                         />
+                      </v-col>
+                    </v-row>
+                    <!-- Kategorie -->
+                    <v-row class="mt-4 align-center">
+                      <v-col
+                        cols="auto"
+                        class="d-flex align-center pr-2"
+                      >
+                        <span class="subtitle-2">{{ t('angebot.kategorie') }}:</span>
+                      </v-col>
+                      <v-col
+                        cols="auto"
+                        class="d-flex align-center"
+                        data-testid="service-provider-kategorie"
+                      >
+                        <span class="text-body text-break">
+                          {{ serviceProviderStore.currentServiceProvider.kategorie.toLocaleLowerCase() }}
+                        </span>
+                      </v-col>
+                    </v-row>
+
+                    <!-- URL -->
+                    <v-row class="mt-4 align-center">
+                      <v-col
+                        cols="auto"
+                        class="d-flex align-center pr-2"
+                      >
+                        <span class="subtitle-2">{{ t('angebot.link') }}:</span>
+                      </v-col>
+                      <v-col
+                        cols="auto"
+                        class="d-flex align-center"
+                        data-testid="service-provider-link"
+                      >
+                        <span class="text-body text-break">
+                          {{
+                            serviceProviderStore.currentServiceProvider.url
+                              ? serviceProviderStore.currentServiceProvider.url
+                              : t('missing')
+                          }}
+                        </span>
+                      </v-col>
+                    </v-row>
+
+                    <!-- Rollenerweiterung -->
+                    <v-row class="mt-md-4 align-center">
+                      <v-col
+                        cols="auto"
+                        class="d-flex align-center pr-2"
+                      >
+                        <span class="subtitle-2">{{ t('angebot.schulspezifischeRollenerweiterung') }}:</span>
+                      </v-col>
+                      <v-col
+                        cols="auto"
+                        class="d-flex align-center"
+                        data-testid="service-provider-rollenerweiterung"
+                      >
+                        <span class="text-body text-break">
+                          {{ serviceProviderStore.currentServiceProvider.hasRollenerweiterung ? t('yes') : t('no') }}
+                        </span>
                       </v-col>
                     </v-row>
                   </v-col>

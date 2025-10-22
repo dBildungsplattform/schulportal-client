@@ -6,6 +6,7 @@
     "rollen": "Rollen",
     "schulspezifischErweitert": "Schulspezifisch erweitert",
     "schulspezifischeRollenerweiterung": "Schulspezifische Rollenerweiterung möglich",
+    "canBeAssignedToRollen": "Darf Rollen hinzugefügt werden",
     "link": "Link",
     "logo": "Logo",
     "requires2FA": "2FA erforderlich",
