@@ -9,6 +9,7 @@ import {
   type ServiceProviderStore,
 } from '@/stores/ServiceProviderStore';
 import { DoFactory } from 'test/DoFactory';
+import type { MockInstance } from 'vitest';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -67,5 +68,11 @@ describe('ServiceProviderDetailsView', () => {
     expect(wrapper?.find('[data-testid="service-provider-link"]').text()).toBe(
       mockServiceProvider.url ? mockServiceProvider.url : 'fehlt',
     );
+  });
+
+  test('it navigates back to service providers table', async () => {
+    const push: MockInstance = vi.spyOn(router, 'push');
+    await wrapper?.find('[data-testid="close-layout-card-button"]').trigger('click');
+    expect(push).toHaveBeenCalledTimes(1);
   });
 });
