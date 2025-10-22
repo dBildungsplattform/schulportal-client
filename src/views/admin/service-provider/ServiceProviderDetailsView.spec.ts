@@ -10,6 +10,7 @@ import {
 } from '@/stores/ServiceProviderStore';
 import { DoFactory } from 'test/DoFactory';
 import type { MockInstance } from 'vitest';
+import { nextTick } from 'vue';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -73,6 +74,16 @@ describe('ServiceProviderDetailsView', () => {
   test('it navigates back to service providers table', async () => {
     const push: MockInstance = vi.spyOn(router, 'push');
     await wrapper?.find('[data-testid="close-layout-card-button"]').trigger('click');
+    expect(push).toHaveBeenCalledTimes(1);
+  });
+
+  test('it sets errorCode and goes back to list on alert close', async () => {
+    const push: MockInstance = vi.spyOn(router, 'push');
+    serviceProviderStore.errorCode = 'error';
+    await nextTick();
+
+    await wrapper?.find('[data-testid$="alert-button"]').trigger('click');
+
     expect(push).toHaveBeenCalledTimes(1);
   });
 });

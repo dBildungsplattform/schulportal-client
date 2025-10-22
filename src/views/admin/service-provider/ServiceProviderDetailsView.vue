@@ -168,7 +168,7 @@
                       <v-col
                         cols="auto"
                         class="d-flex align-center"
-                        data-testid="service-provider-kategorie"
+                        data-testid="service-provider-can-be-assigned-to-rollen"
                       >
                         <span class="text-body text-break">
                           {{
