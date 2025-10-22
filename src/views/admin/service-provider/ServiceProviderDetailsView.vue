@@ -5,6 +5,7 @@
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { computed, onMounted, type ComputedRef } from 'vue';
+  import SchulPortalLogo from '@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg';
 
   const router: Router = useRouter();
   const route: RouteLocationNormalizedLoaded = useRoute();
@@ -15,7 +16,7 @@
   const currentServiceProviderId: string = route.params['id'] as string;
 
   function navigateToServiceProviderTable(): void {
-    router.push({ name: 'service-provider-management' });
+    router.push({ name: 'angebot-management' });
   }
 
   const handleAlertClose = (): void => {
@@ -41,7 +42,9 @@
   onMounted(async () => {
     serviceProviderStore.errorCode = '';
     serviceProviderStore.currentServiceProvider = null;
+    serviceProviderStore.currentServiceProviderLogo = null;
     await serviceProviderStore.getManageableServiceProviderById(currentServiceProviderId);
+    await serviceProviderStore.getServiceProviderLogoById(currentServiceProviderId);
   });
 </script>
 <template>
@@ -84,102 +87,179 @@
       <div v-if="!serviceProviderStore.errorCode">
         <v-container class="service-provider-info">
           <div v-if="serviceProviderStore.currentServiceProvider">
-            <v-row
-              id="personal-info-row"
-              class="ml-md-16"
-            >
-              <v-col>
-                <!-- Name -->
-                <v-row class="mt-4 align-center">
+            <v-row id="service-provider-info-row">
+              <v-col offset="1">
+                <v-row>
+                  <!-- Left column (first 4 fields) -->
                   <v-col
-                    class="d-flex align-center justify-end"
-                    sm="3"
-                    cols="5"
+                    cols="12"
+                    md="6"
                   >
-                    <span class="subtitle-2">{{ t('angebot.name') }}:</span>
+                    <!-- Name -->
+                    <v-row class="mt-4 align-center">
+                      <v-col
+                        class="d-flex align-center justify-end"
+                        sm="4"
+                        cols="5"
+                      >
+                        <span class="subtitle-2">{{ t('angebot.name') }}:</span>
+                      </v-col>
+                      <v-col
+                        class="d-flex align-center"
+                        data-testid="service-provider-name"
+                      >
+                        <span class="text-body text-break">
+                          {{ serviceProviderStore.currentServiceProvider.name }}
+                        </span>
+                      </v-col>
+                    </v-row>
+
+                    <!-- Administrationsebene -->
+                    <v-row class="mt-4 align-center">
+                      <v-col
+                        class="d-flex align-center justify-end"
+                        sm="4"
+                        cols="5"
+                      >
+                        <span class="subtitle-2">{{ t('angebot.administrationsebene') }}:</span>
+                      </v-col>
+                      <v-col
+                        class="d-flex align-center"
+                        data-testid="service-provider-administrationsebene"
+                      >
+                        <span class="text-body text-break">
+                          {{ serviceProviderStore.currentServiceProvider.administrationsebene.name }}
+                        </span>
+                      </v-col>
+                    </v-row>
+
+                    <!-- Requires 2FA -->
+                    <v-row class="mt-4 align-center">
+                      <v-col
+                        class="d-flex align-center justify-end"
+                        sm="4"
+                        cols="5"
+                      >
+                        <span class="subtitle-2">{{ t('angebot.requires2FA') }}:</span>
+                      </v-col>
+                      <v-col
+                        class="d-flex align-center"
+                        data-testid="service-provider-requires-2fa"
+                      >
+                        <span class="text-body text-break">
+                          {{ serviceProviderStore.currentServiceProvider.requires2fa ? t('yes') : t('no') }}
+                        </span>
+                      </v-col>
+                    </v-row>
+
+                    <!-- Kategorie -->
+                    <v-row class="mt-4 align-center">
+                      <v-col
+                        class="d-flex align-center justify-end"
+                        sm="4"
+                        cols="5"
+                      >
+                        <span class="subtitle-2">{{ t('angebot.kategorie') }}:</span>
+                      </v-col>
+                      <v-col
+                        class="d-flex align-center"
+                        data-testid="service-provider-kategorie"
+                      >
+                        <span class="text-body text-break">
+                          {{ serviceProviderStore.currentServiceProvider.kategorie.toLocaleLowerCase() }}
+                        </span>
+                      </v-col>
+                    </v-row>
                   </v-col>
+
+                  <!-- Right column (last 3 fields) -->
                   <v-col
-                    class="d-flex align-center"
-                    data-testid="service-provider-name"
+                    cols="12"
+                    md="6"
                   >
-                    <span class="text-body text-break">{{ serviceProviderStore.currentServiceProvider.name }}</span>
-                  </v-col>
-                </v-row>
-                <!-- Administrationsebene -->
-                <v-row class="mt-4 align-center">
-                  <v-col
-                    class="d-flex align-center justify-end"
-                    sm="3"
-                    cols="5"
-                  >
-                    <span class="subtitle-2">{{ t('angebot.administrationsebene') }}:</span>
-                  </v-col>
-                  <v-col
-                    class="d-flex align-center"
-                    data-testid="service-provider-administrationsebene"
-                  >
-                    <span class="text-body text-break">{{
-                      serviceProviderStore.currentServiceProvider.administrationsebene.name
-                    }}</span>
-                  </v-col>
-                </v-row>
-                <!-- Requires 2FA -->
-                <v-row class="mt-4 align-center">
-                  <v-col
-                    class="d-flex align-center justify-end"
-                    sm="3"
-                    cols="5"
-                  >
-                    <span class="subtitle-2">{{ t('angebot.requires2FA') }}:</span>
-                  </v-col>
-                  <v-col
-                    class="d-flex align-center"
-                    data-testid="service-provider-requires-2fa"
-                  >
-                    <span class="text-body text-break">{{
-                      serviceProviderStore.currentServiceProvider.requires2fa ? t('yes') : t('no')
-                    }}</span>
-                  </v-col>
-                </v-row>
-                <!-- Kategorie -->
-                <v-row class="mt-4 align-center">
-                  <v-col
-                    class="d-flex align-center justify-end"
-                    sm="3"
-                    cols="5"
-                  >
-                    <span class="subtitle-2">{{ t('angebot.kategorie') }}:</span>
-                  </v-col>
-                  <v-col
-                    class="d-flex align-center"
-                    data-testid="service-provider-kategorie"
-                  >
-                    <span class="text-body text-break">{{
-                      serviceProviderStore.currentServiceProvider.kategorie.toLocaleLowerCase()
-                    }}</span>
-                  </v-col>
-                </v-row>
-                <!-- Rollenerweiterung possibility -->
-                <v-row class="mt-4 align-center">
-                  <v-col
-                    class="d-flex align-center justify-end"
-                    sm="3"
-                    cols="5"
-                  >
-                    <span class="subtitle-2">{{ t('angebot.schulspezifischeRollenerweiterung') }}:</span>
-                  </v-col>
-                  <v-col
-                    class="d-flex align-center"
-                    data-testid="service-provider-rollenerweiterung"
-                  >
-                    <span class="text-body text-break">{{
-                      serviceProviderStore.currentServiceProvider.hasRollenerweiterung ? t('yes') : t('no')
-                    }}</span>
+                    <!-- Rollenerweiterung -->
+                    <v-row class="mt-4 align-center">
+                      <v-col
+                        class="d-flex align-center justify-end"
+                        md="10"
+                        sm="4"
+                        cols="5"
+                      >
+                        <span class="subtitle-2">{{ t('angebot.schulspezifischeRollenerweiterung') }}:</span>
+                      </v-col>
+                      <v-col
+                        class="d-flex align-center"
+                        data-testid="service-provider-rollenerweiterung"
+                      >
+                        <span class="text-body text-break">
+                          {{ serviceProviderStore.currentServiceProvider.hasRollenerweiterung ? t('yes') : t('no') }}
+                        </span>
+                      </v-col>
+                    </v-row>
+
+                    <!-- URL -->
+                    <v-row class="mt-4 align-center">
+                      <v-col
+                        class="d-flex align-center justify-end"
+                        sm="4"
+                        cols="5"
+                      >
+                        <span class="subtitle-2">{{ t('angebot.link') }}:</span>
+                      </v-col>
+                      <v-col
+                        class="d-flex align-center"
+                        data-testid="service-provider-link"
+                      >
+                        <span class="text-body text-break">
+                          {{ serviceProviderStore.currentServiceProvider.url }}
+                        </span>
+                      </v-col>
+                    </v-row>
+
+                    <!-- Logo -->
+                    <v-row class="mt-4 align-center">
+                      <v-col
+                        class="d-flex align-center justify-end"
+                        sm="4"
+                        cols="5"
+                      >
+                        <span class="subtitle-2">{{ t('angebot.logo') }}:</span>
+                      </v-col>
+                      <v-col
+                        class="d-flex align-center"
+                        data-testid="service-provider-logo"
+                      >
+                        <v-avatar
+                          v-if="serviceProviderStore.currentServiceProviderLogo"
+                          rounded="0"
+                        >
+                          <v-img
+                            alt="provider-logo"
+                            class="service-provider-logo"
+                            :src="serviceProviderStore.currentServiceProviderLogo"
+                            contain
+                          />
+                        </v-avatar>
+                        <v-avatar
+                          v-else
+                          rounded="0"
+                          size="80"
+                        >
+                          <v-img
+                            alt="schulportal-logo"
+                            class="service-provider-logo"
+                            :src="SchulPortalLogo"
+                            contain
+                          />
+                        </v-avatar>
+                      </v-col>
+                    </v-row>
                   </v-col>
                 </v-row>
               </v-col>
             </v-row>
           </div>
+
           <div v-else-if="serviceProviderStore.loading">
             <v-progress-circular indeterminate></v-progress-circular>
           </div>

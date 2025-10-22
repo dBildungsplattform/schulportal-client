@@ -36,6 +36,7 @@ export type ManageableServiceProviderListEntry = {
   administrationsebene: { id: string; name: string; kennung?: string };
   rollen: Array<{ id: string; name: string }>;
   hasRollenerweiterung?: boolean;
+  url?: string;
 };
 
 export type ServiceProviderIdNameResponse = {
@@ -49,6 +50,7 @@ type ServiceProviderState = {
   manageableServiceProviders: ManageableServiceProviderListEntry[];
   totalManageableServiceProviders: number;
   currentServiceProvider: ManageableServiceProviderListEntry | null;
+  currentServiceProviderLogo: string | null;
   errorCode: string;
   loading: boolean;
 };
@@ -59,6 +61,7 @@ type ServiceProviderActions = {
   getAvailableServiceProviders: () => Promise<void>;
   getManageableServiceProviders: (page: number, entriesPerPage: number) => Promise<void>;
   getManageableServiceProviderById: (serviceProviderId: string) => Promise<void>;
+  getServiceProviderLogoById: (serviceProviderId: string) => Promise<void>;
 };
 
 export { ServiceProviderKategorie };
@@ -84,6 +87,7 @@ export const useServiceProviderStore: StoreDefinition<
       manageableServiceProviders: [],
       totalManageableServiceProviders: 0,
       currentServiceProvider: null,
+      currentServiceProviderLogo: null,
       errorCode: '',
       loading: false,
     };
@@ -139,6 +143,23 @@ export const useServiceProviderStore: StoreDefinition<
         const { data }: { data: ManageableServiceProviderResponse } =
           await serviceProviderApi.providerControllerGetManageableServiceProviderById(serviceProviderId);
         this.currentServiceProvider = data;
+      } catch (error: unknown) {
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async getServiceProviderLogoById(serviceProviderId: string) {
+      this.loading = true;
+      try {
+        const response: { data: Blob } = await serviceProviderApi.providerControllerGetServiceProviderLogo(
+          serviceProviderId,
+          {
+            responseType: 'blob',
+          },
+        );
+        this.currentServiceProviderLogo = URL.createObjectURL(response.data);
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
