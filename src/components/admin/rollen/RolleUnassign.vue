@@ -2,23 +2,18 @@
   import PersonBulkError from '@/components/admin/personen/PersonBulkError.vue';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { useBulkErrors, type BulkErrorList } from '@/composables/useBulkErrors';
-  import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
-  import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
+  import { type BulkErrorList, useBulkErrors } from '@/composables/useBulkErrors';
+  import { type TranslatedRolleWithAttrs, useRollen } from '@/composables/useRollen';
+  import { type BulkOperationStore, useBulkOperationStore } from '@/stores/BulkOperationStore';
   import { type Organisation } from '@/stores/OrganisationStore';
-  import {
-    OperationContext,
-    RolleDialogMode,
-    usePersonenkontextStore,
-    type PersonenkontextStore,
-  } from '@/stores/PersonenkontextStore';
+  import { OperationContext, type PersonenkontextStore, usePersonenkontextStore } from '@/stores/PersonenkontextStore';
   import { RollenArt, type RolleResponse } from '@/stores/RolleStore';
   import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
   import type { TranslatedObject } from '@/types';
   import { toTypedSchema } from '@vee-validate/yup';
-  import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
-  import { computed, ref, watch, type ComputedRef, type Ref } from 'vue';
-  import { useI18n, type Composer } from 'vue-i18n';
+  import { type BaseFieldProps, type TypedSchema, useForm } from 'vee-validate';
+  import { computed, type ComputedRef, ref, type Ref, watch } from 'vue';
+  import { type Composer, useI18n } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
   import { object, string } from 'yup';
 
@@ -197,10 +192,7 @@
           </p>
         </v-container>
         <v-row
-          v-if="
-            bulkOperationStore.currentOperation?.progress !== undefined &&
-            bulkOperationStore.currentOperation?.progress < 100
-          "
+          v-if="bulkOperationStore.currentOperation?.progress < 100"
           align="center"
           justify="center"
         >

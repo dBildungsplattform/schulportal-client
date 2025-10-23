@@ -284,11 +284,6 @@
     }
   };
 
-  function updateKlasseSelection(selectedKlassen: string | undefined): void {
-    selectedKlasse.value = selectedKlassen;
-    emits('update:selectedKlasse', selectedKlassen);
-  }
-
   function updateKlasseSelectionForRadio(selectedKlassen: string | undefined): void {
     selectedKlasseForRadio.value = selectedKlassen;
     emits('update:selectedKlasseForRadio', selectedKlassen);
@@ -337,8 +332,10 @@
   }
 
   function handleKlassenOption(value: string | null): void {
-    if (value === null) return;
-    if (value === KlassenOption.KEEP_KLASSE) {
+    if (value === null) {
+      return;
+    }
+    if (value === KlassenOption.KEEP_KLASSE.toString()) {
       selectedKlasseForRadio.value = undefined;
       emits('update:selectedKlasseForRadio', undefined);
     }

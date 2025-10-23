@@ -7,43 +7,43 @@
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import PasswordOutput from '@/components/form/PasswordOutput.vue';
   import { useOrganisationen } from '@/composables/useOrganisationen';
-  import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
-  import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
+  import { type TranslatedRolleWithAttrs, useRollen } from '@/composables/useRollen';
+  import { type Organisation, type OrganisationStore, useOrganisationStore } from '@/stores/OrganisationStore';
   import {
-    OperationContext,
-    usePersonenkontextStore,
     type DbiamCreatePersonenkontextBodyParams,
     type DBiamPersonenkontextResponse,
+    OperationContext,
     type PersonenkontextStore,
     type PersonenkontextUpdate,
+    usePersonenkontextStore,
   } from '@/stores/PersonenkontextStore';
   import {
-    usePersonStore,
     type CreatePersonBodyParams,
     type PersonLandesbediensteterSearchResponse,
     type PersonStore,
+    usePersonStore,
   } from '@/stores/PersonStore';
   import { RollenArt } from '@/stores/RolleStore';
   import type { Zuordnung } from '@/stores/types/Zuordnung';
   import { type TranslatedObject } from '@/types.d';
-  import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
+  import { type BefristungUtilsType, isBefristungspflichtRolle, useBefristungUtils } from '@/utils/befristung';
   import { formatDateToISO, getNextSchuljahresende, isValidDate, notInPast } from '@/utils/date';
   import { DDMMYYYY, DIN_91379A, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
   import { isKopersRolle } from '@/utils/validationPersonenkontext';
   import { toTypedSchema } from '@vee-validate/yup';
-  import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
-  import { computed, onMounted, onUnmounted, ref, watch, watchEffect, type ComputedRef, type Ref } from 'vue';
-  import { useI18n, type Composer } from 'vue-i18n';
+  import { type BaseFieldProps, type FormContext, type TypedSchema, useForm } from 'vee-validate';
+  import { computed, type ComputedRef, onMounted, onUnmounted, ref, type Ref, watch, watchEffect } from 'vue';
+  import { type Composer, useI18n } from 'vue-i18n';
   import {
-    onBeforeRouteLeave,
-    useRoute,
-    useRouter,
     type NavigationGuardNext,
+    onBeforeRouteLeave,
     type RouteLocationNormalized,
     type Router,
+    useRoute,
+    useRouter,
   } from 'vue-router';
   import { useDisplay } from 'vuetify';
-  import { array, object, string, StringSchema, type AnyObject } from 'yup';
+  import { type AnyObject, array, object, string, StringSchema } from 'yup';
 
   const { mdAndDown, mdAndUp }: { mdAndDown: Ref<boolean>; mdAndUp: Ref<boolean> } = useDisplay();
 
@@ -173,11 +173,7 @@
 
         const isBefristungspflichtig: boolean = await isBefristungspflichtRolle(selectedRollen);
 
-        if (isBefristungspflichtig && !value) {
-          return false; // Required but not provided
-        }
-
-        return true;
+        return !(isBefristungspflichtig && !value);
       });
   };
 
@@ -1084,13 +1080,13 @@
                   ? 'text-body'
                   : 'text-body text-red'
               }`"
-              >
-                <span data-testid="created-person-kopersnr">{{
-                  personenkontextStore.createdPersonWithKontext.person.personalnummer
-                    ? personenkontextStore.createdPersonWithKontext.person.personalnummer
-                    : t('missing')
-                }}</span>
-              </v-col>
+            >
+              <span data-testid="created-person-kopersnr">{{
+                personenkontextStore.createdPersonWithKontext.person.personalnummer
+                  ? personenkontextStore.createdPersonWithKontext.person.personalnummer
+                  : t('missing')
+              }}</span>
+            </v-col>
           </v-row>
           <v-row>
             <v-col
@@ -1109,7 +1105,8 @@
             <v-col
               class="text-body bold text-right pb-8"
               data-testid="created-person-start-password-label"
-              > {{ $t('admin.person.startPassword') }}:
+            >
+              {{ $t('admin.person.startPassword') }}:
             </v-col>
             <v-col class="text-body bold">
               <p class="mb-4">

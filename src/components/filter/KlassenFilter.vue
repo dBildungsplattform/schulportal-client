@@ -18,7 +18,7 @@
   type Props = {
     hideDetails?: boolean;
     systemrechteForSearch?: Array<RollenSystemRechtEnum>;
-    multiple: boolean;
+    multiple?: boolean;
     readonly?: boolean;
     selectedKlasseProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     highlightSelection?: boolean;

@@ -39,7 +39,7 @@ type BulkOperationState = {
   currentOperation: CurrentOperation | null;
 };
 
-type BulkOperationGetters = {};
+type BulkOperationGetters = unknown;
 
 type BulkOperationActions = {
   resetState(): void;
@@ -213,7 +213,9 @@ export const useBulkOperationStore: StoreDefinition<
       const selectedOrganisation: Organisation | undefined = workflowStepResponseOrganisations.find(
         (orga: Organisation) => orga.id === selectedOrganisationId,
       );
-      if (!selectedOrganisation) return;
+      if (!selectedOrganisation) {
+        return;
+      }
 
       await this.processPersonOperation(
         OperationType.MODIFY_ROLLE,

@@ -2,25 +2,25 @@
   import PersonBulkError from '@/components/admin/personen/PersonBulkError.vue';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { useBulkErrors, type BulkErrorList } from '@/composables/useBulkErrors';
+  import { type BulkErrorList, useBulkErrors } from '@/composables/useBulkErrors';
   import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
-  import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
+  import { type BulkOperationStore, useBulkOperationStore } from '@/stores/BulkOperationStore';
   import {
     KlassenOption,
     OperationContext,
+    type PersonenkontextStore,
     RolleDialogMode,
     usePersonenkontextStore,
-    type PersonenkontextStore,
   } from '@/stores/PersonenkontextStore';
   import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
   import type { TranslatedObject } from '@/types';
-  import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
+  import { type BefristungUtilsType, isBefristungspflichtRolle, useBefristungUtils } from '@/utils/befristung';
   import { formatDateToISO, getNextSchuljahresende } from '@/utils/date';
   import { befristungSchema, isKopersRolle, isLernRolle } from '@/utils/validationPersonenkontext';
   import { toTypedSchema } from '@vee-validate/yup';
-  import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
-  import { computed, ref, watchEffect, type ComputedRef, type Ref } from 'vue';
-  import { useI18n, type Composer } from 'vue-i18n';
+  import { type BaseFieldProps, type FormContext, type TypedSchema, useForm } from 'vee-validate';
+  import { computed, type ComputedRef, ref, type Ref, watchEffect } from 'vue';
+  import { type Composer, useI18n } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
   import { object, string, StringSchema } from 'yup';
 
@@ -77,7 +77,7 @@
         selectedOrganisation: string().required(t('admin.organisation.rules.organisation.required')),
         selectedKlassenOption: string(),
         selectedKlasseForRadio: string().when('selectedKlassenOption', {
-          is: (selectedKlassenOption: string) => selectedKlassenOption === KlassenOption.SELECT_NEW_KLASSE,
+          is: (selectedKlassenOption: string) => selectedKlassenOption === KlassenOption.SELECT_NEW_KLASSE.toString(),
           then: (schema: StringSchema) => schema.required(t('admin.klasse.rules.klasse.required')),
           otherwise: (schema: StringSchema) => schema.notRequired(),
         }),
@@ -252,8 +252,6 @@
               @update:befristung="handleBefristungUpdate"
               @update:calculated-befristung-option="handleBefristungOptionUpdate"
               @fieldReset="handleFieldReset"
-              v-model:selected-organisation="selectedOrganisation"
-              v-model:selected-rolle="selectedRolle"
               v-model:selected-klassen-option="selectedKlassenOption"
               v-model:selected-klasse-for-radio="selectedKlasseForRadio"
             />
