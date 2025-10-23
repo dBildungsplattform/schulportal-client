@@ -276,6 +276,49 @@ describe('PersonSearchView', () => {
     });
   });
 
+  describe('errors when submitting', () => {
+    beforeEach(async () => {
+      // Fill KoPers field
+      const kopersInput: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="kopers-input"] input');
+      await kopersInput?.setValue('1234');
+    });
+
+    test.each([['LANDESBEDIENSTETER_SEARCH_NO_PERSON_FOUND'], ['LANDESBEDIENSTETER_SEARCH_MULTIPLE_PERSONS_FOUND']])(
+      '%s',
+      async (errorCode: string) => {
+        personStore.getLandesbedienstetePerson = vi.fn(() => {
+          personStore.errorCode = errorCode;
+          return Promise.resolve();
+        });
+        await wrapper?.find('[data-testid="person-search-form-submit-button"]').trigger('click');
+        await vi.waitUntil(() => {
+          return document.body.querySelector('[data-testid="person-search-error-dialog"]') != null;
+        });
+        if (errorCode === 'LANDESBEDIENSTETER_SEARCH_NO_PERSON_FOUND') {
+          expect(document.body.querySelector('[data-testid="no-person-found-text"]')?.textContent).toContain(
+            'kein Treffer',
+          );
+        } else {
+          expect(document.body.querySelector('[data-testid="no-person-found-text"]')?.textContent).toContain(
+            'mehr als ein Treffer',
+          );
+        }
+      },
+    );
+
+    test('other error', async () => {
+      personStore.getLandesbedienstetePerson = vi.fn(() => {
+        personStore.errorCode = 'UNSPECIFIED_ERROR';
+        return Promise.resolve();
+      });
+      await wrapper?.find('[data-testid="person-search-form-submit-button"]').trigger('click');
+      await vi.waitUntil(() => {
+        return document.body.querySelector('[data-testid="spsh-alert"]') != null;
+      });
+      expect(document.body.querySelector('[data-testid="person-search-error-dialog"]')).toBeNull();
+    });
+  });
+
   test('it displays person data when search is successful', async () => {
     const mockPerson: PersonLandesbediensteterSearchResponse = DoFactory.getPersonLandesbediensteterSearchResponse();
 
@@ -312,6 +355,9 @@ describe('PersonSearchView', () => {
 
   test('it shows error dialog when no person is found', async () => {
     personStore.allLandesbedienstetePersonen = [];
+    personStore.getLandesbedienstetePerson = vi.fn().mockResolvedValue({
+      errorCode: 'LANDESBEDIENSTETER_SEARCH_NO_PERSON_FOUND',
+    });
 
     // Fill form and submit
     const kopersInput: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="kopers-input"] input');
