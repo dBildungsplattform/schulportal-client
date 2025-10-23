@@ -219,9 +219,22 @@ describe('serviceProviderStore', () => {
     const serviceProviderId: string = faker.string.uuid();
     const url: string = `/api/provider/${serviceProviderId}/logo`;
 
+    let mockReader: {
+      onload: (() => void) | null;
+      readAsDataURL: (blob: Blob) => void;
+      result: string | ArrayBuffer | null;
+    };
+
     beforeEach(() => {
-      // Mock URL.createObjectURL
-      global.URL.createObjectURL = vi.fn(() => 'blob:mock-url');
+      mockReader = {
+        onload: null,
+        result: 'data:image/png;base64,bW9jayBpbWFnZSBkYXRh',
+        readAsDataURL: vi.fn(function (this: typeof mockReader, _blob: Blob) {
+          this.onload?.();
+        }),
+      };
+
+      vi.spyOn(global, 'FileReader').mockImplementation(() => mockReader as FileReader);
     });
 
     afterEach(() => {
@@ -230,12 +243,12 @@ describe('serviceProviderStore', () => {
 
     it('should load service provider logo by id', async () => {
       const mockBlob: Blob = new Blob(['mock image data'], { type: 'image/png' });
-
       mockadapter.onGet(url).replyOnce(200, mockBlob, { 'content-type': 'image/png' });
+
       const promise: Promise<void> = serviceProviderStore.getServiceProviderLogoById(serviceProviderId);
       expect(serviceProviderStore.loading).toBe(true);
       await promise;
-      expect(serviceProviderStore.currentServiceProviderLogo).toEqual('blob:mock-url');
+      expect(serviceProviderStore.currentServiceProviderLogo).toEqual('data:image/png;base64,bW9jayBpbWFnZSBkYXRh');
       expect(serviceProviderStore.loading).toBe(false);
     });
 

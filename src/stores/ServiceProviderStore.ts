@@ -155,11 +155,15 @@ export const useServiceProviderStore: StoreDefinition<
       try {
         const response: { data: Blob } = await serviceProviderApi.providerControllerGetServiceProviderLogo(
           serviceProviderId,
-          {
-            responseType: 'blob',
-          },
+          { responseType: 'blob' },
         );
-        this.currentServiceProviderLogo = URL.createObjectURL(response.data);
+        // Convert Blob to base64 string
+        const reader: FileReader = new FileReader();
+        reader.onload = (): void => {
+          this.currentServiceProviderLogo = reader.result as string;
+        };
+        // Start reading the Blob
+        reader.readAsDataURL(response.data);
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
