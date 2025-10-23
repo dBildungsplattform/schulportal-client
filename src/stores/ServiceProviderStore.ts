@@ -50,7 +50,7 @@ type ServiceProviderState = {
   manageableServiceProviders: ManageableServiceProviderListEntry[];
   totalManageableServiceProviders: number;
   currentServiceProvider: ManageableServiceProviderListEntry | null;
-  currentServiceProviderLogo: string | null;
+  serviceProviderLogos: Map<string, string>;
   errorCode: string;
   loading: boolean;
 };
@@ -87,7 +87,7 @@ export const useServiceProviderStore: StoreDefinition<
       manageableServiceProviders: [],
       totalManageableServiceProviders: 0,
       currentServiceProvider: null,
-      currentServiceProviderLogo: null,
+      serviceProviderLogos: new Map<string, string>(),
       errorCode: '',
       loading: false,
     };
@@ -157,13 +157,23 @@ export const useServiceProviderStore: StoreDefinition<
           serviceProviderId,
           { responseType: 'blob' },
         );
-        // Convert Blob to base64 string
-        const reader: FileReader = new FileReader();
-        reader.onload = (): void => {
-          this.currentServiceProviderLogo = reader.result as string;
-        };
-        // Start reading the Blob
-        reader.readAsDataURL(response.data);
+
+        // Convert Blob to base64 string - wrapped in a promise for async/await usage
+        const logoUrl: string = await new Promise<string>(
+          (resolve: (value: string | PromiseLike<string>) => void, reject: (reason?: unknown) => void) => {
+            const reader: FileReader = new FileReader();
+            reader.onload = (): void => {
+              resolve(reader.result as string);
+            };
+            reader.onerror = (): void => {
+              reject(new Error('Failed to read blob'));
+            };
+            reader.readAsDataURL(response.data);
+          },
+        );
+
+        // Now store it in the Map
+        this.serviceProviderLogos.set(serviceProviderId, logoUrl);
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {

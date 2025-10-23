@@ -45,8 +45,7 @@
 
   onMounted(async () => {
     serviceProviderStore.errorCode = '';
-    serviceProviderStore.currentServiceProvider = null;
-    serviceProviderStore.currentServiceProviderLogo = null;
+    serviceProviderStore.serviceProviderLogos.clear();
     await serviceProviderStore.getManageableServiceProviderById(currentServiceProviderId);
     await serviceProviderStore.getServiceProviderLogoById(currentServiceProviderId);
   });
@@ -120,7 +119,7 @@
                     </v-row>
 
                     <!-- Administrationsebene -->
-                    <v-row class="mt-4 align-center">
+                    <v-row class="align-center">
                       <v-col
                         cols="auto"
                         class="d-flex align-center pr-2"
@@ -139,7 +138,7 @@
                     </v-row>
 
                     <!-- Requires 2FA -->
-                    <v-row class="mt-4 align-center">
+                    <v-row class="align-center">
                       <v-col
                         cols="auto"
                         class="d-flex align-center pr-2"
@@ -158,7 +157,7 @@
                     </v-row>
 
                     <!-- Can be assigned to Rollen? -->
-                    <v-row class="mt-4 align-center">
+                    <v-row class="align-center">
                       <v-col
                         cols="auto"
                         class="d-flex align-center pr-2"
@@ -189,7 +188,7 @@
                     md="6"
                   >
                     <!-- Logo -->
-                    <v-row class="mt-4 align-center">
+                    <v-row class="mt-md-4 align-center">
                       <v-col
                         cols="auto"
                         class="d-flex align-center pr-2"
@@ -201,10 +200,10 @@
                         data-testid="service-provider-logo"
                       >
                         <v-img
-                          v-if="serviceProviderStore.currentServiceProviderLogo"
+                          v-if="serviceProviderStore.serviceProviderLogos.has(currentServiceProviderId)"
                           alt="provider-logo"
                           class="service-provider-logo"
-                          :src="serviceProviderStore.currentServiceProviderLogo"
+                          :src="serviceProviderStore.serviceProviderLogos.get(currentServiceProviderId)"
                           max-width="35"
                         />
                         <v-img
@@ -218,7 +217,7 @@
                       </v-col>
                     </v-row>
                     <!-- Kategorie -->
-                    <v-row class="mt-4 align-center">
+                    <v-row class="align-center">
                       <v-col
                         cols="auto"
                         class="d-flex align-center pr-2"
@@ -237,7 +236,7 @@
                     </v-row>
 
                     <!-- URL -->
-                    <v-row class="mt-4 align-center">
+                    <v-row class="align-center">
                       <v-col
                         cols="auto"
                         class="d-flex align-center pr-2"
@@ -260,7 +259,7 @@
                     </v-row>
 
                     <!-- Rollenerweiterung -->
-                    <v-row class="mt-md-4 align-center">
+                    <v-row class="align-center">
                       <v-col
                         cols="auto"
                         class="d-flex align-center pr-2"

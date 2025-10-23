@@ -137,20 +137,26 @@
     await authStore.initializeAuthStatus();
     const personId: string | null | undefined = authStore.currentUser?.personId;
 
-    const providersPromise: Promise<void> = serviceProviderStore.getAvailableServiceProviders().then(async () => {
-      for (const provider of serviceProviderStore.availableServiceProviders) {
-        if (provider.hasLogo) {
-          await serviceProviderStore.getServiceProviderLogoById(provider.id);
-          provider.logoUrl = serviceProviderStore.currentServiceProviderLogo ?? undefined;
-        }
-      }
-    });
+    // Load all service providers first
+    await serviceProviderStore.getAvailableServiceProviders();
+
+    // Load all logos in parallel
+    const logoPromises: Promise<void>[] = serviceProviderStore.availableServiceProviders
+      .filter((provider: ServiceProvider) => provider.hasLogo)
+      .map((provider: ServiceProvider) => serviceProviderStore.getServiceProviderLogoById(provider.id));
 
     const twoFAStatePromise: Promise<void> = personId
       ? twoFactorAuthentificationStore.get2FAState(personId)
       : Promise.resolve();
 
-    await Promise.allSettled([providersPromise, twoFAStatePromise]);
+    await Promise.allSettled([...logoPromises, twoFAStatePromise]);
+
+    // After all logos are loaded, assign them from the Map
+    serviceProviderStore.availableServiceProviders.forEach((provider: ServiceProvider) => {
+      if (provider.hasLogo) {
+        provider.logoUrl = serviceProviderStore.serviceProviderLogos.get(provider.id);
+      }
+    });
   });
 
   onBeforeMount(async () => {

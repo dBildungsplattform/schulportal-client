@@ -248,7 +248,9 @@ describe('serviceProviderStore', () => {
       const promise: Promise<void> = serviceProviderStore.getServiceProviderLogoById(serviceProviderId);
       expect(serviceProviderStore.loading).toBe(true);
       await promise;
-      expect(serviceProviderStore.currentServiceProviderLogo).toEqual('data:image/png;base64,bW9jayBpbWFnZSBkYXRh');
+      expect(serviceProviderStore.serviceProviderLogos.get(serviceProviderId)).toBe(
+        'data:image/png;base64,bW9jayBpbWFnZSBkYXRh',
+      );
       expect(serviceProviderStore.loading).toBe(false);
     });
 
