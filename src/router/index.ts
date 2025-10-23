@@ -13,6 +13,7 @@ type Permission =
   | 'personenimport'
   | 'personenverwaltung'
   | 'rollenverwaltung'
+  | 'angebotsverwaltung'
   | 'schulverwaltung'
   | 'schultraegerverwaltung'
   | 'portalverwaltung'
@@ -114,6 +115,8 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
           return authStore.hasKlassenverwaltungPermission;
         case 'rollenverwaltung':
           return authStore.hasRollenverwaltungPermission;
+        case 'angebotsverwaltung':
+          return authStore.hasAngeboteVerwaltenPermission;
         case 'schulverwaltung':
           return authStore.hasSchulverwaltungPermission;
         case 'schultraegerverwaltung':

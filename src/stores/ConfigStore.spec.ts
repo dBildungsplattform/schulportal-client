@@ -19,6 +19,7 @@ describe('ConfigStore', () => {
       const mockFeatureFlags: FeatureFlagResponse = {
         rolleBearbeitenEnabled: false,
         befristungBearbeitenEnabled: false,
+        rolleErweiternEnabled: false,
       };
 
       mockadapter.onGet('/api/config').replyOnce(200, mockFeatureFlags);

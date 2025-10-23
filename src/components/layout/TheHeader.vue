@@ -61,6 +61,7 @@
         >
           <v-icon
             class="hidden-md-and-up mr-2"
+            data-testid="help-icon"
             icon="mdi-help-circle-outline"
           />
           <span class="hidden-sm-and-down">{{ $t('nav.help') }}</span>
@@ -102,6 +103,7 @@
         >
           <v-icon
             class="mr-2"
+            data-testid="profile-icon"
             icon="mdi-account-outline"
           />
           <span class="hidden-sm-and-down nowrap">{{ $t('nav.profile') }}</span>
@@ -115,6 +117,7 @@
         >
           <v-icon
             class="mr-2"
+            data-testid="logout-icon"
             icon="mdi-logout"
           />
           <span class="hidden-sm-and-down">{{ $t('nav.logout') }}</span>

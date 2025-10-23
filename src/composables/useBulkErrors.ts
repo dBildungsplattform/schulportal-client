@@ -67,7 +67,7 @@ export function useBulkErrors(t: Composer['t'], personen: Map<string, PersonWith
         id,
         nachname: person.name.familienname,
         vorname: person.name.vorname,
-        username: person.referrer,
+        username: person.username,
         error: errorTranslation,
       };
     })

@@ -7,7 +7,9 @@
   import { OrganisationsTyp, type Organisation } from '@/stores/OrganisationStore';
   import {
     CreationType,
+    KlassenOption,
     OperationContext,
+    RolleDialogMode,
     usePersonenkontextStore,
     type PersonenkontextStore,
     type WorkflowFilter,
@@ -32,6 +34,8 @@
   const searchInputRolle: Ref<string | undefined> = ref('');
   const searchInputRollen: Ref<string | undefined> = ref('');
 
+  const localKlassenOption: Ref<string | undefined> = ref(KlassenOption.KEEP_KLASSE);
+
   type Props = {
     organisationen: TranslatedObject[] | undefined;
     rollen: TranslatedRolleWithAttrs[] | undefined;
@@ -42,12 +46,15 @@
     operationContext: OperationContext;
     selectedRolle?: string | undefined;
     selectedRollen?: string[] | undefined;
+    selectedKlassenOption?: string | null;
     selectedKlasse?: string | undefined;
+    selectedKlasseForRadio?: string | undefined;
     selectedOrganisationProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedKlasseProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
+    selectedKlasseForRadioProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedRolleProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedRollenProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
-    isModifyRolleDialog?: boolean;
+    selectedKlassenOptionProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     befristungInputProps?: BefristungProps;
     headlineNumbers?: {
       org: string;
@@ -55,7 +62,7 @@
       befristung: string;
     };
     allowMultipleRollen?: boolean;
-    isRolleUnassignForm?: boolean;
+    rolleDialogMode?: RolleDialogMode;
   };
 
   const props: Props = defineProps<Props>();
@@ -71,6 +78,8 @@
     (event: 'update:selectedRolle', value: string | undefined): void;
     (event: 'update:selectedRollen', value: string[] | undefined): void;
     (event: 'update:selectedKlasse', value: string | undefined): void;
+    (event: 'update:selectedKlasseForRadio', value: string | undefined): void;
+    (event: 'update:selectedKlassenOption', value: string | null): void;
     (event: 'update:canCommit', value: boolean): void;
     (event: 'fieldReset', field: 'selectedOrganisation' | 'selectedRolle' | 'selectedKlasse' | 'selectedRollen'): void;
   };
@@ -80,6 +89,7 @@
   const selectedRolle: Ref<string | undefined> = ref(props.selectedRolle);
   const selectedRollen: Ref<string[] | undefined> = ref(props.selectedRollen || []);
   const selectedKlasse: Ref<string | undefined> = ref(props.selectedKlasse);
+  const selectedKlasseForRadio: Ref<string | undefined> = ref(props.selectedKlasseForRadio);
   // we need to cast the selectedSchule into an array
   // doing it this way prevents an issue where the reactive system constantly re-runs which causes requests to be issued in a loop
   const administriertVon: Ref<string[] | undefined> = ref([]);
@@ -274,6 +284,16 @@
     }
   };
 
+  function updateKlasseSelection(selectedKlassen: string | undefined): void {
+    selectedKlasse.value = selectedKlassen;
+    emits('update:selectedKlasse', selectedKlassen);
+  }
+
+  function updateKlasseSelectionForRadio(selectedKlassen: string | undefined): void {
+    selectedKlasseForRadio.value = selectedKlassen;
+    emits('update:selectedKlasseForRadio', selectedKlassen);
+  }
+
   // Clear the selected Rolle once the input field is cleared (This is the only way to fetch all Rollen again)
   // This is also important since we only want to fetch all orgas once the selected Rolle is null, otherwise an extra request is made with an empty string
   function clearSelectedRolle(): void {
@@ -316,9 +336,20 @@
     emits('update:selectedOrganisation', orgaId);
   }
 
+  function handleKlassenOption(value: string | null): void {
+    if (value === null) return;
+    if (value === KlassenOption.KEEP_KLASSE) {
+      selectedKlasseForRadio.value = undefined;
+      emits('update:selectedKlasseForRadio', undefined);
+    }
+    localKlassenOption.value = value;
+    emits('update:selectedKlassenOption', value);
+  }
+
   // If the submission of the form goes wrong and the user needs to correct something, we need to ensure that the canCommit value is updated
   onMounted(() => {
     emits('update:canCommit', personenkontextStore.workflowStepResponse?.canCommit ?? false);
+    emits('update:selectedKlassenOption', localKlassenOption.value!);
   });
 </script>
 
@@ -348,7 +379,7 @@
         :useWorkflowEndpoints="true"
         :useLandesbediensteteWorkflow="useLandesbediensteteWorkflow"
         :operationContext="props.operationContext"
-        :isRolleUnassignForm="isRolleUnassignForm"
+        :isRolleUnassignForm="rolleDialogMode === RolleDialogMode.UNASSIGN"
         :includeAll="true"
         :placeholderText="$t('admin.organisation.selectOrganisation')"
         :personId="props.personId"
@@ -417,12 +448,15 @@
         />
       </FormRow>
 
-      <!-- Klasse zuordnen -->
+      <!-- Klasse zuordnen for normal flow-->
       <FormRow
         v-if="
           allowMultipleRollen
             ? isLernRolle(selectedRollen) && selectedOrganisation
-            : isLernRolle(selectedRolle) && selectedOrganisation && !isRolleUnassignForm
+            : isLernRolle(selectedRolle) &&
+              selectedOrganisation &&
+              rolleDialogMode !== RolleDialogMode.MODIFY &&
+              rolleDialogMode !== RolleDialogMode.UNASSIGN
         "
         :error-label="selectedKlasseProps?.['error'] || false"
         :is-required="true"
@@ -433,6 +467,60 @@
           ref="klasse-select"
           :administriertVon
           parentId="personenkontext-create"
+        />
+      </FormRow>
+      <FormRow
+        v-if="isLernRolle(selectedRolle) && rolleDialogMode === RolleDialogMode.MODIFY"
+        :errorLabel="selectedKlasseProps?.['error'] || false"
+        :isRequired="true"
+        :isAlignedWithRadio="true"
+        labelForId="klasse-select"
+        :label="$t('admin.klasse.klasse')"
+      >
+        <v-radio-group
+          data-testid="klassen-option-radio-group"
+          ref="klassen-option-radio-group"
+          @update:modelValue="handleKlassenOption"
+          v-model="localKlassenOption"
+          v-bind="selectedKlassenOptionProps"
+        >
+          <v-radio
+            data-testid="keep-klasse-radio-button"
+            :label="$t('admin.klasse.keepKlasse')"
+            :value="KlassenOption.KEEP_KLASSE"
+            color="primary"
+          ></v-radio>
+          <v-radio
+            data-testid="select-new-klasse-radio-button"
+            :label="$t('admin.klasse.selectAnotherKlasse')"
+            :value="KlassenOption.SELECT_NEW_KLASSE"
+            :color="'primary'"
+          ></v-radio>
+        </v-radio-group>
+      </FormRow>
+      <!-- Klasse zuordnen for RolleModify -->
+      <FormRow
+        v-if="
+          isLernRolle(selectedRolle) &&
+          selectedOrganisation &&
+          rolleDialogMode === RolleDialogMode.MODIFY &&
+          localKlassenOption === KlassenOption.SELECT_NEW_KLASSE
+        "
+        :errorLabel="selectedKlasseForRadioProps?.['error'] || false"
+        labelForId="klasse-select"
+        class="mt-n4"
+      >
+        <KlassenFilter
+          :multiple="false"
+          :hideDetails="false"
+          :selectedKlasseProps="selectedKlasseForRadioProps"
+          :highlightSelection="false"
+          :selectedKlassen="selectedKlasseForRadio"
+          @update:selectedKlassen="updateKlasseSelectionForRadio"
+          :placeholderText="$t('admin.klasse.selectKlasse')"
+          ref="klasse-select"
+          :administriertVon
+          parentId="personenkontext-create-rolle-modify"
         />
       </FormRow>
       <!-- Befristung -->
@@ -451,7 +539,6 @@
         v-if="
           selectedOrganisation &&
           (allowMultipleRollen ? (selectedRollen?.length ?? 0) > 0 : selectedRolle) &&
-          !isModifyRolleDialog &&
           props.befristungInputProps
         "
         ref="befristung-input-wrapper"

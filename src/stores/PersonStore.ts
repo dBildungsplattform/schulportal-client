@@ -49,7 +49,7 @@ export enum SortField {
   Familienname = 'familienname',
   Vorname = 'vorname',
   Personalnummer = 'personalnummer',
-  Referrer = 'referrer',
+  Username = 'username',
 }
 
 export type CreatePersonBodyParams = DbiamCreatePersonWithPersonenkontexteBodyParams;

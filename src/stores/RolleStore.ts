@@ -15,6 +15,7 @@ import {
   type ServiceProviderResponse,
   type UpdateRolleBodyParams,
   type SystemRechtResponse,
+  type ServiceProviderIdNameResponse,
 } from '../api-client/generated/api';
 import type { ServiceProvider } from './ServiceProviderStore';
 
@@ -44,7 +45,7 @@ type RolleActions = {
     systemrechte: RollenSystemRechtEnum[],
   ) => Promise<RolleResponse>;
   getAllRollen: (filter: RolleFilter) => Promise<void>;
-  getRolleById: (rolleId: string) => Promise<Rolle>;
+  getRolleById: (rolleId: string) => Promise<void>;
   updateRolle: (
     rolleId: string,
     rollenName: string,
@@ -69,11 +70,11 @@ export type Rolle = {
   name: string;
   rollenart: RollenArt;
   systemrechte?: Set<RollenSystemRechtEnum>;
-  serviceProviders?: Array<ServiceProviderResponse>;
+  serviceProviders?: Array<ServiceProviderIdNameResponse>;
   version: number;
 };
 
-function mapRolleResponseToRolle(response: RolleResponse): Rolle {
+function mapRolleResponseToRolle(response: RolleWithServiceProvidersResponse): Rolle {
   return {
     administeredBySchulstrukturknoten: response.administeredBySchulstrukturknoten,
     id: response.id,
@@ -82,6 +83,7 @@ function mapRolleResponseToRolle(response: RolleResponse): Rolle {
     rollenart: response.rollenart,
     systemrechte: new Set(Array.from(response.systemrechte).map((recht: SystemRechtResponse) => recht.name)),
     version: response.version,
+    serviceProviders: response.serviceProviders,
   };
 }
 
@@ -191,14 +193,13 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
       }
     },
 
-    async getRolleById(rolleId: string): Promise<Rolle> {
+    async getRolleById(rolleId: string): Promise<void> {
       this.loading = true;
       this.errorCode = '';
       try {
-        const { data }: { data: RolleResponse } =
+        const { data }: { data: RolleWithServiceProvidersResponse } =
           await rolleApi.rolleControllerFindRolleByIdWithServiceProviders(rolleId);
         this.currentRolle = mapRolleResponseToRolle(data);
-        return mapRolleResponseToRolle(data);
       } catch (error) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
         return await Promise.reject(this.errorCode);

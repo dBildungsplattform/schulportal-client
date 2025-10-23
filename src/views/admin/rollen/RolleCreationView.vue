@@ -17,6 +17,7 @@
   import {
     useServiceProviderStore,
     type ServiceProvider,
+    type ServiceProviderIdNameResponse,
     type ServiceProviderStore,
   } from '@/stores/ServiceProviderStore';
   import { type TranslatedObject } from '@/types.d';
@@ -146,7 +147,7 @@
     }
 
     return rolleStore.createdRolle.serviceProviders
-      .map((serviceProvider: ServiceProvider) => {
+      .map((serviceProvider: ServiceProviderIdNameResponse) => {
         return serviceProvider.name;
       })
       .join(', ');

@@ -337,14 +337,21 @@
             <v-col
               class="subtitle-2"
               cols="auto"
+              data-testid="following-data-created-text"
             >
               {{ $t('admin.followingDataCreated') }}
             </v-col>
           </v-row>
           <v-row>
-            <v-col class="text-body bold text-right"> {{ $t('admin.schule.schulform') }}: </v-col>
+            <v-col
+              class="text-body bold text-right"
+              data-testid="created-schule-form-label"
+            >
+              {{ $t('admin.schule.schulform') }}:
+            </v-col>
             <v-col class="text-body">
-              <span data-testid="created-schule-form">{{ preservedSchulform }}</span>
+              <span data-testid="created-schule-form">
+                {{ preservedSchulform }}</span>
             </v-col>
           </v-row>
           <v-row>
@@ -356,9 +363,12 @@
             </v-col>
           </v-row>
           <v-row>
-            <v-col class="text-body bold text-right"> {{ $t('admin.schule.schulname') }}: </v-col>
-            <v-col class="text-body">
-              <span data-testid="created-schule-name">{{ organisationStore.createdSchule.name }}</span>
+            <v-col
+              class="text-body bold text-right"
+              data-testid="created-schule-name-label"
+            > {{ $t('admin.schule.schulname') }}: </v-col>
+            <v-col class="text-body"
+              ><span data-testid="created-schule-name">{{ organisationStore.createdSchule.name }}</span>
             </v-col>
           </v-row>
           <v-divider

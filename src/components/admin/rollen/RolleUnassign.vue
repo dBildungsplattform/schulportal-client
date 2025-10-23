@@ -6,7 +6,12 @@
   import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
   import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
   import { type Organisation } from '@/stores/OrganisationStore';
-  import { OperationContext, usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
+  import {
+    OperationContext,
+    RolleDialogMode,
+    usePersonenkontextStore,
+    type PersonenkontextStore,
+  } from '@/stores/PersonenkontextStore';
   import { RollenArt, type RolleResponse } from '@/stores/RolleStore';
   import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
   import type { TranslatedObject } from '@/types';

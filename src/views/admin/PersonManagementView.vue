@@ -73,7 +73,7 @@
     id: string;
     familienname: string;
     vorname: string;
-    referrer: string;
+    username: string;
     personalnummer: string;
     rollen: string;
     administrationsebenen: string;
@@ -82,7 +82,7 @@
   const headers: ReadonlyHeaders = [
     { title: t('person.lastName'), key: 'familienname', align: 'start' },
     { title: t('person.firstName'), key: 'vorname', align: 'start' },
-    { title: t('person.userName'), key: 'referrer', align: 'start' },
+    { title: t('person.userName'), key: 'username', align: 'start' },
     { title: t('person.kopersNr'), key: 'personalnummer', align: 'start' },
     { title: t('person.rolle'), key: 'rollen', align: 'start', sortable: false },
     { title: t('person.zuordnungen'), key: 'administrationsebenen', align: 'start', sortable: false },
@@ -95,7 +95,7 @@
         id: personWithZuordnungen.id,
         familienname: personWithZuordnungen.name.familienname,
         vorname: personWithZuordnungen.name.vorname,
-        referrer: personWithZuordnungen.referrer,
+        username: personWithZuordnungen.username,
         personalnummer: personWithZuordnungen.getPersonalnummerAsString(t('missing')),
         rollen: personWithZuordnungen.rollenAsString,
         administrationsebenen: personWithZuordnungen.administrationsebenenAsString,
@@ -196,9 +196,11 @@
 
   const rollenForForm: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
 
-  // Only Rollen from type LEHR
-  const lehrRollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = computed(() => {
-    return rollenForForm.value?.filter((rolle: TranslatedRolleWithAttrs) => rolle.rollenart === RollenArt.Lehr);
+  // Only Rollen from type LEHR and LERN
+  const lehrAndLernRollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = computed(() => {
+    return rollenForForm.value?.filter(
+      (rolle: TranslatedRolleWithAttrs) => rolle.rollenart === RollenArt.Lehr || rolle.rollenart === RollenArt.Lern,
+    );
   });
 
   const statuses: Array<string> = ['Aktiv', 'Inaktiv'];
@@ -366,7 +368,7 @@
   const keyMapping: Record<string, SortField> = {
     'person.name.familienname': SortField.Familienname,
     'person.name.vorname': SortField.Vorname,
-    'person.referrer': SortField.Referrer,
+    'person.username': SortField.Username,
     'person.personalnummer': SortField.Personalnummer,
   };
 
@@ -851,14 +853,15 @@
             v-if="rolleModifiyDialogVisible"
             ref="person-bulk-rolle-modify"
             :organisationen="organisationenForForm"
-            :rollen="lehrRollen"
-            :is-loading="personenkontextStore.loading"
-            :is-dialog-visible="rolleModifiyDialogVisible"
-            :error-code="personenkontextStore.errorCode"
-            :selected-personen
+            :rollen="lehrAndLernRollen"
+            :isLoading="personenkontextStore.loading"
+            :isDialogVisible="rolleModifiyDialogVisible"
+            :errorCode="personenkontextStore.errorCode"
+            :selectedPersonen
             @update:is-dialog-visible="handleRolleModifyDialog($event)"
             @update:get-uebersichten="getPaginatedPersonen(searchFilterStore.personenPage)"
-          />
+          >
+          </RolleModify>
           <PersonBulkDelete
             v-if="benutzerDeleteDialogVisible"
             ref="person-bulk-delete"
@@ -951,8 +954,9 @@
             :title="item.rollen"
           >
             {{ item.rollen }}
-          </div> </template
-        ><template #[`item.administrationsebenen`]="{ item }">
+          </div>
+        </template>
+        <template v-slot:[`item.administrationsebenen`]="{ item }">
           <div
             class="ellipsis-wrapper"
             :title="item.administrationsebenen"

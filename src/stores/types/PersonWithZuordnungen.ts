@@ -19,7 +19,7 @@ export class PersonWithZuordnungen extends Person {
     super(
       person.id,
       person.name,
-      person.referrer,
+      person.username,
       person.revision,
       person.personalnummer,
       person.isLocked,

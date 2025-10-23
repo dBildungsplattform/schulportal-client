@@ -883,10 +883,13 @@
                   rolle: sectionNumberRolle,
                   befristung: sectionNumberBefristung,
                 }"
-                @update:can-commit="canCommit = $event"
+                @update:canCommit="canCommit = $event"
                 @update:befristung="handleBefristungUpdate"
                 @update:calculated-befristung-option="handleBefristungOptionUpdate"
-                @field-reset="handleFieldReset"
+                @fieldReset="handleFieldReset"
+                v-model:selectedOrganisation="selectedOrganisation"
+                v-model:selectedRollen="selectedRollen"
+                v-model:selectedKlasse="selectedKlasse"
               />
             </template>
             <template v-else>
@@ -918,6 +921,9 @@
                 @update:befristung="handleBefristungUpdate"
                 @update:calculated-befristung-option="handleBefristungOptionUpdate"
                 @field-reset="handleFieldReset"
+                v-model:selectedOrganisation="selectedOrganisation"
+                v-model:selectedRollen="selectedRollen"
+                v-model:selectedKlasse="selectedKlasse"
               />
               <!-- Else: Default Order -->
               <div v-if="selectedOrganisation">
@@ -1007,6 +1013,7 @@
               <v-icon
                 aria-hidden="true"
                 color="#1EAE9C"
+                data-testid="person-success-icon"
                 icon="mdi-check-circle"
                 small
               />
@@ -1016,22 +1023,33 @@
             <v-col
               class="subtitle-2"
               cols="auto"
+              data-testid="following-data-created-text"
             >
               {{ t('admin.followingDataCreated') }}
             </v-col>
           </v-row>
           <v-row>
-            <v-col class="text-body bold text-right"> {{ t('person.firstName') }}: </v-col>
-            <v-col class="text-body">
-              <span data-testid="created-person-vorname">{{
+            <v-col
+              class="text-body bold text-right"
+              data-testid="created-person-vorname-label"
+            >
+              {{ t('person.firstName') }}:
+            </v-col>
+            <v-col class="text-body"
+              ><span data-testid="created-person-vorname">{{
                 personenkontextStore.createdPersonWithKontext.person.name.vorname
               }}</span>
             </v-col>
           </v-row>
           <v-row>
-            <v-col class="text-body bold text-right"> {{ $t('person.lastName') }}: </v-col>
-            <v-col class="text-body">
-              <span data-testid="created-person-familienname">{{
+            <v-col
+              class="text-body bold text-right"
+              data-testid="created-person-familienname-label"
+            >
+              {{ $t('person.lastName') }}:
+            </v-col>
+            <v-col class="text-body"
+              ><span data-testid="created-person-familienname">{{
                 personenkontextStore.createdPersonWithKontext.person.name.familienname
               }}</span>
             </v-col>
@@ -1053,6 +1071,7 @@
                   ? 'text-body bold text-right'
                   : 'text-body bold text-right text-red'
               }`"
+              data-testid="created-person-kopersnr-label"
             >
               {{ t('person.kopersNr') }}:
             </v-col>
@@ -1065,24 +1084,33 @@
                   ? 'text-body'
                   : 'text-body text-red'
               }`"
-            >
-              <span data-testid="created-person-kopersNr">{{
-                personenkontextStore.createdPersonWithKontext.person.personalnummer
-                  ? personenkontextStore.createdPersonWithKontext.person.personalnummer
-                  : t('missing')
-              }}</span>
-            </v-col>
+              >
+                <span data-testid="created-person-kopersnr">{{
+                  personenkontextStore.createdPersonWithKontext.person.personalnummer
+                    ? personenkontextStore.createdPersonWithKontext.person.personalnummer
+                    : t('missing')
+                }}</span>
+              </v-col>
           </v-row>
           <v-row>
-            <v-col class="text-body bold text-right"> {{ $t('person.userName') }}: </v-col>
+            <v-col
+              class="text-body bold text-right"
+              data-testid="created-person-username-label"
+            >
+              {{ $t('person.userName') }}:
+            </v-col>
             <v-col class="text-body">
               <span data-testid="created-person-username">{{
-                personenkontextStore.createdPersonWithKontext.person.referrer
+                personenkontextStore.createdPersonWithKontext.person.username
               }}</span>
             </v-col>
           </v-row>
           <v-row>
-            <v-col class="text-body bold text-right pb-8"> {{ $t('admin.person.startPassword') }}: </v-col>
+            <v-col
+              class="text-body bold text-right pb-8"
+              data-testid="created-person-start-password-label"
+              > {{ $t('admin.person.startPassword') }}:
+            </v-col>
             <v-col class="text-body bold">
               <p class="mb-4">
                 {{ t('admin.person.startPasswordInfo') }}
@@ -1094,22 +1122,37 @@
             </v-col>
           </v-row>
           <v-row>
-            <v-col class="text-body bold text-right"> {{ $t('admin.organisation.organisation') }}: </v-col>
+            <v-col
+              class="text-body bold text-right"
+              data-testid="created-person-organisation-label"
+            >
+              {{ $t('admin.organisation.organisation') }}:
+            </v-col>
             <v-col class="text-body">
               <span data-testid="created-person-organisation">{{ translatedOrganisationsname }}</span>
             </v-col>
           </v-row>
           <v-row>
-            <v-col class="text-body bold text-right"> {{ $t('admin.rolle.rolle') }}: </v-col>
+            <v-col
+              class="text-body bold text-right"
+              data-testid="created-person-rolle-label"
+            >
+              {{ $t('admin.rolle.rolle') }}:
+            </v-col>
             <v-col class="text-body">
               <span data-testid="created-person-rolle">{{ translatedRollenname.join(', ') }}</span>
             </v-col>
           </v-row>
           <v-row>
-            <v-col class="text-body bold text-right"> {{ $t('admin.befristung.befristung') }}: </v-col>
-            <v-col class="text-body">
-              <span data-testid="created-person-befristung">{{ translatedBefristung }}</span>
+            <v-col
+              class="text-body bold text-right"
+              data-testid="created-person-befristung-label"
+            >
+              {{ $t('admin.befristung.befristung') }}:
             </v-col>
+            <v-col class="text-body"
+              ><span data-testid="created-person-befristung">{{ translatedBefristung }}</span></v-col
+            >
           </v-row>
           <v-row
             v-if="
@@ -1118,7 +1161,12 @@
               )
             "
           >
-            <v-col class="text-body bold text-right"> {{ $t('admin.klasse.klasse') }}: </v-col>
+            <v-col
+              class="text-body bold text-right"
+              data-testid="created-person-klasse-label"
+            >
+              {{ $t('admin.klasse.klasse') }}:
+            </v-col>
             <v-col class="text-body">
               <span data-testid="created-person-klasse">{{
                 selectedKlasseCache ? selectedKlasseCache.title : '---'
@@ -1221,7 +1269,7 @@
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('person.firstName') }}: </v-col>
             <v-col class="text-body">
-              <span data-testid="added-landesbediensteter-forname">{{
+              <span data-testid="added-landesbediensteter-vorname">{{
                 personStore.allLandesbedienstetePersonen?.[0]?.vorname
               }}</span>
             </v-col>
@@ -1237,7 +1285,7 @@
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('person.kopersNr') }}: </v-col>
             <v-col class="text-body">
-              <span data-testid="added-landesbediensteter-familienname">{{
+              <span data-testid="added-landesbediensteter-personalnummer">{{
                 personStore.allLandesbedienstetePersonen?.[0]?.personalnummer
               }}</span>
             </v-col>

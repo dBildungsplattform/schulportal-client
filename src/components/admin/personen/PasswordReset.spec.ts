@@ -2,7 +2,6 @@ import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import PasswordReset from './PasswordReset.vue';
 import { nextTick } from 'vue';
-import { EmailAddressStatus } from '@/api-client/generated/api';
 
 let wrapper: VueWrapper | null = null;
 
@@ -32,25 +31,6 @@ beforeEach(() => {
       errorCode: '',
       errorMessage: '',
       password: 'qwertzuiop',
-      person: {
-        person: {
-          id: '2',
-          name: {
-            vorname: 'Albert',
-            familienname: 'Test',
-          },
-          referrer: 'atest',
-          personalnummer: null,
-          isLocked: null,
-          userLock: null,
-          revision: '1',
-          lastModified: '2024-05-22',
-          email: {
-            address: 'email',
-            status: EmailAddressStatus.Requested,
-          },
-        },
-      },
     },
     global: {
       components: {

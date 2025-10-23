@@ -39,6 +39,11 @@ const landesbediensteterApi: LandesbediensteterApiInterface = Landesbediensteter
   axiosApiInstance,
 );
 
+export enum KlassenOption {
+  KEEP_KLASSE = 'keep_klasse',
+  SELECT_NEW_KLASSE = 'select_new_klasse',
+}
+
 export enum BefristungOption {
   SCHULJAHRESENDE = 'schuljahresende',
   UNBEFRISTET = 'unbefristet',
@@ -58,6 +63,11 @@ export enum CreationType {
   Limited = 'limited',
   Full = 'full',
   AddPersonToOwnSchule = 'add-person-to-own-schule',
+}
+
+export enum RolleDialogMode {
+  MODIFY = 'modify',
+  UNASSIGN = 'unassign',
 }
 
 export type PersonenkontextUpdate = Pick<DbiamPersonenkontextBodyParams, 'organisationId' | 'rolleId' | 'befristung'>;

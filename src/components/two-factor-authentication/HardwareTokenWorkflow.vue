@@ -145,13 +145,13 @@
   );
 
   async function assignHardwareToken(): Promise<void> {
-    if (!props.person.person.referrer) {
+    if (!props.person.person.username) {
       return;
     }
     const assignHardwareTokenBodyParams: AssignHardwareTokenBodyParams = {
       serial: selectedSeriennummer.value,
       otp: selectedOtp.value,
-      referrer: props.person.person.referrer,
+      username: props.person.person.username,
       userId: props.person.person.id,
     };
     await twoFactoreAuthentificationStore.assignHardwareToken(assignHardwareTokenBodyParams);

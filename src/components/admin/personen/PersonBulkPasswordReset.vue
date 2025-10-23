@@ -87,7 +87,7 @@
         Klasse: personWithZuordnung.klassenZuordnungenAsString,
         Nachname: personWithZuordnung.name.familienname,
         Vorname: personWithZuordnung.name.vorname,
-        Benutzername: personWithZuordnung.referrer,
+        Benutzername: personWithZuordnung.username,
         Passwort: password as string,
       });
     }

@@ -96,7 +96,7 @@
           {
             vorname: personInfoStore.personInfo.person.name.vorname,
             familienname: personInfoStore.personInfo.person.name.familiennamen,
-            username: personInfoStore.personInfo.person.referrer ?? undefined,
+            username: personInfoStore.personInfo.person.username ?? undefined,
             personalnummer: personInfoStore.personInfo.person.personalnummer ?? null,
             emailStatus: {
               status: personInfoStore.personInfo.email?.status as EmailStatus,
@@ -179,7 +179,7 @@
   function navigateToPasswordChange(): void {
     const url: URL = new URL(window.origin + '/api/auth/reset-password');
     url.searchParams.set('redirectUrl', windowOrigin + route.fullPath);
-    url.searchParams.set('login_hint', personInfoStore.personInfo?.person.referrer ?? '');
+    url.searchParams.set('login_hint', personInfoStore.personInfo?.person.username ?? '');
     window.location.href = url.toString();
   }
 
