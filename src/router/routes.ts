@@ -168,6 +168,17 @@ const routes: readonly RouteRecordRaw[] = [
     },
   },
   {
+    path: '/admin/angebote/:id',
+    name: 'angebot-details',
+    component: () => import('../views/admin/service-provider/ServiceProviderDetailsView.vue'),
+    meta: {
+      layout: 'AdminLayout',
+      requiresAuth: true,
+      requiredStepUpLevel: StepUpLevel.GOLD,
+      requiresPermission: 'angebotsverwaltung',
+    },
+  },
+  {
     path: '/admin/schulen/new',
     name: 'create-schule',
     component: () => import('../views/admin/organisationen/SchuleCreationView.vue'),

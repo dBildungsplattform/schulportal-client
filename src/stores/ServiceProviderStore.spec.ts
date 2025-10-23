@@ -1,10 +1,14 @@
-import type { ProviderControllerGetManageableServiceProviders200Response } from '@/api-client/generated';
+import type {
+  ManageableServiceProviderListEntryResponse,
+  ProviderControllerGetManageableServiceProviders200Response,
+} from '@/api-client/generated';
 import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
 import { createPinia, setActivePinia } from 'pinia';
 
 import { DoFactory } from 'test/DoFactory';
 import { useServiceProviderStore, type ServiceProvider, type ServiceProviderStore } from './ServiceProviderStore';
+import { faker } from '@faker-js/faker';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 
@@ -171,6 +175,99 @@ describe('serviceProviderStore', () => {
       expect(serviceProviderStore.loading).toBe(true);
       await promise;
       expect(serviceProviderStore.manageableServiceProviders).toEqual([]);
+      expect(serviceProviderStore.errorCode).toEqual('some mock server error');
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+  });
+
+  describe('getManageableServiceProviderById', () => {
+    const serviceProviderId: string = 'test-provider-id';
+    const url: string = `/api/provider/manageable/${serviceProviderId}`;
+
+    it('should load a manageable service provider by id', async () => {
+      const mockResponse: ManageableServiceProviderListEntryResponse =
+        DoFactory.getManageableServiceProviderListEntryResponse();
+
+      mockadapter.onGet(url).replyOnce(200, mockResponse);
+      const promise: Promise<void> = serviceProviderStore.getManageableServiceProviderById(serviceProviderId);
+      expect(serviceProviderStore.loading).toBe(true);
+      await promise;
+      expect(serviceProviderStore.currentServiceProvider).toEqual(mockResponse);
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+
+    it('should handle string error', async () => {
+      mockadapter.onGet(url).replyOnce(500, 'some mock server error');
+      const promise: Promise<void> = serviceProviderStore.getManageableServiceProviderById(serviceProviderId);
+      expect(serviceProviderStore.loading).toBe(true);
+      await promise;
+      expect(serviceProviderStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+
+    it('should handle error code', async () => {
+      mockadapter.onGet(url).replyOnce(500, { code: 'some mock server error' });
+      const promise: Promise<void> = serviceProviderStore.getManageableServiceProviderById(serviceProviderId);
+      expect(serviceProviderStore.loading).toBe(true);
+      await promise;
+      expect(serviceProviderStore.errorCode).toEqual('some mock server error');
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+  });
+
+  describe('getServiceProviderLogoById', () => {
+    const serviceProviderId: string = faker.string.uuid();
+    const url: string = `/api/provider/${serviceProviderId}/logo`;
+
+    let mockReader: {
+      onload: (() => void) | null;
+      readAsDataURL: (blob: Blob) => void;
+      result: string | ArrayBuffer | null;
+    };
+
+    beforeEach(() => {
+      mockReader = {
+        onload: null,
+        result: 'data:image/png;base64,bW9jayBpbWFnZSBkYXRh',
+        readAsDataURL: vi.fn(function (this: typeof mockReader, _blob: Blob) {
+          this.onload?.();
+        }),
+      };
+
+      vi.spyOn(global, 'FileReader').mockImplementation(() => mockReader as FileReader);
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it('should load service provider logo by id', async () => {
+      const mockBlob: Blob = new Blob(['mock image data'], { type: 'image/png' });
+      mockadapter.onGet(url).replyOnce(200, mockBlob, { 'content-type': 'image/png' });
+
+      const promise: Promise<void> = serviceProviderStore.getServiceProviderLogoById(serviceProviderId);
+      expect(serviceProviderStore.loading).toBe(true);
+      await promise;
+      expect(serviceProviderStore.serviceProviderLogos.get(serviceProviderId)).toBe(
+        'data:image/png;base64,bW9jayBpbWFnZSBkYXRh',
+      );
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+
+    it('should handle string error', async () => {
+      mockadapter.onGet(url).replyOnce(500, 'some mock server error');
+      const promise: Promise<void> = serviceProviderStore.getServiceProviderLogoById(serviceProviderId);
+      expect(serviceProviderStore.loading).toBe(true);
+      await promise;
+      expect(serviceProviderStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+
+    it('should handle error code', async () => {
+      mockadapter.onGet(url).replyOnce(500, { code: 'some mock server error' });
+      const promise: Promise<void> = serviceProviderStore.getServiceProviderLogoById(serviceProviderId);
+      expect(serviceProviderStore.loading).toBe(true);
+      await promise;
       expect(serviceProviderStore.errorCode).toEqual('some mock server error');
       expect(serviceProviderStore.loading).toBe(false);
     });
