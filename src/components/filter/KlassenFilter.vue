@@ -18,7 +18,7 @@
   type Props = {
     hideDetails?: boolean;
     systemrechteForSearch?: Array<RollenSystemRechtEnum>;
-    multiple: boolean;
+    multiple?: boolean;
     readonly?: boolean;
     selectedKlasseProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     highlightSelection?: boolean;
@@ -62,13 +62,19 @@
   // selection is represented as an array internally
   // wrap/unwrap is used to convert between internal and vuetify representation
   const wrapSelectedKlassenIds = (selectedIds: SelectedKlassenIds): Array<string> => {
-    if (Array.isArray(selectedIds)) return selectedIds.filter(Boolean);
-    if (selectedIds) return [selectedIds];
+    if (Array.isArray(selectedIds)) {
+      return selectedIds.filter(Boolean);
+    }
+    if (selectedIds) {
+      return [selectedIds];
+    }
     return [];
   };
 
   const isEmptySelection = (selection: SelectedKlassenIds): boolean => {
-    if (!selection) return true;
+    if (!selection) {
+      return true;
+    }
     return wrapSelectedKlassenIds(selection).filter(Boolean).length === 0;
   };
 
@@ -81,11 +87,12 @@
     const selectedIds: Array<string> = wrapSelectedKlassenIds(selectedKlassen.value);
     if (!isEmptySelection(selectedIds)) {
       selectedIds.forEach((selectedId: string) => {
-        if (options.find((option: TranslatedObject) => option.value === selectedId) === undefined)
+        if (options.find((option: TranslatedObject) => option.value === selectedId) === undefined) {
           options.push({
             value: selectedId,
             title: '...',
           });
+        }
       });
     }
     return options;
@@ -104,17 +111,29 @@
   };
 
   const getDisplayItem = (item: TranslatedObject, index: number): string => {
-    if (!selectedKlassen.value) return ''; // should not happen
-    if (!canDisplaySelection(selectedKlassen.value)) return '...'; // we are loading
-    if (!props.multiple) return item.title;
+    if (!selectedKlassen.value) {
+      return '';
+    } // should not happen
+    if (!canDisplaySelection(selectedKlassen.value)) {
+      return '...';
+    } // we are loading
+    if (!props.multiple) {
+      return item.title;
+    }
 
-    if (selectedKlassen.value.length < 2) return item.title;
-    if (index === 0) return t('admin.klasse.klassenSelected', { count: selectedKlassen.value.length });
+    if (selectedKlassen.value.length < 2) {
+      return item.title;
+    }
+    if (index === 0) {
+      return t('admin.klasse.klassenSelected', { count: selectedKlassen.value.length });
+    }
     return ''; // do not display anything for other items
   };
 
   const shouldHighlightSelection: ComputedRef<boolean> = computed(() => {
-    if (props.highlightSelection && !isEmptySelection(selectedKlassen.value)) return true;
+    if (props.highlightSelection && !isEmptySelection(selectedKlassen.value)) {
+      return true;
+    }
     return false;
   });
 
@@ -146,7 +165,9 @@
   };
 
   const handleFocusChange = (focused: boolean): void => {
-    if (!props.multiple) return;
+    if (!props.multiple) {
+      return;
+    }
     if (!focused) {
       searchInputKlassen.value = undefined;
     }
@@ -172,13 +193,16 @@
 
   watch(
     klassenFilter,
-    async (newFilter: OrganisationenFilter | undefined, oldFilter: OrganisationenFilter | undefined) => {
-      if (timerId.value) clearTimeout(timerId.value);
+    (newFilter: OrganisationenFilter | undefined, oldFilter: OrganisationenFilter | undefined) => {
+      if (timerId.value) {
+        clearTimeout(timerId.value);
+      }
 
       // We skip if selection is disabled and we already know how to display the selection
       // empty selection means we have to reload anyways
-      if (!isEmptySelection(selectedKlassen.value) && props.readonly && canDisplaySelection(selectedKlassen.value))
+      if (!isEmptySelection(selectedKlassen.value) && props.readonly && canDisplaySelection(selectedKlassen.value)) {
         return;
+      }
 
       // We apply the debounce of 500 only when there is an oldFilter (a change has been made)
       const delay: number = oldFilter ? 500 : 0;
@@ -212,14 +236,17 @@
 
 <template>
   <v-autocomplete
+    :id="testId"
+    :ref="testId"
+    v-bind="selectedKlasseProps"
+    v-model="selectedKlassen"
+    v-model:search="searchInputKlassen"
     autocomplete="off"
     :class="['filter-dropdown', { selected: shouldHighlightSelection }]"
     clearable
     :data-testid="testId"
     density="compact"
     :disabled="props.readonly"
-    :id="testId"
-    :ref="testId"
     :items="translatedKlassen"
     item-value="value"
     item-text="title"
@@ -228,18 +255,15 @@
     :placeholder="placeholderText"
     required="true"
     variant="outlined"
+    :hide-details
     @update:search="updateSearchString"
     @click:clear="organisationStore.resetKlasseFilter(parentId)"
     @update:focused="handleFocusChange"
-    v-bind="selectedKlasseProps"
-    v-model="selectedKlassen"
-    v-model:search="searchInputKlassen"
-    :hide-details
   >
-    <template v-slot:prepend-item>
-      <slot name="prepend-item"></slot>
+    <template #prepend-item>
+      <slot name="prepend-item" />
     </template>
-    <template v-slot:selection="{ item, index }">
+    <template #selection="{ item, index }">
       <span v-if="getDisplayItem(item, index)">
         {{ getDisplayItem(item, index) }}
       </span>

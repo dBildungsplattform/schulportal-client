@@ -51,16 +51,16 @@
     return message;
   });
 
-  async function closePersonDeleteDialog(isActive: Ref<boolean>): Promise<void> {
+  function closePersonDeleteDialog(isActive: Ref<boolean>): void {
     isActive.value = false;
   }
 
-  async function handlePersonDelete(personId: string): Promise<void> {
+  function handlePersonDelete(personId: string): void {
     emit('onDeletePerson', personId);
     successDialogVisible.value = true;
   }
 
-  async function closeSuccessDialogAndPushToManagement(): Promise<void> {
+  function closeSuccessDialogAndPushToManagement(): void {
     successDialogVisible.value = false;
     router.push({ name: 'person-management' });
   }
@@ -100,8 +100,8 @@
             <v-btn
               :block="mdAndDown"
               class="primary"
-              @click.stop="closeSuccessDialogAndPushToManagement()"
               data-testid="close-person-delete-success-dialog-button"
+              @click.stop="closeSuccessDialogAndPushToManagement()"
             >
               {{ $t('close') }}
             </v-btn>
@@ -114,7 +114,7 @@
     v-if="!successDialogVisible"
     persistent
   >
-    <template v-slot:activator="{ props }">
+    <template #activator="{ props }">
       <v-col
         cols="12"
         sm="6"
@@ -122,9 +122,9 @@
         class="pb-0"
       >
         <SpshTooltip
-          :enabledCondition="!disabled"
-          :disabledText="$t('person.finishEditFirst')"
-          :enabledText="$t('admin.person.deletePerson')"
+          :enabled-condition="!disabled"
+          :disabled-text="$t('person.finishEditFirst')"
+          :enabled-text="$t('admin.person.deletePerson')"
           position="start"
         >
           <v-btn
@@ -142,12 +142,12 @@
 
     <template
       v-if="!successDialogVisible"
-      v-slot:default="{ isActive }"
+      #default="{ isActive }"
     >
       <LayoutCard
         :closable="true"
         :header="$t('admin.person.deletePerson')"
-        @onCloseClicked="closePersonDeleteDialog(isActive)"
+        @on-close-clicked="closePersonDeleteDialog(isActive)"
       >
         <v-card-text>
           <v-container>
@@ -159,7 +159,7 @@
                 class="text-right"
                 cols="1"
               >
-                <v-icon icon="mdi-alert"></v-icon>
+                <v-icon icon="mdi-alert" />
               </v-col>
               <v-col>
                 <p data-testid="error-text">
@@ -189,8 +189,8 @@
               <v-btn
                 :block="mdAndDown"
                 class="secondary button"
-                @click.stop="closePersonDeleteDialog(isActive)"
                 data-testid="close-person-delete-dialog-button"
+                @click.stop="closePersonDeleteDialog(isActive)"
               >
                 {{ $t('cancel') }}
               </v-btn>
@@ -203,9 +203,9 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary button"
-                @click.stop="handlePersonDelete(person.person.id)"
                 data-testid="person-delete-button"
                 :disabled="isLoading"
+                @click.stop="handlePersonDelete(person.person.id)"
               >
                 {{ $t('admin.person.deletePerson') }}
               </v-btn>

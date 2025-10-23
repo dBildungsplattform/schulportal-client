@@ -1,5 +1,6 @@
 <script setup lang="ts">
   defineProps<{
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
     buttonAction?: Function;
     buttonText?: string;
     closable?: boolean;
@@ -27,12 +28,12 @@
   <v-container v-if="modelValue">
     <v-slide-y-transition>
       <v-alert
-        @click:close="closeAlert"
         :closable="closable"
         :data-testid="`${dataTestIdPrefix || 'spsh'}-alert`"
         :model-value="modelValue"
         :type="type"
         variant="outlined"
+        @click:close="closeAlert"
       >
         <v-row>
           <v-col
@@ -48,7 +49,7 @@
             cols="auto"
           >
             <span :data-testid="`${dataTestIdPrefix || 'spsh'}-alert-text`">{{ text }}</span>
-            <slot name="text"></slot>
+            <slot name="text" />
           </v-col>
         </v-row>
         <v-row justify="center">
@@ -58,13 +59,13 @@
           >
             <v-btn
               class="primary"
-              @click="buttonAction"
               :data-testid="`${dataTestIdPrefix || 'spsh'}-alert-button`"
+              @click="buttonAction"
             >
               {{ buttonText }}
             </v-btn>
           </v-col>
-          <slot name="button"></slot>
+          <slot name="button" />
         </v-row>
       </v-alert>
     </v-slide-y-transition>

@@ -28,18 +28,18 @@
 
 <template>
   <FormWrapper
-    :canCommit="canCommit"
-    :confirmUnsavedChangesAction="onHandleConfirmUnsavedChanges"
-    :createButtonLabel="$t('admin.schultraeger.create')"
-    :discardButtonLabel="$t('admin.schultraeger.discard')"
-    :hideActions="readonly || !!props.errorCode"
     id="schultraeger-form"
-    :isLoading="isLoading"
-    :onDiscard="onHandleDiscard"
-    @onShowDialogChange="onShowDialogChange"
-    :onSubmit="onSubmit"
     ref="schultraeger-form"
-    :showUnsavedChangesDialog="showUnsavedChangesDialog"
+    :can-commit="canCommit"
+    :confirm-unsaved-changes-action="onHandleConfirmUnsavedChanges"
+    :create-button-label="$t('admin.schultraeger.create')"
+    :discard-button-label="$t('admin.schultraeger.discard')"
+    :hide-actions="readonly || !!props.errorCode"
+    :is-loading="isLoading"
+    :on-discard="onHandleDiscard"
+    :on-submit="onSubmit"
+    :show-unsaved-changes-dialog="showUnsavedChangesDialog"
+    @on-show-dialog-change="onShowDialogChange"
   >
     <!-- Slot for SPSH alerts -->
     <slot />
@@ -55,10 +55,10 @@
         <v-col
           cols="4"
           class="d-none d-md-flex"
-        ></v-col>
+        />
         <v-radio-group
-          inline
           v-model="selectedSchultraegerform"
+          inline
           data-testid="schultraegerform-radio-group"
           :disabled="readonly"
         >
@@ -74,7 +74,7 @@
               :label="schultraeger.name"
               :value="schultraeger.id"
               :data-testid="'schultraegerform-radio-button-' + schultraeger.name.replace(/\s+/g, '-').toLowerCase()"
-            ></v-radio>
+            />
           </v-col>
         </v-radio-group>
       </v-row>
@@ -85,22 +85,22 @@
         </v-col>
       </v-row>
       <FormRow
-        :errorLabel="selectedSchultraegernameProps?.error || ''"
-        labelForId="schultraegername-input"
-        :isRequired="true"
+        :error-label="selectedSchultraegernameProps?.error || ''"
+        label-for-id="schultraegername-input"
+        :is-required="true"
         :label="$t('admin.schultraeger.schultraegername')"
       >
         <v-text-field
+          v-bind="selectedSchultraegernameProps"
+          ref="schultraegername-input"
+          v-model="selectedSchultraegername"
           clearable
           data-testid="schultraegername-input"
-          v-bind="selectedSchultraegernameProps"
-          v-model="selectedSchultraegername"
           :placeholder="$t('admin.schultraeger.schultraegername')"
-          ref="schultraegername-input"
           variant="outlined"
           density="compact"
           required
-        ></v-text-field>
+        />
       </FormRow>
     </template>
   </FormWrapper>

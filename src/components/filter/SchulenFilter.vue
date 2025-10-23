@@ -87,8 +87,11 @@
     },
   );
   const typFilter: ComputedRef<Pick<OrganisationenFilter, 'includeTyp' | 'excludeTyp'>> = computed(() => {
-    if (props.includeAll) return { excludeTyp: [OrganisationsTyp.Klasse] };
-    else return { includeTyp: OrganisationsTyp.Schule };
+    if (props.includeAll) {
+      return { excludeTyp: [OrganisationsTyp.Klasse] };
+    } else {
+      return { includeTyp: OrganisationsTyp.Schule };
+    }
   });
 
   // The filter used to load the Schulen and possibly orgas
@@ -123,19 +126,29 @@
   // selection is represented as an array internally
   // wrap/unwrap is used to convert between internal and vuetify representation
   const wrapSelectedSchulenIds = (selectedIds: SelectedSchulenIds): Array<string> => {
-    if (Array.isArray(selectedIds)) return selectedIds.filter(Boolean);
-    if (selectedIds) return [selectedIds];
+    if (Array.isArray(selectedIds)) {
+      return selectedIds.filter(Boolean);
+    }
+    if (selectedIds) {
+      return [selectedIds];
+    }
     return [];
   };
 
   const unwrapSelectedSchulenIds = (selectedIds: Array<string>): SelectedSchulenIds => {
-    if (selectedIds.length === 0) return undefined;
-    else if (selectedIds.length === 1) return selectedIds.at(0);
-    else return selectedIds;
+    if (selectedIds.length === 0) {
+      return undefined;
+    } else if (selectedIds.length === 1) {
+      return selectedIds.at(0);
+    } else {
+      return selectedIds;
+    }
   };
 
   const isEmptySelection = (selection: SelectedSchulenIds): boolean => {
-    if (!selection) return true;
+    if (!selection) {
+      return true;
+    }
     return wrapSelectedSchulenIds(selection).filter(Boolean).length === 0;
   };
 
@@ -159,7 +172,7 @@
       // Handle regular organisation store - check if filterResult exists and is an array. If yes then we are dealing with the organisation store
       let filterResult: Organisation[] | undefined;
       if ('filterResult' in storeData) {
-        filterResult = (storeData as AutoCompleteStore<Organisation>).filterResult;
+        filterResult = storeData.filterResult;
       }
       if (Array.isArray(filterResult)) {
         organisations = filterResult;
@@ -189,20 +202,34 @@
   };
 
   const getDisplayItem = (item: TranslatedObject, index: number): string => {
-    if (!selectedSchulen.value) return '';
-    if (!canDisplaySelection(selectedSchulen.value)) return '...';
+    if (!selectedSchulen.value) {
+      return '';
+    }
+    if (!canDisplaySelection(selectedSchulen.value)) {
+      return '...';
+    }
 
     const selectedIds: string[] = wrapSelectedSchulenIds(selectedSchulen.value);
 
-    if (!props.multiple) return item.title;
-    if (selectedIds.length < 2) return item.title;
-    if (index === 0) return t('admin.schule.schulenSelected', { count: selectedIds.length });
+    if (!props.multiple) {
+      return item.title;
+    }
+    if (selectedIds.length < 2) {
+      return item.title;
+    }
+    if (index === 0) {
+      return t('admin.schule.schulenSelected', { count: selectedIds.length });
+    }
     return '';
   };
 
   const shouldHighlightSelection: ComputedRef<boolean> = computed(() => {
-    if (hasAutoselectedSchule.value || props.isRolleUnassignForm) return true;
-    if (props.highlightSelection && !isEmptySelection(selectedSchulen.value)) return true;
+    if (hasAutoselectedSchule.value || props.isRolleUnassignForm) {
+      return true;
+    }
+    if (props.highlightSelection && !isEmptySelection(selectedSchulen.value)) {
+      return true;
+    }
     return false;
   });
 
@@ -238,7 +265,9 @@
   };
 
   const resolveSelection = (selection: SelectedSchulenIds): Array<Organisation> => {
-    if (isEmptySelection(selection)) return [];
+    if (isEmptySelection(selection)) {
+      return [];
+    }
     const selectedIds: Array<string> = wrapSelectedSchulenIds(selection);
     let organisations: Organisation[] = [];
 
@@ -269,7 +298,9 @@
   };
 
   const handleFocusChange = (focused: boolean): void => {
-    if (!props.multiple) return;
+    if (!props.multiple) {
+      return;
+    }
     if (!focused) {
       searchInputSchulen.value = undefined;
     }
@@ -315,7 +346,7 @@
   // This watches both filters and triggers loading of organisationen when they change
   watch(
     [schulenFilter, organisationenFilter],
-    async (
+    (
       [newSchulenFilter, newOrganisationenFilter]: [OrganisationenFilter, WorkflowFilter],
       [oldSchulenFilter, oldOrganisationenFilter]: [OrganisationenFilter | undefined, WorkflowFilter | undefined] = [
         undefined,
@@ -401,8 +432,8 @@
     v-model:search="searchInputSchulen"
     :hide-details
   >
-    <template v-slot:prepend-item>
-      <slot name="prepend-item"></slot>
+    <template #prepend-item>
+      <slot name="prepend-item" />
     </template>
     <template v-slot:selection="{ item, index }">
       <span

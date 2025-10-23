@@ -48,7 +48,7 @@
         </v-col>
       </v-row>
     </v-app-bar-title>
-    <v-spacer></v-spacer>
+    <v-spacer />
 
     <v-toolbar-items>
       <v-col class="align-self-center mr-2">
@@ -63,7 +63,7 @@
             class="hidden-md-and-up mr-2"
             data-testid="help-icon"
             icon="mdi-help-circle-outline"
-          ></v-icon>
+          />
           <span class="hidden-sm-and-down">{{ $t('nav.help') }}</span>
         </a>
       </v-col>
@@ -75,7 +75,7 @@
     height="40"
     :elevation="0"
   >
-    <v-spacer></v-spacer>
+    <v-spacer />
 
     <v-toolbar-items v-if="!auth.isAuthenticated">
       <v-col class="align-self-center mr-2">
@@ -87,7 +87,7 @@
           <v-icon
             class="mr-2"
             icon="mdi-login"
-          ></v-icon>
+          />
           <!-- Hide this on small screens and below -->
           <span class="hidden-sm-and-down">{{ $t('nav.login') }}</span>
         </a>
@@ -105,7 +105,7 @@
             class="mr-2"
             data-testid="profile-icon"
             icon="mdi-account-outline"
-          ></v-icon>
+          />
           <span class="hidden-sm-and-down nowrap">{{ $t('nav.profile') }}</span>
         </a>
       </v-col>
@@ -119,7 +119,7 @@
             class="mr-2"
             data-testid="logout-icon"
             icon="mdi-logout"
-          ></v-icon>
+          />
           <span class="hidden-sm-and-down">{{ $t('nav.logout') }}</span>
         </a>
       </v-col>

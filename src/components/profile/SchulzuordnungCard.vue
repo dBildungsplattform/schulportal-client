@@ -51,7 +51,9 @@
 
   const header: ComputedRef<string> = computed(() => {
     let text: string = t('person.zuordnung');
-    if (props.showNumber) text += ` ${oneBasedIndex.value}`;
+    if (props.showNumber) {
+      text += ` ${oneBasedIndex.value}`;
+    }
     return text;
   });
 </script>
@@ -60,33 +62,39 @@
   <LayoutCard
     :header="header"
     :data-testid="`zuordnung-card-${oneBasedIndex}`"
-    :headlineTestId="`zuordnung-card-${oneBasedIndex}-headline`"
+    :headline-test-id="`zuordnung-card-${oneBasedIndex}-headline`"
   >
     <v-row class="ma-3 p-4">
       <v-col cols="12">
         <v-table class="text-body-1">
-          <template v-slot:default>
+          <template #default>
             <tbody>
               <!-- schule -->
               <tr>
                 <td>
                   <strong :data-testid="`schule-label-${oneBasedIndex}`"> {{ t('profile.schule') }}: </strong>
                 </td>
-                <td :data-testid="`schule-value-${oneBasedIndex}`">{{ sskName }}</td>
+                <td :data-testid="`schule-value-${oneBasedIndex}`">
+                  {{ sskName }}
+                </td>
               </tr>
               <!-- klasse -->
               <tr v-if="klassen">
                 <td>
                   <strong :data-testid="`klasse-label-${oneBasedIndex}`"> {{ t('profile.klasse') }}: </strong>
                 </td>
-                <td :data-testid="`klasse-value-${oneBasedIndex}`">{{ klassen }}</td>
+                <td :data-testid="`klasse-value-${oneBasedIndex}`">
+                  {{ klassen }}
+                </td>
               </tr>
               <!-- rolle -->
               <tr>
                 <td>
                   <strong :data-testid="`rolle-label-${oneBasedIndex}`"> {{ t('admin.rolle.rolle') }}: </strong>
                 </td>
-                <td :data-testid="`rolle-value-${oneBasedIndex}`">{{ rollen }}</td>
+                <td :data-testid="`rolle-value-${oneBasedIndex}`">
+                  {{ rollen }}
+                </td>
               </tr>
               <!-- dienstStellenNummer -->
               <tr v-if="sskDstNr">
@@ -99,29 +107,33 @@
                     </abbr>
                   </span>
                 </td>
-                <td :data-testid="`dienststellennummer-value-${oneBasedIndex}`">{{ sskDstNr }}</td>
+                <td :data-testid="`dienststellennummer-value-${oneBasedIndex}`">
+                  {{ sskDstNr }}
+                </td>
               </tr>
               <!-- befristung -->
               <tr v-if="befristung">
                 <td>
                   <strong :data-testid="`befristung-label-${oneBasedIndex}`"> {{ t('profile.limitedUntil') }}: </strong>
                 </td>
-                <td :data-testid="`befristung-value-${oneBasedIndex}`">{{ befristung }}</td>
+                <td :data-testid="`befristung-value-${oneBasedIndex}`">
+                  {{ befristung }}
+                </td>
               </tr>
             </tbody>
           </template>
         </v-table>
         <p
+          v-if="admins"
           class="pt-4 text-center text-body-1 text-medium-emphasis"
           data-testid="schuladmins-info-text-with-icon"
           style="white-space: normal"
-          v-if="admins"
         >
           <v-icon
             class="mr-2"
             icon="mdi-information-slab-circle-outline"
             data-testid="schuladmins-info-icon"
-          ></v-icon>
+          />
           <span data-testid="schulAdmins-info-text">
             {{ `${t('profile.yourSchuladminsAre')} ${admins}` }}
           </span>

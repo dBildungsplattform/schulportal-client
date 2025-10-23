@@ -45,15 +45,15 @@
 <template>
   <v-row>
     <SearchField
-      :buttonCols="12"
-      :buttonColsMd="4"
-      hoverText=""
-      initialValue=""
-      :inputCols="12"
-      :inputColsMd="8"
-      @onApplySearchFilter="handleSearchFilter"
       ref="searchFieldComponent"
-    ></SearchField>
+      :button-cols="12"
+      :button-cols-md="4"
+      hover-text=""
+      initial-value=""
+      :input-cols="12"
+      :input-cols-md="8"
+      @on-apply-search-filter="handleSearchFilter"
+    />
   </v-row>
   <v-row>
     <v-col>
@@ -71,18 +71,20 @@
         >
           <v-list-item
             v-for="(item, index) in items"
-            @click="handleItemClick(item)"
-            @keydown.enter.prevent="focusNextChip(index)"
-            @keydown.space.prevent="focusNextChip(index)"
             :key="item.id"
             :data-testid="`assign-list-item-${item.id}`"
             tabindex="0"
+            @click="handleItemClick(item)"
+            @keydown.enter.prevent="focusNextChip(index)"
+            @keydown.space.prevent="focusNextChip(index)"
           >
-            <v-chip><slot :item="item"></slot></v-chip>
+            <v-chip><slot :item="item" /></v-chip>
           </v-list-item>
         </v-list>
         <div v-else>
-          <p class="body-2 ma-16 text-center">{{ noItemsFoundText }}</p>
+          <p class="body-2 ma-16 text-center">
+            {{ noItemsFoundText }}
+          </p>
         </div>
       </v-card>
     </v-col>

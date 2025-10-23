@@ -44,34 +44,38 @@
     cols="12"
     md="6"
   >
-    <h3 class="subtitle-1 mb-3">{{ unassignedItemsHeader }}</h3>
+    <h3 class="subtitle-1 mb-3">
+      {{ unassignedItemsHeader }}
+    </h3>
     <RelationshipAssignList
-      dataTestId="unassigned-items-list"
-      :items="unassignedItems"
-      :noItemsFoundText="noUnassignedItemsFoundText"
-      @onHandleItemClick="handleUnassignedItemClick"
-      @onHandleSearchFilter="handleUnassignedItemsSearchFilter"
       ref="unassignedItemsList"
       v-slot="{ item }"
+      data-test-id="unassigned-items-list"
+      :items="unassignedItems"
+      :no-items-found-text="noUnassignedItemsFoundText"
+      @on-handle-item-click="handleUnassignedItemClick"
+      @on-handle-search-filter="handleUnassignedItemsSearchFilter"
     >
-      <slot :item="item"></slot>
+      <slot :item="item" />
     </RelationshipAssignList>
   </v-col>
   <v-col
     cols="12"
     md="6"
   >
-    <h3 class="subtitle-1 mb-3">{{ assignedItemsHeader }}</h3>
+    <h3 class="subtitle-1 mb-3">
+      {{ assignedItemsHeader }}
+    </h3>
     <RelationshipAssignList
-      dataTestId="assigned-items-list"
-      :items="assignedItems"
-      :noItemsFoundText="noAssignedItemsFoundText"
-      @onHandleItemClick="handleAssignedItemClick"
-      @onHandleSearchFilter="handleAssignedItemsSearchFilter"
       ref="assignedItemsList"
       v-slot="{ item }"
+      data-test-id="assigned-items-list"
+      :items="assignedItems"
+      :no-items-found-text="noAssignedItemsFoundText"
+      @on-handle-item-click="handleAssignedItemClick"
+      @on-handle-search-filter="handleAssignedItemsSearchFilter"
     >
-      <slot :item="item"></slot>
+      <slot :item="item" />
     </RelationshipAssignList>
   </v-col>
 </template>

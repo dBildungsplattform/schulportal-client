@@ -11,27 +11,27 @@
 
 <template>
   <SpshAlert
-    :buttonAction="goToStart"
-    :buttonText="$t('nav.backToStart')"
+    :button-action="goToStart"
+    :button-text="$t('nav.backToStart')"
     :closable="false"
-    :modelValue="true"
-    :showButton="true"
+    :model-value="true"
+    :show-button="true"
     :text="$t('admin.person.twoFactorAuthentication.requiredSecondFactor')"
     :title="$t('admin.person.twoFactorAuthentication.header')"
     type="error"
   >
-    <template v-slot:button>
+    <template #button>
       <v-col cols="auto">
         <v-btn
           class="primary"
-          @click="toSecondFactorSetup"
           data-testid="toSecondFactorSetup-button"
+          @click="toSecondFactorSetup"
         >
           {{ $t('admin.person.twoFactorAuthentication.toSecondFactorSetup') }}
         </v-btn>
       </v-col>
     </template>
-    <template v-slot:text>
+    <template #text>
       <p>
         {{ $t('admin.person.twoFactorAuthentication.noSecondFactorText') }}
       </p>

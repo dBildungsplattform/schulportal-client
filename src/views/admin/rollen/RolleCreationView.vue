@@ -76,7 +76,9 @@
   const isFormDirty: ComputedRef<boolean> = computed(() => getDirtyState(formContext));
 
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
-  let blockedNext: () => void = () => {};
+  let blockedNext: () => void = () => {
+    /* empty */
+  };
 
   const handleCreateAnotherRolle = (): void => {
     rolleStore.createdRolle = null;
@@ -171,8 +173,12 @@
   );
 
   function preventNavigation(event: BeforeUnloadEvent): void {
-    if (rolleStore.errorCode) formContext.resetForm();
-    if (!isFormDirty.value) return;
+    if (rolleStore.errorCode) {
+      formContext.resetForm();
+    }
+    if (!isFormDirty.value) {
+      return;
+    }
     event.preventDefault();
     /* Chrome requires returnValue to be set. */
     event.returnValue = '';
@@ -229,7 +235,7 @@
     window.removeEventListener('beforeunload', preventNavigation);
   });
 
-  const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = formContext.handleSubmit(async () => {
+  const onSubmit: (e?: Event) => Promise<Promise<void> | undefined> = formContext.handleSubmit(async () => {
     if (selectedRollenName.value && selectedAdministrationsebene.value && selectedRollenArt.value) {
       const merkmaleToSubmit: RollenMerkmal[] = selectedMerkmale.value?.map((m: RollenMerkmal) => m) || [];
       const systemrechteToSubmit: RollenSystemRecht[] =
@@ -273,10 +279,10 @@
     <LayoutCard
       :closable="!rolleStore.errorCode"
       data-testid="rolle-creation-card"
-      @onCloseClicked="navigateToRolleManagement"
       :header="$t('admin.rolle.addNew')"
       :padded="true"
-      :showCloseText="true"
+      :show-close-text="true"
+      @on-close-clicked="navigateToRolleManagement"
     >
       <!-- The form to create a new Rolle -->
       <template v-if="!rolleStore.createdRolle">
@@ -315,9 +321,9 @@
             :type="'error'"
             :closable="false"
             :text="rolleStore.errorCode ? $t(`admin.rolle.errors.${rolleStore.errorCode}`) : ''"
-            :showButton="true"
-            :buttonText="$t('admin.rolle.backToCreateRolle')"
-            :buttonAction="navigateBackToRolleForm"
+            :show-button="true"
+            :button-text="$t('admin.rolle.backToCreateRolle')"
+            :button-action="navigateBackToRolleForm"
           />
         </RolleForm>
       </template>
@@ -325,9 +331,9 @@
       <!-- Result template on success after submit  -->
       <template v-if="rolleStore.createdRolle && !rolleStore.errorCode">
         <RolleSuccessTemplate
-          :successMessage="$t('admin.rolle.rolleAddedSuccessfully')"
-          :followingRolleDataCreated="$t('admin.followingDataCreated')"
-          :createdRolleData="[
+          :success-message="$t('admin.rolle.rolleAddedSuccessfully')"
+          :following-rolle-data-created="$t('admin.followingDataCreated')"
+          :created-rolle-data="[
             {
               label: $t('admin.administrationsebene.administrationsebene'),
               value: getSskName(
@@ -358,13 +364,13 @@
               testId: 'created-rolle-systemrecht',
             },
           ]"
-          :backButtonText="$t('nav.backToList')"
-          :createAnotherRolleButtonText="$t('admin.rolle.createAnother')"
-          :showCreateAnotherRolleButton="true"
-          backButtonTestId="back-to-list-button"
-          createAnotherButtonTestId="create-another-rolle-button"
-          @OnNavigateBackToRolleManagement="navigateToRolleManagement"
-          @OnCreateAnotherRolle="handleCreateAnotherRolle"
+          :back-button-text="$t('nav.backToList')"
+          :create-another-rolle-button-text="$t('admin.rolle.createAnother')"
+          :show-create-another-rolle-button="true"
+          back-button-test-id="back-to-list-button"
+          create-another-button-test-id="create-another-rolle-button"
+          @on-navigate-back-to-rolle-management="navigateToRolleManagement"
+          @on-create-another-rolle="handleCreateAnotherRolle"
         />
       </template>
     </LayoutCard>

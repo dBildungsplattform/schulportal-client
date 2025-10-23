@@ -88,21 +88,21 @@
 <template>
   <div>
     <FormRow
-      :errorLabel="befristungProps?.error || ''"
-      labelForId="befristung-select"
-      :isRequired="isBefristungRequired"
+      :error-label="befristungProps?.error || ''"
+      label-for-id="befristung-select"
+      :is-required="isBefristungRequired"
       :label="$t('admin.befristung.befristung')"
     >
       <v-text-field
-        data-testid="befristung-input"
-        v-model="localBefristung"
         v-bind="befristungProps"
+        ref="befristung-input"
+        v-model="localBefristung"
+        data-testid="befristung-input"
         variant="outlined"
         placeholder="TT.MM.JJJJ"
         color="primary"
-        ref="befristung-input"
-        @update:modelValue="handleBefristungChange"
-      ></v-text-field>
+        @update:model-value="handleBefristungChange"
+      />
     </FormRow>
     <v-row class="align-center">
       <v-col
@@ -112,22 +112,22 @@
         offset-sm="5"
       >
         <v-radio-group
-          data-testid="befristung-radio-group"
           ref="befristung-radio-group"
-          @update:modelValue="handleBefristungOptionChange"
           v-model="localBefristungOption"
+          data-testid="befristung-radio-group"
           v-bind="befristungOptionProps"
+          @update:model-value="handleBefristungOptionChange"
         >
           <v-radio
             data-testid="schuljahresende-radio-button"
             :label="`${$t('admin.befristung.untilEndOfSchoolYear')} (${nextSchuljahresende})`"
             :value="BefristungOption.SCHULJAHRESENDE"
             color="primary"
-          ></v-radio>
+          />
           <SpshTooltip
             v-if="isUnbefristetDisabled"
-            :enabledCondition="!isUnbefristetDisabled"
-            :disabledText="$t('admin.befristung.unlimitedInactive')"
+            :enabled-condition="!isUnbefristetDisabled"
+            :disabled-text="$t('admin.befristung.unlimitedInactive')"
             position="start"
           >
             <v-radio
@@ -136,7 +136,7 @@
               :value="BefristungOption.UNBEFRISTET"
               :color="'primary'"
               :disabled="isUnbefristetDisabled"
-            ></v-radio>
+            />
           </SpshTooltip>
           <v-radio
             v-else
@@ -145,7 +145,7 @@
             :value="BefristungOption.UNBEFRISTET"
             :color="'primary'"
             :disabled="isUnbefristetDisabled"
-          ></v-radio>
+          />
         </v-radio-group>
       </v-col>
     </v-row>

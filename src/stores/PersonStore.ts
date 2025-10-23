@@ -193,7 +193,9 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
           const person: Person = allPersons.get(personId)!;
 
           const uebersicht: DBiamPersonenuebersichtResponse | undefined = tempUebersichtenMap.get(personId);
-          if (!uebersicht) continue;
+          if (!uebersicht) {
+            continue;
+          }
 
           const zuordnungen: Zuordnung[] = uebersicht.zuordnungen.map(
             (zuordnungResponse: DBiamPersonenzuordnungResponse) => Zuordnung.fromResponse(zuordnungResponse),
@@ -240,8 +242,11 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       this.loading = true;
       try {
         let data: string;
-        if (personId) data = (await personenApi.personControllerResetUEMPasswordByPersonId(personId)).data;
-        else data = (await personenApi.personControllerResetUEMPassword()).data;
+        if (personId) {
+          data = (await personenApi.personControllerResetUEMPasswordByPersonId(personId)).data;
+        } else {
+          data = (await personenApi.personControllerResetUEMPassword()).data;
+        }
         this.newDevicePassword = data;
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');

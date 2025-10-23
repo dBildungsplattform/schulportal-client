@@ -58,7 +58,9 @@
     const persons: Map<string, PersonWithZuordnungen> = new Map();
     for (const personId of selectedPersonIds.value) {
       const person: PersonWithZuordnungen | undefined = personStore.allUebersichten.get(personId);
-      if (!person) continue;
+      if (!person) {
+        continue;
+      }
 
       persons.set(personId, person);
     }
@@ -250,13 +252,13 @@
     await applySearchAndFilters();
   }
 
-  async function updateKlassenSelection(newValue: Array<string>): Promise<void> {
+  function updateKlassenSelection(newValue: Array<string>): void {
     searchFilterStore.setKlasseFilterForPersonen(newValue);
     applySearchAndFilters();
     selectedKlassen.value = newValue;
   }
 
-  async function setRolleFilter(newValue: Array<string>): Promise<void> {
+  function setRolleFilter(newValue: Array<string>): void {
     searchFilterStore.setRolleFilterForPersonen(newValue);
     // Update selectedRollenObjects based on the new selection
     selectedRollenObjects.value = newValue
@@ -284,7 +286,7 @@
     selectedOrganisationen.value = searchFilterStore.selectedOrgaObjects ?? [];
   }
 
-  async function setOrganisationFilter(newValue: Array<string> | undefined): Promise<void> {
+  function setOrganisationFilter(newValue: Array<string> | undefined): void {
     selectedOrganisationIds.value = newValue ?? [];
     searchFilterStore.setOrganisationFilterForPersonen(newValue ?? []);
     searchFilterStore.setKlasseFilterForPersonen([]);
@@ -332,7 +334,7 @@
     await applySearchAndFilters();
   }
 
-  async function updateRollenSearch(searchValue: string): Promise<void> {
+  function updateRollenSearch(searchValue: string): void {
     clearTimeout(timerId);
 
     timerId = setTimeout(async () => {
@@ -355,10 +357,10 @@
     }, 500);
   }
 
-  const handleFocusChange = async (focused: boolean): Promise<void> => {
+  const handleFocusChange = (focused: boolean): void => {
     if (!focused && searchInputRollen.value) {
       searchInputRollen.value = '';
-      await updateRollenSearch(searchInputRollen.value);
+      updateRollenSearch(searchInputRollen.value);
     }
   };
 
@@ -376,10 +378,7 @@
   }
 
   // Triggers sorting for the selected column
-  async function handleTableSorting(update: {
-    sortField: string | undefined;
-    sortOrder: 'asc' | 'desc';
-  }): Promise<void> {
+  function handleTableSorting(update: { sortField: string | undefined; sortOrder: 'asc' | 'desc' }): void {
     if (update.sortField) {
       sortField.value = mapKeyToBackend(update.sortField);
       searchFilterStore.currentSort = {
@@ -405,7 +404,9 @@
   const onlyLernRollenSelected: ComputedRef<boolean> = computed(() => {
     for (const personId of selectedPersonIds.value) {
       const person: PersonWithZuordnungen | undefined = personStore.allUebersichten.get(personId);
-      if (!person) continue;
+      if (!person) {
+        continue;
+      }
       const { rollenArten }: PersonWithZuordnungen = person;
       if (!(rollenArten.size === 1 && rollenArten.has(RollenArt.Lern))) {
         return false;
@@ -416,7 +417,9 @@
 
   const singleSchuleSelected: ComputedRef<boolean> = computed(() => {
     const val: string[] | string = selectedOrganisationIds.value;
-    if (Array.isArray(val)) return val.length === 1;
+    if (Array.isArray(val)) {
+      return val.length === 1;
+    }
     return true;
   });
 
@@ -426,8 +429,12 @@
 
   const checkSingleOrgAndOnlyLernDisplayDialog = (dialog: Ref<boolean>): void => {
     const messages: Array<string> = [];
-    if (!singleSchuleSelected.value) messages.push(t('admin.person.onlyOneSchuleAlert'));
-    if (!onlyLernRollenSelected.value) messages.push(t('admin.person.onlyLernRollenAlert'));
+    if (!singleSchuleSelected.value) {
+      messages.push(t('admin.person.onlyOneSchuleAlert'));
+    }
+    if (!onlyLernRollenSelected.value) {
+      messages.push(t('admin.person.onlyLernRollenAlert'));
+    }
     if (messages.length > 0) {
       onlyOneOrganisationAlertDialogVisible.value = true;
       invalidSelectionAlertMessages.value = messages;
@@ -455,9 +462,11 @@
 
   // Handle the selected action
   const handleOption = (newValue: string | null): void => {
-    if (!newValue) return;
+    if (!newValue) {
+      return;
+    }
 
-    switch (newValue) {
+    switch (newValue as OperationType) {
       case OperationType.MODIFY_ROLLE:
         rolleModifiyDialogVisible.value = true;
         break;
@@ -478,8 +487,12 @@
         break;
 
       case OperationType.ROLLE_UNASSIGN:
-        if (!validateSingleSchuleSelection()) return;
-        if (!validateSingleRolleSelection()) return;
+        if (!validateSingleSchuleSelection()) {
+          return;
+        }
+        if (!validateSingleRolleSelection()) {
+          return;
+        }
         rolleUnassignDialogVisible.value = true;
         break;
       case OperationType.CHANGE_KLASSE:
@@ -504,7 +517,7 @@
     }
   };
 
-  const handleBulkPasswordResetDialog = async (_finished: boolean): Promise<void> => {
+  const handleBulkPasswordResetDialog = (_finished: boolean): void => {
     passwordResetDialogVisible.value = false;
     selectedOption.value = null;
   };
@@ -606,12 +619,12 @@
         >
           <v-btn
             class="px-0 reset-filter"
-            @click="resetSearchAndFilter()"
             data-testid="reset-filter-button"
             :disabled="!filterOrSearchActive"
             size="x-small"
             variant="text"
             width="auto"
+            @click="resetSearchAndFilter()"
           >
             {{ $t('resetFilter') }}
           </v-btn>
@@ -634,12 +647,12 @@
             :placeholderText="$t('admin.schule.schule')"
             hideDetails
           >
-            <template v-slot:prepend-item>
+            <template #prepend-item>
               <v-list-item>
                 <v-progress-circular
-                  indeterminate
                   v-if="organisationStore.loading"
-                ></v-progress-circular>
+                  indeterminate
+                />
                 <span
                   v-else
                   class="filter-header"
@@ -661,6 +674,10 @@
           class="py-md-0"
         >
           <v-autocomplete
+            id="rolle-select"
+            ref="rolle-select"
+            v-model="selectedRollen"
+            v-model:search="searchInputRollen"
             autocomplete="off"
             class="filter-dropdown"
             :class="{ selected: selectedRollen.length > 0 }"
@@ -668,28 +685,24 @@
             data-testid="rolle-select"
             density="compact"
             hide-details
-            id="rolle-select"
             :items="rollen"
             item-value="value"
             item-text="title"
             multiple
             :no-data-text="$t('noDataFound')"
             :placeholder="$t('admin.rolle.rolle')"
-            ref="rolle-select"
             required="true"
-            @update:modelValue="setRolleFilter"
+            variant="outlined"
+            @update:model-value="setRolleFilter"
             @update:search="updateRollenSearch"
             @update:focused="handleFocusChange"
-            variant="outlined"
-            v-model="selectedRollen"
-            v-model:search="searchInputRollen"
           >
-            <template v-slot:prepend-item>
+            <template #prepend-item>
               <v-list-item>
                 <v-progress-circular
-                  indeterminate
                   v-if="rolleStore.loading"
-                ></v-progress-circular>
+                  indeterminate
+                />
                 <span
                   v-else
                   class="filter-header"
@@ -703,7 +716,7 @@
                 >
               </v-list-item>
             </template>
-            <template v-slot:selection="{ item, index }">
+            <template #selection="{ item, index }">
               <v-chip v-if="selectedRollen.length < 2">
                 <span>{{ item.title }}</span>
               </v-chip>
@@ -722,27 +735,26 @@
             :disabled="selectedOrganisationIds.length > 0"
             location="top"
           >
-            <template v-slot:activator="{ props }">
+            <template #activator="{ props }">
               <div v-bind="props">
                 <KlassenFilter
                   parentId="personen-management"
                   :systemrechteForSearch="[RollenSystemRecht.KlassenVerwalten]"
                   :multiple="true"
                   :readonly="selectedOrganisationIds.length == 0"
-                  :hideDetails="true"
-                  :highlightSelection="true"
-                  :selectedKlassen="selectedKlassen"
-                  @update:selectedKlassen="updateKlassenSelection"
-                  :placeholderText="t('admin.klasse.klassen')"
-                  ref="klasse-select"
-                  :administriertVon="selectedOrganisationIds ? selectedOrganisationIds : undefined"
+                  :hide-details="true"
+                  :highlight-selection="true"
+                  :selected-klassen="selectedKlassen"
+                  :placeholder-text="t('admin.klasse.klassen')"
+                  :administriert-von="selectedOrganisationIds ? selectedOrganisationIds : undefined"
+                  @update:selected-klassen="updateKlassenSelection"
                 >
-                  <template v-slot:prepend-item>
+                  <template #prepend-item>
                     <v-list-item>
                       <v-progress-circular
-                        indeterminate
                         v-if="organisationStore.loading"
-                      ></v-progress-circular>
+                        indeterminate
+                      />
                       <span
                         v-else
                         class="filter-header"
@@ -762,6 +774,8 @@
           class="py-md-0"
         >
           <v-autocomplete
+            id="status-select"
+            v-model="selectedStatus"
             autocomplete="off"
             chips
             class="filter-dropdown"
@@ -769,7 +783,6 @@
             data-testid="status-select"
             density="compact"
             hide-details
-            id="status-select"
             :items="statuses"
             item-value="value"
             item-text="title"
@@ -777,9 +790,7 @@
             :placeholder="$t('admin.status')"
             required="true"
             variant="outlined"
-            v-model="selectedStatus"
-          >
-          </v-autocomplete>
+          />
         </v-col>
       </v-row>
       <v-row
@@ -791,35 +802,35 @@
           cols="12"
         >
           <SpshTooltip
-            :enabledCondition="selectedPersonIds.length > 0"
-            :disabledText="$t('admin.person.choosePersonFirst')"
+            :enabled-condition="selectedPersonIds.length > 0"
+            :disabled-text="$t('admin.person.choosePersonFirst')"
             position="top"
           >
             <v-select
               v-if="authStore.hasPersonenBulkPermission"
+              id="benutzer-edit-select"
+              ref="benutzer-bulk-edit-select"
+              v-model="selectedOption"
               clearable
               data-testid="benutzer-edit-select"
               density="compact"
               :disabled="selectedPersonIds.length === 0"
-              id="benutzer-edit-select"
               :items="actions"
               item-value="value"
               item-text="title"
               :no-data-text="$t('noDataFound')"
               :placeholder="$t('edit')"
-              ref="benutzer-bulk-edit-select"
               required="true"
               variant="outlined"
-              v-model="selectedOption"
-              @update:modelValue="handleOption"
-            ></v-select>
+              @update:model-value="handleOption"
+            />
           </SpshTooltip>
           <InfoDialog
             id="invalid-selection-alert-dialog"
-            :isDialogVisible="onlyOneOrganisationAlertDialogVisible"
+            :is-dialog-visible="onlyOneOrganisationAlertDialogVisible"
             :header="invalidSelectionAlertHeader"
             :messages="invalidSelectionAlertMessages"
-            @update:dialogExit="
+            @update:dialog-exit="
               () => {
                 onlyOneOrganisationAlertDialogVisible = false;
                 selectedOption = null;
@@ -828,10 +839,10 @@
           />
           <InfoDialog
             id="only-one-rolle-notice"
-            :isDialogVisible="onlyOneRolleAlertDialogVisible"
+            :is-dialog-visible="onlyOneRolleAlertDialogVisible"
             :header="invalidSelectionAlertHeader"
             :messages="[$t('admin.person.onlyOneRolleAlert')]"
-            @update:dialogExit="
+            @update:dialog-exit="
               () => {
                 onlyOneRolleAlertDialogVisible = false;
                 selectedOption = null;
@@ -839,37 +850,35 @@
             "
           />
           <RolleModify
-            ref="person-bulk-rolle-modify"
             v-if="rolleModifiyDialogVisible"
+            ref="person-bulk-rolle-modify"
             :organisationen="organisationenForForm"
             :rollen="lehrAndLernRollen"
             :isLoading="personenkontextStore.loading"
             :isDialogVisible="rolleModifiyDialogVisible"
             :errorCode="personenkontextStore.errorCode"
             :selectedPersonen
-            @update:isDialogVisible="handleRolleModifyDialog($event)"
-            @update:getUebersichten="getPaginatedPersonen(searchFilterStore.personenPage)"
+            @update:is-dialog-visible="handleRolleModifyDialog($event)"
+            @update:get-uebersichten="getPaginatedPersonen(searchFilterStore.personenPage)"
           >
           </RolleModify>
           <PersonBulkDelete
-            ref="person-bulk-delete"
             v-if="benutzerDeleteDialogVisible"
-            :errorCode="personStore.errorCode"
-            :isLoading="personStore.loading"
-            :isDialogVisible="benutzerDeleteDialogVisible"
-            :selectedPersonen
-            @update:dialogExit="handleBulkDeleteDialog($event)"
-          >
-          </PersonBulkDelete>
+            ref="person-bulk-delete"
+            :error-code="personStore.errorCode"
+            :is-loading="personStore.loading"
+            :is-dialog-visible="benutzerDeleteDialogVisible"
+            :selected-personen
+            @update:dialog-exit="handleBulkDeleteDialog($event)"
+          />
           <PersonBulkPasswordReset
-            ref="person-bulk-password-reset"
             v-if="passwordResetDialogVisible"
-            :isDialogVisible="passwordResetDialogVisible"
-            :selectedSchuleKennung="selectedOrganisationKennung"
-            :selectedPersonen
-            @update:dialogExit="handleBulkPasswordResetDialog($event)"
-          >
-          </PersonBulkPasswordReset>
+            ref="person-bulk-password-reset"
+            :is-dialog-visible="passwordResetDialogVisible"
+            :selected-schule-kennung="selectedOrganisationKennung"
+            :selected-personen
+            @update:dialog-exit="handleBulkPasswordResetDialog($event)"
+          />
           <OrganisationUnassign
             ref="organisation-unassign"
             v-if="organisationUnassignDialogVisible"
@@ -907,37 +916,37 @@
         >
           <p class="text-body">{{ selectedPersonIds.length }} {{ $t('selected') }}</p>
         </v-col>
-        <v-spacer></v-spacer>
+        <v-spacer />
         <SearchField
-          :initialValue="searchFilterStore.searchFilterPersonen ?? ''"
-          :inputCols="6"
-          :inputColsMd="3"
-          :buttonCols="6"
-          :buttonColsMd="2"
-          :hoverText="$t('person.firstNameLastNameReferrerKopersNr')"
-          @onApplySearchFilter="handleSearchFilter"
           ref="searchFieldComponent"
-        ></SearchField>
+          :initial-value="searchFilterStore.searchFilterPersonen ?? ''"
+          :input-cols="6"
+          :input-cols-md="3"
+          :button-cols="6"
+          :button-cols-md="2"
+          :hover-text="$t('person.firstNameLastNameReferrerKopersNr')"
+          @on-apply-search-filter="handleSearchFilter"
+        />
       </v-row>
       <ResultTable
-        :currentPage="searchFilterStore.personenPage"
-        data-testid="person-table"
         ref="resultTable"
+        :current-page="searchFilterStore.personenPage"
+        data-testid="person-table"
         :items="personRows"
-        :itemsPerPage="searchFilterStore.personenPerPage"
+        :items-per-page="searchFilterStore.personenPerPage"
         :loading="personStore.loading"
         :headers="headers"
-        :currentSort="searchFilterStore.currentSort"
-        @onHandleRowClick="
+        :current-sort="searchFilterStore.currentSort"
+        :model-value="selectedPersonIds as unknown as TableItem[]"
+        :total-items="personStore.totalPersons"
+        item-value-path="id"
+        @on-handle-row-click="
           (event: PointerEvent, item: TableRow<unknown>) => navigateToPersonDetails(event, item as TableRow<PersonRow>)
         "
         @onItemsPerPageUpdate="getPaginatedPersonenWithLimit"
         @onPageUpdate="getPaginatedPersonen"
         @onTableUpdate="handleTableSorting"
         @update:selectedRows="handleSelectedRows"
-        :modelValue="selectedPersonIds as unknown as TableItem[]"
-        :totalItems="personStore.totalPersons"
-        item-value-path="id"
       >
         <template v-slot:[`item.rollen`]="{ item }">
           <div

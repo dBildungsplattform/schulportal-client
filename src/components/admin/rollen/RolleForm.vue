@@ -47,17 +47,17 @@
 
 <template data-test-id="rolle-form">
   <FormWrapper
-    :confirmUnsavedChangesAction="onHandleConfirmUnsavedChanges"
-    :createButtonLabel="$t('admin.rolle.create')"
-    :discardButtonLabel="$t('admin.rolle.discard')"
-    :hideActions="readonly || !!props.errorCode"
     id="rolle-form"
-    :isLoading="isLoading"
-    :onDiscard="onHandleDiscard"
-    @onShowDialogChange="onShowDialogChange"
-    :onSubmit="onSubmit"
     ref="form-wrapper"
-    :showUnsavedChangesDialog="showUnsavedChangesDialog"
+    :confirm-unsaved-changes-action="onHandleConfirmUnsavedChanges"
+    :create-button-label="$t('admin.rolle.create')"
+    :discard-button-label="$t('admin.rolle.discard')"
+    :hide-actions="readonly || !!props.errorCode"
+    :is-loading="isLoading"
+    :on-discard="onHandleDiscard"
+    :on-submit="onSubmit"
+    :show-unsaved-changes-dialog="showUnsavedChangesDialog"
+    @on-show-dialog-change="onShowDialogChange"
   >
     <!-- Slot for SPSH alerts -->
     <slot />
@@ -68,9 +68,9 @@
         <h3 class="headline-3">1. {{ $t('admin.administrationsebene.assignAdministrationsebene') }}</h3>
       </v-row>
       <FormRow
-        :errorLabel="selectedAdministrationsebeneProps?.error || ''"
-        labelForId="administrationsebene-select"
-        :isRequired="true"
+        :error-label="selectedAdministrationsebeneProps?.error || ''"
+        label-for-id="administrationsebene-select"
+        :is-required="true"
         :label="$t('admin.administrationsebene.administrationsebene')"
       >
         <SchulenFilter
@@ -93,28 +93,28 @@
         <h3 class="headline-3">2. {{ $t('admin.rolle.assignRollenart') }}</h3>
       </v-row>
       <FormRow
-        :errorLabel="selectedRollenArtProps?.error || ''"
-        labelForId="rollenart-select"
-        :isRequired="true"
+        :error-label="selectedRollenArtProps?.error || ''"
+        label-for-id="rollenart-select"
+        :is-required="true"
         :label="$t('admin.rolle.rollenart')"
       >
         <v-select
+          id="rollenart-select"
+          ref="rollenart-select"
+          v-bind="selectedRollenArtProps"
+          v-model="selectedRollenArt"
           clearable
           data-testid="rollenart-select"
           density="compact"
           :disabled="readonly"
-          id="rollenart-select"
           :items="translatedRollenarten"
           item-value="value"
           item-text="title"
           :no-data-text="$t('noDataFound')"
           :placeholder="$t('admin.rolle.selectRollenart')"
-          ref="rollenart-select"
           required="true"
           variant="outlined"
-          v-bind="selectedRollenArtProps"
-          v-model="selectedRollenArt"
-        ></v-select>
+        />
       </FormRow>
 
       <template v-if="selectedRollenArt && selectedAdministrationsebene">
@@ -123,24 +123,24 @@
           <h3 class="headline-3">3. {{ $t('admin.rolle.enterRollenname') }}</h3>
         </v-row>
         <FormRow
-          :errorLabel="selectedRollenNameProps?.error || ''"
-          labelForId="rollenname-input"
-          :isRequired="true"
+          :error-label="selectedRollenNameProps?.error || ''"
+          label-for-id="rollenname-input"
+          :is-required="true"
           :label="$t('admin.rolle.rollenname')"
         >
           <v-text-field
+            id="rollenname-input"
+            ref="rollenname-input"
+            v-bind="selectedRollenNameProps"
+            v-model="selectedRollenName"
             clearable
             data-testid="rollenname-input"
             density="compact"
             :disabled="!isEditActive"
-            id="rollenname-input"
             :placeholder="$t('admin.rolle.enterRollenname')"
-            ref="rollenname-input"
             required="true"
             variant="outlined"
-            v-bind="selectedRollenNameProps"
-            v-model="selectedRollenName"
-          ></v-text-field>
+          />
         </FormRow>
 
         <!-- 4. Merkmale zuordnen -->
@@ -148,28 +148,28 @@
           <h3 class="headline-3">4. {{ $t('admin.rolle.assignMerkmale') }}</h3>
         </v-row>
         <FormRow
-          :errorLabel="selectedMerkmaleProps?.error || ''"
-          labelForId="merkmale-select"
+          :error-label="selectedMerkmaleProps?.error || ''"
+          label-for-id="merkmale-select"
           :label="$t('admin.rolle.merkmale')"
         >
           <v-select
+            id="merkmale-select"
+            ref="merkmale-select"
+            v-bind="selectedMerkmaleProps"
+            v-model="selectedMerkmale"
             chips
             clearable
             data-testid="merkmale-select"
             density="compact"
             :disabled="!isEditActive"
-            id="merkmale-select"
             :items="translatedMerkmale"
             item-value="value"
             item-text="title"
             multiple
             :no-data-text="$t('noDataFound')"
             :placeholder="isEditActive ? $t('admin.rolle.selectMerkmale') : '---'"
-            ref="merkmale-select"
             variant="outlined"
-            v-bind="selectedMerkmaleProps"
-            v-model="selectedMerkmale"
-          ></v-select>
+          />
         </FormRow>
 
         <!-- 5. Angebote zuordnen -->
@@ -177,19 +177,21 @@
           <h3 class="headline-3">5. {{ $t('admin.serviceProvider.assignServiceProvider') }}</h3>
         </v-row>
         <FormRow
-          :errorLabel="selectedServiceProvidersProps?.error || ''"
-          labelForId="service-provider-select"
+          :error-label="selectedServiceProvidersProps?.error || ''"
+          label-for-id="service-provider-select"
           :label="$t('admin.serviceProvider.serviceProvider')"
         >
           <v-autocomplete
+            id="service-provider-select"
+            ref="service-provider-select"
+            v-bind="selectedServiceProvidersProps"
+            v-model="selectedServiceProviders"
             autocomplete="off"
             chips
             clearable
             data-testid="service-provider-select"
             density="compact"
             :disabled="!isEditActive"
-            id="service-provider-select"
-            ref="service-provider-select"
             :items="serviceProviders"
             item-value="value"
             item-text="title"
@@ -197,9 +199,7 @@
             :no-data-text="$t('noDataFound')"
             :placeholder="isEditActive ? $t('admin.serviceProvider.selectServiceProvider') : '---'"
             variant="outlined"
-            v-bind="selectedServiceProvidersProps"
-            v-model="selectedServiceProviders"
-          ></v-autocomplete>
+          />
         </FormRow>
 
         <!-- 6. Systemrechte zuordnen -->
@@ -208,29 +208,29 @@
         </v-row>
         <!-- Iterate over each system right and create a checkbox for it -->
         <FormRow
-          :errorLabel="selectedSystemRechteProps?.error || ''"
-          labelForId="systemrecht-select"
+          :error-label="selectedSystemRechteProps?.error || ''"
+          label-for-id="systemrecht-select"
           :label="$t('admin.rolle.systemrechte')"
         >
           <v-autocomplete
+            id="systemrechte-select"
+            ref="systemrechte-select"
+            v-bind="selectedSystemRechteProps"
+            v-model="selectedSystemRechte"
             autocomplete="off"
             chips
             clearable
             data-testid="systemrechte-select"
             density="compact"
             :disabled="!isEditActive"
-            id="systemrechte-select"
             :items="translatedSystemrechte"
             item-value="value"
             item-text="title"
             multiple
             :no-data-text="$t('noDataFound')"
             :placeholder="isEditActive ? $t('admin.rolle.selectSystemrechte') : '---'"
-            ref="systemrechte-select"
             variant="outlined"
-            v-bind="selectedSystemRechteProps"
-            v-model="selectedSystemRechte"
-          ></v-autocomplete>
+          />
         </FormRow>
       </template>
     </template>
