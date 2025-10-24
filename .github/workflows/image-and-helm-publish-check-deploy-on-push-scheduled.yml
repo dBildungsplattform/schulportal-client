@@ -260,7 +260,6 @@ jobs:
       security-events: write
     uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-trivy-node.yaml@DBP-1473_Trivy-also-for-node-modules
     with:
-      image_ref: 'ghcr.io/${{ github.repository_owner }}/schulportal-client:latest'
       fail_on_vulnerabilites: true
       report_location: 'Dockerfile'
       trivyignores: '.trivyignore'
