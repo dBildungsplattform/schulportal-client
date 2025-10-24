@@ -175,13 +175,11 @@ describe('PersonenkontextCreate', () => {
           const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({
             ref: allowMultipleRollen ? 'rollen-select' : 'rolle-select',
           });
-          if (allowMultipleRollen) {
-            rolleAutocomplete?.vm.$emit('update:search', rolleId);
-            await rolleAutocomplete?.setValue([rolleId]);
-          } else {
-            rolleAutocomplete?.vm.$emit('update:search', rolleId);
-            await rolleAutocomplete?.setValue(rolleId);
-          }
+          // Maybe not necessary since its not an optional prop
+          if (!rolleAutocomplete || !rolleId) return rolleAutocomplete;
+
+          rolleAutocomplete.vm.$emit('update:search', rolleId);
+          await rolleAutocomplete.setValue(allowMultipleRollen ? [rolleId] : rolleId);
           return rolleAutocomplete;
         }
 
