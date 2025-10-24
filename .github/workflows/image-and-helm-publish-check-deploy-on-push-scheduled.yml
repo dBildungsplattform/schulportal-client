@@ -231,27 +231,20 @@ jobs:
     steps:
       - run: echo "Deletion of namespace" ${{ needs.create_branch_identifier_for_deletion.outputs.namespace_from_branch }} "done"
   
+  # Scheduled trivy scan of latest image
   trivy_scan:
-    name: 'Trivy scan of latest image and node modules'
+    name: 'Trivy scan of latest image'
     if: ${{ github.event_name == 'push' || github.event_name == 'schedule' }} # for testing purposes temporally also on push
-    runs-on: ubuntu-latest
     permissions:
       packages: read
       security-events: write
-    steps:
-    - name: 'Trivy scan of latest image'
-      uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-trivy.yaml@DBP-1473_Trivy-also-for-node-modules
-      with:
-        image_ref: 'ghcr.io/${{ github.repository_owner }}/schulportal-client:latest'
-        fail_on_vulnerabilites: true
-        report_location: 'Dockerfile'
-        trivyignores: '.trivyignore'
-    - name: 'Trivy scan of node modules'
-      uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-trivy-node.yaml@DBP-1473_Trivy-also-for-node-modules
-      with:
-        fail_on_vulnerabilites: true
-        report_location: 'Dockerfile'
-        trivyignores: '.trivyignore'
+    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-trivy.yaml@DBP-1473_Trivy-also-for-node-modules
+    with:
+      image_ref: 'ghcr.io/${{ github.repository_owner }}/schulportal-client:latest'
+      fail_on_vulnerabilites: true
+      report_location: 'Dockerfile'
+      trivyignores: '.trivyignore'
+      scan_node_dependencies: true  
 
   trivy_scan_rocketchat_notification:
     if: github.event_name == 'schedule' && failure()
