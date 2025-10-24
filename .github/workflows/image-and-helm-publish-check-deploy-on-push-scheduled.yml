@@ -253,7 +253,7 @@ jobs:
       trivyignores: '.trivyignore'
 
   trivy_scan_node_modules:
-    name: 'Scheduled or manual trivy scan of latest image'
+    name: 'Trivy scan of node modules'
     if: ${{ github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }} # for testing purposes temporally also on push
     permissions:
       packages: read
