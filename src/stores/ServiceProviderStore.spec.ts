@@ -1,7 +1,4 @@
-import type {
-  ManageableServiceProviderListEntryResponse,
-  ProviderControllerGetManageableServiceProviders200Response,
-} from '@/api-client/generated';
+import type { ProviderControllerGetManageableServiceProviders200Response } from '@/api-client/generated';
 import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
 import { createPinia, setActivePinia } from 'pinia';
@@ -11,6 +8,7 @@ import {
   useServiceProviderStore,
   type StartPageServiceProvider,
   type ServiceProviderStore,
+  type ManageableServiceProviderDetail,
 } from './ServiceProviderStore';
 import { faker } from '@faker-js/faker';
 
@@ -189,8 +187,7 @@ describe('serviceProviderStore', () => {
     const url: string = `/api/provider/manageable/${serviceProviderId}`;
 
     it('should load a manageable service provider by id', async () => {
-      const mockResponse: ManageableServiceProviderListEntryResponse =
-        DoFactory.getManageableServiceProviderListEntryResponse();
+      const mockResponse: ManageableServiceProviderDetail = DoFactory.getManageableServiceProviderDetail();
 
       mockadapter.onGet(url).replyOnce(200, mockResponse);
       const promise: Promise<void> = serviceProviderStore.getManageableServiceProviderById(serviceProviderId);

@@ -29,7 +29,7 @@ import type { Organisation } from '@/stores/OrganisationStore';
 import type { PersonenkontextWorkflowResponse } from '@/stores/PersonenkontextStore';
 import { type Personendatensatz } from '@/stores/PersonStore';
 import type { Rolle, RolleResponse } from '@/stores/RolleStore';
-import { ManageableServiceProviderDetail } from '@/stores/ServiceProviderStore';
+import { type ManageableServiceProviderDetail } from '@/stores/ServiceProviderStore';
 import type { Person } from '@/stores/types/Person';
 import { PersonenUebersicht } from '@/stores/types/PersonenUebersicht';
 import { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
@@ -449,6 +449,7 @@ export class DoFactory {
     return {
       ...this.getManageableServiceProviderListEntryResponse(props),
       url: props?.url ?? faker.internet.url(),
+      rollenerweiterungen: props?.rollenerweiterungen ?? [],
     };
   }
 

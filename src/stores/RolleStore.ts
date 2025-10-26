@@ -17,7 +17,7 @@ import {
   type SystemRechtResponse,
   type ServiceProviderIdNameResponse,
 } from '../api-client/generated/api';
-import type { StartPageServiceProvider } from './ServiceProviderStore';
+import type { BaseServiceProvider } from './ServiceProviderStore';
 
 const rolleApi: RolleApiInterface = RolleApiFactory(undefined, '', axiosApiInstance);
 
@@ -102,7 +102,7 @@ export type RolleFormType = {
   selectedRollenArt: RollenArt | string;
   selectedRollenName: string | undefined;
   selectedMerkmale: RollenMerkmal[] | string[];
-  selectedServiceProviders: StartPageServiceProvider[] | string[];
+  selectedServiceProviders: BaseServiceProvider[] | string[];
   selectedSystemRechte: RollenSystemRechtEnum[] | string[];
 };
 

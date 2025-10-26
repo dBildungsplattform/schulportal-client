@@ -9,6 +9,7 @@ import {
   type ManageableServiceProviderResponse,
   type ProviderApiInterface,
   type ProviderControllerGetManageableServiceProviders200Response,
+  type RollenerweiterungForServiceProviderResponse,
 } from '../api-client/generated/api';
 
 const serviceProviderApi: ProviderApiInterface = ProviderApiFactory(undefined, '', axiosApiInstance);
@@ -37,6 +38,7 @@ export type ManageableServiceProviderListEntry = BaseServiceProvider & {
 
 export type ManageableServiceProviderDetail = ManageableServiceProviderListEntry & {
   url: string;
+  rollenerweiterungen: Array<RollenerweiterungForServiceProviderResponse>;
 };
 
 export { ServiceProviderMerkmal };
