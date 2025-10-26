@@ -222,6 +222,7 @@ describe('serviceProviderStore', () => {
 
     let mockReader: {
       onload: (() => void) | null;
+      onerror?: (() => void) | null;
       readAsDataURL: (blob: Blob) => void;
       result: string | ArrayBuffer | null;
     };
@@ -270,6 +271,32 @@ describe('serviceProviderStore', () => {
       expect(serviceProviderStore.loading).toBe(true);
       await promise;
       expect(serviceProviderStore.errorCode).toEqual('some mock server error');
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+
+    it('should handle FileReader error', async () => {
+      // Mock the FileReader to trigger an error
+      mockReader = {
+        onload: null,
+        onerror: null,
+        result: null,
+        readAsDataURL: vi.fn(function (this: typeof mockReader, _blob: Blob) {
+          // Simulate FileReader error
+          this.onerror?.();
+        }),
+      };
+
+      vi.spyOn(global, 'FileReader').mockImplementation(() => mockReader as unknown as FileReader);
+
+      const mockBlob: Blob = new Blob(['mock image data'], { type: 'image/png' });
+      mockadapter
+        .onGet(`/api/provider/${serviceProviderId}/logo`)
+        .replyOnce(200, mockBlob, { 'content-type': 'image/png' });
+
+      await serviceProviderStore.getServiceProviderLogoById(serviceProviderId);
+
+      // The FileReader error triggers your rejection handler, which sets errorCode
+      expect(serviceProviderStore.errorCode).toEqual('UNSPECIFIED_ERROR');
       expect(serviceProviderStore.loading).toBe(false);
     });
   });
