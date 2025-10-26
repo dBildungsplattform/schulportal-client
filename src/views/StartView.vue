@@ -143,23 +143,19 @@
     // Load all service providers first
     await serviceProviderStore.getAvailableServiceProviders();
 
-    // Load all logos in parallel
+    // Load all logos in parallel and assign them to the respective service providers
     const logoPromises: Promise<void>[] = serviceProviderStore.availableServiceProviders
-      .filter((provider: StartPageServiceProvider) => provider.hasLogo)
-      .map((provider: StartPageServiceProvider) => serviceProviderStore.getServiceProviderLogoById(provider.id));
+      .filter((p: StartPageServiceProvider) => p.hasLogo)
+      .map(async (p: StartPageServiceProvider) => {
+        await serviceProviderStore.getServiceProviderLogoById(p.id);
+        p.logoUrl = serviceProviderStore.serviceProviderLogos.get(p.id);
+      });
 
     const twoFAStatePromise: Promise<void> = personId
       ? twoFactorAuthentificationStore.get2FAState(personId)
       : Promise.resolve();
 
     await Promise.allSettled([...logoPromises, twoFAStatePromise]);
-
-    // After all logos are loaded, assign them from the Map
-    serviceProviderStore.availableServiceProviders.forEach((provider: StartPageServiceProvider) => {
-      if (provider.hasLogo) {
-        provider.logoUrl = serviceProviderStore.serviceProviderLogos.get(provider.id);
-      }
-    });
   });
 
   onBeforeMount(async () => {
