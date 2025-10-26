@@ -193,7 +193,7 @@ describe('serviceProviderStore', () => {
       const promise: Promise<void> = serviceProviderStore.getManageableServiceProviderById(serviceProviderId);
       expect(serviceProviderStore.loading).toBe(true);
       await promise;
-      expect(serviceProviderStore.currentServiceProvider).toEqual(mockResponse);
+      expect(serviceProviderStore.currentServiceProvider).toEqual({ ...mockResponse, hasRollenerweiterung: false });
       expect(serviceProviderStore.loading).toBe(false);
     });
 

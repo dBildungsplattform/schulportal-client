@@ -449,7 +449,7 @@ export class DoFactory {
     return {
       ...this.getManageableServiceProviderListEntryResponse(props),
       url: props?.url ?? faker.internet.url(),
-      rollenerweiterungen: props?.rollenerweiterungen ?? [],
+      rollenerweiterungen: [],
     };
   }
 
