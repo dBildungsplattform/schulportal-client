@@ -10,6 +10,7 @@
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { computed, onMounted, type ComputedRef } from 'vue';
   import SchulPortalLogo from '@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg';
+  import LabeledField from '@/components/admin/LabeledField.vue';
 
   const router: Router = useRouter();
   const route: RouteLocationNormalizedLoaded = useRoute();
@@ -100,182 +101,82 @@
                     md="6"
                   >
                     <!-- Name -->
-                    <v-row class="mt-4 align-center">
-                      <v-col
-                        cols="auto"
-                        class="d-flex align-center pr-2"
-                      >
-                        <span class="subtitle-2">{{ t('angebot.name') }}:</span>
-                      </v-col>
-                      <v-col
-                        cols="auto"
-                        class="d-flex align-center"
-                        data-testid="service-provider-name"
-                      >
-                        <span class="text-body text-break">
-                          {{ serviceProviderStore.currentServiceProvider.name }}
-                        </span>
-                      </v-col>
-                    </v-row>
+                    <LabeledField
+                      :label="t('angebot.name')"
+                      :value="serviceProviderStore.currentServiceProvider.name"
+                      test-id="service-provider-name"
+                    />
 
                     <!-- Administrationsebene -->
-                    <v-row class="align-center">
-                      <v-col
-                        cols="auto"
-                        class="d-flex align-center pr-2"
-                      >
-                        <span class="subtitle-2">{{ t('angebot.administrationsebene') }}:</span>
-                      </v-col>
-                      <v-col
-                        cols="auto"
-                        class="d-flex align-center"
-                        data-testid="service-provider-administrationsebene"
-                      >
-                        <span class="text-body text-break">
-                          {{ serviceProviderStore.currentServiceProvider.administrationsebene.name }}
-                        </span>
-                      </v-col>
-                    </v-row>
+                    <LabeledField
+                      :label="t('angebot.administrationsebene')"
+                      :value="serviceProviderStore.currentServiceProvider.administrationsebene.name"
+                      test-id="service-provider-administrationsebene"
+                      no-margin-top
+                    />
 
                     <!-- Requires 2FA -->
-                    <v-row class="align-center">
-                      <v-col
-                        cols="auto"
-                        class="d-flex align-center pr-2"
-                      >
-                        <span class="subtitle-2">{{ t('angebot.requires2FA') }}:</span>
-                      </v-col>
-                      <v-col
-                        cols="auto"
-                        class="d-flex align-center"
-                        data-testid="service-provider-requires-2fa"
-                      >
-                        <span class="text-body text-break">
-                          {{ serviceProviderStore.currentServiceProvider.requires2fa ? t('yes') : t('no') }}
-                        </span>
-                      </v-col>
-                    </v-row>
+                    <LabeledField
+                      :label="t('angebot.requires2FA')"
+                      :value="serviceProviderStore.currentServiceProvider.requires2fa ? t('yes') : t('no')"
+                      test-id="service-provider-requires-2fa"
+                      no-margin-top
+                    />
 
                     <!-- Can be assigned to Rollen? -->
-                    <v-row class="align-center">
-                      <v-col
-                        cols="auto"
-                        class="d-flex align-center pr-2"
-                      >
-                        <span class="subtitle-2">{{ t('angebot.canBeAssignedToRollen') }}:</span>
-                      </v-col>
-                      <v-col
-                        cols="auto"
-                        class="d-flex align-center"
-                        data-testid="service-provider-can-be-assigned-to-rollen"
-                      >
-                        <span class="text-body text-break">
-                          {{
-                            serviceProviderStore.currentServiceProvider.merkmale.some(
-                              (m: ServiceProviderMerkmal) => m === ServiceProviderMerkmal.NachtraeglichZuweisbar,
-                            )
-                              ? t('yes')
-                              : t('no')
-                          }}
-                        </span>
-                      </v-col>
-                    </v-row>
+                    <LabeledField
+                      :label="t('angebot.canBeAssignedToRollen')"
+                      :value="
+                        serviceProviderStore.currentServiceProvider.merkmale.some(
+                          (m: ServiceProviderMerkmal) => m === ServiceProviderMerkmal.NachtraeglichZuweisbar,
+                        )
+                          ? t('yes')
+                          : t('no')
+                      "
+                      test-id="service-provider-can-be-assigned-to-rollen"
+                      no-margin-top
+                    />
                   </v-col>
 
-                  <!-- Right column (last 3 fields) -->
+                  <!-- Right column -->
                   <v-col
                     cols="12"
                     md="6"
                   >
                     <!-- Logo -->
-                    <v-row class="mt-md-4 align-center">
-                      <v-col
-                        cols="auto"
-                        class="d-flex align-center pr-2"
-                      >
-                        <span class="subtitle-2">{{ t('angebot.logo') }}:</span>
-                      </v-col>
-                      <v-col
-                        class="d-flex align-center"
-                        data-testid="service-provider-logo"
-                      >
-                        <v-img
-                          v-if="serviceProviderStore.serviceProviderLogos.has(currentServiceProviderId)"
-                          alt="provider-logo"
-                          class="service-provider-logo"
-                          :src="serviceProviderStore.serviceProviderLogos.get(currentServiceProviderId)"
-                          max-width="35"
-                        />
-                        <v-img
-                          v-else
-                          alt="schulportal-logo"
-                          class="service-provider-logo"
-                          :src="SchulPortalLogo"
-                          contain
-                          max-width="35"
-                        />
-                      </v-col>
-                    </v-row>
+                    <LabeledField
+                      :label="t('angebot.logo')"
+                      is-logo
+                      :logo-src="serviceProviderStore.serviceProviderLogos.get(currentServiceProviderId)"
+                      :default-logo-src="SchulPortalLogo"
+                      test-id="service-provider-logo"
+                      md-margin-top
+                    />
+
                     <!-- Kategorie -->
-                    <v-row class="align-center">
-                      <v-col
-                        cols="auto"
-                        class="d-flex align-center pr-2"
-                      >
-                        <span class="subtitle-2">{{ t('angebot.kategorie') }}:</span>
-                      </v-col>
-                      <v-col
-                        cols="auto"
-                        class="d-flex align-center"
-                        data-testid="service-provider-kategorie"
-                      >
-                        <span class="text-body text-break">
-                          {{ serviceProviderStore.currentServiceProvider.kategorie.toLocaleLowerCase() }}
-                        </span>
-                      </v-col>
-                    </v-row>
+                    <LabeledField
+                      :label="t('angebot.kategorie')"
+                      :value="serviceProviderStore.currentServiceProvider.kategorie.toLocaleLowerCase()"
+                      test-id="service-provider-kategorie"
+                      no-margin-top
+                    />
 
                     <!-- URL -->
-                    <v-row class="align-center">
-                      <v-col
-                        cols="auto"
-                        class="d-flex align-center pr-2"
-                      >
-                        <span class="subtitle-2">{{ t('angebot.link') }}:</span>
-                      </v-col>
-                      <v-col
-                        class="d-flex align-center"
-                        data-testid="service-provider-link"
-                        style="word-break: break-all"
-                      >
-                        <span class="text-body text-break">
-                          {{
-                            serviceProviderStore.currentServiceProvider.url
-                              ? serviceProviderStore.currentServiceProvider.url
-                              : t('missing')
-                          }}
-                        </span>
-                      </v-col>
-                    </v-row>
+                    <LabeledField
+                      :label="t('angebot.link')"
+                      :value="serviceProviderStore.currentServiceProvider.url || t('missing')"
+                      test-id="service-provider-link"
+                      word-break-all
+                      no-margin-top
+                    />
 
                     <!-- Rollenerweiterung -->
-                    <v-row class="align-center">
-                      <v-col
-                        cols="auto"
-                        class="d-flex align-center pr-2"
-                      >
-                        <span class="subtitle-2">{{ t('angebot.schulspezifischeRollenerweiterung') }}:</span>
-                      </v-col>
-                      <v-col
-                        cols="auto"
-                        class="d-flex align-center"
-                        data-testid="service-provider-rollenerweiterung"
-                      >
-                        <span class="text-body text-break">
-                          {{ serviceProviderStore.currentServiceProvider.hasRollenerweiterung ? t('yes') : t('no') }}
-                        </span>
-                      </v-col>
-                    </v-row>
+                    <LabeledField
+                      :label="t('angebot.schulspezifischeRollenerweiterung')"
+                      :value="serviceProviderStore.currentServiceProvider.hasRollenerweiterung ? t('yes') : t('no')"
+                      test-id="service-provider-rollenerweiterung"
+                      no-margin-top
+                    />
                   </v-col>
                 </v-row>
               </v-col>

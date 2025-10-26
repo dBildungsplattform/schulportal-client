@@ -13,31 +13,35 @@ import {
 
 const serviceProviderApi: ProviderApiInterface = ProviderApiFactory(undefined, '', axiosApiInstance);
 
-export type ServiceProvider = {
+export type BaseServiceProvider = {
   id: string;
   name: string;
-  url: string;
-  kategorie: string;
-  hasLogo: boolean;
-  logoUrl?: string;
-  target: string;
+  kategorie: ServiceProviderKategorie;
   requires2fa: boolean;
+};
+
+export type StartPageServiceProvider = BaseServiceProvider & {
+  url: string;
+  hasLogo: boolean;
+  target: string;
+  // Could be undefined if the logo is not provided by the backend
+  logoUrl?: string;
+};
+
+export type ManageableServiceProviderListEntry = BaseServiceProvider & {
+  merkmale: Array<ServiceProviderMerkmal>;
+  administrationsebene: { id: string; name: string; kennung?: string };
+  rollen: Array<{ id: string; name: string }>;
+  hasRollenerweiterung: boolean;
+};
+
+export type ManageableServiceProviderDetail = ManageableServiceProviderListEntry & {
+  url: string;
 };
 
 export { ServiceProviderMerkmal };
 
 export type ManageableServiceProvider = {};
-export type ManageableServiceProviderListEntry = {
-  id: string;
-  kategorie: ServiceProviderKategorie;
-  name: string;
-  requires2fa: boolean;
-  merkmale: Array<ServiceProviderMerkmal>;
-  administrationsebene: { id: string; name: string; kennung?: string };
-  rollen: Array<{ id: string; name: string }>;
-  hasRollenerweiterung?: boolean;
-  url?: string;
-};
 
 export type ServiceProviderIdNameResponse = {
   id: string;
@@ -45,11 +49,11 @@ export type ServiceProviderIdNameResponse = {
 };
 
 type ServiceProviderState = {
-  allServiceProviders: ServiceProvider[];
-  availableServiceProviders: ServiceProvider[];
+  allServiceProviders: StartPageServiceProvider[];
+  availableServiceProviders: StartPageServiceProvider[];
   manageableServiceProviders: ManageableServiceProviderListEntry[];
   totalManageableServiceProviders: number;
-  currentServiceProvider: ManageableServiceProviderListEntry | null;
+  currentServiceProvider: ManageableServiceProviderDetail | null;
   serviceProviderLogos: Map<string, string>;
   errorCode: string;
   loading: boolean;
@@ -96,7 +100,7 @@ export const useServiceProviderStore: StoreDefinition<
     async getAllServiceProviders() {
       this.loading = true;
       try {
-        const { data }: { data: ServiceProvider[] } =
+        const { data }: { data: StartPageServiceProvider[] } =
           await serviceProviderApi.providerControllerGetAllServiceProviders();
         this.allServiceProviders = data;
       } catch (error: unknown) {
@@ -109,7 +113,7 @@ export const useServiceProviderStore: StoreDefinition<
     async getAvailableServiceProviders() {
       this.loading = true;
       try {
-        const { data }: { data: ServiceProvider[] } =
+        const { data }: { data: StartPageServiceProvider[] } =
           await serviceProviderApi.providerControllerGetAvailableServiceProviders();
         this.availableServiceProviders = data;
       } catch (error: unknown) {
@@ -142,8 +146,11 @@ export const useServiceProviderStore: StoreDefinition<
       try {
         const { data }: { data: ManageableServiceProviderResponse } =
           await serviceProviderApi.providerControllerGetManageableServiceProviderById(serviceProviderId);
-        this.currentServiceProvider = data;
-      } catch (error: unknown) {
+        this.currentServiceProvider = {
+          ...data,
+          hasRollenerweiterung: data.rollenerweiterungen.length > 0,
+        };
+      } catch (error) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
         this.loading = false;
@@ -172,7 +179,6 @@ export const useServiceProviderStore: StoreDefinition<
           },
         );
 
-        // Now store it in the Map
         this.serviceProviderLogos.set(serviceProviderId, logoUrl);
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');

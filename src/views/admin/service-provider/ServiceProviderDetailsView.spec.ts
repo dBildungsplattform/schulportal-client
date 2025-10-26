@@ -5,7 +5,7 @@ import { createRouter, createWebHistory, type Router } from 'vue-router';
 import ServiceProviderDetailsView from './ServiceProviderDetailsView.vue';
 import {
   useServiceProviderStore,
-  type ManageableServiceProviderListEntry,
+  type ManageableServiceProviderDetail,
   type ServiceProviderStore,
 } from '@/stores/ServiceProviderStore';
 import { DoFactory } from 'test/DoFactory';
@@ -16,8 +16,7 @@ let wrapper: VueWrapper | null = null;
 let router: Router;
 const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
 
-const mockServiceProvider: ManageableServiceProviderListEntry =
-  DoFactory.getManageableServiceProviderListEntryResponse();
+const mockServiceProvider: ManageableServiceProviderDetail = DoFactory.getManageableServiceProviderDetail();
 
 beforeEach(async () => {
   setActivePinia(createPinia());

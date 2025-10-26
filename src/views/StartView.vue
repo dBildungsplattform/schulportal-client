@@ -10,7 +10,7 @@
   import {
     ServiceProviderKategorie,
     useServiceProviderStore,
-    type ServiceProvider,
+    type StartPageServiceProvider,
     type ServiceProviderStore,
   } from '@/stores/ServiceProviderStore';
   import {
@@ -38,30 +38,33 @@
   const authStore: AuthStore = useAuthStore();
   const meldungStore: MeldungStore = useMeldungStore();
 
-  function filterSortProviders(providers: ServiceProvider[], kategorie: ServiceProviderKategorie): ServiceProvider[] {
+  function filterSortProviders(
+    providers: StartPageServiceProvider[],
+    kategorie: ServiceProviderKategorie,
+  ): StartPageServiceProvider[] {
     return providers
-      .filter((provider: ServiceProvider) => provider.kategorie === kategorie)
-      .sort((a: ServiceProvider, b: ServiceProvider) => a.name.localeCompare(b.name));
+      .filter((provider: StartPageServiceProvider) => provider.kategorie === kategorie)
+      .sort((a: StartPageServiceProvider, b: StartPageServiceProvider) => a.name.localeCompare(b.name));
   }
 
   // Filter service providers by category "EMAIL"
-  const emailServiceProviders: ComputedRef<ServiceProvider[]> = computed(() =>
+  const emailServiceProviders: ComputedRef<StartPageServiceProvider[]> = computed(() =>
     filterSortProviders(serviceProviderStore.availableServiceProviders, ServiceProviderKategorie.Email),
   );
   // Filter service providers by category "UNTERRICHT"
-  const classServiceProviders: ComputedRef<ServiceProvider[]> = computed(() =>
+  const classServiceProviders: ComputedRef<StartPageServiceProvider[]> = computed(() =>
     filterSortProviders(serviceProviderStore.availableServiceProviders, ServiceProviderKategorie.Unterricht),
   );
   // Filter service providers by category "VERWALTUNG"
-  const administrationServiceProviders: ComputedRef<ServiceProvider[]> = computed(() =>
+  const administrationServiceProviders: ComputedRef<StartPageServiceProvider[]> = computed(() =>
     filterSortProviders(serviceProviderStore.availableServiceProviders, ServiceProviderKategorie.Verwaltung),
   );
   // Filter service providers by category "HINWEISE"
-  const hintsServiceProviders: ComputedRef<ServiceProvider[]> = computed(() =>
+  const hintsServiceProviders: ComputedRef<StartPageServiceProvider[]> = computed(() =>
     filterSortProviders(serviceProviderStore.availableServiceProviders, ServiceProviderKategorie.Hinweise),
   );
   // Filter service providers by category "ANGEBOTE"
-  const schoolOfferingsServiceProviders: ComputedRef<ServiceProvider[]> = computed(() =>
+  const schoolOfferingsServiceProviders: ComputedRef<StartPageServiceProvider[]> = computed(() =>
     filterSortProviders(serviceProviderStore.availableServiceProviders, ServiceProviderKategorie.Angebote),
   );
 
@@ -142,8 +145,8 @@
 
     // Load all logos in parallel
     const logoPromises: Promise<void>[] = serviceProviderStore.availableServiceProviders
-      .filter((provider: ServiceProvider) => provider.hasLogo)
-      .map((provider: ServiceProvider) => serviceProviderStore.getServiceProviderLogoById(provider.id));
+      .filter((provider: StartPageServiceProvider) => provider.hasLogo)
+      .map((provider: StartPageServiceProvider) => serviceProviderStore.getServiceProviderLogoById(provider.id));
 
     const twoFAStatePromise: Promise<void> = personId
       ? twoFactorAuthentificationStore.get2FAState(personId)
@@ -152,7 +155,7 @@
     await Promise.allSettled([...logoPromises, twoFAStatePromise]);
 
     // After all logos are loaded, assign them from the Map
-    serviceProviderStore.availableServiceProviders.forEach((provider: ServiceProvider) => {
+    serviceProviderStore.availableServiceProviders.forEach((provider: StartPageServiceProvider) => {
       if (provider.hasLogo) {
         provider.logoUrl = serviceProviderStore.serviceProviderLogos.get(provider.id);
       }

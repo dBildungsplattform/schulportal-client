@@ -7,7 +7,11 @@ import MockAdapter from 'axios-mock-adapter';
 import { createPinia, setActivePinia } from 'pinia';
 
 import { DoFactory } from 'test/DoFactory';
-import { useServiceProviderStore, type ServiceProvider, type ServiceProviderStore } from './ServiceProviderStore';
+import {
+  useServiceProviderStore,
+  type StartPageServiceProvider,
+  type ServiceProviderStore,
+} from './ServiceProviderStore';
 import { faker } from '@faker-js/faker';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
@@ -28,7 +32,7 @@ describe('serviceProviderStore', () => {
 
   describe('getAllServiceProviders', () => {
     it('should load service providers and update state', async () => {
-      const mockResponse: ServiceProvider[] = [
+      const mockResponse: StartPageServiceProvider[] = [
         {
           id: '1234',
           name: 'itslearning mock',
@@ -80,7 +84,7 @@ describe('serviceProviderStore', () => {
 
   describe('getAvailableServiceProviders', () => {
     it("should load user's available service providers and update state", async () => {
-      const mockResponse: ServiceProvider[] = [
+      const mockResponse: StartPageServiceProvider[] = [
         {
           id: '1234',
           name: 'itslearning mock',

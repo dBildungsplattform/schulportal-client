@@ -1,18 +1,18 @@
 <script setup lang="ts">
   import ServiceProviderCard from '@/components/cards/ServiceProviderCard.vue';
   import { type AuthStore, StepUpLevel, useAuthStore } from '@/stores/AuthStore';
-  import { type ServiceProvider } from '@/stores/ServiceProviderStore';
+  import type { StartPageServiceProvider } from '@/stores/ServiceProviderStore';
 
   const authStore: AuthStore = useAuthStore();
   const NO_SECOND_FACTOR: string = '/no-second-factor';
 
   const props: {
     categoryTitle: string;
-    serviceProviders: Array<ServiceProvider>;
+    serviceProviders: Array<StartPageServiceProvider>;
     hasToken: boolean;
   } = defineProps<{
     categoryTitle: string;
-    serviceProviders: Array<ServiceProvider>;
+    serviceProviders: Array<StartPageServiceProvider>;
     hasToken: boolean;
   }>();
 
@@ -34,7 +34,7 @@
     return '';
   }
 
-  function computeUrlAndTab(serviceProvider: ServiceProvider): { url: string; newTab: boolean } {
+  function computeUrlAndTab(serviceProvider: StartPageServiceProvider): { url: string; newTab: boolean } {
     if (serviceProvider.target === 'URL') {
       if (serviceProvider.requires2fa && !props.hasToken && authStore.acr !== StepUpLevel.GOLD) {
         return { url: NO_SECOND_FACTOR, newTab: false };
