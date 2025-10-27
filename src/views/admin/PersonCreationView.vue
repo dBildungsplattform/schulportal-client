@@ -43,7 +43,7 @@
     useRouter,
   } from 'vue-router';
   import { useDisplay } from 'vuetify';
-  import { type AnyObject, array, object, string, StringSchema } from 'yup';
+  import { array, ArraySchema, object, string, StringSchema, type AnyObject } from 'yup';
 
   const { mdAndDown, mdAndUp }: { mdAndDown: Ref<boolean>; mdAndUp: Ref<boolean> } = useDisplay();
 
@@ -179,9 +179,11 @@
 
   const validationSchema: TypedSchema = toTypedSchema(
     object({
-      selectedRollen: array()
-        .of(string().required(t('admin.rolle.rules.rolle.required')))
-        .min(1, t('admin.rolle.rules.rolle.required')),
+      selectedRollen: array(string().required(t('admin.rolle.rules.rolle.required'))).when('selectedOrganisation', {
+        is: (selectedOrganisation: string) => !!selectedOrganisation,
+        then: (schema: ArraySchema<string[] | undefined, AnyObject, undefined, ''>) =>
+          schema.min(1, t('admin.rolle.rules.rolle.required')).required(t('admin.rolle.rules.rolle.required')),
+      }),
       selectedVorname: string()
         .matches(DIN_91379A, t('admin.person.rules.vorname.matches'))
         .matches(NO_LEADING_TRAILING_SPACES, t('admin.person.rules.vorname.noLeadingTrailingSpaces'))
@@ -883,9 +885,6 @@
                 @update:befristung="handleBefristungUpdate"
                 @update:calculated-befristung-option="handleBefristungOptionUpdate"
                 @fieldReset="handleFieldReset"
-                v-model:selectedOrganisation="selectedOrganisation"
-                v-model:selectedRollen="selectedRollen"
-                v-model:selectedKlasse="selectedKlasse"
               />
             </template>
             <template v-else>
@@ -917,9 +916,6 @@
                 @update:befristung="handleBefristungUpdate"
                 @update:calculated-befristung-option="handleBefristungOptionUpdate"
                 @field-reset="handleFieldReset"
-                v-model:selectedOrganisation="selectedOrganisation"
-                v-model:selectedRollen="selectedRollen"
-                v-model:selectedKlasse="selectedKlasse"
               />
               <!-- Else: Default Order -->
               <div v-if="selectedOrganisation">
