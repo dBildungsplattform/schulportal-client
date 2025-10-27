@@ -158,9 +158,6 @@ export const useServiceProviderStore: StoreDefinition<
     },
 
     async getServiceProviderLogoById(serviceProviderId: string) {
-      if (this.serviceProviderLogos.has(serviceProviderId)) {
-        return;
-      }
       this.loading = true;
       try {
         const response: { data: Blob } = await serviceProviderApi.providerControllerGetServiceProviderLogo(
