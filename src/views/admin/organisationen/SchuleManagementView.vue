@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { onMounted, ref, type Ref } from 'vue';
-  import ResultTable from '@/components/admin/ResultTable.vue';
+  import ResultTable, { type Headers } from '@/components/admin/ResultTable.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import {
@@ -14,7 +14,6 @@
   import ItsLearningSetup from '@/components/admin/schulen/itsLearningSetup.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import { onBeforeRouteLeave, useRouter, type Router } from 'vue-router';
-  import type { Headers } from '@/components/admin/ResultTable.vue';
 
   const organisationStore: OrganisationStore = useOrganisationStore();
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();

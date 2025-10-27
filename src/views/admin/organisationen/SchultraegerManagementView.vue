@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { onMounted, ref, type Ref } from 'vue';
-  import ResultTable, { type TableRow } from '@/components/admin/ResultTable.vue';
+  import ResultTable, { type TableRow, type Headers } from '@/components/admin/ResultTable.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import {
@@ -13,7 +13,6 @@
   import { type SearchFilterStore, useSearchFilterStore } from '@/stores/SearchFilterStore';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import { onBeforeRouteLeave, useRouter, type Router } from 'vue-router';
-  import type { Headers } from '@/components/admin/ResultTable.vue';
 
   const organisationStore: OrganisationStore = useOrganisationStore();
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
@@ -22,7 +21,7 @@
 
   const { t }: Composer = useI18n({ useScope: 'global' });
 
-  type ReadonlyHeaders = Headers
+  type ReadonlyHeaders = Headers;
   const headers: ReadonlyHeaders = [
     {
       title: t('admin.schultraeger.schultraegername'),

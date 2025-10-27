@@ -7,12 +7,11 @@
     type RolleStore,
   } from '@/stores/RolleStore';
   import { computed, onMounted, type ComputedRef } from 'vue';
-  import ResultTable, { type TableRow } from '@/components/admin/ResultTable.vue';
+  import ResultTable, { type TableRow, type Headers } from '@/components/admin/ResultTable.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import { useRouter, type Router } from 'vue-router';
   import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
-  import type { Headers } from '@/components/admin/ResultTable.vue';
 
   const rolleStore: RolleStore = useRolleStore();
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
