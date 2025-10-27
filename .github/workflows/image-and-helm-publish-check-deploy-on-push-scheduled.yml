@@ -232,8 +232,8 @@ jobs:
       - run: echo "Deletion of namespace" ${{ needs.create_branch_identifier_for_deletion.outputs.namespace_from_branch }} "done"
   
   # Scheduled trivy scan of latest image
-  trivy_scan:
-    name: 'Trivy scan of latest image'
+  scheduled_trivy_scan:
+    name: 'Trivy scan of latest image and node modules'
     if: ${{ github.event_name == 'push' || github.event_name == 'schedule' }} # for testing purposes temporally also on push
     permissions:
       packages: read
@@ -249,12 +249,12 @@ jobs:
   trivy_scan_rocketchat_notification:
     if: github.event_name == 'schedule' && failure()
     needs:
-    - trivy_scan
+    - scheduled_trivy_scan
     runs-on: 'ubuntu-latest'
     steps:
     - name: Send Notification to Rocket Chat
       uses: RocketChat/Rocket.Chat.GitHub.Action.Notification@1.1.1
       with:
         type: failure
-        job_name: 'Daily nightly image check failed. This notification will be sent only on Mondays, so the check may have been failing for several days. CVE scan results: https://github.com/dBildungsplattform/schulportal-client/security/code-scanning'
+        job_name: 'Daily nightly image check failed - CVEs found so check'
         url: ${{ secrets.RC_WEBHOOK_SPSH_DEVELOPER_CHANNEL }}
