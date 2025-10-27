@@ -1,6 +1,5 @@
 import { createI18n, type DefaultLocaleMessageSchema } from 'vue-i18n';
 import * as deDE from '../locales/de-DE.json';
-// @ts-expect-error Vuetify doesn't provide types for its locale files
 import vuetifyDeMessages from 'vuetify/lib/locale/de.mjs';
 
 function loadLocaleMessages(): { [x: string]: DefaultLocaleMessageSchema } {

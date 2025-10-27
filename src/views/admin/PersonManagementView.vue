@@ -34,7 +34,7 @@
   import { type ComputedRef, type Ref, computed, onMounted, ref, watch } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import { type Router, useRouter } from 'vue-router';
-  import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
+  import type { Headers } from '@/components/admin/ResultTable.vue';
 
   const searchFieldComponent: Ref = ref();
 
@@ -68,7 +68,7 @@
   });
   const resultTable: Ref = ref(null);
 
-  type ReadonlyHeaders = VDataTableServer['headers'];
+  type ReadonlyHeaders = Headers;
   export type PersonRow = {
     id: string;
     familienname: string;

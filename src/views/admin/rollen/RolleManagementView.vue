@@ -10,9 +10,9 @@
   import ResultTable, { type TableRow } from '@/components/admin/ResultTable.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { type Composer, useI18n } from 'vue-i18n';
-  import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
   import { useRouter, type Router } from 'vue-router';
   import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
+  import type { Headers } from '@/components/admin/ResultTable.vue';
 
   const rolleStore: RolleStore = useRolleStore();
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
@@ -20,7 +20,7 @@
   const router: Router = useRouter();
   const { t }: Composer = useI18n({ useScope: 'global' });
 
-  type ReadonlyHeaders = InstanceType<typeof VDataTableServer>['headers'];
+  type ReadonlyHeaders = Headers;
   const headers: ReadonlyHeaders = [
     { title: t('admin.rolle.rollenname'), key: 'name', align: 'start' },
     { title: t('admin.rolle.rollenart'), key: 'rollenart', align: 'start' },

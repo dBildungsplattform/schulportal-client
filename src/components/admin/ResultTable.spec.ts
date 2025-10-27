@@ -1,8 +1,8 @@
 import { expect, test, describe, beforeEach } from 'vitest';
 import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
 import ResultTable from './ResultTable.vue';
-import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
 import type { VueNode } from 'node_modules/@vue/test-utils/dist/types';
+import type { Headers } from '@/components/admin/ResultTable.vue';
 
 let wrapper: VueWrapper | null = null;
 
@@ -22,7 +22,7 @@ beforeEach(() => {
     </div>
   `;
 
-  type ReadonlyHeaders = InstanceType<typeof VDataTableServer>['headers'];
+  type ReadonlyHeaders = Headers;
   const headers: ReadonlyHeaders = [{ title: 'Name', key: 'name', align: 'start' }];
 
   wrapper = mount(ResultTable, {

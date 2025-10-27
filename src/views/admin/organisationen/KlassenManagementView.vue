@@ -20,7 +20,7 @@
   import { computed, ref, watch, watchEffect, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { onBeforeRouteLeave, useRouter, type Router } from 'vue-router';
-  import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
+  import type { Headers } from '@/components/admin/ResultTable.vue';
 
   const organisationStore: OrganisationStore = useOrganisationStore();
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
@@ -28,7 +28,7 @@
 
   const router: Router = useRouter();
 
-  type TableHeaders = VDataTableServer['headers'];
+  type TableHeaders = Headers;
 
   const klasseColumnKey: string = 'name';
 

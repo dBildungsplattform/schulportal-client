@@ -4,9 +4,9 @@
    */
   import { SortOrder } from '@/utils/sorting';
   import { onMounted, onUnmounted, ref, watch, type Ref } from 'vue';
-  import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
+  import type { DataTableHeader } from 'vuetify';
 
-  type Headers = VDataTableServer['headers'];
+  export type Headers = DataTableHeader[];
 
   export type TableItem = Record<string, unknown>;
 
