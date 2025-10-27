@@ -231,7 +231,7 @@ jobs:
     steps:
       - run: echo "Deletion of namespace" ${{ needs.create_branch_identifier_for_deletion.outputs.namespace_from_branch }} "done"
   
-  # Scheduled trivy scan of latest image
+  # Scheduled
   scheduled_trivy_scan:
     name: 'Trivy scan of latest image and node modules'
     if: ${{ github.event_name == 'push' || github.event_name == 'schedule' }} # for testing purposes temporally also on push
