@@ -284,6 +284,11 @@
     }
   };
 
+  function updateKlasseSelection(selectedKlassen: string | undefined): void {
+    selectedKlasse.value = selectedKlassen;
+    emits('update:selectedKlasse', selectedKlassen);
+  }
+
   function updateKlasseSelectionForRadio(selectedKlassen: string | undefined): void {
     selectedKlasseForRadio.value = selectedKlassen;
     emits('update:selectedKlasseForRadio', selectedKlassen);
@@ -461,6 +466,13 @@
         :label="$t('admin.klasse.klasse')"
       >
         <KlassenFilter
+          :multiple="false"
+          :hideDetails="false"
+          :selectedKlasseProps="selectedKlasseProps"
+          :highlightSelection="false"
+          :selectedKlassen="selectedKlasse"
+          @update:selectedKlassen="updateKlasseSelection"
+          :placeholderText="$t('admin.klasse.selectKlasse')"
           ref="klasse-select"
           :administriertVon
           parentId="personenkontext-create"

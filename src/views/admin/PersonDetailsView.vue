@@ -519,10 +519,10 @@
       )
       .sort((a: ZuordnungWithKlasse, b: ZuordnungWithKlasse) => a.rolle.localeCompare(b.rolle))
       .sort((a: ZuordnungWithKlasse, b: ZuordnungWithKlasse) => {
-        if (a.sskDstNr === undefined) {
+        if (a.sskDstNr == null) {
           return 1;
         }
-        if (b.sskDstNr === undefined) {
+        if (b.sskDstNr == null) {
           return -1;
         }
         return a.sskDstNr.localeCompare(b.sskDstNr);
@@ -2359,16 +2359,10 @@
                     befristung: selectedBefristung,
                     befristungOption: selectedBefristungOption,
                   }"
-                  @update:selected-organisation="(value?: string) => (selectedOrganisation = value)"
-                  @update:selected-rolle="(value?: string) => (selectedRolle = value)"
-                  @update:selected-klasse="(value?: string) => (selectedKlasse = value)"
                   @update:can-commit="canCommit = $event"
                   @update:befristung="handleBefristungUpdate"
                   @update:calculated-befristung-option="handleBefristungOptionUpdate"
                   @field-reset="handleFieldReset"
-                  v-model:selectedOrganisation="selectedOrganisation"
-                  v-model:selectedRolle="selectedRolle"
-                  v-model:selectedKlasse="selectedKlasse"
                 />
                 <KopersInput
                   v-if="
