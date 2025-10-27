@@ -46,7 +46,7 @@
     type Router,
   } from 'vue-router';
   import { useDisplay } from 'vuetify';
-  import type { SystemRechtResponse } from '@/api-client/generated';
+  import type { RollenArt, SystemRechtResponse } from '@/api-client/generated';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
@@ -282,7 +282,7 @@
 
     // Set the initial values using the computed properties
     formContext.setFieldValue('selectedAdministrationsebene', organisationStore.currentOrganisation?.id);
-    formContext.setFieldValue('selectedRollenArt', translatedRollenart.value);
+    formContext.setFieldValue('selectedRollenArt', translatedRollenart.value as RollenArt);
     formContext.setFieldValue('selectedRollenName', rolleStore.currentRolle?.name);
     formContext.setFieldValue(
       'selectedMerkmale',

@@ -882,9 +882,9 @@
                   befristung: sectionNumberBefristung,
                 }"
                 @update:canCommit="canCommit = $event"
-                @update:befristung="handleBefristungUpdate"
-                @update:calculated-befristung-option="handleBefristungOptionUpdate"
-                @fieldReset="handleFieldReset"
+                @update:befristung="handleBefristungUpdate($event)"
+                @update:calculated-befristung-option="handleBefristungOptionUpdate($event)"
+                @fieldReset="handleFieldReset($event)"
               />
             </template>
             <template v-else>
@@ -913,9 +913,9 @@
                   befristungOption: selectedBefristungOption,
                 }"
                 @update:can-commit="canCommit = $event"
-                @update:befristung="handleBefristungUpdate"
-                @update:calculated-befristung-option="handleBefristungOptionUpdate"
-                @field-reset="handleFieldReset"
+                @update:befristung="handleBefristungUpdate($event)"
+                @update:calculated-befristung-option="handleBefristungOptionUpdate($event)"
+                @field-reset="handleFieldReset($event)"
               />
               <!-- Else: Default Order -->
               <div v-if="selectedOrganisation">

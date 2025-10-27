@@ -2360,9 +2360,9 @@
                     befristungOption: selectedBefristungOption,
                   }"
                   @update:can-commit="canCommit = $event"
-                  @update:befristung="handleBefristungUpdate"
-                  @update:calculated-befristung-option="handleBefristungOptionUpdate"
-                  @field-reset="handleFieldReset"
+                  @update:befristung="handleBefristungUpdate($event)"
+                  @update:calculated-befristung-option="handleBefristungOptionUpdate($event)"
+                  @field-reset="handleFieldReset($event)"
                 />
                 <KopersInput
                   v-if="

@@ -163,8 +163,8 @@
             :selected-rolle-props="selectedRolleProps"
             :is-rolle-unassign-form="true"
             :selected-rolle="props.selectedRolleFromFilter ? props.selectedRolleFromFilter.id : undefined"
-            @update:selected-rolle="(value?: string) => (selectedRolle = value)"
-            @field-reset="handleFieldReset"
+            @update:selected-rolle="selectedRolle = $event"
+            @field-reset="handleFieldReset($event)"
           />
         </template>
       </v-container>

@@ -168,17 +168,6 @@
       <!-- The form to create a new Klasse -->
       <template v-if="!organisationStore.createdKlasse">
         <KlasseForm
-          :errorCode="organisationStore.errorCode"
-          :editMode="false"
-          :initialValues="initialFormValues"
-          :isLoading="organisationStore.loading"
-          :showUnsavedChangesDialog="showUnsavedChangesDialog"
-          :onHandleConfirmUnsavedChanges="handleConfirmUnsavedChanges"
-          :onHandleDiscard="navigateToKlasseManagement"
-          :onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
-          :onSubmit
-          @formStateChanged="handleChangedFormState"
-          @update:selectedSchule="(selectedSchule) => (selectedSchuleObject = selectedSchule)"
           ref="klasse-creation-form"
           :error-code="organisationStore.errorCode"
           :edit-mode="false"
@@ -190,6 +179,7 @@
           :on-show-dialog-change="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
           :on-submit
           @form-state-changed="handleChangedFormState"
+          @update:selectedSchule="(selectedSchule) => (selectedSchuleObject = selectedSchule)"
         >
           <!-- Error Message Display if error on submit -->
           <SpshAlert

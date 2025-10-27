@@ -228,6 +228,8 @@
               ref="personenkontext-create"
               v-model:selected-organisation="selectedOrganisation"
               v-model:selected-rolle="selectedRolle"
+              v-model:selected-klassen-option="selectedKlassenOption"
+              v-model:selected-klasse-for-radio="selectedKlasseForRadio"
               :operation-context="OperationContext.PERSON_BEARBEITEN"
               :show-headline="false"
               :organisationen="organisationen"
@@ -246,14 +248,10 @@
                 befristung: selectedBefristung,
                 befristungOption: selectedBefristungOption,
               }"
-              @update:selected-organisation="(value?: string) => (selectedOrganisation = value)"
-              @update:selected-rolle="(value?: string) => (selectedRolle = value)"
               @update:can-commit="canCommit = $event"
-              @update:befristung="handleBefristungUpdate"
-              @update:calculated-befristung-option="handleBefristungOptionUpdate"
-              @fieldReset="handleFieldReset"
-              v-model:selected-klassen-option="selectedKlassenOption"
-              v-model:selected-klasse-for-radio="selectedKlasseForRadio"
+              @update:befristung="handleBefristungUpdate($event)"
+              @update:calculated-befristung-option="handleBefristungOptionUpdate($event)"
+              @fieldReset="handleFieldReset($event)"
             />
 
             <v-row
