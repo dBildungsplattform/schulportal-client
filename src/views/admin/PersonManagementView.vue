@@ -738,6 +738,7 @@
             <template #activator="{ props }">
               <div v-bind="props">
                 <KlassenFilter
+                  ref="klasse-select"
                   parentId="personen-management"
                   :systemrechteForSearch="[RollenSystemRecht.KlassenVerwalten]"
                   :multiple="true"
