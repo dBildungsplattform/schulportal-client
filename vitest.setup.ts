@@ -43,6 +43,9 @@ beforeAll(() => {
       // do nothing
     }
   };
+  // Fix Vuetify >=3.8.7 overlay bug (visualViewport not defined)
+  // @ts-expect-error: visualViewport is missing in Node
+  global.visualViewport = new EventTarget();
 });
 
 /* Close mock server after all tests */
