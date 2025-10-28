@@ -93,13 +93,14 @@
         <v-container class="service-provider-info">
           <div v-if="serviceProviderStore.currentServiceProvider">
             <v-row id="service-provider-info-row">
-              <v-col offset="1">
+              <v-col offset="1" offset-sm="1" offset-md="1" offset-lg="0" offset-xl="1">
                 <v-row>
                   <!-- Left column (first 4 fields) -->
                   <v-col
                     cols="12"
                     md="6"
                   >
+                  <div class="compact-spacing">
                     <!-- Name -->
                     <LabeledField
                       :label="t('angebot.name')"
@@ -136,6 +137,7 @@
                       test-id="service-provider-can-be-assigned-to-rollen"
                       no-margin-top
                     />
+                    </div>
                   </v-col>
 
                   <!-- Right column -->
@@ -188,7 +190,7 @@
             thickness="6"
             ></v-divider>
             <v-row>
-              <v-col offset="1">
+              <v-col offset="1" offset-sm="1" offset-md="1" offset-lg="0" offset-xl="1">
                 <v-row class="mt-4 align-center">
                   <v-col
                     cols="auto"
