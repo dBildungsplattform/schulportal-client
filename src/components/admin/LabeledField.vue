@@ -33,7 +33,7 @@
           alt="provider-logo"
           class="service-provider-logo"
           :src="logoSrc"
-          max-width="50"
+          max-width="40"
         />
         <v-img
           v-else
@@ -41,7 +41,7 @@
           class="service-provider-logo"
           :src="defaultLogoSrc"
           contain
-          max-width="35"
+          max-width="40"
         />
       </template>
 
