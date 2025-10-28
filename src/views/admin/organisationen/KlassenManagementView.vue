@@ -47,7 +47,7 @@
     },
   ];
   // Define headers as a mutable array
-  let headers: Ref<Mutable<TableHeaders>> = ref([...defaultHeaders]);
+  let headers = ref<Mutable<TableHeaders>>([...defaultHeaders]);
 
   const { hasAutoselectedSchule }: ReturnType<typeof useAutoselectedSchule> = useAutoselectedSchule([
     RollenSystemRecht.KlassenVerwalten,
@@ -337,7 +337,7 @@
                   <KlassenFilter
                     ref="klasse-select"
                     parentId="klassen-management"
-                    :systemrechteForSearch="[RollenSystemRecht.KlassenVerwalten]"
+                    :systemrechte-for-search="[RollenSystemRecht.KlassenVerwalten]"
                     :multiple="true"
                     :readonly="!hasSelectedSchule"
                     :hide-details="true"

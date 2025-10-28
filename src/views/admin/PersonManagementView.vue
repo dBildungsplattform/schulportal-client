@@ -854,10 +854,10 @@
             ref="person-bulk-rolle-modify"
             :organisationen="organisationenForForm"
             :rollen="lehrAndLernRollen"
-            :isLoading="personenkontextStore.loading"
-            :isDialogVisible="rolleModifiyDialogVisible"
-            :errorCode="personenkontextStore.errorCode"
-            :selectedPersonen
+            :is-loading="personenkontextStore.loading"
+            :is-dialog-visible="rolleModifiyDialogVisible"
+            :error-code="personenkontextStore.errorCode"
+            :selected-personen
             @update:is-dialog-visible="handleRolleModifyDialog($event)"
             @update:get-uebersichten="getPaginatedPersonen(searchFilterStore.personenPage)"
           >
@@ -882,28 +882,28 @@
           <OrganisationUnassign
             ref="organisation-unassign"
             v-if="organisationUnassignDialogVisible"
-            :isDialogVisible="organisationUnassignDialogVisible"
-            :selectedPersonen
-            :selectedOrganisation="selectedOrganisationen[0] ?? ({} as Organisation)"
-            @update:dialogExit="handleUnassignOrgDialog($event)"
+            :is-dialog-visible="organisationUnassignDialogVisible"
+            :selected-personen="selectedPersonen"
+            :selected-organisation="selectedOrganisationen[0] ?? ({} as Organisation)"
+            @update:dialog-exit="handleUnassignOrgDialog($event)"
           >
           </OrganisationUnassign>
           <RolleUnassign
             ref="rolle-unassign"
             v-if="rolleUnassignDialogVisible"
-            :isDialogVisible="rolleUnassignDialogVisible"
+            :is-dialog-visible="rolleUnassignDialogVisible"
             :organisationen="organisationenForForm"
-            :selectedPersonen="Array.isArray(selectedPersonen) ? selectedPersonen[0] : selectedPersonen"
-            :selectedOrganisationFromFilter="selectedOrganisationen[0] ?? ({} as Organisation)"
-            :selectedRolleFromFilter="selectedRolle!"
-            @update:dialogExit="handleUnassignRolleDialog($event)"
+            :selected-personen="Array.isArray(selectedPersonen) ? selectedPersonen[0] : selectedPersonen"
+            :selected-organisation-from-filter="selectedOrganisationen[0] ?? ({} as Organisation)"
+            :selected-rolle-from-filter="selectedRolle!"
+            @update:dialog-exit="handleUnassignRolleDialog($event)"
           >
           </RolleUnassign>
           <PersonBulkChangeKlasse
             v-if="changeKlasseDialogVisible"
-            :isDialogVisible="changeKlasseDialogVisible"
-            :selectedPersonen
-            :selectedSchuleId="selectedOrganisationen[0]?.id ?? undefined"
+            :is-dialog-visible="changeKlasseDialogVisible"
+            :selected-personen="selectedPersonen"
+            :selected-schule-id="selectedOrganisationen[0]?.id ?? undefined"
             @update:dialog-exit="handleBulkKlasseChangeDialog"
           />
         </v-col>
@@ -943,10 +943,10 @@
         @on-handle-row-click="
           (event: PointerEvent, item: TableRow<unknown>) => navigateToPersonDetails(event, item as TableRow<PersonRow>)
         "
-        @onItemsPerPageUpdate="getPaginatedPersonenWithLimit"
-        @onPageUpdate="getPaginatedPersonen"
-        @onTableUpdate="handleTableSorting"
-        @update:selectedRows="handleSelectedRows"
+        @on-items-per-page-update="getPaginatedPersonenWithLimit"
+        @on-page-update="getPaginatedPersonen"
+        @on-table-update="handleTableSorting"
+        @update:selected-rows="handleSelectedRows"
       >
         <template v-slot:[`item.rollen`]="{ item }">
           <div

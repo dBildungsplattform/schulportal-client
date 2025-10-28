@@ -626,11 +626,11 @@
           >
             <SchulenFilter
               :multiple="false"
-              parentId="person-import"
-              :placeholderText="t('admin.schule.selectSchule')"
-              :selectedSchuleProps="selectedSchuleProps"
-              :selectedSchulen="selectedSchule"
-              @update:selectedSchulen="updateSelectedSchule"
+              parent-id="person-import"
+              :placeholder-text="t('admin.schule.selectSchule')"
+              :selected-schule-props="selectedSchuleProps"
+              :selected-schulen="selectedSchule"
+              @update:selected-schulen="updateSelectedSchule"
               ref="schulFilter"
             />
           </FormRow>
