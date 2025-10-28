@@ -183,10 +183,10 @@
               </v-col>
             </v-row>
             <v-divider
-      class="border-opacity-100 rounded my-6"
-      color="#E5EAEF"
-      thickness="6"
-    ></v-divider>
+            class="border-opacity-100 rounded my-6"
+            color="#E5EAEF"
+            thickness="6"
+            ></v-divider>
             <v-row>
               <v-col offset="1">
                 <v-row class="mt-4 align-center">
