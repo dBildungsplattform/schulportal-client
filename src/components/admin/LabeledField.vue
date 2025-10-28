@@ -33,7 +33,7 @@
           alt="provider-logo"
           class="service-provider-logo"
           :src="logoSrc"
-          max-width="35"
+          max-width="50"
         />
         <v-img
           v-else
