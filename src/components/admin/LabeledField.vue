@@ -23,7 +23,7 @@
       <span class="subtitle-2 text-no-wrap">{{ label }}:</span>
     </v-col>
     <v-col
-      class="d-flex align-center flex-grow-1"
+      class="d-flex align-center flex-grow-1 pl-2"
       :data-testid="testId"
       :style="wordBreakAll ? 'word-break: break-all' : undefined"
     >

@@ -185,7 +185,7 @@
               </v-col>
             </v-row>
             <v-divider
-            class="border-opacity-100 rounded my-6"
+            class="border-opacity-100 rounded mt-8"
             color="#E5EAEF"
             thickness="6"
             ></v-divider>
@@ -209,7 +209,6 @@
                       class="ma-1"
                       color="primary"
                       variant="tonal"
-                      label
                     >
                       {{ rolle.name }}
                     </v-chip>
