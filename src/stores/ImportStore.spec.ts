@@ -3,7 +3,6 @@ import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
 import { createPinia, setActivePinia } from 'pinia';
 import { ImportDataItemStatus, useImportStore, type ImportStore } from './ImportStore';
-import { flushPromises } from '@vue/test-utils';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 
