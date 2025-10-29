@@ -15,7 +15,7 @@
 
 <template>
   <v-app>
-    <TheHeader></TheHeader>
+    <TheHeader />
     <v-main>
       <!-- TODO: Can we change the conditional layouts into a dynamic component? -->
       <AdminLayout v-if="isAdminRoute">

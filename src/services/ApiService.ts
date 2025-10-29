@@ -16,6 +16,7 @@ axiosApiInstance.interceptors.response.use(
     if (error instanceof AxiosError && error.response?.status === HttpStatusCode.Unauthorized) {
       window.location.href = `/api/auth/login?redirectUrl=${location.href}`;
     }
+    // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
     return Promise.reject(error);
   },
 );

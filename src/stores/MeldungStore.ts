@@ -29,7 +29,7 @@ type MeldungState = {
   errorCode: string;
 };
 
-type MeldungGetters = {};
+type MeldungGetters = object;
 
 type MeldungActions = {
   getAllMeldungen: () => Promise<void>;

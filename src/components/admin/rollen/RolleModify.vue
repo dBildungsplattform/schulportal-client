@@ -2,25 +2,25 @@
   import PersonBulkError from '@/components/admin/personen/PersonBulkError.vue';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { useBulkErrors, type BulkErrorList } from '@/composables/useBulkErrors';
+  import { type BulkErrorList, useBulkErrors } from '@/composables/useBulkErrors';
   import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
-  import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
+  import { type BulkOperationStore, useBulkOperationStore } from '@/stores/BulkOperationStore';
   import {
     KlassenOption,
     OperationContext,
+    type PersonenkontextStore,
     RolleDialogMode,
     usePersonenkontextStore,
-    type PersonenkontextStore,
   } from '@/stores/PersonenkontextStore';
   import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
   import type { TranslatedObject } from '@/types';
-  import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
+  import { type BefristungUtilsType, isBefristungspflichtRolle, useBefristungUtils } from '@/utils/befristung';
   import { formatDateToISO, getNextSchuljahresende } from '@/utils/date';
   import { befristungSchema, isKopersRolle, isLernRolle } from '@/utils/validationPersonenkontext';
   import { toTypedSchema } from '@vee-validate/yup';
-  import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
-  import { computed, ref, watchEffect, type ComputedRef, type Ref } from 'vue';
-  import { useI18n, type Composer } from 'vue-i18n';
+  import { type BaseFieldProps, type FormContext, type TypedSchema, useForm } from 'vee-validate';
+  import { computed, type ComputedRef, ref, type Ref, watchEffect } from 'vue';
+  import { type Composer, useI18n } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
   import { object, string, StringSchema } from 'yup';
 
@@ -77,7 +77,7 @@
         selectedOrganisation: string().required(t('admin.organisation.rules.organisation.required')),
         selectedKlassenOption: string(),
         selectedKlasseForRadio: string().when('selectedKlassenOption', {
-          is: (selectedKlassenOption: string) => selectedKlassenOption === KlassenOption.SELECT_NEW_KLASSE,
+          is: (selectedKlassenOption: string) => selectedKlassenOption === KlassenOption.SELECT_NEW_KLASSE.toString(),
           then: (schema: StringSchema) => schema.required(t('admin.klasse.rules.klasse.required')),
           otherwise: (schema: StringSchema) => schema.notRequired(),
         }),
@@ -160,7 +160,7 @@
   setupRolleWatcher();
   setupWatchers();
 
-  async function closeModifyRolleDeleteDialog(): Promise<void> {
+  function closeModifyRolleDeleteDialog(): void {
     if (bulkOperationStore.currentOperation) {
       bulkOperationStore.resetState();
     }
@@ -215,7 +215,7 @@
       data-testid="rolle-modify-layout-card"
       :closable="false"
       :header="t('admin.rolle.assignRolle')"
-      @onCloseClicked="closeModifyRolleDeleteDialog()"
+      @on-close-clicked="closeModifyRolleDeleteDialog()"
     >
       <v-form
         data-testid="rolle-assign-form"
@@ -226,16 +226,20 @@
           <template v-if="bulkOperationStore.currentOperation?.progress === 0">
             <PersonenkontextCreate
               ref="personenkontext-create"
-              :operationContext="OperationContext.PERSON_BEARBEITEN"
-              :showHeadline="false"
+              v-model:selected-organisation="selectedOrganisation"
+              v-model:selected-rolle="selectedRolle"
+              v-model:selected-klassen-option="selectedKlassenOption"
+              v-model:selected-klasse-for-radio="selectedKlasseForRadio"
+              :operation-context="OperationContext.PERSON_BEARBEITEN"
+              :show-headline="false"
               :organisationen="organisationen"
               :rollen="rollen"
-              :selectedOrganisationProps="selectedOrganisationProps"
-              :selectedRolleProps="selectedRolleProps"
-              :selectedKlassenOptionProps="selectedKlassenOptionProps"
-              :selectedKlasseForRadioProps="selectedKlasseForRadioProps"
-              :rolleDialogMode="RolleDialogMode.MODIFY"
-              :befristungInputProps="{
+              :selected-organisation-props="selectedOrganisationProps"
+              :selected-rolle-props="selectedRolleProps"
+              :selected-klassen-option-props="selectedKlassenOptionProps"
+              :selected-klasse-for-radio-props="selectedKlasseForRadioProps"
+              :rolle-dialog-mode="RolleDialogMode.MODIFY"
+              :befristung-input-props="{
                 befristungProps: selectedBefristungProps,
                 befristungOptionProps: selectedBefristungOptionProps,
                 isUnbefristetDisabled: isBefristungRequired,
@@ -244,13 +248,9 @@
                 befristung: selectedBefristung,
                 befristungOption: selectedBefristungOption,
               }"
-              v-model:selectedOrganisation="selectedOrganisation"
-              v-model:selectedRolle="selectedRolle"
-              v-model:selectedKlassenOption="selectedKlassenOption"
-              v-model:selectedKlasseForRadio="selectedKlasseForRadio"
-              @update:canCommit="canCommit = $event"
+              @update:can-commit="canCommit = $event"
               @update:befristung="handleBefristungUpdate($event)"
-              @update:calculatedBefristungOption="handleBefristungOptionUpdate($event)"
+              @update:calculated-befristung-option="handleBefristungOptionUpdate($event)"
               @fieldReset="handleFieldReset($event)"
             />
 
@@ -299,7 +299,7 @@
                     small
                     color="#1EAE9C"
                     icon="mdi-check-circle"
-                  ></v-icon>
+                  />
                 </v-col>
               </v-row>
               <p class="mt-2 text-center">
@@ -317,7 +317,7 @@
                   class="mr-2"
                   icon="mdi-alert-circle-outline"
                   size="small"
-                ></v-icon>
+                />
                 <span class="subtitle-2">
                   {{ t('admin.doNotCloseBrowserNotice') }}
                 </span>
@@ -325,11 +325,11 @@
             </v-row>
             <v-progress-linear
               class="mt-5"
-              :modelValue="bulkOperationStore.currentOperation?.progress"
+              :model-value="bulkOperationStore.currentOperation?.progress"
               color="primary"
               height="25"
             >
-              <template v-slot:default="{ value }">
+              <template #default="{ value }">
                 <strong class="text-white">{{ Math.ceil(value) }}%</strong>
               </template>
             </v-progress-linear>
@@ -342,7 +342,7 @@
             v-if="bulkOperationStore.currentOperation?.progress === 0"
             class="py-3 px-2 justify-center"
           >
-            <v-spacer class="hidden-sm-and-down"></v-spacer>
+            <v-spacer class="hidden-sm-and-down" />
 
             <v-col
               cols="12"
@@ -352,8 +352,8 @@
               <v-btn
                 :block="mdAndDown"
                 class="secondary"
-                @click="closeModifyRolleDeleteDialog"
                 data-testid="rolle-modify-discard-button"
+                @click="closeModifyRolleDeleteDialog"
               >
                 {{ t('cancel') }}
               </v-btn>
@@ -388,8 +388,8 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary"
-                @click="closeModifyRolleDeleteDialog"
                 data-testid="rolle-modify-close-button"
+                @click="closeModifyRolleDeleteDialog"
               >
                 {{ t('close') }}
               </v-btn>
@@ -403,9 +403,10 @@
   <!-- Error Dialog -->
   <template v-if="showErrorDialog">
     <PersonBulkError
-      :bulkOperationName="t('admin.rolle.assignRolle')"
-      :isDialogVisible="showErrorDialog"
-      @update:isDialogVisible="
+      :bulk-operation-name="t('admin.rolle.assignRolle')"
+      :is-dialog-visible="showErrorDialog"
+      :errors="bulkErrorList"
+      @update:is-dialog-visible="
         (val: boolean) => {
           showErrorDialog = val;
           if (!val) {
@@ -413,7 +414,6 @@
           }
         }
       "
-      :errors="bulkErrorList"
     />
   </template>
 </template>

@@ -83,7 +83,9 @@
   });
   const selectedOrganisation: Ref<string | null> = ref(null);
   const errorMessage: ComputedRef<string> = computed(() => {
-    if (!props.errorCode) return '';
+    if (!props.errorCode) {
+      return '';
+    }
     return !props.person.person.userLock.some(
       (lock: UserLock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT,
     )
@@ -94,7 +96,9 @@
     return organisations.value.length <= 1;
   });
   const selectedOrganisationId: ComputedRef<string | null> = computed(() => {
-    if (!selectedOrganisation.value) return null;
+    if (!selectedOrganisation.value) {
+      return null;
+    }
     const organisation: Organisation | undefined = Array.from(props.intersectingOrganisations).find(
       (org: Organisation) => props.formatOrganisationName(org) === selectedOrganisation.value,
     );
@@ -118,7 +122,7 @@
     isEditMode.value = false;
   }
 
-  async function handleOnLockUser(): Promise<void> {
+  function handleOnLockUser(): void {
     // Find the "MANUELL_GESPERRT" lock if it exists
     const manualLock: UserLock | null =
       props.person.person.userLock.find(
@@ -128,7 +132,9 @@
     // Use the locked_by ID from "MANUELL_GESPERRT" if person is locked, otherwise use selectedOrganisationId
     const lockingOrgId: string | null = manualLock ? manualLock.locked_by : selectedOrganisationId.value;
 
-    if (!lockingOrgId) return;
+    if (!lockingOrgId) {
+      return;
+    }
 
     // Format date if provided
     const dateISO: string | undefined = formatDateToISO(selectedBefristung.value);
@@ -139,7 +145,7 @@
     closeLockPersonDialog();
   }
 
-  const onSubmit: (e?: Event | undefined) => Promise<void | undefined> = formContext.handleSubmit(() => {
+  const onSubmit: (e?: Event) => Promise<void | undefined> = formContext.handleSubmit(() => {
     handleOnLockUser();
   });
 
@@ -187,10 +193,10 @@
 
 <template v-if="organisations.length > 0">
   <v-dialog
-    persistent
     v-model="dialogIsActive"
+    persistent
   >
-    <template v-slot:activator="{ props }">
+    <template #activator="{ props }">
       <v-col
         cols="12"
         sm="6"
@@ -199,9 +205,9 @@
       >
         <SpshTooltip
           v-if="!person.person.isLocked"
-          :enabledCondition="!disabled"
-          :disabledText="$t('person.finishEditFirst')"
-          :enabledText="$t('person.lockUser')"
+          :enabled-condition="!disabled"
+          :disabled-text="$t('person.finishEditFirst')"
+          :enabled-text="$t('person.lockUser')"
           position="start"
         >
           <v-btn
@@ -216,9 +222,9 @@
         </SpshTooltip>
         <SpshTooltip
           v-else
-          :enabledCondition="!disabled"
-          :disabledText="$t('person.finishEditFirst')"
-          :enabledText="$t('admin.person.editLock')"
+          :enabled-condition="!disabled"
+          :disabled-text="$t('person.finishEditFirst')"
+          :enabled-text="$t('admin.person.editLock')"
           position="start"
         >
           <v-btn
@@ -242,7 +248,7 @@
       data-testid="person-lock-card"
       :closable="true"
       :header="!isManuallyLocked ? $t('person.lockUser') : $t('admin.person.editLock')"
-      @onCloseClicked="closeLockPersonDialog"
+      @on-close-clicked="closeLockPersonDialog"
     >
       <v-container>
         <v-card-text>
@@ -254,7 +260,7 @@
               class="text-right"
               cols="1"
             >
-              <v-icon icon="mdi-alert"></v-icon>
+              <v-icon icon="mdi-alert" />
             </v-col>
             <v-col>
               <p data-testid="error-text">
@@ -280,6 +286,9 @@
               md="6"
             >
               <v-select
+                id="schule-select"
+                ref="schule-select"
+                v-model="selectedOrganisation"
                 :clearable="!hasSingleSelection"
                 :disabled="hasSingleSelection || isManuallyLocked"
                 :hide-details="hasSingleSelection || isManuallyLocked"
@@ -290,23 +299,20 @@
                 ]"
                 data-testid="schule-select"
                 density="compact"
-                id="schule-select"
                 :items="organisations"
-                @update:modelValue="handleChangeOrganisation"
                 item-value="value"
                 item-text="title"
                 :no-data-text="$t('noDataFound')"
                 :placeholder="$t('person.lockedBy')"
-                ref="schule-select"
                 required="true"
                 variant="outlined"
-                v-model="selectedOrganisation"
-              ></v-select>
+                @update:model-value="handleChangeOrganisation"
+              />
             </v-col>
           </v-row>
           <v-row
-            class="justify-center w-full"
             v-if="!isManuallyLocked || (isManuallyLocked && isEditMode)"
+            class="justify-center w-full"
           >
             <v-col
               class="text-body"
@@ -324,17 +330,16 @@
             >
               <PersonLockInput
                 v-model:befristung="selectedBefristung"
-                v-bind:befristungProps="selectedBefristungProps"
-                :isUnbefristet="isUnbefristet"
+                :befristung-props="selectedBefristungProps"
+                :is-unbefristet="isUnbefristet"
                 @update:befristung="handleBefristungChange"
-                @handleSelectedRadioButtonChange="selectedRadionButtonChange"
-              >
-              </PersonLockInput>
+                @handle-selected-radio-button-change="selectedRadionButtonChange"
+              />
             </v-col>
           </v-row>
           <v-row class="text-body bold px-md-16">
             <v-col cols="1">
-              <v-icon icon="mdi-information-slab-circle-outline"></v-icon>
+              <v-icon icon="mdi-information-slab-circle-outline" />
             </v-col>
             <v-col cols="11">
               <span
@@ -360,8 +365,8 @@
               <v-btn
                 :block="mdAndDown"
                 class="secondary button"
-                @click.stop="closeLockPersonDialog"
                 data-testid="close-lock-person-dialog-button"
+                @click.stop="closeLockPersonDialog"
               >
                 {{ !selectedOrganisation ? $t('close') : $t('cancel') }}
               </v-btn>
@@ -380,8 +385,8 @@
                     (lock) => lock.lock_occasion === PersonLockOccasion.MANUELL_GESPERRT,
                   ) && !selectedOrganisation
                 "
-                @click.stop="isEditMode = true"
                 data-testid="edit-user-lock-button"
+                @click.stop="isEditMode = true"
               >
                 {{ $t('admin.person.editLock') }}
               </v-btn>
@@ -390,8 +395,8 @@
                 :block="mdAndDown"
                 class="primary button"
                 :disabled="!isManuallyLocked && !selectedOrganisation"
-                @click.stop="onSubmit"
                 data-testid="lock-user-button"
+                @click.stop="onSubmit"
               >
                 {{ $t('person.lockUser') }}
               </v-btn>
@@ -406,8 +411,8 @@
                 :block="mdAndDown"
                 class="primary button"
                 :disabled="!isManuallyLocked && !selectedOrganisation"
-                @click.stop="onSubmit"
                 data-testid="lock-user-button"
+                @click.stop="onSubmit"
               >
                 {{ isManuallyLocked ? $t('admin.person.removeLock') : $t('person.lockUser') }}
               </v-btn>

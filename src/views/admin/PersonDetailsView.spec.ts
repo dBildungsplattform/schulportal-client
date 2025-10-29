@@ -766,8 +766,6 @@ describe('PersonDetailsView', () => {
     await befristungInput?.setValue('12.08.2099');
     await nextTick();
 
-    await nextTick();
-
     const submitButton: Element | null = document.body.querySelector(
       '[data-testid="zuordnung-creation-submit-button"]',
     );

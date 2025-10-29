@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import KlasseDelete from '@/components/admin/klassen/KlasseDelete.vue';
-  import ResultTable, { type TableRow } from '@/components/admin/ResultTable.vue';
+  import ResultTable, { type TableRow, type Headers } from '@/components/admin/ResultTable.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import KlassenFilter from '@/components/filter/KlassenFilter.vue';
@@ -20,7 +20,6 @@
   import { computed, ref, watch, watchEffect, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { onBeforeRouteLeave, useRouter, type Router } from 'vue-router';
-  import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
 
   const organisationStore: OrganisationStore = useOrganisationStore();
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
@@ -28,11 +27,9 @@
 
   const router: Router = useRouter();
 
-  type TableHeaders = VDataTableServer['headers'];
-
   const klasseColumnKey: string = 'name';
 
-  const defaultHeaders: TableHeaders = [
+  let defaultHeaders: Mutable<Headers> = [
     {
       title: t('admin.klasse.klasse'),
       key: klasseColumnKey,
@@ -47,8 +44,8 @@
       width: '250px',
     },
   ];
-  // Define headers as a mutable array
-  let headers: Ref<Mutable<TableHeaders>> = ref([...defaultHeaders]);
+
+  const headers: Ref<Mutable<Headers>> = ref(defaultHeaders) as Ref<Mutable<Headers>>;
 
   const { hasAutoselectedSchule }: ReturnType<typeof useAutoselectedSchule> = useAutoselectedSchule([
     RollenSystemRecht.KlassenVerwalten,
@@ -73,7 +70,9 @@
       sortField: searchFilterStore.organisationenSortField ?? undefined,
       sortOrder: searchFilterStore.organisationenSortOrder ?? undefined,
     };
-    if (selectedSchule.value) initialFilter.administriertVon = [selectedSchule.value];
+    if (selectedSchule.value) {
+      initialFilter.administriertVon = [selectedSchule.value];
+    }
     return initialFilter;
   });
   const administriertVonForKlassenFilter: Ref<Array<string>> = ref([]);
@@ -140,7 +139,7 @@
   });
 
   // // Function to reset search and filter
-  async function resetSearchAndFilter(): Promise<void> {
+  function resetSearchAndFilter(): void {
     // Clear selected Klassen
     selectedKlassen.value = [];
     // Clear the store
@@ -156,17 +155,19 @@
     }
   }
 
-  async function updateSchuleSelection(id: string | undefined): Promise<void> {
-    if (selectedSchule.value == id) return;
+  function updateSchuleSelection(id: string | undefined): void {
+    if (selectedSchule.value === id) {
+      return;
+    }
     selectedSchule.value = id;
     searchFilterStore.setSchuleFilterForKlassen(id ?? null);
     searchFilterStore.klassenPage = 1;
     if (!id) {
-      await resetSearchAndFilter();
+      resetSearchAndFilter();
     }
   }
 
-  async function updateKlassenSelection(ids: string[] | undefined): Promise<void> {
+  function updateKlassenSelection(ids: string[] | undefined): void {
     selectedKlassen.value = ids ?? [];
     searchFilterStore.setKlasseFilterForKlassen(ids ?? null);
   }
@@ -192,10 +193,7 @@
     router.push({ name: 'klasse-details', params: { id: item.id } });
   }
 
-  async function handleTableSorting(update: {
-    sortField: string | undefined;
-    sortOrder: 'asc' | 'desc';
-  }): Promise<void> {
+  function handleTableSorting(update: { sortField: string | undefined; sortOrder: 'asc' | 'desc' }): void {
     if (update.sortField && Object.values(OrganisationSortField).includes(update.sortField as OrganisationSortField)) {
       searchFilterStore.organisationenSortField = update.sortField as OrganisationSortField;
       searchFilterStore.organisationenSortOrder = update.sortOrder as SortOrder;
@@ -206,7 +204,7 @@
     hasAutoselectedSchule,
     () => {
       if (hasAutoselectedSchule.value) {
-        headers.value = [...defaultHeaders];
+        return;
       } else {
         headers.value = [
           {
@@ -216,7 +214,8 @@
             sortable: false,
             width: '350px',
           },
-          ...defaultHeaders,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          ...headers.value,
         ];
       }
     },
@@ -234,7 +233,7 @@
     await reloadData(klassenListFilter.value);
   });
 
-  onBeforeRouteLeave(async () => {
+  onBeforeRouteLeave(() => {
     organisationStore.errorCode = '';
   });
 </script>
@@ -253,12 +252,12 @@
     >
       <!-- Error Message Display -->
       <SpshAlert
-        :buttonAction="handleAlertClose"
-        :buttonText="t('nav.backToList')"
+        :button-action="handleAlertClose"
+        :button-text="t('nav.backToList')"
         :closable="false"
-        dataTestIdPrefix="klasse-management-error"
-        :modelValue="!!organisationStore.errorCode"
-        :showButton="true"
+        data-test-id-prefix="klasse-management-error"
+        :model-value="!!organisationStore.errorCode"
+        :show-button="true"
         :text="errorText"
         :title="errorTitle"
         :type="'error'"
@@ -278,10 +277,10 @@
               class="px-0 reset-filter"
               data-testid="reset-filter-button"
               :disabled="!filterActive"
-              @click="resetSearchAndFilter()"
               size="x-small"
               variant="text"
               width="auto"
+              @click="resetSearchAndFilter()"
             >
               {{ t('resetFilter') }}
             </v-btn>
@@ -292,17 +291,17 @@
             class="py-md-0"
           >
             <SchulenFilter
+              ref="schule-select"
               :systemrechte-for-search="[RollenSystemRecht.KlassenVerwalten]"
               parentId="klassen-management"
               :multiple="false"
-              :hideDetails="true"
-              :highlightSelection="true"
-              :selectedSchulen="selectedSchule"
-              @update:selectedSchulen="updateSchuleSelection"
-              :placeholderText="t('admin.schule.schule')"
-              ref="schule-select"
+              :hide-details="true"
+              :highlight-selection="true"
+              :selected-schulen="selectedSchule"
+              :placeholder-text="t('admin.schule.schule')"
+              @update:selected-schulen="updateSchuleSelection"
             >
-              <template v-slot:prepend-item>
+              <template #prepend-item>
                 <v-list-item>
                   <v-progress-circular
                     indeterminate
@@ -332,29 +331,29 @@
               :disabled="hasSelectedSchule"
               location="top"
             >
-              <template v-slot:activator="{ props }">
+              <template #activator="{ props }">
                 <div v-bind="props">
                   <KlassenFilter
+                    ref="klasse-select"
                     parentId="klassen-management"
-                    :systemrechteForSearch="[RollenSystemRecht.KlassenVerwalten]"
+                    :systemrechte-for-search="[RollenSystemRecht.KlassenVerwalten]"
                     :multiple="true"
                     :readonly="!hasSelectedSchule"
-                    :hideDetails="true"
-                    :highlightSelection="true"
-                    :selectedKlassen="selectedKlassen"
-                    :totalKlassen="totalKlassen"
-                    @update:selectedKlassen="updateKlassenSelection"
-                    :placeholderText="t('admin.klasse.klassen')"
-                    ref="klasse-select"
-                    :administriertVon="administriertVonForKlassenFilter"
+                    :hide-details="true"
+                    :highlight-selection="true"
+                    :selected-klassen="selectedKlassen"
+                    :total-klassen="totalKlassen"
+                    :placeholder-text="t('admin.klasse.klassen')"
+                    :administriert-von="administriertVonForKlassenFilter"
+                    @update:selected-klassen="updateKlassenSelection"
                   >
-                    <template v-slot:prepend-item>
+                    <template #prepend-item>
                       <v-list-item>
                         <v-progress-circular
+                          v-if="organisationStore.loading"
                           data-testid="klassen-filter-progress"
                           indeterminate
-                          v-if="organisationStore.loading"
-                        ></v-progress-circular>
+                        />
                         <span
                           v-else
                           class="filter-header"
@@ -371,28 +370,28 @@
         </v-row>
         <ResultTable
           ref="resultTable"
-          :currentPage="searchFilterStore.klassenPage"
+          :current-page="searchFilterStore.klassenPage"
           data-testid="klasse-table"
           :header="t('admin.klasse.management')"
           :items="finalKlassen || []"
           :loading="organisationStore.loading"
           :headers="headers"
-          :currentSort="{
+          :current-sort="{
             key: searchFilterStore.organisationenSortField ?? klasseColumnKey,
             order: searchFilterStore.organisationenSortOrder ?? SortOrder.Asc,
           }"
-          @onHandleRowClick="
+          :total-items="totalKlassenCount"
+          :items-per-page="searchFilterStore.klassenPerPage"
+          item-value-path="id"
+          @on-handle-row-click="
             (event: PointerEvent, item: TableRow<unknown>) =>
               navigateToKlassenDetails(event, item as TableRow<Organisation>)
           "
-          @onItemsPerPageUpdate="getPaginatedKlassenWithLimit"
-          @onPageUpdate="setKlassenPage"
-          @onTableUpdate="handleTableSorting"
-          :totalItems="totalKlassenCount"
-          :itemsPerPage="searchFilterStore.klassenPerPage"
-          item-value-path="id"
+          @on-items-per-page-update="getPaginatedKlassenWithLimit"
+          @on-page-update="setKlassenPage"
+          @on-table-update="handleTableSorting"
         >
-          <template v-slot:[`item.schuleDetails`]="{ item }">
+          <template #[`item.schuleDetails`]="{ item }">
             <div
               class="ellipsis-wrapper"
               :title="item.schuleDetails"
@@ -400,17 +399,17 @@
               {{ item.schuleDetails }}
             </div>
           </template>
-          <template v-slot:[`item.actions`]="{ item }">
+          <template #[`item.actions`]="{ item }">
             <KlasseDelete
               :klassenname="item.name"
-              :klassenId="item.id"
+              :klassen-id="item.id"
               :schulname="item.schuleDetails ?? ''"
-              :errorCode="organisationStore.errorCode"
-              :useIconActivator="true"
-              :isLoading="organisationStore.loading"
-              @onDeleteKlasse="deleteKlasse(item.id)"
-              @onClose="handleKlasseDeleteClose"
-            ></KlasseDelete>
+              :error-code="organisationStore.errorCode"
+              :use-icon-activator="true"
+              :is-loading="organisationStore.loading"
+              @on-delete-klasse="deleteKlasse(item.id)"
+              @on-close="handleKlasseDeleteClose"
+            />
           </template>
         </ResultTable>
       </template>

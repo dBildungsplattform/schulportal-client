@@ -55,7 +55,9 @@ export function isKopersRolle(
   selectedRolleIds: string[] | undefined,
   translatedRollen: TranslatedRolleWithAttrs[] | undefined,
 ): boolean {
-  if (!selectedRolleIds || selectedRolleIds.length === 0) return false;
+  if (!selectedRolleIds || selectedRolleIds.length === 0) {
+    return false;
+  }
   return (
     translatedRollen?.some(
       (r: TranslatedRolleWithAttrs) =>
@@ -73,7 +75,10 @@ export const befristungSchema = (t: (key: string) => string): StringSchema =>
       const {
         selectedRolle,
         selectedBefristungOption,
-      }: { selectedRolle: string | undefined; selectedBefristungOption: string | undefined } = this.parent;
+      }: { selectedRolle: string | undefined; selectedBefristungOption: string | undefined } = this.parent as {
+        selectedRolle: string | undefined;
+        selectedBefristungOption: string | undefined;
+      };
 
       if (!selectedRolle || selectedBefristungOption !== undefined) {
         return true; // Not required in this case

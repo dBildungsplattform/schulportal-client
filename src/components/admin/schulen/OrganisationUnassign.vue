@@ -26,7 +26,7 @@
   const props: Props = defineProps<Props>();
   const emit: Emits = defineEmits<Emits>();
 
-  async function closeDialog(finished: boolean): Promise<void> {
+  function closeDialog(finished: boolean): void {
     bulkOperationStore.resetState();
     emit('update:dialogExit', finished);
   }
@@ -50,7 +50,7 @@
 
 <template>
   <v-dialog
-    :modelValue="props.isDialogVisible"
+    :model-value="props.isDialogVisible"
     persistent
   >
     <LayoutCard
@@ -59,8 +59,8 @@
     >
       <!-- Initial block -->
       <v-container
-        class="mt-8 mb-4"
         v-if="bulkOperationStore.currentOperation?.progress === 0"
+        class="mt-8 mb-4"
       >
         <v-row class="text-body bold justify-center">
           <v-col
@@ -96,7 +96,7 @@
                 small
                 color="#1EAE9C"
                 icon="mdi-check-circle"
-              ></v-icon>
+              />
             </v-col>
           </v-row>
           <p class="mt-2 text-center">
@@ -117,7 +117,7 @@
               class="mr-2"
               icon="mdi-alert-circle-outline"
               size="small"
-            ></v-icon>
+            />
             <span
               class="subtitle-2"
               data-testid="org-unassign-progressing-notice"
@@ -129,12 +129,12 @@
         <!-- Progress Bar -->
         <v-progress-linear
           class="mt-5"
-          :modelValue="bulkOperationStore.currentOperation?.progress"
+          :model-value="bulkOperationStore.currentOperation?.progress"
           color="primary"
           height="25"
           data-testid="org-unassign-progressbar"
         >
-          <template v-slot:default="{ value }">
+          <template #default="{ value }">
             <strong class="text-white">{{ Math.ceil(value) }}%</strong>
           </template>
         </v-progress-linear>
@@ -151,8 +151,8 @@
               v-if="bulkOperationStore.currentOperation?.progress === 100"
               :block="mdAndDown"
               class="secondary"
-              @click="closeDialog(true)"
               data-testid="org-unassign-close-button"
+              @click="closeDialog(true)"
             >
               {{ t('close') }}
             </v-btn>
@@ -160,8 +160,8 @@
               v-else-if="bulkOperationStore.currentOperation?.progress === 0"
               :block="mdAndDown"
               class="secondary"
-              @click="closeDialog(false)"
               data-testid="org-unassign-discard-button"
+              @click="closeDialog(false)"
             >
               {{ t('cancel') }}
             </v-btn>
@@ -176,9 +176,9 @@
               :block="mdAndDown"
               :disabled="bulkOperationStore.currentOperation?.isRunning"
               class="primary"
-              @click="handleOrgUnassign()"
               data-testid="org-unassign-submit-button"
               type="submit"
+              @click="handleOrgUnassign()"
             >
               {{ t('admin.person.bulkUnassignOrganisation.cancelZuordnung') }}
             </v-btn>
@@ -189,9 +189,10 @@
   </v-dialog>
   <template v-if="showErrorDialog">
     <PersonBulkError
-      :bulkOperationName="$t('admin.person.bulkUnassignOrganisation.cancelZuordnung')"
-      :isDialogVisible="showErrorDialog"
-      @update:isDialogVisible="
+      :bulk-operation-name="$t('admin.person.bulkUnassignOrganisation.cancelZuordnung')"
+      :is-dialog-visible="showErrorDialog"
+      :errors="bulkErrorList"
+      @update:is-dialog-visible="
         (val: boolean) => {
           showErrorDialog = val;
           if (!val) {
@@ -199,7 +200,6 @@
           }
         }
       "
-      :errors="bulkErrorList"
     />
   </template>
 </template>

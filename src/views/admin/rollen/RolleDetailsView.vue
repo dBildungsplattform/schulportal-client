@@ -46,7 +46,7 @@
     type Router,
   } from 'vue-router';
   import { useDisplay } from 'vuetify';
-  import type { SystemRechtResponse } from '@/api-client/generated';
+  import type { RollenArt, SystemRechtResponse } from '@/api-client/generated';
 
   const route: RouteLocationNormalizedLoaded = useRoute();
   const router: Router = useRouter();
@@ -130,7 +130,9 @@
 
   const isFormDirty: ComputedRef<boolean> = computed(() => (isEditActive.value ? getDirtyState(formContext) : false));
 
-  let blockedNext: () => void = () => {};
+  let blockedNext: () => void = () => {
+    /* empty */
+  };
 
   const serviceProviders: ComputedRef<
     {
@@ -151,7 +153,7 @@
     rolleStore.errorCode = '';
   }
 
-  const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = formContext.handleSubmit(async () => {
+  const onSubmit: (e?: Event) => Promise<Promise<void> | undefined> = formContext.handleSubmit(async () => {
     if (selectedRollenName.value && selectedAdministrationsebene.value && selectedRollenArt.value) {
       if (rolleStore.currentRolle) {
         try {
@@ -233,7 +235,9 @@
   }
 
   function preventNavigation(event: BeforeUnloadEvent): void {
-    if (!isFormDirty.value) return;
+    if (!isFormDirty.value) {
+      return;
+    }
     event.preventDefault();
     /* Chrome requires returnValue to be set. */
     event.returnValue = '';
@@ -278,7 +282,7 @@
 
     // Set the initial values using the computed properties
     formContext.setFieldValue('selectedAdministrationsebene', organisationStore.currentOrganisation?.id);
-    formContext.setFieldValue('selectedRollenArt', translatedRollenart.value);
+    formContext.setFieldValue('selectedRollenArt', translatedRollenart.value as RollenArt);
     formContext.setFieldValue('selectedRollenName', rolleStore.currentRolle?.name);
     formContext.setFieldValue(
       'selectedMerkmale',
@@ -334,45 +338,45 @@
       :closable="true"
       data-testid="rolle-details-card"
       :header="$t('admin.rolle.edit')"
-      @onCloseClicked="navigateToRolleTable"
       :padded="true"
-      :showCloseText="true"
+      :show-close-text="true"
+      @on-close-clicked="navigateToRolleTable"
     >
       <template v-if="!rolleStore.updatedRolle">
         <v-container>
           <div v-if="rolleStore.currentRolle">
             <RolleForm
-              :administrationsebenen="administrationsebenen"
-              :errorCode="rolleStore.errorCode"
-              :onHandleConfirmUnsavedChanges="handleConfirmUnsavedChanges"
-              :onHandleDiscard="navigateToRolleTable"
-              :onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
-              :onSubmit="onSubmit"
-              :isEditActive="isEditActive"
-              :isLoading="rolleStore.loading"
-              :readonly="true"
               ref="rolle-form"
-              v-model:selectedAdministrationsebene="selectedAdministrationsebene"
-              :selectedAdministrationsebeneProps="selectedAdministrationsebeneProps"
-              v-model:selectedRollenArt="selectedRollenArt"
-              :selectedRollenArtProps="selectedRollenArtProps"
-              v-model:selectedRollenName="selectedRollenName"
-              :selectedRollenNameProps="selectedRollenNameProps"
-              v-model:selectedMerkmale="selectedMerkmale"
-              :selectedMerkmaleProps="selectedMerkmaleProps"
-              v-model:selectedServiceProviders="selectedServiceProviders"
-              :selectedServiceProvidersProps="selectedServiceProvidersProps"
-              v-model:selectedSystemRechte="selectedSystemRechte"
-              :selectedSystemRechteProps="selectedSystemRechteProps"
-              :serviceProviders="serviceProviders"
-              :translatedMerkmale="allMerkmale"
-              :translatedSystemrechte="allSystemrechte"
-              :showUnsavedChangesDialog="showUnsavedChangesDialog"
+              v-model:selected-administrationsebene="selectedAdministrationsebene"
+              v-model:selected-rollen-art="selectedRollenArt"
+              v-model:selected-rollen-name="selectedRollenName"
+              v-model:selected-merkmale="selectedMerkmale"
+              v-model:selected-service-providers="selectedServiceProviders"
+              v-model:selected-system-rechte="selectedSystemRechte"
+              :administrationsebenen="administrationsebenen"
+              :error-code="rolleStore.errorCode"
+              :on-handle-confirm-unsaved-changes="handleConfirmUnsavedChanges"
+              :on-handle-discard="navigateToRolleTable"
+              :on-show-dialog-change="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
+              :on-submit="onSubmit"
+              :is-edit-active="isEditActive"
+              :is-loading="rolleStore.loading"
+              :readonly="true"
+              :selected-administrationsebene-props="selectedAdministrationsebeneProps"
+              :selected-rollen-art-props="selectedRollenArtProps"
+              :selected-rollen-name-props="selectedRollenNameProps"
+              :selected-merkmale-props="selectedMerkmaleProps"
+              :selected-service-providers-props="selectedServiceProvidersProps"
+              :selected-system-rechte-props="selectedSystemRechteProps"
+              :service-providers="serviceProviders"
+              :translated-merkmale="allMerkmale"
+              :translated-systemrechte="allSystemrechte"
+              :show-unsaved-changes-dialog="showUnsavedChangesDialog"
             >
               <!-- Error Message Display -->
               <SpshAlert
                 v-if="!!rolleStore.errorCode"
-                dataTestIdPrefix="rolle-details-error"
+                data-test-id-prefix="rolle-details-error"
                 :model-value="!!rolleStore.errorCode"
                 :title="
                   organisationStore.errorCode === 'UNSPECIFIED_ERROR'
@@ -386,10 +390,10 @@
                     ? $t('admin.rolle.loadingErrorText')
                     : $t(`admin.rolle.errors.${rolleStore.errorCode}`)
                 "
-                :showButton="true"
-                :buttonText="alertButtonText"
-                :buttonAction="alertButtonAction"
-                @update:modelValue="handleAlertClose"
+                :show-button="true"
+                :button-text="alertButtonText"
+                :button-action="alertButtonAction"
+                @update:model-value="handleAlertClose"
               />
             </RolleForm>
             <template v-if="!rolleStore.errorCode">
@@ -398,7 +402,7 @@
                 class="border-opacity-100 rounded"
                 color="#E5EAEF"
                 thickness="5px"
-              ></v-divider>
+              />
               <div
                 v-if="!isEditActive"
                 class="d-flex justify-sm-end"
@@ -411,12 +415,11 @@
                   >
                     <div class="d-flex justify-sm-end">
                       <RolleDelete
-                        :errorCode="rolleStore.errorCode"
+                        :error-code="rolleStore.errorCode"
                         :rolle="rolleStore.currentRolle"
-                        :isLoading="rolleStore.loading"
-                        @onDeleteRolle="deleteRolle(currentRolleId)"
-                      >
-                      </RolleDelete>
+                        :is-loading="rolleStore.loading"
+                        @on-delete-rolle="deleteRolle(currentRolleId)"
+                      />
                     </div>
                   </v-col>
                   <v-col
@@ -449,8 +452,8 @@
                     <v-btn
                       class="secondary"
                       data-testid="rolle-edit-cancel-button"
-                      @click="handleCancel"
                       :block="mdAndDown"
+                      @click="handleCancel"
                     >
                       {{ $t('cancel') }}
                     </v-btn>
@@ -463,9 +466,9 @@
                     <v-btn
                       class="primary"
                       data-testid="rolle-changes-save-button"
-                      @click="onSubmit"
                       :block="mdAndDown"
                       :disabled="rolleStore.loading"
+                      @click="onSubmit"
                     >
                       {{ $t('save') }}
                     </v-btn>
@@ -475,16 +478,16 @@
             </template>
           </div>
           <div v-else-if="rolleStore.loading">
-            <v-progress-circular indeterminate></v-progress-circular>
+            <v-progress-circular indeterminate />
           </div>
         </v-container>
       </template>
       <!-- Result template on success after submit  -->
       <template v-if="rolleStore.updatedRolle && !rolleStore.errorCode">
         <RolleSuccessTemplate
-          :successMessage="$t('admin.rolle.rolleUpdatedSuccessfully')"
-          :followingRolleDataCreated="$t('admin.followingDataCreated')"
-          :createdRolleData="[
+          :success-message="$t('admin.rolle.rolleUpdatedSuccessfully')"
+          :following-rolle-data-created="$t('admin.followingDataCreated')"
+          :created-rolle-data="[
             { label: $t('admin.rolle.rollenname'), value: rolleStore.updatedRolle?.name, testId: 'updated-rolle-name' },
             {
               label: $t('admin.rolle.merkmale'),
@@ -502,12 +505,12 @@
               testId: 'updated-rolle-systemrechte',
             },
           ]"
-          :backButtonText="$t('nav.backToDetails')"
-          :createAnotherRolleButtonText="$t('admin.rolle.createAnother')"
-          :showCreateAnotherRolleButton="false"
-          backButtonTestId="back-to-details-button"
-          createAnotherButtonTestId="create-another-rolle-button"
-          @OnNavigateBackToRolleManagement="router.go(0)"
+          :back-button-text="$t('nav.backToDetails')"
+          :create-another-rolle-button-text="$t('admin.rolle.createAnother')"
+          :show-create-another-rolle-button="false"
+          back-button-test-id="back-to-details-button"
+          create-another-button-test-id="create-another-rolle-button"
+          @on-navigate-back-to-rolle-management="router.go(0)"
         />
       </template>
     </LayoutCard>

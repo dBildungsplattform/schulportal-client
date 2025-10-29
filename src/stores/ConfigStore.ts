@@ -12,7 +12,7 @@ type ConfigState = {
   loading: boolean;
 };
 
-type ConfigGetters = {};
+type ConfigGetters = object;
 type ConfigActions = {
   getFeatureFlags: () => Promise<void>;
 };

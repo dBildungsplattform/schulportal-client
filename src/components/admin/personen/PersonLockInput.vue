@@ -29,7 +29,7 @@
   }>();
 
   const localBefristung: Ref<string | undefined> = ref(props.befristung);
-  const selectedRadioButton: Ref<string> = ref(
+  const selectedRadioButton: Ref<RadioButtonSelect> = ref(
     props.befristung ? RadioButtonSelect.BEFRISTET : RadioButtonSelect.UNBEFRISTET,
   );
 
@@ -38,7 +38,7 @@
     emit('update:befristung', value);
   };
 
-  watch(selectedRadioButton, (newVal: string) => {
+  watch(selectedRadioButton, (newVal: RadioButtonSelect) => {
     if (newVal === RadioButtonSelect.UNBEFRISTET) {
       emit('handleSelectedRadioButtonChange', true);
       localBefristung.value = '';
@@ -58,21 +58,21 @@
         class="text-sm-center text-body"
       >
         <v-radio-group
-          data-testid="befristung-radio-group"
           v-model="selectedRadioButton"
+          data-testid="befristung-radio-group"
         >
           <v-radio
             data-testid="unbefristet-radio-button"
             :label="$t('admin.befristung.unlimited')"
             :value="RadioButtonSelect.UNBEFRISTET"
             :color="'primary'"
-          ></v-radio>
+          />
           <v-radio
             data-testid="befristet-radio-button"
             :label="$t('admin.befristung.limited')"
             :value="RadioButtonSelect.BEFRISTET"
             :color="'primary'"
-          ></v-radio>
+          />
         </v-radio-group>
       </v-col>
       <v-col
@@ -83,15 +83,15 @@
       >
         <v-text-field
           v-if="!(selectedRadioButton === RadioButtonSelect.UNBEFRISTET)"
+          v-model="localBefristung"
           density="compact"
           variant="outlined"
           data-testid="befristung-input"
-          v-model="localBefristung"
           v-bind="befristungProps"
           placeholder="TT.MM.JJJJ"
           color="primary"
-          @update:modelValue="handleBefristungChange"
-        ></v-text-field>
+          @update:model-value="handleBefristungChange"
+        />
       </v-col>
     </v-row>
   </div>

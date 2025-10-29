@@ -25,7 +25,6 @@ export type ServiceProvider = {
 
 export { ServiceProviderMerkmal };
 
-export type ManageableServiceProvider = {};
 export type ManageableServiceProviderListEntry = {
   id: string;
   kategorie: ServiceProviderKategorie;
@@ -51,7 +50,7 @@ type ServiceProviderState = {
   loading: boolean;
 };
 
-type ServiceProviderGetters = {};
+type ServiceProviderGetters = object;
 type ServiceProviderActions = {
   getAllServiceProviders: () => Promise<void>;
   getAvailableServiceProviders: () => Promise<void>;

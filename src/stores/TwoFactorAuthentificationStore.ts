@@ -22,7 +22,7 @@ type TwoFactorState = {
   required: boolean;
 };
 
-type TwoFactorGetters = {};
+type TwoFactorGetters = object;
 type TwoFactorActions = {
   resetState: () => void;
   get2FAState: (personId: string) => Promise<void>;
@@ -83,10 +83,10 @@ export const useTwoFactorAuthentificationStore: StoreDefinition<
         }
 
         switch (twoFactorState.tokenKind) {
-          case TokenKind.hardware:
+          case 'hardware':
             this.tokenKind = TokenKind.hardware;
             break;
-          case TokenKind.software:
+          case 'software':
             this.tokenKind = TokenKind.software;
             break;
           default:

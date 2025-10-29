@@ -17,7 +17,7 @@ export type UserLock = {
   locked_by: string;
   created_at: string;
   locked_until: string;
-  lock_occasion: string;
+  lock_occasion: PersonLockOccasion;
 };
 
 export function parseUserLock(unparsedArray: object[]): UserLock[] {
@@ -26,17 +26,17 @@ export function parseUserLock(unparsedArray: object[]): UserLock[] {
   for (const unparsed of unparsedArray) {
     const result: Partial<UserLock> = {};
 
-    if (LockKeys.LockOccasion in unparsed && unparsed[LockKeys.LockOccasion] == PersonLockOccasion.MANUELL_GESPERRT) {
+    if (LockKeys.LockOccasion in unparsed && unparsed[LockKeys.LockOccasion] === PersonLockOccasion.MANUELL_GESPERRT) {
       // Process "MANUELL_GESPERRT" entries
       if (LockKeys.LockedBy in unparsed) {
-        result.locked_by = '' + unparsed[LockKeys.LockedBy];
+        result.locked_by = '' + (unparsed[LockKeys.LockedBy] as string);
       }
       if (LockKeys.CreatedAt in unparsed) {
-        result.created_at = '' + unparsed[LockKeys.CreatedAt];
+        result.created_at = '' + (unparsed[LockKeys.CreatedAt] as string);
         result.created_at = formatDateDigitsToGermanDate(new Date(result.created_at));
       }
       if (LockKeys.LockedUntil in unparsed) {
-        result.locked_until = '' + unparsed[LockKeys.LockedUntil];
+        result.locked_until = '' + (unparsed[LockKeys.LockedUntil] as string);
         // Parse the UTC date
         const utcDate: Date = new Date(result.locked_until);
 
@@ -46,12 +46,12 @@ export function parseUserLock(unparsedArray: object[]): UserLock[] {
         }
         result.locked_until = formatDateDigitsToGermanDate(utcDate);
       }
-      result.lock_occasion = '' + unparsed[LockKeys.LockOccasion];
+      result.lock_occasion = unparsed[LockKeys.LockOccasion] as PersonLockOccasion;
     } else if (
       LockKeys.LockOccasion in unparsed &&
-      unparsed[LockKeys.LockOccasion] == PersonLockOccasion.KOPERS_GESPERRT
+      unparsed[LockKeys.LockOccasion] === PersonLockOccasion.KOPERS_GESPERRT
     ) {
-      result.lock_occasion = '' + unparsed[LockKeys.LockOccasion];
+      result.lock_occasion = PersonLockOccasion.KOPERS_GESPERRT;
     }
 
     if (Object.keys(result).length > 0) {

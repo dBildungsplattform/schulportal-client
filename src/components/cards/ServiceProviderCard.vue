@@ -28,22 +28,24 @@
             <v-avatar
               v-if="logoUrl"
               rounded="0"
-              ><v-img
+            >
+              <v-img
                 alt="provider-logo"
                 class="service-provider-logo"
                 :src="logoUrl"
-              ></v-img
-            ></v-avatar>
+              />
+            </v-avatar>
             <!-- Fallback logo -->
             <v-avatar
               v-else
               rounded="0"
-              ><v-img
+            >
+              <v-img
                 alt="schulportal-logo"
                 class="service-provider-logo"
                 :src="SchulPortalLogo"
-              ></v-img
-            ></v-avatar>
+              />
+            </v-avatar>
           </div>
         </v-col>
         <v-col
@@ -52,8 +54,8 @@
         >
           <span data-testid="card-title">{{ title }}</span>
         </v-col>
-      </v-row></v-card-text
-    >
+      </v-row>
+    </v-card-text>
   </v-card>
 </template>
 
