@@ -28,7 +28,7 @@
     type Organisation,
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
-  import { EmailStatus, usePersonStore, type Personendatensatz, type PersonStore } from '@/stores/PersonStore';
+  import { EmailStatus, usePersonStore, type PersonStore } from '@/stores/PersonStore';
   import {
     mapZuordnungToPersonenkontextUpdate,
     OperationContext,
@@ -1600,7 +1600,7 @@
     twoFactorAuthentificationStore.resetState();
 
     const twoFARequirementPromise: Promise<void> = twoFactorAuthentificationStore.get2FARequirement(currentPersonId);
-    const personByIdPromise: Promise<Personendatensatz> = personStore.getPersonById(currentPersonId);
+    const personByIdPromise: Promise<void> = personStore.getPersonById(currentPersonId);
     const personUebersichtPromise: Promise<void> = personStore.getPersonenuebersichtById(currentPersonId);
     const workflowStepPromise: Promise<void> = personenkontextStore.processWorkflowStep({
       personId: currentPersonId,

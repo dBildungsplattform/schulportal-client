@@ -11,7 +11,6 @@
     RollenSystemRecht,
     useRolleStore,
     type RolleFormType,
-    type RolleResponse,
     type RolleStore,
   } from '@/stores/RolleStore';
   import {
@@ -248,9 +247,9 @@
           merkmaleToSubmit,
           systemrechteToSubmit,
         )
-        .then(async (rolleResponse: RolleResponse) => {
+        .then(async () => {
           if (selectedServiceProviders.value && selectedServiceProviders.value.length > 0) {
-            await rolleStore.updateServiceProviderInRolle(rolleResponse.id, {
+            await rolleStore.updateServiceProviderInRolle(rolleStore.createdRolle?.id ?? '', {
               serviceProviderIds: selectedServiceProviders.value,
               version: rolleStore.currentRolle?.version || 1,
             });

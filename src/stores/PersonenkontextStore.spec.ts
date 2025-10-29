@@ -418,7 +418,7 @@ describe('PersonenkontextStore', () => {
       const getPersonenkontextRolleWithFilterPromise: Promise<void> =
         personenkontextStore.getPersonenkontextRolleWithFilter('str', 2);
       expect(personenkontextStore.loading).toBe(true);
-      await rejects(getPersonenkontextRolleWithFilterPromise);
+      await getPersonenkontextRolleWithFilterPromise;
       expect(personenkontextStore.errorCode).toEqual('UNSPECIFIED_ERROR');
       expect(personenkontextStore.loading).toBe(false);
     });
@@ -430,7 +430,7 @@ describe('PersonenkontextStore', () => {
       const getPersonenkontextRolleWithFilterPromise: Promise<void> =
         personenkontextStore.getPersonenkontextRolleWithFilter('str', 2);
       expect(personenkontextStore.loading).toBe(true);
-      await rejects(getPersonenkontextRolleWithFilterPromise);
+      await getPersonenkontextRolleWithFilterPromise;
       expect(personenkontextStore.errorCode).toEqual('some mock server error');
       expect(personenkontextStore.loading).toBe(false);
     });

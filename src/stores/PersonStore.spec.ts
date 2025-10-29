@@ -334,7 +334,7 @@ describe('PersonStore', () => {
       mockadapter.onGet('/api/personen/2345').replyOnce(500, 'some mock server error');
       const getPersonByIdPromise: Promise<void> = personStore.getPersonById('2345');
       expect(personStore.loading).toBe(true);
-      await rejects(getPersonByIdPromise);
+      await getPersonByIdPromise;
       expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR');
       expect(personStore.loading).toBe(false);
     });
