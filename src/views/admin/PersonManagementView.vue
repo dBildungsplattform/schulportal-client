@@ -31,11 +31,11 @@
   import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
   import { type TranslatedObject } from '@/types.d';
   import { SortOrder } from '@/utils/sorting';
-  import { type ComputedRef, type Ref, computed, onMounted, ref, watch } from 'vue';
+  import { type ComputedRef, type Ref, computed, onMounted, ref, watch, type ComponentPublicInstance } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import { type Router, useRouter } from 'vue-router';
 
-  const searchFieldComponent: Ref = ref();
+  const searchFieldComponent: Ref<{ searchFilter?: string } | null> = ref(null);
 
   const router: Router = useRouter();
   const organisationStore: OrganisationStore = useOrganisationStore();
@@ -65,7 +65,10 @@
     }
     return persons;
   });
-  const resultTable: Ref = ref(null);
+
+  // Add the correct type for ResultTable's exposed methods if available
+  type ResultTableInstance = ComponentPublicInstance<{ resetSelection: () => void }>;
+  const resultTable: Ref<ResultTableInstance | null> = ref(null);
 
   type ReadonlyHeaders = Headers;
   export type PersonRow = {
@@ -299,7 +302,9 @@
 
   function resetSearchAndFilter(): void {
     searchFilter.value = '';
-    searchFieldComponent.value.searchFilter = '';
+    if (searchFieldComponent.value) {
+      searchFieldComponent.value.searchFilter = '';
+    }
     searchFilterStore.setKlasseFilterForPersonen([]);
     searchFilterStore.setRolleFilterForPersonen([]);
     searchFilterStore.setRolleFilterWithObjectsForPersonen([], []);
@@ -512,7 +517,7 @@
     if (finished) {
       selectedPersonIds.value = [];
       await getPaginatedPersonen(searchFilterStore.personenPage);
-      resultTable.value.resetSelection();
+      resultTable.value?.resetSelection();
     }
   };
 
@@ -527,7 +532,7 @@
     if (finished) {
       selectedPersonIds.value = [];
       await getPaginatedPersonen(searchFilterStore.personenPage);
-      resultTable.value.resetSelection();
+      resultTable.value?.resetSelection();
     }
   };
 
@@ -537,7 +542,7 @@
     if (finished) {
       selectedPersonIds.value = [];
       await getPaginatedPersonen(searchFilterStore.personenPage);
-      resultTable.value.resetSelection();
+      resultTable.value?.resetSelection();
     }
   };
 
@@ -547,7 +552,7 @@
     if (finished) {
       selectedPersonIds.value = [];
       await getPaginatedPersonen(searchFilterStore.personenPage);
-      resultTable.value.resetSelection();
+      resultTable.value?.resetSelection();
     }
   };
 

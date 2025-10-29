@@ -38,7 +38,7 @@ export type ImportState = {
   importedUsersPage: number;
 };
 
-type ImportGetters = {};
+type ImportGetters = object;
 type ImportActions = {
   executePersonenImport: (importVorgangId: string) => Promise<void>;
   uploadPersonenImportFile: (organisationId: string, rolleId: string, file: File) => Promise<void>;

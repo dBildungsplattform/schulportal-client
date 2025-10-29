@@ -27,11 +27,9 @@
 
   const router: Router = useRouter();
 
-  type TableHeaders = Headers;
-
   const klasseColumnKey: string = 'name';
 
-  const defaultHeaders: TableHeaders = [
+  let defaultHeaders: Mutable<Headers> = [
     {
       title: t('admin.klasse.klasse'),
       key: klasseColumnKey,
@@ -46,8 +44,8 @@
       width: '250px',
     },
   ];
-  // Define headers as a mutable array
-  let headers = ref<Mutable<TableHeaders>>([...defaultHeaders]);
+
+  const headers: Ref<Mutable<Headers>> = ref(defaultHeaders) as Ref<Mutable<Headers>>;
 
   const { hasAutoselectedSchule }: ReturnType<typeof useAutoselectedSchule> = useAutoselectedSchule([
     RollenSystemRecht.KlassenVerwalten,
@@ -206,7 +204,7 @@
     hasAutoselectedSchule,
     () => {
       if (hasAutoselectedSchule.value) {
-        headers.value = [...defaultHeaders];
+        return;
       } else {
         headers.value = [
           {
@@ -216,7 +214,8 @@
             sortable: false,
             width: '350px',
           },
-          ...defaultHeaders,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          ...headers.value,
         ];
       }
     },

@@ -100,7 +100,9 @@
     },
   });
 
-  const formContext: FormContext<PersonSearchForm> = useForm({ validationSchema: schema });
+  const formContext: FormContext<PersonSearchForm, PersonSearchForm> = useForm<PersonSearchForm, PersonSearchForm>({
+    validationSchema: schema,
+  });
 
   const [selectedKopers, selectedKopersProps]: [
     Ref<string | undefined>,

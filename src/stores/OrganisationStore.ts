@@ -140,7 +140,7 @@ export enum SchuleType {
   UNASSIGNED = 'unassigned',
 }
 
-type OrganisationGetters = {};
+type OrganisationGetters = object;
 type OrganisationActions = {
   getAllOrganisationen: (filter?: OrganisationenFilter) => Promise<void>;
   getFilteredKlassen(filter?: OrganisationenFilter): Promise<void>;
@@ -590,7 +590,7 @@ export const useOrganisationStore: StoreDefinition<
       try {
         const response: AxiosResponse<OrganisationRootChildrenResponse> =
           await organisationApi.organisationControllerGetRootChildren();
-        this.schultraeger = Object.values(response.data);
+        this.schultraeger = Object.values(response.data) as Organisation[];
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'SCHULTRAEGER_ERROR');
       }

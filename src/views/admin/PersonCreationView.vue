@@ -159,7 +159,10 @@
         const {
           selectedRollen,
           selectedBefristungOption,
-        }: { selectedRollen: string[]; selectedBefristungOption: string | undefined } = this.parent;
+        }: { selectedRollen: string[]; selectedBefristungOption: string | undefined } = this.parent as {
+          selectedRollen: string[];
+          selectedBefristungOption: string | undefined;
+        };
 
         // If befristungOption is defined, befristung is not required
         if (selectedBefristungOption !== undefined) {
@@ -459,8 +462,8 @@
     }
     // We save a copy of the selected values because they are not available anymore since we reset the form right after submitting
     // This will then be used to display the organisation again in the success template after receiving the orga ID and rolle ID back from the BE.
-    selectedOrgaCache.value = JSON.parse(JSON.stringify(selectedOrganisation.value));
-    selectedRolleCache.value = JSON.parse(JSON.stringify(selectedRollen.value));
+    selectedOrgaCache.value = JSON.parse(JSON.stringify(selectedOrganisation.value)) as string | undefined;
+    selectedRolleCache.value = JSON.parse(JSON.stringify(selectedRollen.value)) as string[] | undefined;
     await personenkontextStore.createPersonWithKontexte(bodyParams);
     formContext.resetForm();
     hasNoKopersNr.value = false;

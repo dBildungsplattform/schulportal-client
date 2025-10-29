@@ -71,7 +71,7 @@ type AuthActions = {
   initializeAuthStatus: () => Promise<void>;
 };
 
-type AuthGetters = {};
+type AuthGetters = object;
 
 export type AuthStore = Store<'authStore', AuthState, AuthGetters, AuthActions>;
 

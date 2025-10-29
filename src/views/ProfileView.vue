@@ -114,7 +114,7 @@
 
   const groupedZuordnungen: ComputedRef<Map<string, Zuordnung[]>> = computed(() => {
     if (!personStore.personenuebersicht) {
-      return new Map();
+      return new Map<string, Zuordnung[]>();
     }
     return groupZuordnungen(personStore.personenuebersicht.zuordnungen);
   });

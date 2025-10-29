@@ -29,7 +29,7 @@
   }>();
 
   const localBefristung: Ref<string | undefined> = ref(props.befristung);
-  const selectedRadioButton: Ref<string> = ref(
+  const selectedRadioButton: Ref<RadioButtonSelect> = ref(
     props.befristung ? RadioButtonSelect.BEFRISTET : RadioButtonSelect.UNBEFRISTET,
   );
 
@@ -38,7 +38,7 @@
     emit('update:befristung', value);
   };
 
-  watch(selectedRadioButton, (newVal: string) => {
+  watch(selectedRadioButton, (newVal: RadioButtonSelect) => {
     if (newVal === RadioButtonSelect.UNBEFRISTET) {
       emit('handleSelectedRadioButtonChange', true);
       localBefristung.value = '';

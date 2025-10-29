@@ -101,11 +101,11 @@ export type LandesbediensteterFilter = {
   nachname?: string;
 };
 
-type PersonGetters = {};
+type PersonGetters = object;
 type PersonActions = {
   resetState: () => void;
   getAllPersons: (filter: PersonFilter) => Promise<void>;
-  getPersonById: (personId: string) => Promise<Personendatensatz>;
+  getPersonById: (personId: string) => Promise<void>;
   resetPassword: (personId: string) => Promise<void>;
   resetDevicePassword: (personId?: string) => Promise<void>;
   deletePersonById: (personId: string) => Promise<void>;
@@ -210,17 +210,15 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       }
     },
 
-    async getPersonById(personId: string): Promise<Personendatensatz> {
+    async getPersonById(personId: string): Promise<void> {
       this.loading = true;
       this.errorCode = '';
       try {
         const { data }: AxiosResponse<PersonendatensatzResponse, unknown> =
           await personenApi.personControllerFindPersonById(personId);
         this.currentPerson = mapPersonendatensatzResponseToPersonendatensatz(data);
-        return this.currentPerson;
       } catch (error) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
-        return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
       }
@@ -273,7 +271,6 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
         await this.getPersonById(personId);
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
-        return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
       }

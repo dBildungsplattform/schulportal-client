@@ -17,7 +17,7 @@ export type UserLock = {
   locked_by: string;
   created_at: string;
   locked_until: string;
-  lock_occasion: string;
+  lock_occasion: PersonLockOccasion;
 };
 
 export function parseUserLock(unparsedArray: object[]): UserLock[] {
@@ -46,12 +46,12 @@ export function parseUserLock(unparsedArray: object[]): UserLock[] {
         }
         result.locked_until = formatDateDigitsToGermanDate(utcDate);
       }
-      result.lock_occasion = '' + unparsed[LockKeys.LockOccasion];
+      result.lock_occasion = unparsed[LockKeys.LockOccasion] as PersonLockOccasion;
     } else if (
       LockKeys.LockOccasion in unparsed &&
       unparsed[LockKeys.LockOccasion] === PersonLockOccasion.KOPERS_GESPERRT
     ) {
-      result.lock_occasion = '' + unparsed[LockKeys.LockOccasion];
+      result.lock_occasion = PersonLockOccasion.KOPERS_GESPERRT;
     }
 
     if (Object.keys(result).length > 0) {

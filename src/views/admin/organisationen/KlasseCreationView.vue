@@ -62,7 +62,9 @@
   };
 
   function resetForm(): void {
-    formRef.value?.reset();
+    if (formRef.value && typeof (formRef.value as { reset?: () => void }).reset === 'function') {
+      (formRef.value as { reset: () => void }).reset();
+    }
   }
 
   function preventNavigation(event: BeforeUnloadEvent): void {

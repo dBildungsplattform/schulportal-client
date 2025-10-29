@@ -16,7 +16,7 @@ export type MasterDataState = {
   status: MasterDataStatus;
 };
 
-type MasterDataGetters = {};
+type MasterDataGetters = object;
 type MasterDataActions = {
   initialise: () => Promise<void>;
   isInitialized: () => boolean;

@@ -452,7 +452,7 @@ describe('PersonenkontextStore', () => {
       const mockResponse: PersonendatensatzResponse = mockPerson;
 
       mockadapter.onPost('/api/personenkontext-workflow').replyOnce(201, mockResponse);
-      const createPersonPromise: Promise<PersonendatensatzResponse> = personenkontextStore.createPersonWithKontexte({
+      const createPersonPromise: Promise<void> = personenkontextStore.createPersonWithKontexte({
         familienname: 'Cena',
         vorname: 'Randy',
         createPersonenkontexte: [
@@ -463,14 +463,14 @@ describe('PersonenkontextStore', () => {
         ],
       });
       expect(personenkontextStore.loading).toBe(true);
-      const createdPerson: PersonendatensatzResponse = await createPersonPromise;
-      expect(createdPerson).toEqual(mockPerson);
+      await createPersonPromise;
+      expect(personenkontextStore.createdPersonWithKontext).toEqual(mockPerson);
       expect(personenkontextStore.loading).toBe(false);
     });
 
     it('should handle string error', async () => {
       mockadapter.onPost('/api/personenkontext-workflow').replyOnce(500, 'some error');
-      const createPersonPromise: Promise<PersonendatensatzResponse> = personenkontextStore.createPersonWithKontexte({
+      const createPersonPromise: Promise<void> = personenkontextStore.createPersonWithKontexte({
         familienname: 'Copeland',
         vorname: 'Christian',
         createPersonenkontexte: [
@@ -481,14 +481,14 @@ describe('PersonenkontextStore', () => {
         ],
       });
       expect(personenkontextStore.loading).toBe(true);
-      await rejects(createPersonPromise);
+      await createPersonPromise;
       expect(personenkontextStore.errorCode).toEqual('UNSPECIFIED_ERROR');
       expect(personenkontextStore.loading).toBe(false);
     });
 
     it('should handle error code', async () => {
       mockadapter.onPost('/api/personenkontext-workflow').replyOnce(500, { i18nKey: 'SOME_MOCK_SERVER_ERROR' });
-      const createPersonPromise: Promise<PersonendatensatzResponse> = personenkontextStore.createPersonWithKontexte({
+      const createPersonPromise: Promise<void> = personenkontextStore.createPersonWithKontexte({
         familienname: 'Copeland',
         vorname: 'Christian',
         createPersonenkontexte: [
@@ -499,7 +499,7 @@ describe('PersonenkontextStore', () => {
         ],
       });
       expect(personenkontextStore.loading).toBe(true);
-      await rejects(createPersonPromise);
+      await createPersonPromise;
       expect(personenkontextStore.errorCode).toEqual('SOME_MOCK_SERVER_ERROR');
       expect(personenkontextStore.loading).toBe(false);
     });

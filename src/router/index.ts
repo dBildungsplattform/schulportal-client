@@ -99,8 +99,8 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
 
   if (to.meta['requiresPermission']) {
     const requiredPermissions: Permission[] = Array.isArray(to.meta['requiresPermission'])
-      ? to.meta['requiresPermission']
-      : [to.meta['requiresPermission']];
+      ? (to.meta['requiresPermission'] as Permission[])
+      : [to.meta['requiresPermission'] as Permission];
 
     // Check if user has ALL required permissions
     const hasAllPermissions: boolean = requiredPermissions.every((permission: Permission) => {

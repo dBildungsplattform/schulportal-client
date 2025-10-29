@@ -875,7 +875,9 @@
     isEditActive.value = true;
     // Deep copy of the zuordnungenResult to keep track of the Zuordnungen before any changes were done.
     // This is necessary if a user cancels the editing at some point and the zuordnungenResult was mutated at the time.
-    originalZuordnungen.value = JSON.parse(JSON.stringify(zuordnungenWithPendingChanges.value));
+    originalZuordnungen.value = JSON.parse(
+      JSON.stringify(zuordnungenWithPendingChanges.value),
+    ) as ZuordnungWithKlasse[];
   };
 
   // Triggers the template to change the Klasse. Also pre-select the Schule and Klasse.
@@ -922,7 +924,7 @@
     resetChangeKlasseForm();
     changeBefristungFormContext.resetForm();
     zuordnungenWithPendingChanges.value = originalZuordnungen.value
-      ? JSON.parse(JSON.stringify(originalZuordnungen.value))
+      ? (JSON.parse(JSON.stringify(originalZuordnungen.value)) as ZuordnungWithKlasse[])
       : undefined;
   };
 
