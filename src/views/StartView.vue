@@ -124,7 +124,10 @@
       personInfoStore.initPersonInfo(),
       meldungStore.getCurrentMeldung(),
     ]);
-    await personStore.getPersonenuebersichtById(personInfoStore.personInfo?.person.id ?? '');
+    const personId: string | undefined = personInfoStore.personInfo?.person.id;
+    if (personId) {
+      await personStore.getPersonenuebersichtById(personId);
+    }
   }
 
   const closedAlerts: Ref<Set<string>> = ref(new Set());
