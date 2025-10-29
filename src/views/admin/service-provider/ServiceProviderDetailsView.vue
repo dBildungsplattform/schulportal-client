@@ -93,7 +93,7 @@
         <v-container class="service-provider-info">
           <div v-if="serviceProviderStore.currentServiceProvider">
             <v-row id="service-provider-info-row">
-              <v-col offset="1" offset-sm="1" offset-md="1" offset-lg="0" offset-xl="1">
+              <v-col class="custom-offset" offset="1" offset-sm="1" offset-md="1" offset-lg="1">
                 <v-row>
                   <!-- Left column (first 4 fields) -->
                   <v-col
@@ -185,12 +185,12 @@
               </v-col>
             </v-row>
             <v-divider
-            class="border-opacity-100 rounded mt-8"
+            class="border-opacity-100 rounded mt-16"
             color="#E5EAEF"
             thickness="6"
             ></v-divider>
             <v-row class="mt-n6">
-              <v-col offset="1" offset-sm="1" offset-md="1" offset-lg="0" offset-xl="1">
+              <v-col class="custom-offset" offset="1" offset-sm="1" offset-md="1" offset-lg="1">
                 <v-row class="mt-4 align-center">
                   <v-col
                     cols="auto"
@@ -226,3 +226,11 @@
     </LayoutCard>
   </div>
 </template>
+
+<style scoped>
+@media (min-width: 1280px) and (max-width: 1600px) {
+  .custom-offset {
+    margin-left: 0 !important; /* removes the Vuetify offset */
+  }
+}
+</style>
