@@ -5,7 +5,6 @@ import {
   type RolleResponse,
 } from '@/api-client/generated';
 import ApiService from '@/services/ApiService';
-import { rejects } from 'assert';
 import MockAdapter from 'axios-mock-adapter';
 import { createPinia, setActivePinia } from 'pinia';
 import { DoFactory } from 'test/DoFactory';

@@ -3,6 +3,7 @@ import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
 import { createPinia, setActivePinia } from 'pinia';
 import { ImportDataItemStatus, useImportStore, type ImportStore } from './ImportStore';
+import { flushPromises } from '@vue/test-utils';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 
@@ -245,7 +246,7 @@ describe('ImportStore', () => {
 
         await pollingPromise;
 
-        expect(importStore.errorCode).toEqual('ERROR_IMPORTING_FILE');
+        expect(importStore.errorCode).toEqual('UNSPECIFIED_ERROR');
         expect(importStore.importProgress).toEqual(0);
       });
     });

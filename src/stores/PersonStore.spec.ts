@@ -11,7 +11,6 @@ import {
 } from '@/api-client/generated';
 import ApiService from '@/services/ApiService';
 import { PersonLockOccasion } from '@/utils/lock';
-import { rejects } from 'assert';
 import MockAdapter from 'axios-mock-adapter';
 import { createPinia, setActivePinia } from 'pinia';
 import { DoFactory } from 'test/DoFactory';
