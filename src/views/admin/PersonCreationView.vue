@@ -807,7 +807,7 @@
                 :label="$t('person.firstName')"
               >
                 <v-text-field
-                  id="vorname-input"
+                  id="add-personvorname-input"
                   ref="vorname-input"
                   v-bind="selectedVornameProps"
                   v-model="selectedVorname"
@@ -829,7 +829,7 @@
                 :label="$t('person.lastName')"
               >
                 <v-text-field
-                  id="familienname-input"
+                  id="add-person-familienname-input"
                   ref="familienname-input"
                   v-bind="selectedFamiliennameProps"
                   v-model="selectedFamilienname"
