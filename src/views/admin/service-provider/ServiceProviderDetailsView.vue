@@ -189,7 +189,7 @@
             color="#E5EAEF"
             thickness="6"
             ></v-divider>
-            <v-row>
+            <v-row class="mt-n6">
               <v-col offset="1" offset-sm="1" offset-md="1" offset-lg="0" offset-xl="1">
                 <v-row class="mt-4 align-center">
                   <v-col
