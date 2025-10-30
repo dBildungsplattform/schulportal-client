@@ -16,7 +16,7 @@
   } from '@/stores/RolleStore';
   import {
     useServiceProviderStore,
-    type ServiceProvider,
+    type BaseServiceProvider,
     type ServiceProviderIdNameResponse,
     type ServiceProviderStore,
   } from '@/stores/ServiceProviderStore';
@@ -164,7 +164,7 @@
   });
 
   const serviceProviders: ComputedRef<TranslatedObject[]> = computed(() =>
-    serviceProviderStore.allServiceProviders.map((provider: ServiceProvider) => ({
+    serviceProviderStore.allServiceProviders.map((provider: BaseServiceProvider) => ({
       value: provider.id,
       title: provider.name,
     })),
