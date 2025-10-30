@@ -233,17 +233,18 @@ jobs:
   
   # Scheduled
   scheduled_trivy_scan:
-    name: 'Scheduled trivy scan of latest image'
-    if: ${{ github.event_name == 'schedule' }}
+    name: 'Scheduled trivy scan of latest image and node modules'
+    if: ${{ github.event_name == 'push' || github.event_name == 'schedule' }} # for testing purposes temporally also on push
     permissions:
       packages: read
       security-events: write
-    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-trivy.yaml@7
+    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-trivy.yaml@DBP-1473_Trivy-also-for-node-modules
     with:
       image_ref: 'ghcr.io/${{ github.repository_owner }}/schulportal-client:latest'
       fail_on_vulnerabilites: true
       report_location: 'Dockerfile'
       trivyignores: '.trivyignore'
+      scan_node_dependencies: true  
 
   trivy_scan_rocketchat_notification:
     if: github.event_name == 'schedule' && failure()
