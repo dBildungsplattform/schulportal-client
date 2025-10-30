@@ -475,7 +475,7 @@
               <v-row class="align-center dense">
                 <v-col cols="auto">
                   <v-radio
-                    data-testid="kopers-radio"
+                    data-testid="kopers-radio-button"
                     :label="t('admin.person.stateEmployeeSearch.withKopers')"
                     :value="SearchType.KoPers"
                   />
@@ -503,7 +503,7 @@
               <v-row class="align-center dense">
                 <v-col cols="auto">
                   <v-radio
-                    data-testid="email-radio"
+                    data-testid="email-radio-button"
                     :label="t('admin.person.stateEmployeeSearch.withEmail')"
                     :value="SearchType.Email"
                   />
@@ -531,7 +531,7 @@
               <v-row class="align-center dense">
                 <v-col cols="auto">
                   <v-radio
-                    data-testid="username-radio"
+                    data-testid="username-radio-button"
                     :label="t('admin.person.stateEmployeeSearch.withUsername')"
                     :value="SearchType.Username"
                   />
@@ -559,7 +559,7 @@
               <v-row class="align-center dense">
                 <v-col cols="auto">
                   <v-radio
-                    data-testid="name-radio"
+                    data-testid="name-radio-button"
                     :label="t('admin.person.stateEmployeeSearch.withfirstAndLastname')"
                     :value="SearchType.Name"
                   />
@@ -616,9 +616,9 @@
           thickness="5px"
         ></v-divider>
         <LayoutCard
-          data-testid="personal-data-card"
+          data-testid="search-result-card"
           :header="$t('admin.person.stateEmployeeSearch.searchResult')"
-          :headlineTestId="'layout-card-headline-personal-data'"
+          headlineTestId="layout-card-headline-search-result"
           class="ma-5"
         >
           <v-row
@@ -634,7 +634,7 @@
               <LayoutCard
                 data-testid="personal-data-card"
                 :header="$t('profile.personalData')"
-                :headlineTestId="'layout-card-headline-personal-data'"
+                headlineTestId="layout-card-headline-personal-data"
                 :subCards="true"
               >
                 <v-row>
@@ -747,7 +747,7 @@
             <v-btn
               @click.stop="() => (personStore.allLandesbedienstetePersonen = [])"
               class="secondary button"
-              data-testid="reset-search-button"
+              data-testid="back-to-search-button"
               :block="mdAndDown"
             >
               {{ $t('nav.backToSearch') }}

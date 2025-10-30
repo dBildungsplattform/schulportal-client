@@ -89,6 +89,7 @@
     discardButtonLabel: string;
     headerLabel: string;
     layoutCardLabel: string;
+    layoutCardHeadlineTestId: string;
   };
 
   const labelConfig: Record<CreationType, LabelConfig> = {
@@ -98,6 +99,7 @@
       discardButtonLabel: t('cancel'),
       headerLabel: t('admin.person.stateEmployeeSearch.anotherPerson'),
       layoutCardLabel: t('admin.person.stateEmployeeSearch.anotherPerson'),
+      layoutCardHeadlineTestId: 'add-another-state-employee-headline',
     },
     [CreationType.AddPersonToOwnSchule]: {
       createAnotherButtonLabel: t('admin.person.stateEmployeeSearch.searchAnotherStateEmployee'),
@@ -105,6 +107,7 @@
       discardButtonLabel: t('cancel'),
       headerLabel: t('admin.person.stateEmployeeSearch.searchAndAdd'),
       layoutCardLabel: t('admin.person.stateEmployeeSearch.addStateEmployee'),
+      layoutCardHeadlineTestId: 'add-state-employee-headline',
     },
     [CreationType.Full]: {
       createAnotherButtonLabel: t('admin.person.createAnother'),
@@ -112,6 +115,7 @@
       discardButtonLabel: t('admin.person.discard'),
       headerLabel: t('admin.person.addNew'),
       layoutCardLabel: t('admin.person.addNew'),
+      layoutCardHeadlineTestId: 'create-person-headline',
     },
   };
 
@@ -141,6 +145,7 @@
 
   const headerLabel: Ref<string> = ref(t('admin.person.addNew'));
   const layoutCardLabel: Ref<string> = ref(t('admin.person.addNew'));
+  const layoutCardHeadlineTestId: Ref<string> = ref('create-person-headline');
   const createButtonLabel: Ref<string> = ref(t('admin.person.create'));
   const discardButtonLabel: Ref<string> = ref(t('admin.person.discard'));
   const createAnotherButtonLabel: Ref<string> = ref(t('admin.person.createAnother'));
@@ -698,6 +703,7 @@
       discardButtonLabel.value = config.discardButtonLabel;
       headerLabel.value = config.headerLabel;
       layoutCardLabel.value = config.layoutCardLabel;
+      layoutCardHeadlineTestId.value = config.layoutCardHeadlineTestId;
     },
     {
       immediate: true,
@@ -731,6 +737,7 @@
       :closable="!personenkontextStore.errorCode && !personStore.errorCode"
       data-testid="person-creation-card"
       :header="layoutCardLabel"
+      :headlineTestId="layoutCardHeadlineTestId"
       @onCloseClicked="navigateToPersonTable"
       :padded="true"
       :showCloseText="true"

@@ -115,7 +115,7 @@ describe('PersonSearchView', () => {
   });
 
   test('it shows KoPers input when KoPers radio is selected', async () => {
-    const kopersRadio: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="kopers-radio"]');
+    const kopersRadio: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="kopers-radio-button"]');
     if (kopersRadio && kopersRadio.element instanceof HTMLInputElement) {
       kopersRadio.element.checked = true;
       await kopersRadio.trigger('change');
@@ -127,7 +127,7 @@ describe('PersonSearchView', () => {
 
   test('it shows email input when email radio is selected', async () => {
     const emailRadioButton: HTMLElement = document.querySelector(
-      '[data-testid="email-radio"] input[type="radio"]',
+      '[data-testid="email-radio-button"] input[type="radio"]',
     ) as HTMLElement;
 
     expect(emailRadioButton).not.toBeNull();
@@ -140,7 +140,7 @@ describe('PersonSearchView', () => {
 
   test('it shows username input when username radio is selected', async () => {
     const usernameRadioButton: HTMLElement = document.querySelector(
-      '[data-testid="username-radio"] input[type="radio"]',
+      '[data-testid="username-radio-button"] input[type="radio"]',
     ) as HTMLElement;
 
     expect(usernameRadioButton).not.toBeNull();
@@ -153,7 +153,7 @@ describe('PersonSearchView', () => {
 
   test('it shows name inputs when name radio is selected', async () => {
     const nameRadioButton: HTMLElement = document.querySelector(
-      '[data-testid="name-radio"] input[type="radio"]',
+      '[data-testid="name-radio-button"] input[type="radio"]',
     ) as HTMLElement;
 
     expect(nameRadioButton).not.toBeNull();
@@ -172,7 +172,7 @@ describe('PersonSearchView', () => {
 
     // Switch to email via data-testid
     const emailRadioButton: HTMLElement = document.querySelector(
-      '[data-testid="email-radio"] input[type="radio"]',
+      '[data-testid="email-radio-button"] input[type="radio"]',
     ) as HTMLElement;
 
     expect(emailRadioButton).not.toBeNull();
@@ -207,7 +207,7 @@ describe('PersonSearchView', () => {
     personStore.getLandesbedienstetePerson = vi.fn().mockResolvedValue(undefined);
 
     const emailRadioButton: HTMLElement = document.querySelector(
-      '[data-testid="email-radio"] input[type="radio"]',
+      '[data-testid="email-radio-button"] input[type="radio"]',
     ) as HTMLElement;
     expect(emailRadioButton).not.toBeNull();
     emailRadioButton.click();
@@ -230,7 +230,7 @@ describe('PersonSearchView', () => {
     personStore.getLandesbedienstetePerson = vi.fn().mockResolvedValue(undefined);
 
     const usernameRadioButton: HTMLElement = document.querySelector(
-      '[data-testid="username-radio"] input[type="radio"]',
+      '[data-testid="username-radio-button"] input[type="radio"]',
     ) as HTMLElement;
     expect(usernameRadioButton).not.toBeNull();
     usernameRadioButton.click();
@@ -253,7 +253,7 @@ describe('PersonSearchView', () => {
     personStore.getLandesbedienstetePerson = vi.fn().mockResolvedValue(undefined);
 
     const nameRadioButton: HTMLElement = document.querySelector(
-      '[data-testid="name-radio"] input[type="radio"]',
+      '[data-testid="name-radio-button"] input[type="radio"]',
     ) as HTMLElement;
     expect(nameRadioButton).not.toBeNull();
     nameRadioButton.click();
