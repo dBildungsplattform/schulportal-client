@@ -807,12 +807,12 @@
                 :label="$t('person.firstName')"
               >
                 <v-text-field
-                  id="add-personvorname-input"
+                  id="add-person-vorname-input"
                   ref="vorname-input"
                   v-bind="selectedVornameProps"
                   v-model="selectedVorname"
                   clearable
-                  data-testid="vorname-input"
+                  data-testid="add-person-vorname-input"
                   density="compact"
                   :disabled="createType === CreationType.AddPersonToOwnSchule"
                   :placeholder="$t('person.enterFirstName')"
