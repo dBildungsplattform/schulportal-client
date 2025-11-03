@@ -382,7 +382,7 @@ export const useOrganisationStore: StoreDefinition<
       }
     },
 
-    async getFilteredKlassen(filter?: OrganisationenFilter) {
+    async getFilteredKlassen(filter?: OrganisationenFilter): Promise<void> {
       this.loadingKlassen = true;
       try {
         const response: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations(
@@ -403,7 +403,6 @@ export const useOrganisationStore: StoreDefinition<
         this.totalPaginatedKlassen = +response.headers['x-paging-pagetotal'];
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
-        return await Promise.reject(new Error(this.errorCode));
       } finally {
         this.loadingKlassen = false;
       }
@@ -492,7 +491,6 @@ export const useOrganisationStore: StoreDefinition<
         await this.fetchSchuleDetailsForKlassen(true);
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
-        return await Promise.reject(new Error(this.errorCode));
       } finally {
         this.loadingKlassen = false;
       }

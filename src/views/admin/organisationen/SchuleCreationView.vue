@@ -356,7 +356,7 @@
           <v-row>
             <v-col
               class="text-body bold text-right"
-              data-testid="created-dienststellennummer-label"
+              data-testid="created-schule-dienststellennummer-label"
             >
               {{ $t('admin.schule.dienststellennummer') }}:
             </v-col>

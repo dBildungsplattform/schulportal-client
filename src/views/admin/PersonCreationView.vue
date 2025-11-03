@@ -834,7 +834,7 @@
                   v-bind="selectedFamiliennameProps"
                   v-model="selectedFamilienname"
                   clearable
-                  data-testid="familienname-input"
+                  data-testid="add-person-familienname-input"
                   density="compact"
                   :disabled="createType === CreationType.AddPersonToOwnSchule"
                   :placeholder="$t('person.enterLastName')"
