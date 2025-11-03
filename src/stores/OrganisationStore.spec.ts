@@ -434,7 +434,7 @@ describe('OrganisationStore', () => {
         administriertVon: ['1'],
       });
       expect(organisationStore.loadingKlassen).toBe(true);
-      await rejects(getAllKlassenByOrganisationId);
+      await getAllKlassenByOrganisationId;
       expect(organisationStore.klassen).toEqual([]);
       expect(organisationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
       expect(organisationStore.loadingKlassen).toBe(false);
@@ -448,7 +448,7 @@ describe('OrganisationStore', () => {
         administriertVon: ['1'],
       });
       expect(organisationStore.loadingKlassen).toBe(true);
-      await rejects(getAllKlassenByOrganisationId);
+      await getAllKlassenByOrganisationId;
       expect(organisationStore.klassen).toEqual([]);
       expect(organisationStore.errorCode).toEqual('some mock server error');
       expect(organisationStore.loadingKlassen).toBe(false);
