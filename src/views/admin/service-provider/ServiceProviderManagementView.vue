@@ -2,7 +2,7 @@
   import { computed, watchEffect, type ComputedRef } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
 
-  import ResultTable, { type Headers } from '@/components/admin/ResultTable.vue';
+  import ResultTable, { type Headers, type TableRow } from '@/components/admin/ResultTable.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
   import {
