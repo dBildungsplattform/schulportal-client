@@ -1130,7 +1130,7 @@ describe('OrganisationStore', () => {
       });
 
       expect(organisationStore.loadingKlassen).toBe(true);
-      await rejects(getFilteredKlassenPromise);
+      await getFilteredKlassenPromise;
       expect(organisationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
       expect(organisationStore.loadingKlassen).toBe(false);
     });
@@ -1145,7 +1145,7 @@ describe('OrganisationStore', () => {
       });
 
       expect(organisationStore.loadingKlassen).toBe(true);
-      await rejects(getFilteredKlassenPromise);
+      await getFilteredKlassenPromise;
       expect(organisationStore.errorCode).toEqual('some mock server error');
       expect(organisationStore.loadingKlassen).toBe(false);
     });
