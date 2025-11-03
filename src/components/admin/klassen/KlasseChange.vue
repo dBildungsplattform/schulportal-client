@@ -79,6 +79,7 @@
         ref="klasse-select"
         :administriertVon
         :parentId="'klasse-change'"
+        :placeholder-text="$t('admin.klasse.selectKlasse')"
         @update:selectedKlassen="(newValue: string | undefined) => (selectedNewKlasse = newValue)"
       />
     </FormRow>

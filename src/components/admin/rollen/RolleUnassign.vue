@@ -161,7 +161,6 @@
             :organisationen="props.organisationen"
             :rollen="rollenForForm"
             :selected-rolle-props="selectedRolleProps"
-            :is-rolle-unassign-form="true"
             :selected-rolle="props.selectedRolleFromFilter ? props.selectedRolleFromFilter.id : undefined"
             @update:selected-rolle="selectedRolle = $event"
             @field-reset="handleFieldReset($event)"

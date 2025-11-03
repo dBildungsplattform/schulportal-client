@@ -145,7 +145,7 @@ type OrganisationActions = {
   getAllOrganisationen: (filter?: OrganisationenFilter) => Promise<void>;
   getFilteredKlassen(filter?: OrganisationenFilter): Promise<void>;
   getKlassenByOrganisationId: (filter?: OrganisationenFilter) => Promise<void>;
-  getOrganisationById: (organisationId: string, organisationsTyp: OrganisationsTyp) => Promise<Organisation>;
+  getOrganisationById: (organisationId: string, organisationsTyp: OrganisationsTyp) => Promise<void>;
   getLockingOrganisationById: (organisationId: string) => Promise<void>;
   getParentOrganisationsByIds: (organisationIds: string[]) => Promise<void>;
   createOrganisation: (
@@ -409,7 +409,7 @@ export const useOrganisationStore: StoreDefinition<
       }
     },
 
-    async getOrganisationById(organisationId: string, organisationsTyp: OrganisationsTyp) {
+    async getOrganisationById(organisationId: string, organisationsTyp: OrganisationsTyp): Promise<void> {
       this.errorCode = '';
       this.loading = true;
       try {
@@ -420,11 +420,8 @@ export const useOrganisationStore: StoreDefinition<
         } else {
           this.currentOrganisation = data;
         }
-
-        return data;
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
-        return await Promise.reject(new Error(this.errorCode));
       } finally {
         this.loading = false;
       }

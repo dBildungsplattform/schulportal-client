@@ -1273,7 +1273,7 @@
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('person.lastName') }}: </v-col>
             <v-col class="text-body">
-              <span data-testid="added-landesbediensteter-ffamilienname">{{
+              <span data-testid="added-landesbediensteter-familienname">{{
                 personStore.allLandesbedienstetePersonen?.[0]?.familienname
               }}</span>
             </v-col>

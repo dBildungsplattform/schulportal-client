@@ -354,7 +354,12 @@
             </v-col>
           </v-row>
           <v-row>
-            <v-col class="text-body bold text-right"> {{ $t('admin.schule.dienststellennummer') }}: </v-col>
+            <v-col
+              class="text-body bold text-right"
+              data-testid="created-dienststellennummer-label"
+            >
+              {{ $t('admin.schule.dienststellennummer') }}:
+            </v-col>
             <v-col class="text-body">
               <span data-testid="created-schule-dienststellennummer">{{
                 organisationStore.createdSchule.kennung

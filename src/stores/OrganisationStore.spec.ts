@@ -202,7 +202,7 @@ describe('OrganisationStore', () => {
       ];
 
       mockadapter.onGet('/api/organisationen/1').replyOnce(200, mockResponse);
-      const getOrganisationByIdPromise: Promise<Organisation> = organisationStore.getOrganisationById(
+      const getOrganisationByIdPromise: Promise<void> = organisationStore.getOrganisationById(
         '1',
         OrganisationsTyp.Schule,
       );
@@ -225,7 +225,7 @@ describe('OrganisationStore', () => {
       ];
 
       mockadapter.onGet('/api/organisationen/2').replyOnce(200, mockResponse);
-      const getOrganisationByIdPromise: Promise<Organisation> = organisationStore.getOrganisationById(
+      const getOrganisationByIdPromise: Promise<void> = organisationStore.getOrganisationById(
         '2',
         OrganisationsTyp.Klasse,
       );
@@ -236,7 +236,7 @@ describe('OrganisationStore', () => {
 
     it('should handle string error', async () => {
       mockadapter.onGet('/api/organisationen/1').replyOnce(500, 'some mock server error');
-      const getOrganisationByIdPromise: Promise<Organisation> = organisationStore.getOrganisationById(
+      const getOrganisationByIdPromise: Promise<void> = organisationStore.getOrganisationById(
         '1',
         OrganisationsTyp.Schule,
       );
@@ -248,7 +248,7 @@ describe('OrganisationStore', () => {
 
     it('should handle error code', async () => {
       mockadapter.onGet('/api/organisationen/1').replyOnce(500, { code: 'some mock server error' });
-      const getOrganisationByIdPromise: Promise<Organisation> = organisationStore.getOrganisationById(
+      const getOrganisationByIdPromise: Promise<void> = organisationStore.getOrganisationById(
         '1',
         OrganisationsTyp.Schule,
       );

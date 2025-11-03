@@ -83,10 +83,10 @@ export const useTwoFactorAuthentificationStore: StoreDefinition<
         }
 
         switch (twoFactorState.tokenKind) {
-          case 'hardware':
+          case TokenKind.hardware.toString():
             this.tokenKind = TokenKind.hardware;
             break;
-          case 'software':
+          case TokenKind.software.toString():
             this.tokenKind = TokenKind.software;
             break;
           default:
