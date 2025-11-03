@@ -253,7 +253,7 @@ describe('OrganisationStore', () => {
         OrganisationsTyp.Schule,
       );
       expect(organisationStore.loading).toBe(true);
-      await rejects(getOrganisationByIdPromise);
+      await getOrganisationByIdPromise;
       expect(organisationStore.currentOrganisation).toEqual(null);
       expect(organisationStore.errorCode).toEqual('some mock server error');
       expect(organisationStore.loading).toBe(false);
