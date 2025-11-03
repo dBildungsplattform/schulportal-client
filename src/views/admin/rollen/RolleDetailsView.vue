@@ -20,9 +20,9 @@
   } from '@/stores/RolleStore';
   import {
     useServiceProviderStore,
-    type ServiceProvider,
     type ServiceProviderIdNameResponse,
     type ServiceProviderStore,
+    type BaseServiceProvider,
   } from '@/stores/ServiceProviderStore';
   import { type TranslatedObject } from '@/types.d';
   import { getDisplayNameForOrg } from '@/utils/formatting';
@@ -140,7 +140,7 @@
       title: string;
     }[]
   > = computed(() =>
-    serviceProviderStore.allServiceProviders.map((provider: ServiceProvider) => ({
+    serviceProviderStore.allServiceProviders.map((provider: BaseServiceProvider) => ({
       value: provider.id,
       title: provider.name,
     })),

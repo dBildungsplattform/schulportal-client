@@ -5,7 +5,7 @@ import { usePersonInfoStore, type PersonInfoResponse, type PersonInfoStore } fro
 import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
 import {
   useServiceProviderStore,
-  type ServiceProvider,
+  type StartPageServiceProvider,
   type ServiceProviderStore,
 } from '@/stores/ServiceProviderStore';
 import { PersonenUebersicht } from '@/stores/types/PersonenUebersicht';
@@ -24,7 +24,7 @@ let personStore: PersonStore;
 let personInfoStore: PersonInfoStore;
 let meldungStore: MeldungStore;
 
-const mockProviders: Array<ServiceProvider> = [
+const mockProviders: Array<StartPageServiceProvider> = [
   {
     id: '2',
     name: 'Spongebob Squarepants',
@@ -225,15 +225,17 @@ describe('StartView', () => {
     serviceProviderStore.availableServiceProviders = mockProviders;
 
     interface StartViewComponent {
-      filterSortProviders: (providers: ServiceProvider[], kategorie: ServiceProviderKategorie) => ServiceProvider[];
+      filterSortProviders: (
+        providers: StartPageServiceProvider[],
+        kategorie: ServiceProviderKategorie,
+      ) => StartPageServiceProvider[];
     }
 
-    const filteredSortProviders: ServiceProvider[] = (wrapper?.vm as unknown as StartViewComponent).filterSortProviders(
-      mockProviders,
-      ServiceProviderKategorie.Email,
-    );
+    const filteredSortProviders: StartPageServiceProvider[] = (
+      wrapper?.vm as unknown as StartViewComponent
+    ).filterSortProviders(mockProviders, ServiceProviderKategorie.Email);
 
-    expect(filteredSortProviders.map((p: ServiceProvider) => p.name)).toEqual([
+    expect(filteredSortProviders.map((p: StartPageServiceProvider) => p.name)).toEqual([
       'Not Squarepants',
       'Spongebob Squarepants',
     ]);

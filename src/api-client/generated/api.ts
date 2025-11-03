@@ -766,7 +766,8 @@ export const DbiamPersonenkontexteUpdateErrorI18nKeyEnum = {
     PersonIdMismatch: 'PERSON_ID_MISMATCH',
     PersonNotFound: 'PERSON_NOT_FOUND',
     InvalidPersonenkontextForPersonWithRollenartLern: 'INVALID_PERSONENKONTEXT_FOR_PERSON_WITH_ROLLENART_LERN',
-    BefristungRequiredForPersonenkontext: ' BEFRISTUNG_REQUIRED_FOR_PERSONENKONTEXT'
+    BefristungRequiredForPersonenkontext: ' BEFRISTUNG_REQUIRED_FOR_PERSONENKONTEXT',
+    DuplicateKlassenkontextForSameRolle: 'DUPLICATE_KLASSENKONTEXT_FOR_SAME_ROLLE'
 } as const;
 
 export type DbiamPersonenkontexteUpdateErrorI18nKeyEnum = typeof DbiamPersonenkontexteUpdateErrorI18nKeyEnum[keyof typeof DbiamPersonenkontexteUpdateErrorI18nKeyEnum];
@@ -1394,6 +1395,12 @@ export interface ManageableServiceProviderResponse {
      * @memberof ManageableServiceProviderResponse
      */
     'merkmale': Array<ServiceProviderMerkmal>;
+    /**
+     * Can be undefined, if `target` is not equal to `URL`
+     * @type {string}
+     * @memberof ManageableServiceProviderResponse
+     */
+    'url': string;
     /**
      * 
      * @type {Array<RollenerweiterungForServiceProviderResponse>}

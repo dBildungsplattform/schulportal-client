@@ -8,7 +8,7 @@ import {
   type SystemRechtResponse,
 } from '../api-client/generated/api';
 import { useRolleStore, type RolleStore } from './RolleStore';
-import type { ServiceProvider } from './ServiceProviderStore';
+import type { BaseServiceProvider, StartPageServiceProvider } from './ServiceProviderStore';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 
@@ -151,7 +151,7 @@ describe('rolleStore', () => {
         version: 1,
       };
 
-      const mockResponse: ServiceProvider[] = [
+      const mockResponse: StartPageServiceProvider[] = [
         {
           id: '1234',
           name: 'itslearning mock',
@@ -177,14 +177,11 @@ describe('rolleStore', () => {
     it('should do nothing if no created rolle exists', async () => {
       rolleStore.createdRolle = null;
 
-      const mockResponse: ServiceProvider[] = [
+      const mockResponse: BaseServiceProvider[] = [
         {
           id: '1234',
           name: 'itslearning mock',
-          url: 'example.org/itslearning',
-          target: 'URL',
           kategorie: 'EMAIL',
-          hasLogo: true,
           requires2fa: true,
         },
       ];

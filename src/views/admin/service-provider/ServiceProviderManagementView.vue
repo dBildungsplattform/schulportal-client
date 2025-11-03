@@ -11,6 +11,7 @@
     type ServiceProviderStore,
   } from '@/stores/ServiceProviderStore';
   import { getDisplayNameForOrg } from '@/utils/formatting';
+  import { useRouter, type Router } from 'vue-router';
 
   type ServiceProviderRow = {
     id: string;
@@ -21,7 +22,9 @@
     hasRollenerweiterung: string;
   };
 
+  const router: Router = useRouter();
   const { t }: Composer = useI18n();
+
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
 
@@ -44,6 +47,10 @@
       };
     });
   });
+
+  function navigateToServiceProviderDetails(_$event: PointerEvent, { item }: { item: ServiceProviderRow }): void {
+    router.push({ name: 'angebot-details', params: { id: item.id } });
+  }
 
   watchEffect(async () => {
     await serviceProviderStore.getManageableServiceProviders(
@@ -71,6 +78,10 @@
       :totalItems="serviceProviderStore.totalManageableServiceProviders"
       @onItemsPerPageUpdate="(val: number) => (searchFilterStore.serviceProviderPerPage = val)"
       @onPageUpdate="(val: number) => (searchFilterStore.serviceProviderPage = val)"
+      @onHandleRowClick="
+        (event: PointerEvent, item: TableRow<unknown>) =>
+          navigateToServiceProviderDetails(event, item as TableRow<ServiceProviderRow>)
+      "
     >
       <template v-slot:[`item.rollen`]="{ item }">
         <div

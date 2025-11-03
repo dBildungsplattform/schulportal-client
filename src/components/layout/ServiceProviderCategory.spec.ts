@@ -4,11 +4,11 @@ import { VApp } from 'vuetify/components';
 import { h } from 'vue';
 import ServiceProviderCategory from '@/components/layout/ServiceProviderCategory.vue';
 import ServiceProviderCard from '@/components/cards/ServiceProviderCard.vue';
-import { type ServiceProvider } from '@/stores/ServiceProviderStore';
+import { ServiceProviderKategorie, type StartPageServiceProvider } from '@/stores/ServiceProviderStore';
 
 let wrapper: VueWrapper | null = null;
 
-const mockServiceProviders: Array<ServiceProvider> = [
+const mockServiceProviders: Array<StartPageServiceProvider> = [
   {
     id: '1',
     name: 'Service A',
@@ -16,7 +16,7 @@ const mockServiceProviders: Array<ServiceProvider> = [
     target: 'URL',
     requires2fa: true,
     logoUrl: '/logo-a.png',
-    kategorie: '',
+    kategorie: ServiceProviderKategorie.Angebote,
     hasLogo: false,
   },
   {
@@ -26,7 +26,7 @@ const mockServiceProviders: Array<ServiceProvider> = [
     requires2fa: false,
     logoUrl: '/logo-b.png',
     url: 'https://service-b.com',
-    kategorie: '',
+    kategorie: ServiceProviderKategorie.Angebote,
     hasLogo: false,
   },
   {
@@ -36,12 +36,12 @@ const mockServiceProviders: Array<ServiceProvider> = [
     requires2fa: true,
     logoUrl: '/logo-c.png',
     url: '',
-    kategorie: '',
+    kategorie: ServiceProviderKategorie.Angebote,
     hasLogo: false,
   },
 ];
 
-const defaultProps: { categoryTitle: string; serviceProviders: ServiceProvider[]; hasToken: boolean } = {
+const defaultProps: { categoryTitle: string; serviceProviders: StartPageServiceProvider[]; hasToken: boolean } = {
   categoryTitle: 'Category Title',
   serviceProviders: mockServiceProviders,
   hasToken: false,
