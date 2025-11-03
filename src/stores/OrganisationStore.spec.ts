@@ -240,7 +240,7 @@ describe('OrganisationStore', () => {
         '1',
         OrganisationsTyp.Schule,
       );
-      await rejects(getOrganisationByIdPromise);
+      await getOrganisationByIdPromise;
       expect(organisationStore.currentOrganisation).toEqual(null);
       expect(organisationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
       expect(organisationStore.loading).toBe(false);
