@@ -549,7 +549,7 @@
 
   const createAnotherButtonTestId: ComputedRef<string> = computed(() =>
     createType.value === CreationType.AddPersonToOwnSchule
-      ? 'search-another-landesbediensteter-button'
+      ? 'search-another-state-employee-button'
       : 'create-another-person-button',
   );
 
@@ -790,7 +790,12 @@
             <!-- If AddPersonToOwnSchule: Persönliche Info first -->
             <template v-if="createType === CreationType.AddPersonToOwnSchule">
               <v-row>
-                <h3 class="headline-3">1. {{ $t('admin.person.personalInfo') }}</h3>
+                <h3
+                  class="headline-3"
+                  data-testid="personal-info-headline"
+                >
+                  1. {{ $t('admin.person.personalInfo') }}
+                </h3>
               </v-row>
               <!-- Vorname -->
               <FormRow
@@ -916,7 +921,12 @@
               <!-- Else: Default Order -->
               <div v-if="selectedOrganisation">
                 <v-row>
-                  <h3 class="headline-3">3. {{ $t('admin.person.personalInfo') }}</h3>
+                  <h3
+                    class="headline-3"
+                    data-testid="personal-info-headline"
+                  >
+                    3. {{ $t('admin.person.personalInfo') }}
+                  </h3>
                 </v-row>
                 <!-- Vorname -->
                 <FormRow
@@ -1175,7 +1185,7 @@
               <v-btn
                 class="secondary"
                 @click.stop="navigateToPersonDetails"
-                data-testid="to-details-button"
+                data-testid="go-to-details-button"
                 :block="mdAndDown"
               >
                 {{ t('nav.toDetails') }}
@@ -1226,7 +1236,7 @@
               class="subtitle-1"
               cols="auto"
             >
-              <span data-testid="landesbediensteter-success-text">
+              <span data-testid="state-employee-success-text">
                 {{
                   t('admin.person.addedSuccessfully', {
                     firstname: personStore.allLandesbedienstetePersonen?.[0]?.vorname,
@@ -1241,6 +1251,7 @@
               <v-icon
                 aria-hidden="true"
                 color="#1EAE9C"
+                data-testid="state-employee-success-icon"
                 icon="mdi-check-circle"
                 small
               >
@@ -1251,58 +1262,94 @@
             <v-col
               class="subtitle-2"
               cols="auto"
+              data-testid="following-data-added-text"
             >
               {{ t('admin.followingDataCreated') }}
             </v-col>
           </v-row>
           <v-row>
-            <v-col class="text-body bold text-right"> {{ $t('person.firstName') }}: </v-col>
+            <v-col
+              class="text-body bold text-right"
+              data-testid="added-state-employee-vorname-label"
+            >
+              {{ $t('person.firstName') }}:
+            </v-col>
             <v-col class="text-body"
-              ><span data-testid="added-landesbediensteter-vorname">{{
+              ><span data-testid="added-state-employee-vorname">{{
                 personStore.allLandesbedienstetePersonen?.[0]?.vorname
               }}</span></v-col
             >
           </v-row>
           <v-row>
-            <v-col class="text-body bold text-right"> {{ $t('person.lastName') }}: </v-col>
+            <v-col
+              class="text-body bold text-right"
+              data-testid="added-state-employee-familienname-label"
+            >
+              {{ $t('person.lastName') }}:
+            </v-col>
             <v-col class="text-body"
-              ><span data-testid="added-landesbediensteter-familienname">{{
+              ><span data-testid="added-state-employee-familienname">{{
                 personStore.allLandesbedienstetePersonen?.[0]?.familienname
               }}</span></v-col
             >
           </v-row>
           <v-row>
-            <v-col class="text-body bold text-right"> {{ $t('person.kopersNr') }}: </v-col>
+            <v-col
+              class="text-body bold text-right"
+              data-testid="added-state-employee-personalnummer-label"
+            >
+              {{ $t('person.kopersNr') }}:
+            </v-col>
             <v-col class="text-body"
-              ><span data-testid="added-landesbediensteter-personalnummer">{{
+              ><span data-testid="added-state-employee-personalnummer">{{
                 personStore.allLandesbedienstetePersonen?.[0]?.personalnummer
               }}</span></v-col
             >
           </v-row>
           <v-row>
-            <v-col class="text-body bold text-right"> {{ t('person.userName') }}: </v-col>
+            <v-col
+              class="text-body bold text-right"
+              data-testid="added-state-employee-username-label"
+            >
+              {{ t('person.userName') }}:
+            </v-col>
             <v-col class="text-body"
-              ><span data-testid="added-landesbediensteter-username">{{
+              ><span data-testid="added-state-employee-username">{{
                 personStore.allLandesbedienstetePersonen?.[0]?.username
               }}</span></v-col
             >
           </v-row>
           <v-row>
-            <v-col class="text-body bold text-right"> {{ t('admin.organisation.organisation') }}: </v-col>
+            <v-col
+              class="text-body bold text-right"
+              data-testid="added-state-employee-organisation-label"
+            >
+              {{ t('admin.organisation.organisation') }}:
+            </v-col>
             <v-col class="text-body"
-              ><span data-testid="added-landesbediensteter-organisation">{{ translatedOrganisationsname }}</span></v-col
+              ><span data-testid="added-state-employee-organisation">{{ translatedOrganisationsname }}</span></v-col
             >
           </v-row>
           <v-row>
-            <v-col class="text-body bold text-right"> {{ t('admin.rolle.rolle') }}: </v-col>
+            <v-col
+              class="text-body bold text-right"
+              data-testid="added-state-employee-rolle-label"
+            >
+              {{ t('admin.rolle.rolle') }}:
+            </v-col>
             <v-col class="text-body"
-              ><span data-testid="added-landesbediensteter-rolle">{{ translatedRollenname.join(', ') }}</span></v-col
+              ><span data-testid="added-state-employee-rolle">{{ translatedRollenname.join(', ') }}</span></v-col
             >
           </v-row>
           <v-row>
-            <v-col class="text-body bold text-right"> {{ t('admin.befristung.befristung') }}: </v-col>
+            <v-col
+              class="text-body bold text-right"
+              data-testid="added-state-employee-befristung-label"
+            >
+              {{ t('admin.befristung.befristung') }}:
+            </v-col>
             <v-col class="text-body"
-              ><span data-testid="added-landesbediensteter-befristung">{{ translatedBefristung }}</span></v-col
+              ><span data-testid="added-state-employee-befristung">{{ translatedBefristung }}</span></v-col
             >
           </v-row>
           <v-divider
@@ -1319,7 +1366,7 @@
               <v-btn
                 class="secondary"
                 @click.stop="navigateToPersonDetails"
-                data-testid="to-details-button"
+                data-testid="go-to-details-button"
                 :block="mdAndDown"
               >
                 {{ $t('nav.toDetails') }}
@@ -1428,6 +1475,7 @@
         v-if="showAddPersonConfirmationDialog"
         :closable="false"
         :header="t('admin.person.stateEmployeeSearch.addStateEmployee')"
+        headlineTestId="add-person-confirmation-dialog-headline"
       >
         <v-card-text>
           <v-container>
