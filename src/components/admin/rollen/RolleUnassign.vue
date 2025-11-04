@@ -6,7 +6,12 @@
   import { type TranslatedRolleWithAttrs, useRollen } from '@/composables/useRollen';
   import { type BulkOperationStore, useBulkOperationStore } from '@/stores/BulkOperationStore';
   import { type Organisation } from '@/stores/OrganisationStore';
-  import { OperationContext, type PersonenkontextStore, usePersonenkontextStore } from '@/stores/PersonenkontextStore';
+  import {
+    OperationContext,
+    type PersonenkontextStore,
+    usePersonenkontextStore,
+    RolleDialogMode,
+  } from '@/stores/PersonenkontextStore';
   import { RollenArt, type RolleResponse } from '@/stores/RolleStore';
   import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
   import type { TranslatedObject } from '@/types';
@@ -156,6 +161,7 @@
             v-if="bulkOperationStore.currentOperation?.progress === 0"
             ref="personenkontext-create"
             :operation-context="OperationContext.PERSON_BEARBEITEN"
+            :rolleDialogMode="RolleDialogMode.UNASSIGN"
             :show-headline="false"
             :selected-organisation="selectedOrganisationFromFilterId"
             :organisationen="props.organisationen"
