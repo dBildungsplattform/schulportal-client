@@ -802,7 +802,7 @@
               <!-- Vorname -->
               <FormRow
                 :error-label="selectedVornameProps['error']"
-                label-for-id="vorname-input"
+                label-for-id="add-person-vorname-input"
                 :is-required="true"
                 :label="$t('person.firstName')"
               >
@@ -824,7 +824,7 @@
               <!-- Nachname -->
               <FormRow
                 :error-label="selectedFamiliennameProps['error']"
-                label-for-id="familienname-input"
+                label-for-id="add-person-familienname-input"
                 :is-required="true"
                 :label="$t('person.lastName')"
               >
