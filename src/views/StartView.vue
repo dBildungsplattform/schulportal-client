@@ -10,7 +10,7 @@
   import {
     ServiceProviderKategorie,
     useServiceProviderStore,
-    type ServiceProvider,
+    type StartPageServiceProvider,
     type ServiceProviderStore,
   } from '@/stores/ServiceProviderStore';
   import {
@@ -38,30 +38,33 @@
   const authStore: AuthStore = useAuthStore();
   const meldungStore: MeldungStore = useMeldungStore();
 
-  function filterSortProviders(providers: ServiceProvider[], kategorie: ServiceProviderKategorie): ServiceProvider[] {
+  function filterSortProviders(
+    providers: StartPageServiceProvider[],
+    kategorie: ServiceProviderKategorie,
+  ): StartPageServiceProvider[] {
     return providers
-      .filter((provider: ServiceProvider) => provider.kategorie === kategorie)
-      .sort((a: ServiceProvider, b: ServiceProvider) => a.name.localeCompare(b.name));
+      .filter((provider: StartPageServiceProvider) => provider.kategorie === kategorie)
+      .sort((a: StartPageServiceProvider, b: StartPageServiceProvider) => a.name.localeCompare(b.name));
   }
 
   // Filter service providers by category "EMAIL"
-  const emailServiceProviders: ComputedRef<ServiceProvider[]> = computed(() =>
+  const emailServiceProviders: ComputedRef<StartPageServiceProvider[]> = computed(() =>
     filterSortProviders(serviceProviderStore.availableServiceProviders, ServiceProviderKategorie.Email),
   );
   // Filter service providers by category "UNTERRICHT"
-  const classServiceProviders: ComputedRef<ServiceProvider[]> = computed(() =>
+  const classServiceProviders: ComputedRef<StartPageServiceProvider[]> = computed(() =>
     filterSortProviders(serviceProviderStore.availableServiceProviders, ServiceProviderKategorie.Unterricht),
   );
   // Filter service providers by category "VERWALTUNG"
-  const administrationServiceProviders: ComputedRef<ServiceProvider[]> = computed(() =>
+  const administrationServiceProviders: ComputedRef<StartPageServiceProvider[]> = computed(() =>
     filterSortProviders(serviceProviderStore.availableServiceProviders, ServiceProviderKategorie.Verwaltung),
   );
   // Filter service providers by category "HINWEISE"
-  const hintsServiceProviders: ComputedRef<ServiceProvider[]> = computed(() =>
+  const hintsServiceProviders: ComputedRef<StartPageServiceProvider[]> = computed(() =>
     filterSortProviders(serviceProviderStore.availableServiceProviders, ServiceProviderKategorie.Hinweise),
   );
   // Filter service providers by category "ANGEBOTE"
-  const schoolOfferingsServiceProviders: ComputedRef<ServiceProvider[]> = computed(() =>
+  const schoolOfferingsServiceProviders: ComputedRef<StartPageServiceProvider[]> = computed(() =>
     filterSortProviders(serviceProviderStore.availableServiceProviders, ServiceProviderKategorie.Angebote),
   );
 
@@ -137,19 +140,22 @@
     await authStore.initializeAuthStatus();
     const personId: string | null | undefined = authStore.currentUser?.personId;
 
-    const providersPromise: Promise<void> = serviceProviderStore.getAvailableServiceProviders().then(() => {
-      for (const provider of serviceProviderStore.availableServiceProviders) {
-        if (provider.hasLogo) {
-          provider.logoUrl = `/api/provider/${provider.id}/logo`;
-        }
-      }
-    });
+    // Load all service providers first
+    await serviceProviderStore.getAvailableServiceProviders();
+
+    // Load all logos in parallel and assign them to the respective service providers
+    const logoPromises: Promise<void>[] = serviceProviderStore.availableServiceProviders
+      .filter((p: StartPageServiceProvider) => p.hasLogo)
+      .map(async (p: StartPageServiceProvider) => {
+        await serviceProviderStore.getServiceProviderLogoById(p.id);
+        p.logoUrl = serviceProviderStore.serviceProviderLogos.get(p.id);
+      });
 
     const twoFAStatePromise: Promise<void> = personId
       ? twoFactorAuthentificationStore.get2FAState(personId)
       : Promise.resolve();
 
-    await Promise.allSettled([providersPromise, twoFAStatePromise]);
+    await Promise.allSettled([...logoPromises, twoFAStatePromise]);
   });
 
   onBeforeMount(async () => {
