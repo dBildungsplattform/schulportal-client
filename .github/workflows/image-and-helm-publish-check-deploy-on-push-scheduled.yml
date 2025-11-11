@@ -233,8 +233,11 @@ jobs:
   
   # Scheduled
   scheduled_trivy_scan:
-    name: 'Scheduled trivy scan of latest image'
+    name: 'Scheduled trivy scan of image (image) or node modules (fs). This job scanned: '
     if: ${{ github.event_name == 'schedule' }}
+    strategy:
+      matrix:
+        scan_type: [ 'image', 'fs' ]
     permissions:
       packages: read
       security-events: write
@@ -244,6 +247,7 @@ jobs:
       fail_on_vulnerabilites: true
       report_location: 'Dockerfile'
       trivyignores: '.trivyignore'
+      scan_type: ${{ matrix.scan_type }}
 
   trivy_scan_rocketchat_notification:
     if: github.event_name == 'schedule' && failure()
