@@ -1,7 +1,5 @@
 import { createI18n, type DefaultLocaleMessageSchema } from 'vue-i18n';
 import * as deDE from '../locales/de-DE.json';
-// @ts-ignore
-// eslint-disable-next-line import/extensions
 import vuetifyDeMessages from 'vuetify/lib/locale/de.mjs';
 
 function loadLocaleMessages(): { [x: string]: DefaultLocaleMessageSchema } {

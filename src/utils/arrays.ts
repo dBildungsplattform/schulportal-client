@@ -12,7 +12,9 @@ export function dedup<K, V>(arr: Array<V>, toKey?: (a: V) => K): Array<V> {
   const keySet: Set<K> = new Set();
   arr.forEach((value: V) => {
     const key: K = toKey(value);
-    if (keySet.has(key)) return;
+    if (keySet.has(key)) {
+      return;
+    }
     keySet.add(key);
     result.push(value);
   });

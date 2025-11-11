@@ -53,20 +53,22 @@
   ] = defineField('meldungText', vuetifyConfig);
 
   const publishOrUnpublishButton: ComputedRef<string> = computed(() => {
-    return !newsboxMeldung.value || newsboxMeldung.value.status == MeldungStatus.NICHT_VEROEFFENTLICHT
+    return !newsboxMeldung.value || newsboxMeldung.value.status === MeldungStatus.NICHT_VEROEFFENTLICHT
       ? t('admin.hinweise.publish')
       : t('admin.hinweise.publishEnd');
   });
 
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
-  let blockedNext: () => void = () => {};
+  let blockedNext: () => void = () => {
+    /* empty */
+  };
 
-  const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
+  const onSubmit: (e?: Event) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
     await meldungStore.createOrUpdateMeldung({
       ...newsboxMeldung.value,
       text: meldungText.value,
       status:
-        !newsboxMeldung.value || newsboxMeldung.value.status == MeldungStatus.NICHT_VEROEFFENTLICHT
+        !newsboxMeldung.value || newsboxMeldung.value.status === MeldungStatus.NICHT_VEROEFFENTLICHT
           ? MeldungStatus.VEROEFFENTLICHT
           : MeldungStatus.NICHT_VEROEFFENTLICHT,
     });
@@ -91,7 +93,9 @@
   };
 
   function preventNavigation(event: BeforeUnloadEvent): void {
-    if (formWasChanged()) return;
+    if (formWasChanged()) {
+      return;
+    }
     event.preventDefault();
     /* Chrome requires returnValue to be set. */
     event.returnValue = '';
@@ -132,19 +136,19 @@
       :header="$t('admin.hinweise.hinweiseTexte')"
       :closable="true"
       :padded="true"
-      :showCloseText="true"
-      @onCloseClicked="onCloseDialog"
+      :show-close-text="true"
+      @on-close-clicked="onCloseDialog"
     >
       <FormWrapper
-        :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
-        :createButtonLabel="$t('admin.schultraeger.create')"
-        :discardButtonLabel="$t('admin.schultraeger.discard')"
-        :hideActions="true"
         id="newsbox-form"
-        :onSubmit="onSubmit"
-        :onDiscard="resetForm"
-        :showUnsavedChangesDialog="showUnsavedChangesDialog"
-        @onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
+        :confirm-unsaved-changes-action="handleConfirmUnsavedChanges"
+        :create-button-label="$t('admin.schultraeger.create')"
+        :discard-button-label="$t('admin.schultraeger.discard')"
+        :hide-actions="true"
+        :on-submit="onSubmit"
+        :on-discard="resetForm"
+        :show-unsaved-changes-dialog="showUnsavedChangesDialog"
+        @on-show-dialog-change="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
       >
         <SpshAlert
           v-if="meldungStore.errorCode"
@@ -153,25 +157,27 @@
           :type="'error'"
           :closable="false"
           :text="$t(`admin.hinweise.errors.${meldungStore.errorCode}`)"
-          :showButton="true"
-          :buttonText="t('refreshData')"
-          :buttonAction="refreshPage"
+          :show-button="true"
+          :button-text="t('refreshData')"
+          :button-action="refreshPage"
         />
         <v-row>
           <v-col cols="12">
-            <h3 class="headline-3 mb-4">{{ $t('admin.hinweise.newsbox') }}</h3>
+            <h3 class="headline-3 mb-4">
+              {{ $t('admin.hinweise.newsbox') }}
+            </h3>
             <v-textarea
-              data-testid="newsbox-text"
               ref="newsbox-text"
               v-bind="meldungTextProps"
               v-model="meldungText"
+              data-testid="newsbox-text"
               variant="outlined"
               rows="5"
               placeholder="Newsbox"
               auto-grow
               counter
               maxlength="2000"
-            ></v-textarea>
+            />
           </v-col>
         </v-row>
 
@@ -188,8 +194,9 @@
               color="primary"
               type="submit"
               @click="onSubmit"
-              >{{ publishOrUnpublishButton }}</v-btn
             >
+              {{ publishOrUnpublishButton }}
+            </v-btn>
           </v-col>
         </v-row>
       </FormWrapper>

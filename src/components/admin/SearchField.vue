@@ -29,7 +29,7 @@
     searchFilter,
   });
 
-  async function applySearchFilter(): Promise<void> {
+  function applySearchFilter(): void {
     if (searchFilter.value !== null) {
       emit('onApplySearchFilter', searchFilter.value.trim());
     } else {
@@ -49,20 +49,20 @@
     :md="inputColsMd"
   >
     <v-text-field
+      id="search-filter-input"
+      v-model="searchFilter"
       autocomplete="off"
       class="search-field"
       clearable
       data-testid="search-filter-input"
       density="compact"
       hide-details
-      id="search-filter-input"
-      @keyup.enter="applySearchFilter"
       :placeholder="$t('admin.searchResultTable')"
       required="true"
       :title="props.hoverText"
       variant="outlined"
-      v-model="searchFilter"
-    ></v-text-field>
+      @keyup.enter="applySearchFilter"
+    />
   </v-col>
   <v-col
     :cols="buttonCols"
@@ -71,11 +71,11 @@
     <v-btn
       block
       class="primary search button"
-      @click="applySearchFilter()"
       data-testid="apply-search-filter-button"
       height="44"
       prepend-icon="mdi-magnify"
       width="130"
+      @click="applySearchFilter()"
     >
       {{ $t('search') }}
     </v-btn>

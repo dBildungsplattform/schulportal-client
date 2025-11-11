@@ -59,10 +59,10 @@ beforeEach(async () => {
 
   organisationStore.currentKlasse = mockCurrentKlasse;
   vi.spyOn(organisationStore, 'getOrganisationById').mockImplementation(
-    (_id: string, _typ: OrganisationsTyp): Promise<Organisation> => {
+    (_id: string, _typ: OrganisationsTyp): Promise<void> => {
       organisationStore.currentKlasse = mockCurrentKlasse;
       organisationStore.currentOrganisation = mockCurrentOrganisation;
-      return Promise.resolve(mockCurrentOrganisation);
+      return Promise.resolve();
     },
   );
 

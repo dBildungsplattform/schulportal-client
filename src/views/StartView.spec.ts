@@ -112,6 +112,12 @@ beforeEach(() => {
       school: null,
       rolle: null,
     },
+    {
+      occasion: 'KOPERS',
+      deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+      school: "Carl-orff-Schule",
+      rolle: null,
+    },
   ];
 
   personInfoStore.personInfo = mockPerson;

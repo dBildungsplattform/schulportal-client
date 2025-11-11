@@ -4,11 +4,11 @@
 </script>
 
 <template>
-  <AdminMenuBar></AdminMenuBar>
+  <AdminMenuBar />
   <v-container>
     <slot />
   </v-container>
-  <TheFooter></TheFooter>
+  <TheFooter />
 </template>
 
 <style scoped lang="scss">

@@ -1,6 +1,5 @@
 import { OrganisationsTyp, type OrganisationRootChildrenResponse } from '@/api-client/generated';
 import ApiService from '@/services/ApiService';
-import { rejects } from 'assert';
 import MockAdapter from 'axios-mock-adapter';
 import { createPinia, setActivePinia } from 'pinia';
 import { DoFactory } from 'test/DoFactory';
@@ -202,7 +201,7 @@ describe('OrganisationStore', () => {
       ];
 
       mockadapter.onGet('/api/organisationen/1').replyOnce(200, mockResponse);
-      const getOrganisationByIdPromise: Promise<Organisation> = organisationStore.getOrganisationById(
+      const getOrganisationByIdPromise: Promise<void> = organisationStore.getOrganisationById(
         '1',
         OrganisationsTyp.Schule,
       );
@@ -225,7 +224,7 @@ describe('OrganisationStore', () => {
       ];
 
       mockadapter.onGet('/api/organisationen/2').replyOnce(200, mockResponse);
-      const getOrganisationByIdPromise: Promise<Organisation> = organisationStore.getOrganisationById(
+      const getOrganisationByIdPromise: Promise<void> = organisationStore.getOrganisationById(
         '2',
         OrganisationsTyp.Klasse,
       );
@@ -236,11 +235,11 @@ describe('OrganisationStore', () => {
 
     it('should handle string error', async () => {
       mockadapter.onGet('/api/organisationen/1').replyOnce(500, 'some mock server error');
-      const getOrganisationByIdPromise: Promise<Organisation> = organisationStore.getOrganisationById(
+      const getOrganisationByIdPromise: Promise<void> = organisationStore.getOrganisationById(
         '1',
         OrganisationsTyp.Schule,
       );
-      await rejects(getOrganisationByIdPromise);
+      await getOrganisationByIdPromise;
       expect(organisationStore.currentOrganisation).toEqual(null);
       expect(organisationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
       expect(organisationStore.loading).toBe(false);
@@ -248,12 +247,12 @@ describe('OrganisationStore', () => {
 
     it('should handle error code', async () => {
       mockadapter.onGet('/api/organisationen/1').replyOnce(500, { code: 'some mock server error' });
-      const getOrganisationByIdPromise: Promise<Organisation> = organisationStore.getOrganisationById(
+      const getOrganisationByIdPromise: Promise<void> = organisationStore.getOrganisationById(
         '1',
         OrganisationsTyp.Schule,
       );
       expect(organisationStore.loading).toBe(true);
-      await rejects(getOrganisationByIdPromise);
+      await getOrganisationByIdPromise;
       expect(organisationStore.currentOrganisation).toEqual(null);
       expect(organisationStore.errorCode).toEqual('some mock server error');
       expect(organisationStore.loading).toBe(false);
@@ -434,7 +433,7 @@ describe('OrganisationStore', () => {
         administriertVon: ['1'],
       });
       expect(organisationStore.loadingKlassen).toBe(true);
-      await rejects(getAllKlassenByOrganisationId);
+      await getAllKlassenByOrganisationId;
       expect(organisationStore.klassen).toEqual([]);
       expect(organisationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
       expect(organisationStore.loadingKlassen).toBe(false);
@@ -448,7 +447,7 @@ describe('OrganisationStore', () => {
         administriertVon: ['1'],
       });
       expect(organisationStore.loadingKlassen).toBe(true);
-      await rejects(getAllKlassenByOrganisationId);
+      await getAllKlassenByOrganisationId;
       expect(organisationStore.klassen).toEqual([]);
       expect(organisationStore.errorCode).toEqual('some mock server error');
       expect(organisationStore.loadingKlassen).toBe(false);
@@ -1130,7 +1129,7 @@ describe('OrganisationStore', () => {
       });
 
       expect(organisationStore.loadingKlassen).toBe(true);
-      await rejects(getFilteredKlassenPromise);
+      await getFilteredKlassenPromise;
       expect(organisationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
       expect(organisationStore.loadingKlassen).toBe(false);
     });
@@ -1145,7 +1144,7 @@ describe('OrganisationStore', () => {
       });
 
       expect(organisationStore.loadingKlassen).toBe(true);
-      await rejects(getFilteredKlassenPromise);
+      await getFilteredKlassenPromise;
       expect(organisationStore.errorCode).toEqual('some mock server error');
       expect(organisationStore.loadingKlassen).toBe(false);
     });

@@ -27,16 +27,16 @@
 
   const successDialogVisible: Ref<boolean> = ref(false);
 
-  async function closeActivateSchuleDialog(isActive: Ref<boolean>): Promise<void> {
+  function closeActivateSchuleDialog(isActive: Ref<boolean>): void {
     isActive.value = false;
   }
 
-  async function handleSchuleToItsLearning(schuleId: string): Promise<void> {
+  function handleSchuleToItsLearning(schuleId: string): void {
     emit('onActivateItslearning', schuleId);
     successDialogVisible.value = true;
   }
 
-  async function closeSuccessDialogAndPushToManagement(): Promise<void> {
+  function closeSuccessDialogAndPushToManagement(): void {
     successDialogVisible.value = false;
     if (router.currentRoute.value.name === 'schule-management') {
       router.go(0);
@@ -113,8 +113,8 @@
             <v-btn
               :block="mdAndDown"
               class="primary"
-              @click.stop="closeSuccessDialogAndPushToManagement()"
               data-testid="close-schule-sync-itslearning-dialog-button"
+              @click.stop="closeSuccessDialogAndPushToManagement()"
             >
               {{ $t('close') }}
             </v-btn>
@@ -127,36 +127,35 @@
     v-if="!successDialogVisible"
     persistent
   >
-    <template v-slot:activator="{ props }">
+    <template #activator="{ props }">
       <v-icon
-        class="ml-10"
         v-if="itslearningEnabled"
+        class="ml-10"
         :title="$t('admin.schule.retransmit')"
         data-testid="open-schule-itslearning-resync-dialog-icon"
         icon="mdi-reload"
         size="small"
         v-bind="props"
-      >
-      </v-icon>
+      />
       <v-icon
-        class="ml-10"
         v-else
+        class="ml-10"
         :title="$t('admin.schule.enableNow')"
         data-testid="open-schule-itslearning-sync-dialog-icon"
         icon="mdi-power"
         size="small"
         v-bind="props"
-      ></v-icon>
+      />
     </template>
 
     <template
       v-if="!successDialogVisible"
-      v-slot:default="{ isActive }"
+      #default="{ isActive }"
     >
       <LayoutCard
         :closable="true"
         :header="$t('admin.schule.activateInItsLearning')"
-        @onCloseClicked="closeActivateSchuleDialog(isActive)"
+        @on-close-clicked="closeActivateSchuleDialog(isActive)"
       >
         <v-card-text>
           <v-container>
@@ -168,7 +167,7 @@
                 class="text-right"
                 cols="1"
               >
-                <v-icon icon="mdi-alert"></v-icon>
+                <v-icon icon="mdi-alert" />
               </v-col>
               <v-col>
                 <p data-testid="error-text">
@@ -207,8 +206,8 @@
               <v-btn
                 :block="mdAndDown"
                 class="secondary button"
-                @click.stop="closeActivateSchuleDialog(isActive)"
                 data-testid="cancel-schule-activate-in-itslearning-dialog-button"
+                @click.stop="closeActivateSchuleDialog(isActive)"
               >
                 {{ $t('cancel') }}
               </v-btn>
@@ -221,8 +220,8 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary button"
-                @click.stop="handleSchuleToItsLearning(props.schulId)"
                 data-testid="schule-itslearning-sync-button"
+                @click.stop="handleSchuleToItsLearning(props.schulId)"
               >
                 {{ itslearningEnabled ? $t('admin.schule.retransmit') : $t('admin.schule.activateInItsLearning') }}
               </v-btn>

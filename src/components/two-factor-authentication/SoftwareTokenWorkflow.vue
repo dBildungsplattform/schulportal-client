@@ -82,10 +82,10 @@
   <v-card-actions class="justify-center">
     <v-row class="justify-center">
       <v-col
+        v-if="!twoFactorStore.errorCode"
         cols="12"
         sm="6"
         md="4"
-        v-if="!twoFactorStore.errorCode"
       >
         <v-btn
           class="primary button"

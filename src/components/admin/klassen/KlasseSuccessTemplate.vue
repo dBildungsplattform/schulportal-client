@@ -44,7 +44,7 @@
           data-testid="klasse-success-icon"
           icon="mdi-check-circle"
           small
-        ></v-icon>
+        />
       </v-col>
     </v-row>
     <v-row justify="center">
@@ -73,7 +73,7 @@
       class="border-opacity-100 rounded my-6"
       color="#E5EAEF"
       thickness="6"
-    ></v-divider>
+    />
     <v-row justify="end">
       <v-col
         cols="12"
@@ -90,10 +90,10 @@
         </v-btn>
       </v-col>
       <v-col
+        v-if="showCreateAnotherButton"
         cols="12"
         sm="6"
         md="auto"
-        v-if="showCreateAnotherButton"
       >
         <v-btn
           class="primary button"

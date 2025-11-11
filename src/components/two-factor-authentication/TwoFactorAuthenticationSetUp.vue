@@ -37,7 +37,7 @@
 
   const props: Props = defineProps<Props>();
 
-  async function close2FADialog(isActive: Ref<boolean>): Promise<void> {
+  function close2FADialog(isActive: Ref<boolean>): void {
     if (tokenIsRequested.value) {
       emits('dialogClosed');
       twoFactorAuthentificationStore.qrCode = '';
@@ -59,18 +59,18 @@
     tokenIsRequested.value = true;
   }
 
-  async function handleHeaderUpdate(header: string): Promise<void> {
+  function handleHeaderUpdate(header: string): void {
     dialogHeader.value = header;
   }
 </script>
 
 <template>
   <v-dialog persistent>
-    <template v-slot:activator="{ props }">
+    <template #activator="{ props }">
       <SpshTooltip
-        :enabledCondition="!disabled"
-        :disabledText="$t('person.finishEditFirst')"
-        :enabledText="$t('admin.person.twoFactorAuthentication.setUpShort')"
+        :enabled-condition="!disabled"
+        :disabled-text="$t('person.finishEditFirst')"
+        :enabled-text="$t('admin.person.twoFactorAuthentication.setUpShort')"
         position="start"
       >
         <v-btn
@@ -85,12 +85,12 @@
       </SpshTooltip>
     </template>
 
-    <template v-slot:default="{ isActive }">
+    <template #default="{ isActive }">
       <LayoutCard
         :closable="true"
         :header="dialogHeader"
-        @onCloseClicked="close2FADialog(isActive)"
         data-testid="two-factor-authentication-dialog"
+        @on-close-clicked="close2FADialog(isActive)"
       >
         <v-card-text v-if="!tokenIsRequested">
           <v-container>
@@ -101,12 +101,12 @@
                     :label="$t('admin.person.twoFactorAuthentication.softwareTokenOption')"
                     data-testid="software-token-radio-button"
                     value="software"
-                  ></v-radio>
+                  />
                   <v-radio
                     :label="$t('admin.person.twoFactorAuthentication.hardwareTokenOption')"
                     data-testid="hardware-token-radio-button"
                     value="hardware"
-                  ></v-radio>
+                  />
                 </v-radio-group>
               </v-col>
             </v-row>
@@ -118,19 +118,18 @@
                 <v-icon
                   class="mb-2"
                   icon="mdi-information"
-                >
-                </v-icon>
+                />
               </v-col>
               <div class="v-col">
                 <p
-                  class="text-body"
                   v-if="selectedOption === TokenKind.software"
+                  class="text-body"
                 >
                   {{ $t('admin.person.twoFactorAuthentication.softwareTokenText') }}
                 </p>
                 <p
-                  class="text-body"
                   v-if="selectedOption === TokenKind.hardware"
+                  class="text-body"
                 >
                   {{ $t('admin.person.twoFactorAuthentication.hardwareTokenText') }}
                 </p>
@@ -141,24 +140,23 @@
         <v-container v-if="tokenIsRequested">
           <SoftwareTokenWorkflow
             v-if="selectedOption === TokenKind.software"
-            :qrCodeImageBase64="twoFactorAuthentificationStore.qrCode"
-            @updateHeader="handleHeaderUpdate"
-            @onCloseClicked="close2FADialog(isActive)"
+            :qr-code-image-base64="twoFactorAuthentificationStore.qrCode"
             data-testid="software-token-workflow"
-          ></SoftwareTokenWorkflow>
+            @update-header="handleHeaderUpdate"
+            @on-close-clicked="close2FADialog(isActive)"
+          />
           <HardwareTokenWorkflow
             v-if="selectedOption === TokenKind.hardware"
-            @updateHeader="handleHeaderUpdate"
-            @onCloseClicked="close2FADialog(isActive)"
-            :errorCode="props.errorCode"
+            :error-code="props.errorCode"
             :person="props.person"
             data-testid="hardware-token-workflow"
-          >
-          </HardwareTokenWorkflow>
+            @update-header="handleHeaderUpdate"
+            @on-close-clicked="close2FADialog(isActive)"
+          />
         </v-container>
         <v-card-actions
-          class="justify-center"
           v-if="!tokenIsRequested"
+          class="justify-center"
         >
           <v-row class="justify-center">
             <v-col
@@ -169,8 +167,8 @@
               <v-btn
                 :block="mdAndDown"
                 class="secondary button"
-                @click.stop="close2FADialog(isActive)"
                 data-testid="close-two-factor-authentication-dialog-button"
+                @click.stop="close2FADialog(isActive)"
               >
                 {{ $t('cancel') }}
               </v-btn>
@@ -183,9 +181,9 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary button"
-                @click.stop="requestSoftwareToken()"
                 data-testid="proceed-two-factor-authentication-dialog-button"
                 :disabled="isLoading"
+                @click.stop="requestSoftwareToken()"
               >
                 {{ $t('proceed') }}
               </v-btn>

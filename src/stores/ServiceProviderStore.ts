@@ -59,7 +59,7 @@ type ServiceProviderState = {
   loading: boolean;
 };
 
-type ServiceProviderGetters = {};
+type ServiceProviderGetters = object;
 type ServiceProviderActions = {
   getAllServiceProviders: () => Promise<void>;
   getAvailableServiceProviders: () => Promise<void>;

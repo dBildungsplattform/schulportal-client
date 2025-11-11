@@ -1,7 +1,7 @@
 {
   "extends": "@tsconfig/node18/tsconfig.json",
   "include": [
-    ".eslintrc.cjs",
+    "eslint.config.ts",
     "src/specs/request-handlers.ts",
     "vite.config.ts",
     "vitest.config.ts",

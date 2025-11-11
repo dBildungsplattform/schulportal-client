@@ -82,7 +82,9 @@
 
   const isFormDirty: ComputedRef<boolean> = computed(() => getDirtyState(formContext));
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
-  let blockedNext: () => void = () => {};
+  let blockedNext: () => void = () => {
+    /* empty */
+  };
 
   function handleConfirmUnsavedChanges(): void {
     showUnsavedChangesDialog.value = false;
@@ -106,7 +108,9 @@
   }
 
   function preventNavigation(event: BeforeUnloadEvent): void {
-    if (!isFormDirty.value) return;
+    if (!isFormDirty.value) {
+      return;
+    }
     event.preventDefault();
     /* Chrome requires returnValue to be set. */
     event.returnValue = '';
@@ -120,7 +124,7 @@
     );
   });
 
-  const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = formContext.handleSubmit(async () => {
+  const onSubmit: (e?: Event) => Promise<Promise<void> | undefined> = formContext.handleSubmit(async () => {
     if (
       selectedSchultraegername.value &&
       selectedSchultraegername.value !== organisationStore.currentOrganisation?.name
@@ -140,6 +144,7 @@
       for (let index: number = 0; index < unpersistedSchulenToAssign.value.length; index++) {
         const schuleId: string = unpersistedSchulenToAssign.value[index]!.id;
 
+        // eslint-disable-next-line no-await-in-loop
         await organisationStore.assignSchuleToTraeger(currentSchultraegerId, { organisationId: schuleId });
 
         /* Update progress for each item processed */
@@ -158,6 +163,7 @@
 
         /* assign to traeger's parent */
         if (organisationStore.currentOrganisation?.zugehoerigZu) {
+          // eslint-disable-next-line no-await-in-loop
           await organisationStore.assignSchuleToTraeger(organisationStore.currentOrganisation.zugehoerigZu, {
             organisationId: schuleId,
           });
@@ -240,7 +246,9 @@
 
   // This method will search for both assigned or unassigned Schulen depending on the parameter "type" which could be either 'assigned' or 'unassigned'.
   async function searchSchulen(searchString: string, type: SchuleType): Promise<void> {
-    if (!organisationStore.currentOrganisation) return;
+    if (!organisationStore.currentOrganisation) {
+      return;
+    }
 
     const isAssigned: boolean = type === SchuleType.ASSIGNED;
     const hasSearchInput: boolean = !!searchString;
@@ -362,29 +370,29 @@
     </h1>
     <LayoutCard
       :closable="!organisationStore.errorCode"
-      @onCloseClicked="navigateToSchultraegerManagement"
       :header="$t('admin.schultraeger.edit')"
       :padded="true"
-      :showCloseText="true"
+      :show-close-text="true"
+      @on-close-clicked="navigateToSchultraegerManagement"
     >
       <!-- The form to edit the current Schultraeger -->
       <template v-if="organisationStore.currentOrganisation">
         <SchultraegerForm
           v-if="progress === 0 && !organisationStore.updatedOrganisation"
-          :canCommit="canCommit"
-          :errorCode="organisationStore.errorCode"
-          :isLoading="organisationStore.loading"
-          :onHandleConfirmUnsavedChanges="handleConfirmUnsavedChanges"
-          :onHandleDiscard="navigateToSchultraegerManagement"
-          :onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
-          :onSubmit="onSubmit"
-          :readonly="true"
           ref="schultraeger-edit-form"
-          :rootChildSchultraegerList="rootChildSchultraegerList"
-          :selectedSchultraegernameProps="selectedSchultraegernameProps"
-          :showUnsavedChangesDialog="showUnsavedChangesDialog"
-          v-model:selectedSchultraegerform="selectedSchultraegerform"
-          v-model:selectedSchultraegername="selectedSchultraegername"
+          v-model:selected-schultraegerform="selectedSchultraegerform"
+          v-model:selected-schultraegername="selectedSchultraegername"
+          :can-commit="canCommit"
+          :error-code="organisationStore.errorCode"
+          :is-loading="organisationStore.loading"
+          :on-handle-confirm-unsaved-changes="handleConfirmUnsavedChanges"
+          :on-handle-discard="navigateToSchultraegerManagement"
+          :on-show-dialog-change="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
+          :on-submit="onSubmit"
+          :readonly="true"
+          :root-child-schultraeger-list="rootChildSchultraegerList"
+          :selected-schultraegername-props="selectedSchultraegernameProps"
+          :show-unsaved-changes-dialog="showUnsavedChangesDialog"
         >
           <!-- Error Message Display if error on submit -->
           <!-- To trigger unsaved changes dialog the alert has to be inside the form wrapper -->
@@ -394,10 +402,10 @@
             :type="'error'"
             :closable="false"
             :text="organisationStore.errorCode ? $t(`admin.schultraeger.errors.${organisationStore.errorCode}`) : ''"
-            :showButton="true"
-            :buttonText="$t('admin.schultraeger.backToSchultraeger')"
-            :buttonAction="navigateBackToSchultraegerDetails"
-            buttonClass="primary"
+            :show-button="true"
+            :button-text="$t('admin.schultraeger.backToSchultraeger')"
+            :button-action="navigateBackToSchultraegerDetails"
+            button-class="primary"
           />
         </SchultraegerForm>
 
@@ -413,25 +421,27 @@
             </v-row>
             <v-row class="align-center mt-8 px-5">
               <RelationshipAssign
-                :assignedItems="displayedAssignedSchulen"
-                :assignedItemsHeader="$t('admin.schultraeger.schulenOfThisTraeger', { amount: assignedSchulen.length })"
-                :noAssignedItemsFoundText="noAssignedSchulenFoundText"
-                :noUnassignedItemsFoundText="noUnassignedSchulenFoundText"
-                @onHandleAssignedItemClick="prepareSchuleToUnassign"
-                @onHandleAssignedItemsSearchFilter="
+                :assigned-items="displayedAssignedSchulen"
+                :assigned-items-header="
+                  $t('admin.schultraeger.schulenOfThisTraeger', { amount: assignedSchulen.length })
+                "
+                :no-assigned-items-found-text="noAssignedSchulenFoundText"
+                :no-unassigned-items-found-text="noUnassignedSchulenFoundText"
+                :unassigned-items="displayedUnassignedSchulen"
+                :unassigned-items-header="$t('admin.schultraeger.schulenWithoutTraeger')"
+                @on-handle-assigned-item-click="prepareSchuleToUnassign"
+                @on-handle-assigned-items-search-filter="
                   (searchString: string) => searchSchulen(searchString, SchuleType.ASSIGNED)
                 "
-                @onHandleUnassignedItemClick="prepareSchuleToAssign"
-                @onHandleUnassignedItemsSearchFilter="
+                @on-handle-unassigned-item-click="prepareSchuleToAssign"
+                @on-handle-unassigned-items-search-filter="
                   (searchString: string) => searchSchulen(searchString, SchuleType.UNASSIGNED)
                 "
-                :unassignedItems="displayedUnassignedSchulen"
-                :unassignedItemsHeader="$t('admin.schultraeger.schulenWithoutTraeger')"
               >
-                <template v-slot="{ item }">
+                <template #default="{ item }">
                   <SpshTooltip
-                    :enabledCondition="true"
-                    :enabledText="`(${item.kennung}) ${item.name}`"
+                    :enabled-condition="true"
+                    :enabled-text="`(${item.kennung}) ${item.name}`"
                   >
                     {{ `(${item.kennung}) ${item.name}` }}
                   </SpshTooltip>
@@ -444,22 +454,22 @@
         <!-- Result template on success after submit  -->
         <template v-if="organisationStore.updatedOrganisation && !organisationStore.errorCode">
           <SchultraegerSuccessTemplate
-            :successMessage="$t('admin.schultraeger.schultraegerUpdatedSuccessfully')"
-            :followingDataChanged="$t('admin.followingDataCreated')"
-            :changedData="[
+            :success-message="$t('admin.schultraeger.schultraegerUpdatedSuccessfully')"
+            :following-data-changed="$t('admin.followingDataCreated')"
+            :changed-data="[
               {
                 label: $t('admin.schultraeger.schultraegername'),
                 value: organisationStore.updatedOrganisation.name,
                 testId: 'updated-schultraeger-name',
               },
             ]"
-            :backButtonText="$t('nav.backToDetails')"
-            :createAnotherButtonText="$t('admin.schultraeger.createAnother')"
-            :showBackButton="false"
-            :showCreateAnotherButton="false"
-            backButtonTestId="back-to-details-button"
-            createAnotherButtonTestId="create-another-schultraeger-button"
-            @onNavigateBackToSchultraegerManagement="navigateToSchultraegerManagement"
+            :back-button-text="$t('nav.backToDetails')"
+            :create-another-button-text="$t('admin.schultraeger.createAnother')"
+            :show-back-button="false"
+            :show-create-another-button="false"
+            back-button-test-id="back-to-details-button"
+            create-another-button-test-id="create-another-schultraeger-button"
+            @on-navigate-back-to-schultraeger-management="navigateToSchultraegerManagement"
           />
         </template>
 
@@ -475,7 +485,7 @@
                   small
                   color="#1EAE9C"
                   icon="mdi-check-circle"
-                ></v-icon>
+                />
               </v-col>
             </v-row>
             <p class="mt-2 text-center">
@@ -493,7 +503,7 @@
                 class="mr-2"
                 icon="mdi-alert-circle-outline"
                 size="small"
-              ></v-icon>
+              />
               <span class="subtitle-2">
                 {{ $t('admin.doNotCloseBrowserNotice') }}
               </span>
@@ -501,11 +511,11 @@
           </v-row>
           <v-progress-linear
             class="mt-5"
-            :modelValue="progress"
+            :model-value="progress"
             color="primary"
             height="25"
           >
-            <template v-slot:default="{ value }">
+            <template #default="{ value }">
               <strong class="text-white">{{ Math.ceil(value) }}%</strong>
             </template>
           </v-progress-linear>
@@ -513,7 +523,7 @@
             class="border-opacity-100 rounded my-6"
             color="#E5EAEF"
             thickness="6"
-          ></v-divider>
+          />
         </div>
 
         <v-row
@@ -529,8 +539,8 @@
             <v-btn
               class="secondary"
               data-testid="go-to-schultraeger-management-button"
-              @click="navigateToSchultraegerManagement"
               :block="mdAndDown"
+              @click="navigateToSchultraegerManagement"
             >
               {{ $t('nav.backToList') }}
             </v-btn>
@@ -544,8 +554,8 @@
             <v-btn
               class="primary"
               data-testid="back-to-schultraeger-button"
-              @click="navigateBackToSchultraegerDetails"
               :block="mdAndDown"
+              @click="navigateBackToSchultraegerDetails"
             >
               {{ $t('nav.backToDetails') }}
             </v-btn>
@@ -559,9 +569,9 @@
             <v-btn
               :block="mdAndDown"
               class="primary"
-              @click="onSubmit"
               data-testid="schultraeger-edit-save-button"
               :disabled="!canCommit || organisationStore.loading"
+              @click="onSubmit"
             >
               {{ $t('save') }}
             </v-btn>
