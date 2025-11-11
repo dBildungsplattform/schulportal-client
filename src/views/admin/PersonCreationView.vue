@@ -735,7 +735,6 @@
     </h1>
     <LayoutCard
       :closable="!personenkontextStore.errorCode && !personStore.errorCode"
-      data-testid="person-creation-card"
       :header="layoutCardLabel"
       :headlineTestId="layoutCardHeadlineTestId"
       @onCloseClicked="navigateToPersonTable"

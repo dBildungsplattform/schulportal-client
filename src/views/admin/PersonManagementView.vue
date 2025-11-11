@@ -592,7 +592,10 @@
     >
       {{ $t('admin.headline') }}
     </h1>
-    <LayoutCard :header="$t('admin.person.management')">
+    <LayoutCard
+      :header="$t('admin.person.management')"
+      headlineTestId="person-management-headline"
+    >
       <v-row
         align="start"
         class="ma-3"

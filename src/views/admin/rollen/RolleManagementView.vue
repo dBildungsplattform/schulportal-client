@@ -103,7 +103,10 @@
     >
       {{ $t('admin.headline') }}
     </h1>
-    <LayoutCard :header="$t('admin.rolle.management')">
+    <LayoutCard
+      :header="$t('admin.rolle.management')"
+      headlineTestId="rolle-management-headline"
+    >
       <ResultTable
         :currentPage="searchFilterStore.rollenPage"
         data-testid="rolle-table"

@@ -406,8 +406,8 @@
     </h1>
     <LayoutCard
       :closable="true"
-      data-testid="person-import-card"
       :header="$t('admin.person.import')"
+      headlineTestId="person-import-headline"
       @onCloseClicked="navigateToPersonTable"
       :padded="true"
       :showCloseText="true"

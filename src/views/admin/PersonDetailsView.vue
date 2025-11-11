@@ -1606,8 +1606,8 @@
     </h1>
     <LayoutCard
       :closable="!personStore.errorCode && !personenkontextStore.errorCode"
-      data-testid="person-details-card"
       :header="t('admin.person.edit')"
+      :headlineTestId="'person-details-headline'"
       @onCloseClicked="navigateToPersonTable"
       :padded="true"
       :showCloseText="true"

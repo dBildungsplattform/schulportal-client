@@ -248,8 +248,8 @@
       {{ t('admin.headline') }}
     </h1>
     <LayoutCard
-      data-testid="klasse-management-card"
       :header="t('admin.klasse.management')"
+      headlineTestId="klasse-management-headline"
     >
       <!-- Error Message Display -->
       <SpshAlert

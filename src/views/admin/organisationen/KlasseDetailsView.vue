@@ -199,8 +199,8 @@
     </h1>
     <LayoutCard
       :closable="!organisationStore.errorCode"
-      data-testid="klasse-details-card"
       :header="$t('admin.klasse.edit')"
+      headlineTestId="klasse-details-headline"
       @onCloseClicked="navigateToKlasseManagement"
       :padded="true"
       :showCloseText="true"
