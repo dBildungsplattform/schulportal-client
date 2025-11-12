@@ -401,6 +401,7 @@
       :closable="true"
       @onCloseClicked="navigateToPersonTable"
       :header="t('admin.person.stateEmployeeSearch.searchStateEmployee')"
+      headlineTestId="search-state-employee-headline"
       :padded="true"
       :showCloseText="true"
     >
