@@ -199,8 +199,7 @@
       @onCloseClicked="navigateToSchuleManagement"
       :header="$t('admin.schule.addNew')"
       :padded="true"
-      :show-close-text="true"
-      @on-close-clicked="navigateToSchuleManagement"
+      :showCloseText="true"
     >
       <!-- The form to create a new school (No created school yet and no errorCode) -->
       <template v-if="!organisationStore.createdSchule">
