@@ -115,7 +115,7 @@ beforeEach(() => {
     {
       occasion: 'KOPERS',
       deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-      school: "Carl-orff-Schule",
+      school: 'Carl-orff-Schule',
       rolle: null,
     },
   ];

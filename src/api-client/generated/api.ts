@@ -1403,10 +1403,10 @@ export interface ManageableServiceProviderResponse {
     'url': string;
     /**
      * 
-     * @type {Array<RollenerweiterungForServiceProviderResponse>}
+     * @type {boolean}
      * @memberof ManageableServiceProviderResponse
      */
-    'rollenerweiterungen': Array<RollenerweiterungForServiceProviderResponse>;
+    'hasRollenerweiterung': boolean;
     /**
      * 
      * @type {Array<RolleRefResponse>}
@@ -2926,44 +2926,44 @@ export interface PersonenuebersichtBodyParams {
 /**
  * 
  * @export
- * @interface ProviderControllerGetManageableServiceProviders200Response
+ * @interface ProviderControllerFindRollenerweiterungenByServiceProviderId200Response
  */
-export interface ProviderControllerGetManageableServiceProviders200Response {
+export interface ProviderControllerFindRollenerweiterungenByServiceProviderId200Response {
     /**
      * 
      * @type {number}
-     * @memberof ProviderControllerGetManageableServiceProviders200Response
+     * @memberof ProviderControllerFindRollenerweiterungenByServiceProviderId200Response
      */
     'total': number;
     /**
      * 
      * @type {number}
-     * @memberof ProviderControllerGetManageableServiceProviders200Response
+     * @memberof ProviderControllerFindRollenerweiterungenByServiceProviderId200Response
      */
     'offset': number;
     /**
      * 
      * @type {number}
-     * @memberof ProviderControllerGetManageableServiceProviders200Response
+     * @memberof ProviderControllerFindRollenerweiterungenByServiceProviderId200Response
      */
     'limit': number;
     /**
      * 
      * @type {Array<ManageableServiceProviderListEntryResponse>}
-     * @memberof ProviderControllerGetManageableServiceProviders200Response
+     * @memberof ProviderControllerFindRollenerweiterungenByServiceProviderId200Response
      */
     'items': Array<ManageableServiceProviderListEntryResponse>;
 }
 /**
  * 
  * @export
- * @interface ProviderControllerGetManageableServiceProviders200ResponseAllOf
+ * @interface ProviderControllerFindRollenerweiterungenByServiceProviderId200ResponseAllOf
  */
-export interface ProviderControllerGetManageableServiceProviders200ResponseAllOf {
+export interface ProviderControllerFindRollenerweiterungenByServiceProviderId200ResponseAllOf {
     /**
      * 
      * @type {Array<ManageableServiceProviderListEntryResponse>}
-     * @memberof ProviderControllerGetManageableServiceProviders200ResponseAllOf
+     * @memberof ProviderControllerFindRollenerweiterungenByServiceProviderId200ResponseAllOf
      */
     'items': Array<ManageableServiceProviderListEntryResponse>;
 }
@@ -3285,25 +3285,6 @@ export interface RollenSystemRechtServiceProviderIDResponse {
      * @memberof RollenSystemRechtServiceProviderIDResponse
      */
     'serviceProviderIds': Array<string>;
-}
-/**
- * 
- * @export
- * @interface RollenerweiterungForServiceProviderResponse
- */
-export interface RollenerweiterungForServiceProviderResponse {
-    /**
-     * 
-     * @type {OrganisationRefResponse}
-     * @memberof RollenerweiterungForServiceProviderResponse
-     */
-    'organisation': OrganisationRefResponse;
-    /**
-     * 
-     * @type {RolleRefResponse}
-     * @memberof RollenerweiterungForServiceProviderResponse
-     */
-    'rolle': RolleRefResponse;
 }
 /**
  * 
@@ -11164,6 +11145,58 @@ export class PersonenkontexteApi extends BaseAPI implements PersonenkontexteApiI
 export const ProviderApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
+         * Get service-providers the logged-in user is allowed to manage.
+         * @summary 
+         * @param {string} angebotId The id of the service provider
+         * @param {number} [offset] The offset of the paginated list.
+         * @param {number} [limit] The requested limit for the page size.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        providerControllerFindRollenerweiterungenByServiceProviderId: async (angebotId: string, offset?: number, limit?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'angebotId' is not null or undefined
+            assertParamExists('providerControllerFindRollenerweiterungenByServiceProviderId', 'angebotId', angebotId)
+            const localVarPath = `/api/provider/{angebotId}/rollenerweiterung`
+                .replace(`{${"angebotId"}}`, encodeURIComponent(String(angebotId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+            if (offset !== undefined) {
+                localVarQueryParameter['offset'] = offset;
+            }
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Get all service-providers.
          * @summary 
          * @param {*} [options] Override http request option.
@@ -11381,6 +11414,19 @@ export const ProviderApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = ProviderApiAxiosParamCreator(configuration)
     return {
         /**
+         * Get service-providers the logged-in user is allowed to manage.
+         * @summary 
+         * @param {string} angebotId The id of the service provider
+         * @param {number} [offset] The offset of the paginated list.
+         * @param {number} [limit] The requested limit for the page size.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async providerControllerFindRollenerweiterungenByServiceProviderId(angebotId: string, offset?: number, limit?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ProviderControllerFindRollenerweiterungenByServiceProviderId200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.providerControllerFindRollenerweiterungenByServiceProviderId(angebotId, offset, limit, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * Get all service-providers.
          * @summary 
          * @param {*} [options] Override http request option.
@@ -11419,7 +11465,7 @@ export const ProviderApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async providerControllerGetManageableServiceProviders(offset?: number, limit?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ProviderControllerGetManageableServiceProviders200Response>> {
+        async providerControllerGetManageableServiceProviders(offset?: number, limit?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ProviderControllerFindRollenerweiterungenByServiceProviderId200Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.providerControllerGetManageableServiceProviders(offset, limit, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -11443,6 +11489,18 @@ export const ProviderApiFp = function(configuration?: Configuration) {
 export const ProviderApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = ProviderApiFp(configuration)
     return {
+        /**
+         * Get service-providers the logged-in user is allowed to manage.
+         * @summary 
+         * @param {string} angebotId The id of the service provider
+         * @param {number} [offset] The offset of the paginated list.
+         * @param {number} [limit] The requested limit for the page size.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        providerControllerFindRollenerweiterungenByServiceProviderId(angebotId: string, offset?: number, limit?: number, options?: any): AxiosPromise<ProviderControllerFindRollenerweiterungenByServiceProviderId200Response> {
+            return localVarFp.providerControllerFindRollenerweiterungenByServiceProviderId(angebotId, offset, limit, options).then((request) => request(axios, basePath));
+        },
         /**
          * Get all service-providers.
          * @summary 
@@ -11479,7 +11537,7 @@ export const ProviderApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        providerControllerGetManageableServiceProviders(offset?: number, limit?: number, options?: any): AxiosPromise<ProviderControllerGetManageableServiceProviders200Response> {
+        providerControllerGetManageableServiceProviders(offset?: number, limit?: number, options?: any): AxiosPromise<ProviderControllerFindRollenerweiterungenByServiceProviderId200Response> {
             return localVarFp.providerControllerGetManageableServiceProviders(offset, limit, options).then((request) => request(axios, basePath));
         },
         /**
@@ -11500,6 +11558,18 @@ export const ProviderApiFactory = function (configuration?: Configuration, baseP
  * @interface ProviderApi
  */
 export interface ProviderApiInterface {
+    /**
+     * Get service-providers the logged-in user is allowed to manage.
+     * @summary 
+     * @param {string} angebotId The id of the service provider
+     * @param {number} [offset] The offset of the paginated list.
+     * @param {number} [limit] The requested limit for the page size.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProviderApiInterface
+     */
+    providerControllerFindRollenerweiterungenByServiceProviderId(angebotId: string, offset?: number, limit?: number, options?: AxiosRequestConfig): AxiosPromise<ProviderControllerFindRollenerweiterungenByServiceProviderId200Response>;
+
     /**
      * Get all service-providers.
      * @summary 
@@ -11537,7 +11607,7 @@ export interface ProviderApiInterface {
      * @throws {RequiredError}
      * @memberof ProviderApiInterface
      */
-    providerControllerGetManageableServiceProviders(offset?: number, limit?: number, options?: AxiosRequestConfig): AxiosPromise<ProviderControllerGetManageableServiceProviders200Response>;
+    providerControllerGetManageableServiceProviders(offset?: number, limit?: number, options?: AxiosRequestConfig): AxiosPromise<ProviderControllerFindRollenerweiterungenByServiceProviderId200Response>;
 
     /**
      * 
@@ -11557,6 +11627,20 @@ export interface ProviderApiInterface {
  * @extends {BaseAPI}
  */
 export class ProviderApi extends BaseAPI implements ProviderApiInterface {
+    /**
+     * Get service-providers the logged-in user is allowed to manage.
+     * @summary 
+     * @param {string} angebotId The id of the service provider
+     * @param {number} [offset] The offset of the paginated list.
+     * @param {number} [limit] The requested limit for the page size.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProviderApi
+     */
+    public providerControllerFindRollenerweiterungenByServiceProviderId(angebotId: string, offset?: number, limit?: number, options?: AxiosRequestConfig) {
+        return ProviderApiFp(this.configuration).providerControllerFindRollenerweiterungenByServiceProviderId(angebotId, offset, limit, options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * Get all service-providers.
      * @summary 
