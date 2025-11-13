@@ -90,7 +90,9 @@
   }
 
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
-  let blockedNext: () => void = () => {};
+  let blockedNext: () => void = () => {
+    /* empty */
+  };
 
   onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
     if (isFormDirty()) {
@@ -101,7 +103,7 @@
     }
   });
 
-  const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
+  const onSubmit: (e?: Event) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
     preservedSchulform.value = schultraegerList.value?.find(
       (schultraeger: Organisation) => schultraeger.id === selectedSchulform.value,
     )?.name;
@@ -156,7 +158,9 @@
   }
 
   function preventNavigation(event: BeforeUnloadEvent): void {
-    if (!isFormDirty()) return;
+    if (!isFormDirty()) {
+      return;
+    }
     event.preventDefault();
     /* Chrome requires returnValue to be set. */
     event.returnValue = '';
@@ -195,22 +199,23 @@
       @onCloseClicked="navigateToSchuleManagement"
       :header="$t('admin.schule.addNew')"
       :padded="true"
-      :showCloseText="true"
+      :show-close-text="true"
+      @on-close-clicked="navigateToSchuleManagement"
     >
       <!-- The form to create a new school (No created school yet and no errorCode) -->
       <template v-if="!organisationStore.createdSchule">
         <FormWrapper
-          :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
-          :createButtonLabel="$t('admin.schule.create')"
-          :discardButtonLabel="$t('admin.schule.discard')"
-          :hideActions="!!organisationStore.errorCode"
           id="schule-creation-form"
-          :isLoading="organisationStore.loading"
-          :onDiscard="navigateToSchuleManagement"
-          @onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
-          :onSubmit="onSubmit"
           ref="schule-creation-form"
-          :showUnsavedChangesDialog="showUnsavedChangesDialog"
+          :confirm-unsaved-changes-action="handleConfirmUnsavedChanges"
+          :create-button-label="$t('admin.schule.create')"
+          :discard-button-label="$t('admin.schule.discard')"
+          :hide-actions="!!organisationStore.errorCode"
+          :is-loading="organisationStore.loading"
+          :on-discard="navigateToSchuleManagement"
+          :on-submit="onSubmit"
+          :show-unsaved-changes-dialog="showUnsavedChangesDialog"
+          @on-show-dialog-change="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
         >
           <!-- Error Message Display if error on submit -->
           <SpshAlert
@@ -219,10 +224,10 @@
             :type="'error'"
             :closable="false"
             :text="organisationStore.errorCode ? $t(`admin.schule.errors.${organisationStore.errorCode}`) : ''"
-            :showButton="true"
-            :buttonText="$t('admin.schule.backToCreateSchule')"
-            :buttonAction="navigateBackToSchuleForm"
-            buttonClass="primary"
+            :show-button="true"
+            :button-text="$t('admin.schule.backToCreateSchule')"
+            :button-action="navigateBackToSchuleForm"
+            button-class="primary"
           />
 
           <template v-if="!organisationStore.errorCode">
@@ -236,10 +241,10 @@
               <v-col
                 cols="4"
                 class="d-none d-md-flex"
-              ></v-col>
+              />
               <v-radio-group
-                inline
                 v-model="selectedSchulform"
+                inline
                 data-testid="schulform-radio-group"
               >
                 <v-col
@@ -254,7 +259,7 @@
                     :label="schultraeger.name"
                     :value="schultraeger.id"
                     :data-testid="'schulform-radio-button-' + index"
-                  ></v-radio>
+                  />
                 </v-col>
               </v-radio-group>
             </v-row>
@@ -265,21 +270,21 @@
               </v-col>
             </v-row>
             <FormRow
-              :errorLabel="selectedDienststellennummerProps['error']"
-              labelForId="dienststellennummer-input"
-              :isRequired="true"
+              :error-label="selectedDienststellennummerProps['error']"
+              label-for-id="dienststellennummer-input"
+              :is-required="true"
               :label="$t('admin.schule.dienststellennummer')"
             >
               <v-text-field
+                v-bind="selectedDienststellennummerProps"
+                ref="dienststellennummer-input"
+                v-model="selectedDienststellennummer"
                 clearable
                 data-testid="dienststellennummer-input"
-                v-bind="selectedDienststellennummerProps"
-                v-model="selectedDienststellennummer"
                 :placeholder="$t('admin.schule.dienststellennummer')"
-                ref="dienststellennummer-input"
                 variant="outlined"
                 density="compact"
-              ></v-text-field>
+              />
             </FormRow>
             <!-- select school name -->
             <v-row>
@@ -288,22 +293,22 @@
               </v-col>
             </v-row>
             <FormRow
-              :errorLabel="selectedSchulnameProps['error']"
-              labelForId="schulname-input"
-              :isRequired="true"
+              :error-label="selectedSchulnameProps['error']"
+              label-for-id="schulname-input"
+              :is-required="true"
               :label="$t('admin.schule.schulname')"
             >
               <v-text-field
+                v-bind="selectedSchulnameProps"
+                ref="schulname-input"
+                v-model="selectedSchulname"
                 clearable
                 data-testid="schulname-input"
-                v-bind="selectedSchulnameProps"
-                v-model="selectedSchulname"
                 :placeholder="$t('admin.schule.schulname')"
-                ref="schulname-input"
                 variant="outlined"
                 density="compact"
                 required
-              ></v-text-field>
+              />
             </FormRow>
           </template>
         </FormWrapper>
@@ -326,8 +331,7 @@
                 color="#1EAE9C"
                 data-testid="schule-success-icon"
                 icon="mdi-check-circle"
-              >
-              </v-icon>
+              />
             </v-col>
           </v-row>
           <v-row justify="center">
@@ -346,9 +350,9 @@
             >
               {{ $t('admin.schule.schulform') }}:
             </v-col>
-            <v-col class="text-body"
-              ><span data-testid="created-schule-form">{{ preservedSchulform }}</span></v-col
-            >
+            <v-col class="text-body">
+              <span data-testid="created-schule-form"> {{ preservedSchulform }}</span>
+            </v-col>
           </v-row>
           <v-row>
             <v-col
@@ -357,11 +361,11 @@
             >
               {{ $t('admin.schule.dienststellennummer') }}:
             </v-col>
-            <v-col class="text-body"
-              ><span data-testid="created-schule-dienststellennummer">{{
+            <v-col class="text-body">
+              <span data-testid="created-schule-dienststellennummer">{{
                 organisationStore.createdSchule.kennung
-              }}</span></v-col
-            >
+              }}</span>
+            </v-col>
           </v-row>
           <v-row>
             <v-col
@@ -371,14 +375,14 @@
               {{ $t('admin.schule.schulname') }}:
             </v-col>
             <v-col class="text-body"
-              ><span data-testid="created-schule-name">{{ organisationStore.createdSchule.name }}</span></v-col
-            >
+              ><span data-testid="created-schule-name">{{ organisationStore.createdSchule.name }}</span>
+            </v-col>
           </v-row>
           <v-divider
             class="border-opacity-100 rounded my-6"
             color="#E5EAEF"
             thickness="6"
-          ></v-divider>
+          />
           <v-row justify="end">
             <v-col
               cols="12"
@@ -388,10 +392,11 @@
               <v-btn
                 class="secondary"
                 data-testid="back-to-list-button"
-                @click="navigateToSchuleManagement"
                 :block="mdAndDown"
-                >{{ $t('nav.backToList') }}</v-btn
+                @click="navigateToSchuleManagement"
               >
+                {{ $t('nav.backToList') }}
+              </v-btn>
             </v-col>
             <v-col
               cols="12"
@@ -401,8 +406,8 @@
               <v-btn
                 class="primary button"
                 data-testid="create-another-schule-button"
-                @click="handleCreateAnotherSchule"
                 :block="mdAndDown"
+                @click="handleCreateAnotherSchule"
               >
                 {{ $t('admin.schule.createAnother') }}
               </v-btn>

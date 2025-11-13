@@ -46,7 +46,7 @@ type SearchFilterActions = {
   setKlasseFilterForKlassen: (selectedKlassenForKlassen: Array<string> | null) => void;
 };
 
-type SearchFilterGetters = {};
+type SearchFilterGetters = object;
 
 export type SearchFilterStore = Store<'searchFilterStore', SearchFilterState, SearchFilterGetters, SearchFilterActions>;
 

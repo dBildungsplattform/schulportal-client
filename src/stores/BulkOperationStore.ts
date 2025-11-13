@@ -39,7 +39,7 @@ type BulkOperationState = {
   currentOperation: CurrentOperation | null;
 };
 
-type BulkOperationGetters = {};
+type BulkOperationGetters = unknown;
 
 type BulkOperationActions = {
   resetState(): void;
@@ -132,6 +132,7 @@ export const useBulkOperationStore: StoreDefinition<
         const personId: string = personIDs[i]!;
 
         try {
+          // eslint-disable-next-line no-await-in-loop
           await processFunction(personId, i);
         } finally {
           // Always update progress even if there was an error
@@ -212,7 +213,9 @@ export const useBulkOperationStore: StoreDefinition<
       const selectedOrganisation: Organisation | undefined = workflowStepResponseOrganisations.find(
         (orga: Organisation) => orga.id === selectedOrganisationId,
       );
-      if (!selectedOrganisation) return;
+      if (!selectedOrganisation) {
+        return;
+      }
 
       await this.processPersonOperation(
         OperationType.MODIFY_ROLLE,

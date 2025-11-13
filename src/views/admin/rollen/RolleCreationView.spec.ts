@@ -357,7 +357,10 @@ describe('RolleCreationView', () => {
       administeredBySchulstrukturknotenKennung: '',
       version: 1,
     };
-    vi.spyOn(rolleStore, 'createRolle').mockResolvedValue(mockRolle);
+    vi.spyOn(rolleStore, 'createRolle').mockImplementation(async () => { {
+      rolleStore.createdRolle = { ...mockRolle, systemrechte: [] as unknown as Set<RollenSystemRechtEnum> };
+    }
+    });
 
     expect(
       wrapper

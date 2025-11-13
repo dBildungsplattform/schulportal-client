@@ -7,10 +7,9 @@
     type RolleStore,
   } from '@/stores/RolleStore';
   import { computed, onMounted, type ComputedRef } from 'vue';
-  import ResultTable, { type TableRow } from '@/components/admin/ResultTable.vue';
+  import ResultTable, { type TableRow, type Headers } from '@/components/admin/ResultTable.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { type Composer, useI18n } from 'vue-i18n';
-  import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
   import { useRouter, type Router } from 'vue-router';
   import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
 
@@ -20,7 +19,7 @@
   const router: Router = useRouter();
   const { t }: Composer = useI18n({ useScope: 'global' });
 
-  type ReadonlyHeaders = InstanceType<typeof VDataTableServer>['headers'];
+  type ReadonlyHeaders = Headers;
   const headers: ReadonlyHeaders = [
     { title: t('admin.rolle.rollenname'), key: 'name', align: 'start' },
     { title: t('admin.rolle.rollenart'), key: 'rollenart', align: 'start' },
@@ -108,22 +107,22 @@
       headlineTestId="rolle-management-headline"
     >
       <ResultTable
-        :currentPage="searchFilterStore.rollenPage"
+        :current-page="searchFilterStore.rollenPage"
         data-testid="rolle-table"
         :items="transformedRollenAndMerkmale || []"
-        :itemsPerPage="searchFilterStore.rollenPerPage"
+        :items-per-page="searchFilterStore.rollenPerPage"
         :loading="rolleStore.loading"
         :headers="headers"
-        @onHandleRowClick="
+        :total-items="rolleStore.totalRollen"
+        item-value-path="id"
+        @on-handle-row-click="
           (event: PointerEvent, item: TableRow<unknown>) =>
             navigateToRolleDetails(event, item as TableRow<RolleTableItem>)
         "
-        @onItemsPerPageUpdate="getPaginatedRollenWithLimit"
-        @onPageUpdate="getPaginatedRollen"
-        :totalItems="rolleStore.totalRollen"
-        item-value-path="id"
+        @on-items-per-page-update="getPaginatedRollenWithLimit"
+        @on-page-update="getPaginatedRollen"
       >
-        <template v-slot:[`item.serviceProviders`]="{ item }">
+        <template #[`item.serviceProviders`]="{ item }">
           <div class="ellipsis-wrapper">
             <span
               v-if="!item.serviceProviders.length"

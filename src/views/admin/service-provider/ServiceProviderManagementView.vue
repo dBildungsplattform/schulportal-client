@@ -1,9 +1,8 @@
 <script setup lang="ts">
   import { computed, watchEffect, type ComputedRef } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
-  import { VDataTableServer } from 'vuetify/components';
 
-  import ResultTable, { type TableRow } from '@/components/admin/ResultTable.vue';
+  import ResultTable, { type Headers, type TableRow } from '@/components/admin/ResultTable.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
   import {
@@ -29,7 +28,7 @@
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
 
-  const headers: VDataTableServer['headers'] = [
+  const headers: Headers = [
     { title: t('angebot.kategorie'), key: 'kategorie', align: 'start' },
     { title: t('angebot.name'), key: 'name', align: 'start' },
     { title: t('angebot.administrationsebene'), key: 'administrationsebene', align: 'start' },

@@ -1,18 +1,12 @@
 import {
-  EmailAddressStatus,
-  OrganisationsTyp,
-  RollenArt,
-  RollenMerkmal,
-  RollenSystemRechtEnum,
-  ServiceProviderKategorie,
-  ServiceProviderTarget,
-  TraegerschaftTyp,
   type DBiamPersonenkontextResponse,
   type DBiamPersonenuebersichtResponse,
   type DBiamPersonenzuordnungResponse,
+  EmailAddressStatus,
   type ManageableServiceProviderListEntryResponse,
   type OrganisationResponse,
   type OrganisationResponseLegacy,
+  OrganisationsTyp,
   type PersonendatensatzResponse,
   type PersonenkontexteUpdateResponse,
   type PersonenkontextRolleFieldsResponse,
@@ -20,9 +14,15 @@ import {
   type PersonLandesbediensteterSearchPersonenkontextResponse,
   type PersonLandesbediensteterSearchResponse,
   type PersonResponse,
+  RollenArt,
+  RollenMerkmal,
+  RollenSystemRechtEnum,
   type RollenSystemRechtServiceProviderIDResponse,
+  ServiceProviderKategorie,
   type ServiceProviderResponse,
+  ServiceProviderTarget,
   type SystemRechtResponse,
+  TraegerschaftTyp,
   type UserinfoResponse,
 } from '@/api-client/generated';
 import type { Organisation } from '@/stores/OrganisationStore';
@@ -35,7 +35,7 @@ import { PersonenUebersicht } from '@/stores/types/PersonenUebersicht';
 import { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
 import { Zuordnung } from '@/stores/types/Zuordnung';
 import { PersonLockOccasion, type UserLock } from '@/utils/lock';
-// eslint-disable-next-line import/no-extraneous-dependencies
+
 import { faker } from '@faker-js/faker';
 
 export class DoFactory {
@@ -73,7 +73,8 @@ export class DoFactory {
 
   public static getZuordnung(props?: Partial<Zuordnung>, nested?: { organisation: Partial<Organisation> }): Zuordnung {
     const schule: Organisation = DoFactory.getSchule(nested?.organisation);
-    const zuordnung: Zuordnung = new Zuordnung(
+
+    return new Zuordnung(
       props?.sskId ?? schule.id,
       props?.rolleId ?? faker.string.uuid(),
       props?.sskName ?? schule.name,
@@ -87,7 +88,6 @@ export class DoFactory {
       props?.merkmale ?? [],
       props?.admins ?? [faker.person.fullName()],
     );
-    return zuordnung;
   }
 
   public static getPersonenUebersicht(
@@ -98,7 +98,7 @@ export class DoFactory {
       person.id,
       person.name.vorname,
       person.name.familienname,
-      person.username!,
+      person.username,
       faker.date.recent().toISOString(),
       zuordnungen,
     );

@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import FormRow from '@/components/form/FormRow.vue';
-  import { onMounted, onUnmounted, ref, type Ref } from 'vue';
+  import { onMounted, onUnmounted, ref, type Ref, watch } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import type { AssignHardwareTokenBodyParams } from '@/api-client/generated';
   import { object, string } from 'yup';
@@ -14,7 +14,6 @@
   } from '@/stores/TwoFactorAuthentificationStore';
   import { useDisplay } from 'vuetify';
   import type { Personendatensatz } from '@/stores/PersonStore';
-  import { watch } from 'vue';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const dialogText: Ref<string> = ref('');
@@ -101,14 +100,18 @@
   }
 
   function preventNavigation(event: BeforeUnloadEvent): void {
-    if (!isFormDirty()) return;
+    if (!isFormDirty()) {
+      return;
+    }
     event.preventDefault();
     /* Chrome requires returnValue to be set. */
     event.returnValue = '';
   }
 
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
-  let blockedNext: () => void = () => {};
+  let blockedNext: () => void = () => {
+    /* empty */
+  };
 
   onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
     if (isFormDirty()) {
@@ -123,7 +126,7 @@
     blockedNext();
   }
 
-  onMounted(async () => {
+  onMounted(() => {
     /* listen for browser changes and prevent them when form is dirty */
     window.addEventListener('beforeunload', preventNavigation);
   });
@@ -142,7 +145,9 @@
   );
 
   async function assignHardwareToken(): Promise<void> {
-    if (!props.person.person.username) return;
+    if (!props.person.person.username) {
+      return;
+    }
     const assignHardwareTokenBodyParams: AssignHardwareTokenBodyParams = {
       serial: selectedSeriennummer.value,
       otp: selectedOtp.value,
@@ -156,7 +161,7 @@
     }
     hardwareTokenIsAssigned.value = true;
   }
-  const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = handleSubmit(async () => {
+  const onSubmit: (e?: Event) => Promise<void | undefined> = handleSubmit(() => {
     assignHardwareToken();
   });
 </script>
@@ -164,55 +169,55 @@
 <template v-slot:activator="{ props }">
   <v-container v-if="!hardwareTokenIsAssigned">
     <FormWrapper
-      :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
-      :createButtonLabel="$t('admin.person.twoFactorAuthentication.setUp')"
-      :discardButtonLabel="$t('cancel')"
       id="hardware-token-form"
-      :onDiscard="cancelCheck"
-      @onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value ?? false)"
-      :centerButtons="true"
-      :onSubmit="onSubmit"
-      :showUnsavedChangesDialog="showUnsavedChangesDialog"
+      :confirm-unsaved-changes-action="handleConfirmUnsavedChanges"
+      :create-button-label="$t('admin.person.twoFactorAuthentication.setUp')"
+      :discard-button-label="$t('cancel')"
+      :on-discard="cancelCheck"
+      :center-buttons="true"
+      :on-submit="onSubmit"
+      :show-unsaved-changes-dialog="showUnsavedChangesDialog"
+      @on-show-dialog-change="(value?: boolean) => (showUnsavedChangesDialog = value ?? false)"
     >
       <FormRow
-        :errorLabel="''"
-        labelForId="serial-input"
-        :isRequired="true"
+        :error-label="''"
+        label-for-id="serial-input"
+        :is-required="true"
         :label="t('admin.person.twoFactorAuthentication.serial')"
       >
         <v-text-field
+          id="hardware-token-serial-input"
+          ref="hardware-token-serial-input"
+          v-model="selectedSeriennummer"
           clearable
           data-testid="hardware-token-serial-input"
           density="compact"
           :disabled="false"
-          id="hardware-token-serial-input"
           :placeholder="t('admin.person.twoFactorAuthentication.serial')"
-          ref="hardware-token-serial-input"
           required="true"
           variant="outlined"
-          v-model="selectedSeriennummer"
           v-bind="selectedSeriennummerProps"
-        ></v-text-field>
+        />
       </FormRow>
       <FormRow
-        :errorLabel="''"
-        labelForId="otp-input"
-        :isRequired="true"
+        :error-label="''"
+        label-for-id="otp-input"
+        :is-required="true"
         :label="t('admin.person.twoFactorAuthentication.currentOtp')"
       >
         <v-text-field
+          id="hardware-token-otp-input"
+          ref="hardware-token-otp-input"
+          v-model="selectedOtp"
           clearable
           data-testid="hardware-token-otp-input"
           density="compact"
           :disabled="false"
-          id="hardware-token-otp-input"
           :placeholder="t('admin.person.twoFactorAuthentication.otpPlaceholder')"
-          ref="hardware-token-otp-input"
           required="true"
           variant="outlined"
-          v-model="selectedOtp"
           v-bind="selectedOtpProps"
-        ></v-text-field>
+        />
       </FormRow>
     </FormWrapper>
   </v-container>
@@ -242,17 +247,18 @@
         data-testid="hardware-token-dialog-error-text"
       >
         {{ $t('admin.person.twoFactorAuthentication.errors.' + twoFactoreAuthentificationStore.errorCode) }}
-      </p></v-row
-    >
+      </p>
+    </v-row>
     <v-row
       v-else-if="hardwareTokenIsAssigned"
       class="justify-center text-body bold"
-      >{{ dialogText }}</v-row
     >
+      {{ dialogText }}
+    </v-row>
   </v-container>
   <v-card-actions
-    class="justify-center"
     v-if="twoFactoreAuthentificationStore.errorCode || hardwareTokenIsAssigned"
+    class="justify-center"
   >
     <v-row class="justify-center">
       <v-col
@@ -263,8 +269,8 @@
         <v-btn
           :block="mdAndDown"
           class="primary button"
-          @click="cancelCheck()"
           data-testid="close-two-way-authentification-dialog-button"
+          @click="cancelCheck()"
         >
           {{ hardwareTokenIsAssigned ? $t('close') : $t('cancel') }}
         </v-btn>

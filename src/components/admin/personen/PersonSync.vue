@@ -25,17 +25,17 @@
 
   const successDialogVisible: Ref<boolean> = ref(false);
 
-  async function closeSyncDialog(isActive: Ref<boolean>): Promise<void> {
+  function closeSyncDialog(isActive: Ref<boolean>): void {
     isActive.value = false;
   }
 
-  async function closeDialogAndHandlePersonSync(isActive: Ref<boolean>, personId: string): Promise<void> {
+  function closeDialogAndHandlePersonSync(isActive: Ref<boolean>, personId: string): void {
     emit('onSyncPerson', personId);
     isActive.value = false;
     successDialogVisible.value = true;
   }
 
-  async function closeSuccessDialog(): Promise<void> {
+  function closeSuccessDialog(): void {
     successDialogVisible.value = false;
   }
 </script>
@@ -75,8 +75,8 @@
             <v-btn
               :block="mdAndDown"
               class="primary"
-              @click.stop="closeSuccessDialog()"
               data-testid="close-person-sync-success-dialog-button"
+              @click.stop="closeSuccessDialog()"
             >
               {{ $t('close') }}
             </v-btn>
@@ -86,16 +86,16 @@
     </LayoutCard>
   </v-dialog>
   <v-dialog persistent>
-    <template v-slot:activator="{ props }">
+    <template #activator="{ props }">
       <v-col
         cols="12"
         sm="6"
         md="auto"
       >
         <SpshTooltip
-          :enabledCondition="!disabled"
-          :disabledText="$t('person.finishEditFirst')"
-          :enabledText="$t('admin.person.syncPerson')"
+          :enabled-condition="!disabled"
+          :disabled-text="$t('person.finishEditFirst')"
+          :enabled-text="$t('admin.person.syncPerson')"
           position="start"
         >
           <v-btn
@@ -113,12 +113,12 @@
 
     <template
       v-if="!successDialogVisible"
-      v-slot:default="{ isActive }"
+      #default="{ isActive }"
     >
       <LayoutCard
         :closable="true"
         :header="$t('admin.person.syncPerson')"
-        @onCloseClicked="closeSyncDialog(isActive)"
+        @on-close-clicked="closeSyncDialog(isActive)"
       >
         <v-card-text>
           <v-container>
@@ -130,7 +130,7 @@
                 class="text-right"
                 cols="1"
               >
-                <v-icon icon="mdi-alert"></v-icon>
+                <v-icon icon="mdi-alert" />
               </v-col>
               <v-col>
                 <p data-testid="error-text">
@@ -160,8 +160,8 @@
               <v-btn
                 :block="mdAndDown"
                 class="secondary button"
-                @click.stop="closeSyncDialog(isActive)"
                 data-testid="close-person-sync-dialog-button"
+                @click.stop="closeSyncDialog(isActive)"
               >
                 {{ $t('cancel') }}
               </v-btn>
@@ -174,9 +174,9 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary button"
-                @click.stop="closeDialogAndHandlePersonSync(isActive, person.person.id)"
                 data-testid="person-sync-button"
                 :disabled="isLoading"
+                @click.stop="closeDialogAndHandlePersonSync(isActive, person.person.id)"
               >
                 {{ $t('proceed') }}
               </v-btn>

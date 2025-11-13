@@ -30,7 +30,9 @@
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
-  let blockedNext: () => void = () => {};
+  let blockedNext: () => void = () => {
+    /* empty */
+  };
 
   const personStore: PersonStore = usePersonStore();
 
@@ -98,7 +100,9 @@
     },
   });
 
-  const formContext: FormContext<PersonSearchForm> = useForm({ validationSchema: schema });
+  const formContext: FormContext<PersonSearchForm, PersonSearchForm> = useForm<PersonSearchForm, PersonSearchForm>({
+    validationSchema: schema,
+  });
 
   const [selectedKopers, selectedKopersProps]: [
     Ref<string | undefined>,
@@ -254,7 +258,9 @@
   const personalData: ComputedRef<LabelValue[]> = computed(() => {
     const person: PersonLandesbediensteterSearchResponse | undefined =
       personStore.allLandesbedienstetePersonen?.[0] ?? undefined;
-    if (!person) return [];
+    if (!person) {
+      return [];
+    }
 
     return mapToLabelValues(
       t,
@@ -344,7 +350,7 @@
     await router.push({ name: 'person-management' });
   }
 
-  async function resetForm(): Promise<void> {
+  function resetForm(): void {
     formContext.resetForm();
     personStore.errorCode = '';
     personStore.allLandesbedienstetePersonen = [];
@@ -362,7 +368,9 @@
   }
 
   function preventNavigation(event: BeforeUnloadEvent): void {
-    if (!isFormDirty()) return;
+    if (!isFormDirty()) {
+      return;
+    }
     event.preventDefault();
     /* Chrome requires returnValue to be set. */
     event.returnValue = '';
@@ -377,7 +385,7 @@
     }
   });
 
-  onMounted(async () => {
+  onMounted(() => {
     personStore.errorCode = '';
     personStore.allLandesbedienstetePersonen = [];
 
@@ -399,35 +407,35 @@
     </h1>
     <LayoutCard
       :closable="true"
-      @onCloseClicked="navigateToPersonTable"
       :header="t('admin.person.stateEmployeeSearch.searchStateEmployee')"
       headlineTestId="search-state-employee-headline"
       :padded="true"
-      :showCloseText="true"
+      :show-close-text="true"
+      @on-close-clicked="navigateToPersonTable"
     >
       <FormWrapper
-        :canCommit="!isSearchDisabled || personStore.loading"
-        :confirmUnsavedChangesAction="handleConfirmUnsavedChanges"
-        :createButtonLabel="$t('admin.person.stateEmployeeSearch.searchStateEmployee')"
-        :discardButtonLabel="$t('reset')"
-        :hideActions="!!personStore.errorCode"
-        :hideNotice="true"
         id="person-search-form"
-        :isLoading="personStore.loading"
-        :onDiscard="resetForm"
-        @onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
-        :onSubmit="onSubmit"
-        :showUnsavedChangesDialog="showUnsavedChangesDialog"
+        :can-commit="!isSearchDisabled || personStore.loading"
+        :confirm-unsaved-changes-action="handleConfirmUnsavedChanges"
+        :create-button-label="$t('admin.person.stateEmployeeSearch.searchStateEmployee')"
+        :discard-button-label="$t('reset')"
+        :hide-actions="!!personStore.errorCode"
+        :hide-notice="true"
+        :is-loading="personStore.loading"
+        :on-discard="resetForm"
+        :on-submit="onSubmit"
+        :show-unsaved-changes-dialog="showUnsavedChangesDialog"
+        @on-show-dialog-change="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
       >
         <!-- Error Message Display for error messages from the personStore -->
         <SpshAlert
-          :modelValue="!!personStore.errorCode"
+          :model-value="!!personStore.errorCode"
           :title="personStore.errorCode ? t(`admin.person.title.${personStore.errorCode}`) : ''"
           :type="'error'"
           :closable="false"
-          :showButton="true"
-          :buttonText="t('admin.person.backToCreatePerson')"
-          :buttonAction="navigateBackToPersonSearchForm"
+          :show-button="true"
+          :button-text="t('admin.person.backToCreatePerson')"
+          :button-action="navigateBackToPersonSearchForm"
           :text="personStore.errorCode ? t(`admin.person.errors.${personStore.errorCode}`) : ''"
         />
 
@@ -482,19 +490,19 @@
                   />
                 </v-col>
                 <v-col
+                  v-if="searchType === SearchType.KoPers"
                   cols="12"
                   sm="9"
-                  v-if="searchType === SearchType.KoPers"
                 >
                   <v-text-field
+                    id="kopers-input"
+                    ref="kopers-input"
+                    v-bind="selectedKopersProps"
+                    v-model="selectedKopers"
                     clearable
                     data-testid="kopers-input"
                     density="compact"
-                    id="kopers-input"
-                    ref="kopers-input"
                     variant="outlined"
-                    v-bind="selectedKopersProps"
-                    v-model="selectedKopers"
                     :placeholder="$t('person.enterKopersNr')"
                   />
                 </v-col>
@@ -510,19 +518,19 @@
                   />
                 </v-col>
                 <v-col
+                  v-if="searchType === SearchType.Email"
                   cols="12"
                   sm="9"
-                  v-if="searchType === SearchType.Email"
                 >
                   <v-text-field
+                    id="email-input"
+                    ref="email-input"
+                    v-bind="selectedEmailProps"
+                    v-model="selectedEmail"
                     clearable
                     data-testid="email-input"
                     density="compact"
-                    id="email-input"
-                    ref="email-input"
                     variant="outlined"
-                    v-bind="selectedEmailProps"
-                    v-model="selectedEmail"
                     :placeholder="$t('person.enterEmail')"
                   />
                 </v-col>
@@ -538,19 +546,19 @@
                   />
                 </v-col>
                 <v-col
+                  v-if="searchType === SearchType.Username"
                   cols="12"
                   sm="8"
-                  v-if="searchType === SearchType.Username"
                 >
                   <v-text-field
+                    id="username-input"
+                    ref="username-input"
+                    v-bind="selectedUsernameProps"
+                    v-model="selectedUsername"
                     clearable
                     data-testid="username-input"
                     density="compact"
-                    id="username-input"
-                    ref="username-input"
                     variant="outlined"
-                    v-bind="selectedUsernameProps"
-                    v-model="selectedUsername"
                     :placeholder="$t('person.enterUsername')"
                   />
                 </v-col>
@@ -566,9 +574,9 @@
                   />
                 </v-col>
                 <v-col
+                  v-if="searchType === SearchType.Name"
                   cols="12"
                   sm="9"
-                  v-if="searchType === SearchType.Name"
                 >
                   <v-row>
                     <v-col
@@ -576,14 +584,14 @@
                       sm="6"
                     >
                       <v-text-field
+                        id="vorname-input"
+                        ref="vorname-input"
+                        v-bind="selectedVornameProps"
+                        v-model="selectedVorname"
                         clearable
                         data-testid="vorname-input"
                         density="compact"
-                        id="vorname-input"
-                        ref="vorname-input"
                         variant="outlined"
-                        v-bind="selectedVornameProps"
-                        v-model="selectedVorname"
                         :placeholder="$t('person.enterFirstName')"
                       />
                     </v-col>
@@ -592,14 +600,14 @@
                       sm="6"
                     >
                       <v-text-field
+                        id="nachname-input"
+                        ref="nachname-input"
+                        v-bind="selectedNachnameProps"
+                        v-model="selectedNachname"
                         clearable
                         data-testid="nachname-input"
                         density="compact"
-                        id="nachname-input"
-                        ref="nachname-input"
                         variant="outlined"
-                        v-bind="selectedNachnameProps"
-                        v-model="selectedNachname"
                         :placeholder="$t('person.enterLastName')"
                       />
                     </v-col>
@@ -615,7 +623,7 @@
           class="border-opacity-100 rounded"
           color="#E5EAEF"
           thickness="5px"
-        ></v-divider>
+        />
         <LayoutCard
           data-testid="search-result-card"
           :header="$t('admin.person.stateEmployeeSearch.searchResult')"
@@ -641,7 +649,7 @@
                 <v-row>
                   <v-col cols="12">
                     <v-table class="text-body-1">
-                      <template v-slot:default>
+                      <template #default>
                         <tbody>
                           <tr
                             v-for="item in personalData"
@@ -667,8 +675,8 @@
                               >
                                 <SpshTooltip
                                   v-if="item.tooltip"
-                                  enabledCondition
-                                  :enabledText="item.tooltip"
+                                  enabled-condition
+                                  :enabled-text="item.tooltip"
                                   position="bottom"
                                 >
                                   <v-icon
@@ -701,13 +709,13 @@
               <LayoutCard
                 :data-testid="`zuordnung-card-${index + 1}`"
                 :header="$t('person.zuordnung') + ' ' + (organisationenDaten.length > 1 ? (index + 1).toString() : '')"
-                :headlineTestId="`zuordnung-card-${index + 1}-headline`"
-                :subCards="true"
+                :headline-test-id="`zuordnung-card-${index + 1}-headline`"
+                :sub-cards="true"
               >
                 <v-row>
                   <v-col cols="12">
                     <v-table class="text-body-1">
-                      <template v-slot:default>
+                      <template #default>
                         <tbody>
                           <tr
                             v-for="item in orgData.labelAndValues"
@@ -746,10 +754,10 @@
             md="auto"
           >
             <v-btn
-              @click.stop="() => (personStore.allLandesbedienstetePersonen = [])"
               class="secondary button"
               data-testid="back-to-search-button"
               :block="mdAndDown"
+              @click.stop="() => (personStore.allLandesbedienstetePersonen = [])"
             >
               {{ $t('nav.backToSearch') }}
             </v-btn>
@@ -760,10 +768,10 @@
             md="auto"
           >
             <v-btn
-              @click.stop="navigateToPersonCreationForm"
               class="primary button"
               data-testid="add-state-employee-button"
               :block="mdAndDown"
+              @click.stop="navigateToPersonCreationForm"
             >
               {{ $t('admin.person.stateEmployeeSearch.addStateEmployee') }}
             </v-btn>
@@ -772,8 +780,8 @@
       </template>
     </LayoutCard>
     <v-dialog
-      data-testid="person-search-error-dialog"
       v-model="showErrorDialog"
+      data-testid="person-search-error-dialog"
       persistent
     >
       <LayoutCard
@@ -804,8 +812,8 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary"
-                @click.stop="showErrorDialog = false"
                 data-testid="cancel-person-search-error-button"
+                @click.stop="showErrorDialog = false"
               >
                 {{ t('cancel') }}
               </v-btn>
@@ -814,8 +822,7 @@
               cols="12"
               sm="6"
               md="4"
-            >
-            </v-col>
+            />
           </v-row>
         </v-card-actions>
       </LayoutCard>

@@ -40,37 +40,49 @@
   const selectedSchuleObject: Ref<Option<Organisation>> = ref(null);
 
   const translatedSchulname: ComputedRef<string> = computed(() => {
-    if (selectedSchuleObject.value) return getDisplayNameForOrg(selectedSchuleObject.value);
-    if (autoselectedSchule.value) return getDisplayNameForOrg(autoselectedSchule.value);
+    if (selectedSchuleObject.value) {
+      return getDisplayNameForOrg(selectedSchuleObject.value);
+    }
+    if (autoselectedSchule.value) {
+      return getDisplayNameForOrg(autoselectedSchule.value);
+    }
     return '';
   });
 
   const isFormDirty: Ref<boolean> = ref(false);
   const hasUnsavedChanges: ComputedRef<boolean> = computed(() => {
-    if (organisationStore.createdKlasse) return false;
+    if (organisationStore.createdKlasse) {
+      return false;
+    }
     return isFormDirty.value;
   });
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
-  let blockedNext: () => void = () => {};
+  let blockedNext: () => void = () => {
+    /* empty */
+  };
 
   function resetForm(): void {
-    formRef.value?.reset();
+    if (formRef.value && typeof (formRef.value as { reset?: () => void }).reset === 'function') {
+      (formRef.value as { reset: () => void }).reset();
+    }
   }
 
   function preventNavigation(event: BeforeUnloadEvent): void {
-    if (!hasUnsavedChanges.value) return;
+    if (!hasUnsavedChanges.value) {
+      return;
+    }
     event.preventDefault();
     /* Chrome requires returnValue to be set. */
     event.returnValue = '';
   }
 
-  async function initStores(): Promise<void> {
+  function initStores(): void {
     organisationStore.createdKlasse = null;
     organisationStore.errorCode = '';
   }
 
-  const handleCreateAnotherKlasse = async (): Promise<void> => {
-    await initStores();
+  const handleCreateAnotherKlasse = (): void => {
+    initStores();
     router.push({ name: 'create-klasse' });
   };
 
@@ -119,8 +131,8 @@
     );
   };
 
-  onMounted(async () => {
-    await initStores();
+  onMounted(() => {
+    initStores();
     /* listen for browser changes and prevent them when form is dirty */
     window.addEventListener('beforeunload', preventNavigation);
   });
@@ -158,18 +170,18 @@
       <!-- The form to create a new Klasse -->
       <template v-if="!organisationStore.createdKlasse">
         <KlasseForm
-          :errorCode="organisationStore.errorCode"
-          :editMode="false"
-          :initialValues="initialFormValues"
-          :isLoading="organisationStore.loading"
-          :showUnsavedChangesDialog="showUnsavedChangesDialog"
-          :onHandleConfirmUnsavedChanges="handleConfirmUnsavedChanges"
-          :onHandleDiscard="navigateToKlasseManagement"
-          :onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
-          :onSubmit
-          @formStateChanged="handleChangedFormState"
-          @update:selectedSchule="(selectedSchule) => (selectedSchuleObject = selectedSchule)"
           ref="klasse-creation-form"
+          :error-code="organisationStore.errorCode"
+          :edit-mode="false"
+          :initial-values="initialFormValues"
+          :is-loading="organisationStore.loading"
+          :show-unsaved-changes-dialog="showUnsavedChangesDialog"
+          :on-handle-confirm-unsaved-changes="handleConfirmUnsavedChanges"
+          :on-handle-discard="navigateToKlasseManagement"
+          :on-show-dialog-change="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
+          :on-submit
+          @form-state-changed="handleChangedFormState"
+          @update:selectedSchule="(selectedSchule) => (selectedSchuleObject = selectedSchule)"
         >
           <!-- Error Message Display if error on submit -->
           <SpshAlert
@@ -178,9 +190,9 @@
             :type="'error'"
             :closable="false"
             :text="organisationStore.errorCode ? $t(`admin.klasse.errors.${organisationStore.errorCode}`) : ''"
-            :showButton="true"
-            :buttonText="$t('admin.klasse.backToCreateKlasse')"
-            :buttonAction="navigateBackToKlasseForm"
+            :show-button="true"
+            :button-text="$t('admin.klasse.backToCreateKlasse')"
+            :button-action="navigateBackToKlasseForm"
           />
         </KlasseForm>
       </template>
@@ -188,9 +200,9 @@
       <!-- Result template on success after submit -->
       <template v-if="organisationStore.createdKlasse && !organisationStore.errorCode">
         <KlasseSuccessTemplate
-          :successMessage="$t('admin.klasse.klasseAddedSuccessfully')"
-          :followingDataCreated="$t('admin.followingDataCreated')"
-          :createdData="[
+          :success-message="$t('admin.klasse.klasseAddedSuccessfully')"
+          :following-data-created="$t('admin.followingDataCreated')"
+          :created-data="[
             { label: $t('admin.schule.schule'), value: translatedSchulname, testId: 'created-klasse-schule' },
             {
               label: $t('admin.klasse.klassenname'),
@@ -198,13 +210,13 @@
               testId: 'created-klasse-name',
             },
           ]"
-          :backButtonText="$t('nav.backToList')"
-          :createAnotherButtonText="$t('admin.klasse.createAnother')"
-          :showCreateAnotherButton="true"
-          :backButtonTestId="'back-to-list-button'"
-          :createAnotherButtonTestId="'create-another-klasse-button'"
-          @OnNavigateBack="navigateToKlasseManagement"
-          @OnCreateAnother="handleCreateAnotherKlasse"
+          :back-button-text="$t('nav.backToList')"
+          :create-another-button-text="$t('admin.klasse.createAnother')"
+          :show-create-another-button="true"
+          :back-button-test-id="'back-to-list-button'"
+          :create-another-button-test-id="'create-another-klasse-button'"
+          @on-navigate-back="navigateToKlasseManagement"
+          @on-create-another="handleCreateAnotherKlasse"
         />
       </template>
     </LayoutCard>

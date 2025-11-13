@@ -48,13 +48,17 @@
       : organisationStore.currentOrganisation.name;
   });
   const errorTitle: ComputedRef<string> = computed(() => {
-    if (!organisationStore.errorCode) return '';
+    if (!organisationStore.errorCode) {
+      return '';
+    }
     return organisationStore.errorCode === 'UNSPECIFIED_ERROR'
       ? t('admin.klasse.loadingErrorTitle')
       : t(`admin.klasse.title.${organisationStore.errorCode}`);
   });
   const errorText: ComputedRef<string> = computed(() => {
-    if (!organisationStore.errorCode) return '';
+    if (!organisationStore.errorCode) {
+      return '';
+    }
     return organisationStore.errorCode === 'UNSPECIFIED_ERROR'
       ? t('admin.klasse.loadingErrorText')
       : t(`admin.klasse.errors.${organisationStore.errorCode}`);
@@ -68,11 +72,15 @@
   const isFormDirty: Ref<boolean> = ref(false);
 
   const hasUnsavedChanges: ComputedRef<boolean> = computed(() => {
-    if (organisationStore.updatedOrganisation) return false;
+    if (organisationStore.updatedOrganisation) {
+      return false;
+    }
     return isFormDirty.value;
   });
 
-  let blockedNext: () => void = () => {};
+  let blockedNext: () => void = () => {
+    /* empty */
+  };
 
   function handleConfirmUnsavedChanges(): void {
     isEditActive.value = false;
@@ -92,14 +100,18 @@
   function handleCancel(next?: NavigationGuardNext): void {
     if (hasUnsavedChanges.value) {
       showUnsavedChangesDialog.value = true;
-      if (next) blockedNext = next;
+      if (next) {
+        blockedNext = next;
+      }
     } else {
       cancelEdit();
     }
   }
 
   function preventNavigation(event: BeforeUnloadEvent): void {
-    if (!hasUnsavedChanges.value) return;
+    if (!hasUnsavedChanges.value) {
+      return;
+    }
     event.preventDefault();
     /* Chrome requires returnValue to be set. */
     event.returnValue = '';
@@ -130,10 +142,13 @@
   }
 
   const alertButtonText: ComputedRef<string> = computed(() => {
-    if (organisationStore.errorCode === 'NEWER_VERSION_ORGANISATION') return t('refreshData');
-    else if (isEditActive.value) {
+    if (organisationStore.errorCode === 'NEWER_VERSION_ORGANISATION') {
+      return t('refreshData');
+    } else if (isEditActive.value) {
       return t('admin.klasse.backToEditKlasse');
-    } else return t('nav.backToList');
+    } else {
+      return t('nav.backToList');
+    }
   });
 
   const alertButtonAction: ComputedRef<() => void> = computed(() => {
@@ -149,13 +164,16 @@
   watch(
     () => organisationStore.currentKlasse,
     async (newKlasse: Organisation | null) => {
-      if (!newKlasse) return;
+      if (!newKlasse) {
+        return;
+      }
       if (newKlasse.administriertVon) {
         if (
           !organisationStore.currentOrganisation ||
           organisationStore.currentOrganisation.id !== newKlasse.administriertVon
-        )
+        ) {
           await organisationStore.getOrganisationById(newKlasse.administriertVon, OrganisationsTyp.Schule);
+        }
       }
     },
     { immediate: true },
@@ -203,37 +221,38 @@
       headlineTestId="klasse-details-headline"
       @onCloseClicked="navigateToKlasseManagement"
       :padded="true"
-      :showCloseText="true"
+      :show-close-text="true"
+      @on-close-clicked="navigateToKlasseManagement"
     >
       <template v-if="!organisationStore.updatedOrganisation">
         <v-container>
           <div v-if="organisationStore.currentOrganisation">
             <KlasseForm
-              :initialValues="initialFormValues"
-              :errorCode="organisationStore.errorCode"
-              :editMode="true"
-              :isEditActive="isEditActive"
-              :isLoading="organisationStore.loading"
-              :showUnsavedChangesDialog="showUnsavedChangesDialog"
-              :onHandleConfirmUnsavedChanges="handleConfirmUnsavedChanges"
-              :onHandleDiscard="handleCancel"
-              :onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
-              :onSubmit="onSubmit"
-              @form-state-changed="handleChangedFormState"
               ref="klasse-creation-form"
+              :initial-values="initialFormValues"
+              :error-code="organisationStore.errorCode"
+              :edit-mode="true"
+              :is-edit-active="isEditActive"
+              :is-loading="organisationStore.loading"
+              :show-unsaved-changes-dialog="showUnsavedChangesDialog"
+              :on-handle-confirm-unsaved-changes="handleConfirmUnsavedChanges"
+              :on-handle-discard="handleCancel"
+              :on-show-dialog-change="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
+              :on-submit="onSubmit"
+              @form-state-changed="handleChangedFormState"
             >
               <!-- Error Message Display -->
               <SpshAlert
-                :buttonAction="alertButtonAction"
-                :buttonText="alertButtonText"
+                :button-action="alertButtonAction"
+                :button-text="alertButtonText"
                 :closable="false"
-                dataTestIdPrefix="klasse-details-error"
+                data-test-id-prefix="klasse-details-error"
                 :model-value="!!organisationStore.errorCode"
-                :showButton="true"
+                :show-button="true"
                 :text="errorText"
                 :title="errorTitle"
                 :type="'error'"
-                @update:modelValue="handleAlertClose"
+                @update:model-value="handleAlertClose"
               />
             </KlasseForm>
             <template v-if="!isEditActive && !organisationStore.errorCode">
@@ -241,7 +260,7 @@
                 class="border-opacity-100 rounded"
                 color="#E5EAEF"
                 thickness="5px"
-              ></v-divider>
+              />
               <div class="d-flex justify-sm-end">
                 <v-row class="pt-3 px-2 justify-end">
                   <v-col
@@ -251,17 +270,16 @@
                   >
                     <div class="d-flex justify-sm-end">
                       <KlasseDelete
-                        :errorCode="organisationStore.errorCode"
-                        :klassenname="organisationStore.currentKlasse?.name || ''"
-                        :klassenId="organisationStore.currentKlasse?.id || ''"
                         ref="klasse-delete"
+                        :error-code="organisationStore.errorCode"
+                        :klassenname="organisationStore.currentKlasse?.name || ''"
+                        :klassen-id="organisationStore.currentKlasse?.id || ''"
                         :schulname="organisationStore.currentOrganisation.name || ''"
-                        :isLoading="organisationStore.loading"
-                        :useIconActivator="false"
-                        @onDeleteKlasse="deleteKlasseById(currentKlasseId)"
-                        @onClose="navigateToKlasseManagement"
-                      >
-                      </KlasseDelete>
+                        :is-loading="organisationStore.loading"
+                        :use-icon-activator="false"
+                        @on-delete-klasse="deleteKlasseById(currentKlasseId)"
+                        @on-close="navigateToKlasseManagement"
+                      />
                     </div>
                   </v-col>
                   <v-col
@@ -272,8 +290,8 @@
                     <v-btn
                       class="primary ml-lg-8"
                       data-testid="klasse-edit-button"
-                      @click="activateEditing"
                       :block="mdAndDown"
+                      @click="activateEditing"
                     >
                       {{ $t('edit') }}
                     </v-btn>
@@ -283,17 +301,17 @@
             </template>
           </div>
           <div v-else-if="organisationStore.loading">
-            <v-progress-circular indeterminate></v-progress-circular>
+            <v-progress-circular indeterminate />
           </div>
         </v-container>
       </template>
       <!-- Result template on success after submit  -->
       <template v-if="organisationStore.updatedOrganisation && !organisationStore.errorCode">
         <KlasseSuccessTemplate
-          :backButtonTestId="'back-to-details-button'"
-          :backButtonText="$t('nav.backToList')"
-          :createAnotherButtonText="$t('admin.klasse.createAnother')"
-          :createdData="[
+          :back-button-test-id="'back-to-details-button'"
+          :back-button-text="$t('nav.backToList')"
+          :create-another-button-text="$t('admin.klasse.createAnother')"
+          :created-data="[
             { label: $t('admin.schule.schule'), value: translatedSchulname || '', testId: 'created-klasse-schule' },
             {
               label: $t('admin.klasse.klassenname'),
@@ -301,10 +319,10 @@
               testId: 'created-klasse-name',
             },
           ]"
-          :followingDataCreated="$t('admin.followingDataCreated')"
-          @onNavigateBack="navigateToKlasseManagement"
-          :showCreateAnotherButton="false"
-          :successMessage="$t('admin.klasse.klasseUpdatedSuccessfully')"
+          :following-data-created="$t('admin.followingDataCreated')"
+          :show-create-another-button="false"
+          :success-message="$t('admin.klasse.klasseUpdatedSuccessfully')"
+          @on-navigate-back="navigateToKlasseManagement"
         />
       </template>
     </LayoutCard>
