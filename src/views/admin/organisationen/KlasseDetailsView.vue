@@ -217,11 +217,11 @@
     </h1>
     <LayoutCard
       :closable="!organisationStore.errorCode"
-      data-testid="klasse-details-card"
       :header="$t('admin.klasse.edit')"
+      headlineTestId="klasse-details-headline"
+      @onCloseClicked="navigateToKlasseManagement"
       :padded="true"
-      :show-close-text="true"
-      @on-close-clicked="navigateToKlasseManagement"
+      :showCloseText="true"
     >
       <template v-if="!organisationStore.updatedOrganisation">
         <v-container>

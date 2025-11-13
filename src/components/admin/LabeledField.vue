@@ -18,7 +18,7 @@
       cols="12"
       sm="auto"
       class="d-flex align-center pr-0 flex-shrink-1"
-      style="max-width: fit-content;"
+      style="max-width: fit-content"
     >
       <span class="subtitle-2 text-no-wrap">{{ label }}:</span>
     </v-col>

@@ -416,11 +416,11 @@
     </h1>
     <LayoutCard
       :closable="true"
-      data-testid="person-import-card"
       :header="$t('admin.person.import')"
+      headlineTestId="person-import-headline"
+      @onCloseClicked="navigateToPersonTable"
       :padded="true"
-      :show-close-text="true"
-      @on-close-clicked="navigateToPersonTable"
+      :showCloseText="true"
     >
       <!-- Import success template -->
       <template v-if="importStore.importProgress === 100 && !importStore.importIsLoading && !isDownloadingFile">

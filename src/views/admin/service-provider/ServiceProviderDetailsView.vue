@@ -93,50 +93,56 @@
         <v-container class="service-provider-info">
           <div v-if="serviceProviderStore.currentServiceProvider">
             <v-row id="service-provider-info-row">
-              <v-col class="custom-offset" offset="1" offset-sm="1" offset-md="1" offset-lg="1">
+              <v-col
+                class="custom-offset"
+                offset="1"
+                offset-sm="1"
+                offset-md="1"
+                offset-lg="1"
+              >
                 <v-row>
                   <!-- Left column (first 4 fields) -->
                   <v-col
                     cols="12"
                     md="6"
                   >
-                  <div class="compact-spacing">
-                    <!-- Name -->
-                    <LabeledField
-                      :label="t('angebot.name')"
-                      :value="serviceProviderStore.currentServiceProvider.name"
-                      test-id="service-provider-name"
-                    />
+                    <div class="compact-spacing">
+                      <!-- Name -->
+                      <LabeledField
+                        :label="t('angebot.name')"
+                        :value="serviceProviderStore.currentServiceProvider.name"
+                        test-id="service-provider-name"
+                      />
 
-                    <!-- Administrationsebene -->
-                    <LabeledField
-                      :label="t('angebot.administrationsebene')"
-                      :value="serviceProviderStore.currentServiceProvider.administrationsebene.name"
-                      test-id="service-provider-administrationsebene"
-                      no-margin-top
-                    />
+                      <!-- Administrationsebene -->
+                      <LabeledField
+                        :label="t('angebot.administrationsebene')"
+                        :value="serviceProviderStore.currentServiceProvider.administrationsebene.name"
+                        test-id="service-provider-administrationsebene"
+                        no-margin-top
+                      />
 
-                    <!-- Requires 2FA -->
-                    <LabeledField
-                      :label="t('angebot.requires2FA')"
-                      :value="serviceProviderStore.currentServiceProvider.requires2fa ? t('yes') : t('no')"
-                      test-id="service-provider-requires-2fa"
-                      no-margin-top
-                    />
+                      <!-- Requires 2FA -->
+                      <LabeledField
+                        :label="t('angebot.requires2FA')"
+                        :value="serviceProviderStore.currentServiceProvider.requires2fa ? t('yes') : t('no')"
+                        test-id="service-provider-requires-2fa"
+                        no-margin-top
+                      />
 
-                    <!-- Can be assigned to Rollen? -->
-                    <LabeledField
-                      :label="t('angebot.canBeAssignedToRollen')"
-                      :value="
-                        serviceProviderStore.currentServiceProvider.merkmale.some(
-                          (m: ServiceProviderMerkmal) => m === ServiceProviderMerkmal.NachtraeglichZuweisbar,
-                        )
-                          ? t('yes')
-                          : t('no')
-                      "
-                      test-id="service-provider-can-be-assigned-to-rollen"
-                      no-margin-top
-                    />
+                      <!-- Can be assigned to Rollen? -->
+                      <LabeledField
+                        :label="t('angebot.canBeAssignedToRollen')"
+                        :value="
+                          serviceProviderStore.currentServiceProvider.merkmale.some(
+                            (m: ServiceProviderMerkmal) => m === ServiceProviderMerkmal.NachtraeglichZuweisbar,
+                          )
+                            ? t('yes')
+                            : t('no')
+                        "
+                        test-id="service-provider-can-be-assigned-to-rollen"
+                        no-margin-top
+                      />
                     </div>
                   </v-col>
 
@@ -161,7 +167,7 @@
                       :value="serviceProviderStore.currentServiceProvider.kategorie.toLocaleLowerCase()"
                       test-id="service-provider-kategorie"
                       no-margin-top
-                      style="text-transform: capitalize;"
+                      style="text-transform: capitalize"
                     />
 
                     <!-- URL -->
@@ -185,12 +191,18 @@
               </v-col>
             </v-row>
             <v-divider
-            class="border-opacity-100 rounded mt-16"
-            color="#E5EAEF"
-            thickness="6"
+              class="border-opacity-100 rounded mt-16"
+              color="#E5EAEF"
+              thickness="6"
             ></v-divider>
             <v-row class="mt-n6">
-              <v-col class="custom-offset" offset="1" offset-sm="1" offset-md="1" offset-lg="1">
+              <v-col
+                class="custom-offset"
+                offset="1"
+                offset-sm="1"
+                offset-md="1"
+                offset-lg="1"
+              >
                 <v-row class="mt-4 align-center">
                   <v-col
                     cols="auto"
@@ -228,9 +240,9 @@
 </template>
 
 <style scoped>
-@media (min-width: 1280px) and (max-width: 1600px) {
-  .custom-offset {
-    margin-left: 0 !important; /* removes the Vuetify offset */
+  @media (min-width: 1280px) and (max-width: 1600px) {
+    .custom-offset {
+      margin-left: 0 !important; /* removes the Vuetify offset */
+    }
   }
-}
 </style>

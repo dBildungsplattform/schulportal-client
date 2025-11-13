@@ -118,7 +118,7 @@ beforeEach(async () => {
 
 describe('PersonImportView', () => {
   test('it renders the person import view', async () => {
-    expect(wrapper?.find('[data-testid="person-import-card"]').isVisible()).toBe(true);
+    expect(wrapper?.find('[data-testid="person-import-headline"]').isVisible()).toBe(true);
     expect(wrapper?.find('[data-testid="person-import-schule-select"]').isVisible()).toBe(true);
     expect(wrapper?.find('[data-testid="rolle-select"]').isVisible()).toBe(true);
     expect(wrapper?.find('[data-testid="file-input"]').isVisible()).toBe(true);
