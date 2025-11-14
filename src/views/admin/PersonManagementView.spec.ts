@@ -209,7 +209,7 @@ describe('PersonManagementView', () => {
       id: personWithZuordnungen.id,
       familienname: personWithZuordnungen.name.familienname,
       vorname: personWithZuordnungen.name.vorname,
-      referrer: personWithZuordnungen.referrer,
+      username: personWithZuordnungen.username,
       personalnummer: personWithZuordnungen.personalnummer,
       rollen: personWithZuordnungen.rollenAsString,
       administrationsebenen: personWithZuordnungen.administrationsebenenAsString,
@@ -385,6 +385,64 @@ describe('PersonManagementView', () => {
     const totalKlassen: ComputedRef<number> = vm.totalKlassen;
 
     expect(totalKlassen).toBe(0);
+  });
+
+    test('it sorts Personen correctly when changing sort order', async () => {
+    // Find the table header for "Nachname" (last name)
+    const nachnameHeader: DOMWrapper<Element> | undefined = wrapper
+      ?.findAll('.v-data-table__th')
+      .find((th: DOMWrapper<Element>) => th.text().includes('Nachname'));
+
+    // Click to sort descending
+    await nachnameHeader?.trigger('click');
+    await flushPromises();
+    await nextTick();
+
+    expect(personStore.getAllPersons).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sortField: 'familienname',
+        sortOrder: 'desc',
+      }),
+    );
+
+    // Click again to sort ascending
+    await nachnameHeader?.trigger('click');
+    await flushPromises();
+
+    expect(personStore.getAllPersons).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sortField: 'familienname',
+        sortOrder: 'asc',
+      }),
+    );
+
+    // Find the table header for "Nachname" (last name)
+    const vornameHeader: DOMWrapper<Element> | undefined = wrapper
+      ?.findAll('.v-data-table__th')
+      .find((th: DOMWrapper<Element>) => th.text().includes('Vorname'));
+
+    // Click to sort asc
+    await vornameHeader?.trigger('click');
+    await flushPromises();
+    await nextTick();
+
+    expect(personStore.getAllPersons).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sortField: 'vorname',
+        sortOrder: 'asc',
+      }),
+    );
+
+    // Click again to sort desc
+    await vornameHeader?.trigger('click');
+    await flushPromises();
+    await nextTick();
+    expect(personStore.getAllPersons).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sortField: 'vorname',
+        sortOrder: 'desc',
+      }),
+    );
   });
 
   test('it updates Rollen search correctly', async () => {
@@ -568,63 +626,5 @@ describe('PersonManagementView', () => {
     expect(
       document.body.querySelector(`[data-testid="invalid-selection-alert-dialog-layout-card"]`)?.textContent,
     ).toContain('Schülerrolle');
-  });
-
-  test('it sorts Personen correctly when changing sort order', async () => {
-    // Find the table header for "Nachname" (last name)
-    const nachnameHeader: DOMWrapper<Element> | undefined = wrapper
-      ?.findAll('.v-data-table__th')
-      .find((th: DOMWrapper<Element>) => th.text().includes('Nachname'));
-
-    // Click to sort descending
-    await nachnameHeader?.trigger('click');
-    await flushPromises();
-    await nextTick();
-
-    expect(personStore.getAllPersons).toHaveBeenCalledWith(
-      expect.objectContaining({
-        sortField: 'familienname',
-        sortOrder: 'desc',
-      }),
-    );
-
-    // Click again to sort ascending
-    await nachnameHeader?.trigger('click');
-    await flushPromises();
-
-    expect(personStore.getAllPersons).toHaveBeenCalledWith(
-      expect.objectContaining({
-        sortField: 'familienname',
-        sortOrder: 'asc',
-      }),
-    );
-
-    // Find the table header for "Nachname" (last name)
-    const vornameHeader: DOMWrapper<Element> | undefined = wrapper
-      ?.findAll('.v-data-table__th')
-      .find((th: DOMWrapper<Element>) => th.text().includes('Vorname'));
-
-    // Click to sort asc
-    await vornameHeader?.trigger('click');
-    await flushPromises();
-    await nextTick();
-
-    expect(personStore.getAllPersons).toHaveBeenCalledWith(
-      expect.objectContaining({
-        sortField: 'vorname',
-        sortOrder: 'asc',
-      }),
-    );
-
-    // Click again to sort desc
-    await vornameHeader?.trigger('click');
-    await flushPromises();
-    await nextTick();
-    expect(personStore.getAllPersons).toHaveBeenCalledWith(
-      expect.objectContaining({
-        sortField: 'vorname',
-        sortOrder: 'desc',
-      }),
-    );
   });
 });

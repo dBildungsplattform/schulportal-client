@@ -30,7 +30,7 @@
     closeMenuOnMobile();
   }
 
-  onMounted(async () => {
+  onMounted(() => {
     menuDrawer.value = !mobile.value;
   });
 </script>
@@ -39,16 +39,16 @@
   <v-btn
     :aria-label="$t('nav.openMobileMenu')"
     class="hidden-lg-and-up"
-    @click.stop="menuDrawer = !menuDrawer"
     data-testid="open-mobile-menu-button"
     density="compact"
     icon
     variant="text"
+    @click.stop="menuDrawer = !menuDrawer"
   >
     <v-icon
       icon="mdi-menu"
       size="x-large"
-    ></v-icon>
+    />
   </v-btn>
   <v-btn
     :aria-label="$t('nav.backToStart')"
@@ -63,32 +63,32 @@
       class="hidden lg-and-up"
       icon="mdi-home"
       size="x-large"
-    ></v-icon>
+    />
   </v-btn>
 
   <v-navigation-drawer
+    v-model="menuDrawer"
     class="menu-bar"
     floating
     order="1"
-    v-model="menuDrawer"
     width="320"
   >
     <v-btn
       v-if="menuDrawer"
       :aria-label="$t('nav.closeMobileMenu')"
       class="hidden-lg-and-up primary menu-bar-close-button"
-      @click.stop="menuDrawer = !menuDrawer"
       data-testid="close-mobile-menu-button"
       density="compact"
       icon
       position="absolute"
       rounded="sm e-lg"
       variant="text"
+      @click.stop="menuDrawer = !menuDrawer"
     >
       <v-icon
         icon="mdi-menu-open"
         size="x-large"
-      ></v-icon>
+      />
     </v-btn>
 
     <!-- Title -->
@@ -96,8 +96,8 @@
       class="menu-bar-title"
       data-testid="menu-bar-title"
       :title="$t('nav.navigation')"
-    ></v-list-item>
-    <v-divider></v-divider>
+    />
+    <v-divider />
 
     <!-- Back to start page -->
     <v-list-item
@@ -110,10 +110,10 @@
         <v-icon
           icon="mdi-home"
           size="x-large"
-        ></v-icon>
+        />
       </template>
     </v-list-item>
-    <v-divider></v-divider>
+    <v-divider />
 
     <!-- Benutzerverwaltung -->
     <div v-if="authStore.hasPersonenverwaltungPermission">
@@ -121,33 +121,33 @@
         class="menu-bar-main-item headline-2"
         data-testid="person-management-title"
         :title="$t('admin.person.management')"
-      ></v-list-item>
+      />
       <v-list-item
         class="menu-bar-sub-item caption"
-        @click="handleMenuItemClick('/admin/personen')"
         data-testid="person-management-menu-item"
         prepend-icon="mdi-format-list-bulleted"
         :title="$t('admin.person.showAll')"
         to="/admin/personen"
-      ></v-list-item>
+        @click="handleMenuItemClick('/admin/personen')"
+      />
       <v-list-item
         v-if="authStore.hasPersonenAnlegenPermission"
         class="menu-bar-sub-item caption"
-        @click="closeMenuOnMobile"
         data-testid="person-creation-menu-item"
         prepend-icon="mdi-plus-circle-outline"
         :title="$t('admin.person.createNew')"
         to="/admin/personen/new"
-      ></v-list-item>
+        @click="closeMenuOnMobile"
+      />
       <v-list-item
         v-if="authStore.hasImportPermission"
         class="menu-bar-sub-item caption"
-        @click="handleMenuItemClick('/admin/personen/import')"
         data-testid="person-import-menu-item"
         prepend-icon="mdi-file-upload-outline"
         :title="$t('admin.person.import')"
         to="/admin/personen/import"
-      ></v-list-item>
+        @click="handleMenuItemClick('/admin/personen/import')"
+      />
     </div>
 
     <!-- Person Hinzufügen -->
@@ -161,25 +161,25 @@
         class="menu-bar-main-item headline-2"
         data-testid="person-add-title"
         :title="$t('admin.person.stateEmployeeSearch.addPerson')"
-      ></v-list-item>
+      />
       <v-list-item
         v-if="authStore.hasLandesbediensteteSuchenUndHinzufügenPermission"
         class="menu-bar-sub-item caption"
-        @click="closeMenuOnMobile"
         data-testid="person-search-menu-item"
         prepend-icon="mdi-plus-circle-outline"
         :title="$t('admin.person.stateEmployeeSearch.searchAndAdd')"
         to="/admin/limited/personen/search"
-      ></v-list-item>
+        @click="closeMenuOnMobile"
+      />
       <v-list-item
         v-if="authStore.hasEingeschränktNeueBenutzerErstellenPermission"
         class="menu-bar-sub-item caption"
-        @click="closeMenuOnMobile"
         data-testid="person-add-menu-item"
         prepend-icon="mdi-plus-circle-outline"
         :title="$t('admin.person.stateEmployeeSearch.anotherPerson')"
         to="/admin/limited/personen/new"
-      ></v-list-item>
+        @click="closeMenuOnMobile"
+      />
     </div>
 
     <!-- Klassenverwaltung -->
@@ -188,23 +188,23 @@
         class="menu-bar-main-item headline-2"
         data-testid="klasse-management-title"
         :title="$t('admin.klasse.management')"
-      ></v-list-item>
+      />
       <v-list-item
         class="menu-bar-sub-item caption"
-        @click="handleMenuItemClick('/admin/klassen')"
         data-testid="klasse-management-menu-item"
         prepend-icon="mdi-format-list-bulleted"
         :title="$t('admin.klasse.showAll')"
         to="/admin/klassen"
-      ></v-list-item>
+        @click="handleMenuItemClick('/admin/klassen')"
+      />
       <v-list-item
         class="menu-bar-sub-item caption"
-        @click="closeMenuOnMobile"
         data-testid="klasse-creation-menu-item"
         prepend-icon="mdi-plus-circle-outline"
         :title="$t('admin.klasse.createNew')"
         to="/admin/klassen/new"
-      ></v-list-item>
+        @click="closeMenuOnMobile"
+      />
     </div>
 
     <!-- Rollenverwaltung -->
@@ -213,22 +213,39 @@
         class="menu-bar-main-item headline-2"
         data-testid="rolle-management-title"
         :title="$t('admin.rolle.management')"
-      ></v-list-item>
+      />
       <v-list-item
         class="menu-bar-sub-item caption"
-        @click="handleMenuItemClick('/admin/rollen')"
         data-testid="rolle-management-menu-item"
         prepend-icon="mdi-format-list-bulleted"
         :title="$t('admin.rolle.showAll')"
         to="/admin/rollen"
-      ></v-list-item>
+        @click="handleMenuItemClick('/admin/rollen')"
+      />
       <v-list-item
         class="menu-bar-sub-item caption"
-        @click="closeMenuOnMobile"
         data-testid="rolle-creation-menu-item"
         prepend-icon="mdi-plus-circle-outline"
         :title="$t('admin.rolle.createNew')"
         to="/admin/rollen/new"
+        @click="closeMenuOnMobile"
+      />
+    </div>
+
+    <!-- Angebotsverwaltung -->
+    <div v-if="authStore.hasAngeboteVerwaltenPermission">
+      <v-list-item
+        class="menu-bar-main-item headline-2"
+        data-testid="angebot-management-title"
+        :title="$t('admin.angebot.management.title')"
+      ></v-list-item>
+      <v-list-item
+        class="menu-bar-sub-item caption"
+        @click="handleMenuItemClick('/admin/angebote')"
+        data-testid="angebot-management-menu-item"
+        prepend-icon="mdi-format-list-bulleted"
+        :title="$t('admin.angebot.showAll')"
+        to="/admin/angebote"
       ></v-list-item>
     </div>
 
@@ -238,23 +255,23 @@
         class="menu-bar-main-item headline-2"
         data-testid="schule-management-title"
         :title="$t('admin.schule.management')"
-      ></v-list-item>
+      />
       <v-list-item
         class="menu-bar-sub-item caption"
-        @click="handleMenuItemClick('/admin/schulen')"
         data-testid="schule-management-menu-item"
         prepend-icon="mdi-format-list-bulleted"
         :title="$t('admin.schule.showAll')"
         to="/admin/schulen"
-      ></v-list-item>
+        @click="handleMenuItemClick('/admin/schulen')"
+      />
       <v-list-item
         class="menu-bar-sub-item caption"
-        @click="closeMenuOnMobile"
         data-testid="schule-creation-menu-item"
         prepend-icon="mdi-plus-circle-outline"
         :title="$t('admin.schule.createNew')"
         to="/admin/schulen/new"
-      ></v-list-item>
+        @click="closeMenuOnMobile"
+      />
     </div>
     <!-- Schulträgerverwaltung -->
     <div v-if="authStore.hasSchultraegerverwaltungPermission">
@@ -262,23 +279,23 @@
         class="menu-bar-main-item headline-2"
         data-testid="schultraeger-management-title"
         :title="$t('admin.schultraeger.management')"
-      ></v-list-item>
+      />
       <v-list-item
         class="menu-bar-sub-item caption"
-        @click="handleMenuItemClick('/admin/schultraeger')"
         data-testid="schultraeger-management-menu-item"
         prepend-icon="mdi-format-list-bulleted"
         :title="$t('admin.schultraeger.showAll')"
         to="/admin/schultraeger"
-      ></v-list-item>
+        @click="handleMenuItemClick('/admin/schultraeger')"
+      />
       <v-list-item
         class="menu-bar-sub-item caption"
-        @click="closeMenuOnMobile"
         data-testid="schultraeger-creation-menu-item"
         prepend-icon="mdi-plus-circle-outline"
         :title="$t('admin.schultraeger.createNew')"
         to="/admin/schultraeger/new"
-      ></v-list-item>
+        @click="closeMenuOnMobile"
+      />
     </div>
     <!-- Portalverwaltung -->
     <div v-if="authStore.hasPortalVerwaltungPermission && authStore.hasHinweiseBearbeitenPermission">
@@ -286,16 +303,16 @@
         class="menu-bar-main-item headline-2"
         data-testid="portal-management-title"
         :title="$t('admin.portal.management')"
-      ></v-list-item>
+      />
       <v-list-item
         v-if="authStore.hasHinweiseBearbeitenPermission"
         class="menu-bar-sub-item caption"
-        @click="closeMenuOnMobile"
         data-testid="hinweise-edit-menu-item"
         prepend-icon="mdi-pencil"
         :title="$t('admin.portal.editHinweise')"
         to="/admin/hinweise/new"
-      ></v-list-item>
+        @click="closeMenuOnMobile"
+      />
     </div>
   </v-navigation-drawer>
 </template>

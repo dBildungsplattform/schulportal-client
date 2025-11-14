@@ -1,6 +1,5 @@
 import { computed, type ComputedRef } from 'vue';
-import { useOrganisationStore } from '@/stores/OrganisationStore';
-import type { Organisation, OrganisationStore } from '@/stores/OrganisationStore';
+import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
 import { type TranslatedObject } from '@/types.d';
 
 export function useKlassen(): ComputedRef<TranslatedObject[]> {

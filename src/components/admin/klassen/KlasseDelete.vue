@@ -48,18 +48,18 @@
     return hasTriggeredAction.value ? State.SUCCESS : State.CONFIRM;
   });
 
-  async function closeKlasseDeleteDialog(isActive: Ref<boolean>): Promise<void> {
+  function closeKlasseDeleteDialog(isActive: Ref<boolean>): void {
     isActive.value = false;
   }
 
-  async function handleKlasseDelete(klasseId: string): Promise<void> {
+  function handleKlasseDelete(klasseId: string): void {
     hasTriggeredAction.value = true;
     emit('onDeleteKlasse', klasseId);
   }
 
-  async function closeSuccessDialog(isActive: Ref<boolean>): Promise<void> {
+  function closeSuccessDialog(isActive: Ref<boolean>): void {
     isClosing.value = true;
-    await closeKlasseDeleteDialog(isActive);
+    closeKlasseDeleteDialog(isActive);
     emit('onClose');
   }
 
@@ -86,9 +86,9 @@
 <template>
   <v-dialog
     persistent
-    @afterLeave="resetState"
+    @after-leave="resetState"
   >
-    <template v-slot:activator="{ props }">
+    <template #activator="{ props }">
       <v-btn
         v-if="!useIconActivator"
         class="secondary button"
@@ -105,15 +105,15 @@
         icon="mdi-delete"
         size="small"
         v-bind="props"
-      ></v-icon>
+      />
     </template>
 
-    <template v-slot:default="{ isActive }">
+    <template #default="{ isActive }">
       <LayoutCard
-        :headlineTestId="state === State.SUCCESS ? 'klasse-delete-success' : 'klasse-delete-confirmation'"
+        :headline-test-id="state === State.SUCCESS ? 'klasse-delete-success' : 'klasse-delete-confirmation'"
         :closable="state === State.SUCCESS ? false : true"
         :header="$t('admin.klasse.deleteKlasse')"
-        @onCloseClicked="closeKlasseDeleteDialog(isActive)"
+        @on-close-clicked="closeKlasseDeleteDialog(isActive)"
       >
         <v-card-text>
           <v-container>
@@ -149,8 +149,8 @@
               <v-btn
                 :block="mdAndDown"
                 class="secondary button"
-                @click.stop="closeKlasseDeleteDialog(isActive)"
                 data-testid="cancel-klasse-delete-dialog-button"
+                @click.stop="closeKlasseDeleteDialog(isActive)"
               >
                 {{ $t('cancel') }}
               </v-btn>
@@ -164,8 +164,8 @@
                 v-if="state === State.SUCCESS"
                 :block="mdAndDown"
                 class="primary"
-                @click.stop="closeSuccessDialog(isActive)"
                 data-testid="close-klasse-delete-success-dialog-button"
+                @click.stop="closeSuccessDialog(isActive)"
               >
                 {{ $t('close') }}
               </v-btn>
@@ -173,9 +173,9 @@
                 v-else
                 :block="mdAndDown"
                 class="primary button"
-                @click.stop="handleKlasseDelete(klassenId)"
                 data-testid="klasse-delete-button"
                 :disabled="state === State.LOADING"
+                @click.stop="handleKlasseDelete(klassenId)"
               >
                 {{ $t('admin.klasse.deleteKlasse') }}
               </v-btn>

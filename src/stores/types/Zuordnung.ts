@@ -46,7 +46,7 @@ export class Zuordnung {
       response.administriertVon,
       response.typ,
       response.editable,
-      response.befristung != '' ? response.befristung : null,
+      response.befristung !== '' ? response.befristung : null,
       response.merkmale,
       response.admins ?? [],
     );

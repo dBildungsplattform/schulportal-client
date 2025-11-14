@@ -43,17 +43,7 @@ const mockPerson: Personendatensatz = {
 };
 
 const mockCurrentUser: UserInfo = {
-  middle_name: null,
-  nickname: null,
-  profile: null,
-  picture: null,
-  website: null,
-  gender: null,
-  birthdate: null,
-  zoneinfo: null,
-  locale: null,
-  phone_number: null,
-  updated_at: null,
+  ...DoFactory.getUserinfoResponse(),
   personId: '2',
   email: 'albert@test.de',
   email_verified: true,
@@ -81,7 +71,7 @@ const mockPersonenuebersicht: PersonenUebersicht = DoFactory.getPersonenUebersic
       vorname: 'John',
       familienname: 'Orton',
     },
-    referrer: 'jorton',
+    username: 'jorton',
   }),
   [
     DoFactory.getZuordnung({
@@ -265,6 +255,7 @@ describe('PersonDetailsView', () => {
     configStore.configData = {
       befristungBearbeitenEnabled: true,
       rolleBearbeitenEnabled: true,
+      rolleErweiternEnabled: true,
     };
 
     document.body.innerHTML = `
@@ -300,7 +291,7 @@ describe('PersonDetailsView', () => {
           familienname: 'Vimes',
           vorname: 'Susan',
         },
-        referrer: '6978',
+        username: '6978',
         personalnummer: '9183756',
         isLocked: false,
         userLock: [],
@@ -319,7 +310,7 @@ describe('PersonDetailsView', () => {
     expect(wrapper?.find('[data-testid="person-details-card"]').isVisible()).toBe(true);
     expect(wrapper?.find('[data-testid="person-vorname"]').text()).toBe(mockPerson.person.name.vorname);
     expect(wrapper?.find('[data-testid="person-familienname"]').text()).toBe(mockPerson.person.name.familienname);
-    expect(wrapper?.find('[data-testid="person-username"]').text()).toBe(mockPerson.person.referrer);
+    expect(wrapper?.find('[data-testid="person-username"]').text()).toBe(mockPerson.person.username);
     expect(wrapper?.find('[data-testid="person-email"]').text()).toBe(mockPerson.person.email?.address);
     expect(wrapper?.find('[data-testid="person-zuordnung-1"]').text()).toBe(
       `123456 (Testschule Birmingham): SuS 9a  (befristet bis ${adjustDateForTimezoneAndFormat(befristung)})`,
@@ -348,7 +339,7 @@ describe('PersonDetailsView', () => {
           familienname: 'Vimes',
           vorname: 'Samuel',
         },
-        referrer: '6978',
+        username: '6978',
         personalnummer: '9183756',
         isLocked: true,
         userLock,
@@ -775,8 +766,6 @@ describe('PersonDetailsView', () => {
     await befristungInput?.setValue('12.08.2099');
     await nextTick();
 
-    await nextTick();
-
     const submitButton: Element | null = document.body.querySelector(
       '[data-testid="zuordnung-creation-submit-button"]',
     );
@@ -1112,6 +1101,7 @@ describe('PersonDetailsView', () => {
       configStore.configData = {
         befristungBearbeitenEnabled: false,
         rolleBearbeitenEnabled: true,
+        rolleErweiternEnabled: true,
       };
       await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
       await nextTick();

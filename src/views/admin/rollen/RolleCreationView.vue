@@ -11,12 +11,11 @@
     RollenSystemRecht,
     useRolleStore,
     type RolleFormType,
-    type RolleResponse,
     type RolleStore,
   } from '@/stores/RolleStore';
   import {
     useServiceProviderStore,
-    type ServiceProvider,
+    type BaseServiceProvider,
     type ServiceProviderIdNameResponse,
     type ServiceProviderStore,
   } from '@/stores/ServiceProviderStore';
@@ -76,7 +75,9 @@
   const isFormDirty: ComputedRef<boolean> = computed(() => getDirtyState(formContext));
 
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
-  let blockedNext: () => void = () => {};
+  let blockedNext: () => void = () => {
+    /* empty */
+  };
 
   const handleCreateAnotherRolle = (): void => {
     rolleStore.createdRolle = null;
@@ -164,15 +165,19 @@
   });
 
   const serviceProviders: ComputedRef<TranslatedObject[]> = computed(() =>
-    serviceProviderStore.allServiceProviders.map((provider: ServiceProvider) => ({
+    serviceProviderStore.allServiceProviders.map((provider: BaseServiceProvider) => ({
       value: provider.id,
       title: provider.name,
     })),
   );
 
   function preventNavigation(event: BeforeUnloadEvent): void {
-    if (rolleStore.errorCode) formContext.resetForm();
-    if (!isFormDirty.value) return;
+    if (rolleStore.errorCode) {
+      formContext.resetForm();
+    }
+    if (!isFormDirty.value) {
+      return;
+    }
     event.preventDefault();
     /* Chrome requires returnValue to be set. */
     event.returnValue = '';
@@ -229,7 +234,7 @@
     window.removeEventListener('beforeunload', preventNavigation);
   });
 
-  const onSubmit: (e?: Event | undefined) => Promise<Promise<void> | undefined> = formContext.handleSubmit(async () => {
+  const onSubmit: (e?: Event) => Promise<Promise<void> | undefined> = formContext.handleSubmit(async () => {
     if (selectedRollenName.value && selectedAdministrationsebene.value && selectedRollenArt.value) {
       const merkmaleToSubmit: RollenMerkmal[] = selectedMerkmale.value?.map((m: RollenMerkmal) => m) || [];
       const systemrechteToSubmit: RollenSystemRecht[] =
@@ -242,9 +247,9 @@
           merkmaleToSubmit,
           systemrechteToSubmit,
         )
-        .then(async (rolleResponse: RolleResponse) => {
+        .then(async () => {
           if (selectedServiceProviders.value && selectedServiceProviders.value.length > 0) {
-            await rolleStore.updateServiceProviderInRolle(rolleResponse.id, {
+            await rolleStore.updateServiceProviderInRolle(rolleStore.createdRolle?.id ?? '', {
               serviceProviderIds: selectedServiceProviders.value,
               version: rolleStore.currentRolle?.version || 1,
             });
@@ -273,39 +278,39 @@
     <LayoutCard
       :closable="!rolleStore.errorCode"
       data-testid="rolle-creation-card"
-      @onCloseClicked="navigateToRolleManagement"
       :header="$t('admin.rolle.addNew')"
       :padded="true"
-      :showCloseText="true"
+      :show-close-text="true"
+      @on-close-clicked="navigateToRolleManagement"
     >
       <!-- The form to create a new Rolle -->
       <template v-if="!rolleStore.createdRolle">
         <RolleForm
-          :errorCode="rolleStore.errorCode"
-          :onHandleConfirmUnsavedChanges="handleConfirmUnsavedChanges"
-          :onHandleDiscard="navigateToRolleManagement"
-          :onShowDialogChange="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
-          :onSubmit="onSubmit"
-          :isEditActive="true"
-          :isLoading="rolleStore.loading"
+          :error-code="rolleStore.errorCode"
+          :on-handle-confirm-unsaved-changes="handleConfirmUnsavedChanges"
+          :on-handle-discard="navigateToRolleManagement"
+          :on-show-dialog-change="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
+          :on-submit="onSubmit"
+          :is-edit-active="true"
+          :is-loading="rolleStore.loading"
           ref="rolle-creation-form"
-          v-model:selectedAdministrationsebene="selectedAdministrationsebene"
-          :selectedAdministrationsebeneProps="selectedAdministrationsebeneProps"
-          v-model:selectedRollenArt="selectedRollenArt"
-          :selectedRollenArtProps="selectedRollenArtProps"
-          v-model:selectedRollenName="selectedRollenName"
-          :selectedRollenNameProps="selectedRollenNameProps"
-          v-model:selectedMerkmale="selectedMerkmale"
-          :selectedMerkmaleProps="selectedMerkmaleProps"
-          v-model:selectedServiceProviders="selectedServiceProviders"
-          :selectedServiceProvidersProps="selectedServiceProvidersProps"
-          v-model:selectedSystemRechte="selectedSystemRechte"
-          :selectedSystemRechteProps="selectedSystemRechteProps"
-          :serviceProviders="serviceProviders"
-          :showUnsavedChangesDialog="showUnsavedChangesDialog"
-          :translatedRollenarten="translatedRollenarten"
-          :translatedMerkmale="translatedMerkmale"
-          :translatedSystemrechte="translatedSystemrechte"
+          v-model:selected-administrationsebene="selectedAdministrationsebene"
+          :selected-administrationsebene-props="selectedAdministrationsebeneProps"
+          v-model:selected-rollen-art="selectedRollenArt"
+          :selected-rollen-art-props="selectedRollenArtProps"
+          v-model:selected-rollen-name="selectedRollenName"
+          :selected-rollen-name-props="selectedRollenNameProps"
+          v-model:selected-merkmale="selectedMerkmale"
+          :selected-merkmale-props="selectedMerkmaleProps"
+          v-model:selected-service-providers="selectedServiceProviders"
+          :selected-service-providers-props="selectedServiceProvidersProps"
+          v-model:selected-system-rechte="selectedSystemRechte"
+          :selected-system-rechte-props="selectedSystemRechteProps"
+          :service-providers="serviceProviders"
+          :show-unsaved-changes-dialog="showUnsavedChangesDialog"
+          :translated-rollenarten="translatedRollenarten"
+          :translated-merkmale="translatedMerkmale"
+          :translated-systemrechte="translatedSystemrechte"
         >
           <!-- Error Message Display if error on submit -->
           <!-- To trigger unsaved changes dialog the alert has to be inside the form wrapper -->
@@ -315,9 +320,9 @@
             :type="'error'"
             :closable="false"
             :text="rolleStore.errorCode ? $t(`admin.rolle.errors.${rolleStore.errorCode}`) : ''"
-            :showButton="true"
-            :buttonText="$t('admin.rolle.backToCreateRolle')"
-            :buttonAction="navigateBackToRolleForm"
+            :show-button="true"
+            :button-text="$t('admin.rolle.backToCreateRolle')"
+            :button-action="navigateBackToRolleForm"
           />
         </RolleForm>
       </template>
@@ -325,9 +330,9 @@
       <!-- Result template on success after submit  -->
       <template v-if="rolleStore.createdRolle && !rolleStore.errorCode">
         <RolleSuccessTemplate
-          :successMessage="$t('admin.rolle.rolleAddedSuccessfully')"
-          :followingRolleDataCreated="$t('admin.followingDataCreated')"
-          :createdRolleData="[
+          :success-message="$t('admin.rolle.rolleAddedSuccessfully')"
+          :following-rolle-data-created="$t('admin.followingDataCreated')"
+          :created-rolle-data="[
             {
               label: $t('admin.administrationsebene.administrationsebene'),
               value: getSskName(
@@ -358,13 +363,13 @@
               testId: 'created-rolle-systemrecht',
             },
           ]"
-          :backButtonText="$t('nav.backToList')"
-          :createAnotherRolleButtonText="$t('admin.rolle.createAnother')"
-          :showCreateAnotherRolleButton="true"
-          backButtonTestId="back-to-list-button"
-          createAnotherButtonTestId="create-another-rolle-button"
-          @OnNavigateBackToRolleManagement="navigateToRolleManagement"
-          @OnCreateAnotherRolle="handleCreateAnotherRolle"
+          :back-button-text="$t('nav.backToList')"
+          :create-another-rolle-button-text="$t('admin.rolle.createAnother')"
+          :show-create-another-rolle-button="true"
+          back-button-test-id="back-to-list-button"
+          create-another-button-test-id="create-another-rolle-button"
+          @on-navigate-back-to-rolle-management="navigateToRolleManagement"
+          @on-create-another-rolle="handleCreateAnotherRolle"
         />
       </template>
     </LayoutCard>

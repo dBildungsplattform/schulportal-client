@@ -2,8 +2,7 @@
   import KlassenFilter from '@/components/filter/KlassenFilter.vue';
   import FormRow from '@/components/form/FormRow.vue';
   import { type BaseFieldProps } from 'vee-validate';
-  import { type Ref, ref, type ModelRef } from 'vue';
-  import { watch } from 'vue';
+  import { type Ref, ref, type ModelRef, watch } from 'vue';
 
   type Props = {
     schulen?: Array<{ value: string; title: string }>;
@@ -24,8 +23,11 @@
   watch(
     selectedSchule,
     (newValue: string | undefined) => {
-      if (!newValue) administriertVon.value = [];
-      else if (!administriertVon.value?.includes(newValue)) administriertVon.value = [newValue];
+      if (!newValue) {
+        administriertVon.value = [];
+      } else if (!administriertVon.value?.includes(newValue)) {
+        administriertVon.value = [newValue];
+      }
     },
     { immediate: true },
   );
@@ -33,56 +35,51 @@
 
 <template>
   <v-form
-    data-testid="klasse-change-form"
     id="klasse-change-form"
-    :onSubmit="onSubmit"
+    data-testid="klasse-change-form"
+    :on-submit="onSubmit"
   >
     <!-- Schule zuordnen -->
     <FormRow
-      :errorLabel="selectedSchuleProps?.error || ''"
-      labelForId="schule-select"
-      :isRequired="true"
+      :error-label="selectedSchuleProps?.error || ''"
+      label-for-id="schule-select"
+      :is-required="true"
       :label="$t('admin.schule.schule')"
     >
       <v-autocomplete
+        id="schule-select"
+        ref="schule-select"
+        v-bind="selectedSchuleProps"
+        v-model="selectedSchule"
         :class="[{ 'filter-dropdown mb-4': true }, { selected: selectedSchule }]"
         autocomplete="off"
         clearable
         data-testid="schule-select"
         density="compact"
         :disabled="readonly"
-        id="schule-select"
         :items="schulen"
         item-value="value"
         item-text="title"
         :no-data-text="$t('noDataFound')"
         :placeholder="$t('admin.schule.assignSchule')"
-        ref="schule-select"
         hide-details
         required="true"
         variant="outlined"
-        v-bind="selectedSchuleProps"
-        v-model="selectedSchule"
-      ></v-autocomplete>
+      />
     </FormRow>
 
     <!-- Klasse auswählen -->
     <FormRow
-      :errorLabel="selectedNewKlasseProps?.error || ''"
-      labelForId="klasse-select"
-      :isRequired="true"
+      :error-label="selectedNewKlasseProps?.error || ''"
+      label-for-id="klasse-select"
+      :is-required="true"
       :label="$t('admin.klasse.klasse')"
     >
       <KlassenFilter
-        :multiple="false"
-        :hideDetails="false"
-        :selectedKlasseProps="selectedNewKlasseProps"
-        :highlightSelection="false"
-        :selectedKlassen="selectedNewKlasse"
-        :placeholderText="$t('admin.klasse.selectKlasse')"
         ref="klasse-select"
         :administriertVon
         :parentId="'klasse-change'"
+        :placeholder-text="$t('admin.klasse.selectKlasse')"
         @update:selectedKlassen="(newValue: string | undefined) => (selectedNewKlasse = newValue)"
       />
     </FormRow>

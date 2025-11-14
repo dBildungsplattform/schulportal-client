@@ -1,6 +1,5 @@
 <script setup lang="ts">
-  import type { BefristungProps } from '@/components/admin/personen/BefristungInput.vue';
-  import BefristungInput from '@/components/admin/personen/BefristungInput.vue';
+  import BefristungInput, { type BefristungProps } from '@/components/admin/personen/BefristungInput.vue';
   import KlassenFilter from '@/components/filter/KlassenFilter.vue';
   import FormRow from '@/components/form/FormRow.vue';
   import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
@@ -8,7 +7,9 @@
   import { OrganisationsTyp, type Organisation } from '@/stores/OrganisationStore';
   import {
     CreationType,
+    KlassenOption,
     OperationContext,
+    RolleDialogMode,
     usePersonenkontextStore,
     type PersonenkontextStore,
     type WorkflowFilter,
@@ -33,6 +34,8 @@
   const searchInputRolle: Ref<string | undefined> = ref('');
   const searchInputRollen: Ref<string | undefined> = ref('');
 
+  const localKlassenOption: Ref<string | undefined> = ref(KlassenOption.KEEP_KLASSE);
+
   type Props = {
     organisationen: TranslatedObject[] | undefined;
     rollen: TranslatedRolleWithAttrs[] | undefined;
@@ -43,12 +46,15 @@
     operationContext: OperationContext;
     selectedRolle?: string | undefined;
     selectedRollen?: string[] | undefined;
+    selectedKlassenOption?: string | null;
     selectedKlasse?: string | undefined;
+    selectedKlasseForRadio?: string | undefined;
     selectedOrganisationProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedKlasseProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
+    selectedKlasseForRadioProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedRolleProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedRollenProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
-    isModifyRolleDialog?: boolean;
+    selectedKlassenOptionProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     befristungInputProps?: BefristungProps;
     headlineNumbers?: {
       org: string;
@@ -56,7 +62,7 @@
       befristung: string;
     };
     allowMultipleRollen?: boolean;
-    isRolleUnassignForm?: boolean;
+    rolleDialogMode?: RolleDialogMode;
   };
 
   const props: Props = defineProps<Props>();
@@ -72,6 +78,8 @@
     (event: 'update:selectedRolle', value: string | undefined): void;
     (event: 'update:selectedRollen', value: string[] | undefined): void;
     (event: 'update:selectedKlasse', value: string | undefined): void;
+    (event: 'update:selectedKlasseForRadio', value: string | undefined): void;
+    (event: 'update:selectedKlassenOption', value: string | null): void;
     (event: 'update:canCommit', value: boolean): void;
     (event: 'fieldReset', field: 'selectedOrganisation' | 'selectedRolle' | 'selectedKlasse' | 'selectedRollen'): void;
   };
@@ -81,12 +89,15 @@
   const selectedRolle: Ref<string | undefined> = ref(props.selectedRolle);
   const selectedRollen: Ref<string[] | undefined> = ref(props.selectedRollen || []);
   const selectedKlasse: Ref<string | undefined> = ref(props.selectedKlasse);
+  const selectedKlasseForRadio: Ref<string | undefined> = ref(props.selectedKlasseForRadio);
   // we need to cast the selectedSchule into an array
   // doing it this way prevents an issue where the reactive system constantly re-runs which causes requests to be issued in a loop
   const administriertVon: Ref<string[] | undefined> = ref([]);
 
   const selectedRolleTitles: ComputedRef<string[]> = computed(() => {
-    if (!Array.isArray(selectedRollen.value)) return [];
+    if (!Array.isArray(selectedRollen.value)) {
+      return [];
+    }
     return selectedRollen.value
       .map((id: string) => props.rollen?.find((rolle: TranslatedObject) => rolle.value === id)?.title)
       .filter((title: string | undefined): title is string => !!title);
@@ -110,7 +121,9 @@
   );
 
   function isLernRolle(selectedRolleIds: string | string[] | undefined): boolean {
-    if (!selectedRolleIds) return false;
+    if (!selectedRolleIds) {
+      return false;
+    }
 
     // Ensure we always work with an array
     const rolleIdsArray: string[] = Array.isArray(selectedRolleIds) ? selectedRolleIds : [selectedRolleIds];
@@ -140,13 +153,17 @@
   }
 
   // Watcher for selectedOrganisation to fetch roles and classes
-  watch(selectedOrganisation, async (newValue: string | undefined, oldValue: string | undefined) => {
+  watch(selectedOrganisation, (newValue: string | undefined, oldValue: string | undefined) => {
     // Reset selected roles if oldValue existed (change event)
     if (oldValue !== undefined) {
-      selectedRolle.value = undefined;
-      selectedRollen.value = undefined;
-      emits('fieldReset', 'selectedRolle');
-      emits('fieldReset', 'selectedRollen');
+      if (selectedRolle.value) {
+        selectedRolle.value = undefined;
+        emits('fieldReset', 'selectedRolle');
+      }
+      if (selectedRollen.value?.length) {
+        selectedRollen.value = undefined;
+        emits('fieldReset', 'selectedRollen');
+      }
     }
     emits('update:selectedOrganisation', newValue);
 
@@ -226,11 +243,13 @@
 
   watch(
     props.allowMultipleRollen ? searchInputRollen : searchInputRolle,
-    async (newValue: string | undefined, oldValue: string | undefined) => {
+    (newValue: string | undefined, oldValue: string | undefined) => {
       clearTimeout(timerId.value);
 
       // this prevents duplicate requests because the input value changes between "" and null
-      if (!newValue && !oldValue) return;
+      if (!newValue && !oldValue) {
+        return;
+      }
 
       // this prevents duplicate requests when the user selects a value from the dropdown
       if (
@@ -274,6 +293,11 @@
     emits('update:selectedKlasse', selectedKlassen);
   }
 
+  function updateKlasseSelectionForRadio(selectedKlassen: string | undefined): void {
+    selectedKlasseForRadio.value = selectedKlassen;
+    emits('update:selectedKlasseForRadio', selectedKlassen);
+  }
+
   // Clear the selected Rolle once the input field is cleared (This is the only way to fetch all Rollen again)
   // This is also important since we only want to fetch all orgas once the selected Rolle is null, otherwise an extra request is made with an empty string
   function clearSelectedRolle(): void {
@@ -286,7 +310,7 @@
 
   watch(
     autoselectedSchule,
-    async (newAutoselectedSchule: Organisation | null) => {
+    (newAutoselectedSchule: Organisation | null) => {
       if (newAutoselectedSchule) {
         selectedOrganisation.value = newAutoselectedSchule.id;
         emits('update:selectedOrganisation', newAutoselectedSchule.id);
@@ -316,9 +340,22 @@
     emits('update:selectedOrganisation', orgaId);
   }
 
+  function handleKlassenOption(value: string | null): void {
+    if (value === null) {
+      return;
+    }
+    if (value === KlassenOption.KEEP_KLASSE.toString()) {
+      selectedKlasseForRadio.value = undefined;
+      emits('update:selectedKlasseForRadio', undefined);
+    }
+    localKlassenOption.value = value;
+    emits('update:selectedKlassenOption', value);
+  }
+
   // If the submission of the form goes wrong and the user needs to correct something, we need to ensure that the canCommit value is updated
   onMounted(() => {
     emits('update:canCommit', personenkontextStore.workflowStepResponse?.canCommit ?? false);
+    emits('update:selectedKlassenOption', localKlassenOption.value!);
   });
 </script>
 
@@ -332,9 +369,9 @@
     <!-- Organisation zuordnen -->
     <FormRow
       ref="form-row"
-      :errorLabel="selectedOrganisationProps?.['error'] ?? false"
-      :isRequired="true"
-      labelForId="organisation-select"
+      :error-label="selectedOrganisationProps?.['error'] ?? false"
+      :is-required="true"
+      label-for-id="organisation-select"
       :label="$t('admin.organisation.organisation')"
     >
       <SchulenFilter
@@ -348,7 +385,7 @@
         :useWorkflowEndpoints="true"
         :useLandesbediensteteWorkflow="useLandesbediensteteWorkflow"
         :operationContext="props.operationContext"
-        :isRolleUnassignForm="isRolleUnassignForm"
+        :isRolleUnassignForm="rolleDialogMode === RolleDialogMode.UNASSIGN"
         :includeAll="true"
         :placeholderText="$t('admin.organisation.selectOrganisation')"
         :personId="props.personId"
@@ -366,23 +403,24 @@
       </v-row>
       <!-- Rollenzuordnung -->
       <FormRow
-        :errorLabel="
+        :error-label="
           allowMultipleRollen ? (selectedRollenProps?.['error'] ?? false) : (selectedRolleProps?.['error'] ?? false)
         "
-        labelForId="rolle-select"
-        :isRequired="true"
+        label-for-id="rolle-select"
+        :is-required="true"
         :label="$t('admin.rolle.rolle')"
       >
         <v-autocomplete
           v-if="allowMultipleRollen"
-          autocomplete="off"
-          clearable
-          @clear="clearSelectedRollen"
-          @update:focused="handleFocusChange"
-          data-testid="rollen-select"
-          density="compact"
           id="rollen-select"
           ref="rollen-select"
+          v-bind="selectedRollenProps"
+          v-model="selectedRollen"
+          v-model:search="searchInputRollen"
+          autocomplete="off"
+          clearable
+          data-testid="rollen-select"
+          density="compact"
           :items="rollen"
           item-value="value"
           item-text="title"
@@ -391,19 +429,20 @@
           :placeholder="$t('admin.rolle.selectRolle')"
           required="true"
           variant="outlined"
-          v-bind="selectedRollenProps"
-          v-model="selectedRollen"
-          v-model:search="searchInputRollen"
-        ></v-autocomplete>
+          @clear="clearSelectedRollen"
+          @update:focused="handleFocusChange"
+        />
         <v-autocomplete
           v-else-if="!allowMultipleRollen"
-          autocomplete="off"
-          clearable
-          @clear="clearSelectedRolle"
-          data-testid="rolle-select"
-          density="compact"
           id="rolle-select"
           ref="rolle-select"
+          v-bind="selectedRolleProps"
+          v-model="selectedRolle"
+          v-model:search="searchInputRolle"
+          autocomplete="off"
+          clearable
+          data-testid="rolle-select"
+          density="compact"
           :items="rollen"
           item-value="value"
           item-text="title"
@@ -411,22 +450,23 @@
           :placeholder="$t('admin.rolle.selectRolle')"
           required="true"
           variant="outlined"
-          v-bind="selectedRolleProps"
-          v-model="selectedRolle"
-          v-model:search="searchInputRolle"
-        ></v-autocomplete>
+          @clear="clearSelectedRolle"
+        />
       </FormRow>
 
-      <!-- Klasse zuordnen -->
+      <!-- Klasse zuordnen for normal flow-->
       <FormRow
         v-if="
           allowMultipleRollen
             ? isLernRolle(selectedRollen) && selectedOrganisation
-            : isLernRolle(selectedRolle) && selectedOrganisation && !isRolleUnassignForm
+            : isLernRolle(selectedRolle) &&
+              selectedOrganisation &&
+              rolleDialogMode !== RolleDialogMode.MODIFY &&
+              rolleDialogMode !== RolleDialogMode.UNASSIGN
         "
-        :errorLabel="selectedKlasseProps?.['error'] || false"
-        :isRequired="true"
-        labelForId="klasse-select"
+        :error-label="selectedKlasseProps?.['error'] || false"
+        :is-required="true"
+        label-for-id="klasse-select"
         :label="$t('admin.klasse.klasse')"
       >
         <KlassenFilter
@@ -440,6 +480,60 @@
           ref="klasse-select"
           :administriertVon
           parentId="personenkontext-create"
+        />
+      </FormRow>
+      <FormRow
+        v-if="isLernRolle(selectedRolle) && rolleDialogMode === RolleDialogMode.MODIFY"
+        :errorLabel="selectedKlasseProps?.['error'] || false"
+        :isRequired="true"
+        :isAlignedWithRadio="true"
+        labelForId="klasse-select"
+        :label="$t('admin.klasse.klasse')"
+      >
+        <v-radio-group
+          data-testid="klassen-option-radio-group"
+          ref="klassen-option-radio-group"
+          @update:modelValue="handleKlassenOption"
+          v-model="localKlassenOption"
+          v-bind="selectedKlassenOptionProps"
+        >
+          <v-radio
+            data-testid="keep-klasse-radio-button"
+            :label="$t('admin.klasse.keepKlasse')"
+            :value="KlassenOption.KEEP_KLASSE"
+            color="primary"
+          ></v-radio>
+          <v-radio
+            data-testid="select-new-klasse-radio-button"
+            :label="$t('admin.klasse.selectAnotherKlasse')"
+            :value="KlassenOption.SELECT_NEW_KLASSE"
+            :color="'primary'"
+          ></v-radio>
+        </v-radio-group>
+      </FormRow>
+      <!-- Klasse zuordnen for RolleModify -->
+      <FormRow
+        v-if="
+          isLernRolle(selectedRolle) &&
+          selectedOrganisation &&
+          rolleDialogMode === RolleDialogMode.MODIFY &&
+          localKlassenOption === KlassenOption.SELECT_NEW_KLASSE
+        "
+        :errorLabel="selectedKlasseForRadioProps?.['error'] || false"
+        labelForId="klasse-select"
+        class="mt-n4"
+      >
+        <KlassenFilter
+          :multiple="false"
+          :hideDetails="false"
+          :selectedKlasseProps="selectedKlasseForRadioProps"
+          :highlightSelection="false"
+          :selectedKlassen="selectedKlasseForRadio"
+          @update:selectedKlassen="updateKlasseSelectionForRadio"
+          :placeholderText="$t('admin.klasse.selectKlasse')"
+          ref="klasse-select"
+          :administriertVon
+          parentId="personenkontext-create-rolle-modify"
         />
       </FormRow>
       <!-- Befristung -->
@@ -458,19 +552,18 @@
         v-if="
           selectedOrganisation &&
           (allowMultipleRollen ? (selectedRollen?.length ?? 0) > 0 : selectedRolle) &&
-          !isModifyRolleDialog &&
           props.befristungInputProps
         "
-        :befristungProps="befristungInputProps?.befristungProps"
-        :befristungOptionProps="befristungInputProps?.befristungOptionProps"
-        :isUnbefristetDisabled="befristungInputProps?.isUnbefristetDisabled"
-        :isBefristungRequired="befristungInputProps?.isBefristungRequired"
-        :nextSchuljahresende="befristungInputProps?.nextSchuljahresende"
-        :befristung="befristungInputProps?.befristung"
-        :befristungOption="befristungInputProps?.befristungOption"
         ref="befristung-input-wrapper"
+        :befristung-props="befristungInputProps?.befristungProps"
+        :befristung-option-props="befristungInputProps?.befristungOptionProps"
+        :is-unbefristet-disabled="befristungInputProps?.isUnbefristetDisabled"
+        :is-befristung-required="befristungInputProps?.isBefristungRequired"
+        :next-schuljahresende="befristungInputProps?.nextSchuljahresende"
+        :befristung="befristungInputProps?.befristung"
+        :befristung-option="befristungInputProps?.befristungOption"
         @update:befristung="handleBefristungChange"
-        @update:calculatedBefristungOption="handleCalculatedBefristungOptionChange"
+        @update:calculated-befristung-option="handleCalculatedBefristungOptionChange"
       />
     </div>
   </div>

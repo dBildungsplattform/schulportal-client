@@ -11,7 +11,6 @@ import {
 } from '@/api-client/generated';
 import ApiService from '@/services/ApiService';
 import { PersonLockOccasion } from '@/utils/lock';
-import { rejects } from 'assert';
 import MockAdapter from 'axios-mock-adapter';
 import { createPinia, setActivePinia } from 'pinia';
 import { DoFactory } from 'test/DoFactory';
@@ -93,7 +92,7 @@ describe('PersonStore', () => {
               personId: person.person.id,
               vorname: person.person.name.vorname,
               nachname: person.person.name.familienname,
-              benutzername: person.person.referrer ?? '---',
+              benutzername: person.person.username ?? '---',
             },
             {
               organisation: mockSchule,
@@ -159,7 +158,7 @@ describe('PersonStore', () => {
               personId: mockPersons[0]!.person.id,
               vorname: mockPersons[0]!.person.name.vorname,
               nachname: mockPersons[0]!.person.name.familienname,
-              benutzername: mockPersons[0]!.person.referrer ?? '---',
+              benutzername: mockPersons[0]!.person.username ?? '---',
             },
             {
               organisation: mockSchule,
@@ -292,9 +291,9 @@ describe('PersonStore', () => {
       const mockResponse: PersonendatensatzResponse = DoFactory.getPersonendatensatzResponse(mockPerson.person);
 
       mockadapter.onGet('/api/personen/1234').replyOnce(200, mockResponse);
-      const getPersonByIdPromise: Promise<Personendatensatz> = personStore.getPersonById('1234');
+      const getPersonByIdPromise: Promise<void> = personStore.getPersonById('1234');
       expect(personStore.loading).toBe(true);
-      const currentPerson: Personendatensatz = await getPersonByIdPromise;
+      await getPersonByIdPromise;
       mockPerson.person.userLock.forEach((lock) => {
         const lockDate = new Date(lock.locked_until);
         // Adjust date for MESZ (German summer time) if necessary
@@ -305,7 +304,7 @@ describe('PersonStore', () => {
         lock.locked_until = lockDate.toLocaleDateString('de-DE', dateOptions);
         lock.created_at = createdAt.toLocaleDateString('de-DE', dateOptions);
       });
-      expect(currentPerson).toEqual(
+      expect(personStore.currentPerson).toEqual(
         expect.objectContaining({
           // Include only the relevant properties you want to check
           person: expect.objectContaining({
@@ -332,18 +331,18 @@ describe('PersonStore', () => {
 
     it('should handle string error', async () => {
       mockadapter.onGet('/api/personen/2345').replyOnce(500, 'some mock server error');
-      const getPersonByIdPromise: Promise<Personendatensatz> = personStore.getPersonById('2345');
+      const getPersonByIdPromise: Promise<void> = personStore.getPersonById('2345');
       expect(personStore.loading).toBe(true);
-      await rejects(getPersonByIdPromise);
+      await getPersonByIdPromise;
       expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR');
       expect(personStore.loading).toBe(false);
     });
 
     it('should handle error code', async () => {
       mockadapter.onGet('/api/personen/2345').replyOnce(500, { code: 'some mock server error' });
-      const getPersonByIdPromise: Promise<Personendatensatz> = personStore.getPersonById('2345');
+      const getPersonByIdPromise: Promise<void> = personStore.getPersonById('2345');
       expect(personStore.loading).toBe(true);
-      await rejects(getPersonByIdPromise);
+      await getPersonByIdPromise;
       expect(personStore.errorCode).toEqual('some mock server error');
       expect(personStore.loading).toBe(false);
     });
@@ -525,7 +524,7 @@ describe('PersonStore', () => {
       const lockUserBodyParams: LockUserBodyParams = getUserLockBodyParams(true);
       const lockPersonPromise: Promise<void> = personStore.lockPerson(personId, lockUserBodyParams);
       expect(personStore.loading).toBe(true);
-      await expect(lockPersonPromise).rejects.toEqual('UNSPECIFIED_ERROR');
+      await lockPersonPromise;
       expect(personStore.loading).toBe(false);
       expect(personStore.errorCode).toBe('UNSPECIFIED_ERROR');
     });
@@ -537,7 +536,7 @@ describe('PersonStore', () => {
       const lockUserBodyParams: LockUserBodyParams = getUserLockBodyParams(true);
       const lockPersonPromise: Promise<void> = personStore.lockPerson(personId, lockUserBodyParams);
       expect(personStore.loading).toBe(true);
-      await expect(lockPersonPromise).rejects.toEqual('LOCK_FAILED_ERROR');
+      await lockPersonPromise;
       expect(personStore.loading).toBe(false);
       expect(personStore.errorCode).toEqual('LOCK_FAILED_ERROR');
     });

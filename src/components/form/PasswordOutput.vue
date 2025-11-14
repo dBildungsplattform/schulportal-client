@@ -48,55 +48,55 @@
     :value="password"
     variant="outlined"
   >
-    <template v-slot:append-inner>
+    <template #append-inner>
       <SpshTooltip
-        :enabledCondition="showPassword"
-        :disabledText="$t('showPassword')"
-        :enabledText="$t('hidePassword')"
+        :enabled-condition="showPassword"
+        :disabled-text="$t('showPassword')"
+        :enabled-text="$t('hidePassword')"
         position="start"
       >
         <v-icon
-          @click.stop="showPassword = !showPassword"
-          @keyup.enter="showPassword = !showPassword"
-          @keyup.space="showPassword = !showPassword"
           data-testid="show-password-icon"
           :icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
           tabindex="0"
-        ></v-icon>
+          @click.stop="showPassword = !showPassword"
+          @keyup.enter="showPassword = !showPassword"
+          @keyup.space="showPassword = !showPassword"
+        />
       </SpshTooltip>
     </template>
-    <template v-slot:append>
+    <template #append>
       <SpshTooltip
-        :enabledCondition="true"
-        :disabledText="$t('copyPassword')"
-        :enabledText="$t('copyPassword')"
+        :enabled-condition="true"
+        :disabled-text="$t('copyPassword')"
+        :enabled-text="$t('copyPassword')"
         position="start"
       >
         <v-icon
-          @click.stop="copyToClipboard(password)"
-          @keyup.enter="copyToClipboard(password)"
-          @keyup.space="copyToClipboard(password)"
           data-testid="copy-password-icon"
           icon="mdi-content-copy"
           tabindex="0"
-        ></v-icon>
+          @click.stop="copyToClipboard(password)"
+          @keyup.enter="copyToClipboard(password)"
+          @keyup.space="copyToClipboard(password)"
+        />
       </SpshTooltip>
       <SpshTooltip
         v-if="props.showPrintIcon"
-        :enabledCondition="true"
-        :disabledText="$t('admin.person.printPassword')"
-        :enabledText="$t('admin.person.printPassword')"
+        :enabled-condition="true"
+        :disabled-text="$t('admin.person.printPassword')"
+        :enabled-text="$t('admin.person.printPassword')"
         position="start"
       >
         <v-icon
-          @click.stop="printPassword()"
-          @keyup.enter="printPassword()"
-          @keyup.space="printPassword()"
           data-testid="print-password-icon"
           icon="mdi-printer-outline"
           tabindex="0"
           class="ml-1"
-        ></v-icon>
+          @click.stop="printPassword()"
+          @keyup.enter="printPassword()"
+          @keyup.space="printPassword()"
+        />
       </SpshTooltip>
     </template>
   </v-text-field>

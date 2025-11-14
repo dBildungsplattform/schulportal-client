@@ -13,6 +13,7 @@ type Permission =
   | 'personenimport'
   | 'personenverwaltung'
   | 'rollenverwaltung'
+  | 'angebotsverwaltung'
   | 'schulverwaltung'
   | 'schultraegerverwaltung'
   | 'portalverwaltung'
@@ -53,11 +54,15 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
   if (!authStore.isAuthenticated) {
     await authStore.initializeAuthStatus();
   }
-  if (to.path != '/profile' && to.path != '/no-second-factor') sessionStorage.setItem('previousUrl', to.path);
+  if (to.path !== '/profile' && to.path !== '/no-second-factor') {
+    sessionStorage.setItem('previousUrl', to.path);
+  }
 
   if (to.path === '/no-second-factor') {
     const personId: string | null | undefined = authStore.currentUser?.personId;
-    if (!personId) return false;
+    if (!personId) {
+      return false;
+    }
     const twoFactorAuthentificationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
     await twoFactorAuthentificationStore.get2FAState(personId);
     if (twoFactorAuthentificationStore.hasToken) {
@@ -78,7 +83,9 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
 
   if (to.meta['requiredStepUpLevel'] === StepUpLevel.GOLD && authStore.acr !== StepUpLevel.GOLD) {
     const personId: string | null | undefined = authStore.currentUser?.personId;
-    if (!personId) return false;
+    if (!personId) {
+      return false;
+    }
     const twoFactorAuthentificationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
     await twoFactorAuthentificationStore.get2FAState(personId);
     if (!twoFactorAuthentificationStore.hasToken) {
@@ -92,8 +99,8 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
 
   if (to.meta['requiresPermission']) {
     const requiredPermissions: Permission[] = Array.isArray(to.meta['requiresPermission'])
-      ? to.meta['requiresPermission']
-      : [to.meta['requiresPermission']];
+      ? (to.meta['requiresPermission'] as Permission[])
+      : [to.meta['requiresPermission'] as Permission];
 
     // Check if user has ALL required permissions
     const hasAllPermissions: boolean = requiredPermissions.every((permission: Permission) => {
@@ -108,6 +115,8 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
           return authStore.hasKlassenverwaltungPermission;
         case 'rollenverwaltung':
           return authStore.hasRollenverwaltungPermission;
+        case 'angebotsverwaltung':
+          return authStore.hasAngeboteVerwaltenPermission;
         case 'schulverwaltung':
           return authStore.hasSchulverwaltungPermission;
         case 'schultraegerverwaltung':

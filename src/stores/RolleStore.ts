@@ -17,7 +17,7 @@ import {
   type SystemRechtResponse,
   type ServiceProviderIdNameResponse,
 } from '../api-client/generated/api';
-import type { ServiceProvider } from './ServiceProviderStore';
+import type { BaseServiceProvider } from './ServiceProviderStore';
 
 const rolleApi: RolleApiInterface = RolleApiFactory(undefined, '', axiosApiInstance);
 
@@ -31,7 +31,7 @@ type RolleState = {
   totalRollen: number;
 };
 
-type RolleGetters = {};
+type RolleGetters = object;
 type RolleActions = {
   updateServiceProviderInRolle: (
     rolleId: string,
@@ -43,7 +43,7 @@ type RolleActions = {
     rollenArt: RollenArt,
     merkmale: RollenMerkmal[],
     systemrechte: RollenSystemRechtEnum[],
-  ) => Promise<RolleResponse>;
+  ) => Promise<void>;
   getAllRollen: (filter: RolleFilter) => Promise<void>;
   getRolleById: (rolleId: string) => Promise<void>;
   updateRolle: (
@@ -99,10 +99,10 @@ export type RolleTableItem = {
 
 export type RolleFormType = {
   selectedAdministrationsebene: string | undefined;
-  selectedRollenArt: RollenArt | string;
+  selectedRollenArt: RollenArt;
   selectedRollenName: string | undefined;
   selectedMerkmale: RollenMerkmal[] | string[];
-  selectedServiceProviders: ServiceProvider[] | string[];
+  selectedServiceProviders: BaseServiceProvider[] | string[];
   selectedSystemRechte: RollenSystemRechtEnum[] | string[];
 };
 
@@ -152,7 +152,7 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
       rollenArt: RollenArt,
       merkmale: RollenMerkmal[],
       systemrechte: RollenSystemRechtEnum[],
-    ): Promise<RolleResponse> {
+    ): Promise<void> {
       this.loading = true;
       try {
         // Construct the body params object
@@ -170,10 +170,8 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
         );
         this.createdRolle = { ...data, systemrechte: receivedSystemrechte };
         this.currentRolle = this.createdRolle;
-        return data;
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'ROLLE_ERROR');
-        return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
       }
@@ -202,7 +200,6 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
         this.currentRolle = mapRolleResponseToRolle(data);
       } catch (error) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
-        return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
       }

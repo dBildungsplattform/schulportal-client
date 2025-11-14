@@ -96,7 +96,7 @@
           {
             vorname: personInfoStore.personInfo.person.name.vorname,
             familienname: personInfoStore.personInfo.person.name.familiennamen,
-            username: personInfoStore.personInfo.person.referrer ?? undefined,
+            username: personInfoStore.personInfo.person.username ?? undefined,
             personalnummer: personInfoStore.personInfo.person.personalnummer ?? null,
             emailStatus: {
               status: personInfoStore.personInfo.email?.status as EmailStatus,
@@ -113,15 +113,21 @@
   );
 
   const groupedZuordnungen: ComputedRef<Map<string, Zuordnung[]>> = computed(() => {
-    if (!personStore.personenuebersicht) return new Map();
+    if (!personStore.personenuebersicht) {
+      return new Map<string, Zuordnung[]>();
+    }
     return groupZuordnungen(personStore.personenuebersicht.zuordnungen);
   });
 
   const lastPasswordChangeDate: ComputedRef<string> = computed(() => {
     const passwordUpdatedAt: string | null | undefined = authStore.currentUser?.password_updated_at;
-    if (!passwordUpdatedAt) return '';
+    if (!passwordUpdatedAt) {
+      return '';
+    }
     const date: Date = new Date(passwordUpdatedAt);
-    if (isNaN(date.valueOf())) return '';
+    if (isNaN(date.valueOf())) {
+      return '';
+    }
     return new Intl.DateTimeFormat('de-DE', {
       year: 'numeric',
       month: '2-digit',
@@ -131,7 +137,9 @@
 
   const twoFactorAuthError: ComputedRef<string> = computed(() => {
     // Early return if loading
-    if (twoFactorAuthenticationStore.loading) return '';
+    if (twoFactorAuthenticationStore.loading) {
+      return '';
+    }
 
     switch (twoFactorAuthenticationStore.errorCode) {
       case 'TOKEN_STATE_ERROR':
@@ -171,14 +179,16 @@
   function navigateToPasswordChange(): void {
     const url: URL = new URL(window.origin + '/api/auth/reset-password');
     url.searchParams.set('redirectUrl', windowOrigin + route.fullPath);
-    url.searchParams.set('login_hint', personInfoStore.personInfo?.person.referrer ?? '');
+    url.searchParams.set('login_hint', personInfoStore.personInfo?.person.username ?? '');
     window.location.href = url.toString();
   }
 
   watch(
     () => personInfoStore.personInfo?.person.id,
     async (personId: string | undefined) => {
-      if (!personId) return;
+      if (!personId) {
+        return;
+      }
       loading2FA.value = true;
 
       const twoFARequirementPromise: Promise<void> = twoFactorAuthenticationStore.get2FARequirement(personId);
@@ -199,15 +209,15 @@
 <template>
   <v-btn
     class="mt-8"
-    @click="handleGoToPreviousPage()"
     data-testid="back-to-previous-page-button"
+    @click="handleGoToPreviousPage()"
   >
     <v-icon
       class="mr-2"
       icon="mdi-arrow-left-thin"
     />
-    {{ $t('nav.backToPreviousPage') }}</v-btn
-  >
+    {{ $t('nav.backToPreviousPage') }}
+  </v-btn>
   <div class="my-8">
     <v-row class="flex-nowrap mb-1 justify-center">
       <v-col cols="auto">
@@ -228,12 +238,12 @@
       >
         <LayoutCard
           :header="$t('profile.personalData')"
-          :headlineTestId="'layout-card-headline-persoenliche-daten'"
+          :headline-test-id="'layout-card-headline-persoenliche-daten'"
         >
           <v-row class="ma-4">
             <v-col cols="12">
               <v-table class="text-body-1">
-                <template v-slot:default>
+                <template #default>
                   <tbody>
                     <tr
                       v-for="item in personalData"
@@ -241,8 +251,8 @@
                     >
                       <td v-if="item.type === ItemType.KO_PERS && item.value === null">
                         <SpshTooltip
-                          :disabledText="t('profile.koPersNummerMissing')"
-                          :enabledText="t('profile.koPersNummerMissing')"
+                          :disabled-text="t('profile.koPersNummerMissing')"
+                          :enabled-text="t('profile.koPersNummerMissing')"
                           position="top"
                         >
                           <span
@@ -261,21 +271,21 @@
                           ></span
                         >
                         <strong
-                          :data-testid="item.testIdLabel"
                           v-else
+                          :data-testid="item.testIdLabel"
                           >{{ item.label }}:</strong
                         >
                       </td>
                       <td
-                        :data-testid="item.testIdValue"
                         v-if="item.type === ItemType.KO_PERS && item.value === null"
+                        :data-testid="item.testIdValue"
                         class="text-red"
                       >
                         {{ t('missing') }}
                       </td>
                       <td
-                        :data-testid="item.testIdValue"
                         v-else
+                        :data-testid="item.testIdValue"
                       >
                         <v-row
                           no-gutters
@@ -283,8 +293,8 @@
                         >
                           <SpshTooltip
                             v-if="item.tooltip"
-                            enabledCondition
-                            :enabledText="item.tooltip"
+                            enabled-condition
+                            :enabled-text="item.tooltip"
                             position="bottom"
                           >
                             <v-icon
@@ -310,7 +320,7 @@
                   class="mr-2"
                   icon="mdi-information-slab-circle-outline"
                   data-testid="info-icon"
-                ></v-icon>
+                />
                 <span data-testid="info-text">
                   {{ $t('profile.infoAboutChangeabilityFromPersonalData') }}
                 </span>
@@ -320,7 +330,7 @@
         </LayoutCard>
         <LayoutCard
           data-testid="password-card"
-          :headlineTestId="'new-password-card'"
+          :headline-test-id="'new-password-card'"
           :header="$t('login.password')"
           class="text-body"
         >
@@ -332,8 +342,8 @@
             <v-col class="text-center px-0">
               <v-row>
                 <p
-                  class="w-100"
                   v-if="lastPasswordChangeDate"
+                  class="w-100"
                 >
                   {{ t('profile.lastPasswordChange', { date: lastPasswordChangeDate }) }}
                 </p>
@@ -359,7 +369,7 @@
             <LayoutCard
               :closable="true"
               :header="$t('profile.changePassword')"
-              @onCloseClicked="closeChangePasswordDialog()"
+              @on-close-clicked="closeChangePasswordDialog()"
             >
               <v-card-text>
                 <v-container class="d-flex align-center">
@@ -371,7 +381,7 @@
                       class="mr-2"
                       size="x-large"
                       icon="mdi-information-slab-circle-outline"
-                    ></v-icon>
+                    />
                   </v-col>
                   <v-col>
                     <p class="text-body bold">
@@ -390,8 +400,8 @@
                   >
                     <v-btn
                       class="secondary button w-100"
-                      @click.stop="closeChangePasswordDialog()"
                       data-testid="close-change-password-dialog-button"
+                      @click.stop="closeChangePasswordDialog()"
                     >
                       {{ $t('cancel') }}
                     </v-btn>
@@ -403,9 +413,9 @@
                     class="d-flex justify-center"
                   >
                     <v-btn
-                      @click.stop="navigateToPasswordChange()"
                       class="primary w-100"
                       data-testid="change-password-button"
+                      @click.stop="navigateToPasswordChange()"
                     >
                       {{ $t('profile.changePassword') }}
                     </v-btn>
@@ -426,12 +436,12 @@
               size="64"
               color="primary"
               data-testid="loading-spinner"
-            ></v-progress-circular>
+            />
           </v-row>
         </template>
         <LayoutCard
           v-else-if="twoFactorAuthenticationStore.required"
-          :headlineTestId="'two-factor-card'"
+          :headline-test-id="'two-factor-card'"
           :header="$t('profile.twoFactorAuth')"
         >
           <v-row
@@ -453,12 +463,12 @@
                     v-if="twoFactorAuthError"
                     color="warning"
                     icon="mdi-alert-outline"
-                  ></v-icon>
+                  />
                   <v-icon
                     v-else-if="twoFactorAuthenticationStore.hasToken === true"
                     color="green"
                     icon="mdi-check-circle"
-                  ></v-icon>
+                  />
                 </v-col>
                 <v-col data-testid="two-factor-info">
                   <template v-if="twoFactorAuthError">
@@ -480,8 +490,8 @@
               </v-row>
             </v-col>
             <v-col
-              cols="12"
               v-else
+              cols="12"
             >
               <v-row justify="center">
                 <v-col
@@ -492,22 +502,23 @@
                   <v-icon
                     color="warning"
                     icon="mdi-alert-circle"
-                  ></v-icon>
+                  />
                   {{ $t('admin.person.twoFactorAuthentication.secondFactorNotSet') }}
                 </v-col>
               </v-row>
             </v-col>
             <v-col
-              cols="12"
               v-if="!twoFactorAuthError"
+              cols="12"
             >
               <v-row>
                 <template v-if="twoFactorAuthenticationStore.hasToken === false">
                   <SelfServiceWorkflow
-                    :personId="personInfoStore.personInfo?.person.id ?? ''"
-                    @updateState="twoFactorAuthenticationStore.get2FAState(personInfoStore.personInfo?.person.id ?? '')"
-                  >
-                  </SelfServiceWorkflow>
+                    :person-id="personInfoStore.personInfo?.person.id ?? ''"
+                    @update-state="
+                      twoFactorAuthenticationStore.get2FAState(personInfoStore.personInfo?.person.id ?? '')
+                    "
+                  />
                 </template>
                 <template v-else-if="twoFactorAuthenticationStore.hasToken === true">
                   <v-col
@@ -518,8 +529,7 @@
                     <v-icon
                       class="mb-2"
                       icon="mdi-information"
-                    >
-                    </v-icon>
+                    />
                   </v-col>
                   <v-col>
                     <p>
@@ -534,7 +544,7 @@
         <LayoutCard
           v-if="hasLehrRolle"
           data-testid="reset-device-password-card"
-          headlineTestId="reset-device-password-card-headline"
+          headline-test-id="reset-device-password-card-headline"
           :header="$t('admin.person.devicePassword.header')"
           class="text-body"
         >
@@ -546,19 +556,18 @@
             <v-col class="text-center px-0">
               <v-row class="d-flex align-center justify-center">
                 <PasswordReset
-                  :buttonText="$t('admin.person.devicePassword.createPassword')"
-                  :confirmButtonText="$t('admin.person.devicePassword.createPassword')"
-                  :dialogHeader="$t('admin.person.devicePassword.createDevicePassword')"
-                  :dialogText="devicePasswordDialogText"
-                  :errorCode="personStore.errorCode"
-                  :errorMessage="devicePasswordErrorMessage"
-                  :isLoading="personStore.loading"
-                  @onClearPassword="devicePassword = ''"
-                  @onResetPassword="resetDevicePassword()"
+                  :button-text="$t('admin.person.devicePassword.createPassword')"
+                  :confirm-button-text="$t('admin.person.devicePassword.createPassword')"
+                  :dialog-header="$t('admin.person.devicePassword.createDevicePassword')"
+                  :dialog-text="devicePasswordDialogText"
+                  :error-code="personStore.errorCode"
+                  :error-message="devicePasswordErrorMessage"
+                  :is-loading="personStore.loading"
                   :password="devicePassword"
-                  :testId="'device-password'"
-                >
-                </PasswordReset>
+                  :test-id="'device-password'"
+                  @on-clear-password="devicePassword = ''"
+                  @on-reset-password="resetDevicePassword()"
+                />
               </v-row>
               <v-row class="d-flex justify-center">
                 <v-col
@@ -568,8 +577,7 @@
                   <v-icon
                     class="mb-2"
                     icon="mdi-information"
-                  >
-                  </v-icon>
+                  />
                 </v-col>
                 <v-col class="text-left">
                   <p
@@ -594,7 +602,7 @@
           v-for="(zuordnungen, index) in Array.from(groupedZuordnungen.values())"
           :key="`zuordnung-${index}`"
           :zuordnungen="zuordnungen"
-          :showNumber="groupedZuordnungen.size > 1"
+          :show-number="groupedZuordnungen.size > 1"
           :index="index"
         />
       </v-col>
@@ -609,7 +617,7 @@
       <LayoutCard
         :closable="true"
         :header="$t('profile.changePassword')"
-        @onCloseClicked="closePasswordChangedDialogAndClearQuery()"
+        @on-close-clicked="closePasswordChangedDialogAndClearQuery()"
       >
         <v-card-text>
           <v-container class="d-flex align-center">
@@ -621,7 +629,7 @@
                 class="mr-2"
                 size="x-large"
                 icon="mdi-information-slab-circle-outline"
-              ></v-icon>
+              />
             </v-col>
             <v-col>
               <p class="text-body bold">
@@ -637,9 +645,9 @@
         <v-card-actions class="justify-center">
           <v-btn
             class="secondary button"
-            @click.stop="closePasswordChangedDialogAndClearQuery()"
             data-testid="close-password-changed-dialog-button"
             :block="xs"
+            @click.stop="closePasswordChangedDialogAndClearQuery()"
           >
             {{ $t('close') }}
           </v-btn>

@@ -4,9 +4,9 @@
    */
   import { SortOrder } from '@/utils/sorting';
   import { onMounted, onUnmounted, ref, watch, type Ref } from 'vue';
-  import type { VDataTableServer } from 'vuetify/lib/components/index.mjs';
+  import type { DataTableHeader } from 'vuetify';
 
-  type Headers = VDataTableServer['headers'];
+  export type Headers = DataTableHeader[];
 
   export type TableItem = Record<string, unknown>;
 
@@ -156,29 +156,29 @@
 
 <template>
   <v-data-table-server
+    ref="v-data-table-server"
     class="result-table"
-    @click:row="handleRowClick"
+    v-model="selectedItems"
     data-testid="result-table"
     density="compact"
     :headers="headers"
     :items="items"
     :items-length="totalItems"
     :items-per-page="itemsPerPage"
-    :items-per-page-options="[30, 50, 100, 300]"
+    :items-per-page-options="[5, 30, 50, 100, 300]"
     :items-per-page-text="'itemsPerPage'"
     :item-value="itemValuePath"
     :page="currentPage"
-    ref="v-data-table-server"
     select-strategy="page"
-    :showCurrentPage="true"
+    :show-current-page="true"
     show-select
-    :sortBy="currentSort ? [currentSort] : []"
-    v-model="selectedItems"
-    @update:sortBy="onUpdateOptions"
-    @update:page="(page: number) => $emit('onPageUpdate', page)"
-    @update:itemsPerPage="(limit: number) => $emit('onItemsPerPageUpdate', limit)"
-    @update:modelValue="emitSelectedRows"
+    :sort-by="currentSort ? [currentSort] : []"
     :no-data-text="'noDataFound'"
+    @click:row="handleRowClick"
+    @update:sort-by="onUpdateOptions"
+    @update:page="(page: number) => $emit('onPageUpdate', page)"
+    @update:items-per-page="(limit: number) => $emit('onItemsPerPageUpdate', limit)"
+    @update:model-value="emitSelectedRows"
   >
     <template
       v-for="(_, name) in $slots as unknown as Readonly<Slots>"

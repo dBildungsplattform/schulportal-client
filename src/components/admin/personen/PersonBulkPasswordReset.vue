@@ -61,7 +61,9 @@
 
   // Calculates the progress dynamically (Requests are sent sequentially and for every response we get the bar increments)
   const progress: ComputedRef<number> = computed(() => {
-    if (!bulkOperationStore.currentOperation?.progress) return 0;
+    if (!bulkOperationStore.currentOperation?.progress) {
+      return 0;
+    }
     return bulkOperationStore.currentOperation.progress;
   });
 
@@ -69,19 +71,23 @@
   const resultFile: ComputedRef<Blob | null> = computed(() => {
     const operation: CurrentOperation | null = bulkOperationStore.currentOperation;
 
-    if (!operation?.complete) return null;
+    if (!operation?.complete) {
+      return null;
+    }
 
     const rows: Array<CSVRow> = [];
 
     // For every password in the Map find the corresponding person (using the key) and merge them together in the file.
     for (const [id, password] of operation.data.entries()) {
       const personWithZuordnung: PersonWithZuordnungen | undefined = props.selectedPersonen.get(id);
-      if (!personWithZuordnung) continue;
+      if (!personWithZuordnung) {
+        continue;
+      }
       rows.push({
         Klasse: personWithZuordnung.klassenZuordnungenAsString,
         Nachname: personWithZuordnung.name.familienname,
         Vorname: personWithZuordnung.name.vorname,
-        Benutzername: personWithZuordnung.referrer,
+        Benutzername: personWithZuordnung.username,
         Passwort: password as string,
       });
     }
@@ -91,17 +97,17 @@
     return new Blob([csv], { type: 'text/csv' });
   });
 
-  async function closePasswordResetDialog(finished: boolean): Promise<void> {
+  function closePasswordResetDialog(finished: boolean): void {
     bulkOperationStore.resetState();
     personStore.errorCode = '';
     emit('update:dialogExit', finished);
   }
 
-  async function openConfirmationDialog(): Promise<void> {
+  function openConfirmationDialog(): void {
     showConfirmationDialog.value = true;
   }
 
-  async function closeConfirmationDialog(): Promise<void> {
+  function closeConfirmationDialog(): void {
     showConfirmationDialog.value = false;
     hasConfirmed.value = true;
   }
@@ -132,8 +138,8 @@
     >
       <!-- Initial block -->
       <v-container
-        class="mt-8 mb-4"
         v-if="progressState === State.INITIAL"
+        class="mt-8 mb-4"
       >
         <v-row class="text-body bold justify-center">
           <span data-testid="password-reset-confirmation-text">
@@ -157,7 +163,7 @@
               class="mr-2"
               icon="mdi-alert-circle-outline"
               size="small"
-            ></v-icon>
+            />
             <span
               class="subtitle-2"
               data-testid="password-reset-progressing-notice"
@@ -169,12 +175,12 @@
         <!-- Progress Bar -->
         <v-progress-linear
           class="mt-5"
-          :modelValue="progress"
+          :model-value="progress"
           color="primary"
           height="25"
           data-testid="password-reset-progressbar"
         >
-          <template v-slot:default="{ value }">
+          <template #default="{ value }">
             <strong class="text-white">{{ Math.ceil(value) }}%</strong>
           </template>
         </v-progress-linear>
@@ -188,7 +194,7 @@
               small
               color="#1EAE9C"
               icon="mdi-check-circle"
-            ></v-icon>
+            />
           </v-col>
         </v-row>
         <div
@@ -215,8 +221,8 @@
               v-if="progressState === State.FINISHED"
               :block="mdAndDown"
               class="secondary"
-              @click="hasConfirmed ? closePasswordResetDialog(true) : openConfirmationDialog()"
               data-testid="password-reset-close-button"
+              @click="hasConfirmed ? closePasswordResetDialog(true) : openConfirmationDialog()"
             >
               {{ t('close') }}
             </v-btn>
@@ -224,8 +230,8 @@
               v-else-if="progressState === State.INITIAL"
               :block="mdAndDown"
               class="secondary"
-              @click="closePasswordResetDialog(false)"
               data-testid="password-reset-discard-button"
+              @click="closePasswordResetDialog(false)"
             >
               {{ t('cancel') }}
             </v-btn>
@@ -240,9 +246,9 @@
               :block="mdAndDown"
               :disabled="bulkOperationStore.currentOperation?.isRunning"
               class="primary"
-              @click="handleResetPassword()"
               data-testid="password-reset-submit-button"
               type="submit"
+              @click="handleResetPassword()"
             >
               {{ t('admin.person.resetPassword') }}
             </v-btn>
@@ -250,9 +256,9 @@
               v-if="progressState === State.FINISHED && resultFile"
               :block="mdAndDown"
               class="primary"
-              @click="downloadFile(resultFile)"
               data-testid="download-result-button"
               :disabled="bulkOperationStore.currentOperation?.isRunning"
+              @click="downloadFile(resultFile)"
             >
               {{ t('admin.person.bulk.bulkPasswordReset.downloadResult') }}
             </v-btn>
@@ -263,11 +269,12 @@
   </v-dialog>
   <template v-if="showErrorDialog">
     <PersonBulkError
-      :bulkOperationName="t('admin.person.resetPassword')"
-      :isDialogVisible="showErrorDialog"
+      :bulk-operation-name="t('admin.person.resetPassword')"
+      :is-dialog-visible="showErrorDialog"
       :passwords="resultFile"
       :filename="props.selectedSchuleKennung ? `PW_${props.selectedSchuleKennung}.txt` : 'PW.txt'"
-      @update:isDialogVisible="
+      :errors="bulkErrorList"
+      @update:is-dialog-visible="
         (val: boolean) => {
           showErrorDialog = val;
           if (!val) {
@@ -275,14 +282,13 @@
           }
         }
       "
-      :errors="bulkErrorList"
     />
   </template>
 
   <!-- Confirmation Dialog -->
   <v-dialog
-    :width="'80%'"
     v-model="showConfirmationDialog"
+    :width="'80%'"
   >
     <LayoutCard
       data-testid="password-reset-download-confirmation-layout-card"
@@ -301,8 +307,8 @@
         <v-btn
           :block="mdAndDown"
           class="primary"
-          @click="closeConfirmationDialog()"
           data-testid="password-reset-download-confirmation-button"
+          @click="closeConfirmationDialog()"
         >
           {{ t('ok') }}
         </v-btn>

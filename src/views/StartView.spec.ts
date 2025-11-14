@@ -5,7 +5,7 @@ import { usePersonInfoStore, type PersonInfoResponse, type PersonInfoStore } fro
 import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
 import {
   useServiceProviderStore,
-  type ServiceProvider,
+  type StartPageServiceProvider,
   type ServiceProviderStore,
 } from '@/stores/ServiceProviderStore';
 import { PersonenUebersicht } from '@/stores/types/PersonenUebersicht';
@@ -24,7 +24,7 @@ let personStore: PersonStore;
 let personInfoStore: PersonInfoStore;
 let meldungStore: MeldungStore;
 
-const mockProviders: Array<ServiceProvider> = [
+const mockProviders: Array<StartPageServiceProvider> = [
   {
     id: '2',
     name: 'Spongebob Squarepants',
@@ -54,37 +54,8 @@ const mockProviders: Array<ServiceProvider> = [
   },
 ];
 
-const mockPerson: PersonInfoResponse = {
-  person: {
-    id: '1234',
-    name: {
-      familiennamen: 'Vimes',
-      vorname: 'Samuel',
-      initialenfamilienname: null,
-      initialenvorname: null,
-      rufname: null,
-      titel: null,
-      anrede: null,
-      namenspraefix: null,
-      namenssuffix: null,
-      sortierindex: null,
-    },
-    referrer: 'samuelvimes',
-    personalnummer: null,
-    mandant: '',
-    geburt: null,
-    stammorganisation: null,
-    geschlecht: null,
-    lokalisierung: null,
-    vertrauensstufe: 'KEIN',
-    revision: '',
-    dienststellen: [],
-  },
-  pid: '',
-  personenkontexte: [],
-  gruppen: [],
-  email: null,
-};
+const mockPerson: PersonInfoResponse = DoFactory.getPersonInfoResponse();
+mockPerson.person.personalnummer = null;
 
 const mockPersonenUebersicht: PersonenUebersicht = new PersonenUebersicht(
   '1234',
@@ -139,6 +110,12 @@ beforeEach(() => {
       occasion: 'KOPERS',
       deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
       school: null,
+      rolle: null,
+    },
+    {
+      occasion: 'KOPERS',
+      deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+      school: "Carl-orff-Schule",
       rolle: null,
     },
   ];
@@ -248,15 +225,17 @@ describe('StartView', () => {
     serviceProviderStore.availableServiceProviders = mockProviders;
 
     interface StartViewComponent {
-      filterSortProviders: (providers: ServiceProvider[], kategorie: ServiceProviderKategorie) => ServiceProvider[];
+      filterSortProviders: (
+        providers: StartPageServiceProvider[],
+        kategorie: ServiceProviderKategorie,
+      ) => StartPageServiceProvider[];
     }
 
-    const filteredSortProviders: ServiceProvider[] = (wrapper?.vm as unknown as StartViewComponent).filterSortProviders(
-      mockProviders,
-      ServiceProviderKategorie.Email,
-    );
+    const filteredSortProviders: StartPageServiceProvider[] = (
+      wrapper?.vm as unknown as StartViewComponent
+    ).filterSortProviders(mockProviders, ServiceProviderKategorie.Email);
 
-    expect(filteredSortProviders.map((p: ServiceProvider) => p.name)).toEqual([
+    expect(filteredSortProviders.map((p: StartPageServiceProvider) => p.name)).toEqual([
       'Not Squarepants',
       'Spongebob Squarepants',
     ]);

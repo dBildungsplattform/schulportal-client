@@ -35,7 +35,7 @@
   };
 
   const props: Props = defineProps<Props>();
-  async function closeTokenResetDialog(isActive: Ref<boolean>): Promise<void> {
+  function closeTokenResetDialog(isActive: Ref<boolean>): void {
     isActive.value = false;
     isTokenResetRequested.value = false;
     twoFactorAuthenticationStore.hasToken = null;
@@ -69,11 +69,11 @@
 </script>
 <template>
   <v-dialog persistent>
-    <template v-slot:activator="{ props }">
+    <template #activator="{ props }">
       <SpshTooltip
-        :enabledCondition="!disabled"
-        :disabledText="$t('person.finishEditFirst')"
-        :enabledText="$t('admin.person.twoFactorAuthentication.tokenReset')"
+        :enabled-condition="!disabled"
+        :disabled-text="$t('person.finishEditFirst')"
+        :enabled-text="$t('admin.person.twoFactorAuthentication.tokenReset')"
         position="start"
       >
         <v-btn
@@ -88,11 +88,11 @@
       </SpshTooltip>
     </template>
 
-    <template v-slot:default="{ isActive }">
+    <template #default="{ isActive }">
       <LayoutCard
         :closable="true"
         :header="dialogHeader"
-        @onCloseClicked="closeTokenResetDialog(isActive)"
+        @on-close-clicked="closeTokenResetDialog(isActive)"
       >
         <v-card-text>
           <v-container v-if="!isTokenResetRequested">
@@ -146,8 +146,8 @@
               <v-btn
                 :block="mdAndDown"
                 class="secondary button"
-                @click.stop="closeTokenResetDialog(isActive)"
                 data-testid="close-two-way-authentification-dialog-button"
+                @click.stop="closeTokenResetDialog(isActive)"
               >
                 {{ $t('cancel') }}
               </v-btn>
@@ -159,11 +159,11 @@
               md="4"
             >
               <v-btn
-                @click="tokenReset()"
                 :block="mdAndDown"
                 class="primary button"
                 data-testid="two-way-authentification-set-up-button"
                 :disabled="isLoading"
+                @click="tokenReset()"
               >
                 {{ $t('admin.person.twoFactorAuthentication.tokenResetButton') }}
               </v-btn>
@@ -175,10 +175,10 @@
               md="4"
             >
               <v-btn
-                @click.stop="closeTokenResetDialog(isActive)"
                 :block="mdAndDown"
                 class="primary button"
                 data-testid="two-way-authentification-set-up-button"
+                @click.stop="closeTokenResetDialog(isActive)"
               >
                 {{ $t('close') }}
               </v-btn>

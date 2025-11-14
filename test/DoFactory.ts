@@ -1,39 +1,41 @@
 import {
-  EmailAddressStatus,
-  OrganisationsTyp,
-  RollenArt,
-  RollenMerkmal,
-  RollenSystemRechtEnum,
-  ServiceProviderKategorie,
-  ServiceProviderTarget,
-  type SystemRechtResponse,
-  TraegerschaftTyp,
-  Vertrauensstufe,
   type DBiamPersonenkontextResponse,
   type DBiamPersonenuebersichtResponse,
   type DBiamPersonenzuordnungResponse,
+  EmailAddressStatus,
+  type ManageableServiceProviderListEntryResponse,
   type OrganisationResponse,
   type OrganisationResponseLegacy,
+  OrganisationsTyp,
   type PersonendatensatzResponse,
   type PersonenkontexteUpdateResponse,
   type PersonenkontextRolleFieldsResponse,
+  type PersonInfoResponse,
   type PersonLandesbediensteterSearchPersonenkontextResponse,
   type PersonLandesbediensteterSearchResponse,
   type PersonResponse,
+  RollenArt,
+  RollenMerkmal,
+  RollenSystemRechtEnum,
   type RollenSystemRechtServiceProviderIDResponse,
+  ServiceProviderKategorie,
   type ServiceProviderResponse,
+  ServiceProviderTarget,
+  type SystemRechtResponse,
+  TraegerschaftTyp,
   type UserinfoResponse,
 } from '@/api-client/generated';
 import type { Organisation } from '@/stores/OrganisationStore';
 import type { PersonenkontextWorkflowResponse } from '@/stores/PersonenkontextStore';
 import { type Personendatensatz } from '@/stores/PersonStore';
 import type { Rolle, RolleResponse } from '@/stores/RolleStore';
+import { type ManageableServiceProviderDetail } from '@/stores/ServiceProviderStore';
 import type { Person } from '@/stores/types/Person';
 import { PersonenUebersicht } from '@/stores/types/PersonenUebersicht';
 import { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
 import { Zuordnung } from '@/stores/types/Zuordnung';
 import { PersonLockOccasion, type UserLock } from '@/utils/lock';
-// eslint-disable-next-line import/no-extraneous-dependencies
+
 import { faker } from '@faker-js/faker';
 
 export class DoFactory {
@@ -55,7 +57,7 @@ export class DoFactory {
         vorname: faker.person.firstName(),
         familienname: faker.person.lastName(),
       },
-      referrer: faker.internet.username(),
+      username: faker.internet.username(),
       revision: faker.string.numeric(2),
       personalnummer: faker.string.numeric(7),
       isLocked: false,
@@ -71,7 +73,8 @@ export class DoFactory {
 
   public static getZuordnung(props?: Partial<Zuordnung>, nested?: { organisation: Partial<Organisation> }): Zuordnung {
     const schule: Organisation = DoFactory.getSchule(nested?.organisation);
-    const zuordnung: Zuordnung = new Zuordnung(
+
+    return new Zuordnung(
       props?.sskId ?? schule.id,
       props?.rolleId ?? faker.string.uuid(),
       props?.sskName ?? schule.name,
@@ -85,7 +88,6 @@ export class DoFactory {
       props?.merkmale ?? [],
       props?.admins ?? [faker.person.fullName()],
     );
-    return zuordnung;
   }
 
   public static getPersonenUebersicht(
@@ -96,7 +98,7 @@ export class DoFactory {
       person.id,
       person.name.vorname,
       person.name.familienname,
-      person.referrer!,
+      person.username,
       faker.date.recent().toISOString(),
       zuordnungen,
     );
@@ -107,15 +109,8 @@ export class DoFactory {
     return {
       ...person,
       mandant: faker.string.uuid(),
-      geburt: {
-        datum: faker.date.birthdate().toISOString(),
-        geburtsort: faker.location.city(),
-      },
       stammorganisation: faker.string.uuid(),
-      geschlecht: faker.person.gender(),
-      lokalisierung: faker.location.language().alpha2,
       startpasswort: faker.string.alpha(10),
-      vertrauensstufe: Vertrauensstufe.Voll,
       ...props,
     };
   }
@@ -199,7 +194,6 @@ export class DoFactory {
   }
 
   public static getUserinfoResponse(props?: Partial<UserinfoResponse>): UserinfoResponse {
-    const gender: string = faker.person.gender();
     const firstName: string = faker.person.firstName();
     const lastName: string = faker.person.lastName();
     return {
@@ -209,13 +203,10 @@ export class DoFactory {
       family_name: lastName,
       given_name: firstName,
       middle_name: faker.person.middleName(),
-      nickname: faker.internet.displayName({ firstName, lastName }),
       profile: null,
       picture: null,
       phone_number: faker.phone.number(),
       website: faker.internet.url(),
-      gender,
-      birthdate: faker.date.birthdate().toISOString(),
       zoneinfo: null,
       locale: faker.location.countryCode(),
       updated_at: faker.date.past().toISOString(),
@@ -401,7 +392,7 @@ export class DoFactory {
       id: person.id,
       vorname: person.name.vorname,
       familienname: person.name.familienname,
-      username: person.referrer,
+      username: person.username,
       personalnummer: person.personalnummer!,
       primaryEmailAddress: person.email!.address,
       personenkontexte: [DoFactory.getPersonLandesbediensteterSearchPersonenkontextResponse(rolle, schule)],
@@ -432,6 +423,61 @@ export class DoFactory {
       hasLogo: true,
       requires2fa: false,
       merkmale: [],
+      ...props,
+    };
+  }
+
+  public static getManageableServiceProviderListEntryResponse(
+    props?: Partial<ManageableServiceProviderListEntryResponse>,
+  ): ManageableServiceProviderListEntryResponse {
+    return {
+      id: faker.string.uuid(),
+      kategorie: faker.helpers.enumValue(ServiceProviderKategorie),
+      name: faker.company.name(),
+      administrationsebene: { id: faker.string.uuid(), name: faker.company.name(), kennung: faker.string.numeric(7) },
+      rollen: [{ id: faker.string.uuid(), name: faker.person.jobTitle() }],
+      requires2fa: faker.datatype.boolean(),
+      merkmale: [],
+      hasRollenerweiterung: faker.datatype.boolean(),
+      ...props,
+    };
+  }
+
+  public static getManageableServiceProviderDetail(
+    props?: Partial<ManageableServiceProviderDetail>,
+  ): ManageableServiceProviderDetail {
+    return {
+      ...this.getManageableServiceProviderListEntryResponse(props),
+      url: props?.url ?? faker.internet.url(),
+      rollenerweiterungen: [],
+    };
+  }
+
+  public static getPersonInfoResponse(props?: Partial<PersonInfoResponse>): PersonInfoResponse {
+    const person: Person = DoFactory.getPerson();
+    return {
+      person: {
+        id: person.id,
+        name: {
+          familiennamen: person.name.familienname,
+          vorname: person.name.vorname,
+        },
+        username: person.username,
+        personalnummer: person.personalnummer,
+        mandant: '',
+        stammorganisation: '',
+        revision: '',
+        dienststellen: [],
+      },
+      pid: faker.string.uuid(),
+      personenkontexte: [],
+      gruppen: [],
+      email: person.email
+        ? {
+            status: person.email.status,
+            address: person.email.address,
+          }
+        : null,
       ...props,
     };
   }

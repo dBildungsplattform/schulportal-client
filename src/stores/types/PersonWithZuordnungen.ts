@@ -19,7 +19,7 @@ export class PersonWithZuordnungen extends Person {
     super(
       person.id,
       person.name,
-      person.referrer,
+      person.username,
       person.revision,
       person.personalnummer,
       person.isLocked,
@@ -34,8 +34,11 @@ export class PersonWithZuordnungen extends Person {
         merkmale: zuordnung.merkmale,
       });
       if (zuordnung.typ !== OrganisationsTyp.Klasse) {
-        if (zuordnung.sskDstNr != null && zuordnung.sskDstNr != '') this.administrationsebenen.add(zuordnung.sskDstNr);
-        else this.administrationsebenen.add(zuordnung.sskName);
+        if (zuordnung.sskDstNr !== null && zuordnung.sskDstNr !== '') {
+          this.administrationsebenen.add(zuordnung.sskDstNr);
+        } else {
+          this.administrationsebenen.add(zuordnung.sskName);
+        }
       } else {
         this.klassenZuordnungen.add(zuordnung.sskName);
       }
@@ -64,7 +67,9 @@ export class PersonWithZuordnungen extends Person {
 
   public getPersonalnummerAsString(replacementForMissing: string = 'fehlt'): string {
     if (!this.personalnummer) {
-      if (this.hasKopersRolle()) return replacementForMissing;
+      if (this.hasKopersRolle()) {
+        return replacementForMissing;
+      }
       return '---';
     }
     return this.personalnummer;

@@ -22,6 +22,7 @@ describe('AuthStore', () => {
   describe('initializeAuthStatus', () => {
     it('should get login status', async () => {
       const mockInfo: UserinfoResponse = DoFactory.getUserinfoResponse();
+      mockInfo.personenkontexte[0]?.rolle.systemrechte.push(''); // for coverage
 
       const mockResponse: UserinfoResponse = mockInfo;
 

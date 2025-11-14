@@ -14,6 +14,8 @@ type SearchFilterState = {
   schulenPerPage: number;
   schultraegerPage: number;
   schulentraegerPerPage: number;
+  serviceProviderPage: number;
+  serviceProviderPerPage: number;
   searchFilterPersonen: string | null;
   searchFilterSchulen: string | null;
   selectedKlassen: Array<string> | null;
@@ -44,7 +46,7 @@ type SearchFilterActions = {
   setKlasseFilterForKlassen: (selectedKlassenForKlassen: Array<string> | null) => void;
 };
 
-type SearchFilterGetters = {};
+type SearchFilterGetters = object;
 
 export type SearchFilterStore = Store<'searchFilterStore', SearchFilterState, SearchFilterGetters, SearchFilterActions>;
 
@@ -66,6 +68,8 @@ export const useSearchFilterStore: StoreDefinition<
     schulenPerPage: 30,
     schultraegerPage: 1,
     schulentraegerPerPage: 30,
+    serviceProviderPage: 1,
+    serviceProviderPerPage: 30,
     searchFilterPersonen: '',
     searchFilterSchulen: '',
     selectedKlassen: [],

@@ -49,7 +49,7 @@ export enum SortField {
   Familienname = 'familienname',
   Vorname = 'vorname',
   Personalnummer = 'personalnummer',
-  Referrer = 'referrer',
+  Username = 'username',
 }
 
 export type CreatePersonBodyParams = DbiamCreatePersonWithPersonenkontexteBodyParams;
@@ -101,11 +101,11 @@ export type LandesbediensteterFilter = {
   nachname?: string;
 };
 
-type PersonGetters = {};
+type PersonGetters = object;
 type PersonActions = {
   resetState: () => void;
   getAllPersons: (filter: PersonFilter) => Promise<void>;
-  getPersonById: (personId: string) => Promise<Personendatensatz>;
+  getPersonById: (personId: string) => Promise<void>;
   resetPassword: (personId: string) => Promise<void>;
   resetDevicePassword: (personId?: string) => Promise<void>;
   deletePersonById: (personId: string) => Promise<void>;
@@ -193,7 +193,9 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
           const person: Person = allPersons.get(personId)!;
 
           const uebersicht: DBiamPersonenuebersichtResponse | undefined = tempUebersichtenMap.get(personId);
-          if (!uebersicht) continue;
+          if (!uebersicht) {
+            continue;
+          }
 
           const zuordnungen: Zuordnung[] = uebersicht.zuordnungen.map(
             (zuordnungResponse: DBiamPersonenzuordnungResponse) => Zuordnung.fromResponse(zuordnungResponse),
@@ -208,17 +210,15 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       }
     },
 
-    async getPersonById(personId: string): Promise<Personendatensatz> {
+    async getPersonById(personId: string): Promise<void> {
       this.loading = true;
       this.errorCode = '';
       try {
         const { data }: AxiosResponse<PersonendatensatzResponse, unknown> =
           await personenApi.personControllerFindPersonById(personId);
         this.currentPerson = mapPersonendatensatzResponseToPersonendatensatz(data);
-        return this.currentPerson;
       } catch (error) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
-        return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
       }
@@ -240,8 +240,11 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       this.loading = true;
       try {
         let data: string;
-        if (personId) data = (await personenApi.personControllerResetUEMPasswordByPersonId(personId)).data;
-        else data = (await personenApi.personControllerResetUEMPassword()).data;
+        if (personId) {
+          data = (await personenApi.personControllerResetUEMPasswordByPersonId(personId)).data;
+        } else {
+          data = (await personenApi.personControllerResetUEMPassword()).data;
+        }
         this.newDevicePassword = data;
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
@@ -268,7 +271,6 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
         await this.getPersonById(personId);
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
-        return await Promise.reject(this.errorCode);
       } finally {
         this.loading = false;
       }

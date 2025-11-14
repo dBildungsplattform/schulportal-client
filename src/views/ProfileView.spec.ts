@@ -25,100 +25,21 @@ let authStore: AuthStore;
 let twoFactorAuthenticationStore: TwoFactorAuthentificationStore;
 let router: Router;
 
-const mockPersonInfoResponse: PersonInfoResponse = {
-  person: {
-    id: '1234',
-    name: {
-      familiennamen: 'Vimes',
-      vorname: 'Samuel',
-      initialenfamilienname: null,
-      initialenvorname: null,
-      rufname: null,
-      titel: null,
-      anrede: null,
-      namenspraefix: null,
-      namenssuffix: null,
-      sortierindex: null,
-    },
-    referrer: 'samuelvimes',
-    personalnummer: '123456',
-    mandant: '',
-    geburt: null,
-    stammorganisation: null,
-    geschlecht: null,
-    lokalisierung: null,
-    vertrauensstufe: 'KEIN',
-    revision: '',
-    dienststellen: [],
-  },
-  pid: '',
-  personenkontexte: [],
-  gruppen: [],
-  email: null,
-};
+const mockPersonInfoResponse: PersonInfoResponse = DoFactory.getPersonInfoResponse();
 
-const mockSchueler: PersonInfoResponse = {
-  person: {
-    id: '1234',
-    name: {
-      familiennamen: 'Vimes',
-      vorname: 'Samuel',
-      initialenfamilienname: null,
-      initialenvorname: null,
-      rufname: null,
-      titel: null,
-      anrede: null,
-      namenspraefix: null,
-      namenssuffix: null,
-      sortierindex: null,
-    },
-    referrer: 'samuelvimes',
-    personalnummer: null,
-    mandant: '',
-    geburt: null,
-    stammorganisation: null,
-    geschlecht: null,
-    lokalisierung: null,
-    vertrauensstufe: 'KEIN',
-    revision: '',
-    dienststellen: [],
-  },
-  pid: '',
-  personenkontexte: [],
-  gruppen: [],
-  email: null,
-};
+const mockSchueler: PersonInfoResponse = DoFactory.getPersonInfoResponse();
 
 const passwordUpdatedAt: Date = new Date(2024, 9, 9);
-const mockCurrentUser: UserInfo = {
+const mockCurrentUser: UserInfo = DoFactory.getUserinfoResponse({
   sub: mockPersonInfoResponse.person.id,
-  name: null,
-  given_name: null,
-  family_name: null,
-  middle_name: null,
-  nickname: null,
-  preferred_username: null,
-  profile: null,
-  picture: null,
-  website: null,
-  email: null,
-  email_verified: null,
-  gender: null,
-  birthdate: null,
-  zoneinfo: null,
-  locale: null,
-  phone_number: null,
-  updated_at: null,
-  personId: null,
-  personenkontexte: null,
   password_updated_at: passwordUpdatedAt.toISOString(),
-};
+});
 
 const mockLehrerUebersicht: PersonenUebersicht = new PersonenUebersicht(
   mockPersonInfoResponse.person.id,
   mockPersonInfoResponse.person.name.vorname,
   mockPersonInfoResponse.person.name.familiennamen,
-  mockPersonInfoResponse.person.referrer!,
+  mockPersonInfoResponse.person.username!,
   '2021-09-01T12:00:00Z',
   [
     DoFactory.getZuordnung({
@@ -142,7 +63,7 @@ const mockLehrerUebersichtWith2Zuordnungen: PersonenUebersicht = new PersonenUeb
   mockPersonInfoResponse.person.id,
   mockPersonInfoResponse.person.name.vorname,
   mockPersonInfoResponse.person.name.familiennamen,
-  mockPersonInfoResponse.person.referrer!,
+  mockPersonInfoResponse.person.username!,
   '2021-09-01T12:00:00Z',
   [
     DoFactory.getZuordnung({
@@ -167,7 +88,7 @@ const mockSchuelerUebersicht: PersonenUebersicht = new PersonenUebersicht(
   mockPersonInfoResponse.person.id,
   mockPersonInfoResponse.person.name.vorname,
   mockPersonInfoResponse.person.name.familiennamen,
-  mockPersonInfoResponse.person.referrer!,
+  mockPersonInfoResponse.person.username!,
   '2021-09-01T12:00:00Z',
   [
     DoFactory.getZuordnung(
@@ -190,7 +111,7 @@ const mockSchuelerUebersichtWithReversedOrder: PersonenUebersicht = new Personen
   mockPersonInfoResponse.person.id,
   mockPersonInfoResponse.person.name.vorname,
   mockPersonInfoResponse.person.name.familiennamen,
-  mockPersonInfoResponse.person.referrer!,
+  mockPersonInfoResponse.person.username!,
   '2021-09-01T12:00:00Z',
   [
     DoFactory.getZuordnung(
@@ -213,10 +134,11 @@ const uebersichtWithoutZuordnungen: PersonenUebersicht = new PersonenUebersicht(
   mockPersonInfoResponse.person.id,
   mockPersonInfoResponse.person.name.vorname,
   mockPersonInfoResponse.person.name.familiennamen,
-  mockPersonInfoResponse.person.referrer!,
+  mockPersonInfoResponse.person.username!,
   '2021-09-01T12:00:00Z',
   [],
 );
+
 describe('ProfileView', () => {
   beforeAll(() => {
     personInfoStore = usePersonInfoStore();
@@ -288,8 +210,10 @@ describe('ProfileView', () => {
     personStore.personenuebersicht = mockLehrerUebersicht;
     const personalData: DOMWrapper<HTMLTableRowElement>[] | undefined = wrapper?.findAll('tr');
     expect(personalData?.length).toBeGreaterThan(0);
-    expect(personalData?.at(0)?.text()).toContain('Vor- und Nachname:Samuel Vimes');
-    expect(personalData?.at(1)?.text()).toContain('Benutzername:samuelvimes');
+    expect(personalData?.at(0)?.text()).toContain(
+      `Vor- und Nachname:${mockPersonInfoResponse.person.name.vorname} ${mockPersonInfoResponse.person.name.familiennamen}`,
+    );
+    expect(personalData?.at(1)?.text()).toContain(`Benutzername:${mockPersonInfoResponse.person.username}`);
     if (mockPersonInfoResponse.person.personalnummer) {
       expect(personalData?.at(2)?.text()).toContain(mockPersonInfoResponse.person.personalnummer);
     }

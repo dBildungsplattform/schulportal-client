@@ -82,7 +82,7 @@
           ? t('admin.person.resetPassword')
           : $t('admin.person.bulk.bulkErrorTitle')
       "
-      @onCloseClicked="closeBulkErrorDialogDialogVisible = true"
+      @on-close-clicked="closeBulkErrorDialogDialogVisible = true"
     >
       <!-- This container is scrollable because of the max height -->
       <v-container style="max-height: 60vh; overflow-y: auto">
@@ -168,7 +168,7 @@
         style="border-top: 1px solid #e5eaef"
       >
         <v-row class="py-3 px-2 justify-center">
-          <v-spacer class="hidden-sm-and-down"></v-spacer>
+          <v-spacer class="hidden-sm-and-down" />
 
           <v-col
             cols="12"
@@ -178,8 +178,8 @@
             <v-btn
               :block="mdAndDown"
               class="secondary"
-              @click="closeBulkErrorDialogDialogVisible = true"
               data-testid="person-bulk-error-discard-button"
+              @click="closeBulkErrorDialogDialogVisible = true"
             >
               {{ t('admin.person.bulk.closeList') }}
             </v-btn>
@@ -193,8 +193,8 @@
             <v-btn
               :block="mdAndDown"
               class="primary"
-              @click="saveErrorsAsCSV"
               data-testid="person-bulk-error-save-button"
+              @click="saveErrorsAsCSV"
             >
               {{ t('admin.person.bulk.saveList') }}
             </v-btn>
@@ -211,7 +211,7 @@
   >
     <LayoutCard
       :header="$t('admin.person.bulk.bulkErrorTitle')"
-      @onCloseClicked="closeBulkErrorDialogDialogVisible = false"
+      @on-close-clicked="closeBulkErrorDialogDialogVisible = false"
     >
       <v-card-text>
         <v-container class="my-4">

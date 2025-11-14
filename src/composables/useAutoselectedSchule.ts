@@ -14,7 +14,9 @@ function getOnlySchulenWithSystemrechte(
   const temp: Array<Organisation> = [];
   for (const pk of pks) {
     const isSchule: boolean = pk.organisation.typ === OrganisationsTyp.Schule;
-    if (!isSchule) continue;
+    if (!isSchule) {
+      continue;
+    }
 
     const systemrechteIntersection: Array<RollenSystemRechtEnum> = intersect(
       systemrechte,
@@ -34,7 +36,9 @@ export function useAutoselectedSchule(systemrechte: Array<RollenSystemRechtEnum>
 } {
   const authStore: AuthStore = useAuthStore();
   const currentUserSchulen: ComputedRef<Array<Organisation>> = computed(() => {
-    if (!authStore.currentUser?.personenkontexte) return [];
+    if (!authStore.currentUser?.personenkontexte) {
+      return [];
+    }
     return getOnlySchulenWithSystemrechte(authStore.currentUser.personenkontexte, systemrechte);
   });
   const hasAutoselectedSchule: ComputedRef<boolean> = computed(() => currentUserSchulen.value.length === 1);

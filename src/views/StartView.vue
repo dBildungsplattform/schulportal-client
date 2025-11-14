@@ -10,7 +10,7 @@
   import {
     ServiceProviderKategorie,
     useServiceProviderStore,
-    type ServiceProvider,
+    type StartPageServiceProvider,
     type ServiceProviderStore,
   } from '@/stores/ServiceProviderStore';
   import {
@@ -20,9 +20,9 @@
   import type { Zuordnung } from '@/stores/types/Zuordnung';
   import { adjustDateForTimezoneAndFormat } from '@/utils/date';
   import { computed, onBeforeMount, onMounted, ref, type ComputedRef, type Ref } from 'vue';
-  import { useI18n } from 'vue-i18n';
+  import { useI18n, type Composer } from 'vue-i18n';
 
-  const { t }: { t: Function } = useI18n();
+  const { t }: Composer = useI18n();
 
   export type Alert = {
     id: string;
@@ -38,30 +38,33 @@
   const authStore: AuthStore = useAuthStore();
   const meldungStore: MeldungStore = useMeldungStore();
 
-  function filterSortProviders(providers: ServiceProvider[], kategorie: ServiceProviderKategorie): ServiceProvider[] {
+  function filterSortProviders(
+    providers: StartPageServiceProvider[],
+    kategorie: ServiceProviderKategorie,
+  ): StartPageServiceProvider[] {
     return providers
-      .filter((provider: ServiceProvider) => provider.kategorie === kategorie)
-      .sort((a: ServiceProvider, b: ServiceProvider) => a.name.localeCompare(b.name));
+      .filter((provider: StartPageServiceProvider) => provider.kategorie === kategorie)
+      .sort((a: StartPageServiceProvider, b: StartPageServiceProvider) => a.name.localeCompare(b.name));
   }
 
   // Filter service providers by category "EMAIL"
-  const emailServiceProviders: ComputedRef<ServiceProvider[]> = computed(() =>
+  const emailServiceProviders: ComputedRef<StartPageServiceProvider[]> = computed(() =>
     filterSortProviders(serviceProviderStore.availableServiceProviders, ServiceProviderKategorie.Email),
   );
   // Filter service providers by category "UNTERRICHT"
-  const classServiceProviders: ComputedRef<ServiceProvider[]> = computed(() =>
+  const classServiceProviders: ComputedRef<StartPageServiceProvider[]> = computed(() =>
     filterSortProviders(serviceProviderStore.availableServiceProviders, ServiceProviderKategorie.Unterricht),
   );
   // Filter service providers by category "VERWALTUNG"
-  const administrationServiceProviders: ComputedRef<ServiceProvider[]> = computed(() =>
+  const administrationServiceProviders: ComputedRef<StartPageServiceProvider[]> = computed(() =>
     filterSortProviders(serviceProviderStore.availableServiceProviders, ServiceProviderKategorie.Verwaltung),
   );
   // Filter service providers by category "HINWEISE"
-  const hintsServiceProviders: ComputedRef<ServiceProvider[]> = computed(() =>
+  const hintsServiceProviders: ComputedRef<StartPageServiceProvider[]> = computed(() =>
     filterSortProviders(serviceProviderStore.availableServiceProviders, ServiceProviderKategorie.Hinweise),
   );
   // Filter service providers by category "ANGEBOTE"
-  const schoolOfferingsServiceProviders: ComputedRef<ServiceProvider[]> = computed(() =>
+  const schoolOfferingsServiceProviders: ComputedRef<StartPageServiceProvider[]> = computed(() =>
     filterSortProviders(serviceProviderStore.availableServiceProviders, ServiceProviderKategorie.Angebote),
   );
 
@@ -88,7 +91,7 @@
     );
     lockInfos.forEach((lockInfo: PersonTimeLimitInfoResponse) => {
       const message: string = t(messageKey, {
-        date: adjustDateForTimezoneAndFormat(lockInfo.deadline!),
+        date: adjustDateForTimezoneAndFormat(lockInfo.deadline),
         ...(occasion === 'PERSONENKONTEXT_EXPIRES' && { schule: lockInfo.school, rolle: lockInfo.rolle }),
       });
 
@@ -100,7 +103,7 @@
         id: id,
         message: message,
         visible: true,
-        type: getUrgencyType(new Date(lockInfo.deadline!)),
+        type: getUrgencyType(new Date(lockInfo.deadline)),
       });
     });
   }
@@ -124,7 +127,10 @@
       personInfoStore.initPersonInfo(),
       meldungStore.getCurrentMeldung(),
     ]);
-    await personStore.getPersonenuebersichtById(personInfoStore.personInfo?.person.id ?? '');
+    const personId: string | undefined = personInfoStore.personInfo?.person.id;
+    if (personId) {
+      await personStore.getPersonenuebersichtById(personId);
+    }
   }
 
   const closedAlerts: Ref<Set<string>> = ref(new Set());
@@ -137,19 +143,22 @@
     await authStore.initializeAuthStatus();
     const personId: string | null | undefined = authStore.currentUser?.personId;
 
-    const providersPromise: Promise<void> = serviceProviderStore.getAvailableServiceProviders().then(() => {
-      for (const provider of serviceProviderStore.availableServiceProviders) {
-        if (provider.hasLogo) {
-          provider.logoUrl = `/api/provider/${provider.id}/logo`;
-        }
-      }
-    });
+    // Load all service providers first
+    await serviceProviderStore.getAvailableServiceProviders();
+
+    // Load all logos in parallel and assign them to the respective service providers
+    const logoPromises: Promise<void>[] = serviceProviderStore.availableServiceProviders
+      .filter((p: StartPageServiceProvider) => p.hasLogo)
+      .map(async (p: StartPageServiceProvider) => {
+        await serviceProviderStore.getServiceProviderLogoById(p.id);
+        p.logoUrl = serviceProviderStore.serviceProviderLogos.get(p.id);
+      });
 
     const twoFAStatePromise: Promise<void> = personId
       ? twoFactorAuthentificationStore.get2FAState(personId)
       : Promise.resolve();
 
-    await Promise.allSettled([providersPromise, twoFAStatePromise]);
+    await Promise.allSettled([...logoPromises, twoFAStatePromise]);
   });
 
   onBeforeMount(async () => {
@@ -157,6 +166,7 @@
     alerts.value = getBannerAlerts();
     const closedAlertsStr: string | null = sessionStorage.getItem('closedAlerts');
     if (closedAlertsStr) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       closedAlerts.value = new Set(JSON.parse(closedAlertsStr));
       alerts.value.forEach((alert: Alert) => {
         if (closedAlerts.value.has(alert.id.toString())) {
@@ -197,15 +207,15 @@
       <v-col cols="12">
         <!-- Banner for hinweise -->
         <SpshBanner
-          v-bind:key="hinweis.id"
           v-for="hinweis in hinweise"
           id="hinweis"
+          :key="hinweis.id"
           ref="hinweis-banner"
           type="background-grey"
           :visible="true"
           :dismissable="false"
         >
-          <template v-slot:text>
+          <template #text>
             <span class="text-body">
               <v-textarea
                 v-model="hinweis.text"
@@ -221,16 +231,16 @@
 
         <!-- Banner for alerts -->
         <SpshBanner
-          v-bind:key="alert.id"
           v-for="alert in alerts"
           :id="alert.id.toString()"
+          :key="alert.id"
           ref="spsh-banner"
           :type="alert.type"
           :visible="alert.visible"
           :dismissable="true"
-          @dismissBanner="dismissBannerForSession"
+          @dismiss-banner="dismissBannerForSession"
         >
-          <template v-slot:text>
+          <template #text>
             <span class="text-body bold">{{ $t('banner.hint') }} </span>
             <span
               class="text-body"
@@ -246,7 +256,7 @@
       class="border-opacity-100 rounded"
       color="#1EAE9C"
       thickness="5px"
-    ></v-divider>
+    />
     <v-row class="flex-nowrap my-3">
       <v-col cols="auto">
         <h2
@@ -259,7 +269,7 @@
     </v-row>
     <!-- Template to be displayed in case the providers are still being loaded -->
     <template v-if="serviceProviderStore.loading">
-      <v-progress-circular indeterminate></v-progress-circular>
+      <v-progress-circular indeterminate />
     </template>
     <!-- Template to be displayed in case loading the providers throws an error -->
     <template v-else-if="serviceProviderStore.errorCode">
@@ -274,34 +284,34 @@
     <template v-else>
       <!-- Categorie 1: Work Email -->
       <ServiceProviderCategory
-        :categoryTitle="$t('start.categories.workEmail')"
-        :serviceProviders="emailServiceProviders"
-        :hasToken="getHasToken()"
-      ></ServiceProviderCategory>
+        :category-title="$t('start.categories.workEmail')"
+        :service-providers="emailServiceProviders"
+        :has-token="getHasToken()"
+      />
       <!-- Categorie 2: Class -->
       <ServiceProviderCategory
-        :categoryTitle="$t('start.categories.class')"
-        :serviceProviders="classServiceProviders"
-        :hasToken="getHasToken()"
-      ></ServiceProviderCategory>
+        :category-title="$t('start.categories.class')"
+        :service-providers="classServiceProviders"
+        :has-token="getHasToken()"
+      />
       <!-- Categorie 3: Administration -->
       <ServiceProviderCategory
-        :categoryTitle="$t('start.categories.administration')"
-        :serviceProviders="administrationServiceProviders"
-        :hasToken="getHasToken()"
-      ></ServiceProviderCategory>
+        :category-title="$t('start.categories.administration')"
+        :service-providers="administrationServiceProviders"
+        :has-token="getHasToken()"
+      />
       <!-- Categorie 4: Hints -->
       <ServiceProviderCategory
-        :categoryTitle="$t('start.categories.hints')"
-        :serviceProviders="hintsServiceProviders"
-        :hasToken="getHasToken()"
-      ></ServiceProviderCategory>
+        :category-title="$t('start.categories.hints')"
+        :service-providers="hintsServiceProviders"
+        :has-token="getHasToken()"
+      />
       <!-- Categorie 5: School Offerings -->
       <ServiceProviderCategory
-        :categoryTitle="$t('start.categories.schoolOfferings')"
-        :serviceProviders="schoolOfferingsServiceProviders"
-        :hasToken="getHasToken()"
-      ></ServiceProviderCategory>
+        :category-title="$t('start.categories.schoolOfferings')"
+        :service-providers="schoolOfferingsServiceProviders"
+        :has-token="getHasToken()"
+      />
     </template>
   </v-card>
 </template>

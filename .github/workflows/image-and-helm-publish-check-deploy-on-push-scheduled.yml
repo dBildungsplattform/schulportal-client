@@ -233,8 +233,11 @@ jobs:
   
   # Scheduled
   scheduled_trivy_scan:
-    name: 'Scheduled trivy scan of latest image'
+    name: 'Scheduled trivy scan of image (image) or node modules (fs). This job scanned: '
     if: ${{ github.event_name == 'schedule' }}
+    strategy:
+      matrix:
+        scan_type: [ 'image', 'fs' ]
     permissions:
       packages: read
       security-events: write
@@ -244,6 +247,7 @@ jobs:
       fail_on_vulnerabilites: true
       report_location: 'Dockerfile'
       trivyignores: '.trivyignore'
+      scan_type: ${{ matrix.scan_type }}
 
   trivy_scan_rocketchat_notification:
     if: github.event_name == 'schedule' && failure()
@@ -251,9 +255,14 @@ jobs:
     - scheduled_trivy_scan
     runs-on: 'ubuntu-latest'
     steps:
+    - name: Check if today is Monday
+      id: check_monday
+      run: |
+          echo "date=$(date +%u)" >> $GITHUB_OUTPUT
     - name: Send Notification to Rocket Chat
       uses: RocketChat/Rocket.Chat.GitHub.Action.Notification@1.1.1
+      if: ${{ steps.check_monday.outputs.date == '1' }}
       with:
         type: failure
-        job_name: 'Daily nightly image check failed - CVEs found so check'
+        job_name: 'Daily nightly image check failed. This notification will be sent only on Mondays, so the check may have been failing for several days. CVE scan results: https://github.com/dBildungsplattform/schulportal-client/security/code-scanning'
         url: ${{ secrets.RC_WEBHOOK_SPSH_DEVELOPER_CHANNEL }}

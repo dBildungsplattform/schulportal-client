@@ -37,7 +37,7 @@
   // Define the error list for the selected persons using the useBulkErrors composable
   const bulkErrorList: ComputedRef<BulkErrorList[]> = computed(() => useBulkErrors(t, props.selectedPersonen));
 
-  async function closeDeletePersonDialog(finished: boolean): Promise<void> {
+  function closeDeletePersonDialog(finished: boolean): void {
     if (bulkOperationStore.currentOperation) {
       bulkOperationStore.resetState();
     }
@@ -66,8 +66,8 @@
       :header="$t('admin.person.deletePerson')"
     >
       <v-container
-        class="mt-8 mb-4"
         v-if="bulkOperationStore.currentOperation?.progress == 0"
+        class="mt-8 mb-4"
       >
         <v-row class="text-body bold justify-center">
           <span data-testid="person-delete-confirmation-text">
@@ -91,7 +91,7 @@
                 small
                 color="#1EAE9C"
                 icon="mdi-check-circle"
-              ></v-icon>
+              />
             </v-col>
           </v-row>
           <p class="mt-2 text-center">
@@ -109,7 +109,7 @@
               class="mr-2"
               icon="mdi-alert-circle-outline"
               size="small"
-            ></v-icon>
+            />
             <span class="subtitle-2">
               {{ $t('admin.doNotCloseBrowserNotice') }}
             </span>
@@ -117,11 +117,11 @@
         </v-row>
         <v-progress-linear
           class="mt-5"
-          :modelValue="bulkOperationStore.currentOperation?.progress"
+          :model-value="bulkOperationStore.currentOperation?.progress"
           color="primary"
           height="25"
         >
-          <template v-slot:default="{ value }">
+          <template #default="{ value }">
             <strong class="text-white">{{ Math.ceil(value) }}%</strong>
           </template>
         </v-progress-linear>
@@ -140,8 +140,8 @@
             <v-btn
               :block="mdAndDown"
               class="secondary"
-              @click="closeDeletePersonDialog(false)"
               data-testid="person-delete-discard-button"
+              @click="closeDeletePersonDialog(false)"
             >
               {{ $t('cancel') }}
             </v-btn>
@@ -155,9 +155,9 @@
               :block="mdAndDown"
               :disabled="bulkOperationStore.currentOperation?.isRunning"
               class="primary"
-              @click="handleDeletePerson(Array.from(props.selectedPersonen.keys()))"
               data-testid="person-delete-submit-button"
               type="submit"
+              @click="handleDeletePerson(Array.from(props.selectedPersonen.keys()))"
             >
               {{ $t('admin.person.deletePerson') }}
             </v-btn>
@@ -175,8 +175,8 @@
             <v-btn
               :block="mdAndDown"
               class="primary"
-              @click="closeDeletePersonDialog(true)"
               data-testid="person-delete-close-button"
+              @click="closeDeletePersonDialog(true)"
             >
               {{ $t('close') }}
             </v-btn>
@@ -187,9 +187,10 @@
   </v-dialog>
   <template v-if="showErrorDialog">
     <PersonBulkError
-      :bulkOperationName="$t('admin.person.deletePerson')"
-      :isDialogVisible="showErrorDialog"
-      @update:isDialogVisible="
+      :bulk-operation-name="$t('admin.person.deletePerson')"
+      :is-dialog-visible="showErrorDialog"
+      :errors="bulkErrorList"
+      @update:is-dialog-visible="
         (val: boolean) => {
           showErrorDialog = val;
           if (!val) {
@@ -197,7 +198,6 @@
           }
         }
       "
-      :errors="bulkErrorList"
     />
   </template>
 </template>

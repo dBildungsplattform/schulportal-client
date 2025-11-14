@@ -38,7 +38,7 @@ export type ImportState = {
   importedUsersPage: number;
 };
 
-type ImportGetters = {};
+type ImportGetters = object;
 type ImportActions = {
   executePersonenImport: (importVorgangId: string) => Promise<void>;
   uploadPersonenImportFile: (organisationId: string, rolleId: string, file: File) => Promise<void>;
@@ -144,7 +144,7 @@ export const useImportStore: StoreDefinition<'importStore', ImportState, ImportG
             this.errorCode = 'IMPORT_TIMEOUT';
             this.importProgress = 0;
           }
-        } catch (error: unknown) {
+        } catch (_error: unknown) {
           this.stopImportStatusPolling();
           this.errorCode = 'UNSPECIFIED_ERROR';
           this.importProgress = 0;
@@ -175,6 +175,7 @@ export const useImportStore: StoreDefinition<'importStore', ImportState, ImportG
         this.importStatus = data;
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'ERROR_IMPORTING_FILE');
+        throw error;
       }
     },
 

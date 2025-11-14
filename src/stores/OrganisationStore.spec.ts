@@ -1,6 +1,5 @@
 import { OrganisationsTyp, type OrganisationRootChildrenResponse } from '@/api-client/generated';
 import ApiService from '@/services/ApiService';
-import { rejects } from 'assert';
 import MockAdapter from 'axios-mock-adapter';
 import { createPinia, setActivePinia } from 'pinia';
 import { DoFactory } from 'test/DoFactory';
@@ -202,7 +201,7 @@ describe('OrganisationStore', () => {
       ];
 
       mockadapter.onGet('/api/organisationen/1').replyOnce(200, mockResponse);
-      const getOrganisationByIdPromise: Promise<Organisation> = organisationStore.getOrganisationById(
+      const getOrganisationByIdPromise: Promise<void> = organisationStore.getOrganisationById(
         '1',
         OrganisationsTyp.Schule,
       );
@@ -225,7 +224,7 @@ describe('OrganisationStore', () => {
       ];
 
       mockadapter.onGet('/api/organisationen/2').replyOnce(200, mockResponse);
-      const getOrganisationByIdPromise: Promise<Organisation> = organisationStore.getOrganisationById(
+      const getOrganisationByIdPromise: Promise<void> = organisationStore.getOrganisationById(
         '2',
         OrganisationsTyp.Klasse,
       );
@@ -236,11 +235,11 @@ describe('OrganisationStore', () => {
 
     it('should handle string error', async () => {
       mockadapter.onGet('/api/organisationen/1').replyOnce(500, 'some mock server error');
-      const getOrganisationByIdPromise: Promise<Organisation> = organisationStore.getOrganisationById(
+      const getOrganisationByIdPromise: Promise<void> = organisationStore.getOrganisationById(
         '1',
         OrganisationsTyp.Schule,
       );
-      await rejects(getOrganisationByIdPromise);
+      await getOrganisationByIdPromise;
       expect(organisationStore.currentOrganisation).toEqual(null);
       expect(organisationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
       expect(organisationStore.loading).toBe(false);
@@ -248,12 +247,12 @@ describe('OrganisationStore', () => {
 
     it('should handle error code', async () => {
       mockadapter.onGet('/api/organisationen/1').replyOnce(500, { code: 'some mock server error' });
-      const getOrganisationByIdPromise: Promise<Organisation> = organisationStore.getOrganisationById(
+      const getOrganisationByIdPromise: Promise<void> = organisationStore.getOrganisationById(
         '1',
         OrganisationsTyp.Schule,
       );
       expect(organisationStore.loading).toBe(true);
-      await rejects(getOrganisationByIdPromise);
+      await getOrganisationByIdPromise;
       expect(organisationStore.currentOrganisation).toEqual(null);
       expect(organisationStore.errorCode).toEqual('some mock server error');
       expect(organisationStore.loading).toBe(false);
@@ -434,7 +433,7 @@ describe('OrganisationStore', () => {
         administriertVon: ['1'],
       });
       expect(organisationStore.loadingKlassen).toBe(true);
-      await rejects(getAllKlassenByOrganisationId);
+      await getAllKlassenByOrganisationId;
       expect(organisationStore.klassen).toEqual([]);
       expect(organisationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
       expect(organisationStore.loadingKlassen).toBe(false);
@@ -448,7 +447,7 @@ describe('OrganisationStore', () => {
         administriertVon: ['1'],
       });
       expect(organisationStore.loadingKlassen).toBe(true);
-      await rejects(getAllKlassenByOrganisationId);
+      await getAllKlassenByOrganisationId;
       expect(organisationStore.klassen).toEqual([]);
       expect(organisationStore.errorCode).toEqual('some mock server error');
       expect(organisationStore.loadingKlassen).toBe(false);
@@ -748,18 +747,11 @@ describe('OrganisationStore', () => {
 
   describe('fetchSchuleDetailsForSchultraeger', () => {
     const mockSchultraeger: Organisation[] = [
-      {
-        id: '999',
-        kennung: 'TR001',
-        name: 'Schulträger 1',
-        namensergaenzung: 'Zusatz',
-        kuerzel: 'ST1',
-        typ: OrganisationsTyp.Traeger,
-        administriertVon: '',
-        zugehoerigZu: '',
-        version: 1,
-      },
+      DoFactory.getOrganisation({ typ: OrganisationsTyp.Traeger }),
+      DoFactory.getOrganisation({ typ: OrganisationsTyp.Traeger }),
     ];
+    const zugehoerigZuParams: string = mockSchultraeger.map((st: Organisation) => `zugehoerigZu=${st.id}`).join('&');
+    const url: string = `/api/organisationen?limit=30&typ=SCHULE&systemrechte=SCHULTRAEGER_VERWALTEN&${zugehoerigZuParams}`;
 
     beforeEach(() => {
       organisationStore.allSchultraeger = [...mockSchultraeger];
@@ -768,26 +760,17 @@ describe('OrganisationStore', () => {
     });
 
     it('should fetch Schule details for Schulträger', async () => {
-      const mockResponse: Organisation[] = [
-        {
-          id: '1000',
-          kennung: '123456',
-          name: 'Schule A',
-          namensergaenzung: 'Zusatz A',
-          kuerzel: 'S1',
-          typ: OrganisationsTyp.Schule,
-          zugehoerigZu: '999',
-          version: 1,
-          schuleDetails: '',
-        },
-      ];
-      mockadapter
-        .onGet('/api/organisationen?limit=30&typ=SCHULE&systemrechte=SCHULTRAEGER_VERWALTEN&zugehoerigZu=999')
-        .replyOnce(200, mockResponse);
+      const mockResponse: Organisation[] = [DoFactory.getOrganisation({ zugehoerigZu: mockSchultraeger[0]!.id })];
+      mockadapter.onGet(url).replyOnce(200, mockResponse);
 
       await organisationStore.fetchSchuleDetailsForSchultraeger();
 
-      expect(organisationStore.allSchultraeger[0]?.schuleDetails).toBe('123456');
+      expect(organisationStore.allSchultraeger[0]?.schuleDetails).toBe(
+        mockResponse
+          .filter((org: Organisation) => org.zugehoerigZu === mockSchultraeger[0]!.id)
+          .map((org: Organisation) => org.kennung)
+          .join(', ') || '---',
+      );
       expect(organisationStore.loading).toBe(false);
     });
 
@@ -804,9 +787,7 @@ describe('OrganisationStore', () => {
             },
         expectedError: string,
       ) => {
-        mockadapter
-          .onGet('/api/organisationen?limit=30&typ=SCHULE&systemrechte=SCHULTRAEGER_VERWALTEN&zugehoerigZu=999')
-          .replyOnce(500, response);
+        mockadapter.onGet(url).replyOnce(500, response);
 
         await organisationStore.fetchSchuleDetailsForSchultraeger();
 
@@ -1177,7 +1158,7 @@ describe('OrganisationStore', () => {
       });
 
       expect(organisationStore.loadingKlassen).toBe(true);
-      await rejects(getFilteredKlassenPromise);
+      await getFilteredKlassenPromise;
       expect(organisationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
       expect(organisationStore.loadingKlassen).toBe(false);
     });
@@ -1192,7 +1173,7 @@ describe('OrganisationStore', () => {
       });
 
       expect(organisationStore.loadingKlassen).toBe(true);
-      await rejects(getFilteredKlassenPromise);
+      await getFilteredKlassenPromise;
       expect(organisationStore.errorCode).toEqual('some mock server error');
       expect(organisationStore.loadingKlassen).toBe(false);
     });
