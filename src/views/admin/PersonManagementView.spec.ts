@@ -387,7 +387,7 @@ describe('PersonManagementView', () => {
     expect(totalKlassen).toBe(0);
   });
 
-    test('it sorts Personen correctly when changing sort order', async () => {
+  test('it sorts Personen correctly when changing sort order', async () => {
     // Find the table header for "Nachname" (last name)
     const nachnameHeader: DOMWrapper<Element> | undefined = wrapper
       ?.findAll('.v-data-table__th')
