@@ -8,8 +8,7 @@ import {
   ServiceProviderMerkmal,
   type ManageableServiceProviderResponse,
   type ProviderApiInterface,
-  type ProviderControllerGetManageableServiceProviders200Response,
-  type RollenerweiterungForServiceProviderResponse,
+  type ProviderControllerFindRollenerweiterungenByServiceProviderId200Response,
 } from '../api-client/generated/api';
 
 const serviceProviderApi: ProviderApiInterface = ProviderApiFactory(undefined, '', axiosApiInstance);
@@ -38,7 +37,6 @@ export type ManageableServiceProviderListEntry = BaseServiceProvider & {
 
 export type ManageableServiceProviderDetail = ManageableServiceProviderListEntry & {
   url: string;
-  rollenerweiterungen: Array<RollenerweiterungForServiceProviderResponse>;
 };
 
 export { ServiceProviderMerkmal };
@@ -128,10 +126,10 @@ export const useServiceProviderStore: StoreDefinition<
       try {
         const limit: number = entriesPerPage;
         const offset: number = (page - 1) * entriesPerPage;
-        const response: ProviderControllerGetManageableServiceProviders200Response = (
+        const response: ProviderControllerFindRollenerweiterungenByServiceProviderId200Response = (
           await serviceProviderApi.providerControllerGetManageableServiceProviders(offset, limit)
         ).data;
-        const { items, total }: ProviderControllerGetManageableServiceProviders200Response = response;
+        const { items, total }: ProviderControllerFindRollenerweiterungenByServiceProviderId200Response = response;
         this.manageableServiceProviders = items;
         this.totalManageableServiceProviders = total;
       } catch (error: unknown) {
@@ -146,10 +144,7 @@ export const useServiceProviderStore: StoreDefinition<
       try {
         const { data }: { data: ManageableServiceProviderResponse } =
           await serviceProviderApi.providerControllerGetManageableServiceProviderById(serviceProviderId);
-        this.currentServiceProvider = {
-          ...data,
-          hasRollenerweiterung: data.rollenerweiterungen.length > 0,
-        };
+        this.currentServiceProvider = data;
       } catch (error) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
