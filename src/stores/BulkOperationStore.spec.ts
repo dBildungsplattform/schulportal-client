@@ -807,6 +807,20 @@ describe('BulkOperationStore', () => {
             merkmale: [] as unknown as RollenMerkmal[],
             admins: ['admin1'],
           },
+          {
+            sskId: '5679',
+            rolleId: rolleId,
+            sskName: '9B',
+            sskDstNr: '456',
+            rolle: 'Test Role',
+            rollenArt: RollenArt.Lern,
+            administriertVon: '123',
+            typ: OrganisationsTyp.Schule,
+            editable: true,
+            befristung: 'unbefristet',
+            merkmale: [] as unknown as RollenMerkmal[],
+            admins: ['admin1'],
+          },
         ],
       };
 
