@@ -990,6 +990,7 @@ describe('BulkOperationStore', () => {
             personId: mockPersonId,
             zuordnungen: [
               DoFactory.getDBiamPersonenzuordnungResponse({ rollenArt: RollenArt.Lern, rolleId: rolleId, editable: true }, { organisation: mockSchule }),
+              DoFactory.getDBiamPersonenzuordnungResponse({ rollenArt: RollenArt.Lern, rolleId: rolleId, editable: true }, { organisation: mockSchule }),
             ],
           },
           { organisation: mockSchule },

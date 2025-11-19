@@ -365,8 +365,8 @@ export const useBulkOperationStore: StoreDefinition<
             if (z.sskId === organisationId && z.rolleId === rolleId) {
               return false;
             }
-            // If rolle is LERN, also filter out klassen administered by this organisation
-            if (isRolleLern && z.administriertVon === organisationId) {
+            // If rolle is LERN, also filter out klassen administered by this organisation with that rolle
+            if (isRolleLern && z.administriertVon === organisationId && z.rolleId === rolleId) {
               return false;
             }
             return z.editable;
