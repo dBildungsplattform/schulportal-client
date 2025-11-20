@@ -358,6 +358,26 @@ export const useBulkOperationStore: StoreDefinition<
 
           const existingZuordnungen: Zuordnung[] = personStore.personenuebersicht?.zuordnungen ?? [];
 
+          // Check if removing this zuordnung would leave the user with no editable zuordnungen
+          // For LERN rolle, also consider klassen administered by this organisation
+          const remainingEditableZuordnungen: Zuordnung[] = existingZuordnungen.filter((z: Zuordnung) => {
+            // Filter out the target zuordnung
+            if (z.sskId === organisationId && z.rolleId === rolleId) {
+              return false;
+            }
+            // If rolle is LERN, also filter out klassen administered by this organisation with that rolle
+            if (isRolleLern && z.administriertVon === organisationId && z.rolleId === rolleId) {
+              return false;
+            }
+            return z.editable;
+          });
+
+          // No remaining editable Zuordnungen means the user will disappear from the admin's list
+          if (remainingEditableZuordnungen.length === 0) {
+            this.currentOperation?.errors.set(personId, 'NO_EDITABLE_ZUORDNUNGEN_LEFT');
+            return;
+          }
+
           const updatedZuordnungen: Zuordnung[] = existingZuordnungen.filter((zuordnung: Zuordnung) => {
             const isExactMatch: boolean = zuordnung.sskId === organisationId && zuordnung.rolleId === rolleId;
             const isChildOfOrganisation: boolean = zuordnung.administriertVon === organisationId;
