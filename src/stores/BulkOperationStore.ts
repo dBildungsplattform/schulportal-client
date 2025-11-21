@@ -358,19 +358,21 @@ export const useBulkOperationStore: StoreDefinition<
 
           const existingZuordnungen: Zuordnung[] = personStore.personenuebersicht?.zuordnungen ?? [];
 
+          // Shared predicate: should this Zuordnung be removed for this operation?
+          const shouldRemoveZuordnung = (z: Zuordnung): boolean => {
+            const isExactMatch: boolean = z.sskId === organisationId && z.rolleId === rolleId;
+            const isChildOfOrganisation: boolean = z.administriertVon === organisationId && z.rolleId === rolleId;
+
+            // If "lern" type, remove both exact matches and children
+            // Otherwise, only remove exact matches
+            return isRolleLern ? isExactMatch || isChildOfOrganisation : isExactMatch;
+          };
+
           // Check if removing this zuordnung would leave the user with no editable zuordnungen
           // For LERN rolle, also consider klassen administered by this organisation
-          const remainingEditableZuordnungen: Zuordnung[] = existingZuordnungen.filter((z: Zuordnung) => {
-            // Filter out the target zuordnung
-            if (z.sskId === organisationId && z.rolleId === rolleId) {
-              return false;
-            }
-            // If rolle is LERN, also filter out klassen administered by this organisation with that rolle
-            if (isRolleLern && z.administriertVon === organisationId && z.rolleId === rolleId) {
-              return false;
-            }
-            return z.editable;
-          });
+          const remainingEditableZuordnungen: Zuordnung[] = existingZuordnungen.filter(
+            (z: Zuordnung) => !shouldRemoveZuordnung(z) && z.editable,
+          );
 
           // No remaining editable Zuordnungen means the user will disappear from the admin's list
           if (remainingEditableZuordnungen.length === 0) {
@@ -378,18 +380,9 @@ export const useBulkOperationStore: StoreDefinition<
             return;
           }
 
-          const updatedZuordnungen: Zuordnung[] = existingZuordnungen.filter((zuordnung: Zuordnung) => {
-            const isExactMatch: boolean = zuordnung.sskId === organisationId && zuordnung.rolleId === rolleId;
-            const isChildOfOrganisation: boolean = zuordnung.administriertVon === organisationId;
-
-            // If "lern" type, remove both exact matches and children
-            // Otherwise, only remove exact matches
-            if (isRolleLern) {
-              return !(isExactMatch || isChildOfOrganisation);
-            } else {
-              return !isExactMatch;
-            }
-          });
+          const updatedZuordnungen: Zuordnung[] = existingZuordnungen.filter(
+            (z: Zuordnung) => !shouldRemoveZuordnung(z),
+          );
 
           if (updatedZuordnungen.length === existingZuordnungen.length) {
             return; // No changes needed
