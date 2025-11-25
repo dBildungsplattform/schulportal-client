@@ -52,6 +52,7 @@
       <v-col
         class="subtitle-2"
         cols="auto"
+        data-testid="following-rolle-data-created-text"
       >
         {{ followingRolleDataCreated }}
       </v-col>
