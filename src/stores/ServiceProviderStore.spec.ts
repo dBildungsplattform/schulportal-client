@@ -1,4 +1,3 @@
-import type { ProviderControllerGetManageableServiceProviders200Response } from '@/api-client/generated';
 import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
 import { createPinia, setActivePinia } from 'pinia';
@@ -11,6 +10,7 @@ import {
   type ManageableServiceProviderDetail,
 } from './ServiceProviderStore';
 import { faker } from '@faker-js/faker';
+import type { ProviderControllerFindRollenerweiterungenByServiceProviderId200Response } from '@/api-client/generated';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 
@@ -140,7 +140,7 @@ describe('serviceProviderStore', () => {
     const url: string = `/api/provider/manageable?offset=${offset}&limit=${limit}`;
 
     it('should load service providers manageable by the user', async () => {
-      const mockResponse: ProviderControllerGetManageableServiceProviders200Response = {
+      const mockResponse: ProviderControllerFindRollenerweiterungenByServiceProviderId200Response = {
         items: [
           DoFactory.getManageableServiceProviderListEntryResponse(),
           DoFactory.getManageableServiceProviderListEntryResponse(),
@@ -193,7 +193,7 @@ describe('serviceProviderStore', () => {
       const promise: Promise<void> = serviceProviderStore.getManageableServiceProviderById(serviceProviderId);
       expect(serviceProviderStore.loading).toBe(true);
       await promise;
-      expect(serviceProviderStore.currentServiceProvider).toEqual({ ...mockResponse, hasRollenerweiterung: false });
+      expect(serviceProviderStore.currentServiceProvider).toEqual(mockResponse);
       expect(serviceProviderStore.loading).toBe(false);
     });
 
