@@ -58,7 +58,9 @@ jobs:
   codeql_analyze:
     name: 'CodeQL'
     if: ${{ github.event_name == 'push' }}
-    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-codeql.yaml@5
+    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-codeql.yaml@8
+    with:
+      codeql_languages: javascript
     permissions:
       actions: read
       contents: read
@@ -67,7 +69,7 @@ jobs:
   nest_lint:
     name: 'Linting'
     if: ${{ github.event_name == 'push' }}
-    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-nest-lint.yaml@5
+    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-nest-lint.yaml@8
     with:
       node_version: '18'
     permissions:
@@ -95,7 +97,7 @@ jobs:
       packages: write
       security-events: write
       contents: read
-    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/image-publish-trivy.yaml@7
+    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/image-publish-trivy.yaml@8
     with:
       image_name: 'erwin-portal-client'
       run_trivy_scan: true
@@ -107,7 +109,7 @@ jobs:
       report_location: 'Dockerfile'
 
   scan_helm:
-    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-helm-kics.yaml@5
+    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-helm-kics.yaml@8
     permissions:
       contents: read
 
@@ -132,7 +134,7 @@ jobs:
           fi
 
   release_helm:
-    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/chart-release.yaml@7
+    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/chart-release.yaml@8
     needs:
       - create_branch_identifier 
       - select_helm_version_generation_and_image_tag_generation
@@ -237,7 +239,7 @@ jobs:
     permissions:
       packages: read
       security-events: write
-    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-trivy.yaml@7
+    uses: dBildungsplattform/dbp-github-workflows/.github/workflows/check-trivy.yaml@8
     with:
       image_ref: 'ghcr.io/${{ github.repository_owner }}/erwin-portal-client:latest'
       fail_on_vulnerabilites: true
