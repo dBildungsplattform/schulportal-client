@@ -57,8 +57,12 @@
           class="mr-2"
           icon="mdi-alert-circle-outline"
           size="small"
-        />
-        <label class="subtitle-2">{{ $t('admin.mandatoryFieldsNotice') }}</label>
+        ></v-icon>
+        <label
+          class="subtitle-2"
+          data-testid="mandatory-fields-notice"
+          >{{ $t('admin.mandatoryFieldsNotice') }}</label
+        >
       </v-row>
       <v-container class="px-lg-16">
         <slot />

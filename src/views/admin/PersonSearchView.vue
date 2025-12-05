@@ -408,6 +408,7 @@
     <LayoutCard
       :closable="true"
       :header="t('admin.person.stateEmployeeSearch.searchStateEmployee')"
+      headlineTestId="search-state-employee-headline"
       :padded="true"
       :show-close-text="true"
       @on-close-clicked="navigateToPersonTable"
@@ -483,7 +484,7 @@
               <v-row class="align-center dense">
                 <v-col cols="auto">
                   <v-radio
-                    data-testid="kopers-radio"
+                    data-testid="kopers-radio-button"
                     :label="t('admin.person.stateEmployeeSearch.withKopers')"
                     :value="SearchType.KoPers"
                   />
@@ -511,7 +512,7 @@
               <v-row class="align-center dense">
                 <v-col cols="auto">
                   <v-radio
-                    data-testid="email-radio"
+                    data-testid="email-radio-button"
                     :label="t('admin.person.stateEmployeeSearch.withEmail')"
                     :value="SearchType.Email"
                   />
@@ -539,7 +540,7 @@
               <v-row class="align-center dense">
                 <v-col cols="auto">
                   <v-radio
-                    data-testid="username-radio"
+                    data-testid="username-radio-button"
                     :label="t('admin.person.stateEmployeeSearch.withUsername')"
                     :value="SearchType.Username"
                   />
@@ -567,7 +568,7 @@
               <v-row class="align-center dense">
                 <v-col cols="auto">
                   <v-radio
-                    data-testid="name-radio"
+                    data-testid="name-radio-button"
                     :label="t('admin.person.stateEmployeeSearch.withfirstAndLastname')"
                     :value="SearchType.Name"
                   />
@@ -624,9 +625,9 @@
           thickness="5px"
         />
         <LayoutCard
-          data-testid="personal-data-card"
+          data-testid="search-result-card"
           :header="$t('admin.person.stateEmployeeSearch.searchResult')"
-          :headline-test-id="'layout-card-headline-personal-data'"
+          headlineTestId="layout-card-headline-search-result"
           class="ma-5"
         >
           <v-row
@@ -642,8 +643,8 @@
               <LayoutCard
                 data-testid="personal-data-card"
                 :header="$t('profile.personalData')"
-                :headline-test-id="'layout-card-headline-personal-data'"
-                :sub-cards="true"
+                headlineTestId="layout-card-headline-personal-data"
+                :subCards="true"
               >
                 <v-row>
                   <v-col cols="12">
@@ -754,7 +755,7 @@
           >
             <v-btn
               class="secondary button"
-              data-testid="reset-search-button"
+              data-testid="back-to-search-button"
               :block="mdAndDown"
               @click.stop="() => (personStore.allLandesbedienstetePersonen = [])"
             >

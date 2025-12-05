@@ -307,7 +307,7 @@ describe('PersonDetailsView', () => {
 
   test('it renders the person details page and shows person data', async () => {
     expect(wrapper).toBeTruthy();
-    expect(wrapper?.find('[data-testid="person-details-card"]').isVisible()).toBe(true);
+    expect(wrapper?.find('[data-testid="person-details-headline"]').isVisible()).toBe(true);
     expect(wrapper?.find('[data-testid="person-vorname"]').text()).toBe(mockPerson.person.name.vorname);
     expect(wrapper?.find('[data-testid="person-familienname"]').text()).toBe(mockPerson.person.name.familienname);
     expect(wrapper?.find('[data-testid="person-username"]').text()).toBe(mockPerson.person.username);
