@@ -9,6 +9,7 @@ import {
   type ManageableServiceProviderResponse,
   type ProviderApiInterface,
   type ProviderControllerFindRollenerweiterungenByServiceProviderId200Response,
+  type ProviderControllerGetManageableServiceProviders200Response,
 } from '../api-client/generated/api';
 
 const serviceProviderApi: ProviderApiInterface = ProviderApiFactory(undefined, '', axiosApiInstance);
@@ -53,6 +54,7 @@ type ServiceProviderState = {
   totalManageableServiceProviders: number;
   currentServiceProvider: ManageableServiceProviderDetail | null;
   serviceProviderLogos: Map<string, string>;
+  rollenErweiterungUebersicht: ProviderControllerFindRollenerweiterungenByServiceProviderId200Response | null;
   errorCode: string;
   loading: boolean;
 };
@@ -64,6 +66,7 @@ type ServiceProviderActions = {
   getManageableServiceProviders: (page: number, entriesPerPage: number) => Promise<void>;
   getManageableServiceProviderById: (serviceProviderId: string) => Promise<void>;
   getServiceProviderLogoById: (serviceProviderId: string) => Promise<void>;
+  getRollenerweiterungUebersichtById: (serviceProviderId: string) => Promise<void>;
 };
 
 export { ServiceProviderKategorie };
@@ -90,6 +93,7 @@ export const useServiceProviderStore: StoreDefinition<
       totalManageableServiceProviders: 0,
       currentServiceProvider: null,
       serviceProviderLogos: new Map<string, string>(),
+      rollenErweiterungUebersicht: null,
       errorCode: '',
       loading: false,
     };
@@ -126,10 +130,10 @@ export const useServiceProviderStore: StoreDefinition<
       try {
         const limit: number = entriesPerPage;
         const offset: number = (page - 1) * entriesPerPage;
-        const response: ProviderControllerFindRollenerweiterungenByServiceProviderId200Response = (
+        const response: ProviderControllerGetManageableServiceProviders200Response = (
           await serviceProviderApi.providerControllerGetManageableServiceProviders(offset, limit)
         ).data;
-        const { items, total }: ProviderControllerFindRollenerweiterungenByServiceProviderId200Response = response;
+        const { items, total }: ProviderControllerGetManageableServiceProviders200Response = response;
         this.manageableServiceProviders = items;
         this.totalManageableServiceProviders = total;
       } catch (error: unknown) {
@@ -175,6 +179,19 @@ export const useServiceProviderStore: StoreDefinition<
         );
 
         this.serviceProviderLogos.set(serviceProviderId, logoUrl);
+      } catch (error: unknown) {
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async getRollenerweiterungUebersichtById(serviceProviderId: string): Promise<void> {
+      this.loading = true;
+      try {
+        const { data }: { data: ProviderControllerFindRollenerweiterungenByServiceProviderId200Response } =
+          await serviceProviderApi.providerControllerFindRollenerweiterungenByServiceProviderId(serviceProviderId);
+        this.rollenErweiterungUebersicht = data;
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {

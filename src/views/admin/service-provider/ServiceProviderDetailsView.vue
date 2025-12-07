@@ -47,8 +47,12 @@
   onMounted(async () => {
     serviceProviderStore.errorCode = '';
     serviceProviderStore.serviceProviderLogos.clear();
-    await serviceProviderStore.getManageableServiceProviderById(currentServiceProviderId);
-    await serviceProviderStore.getServiceProviderLogoById(currentServiceProviderId);
+
+    await Promise.all([
+      serviceProviderStore.getManageableServiceProviderById(currentServiceProviderId),
+      serviceProviderStore.getServiceProviderLogoById(currentServiceProviderId),
+      serviceProviderStore.getRollenerweiterungUebersichtById(currentServiceProviderId),
+    ]);
   });
 </script>
 
