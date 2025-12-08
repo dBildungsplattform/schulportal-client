@@ -229,15 +229,13 @@ export const useServiceProviderStore: StoreDefinition<
           if (!rollenerweiterungMap.has(orgId)) {
             rollenerweiterungMap.set(orgId, {
               id: orgId,
-              kennung: item.organisationKennung ?? '',
-              schule: item.organisationName ?? '',
+              kennung: item.organisationKennung,
+              schule: item.organisationName,
               rollen: new Set<string>(),
             });
           }
 
-          if (item.rolleName) {
-            rollenerweiterungMap.get(orgId)!.rollen.add(item.rolleName);
-          }
+          rollenerweiterungMap.get(orgId)!.rollen.add(item.rolleName);
         }
 
         // build the final array expected by the table
