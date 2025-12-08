@@ -257,7 +257,13 @@
                     class="d-flex align-center flex-wrap"
                     data-testid="service-provider-rollen"
                   >
+                    <span
+                      class="text-body ml-n3"
+                      v-if="serviceProviderStore.currentServiceProvider.rollen.length === 0"
+                      >{{ t('none') }}</span
+                    >
                     <v-chip
+                      else
                       v-for="rolle in serviceProviderStore.currentServiceProvider.rollen"
                       :key="rolle.id"
                       class="ma-1"

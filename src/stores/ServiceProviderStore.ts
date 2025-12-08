@@ -237,7 +237,6 @@ export const useServiceProviderStore: StoreDefinition<
 
           rollenerweiterungMap.get(orgId)!.rollen.add(item.rolleName);
         }
-
         // build the final array expected by the table
         const rollenerweiterungenUebersicht: RollenErweiterungenUebersicht[] = Array.from(
           rollenerweiterungMap.values(),
