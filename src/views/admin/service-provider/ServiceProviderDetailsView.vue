@@ -87,7 +87,7 @@
     await Promise.all([
       serviceProviderStore.getManageableServiceProviderById(currentServiceProviderId),
       serviceProviderStore.getServiceProviderLogoById(currentServiceProviderId),
-      serviceProviderStore.getRollenerweiterungenById({ id: currentServiceProviderId }),
+      fetchRollenerweiterungen(),
     ]);
   });
 </script>
@@ -331,6 +331,7 @@
                     <template v-if="serviceProviderStore.currentServiceProvider?.availableForRollenerweiterung">
                       <ResultTable
                         ref="result-table"
+                        :current-page="rollenerweiterungPage"
                         data-testid="rollenerweiterungen-table"
                         :items="serviceProviderStore.rollenerweiterungenUebersicht || []"
                         :loading="serviceProviderStore.loading"

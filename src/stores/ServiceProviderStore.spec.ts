@@ -318,26 +318,7 @@ describe('serviceProviderStore', () => {
 
     await serviceProviderStore.getRollenerweiterungenById({ id: serviceProviderId });
 
-    // The map should have one entry per organisationId
-    const rollenerweiterungMap = new Map<string, RollenerweiterungMap>();
-    for (const item of mockResponse.items) {
-      if (!rollenerweiterungMap.has(item.organisationId)) {
-        rollenerweiterungMap.set(item.organisationId, {
-          id: item.organisationId,
-          kennung: item.organisationKennung ?? '',
-          schule: item.organisationName ?? '',
-          rollen: new Set<string>(),
-        });
-      }
-      if (item.rolleName) rollenerweiterungMap.get(item.organisationId)!.rollen.add(item.rolleName);
-    }
-
-    const expectedOverview = Array.from(rollenerweiterungMap.values()).map((g: RollenerweiterungMap) => ({
-      id: g.id,
-      kennung: g.kennung,
-      schule: g.schule,
-      rollenerweiterungen: Array.from(g.rollen).join(', '),
-    }));
+    const expectedOverview = DoFactory.buildRollenerweiterungenUebersicht(apiItems);
 
     // Assert the store built the same overview
     expect(serviceProviderStore.rollenerweiterungenUebersicht).toEqual(

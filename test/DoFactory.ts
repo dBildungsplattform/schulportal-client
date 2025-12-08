@@ -31,7 +31,11 @@ import type { Organisation } from '@/stores/OrganisationStore';
 import type { PersonenkontextWorkflowResponse } from '@/stores/PersonenkontextStore';
 import { type Personendatensatz } from '@/stores/PersonStore';
 import type { Rolle, RolleResponse } from '@/stores/RolleStore';
-import { type ManageableServiceProviderDetail } from '@/stores/ServiceProviderStore';
+import {
+  RollenErweiterungenUebersicht,
+  RollenerweiterungMap,
+  type ManageableServiceProviderDetail,
+} from '@/stores/ServiceProviderStore';
 import type { Person } from '@/stores/types/Person';
 import { PersonenUebersicht } from '@/stores/types/PersonenUebersicht';
 import { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
@@ -451,7 +455,34 @@ export class DoFactory {
     return {
       ...this.getManageableServiceProviderListEntryResponse(props),
       url: props?.url ?? faker.internet.url(),
+      availableForRollenerweiterung: props?.availableForRollenerweiterung ?? false,
     };
+  }
+
+  public static buildRollenerweiterungenUebersicht(
+    items: RollenerweiterungWithExtendedDataResponse[],
+  ): RollenErweiterungenUebersicht[] {
+    const map: Map<string, RollenerweiterungMap> = new Map();
+
+    for (const item of items) {
+      const orgId: string = item.organisationId;
+      if (!map.has(orgId)) {
+        map.set(orgId, {
+          id: orgId,
+          kennung: item.organisationKennung,
+          schule: item.organisationName,
+          rollen: new Set<string>(),
+        });
+      }
+      map.get(orgId)!.rollen.add(item.rolleName);
+    }
+
+    return Array.from(map.values()).map((g: RollenerweiterungMap) => ({
+      id: g.id,
+      kennung: g.kennung,
+      schule: g.schule,
+      rollenerweiterungen: Array.from(g.rollen).join(', '),
+    }));
   }
 
   public static getRollenerweiterungItem(
