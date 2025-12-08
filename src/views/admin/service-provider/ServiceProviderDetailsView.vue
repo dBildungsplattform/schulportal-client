@@ -31,6 +31,8 @@
   const rollenerweiterungPage: Ref<number> = ref(1);
   const rollenerweiterungPerPage: Ref<number> = ref(30);
 
+  const isOpen: Ref<boolean> = ref(false);
+
   function navigateToServiceProviderTable(): void {
     router.push({ name: 'angebot-management' });
   }
@@ -280,51 +282,83 @@
               thickness="6"
             ></v-divider>
 
-            <v-row class="ml-md-16">
-              <v-col>
+            <!-- Header row + chevron -->
+            <v-row
+              class="ml-md-16"
+              align="center"
+              justify="space-between"
+            >
+              <v-col cols="auto">
                 <h3
                   class="subtitle-1"
                   data-testid="password-reset-section-headline"
                 >
                   {{ t('angebot.showSchulspezifischeRollenerweiterungen') }}
                 </h3>
-              </v-col></v-row
-            >
+              </v-col>
+
+              <!-- Vuetify chevron -->
+              <v-col cols="auto">
+                <v-btn
+                  icon
+                  variant="text"
+                  size="small"
+                  @click="isOpen = !isOpen"
+                  :aria-expanded="isOpen.toString()"
+                >
+                  <v-icon
+                    class="chevron"
+                    :class="{ rotate: isOpen }"
+                  >
+                    mdi-chevron-down
+                  </v-icon>
+                </v-btn>
+              </v-col>
+            </v-row>
+
+            <!-- Expandable table -->
             <v-row
               align="center"
               class="mx-16"
               justify="end"
             >
-              <ResultTable
-                ref="result-table"
-                data-testid="rollenerweiterungen-table"
-                :items="serviceProviderStore.rollenerweiterungenUebersicht || []"
-                :loading="serviceProviderStore.loading"
-                :headers="headers"
-                :hide-show-select="true"
-                item-value-path="id"
-                :total-items="serviceProviderStore.rollenerweiterungen?.total || 0"
-                :items-per-page="rollenerweiterungPerPage"
-                @on-items-per-page-update="getPaginatedRollenerweiterungenWithLimit"
-                @on-page-update="getPaginatedRollenerweiterungen"
-              >
-                <template #[`item.schule`]="{ item }">
-                  <div
-                    class="ellipsis-wrapper"
-                    :title="item.schule"
-                  >
-                    {{ item.schule }}
+              <v-col cols="12">
+                <v-expand-transition>
+                  <div v-show="isOpen">
+                    <ResultTable
+                      ref="result-table"
+                      data-testid="rollenerweiterungen-table"
+                      :items="serviceProviderStore.rollenerweiterungenUebersicht || []"
+                      :loading="serviceProviderStore.loading"
+                      :headers="headers"
+                      :hide-show-select="true"
+                      item-value-path="id"
+                      :total-items="serviceProviderStore.rollenerweiterungen?.total || 0"
+                      :items-per-page="rollenerweiterungPerPage"
+                      @on-items-per-page-update="getPaginatedRollenerweiterungenWithLimit"
+                      @on-page-update="getPaginatedRollenerweiterungen"
+                    >
+                      <template #[`item.schule`]="{ item }">
+                        <div
+                          class="ellipsis-wrapper"
+                          :title="item.schule"
+                        >
+                          {{ item.schule }}
+                        </div>
+                      </template>
+
+                      <template #[`item.rollenerweiterungen`]="{ item }">
+                        <div
+                          class="ellipsis-wrapper"
+                          :title="item.rollenerweiterungen"
+                        >
+                          {{ item.rollenerweiterungen }}
+                        </div>
+                      </template>
+                    </ResultTable>
                   </div>
-                </template>
-                <template #[`item.rollenerweiterungen`]="{ item }">
-                  <div
-                    class="ellipsis-wrapper"
-                    :title="item.rollenerweiterungen"
-                  >
-                    {{ item.rollenerweiterungen }}
-                  </div>
-                </template>
-              </ResultTable>
+                </v-expand-transition>
+              </v-col>
             </v-row>
           </v-container>
         </div>
@@ -338,5 +372,12 @@
     .custom-offset {
       margin-left: 0 !important; /* removes the Vuetify offset */
     }
+  }
+
+  .chevron {
+    transition: transform 200ms ease;
+  }
+  .chevron.rotate {
+    transform: rotate(180deg);
   }
 </style>
