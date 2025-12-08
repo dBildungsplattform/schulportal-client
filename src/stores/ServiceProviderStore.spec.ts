@@ -8,7 +8,6 @@ import {
   type StartPageServiceProvider,
   type ServiceProviderStore,
   type ManageableServiceProviderDetail,
-  type RollenerweiterungMap,
 } from './ServiceProviderStore';
 import { faker } from '@faker-js/faker';
 import type { ProviderControllerGetManageableServiceProviders200Response } from '@/api-client/generated';

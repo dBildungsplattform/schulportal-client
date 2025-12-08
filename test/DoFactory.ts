@@ -32,8 +32,8 @@ import type { PersonenkontextWorkflowResponse } from '@/stores/PersonenkontextSt
 import { type Personendatensatz } from '@/stores/PersonStore';
 import type { Rolle, RolleResponse } from '@/stores/RolleStore';
 import {
-  RollenErweiterungenUebersicht,
-  RollenerweiterungMap,
+  type RollenErweiterungenUebersicht,
+  type RollenerweiterungMap,
   type ManageableServiceProviderDetail,
 } from '@/stores/ServiceProviderStore';
 import type { Person } from '@/stores/types/Person';
