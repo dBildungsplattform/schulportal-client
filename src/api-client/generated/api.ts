@@ -1408,6 +1408,12 @@ export interface ManageableServiceProviderResponse {
      */
     'hasRollenerweiterung': boolean;
     /**
+     * Indicates whether the service provider is available for rollenerweiterung.
+     * @type {boolean}
+     * @memberof ManageableServiceProviderResponse
+     */
+    'availableForRollenerweiterung': boolean;
+    /**
      * 
      * @type {Array<RolleRefResponse>}
      * @memberof ManageableServiceProviderResponse

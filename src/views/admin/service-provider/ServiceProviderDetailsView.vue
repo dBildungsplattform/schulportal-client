@@ -222,7 +222,9 @@
                     <!-- Rollenerweiterung -->
                     <LabeledField
                       :label="t('angebot.schulspezifischeRollenerweiterung')"
-                      :value="serviceProviderStore.currentServiceProvider.hasRollenerweiterung ? t('yes') : t('no')"
+                      :value="
+                        serviceProviderStore.currentServiceProvider.availableForRollenerweiterung ? t('yes') : t('no')
+                      "
                       test-id="service-provider-rollenerweiterung"
                       no-margin-top
                     />
@@ -326,37 +328,48 @@
               <v-col cols="12">
                 <v-expand-transition>
                   <div v-show="isOpen">
-                    <ResultTable
-                      ref="result-table"
-                      data-testid="rollenerweiterungen-table"
-                      :items="serviceProviderStore.rollenerweiterungenUebersicht || []"
-                      :loading="serviceProviderStore.loading"
-                      :headers="headers"
-                      :hide-show-select="true"
-                      item-value-path="id"
-                      :total-items="serviceProviderStore.rollenerweiterungen?.total || 0"
-                      :items-per-page="rollenerweiterungPerPage"
-                      @on-items-per-page-update="getPaginatedRollenerweiterungenWithLimit"
-                      @on-page-update="getPaginatedRollenerweiterungen"
-                    >
-                      <template #[`item.schule`]="{ item }">
-                        <div
-                          class="ellipsis-wrapper"
-                          :title="item.schule"
-                        >
-                          {{ item.schule }}
-                        </div>
-                      </template>
+                    <template v-if="serviceProviderStore.currentServiceProvider?.availableForRollenerweiterung">
+                      <ResultTable
+                        ref="result-table"
+                        data-testid="rollenerweiterungen-table"
+                        :items="serviceProviderStore.rollenerweiterungenUebersicht || []"
+                        :loading="serviceProviderStore.loading"
+                        :headers="headers"
+                        :hide-show-select="true"
+                        item-value-path="id"
+                        :total-items="serviceProviderStore.rollenerweiterungen?.total || 0"
+                        :items-per-page="rollenerweiterungPerPage"
+                        @on-items-per-page-update="getPaginatedRollenerweiterungenWithLimit"
+                        @on-page-update="getPaginatedRollenerweiterungen"
+                      >
+                        <template #[`item.schule`]="{ item }">
+                          <div
+                            class="ellipsis-wrapper"
+                            :title="item.schule"
+                          >
+                            {{ item.schule }}
+                          </div>
+                        </template>
 
-                      <template #[`item.rollenerweiterungen`]="{ item }">
-                        <div
-                          class="ellipsis-wrapper"
-                          :title="item.rollenerweiterungen"
-                        >
-                          {{ item.rollenerweiterungen }}
-                        </div>
-                      </template>
-                    </ResultTable>
+                        <template #[`item.rollenerweiterungen`]="{ item }">
+                          <div
+                            class="ellipsis-wrapper"
+                            :title="item.rollenerweiterungen"
+                          >
+                            {{ item.rollenerweiterungen }}
+                          </div>
+                        </template>
+                      </ResultTable>
+                    </template>
+                    <template v-else>
+                      <v-row>
+                        <v-col cols="12">
+                          <span class="text-body">
+                            {{ t('angebot.notForSchulspezifischeRollenerweiterungenAvailable') }}</span
+                          >
+                        </v-col>
+                      </v-row>
+                    </template>
                   </div>
                 </v-expand-transition>
               </v-col>

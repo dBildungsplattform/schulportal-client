@@ -7199,6 +7199,10 @@
                     "hasRollenerweiterung": {
                         "type": "boolean"
                     },
+                    "availableForRollenerweiterung": {
+                        "type": "boolean",
+                        "description": "Indicates whether the service provider is available for rollenerweiterung."
+                    },
                     "rollen": {
                         "type": "array",
                         "items": {
@@ -7215,6 +7219,7 @@
                     "merkmale",
                     "url",
                     "hasRollenerweiterung",
+                    "availableForRollenerweiterung",
                     "rollen"
                 ]
             },

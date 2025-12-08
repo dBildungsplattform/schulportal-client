@@ -38,6 +38,7 @@ export type ManageableServiceProviderListEntry = BaseServiceProvider & {
 
 export type ManageableServiceProviderDetail = ManageableServiceProviderListEntry & {
   url: string;
+  availableForRollenerweiterung: boolean;
 };
 
 export type RollenerweiterungMap = {
