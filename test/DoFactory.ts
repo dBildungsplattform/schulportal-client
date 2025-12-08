@@ -14,7 +14,9 @@ import {
   type PersonLandesbediensteterSearchPersonenkontextResponse,
   type PersonLandesbediensteterSearchResponse,
   type PersonResponse,
+  ProviderControllerFindRollenerweiterungenByServiceProviderId200Response,
   RollenArt,
+  RollenerweiterungWithExtendedDataResponse,
   RollenMerkmal,
   RollenSystemRechtEnum,
   type RollenSystemRechtServiceProviderIDResponse,
@@ -449,6 +451,41 @@ export class DoFactory {
     return {
       ...this.getManageableServiceProviderListEntryResponse(props),
       url: props?.url ?? faker.internet.url(),
+    };
+  }
+
+  public static getRollenerweiterungItem(
+    props?: Partial<RollenerweiterungWithExtendedDataResponse>,
+  ): RollenerweiterungWithExtendedDataResponse {
+    return {
+      id: faker.string.uuid(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      organisationId: faker.string.uuid(),
+      organisationName: faker.company.name(),
+      organisationKennung: faker.string.alphanumeric(6),
+      rolleId: faker.string.uuid(),
+      rolleName: faker.person.jobTitle(),
+      serviceProviderId: faker.string.uuid(),
+      ...props,
+    };
+  }
+
+  public static getRollenerweiterungenResponse(
+    items?: RollenerweiterungWithExtendedDataResponse[],
+    props?: Partial<ProviderControllerFindRollenerweiterungenByServiceProviderId200Response>,
+  ): ProviderControllerFindRollenerweiterungenByServiceProviderId200Response {
+    const generatedItems: RollenerweiterungWithExtendedDataResponse[] =
+      items && items.length > 0
+        ? items
+        : [this.getRollenerweiterungItem(), this.getRollenerweiterungItem(), this.getRollenerweiterungItem()];
+
+    return {
+      items: generatedItems,
+      total: generatedItems.length,
+      offset: props?.offset ?? 0,
+      limit: props?.limit ?? generatedItems.length,
+      ...props,
     };
   }
 

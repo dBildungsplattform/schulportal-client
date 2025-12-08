@@ -40,7 +40,14 @@ export type ManageableServiceProviderDetail = ManageableServiceProviderListEntry
   url: string;
 };
 
-export type rollenErweiterungenUebersicht = {
+export type RollenerweiterungMap = {
+  id: string;
+  kennung: string;
+  schule: string;
+  rollen: Set<string>;
+};
+
+export type RollenErweiterungenUebersicht = {
   id: string;
   kennung: string;
   schule: string;
@@ -69,7 +76,7 @@ type ServiceProviderState = {
   serviceProviderLogos: Map<string, string>;
   rollenerweiterungen: ProviderControllerFindRollenerweiterungenByServiceProviderId200Response | null;
   // ready-to-display, grouped for the result table:
-  rollenerweiterungenUebersicht: rollenErweiterungenUebersicht[];
+  rollenerweiterungenUebersicht: RollenErweiterungenUebersicht[];
   errorCode: string;
   loading: boolean;
 };
@@ -211,38 +218,34 @@ export const useServiceProviderStore: StoreDefinition<
         this.rollenerweiterungen = data;
 
         // transform into displayable overview grouped by organisationId
-        const groups: Map<
+        const rollenerweiterungMap: Map<string, RollenerweiterungMap> = new Map<
           string,
-          {
-            id: string;
-            kennung: string;
-            schule: string;
-            rollen: Set<string>;
-          }
-        > = new Map<string, { id: string; kennung: string; schule: string; rollen: Set<string> }>();
+          { id: string; kennung: string; schule: string; rollen: Set<string> }
+        >();
 
         for (const item of data.items ?? []) {
           const orgId: string = item.organisationId;
-          if (!groups.has(orgId)) {
-            groups.set(orgId, {
+          if (!rollenerweiterungMap.has(orgId)) {
+            rollenerweiterungMap.set(orgId, {
               id: orgId,
               kennung: item.organisationKennung ?? '',
               schule: item.organisationName ?? '',
               rollen: new Set<string>(),
             });
           }
-          // Add rolle name if present
+
           if (item.rolleName) {
-            groups.get(orgId)!.rollen.add(item.rolleName);
+            rollenerweiterungMap.get(orgId)!.rollen.add(item.rolleName);
           }
         }
 
         // build the final array expected by the table
-        const rollenerweiterungenUebersicht: rollenErweiterungenUebersicht[] = Array.from(groups.values()).map((g) => ({
+        const rollenerweiterungenUebersicht: RollenErweiterungenUebersicht[] = Array.from(
+          rollenerweiterungMap.values(),
+        ).map((g: RollenerweiterungMap) => ({
           id: g.id,
           kennung: g.kennung,
           schule: g.schule,
-          // join rolle names with comma, convert Set -> Array
           rollenerweiterungen: Array.from(g.rollen).join(', '),
         }));
         this.rollenerweiterungenUebersicht = rollenerweiterungenUebersicht;

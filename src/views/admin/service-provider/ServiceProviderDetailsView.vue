@@ -291,7 +291,7 @@
               <v-col cols="auto">
                 <h3
                   class="subtitle-1"
-                  data-testid="password-reset-section-headline"
+                  data-testid="schulspezifische-rollenerweiterungen-section-headline"
                 >
                   {{ t('angebot.showSchulspezifischeRollenerweiterungen') }}
                 </h3>
@@ -300,6 +300,7 @@
               <!-- Vuetify chevron -->
               <v-col cols="auto">
                 <v-btn
+                  data-testid="open-schulspezifische-rollenerweiterungen-section-headline-button"
                   icon
                   variant="text"
                   size="small"

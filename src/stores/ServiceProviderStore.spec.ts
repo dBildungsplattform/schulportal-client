@@ -8,9 +8,10 @@ import {
   type StartPageServiceProvider,
   type ServiceProviderStore,
   type ManageableServiceProviderDetail,
+  type RollenerweiterungMap,
 } from './ServiceProviderStore';
 import { faker } from '@faker-js/faker';
-import type { ProviderControllerFindRollenerweiterungenByServiceProviderId200Response } from '@/api-client/generated';
+import type { ProviderControllerGetManageableServiceProviders200Response } from '@/api-client/generated';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 
@@ -140,7 +141,7 @@ describe('serviceProviderStore', () => {
     const url: string = `/api/provider/manageable?offset=${offset}&limit=${limit}`;
 
     it('should load service providers manageable by the user', async () => {
-      const mockResponse: ProviderControllerFindRollenerweiterungenByServiceProviderId200Response = {
+      const mockResponse: ProviderControllerGetManageableServiceProviders200Response = {
         items: [
           DoFactory.getManageableServiceProviderListEntryResponse(),
           DoFactory.getManageableServiceProviderListEntryResponse(),
@@ -300,4 +301,66 @@ describe('serviceProviderStore', () => {
       expect(serviceProviderStore.loading).toBe(false);
     });
   });
+
+  describe('getRollenerweiterungenById (generic test)', () => {
+  const serviceProviderId = faker.string.uuid();
+  const url = `/api/provider/${serviceProviderId}/rollenerweiterung`;
+
+  it('should transform API response into displayable overview array', async () => {
+    // Generate random API items
+    const apiItems = Array.from({ length: 5 }, () =>
+      DoFactory.getRollenerweiterungItem()
+    );
+
+    const mockResponse = DoFactory.getRollenerweiterungenResponse(apiItems);
+
+    mockadapter.onGet(url).replyOnce(200, mockResponse);
+
+    await serviceProviderStore.getRollenerweiterungenById({ id: serviceProviderId });
+
+    // The map should have one entry per organisationId
+    const rollenerweiterungMap = new Map<string, RollenerweiterungMap>();
+    for (const item of mockResponse.items) {
+      if (!rollenerweiterungMap.has(item.organisationId)) {
+        rollenerweiterungMap.set(item.organisationId, {
+          id: item.organisationId,
+          kennung: item.organisationKennung ?? '',
+          schule: item.organisationName ?? '',
+          rollen: new Set<string>(),
+        });
+      }
+      if (item.rolleName) rollenerweiterungMap.get(item.organisationId)!.rollen.add(item.rolleName);
+    }
+
+    const expectedOverview = Array.from(rollenerweiterungMap.values()).map((g: RollenerweiterungMap) => ({
+      id: g.id,
+      kennung: g.kennung,
+      schule: g.schule,
+      rollenerweiterungen: Array.from(g.rollen).join(', '),
+    }));
+
+    // Assert the store built the same overview
+    expect(serviceProviderStore.rollenerweiterungenUebersicht).toEqual(
+      expectedOverview
+    );
+    expect(serviceProviderStore.loading).toBe(false);
+  });
+
+  it('should handle errors', async () => {
+    mockadapter.onGet(url).replyOnce(500, 'some error');
+    await serviceProviderStore.getRollenerweiterungenById({ id: serviceProviderId });
+    expect(serviceProviderStore.rollenerweiterungenUebersicht).toEqual([]);
+    expect(serviceProviderStore.errorCode).toBe('UNSPECIFIED_ERROR');
+    expect(serviceProviderStore.loading).toBe(false);
+  });
+
+      it('should handle error code', async () => {
+      mockadapter.onGet(url).replyOnce(500, { code: 'some mock server error' });
+    await serviceProviderStore.getRollenerweiterungenById({ id: serviceProviderId });
+    expect(serviceProviderStore.rollenerweiterungenUebersicht).toEqual([]);
+    expect(serviceProviderStore.errorCode).toBe('some mock server error');
+    expect(serviceProviderStore.loading).toBe(false);
+    });
+});
+
 });
