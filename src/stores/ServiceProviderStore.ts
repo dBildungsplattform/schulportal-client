@@ -40,11 +40,24 @@ export type ManageableServiceProviderDetail = ManageableServiceProviderListEntry
   url: string;
 };
 
+export type rollenErweiterungenUebersicht = {
+  id: string;
+  kennung: string;
+  schule: string;
+  rollenerweiterungen: string;
+};
+
 export { ServiceProviderMerkmal };
 
 export type ServiceProviderIdNameResponse = {
   id: string;
   name: string;
+};
+
+export type RollenerweiterungFilter = {
+  id: string;
+  limit?: number;
+  offset?: number;
 };
 
 type ServiceProviderState = {
@@ -54,7 +67,9 @@ type ServiceProviderState = {
   totalManageableServiceProviders: number;
   currentServiceProvider: ManageableServiceProviderDetail | null;
   serviceProviderLogos: Map<string, string>;
-  rollenErweiterungUebersicht: ProviderControllerFindRollenerweiterungenByServiceProviderId200Response | null;
+  rollenerweiterungen: ProviderControllerFindRollenerweiterungenByServiceProviderId200Response | null;
+  // ready-to-display, grouped for the result table:
+  rollenerweiterungenUebersicht: rollenErweiterungenUebersicht[];
   errorCode: string;
   loading: boolean;
 };
@@ -66,7 +81,7 @@ type ServiceProviderActions = {
   getManageableServiceProviders: (page: number, entriesPerPage: number) => Promise<void>;
   getManageableServiceProviderById: (serviceProviderId: string) => Promise<void>;
   getServiceProviderLogoById: (serviceProviderId: string) => Promise<void>;
-  getRollenerweiterungUebersichtById: (serviceProviderId: string) => Promise<void>;
+  getRollenerweiterungenById: (filter: RollenerweiterungFilter) => Promise<void>;
 };
 
 export { ServiceProviderKategorie };
@@ -93,7 +108,8 @@ export const useServiceProviderStore: StoreDefinition<
       totalManageableServiceProviders: 0,
       currentServiceProvider: null,
       serviceProviderLogos: new Map<string, string>(),
-      rollenErweiterungUebersicht: null,
+      rollenerweiterungen: null,
+      rollenerweiterungenUebersicht: [],
       errorCode: '',
       loading: false,
     };
@@ -186,12 +202,50 @@ export const useServiceProviderStore: StoreDefinition<
       }
     },
 
-    async getRollenerweiterungUebersichtById(serviceProviderId: string): Promise<void> {
+    async getRollenerweiterungenById(filter: RollenerweiterungFilter): Promise<void> {
       this.loading = true;
       try {
         const { data }: { data: ProviderControllerFindRollenerweiterungenByServiceProviderId200Response } =
-          await serviceProviderApi.providerControllerFindRollenerweiterungenByServiceProviderId(serviceProviderId);
-        this.rollenErweiterungUebersicht = data;
+          await serviceProviderApi.providerControllerFindRollenerweiterungenByServiceProviderId(filter.id);
+
+        this.rollenerweiterungen = data;
+
+        // transform into displayable overview grouped by organisationId
+        const groups: Map<
+          string,
+          {
+            id: string;
+            kennung: string;
+            schule: string;
+            rollen: Set<string>;
+          }
+        > = new Map<string, { id: string; kennung: string; schule: string; rollen: Set<string> }>();
+
+        for (const item of data.items ?? []) {
+          const orgId: string = item.organisationId;
+          if (!groups.has(orgId)) {
+            groups.set(orgId, {
+              id: orgId,
+              kennung: item.organisationKennung ?? '',
+              schule: item.organisationName ?? '',
+              rollen: new Set<string>(),
+            });
+          }
+          // Add rolle name if present
+          if (item.rolleName) {
+            groups.get(orgId)!.rollen.add(item.rolleName);
+          }
+        }
+
+        // build the final array expected by the table
+        const rollenerweiterungenUebersicht: rollenErweiterungenUebersicht[] = Array.from(groups.values()).map((g) => ({
+          id: g.id,
+          kennung: g.kennung,
+          schule: g.schule,
+          // join rolle names with comma, convert Set -> Array
+          rollenerweiterungen: Array.from(g.rollen).join(', '),
+        }));
+        this.rollenerweiterungenUebersicht = rollenerweiterungenUebersicht;
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {

@@ -1,12 +1,14 @@
 {
   "angebot": {
     "assignedRollen": "Zugeordnete Rollen",
+    "erweiterteRollen": "Erweiterte Rollen",
     "name": "Name",
     "kategorie": "Kategorie",
     "administrationsebene": "Administrationsebene",
     "rollen": "Rollen",
     "schulspezifischErweitert": "Schulspezifisch erweitert",
     "schulspezifischeRollenerweiterung": "Schulspezifische Rollenerweiterung möglich",
+    "showSchulspezifischeRollenerweiterungen": "Schulspezifische Rollenerweiterungen anzeigen",
     "canBeAssignedToRollen": "Darf Rollen hinzugefügt werden",
     "link": "Link",
     "logo": "Logo",

@@ -8,9 +8,10 @@
   import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { computed, onMounted, type ComputedRef } from 'vue';
+  import { computed, onMounted, ref, type ComputedRef, type Ref } from 'vue';
   import SchulPortalLogo from '@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg';
   import LabeledField from '@/components/admin/LabeledField.vue';
+  import ResultTable, { type Headers } from '@/components/admin/ResultTable.vue';
 
   const router: Router = useRouter();
   const route: RouteLocationNormalizedLoaded = useRoute();
@@ -19,6 +20,16 @@
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
 
   const currentServiceProviderId: string = route.params['id'] as string;
+
+  type ReadonlyHeaders = Headers;
+  const headers: ReadonlyHeaders = [
+    { title: t('admin.schule.dienststellennummer'), key: 'kennung', align: 'start' },
+    { title: t('admin.schule.schulname'), key: 'schule', align: 'start' },
+    { title: t('angebot.erweiterteRollen'), key: 'rollenerweiterungen', align: 'start' },
+  ];
+
+  const rollenerweiterungPage: Ref<number> = ref(1);
+  const rollenerweiterungPerPage: Ref<number> = ref(30);
 
   function navigateToServiceProviderTable(): void {
     router.push({ name: 'angebot-management' });
@@ -44,6 +55,29 @@
     }
   });
 
+  async function fetchRollenerweiterungen(): Promise<void> {
+    await serviceProviderStore.getRollenerweiterungenById({
+      id: currentServiceProviderId,
+      offset: (rollenerweiterungPage.value - 1) * rollenerweiterungPerPage.value,
+      limit: rollenerweiterungPerPage.value,
+    });
+  }
+
+  function getPaginatedRollenerweiterungen(page: number): void {
+    rollenerweiterungPage.value = page;
+    fetchRollenerweiterungen();
+  }
+
+  function getPaginatedRollenerweiterungenWithLimit(limit: number): void {
+    /* reset page to 1 if entries are equal to or less than selected limit */
+    if (serviceProviderStore.rollenerweiterungen && serviceProviderStore.rollenerweiterungen.total <= limit) {
+      rollenerweiterungPage.value = 1;
+    }
+
+    rollenerweiterungPerPage.value = limit;
+    fetchRollenerweiterungen();
+  }
+
   onMounted(async () => {
     serviceProviderStore.errorCode = '';
     serviceProviderStore.serviceProviderLogos.clear();
@@ -51,7 +85,7 @@
     await Promise.all([
       serviceProviderStore.getManageableServiceProviderById(currentServiceProviderId),
       serviceProviderStore.getServiceProviderLogoById(currentServiceProviderId),
-      serviceProviderStore.getRollenerweiterungUebersichtById(currentServiceProviderId),
+      serviceProviderStore.getRollenerweiterungenById({ id: currentServiceProviderId }),
     ]);
   });
 </script>
@@ -238,6 +272,62 @@
             <v-progress-circular indeterminate></v-progress-circular>
           </div>
         </v-container>
+        <div>
+          <v-container class="schulspezifische-rollenerweiterungen">
+            <v-divider
+              class="border-opacity-100 rounded my-6 mx-4"
+              color="#E5EAEF"
+              thickness="6"
+            ></v-divider>
+
+            <v-row class="ml-md-16">
+              <v-col>
+                <h3
+                  class="subtitle-1"
+                  data-testid="password-reset-section-headline"
+                >
+                  {{ t('angebot.showSchulspezifischeRollenerweiterungen') }}
+                </h3>
+              </v-col></v-row
+            >
+            <v-row
+              align="center"
+              class="mx-16"
+              justify="end"
+            >
+              <ResultTable
+                ref="result-table"
+                data-testid="rollenerweiterungen-table"
+                :items="serviceProviderStore.rollenerweiterungenUebersicht || []"
+                :loading="serviceProviderStore.loading"
+                :headers="headers"
+                :hide-show-select="true"
+                item-value-path="id"
+                :total-items="serviceProviderStore.rollenerweiterungen?.total || 0"
+                :items-per-page="rollenerweiterungPerPage"
+                @on-items-per-page-update="getPaginatedRollenerweiterungenWithLimit"
+                @on-page-update="getPaginatedRollenerweiterungen"
+              >
+                <template #[`item.schule`]="{ item }">
+                  <div
+                    class="ellipsis-wrapper"
+                    :title="item.schule"
+                  >
+                    {{ item.schule }}
+                  </div>
+                </template>
+                <template #[`item.rollenerweiterungen`]="{ item }">
+                  <div
+                    class="ellipsis-wrapper"
+                    :title="item.rollenerweiterungen"
+                  >
+                    {{ item.rollenerweiterungen }}
+                  </div>
+                </template>
+              </ResultTable>
+            </v-row>
+          </v-container>
+        </div>
       </div>
     </LayoutCard>
   </div>
