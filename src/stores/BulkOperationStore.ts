@@ -295,7 +295,9 @@ export const useBulkOperationStore: StoreDefinition<
               }
             } else {
               // User doesn't have the Rolle, add one Zuordnung for every Klasse (will fail in the backend, if user has multiple Klassen)
-              const deduplicatedKlassen: string[] = [...new Set(klassenZuordnungen.map((z) => z.organisationId))];
+              const deduplicatedKlassen: string[] = [
+                ...new Set(klassenZuordnungen.map((z: InternalZuordnung) => z.organisationId)),
+              ];
               for (const klasse of deduplicatedKlassen) {
                 newZuordnungen.push({
                   organisationId: klasse,
