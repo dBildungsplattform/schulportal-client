@@ -8,9 +8,14 @@ import {
   type StartPageServiceProvider,
   type ServiceProviderStore,
   type ManageableServiceProviderDetail,
+  type RollenErweiterungenUebersicht,
 } from './ServiceProviderStore';
 import { faker } from '@faker-js/faker';
-import type { ProviderControllerGetManageableServiceProviders200Response } from '@/api-client/generated';
+import type {
+  ProviderControllerFindRollenerweiterungenByServiceProviderId200Response,
+  ProviderControllerGetManageableServiceProviders200Response,
+  RollenerweiterungWithExtendedDataResponse,
+} from '@/api-client/generated';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 
@@ -302,45 +307,44 @@ describe('serviceProviderStore', () => {
   });
 
   describe('getRollenerweiterungenById (generic test)', () => {
-  const serviceProviderId = faker.string.uuid();
-  const url = `/api/provider/${serviceProviderId}/rollenerweiterung`;
+    const serviceProviderId: string = faker.string.uuid();
+    const url: string = `/api/provider/${serviceProviderId}/rollenerweiterung`;
 
-  it('should transform API response into displayable overview array', async () => {
-    // Generate random API items
-    const apiItems = Array.from({ length: 5 }, () =>
-      DoFactory.getRollenerweiterungItem()
-    );
+    it('should transform API response into displayable overview array', async () => {
+      // Generate random API items
+      const apiItems: RollenerweiterungWithExtendedDataResponse[] = Array.from({ length: 5 }, () =>
+        DoFactory.getRollenerweiterungItem(),
+      );
 
-    const mockResponse = DoFactory.getRollenerweiterungenResponse(apiItems);
+      const mockResponse: ProviderControllerFindRollenerweiterungenByServiceProviderId200Response =
+        DoFactory.getRollenerweiterungenResponse(apiItems);
 
-    mockadapter.onGet(url).replyOnce(200, mockResponse);
+      mockadapter.onGet(url).replyOnce(200, mockResponse);
 
-    await serviceProviderStore.getRollenerweiterungenById({ id: serviceProviderId });
+      await serviceProviderStore.getRollenerweiterungenById({ id: serviceProviderId });
 
-    const expectedOverview = DoFactory.buildRollenerweiterungenUebersicht(apiItems);
+      const expectedRollenerweiterungUebersicht: RollenErweiterungenUebersicht[] =
+        DoFactory.buildRollenerweiterungenUebersicht(apiItems);
 
-    // Assert the store built the same overview
-    expect(serviceProviderStore.rollenerweiterungenUebersicht).toEqual(
-      expectedOverview
-    );
-    expect(serviceProviderStore.loading).toBe(false);
-  });
-
-  it('should handle errors', async () => {
-    mockadapter.onGet(url).replyOnce(500, 'some error');
-    await serviceProviderStore.getRollenerweiterungenById({ id: serviceProviderId });
-    expect(serviceProviderStore.rollenerweiterungenUebersicht).toEqual([]);
-    expect(serviceProviderStore.errorCode).toBe('UNSPECIFIED_ERROR');
-    expect(serviceProviderStore.loading).toBe(false);
-  });
-
-      it('should handle error code', async () => {
-      mockadapter.onGet(url).replyOnce(500, { code: 'some mock server error' });
-    await serviceProviderStore.getRollenerweiterungenById({ id: serviceProviderId });
-    expect(serviceProviderStore.rollenerweiterungenUebersicht).toEqual([]);
-    expect(serviceProviderStore.errorCode).toBe('some mock server error');
-    expect(serviceProviderStore.loading).toBe(false);
+      // Assert the store built the same overview
+      expect(serviceProviderStore.rollenerweiterungenUebersicht).toEqual(expectedRollenerweiterungUebersicht);
+      expect(serviceProviderStore.loading).toBe(false);
     });
-});
 
+    it('should handle errors', async () => {
+      mockadapter.onGet(url).replyOnce(500, 'some error');
+      await serviceProviderStore.getRollenerweiterungenById({ id: serviceProviderId });
+      expect(serviceProviderStore.rollenerweiterungenUebersicht).toEqual([]);
+      expect(serviceProviderStore.errorCode).toBe('UNSPECIFIED_ERROR');
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+
+    it('should handle error code', async () => {
+      mockadapter.onGet(url).replyOnce(500, { code: 'some mock server error' });
+      await serviceProviderStore.getRollenerweiterungenById({ id: serviceProviderId });
+      expect(serviceProviderStore.rollenerweiterungenUebersicht).toEqual([]);
+      expect(serviceProviderStore.errorCode).toBe('some mock server error');
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+  });
 });
