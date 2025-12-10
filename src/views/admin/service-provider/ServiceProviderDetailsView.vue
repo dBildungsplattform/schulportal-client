@@ -283,7 +283,7 @@
           </div>
         </v-container>
         <div>
-          <v-container class="schulspezifische-rollenerweiterungen">
+          <v-container>
             <v-divider
               class="border-opacity-100 rounded my-6 mx-4"
               color="#E5EAEF"
@@ -310,7 +310,7 @@
                 <v-btn
                   data-testid="open-schulspezifische-rollenerweiterungen-section-headline-button"
                   icon
-                  variant="text"
+                  variant="plain"
                   size="small"
                   @click="isOpen = !isOpen"
                   :aria-expanded="isOpen.toString()"
@@ -342,7 +342,7 @@
                         :items="serviceProviderStore.rollenerweiterungenUebersicht || []"
                         :loading="serviceProviderStore.loading"
                         :headers="headers"
-                        :hide-show-select="true"
+                        :hide-select="true"
                         item-value-path="id"
                         :total-items="serviceProviderStore.rollenerweiterungen?.total || 0"
                         :items-per-page="rollenerweiterungPerPage"

@@ -28,7 +28,7 @@
     currentSort?: { key: string; order: 'asc' | 'desc' } | null;
     // This prop is necessary so the parent component can decide which items should be de-selected after the filters have been used.
     modelValue?: TableItem[];
-    hideShowSelect?: boolean;
+    hideSelect?: boolean;
   };
 
   const props: Props = defineProps<Props>();
@@ -172,7 +172,7 @@
     :page="currentPage"
     select-strategy="page"
     :show-current-page="true"
-    :show-select="!hideShowSelect"
+    :show-select="!hideSelect"
     :sort-by="currentSort ? [currentSort] : []"
     :no-data-text="'noDataFound'"
     @click:row="handleRowClick"

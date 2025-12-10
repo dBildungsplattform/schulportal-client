@@ -214,15 +214,16 @@ export const useServiceProviderStore: StoreDefinition<
       this.loading = true;
       try {
         const { data }: { data: ProviderControllerFindRollenerweiterungenByServiceProviderId200Response } =
-          await serviceProviderApi.providerControllerFindRollenerweiterungenByServiceProviderId(filter.id);
+          await serviceProviderApi.providerControllerFindRollenerweiterungenByServiceProviderId(
+            filter.id,
+            filter.offset,
+            filter.limit,
+          );
 
         this.rollenerweiterungen = data;
 
         // transform into displayable overview grouped by organisationId
-        const rollenerweiterungMap: Map<string, RollenerweiterungMap> = new Map<
-          string,
-          { id: string; kennung: string; schule: string; rollen: Set<string> }
-        >();
+        const rollenerweiterungMap: Map<string, RollenerweiterungMap> = new Map<string, RollenerweiterungMap>();
 
         for (const item of data.items ?? []) {
           const orgId: string = item.organisationId;
