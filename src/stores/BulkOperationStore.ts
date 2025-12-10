@@ -271,20 +271,41 @@ export const useBulkOperationStore: StoreDefinition<
               organisationId: selectedKlasseId,
               rolleId: selectedRolleId,
               administriertVon: selectedOrganisation.id,
-              befristung: befristung,
+              befristung: orgaZuordnung.befristung,
             });
           } else {
+            // Get all Klassen the person already has at that organisation
             const klassenZuordnungen: InternalZuordnung[] = currentZuordnungen.filter(
               (z: InternalZuordnung) => z.administriertVon === selectedOrganisation.id,
             );
+            // Get all Klassen the person already has at that organisation with the wanted Rolle
+            const klasseWithWantedRolle: InternalZuordnung[] = klassenZuordnungen.filter(
+              (z: InternalZuordnung) => z.rolleId === selectedRolleId,
+            );
 
-            for (const klasse of klassenZuordnungen) {
-              newZuordnungen.push({
-                organisationId: klasse.organisationId,
-                rolleId: selectedRolleId,
-                administriertVon: selectedOrganisation.id,
-                befristung: befristung,
-              });
+            if (klasseWithWantedRolle.length > 0) {
+              // User already has the Rolle for at least one of the Klassen, just update Befristung
+              for (const klasse of klasseWithWantedRolle) {
+                newZuordnungen.push({
+                  organisationId: klasse.organisationId,
+                  rolleId: selectedRolleId,
+                  administriertVon: selectedOrganisation.id,
+                  befristung: orgaZuordnung.befristung,
+                });
+              }
+            } else {
+              // User doesn't have the Rolle, add one Zuordnung for every Klasse (will fail in the backend, if user has multiple Klassen)
+              const deduplicatedKlassen: string[] = [
+                ...new Set(klassenZuordnungen.map((z: InternalZuordnung) => z.organisationId)),
+              ];
+              for (const klasse of deduplicatedKlassen) {
+                newZuordnungen.push({
+                  organisationId: klasse,
+                  rolleId: selectedRolleId,
+                  administriertVon: selectedOrganisation.id,
+                  befristung: orgaZuordnung.befristung,
+                });
+              }
             }
           }
 
