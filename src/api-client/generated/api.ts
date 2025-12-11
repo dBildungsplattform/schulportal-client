@@ -731,8 +731,7 @@ export const DbiamPersonenkontextErrorI18nKeyEnum = {
     OrganisationMatchesRollenart: 'ORGANISATION_MATCHES_ROLLENART',
     PersonenkontextAnlageError: 'PERSONENKONTEXT_ANLAGE_ERROR',
     RolleNurAnPassendeOrganisation: 'ROLLE_NUR_AN_PASSENDE_ORGANISATION',
-    PersonalnummerNichtEindeutig: 'PERSONALNUMMER_NICHT_EINDEUTIG',
-    LernHatKeineKlasse: 'LERN_HAT_KEINE_KLASSE'
+    PersonalnummerNichtEindeutig: 'PERSONALNUMMER_NICHT_EINDEUTIG'
 } as const;
 
 export type DbiamPersonenkontextErrorI18nKeyEnum = typeof DbiamPersonenkontextErrorI18nKeyEnum[keyof typeof DbiamPersonenkontextErrorI18nKeyEnum];
@@ -767,7 +766,8 @@ export const DbiamPersonenkontexteUpdateErrorI18nKeyEnum = {
     PersonNotFound: 'PERSON_NOT_FOUND',
     InvalidPersonenkontextForPersonWithRollenartLern: 'INVALID_PERSONENKONTEXT_FOR_PERSON_WITH_ROLLENART_LERN',
     BefristungRequiredForPersonenkontext: ' BEFRISTUNG_REQUIRED_FOR_PERSONENKONTEXT',
-    DuplicateKlassenkontextForSameRolle: 'DUPLICATE_KLASSENKONTEXT_FOR_SAME_ROLLE'
+    DuplicateKlassenkontextForSameRolle: 'DUPLICATE_KLASSENKONTEXT_FOR_SAME_ROLLE',
+    LernNotAtSchuleAndKlasse: 'LERN_NOT_AT_SCHULE_AND_KLASSE'
 } as const;
 
 export type DbiamPersonenkontexteUpdateErrorI18nKeyEnum = typeof DbiamPersonenkontexteUpdateErrorI18nKeyEnum[keyof typeof DbiamPersonenkontexteUpdateErrorI18nKeyEnum];
@@ -1407,6 +1407,12 @@ export interface ManageableServiceProviderResponse {
      * @memberof ManageableServiceProviderResponse
      */
     'hasRollenerweiterung': boolean;
+    /**
+     * Indicates whether the service provider is available for rollenerweiterung.
+     * @type {boolean}
+     * @memberof ManageableServiceProviderResponse
+     */
+    'availableForRollenerweiterung': boolean;
     /**
      * 
      * @type {Array<RolleRefResponse>}
@@ -2949,10 +2955,10 @@ export interface ProviderControllerFindRollenerweiterungenByServiceProviderId200
     'limit': number;
     /**
      * 
-     * @type {Array<ManageableServiceProviderListEntryResponse>}
+     * @type {Array<RollenerweiterungWithExtendedDataResponse>}
      * @memberof ProviderControllerFindRollenerweiterungenByServiceProviderId200Response
      */
-    'items': Array<ManageableServiceProviderListEntryResponse>;
+    'items': Array<RollenerweiterungWithExtendedDataResponse>;
 }
 /**
  * 
@@ -2962,8 +2968,52 @@ export interface ProviderControllerFindRollenerweiterungenByServiceProviderId200
 export interface ProviderControllerFindRollenerweiterungenByServiceProviderId200ResponseAllOf {
     /**
      * 
-     * @type {Array<ManageableServiceProviderListEntryResponse>}
+     * @type {Array<RollenerweiterungWithExtendedDataResponse>}
      * @memberof ProviderControllerFindRollenerweiterungenByServiceProviderId200ResponseAllOf
+     */
+    'items': Array<RollenerweiterungWithExtendedDataResponse>;
+}
+/**
+ * 
+ * @export
+ * @interface ProviderControllerGetManageableServiceProviders200Response
+ */
+export interface ProviderControllerGetManageableServiceProviders200Response {
+    /**
+     * 
+     * @type {number}
+     * @memberof ProviderControllerGetManageableServiceProviders200Response
+     */
+    'total': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof ProviderControllerGetManageableServiceProviders200Response
+     */
+    'offset': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof ProviderControllerGetManageableServiceProviders200Response
+     */
+    'limit': number;
+    /**
+     * 
+     * @type {Array<ManageableServiceProviderListEntryResponse>}
+     * @memberof ProviderControllerGetManageableServiceProviders200Response
+     */
+    'items': Array<ManageableServiceProviderListEntryResponse>;
+}
+/**
+ * 
+ * @export
+ * @interface ProviderControllerGetManageableServiceProviders200ResponseAllOf
+ */
+export interface ProviderControllerGetManageableServiceProviders200ResponseAllOf {
+    /**
+     * 
+     * @type {Array<ManageableServiceProviderListEntryResponse>}
+     * @memberof ProviderControllerGetManageableServiceProviders200ResponseAllOf
      */
     'items': Array<ManageableServiceProviderListEntryResponse>;
 }
@@ -3328,6 +3378,67 @@ export interface RollenerweiterungResponse {
      * @memberof RollenerweiterungResponse
      */
     'serviceProviderId': string;
+}
+/**
+ * 
+ * @export
+ * @interface RollenerweiterungWithExtendedDataResponse
+ */
+export interface RollenerweiterungWithExtendedDataResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof RollenerweiterungWithExtendedDataResponse
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RollenerweiterungWithExtendedDataResponse
+     */
+    'createdAt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RollenerweiterungWithExtendedDataResponse
+     */
+    'updatedAt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RollenerweiterungWithExtendedDataResponse
+     */
+    'organisationId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RollenerweiterungWithExtendedDataResponse
+     */
+    'rolleId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RollenerweiterungWithExtendedDataResponse
+     */
+    'serviceProviderId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RollenerweiterungWithExtendedDataResponse
+     */
+    'rolleName': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RollenerweiterungWithExtendedDataResponse
+     */
+    'organisationName': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RollenerweiterungWithExtendedDataResponse
+     */
+    'organisationKennung': string;
 }
 /**
  * 
@@ -3738,43 +3849,6 @@ export interface UpdateRolleBodyParams {
 /**
  * 
  * @export
- * @interface UserExeternalDataResponse
- */
-export interface UserExeternalDataResponse {
-    /**
-     * 
-     * @type {UserExeternalDataResponseOx}
-     * @memberof UserExeternalDataResponse
-     */
-    'ox': UserExeternalDataResponseOx;
-    /**
-     * 
-     * @type {UserExeternalDataResponseItslearning}
-     * @memberof UserExeternalDataResponse
-     */
-    'itslearning': UserExeternalDataResponseItslearning;
-    /**
-     * 
-     * @type {UserExeternalDataResponseVidis}
-     * @memberof UserExeternalDataResponse
-     */
-    'vidis': UserExeternalDataResponseVidis;
-    /**
-     * 
-     * @type {UserExeternalDataResponseOpsh}
-     * @memberof UserExeternalDataResponse
-     */
-    'opsh': UserExeternalDataResponseOpsh;
-    /**
-     * 
-     * @type {UserExeternalDataResponseOnlineDateiablage}
-     * @memberof UserExeternalDataResponse
-     */
-    'onlineDateiablage': UserExeternalDataResponseOnlineDateiablage;
-}
-/**
- * 
- * @export
  * @interface UserExeternalDataResponseItslearning
  */
 export interface UserExeternalDataResponseItslearning {
@@ -3851,19 +3925,6 @@ export interface UserExeternalDataResponseOpshPk {
 /**
  * 
  * @export
- * @interface UserExeternalDataResponseOx
- */
-export interface UserExeternalDataResponseOx {
-    /**
-     * 
-     * @type {string}
-     * @memberof UserExeternalDataResponseOx
-     */
-    'id': string;
-}
-/**
- * 
- * @export
  * @interface UserExeternalDataResponseVidis
  */
 export interface UserExeternalDataResponseVidis {
@@ -3903,6 +3964,56 @@ export interface UserExeternalDataResponseVidis {
      * @memberof UserExeternalDataResponseVidis
      */
     'dienststellenNummern': Array<string>;
+}
+/**
+ * 
+ * @export
+ * @interface UserExternalDataResponse
+ */
+export interface UserExternalDataResponse {
+    /**
+     * 
+     * @type {UserExternalDataResponseOx}
+     * @memberof UserExternalDataResponse
+     */
+    'ox': UserExternalDataResponseOx;
+    /**
+     * 
+     * @type {UserExeternalDataResponseItslearning}
+     * @memberof UserExternalDataResponse
+     */
+    'itslearning': UserExeternalDataResponseItslearning;
+    /**
+     * 
+     * @type {UserExeternalDataResponseVidis}
+     * @memberof UserExternalDataResponse
+     */
+    'vidis': UserExeternalDataResponseVidis;
+    /**
+     * 
+     * @type {UserExeternalDataResponseOpsh}
+     * @memberof UserExternalDataResponse
+     */
+    'opsh': UserExeternalDataResponseOpsh;
+    /**
+     * 
+     * @type {UserExeternalDataResponseOnlineDateiablage}
+     * @memberof UserExternalDataResponse
+     */
+    'onlineDateiablage': UserExeternalDataResponseOnlineDateiablage;
+}
+/**
+ * 
+ * @export
+ * @interface UserExternalDataResponseOx
+ */
+export interface UserExternalDataResponseOx {
+    /**
+     * 
+     * @type {string}
+     * @memberof UserExternalDataResponseOx
+     */
+    'id': string;
 }
 /**
  * 
@@ -6552,7 +6663,7 @@ export const KeycloakinternalApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async keycloakInternalControllerGetExternalData(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserExeternalDataResponse>> {
+        async keycloakInternalControllerGetExternalData(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserExternalDataResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.keycloakInternalControllerGetExternalData(options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -6572,7 +6683,7 @@ export const KeycloakinternalApiFactory = function (configuration?: Configuratio
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        keycloakInternalControllerGetExternalData(options?: any): AxiosPromise<UserExeternalDataResponse> {
+        keycloakInternalControllerGetExternalData(options?: any): AxiosPromise<UserExternalDataResponse> {
             return localVarFp.keycloakInternalControllerGetExternalData(options).then((request) => request(axios, basePath));
         },
     };
@@ -6591,7 +6702,7 @@ export interface KeycloakinternalApiInterface {
      * @throws {RequiredError}
      * @memberof KeycloakinternalApiInterface
      */
-    keycloakInternalControllerGetExternalData(options?: AxiosRequestConfig): AxiosPromise<UserExeternalDataResponse>;
+    keycloakInternalControllerGetExternalData(options?: AxiosRequestConfig): AxiosPromise<UserExternalDataResponse>;
 
 }
 
@@ -7500,10 +7611,11 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
          * @param {Array<string>} [organisationIds] Liefert Organisationen mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
          * @param {'asc' | 'desc'} [sortOrder] Order to sort by.
          * @param {'name' | 'kennung'} [sortField] Field to sort by.
+         * @param {boolean} [getChildrenRecursively] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerFindOrganizations: async (offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRechtEnum>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, sortOrder?: 'asc' | 'desc', sortField?: 'name' | 'kennung', options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        organisationControllerFindOrganizations: async (offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRechtEnum>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, sortOrder?: 'asc' | 'desc', sortField?: 'name' | 'kennung', getChildrenRecursively?: boolean, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/organisationen`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -7574,6 +7686,10 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
 
             if (sortField !== undefined) {
                 localVarQueryParameter['sortField'] = sortField;
+            }
+
+            if (getChildrenRecursively !== undefined) {
+                localVarQueryParameter['getChildrenRecursively'] = getChildrenRecursively;
             }
 
 
@@ -7972,11 +8088,12 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
          * @param {Array<string>} [organisationIds] Liefert Organisationen mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
          * @param {'asc' | 'desc'} [sortOrder] Order to sort by.
          * @param {'name' | 'kennung'} [sortField] Field to sort by.
+         * @param {boolean} [getChildrenRecursively] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRechtEnum>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, sortOrder?: 'asc' | 'desc', sortField?: 'name' | 'kennung', options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OrganisationResponse>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, systemrechte, excludeTyp, administriertVon, zugehoerigZu, organisationIds, sortOrder, sortField, options);
+        async organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRechtEnum>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, sortOrder?: 'asc' | 'desc', sortField?: 'name' | 'kennung', getChildrenRecursively?: boolean, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OrganisationResponse>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, systemrechte, excludeTyp, administriertVon, zugehoerigZu, organisationIds, sortOrder, sortField, getChildrenRecursively, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -8124,11 +8241,12 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
          * @param {Array<string>} [organisationIds] Liefert Organisationen mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
          * @param {'asc' | 'desc'} [sortOrder] Order to sort by.
          * @param {'name' | 'kennung'} [sortField] Field to sort by.
+         * @param {boolean} [getChildrenRecursively] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRechtEnum>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, sortOrder?: 'asc' | 'desc', sortField?: 'name' | 'kennung', options?: any): AxiosPromise<Array<OrganisationResponse>> {
-            return localVarFp.organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, systemrechte, excludeTyp, administriertVon, zugehoerigZu, organisationIds, sortOrder, sortField, options).then((request) => request(axios, basePath));
+        organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRechtEnum>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, sortOrder?: 'asc' | 'desc', sortField?: 'name' | 'kennung', getChildrenRecursively?: boolean, options?: any): AxiosPromise<Array<OrganisationResponse>> {
+            return localVarFp.organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, systemrechte, excludeTyp, administriertVon, zugehoerigZu, organisationIds, sortOrder, sortField, getChildrenRecursively, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -8267,11 +8385,12 @@ export interface OrganisationenApiInterface {
      * @param {Array<string>} [organisationIds] Liefert Organisationen mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
      * @param {'asc' | 'desc'} [sortOrder] Order to sort by.
      * @param {'name' | 'kennung'} [sortField] Field to sort by.
+     * @param {boolean} [getChildrenRecursively] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganisationenApiInterface
      */
-    organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRechtEnum>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, sortOrder?: 'asc' | 'desc', sortField?: 'name' | 'kennung', options?: AxiosRequestConfig): AxiosPromise<Array<OrganisationResponse>>;
+    organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRechtEnum>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, sortOrder?: 'asc' | 'desc', sortField?: 'name' | 'kennung', getChildrenRecursively?: boolean, options?: AxiosRequestConfig): AxiosPromise<Array<OrganisationResponse>>;
 
     /**
      * 
@@ -8420,12 +8539,13 @@ export class OrganisationenApi extends BaseAPI implements OrganisationenApiInter
      * @param {Array<string>} [organisationIds] Liefert Organisationen mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
      * @param {'asc' | 'desc'} [sortOrder] Order to sort by.
      * @param {'name' | 'kennung'} [sortField] Field to sort by.
+     * @param {boolean} [getChildrenRecursively] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganisationenApi
      */
-    public organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRechtEnum>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, sortOrder?: 'asc' | 'desc', sortField?: 'name' | 'kennung', options?: AxiosRequestConfig) {
-        return OrganisationenApiFp(this.configuration).organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, systemrechte, excludeTyp, administriertVon, zugehoerigZu, organisationIds, sortOrder, sortField, options).then((request) => request(this.axios, this.basePath));
+    public organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRechtEnum>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, sortOrder?: 'asc' | 'desc', sortField?: 'name' | 'kennung', getChildrenRecursively?: boolean, options?: AxiosRequestConfig) {
+        return OrganisationenApiFp(this.configuration).organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, systemrechte, excludeTyp, administriertVon, zugehoerigZu, organisationIds, sortOrder, sortField, getChildrenRecursively, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -10199,10 +10319,10 @@ export class PersonenFrontendApi extends BaseAPI implements PersonenFrontendApiI
 export const PersonenInfoApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * Das Limit (x-limit) darf maximal 5000 betragen.
-         * @summary liefert Personeninformationen basierend auf den Berechtigungen auf Service Provider des aufrufenden Nutzers. Das Limit (x-limit) darf maximal 5000 betragen.
-         * @param {number} [xOffset] Offset für die Ergebnisse (maximal 5000)
-         * @param {number} [xLimit] Maximale Anzahl der Ergebnisse (maximal 5000)
+         * liefert Personeninformationen basierend auf den Berechtigungen auf Service Provider des aufrufenden Nutzers.
+         * @summary liefert Personeninformationen basierend auf den Berechtigungen auf Service Provider des aufrufenden Nutzers.
+         * @param {number} [xOffset] Offset für die Ergebnisse
+         * @param {number} [xLimit] Maximale Anzahl der Ergebnisse
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -10257,10 +10377,10 @@ export const PersonenInfoApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = PersonenInfoApiAxiosParamCreator(configuration)
     return {
         /**
-         * Das Limit (x-limit) darf maximal 5000 betragen.
-         * @summary liefert Personeninformationen basierend auf den Berechtigungen auf Service Provider des aufrufenden Nutzers. Das Limit (x-limit) darf maximal 5000 betragen.
-         * @param {number} [xOffset] Offset für die Ergebnisse (maximal 5000)
-         * @param {number} [xLimit] Maximale Anzahl der Ergebnisse (maximal 5000)
+         * liefert Personeninformationen basierend auf den Berechtigungen auf Service Provider des aufrufenden Nutzers.
+         * @summary liefert Personeninformationen basierend auf den Berechtigungen auf Service Provider des aufrufenden Nutzers.
+         * @param {number} [xOffset] Offset für die Ergebnisse
+         * @param {number} [xLimit] Maximale Anzahl der Ergebnisse
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -10279,10 +10399,10 @@ export const PersonenInfoApiFactory = function (configuration?: Configuration, b
     const localVarFp = PersonenInfoApiFp(configuration)
     return {
         /**
-         * Das Limit (x-limit) darf maximal 5000 betragen.
-         * @summary liefert Personeninformationen basierend auf den Berechtigungen auf Service Provider des aufrufenden Nutzers. Das Limit (x-limit) darf maximal 5000 betragen.
-         * @param {number} [xOffset] Offset für die Ergebnisse (maximal 5000)
-         * @param {number} [xLimit] Maximale Anzahl der Ergebnisse (maximal 5000)
+         * liefert Personeninformationen basierend auf den Berechtigungen auf Service Provider des aufrufenden Nutzers.
+         * @summary liefert Personeninformationen basierend auf den Berechtigungen auf Service Provider des aufrufenden Nutzers.
+         * @param {number} [xOffset] Offset für die Ergebnisse
+         * @param {number} [xLimit] Maximale Anzahl der Ergebnisse
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -10299,10 +10419,10 @@ export const PersonenInfoApiFactory = function (configuration?: Configuration, b
  */
 export interface PersonenInfoApiInterface {
     /**
-     * Das Limit (x-limit) darf maximal 5000 betragen.
-     * @summary liefert Personeninformationen basierend auf den Berechtigungen auf Service Provider des aufrufenden Nutzers. Das Limit (x-limit) darf maximal 5000 betragen.
-     * @param {number} [xOffset] Offset für die Ergebnisse (maximal 5000)
-     * @param {number} [xLimit] Maximale Anzahl der Ergebnisse (maximal 5000)
+     * liefert Personeninformationen basierend auf den Berechtigungen auf Service Provider des aufrufenden Nutzers.
+     * @summary liefert Personeninformationen basierend auf den Berechtigungen auf Service Provider des aufrufenden Nutzers.
+     * @param {number} [xOffset] Offset für die Ergebnisse
+     * @param {number} [xLimit] Maximale Anzahl der Ergebnisse
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonenInfoApiInterface
@@ -10319,10 +10439,10 @@ export interface PersonenInfoApiInterface {
  */
 export class PersonenInfoApi extends BaseAPI implements PersonenInfoApiInterface {
     /**
-     * Das Limit (x-limit) darf maximal 5000 betragen.
-     * @summary liefert Personeninformationen basierend auf den Berechtigungen auf Service Provider des aufrufenden Nutzers. Das Limit (x-limit) darf maximal 5000 betragen.
-     * @param {number} [xOffset] Offset für die Ergebnisse (maximal 5000)
-     * @param {number} [xLimit] Maximale Anzahl der Ergebnisse (maximal 5000)
+     * liefert Personeninformationen basierend auf den Berechtigungen auf Service Provider des aufrufenden Nutzers.
+     * @summary liefert Personeninformationen basierend auf den Berechtigungen auf Service Provider des aufrufenden Nutzers.
+     * @param {number} [xOffset] Offset für die Ergebnisse
+     * @param {number} [xLimit] Maximale Anzahl der Ergebnisse
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonenInfoApi
@@ -11145,7 +11265,7 @@ export class PersonenkontexteApi extends BaseAPI implements PersonenkontexteApiI
 export const ProviderApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * Get service-providers the logged-in user is allowed to manage.
+         * Get rollenerweiterungen for service-provider with provided id.
          * @summary 
          * @param {string} angebotId The id of the service provider
          * @param {number} [offset] The offset of the paginated list.
@@ -11414,7 +11534,7 @@ export const ProviderApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = ProviderApiAxiosParamCreator(configuration)
     return {
         /**
-         * Get service-providers the logged-in user is allowed to manage.
+         * Get rollenerweiterungen for service-provider with provided id.
          * @summary 
          * @param {string} angebotId The id of the service provider
          * @param {number} [offset] The offset of the paginated list.
@@ -11465,7 +11585,7 @@ export const ProviderApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async providerControllerGetManageableServiceProviders(offset?: number, limit?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ProviderControllerFindRollenerweiterungenByServiceProviderId200Response>> {
+        async providerControllerGetManageableServiceProviders(offset?: number, limit?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ProviderControllerGetManageableServiceProviders200Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.providerControllerGetManageableServiceProviders(offset, limit, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -11490,7 +11610,7 @@ export const ProviderApiFactory = function (configuration?: Configuration, baseP
     const localVarFp = ProviderApiFp(configuration)
     return {
         /**
-         * Get service-providers the logged-in user is allowed to manage.
+         * Get rollenerweiterungen for service-provider with provided id.
          * @summary 
          * @param {string} angebotId The id of the service provider
          * @param {number} [offset] The offset of the paginated list.
@@ -11537,7 +11657,7 @@ export const ProviderApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        providerControllerGetManageableServiceProviders(offset?: number, limit?: number, options?: any): AxiosPromise<ProviderControllerFindRollenerweiterungenByServiceProviderId200Response> {
+        providerControllerGetManageableServiceProviders(offset?: number, limit?: number, options?: any): AxiosPromise<ProviderControllerGetManageableServiceProviders200Response> {
             return localVarFp.providerControllerGetManageableServiceProviders(offset, limit, options).then((request) => request(axios, basePath));
         },
         /**
@@ -11559,7 +11679,7 @@ export const ProviderApiFactory = function (configuration?: Configuration, baseP
  */
 export interface ProviderApiInterface {
     /**
-     * Get service-providers the logged-in user is allowed to manage.
+     * Get rollenerweiterungen for service-provider with provided id.
      * @summary 
      * @param {string} angebotId The id of the service provider
      * @param {number} [offset] The offset of the paginated list.
@@ -11607,7 +11727,7 @@ export interface ProviderApiInterface {
      * @throws {RequiredError}
      * @memberof ProviderApiInterface
      */
-    providerControllerGetManageableServiceProviders(offset?: number, limit?: number, options?: AxiosRequestConfig): AxiosPromise<ProviderControllerFindRollenerweiterungenByServiceProviderId200Response>;
+    providerControllerGetManageableServiceProviders(offset?: number, limit?: number, options?: AxiosRequestConfig): AxiosPromise<ProviderControllerGetManageableServiceProviders200Response>;
 
     /**
      * 
@@ -11628,7 +11748,7 @@ export interface ProviderApiInterface {
  */
 export class ProviderApi extends BaseAPI implements ProviderApiInterface {
     /**
-     * Get service-providers the logged-in user is allowed to manage.
+     * Get rollenerweiterungen for service-provider with provided id.
      * @summary 
      * @param {string} angebotId The id of the service provider
      * @param {number} [offset] The offset of the paginated list.
