@@ -1,12 +1,15 @@
 {
   "angebot": {
     "assignedRollen": "Zugeordnete Rollen",
+    "erweiterteRollen": "Erweiterte Rollen",
     "name": "Name",
     "kategorie": "Kategorie",
     "administrationsebene": "Administrationsebene",
     "rollen": "Rollen",
     "schulspezifischErweitert": "Schulspezifisch erweitert",
     "schulspezifischeRollenerweiterung": "Schulspezifische Rollenerweiterung möglich",
+    "showSchulspezifischeRollenerweiterungen": "Schulspezifische Rollenerweiterungen anzeigen",
+    "notForSchulspezifischeRollenerweiterungenAvailable": "Dieses kann Angebot kann nicht für schulspezifische Rollenerweiterungen verwendet werden. In diesem Bereich werden daher keine Daten und Funktionen angeboten.",
     "canBeAssignedToRollen": "Darf Rollen hinzugefügt werden",
     "link": "Link",
     "logo": "Logo",
@@ -907,6 +910,7 @@
   "willBeCreated": "wird hinzugefügt",
   "willBeRemoved": "wird entfernt",
   "yes": "Ja",
+  "none": "Keine",
   "banner": {
     "hint": "Hinweis: ",
     "kopers": "Die Verwendung dieses Benutzerkontos setzt eine KoPers.-Nr. voraus. Bitte kontaktieren Sie Ihre schulischen Administratorinnen und Administratoren, um eine KoPers.-Nr. eintragen zu lassen. Andernfalls wird Ihr Zugang zum {date} automatisch gesperrt.",
