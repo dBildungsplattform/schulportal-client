@@ -336,8 +336,9 @@
     </h1>
     <LayoutCard
       :closable="true"
-      data-testid="rolle-details-card"
       :header="$t('admin.rolle.edit')"
+      headlineTestId="rolle-details-headline"
+      @onCloseClicked="navigateToRolleTable"
       :padded="true"
       :show-close-text="true"
       @on-close-clicked="navigateToRolleTable"
