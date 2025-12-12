@@ -27,6 +27,10 @@
     max-height: 40px;
     object-fit: scale-down;
   }
+
+  .overflow-wrap {
+    overflow-wrap: break-word;
+  }
 }
 
 @media only screen and (max-width: 960px) {
