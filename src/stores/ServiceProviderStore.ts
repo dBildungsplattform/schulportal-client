@@ -8,7 +8,7 @@ import {
   ServiceProviderMerkmal,
   type ManageableServiceProviderResponse,
   type ProviderApiInterface,
-  type ProviderControllerFindRollenerweiterungenByServiceProviderId200Response,
+  type ProviderControllerGetManageableServiceProviders200Response,
 } from '../api-client/generated/api';
 
 const serviceProviderApi: ProviderApiInterface = ProviderApiFactory(undefined, '', axiosApiInstance);
@@ -126,10 +126,10 @@ export const useServiceProviderStore: StoreDefinition<
       try {
         const limit: number = entriesPerPage;
         const offset: number = (page - 1) * entriesPerPage;
-        const response: ProviderControllerFindRollenerweiterungenByServiceProviderId200Response = (
+        const response: ProviderControllerGetManageableServiceProviders200Response = (
           await serviceProviderApi.providerControllerGetManageableServiceProviders(offset, limit)
         ).data;
-        const { items, total }: ProviderControllerFindRollenerweiterungenByServiceProviderId200Response = response;
+        const { items, total }: ProviderControllerGetManageableServiceProviders200Response = response;
         this.manageableServiceProviders = items;
         this.totalManageableServiceProviders = total;
       } catch (error: unknown) {

@@ -10,7 +10,7 @@ import {
   type ManageableServiceProviderDetail,
 } from './ServiceProviderStore';
 import { faker } from '@faker-js/faker';
-import type { ProviderControllerFindRollenerweiterungenByServiceProviderId200Response } from '@/api-client/generated';
+import type { ProviderControllerGetManageableServiceProviders200Response } from '@/api-client/generated';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 
@@ -140,7 +140,7 @@ describe('serviceProviderStore', () => {
     const url: string = `/api/provider/manageable?offset=${offset}&limit=${limit}`;
 
     it('should load service providers manageable by the user', async () => {
-      const mockResponse: ProviderControllerFindRollenerweiterungenByServiceProviderId200Response = {
+      const mockResponse: ProviderControllerGetManageableServiceProviders200Response = {
         items: [
           DoFactory.getManageableServiceProviderListEntryResponse(),
           DoFactory.getManageableServiceProviderListEntryResponse(),
