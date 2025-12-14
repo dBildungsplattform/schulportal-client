@@ -285,7 +285,7 @@
         <div>
           <v-container>
             <v-divider
-              class="border-opacity-100 rounded my-6 mx-4"
+              class="border-opacity-100 rounded"
               color="#E5EAEF"
               thickness="6"
             ></v-divider>
@@ -294,7 +294,7 @@
             <v-row
               class="ml-md-16"
               align="center"
-              justify="space-between"
+             
             >
               <v-col cols="auto">
                 <h3
@@ -328,7 +328,7 @@
             <!-- Expandable table -->
             <v-row
               align="center"
-              class="mx-16"
+              class="mx-16 mt-n4"
               justify="end"
             >
               <v-col cols="12">

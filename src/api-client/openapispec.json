@@ -1396,6 +1396,15 @@
                             ],
                             "type": "string"
                         }
+                    },
+                    {
+                        "name": "getChildrenRecursively",
+                        "required": false,
+                        "in": "query",
+                        "schema": {
+                            "nullable": true,
+                            "type": "boolean"
+                        }
                     }
                 ],
                 "responses": {

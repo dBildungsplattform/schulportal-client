@@ -7611,10 +7611,11 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
          * @param {Array<string>} [organisationIds] Liefert Organisationen mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
          * @param {'asc' | 'desc'} [sortOrder] Order to sort by.
          * @param {'name' | 'kennung'} [sortField] Field to sort by.
+         * @param {boolean} [getChildrenRecursively] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerFindOrganizations: async (offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRechtEnum>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, sortOrder?: 'asc' | 'desc', sortField?: 'name' | 'kennung', options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        organisationControllerFindOrganizations: async (offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRechtEnum>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, sortOrder?: 'asc' | 'desc', sortField?: 'name' | 'kennung', getChildrenRecursively?: boolean, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/organisationen`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -7685,6 +7686,10 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
 
             if (sortField !== undefined) {
                 localVarQueryParameter['sortField'] = sortField;
+            }
+
+            if (getChildrenRecursively !== undefined) {
+                localVarQueryParameter['getChildrenRecursively'] = getChildrenRecursively;
             }
 
 
@@ -8083,11 +8088,12 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
          * @param {Array<string>} [organisationIds] Liefert Organisationen mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
          * @param {'asc' | 'desc'} [sortOrder] Order to sort by.
          * @param {'name' | 'kennung'} [sortField] Field to sort by.
+         * @param {boolean} [getChildrenRecursively] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRechtEnum>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, sortOrder?: 'asc' | 'desc', sortField?: 'name' | 'kennung', options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OrganisationResponse>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, systemrechte, excludeTyp, administriertVon, zugehoerigZu, organisationIds, sortOrder, sortField, options);
+        async organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRechtEnum>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, sortOrder?: 'asc' | 'desc', sortField?: 'name' | 'kennung', getChildrenRecursively?: boolean, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<OrganisationResponse>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, systemrechte, excludeTyp, administriertVon, zugehoerigZu, organisationIds, sortOrder, sortField, getChildrenRecursively, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -8235,11 +8241,12 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
          * @param {Array<string>} [organisationIds] Liefert Organisationen mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
          * @param {'asc' | 'desc'} [sortOrder] Order to sort by.
          * @param {'name' | 'kennung'} [sortField] Field to sort by.
+         * @param {boolean} [getChildrenRecursively] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRechtEnum>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, sortOrder?: 'asc' | 'desc', sortField?: 'name' | 'kennung', options?: any): AxiosPromise<Array<OrganisationResponse>> {
-            return localVarFp.organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, systemrechte, excludeTyp, administriertVon, zugehoerigZu, organisationIds, sortOrder, sortField, options).then((request) => request(axios, basePath));
+        organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRechtEnum>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, sortOrder?: 'asc' | 'desc', sortField?: 'name' | 'kennung', getChildrenRecursively?: boolean, options?: any): AxiosPromise<Array<OrganisationResponse>> {
+            return localVarFp.organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, systemrechte, excludeTyp, administriertVon, zugehoerigZu, organisationIds, sortOrder, sortField, getChildrenRecursively, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -8378,11 +8385,12 @@ export interface OrganisationenApiInterface {
      * @param {Array<string>} [organisationIds] Liefert Organisationen mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
      * @param {'asc' | 'desc'} [sortOrder] Order to sort by.
      * @param {'name' | 'kennung'} [sortField] Field to sort by.
+     * @param {boolean} [getChildrenRecursively] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganisationenApiInterface
      */
-    organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRechtEnum>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, sortOrder?: 'asc' | 'desc', sortField?: 'name' | 'kennung', options?: AxiosRequestConfig): AxiosPromise<Array<OrganisationResponse>>;
+    organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRechtEnum>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, sortOrder?: 'asc' | 'desc', sortField?: 'name' | 'kennung', getChildrenRecursively?: boolean, options?: AxiosRequestConfig): AxiosPromise<Array<OrganisationResponse>>;
 
     /**
      * 
@@ -8531,12 +8539,13 @@ export class OrganisationenApi extends BaseAPI implements OrganisationenApiInter
      * @param {Array<string>} [organisationIds] Liefert Organisationen mit den angegebenen IDs, selbst wenn andere Filterkriterien nicht zutreffen (ODER-verknüpft mit anderen Kriterien).
      * @param {'asc' | 'desc'} [sortOrder] Order to sort by.
      * @param {'name' | 'kennung'} [sortField] Field to sort by.
+     * @param {boolean} [getChildrenRecursively] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganisationenApi
      */
-    public organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRechtEnum>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, sortOrder?: 'asc' | 'desc', sortField?: 'name' | 'kennung', options?: AxiosRequestConfig) {
-        return OrganisationenApiFp(this.configuration).organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, systemrechte, excludeTyp, administriertVon, zugehoerigZu, organisationIds, sortOrder, sortField, options).then((request) => request(this.axios, this.basePath));
+    public organisationControllerFindOrganizations(offset?: number, limit?: number, kennung?: string, name?: string, searchString?: string, typ?: OrganisationsTyp, systemrechte?: Array<RollenSystemRechtEnum>, excludeTyp?: Array<OrganisationsTyp>, administriertVon?: Array<string>, zugehoerigZu?: Array<string>, organisationIds?: Array<string>, sortOrder?: 'asc' | 'desc', sortField?: 'name' | 'kennung', getChildrenRecursively?: boolean, options?: AxiosRequestConfig) {
+        return OrganisationenApiFp(this.configuration).organisationControllerFindOrganizations(offset, limit, kennung, name, searchString, typ, systemrechte, excludeTyp, administriertVon, zugehoerigZu, organisationIds, sortOrder, sortField, getChildrenRecursively, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
