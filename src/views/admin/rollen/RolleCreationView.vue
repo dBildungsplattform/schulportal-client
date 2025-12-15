@@ -278,11 +278,11 @@
     </h1>
     <LayoutCard
       :closable="!rolleStore.errorCode"
-      data-testid="rolle-creation-card"
+      @onCloseClicked="navigateToRolleManagement"
       :header="$t('admin.rolle.addNew')"
+      headlineTestId="rolle-creation-headline"
       :padded="true"
-      :show-close-text="true"
-      @on-close-clicked="navigateToRolleManagement"
+      :showCloseText="true"
     >
       <!-- The form to create a new Rolle -->
       <template v-if="!rolleStore.createdRolle">

@@ -362,7 +362,10 @@
 <template>
   <div>
     <v-row v-if="showHeadline">
-      <h3 class="headline-3 mt-3">
+      <h3
+        class="headline-3 mt-3"
+        data-testid="organisation-assign-headline"
+      >
         {{ headlineNumbers?.org ?? '1.' }} {{ $t('admin.organisation.assignOrganisation') }}
       </h3>
     </v-row>
@@ -399,7 +402,12 @@
 
     <div v-if="selectedOrganisation">
       <v-row v-if="showHeadline">
-        <h3 class="headline-3">{{ headlineNumbers?.rolle ?? '2.' }} {{ $t('admin.rolle.assignRolle') }}</h3>
+        <h3
+          class="headline-3"
+          data-testid="rolle-assign-headline"
+        >
+          {{ headlineNumbers?.rolle ?? '2.' }} {{ $t('admin.rolle.assignRolle') }}
+        </h3>
       </v-row>
       <!-- Rollenzuordnung -->
       <FormRow
@@ -544,7 +552,10 @@
           showHeadline
         "
       >
-        <h3 class="headline-3">
+        <h3
+          class="headline-3"
+          data-testid="befristung-assign-headline"
+        >
           {{ headlineNumbers?.befristung ?? '2.1' }} {{ $t('admin.befristung.assignBefristung') }}
         </h3>
       </v-row>

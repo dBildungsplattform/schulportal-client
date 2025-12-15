@@ -1642,11 +1642,11 @@
     </h1>
     <LayoutCard
       :closable="!personStore.errorCode && !personenkontextStore.errorCode"
-      data-testid="person-details-card"
       :header="t('admin.person.edit')"
+      :headlineTestId="'person-details-headline'"
+      @onCloseClicked="navigateToPersonTable"
       :padded="true"
-      :show-close-text="true"
-      @on-close-clicked="navigateToPersonTable"
+      :showCloseText="true"
     >
       <v-container
         v-if="!!personStore.errorCode || !!personenkontextStore.errorCode"

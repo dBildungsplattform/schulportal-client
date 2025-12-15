@@ -161,11 +161,11 @@
     </h1>
     <LayoutCard
       :closable="!organisationStore.errorCode"
-      data-testid="klasse-creation-card"
+      @onCloseClicked="navigateToKlasseManagement"
       :header="$t('admin.klasse.addNew')"
+      headlineTestId="klasse-creation-headline"
       :padded="true"
-      :show-close-text="true"
-      @on-close-clicked="navigateToKlasseManagement"
+      :showCloseText="true"
     >
       <!-- The form to create a new Klasse -->
       <template v-if="!organisationStore.createdKlasse">

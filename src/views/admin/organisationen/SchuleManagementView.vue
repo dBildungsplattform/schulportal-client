@@ -95,7 +95,7 @@
       {{ $t('admin.headline') }}
     </h1>
     <LayoutCard
-      data-testid="schule-management-card"
+      headlineTestId="schule-management-headline"
       :header="$t('admin.schule.management')"
     >
       <!-- Error Message Display -->
