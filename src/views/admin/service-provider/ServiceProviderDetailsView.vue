@@ -12,12 +12,14 @@
   import SchulPortalLogo from '@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg';
   import LabeledField from '@/components/admin/LabeledField.vue';
   import ResultTable, { type Headers } from '@/components/admin/ResultTable.vue';
+  import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 
   const router: Router = useRouter();
   const route: RouteLocationNormalizedLoaded = useRoute();
   const { t }: Composer = useI18n({ useScope: 'global' });
 
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
+  const authStore: AuthStore = useAuthStore();
 
   const currentServiceProviderId: string = route.params['id'] as string;
 
@@ -87,8 +89,10 @@
     await Promise.all([
       serviceProviderStore.getManageableServiceProviderById(currentServiceProviderId),
       serviceProviderStore.getServiceProviderLogoById(currentServiceProviderId),
-      fetchRollenerweiterungen(),
     ]);
+    if (authStore.hasRollenerweiternPermission) {
+      fetchRollenerweiterungen();
+    }
   });
 </script>
 
@@ -282,7 +286,7 @@
             <v-progress-circular indeterminate></v-progress-circular>
           </div>
         </v-container>
-        <div>
+        <div v-if="authStore.hasRollenerweiternPermission">
           <v-container>
             <v-divider
               class="border-opacity-100 rounded"

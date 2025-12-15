@@ -62,6 +62,7 @@ type AuthState = {
   hasLandesbediensteteSuchenUndHinzufügenPermission: boolean;
   hasEingeschränktNeueBenutzerErstellenPermission: boolean;
   hasAngeboteVerwaltenPermission: boolean;
+  hasRollenerweiternPermission: boolean;
   isAuthenticated: boolean;
   acr: StepUpLevel;
   timeLimitInfos: PersonTimeLimitInfoResponse[];
@@ -97,6 +98,7 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
     hasLandesbediensteteSuchenUndHinzufügenPermission: false,
     hasEingeschränktNeueBenutzerErstellenPermission: false,
     hasAngeboteVerwaltenPermission: false,
+    hasRollenerweiternPermission: false,
     isAuthenticated: false,
     acr: StepUpLevel.NONE,
     timeLimitInfos: [],
@@ -148,6 +150,7 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
           this.hasAngeboteVerwaltenPermission = this.currentUserPermissions.includes(
             RollenSystemRecht.AngeboteVerwalten,
           );
+          this.hasRollenerweiternPermission = this.currentUserPermissions.includes(RollenSystemRecht.RollenErweitern);
         } else {
           throw new Error('User info could not be retrieved.');
         }
