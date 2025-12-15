@@ -8,7 +8,8 @@ import {
   ServiceProviderMerkmal,
   type ManageableServiceProviderResponse,
   type ProviderApiInterface,
-  type ProviderControllerGetManageableServiceProviders200Response,
+  type ProviderControllerFindRollenerweiterungenByServiceProviderId200Response,
+  type ProviderControllerFindRollenerweiterungenByServiceProviderId200Response,
 } from '../api-client/generated/api';
 
 const serviceProviderApi: ProviderApiInterface = ProviderApiFactory(undefined, '', axiosApiInstance);
@@ -37,6 +38,21 @@ export type ManageableServiceProviderListEntry = BaseServiceProvider & {
 
 export type ManageableServiceProviderDetail = ManageableServiceProviderListEntry & {
   url: string;
+  availableForRollenerweiterung: boolean;
+};
+
+export type RollenerweiterungMap = {
+  id: string;
+  kennung: string;
+  schule: string;
+  rollen: Set<string>;
+};
+
+export type RollenErweiterungenUebersicht = {
+  id: string;
+  kennung: string;
+  schule: string;
+  rollenerweiterungen: string;
 };
 
 export { ServiceProviderMerkmal };
@@ -46,6 +62,12 @@ export type ServiceProviderIdNameResponse = {
   name: string;
 };
 
+export type RollenerweiterungFilter = {
+  id: string;
+  limit?: number;
+  offset?: number;
+};
+
 type ServiceProviderState = {
   allServiceProviders: StartPageServiceProvider[];
   availableServiceProviders: StartPageServiceProvider[];
@@ -53,6 +75,9 @@ type ServiceProviderState = {
   totalManageableServiceProviders: number;
   currentServiceProvider: ManageableServiceProviderDetail | null;
   serviceProviderLogos: Map<string, string>;
+  rollenerweiterungen: ProviderControllerFindRollenerweiterungenByServiceProviderId200Response | null;
+  // ready-to-display, grouped for the result table:
+  rollenerweiterungenUebersicht: RollenErweiterungenUebersicht[];
   errorCode: string;
   loading: boolean;
 };
@@ -64,6 +89,7 @@ type ServiceProviderActions = {
   getManageableServiceProviders: (page: number, entriesPerPage: number) => Promise<void>;
   getManageableServiceProviderById: (serviceProviderId: string) => Promise<void>;
   getServiceProviderLogoById: (serviceProviderId: string) => Promise<void>;
+  getRollenerweiterungenById: (filter: RollenerweiterungFilter) => Promise<void>;
 };
 
 export { ServiceProviderKategorie };
@@ -90,6 +116,8 @@ export const useServiceProviderStore: StoreDefinition<
       totalManageableServiceProviders: 0,
       currentServiceProvider: null,
       serviceProviderLogos: new Map<string, string>(),
+      rollenerweiterungen: null,
+      rollenerweiterungenUebersicht: [],
       errorCode: '',
       loading: false,
     };
@@ -126,10 +154,10 @@ export const useServiceProviderStore: StoreDefinition<
       try {
         const limit: number = entriesPerPage;
         const offset: number = (page - 1) * entriesPerPage;
-        const response: ProviderControllerGetManageableServiceProviders200Response = (
+        const response: ProviderControllerFindRollenerweiterungenByServiceProviderId200Response = (
           await serviceProviderApi.providerControllerGetManageableServiceProviders(offset, limit)
         ).data;
-        const { items, total }: ProviderControllerGetManageableServiceProviders200Response = response;
+        const { items, total }: ProviderControllerFindRollenerweiterungenByServiceProviderId200Response = response;
         this.manageableServiceProviders = items;
         this.totalManageableServiceProviders = total;
       } catch (error: unknown) {
@@ -175,6 +203,51 @@ export const useServiceProviderStore: StoreDefinition<
         );
 
         this.serviceProviderLogos.set(serviceProviderId, logoUrl);
+      } catch (error: unknown) {
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async getRollenerweiterungenById(filter: RollenerweiterungFilter): Promise<void> {
+      this.loading = true;
+      try {
+        const { data }: { data: ProviderControllerFindRollenerweiterungenByServiceProviderId200Response } =
+          await serviceProviderApi.providerControllerFindRollenerweiterungenByServiceProviderId(
+            filter.id,
+            filter.offset,
+            filter.limit,
+          );
+
+        this.rollenerweiterungen = data;
+
+        // transform into displayable overview grouped by organisationId
+        const rollenerweiterungMap: Map<string, RollenerweiterungMap> = new Map<string, RollenerweiterungMap>();
+
+        for (const item of data.items ?? []) {
+          const orgId: string = item.organisationId;
+          if (!rollenerweiterungMap.has(orgId)) {
+            rollenerweiterungMap.set(orgId, {
+              id: orgId,
+              kennung: item.organisationKennung,
+              schule: item.organisationName,
+              rollen: new Set<string>(),
+            });
+          }
+
+          rollenerweiterungMap.get(orgId)!.rollen.add(item.rolleName);
+        }
+        // build the final array expected by the table
+        const rollenerweiterungenUebersicht: RollenErweiterungenUebersicht[] = Array.from(
+          rollenerweiterungMap.values(),
+        ).map((g: RollenerweiterungMap) => ({
+          id: g.id,
+          kennung: g.kennung,
+          schule: g.schule,
+          rollenerweiterungen: Array.from(g.rollen).join(', '),
+        }));
+        this.rollenerweiterungenUebersicht = rollenerweiterungenUebersicht;
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
