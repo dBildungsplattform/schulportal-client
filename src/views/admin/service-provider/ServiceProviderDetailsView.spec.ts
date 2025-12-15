@@ -12,10 +12,12 @@ import { DoFactory } from 'test/DoFactory';
 import type { MockInstance } from 'vitest';
 import { nextTick } from 'vue';
 import type WrapperLike from 'node_modules/@vue/test-utils/dist/interfaces/wrapperLike';
+import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
 const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
+const authStore: AuthStore = useAuthStore();
 
 const mockServiceProvider: ManageableServiceProviderDetail = DoFactory.getManageableServiceProviderDetail({availableForRollenerweiterung: true});
 
@@ -53,6 +55,7 @@ beforeEach(async () => {
   const mockItems = Array.from({ length: 2 }, () => DoFactory.getRollenerweiterungItem());
   serviceProviderStore.rollenerweiterungen = DoFactory.getRollenerweiterungenResponse(mockItems);
   serviceProviderStore.rollenerweiterungenUebersicht = DoFactory.buildRollenerweiterungenUebersicht(mockItems);
+  authStore.hasRollenerweiternPermission = true;
 });
 
 describe('ServiceProviderDetailsView', () => {
