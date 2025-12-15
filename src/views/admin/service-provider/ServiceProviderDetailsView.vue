@@ -23,9 +23,9 @@
 
   type ReadonlyHeaders = Headers;
   const headers: ReadonlyHeaders = [
-    { title: t('admin.schule.dienststellennummer'), key: 'kennung', align: 'start' },
-    { title: t('admin.schule.schulname'), key: 'schule', align: 'start' },
-    { title: t('angebot.erweiterteRollen'), key: 'rollenerweiterungen', align: 'start' },
+    { title: t('admin.schule.dienststellennummer'), key: 'kennung', align: 'start', sortable: false },
+    { title: t('admin.schule.schulname'), key: 'schule', align: 'start', sortable: false },
+    { title: t('angebot.erweiterteRollen'), key: 'rollenerweiterungen', align: 'start', sortable: false },
   ];
 
   const rollenerweiterungPage: Ref<number> = ref(1);
@@ -292,9 +292,9 @@
 
             <!-- Header row + chevron -->
             <v-row
-              class="ml-md-16"
+              class="ml-sm-16 mt-2"
               align="center"
-             
+              no-gutters
             >
               <v-col cols="auto">
                 <h3
