@@ -239,22 +239,23 @@
       const merkmaleToSubmit: RollenMerkmal[] = selectedMerkmale.value?.map((m: RollenMerkmal) => m) || [];
       const systemrechteToSubmit: RollenSystemRecht[] =
         selectedSystemRechte.value?.map((m: RollenSystemRecht) => m) || [];
-      await rolleStore
-        .createRolle(
-          selectedRollenName.value,
-          selectedAdministrationsebene.value,
-          selectedRollenArt.value,
-          merkmaleToSubmit,
-          systemrechteToSubmit,
-        )
-        .then(async () => {
-          if (selectedServiceProviders.value && selectedServiceProviders.value.length > 0) {
-            await rolleStore.updateServiceProviderInRolle(rolleStore.createdRolle?.id ?? '', {
-              serviceProviderIds: selectedServiceProviders.value,
-              version: rolleStore.currentRolle?.version || 1,
-            });
-          }
+      await rolleStore.createRolle(
+        selectedRollenName.value,
+        selectedAdministrationsebene.value,
+        selectedRollenArt.value,
+        merkmaleToSubmit,
+        systemrechteToSubmit,
+      );
+      // If the creation failed, do not proceed with assigning service providers
+      if (rolleStore.errorCode) {
+        return;
+      }
+      if (selectedServiceProviders.value && selectedServiceProviders.value.length > 0) {
+        await rolleStore.updateServiceProviderInRolle(rolleStore.createdRolle?.id ?? '', {
+          serviceProviderIds: selectedServiceProviders.value,
+          version: rolleStore.currentRolle?.version || 1,
         });
+      }
       formContext.resetForm();
 
       if (rolleStore.createdRolle) {
@@ -277,11 +278,11 @@
     </h1>
     <LayoutCard
       :closable="!rolleStore.errorCode"
-      data-testid="rolle-creation-card"
+      @onCloseClicked="navigateToRolleManagement"
       :header="$t('admin.rolle.addNew')"
+      headlineTestId="rolle-creation-headline"
       :padded="true"
-      :show-close-text="true"
-      @on-close-clicked="navigateToRolleManagement"
+      :showCloseText="true"
     >
       <!-- The form to create a new Rolle -->
       <template v-if="!rolleStore.createdRolle">

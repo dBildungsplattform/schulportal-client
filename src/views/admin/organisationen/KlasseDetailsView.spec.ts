@@ -84,7 +84,7 @@ beforeEach(async () => {
 
 describe('KlassenDetailsView', () => {
   test('it renders the klasse details view and its components', () => {
-    expect(wrapper?.find('[data-testid="klasse-details-card"]').isVisible()).toBe(true);
+    expect(wrapper?.find('[data-testid="klasse-details-headline"]').isVisible()).toBe(true);
     expect(wrapper?.findComponent({ ref: 'klasse-creation-form' }).isVisible()).toBe(true);
     expect(wrapper?.findComponent({ ref: 'klasse-delete' }).isVisible()).toBe(true);
     expect(wrapper?.find('[data-testid="klasse-form-schule-select"]').text()).toEqual('1234654 (BTC Schule)');
