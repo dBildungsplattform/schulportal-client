@@ -11,12 +11,15 @@ import {
 import { DoFactory } from 'test/DoFactory';
 import type { MockInstance } from 'vitest';
 import { nextTick } from 'vue';
+import type WrapperLike from 'node_modules/@vue/test-utils/dist/interfaces/wrapperLike';
+import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
 const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
+const authStore: AuthStore = useAuthStore();
 
-const mockServiceProvider: ManageableServiceProviderDetail = DoFactory.getManageableServiceProviderDetail();
+const mockServiceProvider: ManageableServiceProviderDetail = DoFactory.getManageableServiceProviderDetail({availableForRollenerweiterung: true});
 
 beforeEach(async () => {
   setActivePinia(createPinia());
@@ -49,6 +52,10 @@ beforeEach(async () => {
     },
   });
   serviceProviderStore.currentServiceProvider = mockServiceProvider;
+  const mockItems = Array.from({ length: 2 }, () => DoFactory.getRollenerweiterungItem());
+  serviceProviderStore.rollenerweiterungen = DoFactory.getRollenerweiterungenResponse(mockItems);
+  serviceProviderStore.rollenerweiterungenUebersicht = DoFactory.buildRollenerweiterungenUebersicht(mockItems);
+  authStore.hasRollenerweiternPermission = true;
 });
 
 describe('ServiceProviderDetailsView', () => {
@@ -84,5 +91,52 @@ describe('ServiceProviderDetailsView', () => {
     await wrapper?.find('[data-testid$="alert-button"]').trigger('click');
 
     expect(push).toHaveBeenCalledTimes(1);
+  });
+
+  test('it reloads data after changing page', async () => {
+    await wrapper?.find('[data-testid="open-schulspezifische-rollenerweiterungen-section-headline-button"]').trigger('click');
+    await nextTick();
+    expect(wrapper?.find('.v-pagination__next button.v-btn--disabled').isVisible()).toBe(true);
+    expect(wrapper?.find('.v-data-table-footer__info').text()).toContain('1-2');
+
+    if (serviceProviderStore.rollenerweiterungen) {
+      serviceProviderStore.rollenerweiterungen.total = 50;
+    }
+    await nextTick();
+
+    expect(wrapper?.find('.v-data-table-footer__info').text()).toContain('1-30');
+    expect(wrapper?.find('.v-pagination__next button:not(.v-btn--disabled)').isVisible()).toBe(true);
+    await wrapper?.find('.v-pagination__next button:not(.v-btn--disabled)').trigger('click');
+    expect(wrapper?.find('.v-data-table-footer__info').text()).toContain('31-50');
+  });
+
+  test('it reloads data after changing limit', async () => {
+    await wrapper?.find('[data-testid="open-schulspezifische-rollenerweiterungen-section-headline-button"]').trigger('click');
+    await nextTick();
+    /* check for both cases, first if total is greater than, afterwards if total is less or equal than chosen limit */
+    if (serviceProviderStore.rollenerweiterungen) {
+      serviceProviderStore.rollenerweiterungen.total = 50;
+    }
+    await nextTick();
+
+    expect(wrapper?.find('.v-data-table-footer__items-per-page').isVisible()).toBe(true);
+    expect(wrapper?.find('.v-data-table-footer__items-per-page').text()).toContain('30');
+
+    const itemsPerPageSelection: WrapperLike | undefined = wrapper?.findComponent(
+      '.v-data-table-footer__items-per-page .v-select',
+    );
+    await itemsPerPageSelection?.setValue(50);
+
+    expect(wrapper?.find('.v-data-table-footer__items-per-page').text()).toContain('50');
+
+    if (serviceProviderStore.rollenerweiterungen) {
+      serviceProviderStore.rollenerweiterungen.total = 30;
+    }
+    await itemsPerPageSelection?.setValue(30);
+
+    expect(wrapper?.find('.v-data-table-footer__items-per-page').text()).toContain('30');
+    if (serviceProviderStore.rollenerweiterungen) {
+      serviceProviderStore.rollenerweiterungen.total = 3;
+    }
   });
 });
