@@ -5349,9 +5349,9 @@
         "type": "oauth2",
         "flows": {
           "authorizationCode": {
-            "authorizationUrl": "https://spsh-3026-keycloak.dev.spsh.dbildungsplattform.de/realms/SPSH/protocol/openid-connect/auth",
-            "tokenUrl": "https://spsh-3026-keycloak.dev.spsh.dbildungsplattform.de/realms/SPSH/protocol/openid-connect/token",
-            "refreshUrl": "https://spsh-3026-keycloak.dev.spsh.dbildungsplattform.de/realms/SPSH/protocol/openid-connect/token",
+            "authorizationUrl": "http://localhost:8080/realms/SPSH/protocol/openid-connect/auth",
+            "tokenUrl": "http://localhost:8080/realms/SPSH/protocol/openid-connect/token",
+            "refreshUrl": "http://localhost:8080/realms/SPSH/protocol/openid-connect/token",
             "scopes": {}
           }
         }
