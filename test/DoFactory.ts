@@ -14,7 +14,9 @@ import {
   type PersonLandesbediensteterSearchPersonenkontextResponse,
   type PersonLandesbediensteterSearchResponse,
   type PersonResponse,
+  type ProviderControllerFindRollenerweiterungenByServiceProviderId200Response,
   RollenArt,
+  type RollenerweiterungWithExtendedDataResponse,
   RollenMerkmal,
   RollenSystemRechtEnum,
   type RollenSystemRechtServiceProviderIDResponse,
@@ -29,7 +31,11 @@ import type { Organisation } from '@/stores/OrganisationStore';
 import type { PersonenkontextWorkflowResponse } from '@/stores/PersonenkontextStore';
 import { type Personendatensatz } from '@/stores/PersonStore';
 import type { Rolle, RolleResponse } from '@/stores/RolleStore';
-import { type ManageableServiceProviderDetail } from '@/stores/ServiceProviderStore';
+import {
+  type RollenErweiterungenUebersicht,
+  type RollenerweiterungMap,
+  type ManageableServiceProviderDetail,
+} from '@/stores/ServiceProviderStore';
 import type { Person } from '@/stores/types/Person';
 import { PersonenUebersicht } from '@/stores/types/PersonenUebersicht';
 import { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
@@ -449,7 +455,68 @@ export class DoFactory {
     return {
       ...this.getManageableServiceProviderListEntryResponse(props),
       url: props?.url ?? faker.internet.url(),
-      rollenerweiterungen: [],
+      availableForRollenerweiterung: props?.availableForRollenerweiterung ?? false,
+    };
+  }
+
+  public static buildRollenerweiterungenUebersicht(
+    items: RollenerweiterungWithExtendedDataResponse[],
+  ): RollenErweiterungenUebersicht[] {
+    const map: Map<string, RollenerweiterungMap> = new Map();
+
+    for (const item of items) {
+      const orgId: string = item.organisationId;
+      if (!map.has(orgId)) {
+        map.set(orgId, {
+          id: orgId,
+          kennung: item.organisationKennung,
+          schule: item.organisationName,
+          rollen: new Set<string>(),
+        });
+      }
+      map.get(orgId)!.rollen.add(item.rolleName);
+    }
+
+    return Array.from(map.values()).map((g: RollenerweiterungMap) => ({
+      id: g.id,
+      kennung: g.kennung,
+      schule: g.schule,
+      rollenerweiterungen: Array.from(g.rollen).join(', '),
+    }));
+  }
+
+  public static getRollenerweiterungItem(
+    props?: Partial<RollenerweiterungWithExtendedDataResponse>,
+  ): RollenerweiterungWithExtendedDataResponse {
+    return {
+      id: faker.string.uuid(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      organisationId: faker.string.uuid(),
+      organisationName: faker.company.name(),
+      organisationKennung: faker.string.alphanumeric(6),
+      rolleId: faker.string.uuid(),
+      rolleName: faker.person.jobTitle(),
+      serviceProviderId: faker.string.uuid(),
+      ...props,
+    };
+  }
+
+  public static getRollenerweiterungenResponse(
+    items?: RollenerweiterungWithExtendedDataResponse[],
+    props?: Partial<ProviderControllerFindRollenerweiterungenByServiceProviderId200Response>,
+  ): ProviderControllerFindRollenerweiterungenByServiceProviderId200Response {
+    const generatedItems: RollenerweiterungWithExtendedDataResponse[] =
+      items && items.length > 0
+        ? items
+        : [this.getRollenerweiterungItem(), this.getRollenerweiterungItem(), this.getRollenerweiterungItem()];
+
+    return {
+      items: generatedItems,
+      total: generatedItems.length,
+      offset: props?.offset ?? 0,
+      limit: props?.limit ?? generatedItems.length,
+      ...props,
     };
   }
 

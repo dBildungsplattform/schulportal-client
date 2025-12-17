@@ -1642,11 +1642,11 @@
     </h1>
     <LayoutCard
       :closable="!personStore.errorCode && !personenkontextStore.errorCode"
-      data-testid="person-details-card"
       :header="t('admin.person.edit')"
+      :headlineTestId="'person-details-headline'"
+      @onCloseClicked="navigateToPersonTable"
       :padded="true"
-      :show-close-text="true"
-      @on-close-clicked="navigateToPersonTable"
+      :showCloseText="true"
     >
       <v-container
         v-if="!!personStore.errorCode || !!personenkontextStore.errorCode"
@@ -1921,7 +1921,10 @@
         <v-container class="password-reset">
           <v-row class="ml-md-16">
             <v-col>
-              <h3 class="subtitle-1" data-testid="password-reset-section-headline">
+              <h3
+                class="subtitle-1"
+                data-testid="password-reset-section-headline"
+              >
                 {{ t('person.password') }}
               </h3>
             </v-col>
@@ -2740,7 +2743,10 @@
         <v-container data-testid="person-lock">
           <v-row class="ml-md-16">
             <v-col data-testid="person-lock-info">
-              <h3 class="subtitle-1" data-testid="status-section-headline">
+              <h3
+                class="subtitle-1"
+                data-testid="status-section-headline"
+              >
                 {{ t('admin.person.status') }}
               </h3>
               <template v-if="!personStore.loading">

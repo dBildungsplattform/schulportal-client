@@ -86,7 +86,7 @@ beforeEach(async () => {
 
 describe('RolleDetailsView', () => {
   test('it renders the rolle details view', () => {
-    expect(wrapper?.find('[data-testid="rolle-details-card"]').isVisible()).toBe(true);
+    expect(wrapper?.find('[data-testid="rolle-details-headline"]').isVisible()).toBe(true);
   });
 
   test('it renders data for current rolle', async () => {

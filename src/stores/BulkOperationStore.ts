@@ -271,20 +271,41 @@ export const useBulkOperationStore: StoreDefinition<
               organisationId: selectedKlasseId,
               rolleId: selectedRolleId,
               administriertVon: selectedOrganisation.id,
-              befristung: befristung,
+              befristung: orgaZuordnung.befristung,
             });
           } else {
+            // Get all Klassen the person already has at that organisation
             const klassenZuordnungen: InternalZuordnung[] = currentZuordnungen.filter(
               (z: InternalZuordnung) => z.administriertVon === selectedOrganisation.id,
             );
+            // Get all Klassen the person already has at that organisation with the wanted Rolle
+            const klasseWithWantedRolle: InternalZuordnung[] = klassenZuordnungen.filter(
+              (z: InternalZuordnung) => z.rolleId === selectedRolleId,
+            );
 
-            for (const klasse of klassenZuordnungen) {
-              newZuordnungen.push({
-                organisationId: klasse.organisationId,
-                rolleId: selectedRolleId,
-                administriertVon: selectedOrganisation.id,
-                befristung: befristung,
-              });
+            if (klasseWithWantedRolle.length > 0) {
+              // User already has the Rolle for at least one of the Klassen, just update Befristung
+              for (const klasse of klasseWithWantedRolle) {
+                newZuordnungen.push({
+                  organisationId: klasse.organisationId,
+                  rolleId: selectedRolleId,
+                  administriertVon: selectedOrganisation.id,
+                  befristung: orgaZuordnung.befristung,
+                });
+              }
+            } else {
+              // User doesn't have the Rolle, add one Zuordnung for every Klasse (will fail in the backend, if user has multiple Klassen)
+              const deduplicatedKlassen: string[] = [
+                ...new Set(klassenZuordnungen.map((z: InternalZuordnung) => z.organisationId)),
+              ];
+              for (const klasse of deduplicatedKlassen) {
+                newZuordnungen.push({
+                  organisationId: klasse,
+                  rolleId: selectedRolleId,
+                  administriertVon: selectedOrganisation.id,
+                  befristung: orgaZuordnung.befristung,
+                });
+              }
             }
           }
 
@@ -358,18 +379,31 @@ export const useBulkOperationStore: StoreDefinition<
 
           const existingZuordnungen: Zuordnung[] = personStore.personenuebersicht?.zuordnungen ?? [];
 
-          const updatedZuordnungen: Zuordnung[] = existingZuordnungen.filter((zuordnung: Zuordnung) => {
-            const isExactMatch: boolean = zuordnung.sskId === organisationId && zuordnung.rolleId === rolleId;
-            const isChildOfOrganisation: boolean = zuordnung.administriertVon === organisationId;
+          // Shared predicate: should this Zuordnung be removed for this operation?
+          const shouldRemoveZuordnung = (z: Zuordnung): boolean => {
+            const isExactMatch: boolean = z.sskId === organisationId && z.rolleId === rolleId;
+            const isChildOfOrganisation: boolean = z.administriertVon === organisationId && z.rolleId === rolleId;
 
             // If "lern" type, remove both exact matches and children
             // Otherwise, only remove exact matches
-            if (isRolleLern) {
-              return !(isExactMatch || isChildOfOrganisation);
-            } else {
-              return !isExactMatch;
-            }
-          });
+            return isRolleLern ? isExactMatch || isChildOfOrganisation : isExactMatch;
+          };
+
+          // Check if removing this zuordnung would leave the user with no editable zuordnungen
+          // For LERN rolle, also consider klassen administered by this organisation
+          const remainingEditableZuordnungen: Zuordnung[] = existingZuordnungen.filter(
+            (z: Zuordnung) => !shouldRemoveZuordnung(z) && z.editable,
+          );
+
+          // No remaining editable Zuordnungen means the user will disappear from the admin's list
+          if (remainingEditableZuordnungen.length === 0) {
+            this.currentOperation?.errors.set(personId, 'NO_EDITABLE_ZUORDNUNGEN_LEFT');
+            return;
+          }
+
+          const updatedZuordnungen: Zuordnung[] = existingZuordnungen.filter(
+            (z: Zuordnung) => !shouldRemoveZuordnung(z),
+          );
 
           if (updatedZuordnungen.length === existingZuordnungen.length) {
             return; // No changes needed

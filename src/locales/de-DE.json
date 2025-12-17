@@ -1,12 +1,15 @@
 {
   "angebot": {
     "assignedRollen": "Zugeordnete Rollen",
+    "erweiterteRollen": "Erweiterte Rollen",
     "name": "Name",
     "kategorie": "Kategorie",
     "administrationsebene": "Administrationsebene",
     "rollen": "Rollen",
     "schulspezifischErweitert": "Schulspezifisch erweitert",
     "schulspezifischeRollenerweiterung": "Schulspezifische Rollenerweiterung möglich",
+    "showSchulspezifischeRollenerweiterungen": "Schulspezifische Rollenerweiterungen anzeigen",
+    "notForSchulspezifischeRollenerweiterungenAvailable": "Dieses Angebot kann nicht für schulspezifische Rollenerweiterungen verwendet werden. In diesem Bereich werden daher keine Daten und Funktionen angeboten.",
     "canBeAssignedToRollen": "Darf Rollen hinzugefügt werden",
     "link": "Link",
     "logo": "Logo",
@@ -421,7 +424,7 @@
         "PERSONENKONTEXTE_UPDATE_ERROR": "Geänderte Daten",
         "PERSON_NOT_FOUND": "Benutzer gelöscht",
         "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Zwei-Faktor-Authentifizierung (2FA) erforderlich",
-        "LERN_HAT_KEINE_KLASSE": "Fehlende Klasse"
+        "LERN_NOT_AT_SCHULE_AND_KLASSE": "Fehlende Klasse oder Schule"
       },
       "errors": {
         "fallbackError": "Es ist ein technischer Fehler aufgetreten.",
@@ -437,8 +440,9 @@
         "PERSONENKONTEXTE_UPDATE_ERROR": "Die Zuordnung konnte nicht aktualisiert werden. Bitte versuchen Sie es später erneut.",
         "PERSON_NOT_FOUND": "Der Benutzer wurde seit Ihrer letzten Änderung gelöscht und kann nicht mehr bearbeitet werden.",
         "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Die letzte Aktion konnte nicht ausgeführt werden. Aufgrund von längerer Inaktivität ist eine erneute Authentifizierung mit einem zweiten Faktor erforderlich. Um fortzufahren, klicken Sie bitte auf „Zurück zur Ergebnisliste“ oder „Schließen“. Sie werden anschließend zur Eingabe Ihres zweiten Faktors aufgefordert.",
-        "LERN_HAT_KEINE_KLASSE": "Für die Erstellung eines Schülerkontos ist die Auswahl einer Klasse erforderlich. Bitte wählen Sie eine Klasse aus.",
-        "DUPLICATE_KLASSENKONTEXT_FOR_SAME_ROLLE": "Die neue Rolle kann diesem Benutzer nicht zugeordnet werden, da er entweder diese Rolle schon an einer anderen Klasse besitzt oder mehreren Klassen zugeordnet ist. Bitte nehmen Sie die Änderung per Einzelbearbeitung vor."
+        "LERN_NOT_AT_SCHULE_AND_KLASSE": "Die Rolle kann diesem Benutzer nicht zugeordnet werden, da er der ausgewählten Schule noch nicht zugeordnet ist. Wenn Sie den Benutzer neu zu der Schule hinzufügen möchten, führen Sie dies bitte per Einzelbearbeitung (Schulzuordnung hinzufügen) aus.",
+        "DUPLICATE_KLASSENKONTEXT_FOR_SAME_ROLLE": "Die neue Rolle kann diesem Benutzer nicht zugeordnet werden, da er entweder diese Rolle schon an einer anderen Klasse besitzt oder mehreren Klassen zugeordnet ist. Bitte nehmen Sie die Änderung per Einzelbearbeitung vor.",
+        "NO_EDITABLE_ZUORDNUNGEN_LEFT": "Die Rolle kann diesem Benutzer nicht entzogen werden, da dies die letzte Rollenzuordnung an der Schule ist und er dadurch von der Schule entfernt werden würde. Wenn Sie den Benutzer von der Schule entfernen möchten, führen Sie dies per Einzelbearbeitung (Schulzuordnung entfernen) oder über die Funktion Schulzuordnung(en) aufheben in der Mehrfachbearbeitung aus."
       }
     },
     "rolle": {
@@ -465,7 +469,7 @@
         "ADD_SYSTEMRECHT_ERROR": "Das Systemrecht konnte nicht hinzugefügt werden.",
         "NEWER_VERSION_OF_ROLLE_AVAILABLE": "Die Rolle wurde zwischenzeitlich von einer anderen Administratorin oder einem anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut.",
         "ROLLE_ERROR": "Die Rolle konnte nicht angelegt werden.",
-        "ROLLE_HAT_PERSONENKONTEXTE_ERROR": "Die Rolle kann nicht gelöscht werden, da die sie noch Benutzern zugeordnet ist. Nehmen Sie bitte zunächst alle Zuordnungen zurück.",
+        "ROLLE_HAT_PERSONENKONTEXTE_ERROR": "Die Rolle kann nicht gelöscht werden, da sie noch Benutzern zugeordnet ist. Nehmen Sie bitte zunächst alle Zuordnungen zurück.",
         "ROLLE_NAME_UNIQUE_ON_SSK": "Der Rollenname ist bereits vergeben. Bitte korrigieren Sie Ihre Eingabe.",
         "UPDATE_MERKMALE_ERROR": "Die gewünschte Bearbeitung kann nicht ausgeführt werden, da die Rolle noch Benutzern zugeordnet ist. Nehmen Sie bitte zunächst alle Zuordnungen zurück.",
         "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Die letzte Aktion konnte nicht ausgeführt werden. Aufgrund von längerer Inaktivität ist eine erneute Authentifizierung mit einem zweiten Faktor erforderlich. Um fortzufahren, klicken Sie bitte auf „Zurück zur Ergebnisliste“ oder „Schließen“. Sie werden anschließend zur Eingabe Ihres zweiten Faktors aufgefordert.",
@@ -906,6 +910,7 @@
   "willBeCreated": "wird hinzugefügt",
   "willBeRemoved": "wird entfernt",
   "yes": "Ja",
+  "none": "Keine",
   "banner": {
     "hint": "Hinweis: ",
     "kopers": "Die Verwendung dieses Benutzerkontos setzt eine KoPers.-Nr. voraus. Bitte kontaktieren Sie Ihre schulischen Administratorinnen und Administratoren, um eine KoPers.-Nr. eintragen zu lassen. Andernfalls wird Ihr Zugang zum {date} automatisch gesperrt.",

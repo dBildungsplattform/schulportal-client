@@ -366,7 +366,9 @@ describe('PersonCreationView', () => {
     await nextTick();
 
     expect(wrapper.find('[data-testid="admin-headline"]').text()).toBe('Andere Person (neu anlegen)');
-    expect(wrapper.find('[data-testid="layout-card-headline"]').text()).toBe('Andere Person (neu anlegen)');
+    expect(wrapper.find('[data-testid="add-another-state-employee-headline"]').text()).toBe(
+      'Andere Person (neu anlegen)',
+    );
     expect(wrapper.find('[data-testid="person-creation-form-discard-button"]').text()).toBe('Abbrechen');
     expect(wrapper.find('[data-testid="person-creation-form-submit-button"]').text()).toBe('Person anlegen');
 
@@ -696,7 +698,7 @@ describe('PersonCreationView', () => {
     personenkontextStore.landesbediensteteCommitResponse = mockLandesbediensteteCommitResponse;
 
     await nextTick();
-    expect(wrapper.find('[data-testid="landesbediensteter-success-text"]').isVisible()).toBe(true);
+    expect(wrapper.find('[data-testid="state-employee-success-text"]').isVisible()).toBe(true);
   });
 
   test('it renders success template for added Landesbediensteter and navigates back to person management', async () => {
@@ -709,22 +711,22 @@ describe('PersonCreationView', () => {
     personenkontextStore.landesbediensteteCommitResponse = mockLandesbediensteteCommitResponse;
     await nextTick();
 
-    expect(wrapper.find('[data-testid="landesbediensteter-success-text"]').isVisible()).toBe(true);
+    expect(wrapper.find('[data-testid="state-employee-success-text"]').isVisible()).toBe(true);
 
-    expect(wrapper.find('[data-testid="search-another-landesbediensteter-button"]').isVisible()).toBe(true);
+    expect(wrapper.find('[data-testid="search-another-state-employee-button"]').isVisible()).toBe(true);
 
-    wrapper.find('[data-testid="search-another-landesbediensteter-button"]').trigger('click');
+    wrapper.find('[data-testid="search-another-state-employee-button"]').trigger('click');
 
-    expect(wrapper.find('[data-testid="landesbediensteter-success-text"]').isVisible()).toBe(true);
+    expect(wrapper.find('[data-testid="state-employee-success-text"]').isVisible()).toBe(true);
   });
 
   test('it navigates to person details when clicking on btn in success template', async () => {
     personenkontextStore.createdPersonWithKontext = mockCreatedPersonWithKontext;
     await nextTick();
-    expect(wrapper?.find('[data-testid="to-details-button"]').isVisible()).toBe(true);
+    expect(wrapper?.find('[data-testid="go-to-details-button"]').isVisible()).toBe(true);
 
     const push: MockInstance = vi.spyOn(router, 'push');
-    wrapper?.find('[data-testid="to-details-button"]').trigger('click');
+    wrapper?.find('[data-testid="go-to-details-button"]').trigger('click');
     await nextTick();
     expect(push).toHaveBeenCalledWith({ name: 'person-details', params: { id: '1' } });
   });

@@ -8,17 +8,32 @@
   import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { computed, onMounted, type ComputedRef } from 'vue';
+  import { computed, onMounted, ref, type ComputedRef, type Ref } from 'vue';
   import SchulPortalLogo from '@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg';
   import LabeledField from '@/components/admin/LabeledField.vue';
+  import ResultTable, { type Headers } from '@/components/admin/ResultTable.vue';
+  import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 
   const router: Router = useRouter();
   const route: RouteLocationNormalizedLoaded = useRoute();
   const { t }: Composer = useI18n({ useScope: 'global' });
 
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
+  const authStore: AuthStore = useAuthStore();
 
   const currentServiceProviderId: string = route.params['id'] as string;
+
+  type ReadonlyHeaders = Headers;
+  const headers: ReadonlyHeaders = [
+    { title: t('admin.schule.dienststellennummer'), key: 'kennung', align: 'start', sortable: false },
+    { title: t('admin.schule.schulname'), key: 'schule', align: 'start', sortable: false },
+    { title: t('angebot.erweiterteRollen'), key: 'rollenerweiterungen', align: 'start', sortable: false },
+  ];
+
+  const rollenerweiterungPage: Ref<number> = ref(1);
+  const rollenerweiterungPerPage: Ref<number> = ref(30);
+
+  const isOpen: Ref<boolean> = ref(false);
 
   function navigateToServiceProviderTable(): void {
     router.push({ name: 'angebot-management' });
@@ -44,11 +59,40 @@
     }
   });
 
+  async function fetchRollenerweiterungen(): Promise<void> {
+    await serviceProviderStore.getRollenerweiterungenById({
+      id: currentServiceProviderId,
+      offset: (rollenerweiterungPage.value - 1) * rollenerweiterungPerPage.value,
+      limit: rollenerweiterungPerPage.value,
+    });
+  }
+
+  function getPaginatedRollenerweiterungen(page: number): void {
+    rollenerweiterungPage.value = page;
+    fetchRollenerweiterungen();
+  }
+
+  function getPaginatedRollenerweiterungenWithLimit(limit: number): void {
+    /* reset page to 1 if entries are equal to or less than selected limit */
+    if (serviceProviderStore.rollenerweiterungen && serviceProviderStore.rollenerweiterungen.total <= limit) {
+      rollenerweiterungPage.value = 1;
+    }
+
+    rollenerweiterungPerPage.value = limit;
+    fetchRollenerweiterungen();
+  }
+
   onMounted(async () => {
     serviceProviderStore.errorCode = '';
     serviceProviderStore.serviceProviderLogos.clear();
-    await serviceProviderStore.getManageableServiceProviderById(currentServiceProviderId);
-    await serviceProviderStore.getServiceProviderLogoById(currentServiceProviderId);
+
+    await Promise.all([
+      serviceProviderStore.getManageableServiceProviderById(currentServiceProviderId),
+      serviceProviderStore.getServiceProviderLogoById(currentServiceProviderId),
+    ]);
+    if (authStore.hasRollenerweiternPermission) {
+      fetchRollenerweiterungen();
+    }
   });
 </script>
 
@@ -93,50 +137,56 @@
         <v-container class="service-provider-info">
           <div v-if="serviceProviderStore.currentServiceProvider">
             <v-row id="service-provider-info-row">
-              <v-col class="custom-offset" offset="1" offset-sm="1" offset-md="1" offset-lg="1">
+              <v-col
+                class="custom-offset"
+                offset="1"
+                offset-sm="1"
+                offset-md="1"
+                offset-lg="1"
+              >
                 <v-row>
                   <!-- Left column (first 4 fields) -->
                   <v-col
                     cols="12"
                     md="6"
                   >
-                  <div class="compact-spacing">
-                    <!-- Name -->
-                    <LabeledField
-                      :label="t('angebot.name')"
-                      :value="serviceProviderStore.currentServiceProvider.name"
-                      test-id="service-provider-name"
-                    />
+                    <div class="compact-spacing">
+                      <!-- Name -->
+                      <LabeledField
+                        :label="t('angebot.name')"
+                        :value="serviceProviderStore.currentServiceProvider.name"
+                        test-id="service-provider-name"
+                      />
 
-                    <!-- Administrationsebene -->
-                    <LabeledField
-                      :label="t('angebot.administrationsebene')"
-                      :value="serviceProviderStore.currentServiceProvider.administrationsebene.name"
-                      test-id="service-provider-administrationsebene"
-                      no-margin-top
-                    />
+                      <!-- Administrationsebene -->
+                      <LabeledField
+                        :label="t('angebot.administrationsebene')"
+                        :value="serviceProviderStore.currentServiceProvider.administrationsebene.name"
+                        test-id="service-provider-administrationsebene"
+                        no-margin-top
+                      />
 
-                    <!-- Requires 2FA -->
-                    <LabeledField
-                      :label="t('angebot.requires2FA')"
-                      :value="serviceProviderStore.currentServiceProvider.requires2fa ? t('yes') : t('no')"
-                      test-id="service-provider-requires-2fa"
-                      no-margin-top
-                    />
+                      <!-- Requires 2FA -->
+                      <LabeledField
+                        :label="t('angebot.requires2FA')"
+                        :value="serviceProviderStore.currentServiceProvider.requires2fa ? t('yes') : t('no')"
+                        test-id="service-provider-requires-2fa"
+                        no-margin-top
+                      />
 
-                    <!-- Can be assigned to Rollen? -->
-                    <LabeledField
-                      :label="t('angebot.canBeAssignedToRollen')"
-                      :value="
-                        serviceProviderStore.currentServiceProvider.merkmale.some(
-                          (m: ServiceProviderMerkmal) => m === ServiceProviderMerkmal.NachtraeglichZuweisbar,
-                        )
-                          ? t('yes')
-                          : t('no')
-                      "
-                      test-id="service-provider-can-be-assigned-to-rollen"
-                      no-margin-top
-                    />
+                      <!-- Can be assigned to Rollen? -->
+                      <LabeledField
+                        :label="t('angebot.canBeAssignedToRollen')"
+                        :value="
+                          serviceProviderStore.currentServiceProvider.merkmale.some(
+                            (m: ServiceProviderMerkmal) => m === ServiceProviderMerkmal.NachtraeglichZuweisbar,
+                          )
+                            ? t('yes')
+                            : t('no')
+                        "
+                        test-id="service-provider-can-be-assigned-to-rollen"
+                        no-margin-top
+                      />
                     </div>
                   </v-col>
 
@@ -161,7 +211,7 @@
                       :value="serviceProviderStore.currentServiceProvider.kategorie.toLocaleLowerCase()"
                       test-id="service-provider-kategorie"
                       no-margin-top
-                      style="text-transform: capitalize;"
+                      style="text-transform: capitalize"
                     />
 
                     <!-- URL -->
@@ -176,7 +226,9 @@
                     <!-- Rollenerweiterung -->
                     <LabeledField
                       :label="t('angebot.schulspezifischeRollenerweiterung')"
-                      :value="serviceProviderStore.currentServiceProvider.hasRollenerweiterung ? t('yes') : t('no')"
+                      :value="
+                        serviceProviderStore.currentServiceProvider.availableForRollenerweiterung ? t('yes') : t('no')
+                      "
                       test-id="service-provider-rollenerweiterung"
                       no-margin-top
                     />
@@ -185,12 +237,18 @@
               </v-col>
             </v-row>
             <v-divider
-            class="border-opacity-100 rounded mt-16"
-            color="#E5EAEF"
-            thickness="6"
+              class="border-opacity-100 rounded mt-16"
+              color="#E5EAEF"
+              thickness="6"
             ></v-divider>
             <v-row class="mt-n6">
-              <v-col class="custom-offset" offset="1" offset-sm="1" offset-md="1" offset-lg="1">
+              <v-col
+                class="custom-offset"
+                offset="1"
+                offset-sm="1"
+                offset-md="1"
+                offset-lg="1"
+              >
                 <v-row class="mt-4 align-center">
                   <v-col
                     cols="auto"
@@ -203,7 +261,13 @@
                     class="d-flex align-center flex-wrap"
                     data-testid="service-provider-rollen"
                   >
+                    <span
+                      class="text-body ml-n3"
+                      v-if="serviceProviderStore.currentServiceProvider.rollen.length === 0"
+                      >{{ t('none') }}</span
+                    >
                     <v-chip
+                      else
                       v-for="rolle in serviceProviderStore.currentServiceProvider.rollen"
                       :key="rolle.id"
                       class="ma-1"
@@ -222,15 +286,123 @@
             <v-progress-circular indeterminate></v-progress-circular>
           </div>
         </v-container>
+        <div v-if="authStore.hasRollenerweiternPermission">
+          <v-container>
+            <v-divider
+              class="border-opacity-100 rounded"
+              color="#E5EAEF"
+              thickness="6"
+            ></v-divider>
+
+            <!-- Header row + chevron -->
+            <v-row
+              class="ml-sm-16 mt-2"
+              align="center"
+              no-gutters
+            >
+              <v-col cols="auto">
+                <h3
+                  class="subtitle-1"
+                  data-testid="schulspezifische-rollenerweiterungen-section-headline"
+                >
+                  {{ t('angebot.showSchulspezifischeRollenerweiterungen') }}
+                </h3>
+              </v-col>
+
+              <!-- Vuetify chevron -->
+              <v-col cols="auto">
+                <v-btn
+                  data-testid="open-schulspezifische-rollenerweiterungen-section-headline-button"
+                  icon
+                  variant="plain"
+                  size="small"
+                  @click="isOpen = !isOpen"
+                  :aria-expanded="isOpen.toString()"
+                >
+                  <v-icon
+                    class="chevron"
+                    :class="{ rotate: isOpen }"
+                  >
+                    mdi-chevron-down
+                  </v-icon>
+                </v-btn>
+              </v-col>
+            </v-row>
+
+            <!-- Expandable table -->
+            <v-row
+              align="center"
+              class="mx-16 mt-n4"
+              justify="end"
+            >
+              <v-col cols="12">
+                <v-expand-transition>
+                  <div v-show="isOpen">
+                    <template v-if="serviceProviderStore.currentServiceProvider?.availableForRollenerweiterung">
+                      <ResultTable
+                        ref="result-table"
+                        :current-page="rollenerweiterungPage"
+                        data-testid="rollenerweiterungen-table"
+                        :items="serviceProviderStore.rollenerweiterungenUebersicht || []"
+                        :loading="serviceProviderStore.loading"
+                        :headers="headers"
+                        :hide-select="true"
+                        item-value-path="id"
+                        :total-items="serviceProviderStore.rollenerweiterungen?.total || 0"
+                        :items-per-page="rollenerweiterungPerPage"
+                        @on-items-per-page-update="getPaginatedRollenerweiterungenWithLimit"
+                        @on-page-update="getPaginatedRollenerweiterungen"
+                      >
+                        <template #[`item.schule`]="{ item }">
+                          <div
+                            class="ellipsis-wrapper"
+                            :title="item.schule"
+                          >
+                            {{ item.schule }}
+                          </div>
+                        </template>
+
+                        <template #[`item.rollenerweiterungen`]="{ item }">
+                          <div
+                            class="ellipsis-wrapper"
+                            :title="item.rollenerweiterungen"
+                          >
+                            {{ item.rollenerweiterungen }}
+                          </div>
+                        </template>
+                      </ResultTable>
+                    </template>
+                    <template v-else>
+                      <v-row>
+                        <v-col cols="12">
+                          <span class="text-body">
+                            {{ t('angebot.notForSchulspezifischeRollenerweiterungenAvailable') }}</span
+                          >
+                        </v-col>
+                      </v-row>
+                    </template>
+                  </div>
+                </v-expand-transition>
+              </v-col>
+            </v-row>
+          </v-container>
+        </div>
       </div>
     </LayoutCard>
   </div>
 </template>
 
 <style scoped>
-@media (min-width: 1280px) and (max-width: 1600px) {
-  .custom-offset {
-    margin-left: 0 !important; /* removes the Vuetify offset */
+  @media (min-width: 1280px) and (max-width: 1600px) {
+    .custom-offset {
+      margin-left: 0 !important; /* removes the Vuetify offset */
+    }
   }
-}
+
+  .chevron {
+    transition: transform 200ms ease;
+  }
+  .chevron.rotate {
+    transform: rotate(180deg);
+  }
 </style>

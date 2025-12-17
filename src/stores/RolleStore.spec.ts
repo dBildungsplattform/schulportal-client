@@ -69,7 +69,7 @@ describe('rolleStore', () => {
         ['ROLLEN_VERWALTEN'],
       );
       expect(rolleStore.loading).toBe(true);
-      await (createRollePromise);
+      await createRollePromise;
       expect(rolleStore.errorCode).toEqual('ROLLE_ERROR');
       expect(rolleStore.createdRolle).toEqual(null);
       expect(rolleStore.loading).toBe(false);
@@ -84,7 +84,7 @@ describe('rolleStore', () => {
         ['ROLLEN_VERWALTEN'],
       );
       expect(rolleStore.loading).toBe(true);
-      await (createRollePromise);
+      await createRollePromise;
       expect(rolleStore.errorCode).toEqual('SOME_MOCK_SERVER_ERROR');
       expect(rolleStore.createdRolle).toEqual(null);
       expect(rolleStore.loading).toBe(false);
