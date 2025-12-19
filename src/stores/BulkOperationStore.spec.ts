@@ -508,19 +508,17 @@ describe('BulkOperationStore', () => {
         DoFactory.getOrganisationResponse({ id: selectedOrganisationId }),
       ];
 
-                        const existingZuordnungA: DBiamPersonenzuordnungResponse = DoFactory.getDBiamPersonenzuordnungResponse(
-        {
-          rolleId: existingRolleId,
-          editable: true,
-          merkmale: [],
-          rollenArt: RollenArt.Lern,
-          admins: [faker.person.fullName()],
-          befristung: null,
-          administriertVon: faker.string.uuid(),
-          typ: OrganisationsTyp.Schule,
-          sskId: selectedOrganisationId
-        },
-      );
+      const existingZuordnungA: DBiamPersonenzuordnungResponse = DoFactory.getDBiamPersonenzuordnungResponse({
+        rolleId: existingRolleId,
+        editable: true,
+        merkmale: [],
+        rollenArt: RollenArt.Lern,
+        admins: [faker.person.fullName()],
+        befristung: null,
+        administriertVon: faker.string.uuid(),
+        typ: OrganisationsTyp.Schule,
+        sskId: selectedOrganisationId,
+      });
 
       const mockPersonResponse: DBiamPersonenuebersichtResponse = DoFactory.getDBiamPersonenuebersichtResponse({
         personId,
@@ -557,8 +555,8 @@ describe('BulkOperationStore', () => {
       );
 
       expect(spy).toHaveBeenCalledWith(
-                expect.arrayContaining([
-                    { organisationId: selectedOrganisationId, rolleId: existingRolleId, befristung: undefined },
+        expect.arrayContaining([
+          { organisationId: selectedOrganisationId, rolleId: existingRolleId, befristung: undefined },
           { organisationId: selectedOrganisationId, rolleId: selectedRolleId, befristung: undefined },
           { organisationId: selectedKlasseId, rolleId: selectedRolleId, befristung: undefined },
         ]),
@@ -597,19 +595,17 @@ describe('BulkOperationStore', () => {
         },
       );
 
-                  const existingZuordnungA: DBiamPersonenzuordnungResponse = DoFactory.getDBiamPersonenzuordnungResponse(
-        {
-          rolle: faker.person.jobTitle(),
-          editable: true,
-          merkmale: [],
-          rollenArt: RollenArt.Lern,
-          admins: [faker.person.fullName()],
-          befristung: null,
-          administriertVon: faker.string.uuid(),
-          typ: OrganisationsTyp.Schule,
-          sskId: selectedOrganisationId
-        },
-      );
+      const existingZuordnungA: DBiamPersonenzuordnungResponse = DoFactory.getDBiamPersonenzuordnungResponse({
+        rolle: faker.person.jobTitle(),
+        editable: true,
+        merkmale: [],
+        rollenArt: RollenArt.Lern,
+        admins: [faker.person.fullName()],
+        befristung: null,
+        administriertVon: faker.string.uuid(),
+        typ: OrganisationsTyp.Schule,
+        sskId: selectedOrganisationId,
+      });
 
       const mockPersonResponse: DBiamPersonenuebersichtResponse = DoFactory.getDBiamPersonenuebersichtResponse({
         personId,
@@ -702,7 +698,7 @@ describe('BulkOperationStore', () => {
         },
       );
 
-            const existingZuordnungC: DBiamPersonenzuordnungResponse = DoFactory.getDBiamPersonenzuordnungResponse(
+      const existingZuordnungC: DBiamPersonenzuordnungResponse = DoFactory.getDBiamPersonenzuordnungResponse(
         {
           rolle: faker.person.jobTitle(),
           editable: true,
@@ -712,7 +708,7 @@ describe('BulkOperationStore', () => {
           befristung: null,
           administriertVon: faker.string.uuid(),
           typ: OrganisationsTyp.Schule,
-          sskId: selectedOrganisationId
+          sskId: selectedOrganisationId,
         },
         {
           organisation: DoFactory.getOrganisationResponse({
@@ -782,9 +778,9 @@ describe('BulkOperationStore', () => {
       ];
 
       mockAdapter.onGet('/api/dbiam/personenuebersicht/1').replyOnce(500, { i18nKey: 'mockGetError' });
-      mockAdapter
-        .onGet('/api/dbiam/personenuebersicht/2')
-        .replyOnce(200, DoFactory.getDBiamPersonenuebersichtResponse({ 
+      mockAdapter.onGet('/api/dbiam/personenuebersicht/2').replyOnce(
+        200,
+        DoFactory.getDBiamPersonenuebersichtResponse({
           personId: '2',
           zuordnungen: [
             // Person needs existing zuordnung for the organisation
@@ -803,7 +799,8 @@ describe('BulkOperationStore', () => {
               admins: [],
             },
           ],
-        }));
+        }),
+      );
 
       mockAdapter.onPut('/api/personenkontext-workflow/2').replyOnce(500, { i18nKey: 'mockPutError' });
 
@@ -864,7 +861,9 @@ describe('BulkOperationStore', () => {
       );
 
       expect(bulkOperationStore.currentOperation?.errors.size).toBe(1);
-      expect(bulkOperationStore.currentOperation?.errors.get(personId)).toBe('PERSON_HAS_NO_ZUORDNUNG_FOR_ORGANISATION');
+      expect(bulkOperationStore.currentOperation?.errors.get(personId)).toBe(
+        'PERSON_HAS_NO_ZUORDNUNG_FOR_ORGANISATION',
+      );
       expect(bulkOperationStore.currentOperation?.complete).toBe(true);
       expect(bulkOperationStore.currentOperation?.progress).toBe(100);
     });
