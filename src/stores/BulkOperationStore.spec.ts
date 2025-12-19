@@ -12,13 +12,14 @@ import { isBefore } from 'date-fns';
 import { createPinia, setActivePinia } from 'pinia';
 import { DoFactory } from 'test/DoFactory';
 import type { MockInstance } from 'vitest';
-import { OperationType, useBulkOperationStore, type BulkOperationStore } from './BulkOperationStore';
+import { useBulkOperationStore, type BulkOperationStore } from './BulkOperationStore';
 import { OrganisationsTyp, type Organisation } from './OrganisationStore';
 import { usePersonStore, type PersonStore } from './PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from './PersonenkontextStore';
 import { RollenArt } from './RolleStore';
 import { PersonenUebersicht } from './types/PersonenUebersicht';
 import type { Zuordnung } from './types/Zuordnung';
+import { OperationType } from './types/bulkOperationTypes';
 
 const mockAdapter: MockAdapter = new MockAdapter(ApiService);
 

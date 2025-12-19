@@ -20,28 +20,9 @@ import {
   combineZuordnungen,
   hasEditableZuordnungsLeft,
 } from '@/utils/bulkOperations';
-import type { InternalZuordnung } from './types/bulkOperationTypes';
+import { OperationType, type CurrentOperation, type InternalZuordnung } from './types/bulkOperationTypes';
 
 const personenApi: PersonenApiInterface = PersonenApiFactory(undefined, '', axiosApiInstance);
-
-export enum OperationType {
-  MODIFY_ROLLE = 'MODIFY_ROLLE',
-  DELETE_PERSON = 'DELETE_PERSON',
-  RESET_PASSWORD = 'RESET_PASSWORD',
-  ROLLE_UNASSIGN = 'ROLLE_UNASSIGN',
-  ORG_UNASSIGN = 'ORG_UNASSIGN',
-  CHANGE_KLASSE = 'CHANGE_KLASSE',
-}
-
-export type CurrentOperation = {
-  type: OperationType | null;
-  isRunning: boolean;
-  progress: number;
-  complete: boolean;
-  errors: Map<string, string>;
-  data: Map<string, unknown>;
-  successMessage?: string;
-};
 
 type BulkOperationState = {
   currentOperation: CurrentOperation | null;
