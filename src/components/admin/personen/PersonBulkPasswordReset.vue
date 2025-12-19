@@ -2,8 +2,9 @@
   import PersonBulkError from '@/components/admin/personen/PersonBulkError.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { useBulkErrors, type BulkErrorList } from '@/composables/useBulkErrors';
-  import { useBulkOperationStore, type BulkOperationStore, type CurrentOperation } from '@/stores/BulkOperationStore';
+  import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
   import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
+  import type { CurrentOperation } from '@/stores/types/bulkOperationTypes';
   import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
   import { buildCSV, download } from '@/utils/file';
   import { computed, ref, type ComputedRef, type Ref } from 'vue';

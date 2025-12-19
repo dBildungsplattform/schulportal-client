@@ -16,7 +16,6 @@
   import { useOrganisationen } from '@/composables/useOrganisationen';
   import { type TranslatedRolleWithAttrs, useRollen } from '@/composables/useRollen';
   import { type AuthStore, useAuthStore } from '@/stores/AuthStore';
-  import { OperationType } from '@/stores/BulkOperationStore';
   import { type Organisation, type OrganisationStore, useOrganisationStore } from '@/stores/OrganisationStore';
   import { type PersonStore, SortField, usePersonStore } from '@/stores/PersonStore';
   import { type PersonenkontextStore, usePersonenkontextStore } from '@/stores/PersonenkontextStore';
@@ -29,6 +28,7 @@
   } from '@/stores/RolleStore';
   import { type SearchFilterStore, useSearchFilterStore } from '@/stores/SearchFilterStore';
   import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
+  import { OperationType } from '@/stores/types/bulkOperationTypes';
   import { type TranslatedObject } from '@/types.d';
   import { SortOrder } from '@/utils/sorting';
   import { type ComputedRef, type Ref, computed, onMounted, ref, watch, type ComponentPublicInstance } from 'vue';
