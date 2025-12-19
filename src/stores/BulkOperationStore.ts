@@ -114,6 +114,13 @@ export const useBulkOperationStore: StoreDefinition<
       };
     },
 
+    /**
+     * Generic processor function for bulk person operations
+     * @param operationType The type of operation being performed
+     * @param personIDs Array of person IDs to process
+     * @param processFunction Function to process each person ID
+     * @param successMessage Optional success message to set when operation completes with no errors
+     */
     async processPersonOperation<T>(
       operationType: OperationType,
       personIDs: string[],
@@ -241,7 +248,7 @@ export const useBulkOperationStore: StoreDefinition<
 
         const existingZuordnungen: Zuordnung[] = personStore.personenuebersicht?.zuordnungen ?? [];
         const updatedZuordnungen: Zuordnung[] = existingZuordnungen.filter(
-          (z) => z.sskId !== organisationId && z.administriertVon !== organisationId,
+          (z: Zuordnung) => z.sskId !== organisationId && z.administriertVon !== organisationId,
         );
 
         if (updatedZuordnungen.length === existingZuordnungen.length) {
@@ -314,9 +321,12 @@ export const useBulkOperationStore: StoreDefinition<
 
           const existingZuordnungen: Zuordnung[] = personStore.personenuebersicht?.zuordnungen ?? [];
 
+          // Shared predicate: should this Zuordnung be removed for this operation?
           const shouldRemoveZuordnung = (z: Zuordnung): boolean => {
             const isExactMatch: boolean = z.sskId === organisationId && z.rolleId === rolleId;
             const isChildOfOrganisation: boolean = z.administriertVon === organisationId && z.rolleId === rolleId;
+            // If "lern" type, remove both exact matches and children
+            // Otherwise, only remove exact matches
             return isRolleLern ? isExactMatch || isChildOfOrganisation : isExactMatch;
           };
 
@@ -325,10 +335,12 @@ export const useBulkOperationStore: StoreDefinition<
             return;
           }
 
-          const updatedZuordnungen: Zuordnung[] = existingZuordnungen.filter((z) => !shouldRemoveZuordnung(z));
+          const updatedZuordnungen: Zuordnung[] = existingZuordnungen.filter(
+            (z: Zuordnung) => !shouldRemoveZuordnung(z),
+          );
 
           if (updatedZuordnungen.length === existingZuordnungen.length) {
-            return; // No changes needed
+            return;
           }
 
           await personenkontextStore.updatePersonenkontexte(
@@ -376,7 +388,7 @@ export const useBulkOperationStore: StoreDefinition<
             }
           }
 
-          const newZuordnungen: Zuordnung[] = zuordnungenToUpdate.map((z) => {
+          const newZuordnungen: Zuordnung[] = zuordnungenToUpdate.map((z: Zuordnung) => {
             const newZuordnung: Zuordnung = Zuordnung.from(z);
             newZuordnung.sskId = newKlasseId;
             return newZuordnung;
