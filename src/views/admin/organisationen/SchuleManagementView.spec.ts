@@ -1,19 +1,31 @@
-import { expect, test } from 'vitest';
-import { VueWrapper, mount } from '@vue/test-utils';
-import SchuleManagementView from './SchuleManagementView.vue';
+import routes from '@/router/routes';
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
-import { nextTick } from 'vue';
+import { VueWrapper, mount } from '@vue/test-utils';
 import type WrapperLike from 'node_modules/@vue/test-utils/dist/interfaces/wrapperLike';
+import { expect, test } from 'vitest';
+import { nextTick } from 'vue';
+import { createRouter, createWebHistory, type Router } from 'vue-router';
+import SchuleManagementView from './SchuleManagementView.vue';
 
 let wrapper: VueWrapper | null = null;
+let router: Router;
 let organisationStore: OrganisationStore;
 
-beforeEach(() => {
+beforeEach(async () => {
   document.body.innerHTML = `
     <div>
       <div id="app"></div>
     </div>
   `;
+
+
+  router = createRouter({
+    history: createWebHistory(),
+    routes,
+  });
+
+  router.push('/');
+  await router.isReady();
 
   organisationStore = useOrganisationStore();
 
@@ -46,11 +58,7 @@ beforeEach(() => {
       components: {
         SchuleManagementView,
       },
-      mocks: {
-        route: {
-          fullPath: 'full/path',
-        },
-      },
+      plugins: [router],
       provide: {
         organisationStore,
       },
@@ -63,6 +71,8 @@ describe('SchuleManagementView', () => {
     expect(wrapper?.getComponent({ name: 'ResultTable' })).toBeTruthy();
     expect(wrapper?.find('[data-testid="schule-table"]').isVisible()).toBe(true);
     expect(wrapper?.findAll('.v-data-table__tr').length).toBe(2);
+    expect(wrapper?.findAll('[data-testid="open-schule-itslearning-sync-dialog-icon"]').length).toBe(2);
+    expect(wrapper?.findAll('[data-testid="open-schule-delete-dialog-icon"]').length).toBe(2);
   });
 
   test('it reloads data after changing page', async () => {
