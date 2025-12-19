@@ -113,18 +113,22 @@
                 class="text-center"
                 cols="10"
               >
+              <template
+                  v-if="state === State.COMPLETE"
+              >
                 <span
-                  v-if="state === State.COMPLETE && !props.errorMessage"
+                  v-if="!props.errorMessage"
                   :data-testid="`${typForTestId}-delete-success-text`"
                 >
                   {{ props.successMessage }}
                 </span>
                 <span
-                  v-else-if="state === State.COMPLETE && props.errorMessage"
+                  v-else-if="props.errorMessage"
                   :data-testid="`${typForTestId}-delete-error-text`"
                 >
                   {{ props.errorMessage }}
                 </span>
+              </template>
                 <span
                   v-else
                   :data-testid="`${typForTestId}-delete-confirmation-text`"
