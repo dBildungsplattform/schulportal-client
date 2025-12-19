@@ -18,7 +18,6 @@ beforeEach(async () => {
     </div>
   `;
 
-
   router = createRouter({
     history: createWebHistory(),
     routes,

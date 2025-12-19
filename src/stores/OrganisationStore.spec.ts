@@ -1195,7 +1195,10 @@ describe('OrganisationStore', () => {
 
     type ErrorType = string | { i18nKey: string };
 
-    it.each([['some mock server error', 'UNSPECIFIED_ERROR'], [{ i18nKey: 'some mock server error' }, 'some mock server error']])('should handle error', async (error: ErrorType, expectedErrorCode: string) => {
+    it.each([
+      ['some mock server error', 'UNSPECIFIED_ERROR'],
+      [{ i18nKey: 'some mock server error' }, 'some mock server error'],
+    ])('should handle error', async (error: ErrorType, expectedErrorCode: string) => {
       mockadapter.onDelete(endpoint).replyOnce(500, error);
       const deleteOrganisationPromise: Promise<void> = organisationStore.deleteOrganisationById(organisationId);
       expect(organisationStore.loading).toBe(true);

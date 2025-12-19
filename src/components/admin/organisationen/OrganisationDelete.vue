@@ -18,14 +18,14 @@
     errorMessage?: string;
   }
 
-  const props = defineProps<Props>();
+  const props: Props = defineProps<Props>();
 
   // Emits
   interface Emits {
     (event: 'onDeleteOrganisation', organisationId: string): void;
     (event: 'onClose'): void;
   }
-  const emit = defineEmits<Emits>();
+  const emit: Emits = defineEmits<Emits>();
 
   // State
   enum State {
@@ -34,8 +34,8 @@
     COMPLETE,
   }
 
-  const hasTriggeredAction = ref(false);
-  const isClosing = ref(false);
+  const hasTriggeredAction: Ref<boolean> = ref(false);
+  const isClosing: Ref<boolean> = ref(false);
 
   const typForTestId: ComputedRef<string> = computed(() => {
     return props.organisationsTyp.toLowerCase().replace(' ', '-');
@@ -66,7 +66,7 @@
     emit('onClose');
   }
 
-  const resetState = (): void => {
+  const resetState: () => void = (): void => {
     hasTriggeredAction.value = false;
     isClosing.value = false;
   };
@@ -113,22 +113,20 @@
                 class="text-center"
                 cols="10"
               >
-              <template
-                  v-if="state === State.COMPLETE"
-              >
-                <span
-                  v-if="!props.errorMessage"
-                  :data-testid="`${typForTestId}-delete-success-text`"
-                >
-                  {{ props.successMessage }}
-                </span>
-                <span
-                  v-else-if="props.errorMessage"
-                  :data-testid="`${typForTestId}-delete-error-text`"
-                >
-                  {{ props.errorMessage }}
-                </span>
-              </template>
+                <template v-if="state === State.COMPLETE">
+                  <span
+                    v-if="!props.errorMessage"
+                    :data-testid="`${typForTestId}-delete-success-text`"
+                  >
+                    {{ props.successMessage }}
+                  </span>
+                  <span
+                    v-else-if="props.errorMessage"
+                    :data-testid="`${typForTestId}-delete-error-text`"
+                  >
+                    {{ props.errorMessage }}
+                  </span>
+                </template>
                 <span
                   v-else
                   :data-testid="`${typForTestId}-delete-confirmation-text`"

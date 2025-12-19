@@ -1,20 +1,16 @@
 <script setup lang="ts">
   import ResultTable, { type Headers } from '@/components/admin/ResultTable.vue';
-import SearchField from '@/components/admin/SearchField.vue';
-import OrganisationDelete from '@/components/admin/organisationen/OrganisationDelete.vue';
-import ItsLearningSetup from '@/components/admin/schulen/itsLearningSetup.vue';
-import SpshAlert from '@/components/alert/SpshAlert.vue';
-import LayoutCard from '@/components/cards/LayoutCard.vue';
-import {
-  OrganisationsTyp,
-  useOrganisationStore,
-  type OrganisationStore
-} from '@/stores/OrganisationStore';
-import { RollenSystemRecht } from '@/stores/RolleStore';
-import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
-import { onMounted, ref, type Ref } from 'vue';
-import { useI18n, type Composer } from 'vue-i18n';
-import { onBeforeRouteLeave, useRouter, type Router } from 'vue-router';
+  import SearchField from '@/components/admin/SearchField.vue';
+  import OrganisationDelete from '@/components/admin/organisationen/OrganisationDelete.vue';
+  import ItsLearningSetup from '@/components/admin/schulen/itsLearningSetup.vue';
+  import SpshAlert from '@/components/alert/SpshAlert.vue';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+  import { RollenSystemRecht } from '@/stores/RolleStore';
+  import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
+  import { onMounted, ref, type Ref } from 'vue';
+  import { useI18n, type Composer } from 'vue-i18n';
+  import { onBeforeRouteLeave, useRouter, type Router } from 'vue-router';
 
   const organisationStore: OrganisationStore = useOrganisationStore();
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
@@ -185,7 +181,9 @@ import { onBeforeRouteLeave, useRouter, type Router } from 'vue-router';
               :organisations-typ="OrganisationsTyp.Schule"
               :organisation-id="item.id"
               :header-text="$t('admin.schule.deleteSchuleHeader', { schulname: item.name })"
-              :confirmation-message="$t('admin.schule.deleteSchuleConfirmation', { dienststellennummer: item.kennung, schulname: item.name })"
+              :confirmation-message="
+                $t('admin.schule.deleteSchuleConfirmation', { dienststellennummer: item.kennung, schulname: item.name })
+              "
               :success-message="$t('admin.schule.deleteSchuleSuccess', { schulname: item.name })"
               :error-message="
                 organisationStore.errorCode ? $t(`admin.schule.errors.${organisationStore.errorCode}`) : ''
