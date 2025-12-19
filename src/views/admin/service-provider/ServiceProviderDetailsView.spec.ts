@@ -19,7 +19,9 @@ let router: Router;
 const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
 const authStore: AuthStore = useAuthStore();
 
-const mockServiceProvider: ManageableServiceProviderDetail = DoFactory.getManageableServiceProviderDetail({availableForRollenerweiterung: true});
+const mockServiceProvider: ManageableServiceProviderDetail = DoFactory.getManageableServiceProviderDetail({
+  availableForRollenerweiterung: true,
+});
 
 beforeEach(async () => {
   setActivePinia(createPinia());
@@ -94,7 +96,9 @@ describe('ServiceProviderDetailsView', () => {
   });
 
   test('it reloads data after changing page', async () => {
-    await wrapper?.find('[data-testid="open-schulspezifische-rollenerweiterungen-section-headline-button"]').trigger('click');
+    await wrapper
+      ?.find('[data-testid="open-schulspezifische-rollenerweiterungen-section-headline-button"]')
+      .trigger('click');
     await nextTick();
     expect(wrapper?.find('.v-pagination__next button.v-btn--disabled').isVisible()).toBe(true);
     expect(wrapper?.find('.v-data-table-footer__info').text()).toContain('1-2');
@@ -111,7 +115,9 @@ describe('ServiceProviderDetailsView', () => {
   });
 
   test('it reloads data after changing limit', async () => {
-    await wrapper?.find('[data-testid="open-schulspezifische-rollenerweiterungen-section-headline-button"]').trigger('click');
+    await wrapper
+      ?.find('[data-testid="open-schulspezifische-rollenerweiterungen-section-headline-button"]')
+      .trigger('click');
     await nextTick();
     /* check for both cases, first if total is greater than, afterwards if total is less or equal than chosen limit */
     if (serviceProviderStore.rollenerweiterungen) {
