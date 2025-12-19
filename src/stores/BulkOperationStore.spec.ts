@@ -766,61 +766,107 @@ describe('BulkOperationStore', () => {
       );
     });
 
-it('should handle errors from both endpoints gracefully', async () => {
-  const personIds: string[] = ['1', '2'];
-  const selectedOrganisationId: string = 'org-123';
-  const selectedRolleId: string = 'rolle-456';
+    it('should handle errors from both endpoints gracefully', async () => {
+      const personIds: string[] = ['1', '2'];
+      const selectedOrganisationId: string = 'org-123';
+      const selectedRolleId: string = 'rolle-456';
 
-  const workflowStepResponseOrganisations: Organisation[] = [
-    {
-      id: 'org-123',
-      name: 'Test Schule',
-      kennung: 'SCH123',
-      administriertVon: 'adminId',
-    } as Organisation,
-  ];
-
-  mockAdapter.onGet('/api/dbiam/personenuebersicht/1').replyOnce(500, { i18nKey: 'mockGetError' });
-  mockAdapter
-    .onGet('/api/dbiam/personenuebersicht/2')
-    .replyOnce(200, DoFactory.getDBiamPersonenuebersichtResponse({ 
-      personId: '2',
-      zuordnungen: [
-        // Person needs existing zuordnung for the organisation
+      const workflowStepResponseOrganisations: Organisation[] = [
         {
-          sskId: selectedOrganisationId,
-          rolleId: faker.string.uuid(),
-          sskName: faker.company.name(),
-          sskDstNr: faker.string.numeric(6),
-          rolle: faker.person.jobTitle(),
-          typ: OrganisationsTyp.Schule,
-          rollenArt: RollenArt.Lern,
-          administriertVon: faker.string.uuid(),
-          editable: true,
-          befristung: null,
-          merkmale: [],
-          admins: [],
-        },
-      ],
-    }));
+          id: 'org-123',
+          name: 'Test Schule',
+          kennung: 'SCH123',
+          administriertVon: 'adminId',
+        } as Organisation,
+      ];
 
-  mockAdapter.onPut('/api/personenkontext-workflow/2').replyOnce(500, { i18nKey: 'mockPutError' });
+      mockAdapter.onGet('/api/dbiam/personenuebersicht/1').replyOnce(500, { i18nKey: 'mockGetError' });
+      mockAdapter
+        .onGet('/api/dbiam/personenuebersicht/2')
+        .replyOnce(200, DoFactory.getDBiamPersonenuebersichtResponse({ 
+          personId: '2',
+          zuordnungen: [
+            // Person needs existing zuordnung for the organisation
+            {
+              sskId: selectedOrganisationId,
+              rolleId: faker.string.uuid(),
+              sskName: faker.company.name(),
+              sskDstNr: faker.string.numeric(6),
+              rolle: faker.person.jobTitle(),
+              typ: OrganisationsTyp.Schule,
+              rollenArt: RollenArt.Lern,
+              administriertVon: faker.string.uuid(),
+              editable: true,
+              befristung: null,
+              merkmale: [],
+              admins: [],
+            },
+          ],
+        }));
 
-  const modifyPromise: Promise<void> = bulkOperationStore.bulkModifyPersonenRolle(
-    personIds,
-    selectedOrganisationId,
-    selectedRolleId,
-    workflowStepResponseOrganisations,
-  );
+      mockAdapter.onPut('/api/personenkontext-workflow/2').replyOnce(500, { i18nKey: 'mockPutError' });
 
-  await modifyPromise;
+      const modifyPromise: Promise<void> = bulkOperationStore.bulkModifyPersonenRolle(
+        personIds,
+        selectedOrganisationId,
+        selectedRolleId,
+        workflowStepResponseOrganisations,
+      );
 
-  expect(bulkOperationStore.currentOperation?.errors.size).toBe(2);
-  expect(bulkOperationStore.currentOperation?.errors.get(personIds[0]!)).toBe('mockGetError');
-  expect(bulkOperationStore.currentOperation?.errors.get(personIds[1]!)).toBe('mockPutError');
-  expect(bulkOperationStore.currentOperation?.progress).toBe(100);
-  expect(bulkOperationStore.currentOperation?.complete).toBe(true);
-});
+      await modifyPromise;
+
+      expect(bulkOperationStore.currentOperation?.errors.size).toBe(2);
+      expect(bulkOperationStore.currentOperation?.errors.get(personIds[0]!)).toBe('mockGetError');
+      expect(bulkOperationStore.currentOperation?.errors.get(personIds[1]!)).toBe('mockPutError');
+      expect(bulkOperationStore.currentOperation?.progress).toBe(100);
+      expect(bulkOperationStore.currentOperation?.complete).toBe(true);
+    });
+
+    it('should set error when person has no zuordnung for the selected organisation', async () => {
+      const personId: string = faker.string.uuid();
+      const selectedOrganisationId: string = faker.string.uuid();
+      const selectedRolleId: string = faker.string.uuid();
+      const differentOrganisationId: string = faker.string.uuid();
+
+      const workflowStepResponseOrganisations: Organisation[] = [
+        DoFactory.getOrganisationResponse({ id: selectedOrganisationId }),
+      ];
+
+      // Person has zuordnung for a DIFFERENT organisation, not the selected one
+      const mockPersonResponse: DBiamPersonenuebersichtResponse = DoFactory.getDBiamPersonenuebersichtResponse({
+        personId,
+        zuordnungen: [
+          {
+            sskId: differentOrganisationId, // Different organisation
+            rolleId: faker.string.uuid(),
+            sskName: 'Other Org',
+            sskDstNr: '456',
+            rolle: 'Some Role',
+            typ: OrganisationsTyp.Schule,
+            rollenArt: RollenArt.Lern,
+            administriertVon: faker.string.uuid(),
+            editable: true,
+            befristung: null,
+            merkmale: [],
+            admins: [],
+          },
+        ],
+      });
+
+      mockAdapter.onGet(`/api/dbiam/personenuebersicht/${personId}`).replyOnce(200, mockPersonResponse);
+
+      await bulkOperationStore.bulkModifyPersonenRolle(
+        [personId],
+        selectedOrganisationId,
+        selectedRolleId,
+        workflowStepResponseOrganisations,
+      );
+
+      expect(bulkOperationStore.currentOperation?.errors.size).toBe(1);
+      expect(bulkOperationStore.currentOperation?.errors.get(personId)).toBe('PERSON_HAS_NO_ZUORDNUNG_FOR_ORGANISATION');
+      expect(bulkOperationStore.currentOperation?.complete).toBe(true);
+      expect(bulkOperationStore.currentOperation?.progress).toBe(100);
+    });
   });
 
   describe('bulkPersonenDelete', () => {
