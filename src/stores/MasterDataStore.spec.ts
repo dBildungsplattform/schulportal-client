@@ -45,7 +45,7 @@ describe('MasterDataStore', () => {
     expect(store.systemrechte).toEqual([]);
   });
 
-  it('isInitialized should return true only if status is Initialized', async () => {
+  it('isInitialized should return true only if status is Initialized', () => {
     expect(store.isInitialized()).toBe(false);
     store.status = MasterDataStatus.Initialized;
     expect(store.isInitialized()).toBe(true);

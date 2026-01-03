@@ -391,18 +391,17 @@ describe('PersonenkontextStore', () => {
       await getPersonenkontextRolleWithFilterPromise;
       expect(personenkontextStore.filteredRollen?.moeglicheRollen).toEqual(
         mockResponse.moeglicheRollen.map(
-          (rr: RolleResponse): Omit<RolleResponse, 'merkmale' | 'systemrechte'> =>
-            expect.objectContaining({
-              id: rr.id,
-              createdAt: rr.createdAt,
-              updatedAt: rr.updatedAt,
-              name: rr.name,
-              administeredBySchulstrukturknoten: rr.administeredBySchulstrukturknoten,
-              rollenart: rr.rollenart,
-              administeredBySchulstrukturknotenName: rr.administeredBySchulstrukturknotenName,
-              administeredBySchulstrukturknotenKennung: rr.administeredBySchulstrukturknotenKennung,
-              version: rr.version,
-            }),
+          (rr: RolleResponse): Omit<RolleResponse, 'merkmale' | 'systemrechte'> => ({
+            id: rr.id,
+            createdAt: rr.createdAt,
+            updatedAt: rr.updatedAt,
+            name: rr.name,
+            administeredBySchulstrukturknoten: rr.administeredBySchulstrukturknoten,
+            rollenart: rr.rollenart,
+            administeredBySchulstrukturknotenName: rr.administeredBySchulstrukturknotenName,
+            administeredBySchulstrukturknotenKennung: rr.administeredBySchulstrukturknotenKennung,
+            version: rr.version,
+          }),
         ),
       );
       expect(personenkontextStore.filteredRollen?.total).toEqual(mockResponse.total);

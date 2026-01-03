@@ -8,7 +8,7 @@ import {
   type Router,
 } from 'vue-router';
 import routes from '@/router/routes';
-import { nextTick } from 'vue';
+import { nextTick, type Component } from 'vue';
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import type { OrganisationResponse } from '@/api-client/generated';
 import SchultraegerCreationView from './SchultraegerCreationView.vue';
@@ -30,17 +30,19 @@ let { storedBeforeRouteLeaveCallback }: { storedBeforeRouteLeaveCallback: OnBefo
         _to: RouteLocationNormalized,
         _from: RouteLocationNormalized,
         _next: NavigationGuardNext,
-      ): void => {},
+      ): void => {
+        // intentionally left blank for test hoisting
+      },
     };
   },
 );
 
-function mountComponent(): VueWrapper {
+function mountComponent(): ReturnType<typeof mount<typeof SchultraegerCreationView>> {
   return mount(SchultraegerCreationView, {
     attachTo: document.getElementById('app') || '',
     global: {
       components: {
-        SchultraegerCreationView,
+        SchultraegerCreationView: SchultraegerCreationView as Component,
       },
       plugins: [router],
     },

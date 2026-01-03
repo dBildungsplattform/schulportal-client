@@ -9,7 +9,7 @@ import { faker } from '@faker-js/faker';
 import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import { DoFactory } from 'test/DoFactory';
 import type { MockInstance } from 'vitest';
-import { nextTick } from 'vue';
+import { nextTick, type Component } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import PersonBulkChangeKlasse from './PersonBulkChangeKlasse.vue';
 import type WrapperLike from 'node_modules/@vue/test-utils/dist/interfaces/wrapperLike';
@@ -39,7 +39,7 @@ type Props = {
   selectedSchuleId?: string;
 };
 
-function mountComponent(partialProps: Partial<Props> = {}): VueWrapper {
+function mountComponent(partialProps: Partial<Props> = {}): VueWrapper<InstanceType<typeof PersonBulkChangeKlasse>> {
   const props: Props = {
     isDialogVisible: true,
     selectedSchuleId: mockSchule.id,
@@ -52,7 +52,7 @@ function mountComponent(partialProps: Partial<Props> = {}): VueWrapper {
     props,
     global: {
       components: {
-        PersonBulkChangeKlasse,
+        PersonBulkChangeKlasse: PersonBulkChangeKlasse as Component,
       },
       plugins: [router],
     },
@@ -88,7 +88,7 @@ describe('PersonBulkChangeKlasse', () => {
   });
 
   test('button should be enabled when a new klasse is selected', async () => {
-    const wrapper: VueWrapper = mountComponent();
+    const wrapper: VueWrapper = mountComponent() as VueWrapper;
     await nextTick();
     await wrapper
       .findComponent({ name: 'KlassenFilter' })
@@ -101,7 +101,7 @@ describe('PersonBulkChangeKlasse', () => {
 
   test('clicking the button should call the bulkOperationStore', async () => {
     const spy: MockInstance = vi.spyOn(bulkOperationStore, 'bulkChangeKlasse');
-    const wrapper: VueWrapper = mountComponent();
+    const wrapper: VueWrapper = mountComponent() as VueWrapper;
     await nextTick();
 
     expect(spy).not.toHaveBeenCalled();
@@ -126,7 +126,7 @@ describe('PersonBulkChangeKlasse', () => {
         bulkOperationStore.currentOperation?.errors.set(id, 'error');
       });
     });
-    const wrapper: VueWrapper = mountComponent();
+    const wrapper: VueWrapper = mountComponent() as VueWrapper;
     await nextTick();
 
     expect(spy).not.toHaveBeenCalled();
@@ -147,7 +147,7 @@ describe('PersonBulkChangeKlasse', () => {
   });
 
   test('clicking the close-button should emit close-event', async () => {
-    const wrapper: VueWrapper = mountComponent();
+    const wrapper: VueWrapper = mountComponent() as VueWrapper;
     await nextTick();
 
     const button: Element = document.body.querySelector('[data-testid="bulk-change-klasse-discard-button"]')!;
@@ -190,7 +190,7 @@ describe('PersonBulkChangeKlasse', () => {
     });
 
     test('the success template should not be displayed', async () => {
-      const wrapper: VueWrapper = mountComponent();
+      const wrapper: VueWrapper = mountComponent() as VueWrapper;
       await nextTick();
 
       const successMessageElement: WrapperLike = wrapper.find('[data-testid="bulk-change-klasse-success-text"]');
@@ -222,7 +222,7 @@ describe('PersonBulkChangeKlasse', () => {
 
     test('clicking the close-button should reset the bulkOperationStore', async () => {
       const spy: MockInstance = vi.spyOn(bulkOperationStore, 'resetState');
-      const wrapper: VueWrapper = mountComponent();
+      const wrapper: VueWrapper = mountComponent() as VueWrapper;
       await nextTick();
 
       expect(spy).not.toHaveBeenCalled();

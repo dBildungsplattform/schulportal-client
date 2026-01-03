@@ -27,7 +27,7 @@ type Props = {
   parentId?: string;
 };
 
-function mountComponent(props: Partial<Props> = {}): VueWrapper {
+function mountComponent(props: Partial<Props> = {}): VueWrapper<InstanceType<typeof KlassenFilter>> {
   return mount(KlassenFilter, {
     attachTo: document.getElementById('app') || '',
     props: {
@@ -60,7 +60,7 @@ beforeEach(() => {
   vi.clearAllTimers();
 });
 
-describe('KlassenFilter', async () => {
+describe('KlassenFilter', () => {
   describe.each([[undefined], ['test-component']])('when storeKey is %s', (storeKey: string | undefined) => {
     describe.each([[true], [false]])('when multiple is %s', (multiple: boolean) => {
       describe.each([[true], [false]])('when readonly is %s', (readonly: boolean) => {
@@ -68,7 +68,7 @@ describe('KlassenFilter', async () => {
         const testId: string = storeKey ? `${storeKey}-klasse-select` : 'klasse-select';
 
         test('it renders', () => {
-          const wrapper: VueWrapper = mountComponent(defaultProps);
+          const wrapper: VueWrapper = mountComponent(defaultProps) as VueWrapper;
           expect(wrapper.exists()).toBe(true);
           expect(wrapper.find(`[data-testid="${testId}"]`).isVisible()).toBe(true);
         });
@@ -77,7 +77,7 @@ describe('KlassenFilter', async () => {
           const mockKlasse: Organisation = DoFactory.getKlasse();
           const selectionRef: Ref<Array<string> | string | undefined> = ref(multiple ? [mockKlasse.id] : mockKlasse.id);
 
-          const wrapper: VueWrapper = mountComponent({ ...defaultProps });
+          const wrapper: VueWrapper = mountComponent({ ...defaultProps }) as VueWrapper;
           await wrapper.setProps({ selectedKlassen: selectionRef });
           // no timers are run, so this is before fetching data
           const actualText: string = wrapper.find(`[data-testid="${testId}"]`).text();
@@ -100,7 +100,7 @@ describe('KlassenFilter', async () => {
             organisationIds: expectedIdsInFilter,
           };
 
-          test('it initializes store', async () => {
+          test('it initializes store', () => {
             const spy: MockInstance = vi.spyOn(organisationStore, 'loadKlassenForFilter');
             mountComponent({
               ...defaultProps,
@@ -118,7 +118,7 @@ describe('KlassenFilter', async () => {
               const wrapper: VueWrapper = mountComponent({
                 ...defaultProps,
                 systemrechteForSearch,
-              });
+              }) as VueWrapper;
               // clear initial loading from mock
               vi.runAllTimers();
               loadSpy.mockClear();
@@ -134,12 +134,14 @@ describe('KlassenFilter', async () => {
               const expected: OrganisationenFilter = {
                 ...expectedFilter,
               };
-              if (searchString.length > 0) expected.searchString = searchString;
+              if (searchString.length > 0) {
+                expected.searchString = searchString;
+              }
               const loadSpy: MockInstance = vi.spyOn(organisationStore, 'loadKlassenForFilter');
               const wrapper: VueWrapper = mountComponent({
                 ...defaultProps,
                 systemrechteForSearch,
-              });
+              }) as VueWrapper;
               const klasseSearchInput: ReturnType<VueWrapper['findComponent']> = wrapper.find(`#${testId}`);
               await klasseSearchInput.setValue(searchString);
               vi.runAllTimers();
@@ -153,7 +155,7 @@ describe('KlassenFilter', async () => {
               const wrapper: VueWrapper = mountComponent({
                 ...defaultProps,
                 systemrechteForSearch,
-              });
+              }) as VueWrapper;
               vi.runAllTimers();
               await flushPromises();
               return wrapper;
@@ -179,7 +181,7 @@ describe('KlassenFilter', async () => {
               expect(loadSpy).toHaveBeenLastCalledWith(expect.objectContaining(expected), storeKey);
             });
 
-            describe('and clearing selection', async () => {
+            describe('and clearing selection', () => {
               test('it triggers search', async () => {
                 const wrapper: VueWrapper = await setup();
                 await selectKlasse(wrapper, faker.string.uuid());
@@ -207,35 +209,41 @@ describe('KlassenFilter', async () => {
           test('it correctly initializes input', async () => {
             const mockKlasse: Organisation = DoFactory.getKlasse();
             const selectionRef: Ref<Array<string> | undefined> = ref(undefined);
-            if (id) mockKlasse.id = id;
-            organisationStore.loadKlassenForFilter = vi.fn(async () => {
-              if (!organisationStore.klassenFilters.has(storeKey ?? ''))
+            if (id) {
+              mockKlasse.id = id;
+            }
+            organisationStore.loadKlassenForFilter = vi.fn(() => {
+              if (!organisationStore.klassenFilters.has(storeKey ?? '')) {
                 organisationStore.klassenFilters.set(storeKey ?? '', {
                   filterResult: [],
                   total: 0,
                   loading: false,
                 });
+              }
               organisationStore.klassenFilters.get(storeKey ?? '')!.filterResult = [mockKlasse];
               selectionRef.value = id ? [id] : [];
             });
-            const wrapper: VueWrapper = mountComponent({ ...defaultProps });
+            const wrapper: VueWrapper = mountComponent({ ...defaultProps }) as VueWrapper;
             vi.runAllTimers();
             await wrapper.setProps({ selectedKlassen: selectionRef });
             vi.runAllTimers();
             await nextTick();
             const actualText: string = wrapper.find(`[data-testid="${testId}"]`).text();
-            if (id) expect(actualText).toContain(mockKlasse.name);
-            else expect(actualText).toBe('');
+            if (id) {
+              expect(actualText).toContain(mockKlasse.name);
+            } else {
+              expect(actualText).toBe('');
+            }
           });
         });
 
-        describe.each([[true], [false]])('when highlightSelection is %s', async (highlightSelection: boolean) => {
+        describe.each([[true], [false]])('when highlightSelection is %s', (highlightSelection: boolean) => {
           test('it correctly displays highlight', async () => {
             const selectedKlasseId: string = faker.string.uuid();
             const wrapper: VueWrapper = mountComponent({
               ...defaultProps,
               highlightSelection,
-            });
+            }) as VueWrapper;
             await wrapper
               .findComponent({
                 name: 'v-autocomplete',

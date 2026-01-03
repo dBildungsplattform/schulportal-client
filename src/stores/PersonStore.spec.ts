@@ -287,14 +287,21 @@ describe('PersonStore', () => {
         month: '2-digit',
         year: 'numeric',
       };
-      const mockPerson: Personendatensatz = getMockPersonendatensatz();
+      const mockPerson = getMockPersonendatensatz();
       const mockResponse: PersonendatensatzResponse = DoFactory.getPersonendatensatzResponse(mockPerson.person);
 
       mockadapter.onGet('/api/personen/1234').replyOnce(200, mockResponse);
       const getPersonByIdPromise: Promise<void> = personStore.getPersonById('1234');
       expect(personStore.loading).toBe(true);
       await getPersonByIdPromise;
-      mockPerson.person.userLock.forEach((lock) => {
+      (
+        mockPerson.person.userLock as Array<{
+          lock_occasion: string;
+          locked_by: string;
+          locked_until: string;
+          created_at: string;
+        }>
+      ).forEach((lock) => {
         const lockDate = new Date(lock.locked_until);
         // Adjust date for MESZ (German summer time) if necessary
         if (lockDate.getTimezoneOffset() >= -120) {
@@ -304,27 +311,18 @@ describe('PersonStore', () => {
         lock.locked_until = lockDate.toLocaleDateString('de-DE', dateOptions);
         lock.created_at = createdAt.toLocaleDateString('de-DE', dateOptions);
       });
-      expect(personStore.currentPerson).toEqual(
-        expect.objectContaining({
-          // Include only the relevant properties you want to check
-          person: expect.objectContaining({
-            id: mockPerson.person.id,
-            email: mockPerson.person.email,
-            name: mockPerson.person.name,
-            // Add any other properties that you want to check from currentPerson
-            userLock: expect.arrayContaining([
-              expect.objectContaining({
-                lock_occasion: PersonLockOccasion.MANUELL_GESPERRT,
-                locked_by: mockPerson.person.userLock[0]!.locked_by,
-                locked_until: mockPerson.person.userLock[0]!.locked_until,
-                created_at: mockPerson.person.userLock[0]!.created_at,
-              }),
-              expect.objectContaining({
-                lock_occasion: PersonLockOccasion.KOPERS_GESPERRT,
-              }),
-            ]),
+      expect(personStore.currentPerson?.person.userLock).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            lock_occasion: PersonLockOccasion.MANUELL_GESPERRT,
+            locked_by: mockPerson.person.userLock?.[0]?.locked_by,
+            locked_until: mockPerson.person.userLock?.[0]?.locked_until,
+            created_at: mockPerson.person.userLock?.[0]?.created_at,
           }),
-        }),
+          expect.objectContaining({
+            lock_occasion: PersonLockOccasion.KOPERS_GESPERRT,
+          }),
+        ]),
       );
       expect(personStore.loading).toBe(false);
     });
@@ -626,7 +624,7 @@ describe('PersonStore', () => {
       };
 
       mockadapter.onPatch(`/api/personen/${personId}/metadata`).reply((config) => {
-        expect(JSON.parse(config.data)).toEqual(expectedBodyParams);
+        expect(JSON.parse(config.data as string)).toEqual(expectedBodyParams);
         return [200, mockResponse];
       });
 

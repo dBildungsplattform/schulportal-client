@@ -4,7 +4,7 @@ import {
   useTwoFactorAuthentificationStore,
   type TwoFactorAuthentificationStore,
 } from '@/stores/TwoFactorAuthentificationStore';
-import { nextTick } from 'vue';
+import { nextTick, type Component } from 'vue';
 
 describe('set up two-factor authentication', () => {
   let wrapper: VueWrapper | null = null;
@@ -28,7 +28,7 @@ describe('set up two-factor authentication', () => {
       },
       global: {
         components: {
-          SelfServiceWorkflow,
+          SelfServiceWorkflow: SelfServiceWorkflow as Component,
         },
         mocks: {
           $t: (key: string) => key,
@@ -51,8 +51,8 @@ describe('set up two-factor authentication', () => {
     wrapper?.get('[data-testid="open-2FA-self-service-dialog-icon"]').trigger('click');
     await nextTick();
 
-    await document.querySelector('[data-testid="self-service-dialog-info-text"]');
-    await document.querySelector('[data-testid="self-service-dialog-warning-text"]');
+    document.querySelector('[data-testid="self-service-dialog-info-text"]');
+    document.querySelector('[data-testid="self-service-dialog-warning-text"]');
     expect(document.querySelector('[data-testid="self-service-dialog-info-text"]')).not.toBeNull();
     expect(document.querySelector('[data-testid="self-service-dialog-warning-text"]')).not.toBeNull();
 
@@ -64,8 +64,8 @@ describe('set up two-factor authentication', () => {
 
     expect(twoFactorAuthenticationStore.get2FASoftwareQRCode).toHaveBeenCalled();
 
-    await document.querySelector('[data-testid="self-service-dialog-qr-info-text"]');
-    await document.querySelector('[data-testid="software-token-dialog-progress-bar"]');
+    document.querySelector('[data-testid="self-service-dialog-qr-info-text"]');
+    document.querySelector('[data-testid="software-token-dialog-progress-bar"]');
     expect(document.querySelector('[data-testid="self-service-dialog-qr-info-text"]')).not.toBeNull();
     expect(document.querySelector('[data-testid="software-token-dialog-progress-bar"]')).not.toBeNull();
 
@@ -73,14 +73,14 @@ describe('set up two-factor authentication', () => {
 
     await nextTick();
 
-    await document.querySelector('[data-testid="software-token-dialog-qr-code"]');
+    document.querySelector('[data-testid="software-token-dialog-qr-code"]');
     expect(document.querySelector('[data-testid="software-token-dialog-qr-code"]')).not.toBeNull();
 
     proceedButton?.click();
     await nextTick();
 
-    await document.querySelector('[data-testid="self-service-otp-entry-info-text"]');
-    await document.querySelector('[data-testid="self-service-otp-input"]');
+    document.querySelector('[data-testid="self-service-otp-entry-info-text"]');
+    document.querySelector('[data-testid="self-service-otp-input"]');
     expect(document.querySelector('[data-testid="self-service-otp-entry-info-text"]')).not.toBeNull();
     expect(document.querySelector('[data-testid="self-service-otp-input"]')).not.toBeNull();
 
@@ -118,10 +118,10 @@ describe('set up two-factor authentication', () => {
     twoFactorAuthenticationStore.errorCode = 'error';
     await nextTick();
 
-    await document.querySelector('[data-testid="self-service-token-init-error-text"]');
+    document.querySelector('[data-testid="self-service-token-init-error-text"]');
     expect(document.querySelector('[data-testid="self-service-token-init-error-text"]')).not.toBeNull();
 
-    await document.querySelector('[data-testid="proceed-two-factor-authentication-dialog"]');
+    document.querySelector('[data-testid="proceed-two-factor-authentication-dialog"]');
     expect(document.querySelector('[data-testid="proceed-two-factor-authentication-dialog"]')).toBeNull();
 
     twoFactorAuthenticationStore.errorCode = '';
@@ -134,7 +134,7 @@ describe('set up two-factor authentication', () => {
     twoFactorAuthenticationStore.errorCode = 'error';
     await nextTick();
 
-    await document.querySelector('[data-testid="self-service-otp-error-text"]');
+    document.querySelector('[data-testid="self-service-otp-error-text"]');
     expect(document.querySelector('[data-testid="self-service-otp-error-text"]')).not.toBeNull();
   });
 
@@ -146,7 +146,7 @@ describe('set up two-factor authentication', () => {
       '[data-testid="close-two-factor-authentication-dialog"]',
     );
     expect(originalCloseButton).not.toBeNull();
-    const originalCloseButtonWrapper: DOMWrapper<Element> = new DOMWrapper(originalCloseButton!);
+    const originalCloseButtonWrapper: DOMWrapper<Element> = new DOMWrapper(originalCloseButton);
     await originalCloseButtonWrapper.trigger('click');
     await nextTick();
     const overlayContent: Element | null = document.querySelector('.v-overlay__content');

@@ -12,7 +12,7 @@ import {
   type RolleStore,
   type RolleWithServiceProvidersResponse,
 } from '@/stores/RolleStore';
-import { nextTick } from 'vue';
+import { nextTick, type Component } from 'vue';
 import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import { RollenSystemRechtEnum, type SystemRechtResponse } from '@/api-client/generated';
 
@@ -72,7 +72,7 @@ beforeEach(async () => {
     attachTo: document.getElementById('app') || '',
     global: {
       components: {
-        RolleDetailsView,
+        RolleDetailsView: RolleDetailsView as Component,
       },
       mocks: {
         route: {

@@ -8,7 +8,7 @@ import {
   type Router,
 } from 'vue-router';
 import routes from '@/router/routes';
-import { nextTick } from 'vue';
+import { nextTick, type Component } from 'vue';
 import {
   OrganisationsTyp,
   SchuleType,
@@ -36,7 +36,9 @@ let { storedBeforeRouteLeaveCallback }: { storedBeforeRouteLeaveCallback: OnBefo
         _to: RouteLocationNormalized,
         _from: RouteLocationNormalized,
         _next: NavigationGuardNext,
-      ): void => {},
+      ): void => {
+        // intentionally left blank
+      },
     };
   },
 );
@@ -65,12 +67,12 @@ async function fillForm(args: Partial<FormFields>): Promise<Partial<FormSelector
   return selectors;
 }
 
-function mountComponent(): VueWrapper {
+function mountComponent(): ReturnType<typeof mount<typeof SchultraegerDetailsView>> {
   return mount(SchultraegerDetailsView, {
     attachTo: document.getElementById('app') || '',
     global: {
       components: {
-        SchultraegerDetailsView,
+        SchultraegerDetailsView: SchultraegerDetailsView as Component,
       },
       plugins: [router],
     },
@@ -280,17 +282,18 @@ describe('SchultraegerDetailsView', () => {
     const unassignedSchulen: Organisation[] = (wrapper?.vm as unknown as SchultraegerDetailsView).unassignedSchulen;
 
     // Simulate the event being triggered on RelationshipAssign
-    await wrapper
-      ?.findComponent({ name: 'RelationshipAssign' })
-      .vm.$emit('onHandleUnassignedItemClick', unassignedItem);
+    const relationshipAssignWrapper: VueWrapper = wrapper?.findComponent({ name: 'RelationshipAssign' }) as VueWrapper;
+    relationshipAssignWrapper.vm.$emit('onHandleUnassignedItemClick', unassignedItem);
     await nextTick();
 
     expect(unpersistedSchulenToAssign.some((schule: string) => schule === unassignedItem.id)).toBeTruthy();
 
     // Now simulate a search for the already assigned Schule.
-    await wrapper
-      ?.findComponent({ name: 'RelationshipAssign' })
-      .vm.$emit('onHandleUnassignedItemsSearchFilter', 'Öffentliche Schule A', SchuleType.UNASSIGNED);
+    relationshipAssignWrapper.vm.$emit(
+      'onHandleUnassignedItemsSearchFilter',
+      'Öffentliche Schule A',
+      SchuleType.UNASSIGNED,
+    );
     await nextTick();
 
     // The unassignedSchulen should be empty because the Schule was already assigned
@@ -311,15 +314,21 @@ describe('SchultraegerDetailsView', () => {
     const assignedSchulen: Organisation[] = (wrapper?.vm as unknown as SchultraegerDetailsView).assignedSchulen;
 
     // Simulate the event being triggered on RelationshipAssign
-    await wrapper?.findComponent({ name: 'RelationshipAssign' }).vm.$emit('onHandleAssignedItemClick', assignedItem);
+    const relationshipAssignWrapper: VueWrapper = wrapper?.findComponent({ name: 'RelationshipAssign' }) as VueWrapper;
+    relationshipAssignWrapper.vm.$emit('onHandleAssignedItemClick', assignedItem);
     await flushPromises();
 
     expect(unpersistedSchulenToUnassign.some((schule: string) => schule === assignedItem.id)).toBeTruthy();
 
     // Now simulate a search for the unassigned Schule.
-    await wrapper
-      ?.findComponent({ name: 'RelationshipAssign' })
-      .vm.$emit('onHandleAssignedItemsSearchFilter', 'Zugeordnete Schule A', SchuleType.ASSIGNED);
+    const relationshipAssignComponent: VueWrapper = wrapper?.findComponent({
+      name: 'RelationshipAssign',
+    }) as VueWrapper;
+    relationshipAssignComponent.vm.$emit(
+      'onHandleAssignedItemsSearchFilter',
+      'Zugeordnete Schule A',
+      SchuleType.ASSIGNED,
+    );
     await flushPromises();
 
     // TODO: The assignedSchulen should only contain one schule after the search
@@ -327,7 +336,9 @@ describe('SchultraegerDetailsView', () => {
   });
 
   test('it assigns a new schule and unassigns an existing schule', async () => {
-    if (!wrapper) return;
+    if (!wrapper) {
+      return;
+    }
 
     organisationStore.updatedOrganisation = null;
     organisationStore.errorCode = '';
@@ -410,7 +421,7 @@ describe('SchultraegerDetailsView', () => {
     });
 
     // the traeger type selection is disabled
-    const schultraegerRadioGroup: DOMWrapper<HTMLElement> | undefined = await schultraegerFormWrapper?.find(
+    const schultraegerRadioGroup: DOMWrapper<HTMLElement> | undefined = schultraegerFormWrapper?.find(
       '[data-testid="schultraegerform-radio-group"]',
     );
     expect(schultraegerRadioGroup?.attributes()['class']).toContain('v-input--disabled');
@@ -444,7 +455,9 @@ describe('SchultraegerDetailsView', () => {
   });
 
   test('it searches for unassigned schulen', async () => {
-    if (!wrapper) return;
+    if (!wrapper) {
+      return;
+    }
 
     organisationStore.updatedOrganisation = null;
     organisationStore.errorCode = '';
@@ -472,7 +485,9 @@ describe('SchultraegerDetailsView', () => {
   });
 
   test('it searches for assigned schulen', async () => {
-    if (!wrapper) return;
+    if (!wrapper) {
+      return;
+    }
 
     organisationStore.updatedOrganisation = null;
     organisationStore.errorCode = '';
@@ -536,7 +551,7 @@ describe('SchultraegerDetailsView', () => {
       expect(spy).toHaveBeenCalledOnce();
     });
 
-    test('it does not trigger if form is not dirty', async () => {
+    test('it does not trigger if form is not dirty', () => {
       const expectedCallsToNext: number = 1;
       vi.mock('vue-router', async (importOriginal: () => Promise<Module>) => {
         const mod: Module = await importOriginal();
@@ -554,7 +569,7 @@ describe('SchultraegerDetailsView', () => {
     });
   });
 
-  describe.each([[true], [false]])('when form is dirty:%s', async (isFormDirty: boolean) => {
+  describe.each([[true], [false]])('when form is dirty:%s', (isFormDirty: boolean) => {
     beforeEach(async () => {
       await fillForm({
         schultraegerName: 'Traeger 1',
@@ -562,13 +577,16 @@ describe('SchultraegerDetailsView', () => {
       await nextTick();
     });
 
-    test('it handles unloading', async () => {
+    test('it handles unloading', () => {
       const event: Event = new Event('beforeunload');
       const spy: MockInstance = vi.spyOn(event, 'preventDefault');
       window.dispatchEvent(event);
 
-      if (isFormDirty) expect(spy).toHaveBeenCalled();
-      else expect(spy).not.toHaveBeenCalledOnce();
+      if (isFormDirty) {
+        expect(spy).toHaveBeenCalled();
+      } else {
+        expect(spy).not.toHaveBeenCalledOnce();
+      }
     });
   });
 });

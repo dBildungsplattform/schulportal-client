@@ -8,14 +8,14 @@ describe('dedup', () => {
     [
       ['1', '2', '1'],
       ['1', '2'],
-    ],
+    ] as [string[], string[]],
     [
       ['4', '2', '1'],
       ['4', '2', '1'],
-    ],
-    [Array(250).fill('2'), ['2']],
-    [['1'], ['1']],
-    [[], []],
+    ] as [string[], string[]],
+    [Array(250).fill('2') as string[], ['2']] as [string[], string[]],
+    [['1'], ['1']] as [string[], string[]],
+    [[], []] as [string[], string[]],
   ];
   function mapTestData<T>(converter: (arg: string) => T): Cases<T> {
     return data.map((a: Array<Array<string>>) => a.map((values: Array<string>) => values.map(converter)));
@@ -80,13 +80,13 @@ describe('sameContent', () => {
       expected: false,
     },
     {
-      a: Array(250).fill('1'),
-      b: Array(100).fill('1'),
+      a: Array(250).fill('1') as string[],
+      b: Array(100).fill('1') as string[],
       expected: true,
     },
     {
-      a: Array(100).fill('1'),
-      b: Array(200).fill('2'),
+      a: Array(100).fill('1') as string[],
+      b: Array(200).fill('2') as string[],
       expected: false,
     },
     {
@@ -142,7 +142,7 @@ describe('sameContent', () => {
     test.each(mapTestData(converter))('it returns the expected value', ({ a, b, expected }: Case<NestedType>) => {
       expect(
         sameContent(a, b, (arg: NestedType) => arg.id),
-        `a: ${a}, b: ${b}`,
+        `a: ${JSON.stringify(a)}, b: ${JSON.stringify(b)}`,
       ).toBe(expected);
     });
   });
