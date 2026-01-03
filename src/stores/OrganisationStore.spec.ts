@@ -11,6 +11,7 @@ import {
   type OrganisationenFilter,
   type OrganisationStore,
 } from './OrganisationStore';
+import { flushPromises } from '@vue/test-utils';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 
@@ -1268,7 +1269,7 @@ describe('OrganisationStore', () => {
   });
 
   describe('loadKlassenForFilter', () => {
-    test('it initializes the field, if it does not exist', () => {
+    test('it initializes the field, if it does not exist', async () => {
       const mockResponse: Organisation[] = [DoFactory.getSchule()];
       mockadapter.onGet('/api/organisationen?offset=0&limit=30&typ=KLASSE').replyOnce(200, mockResponse, {
         'x-paging-total': '1',
@@ -1281,6 +1282,7 @@ describe('OrganisationStore', () => {
         },
         'unknownKey',
       );
+      await flushPromises();
       expect(organisationStore.klassenFilters.get('unknownKey')).toBeDefined();
     });
 

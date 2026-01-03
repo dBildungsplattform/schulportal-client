@@ -4,7 +4,7 @@ import {
   useTwoFactorAuthentificationStore,
   type TwoFactorAuthentificationStore,
 } from '@/stores/TwoFactorAuthentificationStore';
-import type { Component } from 'vue';
+import { nextTick, type Component } from 'vue';
 
 let twoFactorAuthenticationStore: TwoFactorAuthentificationStore;
 
@@ -43,17 +43,20 @@ describe('software token workflow', () => {
     expect(document.querySelector('[data-testid="software-token-dialog-qr-code"]')).not.toBeNull();
   });
 
-  test('check for error messages', () => {
+  test('check for error messages', async () => {
     twoFactorAuthenticationStore.errorCode = 'SOFTWARE_TOKEN_INITIALIZATION_ERROR';
+    await nextTick();
 
     document.querySelector('[data-testid="software-token-dialog-error-text"]');
     expect(document.querySelector('[data-testid="software-token-dialog-error-text"]')).not.toBeNull();
 
     twoFactorAuthenticationStore.errorCode = 'test';
+    await nextTick();
     document.querySelector('[data-testid="software-token-dialog-error-text"]');
     expect(document.querySelector('[data-testid="software-token-dialog-error-text"]')).not.toBeNull();
 
     twoFactorAuthenticationStore.errorCode = '';
+    await nextTick();
     document.querySelector('[data-testid="software-token-dialog-error-text"]');
     expect(document.querySelector('[data-testid="software-token-dialog-error-text"]')).toBeNull();
   });

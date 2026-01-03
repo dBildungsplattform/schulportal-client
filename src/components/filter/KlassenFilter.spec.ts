@@ -222,6 +222,7 @@ describe('KlassenFilter', () => {
               }
               organisationStore.klassenFilters.get(storeKey ?? '')!.filterResult = [mockKlasse];
               selectionRef.value = id ? [id] : [];
+              return Promise.resolve();
             });
             const wrapper: VueWrapper = mountComponent({ ...defaultProps }) as VueWrapper;
             vi.runAllTimers();
