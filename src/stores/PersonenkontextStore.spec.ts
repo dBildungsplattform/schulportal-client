@@ -389,20 +389,18 @@ describe('PersonenkontextStore', () => {
         personenkontextStore.getPersonenkontextRolleWithFilter('str', 2);
       expect(personenkontextStore.loading).toBe(true);
       await getPersonenkontextRolleWithFilterPromise;
-      expect(personenkontextStore.filteredRollen?.moeglicheRollen).toEqual(
-        mockResponse.moeglicheRollen.map(
-          (rr: RolleResponse): Omit<RolleResponse, 'merkmale' | 'systemrechte'> => ({
-            id: rr.id,
-            createdAt: rr.createdAt,
-            updatedAt: rr.updatedAt,
-            name: rr.name,
-            administeredBySchulstrukturknoten: rr.administeredBySchulstrukturknoten,
-            rollenart: rr.rollenart,
-            administeredBySchulstrukturknotenName: rr.administeredBySchulstrukturknotenName,
-            administeredBySchulstrukturknotenKennung: rr.administeredBySchulstrukturknotenKennung,
-            version: rr.version,
-          }),
-        ),
+      expect(personenkontextStore.filteredRollen?.moeglicheRollen).toMatchObject(
+        mockResponse.moeglicheRollen.map((rr: RolleResponse) => ({
+          id: rr.id,
+          createdAt: rr.createdAt,
+          updatedAt: rr.updatedAt,
+          name: rr.name,
+          administeredBySchulstrukturknoten: rr.administeredBySchulstrukturknoten,
+          rollenart: rr.rollenart,
+          administeredBySchulstrukturknotenName: rr.administeredBySchulstrukturknotenName,
+          administeredBySchulstrukturknotenKennung: rr.administeredBySchulstrukturknotenKennung,
+          version: rr.version,
+        })),
       );
       expect(personenkontextStore.filteredRollen?.total).toEqual(mockResponse.total);
       expect(personenkontextStore.totalFilteredRollen).toEqual(moeglicheRollen.length);

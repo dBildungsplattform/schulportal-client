@@ -79,8 +79,9 @@ describe('reset password', () => {
     // expect(dialog?.emitted('onResetPassword')).toBeTruthy();
   });
 
-  it('should render the print button if password was reset', () => {
+  it('should render the print button if password was reset', async () => {
     wrapper?.get('[data-testid="open-password-reset-dialog-button"]').trigger('click');
+    await nextTick();
     document.querySelector('[data-testid="password-print-button"]');
     expect(document.querySelector('[data-testid="password-print-button"]')).not.toBeNull();
   });
