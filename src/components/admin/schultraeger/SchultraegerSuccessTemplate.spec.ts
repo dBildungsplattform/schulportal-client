@@ -1,6 +1,7 @@
 import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import SchultraegerSuccessTemplate from './SchultraegerSuccessTemplate.vue';
+import type { Component } from 'vue';
 
 let wrapper: VueWrapper | null = null;
 
@@ -26,7 +27,7 @@ beforeEach(() => {
     },
     global: {
       components: {
-        SchultraegerSuccessTemplate,
+        SchultraegerSuccessTemplate: SchultraegerSuccessTemplate as Component,
       },
     },
   });

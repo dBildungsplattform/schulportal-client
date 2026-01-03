@@ -2,7 +2,7 @@ import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 import { VueWrapper, mount } from '@vue/test-utils';
 import { DoFactory } from 'test/DoFactory';
 import { expect, test, type Mock, type MockInstance } from 'vitest';
-import { h, nextTick } from 'vue';
+import { h, nextTick, type Component } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useDisplay } from 'vuetify';
 import { VApp } from 'vuetify/components';
@@ -18,8 +18,12 @@ vi.mock('vue-router', () => ({
     path: '/',
   })),
   useRouter: vi.fn(() => ({
-    push: (): void => {},
-    go: (): void => {},
+    push: (): void => {
+      // intentionally empty
+    },
+    go: (): void => {
+      // intentionally empty
+    },
   })),
 }));
 vi.mock('vuetify', () => ({
@@ -33,7 +37,7 @@ function mountComponent(): VueWrapper {
     attachTo: document.getElementById('app') || '',
     global: {
       components: {
-        MenuBar,
+        MenuBar: MenuBar as Component,
       },
       stubs: ['router-link', 'router-view'],
     },
@@ -59,7 +63,7 @@ function setPermissions(hasPermission: boolean): void {
   authStore.hasAngeboteVerwaltenPermission = hasPermission;
 }
 
-beforeEach(async () => {
+beforeEach(() => {
   document.body.innerHTML = `
     <div>
       <div id="app"></div>
@@ -170,7 +174,7 @@ describe('MenuBar', () => {
     expect(go).toHaveBeenCalledOnce();
   });
 
-  describe('on mobile', async () => {
+  describe('on mobile', () => {
     beforeAll(() => {
       (useDisplay as Mock).mockImplementation(() => {
         return { mobile: { value: true } };

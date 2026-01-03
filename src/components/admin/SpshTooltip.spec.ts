@@ -1,6 +1,7 @@
 import { expect, test, describe, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import SpshTooltip from './SpshTooltip.vue';
+import type { Component } from 'vue';
 
 describe('SpshTooltip Component', () => {
   beforeEach(() => {
@@ -18,7 +19,7 @@ describe('SpshTooltip Component', () => {
       },
       global: {
         components: {
-          SpshTooltip,
+          SpshTooltip: SpshTooltip as Component,
         },
       },
       attachTo: '#app', // Ensure the component is attached to the DOM

@@ -1,11 +1,11 @@
 import { VueWrapper, mount } from '@vue/test-utils';
 import { expect, test } from 'vitest';
-import { nextTick } from 'vue';
+import { nextTick, type Component } from 'vue';
 import KlasseDelete from './KlasseDelete.vue';
 
 let wrapper: VueWrapper | null = null;
 
-beforeEach(async () => {
+beforeEach(() => {
   document.body.innerHTML = `
     <div>
       <div id="app"></div>
@@ -24,7 +24,7 @@ beforeEach(async () => {
     },
     global: {
       components: {
-        KlasseDelete,
+        KlasseDelete: KlasseDelete as Component,
       },
     },
   });

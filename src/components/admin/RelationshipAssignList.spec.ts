@@ -4,6 +4,7 @@ import { createRouter, createWebHistory, type Router } from 'vue-router';
 import routes from '@/router/routes';
 import RelationshipAssignList from './RelationshipAssignList.vue';
 import { OrganisationsTyp, type Organisation } from '@/stores/OrganisationStore';
+import type { Component } from 'vue-demi';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -13,7 +14,7 @@ const mockItems: Array<Organisation> = [
   { id: '2', name: 'Org 2', typ: OrganisationsTyp.Schule },
 ];
 
-function mountComponent(): VueWrapper {
+function mountComponent(): VueWrapper<InstanceType<typeof RelationshipAssignList>> {
   return mount(RelationshipAssignList, {
     attachTo: document.getElementById('app') || '',
     props: {
@@ -23,7 +24,7 @@ function mountComponent(): VueWrapper {
     },
     global: {
       components: {
-        RelationshipAssignList,
+        RelationshipAssignList: RelationshipAssignList as Component,
       },
       plugins: [router],
     },
@@ -56,11 +57,11 @@ afterEach(() => {
 });
 
 describe('RelationshipAssignList', () => {
-  test('it renders the assign list component and its child components', async () => {
+  test('it renders the assign list component and its child components', () => {
     expect(wrapper?.findComponent({ name: 'SearchField' })).toBeTruthy();
   });
 
-  test('it emits', async () => {
+  test('it emits', () => {
     expect(true).toBeTruthy();
   });
 

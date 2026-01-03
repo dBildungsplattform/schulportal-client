@@ -1,6 +1,7 @@
 import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import FormWrapper from './FormWrapper.vue';
+import type { Component } from 'vue';
 
 let wrapper: VueWrapper | null = null;
 
@@ -25,7 +26,7 @@ beforeEach(() => {
     },
     global: {
       components: {
-        FormWrapper,
+        FormWrapper: FormWrapper as Component,
       },
     },
   });

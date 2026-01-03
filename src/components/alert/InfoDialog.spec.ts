@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import InfoDialog from './InfoDialog.vue';
-import { nextTick } from 'vue';
+import { nextTick, type Component } from 'vue';
 
 let wrapper: VueWrapper | null = null;
 
@@ -22,7 +22,7 @@ beforeEach(() => {
 
     global: {
       components: {
-        InfoDialog,
+        InfoDialog: InfoDialog as Component,
       },
     },
   });

@@ -1,11 +1,11 @@
 import { expect, test } from 'vitest';
-import { nextTick } from 'vue';
+import { nextTick, type Component } from 'vue';
 import { VueWrapper, mount } from '@vue/test-utils';
 import itsLearningSetup from './itsLearningSetup.vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import routes from '@/router/routes';
 
-let wrapper: VueWrapper;
+let wrapper: VueWrapper<InstanceType<typeof itsLearningSetup>>;
 let router: Router;
 
 async function initWrapper(props: InstanceType<typeof itsLearningSetup>['$props']): Promise<void> {
@@ -28,7 +28,7 @@ async function initWrapper(props: InstanceType<typeof itsLearningSetup>['$props'
     props,
     global: {
       components: {
-        itsLearningSetup,
+        itsLearningSetup: itsLearningSetup as Component,
       },
       plugins: [router],
     },
@@ -49,7 +49,7 @@ describe('itsLearningSetup', () => {
     wrapper.find('[data-testid="open-schule-itslearning-sync-dialog-icon"]').trigger('click');
     await nextTick();
 
-    await document.querySelector('[data-testid="schule-activate-in-itslearning-confirmation-text"]');
+    document.querySelector('[data-testid="schule-activate-in-itslearning-confirmation-text"]');
     expect(document.querySelector('[data-testid="schule-activate-in-itslearning-confirmation-text"]')).not.toBeNull();
 
     const cancelDeleteButton: HTMLElement | undefined = document.querySelectorAll<HTMLElement>(
@@ -65,7 +65,7 @@ describe('itsLearningSetup', () => {
     wrapper.find('[data-testid="open-schule-itslearning-sync-dialog-icon"]').trigger('click');
     await nextTick();
 
-    const syncButton: HTMLButtonElement | null = await document.querySelector<HTMLButtonElement>(
+    const syncButton: HTMLButtonElement | null = document.querySelector<HTMLButtonElement>(
       '[data-testid="schule-itslearning-sync-button"]',
     );
     expect(syncButton).not.toBeNull();
@@ -107,7 +107,7 @@ describe('itsLearningSetup retransmit', () => {
     wrapper.find('[data-testid="open-schule-itslearning-resync-dialog-icon"]').trigger('click');
     await nextTick();
 
-    await document.querySelector('[data-testid="schule-retransmit-in-itslearning-confirmation-text"]');
+    document.querySelector('[data-testid="schule-retransmit-in-itslearning-confirmation-text"]');
     expect(document.querySelector('[data-testid="schule-retransmit-in-itslearning-confirmation-text"]')).not.toBeNull();
 
     const cancelDeleteButton: HTMLElement | undefined = document.querySelectorAll<HTMLElement>(
@@ -123,7 +123,7 @@ describe('itsLearningSetup retransmit', () => {
     wrapper.find('[data-testid="open-schule-itslearning-resync-dialog-icon"]').trigger('click');
     await nextTick();
 
-    const syncButton: HTMLButtonElement | null = await document.querySelector<HTMLButtonElement>(
+    const syncButton: HTMLButtonElement | null = document.querySelector<HTMLButtonElement>(
       '[data-testid="schule-itslearning-sync-button"]',
     );
     expect(syncButton).not.toBeNull();

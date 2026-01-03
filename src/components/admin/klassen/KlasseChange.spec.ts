@@ -1,6 +1,6 @@
 import { VueWrapper, mount } from '@vue/test-utils';
 import { expect, test } from 'vitest';
-import { nextTick } from 'vue';
+import { nextTick, type Component } from 'vue';
 import KlasseChange from './KlasseChange.vue';
 
 let wrapper: VueWrapper | null = null;
@@ -47,7 +47,7 @@ beforeEach(() => {
     },
     global: {
       components: {
-        KlasseChange,
+        KlasseChange: KlasseChange as Component,
       },
     },
   });

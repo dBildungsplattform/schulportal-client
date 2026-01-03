@@ -7,6 +7,7 @@ import {
 import { VueWrapper, mount } from '@vue/test-utils';
 import { expect, test } from 'vitest';
 import SchultraegerForm from './SchultraegerForm.vue';
+import type { Component } from 'vue';
 
 let wrapper: VueWrapper | null = null;
 const organisationStore: OrganisationStore = useOrganisationStore();
@@ -43,7 +44,7 @@ beforeEach(() => {
     },
     global: {
       components: {
-        SchultraegerForm,
+        SchultraegerForm: SchultraegerForm as Component,
       },
     },
   });

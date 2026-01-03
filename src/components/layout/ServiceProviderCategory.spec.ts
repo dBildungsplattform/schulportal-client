@@ -1,7 +1,7 @@
 import { expect, test, describe, beforeEach } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import { VApp } from 'vuetify/components';
-import { h } from 'vue';
+import { h, type Component } from 'vue';
 import ServiceProviderCategory from '@/components/layout/ServiceProviderCategory.vue';
 import ServiceProviderCard from '@/components/cards/ServiceProviderCard.vue';
 import { ServiceProviderKategorie, type StartPageServiceProvider } from '@/stores/ServiceProviderStore';
@@ -51,8 +51,8 @@ beforeEach(() => {
   wrapper = mount(VApp, {
     global: {
       components: {
-        ServiceProviderCategory,
-        ServiceProviderCard,
+        ServiceProviderCategory: ServiceProviderCategory as Component,
+        ServiceProviderCard: ServiceProviderCard as Component,
       },
     },
     slots: {
@@ -66,7 +66,9 @@ describe('ServiceProviderCategory.vue', () => {
     // eslint-disable-next-line @typescript-eslint/typedef
     const cards = wrapper?.findAllComponents(ServiceProviderCard);
     expect(cards).toHaveLength(mockServiceProviders.length);
-    if (!cards || cards.length === 0) throw new Error('No cards found');
+    if (!cards || cards.length === 0) {
+      throw new Error('No cards found');
+    }
 
     expect(cards[0]!.props()).toMatchObject({
       href: '/no-second-factor',

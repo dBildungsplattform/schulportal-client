@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import KopersInput from './KopersInput.vue';
-import { nextTick } from 'vue';
+import { nextTick, type Component } from 'vue';
 
 let wrapper: VueWrapper | null = null;
 
@@ -27,14 +27,14 @@ beforeEach(() => {
     },
     global: {
       components: {
-        KopersInput,
+        KopersInput: KopersInput as Component,
       },
     },
   });
 });
 
 describe('kopers input', () => {
-  test('it renders the component', async () => {
+  test('it renders the component', () => {
     expect(wrapper?.get('[data-testid="has-no-kopersnr-checkbox"]').isVisible()).toBe(true);
     expect(wrapper?.get('[data-testid="kopersnr-input"]').isVisible()).toBe(true);
   });

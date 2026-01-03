@@ -7,7 +7,7 @@ import {
 import type { ValidationSchema as KlasseFormSchema } from '@/utils/validationKlasse';
 import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import { expect, test, type Mock } from 'vitest';
-import { nextTick } from 'vue';
+import { nextTick, type Component } from 'vue';
 import KlasseForm from './KlasseForm.vue';
 
 const organisationStore: OrganisationStore = useOrganisationStore();
@@ -21,7 +21,7 @@ const newValues: KlasseFormSchema = {
   selectedSchule: 'Gerda-Geändert-Schule',
   selectedKlassenname: '9z',
 };
-const mountComponent = (props?: object): VueWrapper => {
+const mountComponent = (props?: object): VueWrapper<InstanceType<typeof KlasseForm>> => {
   return mount(KlasseForm, {
     attachTo: document.getElementById('app') || '',
     props: {
@@ -35,7 +35,7 @@ const mountComponent = (props?: object): VueWrapper => {
     },
     global: {
       components: {
-        KlasseForm,
+        KlasseForm: KlasseForm as Component,
       },
     },
   });
@@ -66,24 +66,24 @@ describe('KlasseForm', () => {
     };
 
     test('it renders the Klasse form', () => {
-      const wrapper: VueWrapper = mountComponent(defaultProps);
+      const wrapper: VueWrapper = mountComponent(defaultProps) as VueWrapper;
       expect(wrapper.find('[data-testid="klasse-form"]').isVisible()).toBe(true);
       expect(wrapper.find(`#${schulenFilterTestId}`).isVisible()).toBe(true);
       expect(wrapper.find('#klassenname-input').isVisible()).toBe(true);
     });
 
-    test('it does not render when there is an error', async () => {
+    test('it does not render when there is an error', () => {
       const wrapper: VueWrapper = mountComponent({
         ...defaultProps,
         errorCode: 'something',
-      });
+      }) as VueWrapper;
       expect(wrapper.find('[data-testid="klasse-form"]').exists()).toBe(true);
       expect(wrapper.find(`[data-testid="${schulenFilterTestId}"]`).exists()).toBe(false);
       expect(wrapper.find('#klassenname-input').exists()).toBe(false);
     });
 
     test('it contains initial values', () => {
-      const wrapper: VueWrapper = mountComponent(defaultProps);
+      const wrapper: VueWrapper = mountComponent(defaultProps) as VueWrapper;
       expect(wrapper.find('[data-testid="klasse-form"]').isVisible()).toBe(true);
       expect(wrapper.find(`[data-testid="${schulenFilterTestId}"]`).text()).toContain(initialValues.selectedSchule);
       expect(wrapper.find('#klassenname-input').attributes('value')).toBe(initialValues.selectedKlassenname);
@@ -93,7 +93,7 @@ describe('KlasseForm', () => {
       const wrapper: VueWrapper = mountComponent({
         ...defaultProps,
         isEditActive: false,
-      });
+      }) as VueWrapper;
       expect(wrapper.find(`[data-testid="${schulenFilterTestId}"]`).text()).toContain(initialValues.selectedSchule);
       expect(wrapper.find('#klassenname-input').attributes('value')).toBe(initialValues.selectedKlassenname);
 
@@ -108,7 +108,7 @@ describe('KlasseForm', () => {
         ...defaultProps,
         isEditActive: false,
         onHandleDiscard,
-      });
+      }) as VueWrapper;
       expect(wrapper.find('[data-testid="klasse-form-submit-button"]').exists()).toBe(false);
       expect(wrapper.find('[data-testid="klasse-form-discard-button"]').exists()).toBe(false);
       wrapper.setProps({ isEditActive: true });
@@ -124,7 +124,7 @@ describe('KlasseForm', () => {
       const wrapper: VueWrapper = mountComponent({
         ...defaultProps,
         isEditActive: false,
-      });
+      }) as VueWrapper;
       expect(wrapper.find(`[data-testid="${schulenFilterTestId}"]`).text()).toContain(initialValues.selectedSchule);
       expect(wrapper.find('#klassenname-input').attributes('value')).toBe(initialValues.selectedKlassenname);
       await wrapper.setProps({ isEditActive: true });
@@ -142,7 +142,7 @@ describe('KlasseForm', () => {
         const wrapper: VueWrapper = mountComponent({
           ...defaultProps,
           isEditActive,
-        });
+        }) as VueWrapper;
         if (editMode) {
           expect(wrapper.find('[data-testid="klasse-form-discard-button"]').exists()).toBe(isEditActive);
           expect(wrapper.find('[data-testid="klasse-form-submit-button"]').exists()).toBe(isEditActive);
@@ -153,21 +153,24 @@ describe('KlasseForm', () => {
       });
 
       test('it correctly sets "disabled"-attributes on inputs', () => {
-        const wrapper: VueWrapper = mountComponent({ ...defaultProps, isEditActive });
+        const wrapper: VueWrapper = mountComponent({ ...defaultProps, isEditActive }) as VueWrapper;
         if (editMode) {
           expect(wrapper.find(`#${schulenFilterTestId}`).attributes('disabled')).toBe('');
         } else {
           expect(wrapper.find(`#${schulenFilterTestId}`).attributes('disabled')).toBeUndefined();
         }
-        if (editMode && !isEditActive) expect(wrapper.find('#klassenname-input').attributes('disabled')).toBe('');
-        else expect(wrapper.find('#klassenname-input').attributes('disabled')).toBeUndefined();
+        if (editMode && !isEditActive) {
+          expect(wrapper.find('#klassenname-input').attributes('disabled')).toBe('');
+        } else {
+          expect(wrapper.find('#klassenname-input').attributes('disabled')).toBeUndefined();
+        }
       });
 
       test('data-entry and submission are correctly en-/disabled', async () => {
         const wrapper: VueWrapper = mountComponent({
           ...defaultProps,
           isEditActive,
-        });
+        }) as VueWrapper;
         await wrapper.find(`#${schulenFilterTestId}`).setValue(newValues.selectedSchule);
         await wrapper.find('#klassenname-input').setValue(newValues.selectedKlassenname);
         vi.runAllTimers();
@@ -190,14 +193,17 @@ describe('KlasseForm', () => {
       });
 
       test('it correctly sets "disabled"-attributes on inputs', () => {
-        const wrapper: VueWrapper = mountComponent({ ...defaultProps, isEditActive });
+        const wrapper: VueWrapper = mountComponent({ ...defaultProps, isEditActive }) as VueWrapper;
         if (editMode) {
           expect(wrapper.find(`#${schulenFilterTestId}`).attributes('disabled')).toBe('');
         } else {
           expect(wrapper.find(`#${schulenFilterTestId}`).attributes('disabled')).toBeUndefined();
         }
-        if (editMode && !isEditActive) expect(wrapper.find('#klassenname-input').attributes('disabled')).toBe('');
-        else expect(wrapper.find('#klassenname-input').attributes('disabled')).toBeUndefined();
+        if (editMode && !isEditActive) {
+          expect(wrapper.find('#klassenname-input').attributes('disabled')).toBe('');
+        } else {
+          expect(wrapper.find('#klassenname-input').attributes('disabled')).toBeUndefined();
+        }
       });
     });
   });

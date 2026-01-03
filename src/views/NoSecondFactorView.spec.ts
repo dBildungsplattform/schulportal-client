@@ -1,7 +1,6 @@
 import { mount, VueWrapper } from '@vue/test-utils';
-import { expect, test, describe, vi, beforeEach } from 'vitest';
+import { expect, test, describe, vi, beforeEach, type Mock } from 'vitest';
 import NoSecondFactor from './NoSecondFactorView.vue';
-import type { Mock } from 'vitest';
 import type WrapperLike from 'node_modules/@vue/test-utils/dist/interfaces/wrapperLike';
 import { nextTick } from 'vue';
 
@@ -14,7 +13,7 @@ const locationMock: Mock = vi.fn(() => ({
 
 vi.stubGlobal('location', locationMock);
 
-beforeEach(async () => {
+beforeEach(() => {
   wrapper = mount(NoSecondFactor, {
     props: {
       buttonText: 'Back',
@@ -39,7 +38,7 @@ describe('SpshAlert Component', () => {
     expect(wrapper?.find('[data-testid$="alert-text"]').exists()).toBe(true);
   });
 
-  test('it renders the back button with correct text', async () => {
+  test('it renders the back button with correct text', () => {
     const backbutton: WrapperLike | undefined = wrapper?.find('[data-testid$="alert-button"]');
 
     if (!backbutton) {

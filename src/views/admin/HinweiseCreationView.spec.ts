@@ -8,7 +8,7 @@ import {
   type Router,
 } from 'vue-router';
 import routes from '@/router/routes';
-import { nextTick } from 'vue';
+import { nextTick, type Component } from 'vue';
 import { MeldungStatus, useMeldungStore, type MeldungStore } from '@/stores/MeldungStore';
 import HinweiseManagementView from './HinweiseCreationView.vue';
 import type Module from 'module';
@@ -29,17 +29,19 @@ let { storedBeforeRouteLeaveCallback }: { storedBeforeRouteLeaveCallback: OnBefo
         _to: RouteLocationNormalized,
         _from: RouteLocationNormalized,
         _next: NavigationGuardNext,
-      ): void => {},
+      ): void => {
+        // intentionally left blank for test hoisting
+      },
     };
   },
 );
 
-function mountComponent(): VueWrapper {
+function mountComponent(): ReturnType<typeof mount<typeof HinweiseManagementView>> {
   return mount(HinweiseManagementView, {
     attachTo: document.getElementById('app') || '',
     global: {
       components: {
-        HinweiseManagementView,
+        HinweiseManagementView: HinweiseManagementView as Component,
       },
       plugins: [router],
     },

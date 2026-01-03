@@ -1,12 +1,11 @@
 import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import PasswordReset from './PasswordReset.vue';
-import { nextTick } from 'vue';
+import { nextTick, type Component } from 'vue';
 
 let wrapper: VueWrapper | null = null;
 
 declare global {
-  // eslint-disable-next-line no-var
   var cspNonce: string;
 }
 
@@ -34,7 +33,7 @@ beforeEach(() => {
     },
     global: {
       components: {
-        PasswordReset,
+        PasswordReset: PasswordReset as Component,
       },
     },
   });
@@ -45,7 +44,7 @@ describe('reset password', () => {
     wrapper?.get('[data-testid="open-password-reset-dialog-button"]').trigger('click');
     await nextTick();
 
-    await document.querySelector('[data-testid="password-reset-info-text"]');
+    document.querySelector('[data-testid="password-reset-info-text"]');
     expect(document.querySelector('[data-testid="password-reset-info-text"]')).not.toBeNull();
 
     const cancelResetButton: HTMLElement | undefined = document.querySelector(
@@ -69,7 +68,7 @@ describe('reset password', () => {
     await wrapper?.setProps({ password: '' });
     wrapper?.get('[data-testid="open-password-reset-dialog-button"]').trigger('click');
     await nextTick();
-    await document.querySelector('[data-testid="password-reset-button"]');
+    document.querySelector('[data-testid="password-reset-button"]');
     expect(document.querySelector('[data-testid="password-reset-button"]')).not.toBeNull();
 
     // const dialog: VueWrapper | undefined = wrapper?.findComponent({ref: 'password-reset-dialog'})
@@ -82,37 +81,46 @@ describe('reset password', () => {
 
   it('should render the print button if password was reset', async () => {
     wrapper?.get('[data-testid="open-password-reset-dialog-button"]').trigger('click');
-    await document.querySelector('[data-testid="password-print-button"]');
+    await nextTick();
+    document.querySelector('[data-testid="password-print-button"]');
     expect(document.querySelector('[data-testid="password-print-button"]')).not.toBeNull();
   });
 
   // skip because v-dialog does not work in test env. see lines 42-47
-  test.skip('it shows and hides password', async () => {
+  test.skip('it shows and hides password', () => {
     wrapper?.get('[data-testid="open-password-reset-dialog-button"]').trigger('click');
-    await document.querySelector('[data-testid="password-output-field"] mdi-eye');
+    document.querySelector('[data-testid="password-output-field"] mdi-eye');
     expect(document.querySelector('[data-testid="password-output-field"] mdi-eye')).not.toBeNull();
   });
 
   // skip because v-dialog does not work in test env. see lines 42-47
-  test.skip('it copies password to clipboard', async () => {
+  test.skip('it copies password to clipboard', () => {
     wrapper?.get('[data-testid="open-password-reset-dialog-button"]').trigger('click');
-    await document.querySelector('[data-testid="password-output-field"] mdi-content-copy');
+    document.querySelector('[data-testid="password-output-field"] mdi-content-copy');
     expect(document.querySelector('[data-testid="password-output-field"] mdi-content-copy')).not.toBeNull();
   });
 
   it('should open the print dialog if print password button was clicked', async () => {
     const mockWindow: Partial<Window> = {
       document: {
-        open: vi.fn(function (this: void) {}),
-        write: vi.fn(function (this: void) {}),
-        close: vi.fn(function (this: void) {}),
+        open: vi.fn(function (this: void) {
+          /* mock open */
+        }),
+        write: vi.fn(function (this: void) {
+          /* mock write */
+        }),
+        close: vi.fn(function (this: void) {
+          /* mock close */
+        }),
       },
-      print: vi.fn(function (this: void) {}),
+      print: vi.fn(function (this: void) {
+        /* mock print */
+      }),
     } as unknown as Window;
     window.open = vi.fn(() => mockWindow) as unknown as typeof window.open;
 
     await wrapper?.find('[data-testid="open-password-reset-dialog-button"]').trigger('click');
-    const passwordPrintButton: Element | null = await document.querySelector('[data-testid="password-print-button"]');
+    const passwordPrintButton: Element | null = document.querySelector('[data-testid="password-print-button"]');
     if (passwordPrintButton instanceof HTMLButtonElement) {
       passwordPrintButton.click();
     }

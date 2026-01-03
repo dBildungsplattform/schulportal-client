@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach, type MockInstance } from 'vitest';
 import { mount, VueWrapper } from '@vue/test-utils';
-import { nextTick } from 'vue';
+import { nextTick, type Component } from 'vue';
 import PersonBulkError from './PersonBulkError.vue';
 import * as fileUtils from '@/utils/file';
 
@@ -27,7 +27,7 @@ beforeEach(() => {
     },
     global: {
       components: {
-        PersonBulkError,
+        PersonBulkError: PersonBulkError as Component,
       },
     },
   });
@@ -69,7 +69,7 @@ describe('PersonBulkError.vue', () => {
   });
 
   it('downloads CSV when save button is clicked', async () => {
-    const downloadSpy: MockInstance = vi.spyOn(fileUtils, 'download').mockImplementation(() => {});
+    const downloadSpy: MockInstance = vi.spyOn(fileUtils, 'download').mockImplementation(() => undefined);
 
     await nextTick();
 
@@ -86,7 +86,7 @@ describe('PersonBulkError.vue', () => {
     const mockBlob: Blob = new Blob(['test'], { type: 'text/csv' });
     const customFilename: string = 'my-custom-file.csv';
 
-    const downloadSpy: MockInstance = vi.spyOn(fileUtils, 'download').mockImplementation(() => {});
+    const downloadSpy: MockInstance = vi.spyOn(fileUtils, 'download').mockImplementation(() => undefined);
 
     wrapper = mount(PersonBulkError, {
       attachTo: document.getElementById('app') || undefined,
@@ -106,7 +106,7 @@ describe('PersonBulkError.vue', () => {
     ) as HTMLElement;
     expect(passwordDownloadButton).not.toBeNull();
 
-    passwordDownloadButton!.dispatchEvent(new Event('click'));
+    passwordDownloadButton.dispatchEvent(new Event('click'));
     await nextTick();
 
     expect(downloadSpy).toHaveBeenCalledWith(customFilename, mockBlob);

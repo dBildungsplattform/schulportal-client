@@ -9,7 +9,7 @@ import {
   type Router,
 } from 'vue-router';
 import routes from '@/router/routes';
-import { nextTick } from 'vue';
+import { nextTick, type Component } from 'vue';
 import {
   OrganisationsTyp,
   useOrganisationStore,
@@ -57,17 +57,19 @@ let { storedBeforeRouteLeaveCallback }: { storedBeforeRouteLeaveCallback: OnBefo
         _to: RouteLocationNormalized,
         _from: RouteLocationNormalized,
         _next: NavigationGuardNext,
-      ): void => {},
+      ): void => {
+        // intentionally left blank
+      },
     };
   },
 );
 
-function mountComponent(): VueWrapper {
+function mountComponent(): ReturnType<typeof mount<typeof SchuleCreationView>> {
   return mount(SchuleCreationView, {
     attachTo: document.getElementById('app') || '',
     global: {
       components: {
-        SchuleCreationView,
+        SchuleCreationView: SchuleCreationView as Component,
       },
       plugins: [router],
     },
@@ -219,7 +221,7 @@ describe('SchuleCreationView', () => {
       expect(spy).toHaveBeenCalledOnce();
     });
 
-    test('it does not trigger if form is not dirty', async () => {
+    test('it does not trigger if form is not dirty', () => {
       const expectedCallsToNext: number = 1;
       vi.mock('vue-router', async (importOriginal: () => Promise<Module>) => {
         const mod: Module = await importOriginal();
@@ -237,24 +239,28 @@ describe('SchuleCreationView', () => {
     });
   });
 
-  describe.each([[true], [false]])('when form is dirty:%s', async (isFormDirty: boolean) => {
+  describe.each([[true], [false]])('when form is dirty:%s', (isFormDirty: boolean) => {
     beforeEach(async () => {
-      if (isFormDirty)
+      if (isFormDirty) {
         await fillForm({
           dienststellennummer: '9356494',
           schulname: 'Random Schulname Gymnasium',
         });
+      }
       await nextTick();
     });
 
-    test('it handles unloading', async () => {
+    test('it handles unloading', () => {
       const event: Event = new Event('beforeunload');
       const spy: MockInstance = vi.spyOn(event, 'preventDefault');
       window.dispatchEvent(event);
       // TODO: why is spy called 3 times?
       // if (isFormDirty) expect(spy).toHaveBeenCalledOnce();
-      if (isFormDirty) expect(spy).toHaveBeenCalled();
-      else expect(spy).not.toHaveBeenCalledOnce();
+      if (isFormDirty) {
+        expect(spy).toHaveBeenCalled();
+      } else {
+        expect(spy).not.toHaveBeenCalledOnce();
+      }
     });
   });
 

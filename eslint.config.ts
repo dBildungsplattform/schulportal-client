@@ -102,7 +102,7 @@ export default defineConfig(
             },
         },
         files: ['**/*.vue', '**/*.js', '**/*.jsx', '**/*.cjs', '**/*.mjs', '**/*.ts', '**/*.tsx', '**/*.cts', '**/*.mts'],
-        ignores: ['**/*spec.ts', 'test-migrations/**/*.ts', 'migrations/**/*.ts'],
+        ignores: ['test-migrations/**/*.ts', 'migrations/**/*.ts'],
         rules: rules,
     },
     // {

@@ -31,8 +31,8 @@ type Props = {
   parentId?: string;
 };
 
-function mountComponent(props: Partial<Props> = {}): VueWrapper {
-  return mount(SchulenFilter, {
+function mountComponent(props: Partial<Props> = {}): VueWrapper<InstanceType<typeof SchulenFilter>> {
+  return mount<typeof SchulenFilter>(SchulenFilter, {
     attachTo: document.getElementById('app') || '',
     props: {
       multiple: false,
@@ -70,13 +70,13 @@ beforeEach(() => {
   vi.clearAllTimers();
 });
 
-describe('SchulenFilter', async () => {
+describe('SchulenFilter', () => {
   describe.each([[false], [true]])('when multiple is %s', (multiple: boolean) => {
     describe.each([[true], [false]])('when readonly is %s', (readonly: boolean) => {
       const defaultProps: Props = { multiple, readonly };
 
       test('it renders', () => {
-        const wrapper: VueWrapper = mountComponent(defaultProps);
+        const wrapper: VueWrapper = mountComponent(defaultProps) as VueWrapper;
         expect(wrapper.find('[data-testid="schule-select"]').isVisible()).toBe(true);
       });
 
@@ -127,7 +127,7 @@ describe('SchulenFilter', async () => {
 
         test('it correctly sets disabled-attribute on input', async () => {
           const autoselected: boolean = autoSelectedSchule != null;
-          const wrapper: VueWrapper = mountComponent({ ...defaultProps });
+          const wrapper: VueWrapper = mountComponent({ ...defaultProps }) as VueWrapper;
           expectInputDisabledAttrToBe(readonly || autoselected);
           wrapper.setProps({ readonly: !readonly });
           await nextTick();
@@ -138,7 +138,7 @@ describe('SchulenFilter', async () => {
           const mockSchule: Organisation = DoFactory.getSchule();
           const selectionRef: Ref<Array<string> | string | undefined> = ref(multiple ? [mockSchule.id] : mockSchule.id);
 
-          const wrapper: VueWrapper = mountComponent({ ...defaultProps });
+          const wrapper: VueWrapper = mountComponent({ ...defaultProps }) as VueWrapper;
           await wrapper.setProps({ selectedSchulen: selectionRef });
           // no timers are run, so this is before fetching data
           const actualText: string = wrapper.find('[data-testid="schule-select"]').text();
@@ -153,7 +153,9 @@ describe('SchulenFilter', async () => {
         ])('when systemrechteForSearch are %s', (systemrechteForSearch: Array<RollenSystemRechtEnum> | undefined) => {
           const expectedIdsInFilter: OrganisationenFilter['organisationIds'] =
             ((): OrganisationenFilter['organisationIds'] => {
-              if (autoSelectedSchule) return [autoSelectedSchule.id];
+              if (autoSelectedSchule) {
+                return [autoSelectedSchule.id];
+              }
               return [];
             })();
           describe.each([[true], [false]])('when includeAll is %s', (includeAll: boolean) => {
@@ -170,7 +172,7 @@ describe('SchulenFilter', async () => {
               delete expectedFilter.excludeTyp;
             }
 
-            test('it initializes store', async () => {
+            test('it initializes store', () => {
               const spy: MockInstance = vi.spyOn(organisationStore, 'loadOrganisationenForFilter');
               mountComponent({
                 ...defaultProps,
@@ -193,7 +195,7 @@ describe('SchulenFilter', async () => {
                   ...defaultProps,
                   includeAll,
                   systemrechteForSearch,
-                });
+                }) as VueWrapper;
                 // clear initial loading from mock
                 vi.runAllTimers();
                 loadSpy.mockClear();
@@ -210,13 +212,15 @@ describe('SchulenFilter', async () => {
                 const expected: OrganisationenFilter = {
                   ...expectedFilter,
                 };
-                if (searchString.length > 0) expected.searchString = searchString;
+                if (searchString.length > 0) {
+                  expected.searchString = searchString;
+                }
                 const loadSpy: MockInstance = vi.spyOn(organisationStore, 'loadOrganisationenForFilter');
                 const wrapper: VueWrapper = mountComponent({
                   ...defaultProps,
                   includeAll,
                   systemrechteForSearch,
-                });
+                }) as VueWrapper;
                 const schuleSearchInput: ReturnType<VueWrapper['findComponent']> = wrapper.find(
                   includeAll ? '#organisation-select' : '#schule-select',
                 );
@@ -233,7 +237,7 @@ describe('SchulenFilter', async () => {
                   ...defaultProps,
                   includeAll,
                   systemrechteForSearch,
-                });
+                }) as VueWrapper;
                 vi.runAllTimers();
                 await flushPromises();
                 return wrapper;
@@ -259,7 +263,7 @@ describe('SchulenFilter', async () => {
                 expect(loadSpy).toHaveBeenLastCalledWith(expected, undefined);
               });
 
-              describe('it triggers clearing selection', async () => {
+              describe('it triggers clearing selection', () => {
                 test('it triggers search', async () => {
                   const wrapper: VueWrapper = await setup();
                   await selectSchule(wrapper, faker.string.uuid());
@@ -276,13 +280,13 @@ describe('SchulenFilter', async () => {
           });
         });
 
-        describe.each([[true], [false]])('when highlightSelection is %s', async (highlightSelection: boolean) => {
+        describe.each([[true], [false]])('when highlightSelection is %s', (highlightSelection: boolean) => {
           test('it correctly displays highlight', async () => {
             const selectedSchuleId: string = faker.string.uuid();
             const wrapper: VueWrapper = mountComponent({
               ...defaultProps,
               highlightSelection,
-            });
+            }) as VueWrapper;
             await wrapper
               .findComponent({
                 name: 'v-autocomplete',

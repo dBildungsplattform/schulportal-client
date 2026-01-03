@@ -18,7 +18,7 @@ describe('SearchFilterStore', () => {
     expect(searchFilterStore.searchFilterPersonen).toEqual('');
   });
 
-  it('should change the state', async () => {
+  it('should change the state', () => {
     // it sets the selectedKlassen
     searchFilterStore.setKlasseFilterForPersonen(['1', '2']);
     expect(searchFilterStore.selectedKlassen).toEqual(['1', '2']);

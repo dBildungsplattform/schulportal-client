@@ -1,6 +1,7 @@
 import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import AdminLayout from './AdminLayout.vue';
+import type { Component } from 'vue-demi';
 
 let wrapper: VueWrapper | null = null;
 
@@ -15,7 +16,7 @@ beforeEach(() => {
     attachTo: document.getElementById('app') || '',
     global: {
       components: {
-        AdminLayout,
+        AdminLayout: AdminLayout as Component,
       },
     },
     slots: {

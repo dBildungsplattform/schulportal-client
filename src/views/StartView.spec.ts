@@ -14,7 +14,7 @@ import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import type WrapperLike from 'node_modules/@vue/test-utils/dist/interfaces/wrapperLike';
 import { DoFactory } from 'test/DoFactory';
 import { expect, test, type Mock } from 'vitest';
-import { nextTick } from 'vue';
+import { nextTick, type Component } from 'vue';
 import StartView from './StartView.vue';
 
 let wrapper: VueWrapper | null = null;
@@ -132,7 +132,7 @@ beforeEach(() => {
     attachTo: document.getElementById('app') || '',
     global: {
       components: {
-        StartView,
+        StartView: StartView as Component,
       },
       mocks: {
         route: {

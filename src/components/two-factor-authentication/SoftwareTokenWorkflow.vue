@@ -3,7 +3,7 @@
     type TwoFactorAuthentificationStore,
     useTwoFactorAuthentificationStore,
   } from '@/stores/TwoFactorAuthentificationStore';
-  import { defineEmits, onMounted, type Ref } from 'vue';
+  import { onMounted, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
 

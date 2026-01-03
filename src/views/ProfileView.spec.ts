@@ -14,7 +14,7 @@ import { faker } from '@faker-js/faker';
 import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
 import { DoFactory } from 'test/DoFactory';
 import { beforeEach, describe, expect, test, type MockInstance } from 'vitest';
-import { nextTick } from 'vue';
+import { nextTick, type Component } from 'vue';
 import { createMemoryHistory, createRouter, useRoute, type Router } from 'vue-router';
 import ProfileView from './ProfileView.vue';
 
@@ -151,7 +151,7 @@ describe('ProfileView', () => {
       routes: [
         {
           path: '/profil',
-          component: ProfileView,
+          component: ProfileView as Component,
         },
       ],
     });
@@ -229,8 +229,10 @@ describe('ProfileView', () => {
       personInfoStore.personInfo = personInfo;
       personStore.personenuebersicht = uebersicht!;
       await nextTick();
-      if (!wrapper) return;
-      uebersicht!.zuordnungen.forEach((mockZuordnung: Zuordnung, index: number) => {
+      if (!wrapper) {
+        return;
+      }
+      uebersicht.zuordnungen.forEach((mockZuordnung: Zuordnung, index: number) => {
         expect(wrapper?.find(`[data-testid="schule-value-${index + 1}"]`).text()).toContain(mockZuordnung.sskName);
         expect(wrapper?.find(`[data-testid="rolle-value-${index + 1}"]`).text()).toContain(mockZuordnung.rolle);
         expect(wrapper?.find(`[data-testid="dienststellennummer-value-${index + 1}"]`).text()).toContain(
@@ -254,12 +256,14 @@ describe('ProfileView', () => {
       personInfoStore.personInfo = mockSchueler;
       personStore.personenuebersicht = personenuebersicht;
       await nextTick();
-      if (!wrapper) return;
+      if (!wrapper) {
+        return;
+      }
       const klasse: Zuordnung = personenuebersicht.zuordnungen.find(
-        (z: Zuordnung) => z.typ == OrganisationsTyp.Klasse,
+        (z: Zuordnung) => z.typ === OrganisationsTyp.Klasse,
       )!;
       const schule: Zuordnung = personenuebersicht.zuordnungen.find(
-        (z: Zuordnung) => z.typ == OrganisationsTyp.Schule,
+        (z: Zuordnung) => z.typ === OrganisationsTyp.Schule,
       )!;
       expect(wrapper.find('[data-testid="schule-value-1"]').text()).toContain(schule.sskName);
       expect(wrapper.find('[data-testid="rolle-value-1"]').text()).toContain(schule.rolle);
@@ -272,7 +276,9 @@ describe('ProfileView', () => {
   describe('password', () => {
     test('it displays password data if there is any', async () => {
       await nextTick();
-      if (!wrapper) return;
+      if (!wrapper) {
+        return;
+      }
       const container: DOMWrapper<Element> = wrapper.find('[data-testid="password-card"]');
       const passwordCardText: string = container.text();
       expect(passwordCardText).toContain(passwordUpdatedAt.getDate());
@@ -283,7 +289,9 @@ describe('ProfileView', () => {
     test('it does not display password data if there is none', async () => {
       authStore.currentUser!.password_updated_at = null;
       await nextTick();
-      if (!wrapper) return;
+      if (!wrapper) {
+        return;
+      }
       const container: DOMWrapper<Element> = wrapper.find('[data-testid="password-card"]');
       const passwordCardText: string = container.text();
       expect(passwordCardText).not.toContain(passwordUpdatedAt.getDate());
@@ -293,7 +301,9 @@ describe('ProfileView', () => {
 
     test('it opens and closes password change dialog', async () => {
       await nextTick();
-      if (!wrapper) return;
+      if (!wrapper) {
+        return;
+      }
 
       const passwordChangeButton: DOMWrapper<Element> = wrapper.find(
         '[data-testid="open-change-password-dialog-button"]',
@@ -301,9 +311,9 @@ describe('ProfileView', () => {
       passwordChangeButton.trigger('click');
       await nextTick();
 
-      const closeDialogButton: HTMLElement = (await document.querySelector(
+      const closeDialogButton: HTMLElement = document.querySelector(
         '[data-testid="close-change-password-dialog-button"]',
-      )) as HTMLElement;
+      ) as HTMLElement;
 
       expect(closeDialogButton).not.toBeNull();
       closeDialogButton.click();
@@ -316,7 +326,9 @@ describe('ProfileView', () => {
       personInfoStore.personInfo = mockPersonInfoResponse;
       personStore.personenuebersicht = mockLehrerUebersicht;
       await nextTick();
-      if (!wrapper) return;
+      if (!wrapper) {
+        return;
+      }
 
       const devicePasswordChangeButton: DOMWrapper<Element> = wrapper.find(
         '[data-testid="open-device-password-dialog-button"]',
@@ -326,9 +338,9 @@ describe('ProfileView', () => {
 
       expect(document.querySelector('[data-testid="password-reset-info-text"]')).not.toBeNull();
 
-      const resetPasswordButton: HTMLElement = (await document.querySelector(
+      const resetPasswordButton: HTMLElement = document.querySelector(
         '[data-testid="password-reset-button"]',
-      )) as HTMLElement;
+      ) as HTMLElement;
 
       expect(resetPasswordButton).not.toBeNull();
       resetPasswordButton.click();
@@ -339,7 +351,9 @@ describe('ProfileView', () => {
   test('it displays 2FA section', async () => {
     twoFactorAuthenticationStore.hasToken = false;
     await nextTick();
-    if (!wrapper) return;
+    if (!wrapper) {
+      return;
+    }
 
     expect(document.querySelector('[data-testid="two-factor-card"]')).not.toBeNull();
     expect(wrapper.text()).not.toContain(
@@ -357,7 +371,9 @@ describe('ProfileView', () => {
     twoFactorAuthenticationStore.hasToken = false;
     twoFactorAuthenticationStore.required = false;
     await nextTick();
-    if (!wrapper) return;
+    if (!wrapper) {
+      return;
+    }
     expect(document.querySelector('[data-testid="two-factor-card"]')).toBeNull();
     expect(document.querySelector('[data-testid="open-2FA-self-service-dialog-icon"]')).toBeNull();
   });
@@ -365,7 +381,9 @@ describe('ProfileView', () => {
   test('it displays 2FA connection error', async () => {
     twoFactorAuthenticationStore.errorCode = 'PI_UNAVAILABLE_ERROR';
     await nextTick();
-    if (!wrapper) return;
+    if (!wrapper) {
+      return;
+    }
     const twoFactorCard: DOMWrapper<Element> = wrapper.find('[data-testid="two-factor-info"]');
     expect(twoFactorCard.text()).toContain(
       'Der Server für die Zwei-Faktor-Authentifizierung kann aktuell nicht erreicht werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut.',

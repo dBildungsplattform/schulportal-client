@@ -11,7 +11,7 @@ import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import type Module from 'module';
 import { DoFactory } from 'test/DoFactory';
 import { expect, test, type Mock, type MockInstance } from 'vitest';
-import { nextTick } from 'vue';
+import { nextTick, type Component } from 'vue';
 import {
   createRouter,
   createWebHistory,
@@ -42,17 +42,19 @@ let { storedBeforeRouteLeaveCallback }: { storedBeforeRouteLeaveCallback: OnBefo
         _to: RouteLocationNormalized,
         _from: RouteLocationNormalized,
         _next: NavigationGuardNext,
-      ): void => {},
+      ): void => {
+        // intentionally left blank
+      },
     };
   },
 );
 
-function mountComponent(): VueWrapper {
+function mountComponent(): ReturnType<typeof mount<typeof RolleCreationView>> {
   return mount(RolleCreationView, {
     attachTo: document.getElementById('app') || '',
     global: {
       components: {
-        RolleCreationView,
+        RolleCreationView: RolleCreationView as Component,
       },
       plugins: [router],
     },
@@ -85,10 +87,13 @@ async function fillForm(args: Partial<FormFields>): Promise<Partial<FormSelector
       .findComponent({ name: 'SchulenFilter' })
       .findComponent({ ref: 'rolle-form-organisation-select' });
     await orgSelect?.setValue(organisation);
-    wrapper
+    const schulenFilterComponent: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'rolle-creation-form' })
-      .findComponent({ name: 'SchulenFilter' })
-      .vm.$emit('update:selectedSchulen', personenkontextStore.workflowStepResponse?.organisations[0]?.id || '');
+      .findComponent({ name: 'SchulenFilter' });
+    (schulenFilterComponent?.vm as unknown as { $emit: (event: string, ...args: unknown[]) => void }).$emit(
+      'update:selectedSchulen',
+      personenkontextStore.workflowStepResponse?.organisations[0]?.id || '',
+    );
     await nextTick();
     selectors.orgSelect = orgSelect;
   }
@@ -256,7 +261,7 @@ describe('RolleCreationView', () => {
     wrapper?.find('[data-testid="close-layout-card-button"]').trigger('click');
     await nextTick();
 
-    await document.querySelector('[data-testid="confirm-unsaved-changes-button"]');
+    document.querySelector('[data-testid="confirm-unsaved-changes-button"]');
   });
 
   test('it fills form and triggers submit', async () => {
@@ -357,10 +362,9 @@ describe('RolleCreationView', () => {
       administeredBySchulstrukturknotenKennung: '',
       version: 1,
     };
-    vi.spyOn(rolleStore, 'createRolle').mockImplementation(async () => {
-      {
-        rolleStore.createdRolle = { ...mockRolle, systemrechte: [] as unknown as Set<RollenSystemRechtEnum> };
-      }
+    vi.spyOn(rolleStore, 'createRolle').mockImplementation(() => {
+      rolleStore.createdRolle = { ...mockRolle, systemrechte: [] as unknown as Set<RollenSystemRechtEnum> };
+      return Promise.resolve();
     });
 
     expect(
@@ -506,7 +510,7 @@ describe('RolleCreationView', () => {
       expect(spy).toHaveBeenCalledOnce();
     });
 
-    test('does not trigger, if form is not dirty', async () => {
+    test('does not trigger, if form is not dirty', () => {
       const expectedCallsToNext: number = 1;
       vi.mock('vue-router', async (importOriginal: () => Promise<Module>) => {
         const mod: Module = await importOriginal();
@@ -524,22 +528,26 @@ describe('RolleCreationView', () => {
     });
   });
 
-  describe.each([[true], [false]])('when form is dirty:%s', async (isFormDirty: boolean) => {
+  describe.each([[true], [false]])('when form is dirty:%s', (isFormDirty: boolean) => {
     beforeEach(async () => {
-      if (isFormDirty)
+      if (isFormDirty) {
         await fillForm({
           organisation: organisationObject.id,
           rollenart: RollenArt.Lern,
           rollenname: 'NewRolle',
           provider: ['1'],
         });
+      }
     });
-    test('it handles unloading', async () => {
+    test('it handles unloading', () => {
       const event: Event = new Event('beforeunload');
       const spy: MockInstance = vi.spyOn(event, 'preventDefault');
       window.dispatchEvent(event);
-      if (isFormDirty) expect(spy).toHaveBeenCalledOnce();
-      else expect(spy).not.toHaveBeenCalledOnce();
+      if (isFormDirty) {
+        expect(spy).toHaveBeenCalledOnce();
+      } else {
+        expect(spy).not.toHaveBeenCalledOnce();
+      }
     });
   });
 });

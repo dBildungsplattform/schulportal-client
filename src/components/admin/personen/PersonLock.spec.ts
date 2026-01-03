@@ -6,7 +6,7 @@ import PersonDetailsView from '@/views/admin/PersonDetailsView.vue';
 import { mount, VueWrapper } from '@vue/test-utils';
 import { DoFactory } from 'test/DoFactory';
 import { expect, test, type Mock } from 'vitest';
-import { nextTick } from 'vue';
+import { nextTick, type Component } from 'vue';
 import PersonLock from './PersonLock.vue';
 
 let wrapper: VueWrapper | null = null;
@@ -24,7 +24,9 @@ function getPersonendatensatz(locked: boolean): Personendatensatz {
   const person: Person = DoFactory.getPerson({
     isLocked: locked,
   });
-  if (locked) person.userLock.push(lock);
+  if (locked) {
+    person.userLock.push(lock);
+  }
   return { person };
 }
 
@@ -81,7 +83,7 @@ describe('Lock user', () => {
         },
         global: {
           components: {
-            PersonLock,
+            PersonLock: PersonLock as Component,
           },
         },
       });
@@ -144,7 +146,7 @@ describe('Lock user', () => {
         },
         global: {
           components: {
-            PersonLock,
+            PersonLock: PersonLock as Component,
           },
         },
       });
@@ -213,8 +215,8 @@ describe('Unlock user', () => {
       },
       global: {
         components: {
-          PersonLock,
-          PersonDetailsView,
+          PersonLock: PersonLock as Component,
+          PersonDetailsView: PersonDetailsView as Component,
         },
       },
     });
@@ -270,7 +272,7 @@ describe.each([
         },
         global: {
           components: {
-            PersonLock,
+            PersonLock: PersonLock as Component,
           },
         },
       });
@@ -303,7 +305,7 @@ describe.each([
         },
         global: {
           components: {
-            PersonLock,
+            PersonLock: PersonLock as Component,
           },
         },
       });

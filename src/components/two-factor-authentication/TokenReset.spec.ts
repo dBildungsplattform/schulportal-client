@@ -7,7 +7,7 @@ import {
 import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import { DoFactory } from 'test/DoFactory';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { nextTick } from 'vue';
+import { nextTick, type Component } from 'vue';
 
 vi.mock('vue-i18n', () => ({
   useI18n: (): { t: (key: string) => string } => ({
@@ -46,7 +46,7 @@ describe('TokenResetComponent', () => {
       attachTo: document.getElementById('app') || '',
       global: {
         components: {
-          TokenReset,
+          TokenReset: TokenReset as Component,
         },
       },
     });

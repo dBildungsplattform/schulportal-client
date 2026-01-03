@@ -28,7 +28,7 @@ type Props = {
   selectedRolleFromFilter?: RolleResponse;
 };
 
-function mountComponent(partialProps: Partial<Props> = {}): VueWrapper {
+function mountComponent(partialProps: Partial<Props> = {}): VueWrapper<InstanceType<typeof RolleUnassign>> {
   const props: Props = {
     isDialogVisible: true,
     organisationen: [
@@ -90,8 +90,11 @@ describe('RolleUnassign.vue', () => {
 
     const layoutCard: Element | null = document.body.querySelector('[data-testid="rolle-unassign-layout-card"]');
 
-    if (isDialogVisible) expect(layoutCard).not.toBeNull();
-    else expect(layoutCard).toBeNull();
+    if (isDialogVisible) {
+      expect(layoutCard).not.toBeNull();
+    } else {
+      expect(layoutCard).toBeNull();
+    }
   });
 
   test('displays confirmation form and triggers submit', async () => {

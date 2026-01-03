@@ -8,7 +8,7 @@ import {
 import { DOMWrapper, VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import { expect, test, type MockInstance } from 'vitest';
-import { nextTick } from 'vue';
+import { nextTick, type Component } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import KlassenDetailsView from './KlasseDetailsView.vue';
 
@@ -70,7 +70,7 @@ beforeEach(async () => {
     attachTo: document.getElementById('app') || '',
     global: {
       components: {
-        KlassenDetailsView,
+        KlassenDetailsView: KlassenDetailsView as Component,
       },
       mocks: {
         route: {

@@ -4,7 +4,7 @@ import type WrapperLike from 'node_modules/@vue/test-utils/dist/interfaces/wrapp
 import { expect, test } from 'vitest';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import UnknownUserErrorView from './UnknownUserErrorView.vue';
-import { nextTick } from 'vue';
+import { nextTick, type Component } from 'vue';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -28,7 +28,7 @@ beforeEach(async () => {
     attachTo: document.getElementById('app') || '',
     global: {
       components: {
-        UnknownUserErrorView,
+        UnknownUserErrorView: UnknownUserErrorView as Component,
       },
       plugins: [router],
     },

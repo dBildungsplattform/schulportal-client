@@ -1,6 +1,7 @@
 import { expect, test, describe, beforeEach } from 'vitest';
 import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
 import LabeledField from './LabeledField.vue';
+import type { Component } from 'vue';
 
 let wrapper: VueWrapper | null = null;
 
@@ -23,7 +24,7 @@ describe('LabeledField', () => {
       },
       global: {
         components: {
-          LabeledField,
+          LabeledField: LabeledField as Component,
         },
       },
     });

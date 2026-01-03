@@ -1,5 +1,5 @@
 import { expect, test, type MockInstance } from 'vitest';
-import { nextTick } from 'vue';
+import { nextTick, type Component } from 'vue';
 import { VueWrapper, mount } from '@vue/test-utils';
 import RolleDelete from './RolleDelete.vue';
 import { RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
@@ -41,7 +41,7 @@ beforeEach(async () => {
     },
     global: {
       components: {
-        RolleDelete,
+        RolleDelete: RolleDelete as Component,
       },
       plugins: [router],
     },
@@ -53,7 +53,7 @@ describe('delete rolle', () => {
     wrapper?.find('[data-testid="open-rolle-delete-dialog-button"]').trigger('click');
     await nextTick();
 
-    await document.querySelector('[data-testid="rolle-delete-confirmation-text"]');
+    document.querySelector('[data-testid="rolle-delete-confirmation-text"]');
     expect(document.querySelector('[data-testid="rolle-delete-confirmation-text"]')).not.toBeNull();
 
     const cancelDeleteButton: HTMLElement | undefined = document.querySelectorAll<HTMLElement>(
@@ -71,7 +71,7 @@ describe('delete rolle', () => {
     wrapper?.find('[data-testid="open-rolle-delete-dialog-button"]').trigger('click');
     await nextTick();
 
-    await document.querySelector('[data-testid="rolle-delete-confirmation-text"]');
+    document.querySelector('[data-testid="rolle-delete-confirmation-text"]');
     expect(document.querySelector('[data-testid="rolle-delete-confirmation-text"]')).not.toBeNull();
 
     const rolleDeleteButton: HTMLElement | undefined = document.querySelectorAll<HTMLElement>(
@@ -80,7 +80,7 @@ describe('delete rolle', () => {
     rolleDeleteButton?.click();
     await nextTick();
 
-    await document.querySelector('[data-testid="rolle-delete-success-text"]');
+    document.querySelector('[data-testid="rolle-delete-success-text"]');
     expect(document.querySelector('[data-testid="rolle-delete-success-text"]')).not.toBeNull();
 
     const closeDialogButton: HTMLElement | undefined = document.querySelectorAll<HTMLElement>(

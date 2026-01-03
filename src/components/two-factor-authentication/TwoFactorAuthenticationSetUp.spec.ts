@@ -5,7 +5,7 @@ import {
 } from '@/stores/TwoFactorAuthentificationStore';
 import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
 import { DoFactory } from 'test/DoFactory';
-import { nextTick } from 'vue';
+import { nextTick, type Component } from 'vue';
 import TwoFactorAuthenticationSetUp from './TwoFactorAuthenticationSetUp.vue';
 
 let wrapper: VueWrapper<InstanceType<typeof TwoFactorAuthenticationSetUp>> | null = null;
@@ -29,7 +29,7 @@ beforeEach(() => {
     },
     global: {
       components: {
-        TwoFactorAuthenticationSetUp,
+        TwoFactorAuthenticationSetUp: TwoFactorAuthenticationSetUp as Component,
       },
     },
   });

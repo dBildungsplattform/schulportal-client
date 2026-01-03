@@ -3,6 +3,7 @@ import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
 import ResultTable from './ResultTable.vue';
 import type { VueNode } from 'node_modules/@vue/test-utils/dist/types';
 import type { Headers } from '@/components/admin/ResultTable.vue';
+import type { Component } from 'vue-demi';
 
 let wrapper: VueWrapper | null = null;
 
@@ -42,7 +43,7 @@ beforeEach(() => {
     },
     global: {
       components: {
-        ResultTable,
+        ResultTable: ResultTable as Component,
       },
     },
   });
@@ -124,7 +125,7 @@ describe('Row Index and Item Retrieval', () => {
     }
   });
 
-  test('emits update:selectedRows event with selected items', async () => {
+  test('emits update:selectedRows event with selected items', () => {
     const selectedItems: {
       id: number;
       name: string;
@@ -133,7 +134,7 @@ describe('Row Index and Item Retrieval', () => {
       { id: 2, name: 'Bob' },
     ];
     const table: VueWrapper | undefined = wrapper?.findComponent({ ref: 'v-data-table-server' });
-    await table?.vm.$emit('update:modelValue', selectedItems);
+    table?.vm.$emit('update:modelValue', selectedItems);
 
     expect(wrapper?.emitted('update:selectedRows')).toBeTruthy();
     expect(wrapper?.emitted('update:selectedRows')?.[0]).toEqual([selectedItems]);
@@ -141,23 +142,23 @@ describe('Row Index and Item Retrieval', () => {
 });
 
 describe('Sorting', () => {
-  test('onUpdateOptions emits correct sort options', async () => {
+  test('onUpdateOptions emits correct sort options', () => {
     const sortOptions: { key: string; order: string }[] = [{ key: 'kennung', order: 'asc' }];
     const table: VueWrapper | undefined = wrapper?.findComponent({ ref: 'v-data-table-server' });
 
     // Simulate the update:sortBy event
-    await table?.vm.$emit('update:sortBy', sortOptions);
+    table?.vm.$emit('update:sortBy', sortOptions);
 
     // Verify the emitted event
     expect(wrapper?.emitted('onTableUpdate')).toBeTruthy();
     expect(wrapper?.emitted('onTableUpdate')?.[0]).toEqual([{ sortField: 'kennung', sortOrder: 'asc' }]);
   });
 
-  test('onUpdateOptions emits default sort options when no options are provided', async () => {
+  test('onUpdateOptions emits default sort options when no options are provided', () => {
     const table: VueWrapper | undefined = wrapper?.findComponent({ ref: 'v-data-table-server' });
 
     // Simulate the update:sortBy event with an empty array
-    await table?.vm.$emit('update:sortBy', []);
+    table?.vm.$emit('update:sortBy', []);
 
     // Verify the emitted event
     expect(wrapper?.emitted('onTableUpdate')).toBeTruthy();

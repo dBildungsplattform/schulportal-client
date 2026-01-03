@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import { VApp } from 'vuetify/components';
-import { h } from 'vue';
+import { h, type Component } from 'vue';
 import TheHeader from './TheHeader.vue';
 
 let wrapper: VueWrapper | null = null;
@@ -28,7 +28,7 @@ beforeEach(async () => {
     attachTo: document.getElementById('app') || '',
     global: {
       components: {
-        TheHeader,
+        TheHeader: TheHeader as Component,
       },
       plugins: [router],
     },

@@ -4,7 +4,7 @@ import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
 import { nextTick } from 'vue';
 
 describe('PersonLockInput', () => {
-  let wrapper: VueWrapper;
+  let wrapper: VueWrapper<InstanceType<typeof PersonLockInput>>;
 
   beforeEach(() => {
     wrapper = mount(PersonLockInput, {
