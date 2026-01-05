@@ -10,12 +10,10 @@
   import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
   import { onMounted, ref, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
-  import { onBeforeRouteLeave, useRouter, type Router } from 'vue-router';
+  import { onBeforeRouteLeave } from 'vue-router';
 
   const organisationStore: OrganisationStore = useOrganisationStore();
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
-
-  const router: Router = useRouter();
 
   const { t }: Composer = useI18n({ useScope: 'global' });
 
@@ -84,7 +82,6 @@
 
   const handleAlertClose = (): void => {
     organisationStore.errorCode = '';
-    router.go(0);
   };
 
   onMounted(async () => {
