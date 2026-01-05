@@ -6,8 +6,7 @@
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
-  // Props
-  interface Props {
+  type Props = {
     organisationId: string;
     organisationsTyp: OrganisationsTyp;
     isLoading: boolean;
@@ -20,14 +19,12 @@
 
   const props: Props = defineProps<Props>();
 
-  // Emits
   interface Emits {
     (event: 'onDeleteOrganisation', organisationId: string): void;
     (event: 'onClose'): void;
   }
   const emit: Emits = defineEmits<Emits>();
 
-  // State
   enum State {
     CONFIRM,
     LOADING,
@@ -37,7 +34,7 @@
   const hasTriggeredAction: Ref<boolean> = ref(false);
   const isClosing: Ref<boolean> = ref(false);
 
-  const typForTestId: ComputedRef<string> = computed(() => {
+  const typeForTestId: ComputedRef<string> = computed(() => {
     return props.organisationsTyp.toLowerCase().replace(' ', '-');
   });
 
@@ -81,7 +78,7 @@
       <v-btn
         v-if="!props.useIconActivator"
         class="secondary button"
-        :data-testid="`open-${typForTestId}-delete-dialog-button`"
+        :data-testid="`open-${typeForTestId}-delete-dialog-button`"
         v-bind="activatorProps"
         :block="mdAndDown"
       >
@@ -90,7 +87,7 @@
       <v-icon
         v-else
         :title="props.headerText"
-        :data-testid="`open-${typForTestId}-delete-dialog-icon`"
+        :data-testid="`open-${typeForTestId}-delete-dialog-icon`"
         icon="mdi-delete"
         size="small"
         v-bind="activatorProps"
@@ -100,7 +97,7 @@
     <template #default="{ isActive }">
       <LayoutCard
         :headline-test-id="
-          state === State.COMPLETE ? `${typForTestId}-delete-success` : `${typForTestId}-delete-confirmation`
+          state === State.COMPLETE ? `${typeForTestId}-delete-success` : `${typeForTestId}-delete-confirmation`
         "
         :closable="state !== State.COMPLETE"
         :header="props.headerText"
@@ -116,20 +113,20 @@
                 <template v-if="state === State.COMPLETE">
                   <span
                     v-if="!props.errorMessage"
-                    :data-testid="`${typForTestId}-delete-success-text`"
+                    :data-testid="`${typeForTestId}-delete-success-text`"
                   >
                     {{ props.successMessage }}
                   </span>
                   <span
                     v-else-if="props.errorMessage"
-                    :data-testid="`${typForTestId}-delete-error-text`"
+                    :data-testid="`${typeForTestId}-delete-error-text`"
                   >
                     {{ props.errorMessage }}
                   </span>
                 </template>
                 <span
                   v-else
-                  :data-testid="`${typForTestId}-delete-confirmation-text`"
+                  :data-testid="`${typeForTestId}-delete-confirmation-text`"
                 >
                   {{ props.confirmationMessage }}
                 </span>
@@ -148,7 +145,7 @@
               <v-btn
                 :block="mdAndDown"
                 class="secondary button"
-                :data-testid="`cancel-${typForTestId}-delete-dialog-button`"
+                :data-testid="`cancel-${typeForTestId}-delete-dialog-button`"
                 @click.stop="closeOrganisationDeleteDialog(isActive)"
               >
                 {{ $t('cancel') }}
@@ -163,7 +160,7 @@
                 v-if="state === State.COMPLETE"
                 :block="mdAndDown"
                 class="primary"
-                :data-testid="`close-${typForTestId}-delete-success-dialog-button`"
+                :data-testid="`close-${typeForTestId}-delete-success-dialog-button`"
                 @click.stop="closeCompleteDialog(isActive)"
               >
                 {{ $t('close') }}
@@ -172,7 +169,7 @@
                 v-else
                 :block="mdAndDown"
                 class="primary button"
-                :data-testid="`${typForTestId}-delete-button`"
+                :data-testid="`${typeForTestId}-delete-button`"
                 :disabled="state === State.LOADING"
                 @click.stop="handleOrganisationDelete(props.organisationId)"
               >
