@@ -1,5 +1,5 @@
 import routes from '@/router/routes';
-import { OperationType, useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
+import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
 import type { Person } from '@/stores/types/Person';
 import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
 import type { Zuordnung } from '@/stores/types/Zuordnung';
@@ -10,6 +10,7 @@ import { beforeEach, describe, expect, test, vi, type MockInstance } from 'vites
 import { nextTick } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import PersonBulkPasswordReset from './PersonBulkPasswordReset.vue';
+import { OperationType } from '@/stores/types/bulkOperationTypes';
 
 let router: Router;
 const bulkOperationStore: BulkOperationStore = useBulkOperationStore();

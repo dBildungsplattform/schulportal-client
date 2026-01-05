@@ -1,9 +1,10 @@
-import { OperationType, useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
+import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
 import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
 import { DoFactory } from 'test/DoFactory';
 import type { MockInstance } from 'vitest';
 import { useBulkErrors, type BulkErrorList } from './useBulkErrors';
 import type { Composer } from 'vue-i18n';
+import { OperationType } from '@/stores/types/bulkOperationTypes';
 
 describe('useBulkErrors', () => {
   let personen: Map<string, PersonWithZuordnungen>;
