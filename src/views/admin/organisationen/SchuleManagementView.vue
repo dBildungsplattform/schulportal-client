@@ -183,7 +183,8 @@
               "
               :success-message="$t('admin.schule.deleteSchuleSuccess', { schulname: item.name })"
               :error-message="
-                organisationStore.errorCode ? $t(`admin.schule.errors.${organisationStore.errorCode}`) : ''
+                $t('admin.schule.deleteSchuleNotice') +
+                (organisationStore.errorCode ? ' ' + $t(`admin.schule.errors.${organisationStore.errorCode}`) : '')
               "
               :use-icon-activator="true"
               :is-loading="organisationStore.loading"

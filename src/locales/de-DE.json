@@ -577,6 +577,7 @@
       "deleteSchuleHeader": "Schule löschen",
       "deleteSchuleConfirmation": "Soll die Schule {dienststellennummer} ({schulname}) wirklich endgültig gelöscht werden?",
       "deleteSchuleSuccess": "Die Schule wurde erfolgreich gelöscht.",
+      "deleteSchuleNotice": "Die Schule kann nicht gelöscht werden, da folgende Bedingung nicht erfüllt ist:",
       "discard": "Schule verwerfen",
       "dienststellennummer": "Dienststellennummer",
       "enterDienststellennummer": "Dienststellennummer eingeben",
