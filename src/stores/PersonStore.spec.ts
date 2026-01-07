@@ -287,7 +287,7 @@ describe('PersonStore', () => {
         month: '2-digit',
         year: 'numeric',
       };
-      const mockPerson = getMockPersonendatensatz();
+      const mockPerson: Personendatensatz = getMockPersonendatensatz();
       const mockResponse: PersonendatensatzResponse = DoFactory.getPersonendatensatzResponse(mockPerson.person);
 
       mockadapter.onGet('/api/personen/1234').replyOnce(200, mockResponse);

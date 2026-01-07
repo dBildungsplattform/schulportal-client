@@ -37,7 +37,7 @@ let { storedBeforeRouteLeaveCallback }: { storedBeforeRouteLeaveCallback: OnBefo
         _from: RouteLocationNormalized,
         _next: NavigationGuardNext,
       ): void => {
-        // intentionally left blank
+        // intentionally left blank for test hoisting
       },
     };
   },

@@ -7,9 +7,7 @@ describe('parseUserLock', () => {
   const personId: string = faker.string.uuid();
 
   const locked_by: string = faker.string.uuid();
-
   const created_at: Date = faker.date.past({ refDate });
-
   const locked_until: Date = faker.date.future({ refDate });
 
   vi.setSystemTime(refDate);
