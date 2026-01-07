@@ -15,7 +15,7 @@
     confirmationMessage: string;
     successMessage: string;
     errorMessage?: string;
-  }
+  };
 
   const props: Props = defineProps<Props>();
 
