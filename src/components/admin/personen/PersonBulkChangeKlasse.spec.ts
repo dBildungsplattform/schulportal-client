@@ -1,5 +1,5 @@
 import routes from '@/router/routes';
-import { OperationType, useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
+import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
 import type { Organisation } from '@/stores/OrganisationStore';
 import { RollenArt } from '@/stores/RolleStore';
 import type { Person } from '@/stores/types/Person';
@@ -13,6 +13,7 @@ import { nextTick, type Component } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import PersonBulkChangeKlasse from './PersonBulkChangeKlasse.vue';
 import type WrapperLike from 'node_modules/@vue/test-utils/dist/interfaces/wrapperLike';
+import { OperationType } from '@/stores/types/bulkOperationTypes';
 
 let router: Router;
 const bulkOperationStore: BulkOperationStore = useBulkOperationStore();

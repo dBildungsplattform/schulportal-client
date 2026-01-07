@@ -1,24 +1,19 @@
 <script setup lang="ts">
-  import { onMounted, ref, type Ref } from 'vue';
   import ResultTable, { type Headers } from '@/components/admin/ResultTable.vue';
-  import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { type Composer, useI18n } from 'vue-i18n';
-  import {
-    OrganisationsTyp,
-    useOrganisationStore,
-    type Organisation,
-    type OrganisationStore,
-  } from '@/stores/OrganisationStore';
-  import { type SearchFilterStore, useSearchFilterStore } from '@/stores/SearchFilterStore';
   import SearchField from '@/components/admin/SearchField.vue';
+  import OrganisationDelete from '@/components/admin/organisationen/OrganisationDelete.vue';
   import ItsLearningSetup from '@/components/admin/schulen/itsLearningSetup.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
-  import { onBeforeRouteLeave, useRouter, type Router } from 'vue-router';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+  import { RollenSystemRecht } from '@/stores/RolleStore';
+  import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
+  import { onMounted, ref, type Ref } from 'vue';
+  import { useI18n, type Composer } from 'vue-i18n';
+  import { onBeforeRouteLeave } from 'vue-router';
 
   const organisationStore: OrganisationStore = useOrganisationStore();
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
-
-  const router: Router = useRouter();
 
   const { t }: Composer = useI18n({ useScope: 'global' });
 
@@ -31,9 +26,15 @@
     },
     { title: t('admin.schule.schulname'), key: 'name', align: 'start' },
     { title: t('admin.schule.itsLearningStatus'), key: 'itslearning', sortable: false, align: 'start' },
+    {
+      title: t('action'),
+      key: 'actions',
+      align: 'center',
+      sortable: false,
+      width: '250px',
+    },
   ];
 
-  const allSchulen: Ref<Array<Organisation>> = ref([]);
   const searchFilter: Ref<string> = ref('');
 
   async function fetchSchulen(): Promise<void> {
@@ -41,7 +42,7 @@
       offset: (searchFilterStore.schulenPage - 1) * searchFilterStore.schulenPerPage,
       limit: searchFilterStore.schulenPerPage,
       includeTyp: OrganisationsTyp.Schule,
-      systemrechte: ['SCHULEN_VERWALTEN'],
+      systemrechte: [RollenSystemRecht.SchulenVerwalten],
       searchString: searchFilterStore.searchFilterSchulen || '',
     });
   }
@@ -71,14 +72,20 @@
     await organisationStore.setItsLearningForSchule(organisationId);
   }
 
+  async function deleteSchule(organisationId: string): Promise<void> {
+    await organisationStore.deleteOrganisationById(organisationId);
+  }
+
+  const handleSchuleDeleteClose = async (): Promise<void> => {
+    await fetchSchulen();
+  };
+
   const handleAlertClose = (): void => {
     organisationStore.errorCode = '';
-    router.go(0);
   };
 
   onMounted(async () => {
     await fetchSchulen();
-    allSchulen.value = organisationStore.allSchulen;
   });
 
   onBeforeRouteLeave(() => {
@@ -111,7 +118,8 @@
         :text="
           organisationStore.errorCode === 'UNSPECIFIED_ERROR'
             ? $t('admin.schule.loadingErrorText')
-            : $t(`admin.schule.errors.${organisationStore.errorCode}`)
+            : $t('admin.schule.deleteSchuleNotice') +
+              (organisationStore.errorCode ? ' ' + $t(`admin.schule.errors.${organisationStore.errorCode}`) : '')
         "
         :show-button="true"
         :button-text="$t('nav.backToList')"
@@ -164,6 +172,24 @@
               :schul-id="item.id"
               :itslearning-enabled="item.itslearningEnabled || false"
               @on-activate-itslearning="toggleItsLearningStatus(item.id)"
+            />
+          </template>
+          <template #[`item.actions`]="{ item }">
+            <OrganisationDelete
+              :organisations-typ="OrganisationsTyp.Schule"
+              :organisation-id="item.id"
+              :header-text="$t('admin.schule.deleteSchuleHeader', { schulname: item.name })"
+              :confirmation-message="
+                $t('admin.schule.deleteSchuleConfirmation', { dienststellennummer: item.kennung, schulname: item.name })
+              "
+              :success-message="$t('admin.schule.deleteSchuleSuccess', { schulname: item.name })"
+              :error-message="
+                organisationStore.errorCode ? $t(`admin.schule.errors.${organisationStore.errorCode}`) : ''
+              "
+              :use-icon-activator="true"
+              :is-loading="organisationStore.loading"
+              @on-delete-organisation="deleteSchule(item.id)"
+              @on-close="handleSchuleDeleteClose"
             />
           </template>
         </ResultTable>

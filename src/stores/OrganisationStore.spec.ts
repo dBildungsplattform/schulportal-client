@@ -12,6 +12,7 @@ import {
   type OrganisationStore,
 } from './OrganisationStore';
 import { flushPromises } from '@vue/test-utils';
+import { faker } from '@faker-js/faker';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 
@@ -1151,10 +1152,10 @@ describe('OrganisationStore', () => {
     });
   });
 
-  describe('deleteOrganisationById', () => {
-    it('should delete organisation and update state', async () => {
+  describe('deleteKlasseById', () => {
+    it('should delete klasse and update state', async () => {
       mockadapter.onDelete('/api/organisationen/1/klasse').replyOnce(200);
-      const deleteOrganisationPromise: Promise<void> = organisationStore.deleteOrganisationById('1');
+      const deleteOrganisationPromise: Promise<void> = organisationStore.deleteKlasseById('1');
       expect(organisationStore.loading).toBe(true);
       await deleteOrganisationPromise;
       expect(organisationStore.loading).toBe(false);
@@ -1163,7 +1164,7 @@ describe('OrganisationStore', () => {
 
     it('should handle string error', async () => {
       mockadapter.onDelete('/api/organisationen/1/klasse').replyOnce(500, 'some mock server error');
-      const deleteOrganisationPromise: Promise<void> = organisationStore.deleteOrganisationById('1');
+      const deleteOrganisationPromise: Promise<void> = organisationStore.deleteKlasseById('1');
       expect(organisationStore.loading).toBe(true);
       await deleteOrganisationPromise;
       expect(organisationStore.loading).toBe(false);
@@ -1172,11 +1173,39 @@ describe('OrganisationStore', () => {
 
     it('should handle error code', async () => {
       mockadapter.onDelete('/api/organisationen/1/klasse').replyOnce(500, { i18nKey: 'KLASSE_ERROR' });
-      const deleteOrganisationPromise: Promise<void> = organisationStore.deleteOrganisationById('1');
+      const deleteOrganisationPromise: Promise<void> = organisationStore.deleteKlasseById('1');
       expect(organisationStore.loading).toBe(true);
       await deleteOrganisationPromise;
       expect(organisationStore.loading).toBe(false);
       expect(organisationStore.errorCode).toEqual('KLASSE_ERROR');
+    });
+  });
+
+  describe('deleteOrganisationById', () => {
+    const organisationId: string = faker.string.uuid();
+    const endpoint: string = `/api/organisationen/${organisationId}`;
+
+    it('should delete organisation and update state', async () => {
+      mockadapter.onDelete(endpoint).replyOnce(200);
+      const deleteOrganisationPromise: Promise<void> = organisationStore.deleteOrganisationById(organisationId);
+      expect(organisationStore.loading).toBe(true);
+      await deleteOrganisationPromise;
+      expect(organisationStore.loading).toBe(false);
+      expect(organisationStore.errorCode).toEqual('');
+    });
+
+    type ErrorType = string | { i18nKey: string };
+
+    it.each([
+      ['some mock server error', 'UNSPECIFIED_ERROR'],
+      [{ i18nKey: 'some mock server error' }, 'some mock server error'],
+    ])('should handle error', async (error: ErrorType, expectedErrorCode: string) => {
+      mockadapter.onDelete(endpoint).replyOnce(500, error);
+      const deleteOrganisationPromise: Promise<void> = organisationStore.deleteOrganisationById(organisationId);
+      expect(organisationStore.loading).toBe(true);
+      await deleteOrganisationPromise;
+      expect(organisationStore.loading).toBe(false);
+      expect(organisationStore.errorCode).toEqual(expectedErrorCode);
     });
   });
 

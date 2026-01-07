@@ -632,7 +632,13 @@ export const DbiamOrganisationErrorI18nKeyEnum = {
     NewerVersionOrganisation: 'NEWER_VERSION_ORGANISATION',
     OrganisationWechseltTeilbaum: 'ORGANISATION_WECHSELT_TEILBAUM',
     OrganisationZuweisungFehler: 'ORGANISATION_ZUWEISUNG_FEHLER',
-    SchultraegerNameEindeutig: 'SCHULTRAEGER_NAME_EINDEUTIG'
+    SchultraegerNameEindeutig: 'SCHULTRAEGER_NAME_EINDEUTIG',
+    OrganisationHatKinder: 'ORGANISATION_HAT_KINDER',
+    OrganisationHatZugehoerige: 'ORGANISATION_HAT_ZUGEHOERIGE',
+    OrganisationHatRollen: 'ORGANISATION_HAT_ROLLEN',
+    OrganisationHatPersonenkontexte: 'ORGANISATION_HAT_PERSONENKONTEXTE',
+    OrganisationHatAngebote: 'ORGANISATION_HAT_ANGEBOTE',
+    OrganisationHatRollenerweiterungen: 'ORGANISATION_HAT_ROLLENERWEITERUNGEN'
 } as const;
 
 export type DbiamOrganisationErrorI18nKeyEnum = typeof DbiamOrganisationErrorI18nKeyEnum[keyof typeof DbiamOrganisationErrorI18nKeyEnum];
@@ -7515,6 +7521,48 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
             };
         },
         /**
+         * Delete an organisation by id.
+         * @summary 
+         * @param {string} organisationId The id of an organization
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        organisationControllerDeleteOrganisation: async (organisationId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'organisationId' is not null or undefined
+            assertParamExists('organisationControllerDeleteOrganisation', 'organisationId', organisationId)
+            const localVarPath = `/api/organisationen/{organisationId}`
+                .replace(`{${"organisationId"}}`, encodeURIComponent(String(organisationId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @param {string} organisationId The id of an organization
          * @param {*} [options] Override http request option.
@@ -8054,6 +8102,17 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * Delete an organisation by id.
+         * @summary 
+         * @param {string} organisationId The id of an organization
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async organisationControllerDeleteOrganisation(organisationId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerDeleteOrganisation(organisationId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * 
          * @param {string} organisationId The id of an organization
          * @param {*} [options] Override http request option.
@@ -8209,6 +8268,16 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
             return localVarFp.organisationControllerDeleteKlasse(organisationId, options).then((request) => request(axios, basePath));
         },
         /**
+         * Delete an organisation by id.
+         * @summary 
+         * @param {string} organisationId The id of an organization
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        organisationControllerDeleteOrganisation(organisationId: string, options?: any): AxiosPromise<void> {
+            return localVarFp.organisationControllerDeleteOrganisation(organisationId, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @param {string} organisationId The id of an organization
          * @param {*} [options] Override http request option.
@@ -8351,6 +8420,16 @@ export interface OrganisationenApiInterface {
      * @memberof OrganisationenApiInterface
      */
     organisationControllerDeleteKlasse(organisationId: string, options?: AxiosRequestConfig): AxiosPromise<void>;
+
+    /**
+     * Delete an organisation by id.
+     * @summary 
+     * @param {string} organisationId The id of an organization
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganisationenApiInterface
+     */
+    organisationControllerDeleteOrganisation(organisationId: string, options?: AxiosRequestConfig): AxiosPromise<void>;
 
     /**
      * 
@@ -8500,6 +8579,18 @@ export class OrganisationenApi extends BaseAPI implements OrganisationenApiInter
      */
     public organisationControllerDeleteKlasse(organisationId: string, options?: AxiosRequestConfig) {
         return OrganisationenApiFp(this.configuration).organisationControllerDeleteKlasse(organisationId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Delete an organisation by id.
+     * @summary 
+     * @param {string} organisationId The id of an organization
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganisationenApi
+     */
+    public organisationControllerDeleteOrganisation(organisationId: string, options?: AxiosRequestConfig) {
+        return OrganisationenApiFp(this.configuration).organisationControllerDeleteOrganisation(organisationId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

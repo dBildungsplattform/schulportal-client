@@ -147,7 +147,7 @@ describe('KlassenManagementView', () => {
 
     organisationStore.getAllOrganisationen = vi.fn();
     organisationStore.getKlassenByOrganisationId = vi.fn();
-    organisationStore.deleteOrganisationById = vi.fn();
+    organisationStore.deleteKlasseById = vi.fn();
 
     authStore.currentUser = authUser;
 
