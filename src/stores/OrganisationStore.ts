@@ -158,7 +158,6 @@ type OrganisationActions = {
     typ: OrganisationsTyp,
     traegerschaft?: TraegerschaftTyp,
   ) => Promise<void>;
-  deleteKlasseById: (klasseId: string) => Promise<void>;
   deleteOrganisationById: (organisationId: string) => Promise<void>;
   updateOrganisationById: (organisationId: string, name: string, type: OrganisationsTyp) => Promise<void>;
   getRootKinderSchultraeger: () => Promise<void>;
@@ -563,18 +562,6 @@ export const useOrganisationStore: StoreDefinition<
         );
 
         this.updatedOrganisation = data;
-      } catch (error: unknown) {
-        this.errorCode = getResponseErrorCode(error, 'KLASSE_ERROR');
-      } finally {
-        this.loading = false;
-      }
-    },
-
-    async deleteKlasseById(klasseId: string): Promise<void> {
-      this.errorCode = '';
-      this.loading = true;
-      try {
-        await organisationApi.organisationControllerDeleteKlasse(klasseId);
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'KLASSE_ERROR');
       } finally {
