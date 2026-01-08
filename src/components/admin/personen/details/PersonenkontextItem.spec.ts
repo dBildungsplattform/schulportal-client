@@ -4,14 +4,15 @@ import { mount, type VueWrapper } from '@vue/test-utils';
 import { DoFactory } from 'test/DoFactory';
 import { PendingState, type Props } from './PersonenkontextItem.types';
 import type { Zuordnung } from '@/stores/types/Zuordnung';
+import type { Component } from 'vue';
 
-function mountComponent(props: Props): VueWrapper {
+function mountComponent(props: Props): VueWrapper<InstanceType<typeof PersonenkontextItem>> {
   return mount(PersonenkontextItem, {
     attachTo: document.getElementById('app') || '',
     props,
     global: {
       components: {
-        PersonenkontextItem,
+        PersonenkontextItem: PersonenkontextItem as Component,
       },
     },
   });
@@ -28,15 +29,19 @@ describe('PersonenkontextItem', () => {
   describe.each([[true], [false]])('when zuordnung hasDstNr=%s', (hasDstNr: boolean) => {
     it('renders correctly', () => {
       const zuordnung: Zuordnung = DoFactory.getZuordnung();
-      if (hasDstNr === false) zuordnung.sskDstNr = null;
+      if (hasDstNr === false) {
+        zuordnung.sskDstNr = null;
+      }
       const klasse: string = DoFactory.getKlasse().name;
       const props: Props = {
         zuordnung: { ...zuordnung, klasse },
         pendingState: undefined,
       };
-      const wrapper: VueWrapper = mountComponent(props);
+      const wrapper: VueWrapper = mountComponent(props) as VueWrapper;
       expect(wrapper.text()).toContain(zuordnung.sskName.substring(0, 30));
-      if (zuordnung.sskDstNr) expect(wrapper.text()).toContain(zuordnung.sskDstNr);
+      if (zuordnung.sskDstNr) {
+        expect(wrapper.text()).toContain(zuordnung.sskDstNr);
+      }
       expect(wrapper.text()).toContain(zuordnung.rolle);
       expect(wrapper.text()).toContain(klasse);
     });
@@ -49,7 +54,7 @@ describe('PersonenkontextItem', () => {
       zuordnung,
       pendingState: undefined,
     };
-    const wrapper: VueWrapper = mountComponent(props);
+    const wrapper: VueWrapper = mountComponent(props) as VueWrapper;
     expect(wrapper.text()).toContain('A'.repeat(30));
     expect(wrapper.text()).toContain('...');
     expect(wrapper.text()).not.toContain('A'.repeat(31)); // Should not show the 31st character
@@ -57,20 +62,27 @@ describe('PersonenkontextItem', () => {
 
   describe.each([[PendingState.CREATED], [PendingState.DELETED], [undefined]])(
     'when pendingState is %s',
-    async (pendingState: PendingState | undefined) => {
+    (pendingState: PendingState | undefined) => {
       describe.each([[true], [false]])('when zuordnung hasBefristung=%s', (hasBefristung: boolean) => {
         it('correctly shows conditional text', () => {
           const zuordnung: Zuordnung = DoFactory.getZuordnung();
-          if (hasBefristung === false) zuordnung.befristung = null;
+          if (hasBefristung === false) {
+            zuordnung.befristung = null;
+          }
           const props: Props = {
             zuordnung,
             pendingState,
           };
-          const wrapper: VueWrapper = mountComponent(props);
-          if (hasBefristung) expect(wrapper.text()).toContain(adjustDateForTimezoneAndFormat(zuordnung.befristung!));
-          else {
-            if (pendingState === PendingState.CREATED) expect(wrapper.text()).toContain('wird hinzugefügt');
-            if (pendingState === PendingState.DELETED) expect(wrapper.text()).toContain('wird entfernt');
+          const wrapper: VueWrapper = mountComponent(props) as VueWrapper;
+          if (hasBefristung) {
+            expect(wrapper.text()).toContain(adjustDateForTimezoneAndFormat(zuordnung.befristung!));
+          } else {
+            if (pendingState === PendingState.CREATED) {
+              expect(wrapper.text()).toContain('wird hinzugefügt');
+            }
+            if (pendingState === PendingState.DELETED) {
+              expect(wrapper.text()).toContain('wird entfernt');
+            }
           }
         });
       });
@@ -81,12 +93,17 @@ describe('PersonenkontextItem', () => {
           zuordnung,
           pendingState,
         };
-        const wrapper: VueWrapper = mountComponent(props);
+        const wrapper: VueWrapper = mountComponent(props) as VueWrapper;
 
-        if (pendingState === PendingState.CREATED) expect(wrapper.classes()).toContain('text-green');
-        if (pendingState === PendingState.DELETED) expect(wrapper.classes()).toContain('text-red');
-        if (pendingState === undefined)
+        if (pendingState === PendingState.CREATED) {
+          expect(wrapper.classes()).toContain('text-green');
+        }
+        if (pendingState === PendingState.DELETED) {
+          expect(wrapper.classes()).toContain('text-red');
+        }
+        if (pendingState === undefined) {
           expect(wrapper.classes()).not.toEqual(expect.arrayContaining(['text-green', 'text-red']));
+        }
       });
     },
   );
@@ -100,10 +117,13 @@ describe('PersonenkontextItem', () => {
         pendingState: undefined,
         showUnlimitedBefristung,
       };
-      const wrapper: VueWrapper = mountComponent(props);
+      const wrapper: VueWrapper = mountComponent(props) as VueWrapper;
 
-      if (showUnlimitedBefristung) expect(wrapper.text()).toContain('Unbefristet');
-      else expect(wrapper.text()).not.toContain('Unbefristet');
+      if (showUnlimitedBefristung) {
+        expect(wrapper.text()).toContain('Unbefristet');
+      } else {
+        expect(wrapper.text()).not.toContain('Unbefristet');
+      }
     });
   });
 
@@ -115,7 +135,7 @@ describe('PersonenkontextItem', () => {
         pendingState: undefined,
         noMargin,
       };
-      const wrapper: VueWrapper = mountComponent(props);
+      const wrapper: VueWrapper = mountComponent(props) as VueWrapper;
 
       if (noMargin) {
         expect(wrapper.classes()).not.toEqual(expect.arrayContaining(['my-3', 'ml-5']));

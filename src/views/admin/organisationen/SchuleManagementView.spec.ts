@@ -1,9 +1,9 @@
 import routes from '@/router/routes';
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+import { nextTick, type Component } from 'vue';
 import { VueWrapper, mount } from '@vue/test-utils';
 import type WrapperLike from 'node_modules/@vue/test-utils/dist/interfaces/wrapperLike';
 import { expect, test } from 'vitest';
-import { nextTick } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import SchuleManagementView from './SchuleManagementView.vue';
 
@@ -55,7 +55,7 @@ beforeEach(async () => {
     attachTo: document.getElementById('app') || '',
     global: {
       components: {
-        SchuleManagementView,
+        SchuleManagementView: SchuleManagementView as Component,
       },
       plugins: [router],
       provide: {

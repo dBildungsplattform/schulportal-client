@@ -3,7 +3,7 @@ import { mount, VueWrapper } from '@vue/test-utils';
 import PersonenMetadataChange from './PersonenMetadataChange.vue';
 
 describe('PersonenMetadataChange', () => {
-  let wrapper: VueWrapper;
+  let wrapper: VueWrapper<InstanceType<typeof PersonenMetadataChange>>;
 
   beforeEach(() => {
     wrapper = mount(PersonenMetadataChange, {
@@ -73,9 +73,9 @@ describe('PersonenMetadataChange', () => {
     expect(wrapper.emitted('update:selectedFamilienname')?.[0]).toEqual(['Smith']);
   });
 
-  it('emits update:selectedKopersNrMetadata when KopersInput changes', async () => {
+  it('emits update:selectedKopersNrMetadata when KopersInput changes', () => {
     const kopersInput: VueWrapper = wrapper.findComponent({ name: 'KopersInput' });
-    await kopersInput.vm.$emit('update:selectedKopersNr', '654321');
+    kopersInput.vm.$emit('update:selectedKopersNr', '654321');
     expect(wrapper.emitted('update:selectedKopersNrMetadata')).toBeTruthy();
     expect(wrapper.emitted('update:selectedKopersNrMetadata')?.[0]).toEqual(['654321']);
   });

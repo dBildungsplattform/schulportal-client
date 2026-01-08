@@ -5,11 +5,9 @@ import { formatDateDigitsToGermanDate } from './date';
 describe('parseUserLock', () => {
   const refDate: Date = new Date();
   const personId: string = faker.string.uuid();
-  // eslint-disable-next-line @typescript-eslint/naming-convention
+
   const locked_by: string = faker.string.uuid();
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   const created_at: Date = faker.date.past({ refDate });
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   const locked_until: Date = faker.date.future({ refDate });
 
   vi.setSystemTime(refDate);

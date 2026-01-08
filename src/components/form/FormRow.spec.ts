@@ -1,6 +1,7 @@
 import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import FormRow from './FormRow.vue';
+import type { Component } from 'vue';
 
 let wrapper: VueWrapper | null = null;
 
@@ -20,7 +21,7 @@ beforeEach(() => {
     },
     global: {
       components: {
-        FormRow,
+        FormRow: FormRow as Component,
       },
     },
   });

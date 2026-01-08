@@ -34,7 +34,7 @@ describe('getNextSchuljahresende', () => {
 });
 
 describe('formatDateToIso', () => {
-  test.todo('', () => {});
+  test.todo('');
 });
 
 describe('formatDateDigitsToGermanDate', () => {
@@ -47,11 +47,11 @@ describe('formatDateDigitsToGermanDate', () => {
 });
 
 describe('adjustDateForTimezoneAndFormat', () => {
-  test.todo('', () => {});
+  test.todo('');
 });
 
 describe('formatDate', () => {
-  test.todo('', () => {});
+  test.todo('');
 });
 
 describe('notInPast', () => {

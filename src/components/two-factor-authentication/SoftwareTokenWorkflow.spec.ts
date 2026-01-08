@@ -4,6 +4,7 @@ import {
   useTwoFactorAuthentificationStore,
   type TwoFactorAuthentificationStore,
 } from '@/stores/TwoFactorAuthentificationStore';
+import { nextTick, type Component } from 'vue';
 
 let twoFactorAuthenticationStore: TwoFactorAuthentificationStore;
 
@@ -26,34 +27,37 @@ describe('software token workflow', () => {
       },
       global: {
         components: {
-          SoftwareTokenWorkflow,
+          SoftwareTokenWorkflow: SoftwareTokenWorkflow as Component,
         },
       },
     });
   });
 
-  test('it opens the dialog', async () => {
-    await document.querySelector('[data-testid="software-token-dialog-text"]');
+  test('it opens the dialog', () => {
+    document.querySelector('[data-testid="software-token-dialog-text"]');
     expect(document.querySelector('[data-testid="software-token-dialog-text"]')).not.toBeNull();
   });
 
-  test('qr code is displayed', async () => {
-    await document.querySelector('[data-testid="software-token-dialog-qr-code"]');
+  test('qr code is displayed', () => {
+    document.querySelector('[data-testid="software-token-dialog-qr-code"]');
     expect(document.querySelector('[data-testid="software-token-dialog-qr-code"]')).not.toBeNull();
   });
 
   test('check for error messages', async () => {
     twoFactorAuthenticationStore.errorCode = 'SOFTWARE_TOKEN_INITIALIZATION_ERROR';
+    await nextTick();
 
-    await document.querySelector('[data-testid="software-token-dialog-error-text"]');
+    document.querySelector('[data-testid="software-token-dialog-error-text"]');
     expect(document.querySelector('[data-testid="software-token-dialog-error-text"]')).not.toBeNull();
 
     twoFactorAuthenticationStore.errorCode = 'test';
-    await document.querySelector('[data-testid="software-token-dialog-error-text"]');
+    await nextTick();
+    document.querySelector('[data-testid="software-token-dialog-error-text"]');
     expect(document.querySelector('[data-testid="software-token-dialog-error-text"]')).not.toBeNull();
 
     twoFactorAuthenticationStore.errorCode = '';
-    await document.querySelector('[data-testid="software-token-dialog-error-text"]');
+    await nextTick();
+    document.querySelector('[data-testid="software-token-dialog-error-text"]');
     expect(document.querySelector('[data-testid="software-token-dialog-error-text"]')).toBeNull();
   });
 });

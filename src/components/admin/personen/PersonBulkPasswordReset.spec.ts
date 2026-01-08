@@ -23,7 +23,7 @@ type Props = {
 
 const mockPerson: Person = DoFactory.getPerson();
 
-function mountComponent(partialProps: Partial<Props> = {}): VueWrapper {
+function mountComponent(partialProps: Partial<Props> = {}): VueWrapper<InstanceType<typeof PersonBulkPasswordReset>> {
   const selectedSchuleKennung: string = '1234567';
   const zuordnung: Zuordnung = DoFactory.getZuordnung({
     sskDstNr: selectedSchuleKennung,
@@ -69,8 +69,11 @@ describe('PersonBulkPasswordReset', () => {
     mountComponent({ isDialogVisible });
     await nextTick();
     const layoutCard: Element | null = document.body.querySelector('[data-testid="password-reset-layout-card"]');
-    if (isDialogVisible) expect(layoutCard).not.toBeNull();
-    else expect(layoutCard).toBeNull();
+    if (isDialogVisible) {
+      expect(layoutCard).not.toBeNull();
+    } else {
+      expect(layoutCard).toBeNull();
+    }
   });
 
   test('when state changes, it switches to next template', async () => {
@@ -111,7 +114,7 @@ describe('PersonBulkPasswordReset', () => {
   });
 
   test('cancel button closes dialog and resets store', async () => {
-    const wrapper: VueWrapper = mountComponent();
+    const wrapper: VueWrapper = mountComponent() as VueWrapper;
     await nextTick();
 
     const cancelButton: Element | null = document.body.querySelector('[data-testid="password-reset-discard-button"]');
@@ -142,7 +145,7 @@ describe('PersonBulkPasswordReset', () => {
       data: new Map(),
       successMessage: '',
     };
-    const wrapper: VueWrapper = mountComponent();
+    const wrapper: VueWrapper = mountComponent() as VueWrapper;
     await nextTick();
 
     const closeButton: Element | null = document.body.querySelector('[data-testid="password-reset-close-button"]');

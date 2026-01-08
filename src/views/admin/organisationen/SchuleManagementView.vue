@@ -182,6 +182,7 @@
               :confirmation-message="
                 $t('admin.schule.deleteSchuleConfirmation', { dienststellennummer: item.kennung, schulname: item.name })
               "
+              :condition-list-message="$t('admin.schule.deleteSchuleConditionList')"
               :success-message="$t('admin.schule.deleteSchuleSuccess', { schulname: item.name })"
               :error-message="
                 organisationStore.errorCode ? $t(`admin.schule.errors.${organisationStore.errorCode}`) : ''

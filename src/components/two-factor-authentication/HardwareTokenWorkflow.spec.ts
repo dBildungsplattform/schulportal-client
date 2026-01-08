@@ -5,7 +5,7 @@ import {
 import { mount, VueWrapper } from '@vue/test-utils';
 import { DoFactory } from 'test/DoFactory';
 import { vi } from 'vitest';
-import { nextTick } from 'vue';
+import { nextTick, type Component } from 'vue';
 import HardwareTokenWorkflow from './HardwareTokenWorkflow.vue';
 
 vi.mock('vue-i18n', () => ({
@@ -38,7 +38,7 @@ describe('HardwareTokenWorkflow.vue', () => {
       attachTo: document.getElementById('app') || '',
       global: {
         components: {
-          HardwareTokenWorkflow,
+          HardwareTokenWorkflow: HardwareTokenWorkflow as Component,
         },
       },
     });
@@ -58,7 +58,7 @@ describe('HardwareTokenWorkflow.vue', () => {
     expect(wrapper?.getComponent({ name: 'FormRow' })).toBeTruthy();
   });
 
-  test('it renders the form fields', async () => {
+  test('it renders the form fields', () => {
     const serialInput: Element | null = document.querySelector('[data-testid="hardware-token-serial-input"]');
     const otpInput: Element | null = document.querySelector('[data-testid="hardware-token-otp-input"]');
 
@@ -75,7 +75,7 @@ describe('HardwareTokenWorkflow.vue', () => {
     });
   });
 
-  test('it submits the form with valid input', async () => {
+  test('it submits the form with valid input', () => {
     const serialWrapper: HTMLElement = document.querySelector(
       '[data-testid="hardware-token-serial-input"]',
     ) as HTMLElement;

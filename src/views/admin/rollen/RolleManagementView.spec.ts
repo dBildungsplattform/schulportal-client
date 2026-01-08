@@ -2,7 +2,7 @@ import { expect, test, type MockInstance } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import RolleManagementView from './RolleManagementView.vue';
 import { RollenMerkmal, useRolleStore, type RolleStore } from '@/stores/RolleStore';
-import { nextTick } from 'vue';
+import { nextTick, type Component } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import routes from '@/router/routes';
 import type WrapperLike from 'node_modules/@vue/test-utils/dist/interfaces/wrapperLike';
@@ -102,7 +102,7 @@ beforeEach(() => {
     attachTo: document.getElementById('app') || '',
     global: {
       components: {
-        RolleManagementView,
+        RolleManagementView: RolleManagementView as Component,
       },
       mocks: {
         route: {

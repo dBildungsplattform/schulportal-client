@@ -11,6 +11,7 @@ import {
   type OrganisationenFilter,
   type OrganisationStore,
 } from './OrganisationStore';
+import { flushPromises } from '@vue/test-utils';
 import { faker } from '@faker-js/faker';
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
@@ -120,7 +121,7 @@ describe('OrganisationStore', () => {
 
       mockadapter.onGet('/api/organisationen?offset=0&limit=30&typ=KLASSE').replyOnce(200, mockResponse);
       mockadapter.onGet('/api/organisationen?limit=30&typ=SCHULE&systemrechte=KLASSEN_VERWALTEN').replyOnce(200, []);
-      const getAllOrganisationenPromise: void = await organisationStore.getAllOrganisationen({
+      const getAllOrganisationenPromise: Promise<void> = organisationStore.getAllOrganisationen({
         offset: 0,
         limit: 30,
         includeTyp: OrganisationsTyp.Klasse,
@@ -1274,13 +1275,14 @@ describe('OrganisationStore', () => {
         'x-paging-total': '1',
       });
       expect(organisationStore.klassenFilters.get('unknownKey')).toBeUndefined();
-      await organisationStore.loadKlassenForFilter(
+      organisationStore.loadKlassenForFilter(
         {
           offset: 0,
           limit: 30,
         },
         'unknownKey',
       );
+      await flushPromises();
       expect(organisationStore.klassenFilters.get('unknownKey')).toBeDefined();
     });
 
