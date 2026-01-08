@@ -14,6 +14,7 @@
     headerText: string;
     confirmationMessage: string;
     successMessage: string;
+    conditionListMessage?: string;
     errorMessage?: string;
   };
 
@@ -106,31 +107,41 @@
         <v-card-text>
           <v-container>
             <v-row class="text-body bold justify-center">
-              <v-col
-                class="text-center"
-                cols="10"
-              >
+              <v-col cols="8">
                 <template v-if="state === State.COMPLETE">
                   <span
                     v-if="!props.errorMessage"
+                    class="text-center d-block"
                     :data-testid="`${typeForTestId}-delete-success-text`"
                   >
                     {{ props.successMessage }}
                   </span>
+
                   <span
-                    v-else-if="props.errorMessage"
+                    v-else
+                    class="text-center d-block ml-3"
                     :data-testid="`${typeForTestId}-delete-error-text`"
                   >
                     {{ props.errorMessage }}
                   </span>
                 </template>
-                <span
-                  class="pre-line"
-                  v-else
-                  :data-testid="`${typeForTestId}-delete-confirmation-text`"
-                >
-                  {{ props.confirmationMessage }}
-                </span>
+
+                <template v-else>
+                  <!-- centered confirmation message -->
+                  <span
+                    class="d-block pre-line"
+                    :data-testid="`${typeForTestId}-delete-confirmation-text`"
+                  >
+                    {{ props.confirmationMessage }}
+                  </span>
+                  <!-- left-aligned condition list -->
+                  <span
+                    class="pre-line d-block ml-8"
+                    :data-testid="`${typeForTestId}-delete-condition-list-text`"
+                  >
+                    {{ props.conditionListMessage }}
+                  </span>
+                </template>
               </v-col>
             </v-row>
           </v-container>
