@@ -1158,7 +1158,7 @@ describe('OrganisationStore', () => {
       expect(organisationStore.loading).toBe(true);
       await deleteOrganisationPromise;
       expect(organisationStore.loading).toBe(false);
-      expect(organisationStore.errorCode).toEqual('');
+      expect(organisationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
     });
 
     it('should handle string error', async () => {
@@ -1167,7 +1167,7 @@ describe('OrganisationStore', () => {
       expect(organisationStore.loading).toBe(true);
       await deleteOrganisationPromise;
       expect(organisationStore.loading).toBe(false);
-      expect(organisationStore.errorCode).toEqual('KLASSE_ERROR');
+      expect(organisationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
     });
 
     it('should handle error code', async () => {
@@ -1176,7 +1176,7 @@ describe('OrganisationStore', () => {
       expect(organisationStore.loading).toBe(true);
       await deleteOrganisationPromise;
       expect(organisationStore.loading).toBe(false);
-      expect(organisationStore.errorCode).toEqual('KLASSE_ERROR');
+      expect(organisationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
     });
   });
 
