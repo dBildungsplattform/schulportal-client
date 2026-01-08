@@ -25,7 +25,7 @@ const schule: Organisation = DoFactory.getSchule();
 const person: Person = DoFactory.getPerson();
 const zuordnung: Zuordnung = DoFactory.getZuordnung({}, { organisation: schule });
 
-function mountComponent(partialProps: Partial<Props> = {}): VueWrapper {
+function mountComponent(partialProps: Partial<Props> = {}): VueWrapper<InstanceType<typeof OrganisationUnassign>> {
   const props: Props = {
     isDialogVisible: true,
     selectedPersonen: new Map<string, PersonWithZuordnungen>([
@@ -69,8 +69,11 @@ describe('OrganisationUnassign', () => {
     wrapper = mountComponent({ isDialogVisible });
     await nextTick();
     const layoutCard: Element | null = document.body.querySelector('[data-testid="org-unassign-layout-card"]');
-    if (isDialogVisible) expect(layoutCard).not.toBeNull();
-    else expect(layoutCard).toBeNull();
+    if (isDialogVisible) {
+      expect(layoutCard).not.toBeNull();
+    } else {
+      expect(layoutCard).toBeNull();
+    }
   });
 
   test('displays confirmation form and trigger submit', async () => {

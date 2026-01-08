@@ -134,7 +134,9 @@ describe('RolleModify', () => {
     }
 
     // Wait for all promises to resolve
-    await new Promise((resolve: (value: unknown) => void) => setTimeout(resolve, 0)); // This processes the event loop
+    await new Promise((resolve: (value: unknown) => void) => {
+      setTimeout(resolve, 0);
+    });
     await flushPromises();
 
     expect(bulkModifyPersonenRolleSpy).toHaveBeenCalledTimes(1);
@@ -188,7 +190,9 @@ describe('RolleModify', () => {
     }
 
     // Wait for all promises to resolve
-    await new Promise((resolve: (value: unknown) => void) => setTimeout(resolve, 0)); // This processes the event loop
+    await new Promise((resolve: (value: unknown) => void) => {
+      setTimeout(resolve, 0);
+    });
     await flushPromises();
 
     // Check for error dialog
@@ -237,7 +241,7 @@ describe('RolleModify', () => {
     expect(kopersInfo?.textContent).toContain('KoPers.-Nr.');
   });
 
-  test('renders the dialog when isDialogVisible is true', async () => {
+  test('renders the dialog when isDialogVisible is true', () => {
     // Find the teleported content in the document body
     const dialogContent: Element | null = document.body.querySelector('[data-testid="rolle-modify-layout-card"]');
     expect(dialogContent).not.toBeNull();
@@ -252,7 +256,7 @@ describe('RolleModify', () => {
     expect(document.querySelector('[data-testid="rolle-modify-layout-card"]')).not.toBeNull();
   });
 
-  test('renders the dialog when isDialogVisible and closes it', async () => {
+  test('renders the dialog when isDialogVisible and closes it', () => {
     const dialogContent: Element | null = document.body.querySelector('[data-testid="rolle-modify-layout-card"]');
     expect(dialogContent).not.toBeNull();
 

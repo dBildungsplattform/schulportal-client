@@ -2,7 +2,7 @@ import type { MockInstance } from 'vitest';
 import { buildCSV, download } from './file';
 
 describe('buildCSV', () => {
-  test('should build file', async () => {
+  test('should build file', () => {
     type FieldName = 'header1' | 'header2' | 'header3' | 'header4';
     const headers: Array<FieldName> = ['header1', 'header2', 'header3', 'header4'];
     const rows: Array<Record<FieldName, string>> = [

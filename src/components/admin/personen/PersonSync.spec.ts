@@ -1,7 +1,7 @@
 import { VueWrapper, mount } from '@vue/test-utils';
 import { DoFactory } from 'test/DoFactory';
 import { expect, test } from 'vitest';
-import { nextTick } from 'vue';
+import { nextTick, type Component } from 'vue';
 import PersonSync from './PersonSync.vue';
 
 let wrapper: VueWrapper | null = null;
@@ -25,7 +25,7 @@ beforeEach(() => {
     },
     global: {
       components: {
-        PersonSync: PersonSync,
+        PersonSync: PersonSync as Component,
       },
     },
   });

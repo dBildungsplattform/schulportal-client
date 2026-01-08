@@ -4,7 +4,7 @@ import { DOMWrapper, VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import type Module from 'module';
 import { DoFactory } from 'test/DoFactory';
 import { expect, test, type Mock, type MockInstance } from 'vitest';
-import { nextTick } from 'vue';
+import { nextTick, type Component } from 'vue';
 import {
   createRouter,
   createWebHistory,
@@ -30,17 +30,19 @@ let { storedBeforeRouteLeaveCallback }: { storedBeforeRouteLeaveCallback: OnBefo
         _to: RouteLocationNormalized,
         _from: RouteLocationNormalized,
         _next: NavigationGuardNext,
-      ): void => {},
+      ): void => {
+        // intentionally left blank for test hoisting
+      },
     };
   },
 );
 
-function mountComponent(): VueWrapper {
+function mountComponent(): VueWrapper<InstanceType<typeof PersonSearchView>> {
   return mount(PersonSearchView, {
     attachTo: document.getElementById('app') || '',
     global: {
       components: {
-        PersonSearchView,
+        PersonSearchView: PersonSearchView as Component,
       },
       plugins: [router],
     },

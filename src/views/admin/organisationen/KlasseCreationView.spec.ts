@@ -4,7 +4,7 @@ import { useOrganisationStore, type OrganisationStore } from '@/stores/Organisat
 import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import type Module from 'module';
 import { beforeEach, describe, expect, test, vi, type Mock, type MockInstance } from 'vitest';
-import { nextTick } from 'vue';
+import { nextTick, type Component } from 'vue';
 import {
   createRouter,
   createWebHistory,
@@ -31,17 +31,19 @@ let { storedBeforeRouteLeaveCallback }: { storedBeforeRouteLeaveCallback: OnBefo
         _to: RouteLocationNormalized,
         _from: RouteLocationNormalized,
         _next: NavigationGuardNext,
-      ): void => {},
+      ): void => {
+        // intentionally left blank for test hoisting
+      },
     };
   },
 );
 
-function mountComponent(): VueWrapper {
+function mountComponent(): ReturnType<typeof mount<typeof KlasseCreationView>> {
   return mount(KlasseCreationView, {
     attachTo: document.getElementById('app') || '',
     global: {
       components: {
-        KlasseCreationView,
+        KlasseCreationView: KlasseCreationView as Component,
       },
       plugins: [router],
     },
@@ -203,7 +205,7 @@ describe('KlasseCreationView', () => {
       expect(spy).toHaveBeenCalledOnce();
     });
 
-    test('it does not trigger if form is not dirty', async () => {
+    test('it does not trigger if form is not dirty', () => {
       const expectedCallsToNext: number = 1;
       vi.mock('vue-router', async (importOriginal: () => Promise<Module>) => {
         const mod: Module = await importOriginal();
@@ -221,21 +223,25 @@ describe('KlasseCreationView', () => {
     });
   });
 
-  describe.each([[true], [false]])('when form is dirty:%s', async (isFormDirty: boolean) => {
+  describe.each([[true], [false]])('when form is dirty:%s', (isFormDirty: boolean) => {
     beforeEach(async () => {
-      if (isFormDirty)
+      if (isFormDirty) {
         await fillForm({
           schule: '1',
           klassenname: '11b',
         });
+      }
     });
 
-    test('it handles unloading', async () => {
+    test('it handles unloading', () => {
       const event: Event = new Event('beforeunload');
       const spy: MockInstance = vi.spyOn(event, 'preventDefault');
       window.dispatchEvent(event);
-      if (isFormDirty) expect(spy).toHaveBeenCalledOnce();
-      else expect(spy).not.toHaveBeenCalledOnce();
+      if (isFormDirty) {
+        expect(spy).toHaveBeenCalledOnce();
+      } else {
+        expect(spy).not.toHaveBeenCalledOnce();
+      }
     });
   });
 

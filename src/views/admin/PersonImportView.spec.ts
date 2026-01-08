@@ -12,7 +12,7 @@ import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import type WrapperLike from 'node_modules/@vue/test-utils/dist/interfaces/wrapperLike';
 import { DoFactory } from 'test/DoFactory';
 import { expect, test, type Mock, type MockInstance } from 'vitest';
-import { nextTick } from 'vue';
+import { nextTick, type Component } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import PersonImportView from './PersonImportView.vue';
 
@@ -106,7 +106,7 @@ beforeEach(async () => {
     attachTo: document.getElementById('app') || '',
     global: {
       components: {
-        PersonImportView,
+        PersonImportView: PersonImportView as Component,
       },
       plugins: [router],
     },
@@ -117,7 +117,7 @@ beforeEach(async () => {
 });
 
 describe('PersonImportView', () => {
-  test('it renders the person import view', async () => {
+  test('it renders the person import view', () => {
     expect(wrapper?.find('[data-testid="person-import-headline"]').isVisible()).toBe(true);
     expect(wrapper?.find('[data-testid="person-import-schule-select"]').isVisible()).toBe(true);
     expect(wrapper?.find('[data-testid="rolle-select"]').isVisible()).toBe(true);
@@ -433,7 +433,7 @@ describe('PersonImportView', () => {
     expect(wrapper?.find('[data-testid="import-progress-bar"]').isVisible()).toBe(true);
   });
 
-  test('it closes the layout card and navigates to person-management', async () => {
+  test('it closes the layout card and navigates to person-management', () => {
     const push: MockInstance = vi.spyOn(router, 'push');
 
     wrapper

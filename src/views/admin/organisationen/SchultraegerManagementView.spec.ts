@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
-import { nextTick } from 'vue';
+import { nextTick, type Component } from 'vue';
 import type WrapperLike from 'node_modules/@vue/test-utils/dist/interfaces/wrapperLike';
 import SchultraegerManagementView from './SchultraegerManagementView.vue';
 
@@ -44,7 +44,7 @@ beforeEach(() => {
     attachTo: document.getElementById('app') || '',
     global: {
       components: {
-        SchultraegerManagementView,
+        SchultraegerManagementView: SchultraegerManagementView as Component,
       },
       mocks: {
         route: {

@@ -1,6 +1,7 @@
 import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import RolleSuccessTemplate from './RolleSuccessTemplate.vue';
+import type { Component } from 'vue';
 
 let wrapper: VueWrapper | null = null;
 
@@ -30,7 +31,7 @@ beforeEach(() => {
     },
     global: {
       components: {
-        RolleSuccessTemplate,
+        RolleSuccessTemplate: RolleSuccessTemplate as Component,
       },
     },
   });

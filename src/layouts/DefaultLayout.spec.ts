@@ -1,6 +1,7 @@
 import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import DefaultLayout from './DefaultLayout.vue';
+import type { Component } from 'vue';
 
 let wrapper: VueWrapper | null = null;
 
@@ -15,7 +16,7 @@ beforeEach(() => {
     attachTo: document.getElementById('app') || '',
     global: {
       components: {
-        DefaultLayout,
+        DefaultLayout: DefaultLayout as Component,
       },
     },
     slots: {

@@ -4,6 +4,7 @@ import { createRouter, createWebHistory, type Router } from 'vue-router';
 import routes from '@/router/routes';
 import RelationshipAssign from './RelationshipAssign.vue';
 import { OrganisationsTyp, type Organisation } from '@/stores/OrganisationStore';
+import type { Component } from 'vue';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -17,7 +18,7 @@ const mockUnassignedItems: Array<Organisation> = [
   { id: '4', name: 'Org 4', typ: OrganisationsTyp.Schule },
 ];
 
-function mountComponent(): VueWrapper {
+function mountComponent(): ReturnType<typeof mount<typeof RelationshipAssign>> {
   return mount(RelationshipAssign, {
     attachTo: document.getElementById('app') || '',
     props: {
@@ -30,7 +31,7 @@ function mountComponent(): VueWrapper {
     },
     global: {
       components: {
-        RelationshipAssign,
+        RelationshipAssign: RelationshipAssign as Component,
       },
       plugins: [router],
     },
@@ -63,27 +64,29 @@ afterEach(() => {
 });
 
 describe('RelationshipAssign', () => {
-  test('it renders both assign list components', async () => {
+  test('it renders both assign list components', () => {
     expect(wrapper?.findAllComponents({ name: 'RelationshipAssignList' }).length).toBe(2);
   });
 
-  test('it emits', async () => {
+  test('it emits', () => {
     expect(true).toBeTruthy();
   });
 
-  test('it emits onHandleAssignedItemClick when an assigned item is clicked', async () => {
+  test('it emits onHandleAssignedItemClick when an assigned item is clicked', () => {
     const assignedItem: Organisation | undefined = mockUnassignedItems[0];
 
-    await wrapper?.findComponent({ ref: 'assignedItemsList' }).vm.$emit('onHandleItemClick', assignedItem);
+    const assignedItemsList: VueWrapper = wrapper?.findComponent({ ref: 'assignedItemsList' }) as VueWrapper;
+    assignedItemsList?.vm?.$emit?.('onHandleItemClick', assignedItem);
 
     expect(wrapper?.emitted('onHandleAssignedItemClick')).toBeTruthy();
     expect(wrapper?.emitted('onHandleAssignedItemClick')?.[0]).toEqual([assignedItem]);
   });
 
-  test('it emits onHandleUnassignedItemClick when an unassigned item is clicked', async () => {
+  test('it emits onHandleUnassignedItemClick when an unassigned item is clicked', () => {
     const unassignedItem: Organisation | undefined = mockUnassignedItems[0];
 
-    await wrapper?.findComponent({ ref: 'unassignedItemsList' }).vm.$emit('onHandleItemClick', unassignedItem);
+    const unassignedItemsList: VueWrapper = wrapper?.findComponent({ ref: 'unassignedItemsList' }) as VueWrapper;
+    unassignedItemsList?.vm?.$emit?.('onHandleItemClick', unassignedItem);
 
     expect(wrapper?.emitted('onHandleUnassignedItemClick')).toBeTruthy();
     expect(wrapper?.emitted('onHandleUnassignedItemClick')?.[0]).toEqual([unassignedItem]);

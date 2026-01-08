@@ -10,9 +10,10 @@ import {
 } from '@/stores/ServiceProviderStore';
 import { DoFactory } from 'test/DoFactory';
 import type { MockInstance } from 'vitest';
-import { nextTick } from 'vue';
+import { nextTick, type Component } from 'vue';
 import type WrapperLike from 'node_modules/@vue/test-utils/dist/interfaces/wrapperLike';
 import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+import type { RollenerweiterungWithExtendedDataResponse } from '@/api-client/generated';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -43,7 +44,7 @@ beforeEach(async () => {
     attachTo: document.getElementById('app') || '',
     global: {
       components: {
-        ServiceProviderDetailsView,
+        ServiceProviderDetailsView: ServiceProviderDetailsView as Component,
       },
       mocks: {
         route: {
@@ -54,14 +55,16 @@ beforeEach(async () => {
     },
   });
   serviceProviderStore.currentServiceProvider = mockServiceProvider;
-  const mockItems = Array.from({ length: 2 }, () => DoFactory.getRollenerweiterungItem());
+  const mockItems: RollenerweiterungWithExtendedDataResponse[] = Array.from({ length: 2 }, () =>
+    DoFactory.getRollenerweiterungItem(),
+  );
   serviceProviderStore.rollenerweiterungen = DoFactory.getRollenerweiterungenResponse(mockItems);
   serviceProviderStore.rollenerweiterungenUebersicht = DoFactory.buildRollenerweiterungenUebersicht(mockItems);
   authStore.hasRollenerweiternPermission = true;
 });
 
 describe('ServiceProviderDetailsView', () => {
-  test('it renders the service provider details page and shows its data', async () => {
+  test('it renders the service provider details page and shows its data', () => {
     expect(wrapper).toBeTruthy();
     expect(wrapper?.find('[data-testid="service-provider-details-card"]').isVisible()).toBe(true);
     expect(wrapper?.find('[data-testid="service-provider-name"]').text()).toBe(mockServiceProvider.name);

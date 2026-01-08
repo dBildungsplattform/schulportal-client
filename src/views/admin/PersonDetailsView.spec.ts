@@ -22,7 +22,7 @@ import { parseUserLock, PersonLockOccasion, type UserLock } from '@/utils/lock';
 import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import { DoFactory } from 'test/DoFactory';
 import { expect, test, type MockInstance } from 'vitest';
-import { nextTick, type ComputedRef, type DefineComponent } from 'vue';
+import { nextTick, type Component, type ComputedRef, type DefineComponent } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import PersonDetailsView from './PersonDetailsView.vue';
 import type { Person } from '@/stores/types/Person';
@@ -223,8 +223,8 @@ describe('PersonDetailsView', () => {
       },
     ];
 
-    organisationStore.getParentOrganisationsByIds = async (_organisationIds: string[]): Promise<void> => {
-      return;
+    organisationStore.getParentOrganisationsByIds = (_organisationIds: string[]): Promise<void> => {
+      return Promise.resolve();
     };
 
     organisationStore.parentOrganisationen = [
@@ -276,7 +276,7 @@ describe('PersonDetailsView', () => {
       attachTo: document.getElementById('app') || '',
       global: {
         components: {
-          PersonDetailsView,
+          PersonDetailsView: PersonDetailsView as Component,
         },
         plugins: [router],
       },
@@ -305,7 +305,7 @@ describe('PersonDetailsView', () => {
     };
   };
 
-  test('it renders the person details page and shows person data', async () => {
+  test('it renders the person details page and shows person data', () => {
     expect(wrapper).toBeTruthy();
     expect(wrapper?.find('[data-testid="person-details-headline"]').isVisible()).toBe(true);
     expect(wrapper?.find('[data-testid="person-vorname"]').text()).toBe(mockPerson.person.name.vorname);
@@ -454,7 +454,7 @@ describe('PersonDetailsView', () => {
   //   expect(klasseChangeFormComponent?.exists()).toBe(true);
   // });
 
-  test('filteredRollen returns correct roles based on person context and selection', async () => {
+  test('filteredRollen returns correct roles based on person context and selection', () => {
     interface PersonDetailsViewType extends DefineComponent {
       filteredRollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined>;
     }
@@ -584,9 +584,7 @@ describe('PersonDetailsView', () => {
     await nextTick();
 
     await wrapper?.find('[data-testid$="alert-button"]').trigger('click');
-    const familienNameInput: DOMWrapper<Element> | undefined = await wrapper?.find(
-      '[data-testid="person-familienname"]',
-    );
+    const familienNameInput: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="person-familienname"]');
 
     expect(familienNameInput?.exists()).toBe(true);
   });
@@ -605,7 +603,7 @@ describe('PersonDetailsView', () => {
 
     await nextTick();
 
-    const unsavedChangesDialogButton: VueWrapper | undefined = await wrapper?.findComponent({
+    const unsavedChangesDialogButton: VueWrapper | undefined = wrapper?.findComponent({
       ref: 'unsaved-changes-dialog',
     });
 
@@ -651,7 +649,7 @@ describe('PersonDetailsView', () => {
     expect(wrapper?.find('[data-testid="loading-spinner"]').isVisible()).toBe(true);
   });
 
-  test('it shows befristung', async () => {
+  test('it shows befristung', () => {
     expect(wrapper?.find('[data-testid="zuordnung-befristung-text"]').isVisible()).toBe(true);
   });
 
@@ -659,7 +657,9 @@ describe('PersonDetailsView', () => {
     personStore.personenuebersicht = mockPersonenuebersichtLehr;
     setCurrentPerson(EmailAddressStatus.Enabled);
     await nextTick();
-    if (!wrapper) return;
+    if (!wrapper) {
+      return;
+    }
 
     expect(wrapper.find('[data-testid="device-password-info"]').isVisible()).toBe(true);
 
@@ -671,9 +671,9 @@ describe('PersonDetailsView', () => {
 
     expect(document.querySelector('[data-testid="password-reset-info-text"]')).not.toBeNull();
 
-    const resetPasswordButton: HTMLElement = (await document.querySelector(
+    const resetPasswordButton: HTMLElement = document.querySelector(
       '[data-testid="password-reset-button"]',
-    )) as HTMLElement;
+    ) as HTMLElement;
 
     expect(resetPasswordButton).not.toBeNull();
     resetPasswordButton.click();
@@ -691,7 +691,9 @@ describe('PersonDetailsView', () => {
     personStore.personenuebersicht = mockPersonenuebersichtLehr;
     setCurrentPerson(EmailAddressStatus.Enabled);
     await nextTick();
-    if (!wrapper) return;
+    if (!wrapper) {
+      return;
+    }
 
     const devicePasswordChangeButton: DOMWrapper<Element> | undefined = wrapper
       .findComponent({ ref: 'password-reset' })
@@ -701,9 +703,9 @@ describe('PersonDetailsView', () => {
 
     expect(document.querySelector('[data-testid="password-reset-info-text"]')).not.toBeNull();
 
-    const resetPasswordButton: HTMLElement = (await document.querySelector(
+    const resetPasswordButton: HTMLElement = document.querySelector(
       '[data-testid="password-reset-button"]',
-    )) as HTMLElement;
+    ) as HTMLElement;
 
     expect(resetPasswordButton).not.toBeNull();
     resetPasswordButton.click();

@@ -1,6 +1,7 @@
 import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import SearchField from './SearchField.vue';
+import type { Component } from 'vue';
 
 let wrapper: VueWrapper | null = null;
 
@@ -23,7 +24,7 @@ beforeEach(() => {
     },
     global: {
       components: {
-        SearchField,
+        SearchField: SearchField as Component,
       },
     },
   });
