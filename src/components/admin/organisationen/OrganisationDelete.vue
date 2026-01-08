@@ -107,7 +107,7 @@
         <v-card-text>
           <v-container>
             <v-row class="text-body bold justify-center">
-              <v-col cols="8">
+              <v-col cols="9">
                 <template v-if="state === State.COMPLETE">
                   <span
                     v-if="!props.errorMessage"
