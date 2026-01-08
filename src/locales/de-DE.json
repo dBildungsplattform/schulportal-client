@@ -576,7 +576,7 @@
       "create": "Schule anlegen",
       "createAnother": "Weitere Schule anlegen",
       "deleteSchuleHeader": "Schule löschen",
-      "deleteSchuleConfirmation": "Soll die Schule {dienststellennummer} ({schulname}) wirklich endgültig gelöscht werden?",
+      "deleteSchuleConfirmation": "Soll die Schule {dienststellennummer} ({schulname}) wirklich endgültig gelöscht werden?\n\nDie Schule kann nur gelöscht werden, wenn keine der folgenden Zuordnungen mehr existieren:\n\n• Zugeordnete Benutzer (Personenkontexte)\n• Klassen\n• Schulspezifische Rollen\n• Schulspezifische Rollenerweiterungen\n• Schulspezifische Dienste / Angebote",      
       "deleteSchuleSuccess": "Die Schule wurde erfolgreich gelöscht.",
       "deleteSchuleNotice": "Die Schule kann nicht gelöscht werden, da folgende Bedingung nicht erfüllt ist:",
       "discard": "Schule verwerfen",

@@ -15,7 +15,7 @@
     confirmationMessage: string;
     successMessage: string;
     errorMessage?: string;
-  }
+  };
 
   const props: Props = defineProps<Props>();
 
@@ -125,6 +125,7 @@
                   </span>
                 </template>
                 <span
+                  class="pre-line"
                   v-else
                   :data-testid="`${typeForTestId}-delete-confirmation-text`"
                 >
@@ -182,3 +183,9 @@
     </template>
   </v-dialog>
 </template>
+
+<style scoped>
+  .pre-line {
+    white-space: pre-wrap;
+  }
+</style>
