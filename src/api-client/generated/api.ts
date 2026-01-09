@@ -3489,6 +3489,7 @@ export const ServiceProviderKategorie = {
     Email: 'EMAIL',
     Unterricht: 'UNTERRICHT',
     Verwaltung: 'VERWALTUNG',
+    Schulisch: 'SCHULISCH',
     Hinweise: 'HINWEISE',
     Angebote: 'ANGEBOTE'
 } as const;
