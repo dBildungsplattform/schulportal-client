@@ -483,7 +483,7 @@ describe('KlassenManagementView', () => {
 
   test('it should call deleteOrganisationById when deleting a Klasse', async () => {
     await wrapper?.find('[data-testid="open-klasse-delete-dialog-icon"]').trigger('click');
-    const deleteButton = document.querySelector('[data-testid="klasse-delete-button"]')!;
+    const deleteButton: Element = document.querySelector('[data-testid="klasse-delete-button"]')!;
     expect(deleteButton).toBeTruthy();
     deleteButton.dispatchEvent(new Event('click'));
     await flushPromises();
