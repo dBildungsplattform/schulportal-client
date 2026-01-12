@@ -147,7 +147,7 @@ describe('KlassenManagementView', () => {
 
     organisationStore.getAllOrganisationen = vi.fn();
     organisationStore.getKlassenByOrganisationId = vi.fn();
-    organisationStore.deleteKlasseById = vi.fn();
+    organisationStore.deleteOrganisationById = vi.fn();
 
     authStore.currentUser = authUser;
 
@@ -479,5 +479,15 @@ describe('KlassenManagementView', () => {
         sortOrder: 'asc',
       }),
     );
+  });
+
+  test('it should call deleteOrganisationById when deleting a Klasse', async () => {
+    await wrapper?.find('[data-testid="open-klasse-delete-dialog-icon"]').trigger('click');
+    const deleteButton: Element = document.querySelector('[data-testid="klasse-delete-button"]')!;
+    expect(deleteButton).toBeTruthy();
+    deleteButton.dispatchEvent(new Event('click'));
+    await flushPromises();
+
+    expect(organisationStore.deleteOrganisationById).toHaveBeenCalledWith(organisationStore.allKlassen[0]!.id);
   });
 });
