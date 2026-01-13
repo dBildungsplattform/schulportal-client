@@ -177,7 +177,7 @@
   }
 
   async function deleteKlasse(organisationId: string): Promise<void> {
-    await organisationStore.deleteKlasseById(organisationId);
+    await organisationStore.deleteOrganisationById(organisationId);
   }
 
   const handleAlertClose = async (): Promise<void> => {
