@@ -4,7 +4,7 @@ import {
   type ServiceProvider,
   type ServiceProviderStore,
 } from '@/stores/ServiceProviderStore';
-import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
+import { VueWrapper, mount } from '@vue/test-utils';
 import type WrapperLike from '@vue/test-utils/dist/interfaces/wrapperLike';
 import { expect, test, type Mock } from 'vitest';
 import { nextTick } from 'vue';
@@ -227,6 +227,8 @@ describe('StartView', () => {
     expect(adminCard?.attributes('href')).toEqual('/admin/klassen');
   });
 
+  //The code to be tested is commented out because it is not currently needed for the ErWIn Portal.
+  /*
   test('it displays correct banner color', async () => {
     await flushPromises();
     await nextTick();
@@ -246,6 +248,7 @@ describe('StartView', () => {
     await nextTick();
     expect(banner?.emitted('dismissBanner')).toBeTruthy();
   });
+  */
 
   test('it renders a hinweis banner', async () => {
     await nextTick();

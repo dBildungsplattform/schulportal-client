@@ -75,6 +75,8 @@
       }) !== undefined
     );
   });
+  // Currently not needed for ErWIn Portal, kept to avoid unused variable warning
+  void hasKoPersMerkmal.value;
 
   function getUrgencyType(date: Date): 'errorLight' | 'warning' {
     const error: boolean = date.valueOf() < new Date().valueOf() + 14 * 24 * 60 * 60 * 1000;
@@ -107,9 +109,12 @@
   function getBannerAlerts(): Alert[] {
     const alerts: Alert[] = [];
 
+    // Currently not needed for ErWIn Portal
+    /*
     if (!personInfoStore.personInfo?.person.personalnummer && hasKoPersMerkmal.value) {
       addAlert(alerts, 'KOPERS', 'banner.kopers');
     }
+    */
 
     addAlert(alerts, 'NO_KONTEXTE', 'banner.noKontexte');
     addAlert(alerts, 'PERSONENKONTEXT_EXPIRES', 'banner.kontextExpires');
