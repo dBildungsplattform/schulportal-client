@@ -23,7 +23,8 @@ beforeEach(() => {
       headerText: 'Schule löschen',
       confirmationMessage: 'Möchten Sie die Schule wirklich löschen?',
       successMessage: 'Die Schule wurde erfolgreich gelöscht.',
-      conditionListMessage: 'Voraussetzungen für das Löschen der Schule:\n- Es sind keine aktiven Benutzer zugeordnet.\n- Es sind keine offenen Vorgänge vorhanden.',
+      conditionListMessage:
+        'Voraussetzungen für das Löschen der Schule:\n- Es sind keine aktiven Benutzer zugeordnet.\n- Es sind keine offenen Vorgänge vorhanden.',
       errorMessage: '',
     },
     global: {
