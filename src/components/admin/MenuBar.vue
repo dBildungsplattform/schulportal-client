@@ -240,6 +240,7 @@
         :title="$t('admin.angebot.management.title')"
       ></v-list-item>
       <v-list-item
+        v-if="authStore.hasAngeboteVerwaltenPermission"
         class="menu-bar-sub-item caption"
         @click="handleMenuItemClick('/admin/angebote')"
         data-testid="angebot-management-menu-item"
