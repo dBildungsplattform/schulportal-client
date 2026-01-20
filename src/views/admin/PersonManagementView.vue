@@ -288,19 +288,22 @@
     selectedOrganisationen.value = searchFilterStore.selectedOrgaObjects ?? [];
   }
 
-  function setOrganisationFilter(newValue: Array<string> | undefined): void {
+  async function setOrganisationFilter(newValue: Array<string> | undefined): Promise<void> {
     selectedOrganisationIds.value = newValue ?? [];
     searchFilterStore.setOrganisationFilterForPersonen(newValue ?? []);
     searchFilterStore.setKlasseFilterForPersonen([]);
     selectedKlassen.value = [];
-    applySearchAndFilters();
+    await Promise.all([
+      applySearchAndFilters(),
+      personenkontextStore.getPersonenkontextRolleWithFilter('', 25, selectedOrganisationIds.value),
+    ]);
   }
 
   function navigateToPersonDetails(_$event: PointerEvent, { item }: { item: PersonRow }): void {
     router.push({ name: 'person-details', params: { id: item.id } });
   }
 
-  function resetSearchAndFilter(): void {
+  async function resetSearchAndFilter(): Promise<void> {
     searchFilter.value = '';
     if (searchFieldComponent.value) {
       searchFieldComponent.value.searchFilter = '';
@@ -323,13 +326,16 @@
     searchFilterStore.personenPerPage = 30;
     searchFilterStore.currentSort = null;
     selectedPersonIds.value = [];
-    personStore.getAllPersons({
-      offset: (searchFilterStore.personenPage - 1) * searchFilterStore.personenPerPage,
-      limit: searchFilterStore.personenPerPage,
-      searchFilter: '',
-      sortField: SortField.Familienname,
-      sortOrder: SortOrder.Asc,
-    });
+    await Promise.all([
+      personStore.getAllPersons({
+        offset: (searchFilterStore.personenPage - 1) * searchFilterStore.personenPerPage,
+        limit: searchFilterStore.personenPerPage,
+        searchFilter: '',
+        sortField: SortField.Familienname,
+        sortOrder: SortOrder.Asc,
+      }),
+      personenkontextStore.getPersonenkontextRolleWithFilter('', 25, selectedOrganisationIds.value),
+    ]);
   }
 
   async function handleSearchFilter(filter: string): Promise<void> {
@@ -342,7 +348,7 @@
     clearTimeout(timerId);
 
     timerId = setTimeout(async () => {
-      await personenkontextStore.getPersonenkontextRolleWithFilter(searchValue, 25);
+      await personenkontextStore.getPersonenkontextRolleWithFilter(searchValue, 25, selectedOrganisationIds.value);
 
       // If there are selected rollen not in the search results, add them to filteredRollen
       const moeglicheRollen: RolleResponse[] = personenkontextStore.filteredRollen?.moeglicheRollen || [];
@@ -597,7 +603,7 @@
     }
 
     await getPaginatedPersonen(searchFilterStore.personenPage);
-    await personenkontextStore.getPersonenkontextRolleWithFilter('', 25);
+    await personenkontextStore.getPersonenkontextRolleWithFilter('', 25, selectedOrganisationIds.value);
   });
 </script>
 

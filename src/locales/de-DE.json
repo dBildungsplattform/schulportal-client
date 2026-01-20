@@ -578,7 +578,7 @@
       "createAnother": "Weitere Schule anlegen",
       "deleteSchuleHeader": "Schule löschen",
       "deleteSchuleConfirmation": "Soll die Schule {dienststellennummer} ({schulname}) wirklich endgültig gelöscht werden?\n\nDie Schule wird nur gelöscht, wenn folgende Bedingungen erfüllt sind:",
-      "deleteSchuleConditionList": "\n• Keine zugeordneten Benutzer (Personenkontexte) vorhanden.\n• Keine Klassen vorhanden.\n• Keine schulspezifischen Rollen vorhanden.\n• Keine schulspezifischen Rollenerweiterungen vorhanden.\n• Keine schulspezifischen Dienste vorhanden.",     
+      "deleteSchuleConditionList": "\n• Keine zugeordneten Benutzer (Personenkontexte) vorhanden.\n• Keine Klassen vorhanden.\n• Keine schulspezifischen Rollen vorhanden.\n• Keine schulspezifischen Rollenerweiterungen vorhanden.\n• Keine schulspezifischen Dienste vorhanden.",
       "deleteSchuleSuccess": "Die Schule wurde erfolgreich gelöscht.",
       "deleteSchuleNotice": "Die Schule kann nicht gelöscht werden, da folgende Bedingung nicht erfüllt ist:",
       "discard": "Schule verwerfen",
