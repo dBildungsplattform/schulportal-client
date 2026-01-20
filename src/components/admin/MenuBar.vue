@@ -233,7 +233,7 @@
     </div>
 
     <!-- Angebotsverwaltung -->
-    <div v-if="authStore.hasAngeboteVerwaltenPermission">
+    <div v-if="authStore.hasAngeboteVerwaltenPermission || authStore.hasRollenerweiternPermission">
       <v-list-item
         class="menu-bar-main-item headline-2"
         data-testid="angebot-management-title"
