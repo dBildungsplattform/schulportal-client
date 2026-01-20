@@ -61,6 +61,7 @@ function setPermissions(hasPermission: boolean): void {
   authStore.hasLandesbediensteteSuchenUndHinzufügenPermission = hasPermission;
   authStore.hasEingeschränktNeueBenutzerErstellenPermission = hasPermission;
   authStore.hasAngeboteVerwaltenPermission = hasPermission;
+  authStore.hasRollenerweiternPermission = hasPermission;
 }
 
 beforeEach(() => {
@@ -102,6 +103,9 @@ describe('MenuBar', () => {
 
       expect(wrapper?.find('[data-testid="angebot-management-title"]').exists()).toBe(hasPermission);
       expect(wrapper?.find('[data-testid="angebot-management-menu-item"]').exists()).toBe(hasPermission);
+      expect(wrapper?.find('[data-testid="angebot-display-school-specific-menu-item"]').exists()).toBe(
+        hasPermission,
+      );
 
       expect(wrapper?.find('[data-testid="schule-management-title"]').exists()).toBe(hasPermission);
       expect(wrapper?.find('[data-testid="schule-management-menu-item"]').exists()).toBe(hasPermission);

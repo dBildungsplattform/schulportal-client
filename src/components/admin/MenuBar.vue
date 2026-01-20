@@ -247,6 +247,15 @@
         :title="$t('admin.angebot.showAll')"
         to="/admin/angebote"
       ></v-list-item>
+      <v-list-item
+        v-if="authStore.hasRollenerweiternPermission"
+        class="menu-bar-sub-item caption"
+        @click="handleMenuItemClick('/admin/angebote')"
+        data-testid="angebot-display-school-specific-menu-item"
+        prepend-icon="mdi-format-list-bulleted"
+        :title="$t('admin.angebot.showSchoolSpecific')"
+        to="/admin/angebote"
+      ></v-list-item>
     </div>
 
     <!-- Schulverwaltung -->

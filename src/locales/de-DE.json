@@ -37,7 +37,8 @@
         "title": "Angebotsverwaltung"
       },
       "edit": "Angebot bearbeiten",
-      "showAll": "Alle Angebote anzeigen"
+      "showAll": "Alle Angebote anzeigen",
+      "showSchoolSpecific": "Schulische Angebote anzeigen"
     },
     "befristung": {
       "assignBefristung": "Befristung zuordnen",
