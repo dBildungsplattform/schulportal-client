@@ -575,9 +575,9 @@ export const useOrganisationStore: StoreDefinition<
       this.errorCode = '';
       this.loading = true;
       try {
-        await organisationApi.organisationControllerDeleteKlasse(organisationId);
+        await organisationApi.organisationControllerDeleteOrganisation(organisationId);
       } catch (error: unknown) {
-        this.errorCode = getResponseErrorCode(error, 'KLASSE_ERROR');
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
         this.loading = false;
       }

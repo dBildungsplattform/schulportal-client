@@ -17,18 +17,16 @@
   const passwordCopied: Ref<boolean> = ref(false);
   const showPassword: Ref<boolean> = ref(false);
 
-  function copyToClipboard(text: string): void {
-    navigator.clipboard.writeText(text).then(
-      () => {
-        passwordCopied.value = true;
-        copyToClipboardError.value = '';
-      },
-      (error: unknown) => {
-        // eslint-disable-next-line no-console
-        console.log(error);
-        copyToClipboardError.value = t('admin.person.copyPasswordError');
-      },
-    );
+  async function copyToClipboard(text: string): Promise<void> {
+    try {
+      await navigator.clipboard.writeText(text);
+      passwordCopied.value = true;
+      copyToClipboardError.value = '';
+    } catch (error: unknown) {
+      // eslint-disable-next-line no-console
+      console.log(error);
+      copyToClipboardError.value = t('admin.person.copyPasswordError');
+    }
   }
   function printPassword(): void {
     print(t('admin.person.password'), props.password);

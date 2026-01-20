@@ -6,7 +6,7 @@ import { PersonenUebersicht } from '@/stores/types/PersonenUebersicht';
 import { VueWrapper, mount } from '@vue/test-utils';
 import { DoFactory } from 'test/DoFactory';
 import { expect, test, type MockInstance } from 'vitest';
-import { nextTick } from 'vue';
+import { nextTick, type Component } from 'vue';
 import type { BefristungProps } from './BefristungInput.vue';
 import PersonenkontextCreate from './PersonenkontextCreate.vue';
 
@@ -17,7 +17,9 @@ const personStore: PersonStore = usePersonStore();
 const klassenFilterRef: string = 'personenkontext-create-klasse-select';
 vi.useFakeTimers();
 
-const mountComponent = (props: Record<string, unknown> = {}): VueWrapper => {
+const mountComponent = (
+  props: Record<string, unknown> = {},
+): VueWrapper<InstanceType<typeof PersonenkontextCreate>> => {
   return mount(PersonenkontextCreate, {
     attachTo: document.getElementById('app') || '',
     props: {
@@ -97,7 +99,7 @@ const mountComponent = (props: Record<string, unknown> = {}): VueWrapper => {
     },
     global: {
       components: {
-        PersonenkontextCreate,
+        PersonenkontextCreate: PersonenkontextCreate as Component,
       },
     },
   });
@@ -176,7 +178,9 @@ describe('PersonenkontextCreate', () => {
             ref: allowMultipleRollen ? 'rollen-select' : 'rolle-select',
           });
           // Maybe not necessary since its not an optional prop
-          if (!rolleAutocomplete || !rolleId) return rolleAutocomplete;
+          if (!rolleAutocomplete || !rolleId) {
+            return rolleAutocomplete;
+          }
 
           rolleAutocomplete.vm.$emit('update:search', rolleId);
           await rolleAutocomplete.setValue(allowMultipleRollen ? [rolleId] : rolleId);

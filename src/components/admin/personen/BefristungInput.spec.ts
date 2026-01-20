@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { DOMWrapper, mount, VueWrapper } from '@vue/test-utils';
 import BefristungInput from './BefristungInput.vue';
-import { nextTick } from 'vue';
+import { nextTick, type Component } from 'vue';
 
-let wrapper: VueWrapper;
+let wrapper: VueWrapper<InstanceType<typeof BefristungInput>>;
 
 beforeEach(() => {
   document.body.innerHTML = `
@@ -36,7 +36,7 @@ beforeEach(() => {
     },
     global: {
       components: {
-        BefristungInput,
+        BefristungInput: BefristungInput as Component,
       },
     },
   });

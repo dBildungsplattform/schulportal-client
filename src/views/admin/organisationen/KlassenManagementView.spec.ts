@@ -13,7 +13,7 @@ import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import type WrapperLike from 'node_modules/@vue/test-utils/dist/interfaces/wrapperLike';
 import { DoFactory } from 'test/DoFactory';
 import { expect, test, type MockInstance } from 'vitest';
-import { nextTick, type ComputedRef, type DefineComponent } from 'vue';
+import { nextTick, type Component, type ComputedRef, type DefineComponent } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import KlassenManagementView from './KlassenManagementView.vue';
 
@@ -30,7 +30,7 @@ async function mountComponent(): Promise<VueWrapper> {
     attachTo: document.getElementById('app') || '',
     global: {
       components: {
-        KlassenManagementView,
+        KlassenManagementView: KlassenManagementView as Component,
       },
       plugins: [router],
     },
@@ -208,7 +208,9 @@ describe('KlassenManagementView', () => {
       const text: string | undefined = wrapper.text();
       organisationStore.allKlassen.forEach((klasse: Organisation) => {
         expect(text).toContain(klasse.name);
-        if (!isSchuleAutoselected) expect(text).toContain(klasse.schuleDetails);
+        if (!isSchuleAutoselected) {
+          expect(text).toContain(klasse.schuleDetails);
+        }
       });
     });
   });
@@ -224,8 +226,11 @@ describe('KlassenManagementView', () => {
       wrapper = await mountComponent();
       await flushPromises();
       const organisationAutocomplete: VueWrapper | undefined = wrapper.findComponent({ ref: 'schule-select' });
-      if (hasStoreData) expect(organisationAutocomplete.text()).toContain(schule1.name);
-      else expect(organisationAutocomplete.text()).toBe('');
+      if (hasStoreData) {
+        expect(organisationAutocomplete.text()).toContain(schule1.name);
+      } else {
+        expect(organisationAutocomplete.text()).toBe('');
+      }
     });
   });
 
@@ -308,7 +313,7 @@ describe('KlassenManagementView', () => {
     expect(klasseAutocomplete?.text()).toEqual('');
   });
 
-  it('should return the total value from klassenFilters if present', async () => {
+  it('should return the total value from klassenFilters if present', () => {
     interface KlassenManagementView extends DefineComponent {
       totalKlassen: ComputedRef<number>;
     }
@@ -474,5 +479,15 @@ describe('KlassenManagementView', () => {
         sortOrder: 'asc',
       }),
     );
+  });
+
+  test('it should call deleteOrganisationById when deleting a Klasse', async () => {
+    await wrapper?.find('[data-testid="open-klasse-delete-dialog-icon"]').trigger('click');
+    const deleteButton: Element = document.querySelector('[data-testid="klasse-delete-button"]')!;
+    expect(deleteButton).toBeTruthy();
+    deleteButton.dispatchEvent(new Event('click'));
+    await flushPromises();
+
+    expect(organisationStore.deleteOrganisationById).toHaveBeenCalledWith(organisationStore.allKlassen[0]!.id);
   });
 });

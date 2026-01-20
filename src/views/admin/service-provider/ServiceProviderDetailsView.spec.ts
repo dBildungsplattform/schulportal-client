@@ -10,16 +10,19 @@ import {
 } from '@/stores/ServiceProviderStore';
 import { DoFactory } from 'test/DoFactory';
 import type { MockInstance } from 'vitest';
-import { nextTick } from 'vue';
+import { nextTick, type Component } from 'vue';
 import type WrapperLike from 'node_modules/@vue/test-utils/dist/interfaces/wrapperLike';
 import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+import type { RollenerweiterungWithExtendedDataResponse } from '@/api-client/generated';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
 const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
 const authStore: AuthStore = useAuthStore();
 
-const mockServiceProvider: ManageableServiceProviderDetail = DoFactory.getManageableServiceProviderDetail({availableForRollenerweiterung: true});
+const mockServiceProvider: ManageableServiceProviderDetail = DoFactory.getManageableServiceProviderDetail({
+  availableForRollenerweiterung: true,
+});
 
 beforeEach(async () => {
   setActivePinia(createPinia());
@@ -41,7 +44,7 @@ beforeEach(async () => {
     attachTo: document.getElementById('app') || '',
     global: {
       components: {
-        ServiceProviderDetailsView,
+        ServiceProviderDetailsView: ServiceProviderDetailsView as Component,
       },
       mocks: {
         route: {
@@ -52,14 +55,16 @@ beforeEach(async () => {
     },
   });
   serviceProviderStore.currentServiceProvider = mockServiceProvider;
-  const mockItems = Array.from({ length: 2 }, () => DoFactory.getRollenerweiterungItem());
+  const mockItems: RollenerweiterungWithExtendedDataResponse[] = Array.from({ length: 2 }, () =>
+    DoFactory.getRollenerweiterungItem(),
+  );
   serviceProviderStore.rollenerweiterungen = DoFactory.getRollenerweiterungenResponse(mockItems);
   serviceProviderStore.rollenerweiterungenUebersicht = DoFactory.buildRollenerweiterungenUebersicht(mockItems);
   authStore.hasRollenerweiternPermission = true;
 });
 
 describe('ServiceProviderDetailsView', () => {
-  test('it renders the service provider details page and shows its data', async () => {
+  test('it renders the service provider details page and shows its data', () => {
     expect(wrapper).toBeTruthy();
     expect(wrapper?.find('[data-testid="service-provider-details-card"]').isVisible()).toBe(true);
     expect(wrapper?.find('[data-testid="service-provider-name"]').text()).toBe(mockServiceProvider.name);
@@ -94,7 +99,9 @@ describe('ServiceProviderDetailsView', () => {
   });
 
   test('it reloads data after changing page', async () => {
-    await wrapper?.find('[data-testid="open-schulspezifische-rollenerweiterungen-section-headline-button"]').trigger('click');
+    await wrapper
+      ?.find('[data-testid="open-schulspezifische-rollenerweiterungen-section-headline-button"]')
+      .trigger('click');
     await nextTick();
     expect(wrapper?.find('.v-pagination__next button.v-btn--disabled').isVisible()).toBe(true);
     expect(wrapper?.find('.v-data-table-footer__info').text()).toContain('1-2');
@@ -111,7 +118,9 @@ describe('ServiceProviderDetailsView', () => {
   });
 
   test('it reloads data after changing limit', async () => {
-    await wrapper?.find('[data-testid="open-schulspezifische-rollenerweiterungen-section-headline-button"]').trigger('click');
+    await wrapper
+      ?.find('[data-testid="open-schulspezifische-rollenerweiterungen-section-headline-button"]')
+      .trigger('click');
     await nextTick();
     /* check for both cases, first if total is greater than, afterwards if total is less or equal than chosen limit */
     if (serviceProviderStore.rollenerweiterungen) {

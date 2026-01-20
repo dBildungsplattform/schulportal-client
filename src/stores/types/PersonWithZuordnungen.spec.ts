@@ -46,8 +46,11 @@ describe('PersonWithZuordnungen', () => {
     const { administrationsebenenAsString, klassenZuordnungenAsString }: PersonWithZuordnungen = personWithZuordnungen;
     for (const zuordnung of zuordnungen) {
       if (zuordnung.typ !== OrganisationsTyp.Klasse) {
-        if (zuordnung.sskDstNr) expect(administrationsebenenAsString).toContain(zuordnung.sskDstNr);
-        else expect(administrationsebenenAsString).toContain(zuordnung.sskName);
+        if (zuordnung.sskDstNr) {
+          expect(administrationsebenenAsString).toContain(zuordnung.sskDstNr);
+        } else {
+          expect(administrationsebenenAsString).toContain(zuordnung.sskName);
+        }
       } else {
         expect(klassenZuordnungenAsString).toContain(zuordnung.sskName);
       }

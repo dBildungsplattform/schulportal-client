@@ -4,7 +4,7 @@ import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen
 import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import { DoFactory } from 'test/DoFactory';
 import { test, type MockInstance } from 'vitest';
-import { nextTick } from 'vue';
+import { nextTick, type Component } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import PersonBulkDelete from './PersonBulkDelete.vue';
 
@@ -39,7 +39,7 @@ beforeEach(async () => {
     },
     global: {
       components: {
-        PersonBulkDelete,
+        PersonBulkDelete: PersonBulkDelete as Component,
       },
       plugins: [router],
     },

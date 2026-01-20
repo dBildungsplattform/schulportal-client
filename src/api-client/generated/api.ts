@@ -632,7 +632,13 @@ export const DbiamOrganisationErrorI18nKeyEnum = {
     NewerVersionOrganisation: 'NEWER_VERSION_ORGANISATION',
     OrganisationWechseltTeilbaum: 'ORGANISATION_WECHSELT_TEILBAUM',
     OrganisationZuweisungFehler: 'ORGANISATION_ZUWEISUNG_FEHLER',
-    SchultraegerNameEindeutig: 'SCHULTRAEGER_NAME_EINDEUTIG'
+    SchultraegerNameEindeutig: 'SCHULTRAEGER_NAME_EINDEUTIG',
+    OrganisationHatKinder: 'ORGANISATION_HAT_KINDER',
+    OrganisationHatZugehoerige: 'ORGANISATION_HAT_ZUGEHOERIGE',
+    OrganisationHatRollen: 'ORGANISATION_HAT_ROLLEN',
+    OrganisationHatPersonenkontexte: 'ORGANISATION_HAT_PERSONENKONTEXTE',
+    OrganisationHatAngebote: 'ORGANISATION_HAT_ANGEBOTE',
+    OrganisationHatRollenerweiterungen: 'ORGANISATION_HAT_ROLLENERWEITERUNGEN'
 } as const;
 
 export type DbiamOrganisationErrorI18nKeyEnum = typeof DbiamOrganisationErrorI18nKeyEnum[keyof typeof DbiamOrganisationErrorI18nKeyEnum];
@@ -3483,6 +3489,7 @@ export const ServiceProviderKategorie = {
     Email: 'EMAIL',
     Unterricht: 'UNTERRICHT',
     Verwaltung: 'VERWALTUNG',
+    Schulisch: 'SCHULISCH',
     Hinweise: 'HINWEISE',
     Angebote: 'ANGEBOTE'
 } as const;
@@ -7473,16 +7480,16 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
             };
         },
         /**
-         * Delete an organisation of type Klasse by id.
+         * Delete an organisation by id.
          * @summary 
          * @param {string} organisationId The id of an organization
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerDeleteKlasse: async (organisationId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        organisationControllerDeleteOrganisation: async (organisationId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'organisationId' is not null or undefined
-            assertParamExists('organisationControllerDeleteKlasse', 'organisationId', organisationId)
-            const localVarPath = `/api/organisationen/{organisationId}/klasse`
+            assertParamExists('organisationControllerDeleteOrganisation', 'organisationId', organisationId)
+            const localVarPath = `/api/organisationen/{organisationId}`
                 .replace(`{${"organisationId"}}`, encodeURIComponent(String(organisationId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -8043,14 +8050,14 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Delete an organisation of type Klasse by id.
+         * Delete an organisation by id.
          * @summary 
          * @param {string} organisationId The id of an organization
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async organisationControllerDeleteKlasse(organisationId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerDeleteKlasse(organisationId, options);
+        async organisationControllerDeleteOrganisation(organisationId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerDeleteOrganisation(organisationId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -8199,14 +8206,14 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
             return localVarFp.organisationControllerCreateOrganisation(createOrganisationBodyParams, options).then((request) => request(axios, basePath));
         },
         /**
-         * Delete an organisation of type Klasse by id.
+         * Delete an organisation by id.
          * @summary 
          * @param {string} organisationId The id of an organization
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerDeleteKlasse(organisationId: string, options?: any): AxiosPromise<void> {
-            return localVarFp.organisationControllerDeleteKlasse(organisationId, options).then((request) => request(axios, basePath));
+        organisationControllerDeleteOrganisation(organisationId: string, options?: any): AxiosPromise<void> {
+            return localVarFp.organisationControllerDeleteOrganisation(organisationId, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -8343,14 +8350,14 @@ export interface OrganisationenApiInterface {
     organisationControllerCreateOrganisation(createOrganisationBodyParams: CreateOrganisationBodyParams, options?: AxiosRequestConfig): AxiosPromise<OrganisationResponse>;
 
     /**
-     * Delete an organisation of type Klasse by id.
+     * Delete an organisation by id.
      * @summary 
      * @param {string} organisationId The id of an organization
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganisationenApiInterface
      */
-    organisationControllerDeleteKlasse(organisationId: string, options?: AxiosRequestConfig): AxiosPromise<void>;
+    organisationControllerDeleteOrganisation(organisationId: string, options?: AxiosRequestConfig): AxiosPromise<void>;
 
     /**
      * 
@@ -8491,15 +8498,15 @@ export class OrganisationenApi extends BaseAPI implements OrganisationenApiInter
     }
 
     /**
-     * Delete an organisation of type Klasse by id.
+     * Delete an organisation by id.
      * @summary 
      * @param {string} organisationId The id of an organization
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganisationenApi
      */
-    public organisationControllerDeleteKlasse(organisationId: string, options?: AxiosRequestConfig) {
-        return OrganisationenApiFp(this.configuration).organisationControllerDeleteKlasse(organisationId, options).then((request) => request(this.axios, this.basePath));
+    public organisationControllerDeleteOrganisation(organisationId: string, options?: AxiosRequestConfig) {
+        return OrganisationenApiFp(this.configuration).organisationControllerDeleteOrganisation(organisationId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import PersonenkontextDelete from './PersonenkontextDelete.vue';
-import { nextTick } from 'vue';
+import { nextTick, type Component } from 'vue';
 
 let wrapper: VueWrapper | null = null;
 
@@ -21,7 +21,7 @@ beforeEach(() => {
     },
     global: {
       components: {
-        PersonenkontextDelete,
+        PersonenkontextDelete: PersonenkontextDelete as Component,
       },
     },
   });
@@ -32,7 +32,7 @@ describe('PersonenkontextDelete', () => {
     wrapper?.get('[data-testid="open-zuordnung-delete-dialog-button"]').trigger('click');
     await nextTick();
 
-    await document.querySelector('[data-testid="zuordnung-delete-confirmation-text"]');
+    document.querySelector('[data-testid="zuordnung-delete-confirmation-text"]');
     expect(document.querySelector('[data-testid="zuordnung-delete-confirmation-text"]')).not.toBeNull();
 
     const closeDialogButton: HTMLElement | undefined = document.querySelector(
@@ -49,7 +49,7 @@ describe('PersonenkontextDelete', () => {
     wrapper?.find('[data-testid="open-zuordnung-delete-dialog-button"]').trigger('click');
     await nextTick();
 
-    await document.querySelector('[data-testid="zuordnung-delete-confirmation-text"]');
+    document.querySelector('[data-testid="zuordnung-delete-confirmation-text"]');
     expect(document.querySelector('[data-testid="zuordnung-delete-confirmation-text"]')).not.toBeNull();
 
     const zuordnungDeleteButton: HTMLElement | undefined = document.querySelector(

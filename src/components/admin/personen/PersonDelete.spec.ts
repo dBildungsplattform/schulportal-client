@@ -2,7 +2,7 @@ import routes from '@/router/routes';
 import { VueWrapper, mount } from '@vue/test-utils';
 import { DoFactory } from 'test/DoFactory';
 import { expect, test, type MockInstance } from 'vitest';
-import { nextTick } from 'vue';
+import { nextTick, type Component } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import PersonDelete from './PersonDelete.vue';
 
@@ -34,7 +34,7 @@ beforeEach(async () => {
     },
     global: {
       components: {
-        PersonDelete,
+        PersonDelete: PersonDelete as Component,
       },
       plugins: [router],
     },

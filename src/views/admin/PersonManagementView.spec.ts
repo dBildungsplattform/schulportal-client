@@ -6,7 +6,6 @@ import {
 } from '@/api-client/generated/api';
 import routes from '@/router/routes';
 import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
-import { OperationType } from '@/stores/BulkOperationStore';
 import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
 import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
@@ -19,9 +18,10 @@ import { DOMWrapper, VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import type WrapperLike from 'node_modules/@vue/test-utils/dist/interfaces/wrapperLike';
 import { DoFactory } from 'test/DoFactory';
 import { expect, test, type Mock, type MockInstance } from 'vitest';
-import { nextTick, type ComputedRef, type DefineComponent } from 'vue';
+import { nextTick, type Component, type ComputedRef, type DefineComponent } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import PersonManagementView from './PersonManagementView.vue';
+import { OperationType } from '@/stores/types/bulkOperationTypes';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -34,12 +34,12 @@ let authStore: AuthStore;
 
 vi.useFakeTimers();
 
-function mountComponent(): VueWrapper {
+function mountComponent(): VueWrapper<InstanceType<typeof PersonManagementView>> {
   return mount(PersonManagementView, {
     attachTo: document.getElementById('app') || '',
     global: {
       components: {
-        PersonManagementView,
+        PersonManagementView: PersonManagementView as Component,
       },
       plugins: [router],
     },
@@ -215,7 +215,8 @@ describe('PersonManagementView', () => {
       administrationsebenen: personWithZuordnungen.administrationsebenenAsString,
       klassen: personWithZuordnungen.klassenZuordnungenAsString,
     };
-    await wrapper?.getComponent({ name: 'ResultTable' }).vm.$emit('onHandleRowClick', undefined, { item: personRow });
+    const resultTable: VueWrapper = wrapper?.getComponent({ name: 'ResultTable' }) as VueWrapper;
+    resultTable.vm.$emit('onHandleRowClick', undefined, { item: personRow });
     await nextTick();
 
     expect(spy).toHaveBeenCalledWith({
@@ -360,7 +361,7 @@ describe('PersonManagementView', () => {
     expect(klasseAutocomplete?.text()).toBe('');
   });
 
-  it('should return the total value from klassenFilters if present', async () => {
+  it('should return the total value from klassenFilters if present', () => {
     interface PersonManagementView extends DefineComponent {
       totalKlassen: ComputedRef<number>;
     }
@@ -584,7 +585,6 @@ describe('PersonManagementView', () => {
 
     const benutzerEditSelect: VueWrapper | undefined = wrapper.findComponent({ ref: 'benutzer-bulk-edit-select' });
 
-    // eslint-disable-next-line @typescript-eslint/dot-notation
     (benutzerEditSelect.props() as { items: { value: string }[] })['items'].forEach((item: { value: string }) => {
       expect(item.value).not.toBe(operationType);
     });
@@ -612,7 +612,8 @@ describe('PersonManagementView', () => {
     // Trigger the checkbox click
     await checkbox.trigger('click');
     await nextTick();
-    wrapper.findComponent({ name: 'ResultTable' }).vm.$emit('update:selectedRows', [person.id]);
+    const resultTable: VueWrapper = wrapper.findComponent({ name: 'ResultTable' }) as VueWrapper;
+    resultTable.vm.$emit('update:selectedRows', [person.id]);
     await nextTick();
 
     const benutzerEditSelect: VueWrapper | undefined = wrapper.findComponent({ ref: 'benutzer-bulk-edit-select' });

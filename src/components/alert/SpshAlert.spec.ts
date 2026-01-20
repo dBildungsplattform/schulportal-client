@@ -1,7 +1,7 @@
 import SpshAlert from './SpshAlert.vue';
 import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
-import { nextTick } from 'vue';
+import { nextTick, type Component } from 'vue';
 
 let wrapper: VueWrapper | null = null;
 
@@ -24,7 +24,7 @@ beforeEach(() => {
 
     global: {
       components: {
-        SpshAlert,
+        SpshAlert: SpshAlert as Component,
       },
     },
   });

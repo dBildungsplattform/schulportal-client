@@ -59,6 +59,10 @@
   const administrationServiceProviders: ComputedRef<StartPageServiceProvider[]> = computed(() =>
     filterSortProviders(serviceProviderStore.availableServiceProviders, ServiceProviderKategorie.Verwaltung),
   );
+  // Filter service providers by category "SCHULISCH"
+  const schulischServiceProviders: ComputedRef<StartPageServiceProvider[]> = computed(() =>
+    filterSortProviders(serviceProviderStore.availableServiceProviders, ServiceProviderKategorie.Schulisch),
+  );
   // Filter service providers by category "HINWEISE"
   const hintsServiceProviders: ComputedRef<StartPageServiceProvider[]> = computed(() =>
     filterSortProviders(serviceProviderStore.availableServiceProviders, ServiceProviderKategorie.Hinweise),
@@ -300,13 +304,19 @@
         :service-providers="administrationServiceProviders"
         :has-token="getHasToken()"
       />
-      <!-- Categorie 4: Hints -->
+      <!-- Categorie 4: Schulisch -->
+      <ServiceProviderCategory
+        :category-title="$t('start.categories.school')"
+        :service-providers="schulischServiceProviders"
+        :has-token="getHasToken()"
+      />
+      <!-- Categorie 5: Hints -->
       <ServiceProviderCategory
         :category-title="$t('start.categories.hints')"
         :service-providers="hintsServiceProviders"
         :has-token="getHasToken()"
       />
-      <!-- Categorie 5: School Offerings -->
+      <!-- Categorie 6: School Offerings -->
       <ServiceProviderCategory
         :category-title="$t('start.categories.schoolOfferings')"
         :service-providers="schoolOfferingsServiceProviders"

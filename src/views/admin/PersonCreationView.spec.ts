@@ -24,7 +24,7 @@ import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import type Module from 'module';
 import { DoFactory } from 'test/DoFactory';
 import { expect, test, type Mock, type MockInstance } from 'vitest';
-import { nextTick } from 'vue';
+import { nextTick, type Component } from 'vue';
 import {
   createRouter,
   createWebHistory,
@@ -209,17 +209,19 @@ let { storedBeforeRouteLeaveCallback }: { storedBeforeRouteLeaveCallback: OnBefo
         _to: RouteLocationNormalized,
         _from: RouteLocationNormalized,
         _next: NavigationGuardNext,
-      ): void => {},
+      ): void => {
+        // intentionally left blank for test hoisting
+      },
     };
   },
 );
 
-function mountComponent(): VueWrapper {
+function mountComponent(): ReturnType<typeof mount<typeof PersonCreationView>> {
   return mount(PersonCreationView, {
     attachTo: document.getElementById('app') || '',
     global: {
       components: {
-        PersonCreationView,
+        PersonCreationView: PersonCreationView as Component,
       },
       plugins: [router],
     },
@@ -357,7 +359,7 @@ describe('PersonCreationView', () => {
       attachTo: document.getElementById('app') || '',
       global: {
         components: {
-          PersonCreationView,
+          PersonCreationView: PersonCreationView as Component,
         },
         plugins: [router],
       },
@@ -393,7 +395,7 @@ describe('PersonCreationView', () => {
     const personenkontextCreate: VueWrapper | undefined = wrapper?.findComponent({ name: 'PersonenkontextCreate' });
 
     // Emit the event from the child component
-    await personenkontextCreate?.vm.$emit('update:calculatedBefristungOption', 'someOption');
+    personenkontextCreate?.vm.$emit('update:calculatedBefristungOption', 'someOption');
 
     // Assert that the parent component emitted the event
     expect(
@@ -422,7 +424,7 @@ describe('PersonCreationView', () => {
     const personenkontextCreate: VueWrapper | undefined = wrapper?.findComponent({ name: 'PersonenkontextCreate' });
 
     // Emit the event from the child component
-    await personenkontextCreate?.vm.$emit('update:calculatedBefristungOption', undefined);
+    personenkontextCreate?.vm.$emit('update:calculatedBefristungOption', undefined);
 
     // Assert that the parent component emitted the event
     expect(
@@ -770,7 +772,7 @@ describe('PersonCreationView', () => {
       expect(spy).toHaveBeenCalledOnce();
     });
 
-    test('it does not trigger if form is not dirty', async () => {
+    test('it does not trigger if form is not dirty', () => {
       // autoselected orgnisation doesnt count as dirty
       const expectedCallsToNext: number = 1;
       vi.mock('vue-router', async (importOriginal: () => Promise<Module>) => {
@@ -789,9 +791,9 @@ describe('PersonCreationView', () => {
     });
   });
 
-  describe.each([[true], [false]])('when form is dirty:%s', async (isFormDirty: boolean) => {
+  describe.each([[true], [false]])('when form is dirty:%s', (isFormDirty: boolean) => {
     beforeEach(async () => {
-      if (isFormDirty)
+      if (isFormDirty) {
         await fillForm({
           organisationsebene: '9876',
           rollen: ['1'],
@@ -800,17 +802,21 @@ describe('PersonCreationView', () => {
           nachname: 'Orton',
           kopersNr: '14614',
         });
+      }
       await nextTick();
     });
 
-    test('it handles unloading', async () => {
+    test('it handles unloading', () => {
       const event: Event = new Event('beforeunload');
       const spy: MockInstance = vi.spyOn(event, 'preventDefault');
       window.dispatchEvent(event);
       // TODO: why is spy called 12 times?
       // if (isFormDirty) expect(spy).toHaveBeenCalledOnce();
-      if (isFormDirty) expect(spy).toHaveBeenCalled();
-      else expect(spy).not.toHaveBeenCalledOnce();
+      if (isFormDirty) {
+        expect(spy).toHaveBeenCalled();
+      } else {
+        expect(spy).not.toHaveBeenCalledOnce();
+      }
     });
   });
 

@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest';
 import { VueWrapper, mount } from '@vue/test-utils';
 import { VApp } from 'vuetify/components';
-import { h } from 'vue';
+import { h, type Component } from 'vue';
 import TheFooter from './TheFooter.vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import routes from '@/router/routes';
@@ -28,7 +28,7 @@ beforeEach(async () => {
     attachTo: document.getElementById('app') || '',
     global: {
       components: {
-        TheFooter,
+        TheFooter: TheFooter as Component,
       },
       plugins: [router],
     },
