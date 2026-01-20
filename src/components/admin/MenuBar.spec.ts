@@ -131,31 +131,33 @@ describe('MenuBar', () => {
   });
 
   test('it handles menu item click', async () => {
+    interface Fixture {
+      selector: string;
+      route: string;
+    }
     const push: MockInstance = vi.fn();
     (useRouter as Mock).mockImplementation(() => {
       return { push };
     });
     wrapper = mountComponent();
-
-    await wrapper.find('[data-testid="person-management-menu-item"]').trigger('click');
-    await nextTick();
-
-    await wrapper.find('[data-testid="person-import-menu-item"]').trigger('click');
-    await nextTick();
-
-    await wrapper.find('[data-testid="klasse-management-menu-item"]').trigger('click');
-    await nextTick();
-
-    await wrapper.find('[data-testid="rolle-management-menu-item"]').trigger('click');
-    await nextTick();
-
-    await wrapper.find('[data-testid="angebot-management-menu-item"]').trigger('click');
-    await nextTick();
-
-    await wrapper.find('[data-testid="schule-management-menu-item"]').trigger('click');
-    await nextTick();
-
-    expect(push).toHaveBeenCalledTimes(6);
+    const fixtures: Fixture[] = [
+      { selector: '[data-testid="person-management-menu-item"]', route: '/admin/personen' },
+      { selector: '[data-testid="person-import-menu-item"]', route: '/admin/personen/import' },
+      { selector: '[data-testid="klasse-management-menu-item"]', route: '/admin/klassen' },
+      { selector: '[data-testid="rolle-management-menu-item"]', route: '/admin/rollen' },
+      { selector: '[data-testid="angebot-management-menu-item"]', route: '/admin/angebote' },
+      {
+        selector: '[data-testid="angebot-display-school-specific-menu-item"]',
+        route: '/admin/angebote/school-specific',
+      },
+      { selector: '[data-testid="schule-management-menu-item"]', route: '/admin/schulen' },
+    ];
+    for (const fixture of fixtures) {
+      // eslint-disable-next-line no-await-in-loop
+      await wrapper.find(fixture.selector).trigger('click');
+      expect(push).toHaveBeenLastCalledWith(fixture.route);
+    }
+    expect(push).toHaveBeenCalledTimes(fixtures.length);
   });
 
   test('it refreshes when navigating to current route', async () => {
