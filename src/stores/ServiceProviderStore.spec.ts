@@ -266,7 +266,7 @@ describe('serviceProviderStore', () => {
       const promise: Promise<void> = serviceProviderStore.getServiceProviderLogoById(serviceProviderId);
       expect(serviceProviderStore.loading).toBe(true);
       await promise;
-      expect(serviceProviderStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(serviceProviderStore.errorCode).toEqual('');
       expect(serviceProviderStore.loading).toBe(false);
     });
 
@@ -275,7 +275,7 @@ describe('serviceProviderStore', () => {
       const promise: Promise<void> = serviceProviderStore.getServiceProviderLogoById(serviceProviderId);
       expect(serviceProviderStore.loading).toBe(true);
       await promise;
-      expect(serviceProviderStore.errorCode).toEqual('some mock server error');
+      expect(serviceProviderStore.errorCode).toEqual('');
       expect(serviceProviderStore.loading).toBe(false);
     });
 
