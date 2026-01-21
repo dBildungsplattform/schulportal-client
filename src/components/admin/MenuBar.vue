@@ -233,19 +233,29 @@
     </div>
 
     <!-- Angebotsverwaltung -->
-    <div v-if="authStore.hasAngeboteVerwaltenPermission">
+    <div v-if="authStore.hasAngeboteVerwaltenPermission || authStore.hasRollenerweiternPermission">
       <v-list-item
         class="menu-bar-main-item headline-2"
         data-testid="angebot-management-title"
         :title="$t('admin.angebot.management.title')"
       ></v-list-item>
       <v-list-item
+        v-if="authStore.hasAngeboteVerwaltenPermission"
         class="menu-bar-sub-item caption"
         @click="handleMenuItemClick('/admin/angebote')"
         data-testid="angebot-management-menu-item"
         prepend-icon="mdi-format-list-bulleted"
         :title="$t('admin.angebot.showAll')"
         to="/admin/angebote"
+      ></v-list-item>
+      <v-list-item
+        v-if="authStore.hasRollenerweiternPermission"
+        class="menu-bar-sub-item caption"
+        @click="handleMenuItemClick('/admin/angebote/schulspezifisch')"
+        data-testid="angebot-display-schulspezifisch-menu-item"
+        prepend-icon="mdi-format-list-bulleted"
+        :title="$t('admin.angebot.showSchoolSpecific')"
+        to="/admin/angebote/schulspezifisch"
       ></v-list-item>
     </div>
 
