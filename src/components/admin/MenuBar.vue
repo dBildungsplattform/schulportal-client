@@ -251,11 +251,11 @@
       <v-list-item
         v-if="authStore.hasRollenerweiternPermission"
         class="menu-bar-sub-item caption"
-        @click="handleMenuItemClick('/admin/angebote/school-specific')"
-        data-testid="angebot-display-school-specific-menu-item"
+        @click="handleMenuItemClick('/admin/angebote/schulspezifisch')"
+        data-testid="angebot-display-schulspezifisch-menu-item"
         prepend-icon="mdi-format-list-bulleted"
         :title="$t('admin.angebot.showSchoolSpecific')"
-        to="/admin/angebote/school-specific"
+        to="/admin/angebote/schulspezifisch"
       ></v-list-item>
     </div>
 

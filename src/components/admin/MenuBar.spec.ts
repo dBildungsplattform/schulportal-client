@@ -103,7 +103,7 @@ describe('MenuBar', () => {
 
       expect(wrapper?.find('[data-testid="angebot-management-title"]').exists()).toBe(hasPermission);
       expect(wrapper?.find('[data-testid="angebot-management-menu-item"]').exists()).toBe(hasPermission);
-      expect(wrapper?.find('[data-testid="angebot-display-school-specific-menu-item"]').exists()).toBe(hasPermission);
+      expect(wrapper?.find('[data-testid="angebot-display-schulspezifisch-menu-item"]').exists()).toBe(hasPermission);
 
       expect(wrapper?.find('[data-testid="schule-management-title"]').exists()).toBe(hasPermission);
       expect(wrapper?.find('[data-testid="schule-management-menu-item"]').exists()).toBe(hasPermission);
@@ -147,8 +147,8 @@ describe('MenuBar', () => {
       { selector: '[data-testid="rolle-management-menu-item"]', route: '/admin/rollen' },
       { selector: '[data-testid="angebot-management-menu-item"]', route: '/admin/angebote' },
       {
-        selector: '[data-testid="angebot-display-school-specific-menu-item"]',
-        route: '/admin/angebote/school-specific',
+        selector: '[data-testid="angebot-display-schulspezifisch-menu-item"]',
+        route: '/admin/angebote/schulspezifisch',
       },
       { selector: '[data-testid="schule-management-menu-item"]', route: '/admin/schulen' },
     ];

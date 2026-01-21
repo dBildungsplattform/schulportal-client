@@ -168,8 +168,8 @@ const routes: readonly RouteRecordRaw[] = [
     },
   },
   {
-    path: '/admin/angebote/school-specific',
-    name: 'angebot-management-school-specific',
+    path: '/admin/angebote/schulspezifisch',
+    name: 'angebot-management-schulspezifisch',
     component: () => import('../views/admin/service-provider/ServiceProviderManagementView.vue'),
     meta: {
       layout: 'AdminLayout',
