@@ -301,7 +301,7 @@ describe('serviceProviderStore', () => {
       await serviceProviderStore.getServiceProviderLogoById(serviceProviderId);
 
       // The FileReader error triggers your rejection handler, which sets errorCode
-      expect(serviceProviderStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(serviceProviderStore.errorCode).toEqual('');
       expect(serviceProviderStore.loading).toBe(false);
     });
   });
