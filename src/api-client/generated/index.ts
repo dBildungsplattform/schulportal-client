@@ -1,5 +1,5 @@
 /* tslint:disable */
- 
+/* eslint-disable */
 /**
  * dBildungs IAM
  * The dBildungs IAM server API description
