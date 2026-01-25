@@ -585,8 +585,6 @@
       // We should apply the search filter if the store for it holds a value, otherwise the values will show as UUIDs...
       await applySearchAndFilters();
     }
-
-    await getPaginatedPersonen(searchFilterStore.personenPage);
     await personenkontextStore.getPersonenkontextRolleWithFilter('', 25);
   });
 </script>
