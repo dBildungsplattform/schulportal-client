@@ -223,16 +223,6 @@
 
   async function getPaginatedPersonen(page: number): Promise<void> {
     searchFilterStore.personenPage = page;
-    await personStore.getAllPersons({
-      offset: (searchFilterStore.personenPage - 1) * searchFilterStore.personenPerPage,
-      limit: searchFilterStore.personenPerPage,
-      organisationIDs: selectedKlassen.value?.length ? selectedKlassen.value : selectedOrganisationIds.value,
-      rolleIDs: searchFilterStore.selectedRollen || selectedRollen.value,
-      searchFilter: searchFilterStore.searchFilterPersonen || searchFilter.value,
-      sortField: searchFilterStore.personenSortField as SortField,
-      sortOrder: searchFilterStore.personenSortOrder as SortOrder,
-    });
-
     await applySearchAndFilters();
   }
 
@@ -595,8 +585,6 @@
       // We should apply the search filter if the store for it holds a value, otherwise the values will show as UUIDs...
       await applySearchAndFilters();
     }
-
-    await getPaginatedPersonen(searchFilterStore.personenPage);
     await personenkontextStore.getPersonenkontextRolleWithFilter('', 25);
   });
 </script>
