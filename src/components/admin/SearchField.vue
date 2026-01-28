@@ -39,7 +39,6 @@
 
   onBeforeMount(() => {
     searchFilter.value = props.initialValue;
-    applySearchFilter(); // Apply the filter if the searchFilter is not an empty string
   });
 </script>
 
