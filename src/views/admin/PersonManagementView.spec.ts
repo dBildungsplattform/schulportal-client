@@ -480,7 +480,7 @@ describe('PersonManagementView', () => {
     vi.runAllTicks();
 
     // Assert that the method was called
-    expect(mockGetPersonenkontextRolleWithFilter).toHaveBeenCalledWith('name', 25);
+    expect(mockGetPersonenkontextRolleWithFilter).toHaveBeenCalledWith('name', 25, []);
 
     // Add more assertions here to check the state after the search
     expect(personenkontextStore.filteredRollen).toBeDefined();
