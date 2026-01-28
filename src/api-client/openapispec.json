@@ -3122,20 +3122,12 @@
 ]
 }
 },
-"/api/provider/manageable-by-organisation/{organisationId}": {
+"/api/provider/manageable-by-organisation": {
 "get": {
 "operationId": "ProviderController_getManageableServiceProvidersForOrganisationId",
 "summary": "",
 "description": "Get service-providers the logged-in user is allowed to manage for an Organisation.",
 "parameters": [
-{
-"name": "organisationId",
-"required": true,
-"in": "path",
-"schema": {
-"type": "string"
-}
-},
 {
 "name": "offset",
 "required": false,
@@ -3152,6 +3144,16 @@
 "description": "The requested limit for the page size.",
 "schema": {
 "type": "number"
+}
+},
+{
+"name": "organisationId",
+"required": true,
+"in": "query",
+"description": "The id of the organisation",
+"schema": {
+"nullable": false,
+"type": "string"
 }
 }
 ],

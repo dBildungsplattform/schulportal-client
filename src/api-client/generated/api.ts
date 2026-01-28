@@ -11492,7 +11492,7 @@ export const ProviderApiAxiosParamCreator = function (configuration?: Configurat
         /**
          * Get service-providers the logged-in user is allowed to manage for an Organisation.
          * @summary 
-         * @param {string} organisationId 
+         * @param {string} organisationId The id of the organisation
          * @param {number} [offset] The offset of the paginated list.
          * @param {number} [limit] The requested limit for the page size.
          * @param {*} [options] Override http request option.
@@ -11501,8 +11501,7 @@ export const ProviderApiAxiosParamCreator = function (configuration?: Configurat
         providerControllerGetManageableServiceProvidersForOrganisationId: async (organisationId: string, offset?: number, limit?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'organisationId' is not null or undefined
             assertParamExists('providerControllerGetManageableServiceProvidersForOrganisationId', 'organisationId', organisationId)
-            const localVarPath = `/api/provider/manageable-by-organisation/{organisationId}`
-                .replace(`{${"organisationId"}}`, encodeURIComponent(String(organisationId)));
+            const localVarPath = `/api/provider/manageable-by-organisation`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -11528,6 +11527,10 @@ export const ProviderApiAxiosParamCreator = function (configuration?: Configurat
 
             if (limit !== undefined) {
                 localVarQueryParameter['limit'] = limit;
+            }
+
+            if (organisationId !== undefined) {
+                localVarQueryParameter['organisationId'] = organisationId;
             }
 
 
@@ -11651,7 +11654,7 @@ export const ProviderApiFp = function(configuration?: Configuration) {
         /**
          * Get service-providers the logged-in user is allowed to manage for an Organisation.
          * @summary 
-         * @param {string} organisationId 
+         * @param {string} organisationId The id of the organisation
          * @param {number} [offset] The offset of the paginated list.
          * @param {number} [limit] The requested limit for the page size.
          * @param {*} [options] Override http request option.
@@ -11735,7 +11738,7 @@ export const ProviderApiFactory = function (configuration?: Configuration, baseP
         /**
          * Get service-providers the logged-in user is allowed to manage for an Organisation.
          * @summary 
-         * @param {string} organisationId 
+         * @param {string} organisationId The id of the organisation
          * @param {number} [offset] The offset of the paginated list.
          * @param {number} [limit] The requested limit for the page size.
          * @param {*} [options] Override http request option.
@@ -11816,7 +11819,7 @@ export interface ProviderApiInterface {
     /**
      * Get service-providers the logged-in user is allowed to manage for an Organisation.
      * @summary 
-     * @param {string} organisationId 
+     * @param {string} organisationId The id of the organisation
      * @param {number} [offset] The offset of the paginated list.
      * @param {number} [limit] The requested limit for the page size.
      * @param {*} [options] Override http request option.
@@ -11907,7 +11910,7 @@ export class ProviderApi extends BaseAPI implements ProviderApiInterface {
     /**
      * Get service-providers the logged-in user is allowed to manage for an Organisation.
      * @summary 
-     * @param {string} organisationId 
+     * @param {string} organisationId The id of the organisation
      * @param {number} [offset] The offset of the paginated list.
      * @param {number} [limit] The requested limit for the page size.
      * @param {*} [options] Override http request option.
