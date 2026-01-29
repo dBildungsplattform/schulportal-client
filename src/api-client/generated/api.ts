@@ -3983,7 +3983,7 @@ export interface UserExternalDataResponse {
      * @type {UserExternalDataResponseOx}
      * @memberof UserExternalDataResponse
      */
-    'ox': UserExternalDataResponseOx;
+    'ox'?: UserExternalDataResponseOx;
     /**
      * 
      * @type {UserExeternalDataResponseItslearning}
@@ -8647,10 +8647,11 @@ export const PersonAdministrationApiAxiosParamCreator = function (configuration?
          * 
          * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
          * @param {number} [limit] The limit of items for the request.
+         * @param {Array<string>} [organisationIds] OrganisationIDs to filter rollen
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personAdministrationControllerFindRollen: async (rolleName?: string, limit?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        personAdministrationControllerFindRollen: async (rolleName?: string, limit?: number, organisationIds?: Array<string>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/person-administration/rollen`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -8679,6 +8680,10 @@ export const PersonAdministrationApiAxiosParamCreator = function (configuration?
                 localVarQueryParameter['limit'] = limit;
             }
 
+            if (organisationIds) {
+                localVarQueryParameter['organisationIds'] = organisationIds;
+            }
+
 
     
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -8704,11 +8709,12 @@ export const PersonAdministrationApiFp = function(configuration?: Configuration)
          * 
          * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
          * @param {number} [limit] The limit of items for the request.
+         * @param {Array<string>} [organisationIds] OrganisationIDs to filter rollen
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async personAdministrationControllerFindRollen(rolleName?: string, limit?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FindRollenResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.personAdministrationControllerFindRollen(rolleName, limit, options);
+        async personAdministrationControllerFindRollen(rolleName?: string, limit?: number, organisationIds?: Array<string>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FindRollenResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.personAdministrationControllerFindRollen(rolleName, limit, organisationIds, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -8725,11 +8731,12 @@ export const PersonAdministrationApiFactory = function (configuration?: Configur
          * 
          * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
          * @param {number} [limit] The limit of items for the request.
+         * @param {Array<string>} [organisationIds] OrganisationIDs to filter rollen
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personAdministrationControllerFindRollen(rolleName?: string, limit?: number, options?: any): AxiosPromise<FindRollenResponse> {
-            return localVarFp.personAdministrationControllerFindRollen(rolleName, limit, options).then((request) => request(axios, basePath));
+        personAdministrationControllerFindRollen(rolleName?: string, limit?: number, organisationIds?: Array<string>, options?: any): AxiosPromise<FindRollenResponse> {
+            return localVarFp.personAdministrationControllerFindRollen(rolleName, limit, organisationIds, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -8744,11 +8751,12 @@ export interface PersonAdministrationApiInterface {
      * 
      * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
      * @param {number} [limit] The limit of items for the request.
+     * @param {Array<string>} [organisationIds] OrganisationIDs to filter rollen
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonAdministrationApiInterface
      */
-    personAdministrationControllerFindRollen(rolleName?: string, limit?: number, options?: AxiosRequestConfig): AxiosPromise<FindRollenResponse>;
+    personAdministrationControllerFindRollen(rolleName?: string, limit?: number, organisationIds?: Array<string>, options?: AxiosRequestConfig): AxiosPromise<FindRollenResponse>;
 
 }
 
@@ -8763,12 +8771,13 @@ export class PersonAdministrationApi extends BaseAPI implements PersonAdministra
      * 
      * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
      * @param {number} [limit] The limit of items for the request.
+     * @param {Array<string>} [organisationIds] OrganisationIDs to filter rollen
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonAdministrationApi
      */
-    public personAdministrationControllerFindRollen(rolleName?: string, limit?: number, options?: AxiosRequestConfig) {
-        return PersonAdministrationApiFp(this.configuration).personAdministrationControllerFindRollen(rolleName, limit, options).then((request) => request(this.axios, this.basePath));
+    public personAdministrationControllerFindRollen(rolleName?: string, limit?: number, organisationIds?: Array<string>, options?: AxiosRequestConfig) {
+        return PersonAdministrationApiFp(this.configuration).personAdministrationControllerFindRollen(rolleName, limit, organisationIds, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
