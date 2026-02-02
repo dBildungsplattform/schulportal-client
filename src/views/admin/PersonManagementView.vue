@@ -592,6 +592,7 @@
       await applySearchAndFilters();
     }
 
+    await getPaginatedPersonen(searchFilterStore.personenPage);
     await personenkontextStore.getPersonenkontextRolleWithFilter('', 25, selectedOrganisationIds.value);
   });
 </script>
