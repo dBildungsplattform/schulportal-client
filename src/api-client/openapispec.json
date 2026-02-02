@@ -1462,6 +1462,30 @@
         },
         "tags": ["provider"],
         "security": [{ "bearer": [] }, { "oauth2": ["openid"] }]
+      },
+      "post": {
+        "operationId": "ProviderController_createServiceProvider",
+        "summary": "",
+        "description": "Create a new service-provider (Angebot).",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/CreateServiceProviderBodyParams" } }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The service-provider was successfully created.",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ServiceProviderResponse" } } }
+          },
+          "400": { "description": "Invalid request body." },
+          "401": { "description": "Not authorized." },
+          "403": { "description": "Insufficient permissions." },
+          "500": { "description": "Internal server error." }
+        },
+        "tags": ["provider"],
+        "security": [{ "bearer": [] }, { "oauth2": ["openid"] }]
       }
     },
     "/api/provider/{angebotId}/logo": {
@@ -1568,6 +1592,64 @@
             "in": "query",
             "description": "The requested limit for the page size.",
             "schema": { "type": "number" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The service providers were successfully returned. WARNING: This endpoint returns all service providers as default when no paging parameters were set.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/RawPagedResponse" },
+                    {
+                      "required": ["items"],
+                      "properties": {
+                        "items": {
+                          "type": "array",
+                          "items": { "$ref": "#/components/schemas/ManageableServiceProviderListEntryResponse" }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": { "description": "Not authorized to get available service providers." },
+          "403": { "description": "Insufficient permissions to get service-providers." },
+          "500": { "description": "Internal server error while getting all service-providers." }
+        },
+        "tags": ["provider"],
+        "security": [{ "bearer": [] }, { "oauth2": ["openid"] }]
+      }
+    },
+    "/api/provider/manageable-by-organisation": {
+      "get": {
+        "operationId": "ProviderController_getManageableServiceProvidersForOrganisationId",
+        "summary": "",
+        "description": "Get service-providers the logged-in user is allowed to manage for an Organisation.",
+        "parameters": [
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "description": "The offset of the paginated list.",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "The requested limit for the page size.",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "organisationId",
+            "required": true,
+            "in": "query",
+            "description": "The id of the organisation",
+            "schema": { "nullable": false, "type": "string" }
           }
         ],
         "responses": {
@@ -3637,6 +3719,32 @@
           "availableForRollenerweiterung",
           "rollen"
         ]
+      },
+      "CreateServiceProviderBodyParams": {
+        "type": "object",
+        "properties": {
+          "organisationId": { "type": "string", "description": "The id of an organization", "nullable": false },
+          "name": { "type": "string" },
+          "target": { "type": "string", "enum": ["URL", "EMAIL", "SCHULPORTAL_ADMINISTRATION"] },
+          "url": { "type": "string" },
+          "logoBase64": { "type": "string", "description": "Optional logo as base64-encoded string" },
+          "logoMimeType": {
+            "type": "string",
+            "enum": ["image/png", "image/jpeg", "image/webp", "image/svg+xml"],
+            "example": "image/png"
+          },
+          "kategorie": {
+            "type": "string",
+            "enum": ["EMAIL", "UNTERRICHT", "VERWALTUNG", "SCHULISCH", "HINWEISE", "ANGEBOTE"]
+          },
+          "requires2fa": { "type": "boolean" },
+          "vidisAngebotId": { "type": "string" },
+          "merkmale": {
+            "type": "array",
+            "items": { "type": "string", "enum": ["NACHTRAEGLICH_ZUWEISBAR", "VERFUEGBAR_FUER_ROLLENERWEITERUNG"] }
+          }
+        },
+        "required": ["organisationId", "name", "target", "kategorie", "requires2fa", "merkmale"]
       },
       "PersonResponseAutomapper": {
         "type": "object",
