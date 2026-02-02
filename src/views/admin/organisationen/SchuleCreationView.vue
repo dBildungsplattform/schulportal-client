@@ -1,13 +1,7 @@
 <script setup lang="ts">
   import { computed, onMounted, onUnmounted, ref, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
-  import {
-    type Router,
-    useRouter,
-    onBeforeRouteLeave,
-    type RouteLocationNormalized,
-    type NavigationGuardNext,
-  } from 'vue-router';
+  import { onBeforeRouteLeave, type RouteLocationNormalized, type NavigationGuardNext } from 'vue-router';
   import { useDisplay } from 'vuetify';
   import {
     OrganisationsTyp,
@@ -29,7 +23,7 @@
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   const { t }: Composer = useI18n({ useScope: 'global' });
-  const router: Router = useRouter();
+  // const router: Router = useRouter();
   const organisationStore: OrganisationStore = useOrganisationStore();
 
   const validationSchema: TypedSchema = toTypedSchema(
@@ -128,7 +122,8 @@
   const handleCreateAnotherSchule = (): void => {
     organisationStore.createdSchule = null;
     resetForm();
-    router.push({ name: 'create-schule' });
+    // routers commented out not needed ErWIn Portal
+    // router.push({ name: 'create-schule' });
   };
 
   function handleConfirmUnsavedChanges(): void {
@@ -138,20 +133,23 @@
 
   async function navigateToSchuleManagement(): Promise<void> {
     organisationStore.createdSchule = null;
-    await router.push({ name: 'schule-management' }).then(() => {
-      router.go(0);
-    });
+    // routers commented out not needed ErWIn Portal
+    // await router.push({ name: 'schule-management' }).then(() => {
+    //   router.go(0);
+    // });
   }
 
   async function navigateBackToSchuleForm(): Promise<void> {
     if (organisationStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
       resetForm();
-      await router.push({ name: 'create-schule' }).then(() => {
-        router.go(0);
-      });
+      // routers commented out not needed ErWIn Portal
+      // await router.push({ name: 'create-schule' }).then(() => {
+      //   router.go(0);
+      // });
     } else {
       organisationStore.errorCode = '';
-      await router.push({ name: 'create-schule' });
+      // routers commented out not needed ErWIn Portal
+      // await router.push({ name: 'create-schule' });
     }
   }
 
@@ -307,7 +305,7 @@
           </template>
         </FormWrapper>
       </template>
-      <!-- Result template on success after submit (Present value in createdSchule and no errorCode)  -->
+      <!--Result template on success after submit (Present value in createdSchule and no errorCode)  -->
       <template v-if="organisationStore.createdSchule && !organisationStore.errorCode">
         <v-container class="new-schule-success">
           <v-row justify="center">

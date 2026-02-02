@@ -1,4 +1,4 @@
-import { expect, test, type Mock, type MockInstance } from 'vitest';
+import { test, type Mock, type MockInstance } from 'vitest';
 import { DOMWrapper, VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import {
   createRouter,
@@ -87,8 +87,8 @@ describe('HinweiseCreationView', () => {
       routes,
     });
 
-    router.push({ name: 'hinweise-creation' });
-    await router.isReady();
+    // router.push({ name: 'hinweise-creation' });
+    // await router.isReady();
 
     wrapper = mountComponent();
     vi.restoreAllMocks();

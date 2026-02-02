@@ -232,6 +232,7 @@
         :title="$t('admin.schule.showAll')"
         to="/admin/schulen"
       ></v-list-item>
+      <!--
       <v-list-item
         class="menu-bar-sub-item caption"
         @click="closeMenuOnMobile"
@@ -240,8 +241,11 @@
         :title="$t('admin.schule.createNew')"
         to="/admin/schulen/new"
       ></v-list-item>
+      -->
     </div>
+    <!-- Not needed for ErWIn Portal -->
     <!-- Schulträgerverwaltung -->
+    <!--
     <div v-if="authStore.hasSchultraegerverwaltungPermission">
       <v-list-item
         class="menu-bar-main-item headline-2"
@@ -265,7 +269,9 @@
         to="/admin/schultraeger/new"
       ></v-list-item>
     </div>
+    -->
     <!-- Portalverwaltung -->
+    <!--
     <div v-if="authStore.hasPortalVerwaltungPermission && authStore.hasHinweiseBearbeitenPermission">
       <v-list-item
         class="menu-bar-main-item headline-2"
@@ -282,6 +288,7 @@
         to="/admin/hinweise/new"
       ></v-list-item>
     </div>
+    -->
   </v-navigation-drawer>
 </template>
 

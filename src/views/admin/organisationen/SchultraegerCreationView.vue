@@ -1,13 +1,7 @@
 <script setup lang="ts">
   import { computed, onMounted, onUnmounted, ref, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
-  import {
-    type Router,
-    useRouter,
-    onBeforeRouteLeave,
-    type RouteLocationNormalized,
-    type NavigationGuardNext,
-  } from 'vue-router';
+  import { onBeforeRouteLeave, type RouteLocationNormalized, type NavigationGuardNext } from 'vue-router';
   import { useDisplay } from 'vuetify';
   import {
     OrganisationsTyp,
@@ -32,8 +26,8 @@
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   const { t }: Composer = useI18n({ useScope: 'global' });
+  // const router: Router = useRouter();
   const validationSchema: TypedSchema = getValidationSchema(t);
-  const router: Router = useRouter();
   const organisationStore: OrganisationStore = useOrganisationStore();
 
   const preservedSchultraegerform: Ref<string | undefined> = ref<string>('');
@@ -83,7 +77,8 @@
   const handleCreateAnotherSchultraeger = (): void => {
     organisationStore.createdSchultraeger = null;
     formContext.resetForm();
-    router.push({ name: 'create-schultraeger' });
+    // routers commented out not needed ErWIn Portal
+    // router.push({ name: 'create-schultraeger' });
   };
 
   function handleConfirmUnsavedChanges(): void {
@@ -93,21 +88,23 @@
 
   async function navigateToSchultraegerManagement(): Promise<void> {
     organisationStore.createdSchultraeger = null;
-    await router.push({ name: 'schultraeger-management' }).then(() => {
-      router.go(0);
-    });
+    // routers commented out not needed ErWIn Portal
+    // await router.push({ name: 'schultraeger-management' }).then(() => {
+    //   router.go(0);
+    // });
   }
 
   async function navigateBackToSchultraegerForm(): Promise<void> {
+    // routers commented out not needed ErWIn Portal
     if (organisationStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
       formContext.resetForm();
-      await router.push({ name: 'create-schultraeger' }).then(() => {
-        router.go(0);
-      });
+      // await router.push({ name: 'create-schultraeger' }).then(() => {
+      //   router.go(0);
+      // });
     } else {
       selectedSchultraegername.value = '';
       organisationStore.errorCode = '';
-      await router.push({ name: 'create-schultraeger' });
+      // await router.push({ name: 'create-schultraeger' });
     }
   }
 

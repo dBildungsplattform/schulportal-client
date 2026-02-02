@@ -63,8 +63,12 @@
     router.go(0);
   };
 
-  function navigateToSchultraegerDetails(_$event: PointerEvent, { item }: { item: SchultraegerTableItem }): void {
-    router.push({ name: 'schultraeger-details', params: { id: item.id } });
+  function navigateToSchultraegerDetails(
+    _$event: PointerEvent,
+    { item: _item }: { item: SchultraegerTableItem },
+  ): void {
+    // routers commented out not needed ErWIn Portal
+    // router.push({ name: 'schultraeger-details', params: { id: _item.id } });
   }
 
   onMounted(async () => {

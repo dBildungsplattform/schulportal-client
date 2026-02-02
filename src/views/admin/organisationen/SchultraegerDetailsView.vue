@@ -2,8 +2,6 @@
   import { computed, onBeforeMount, onUnmounted, ref, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import {
-    type Router,
-    useRouter,
     onBeforeRouteLeave,
     type RouteLocationNormalized,
     type NavigationGuardNext,
@@ -37,7 +35,7 @@
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const validationSchema: TypedSchema = getValidationSchema(t);
-  const router: Router = useRouter();
+  // const router: Router = useRouter();
   const route: RouteLocationNormalizedLoaded = useRoute();
   const organisationStore: OrganisationStore = useOrganisationStore();
 
@@ -79,14 +77,16 @@
 
   async function navigateToSchultraegerManagement(): Promise<void> {
     formContext.resetForm();
-    await router.push({ name: 'schultraeger-management' });
+    // routers commented out not needed ErWIn Portal
+    // await router.push({ name: 'schultraeger-management' });
   }
 
   async function navigateBackToSchultraegerDetails(): Promise<void> {
     formContext.resetForm();
-    await router.push({ name: 'schultraeger-details' }).then(() => {
-      router.go(0);
-    });
+    // routers commented out not needed ErWIn Portal
+    // await router.push({ name: 'schultraeger-details' }).then(() => {
+    //   router.go(0);
+    // });
   }
 
   function preventNavigation(event: BeforeUnloadEvent): void {
