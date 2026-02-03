@@ -1,16 +1,14 @@
 <script setup lang="ts">
-  import { RollenArt, RollenMerkmal, type DBiamPersonenzuordnungResponse } from '@/api-client/generated/api';
+  import { RollenArt } from '@/api-client/generated/api';
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import PasswordReset from '@/components/admin/personen/PasswordReset.vue';
-  import SelfServiceWorkflow from '@/components/two-factor-authentication/SelfServiceWorkflow.vue';
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import { OrganisationsTyp } from '@/stores/OrganisationStore';
   import { usePersonInfoStore, type PersonInfoStore } from '@/stores/PersonInfoStore';
   import { EmailStatus, usePersonStore, type PersonStore } from '@/stores/PersonStore';
   import { type Zuordnung } from '@/stores/PersonenkontextStore';
   import {
-    TokenKind,
     useTwoFactorAuthentificationStore,
     type TwoFactorAuthentificationStore,
   } from '@/stores/TwoFactorAuthentificationStore';
@@ -177,13 +175,13 @@
     return result;
   }
 
-  const hasKoPersMerkmal: ComputedRef<boolean> = computed(() => {
-    return (
-      personStore.personenuebersicht?.zuordnungen.find((zuordnung: DBiamPersonenzuordnungResponse) => {
-        return zuordnung.merkmale.includes(RollenMerkmal.KopersPflicht);
-      }) !== undefined
-    );
-  });
+  // const hasKoPersMerkmal: ComputedRef<boolean> = computed(() => {
+  //   return (
+  //     personStore.personenuebersicht?.zuordnungen.find((zuordnung: DBiamPersonenzuordnungResponse) => {
+  //       return zuordnung.merkmale.includes(RollenMerkmal.KopersPflicht);
+  //     }) !== undefined
+  //   );
+  // });
 
   // Used to show device password block
   const hasLehrRolle: ComputedRef<boolean> = computed(() => {
@@ -234,15 +232,15 @@
         testIdValue: 'userName-value',
       });
 
-    if (!personInfoStore.personInfo.person.personalnummer && !hasKoPersMerkmal.value) return data;
-    data.push({
-      label: t('profile.koPersNummer'),
-      labelAbbr: t('profile.koPersNummerAbbr'),
-      value: personInfoStore.personInfo.person.personalnummer,
-      type: ItemType.KO_PERS,
-      testIdLabel: 'kopersnummer-label',
-      testIdValue: 'kopersnummer-value',
-    });
+    // if (!personInfoStore.personInfo.person.personalnummer && !hasKoPersMerkmal.value) return data;
+    // data.push({
+    //   label: t('profile.koPersNummer'),
+    //   labelAbbr: t('profile.koPersNummerAbbr'),
+    //   value: personInfoStore.personInfo.person.personalnummer,
+    //   type: ItemType.KO_PERS,
+    //   testIdLabel: 'kopersnummer-label',
+    //   testIdValue: 'kopersnummer-value',
+    // });
     return data;
   });
 
@@ -308,19 +306,21 @@
     }).format(date);
   });
 
-  const twoFactorAuthError: ComputedRef<string> = computed(() => {
-    // Early return if loading
-    if (twoFactorAuthenticationStore.loading) return '';
+  // not needed for ErWIn Portal
+  
+  // const twoFactorAuthError: ComputedRef<string> = computed(() => {
+  //   // Early return if loading
+  //   if (twoFactorAuthenticationStore.loading) return '';
 
-    switch (twoFactorAuthenticationStore.errorCode) {
-      case 'TOKEN_STATE_ERROR':
-        return t('admin.person.twoFactorAuthentication.errors.tokenStateSelfServiceError');
-      case 'PI_UNAVAILABLE_ERROR':
-        return t('admin.person.twoFactorAuthentication.errors.connection');
-      default:
-        return '';
-    }
-  });
+  //   switch (twoFactorAuthenticationStore.errorCode) {
+  //     case 'TOKEN_STATE_ERROR':
+  //       return t('admin.person.twoFactorAuthentication.errors.tokenStateSelfServiceError');
+  //     case 'PI_UNAVAILABLE_ERROR':
+  //       return t('admin.person.twoFactorAuthentication.errors.connection');
+  //     default:
+  //       return '';
+  //   }
+  // });
 
   function handleGoToPreviousPage(): void {
     const previousUrl: string | null = sessionStorage.getItem('previousUrl');
@@ -617,7 +617,10 @@
             ></v-progress-circular>
           </v-row>
         </template>
-        <LayoutCard
+
+        <!-- not needed for ErWIn Portal -->
+        
+        <!-- <LayoutCard
           v-else-if="twoFactorAuthenticationStore.required"
           :headline-test-id="'two-factor-card'"
           :header="$t('profile.twoFactorAuth')"
@@ -718,7 +721,7 @@
               </v-row>
             </v-col>
           </v-row>
-        </LayoutCard>
+        </LayoutCard> -->
         <LayoutCard
           v-if="hasLehrRolle"
           data-testid="reset-device-password-card"

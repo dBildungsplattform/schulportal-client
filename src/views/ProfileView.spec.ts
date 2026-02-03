@@ -293,9 +293,12 @@ describe('ProfileView', () => {
     expect(personalData?.length).toBeGreaterThan(0);
     expect(personalData?.at(0)?.text()).toContain('Vor- und Nachname:Samuel Vimes');
     expect(personalData?.at(1)?.text()).toContain('Benutzername:samuelvimes');
-    if (mockLehrer.person.personalnummer) {
-      expect(personalData?.at(2)?.text()).toContain(mockLehrer.person.personalnummer);
-    }
+
+    // not needed for ErWIn Portal
+
+    // if (mockLehrer.person.personalnummer) {
+    //   expect(personalData?.at(2)?.text()).toContain(mockLehrer.person.personalnummer);
+    // }
   });
 
   test.each([
@@ -404,22 +407,24 @@ describe('ProfileView', () => {
     });
   });
 
-  test('it displays 2FA section', async () => {
-    twoFactorAuthenticationStore.hasToken = false;
-    await nextTick();
-    if (!wrapper) return;
+  // not needed for ErWIn Portal
 
-    expect(document.querySelector('[data-testid="two-factor-card"]')).not.toBeNull();
-    expect(wrapper.text()).not.toContain(
-      'Bitte wenden Sie sich bei Fragen und Problemen an Ihre schulischen Administratorinnen und Administratoren.',
-    );
+  // test('it displays 2FA section', async () => {
+  //   twoFactorAuthenticationStore.hasToken = false;
+  //   await nextTick();
+  //   if (!wrapper) return;
 
-    twoFactorAuthenticationStore.hasToken = true;
-    await nextTick();
-    expect(wrapper.text()).toContain(
-      'Bitte wenden Sie sich bei Fragen und Problemen an Ihre schulischen Administratorinnen und Administratoren.',
-    );
-  });
+  //   expect(document.querySelector('[data-testid="two-factor-card"]')).not.toBeNull();
+  //   expect(wrapper.text()).not.toContain(
+  //     'Bitte wenden Sie sich bei Fragen und Problemen an Ihre schulischen Administratorinnen und Administratoren.',
+  //   );
+
+  //   twoFactorAuthenticationStore.hasToken = true;
+  //   await nextTick();
+  //   expect(wrapper.text()).toContain(
+  //     'Bitte wenden Sie sich bei Fragen und Problemen an Ihre schulischen Administratorinnen und Administratoren.',
+  //   );
+  // });
 
   test('it does not display 2FA section if not required', async () => {
     twoFactorAuthenticationStore.hasToken = false;
@@ -430,16 +435,18 @@ describe('ProfileView', () => {
     expect(document.querySelector('[data-testid="open-2FA-self-service-dialog-icon"]')).toBeNull();
   });
 
-  test('it displays 2FA connection error', async () => {
-    twoFactorAuthenticationStore.errorCode = 'PI_UNAVAILABLE_ERROR';
-    await nextTick();
-    if (!wrapper) return;
-    const twoFactorCard: DOMWrapper<Element> = wrapper.find('[data-testid="two-factor-info"]');
-    expect(twoFactorCard.text()).toContain(
-      'Der Server für die Zwei-Faktor-Authentifizierung kann aktuell nicht erreicht werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut.',
-    );
-    expect(document.querySelector('[data-testid="open-2FA-self-service-dialog-icon"]')).toBeNull();
-  });
+  // not needed for ErWIn Portal
+
+  // test('it displays 2FA connection error', async () => {
+  //   twoFactorAuthenticationStore.errorCode = 'PI_UNAVAILABLE_ERROR';
+  //   await nextTick();
+  //   if (!wrapper) return;
+  //   const twoFactorCard: DOMWrapper<Element> = wrapper.find('[data-testid="two-factor-info"]');
+  //   expect(twoFactorCard.text()).toContain(
+  //     'Der Server für die Zwei-Faktor-Authentifizierung kann aktuell nicht erreicht werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut.',
+  //   );
+  //   expect(document.querySelector('[data-testid="open-2FA-self-service-dialog-icon"]')).toBeNull();
+  // });
 
   describe('email', () => {
     test('displays correct email status for enabled', async () => {
