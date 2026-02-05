@@ -255,7 +255,7 @@
     width: 100%;
     height: 22px;
     background-color: #001e49;
-    z-index: 1000;
+    z-index: 1005;
   }
 
   .sponsor-logos-col,
