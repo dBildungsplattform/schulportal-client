@@ -6,6 +6,7 @@
   import SchulzuordnungCard from '@/components/profile/SchulzuordnungCard.vue';
   import SelfServiceWorkflow from '@/components/two-factor-authentication/SelfServiceWorkflow.vue';
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
   import { usePersonInfoStore, type PersonInfoStore } from '@/stores/PersonInfoStore';
   import { EmailStatus, usePersonStore, type PersonStore } from '@/stores/PersonStore';
   import {
@@ -30,6 +31,7 @@
   const authStore: AuthStore = useAuthStore();
   const personInfoStore: PersonInfoStore = usePersonInfoStore();
   const personStore: PersonStore = usePersonStore();
+  const configStore: ConfigStore = useConfigStore();
   const twoFactorAuthenticationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
 
   const windowOrigin: string = window.location.origin;
@@ -59,8 +61,9 @@
   });
 
   // Used to show device password block
-  const hasLehrRolle: ComputedRef<boolean> = computed(() => {
+  const showResetDevicePassword: ComputedRef<boolean> = computed(() => {
     return (
+      configStore.configData?.setUemPasswordEnabled &&
       !!personStore.personenuebersicht?.zuordnungen.find((zuordnung: Zuordnung) => {
         return zuordnung.rollenArt === RollenArt.Lehr;
       }) || false
@@ -542,7 +545,7 @@
           </v-row>
         </LayoutCard>
         <LayoutCard
-          v-if="hasLehrRolle"
+          v-if="showResetDevicePassword"
           data-testid="reset-device-password-card"
           headline-test-id="reset-device-password-card-headline"
           :header="$t('admin.person.devicePassword.header')"
