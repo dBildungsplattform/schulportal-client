@@ -22,6 +22,10 @@ RUN npm run build
 # Deployment Stage
 FROM $BASE_IMAGE AS deployment
 
+# Fix Trivy Warnings
+# CVE-2025-15467
+RUN apk --no-cache add "libssl3>=3.5.5-r0"
+
 COPY --from=build /app/dist/ /usr/share/nginx/html/
 
 RUN rm /etc/nginx/conf.d/default.conf
