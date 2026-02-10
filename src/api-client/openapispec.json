@@ -7468,9 +7468,17 @@
           },
           "rolleErweiternEnabled": {
             "type": "boolean"
+          },
+          "setUemPasswordEnabled": {
+            "type": "boolean"
           }
         },
-        "required": ["rolleBearbeitenEnabled", "befristungBearbeitenEnabled", "rolleErweiternEnabled"]
+        "required": [
+          "rolleBearbeitenEnabled",
+          "befristungBearbeitenEnabled",
+          "rolleErweiternEnabled",
+          "setUemPasswordEnabled"
+        ]
       },
       "MeldungResponse": {
         "type": "object",

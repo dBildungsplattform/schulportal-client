@@ -994,6 +994,12 @@ export interface FeatureFlagResponse {
      * @memberof FeatureFlagResponse
      */
     'rolleErweiternEnabled': boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof FeatureFlagResponse
+     */
+    'setUemPasswordEnabled': boolean;
 }
 /**
  * 

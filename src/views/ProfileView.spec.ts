@@ -17,11 +17,13 @@ import { beforeEach, describe, expect, test, type MockInstance } from 'vitest';
 import { nextTick, type Component } from 'vue';
 import { createMemoryHistory, createRouter, useRoute, type Router } from 'vue-router';
 import ProfileView from './ProfileView.vue';
+import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
 
 let wrapper: VueWrapper | null = null;
 let personInfoStore: PersonInfoStore;
 let personStore: PersonStore;
 let authStore: AuthStore;
+let configStore: ConfigStore;
 let twoFactorAuthenticationStore: TwoFactorAuthentificationStore;
 let router: Router;
 
@@ -145,6 +147,7 @@ describe('ProfileView', () => {
     personStore = usePersonStore();
     authStore = useAuthStore();
     twoFactorAuthenticationStore = useTwoFactorAuthentificationStore();
+    configStore = useConfigStore();
 
     router = createRouter({
       history: createMemoryHistory(),
@@ -325,6 +328,32 @@ describe('ProfileView', () => {
     test('it opens device password change dialog', async () => {
       personInfoStore.personInfo = mockPersonInfoResponse;
       personStore.personenuebersicht = mockLehrerUebersicht;
+      configStore.configData = {
+        befristungBearbeitenEnabled: true,
+        rolleBearbeitenEnabled: true,
+        rolleErweiternEnabled: true,
+        setUemPasswordEnabled: false,
+      };
+      await nextTick();
+      if (!wrapper) {
+        return;
+      }
+
+      const devicePasswordChangeButton: DOMWrapper<Element> = wrapper.find(
+        '[data-testid="open-device-password-dialog-button"]',
+      );
+      expect(devicePasswordChangeButton.exists()).toBe(false);
+    });
+
+    test('it opens device password change dialog', async () => {
+      personInfoStore.personInfo = mockPersonInfoResponse;
+      personStore.personenuebersicht = mockLehrerUebersicht;
+      configStore.configData = {
+        befristungBearbeitenEnabled: true,
+        rolleBearbeitenEnabled: true,
+        rolleErweiternEnabled: true,
+        setUemPasswordEnabled: true,
+      };
       await nextTick();
       if (!wrapper) {
         return;

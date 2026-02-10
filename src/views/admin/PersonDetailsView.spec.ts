@@ -256,6 +256,7 @@ describe('PersonDetailsView', () => {
       befristungBearbeitenEnabled: true,
       rolleBearbeitenEnabled: true,
       rolleErweiternEnabled: true,
+      setUemPasswordEnabled: true,
     };
 
     document.body.innerHTML = `
@@ -1104,6 +1105,7 @@ describe('PersonDetailsView', () => {
         befristungBearbeitenEnabled: false,
         rolleBearbeitenEnabled: true,
         rolleErweiternEnabled: true,
+        setUemPasswordEnabled: true,
       };
       await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
       await nextTick();
