@@ -72,6 +72,7 @@ type ServiceProviderState = {
   allServiceProviders: StartPageServiceProvider[];
   availableServiceProviders: StartPageServiceProvider[];
   manageableServiceProviders: ManageableServiceProviderListEntry[];
+  manageableServiceProvidersForOrganisation: ManageableServiceProviderListEntry[];
   totalManageableServiceProviders: number;
   currentServiceProvider: ManageableServiceProviderDetail | null;
   serviceProviderLogos: Map<string, string>;
@@ -87,6 +88,11 @@ type ServiceProviderActions = {
   getAllServiceProviders: () => Promise<void>;
   getAvailableServiceProviders: () => Promise<void>;
   getManageableServiceProviders: (page: number, entriesPerPage: number) => Promise<void>;
+  getManageableServiceProvidersForOrganisation: (
+    organisationId: string,
+    page: number,
+    entriesPerPage: number,
+  ) => Promise<void>;
   getManageableServiceProviderById: (serviceProviderId: string) => Promise<void>;
   getServiceProviderLogoById: (serviceProviderId: string) => Promise<void>;
   getRollenerweiterungenById: (filter: RollenerweiterungFilter) => Promise<void>;
@@ -113,6 +119,7 @@ export const useServiceProviderStore: StoreDefinition<
       allServiceProviders: [],
       availableServiceProviders: [],
       manageableServiceProviders: [],
+      manageableServiceProvidersForOrganisation: [],
       totalManageableServiceProviders: 0,
       currentServiceProvider: null,
       serviceProviderLogos: new Map<string, string>(),
@@ -159,6 +166,28 @@ export const useServiceProviderStore: StoreDefinition<
         ).data;
         const { items, total }: ProviderControllerGetManageableServiceProviders200Response = response;
         this.manageableServiceProviders = items;
+        this.totalManageableServiceProviders = total;
+      } catch (error: unknown) {
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async getManageableServiceProvidersForOrganisation(organisationId: string, page: number, entriesPerPage: number) {
+      this.loading = true;
+      try {
+        const limit: number = entriesPerPage;
+        const offset: number = (page - 1) * entriesPerPage;
+        const response: ProviderControllerGetManageableServiceProviders200Response = (
+          await serviceProviderApi.providerControllerGetManageableServiceProvidersForOrganisationId(
+            organisationId,
+            offset,
+            limit,
+          )
+        ).data;
+        const { items, total }: ProviderControllerGetManageableServiceProviders200Response = response;
+        this.manageableServiceProvidersForOrganisation = items;
         this.totalManageableServiceProviders = total;
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');

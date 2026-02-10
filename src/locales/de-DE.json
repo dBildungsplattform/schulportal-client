@@ -2,6 +2,7 @@
   "angebot": {
     "assignedRollen": "Zugeordnete Rollen",
     "erweiterteRollen": "Erweiterte Rollen",
+    "erweiterteRollenAnDerSchule": "Erweiterte Rollen an der Schule",
     "name": "Name",
     "kategorie": "Kategorie",
     "administrationsebene": "Administrationsebene",
@@ -21,7 +22,8 @@
       "SCHULISCH": "Schulisch",
       "HINWEISE": "Hinweise",
       "ANGEBOTE": "Angebote"
-    }
+    },
+    "providedBy": "Bereitgestellt von"
   },
   "action": "Aktion",
   "admin": {
