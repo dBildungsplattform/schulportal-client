@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { computed, ref, watchEffect, type ComputedRef, type Ref } from 'vue';
+  import { computed, onMounted, ref, watch, watchEffect, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
 
   import ResultTable, { type Headers } from '@/components/admin/ResultTable.vue';
@@ -13,6 +13,9 @@
   import { getDisplayNameForOrg } from '@/utils/formatting';
   import SchulenFilter from '@/components/filter/SchulenFilter.vue';
   import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+  import { RollenSystemRecht } from '@/stores/RolleStore';
+  import { onBeforeRouteLeave } from 'vue-router';
+  import { SortOrder } from '@/utils/sorting';
 
   type ServiceProviderRow = {
     id: string;
@@ -54,15 +57,12 @@
   function resetSearchAndFilter(): void {
     selectedOrganisationId.value = '';
     serviceProviderStore.manageableServiceProvidersForOrganisation = [];
+    organisationStore.currentOrganisation = null;
   }
 
   function setOrganisationFilter(newValue: string | undefined): void {
     selectedOrganisationId.value = newValue ?? '';
-    serviceProviderStore.getManageableServiceProvidersForOrganisation(
-      newValue ?? '',
-      searchFilterStore.serviceProviderPage,
-      searchFilterStore.serviceProviderPerPage,
-    );
+    searchFilterStore.setSchuleForSchulischeServiceProvider(newValue ?? null);
   }
 
   watchEffect(async () => {
@@ -74,6 +74,25 @@
       );
     }
   });
+
+  watch(
+    () => [selectedOrganisationId.value],
+    async () => {
+      if (selectedOrganisationId.value) {
+        await organisationStore.getOrganisationById(selectedOrganisationId.value);
+      }
+    },
+  );
+
+  onBeforeRouteLeave(() => {
+    organisationStore.errorCode = '';
+  });
+
+  onMounted(() => {
+    if (searchFilterStore.selectedSchuleForSchulischeServiceProvider) {
+      selectedOrganisationId.value = searchFilterStore.selectedSchuleForSchulischeServiceProvider;
+    }
+  });
 </script>
 
 <template>
@@ -83,7 +102,10 @@
   >
     {{ $t('admin.headline') }}
   </h1>
-  <LayoutCard :header="t('admin.angebot.management.title')">
+  <LayoutCard
+    :header="`${t('admin.angebot.management.title')} ${organisationStore.currentOrganisation?.name ?? ''}`"
+    :header-hover-text="organisationStore.currentOrganisation?.name"
+  >
     <v-row
       align="start"
       class="ma-3"
@@ -117,6 +139,7 @@
           highlightSelection
           parentId="person-management"
           ref="schulenFilter"
+          :systemrechteForSearch="[RollenSystemRecht.PersonenVerwalten]"
           :selectedSchulen="selectedOrganisationId ? [selectedOrganisationId] : []"
           @update:selectedSchulen="setOrganisationFilter"
           :placeholderText="$t('admin.schule.schule')"
@@ -146,12 +169,17 @@
     </v-row>
     <ResultTable
       :headers
+      :current-sort="{
+        key: 'kategorie',
+        order: SortOrder.Asc,
+      }"
       :items
       :itemsPerPage="searchFilterStore.serviceProviderPerPage"
       :currentPage="searchFilterStore.serviceProviderPage"
       :itemValuePath="'id'"
       :loading="serviceProviderStore.loading"
       :totalItems="serviceProviderStore.totalManageableServiceProviders"
+      :no-data-text="$t('angebot.noServiceProvidersAvailable')"
       @onItemsPerPageUpdate="(val: number) => (searchFilterStore.serviceProviderPerPage = val)"
       @onPageUpdate="(val: number) => (searchFilterStore.serviceProviderPage = val)"
     >

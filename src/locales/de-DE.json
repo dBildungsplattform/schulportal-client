@@ -23,6 +23,7 @@
       "HINWEISE": "Hinweise",
       "ANGEBOTE": "Angebote"
     },
+    "noServiceProvidersAvailable": "Keine passenden Angebote gefunden.",
     "providedBy": "Bereitgestellt von"
   },
   "action": "Aktion",

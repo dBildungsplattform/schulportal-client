@@ -80,6 +80,13 @@ label.v-label {
   max-width: 241px;
 }
 
+.ellipsis-wrapper-schulspezifisch {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 750px;
+}
+
 .button-container {
   position: absolute;
   display: flex;

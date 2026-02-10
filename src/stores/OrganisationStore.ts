@@ -145,7 +145,7 @@ type OrganisationActions = {
   getAllOrganisationen: (filter?: OrganisationenFilter) => Promise<void>;
   getFilteredKlassen(filter?: OrganisationenFilter): Promise<void>;
   getKlassenByOrganisationId: (filter?: OrganisationenFilter) => Promise<void>;
-  getOrganisationById: (organisationId: string, organisationsTyp: OrganisationsTyp) => Promise<void>;
+  getOrganisationById: (organisationId: string, organisationsTyp?: OrganisationsTyp) => Promise<void>;
   getLockingOrganisationById: (organisationId: string) => Promise<void>;
   getParentOrganisationsByIds: (organisationIds: string[]) => Promise<void>;
   createOrganisation: (
@@ -408,7 +408,7 @@ export const useOrganisationStore: StoreDefinition<
       }
     },
 
-    async getOrganisationById(organisationId: string, organisationsTyp: OrganisationsTyp): Promise<void> {
+    async getOrganisationById(organisationId: string, organisationsTyp?: OrganisationsTyp): Promise<void> {
       this.errorCode = '';
       this.loading = true;
       try {

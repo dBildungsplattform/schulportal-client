@@ -6,6 +6,7 @@
     showCloseText?: boolean;
     headlineTestId?: string;
     subCards?: boolean;
+    headerHoverText?: string;
   }>();
 </script>
 
@@ -18,9 +19,10 @@
     >
       <v-col cols="auto">
         <h2
-          class="text-left"
+          class="text-left ellipsis-wrapper-schulspezifisch"
           :class="subCards ? 'subtitle-1' : 'headline-2'"
           :data-testid="headlineTestId ?? 'layout-card-headline'"
+          :title="headerHoverText"
         >
           {{ header }}
         </h2>
