@@ -23,6 +23,7 @@
       "HINWEISE": "Hinweise",
       "ANGEBOTE": "Angebote"
     },
+    "chooseSchuleFirst": "Bitte wählen Sie zunächst im Filter eine Schule aus.",
     "noServiceProvidersAvailable": "Keine passenden Angebote gefunden.",
     "providedBy": "Bereitgestellt von"
   },

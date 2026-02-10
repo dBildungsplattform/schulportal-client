@@ -179,7 +179,11 @@
       :itemValuePath="'id'"
       :loading="serviceProviderStore.loading"
       :totalItems="serviceProviderStore.totalManageableServiceProviders"
-      :no-data-text="$t('angebot.noServiceProvidersAvailable')"
+      :no-data-text="
+        selectedOrganisationId && serviceProviderStore.manageableServiceProvidersForOrganisation.length === 0
+          ? $t('angebot.noServiceProvidersAvailable')
+          : $t('angebot.chooseSchuleFirst')
+      "
       @onItemsPerPageUpdate="(val: number) => (searchFilterStore.serviceProviderPerPage = val)"
       @onPageUpdate="(val: number) => (searchFilterStore.serviceProviderPage = val)"
     >
