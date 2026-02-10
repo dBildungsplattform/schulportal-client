@@ -181,12 +181,12 @@
             </span>
           </v-col>
         </v-row>
-          <p
-              v-if="progressState === State.FINISHED"
-            class="mt-2 text-center"
-          >
-            {{ t('admin.person.bulk.bulkPasswordReset.success') }}
-          </p>
+        <p
+          v-if="progressState === State.FINISHED"
+          class="mt-2 text-center"
+        >
+          {{ t('admin.person.bulk.bulkPasswordReset.success') }}
+        </p>
         <!-- Progress Bar -->
         <v-progress-linear
           class="mt-5"
