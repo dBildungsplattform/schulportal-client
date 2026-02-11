@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { computed, onMounted, ref, watch, watchEffect, type ComputedRef, type Ref } from 'vue';
+  import { computed, onMounted, ref, watchEffect, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
 
   import ResultTable, { type Headers } from '@/components/admin/ResultTable.vue';
@@ -67,24 +67,19 @@
 
   watchEffect(async () => {
     if (selectedOrganisationId.value) {
-      await serviceProviderStore.getManageableServiceProvidersForOrganisation(
-        selectedOrganisationId.value,
-        searchFilterStore.serviceProviderPage,
-        searchFilterStore.serviceProviderPerPage,
-      );
+      await Promise.all([
+        serviceProviderStore.getManageableServiceProvidersForOrganisation(
+          selectedOrganisationId.value,
+          searchFilterStore.serviceProviderPage,
+          searchFilterStore.serviceProviderPerPage,
+        ),
+        organisationStore.getOrganisationById(selectedOrganisationId.value),
+      ]);
     }
   });
 
-  watch(
-    () => [selectedOrganisationId.value],
-    async () => {
-      if (selectedOrganisationId.value) {
-        await organisationStore.getOrganisationById(selectedOrganisationId.value);
-      }
-    },
-  );
-
   onBeforeRouteLeave(() => {
+    serviceProviderStore.errorCode = '';
     organisationStore.errorCode = '';
   });
 
