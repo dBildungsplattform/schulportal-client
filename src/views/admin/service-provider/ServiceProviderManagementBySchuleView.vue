@@ -137,7 +137,7 @@
           :multiple="false"
           includeAll
           highlightSelection
-          parentId="person-management"
+          parentId="service-provider-management-by-schule"
           ref="schulenFilter"
           :systemrechteForSearch="[RollenSystemRecht.PersonenVerwalten]"
           :selectedSchulen="selectedOrganisationId ? [selectedOrganisationId] : []"
