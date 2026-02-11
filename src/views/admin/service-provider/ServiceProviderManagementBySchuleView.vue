@@ -16,6 +16,7 @@
   import { RollenSystemRecht } from '@/stores/RolleStore';
   import { onBeforeRouteLeave } from 'vue-router';
   import { SortOrder } from '@/utils/sorting';
+  import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
 
   type ServiceProviderRow = {
     id: string;
@@ -32,6 +33,12 @@
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
+
+  const {
+    hasAutoselectedSchule,
+  }: {
+    hasAutoselectedSchule: ComputedRef<boolean>;
+  } = useAutoselectedSchule([RollenSystemRecht.RollenErweitern]);
 
   const headers: Headers = [
     { title: t('angebot.kategorie'), key: 'kategorie', align: 'start' },
@@ -121,7 +128,7 @@
         <v-btn
           class="px-0 reset-filter"
           data-testid="reset-filter-button"
-          :disabled="!selectedOrganisationId"
+          :disabled="!selectedOrganisationId || hasAutoselectedSchule"
           size="x-small"
           variant="text"
           width="auto"
@@ -141,7 +148,7 @@
           highlightSelection
           parentId="service-provider-management-by-schule"
           ref="schulenFilter"
-          :systemrechteForSearch="[RollenSystemRecht.PersonenVerwalten]"
+          :systemrechteForSearch="[RollenSystemRecht.RollenErweitern]"
           :selectedSchulen="selectedOrganisationId ? [selectedOrganisationId] : []"
           @update:selectedSchulen="setOrganisationFilter"
           :placeholderText="$t('admin.schule.schule')"
