@@ -48,7 +48,10 @@
           kategorie: t(`angebot.kategorien.${sp.kategorie}`),
           name: sp.name,
           administrationsebene: getDisplayNameForOrg(sp.administrationsebene),
-          rollen: sp.rollen.map((rolle: ManageableServiceProviderListEntry['rollen'][number]) => rolle.name).join(', '),
+          rollen:
+            sp.rollen.length > 0
+              ? sp.rollen.map((rolle: ManageableServiceProviderListEntry['rollen'][number]) => rolle.name).join(', ')
+              : '---',
         };
       },
     );
@@ -152,8 +155,11 @@
                 >{{
                   $t(
                     'admin.schule.schulenFound',
-                    { count: organisationStore.organisationenFilters.get('person-management')?.total },
-                    organisationStore.organisationenFilters.get('person-management')?.total ?? 0,
+                    {
+                      count: organisationStore.organisationenFilters.get('service-provider-management-by-schule')
+                        ?.total,
+                    },
+                    organisationStore.organisationenFilters.get('service-provider-management-by-schule')?.total ?? 0,
                   )
                 }}</span
               >
