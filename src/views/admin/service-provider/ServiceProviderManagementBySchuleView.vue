@@ -60,7 +60,11 @@
   function resetSearchAndFilter(): void {
     selectedOrganisationId.value = '';
     serviceProviderStore.manageableServiceProvidersForOrganisation = [];
+    serviceProviderStore.totalManageableServiceProvidersForOrganisation = 0;
     organisationStore.currentOrganisation = null;
+    searchFilterStore.setSchuleForSchulischeServiceProvider(null);
+    searchFilterStore.serviceProviderSchulePage = 1;
+    searchFilterStore.serviceProviderSchulePerPage = 30;
   }
 
   function setOrganisationFilter(newValue: string | undefined): void {
@@ -73,8 +77,8 @@
       await Promise.all([
         serviceProviderStore.getManageableServiceProvidersForOrganisation(
           selectedOrganisationId.value,
-          searchFilterStore.serviceProviderPage,
-          searchFilterStore.serviceProviderPerPage,
+          searchFilterStore.serviceProviderSchulePage,
+          searchFilterStore.serviceProviderSchulePerPage,
         ),
         organisationStore.getOrganisationById(selectedOrganisationId.value),
       ]);
@@ -175,18 +179,18 @@
         order: SortOrder.Asc,
       }"
       :items
-      :itemsPerPage="searchFilterStore.serviceProviderPerPage"
-      :currentPage="searchFilterStore.serviceProviderPage"
+      :itemsPerPage="searchFilterStore.serviceProviderSchulePerPage"
+      :currentPage="searchFilterStore.serviceProviderSchulePage"
       :itemValuePath="'id'"
       :loading="serviceProviderStore.loading"
-      :totalItems="serviceProviderStore.totalManageableServiceProviders"
+      :totalItems="serviceProviderStore.totalManageableServiceProvidersForOrganisation"
       :no-data-text="
         selectedOrganisationId && serviceProviderStore.manageableServiceProvidersForOrganisation.length === 0
           ? $t('angebot.noServiceProvidersAvailable')
           : $t('angebot.chooseSchuleFirst')
       "
-      @onItemsPerPageUpdate="(val: number) => (searchFilterStore.serviceProviderPerPage = val)"
-      @onPageUpdate="(val: number) => (searchFilterStore.serviceProviderPage = val)"
+      @onItemsPerPageUpdate="(val: number) => (searchFilterStore.serviceProviderSchulePerPage = val)"
+      @onPageUpdate="(val: number) => (searchFilterStore.serviceProviderSchulePage = val)"
     >
       <template v-slot:[`item.rollen`]="{ item }">
         <div

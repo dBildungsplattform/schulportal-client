@@ -219,7 +219,7 @@ describe('serviceProviderStore', () => {
         expect.arrayContaining(mockResponse.items),
       );
       expect(serviceProviderStore.manageableServiceProvidersForOrganisation).toHaveLength(mockResponse.items.length);
-      expect(serviceProviderStore.totalManageableServiceProviders).toEqual(mockResponse.total);
+      expect(serviceProviderStore.totalManageableServiceProvidersForOrganisation).toEqual(mockResponse.total);
       expect(serviceProviderStore.loading).toBe(false);
     });
 
@@ -233,6 +233,7 @@ describe('serviceProviderStore', () => {
       expect(serviceProviderStore.loading).toBe(true);
       await promise;
       expect(serviceProviderStore.manageableServiceProvidersForOrganisation).toEqual([]);
+      expect(serviceProviderStore.totalManageableServiceProvidersForOrganisation).toEqual(0);
       expect(serviceProviderStore.errorCode).toEqual('UNSPECIFIED_ERROR');
       expect(serviceProviderStore.loading).toBe(false);
     });

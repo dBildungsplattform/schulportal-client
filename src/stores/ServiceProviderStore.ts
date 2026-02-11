@@ -74,6 +74,7 @@ type ServiceProviderState = {
   manageableServiceProviders: ManageableServiceProviderListEntry[];
   manageableServiceProvidersForOrganisation: ManageableServiceProviderListEntry[];
   totalManageableServiceProviders: number;
+  totalManageableServiceProvidersForOrganisation: number;
   currentServiceProvider: ManageableServiceProviderDetail | null;
   serviceProviderLogos: Map<string, string>;
   rollenerweiterungen: ProviderControllerFindRollenerweiterungenByServiceProviderId200Response | null;
@@ -121,6 +122,7 @@ export const useServiceProviderStore: StoreDefinition<
       manageableServiceProviders: [],
       manageableServiceProvidersForOrganisation: [],
       totalManageableServiceProviders: 0,
+      totalManageableServiceProvidersForOrganisation: 0,
       currentServiceProvider: null,
       serviceProviderLogos: new Map<string, string>(),
       rollenerweiterungen: null,
@@ -188,7 +190,7 @@ export const useServiceProviderStore: StoreDefinition<
         ).data;
         const { items, total }: ProviderControllerGetManageableServiceProviders200Response = response;
         this.manageableServiceProvidersForOrganisation = items;
-        this.totalManageableServiceProviders = total;
+        this.totalManageableServiceProvidersForOrganisation = total;
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
