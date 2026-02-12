@@ -108,7 +108,7 @@ describe('PersonBulkPasswordReset', () => {
       const progressbar: Element | null = document.body.querySelector('[data-testid="password-reset-progressbar"]');
       const successMessage: Element | null = document.body.querySelector('[data-testid="password-reset-success-text"]');
       expect(notice).toBeNull();
-      expect(progressbar).toBeNull();
+      expect(progressbar).not.toBeNull();
       expect(successMessage).not.toBeNull();
     }
   });
