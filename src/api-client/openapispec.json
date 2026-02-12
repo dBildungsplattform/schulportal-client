@@ -2812,7 +2812,7 @@
       "get": {
         "operationId": "ProviderController_findRollenerweiterungenByServiceProviderId",
         "summary": "",
-        "description": "Get rollenerweiterungen for service-provider with provided id.",
+        "description": "Get rollenerweiterungen for service-provider with provided id. Total is the amount of organisations.",
         "parameters": [
           {
             "name": "angebotId",

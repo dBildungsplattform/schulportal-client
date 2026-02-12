@@ -11431,7 +11431,7 @@ export const ProviderApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
-         * Get rollenerweiterungen for service-provider with provided id.
+         * Get rollenerweiterungen for service-provider with provided id. Total is the amount of organisations.
          * @summary 
          * @param {string} angebotId The id of the service provider
          * @param {number} [offset] The offset of the paginated list.
@@ -11771,7 +11771,7 @@ export const ProviderApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Get rollenerweiterungen for service-provider with provided id.
+         * Get rollenerweiterungen for service-provider with provided id. Total is the amount of organisations.
          * @summary 
          * @param {string} angebotId The id of the service provider
          * @param {number} [offset] The offset of the paginated list.
@@ -11871,7 +11871,7 @@ export const ProviderApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.providerControllerCreateServiceProvider(createServiceProviderBodyParams, options).then((request) => request(axios, basePath));
         },
         /**
-         * Get rollenerweiterungen for service-provider with provided id.
+         * Get rollenerweiterungen for service-provider with provided id. Total is the amount of organisations.
          * @summary 
          * @param {string} angebotId The id of the service provider
          * @param {number} [offset] The offset of the paginated list.
@@ -11963,7 +11963,7 @@ export interface ProviderApiInterface {
     providerControllerCreateServiceProvider(createServiceProviderBodyParams: CreateServiceProviderBodyParams, options?: AxiosRequestConfig): AxiosPromise<ServiceProviderResponse>;
 
     /**
-     * Get rollenerweiterungen for service-provider with provided id.
+     * Get rollenerweiterungen for service-provider with provided id. Total is the amount of organisations.
      * @summary 
      * @param {string} angebotId The id of the service provider
      * @param {number} [offset] The offset of the paginated list.
@@ -12057,7 +12057,7 @@ export class ProviderApi extends BaseAPI implements ProviderApiInterface {
     }
 
     /**
-     * Get rollenerweiterungen for service-provider with provided id.
+     * Get rollenerweiterungen for service-provider with provided id. Total is the amount of organisations.
      * @summary 
      * @param {string} angebotId The id of the service provider
      * @param {number} [offset] The offset of the paginated list.
