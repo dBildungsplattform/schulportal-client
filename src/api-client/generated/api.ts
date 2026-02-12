@@ -1343,6 +1343,55 @@ export interface ImportvorgangByIdBodyParams {
 /**
  * 
  * @export
+ * @interface LdapUserDataBodyParams
+ */
+export interface LdapUserDataBodyParams {
+    /**
+     * 
+     * @type {string}
+     * @memberof LdapUserDataBodyParams
+     */
+    'keycloakUserId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof LdapUserDataBodyParams
+     */
+    'userName': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof LdapUserDataBodyParams
+     */
+    'email': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof LdapUserDataBodyParams
+     */
+    'firstName': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof LdapUserDataBodyParams
+     */
+    'lastName': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof LdapUserDataBodyParams
+     */
+    'ldapDn': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof LdapUserDataBodyParams
+     */
+    'ldapId': string;
+}
+/**
+ * 
+ * @export
  * @interface LockUserBodyParams
  */
 export interface LockUserBodyParams {
@@ -1978,7 +2027,7 @@ export interface PersonNameResponse {
      * @type {string}
      * @memberof PersonNameResponse
      */
-    'familiennamen': string;
+    'familienname': string;
     /**
      * 
      * @type {string}
@@ -2434,7 +2483,7 @@ export interface PersonenInfoKontextResponse {
      * @type {string}
      * @memberof PersonenInfoKontextResponse
      */
-    'rollenart': string | null;
+    'rolle': string | null;
     /**
      * 
      * @type {string}
@@ -2997,6 +3046,31 @@ export const RollenArt = {
 export type RollenArt = typeof RollenArt[keyof typeof RollenArt];
 
 
+/**
+ * 
+ * @export
+ * @interface RollenMappingRolleResponse
+ */
+export interface RollenMappingRolleResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof RollenMappingRolleResponse
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RollenMappingRolleResponse
+     */
+    'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RollenMappingRolleResponse
+     */
+    'rollenart': string;
+}
 /**
  * 
  * @export
@@ -6501,6 +6575,42 @@ export const KeycloakinternalApiAxiosParamCreator = function (configuration?: Co
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * 
+         * @summary Send data for a new LDAP user
+         * @param {LdapUserDataBodyParams} ldapUserDataBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        keycloakInternalControllerOnNewLdapUser: async (ldapUserDataBodyParams: LdapUserDataBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'ldapUserDataBodyParams' is not null or undefined
+            assertParamExists('keycloakInternalControllerOnNewLdapUser', 'ldapUserDataBodyParams', ldapUserDataBodyParams)
+            const localVarPath = `/api/keycloakinternal/newldapuser`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(ldapUserDataBodyParams, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -6519,6 +6629,17 @@ export const KeycloakinternalApiFp = function(configuration?: Configuration) {
          */
         async keycloakInternalControllerGetExternalData(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserExeternalDataResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.keycloakInternalControllerGetExternalData(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Send data for a new LDAP user
+         * @param {LdapUserDataBodyParams} ldapUserDataBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async keycloakInternalControllerOnNewLdapUser(ldapUserDataBodyParams: LdapUserDataBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<LdapUserDataBodyParams>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.keycloakInternalControllerOnNewLdapUser(ldapUserDataBodyParams, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -6540,6 +6661,16 @@ export const KeycloakinternalApiFactory = function (configuration?: Configuratio
         keycloakInternalControllerGetExternalData(options?: any): AxiosPromise<UserExeternalDataResponse> {
             return localVarFp.keycloakInternalControllerGetExternalData(options).then((request) => request(axios, basePath));
         },
+        /**
+         * 
+         * @summary Send data for a new LDAP user
+         * @param {LdapUserDataBodyParams} ldapUserDataBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        keycloakInternalControllerOnNewLdapUser(ldapUserDataBodyParams: LdapUserDataBodyParams, options?: any): AxiosPromise<LdapUserDataBodyParams> {
+            return localVarFp.keycloakInternalControllerOnNewLdapUser(ldapUserDataBodyParams, options).then((request) => request(axios, basePath));
+        },
     };
 };
 
@@ -6557,6 +6688,16 @@ export interface KeycloakinternalApiInterface {
      * @memberof KeycloakinternalApiInterface
      */
     keycloakInternalControllerGetExternalData(options?: AxiosRequestConfig): AxiosPromise<UserExeternalDataResponse>;
+
+    /**
+     * 
+     * @summary Send data for a new LDAP user
+     * @param {LdapUserDataBodyParams} ldapUserDataBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof KeycloakinternalApiInterface
+     */
+    keycloakInternalControllerOnNewLdapUser(ldapUserDataBodyParams: LdapUserDataBodyParams, options?: AxiosRequestConfig): AxiosPromise<LdapUserDataBodyParams>;
 
 }
 
@@ -6576,6 +6717,18 @@ export class KeycloakinternalApi extends BaseAPI implements KeycloakinternalApiI
      */
     public keycloakInternalControllerGetExternalData(options?: AxiosRequestConfig) {
         return KeycloakinternalApiFp(this.configuration).keycloakInternalControllerGetExternalData(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Send data for a new LDAP user
+     * @param {LdapUserDataBodyParams} ldapUserDataBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof KeycloakinternalApi
+     */
+    public keycloakInternalControllerOnNewLdapUser(ldapUserDataBodyParams: LdapUserDataBodyParams, options?: AxiosRequestConfig) {
+        return KeycloakinternalApiFp(this.configuration).keycloakInternalControllerOnNewLdapUser(ldapUserDataBodyParams, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -11637,6 +11790,48 @@ export const RolleApiAxiosParamCreator = function (configuration?: Configuration
             };
         },
         /**
+         * Get rollen objects by service provider id.
+         * @summary 
+         * @param {string} serviceProviderId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rolleControllerGetRollenByServiceProviderId: async (serviceProviderId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'serviceProviderId' is not null or undefined
+            assertParamExists('rolleControllerGetRollenByServiceProviderId', 'serviceProviderId', serviceProviderId)
+            const localVarPath = `/api/rolle/by-provider/{serviceProviderId}`
+                .replace(`{${"serviceProviderId"}}`, encodeURIComponent(String(serviceProviderId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Remove a service-provider from a rolle by id.
          * @summary 
          * @param {string} rolleId The id for the rolle.
@@ -11860,6 +12055,17 @@ export const RolleApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * Get rollen objects by service provider id.
+         * @summary 
+         * @param {string} serviceProviderId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async rolleControllerGetRollenByServiceProviderId(serviceProviderId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<RollenMappingRolleResponse>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.rolleControllerGetRollenByServiceProviderId(serviceProviderId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * Remove a service-provider from a rolle by id.
          * @summary 
          * @param {string} rolleId The id for the rolle.
@@ -11969,6 +12175,16 @@ export const RolleApiFactory = function (configuration?: Configuration, basePath
             return localVarFp.rolleControllerGetRolleServiceProviderIds(rolleId, options).then((request) => request(axios, basePath));
         },
         /**
+         * Get rollen objects by service provider id.
+         * @summary 
+         * @param {string} serviceProviderId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rolleControllerGetRollenByServiceProviderId(serviceProviderId: string, options?: any): AxiosPromise<Array<RollenMappingRolleResponse>> {
+            return localVarFp.rolleControllerGetRollenByServiceProviderId(serviceProviderId, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Remove a service-provider from a rolle by id.
          * @summary 
          * @param {string} rolleId The id for the rolle.
@@ -12072,6 +12288,16 @@ export interface RolleApiInterface {
      * @memberof RolleApiInterface
      */
     rolleControllerGetRolleServiceProviderIds(rolleId: string, options?: AxiosRequestConfig): AxiosPromise<RolleServiceProviderResponse>;
+
+    /**
+     * Get rollen objects by service provider id.
+     * @summary 
+     * @param {string} serviceProviderId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RolleApiInterface
+     */
+    rolleControllerGetRollenByServiceProviderId(serviceProviderId: string, options?: AxiosRequestConfig): AxiosPromise<Array<RollenMappingRolleResponse>>;
 
     /**
      * Remove a service-provider from a rolle by id.
@@ -12191,6 +12417,18 @@ export class RolleApi extends BaseAPI implements RolleApiInterface {
     }
 
     /**
+     * Get rollen objects by service provider id.
+     * @summary 
+     * @param {string} serviceProviderId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RolleApi
+     */
+    public rolleControllerGetRollenByServiceProviderId(serviceProviderId: string, options?: AxiosRequestConfig) {
+        return RolleApiFp(this.configuration).rolleControllerGetRollenByServiceProviderId(serviceProviderId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * Remove a service-provider from a rolle by id.
      * @summary 
      * @param {string} rolleId The id for the rolle.
@@ -12227,6 +12465,665 @@ export class RolleApi extends BaseAPI implements RolleApiInterface {
      */
     public rolleControllerUpdateServiceProvidersById(rolleId: string, rolleServiceProviderBodyParams: RolleServiceProviderBodyParams, options?: AxiosRequestConfig) {
         return RolleApiFp(this.configuration).rolleControllerUpdateServiceProvidersById(rolleId, rolleServiceProviderBodyParams, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
+ * RollenMappingApi - axios parameter creator
+ * @export
+ */
+export const RollenMappingApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @param {string} serviceProviderId The id of the service provider/LMS.
+         * @param {string} rolleId The id of the role to map to the LMS.
+         * @param {string} mapToLmsRolle The role in the LMS, to which the role should be mapped.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rollenMappingControllerCreateNewRollenMapping: async (serviceProviderId: string, rolleId: string, mapToLmsRolle: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'serviceProviderId' is not null or undefined
+            assertParamExists('rollenMappingControllerCreateNewRollenMapping', 'serviceProviderId', serviceProviderId)
+            // verify required parameter 'rolleId' is not null or undefined
+            assertParamExists('rollenMappingControllerCreateNewRollenMapping', 'rolleId', rolleId)
+            // verify required parameter 'mapToLmsRolle' is not null or undefined
+            assertParamExists('rollenMappingControllerCreateNewRollenMapping', 'mapToLmsRolle', mapToLmsRolle)
+            const localVarPath = `/api/rollenMapping`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+            if (serviceProviderId !== undefined) {
+                localVarQueryParameter['serviceProviderId'] = serviceProviderId;
+            }
+
+            if (rolleId !== undefined) {
+                localVarQueryParameter['rolleId'] = rolleId;
+            }
+
+            if (mapToLmsRolle !== undefined) {
+                localVarQueryParameter['mapToLmsRolle'] = mapToLmsRolle;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rollenMappingControllerDeleteExistingRollenMapping: async (id: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('rollenMappingControllerDeleteExistingRollenMapping', 'id', id)
+            const localVarPath = `/api/rollenMapping/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rollenMappingControllerGetAllAvailableRollenMapping: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/rollenMapping`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} serviceProviderId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rollenMappingControllerGetAvailableRollenMappingForServiceProvider: async (serviceProviderId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'serviceProviderId' is not null or undefined
+            assertParamExists('rollenMappingControllerGetAvailableRollenMappingForServiceProvider', 'serviceProviderId', serviceProviderId)
+            const localVarPath = `/api/rollenMapping/{serviceProviderId}/available`
+                .replace(`{${"serviceProviderId"}}`, encodeURIComponent(String(serviceProviderId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} userId The id of the user that needs token authentication.
+         * @param {string} clientId The id of the client the user is trying to access.
+         * @param {string} clientName The name of the client the user is trying to access.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rollenMappingControllerGetMappingForRolleAndServiceProvider: async (userId: string, clientId: string, clientName: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('rollenMappingControllerGetMappingForRolleAndServiceProvider', 'userId', userId)
+            // verify required parameter 'clientId' is not null or undefined
+            assertParamExists('rollenMappingControllerGetMappingForRolleAndServiceProvider', 'clientId', clientId)
+            // verify required parameter 'clientName' is not null or undefined
+            assertParamExists('rollenMappingControllerGetMappingForRolleAndServiceProvider', 'clientName', clientName)
+            const localVarPath = `/api/rollenMapping/extract-mapping/keycloak`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+            if (userId !== undefined) {
+                localVarQueryParameter['userId'] = userId;
+            }
+
+            if (clientId !== undefined) {
+                localVarQueryParameter['clientId'] = clientId;
+            }
+
+            if (clientName !== undefined) {
+                localVarQueryParameter['clientName'] = clientName;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rollenMappingControllerGetRollenMappingWithId: async (id: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('rollenMappingControllerGetRollenMappingWithId', 'id', id)
+            const localVarPath = `/api/rollenMapping/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} id 
+         * @param {string} mapToLmsRolle 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rollenMappingControllerUpdateExistingRollenMapping: async (id: string, mapToLmsRolle: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('rollenMappingControllerUpdateExistingRollenMapping', 'id', id)
+            // verify required parameter 'mapToLmsRolle' is not null or undefined
+            assertParamExists('rollenMappingControllerUpdateExistingRollenMapping', 'mapToLmsRolle', mapToLmsRolle)
+            const localVarPath = `/api/rollenMapping/{id}`
+                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+            if (mapToLmsRolle !== undefined) {
+                localVarQueryParameter['mapToLmsRolle'] = mapToLmsRolle;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * RollenMappingApi - functional programming interface
+ * @export
+ */
+export const RollenMappingApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = RollenMappingApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @param {string} serviceProviderId The id of the service provider/LMS.
+         * @param {string} rolleId The id of the role to map to the LMS.
+         * @param {string} mapToLmsRolle The role in the LMS, to which the role should be mapped.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async rollenMappingControllerCreateNewRollenMapping(serviceProviderId: string, rolleId: string, mapToLmsRolle: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.rollenMappingControllerCreateNewRollenMapping(serviceProviderId, rolleId, mapToLmsRolle, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async rollenMappingControllerDeleteExistingRollenMapping(id: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.rollenMappingControllerDeleteExistingRollenMapping(id, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async rollenMappingControllerGetAllAvailableRollenMapping(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<object>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.rollenMappingControllerGetAllAvailableRollenMapping(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @param {string} serviceProviderId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async rollenMappingControllerGetAvailableRollenMappingForServiceProvider(serviceProviderId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<object>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.rollenMappingControllerGetAvailableRollenMappingForServiceProvider(serviceProviderId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @param {string} userId The id of the user that needs token authentication.
+         * @param {string} clientId The id of the client the user is trying to access.
+         * @param {string} clientName The name of the client the user is trying to access.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async rollenMappingControllerGetMappingForRolleAndServiceProvider(userId: string, clientId: string, clientName: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.rollenMappingControllerGetMappingForRolleAndServiceProvider(userId, clientId, clientName, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async rollenMappingControllerGetRollenMappingWithId(id: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.rollenMappingControllerGetRollenMappingWithId(id, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @param {string} id 
+         * @param {string} mapToLmsRolle 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async rollenMappingControllerUpdateExistingRollenMapping(id: string, mapToLmsRolle: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.rollenMappingControllerUpdateExistingRollenMapping(id, mapToLmsRolle, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * RollenMappingApi - factory interface
+ * @export
+ */
+export const RollenMappingApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = RollenMappingApiFp(configuration)
+    return {
+        /**
+         * 
+         * @param {string} serviceProviderId The id of the service provider/LMS.
+         * @param {string} rolleId The id of the role to map to the LMS.
+         * @param {string} mapToLmsRolle The role in the LMS, to which the role should be mapped.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rollenMappingControllerCreateNewRollenMapping(serviceProviderId: string, rolleId: string, mapToLmsRolle: string, options?: any): AxiosPromise<object> {
+            return localVarFp.rollenMappingControllerCreateNewRollenMapping(serviceProviderId, rolleId, mapToLmsRolle, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rollenMappingControllerDeleteExistingRollenMapping(id: string, options?: any): AxiosPromise<void> {
+            return localVarFp.rollenMappingControllerDeleteExistingRollenMapping(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rollenMappingControllerGetAllAvailableRollenMapping(options?: any): AxiosPromise<Array<object>> {
+            return localVarFp.rollenMappingControllerGetAllAvailableRollenMapping(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} serviceProviderId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rollenMappingControllerGetAvailableRollenMappingForServiceProvider(serviceProviderId: string, options?: any): AxiosPromise<Array<object>> {
+            return localVarFp.rollenMappingControllerGetAvailableRollenMappingForServiceProvider(serviceProviderId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} userId The id of the user that needs token authentication.
+         * @param {string} clientId The id of the client the user is trying to access.
+         * @param {string} clientName The name of the client the user is trying to access.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rollenMappingControllerGetMappingForRolleAndServiceProvider(userId: string, clientId: string, clientName: string, options?: any): AxiosPromise<object> {
+            return localVarFp.rollenMappingControllerGetMappingForRolleAndServiceProvider(userId, clientId, clientName, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rollenMappingControllerGetRollenMappingWithId(id: string, options?: any): AxiosPromise<object> {
+            return localVarFp.rollenMappingControllerGetRollenMappingWithId(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} id 
+         * @param {string} mapToLmsRolle 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rollenMappingControllerUpdateExistingRollenMapping(id: string, mapToLmsRolle: string, options?: any): AxiosPromise<object> {
+            return localVarFp.rollenMappingControllerUpdateExistingRollenMapping(id, mapToLmsRolle, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * RollenMappingApi - interface
+ * @export
+ * @interface RollenMappingApi
+ */
+export interface RollenMappingApiInterface {
+    /**
+     * 
+     * @param {string} serviceProviderId The id of the service provider/LMS.
+     * @param {string} rolleId The id of the role to map to the LMS.
+     * @param {string} mapToLmsRolle The role in the LMS, to which the role should be mapped.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RollenMappingApiInterface
+     */
+    rollenMappingControllerCreateNewRollenMapping(serviceProviderId: string, rolleId: string, mapToLmsRolle: string, options?: AxiosRequestConfig): AxiosPromise<object>;
+
+    /**
+     * 
+     * @param {string} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RollenMappingApiInterface
+     */
+    rollenMappingControllerDeleteExistingRollenMapping(id: string, options?: AxiosRequestConfig): AxiosPromise<void>;
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RollenMappingApiInterface
+     */
+    rollenMappingControllerGetAllAvailableRollenMapping(options?: AxiosRequestConfig): AxiosPromise<Array<object>>;
+
+    /**
+     * 
+     * @param {string} serviceProviderId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RollenMappingApiInterface
+     */
+    rollenMappingControllerGetAvailableRollenMappingForServiceProvider(serviceProviderId: string, options?: AxiosRequestConfig): AxiosPromise<Array<object>>;
+
+    /**
+     * 
+     * @param {string} userId The id of the user that needs token authentication.
+     * @param {string} clientId The id of the client the user is trying to access.
+     * @param {string} clientName The name of the client the user is trying to access.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RollenMappingApiInterface
+     */
+    rollenMappingControllerGetMappingForRolleAndServiceProvider(userId: string, clientId: string, clientName: string, options?: AxiosRequestConfig): AxiosPromise<object>;
+
+    /**
+     * 
+     * @param {string} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RollenMappingApiInterface
+     */
+    rollenMappingControllerGetRollenMappingWithId(id: string, options?: AxiosRequestConfig): AxiosPromise<object>;
+
+    /**
+     * 
+     * @param {string} id 
+     * @param {string} mapToLmsRolle 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RollenMappingApiInterface
+     */
+    rollenMappingControllerUpdateExistingRollenMapping(id: string, mapToLmsRolle: string, options?: AxiosRequestConfig): AxiosPromise<object>;
+
+}
+
+/**
+ * RollenMappingApi - object-oriented interface
+ * @export
+ * @class RollenMappingApi
+ * @extends {BaseAPI}
+ */
+export class RollenMappingApi extends BaseAPI implements RollenMappingApiInterface {
+    /**
+     * 
+     * @param {string} serviceProviderId The id of the service provider/LMS.
+     * @param {string} rolleId The id of the role to map to the LMS.
+     * @param {string} mapToLmsRolle The role in the LMS, to which the role should be mapped.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RollenMappingApi
+     */
+    public rollenMappingControllerCreateNewRollenMapping(serviceProviderId: string, rolleId: string, mapToLmsRolle: string, options?: AxiosRequestConfig) {
+        return RollenMappingApiFp(this.configuration).rollenMappingControllerCreateNewRollenMapping(serviceProviderId, rolleId, mapToLmsRolle, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RollenMappingApi
+     */
+    public rollenMappingControllerDeleteExistingRollenMapping(id: string, options?: AxiosRequestConfig) {
+        return RollenMappingApiFp(this.configuration).rollenMappingControllerDeleteExistingRollenMapping(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RollenMappingApi
+     */
+    public rollenMappingControllerGetAllAvailableRollenMapping(options?: AxiosRequestConfig) {
+        return RollenMappingApiFp(this.configuration).rollenMappingControllerGetAllAvailableRollenMapping(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} serviceProviderId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RollenMappingApi
+     */
+    public rollenMappingControllerGetAvailableRollenMappingForServiceProvider(serviceProviderId: string, options?: AxiosRequestConfig) {
+        return RollenMappingApiFp(this.configuration).rollenMappingControllerGetAvailableRollenMappingForServiceProvider(serviceProviderId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} userId The id of the user that needs token authentication.
+     * @param {string} clientId The id of the client the user is trying to access.
+     * @param {string} clientName The name of the client the user is trying to access.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RollenMappingApi
+     */
+    public rollenMappingControllerGetMappingForRolleAndServiceProvider(userId: string, clientId: string, clientName: string, options?: AxiosRequestConfig) {
+        return RollenMappingApiFp(this.configuration).rollenMappingControllerGetMappingForRolleAndServiceProvider(userId, clientId, clientName, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RollenMappingApi
+     */
+    public rollenMappingControllerGetRollenMappingWithId(id: string, options?: AxiosRequestConfig) {
+        return RollenMappingApiFp(this.configuration).rollenMappingControllerGetRollenMappingWithId(id, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} id 
+     * @param {string} mapToLmsRolle 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RollenMappingApi
+     */
+    public rollenMappingControllerUpdateExistingRollenMapping(id: string, mapToLmsRolle: string, options?: AxiosRequestConfig) {
+        return RollenMappingApiFp(this.configuration).rollenMappingControllerUpdateExistingRollenMapping(id, mapToLmsRolle, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

@@ -26,7 +26,7 @@ const mockLehrer: PersonInfoResponse = {
   person: {
     id: '1234',
     name: {
-      familiennamen: 'Vimes',
+      familienname: 'Vimes',
       vorname: 'Samuel',
       initialenfamilienname: null,
       initialenvorname: null,
@@ -58,7 +58,7 @@ const mockSchueler: PersonInfoResponse = {
   person: {
     id: '1234',
     name: {
-      familiennamen: 'Vimes',
+      familienname: 'Vimes',
       vorname: 'Samuel',
       initialenfamilienname: null,
       initialenvorname: null,

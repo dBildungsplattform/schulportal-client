@@ -219,8 +219,7 @@
     if (!personInfoStore.personInfo) return data;
     data.push({
       label: t('profile.fullName'),
-      value:
-        personInfoStore.personInfo.person.name.vorname + ' ' + personInfoStore.personInfo.person.name.familiennamen,
+      value: personInfoStore.personInfo.person.name.vorname + ' ' + personInfoStore.personInfo.person.name.familienname,
       testIdLabel: 'fullName-label',
       testIdValue: 'fullName-value',
     });

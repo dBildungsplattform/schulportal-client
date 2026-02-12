@@ -27,7 +27,7 @@ describe('PersonInfoStore', () => {
         person: {
           id: '1234',
           name: {
-            familiennamen: 'Vimes',
+            familienname: 'Vimes',
             vorname: 'Samuel',
             initialenfamilienname: null,
             initialenvorname: null,
