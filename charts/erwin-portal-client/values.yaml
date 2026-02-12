@@ -13,6 +13,10 @@ restartPolicy: Always
 frontendHostname: ""
 frontend2ndHostname: ""
 
+portal_loadbalancer_ingress_client_limit_connections: 40
+portal_loadbalancer_ingress_client_limit_rpm: 400
+portal_loadbalancer_ingress_client_limit_whitelist: "10.0.0.0/8"
+
 containerSecurityContext:
   enabled: true
   runAsUser: 101
