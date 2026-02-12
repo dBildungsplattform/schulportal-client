@@ -2812,7 +2812,7 @@
       "get": {
         "operationId": "ProviderController_findRollenerweiterungenByServiceProviderId",
         "summary": "",
-        "description": "Get rollenerweiterungen for service-provider with provided id.",
+        "description": "Get rollenerweiterungen for service-provider with provided id. Total is the amount of organisations.",
         "parameters": [
           {
             "name": "angebotId",
@@ -2840,6 +2840,16 @@
             "description": "The requested limit for the page size.",
             "schema": {
               "type": "number"
+            }
+          },
+          {
+            "name": "organisationId",
+            "required": false,
+            "in": "query",
+            "description": "The id of the organisation",
+            "schema": {
+              "nullable": true,
+              "type": "string"
             }
           }
         ],
