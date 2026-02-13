@@ -3013,7 +3013,7 @@
             "get": {
                 "operationId": "ProviderController_findRollenerweiterungenByServiceProviderId",
                 "summary": "",
-                "description": "Get rollenerweiterungen for service-provider with provided id.",
+                "description": "Get rollenerweiterungen for service-provider with provided id. Total is the amount of organisations.",
                 "parameters": [
                     {
                         "name": "angebotId",
@@ -3041,6 +3041,16 @@
                         "description": "The requested limit for the page size.",
                         "schema": {
                             "type": "number"
+                        }
+                    },
+                    {
+                        "name": "organisationId",
+                        "required": false,
+                        "in": "query",
+                        "description": "The id of the organisation",
+                        "schema": {
+                            "nullable": true,
+                            "type": "string"
                         }
                     }
                 ],
@@ -7289,6 +7299,21 @@
                     "name"
                 ]
             },
+            "RollenerweiterungForManageableServiceProviderResponse": {
+                "type": "object",
+                "properties": {
+                    "organisation": {
+                        "$ref": "#/components/schemas/OrganisationRefResponse"
+                    },
+                    "rolle": {
+                        "$ref": "#/components/schemas/RolleRefResponse"
+                    }
+                },
+                "required": [
+                    "organisation",
+                    "rolle"
+                ]
+            },
             "ManageableServiceProviderListEntryResponse": {
                 "type": "object",
                 "properties": {
@@ -7313,8 +7338,11 @@
                             "$ref": "#/components/schemas/ServiceProviderMerkmal"
                         }
                     },
-                    "hasRollenerweiterung": {
-                        "type": "boolean"
+                    "rollenerweiterungen": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/RollenerweiterungForManageableServiceProviderResponse"
+                        }
                     },
                     "rollen": {
                         "type": "array",
@@ -7330,7 +7358,7 @@
                     "kategorie",
                     "requires2fa",
                     "merkmale",
-                    "hasRollenerweiterung",
+                    "rollenerweiterungen",
                     "rollen"
                 ]
             },

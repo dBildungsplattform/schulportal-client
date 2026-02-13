@@ -46,7 +46,7 @@
           sp.rollen.length > 0
             ? sp.rollen.map((rolle: ManageableServiceProviderListEntry['rollen'][number]) => rolle.name).join(', ')
             : '---',
-        hasRollenerweiterung: sp.hasRollenerweiterung ? t('yes') : t('no'),
+        hasRollenerweiterung: sp.rollenerweiterungen && sp.rollenerweiterungen.length > 0 ? t('yes') : t('no'),
       };
     });
   });

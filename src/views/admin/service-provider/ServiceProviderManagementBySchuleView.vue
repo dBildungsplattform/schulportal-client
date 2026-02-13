@@ -17,13 +17,14 @@
   import { onBeforeRouteLeave } from 'vue-router';
   import { SortOrder } from '@/utils/sorting';
   import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
+  import type { RollenerweiterungForManageableServiceProviderResponse } from '@/api-client/generated';
 
   type ServiceProviderRow = {
     id: string;
     kategorie: string;
     name: string;
     administrationsebene: string;
-    rollen: string;
+    rollenerweiterungen: string;
   };
 
   const selectedOrganisationId: Ref<string> = ref('');
@@ -42,9 +43,9 @@
 
   const headers: Headers = [
     { title: t('angebot.kategorie'), key: 'kategorie', align: 'start' },
-    { title: t('angebot.name'), key: 'name', align: 'start' },
-    { title: t('angebot.providedBy'), key: 'administrationsebene', align: 'start' },
-    { title: t('angebot.erweiterteRollenAnDerSchule'), key: 'rollen', align: 'start' },
+    { title: t('angebot.name'), key: 'name', align: 'start', sortable: false },
+    { title: t('angebot.providedBy'), key: 'administrationsebene', align: 'start', sortable: false },
+    { title: t('angebot.erweiterteRollenAnDerSchule'), key: 'rollenerweiterungen', align: 'start', sortable: false },
   ];
 
   const items: ComputedRef<ServiceProviderRow[]> = computed(() => {
@@ -55,9 +56,11 @@
           kategorie: t(`angebot.kategorien.${sp.kategorie}`),
           name: sp.name,
           administrationsebene: getDisplayNameForOrg(sp.administrationsebene),
-          rollen:
-            sp.rollen.length > 0
-              ? sp.rollen.map((rolle: ManageableServiceProviderListEntry['rollen'][number]) => rolle.name).join(', ')
+          rollenerweiterungen:
+            sp.rollenerweiterungen && sp.rollenerweiterungen.length > 0
+              ? sp.rollenerweiterungen
+                  .map((re: RollenerweiterungForManageableServiceProviderResponse) => re.rolle.name)
+                  .join(', ')
               : '---',
         };
       },
@@ -148,7 +151,7 @@
           highlightSelection
           parentId="service-provider-management-by-schule"
           ref="schulenFilter"
-          :systemrechteForSearch="[RollenSystemRecht.RollenErweitern]"
+          :systemrechteForSearch="[RollenSystemRecht.PersonenVerwalten]"
           :selectedSchulen="selectedOrganisationId ? [selectedOrganisationId] : []"
           @update:selectedSchulen="setOrganisationFilter"
           :placeholderText="$t('admin.schule.schule')"
@@ -199,12 +202,12 @@
       @onItemsPerPageUpdate="(val: number) => (searchFilterStore.serviceProviderSchulePerPage = val)"
       @onPageUpdate="(val: number) => (searchFilterStore.serviceProviderSchulePage = val)"
     >
-      <template v-slot:[`item.rollen`]="{ item }">
+      <template v-slot:[`item.rollenerweiterungen`]="{ item }">
         <div
           class="ellipsis-wrapper"
-          :title="item.rollen"
+          :title="item.rollenerweiterungen"
         >
-          {{ item.rollen }}
+          {{ item.rollenerweiterungen }}
         </div>
       </template>
     </ResultTable>

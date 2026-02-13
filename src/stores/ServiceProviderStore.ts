@@ -10,6 +10,7 @@ import {
   type ProviderApiInterface,
   type ProviderControllerFindRollenerweiterungenByServiceProviderId200Response,
   type ProviderControllerGetManageableServiceProviders200Response,
+  type RollenerweiterungForManageableServiceProviderResponse,
 } from '../api-client/generated/api';
 
 const serviceProviderApi: ProviderApiInterface = ProviderApiFactory(undefined, '', axiosApiInstance);
@@ -33,7 +34,7 @@ export type ManageableServiceProviderListEntry = BaseServiceProvider & {
   merkmale: Array<ServiceProviderMerkmal>;
   administrationsebene: { id: string; name: string; kennung?: string };
   rollen: Array<{ id: string; name: string }>;
-  hasRollenerweiterung: boolean;
+  rollenerweiterungen?: RollenerweiterungForManageableServiceProviderResponse[];
 };
 
 export type ManageableServiceProviderDetail = ManageableServiceProviderListEntry & {
