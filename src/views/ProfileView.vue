@@ -6,7 +6,7 @@
   import SchulzuordnungCard from '@/components/profile/SchulzuordnungCard.vue';
   import SelfServiceWorkflow from '@/components/two-factor-authentication/SelfServiceWorkflow.vue';
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
-import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
+  import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
   import { usePersonInfoStore, type PersonInfoStore } from '@/stores/PersonInfoStore';
   import { EmailStatus, usePersonStore, type PersonStore } from '@/stores/PersonStore';
   import {
@@ -63,10 +63,11 @@ import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
   // Used to show device password block
   const showResetDevicePassword: ComputedRef<boolean> = computed(() => {
     return (
-      configStore.configData?.setUemPasswordEnabled &&
-      !!personStore.personenuebersicht?.zuordnungen.find((zuordnung: Zuordnung) => {
-        return zuordnung.rollenArt === RollenArt.Lehr;
-      }) || false
+      (configStore.configData?.setUemPasswordEnabled &&
+        !!personStore.personenuebersicht?.zuordnungen.find((zuordnung: Zuordnung) => {
+          return zuordnung.rollenArt === RollenArt.Lehr;
+        })) ||
+      false
     );
   });
 
