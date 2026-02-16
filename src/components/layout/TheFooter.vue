@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { type ComputedRef, ref, type Ref } from 'vue';
-  import BMBF_LOGO from '@/assets/logos/erwin_logos/BMBF_Logo.svg';
+  import BMBF_LOGO from '@/assets/logos/erwin_logos/BMBFSFJ_Logo.svg';
   import ERWIN_LOGO_SMALL from '@/assets/logos/erwin_logos/Logo-ErWIn-Portal-dunkel.svg';
   import { type Composer, useI18n } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
