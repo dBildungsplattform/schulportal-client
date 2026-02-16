@@ -19,7 +19,7 @@
     >
       <v-col cols="auto">
         <h2
-          class="text-left ellipsis-wrapper-schulspezifisch"
+          class="text-left ellipsis-wrapper ellipsis-wrapper--wide"
           :class="subCards ? 'subtitle-1' : 'headline-2'"
           :data-testid="headlineTestId ?? 'layout-card-headline'"
           :title="headerHoverText"
