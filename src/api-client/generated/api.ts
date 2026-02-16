@@ -287,6 +287,106 @@ export interface CreateRollenerweiterungBodyParams {
 /**
  * 
  * @export
+ * @interface CreateServiceProviderBodyParams
+ */
+export interface CreateServiceProviderBodyParams {
+    /**
+     * The id of an organization
+     * @type {string}
+     * @memberof CreateServiceProviderBodyParams
+     */
+    'organisationId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateServiceProviderBodyParams
+     */
+    'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateServiceProviderBodyParams
+     */
+    'target': CreateServiceProviderBodyParamsTargetEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateServiceProviderBodyParams
+     */
+    'url'?: string;
+    /**
+     * Optional logo as base64-encoded string
+     * @type {string}
+     * @memberof CreateServiceProviderBodyParams
+     */
+    'logoBase64'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateServiceProviderBodyParams
+     */
+    'logoMimeType'?: CreateServiceProviderBodyParamsLogoMimeTypeEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateServiceProviderBodyParams
+     */
+    'kategorie': CreateServiceProviderBodyParamsKategorieEnum;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof CreateServiceProviderBodyParams
+     */
+    'requires2fa': boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateServiceProviderBodyParams
+     */
+    'vidisAngebotId'?: string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof CreateServiceProviderBodyParams
+     */
+    'merkmale': Array<CreateServiceProviderBodyParamsMerkmaleEnum>;
+}
+
+export const CreateServiceProviderBodyParamsTargetEnum = {
+    Url: 'URL',
+    Email: 'EMAIL',
+    SchulportalAdministration: 'SCHULPORTAL_ADMINISTRATION'
+} as const;
+
+export type CreateServiceProviderBodyParamsTargetEnum = typeof CreateServiceProviderBodyParamsTargetEnum[keyof typeof CreateServiceProviderBodyParamsTargetEnum];
+export const CreateServiceProviderBodyParamsLogoMimeTypeEnum = {
+    Png: 'image/png',
+    Jpeg: 'image/jpeg',
+    Webp: 'image/webp',
+    Svgxml: 'image/svg+xml'
+} as const;
+
+export type CreateServiceProviderBodyParamsLogoMimeTypeEnum = typeof CreateServiceProviderBodyParamsLogoMimeTypeEnum[keyof typeof CreateServiceProviderBodyParamsLogoMimeTypeEnum];
+export const CreateServiceProviderBodyParamsKategorieEnum = {
+    Email: 'EMAIL',
+    Unterricht: 'UNTERRICHT',
+    Verwaltung: 'VERWALTUNG',
+    Schulisch: 'SCHULISCH',
+    Hinweise: 'HINWEISE',
+    Angebote: 'ANGEBOTE'
+} as const;
+
+export type CreateServiceProviderBodyParamsKategorieEnum = typeof CreateServiceProviderBodyParamsKategorieEnum[keyof typeof CreateServiceProviderBodyParamsKategorieEnum];
+export const CreateServiceProviderBodyParamsMerkmaleEnum = {
+    NachtraeglichZuweisbar: 'NACHTRAEGLICH_ZUWEISBAR',
+    VerfuegbarFuerRollenerweiterung: 'VERFUEGBAR_FUER_ROLLENERWEITERUNG'
+} as const;
+
+export type CreateServiceProviderBodyParamsMerkmaleEnum = typeof CreateServiceProviderBodyParamsMerkmaleEnum[keyof typeof CreateServiceProviderBodyParamsMerkmaleEnum];
+
+/**
+ * 
+ * @export
  * @interface DBiamPersonResponse
  */
 export interface DBiamPersonResponse {
@@ -894,6 +994,12 @@ export interface FeatureFlagResponse {
      * @memberof FeatureFlagResponse
      */
     'rolleErweiternEnabled': boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof FeatureFlagResponse
+     */
+    'setUemPasswordEnabled': boolean;
 }
 /**
  * 
@@ -3983,7 +4089,7 @@ export interface UserExternalDataResponse {
      * @type {UserExternalDataResponseOx}
      * @memberof UserExternalDataResponse
      */
-    'ox': UserExternalDataResponseOx;
+    'ox'?: UserExternalDataResponseOx;
     /**
      * 
      * @type {UserExeternalDataResponseItslearning}
@@ -8647,10 +8753,11 @@ export const PersonAdministrationApiAxiosParamCreator = function (configuration?
          * 
          * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
          * @param {number} [limit] The limit of items for the request.
+         * @param {Array<string>} [organisationIds] OrganisationIDs to filter rollen
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personAdministrationControllerFindRollen: async (rolleName?: string, limit?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        personAdministrationControllerFindRollen: async (rolleName?: string, limit?: number, organisationIds?: Array<string>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/person-administration/rollen`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -8679,6 +8786,10 @@ export const PersonAdministrationApiAxiosParamCreator = function (configuration?
                 localVarQueryParameter['limit'] = limit;
             }
 
+            if (organisationIds) {
+                localVarQueryParameter['organisationIds'] = organisationIds;
+            }
+
 
     
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -8704,11 +8815,12 @@ export const PersonAdministrationApiFp = function(configuration?: Configuration)
          * 
          * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
          * @param {number} [limit] The limit of items for the request.
+         * @param {Array<string>} [organisationIds] OrganisationIDs to filter rollen
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async personAdministrationControllerFindRollen(rolleName?: string, limit?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FindRollenResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.personAdministrationControllerFindRollen(rolleName, limit, options);
+        async personAdministrationControllerFindRollen(rolleName?: string, limit?: number, organisationIds?: Array<string>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FindRollenResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.personAdministrationControllerFindRollen(rolleName, limit, organisationIds, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -8725,11 +8837,12 @@ export const PersonAdministrationApiFactory = function (configuration?: Configur
          * 
          * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
          * @param {number} [limit] The limit of items for the request.
+         * @param {Array<string>} [organisationIds] OrganisationIDs to filter rollen
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personAdministrationControllerFindRollen(rolleName?: string, limit?: number, options?: any): AxiosPromise<FindRollenResponse> {
-            return localVarFp.personAdministrationControllerFindRollen(rolleName, limit, options).then((request) => request(axios, basePath));
+        personAdministrationControllerFindRollen(rolleName?: string, limit?: number, organisationIds?: Array<string>, options?: any): AxiosPromise<FindRollenResponse> {
+            return localVarFp.personAdministrationControllerFindRollen(rolleName, limit, organisationIds, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -8744,11 +8857,12 @@ export interface PersonAdministrationApiInterface {
      * 
      * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
      * @param {number} [limit] The limit of items for the request.
+     * @param {Array<string>} [organisationIds] OrganisationIDs to filter rollen
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonAdministrationApiInterface
      */
-    personAdministrationControllerFindRollen(rolleName?: string, limit?: number, options?: AxiosRequestConfig): AxiosPromise<FindRollenResponse>;
+    personAdministrationControllerFindRollen(rolleName?: string, limit?: number, organisationIds?: Array<string>, options?: AxiosRequestConfig): AxiosPromise<FindRollenResponse>;
 
 }
 
@@ -8763,12 +8877,13 @@ export class PersonAdministrationApi extends BaseAPI implements PersonAdministra
      * 
      * @param {string} [rolleName] Rolle name used to filter for rollen in personenkontext.
      * @param {number} [limit] The limit of items for the request.
+     * @param {Array<string>} [organisationIds] OrganisationIDs to filter rollen
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PersonAdministrationApi
      */
-    public personAdministrationControllerFindRollen(rolleName?: string, limit?: number, options?: AxiosRequestConfig) {
-        return PersonAdministrationApiFp(this.configuration).personAdministrationControllerFindRollen(rolleName, limit, options).then((request) => request(this.axios, this.basePath));
+    public personAdministrationControllerFindRollen(rolleName?: string, limit?: number, organisationIds?: Array<string>, options?: AxiosRequestConfig) {
+        return PersonAdministrationApiFp(this.configuration).personAdministrationControllerFindRollen(rolleName, limit, organisationIds, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -11272,15 +11387,60 @@ export class PersonenkontexteApi extends BaseAPI implements PersonenkontexteApiI
 export const ProviderApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * Get rollenerweiterungen for service-provider with provided id.
+         * Create a new service-provider (Angebot).
+         * @summary 
+         * @param {CreateServiceProviderBodyParams} createServiceProviderBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        providerControllerCreateServiceProvider: async (createServiceProviderBodyParams: CreateServiceProviderBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'createServiceProviderBodyParams' is not null or undefined
+            assertParamExists('providerControllerCreateServiceProvider', 'createServiceProviderBodyParams', createServiceProviderBodyParams)
+            const localVarPath = `/api/provider`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(createServiceProviderBodyParams, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Get rollenerweiterungen for service-provider with provided id. Total is the amount of organisations.
          * @summary 
          * @param {string} angebotId The id of the service provider
          * @param {number} [offset] The offset of the paginated list.
          * @param {number} [limit] The requested limit for the page size.
+         * @param {string} [organisationId] The id of the organisation
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        providerControllerFindRollenerweiterungenByServiceProviderId: async (angebotId: string, offset?: number, limit?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        providerControllerFindRollenerweiterungenByServiceProviderId: async (angebotId: string, offset?: number, limit?: number, organisationId?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'angebotId' is not null or undefined
             assertParamExists('providerControllerFindRollenerweiterungenByServiceProviderId', 'angebotId', angebotId)
             const localVarPath = `/api/provider/{angebotId}/rollenerweiterung`
@@ -11310,6 +11470,10 @@ export const ProviderApiAxiosParamCreator = function (configuration?: Configurat
 
             if (limit !== undefined) {
                 localVarQueryParameter['limit'] = limit;
+            }
+
+            if (organisationId !== undefined) {
+                localVarQueryParameter['organisationId'] = organisationId;
             }
 
 
@@ -11490,6 +11654,61 @@ export const ProviderApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
+         * Get service-providers the logged-in user is allowed to manage for an Organisation.
+         * @summary 
+         * @param {string} organisationId The id of the organisation
+         * @param {number} [offset] The offset of the paginated list.
+         * @param {number} [limit] The requested limit for the page size.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        providerControllerGetManageableServiceProvidersForOrganisationId: async (organisationId: string, offset?: number, limit?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'organisationId' is not null or undefined
+            assertParamExists('providerControllerGetManageableServiceProvidersForOrganisationId', 'organisationId', organisationId)
+            const localVarPath = `/api/provider/manageable-by-organisation`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+            if (offset !== undefined) {
+                localVarQueryParameter['offset'] = offset;
+            }
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            if (organisationId !== undefined) {
+                localVarQueryParameter['organisationId'] = organisationId;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @param {string} angebotId The id of the service provider
          * @param {*} [options] Override http request option.
@@ -11541,16 +11760,28 @@ export const ProviderApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = ProviderApiAxiosParamCreator(configuration)
     return {
         /**
-         * Get rollenerweiterungen for service-provider with provided id.
+         * Create a new service-provider (Angebot).
+         * @summary 
+         * @param {CreateServiceProviderBodyParams} createServiceProviderBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async providerControllerCreateServiceProvider(createServiceProviderBodyParams: CreateServiceProviderBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ServiceProviderResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.providerControllerCreateServiceProvider(createServiceProviderBodyParams, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Get rollenerweiterungen for service-provider with provided id. Total is the amount of organisations.
          * @summary 
          * @param {string} angebotId The id of the service provider
          * @param {number} [offset] The offset of the paginated list.
          * @param {number} [limit] The requested limit for the page size.
+         * @param {string} [organisationId] The id of the organisation
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async providerControllerFindRollenerweiterungenByServiceProviderId(angebotId: string, offset?: number, limit?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ProviderControllerFindRollenerweiterungenByServiceProviderId200Response>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.providerControllerFindRollenerweiterungenByServiceProviderId(angebotId, offset, limit, options);
+        async providerControllerFindRollenerweiterungenByServiceProviderId(angebotId: string, offset?: number, limit?: number, organisationId?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ProviderControllerFindRollenerweiterungenByServiceProviderId200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.providerControllerFindRollenerweiterungenByServiceProviderId(angebotId, offset, limit, organisationId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -11597,6 +11828,19 @@ export const ProviderApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * Get service-providers the logged-in user is allowed to manage for an Organisation.
+         * @summary 
+         * @param {string} organisationId The id of the organisation
+         * @param {number} [offset] The offset of the paginated list.
+         * @param {number} [limit] The requested limit for the page size.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async providerControllerGetManageableServiceProvidersForOrganisationId(organisationId: string, offset?: number, limit?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ProviderControllerGetManageableServiceProviders200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.providerControllerGetManageableServiceProvidersForOrganisationId(organisationId, offset, limit, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * 
          * @param {string} angebotId The id of the service provider
          * @param {*} [options] Override http request option.
@@ -11617,16 +11861,27 @@ export const ProviderApiFactory = function (configuration?: Configuration, baseP
     const localVarFp = ProviderApiFp(configuration)
     return {
         /**
-         * Get rollenerweiterungen for service-provider with provided id.
+         * Create a new service-provider (Angebot).
+         * @summary 
+         * @param {CreateServiceProviderBodyParams} createServiceProviderBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        providerControllerCreateServiceProvider(createServiceProviderBodyParams: CreateServiceProviderBodyParams, options?: any): AxiosPromise<ServiceProviderResponse> {
+            return localVarFp.providerControllerCreateServiceProvider(createServiceProviderBodyParams, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Get rollenerweiterungen for service-provider with provided id. Total is the amount of organisations.
          * @summary 
          * @param {string} angebotId The id of the service provider
          * @param {number} [offset] The offset of the paginated list.
          * @param {number} [limit] The requested limit for the page size.
+         * @param {string} [organisationId] The id of the organisation
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        providerControllerFindRollenerweiterungenByServiceProviderId(angebotId: string, offset?: number, limit?: number, options?: any): AxiosPromise<ProviderControllerFindRollenerweiterungenByServiceProviderId200Response> {
-            return localVarFp.providerControllerFindRollenerweiterungenByServiceProviderId(angebotId, offset, limit, options).then((request) => request(axios, basePath));
+        providerControllerFindRollenerweiterungenByServiceProviderId(angebotId: string, offset?: number, limit?: number, organisationId?: string, options?: any): AxiosPromise<ProviderControllerFindRollenerweiterungenByServiceProviderId200Response> {
+            return localVarFp.providerControllerFindRollenerweiterungenByServiceProviderId(angebotId, offset, limit, organisationId, options).then((request) => request(axios, basePath));
         },
         /**
          * Get all service-providers.
@@ -11668,6 +11923,18 @@ export const ProviderApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.providerControllerGetManageableServiceProviders(offset, limit, options).then((request) => request(axios, basePath));
         },
         /**
+         * Get service-providers the logged-in user is allowed to manage for an Organisation.
+         * @summary 
+         * @param {string} organisationId The id of the organisation
+         * @param {number} [offset] The offset of the paginated list.
+         * @param {number} [limit] The requested limit for the page size.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        providerControllerGetManageableServiceProvidersForOrganisationId(organisationId: string, offset?: number, limit?: number, options?: any): AxiosPromise<ProviderControllerGetManageableServiceProviders200Response> {
+            return localVarFp.providerControllerGetManageableServiceProvidersForOrganisationId(organisationId, offset, limit, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @param {string} angebotId The id of the service provider
          * @param {*} [options] Override http request option.
@@ -11686,16 +11953,27 @@ export const ProviderApiFactory = function (configuration?: Configuration, baseP
  */
 export interface ProviderApiInterface {
     /**
-     * Get rollenerweiterungen for service-provider with provided id.
+     * Create a new service-provider (Angebot).
      * @summary 
-     * @param {string} angebotId The id of the service provider
-     * @param {number} [offset] The offset of the paginated list.
-     * @param {number} [limit] The requested limit for the page size.
+     * @param {CreateServiceProviderBodyParams} createServiceProviderBodyParams 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ProviderApiInterface
      */
-    providerControllerFindRollenerweiterungenByServiceProviderId(angebotId: string, offset?: number, limit?: number, options?: AxiosRequestConfig): AxiosPromise<ProviderControllerFindRollenerweiterungenByServiceProviderId200Response>;
+    providerControllerCreateServiceProvider(createServiceProviderBodyParams: CreateServiceProviderBodyParams, options?: AxiosRequestConfig): AxiosPromise<ServiceProviderResponse>;
+
+    /**
+     * Get rollenerweiterungen for service-provider with provided id. Total is the amount of organisations.
+     * @summary 
+     * @param {string} angebotId The id of the service provider
+     * @param {number} [offset] The offset of the paginated list.
+     * @param {number} [limit] The requested limit for the page size.
+     * @param {string} [organisationId] The id of the organisation
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProviderApiInterface
+     */
+    providerControllerFindRollenerweiterungenByServiceProviderId(angebotId: string, offset?: number, limit?: number, organisationId?: string, options?: AxiosRequestConfig): AxiosPromise<ProviderControllerFindRollenerweiterungenByServiceProviderId200Response>;
 
     /**
      * Get all service-providers.
@@ -11737,6 +12015,18 @@ export interface ProviderApiInterface {
     providerControllerGetManageableServiceProviders(offset?: number, limit?: number, options?: AxiosRequestConfig): AxiosPromise<ProviderControllerGetManageableServiceProviders200Response>;
 
     /**
+     * Get service-providers the logged-in user is allowed to manage for an Organisation.
+     * @summary 
+     * @param {string} organisationId The id of the organisation
+     * @param {number} [offset] The offset of the paginated list.
+     * @param {number} [limit] The requested limit for the page size.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProviderApiInterface
+     */
+    providerControllerGetManageableServiceProvidersForOrganisationId(organisationId: string, offset?: number, limit?: number, options?: AxiosRequestConfig): AxiosPromise<ProviderControllerGetManageableServiceProviders200Response>;
+
+    /**
      * 
      * @param {string} angebotId The id of the service provider
      * @param {*} [options] Override http request option.
@@ -11755,17 +12045,30 @@ export interface ProviderApiInterface {
  */
 export class ProviderApi extends BaseAPI implements ProviderApiInterface {
     /**
-     * Get rollenerweiterungen for service-provider with provided id.
+     * Create a new service-provider (Angebot).
      * @summary 
-     * @param {string} angebotId The id of the service provider
-     * @param {number} [offset] The offset of the paginated list.
-     * @param {number} [limit] The requested limit for the page size.
+     * @param {CreateServiceProviderBodyParams} createServiceProviderBodyParams 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ProviderApi
      */
-    public providerControllerFindRollenerweiterungenByServiceProviderId(angebotId: string, offset?: number, limit?: number, options?: AxiosRequestConfig) {
-        return ProviderApiFp(this.configuration).providerControllerFindRollenerweiterungenByServiceProviderId(angebotId, offset, limit, options).then((request) => request(this.axios, this.basePath));
+    public providerControllerCreateServiceProvider(createServiceProviderBodyParams: CreateServiceProviderBodyParams, options?: AxiosRequestConfig) {
+        return ProviderApiFp(this.configuration).providerControllerCreateServiceProvider(createServiceProviderBodyParams, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Get rollenerweiterungen for service-provider with provided id. Total is the amount of organisations.
+     * @summary 
+     * @param {string} angebotId The id of the service provider
+     * @param {number} [offset] The offset of the paginated list.
+     * @param {number} [limit] The requested limit for the page size.
+     * @param {string} [organisationId] The id of the organisation
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProviderApi
+     */
+    public providerControllerFindRollenerweiterungenByServiceProviderId(angebotId: string, offset?: number, limit?: number, organisationId?: string, options?: AxiosRequestConfig) {
+        return ProviderApiFp(this.configuration).providerControllerFindRollenerweiterungenByServiceProviderId(angebotId, offset, limit, organisationId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -11813,6 +12116,20 @@ export class ProviderApi extends BaseAPI implements ProviderApiInterface {
      */
     public providerControllerGetManageableServiceProviders(offset?: number, limit?: number, options?: AxiosRequestConfig) {
         return ProviderApiFp(this.configuration).providerControllerGetManageableServiceProviders(offset, limit, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Get service-providers the logged-in user is allowed to manage for an Organisation.
+     * @summary 
+     * @param {string} organisationId The id of the organisation
+     * @param {number} [offset] The offset of the paginated list.
+     * @param {number} [limit] The requested limit for the page size.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProviderApi
+     */
+    public providerControllerGetManageableServiceProvidersForOrganisationId(organisationId: string, offset?: number, limit?: number, options?: AxiosRequestConfig) {
+        return ProviderApiFp(this.configuration).providerControllerGetManageableServiceProvidersForOrganisationId(organisationId, offset, limit, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

@@ -20,6 +20,7 @@ describe('ConfigStore', () => {
         rolleBearbeitenEnabled: false,
         befristungBearbeitenEnabled: false,
         rolleErweiternEnabled: false,
+        setUemPasswordEnabled: false,
       };
 
       mockadapter.onGet('/api/config').replyOnce(200, mockFeatureFlags);

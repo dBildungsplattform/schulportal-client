@@ -151,7 +151,7 @@
 
       <!-- In progress -->
       <v-container
-        v-if="progressState === State.PROGRESSING"
+        v-else
         class="mt-4"
       >
         <v-row
@@ -160,12 +160,20 @@
         >
           <v-col cols="auto">
             <v-icon
+              v-if="progressState === State.PROGRESSING"
               aria-hidden="true"
               class="mr-2"
               icon="mdi-alert-circle-outline"
               size="small"
             />
+            <v-icon
+              v-if="progressState === State.FINISHED"
+              small
+              color="#1EAE9C"
+              icon="mdi-check-circle"
+            />
             <span
+              v-if="progressState === State.PROGRESSING"
               class="subtitle-2"
               data-testid="password-reset-progressing-notice"
             >
@@ -173,6 +181,12 @@
             </span>
           </v-col>
         </v-row>
+        <p
+          v-if="progressState === State.FINISHED"
+          class="mt-2 text-center"
+        >
+          {{ t('admin.person.bulk.bulkPasswordReset.success') }}
+        </p>
         <!-- Progress Bar -->
         <v-progress-linear
           class="mt-5"
@@ -185,27 +199,12 @@
             <strong class="text-white">{{ Math.ceil(value) }}%</strong>
           </template>
         </v-progress-linear>
-      </v-container>
-
-      <!-- Result -->
-      <v-container v-if="progressState === State.FINISHED">
-        <v-row justify="center">
-          <v-col cols="auto">
-            <v-icon
-              small
-              color="#1EAE9C"
-              icon="mdi-check-circle"
-            />
-          </v-col>
-        </v-row>
         <div
-          class="mt-2 px-md-16 bold text-body text-center"
+          v-if="progressState === State.FINISHED"
+          class="mt-4 px-md-16 bold text-body text-center"
           data-testid="password-reset-success-text"
         >
           <p>
-            {{ t('admin.person.bulk.bulkPasswordReset.success') }}
-          </p>
-          <p class="mt-4">
             {{ t('admin.person.bulk.bulkPasswordReset.info') }}
           </p>
         </div>

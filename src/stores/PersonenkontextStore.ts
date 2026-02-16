@@ -114,7 +114,7 @@ type PersonenkontextActions = {
     updatedPersonenkontexte: PersonenkontextUpdate[] | undefined,
     personalnummer: string,
   ) => Promise<void>;
-  getPersonenkontextRolleWithFilter: (rolleName: string, limit?: number) => Promise<void>;
+  getPersonenkontextRolleWithFilter: (rolleName: string, limit?: number, organisationIds?: string[]) => Promise<void>;
   updatePersonenkontexte: (
     updatedPersonenkontexte: PersonenkontextUpdate[] | undefined,
     personId: string,
@@ -241,11 +241,15 @@ export const usePersonenkontextStore: StoreDefinition<
       }
     },
 
-    async getPersonenkontextRolleWithFilter(rolleName: string, limit?: number): Promise<void> {
+    async getPersonenkontextRolleWithFilter(
+      rolleName: string,
+      limit?: number,
+      organisationIds?: string[],
+    ): Promise<void> {
       this.loading = true;
       try {
         const { data }: { data: FindRollenResponse } =
-          await personAdministrationApi.personAdministrationControllerFindRollen(rolleName, limit);
+          await personAdministrationApi.personAdministrationControllerFindRollen(rolleName, limit, organisationIds);
         this.filteredRollen = data;
         this.totalFilteredRollen = this.filteredRollen.total;
       } catch (error: unknown) {

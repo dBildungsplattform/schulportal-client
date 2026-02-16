@@ -204,7 +204,8 @@ export const useServiceProviderStore: StoreDefinition<
 
         this.serviceProviderLogos.set(serviceProviderId, logoUrl);
       } catch (error: unknown) {
-        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+        // Just log that the logo failed to load because there is a fallback logo in the UI
+        console.warn(`Failed to load logo for service provider ${serviceProviderId}:`, error);
       } finally {
         this.loading = false;
       }
