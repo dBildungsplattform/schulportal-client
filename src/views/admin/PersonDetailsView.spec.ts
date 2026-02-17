@@ -640,24 +640,26 @@ describe('PersonDetailsView', () => {
     expect(wrapper?.find('[data-testid="metadata-edit-button"]').isVisible()).toBe(true);
   });
 
-  describe('error messages', () => {
-    test('check 2fa connection error', async () => {
-      twoFactorAuthenticationStore.loading = false;
-      twoFactorAuthenticationStore.required = true;
-      twoFactorAuthenticationStore.errorCode = 'PI_UNAVAILABLE_ERROR';
-      await nextTick();
+  // Disabled 2fa tests since 2fa is currently disabled in the UI. Re-enable and adjust tests when 2fa is re-enabled in the UI.
+  //
+  // describe('error messages', () => {
+  //   test('check 2fa connection error', async () => {
+  //     twoFactorAuthenticationStore.loading = false;
+  //     twoFactorAuthenticationStore.required = true;
+  //     twoFactorAuthenticationStore.errorCode = 'PI_UNAVAILABLE_ERROR';
+  //     await nextTick();
 
-      expect(wrapper?.find('[data-testid="connection-error-text"]').isVisible()).toBe(true);
-    });
-    test('check 2fa state error', async () => {
-      twoFactorAuthenticationStore.loading = false;
-      twoFactorAuthenticationStore.required = true;
-      twoFactorAuthenticationStore.errorCode = 'TOKEN_STATE_ERROR';
-      await nextTick();
+  //     expect(wrapper?.find('[data-testid="connection-error-text"]').isVisible()).toBe(true);
+  //   });
+  //   test('check 2fa state error', async () => {
+  //     twoFactorAuthenticationStore.loading = false;
+  //     twoFactorAuthenticationStore.required = true;
+  //     twoFactorAuthenticationStore.errorCode = 'TOKEN_STATE_ERROR';
+  //     await nextTick();
 
-      expect(wrapper?.find('[data-testid="token-state-error-text"]').isVisible()).toBe(true);
-    });
-  });
+  //     expect(wrapper?.find('[data-testid="token-state-error-text"]').isVisible()).toBe(true);
+  //   });
+  // });
 
   test('it shows loading spinner', async () => {
     personStore.loading = true;

@@ -2497,8 +2497,11 @@
             </v-row>
           </v-container>
         </template>
+        <!-- Disabled using false condition (remove 'false &&' to re-enable) -->
         <template
-          v-else-if="twoFactorAuthentificationStore.required || twoFactorAuthentificationStore.hasToken === true"
+          v-else-if="
+            false && (twoFactorAuthentificationStore.required || twoFactorAuthentificationStore.hasToken === true)
+          "
         >
           <v-divider
             class="border-opacity-100 rounded my-6 mx-4"
