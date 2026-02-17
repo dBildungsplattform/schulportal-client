@@ -321,7 +321,7 @@
         :category-title="
           hintsServiceProviders.length > 0 ? t(`angebot.kategorien.${hintsServiceProviders[0]?.kategorie}`) : ''
         "
-        :service-providers="[]"
+        :service-providers="hintsServiceProviders"
         :has-token="getHasToken()"
       />
     </template>
