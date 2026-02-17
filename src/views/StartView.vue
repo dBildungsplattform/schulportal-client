@@ -198,7 +198,7 @@
           class="headline-1"
           data-testid="start-card-headline"
         >
-          {{ $t('start.categories.homePage') }}
+          {{ $t('homePage') }}
         </h2>
       </v-col>
     </v-row>
@@ -263,7 +263,7 @@
           class="headline-2"
           data-testid="all-service-provider-title"
         >
-          {{ $t('start.allServiceProviders') }}
+          {{ $t('angebot.allServiceProviders') }}
         </h2>
       </v-col>
     </v-row>
@@ -318,8 +318,10 @@
       />
       <!-- Categorie 5: Hints -->
       <ServiceProviderCategory
-        :category-title="$t('start.categories.hints')"
-        :service-providers="hintsServiceProviders"
+        :category-title="
+          hintsServiceProviders.length > 0 ? t(`angebot.kategorien.${hintsServiceProviders[0]?.kategorie}`) : ''
+        "
+        :service-providers="[]"
         :has-token="getHasToken()"
       />
     </template>
