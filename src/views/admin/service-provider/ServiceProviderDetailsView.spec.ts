@@ -76,7 +76,7 @@ describe('ServiceProviderDetailsView', () => {
     expect(wrapper?.find('[data-testid="service-provider-requires-2fa"]').text()).toBe(
       mockServiceProvider.requires2fa ? 'Ja' : 'Nein',
     );
-    expect(wrapper?.find('[data-testid="service-provider-kategorie"]').text()).toBe(mockServiceProvider.kategorie);
+    expect(wrapper?.find('[data-testid="service-provider-kategorie"]').text()).toBe('Hinweise');
     expect(wrapper?.find('[data-testid="service-provider-link"]').text()).toBe(
       mockServiceProvider.url ? mockServiceProvider.url : 'fehlt',
     );
