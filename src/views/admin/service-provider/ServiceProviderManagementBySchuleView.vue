@@ -78,8 +78,12 @@
   }
 
   function setOrganisationFilter(newValue: string | undefined): void {
-    selectedOrganisationId.value = newValue ?? '';
-    searchFilterStore.setSchuleForSchulischeServiceProvider(newValue ?? null);
+    if (!newValue) {
+      resetSearchAndFilter();
+      return;
+    }
+    selectedOrganisationId.value = newValue;
+    searchFilterStore.setSchuleForSchulischeServiceProvider(newValue);
   }
 
   watchEffect(async () => {
@@ -151,7 +155,7 @@
           highlightSelection
           parentId="service-provider-management-by-schule"
           ref="schulenFilter"
-          :systemrechteForSearch="[RollenSystemRecht.PersonenVerwalten]"
+          :systemrechteForSearch="[RollenSystemRecht.RollenErweitern]"
           :selectedSchulen="selectedOrganisationId ? [selectedOrganisationId] : []"
           @update:selectedSchulen="setOrganisationFilter"
           :placeholderText="$t('admin.schule.schule')"
