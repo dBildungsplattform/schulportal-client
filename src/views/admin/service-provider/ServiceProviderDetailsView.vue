@@ -215,7 +215,6 @@
                       "
                       test-id="service-provider-kategorie"
                       no-margin-top
-                      style="text-transform: capitalize"
                     />
 
                     <!-- URL -->
