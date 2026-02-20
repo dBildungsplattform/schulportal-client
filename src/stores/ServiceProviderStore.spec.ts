@@ -187,6 +187,72 @@ describe('serviceProviderStore', () => {
     });
   });
 
+  describe('getManageableServiceProvidersForOrganisation', () => {
+    const organisationId: string = faker.string.uuid();
+    const page: number = 1;
+    const itemsPerPage: number = 30;
+    const offset: number = (page - 1) * itemsPerPage;
+    const limit: number = itemsPerPage;
+    const url: string = `/api/provider/manageable-by-organisation?offset=${offset}&limit=${limit}&organisationId=${organisationId}`;
+
+    it('should load service providers manageable for the organisation', async () => {
+      const mockResponse: ProviderControllerGetManageableServiceProviders200Response = {
+        items: [
+          DoFactory.getManageableServiceProviderListEntryResponse(),
+          DoFactory.getManageableServiceProviderListEntryResponse(),
+          DoFactory.getManageableServiceProviderListEntryResponse(),
+        ],
+        offset,
+        limit,
+        total: 3,
+      };
+
+      mockadapter.onGet(url).replyOnce(200, mockResponse);
+      const promise: Promise<void> = serviceProviderStore.getManageableServiceProvidersForOrganisation(
+        organisationId,
+        page,
+        itemsPerPage,
+      );
+      expect(serviceProviderStore.loading).toBe(true);
+      await promise;
+      expect(serviceProviderStore.manageableServiceProvidersForOrganisation).toEqual(
+        expect.arrayContaining(mockResponse.items),
+      );
+      expect(serviceProviderStore.manageableServiceProvidersForOrganisation).toHaveLength(mockResponse.items.length);
+      expect(serviceProviderStore.totalManageableServiceProvidersForOrganisation).toEqual(mockResponse.total);
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+
+    it('should handle string error', async () => {
+      mockadapter.onGet(url).replyOnce(500, 'some mock server error');
+      const promise: Promise<void> = serviceProviderStore.getManageableServiceProvidersForOrganisation(
+        organisationId,
+        page,
+        itemsPerPage,
+      );
+      expect(serviceProviderStore.loading).toBe(true);
+      await promise;
+      expect(serviceProviderStore.manageableServiceProvidersForOrganisation).toEqual([]);
+      expect(serviceProviderStore.totalManageableServiceProvidersForOrganisation).toEqual(0);
+      expect(serviceProviderStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+
+    it('should handle error code', async () => {
+      mockadapter.onGet(url).replyOnce(500, { code: 'some mock server error' });
+      const promise: Promise<void> = serviceProviderStore.getManageableServiceProvidersForOrganisation(
+        organisationId,
+        page,
+        itemsPerPage,
+      );
+      expect(serviceProviderStore.loading).toBe(true);
+      await promise;
+      expect(serviceProviderStore.manageableServiceProvidersForOrganisation).toEqual([]);
+      expect(serviceProviderStore.errorCode).toEqual('some mock server error');
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+  });
+
   describe('getManageableServiceProviderById', () => {
     const serviceProviderId: string = 'test-provider-id';
     const url: string = `/api/provider/manageable/${serviceProviderId}`;

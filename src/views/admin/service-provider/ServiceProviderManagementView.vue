@@ -42,8 +42,11 @@
         kategorie: t(`angebot.kategorien.${sp.kategorie}`),
         name: sp.name,
         administrationsebene: getDisplayNameForOrg(sp.administrationsebene),
-        rollen: sp.rollen.map((rolle: ManageableServiceProviderListEntry['rollen'][number]) => rolle.name).join(', '),
-        hasRollenerweiterung: sp.hasRollenerweiterung ? t('yes') : t('no'),
+        rollen:
+          sp.rollen.length > 0
+            ? sp.rollen.map((rolle: ManageableServiceProviderListEntry['rollen'][number]) => rolle.name).join(', ')
+            : '---',
+        hasRollenerweiterung: sp.rollenerweiterungen && sp.rollenerweiterungen.length > 0 ? t('yes') : t('no'),
       };
     });
   });

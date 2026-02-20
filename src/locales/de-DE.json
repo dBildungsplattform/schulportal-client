@@ -3,6 +3,7 @@
     "allServiceProviders": "Alle Angebote",
     "assignedRollen": "Zugeordnete Rollen",
     "erweiterteRollen": "Erweiterte Rollen",
+    "erweiterteRollenAnDerSchule": "Erweiterte Rollen an der Schule",
     "name": "Name",
     "kategorie": "Kategorie",
     "administrationsebene": "Administrationsebene",
@@ -21,7 +22,10 @@
       "VERWALTUNG": "Verwaltung",
       "SCHULISCH": "Schulische Angebote",
       "HINWEISE": "Hinweise"
-    }
+    },
+    "chooseSchuleFirst": "Bitte wählen Sie zunächst im Filter eine Schule aus.",
+    "noServiceProvidersAvailable": "Keine passenden Angebote gefunden.",
+    "providedBy": "Bereitgestellt von"
   },
   "action": "Aktion",
   "admin": {

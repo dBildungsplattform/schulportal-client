@@ -16,6 +16,8 @@ type SearchFilterState = {
   schulentraegerPerPage: number;
   serviceProviderPage: number;
   serviceProviderPerPage: number;
+  serviceProviderSchulePage: number;
+  serviceProviderSchulePerPage: number;
   searchFilterPersonen: string | null;
   searchFilterSchulen: string | null;
   selectedKlassen: Array<string> | null;
@@ -30,6 +32,7 @@ type SearchFilterState = {
   currentSort: { key: string; order: 'asc' | 'desc' } | null;
   selectedSchuleForKlassen: string | null;
   selectedKlassenForKlassen: Array<string> | null;
+  selectedSchuleForSchulischeServiceProvider: string | null;
 };
 
 type SearchFilterActions = {
@@ -44,6 +47,7 @@ type SearchFilterActions = {
   setSearchFilterForSchulen: (searchFilter: string | null) => void;
   setSchuleFilterForKlassen: (selectedSchuleForKlassen: string | null) => void;
   setKlasseFilterForKlassen: (selectedKlassenForKlassen: Array<string> | null) => void;
+  setSchuleForSchulischeServiceProvider: (selectedSchuleForSchulischeServiceProvider: string | null) => void;
 };
 
 type SearchFilterGetters = object;
@@ -70,6 +74,8 @@ export const useSearchFilterStore: StoreDefinition<
     schulentraegerPerPage: 30,
     serviceProviderPage: 1,
     serviceProviderPerPage: 30,
+    serviceProviderSchulePage: 1,
+    serviceProviderSchulePerPage: 30,
     searchFilterPersonen: '',
     searchFilterSchulen: '',
     selectedKlassen: [],
@@ -84,6 +90,7 @@ export const useSearchFilterStore: StoreDefinition<
     currentSort: null,
     selectedSchuleForKlassen: null,
     selectedKlassenForKlassen: [],
+    selectedSchuleForSchulischeServiceProvider: null,
   }),
   actions: {
     setKlasseFilterForPersonen(selectedKlassen: Array<string> | null) {
@@ -118,6 +125,10 @@ export const useSearchFilterStore: StoreDefinition<
 
     setKlasseFilterForKlassen(selectedKlassenForKlassen: Array<string> | null) {
       this.selectedKlassenForKlassen = selectedKlassenForKlassen;
+    },
+
+    setSchuleForSchulischeServiceProvider(selectedSchuleForSchulischeServiceProvider: string | null) {
+      this.selectedSchuleForSchulischeServiceProvider = selectedSchuleForSchulischeServiceProvider;
     },
   },
 });
