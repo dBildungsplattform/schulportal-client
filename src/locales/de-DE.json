@@ -20,9 +20,8 @@
       "EMAIL": "Dienstliche Email",
       "UNTERRICHT": "Unterricht",
       "VERWALTUNG": "Verwaltung",
-      "SCHULISCH": "Schulisch",
-      "HINWEISE": "Hinweise",
-      "ANGEBOTE": "Angebote"
+      "SCHULISCH": "Schulische Angebote",
+      "HINWEISE": "Hinweise"
     },
     "chooseSchuleFirst": "Bitte wählen Sie zunächst im Filter eine Schule aus.",
     "noServiceProvidersAvailable": "Keine passenden Angebote gefunden.",
