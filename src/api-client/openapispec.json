@@ -2808,6 +2808,66 @@
                 ]
             }
         },
+        "/api/rollen-erweiterung/angebot/{angebotId}/organisation/{organisationId}/apply": {
+            "post": {
+                "operationId": "RollenerweiterungController_applyRollenerweiterungChanges",
+                "summary": "",
+                "description": "Apply changes to rollen-erweiterung for a given angebot and organisation.",
+                "parameters": [
+                    {
+                        "name": "angebotId",
+                        "required": true,
+                        "in": "path",
+                        "description": "The spshPersonId of the person.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "organisationId",
+                        "required": true,
+                        "in": "path",
+                        "description": "The spshPersonId of the person.",
+                        "schema": {
+                            "nullable": false,
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ApplyRollenerweiterungBodyParams"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Changes applied successfully."
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "tags": [
+                    "rolle"
+                ],
+                "security": [
+                    {
+                        "oauth2": [
+                            "openid"
+                        ]
+                    },
+                    {
+                        "bearer": []
+                    }
+                ]
+            }
+        },
         "/api/provider/all": {
             "get": {
                 "operationId": "ProviderController_getAllServiceProviders",
@@ -5510,9 +5570,9 @@
                 "type": "oauth2",
                 "flows": {
                     "authorizationCode": {
-                        "authorizationUrl": "http://localhost:8080/realms/SPSH/protocol/openid-connect/auth",
-                        "tokenUrl": "http://localhost:8080/realms/SPSH/protocol/openid-connect/token",
-                        "refreshUrl": "http://localhost:8080/realms/SPSH/protocol/openid-connect/token",
+                        "authorizationUrl": "https://spsh-3079-keycloak.dev.spsh.dbildungsplattform.de/realms/SPSH/protocol/openid-connect/auth",
+                        "tokenUrl": "https://spsh-3079-keycloak.dev.spsh.dbildungsplattform.de/realms/SPSH/protocol/openid-connect/token",
+                        "refreshUrl": "https://spsh-3079-keycloak.dev.spsh.dbildungsplattform.de/realms/SPSH/protocol/openid-connect/token",
                         "scopes": {}
                     }
                 }
@@ -7219,6 +7279,37 @@
                     "organisationId",
                     "rolleId",
                     "serviceProviderId"
+                ]
+            },
+            "ApplyRollenerweiterungBodyParams": {
+                "type": "object",
+                "properties": {
+                    "addErweiterungenForRolleIds": {
+                        "description": "List of rolleIds to apply.",
+                        "example": [
+                            "rolleId1",
+                            "rolleId2"
+                        ],
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "removeErweiterungenForRolleIds": {
+                        "description": "List of rolleIds to apply.",
+                        "example": [
+                            "rolleId1",
+                            "rolleId2"
+                        ],
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "required": [
+                    "addErweiterungenForRolleIds",
+                    "removeErweiterungenForRolleIds"
                 ]
             },
             "RollenerweiterungWithExtendedDataResponse": {

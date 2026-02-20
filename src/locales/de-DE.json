@@ -1,5 +1,6 @@
 {
   "angebot": {
+    "allServiceProviders": "Alle Angebote",
     "assignedRollen": "Zugeordnete Rollen",
     "erweiterteRollen": "Erweiterte Rollen",
     "erweiterteRollenAnDerSchule": "Erweiterte Rollen an der Schule",
@@ -725,6 +726,7 @@
       }
     }
   },
+  "homePage": "Startseite",
   "cancel": "Abbrechen",
   "proceed": "Weiter",
   "ok": "OK",
@@ -912,18 +914,6 @@
   "reset": "Zurücksetzen",
   "resetFilter": "Filter zurücksetzen",
   "search": "Suchen",
-  "start": {
-    "allServiceProviders": "Alle Angebote",
-    "categories": {
-      "administration": "Verwaltung",
-      "class": "Unterricht",
-      "hints": "Hinweise",
-      "homePage": "Startseite",
-      "schoolOfferings": "Schulische Angebote",
-      "workEmail": "Dienstliche E-Mail",
-      "school": "Schulische Angebote"
-    }
-  },
   "transfer": "Versetzen",
   "unsavedChanges": {
     "message": "Sie haben nicht gespeicherte Änderungen vorgenommen. Wollen Sie die Seite trotzdem verlassen?",

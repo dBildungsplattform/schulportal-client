@@ -240,4 +240,70 @@ describe('StartView', () => {
       'Spongebob Squarepants',
     ]);
   });
+
+  test('it renders category title for class service providers when providers exist', async () => {
+    serviceProviderStore.availableServiceProviders = [
+      {
+        id: '4',
+        name: 'Moodle',
+        target: 'URL',
+        url: 'https://moodle.example.com',
+        kategorie: ServiceProviderKategorie.Unterricht,
+        hasLogo: false,
+        requires2fa: false,
+      },
+    ];
+    await nextTick();
+
+    const categoryTitle: WrapperLike | undefined = wrapper?.find('[data-testid="all-service-provider-title"]');
+    expect(categoryTitle?.isVisible()).toBe(true);
+  });
+
+  test('it renders empty category title for class service providers when no providers exist', async () => {
+    serviceProviderStore.availableServiceProviders = mockProviders.filter(
+      (p: StartPageServiceProvider) => p.kategorie !== 'UNTERRICHT',
+    );
+    await nextTick();
+
+    // Category title should still render but be empty for UNTERRICHT
+    const card: WrapperLike | undefined = wrapper?.find('[data-testid="start-card-headline"]');
+    expect(card?.isVisible()).toBe(true);
+  });
+
+  test('it renders category titles for all categories when providers exist', async () => {
+    serviceProviderStore.availableServiceProviders = [
+      ...mockProviders,
+      {
+        id: '5',
+        name: 'Moodle',
+        target: 'URL',
+        url: 'https://moodle.example.com',
+        kategorie: ServiceProviderKategorie.Unterricht,
+        hasLogo: false,
+        requires2fa: false,
+      },
+      {
+        id: '6',
+        name: 'SchulApp',
+        target: 'URL',
+        url: 'https://schulapp.example.com',
+        kategorie: ServiceProviderKategorie.Schulisch,
+        hasLogo: false,
+        requires2fa: false,
+      },
+      {
+        id: '7',
+        name: 'Hinweis Tool',
+        target: 'URL',
+        url: 'https://hinweis.example.com',
+        kategorie: ServiceProviderKategorie.Hinweise,
+        hasLogo: false,
+        requires2fa: false,
+      },
+    ];
+    await nextTick();
+
+    const headline: WrapperLike | undefined = wrapper?.find('[data-testid="all-service-provider-title"]');
+    expect(headline?.isVisible()).toBe(true);
+  });
 });

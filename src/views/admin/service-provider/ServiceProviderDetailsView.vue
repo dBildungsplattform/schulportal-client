@@ -208,10 +208,13 @@
                     <!-- Kategorie -->
                     <LabeledField
                       :label="t('angebot.kategorie')"
-                      :value="serviceProviderStore.currentServiceProvider.kategorie.toLocaleLowerCase()"
+                      :value="
+                        serviceProviderStore.currentServiceProvider.kategorie
+                          ? t(`angebot.kategorien.${serviceProviderStore.currentServiceProvider.kategorie}`)
+                          : t('missing')
+                      "
                       test-id="service-provider-kategorie"
                       no-margin-top
-                      style="text-transform: capitalize"
                     />
 
                     <!-- URL -->
