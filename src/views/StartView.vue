@@ -67,10 +67,6 @@
   const hintsServiceProviders: ComputedRef<StartPageServiceProvider[]> = computed(() =>
     filterSortProviders(serviceProviderStore.availableServiceProviders, ServiceProviderKategorie.Hinweise),
   );
-  // Filter service providers by category "ANGEBOTE"
-  const schoolOfferingsServiceProviders: ComputedRef<StartPageServiceProvider[]> = computed(() =>
-    filterSortProviders(serviceProviderStore.availableServiceProviders, ServiceProviderKategorie.Angebote),
-  );
 
   function getHasToken(): boolean {
     return twoFactorAuthentificationStore.hasToken ?? false;
@@ -202,7 +198,7 @@
           class="headline-1"
           data-testid="start-card-headline"
         >
-          {{ $t('start.categories.homePage') }}
+          {{ $t('homePage') }}
         </h2>
       </v-col>
     </v-row>
@@ -267,7 +263,7 @@
           class="headline-2"
           data-testid="all-service-provider-title"
         >
-          {{ $t('start.allServiceProviders') }}
+          {{ $t('angebot.allServiceProviders') }}
         </h2>
       </v-col>
     </v-row>
@@ -288,38 +284,44 @@
     <template v-else>
       <!-- Categorie 1: Work Email -->
       <ServiceProviderCategory
-        :category-title="$t('start.categories.workEmail')"
+        :category-title="
+          emailServiceProviders.length > 0 ? t(`angebot.kategorien.${emailServiceProviders[0]?.kategorie}`) : ''
+        "
         :service-providers="emailServiceProviders"
         :has-token="getHasToken()"
       />
       <!-- Categorie 2: Class -->
       <ServiceProviderCategory
-        :category-title="$t('start.categories.class')"
+        :category-title="
+          classServiceProviders.length > 0 ? t(`angebot.kategorien.${classServiceProviders[0]?.kategorie}`) : ''
+        "
         :service-providers="classServiceProviders"
         :has-token="getHasToken()"
       />
       <!-- Categorie 3: Administration -->
       <ServiceProviderCategory
-        :category-title="$t('start.categories.administration')"
+        :category-title="
+          administrationServiceProviders.length > 0
+            ? t(`angebot.kategorien.${administrationServiceProviders[0]?.kategorie}`)
+            : ''
+        "
         :service-providers="administrationServiceProviders"
         :has-token="getHasToken()"
       />
       <!-- Categorie 4: Schulisch -->
       <ServiceProviderCategory
-        :category-title="$t('start.categories.school')"
+        :category-title="
+          schulischServiceProviders.length > 0 ? t(`angebot.kategorien.${schulischServiceProviders[0]?.kategorie}`) : ''
+        "
         :service-providers="schulischServiceProviders"
         :has-token="getHasToken()"
       />
       <!-- Categorie 5: Hints -->
       <ServiceProviderCategory
-        :category-title="$t('start.categories.hints')"
+        :category-title="
+          hintsServiceProviders.length > 0 ? t(`angebot.kategorien.${hintsServiceProviders[0]?.kategorie}`) : ''
+        "
         :service-providers="hintsServiceProviders"
-        :has-token="getHasToken()"
-      />
-      <!-- Categorie 6: School Offerings -->
-      <ServiceProviderCategory
-        :category-title="$t('start.categories.schoolOfferings')"
-        :service-providers="schoolOfferingsServiceProviders"
         :has-token="getHasToken()"
       />
     </template>

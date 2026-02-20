@@ -4,6 +4,7 @@ import { createPinia, setActivePinia } from 'pinia';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import ServiceProviderDetailsView from './ServiceProviderDetailsView.vue';
 import {
+  ServiceProviderKategorie,
   useServiceProviderStore,
   type ManageableServiceProviderDetail,
   type ServiceProviderStore,
@@ -21,6 +22,7 @@ const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
 const authStore: AuthStore = useAuthStore();
 
 const mockServiceProvider: ManageableServiceProviderDetail = DoFactory.getManageableServiceProviderDetail({
+  kategorie: ServiceProviderKategorie.Hinweise,
   availableForRollenerweiterung: true,
 });
 
@@ -74,9 +76,7 @@ describe('ServiceProviderDetailsView', () => {
     expect(wrapper?.find('[data-testid="service-provider-requires-2fa"]').text()).toBe(
       mockServiceProvider.requires2fa ? 'Ja' : 'Nein',
     );
-    expect(wrapper?.find('[data-testid="service-provider-kategorie"]').text()).toBe(
-      mockServiceProvider.kategorie.toLowerCase(),
-    );
+    expect(wrapper?.find('[data-testid="service-provider-kategorie"]').text()).toBe('Hinweise');
     expect(wrapper?.find('[data-testid="service-provider-link"]').text()).toBe(
       mockServiceProvider.url ? mockServiceProvider.url : 'fehlt',
     );
