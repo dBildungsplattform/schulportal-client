@@ -188,6 +188,7 @@
     </v-row>
     <ResultTable
       :headers
+      :hide-select="true"
       :current-sort="{
         key: 'kategorie',
         order: SortOrder.Asc,
