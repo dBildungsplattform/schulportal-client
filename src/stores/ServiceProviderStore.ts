@@ -10,6 +10,7 @@ import {
   type ProviderApiInterface,
   type ProviderControllerFindRollenerweiterungenByServiceProviderId200Response,
   type ProviderControllerGetManageableServiceProviders200Response,
+  type RollenerweiterungForManageableServiceProviderResponse,
 } from '../api-client/generated/api';
 
 const serviceProviderApi: ProviderApiInterface = ProviderApiFactory(undefined, '', axiosApiInstance);
@@ -33,7 +34,7 @@ export type ManageableServiceProviderListEntry = BaseServiceProvider & {
   merkmale: Array<ServiceProviderMerkmal>;
   administrationsebene: { id: string; name: string; kennung?: string };
   rollen: Array<{ id: string; name: string }>;
-  hasRollenerweiterung: boolean;
+  rollenerweiterungen?: RollenerweiterungForManageableServiceProviderResponse[];
 };
 
 export type ManageableServiceProviderDetail = ManageableServiceProviderListEntry & {
@@ -72,7 +73,9 @@ type ServiceProviderState = {
   allServiceProviders: StartPageServiceProvider[];
   availableServiceProviders: StartPageServiceProvider[];
   manageableServiceProviders: ManageableServiceProviderListEntry[];
+  manageableServiceProvidersForOrganisation: ManageableServiceProviderListEntry[];
   totalManageableServiceProviders: number;
+  totalManageableServiceProvidersForOrganisation: number;
   currentServiceProvider: ManageableServiceProviderDetail | null;
   serviceProviderLogos: Map<string, string>;
   rollenerweiterungen: ProviderControllerFindRollenerweiterungenByServiceProviderId200Response | null;
@@ -87,6 +90,11 @@ type ServiceProviderActions = {
   getAllServiceProviders: () => Promise<void>;
   getAvailableServiceProviders: () => Promise<void>;
   getManageableServiceProviders: (page: number, entriesPerPage: number) => Promise<void>;
+  getManageableServiceProvidersForOrganisation: (
+    organisationId: string,
+    page: number,
+    entriesPerPage: number,
+  ) => Promise<void>;
   getManageableServiceProviderById: (serviceProviderId: string) => Promise<void>;
   getServiceProviderLogoById: (serviceProviderId: string) => Promise<void>;
   getRollenerweiterungenById: (filter: RollenerweiterungFilter) => Promise<void>;
@@ -113,7 +121,9 @@ export const useServiceProviderStore: StoreDefinition<
       allServiceProviders: [],
       availableServiceProviders: [],
       manageableServiceProviders: [],
+      manageableServiceProvidersForOrganisation: [],
       totalManageableServiceProviders: 0,
+      totalManageableServiceProvidersForOrganisation: 0,
       currentServiceProvider: null,
       serviceProviderLogos: new Map<string, string>(),
       rollenerweiterungen: null,
@@ -167,6 +177,28 @@ export const useServiceProviderStore: StoreDefinition<
       }
     },
 
+    async getManageableServiceProvidersForOrganisation(organisationId: string, page: number, entriesPerPage: number) {
+      this.loading = true;
+      try {
+        const limit: number = entriesPerPage;
+        const offset: number = (page - 1) * entriesPerPage;
+        const response: ProviderControllerGetManageableServiceProviders200Response = (
+          await serviceProviderApi.providerControllerGetManageableServiceProvidersForOrganisationId(
+            organisationId,
+            offset,
+            limit,
+          )
+        ).data;
+        const { items, total }: ProviderControllerGetManageableServiceProviders200Response = response;
+        this.manageableServiceProvidersForOrganisation = items;
+        this.totalManageableServiceProvidersForOrganisation = total;
+      } catch (error: unknown) {
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+      } finally {
+        this.loading = false;
+      }
+    },
+
     async getManageableServiceProviderById(serviceProviderId: string) {
       this.loading = true;
       try {
@@ -205,6 +237,7 @@ export const useServiceProviderStore: StoreDefinition<
         this.serviceProviderLogos.set(serviceProviderId, logoUrl);
       } catch (error: unknown) {
         // Just log that the logo failed to load because there is a fallback logo in the UI
+        // eslint-disable-next-line no-console
         console.warn(`Failed to load logo for service provider ${serviceProviderId}:`, error);
       } finally {
         this.loading = false;

@@ -16,6 +16,10 @@ describe('SearchFilterStore', () => {
     expect(searchFilterStore.selectedOrganisationen).toEqual([]);
     expect(searchFilterStore.selectedRollenObjects).toEqual([]);
     expect(searchFilterStore.searchFilterPersonen).toEqual('');
+    expect(searchFilterStore.searchFilterSchulen).toEqual('');
+    expect(searchFilterStore.selectedSchuleForKlassen).toEqual(null);
+    expect(searchFilterStore.selectedKlassenForKlassen).toEqual([]);
+    expect(searchFilterStore.selectedSchuleForSchulischeServiceProvider).toEqual(null);
   });
 
   it('should change the state', () => {
@@ -55,5 +59,8 @@ describe('SearchFilterStore', () => {
     // it sets the selectedKlassenForKlassen
     searchFilterStore.setKlasseFilterForKlassen(['10', '20']);
     expect(searchFilterStore.selectedKlassenForKlassen).toEqual(['10', '20']);
+
+    searchFilterStore.setSchuleForSchulischeServiceProvider('10');
+    expect(searchFilterStore.selectedSchuleForSchulischeServiceProvider).toEqual('10');
   });
 });
