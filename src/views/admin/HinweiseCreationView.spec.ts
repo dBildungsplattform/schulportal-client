@@ -11,7 +11,6 @@ import routes from '@/router/routes';
 import { nextTick, type Component } from 'vue';
 import { MeldungStatus, useMeldungStore, type MeldungStore } from '@/stores/MeldungStore';
 import HinweiseManagementView from './HinweiseCreationView.vue';
-import type Module from 'module';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -161,8 +160,8 @@ describe('HinweiseCreationView', () => {
     test('triggers unsaved changes dialog when form is dirty', async () => {
       const expectedCallsToNext: number = 0;
       // Mock onBeforeRouteLeave to capture the callback
-      vi.mock('vue-router', async (importOriginal: () => Promise<Module>) => {
-        const mod: Module = await importOriginal();
+      vi.mock('vue-router', async (importOriginal: () => Promise<object>) => {
+        const mod: object = await importOriginal();
         return {
           ...mod,
           onBeforeRouteLeave: vi.fn((actualCallback: OnBeforeRouteLeaveCallback) => {

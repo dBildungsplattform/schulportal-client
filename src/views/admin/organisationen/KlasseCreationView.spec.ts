@@ -2,7 +2,6 @@ import type { OrganisationResponse } from '@/api-client/generated';
 import routes from '@/router/routes';
 import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
-import type Module from 'module';
 import { beforeEach, describe, expect, test, vi, type Mock, type MockInstance } from 'vitest';
 import { nextTick, type Component } from 'vue';
 import {
@@ -179,8 +178,8 @@ describe('KlasseCreationView', () => {
 
     test('it triggers if form is dirty', async () => {
       const expectedCallsToNext: number = 0;
-      vi.mock('vue-router', async (importOriginal: () => Promise<Module>) => {
-        const mod: Module = await importOriginal();
+      vi.mock('vue-router', async (importOriginal: () => Promise<object>) => {
+        const mod: object = await importOriginal();
         return {
           ...mod,
           onBeforeRouteLeave: vi.fn((actualCallback: OnBeforeRouteLeaveCallback) => {
@@ -207,8 +206,8 @@ describe('KlasseCreationView', () => {
 
     test('it does not trigger if form is not dirty', () => {
       const expectedCallsToNext: number = 1;
-      vi.mock('vue-router', async (importOriginal: () => Promise<Module>) => {
-        const mod: Module = await importOriginal();
+      vi.mock('vue-router', async (importOriginal: () => Promise<object>) => {
+        const mod: object = await importOriginal();
         return {
           ...mod,
           onBeforeRouteLeave: vi.fn((actualCallback: OnBeforeRouteLeaveCallback) => {

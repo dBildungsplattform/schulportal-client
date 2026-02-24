@@ -17,7 +17,6 @@ import {
   type OrganisationStore,
 } from '@/stores/OrganisationStore';
 import SchultraegerDetailsView from './SchultraegerDetailsView.vue';
-import type Module from 'module';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -524,8 +523,8 @@ describe('SchultraegerDetailsView', () => {
 
     test('it triggers if form is dirty', async () => {
       const expectedCallsToNext: number = 0;
-      vi.mock('vue-router', async (importOriginal: () => Promise<Module>) => {
-        const mod: Module = await importOriginal();
+      vi.mock('vue-router', async (importOriginal: () => Promise<object>) => {
+        const mod: object = await importOriginal();
         return {
           ...mod,
           onBeforeRouteLeave: vi.fn((actualCallback: OnBeforeRouteLeaveCallback) => {
@@ -553,8 +552,8 @@ describe('SchultraegerDetailsView', () => {
 
     test('it does not trigger if form is not dirty', () => {
       const expectedCallsToNext: number = 1;
-      vi.mock('vue-router', async (importOriginal: () => Promise<Module>) => {
-        const mod: Module = await importOriginal();
+      vi.mock('vue-router', async (importOriginal: () => Promise<object>) => {
+        const mod: object = await importOriginal();
         return {
           ...mod,
           onBeforeRouteLeave: vi.fn((actualCallback: OnBeforeRouteLeaveCallback) => {

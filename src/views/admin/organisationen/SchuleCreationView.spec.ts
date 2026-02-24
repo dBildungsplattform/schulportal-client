@@ -17,7 +17,6 @@ import {
   type OrganisationStore,
 } from '@/stores/OrganisationStore';
 import type { OrganisationResponse } from '@/api-client/generated';
-import type Module from 'module';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -193,8 +192,8 @@ describe('SchuleCreationView', () => {
 
     test('it triggers if form is dirty', async () => {
       const expectedCallsToNext: number = 0;
-      vi.mock('vue-router', async (importOriginal: () => Promise<Module>) => {
-        const mod: Module = await importOriginal();
+      vi.mock('vue-router', async (importOriginal: () => Promise<object>) => {
+        const mod: object = await importOriginal();
         return {
           ...mod,
           onBeforeRouteLeave: vi.fn((actualCallback: OnBeforeRouteLeaveCallback) => {
@@ -223,8 +222,8 @@ describe('SchuleCreationView', () => {
 
     test('it does not trigger if form is not dirty', () => {
       const expectedCallsToNext: number = 1;
-      vi.mock('vue-router', async (importOriginal: () => Promise<Module>) => {
-        const mod: Module = await importOriginal();
+      vi.mock('vue-router', async (importOriginal: () => Promise<object>) => {
+        const mod: object = await importOriginal();
         return {
           ...mod,
           onBeforeRouteLeave: vi.fn((actualCallback: OnBeforeRouteLeaveCallback) => {

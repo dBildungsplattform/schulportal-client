@@ -223,6 +223,7 @@ describe('PersonBulkChangeKlasse', () => {
 
     test('clicking the close-button should reset the bulkOperationStore', async () => {
       const spy: MockInstance = vi.spyOn(bulkOperationStore, 'resetState');
+      spy.mockClear(); // clear mock call from setup
       const wrapper: VueWrapper = mountComponent() as VueWrapper;
       await nextTick();
 

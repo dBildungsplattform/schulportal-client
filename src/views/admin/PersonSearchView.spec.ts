@@ -1,7 +1,6 @@
 import routes from '@/router/routes';
 import { usePersonStore, type PersonLandesbediensteterSearchResponse, type PersonStore } from '@/stores/PersonStore';
 import { DOMWrapper, VueWrapper, flushPromises, mount } from '@vue/test-utils';
-import type Module from 'module';
 import { DoFactory } from 'test/DoFactory';
 import { expect, test, type Mock, type MockInstance } from 'vitest';
 import { nextTick, type Component } from 'vue';
@@ -467,8 +466,8 @@ describe('PersonSearchView', () => {
       const expectedCallsToNext: number = 0;
 
       // Mock onBeforeRouteLeave to capture the callback
-      vi.mock('vue-router', async (importOriginal: () => Promise<Module>) => {
-        const mod: Module = await importOriginal();
+      vi.mock('vue-router', async (importOriginal: () => Promise<object>) => {
+        const mod: object = await importOriginal();
         return {
           ...mod,
           onBeforeRouteLeave: vi.fn((actualCallback: OnBeforeRouteLeaveCallback) => {
@@ -502,8 +501,8 @@ describe('PersonSearchView', () => {
 
     test('allows navigation when form is clean', async () => {
       // Mock onBeforeRouteLeave
-      vi.mock('vue-router', async (importOriginal: () => Promise<Module>) => {
-        const mod: Module = await importOriginal();
+      vi.mock('vue-router', async (importOriginal: () => Promise<object>) => {
+        const mod: object = await importOriginal();
         return {
           ...mod,
           onBeforeRouteLeave: vi.fn((actualCallback: OnBeforeRouteLeaveCallback) => {
