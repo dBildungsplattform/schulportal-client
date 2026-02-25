@@ -31,6 +31,7 @@ import {
   type RouteLocationNormalized,
   type Router,
 } from 'vue-router';
+import { noop } from 'vuetify/lib/util/helpers.mjs';
 import PersonCreationView from './PersonCreationView.vue';
 
 let wrapper: VueWrapper | null = null;
@@ -377,7 +378,7 @@ describe('PersonCreationView', () => {
     const rolleSelect: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'rollen-select' });
-    await rolleSelect?.setValue('1');
+    await rolleSelect?.setValue(['1']);
     await nextTick();
 
     // Get the BefristungInput component
@@ -406,7 +407,7 @@ describe('PersonCreationView', () => {
     const rolleSelect: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'rollen-select' });
-    await rolleSelect?.setValue('1');
+    await rolleSelect?.setValue(['1']);
     await nextTick();
 
     // Get the BefristungInput component
@@ -798,6 +799,7 @@ describe('PersonCreationView', () => {
     test('it handles unloading', () => {
       const event: Event = new Event('beforeunload');
       const spy: MockInstance = vi.spyOn(event, 'preventDefault');
+      spy.mockClear();
       window.dispatchEvent(event);
       // TODO: why is spy called 12 times?
       // if (isFormDirty) expect(spy).toHaveBeenCalledOnce();
@@ -826,9 +828,14 @@ describe('PersonCreationView', () => {
       personenkontextStore.errorCode = 'REQUIRED_STEP_UP_LEVEL_NOT_MET';
       await nextTick();
 
+      const push: MockInstance = vi.spyOn(router, 'push');
+      vi.spyOn(router, 'go').mockImplementationOnce(noop);
       expect(wrapper?.find('[data-testid$="alert-title"]').isVisible()).toBe(true);
 
       wrapper?.find('[data-testid$="alert-button"]').trigger('click');
+      await nextTick();
+
+      expect(push).toHaveBeenCalledTimes(1);
       await nextTick();
 
       personenkontextStore.errorCode = '';

@@ -293,7 +293,9 @@ describe('serviceProviderStore', () => {
         }),
       };
 
-      vi.spyOn(globalThis, 'FileReader').mockImplementation(() => mockReader as unknown as FileReader);
+      vi.spyOn(globalThis, 'FileReader').mockImplementation(function () {
+        return mockReader as unknown as FileReader;
+      });
 
       const mockBlob: Blob = new Blob(['mock image data'], { type: 'image/png' });
       mockadapter
