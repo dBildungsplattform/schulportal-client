@@ -505,7 +505,7 @@ describe('PersonCreationView', () => {
     await kopersInput?.setValue('23234');
     await nextTick();
 
-    wrapper?.find('[data-testid="person-creation-form-submit-button"]').trigger('click');
+    await wrapper?.find('[data-testid="person-creation-form-submit-button"]').trigger('click');
     await nextTick();
     await flushPromises();
 
@@ -586,7 +586,7 @@ describe('PersonCreationView', () => {
     await kopersInput?.setValue('23234');
     await nextTick();
 
-    wrapper?.find('[data-testid="person-creation-form-submit-button"]').trigger('click');
+   await wrapper?.find('[data-testid="person-creation-form-submit-button"]').trigger('click');
     await nextTick();
     await flushPromises();
 
@@ -614,7 +614,7 @@ describe('PersonCreationView', () => {
 
     personenkontextStore.createdPersonWithKontext = mockCreatedPersonWithKontext;
 
-    wrapper?.find('[data-testid="person-creation-form-submit-button"]').trigger('click');
+    await wrapper?.find('[data-testid="person-creation-form-submit-button"]').trigger('click');
     await flushPromises();
 
     // Form is resetting after submit so orga should be undefined
@@ -632,9 +632,9 @@ describe('PersonCreationView', () => {
 
     expect(wrapper?.find('[data-testid="create-another-person-button"]').isVisible()).toBe(true);
 
-    wrapper?.find('[data-testid="create-another-person-button"]').trigger('click');
+    await wrapper?.find('[data-testid="create-another-person-button"]').trigger('click');
 
-    expect(wrapper?.find('[data-testid="person-success-text"]').isVisible()).toBe(true);
+    expect(wrapper?.find('[data-testid="person-success-text"]').exists()).toBe(false);
   });
 
   test('it fills form for Landesbediensteter, triggers submit and then shows success template', async () => {
@@ -673,7 +673,7 @@ describe('PersonCreationView', () => {
     await rollenSelect.setValue([rolleId]);
     await nextTick();
 
-    wrapper.find('[data-testid="person-creation-form-submit-button"]').trigger('click');
+    await wrapper.find('[data-testid="person-creation-form-submit-button"]').trigger('click');
     await nextTick();
     await flushPromises();
 
@@ -707,9 +707,9 @@ describe('PersonCreationView', () => {
 
     expect(wrapper.find('[data-testid="search-another-state-employee-button"]').isVisible()).toBe(true);
 
-    wrapper.find('[data-testid="search-another-state-employee-button"]').trigger('click');
+    await wrapper.find('[data-testid="search-another-state-employee-button"]').trigger('click');
 
-    expect(wrapper.find('[data-testid="state-employee-success-text"]').isVisible()).toBe(true);
+    expect(wrapper.find('[data-testid="state-employee-success-text"]').exists()).toBe(false);
   });
 
   test('it navigates to person details when clicking on btn in success template', async () => {
@@ -718,7 +718,7 @@ describe('PersonCreationView', () => {
     expect(wrapper?.find('[data-testid="go-to-details-button"]').isVisible()).toBe(true);
 
     const push: MockInstance = vi.spyOn(router, 'push');
-    wrapper?.find('[data-testid="go-to-details-button"]').trigger('click');
+    await wrapper?.find('[data-testid="go-to-details-button"]').trigger('click');
     await nextTick();
     expect(push).toHaveBeenCalledWith({ name: 'person-details', params: { id: '1' } });
   });
@@ -817,7 +817,7 @@ describe('PersonCreationView', () => {
       await nextTick();
 
       const push: MockInstance = vi.spyOn(router, 'push');
-      wrapper?.find('[data-testid$="alert-button"]').trigger('click');
+      await wrapper?.find('[data-testid$="alert-button"]').trigger('click');
       await nextTick();
 
       expect(push).toHaveBeenCalledTimes(1);
@@ -832,7 +832,7 @@ describe('PersonCreationView', () => {
       vi.spyOn(router, 'go').mockImplementationOnce(noop);
       expect(wrapper?.find('[data-testid$="alert-title"]').isVisible()).toBe(true);
 
-      wrapper?.find('[data-testid$="alert-button"]').trigger('click');
+      await wrapper?.find('[data-testid$="alert-button"]').trigger('click');
       await nextTick();
 
       expect(push).toHaveBeenCalledTimes(1);

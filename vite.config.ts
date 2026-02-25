@@ -11,26 +11,12 @@ export default defineConfig({
     // Disable inlining of assets
     assetsInlineLimit: 0,
   },
-  css: {
-    preprocessorOptions: {
-      scss: {
-        api: 'modern-compiler',
-      },
-      sass: {
-        api: 'modern-compiler',
-      },
-    },
-  },
   define: {
     /* disable hydration mismatch details in production build */
     __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'false',
   },
   plugins: [
-    VueI18nPlugin({
-      /* we have to enable jit compilation to use i18n interpolation without violating the CSP
-         https://github.com/intlify/vue-i18n-next/issues/1059#issuecomment-1646097462 */
-      jitCompilation: true,
-    }),
+    VueI18nPlugin(),
     vue(),
     vuetify({
       styles: {
