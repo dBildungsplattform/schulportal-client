@@ -6,7 +6,7 @@
   "type": "module",
   "license": "EUPL-1.2",
   "scripts": {
-    "build": "type-check && build-only",
+    "build": "npm run type-check && npm run build-only",
     "build-only": "vite build",
     "coverage": "vitest run --coverage",
     "dev": "vite",
