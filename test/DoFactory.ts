@@ -444,7 +444,7 @@ export class DoFactory {
       rollen: [{ id: faker.string.uuid(), name: faker.person.jobTitle() }],
       requires2fa: faker.datatype.boolean(),
       merkmale: [],
-      hasRollenerweiterung: faker.datatype.boolean(),
+      rollenerweiterungen: [],
       ...props,
     };
   }

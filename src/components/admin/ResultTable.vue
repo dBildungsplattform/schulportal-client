@@ -29,6 +29,7 @@
     // This prop is necessary so the parent component can decide which items should be de-selected after the filters have been used.
     modelValue?: TableItem[];
     hideSelect?: boolean;
+    noDataText?: string;
   };
 
   const props: Props = defineProps<Props>();
@@ -174,7 +175,7 @@
     :show-current-page="true"
     :show-select="!hideSelect"
     :sort-by="currentSort ? [currentSort] : []"
-    :no-data-text="'noDataFound'"
+    :no-data-text="noDataText ?? 'noDataFound'"
     @click:row="handleRowClick"
     @update:sort-by="onUpdateOptions"
     @update:page="(page: number) => $emit('onPageUpdate', page)"

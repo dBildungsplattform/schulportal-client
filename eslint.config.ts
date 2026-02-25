@@ -81,7 +81,7 @@ const rules: Partial<Linter.RulesRecord> = {
 };
 
 export default defineConfig(
-    globalIgnores(['eslint.config.ts', '.prettierrc.cjs', 'dist/*', 'node_modules/*', 'coverage/*']),
+    globalIgnores(['eslint.config.ts', '.prettierrc.cjs', 'dist/*', 'node_modules/*', 'coverage/*', 'src/api-client/generated/**/*']),
     {
         name: 'ts-config',
         extends: [
@@ -102,7 +102,7 @@ export default defineConfig(
             },
         },
         files: ['**/*.vue', '**/*.js', '**/*.jsx', '**/*.cjs', '**/*.mjs', '**/*.ts', '**/*.tsx', '**/*.cts', '**/*.mts'],
-        ignores: ['test-migrations/**/*.ts', 'migrations/**/*.ts'],
+        ignores: ['test-migrations/**/*.ts', 'migrations/**/*.ts', 'src/api-client/openapi/**'],
         rules: rules,
     },
     // {
