@@ -206,7 +206,8 @@ let { storedBeforeRouteLeaveCallback }: { storedBeforeRouteLeaveCallback: OnBefo
   },
 );
 
-function mountComponent(): ReturnType<typeof mount<typeof PersonCreationView>> {
+async function mountComponent(): Promise<ReturnType<typeof mount<typeof PersonCreationView>>> {
+  await vi.dynamicImportSettled();
   return mount(PersonCreationView, {
     attachTo: document.getElementById('app') || '',
     global: {
@@ -323,7 +324,7 @@ beforeEach(async () => {
   router.push('/');
   await router.isReady();
 
-  wrapper = mountComponent();
+  wrapper = await mountComponent();
   personStore.errorCode = '';
   personenkontextStore.errorCode = '';
   personenkontextStore.createdPersonWithKontext = null;
@@ -586,7 +587,7 @@ describe('PersonCreationView', () => {
     await kopersInput?.setValue('23234');
     await nextTick();
 
-   await wrapper?.find('[data-testid="person-creation-form-submit-button"]').trigger('click');
+    await wrapper?.find('[data-testid="person-creation-form-submit-button"]').trigger('click');
     await nextTick();
     await flushPromises();
 
@@ -648,7 +649,7 @@ describe('PersonCreationView', () => {
     await router.push({ name: 'add-person-to-own-schule' });
     await router.isReady();
 
-    wrapper = mountComponent();
+    wrapper = await mountComponent();
     await nextTick();
     personenkontextStore.workflowStepResponse = DoFactory.getPersonenkontextWorkflowResponse({
       organisations: [
@@ -697,7 +698,7 @@ describe('PersonCreationView', () => {
     await router.push({ name: 'add-person-to-own-schule' });
     await router.isReady();
 
-    wrapper = mountComponent();
+    wrapper = await mountComponent();
 
     await nextTick();
     personenkontextStore.landesbediensteteCommitResponse = mockLandesbediensteteCommitResponse;
@@ -740,7 +741,7 @@ describe('PersonCreationView', () => {
         };
       });
 
-      wrapper = mountComponent();
+      wrapper = await mountComponent();
       await fillForm({
         organisationsebene: '9876',
         rollen: ['1'],
@@ -762,7 +763,7 @@ describe('PersonCreationView', () => {
       expect(spy).toHaveBeenCalledOnce();
     });
 
-    test('it does not trigger if form is not dirty', () => {
+    test('it does not trigger if form is not dirty', async () => {
       // autoselected orgnisation doesnt count as dirty
       const expectedCallsToNext: number = 1;
       vi.mock('vue-router', async (importOriginal: () => Promise<object>) => {
@@ -774,7 +775,7 @@ describe('PersonCreationView', () => {
           }),
         };
       });
-      wrapper = mountComponent();
+      wrapper = await mountComponent();
       const spy: Mock = vi.fn();
       storedBeforeRouteLeaveCallback({} as RouteLocationNormalized, {} as RouteLocationNormalized, spy);
       expect(spy).toHaveBeenCalledTimes(expectedCallsToNext);

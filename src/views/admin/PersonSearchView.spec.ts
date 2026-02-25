@@ -36,7 +36,8 @@ let { storedBeforeRouteLeaveCallback }: { storedBeforeRouteLeaveCallback: OnBefo
   },
 );
 
-function mountComponent(): VueWrapper<InstanceType<typeof PersonSearchView>> {
+async function mountComponent(): Promise<VueWrapper<InstanceType<typeof PersonSearchView>>> {
+  await vi.dynamicImportSettled();
   return mount(PersonSearchView, {
     attachTo: document.getElementById('app') || '',
     global: {
@@ -99,7 +100,7 @@ describe('PersonSearchView', () => {
     router.push({ name: 'search-person-limited' });
     await router.isReady();
 
-    wrapper = mountComponent();
+    wrapper = await mountComponent();
     vi.restoreAllMocks();
   });
 
@@ -477,7 +478,7 @@ describe('PersonSearchView', () => {
       });
 
       // Remount the component
-      wrapper = mountComponent();
+      wrapper = await mountComponent();
       await nextTick();
 
       // Fill the form to make it dirty
@@ -511,7 +512,7 @@ describe('PersonSearchView', () => {
         };
       });
 
-      wrapper = mountComponent();
+      wrapper = await mountComponent();
       await nextTick();
 
       // Don't fill any form fields
@@ -523,11 +524,11 @@ describe('PersonSearchView', () => {
     });
   });
 
-  test('it sets up and removes beforeunload event listener', () => {
+  test('it sets up and removes beforeunload event listener', async () => {
     const addEventListener: MockInstance = vi.spyOn(window, 'addEventListener');
     const removeEventListener: MockInstance = vi.spyOn(window, 'removeEventListener');
 
-    wrapper = mountComponent();
+    wrapper = await mountComponent();
 
     // Should add event listener on mount
     expect(addEventListener).toHaveBeenCalledWith('beforeunload', expect.any(Function));

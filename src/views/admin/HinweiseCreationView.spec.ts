@@ -35,7 +35,8 @@ let { storedBeforeRouteLeaveCallback }: { storedBeforeRouteLeaveCallback: OnBefo
   },
 );
 
-function mountComponent(): ReturnType<typeof mount<typeof HinweiseManagementView>> {
+async function mountComponent(): Promise<ReturnType<typeof mount<typeof HinweiseManagementView>>> {
+  await vi.dynamicImportSettled();
   return mount(HinweiseManagementView, {
     attachTo: document.getElementById('app') || '',
     global: {
@@ -91,7 +92,7 @@ describe('HinweiseCreationView', () => {
     router.push({ name: 'hinweise-creation' });
     await router.isReady();
 
-    wrapper = mountComponent();
+    wrapper = await mountComponent();
     vi.restoreAllMocks();
   });
 
@@ -117,7 +118,7 @@ describe('HinweiseCreationView', () => {
   });
 
   test('it fills form and triggers submit', async () => {
-    wrapper = mountComponent();
+    wrapper = await mountComponent();
     meldungStore.createOrUpdateMeldung = vi.fn().mockResolvedValue(undefined);
     meldungStore.getAllMeldungen = vi.fn().mockResolvedValue(undefined);
 
@@ -171,7 +172,7 @@ describe('HinweiseCreationView', () => {
       });
 
       // Remount the component to make sure the form is empty at first
-      wrapper = mountComponent();
+      wrapper = await mountComponent();
       await nextTick();
 
       // Fill the form to make it dirty

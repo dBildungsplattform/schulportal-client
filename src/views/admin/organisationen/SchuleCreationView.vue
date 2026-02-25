@@ -60,7 +60,7 @@
   };
 
   // eslint-disable-next-line @typescript-eslint/typedef
-  const { defineField, handleSubmit, isFieldDirty, resetForm } = useForm<SchuleCreationForm>({
+  const { defineField, handleSubmit, isFieldDirty, resetForm, isFieldTouched } = useForm<SchuleCreationForm>({
     validationSchema,
   });
 
@@ -83,7 +83,7 @@
 
   function isFormDirty(): boolean {
     return (
-      isFieldDirty('selectedSchulform') ||
+      (isFieldDirty('selectedSchulform') && isFieldTouched('selectedSchulform')) ||
       isFieldDirty('selectedSchulname') ||
       isFieldDirty('selectedDienststellennummer')
     );

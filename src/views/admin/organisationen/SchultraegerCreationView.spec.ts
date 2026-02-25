@@ -36,7 +36,8 @@ let { storedBeforeRouteLeaveCallback }: { storedBeforeRouteLeaveCallback: OnBefo
   },
 );
 
-function mountComponent(): ReturnType<typeof mount<typeof SchultraegerCreationView>> {
+async function mountComponent(): Promise<ReturnType<typeof mount<typeof SchultraegerCreationView>>> {
+  await vi.dynamicImportSettled();
   return mount(SchultraegerCreationView, {
     attachTo: document.getElementById('app') || '',
     global: {
@@ -104,7 +105,7 @@ beforeEach(async () => {
   router.push({ name: 'create-schultraeger' });
   await router.isReady();
 
-  wrapper = mountComponent();
+  wrapper = await mountComponent();
 });
 
 afterEach(() => {
@@ -204,7 +205,7 @@ describe('SchultraegerCreationView', () => {
       });
 
       // Remount the component to make sure the form is empty at first
-      wrapper = mountComponent();
+      wrapper = await mountComponent();
       await nextTick();
 
       // Fill the form to make it dirty

@@ -66,7 +66,8 @@ async function fillForm(args: Partial<FormFields>): Promise<Partial<FormSelector
   return selectors;
 }
 
-function mountComponent(): ReturnType<typeof mount<typeof SchultraegerDetailsView>> {
+async function mountComponent(): Promise<ReturnType<typeof mount<typeof SchultraegerDetailsView>>> {
+  await vi.dynamicImportSettled();
   return mount(SchultraegerDetailsView, {
     attachTo: document.getElementById('app') || '',
     global: {
@@ -217,7 +218,7 @@ beforeEach(async () => {
   router.push({ name: 'schultraeger-details', params: { id: '2' } });
   await router.isReady();
 
-  wrapper = mountComponent();
+  wrapper = await mountComponent();
 });
 
 afterEach(() => {
@@ -533,7 +534,7 @@ describe('SchultraegerDetailsView', () => {
         };
       });
 
-      wrapper = mountComponent();
+      wrapper = await mountComponent();
       await fillForm({
         schultraegerName: 'Traeger 1',
       });
@@ -550,7 +551,7 @@ describe('SchultraegerDetailsView', () => {
       expect(spy).toHaveBeenCalledOnce();
     });
 
-    test('it does not trigger if form is not dirty', () => {
+    test('it does not trigger if form is not dirty', async () => {
       const expectedCallsToNext: number = 1;
       vi.mock('vue-router', async (importOriginal: () => Promise<object>) => {
         const mod: object = await importOriginal();
@@ -561,7 +562,7 @@ describe('SchultraegerDetailsView', () => {
           }),
         };
       });
-      wrapper = mountComponent();
+      wrapper = await mountComponent();
       const spy: Mock = vi.fn();
       storedBeforeRouteLeaveCallback({} as RouteLocationNormalized, {} as RouteLocationNormalized, spy);
       expect(spy).toHaveBeenCalledTimes(expectedCallsToNext);
