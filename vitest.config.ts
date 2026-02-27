@@ -7,11 +7,7 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   plugins: [
-    VueI18nPlugin({
-      /* we have to enable jit compilation to use i18n interpolation without violating the CSP
-         https://github.com/intlify/vue-i18n-next/issues/1059#issuecomment-1646097462 */
-      jitCompilation: true,
-    }),
+    VueI18nPlugin(),
     vue(),
     vuetify({
       styles: {
