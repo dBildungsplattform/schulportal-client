@@ -595,7 +595,7 @@
       selectedRollenObjects.value = searchFilterStore.selectedRollenObjects;
     }
 
-    await getPaginatedPersonen(searchFilterStore.personenPage); // now includes the school
+    await getPaginatedPersonen(searchFilterStore.personenPage);
     await personenkontextStore.getPersonenkontextRolleWithFilter('', 25, selectedOrganisationIds.value);
   });
 </script>
