@@ -119,8 +119,8 @@
   const searchFilter: Ref<string> = ref('');
 
   const selectedRollenObjects: Ref<RolleResponse[]> = ref([]);
-  const sortField: Ref<string | null> = ref(null);
-  const sortOrder: Ref<SortOrder | null> = ref(null);
+  const sortField: Ref<string | null> = ref(SortField.Familienname);
+  const sortOrder: Ref<SortOrder | null> = ref(SortOrder.Asc);
 
   const rolleModifiyDialogVisible: Ref<boolean> = ref(false);
   const benutzerDeleteDialogVisible: Ref<boolean> = ref(false);
@@ -379,21 +379,26 @@
 
   // Triggers sorting for the selected column
   function handleTableSorting(update: { sortField: string | undefined; sortOrder: 'asc' | 'desc' }): void {
+    const mappedField: string | null = update.sortField ? mapKeyToBackend(update.sortField) : sortField.value;
+    const mappedOrder: SortOrder = update.sortOrder as SortOrder;
+
+    // Skip if nothing actually changed (e.g. table emitting its default sort on mount)
+    if (mappedField === searchFilterStore.personenSortField && mappedOrder === searchFilterStore.personenSortOrder) {
+      return;
+    }
+
     if (update.sortField) {
-      sortField.value = mapKeyToBackend(update.sortField);
+      sortField.value = mappedField;
       searchFilterStore.currentSort = {
         key: update.sortField,
         order: update.sortOrder,
       };
     }
 
-    sortOrder.value = update.sortOrder as SortOrder;
-
-    // Save the sorting values in the store
+    sortOrder.value = mappedOrder;
     searchFilterStore.personenSortField = sortField.value;
     searchFilterStore.personenSortOrder = sortOrder.value;
 
-    // Fetch the sorted data
     getPaginatedPersonen(searchFilterStore.personenPage);
   }
 
@@ -588,11 +593,9 @@
       selectedRollen.value = searchFilterStore.selectedRollen || [];
       selectedKlassen.value = searchFilterStore.selectedKlassen || [];
       selectedRollenObjects.value = searchFilterStore.selectedRollenObjects;
-      // We should apply the search filter if the store for it holds a value, otherwise the values will show as UUIDs...
-      await applySearchAndFilters();
     }
 
-    await getPaginatedPersonen(searchFilterStore.personenPage);
+    await getPaginatedPersonen(searchFilterStore.personenPage); // now includes the school
     await personenkontextStore.getPersonenkontextRolleWithFilter('', 25, selectedOrganisationIds.value);
   });
 </script>

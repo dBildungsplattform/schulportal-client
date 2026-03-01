@@ -1,7 +1,8 @@
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import type { RolleResponse } from './RolleStore';
-import type { SortOrder, OrganisationSortField } from '@/utils/sorting';
+import { SortOrder, type OrganisationSortField } from '@/utils/sorting';
 import type { Organisation } from './OrganisationStore';
+import { SortField } from './PersonStore';
 
 type SearchFilterState = {
   klassenPage: number;
@@ -83,11 +84,11 @@ export const useSearchFilterStore: StoreDefinition<
     selectedRollenObjects: [],
     selectedOrganisationen: [],
     selectedOrgaObjects: [],
-    personenSortField: null,
-    personenSortOrder: null,
+    personenSortField: SortField.Familienname,
+    personenSortOrder: SortOrder.Asc,
     organisationenSortField: null,
     organisationenSortOrder: null,
-    currentSort: null,
+    currentSort: { key: SortField.Familienname, order: SortOrder.Asc },
     selectedSchuleForKlassen: null,
     selectedKlassenForKlassen: [],
     selectedSchuleForSchulischeServiceProvider: null,
