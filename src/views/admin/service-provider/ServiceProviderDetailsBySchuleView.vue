@@ -21,13 +21,13 @@
 
   const currentServiceProviderId: string = route.params['id'] as string;
 
-  function navigateToServiceProviderTable(): void {
+  function navigateToServiceProviderBySchuleTable(): void {
     router.push({ name: 'angebot-management-schulspezifisch' });
   }
 
   const handleAlertClose = (): void => {
     serviceProviderStore.errorCode = '';
-    navigateToServiceProviderTable();
+    navigateToServiceProviderBySchuleTable();
   };
 
   // Default for now - in the future when Edit functionality is added, this will have more error codes as cases to handle accordingly
@@ -41,7 +41,7 @@
   const alertButtonActionKopers: ComputedRef<() => void> = computed(() => {
     switch (serviceProviderStore.errorCode) {
       default:
-        return navigateToServiceProviderTable;
+        return navigateToServiceProviderBySchuleTable;
     }
   });
 
@@ -79,7 +79,7 @@
       data-testid="service-provider-details-by-schule-card"
       :header="`${t('admin.angebot.edit')} ${organisationStore.currentOrganisation?.name ?? ''}`"
       :header-hover-text="organisationStore.currentOrganisation?.name"
-      @onCloseClicked="navigateToServiceProviderTable"
+      @onCloseClicked="navigateToServiceProviderBySchuleTable"
       :padded="true"
       :showCloseText="true"
     >
