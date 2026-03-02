@@ -8,6 +8,7 @@ import { useServiceProviderStore, type ServiceProviderStore } from '@/stores/Ser
 import { DoFactory } from 'test/DoFactory';
 import type { Organisation } from '@/stores/OrganisationStore';
 import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
+import type { MockInstance } from 'vitest';
 
 let router: Router;
 const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
@@ -44,7 +45,7 @@ beforeEach(async () => {
   router.push('/');
   await router.isReady();
 
-  serviceProviderStore.manageableServiceProviders = [
+  serviceProviderStore.manageableServiceProvidersForOrganisation = [
     DoFactory.getManageableServiceProviderListEntryResponse(),
     DoFactory.getManageableServiceProviderListEntryResponse(),
   ];
@@ -102,5 +103,24 @@ describe('ServiceProviderManagementView', () => {
       .selectedOrganisationId;
 
     expect(selectedSchule).toBe('');
+  });
+
+  test('it routes to Service Provider details page', async () => {
+    const push: MockInstance = vi.spyOn(router, 'push');
+    const wrapper: VueWrapper = mountComponent() as VueWrapper;
+    await nextTick();
+
+    const schule: Organisation = DoFactory.getSchule();
+
+    const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ name: 'SchulenFilter' });
+    schuleAutocomplete?.vm.$emit('update:selectedSchulen', schule.id);
+    await nextTick();
+  
+    await flushPromises();
+
+    await wrapper?.find('.v-data-table__tr').trigger('click');
+    await nextTick();
+
+    expect(push).toHaveBeenCalledTimes(1);
   });
 });
