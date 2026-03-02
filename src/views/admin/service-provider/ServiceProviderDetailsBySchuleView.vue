@@ -56,6 +56,7 @@
     await Promise.all([
       serviceProviderStore.getManageableServiceProviderById(currentServiceProviderId),
       serviceProviderStore.getServiceProviderLogoById(currentServiceProviderId),
+      serviceProviderStore.getRollenerweiterungenById({ id: currentServiceProviderId }),
     ]);
 
     // Restore filter context if missing
@@ -75,7 +76,7 @@
     </h1>
     <LayoutCard
       :closable="!serviceProviderStore.errorCode"
-      data-testid="service-provider-details-card"
+      data-testid="service-provider-details-by-schule-card"
       :header="`${t('admin.angebot.edit')} ${organisationStore.currentOrganisation?.name ?? ''}`"
       :header-hover-text="organisationStore.currentOrganisation?.name"
       @onCloseClicked="navigateToServiceProviderTable"
@@ -227,27 +228,27 @@
                     cols="auto"
                     class="d-flex align-center pr-2"
                   >
-                    <span class="subtitle-2">{{ t('angebot.assignedRollen') }}:</span>
+                    <span class="subtitle-2">{{ t('angebot.erweiterteRollenAnDerSchule') }}:</span>
                   </v-col>
 
                   <v-col
                     class="d-flex align-center flex-wrap"
-                    data-testid="service-provider-rollen"
+                    data-testid="service-provider-rollenerweiterungen"
                   >
                     <span
                       class="text-body ml-n3"
-                      v-if="serviceProviderStore.currentServiceProvider.rollen.length === 0"
+                      v-if="serviceProviderStore.rollenerweiterungen?.items?.length === 0"
                       >{{ t('none') }}</span
                     >
                     <v-chip
                       else
-                      v-for="rolle in serviceProviderStore.currentServiceProvider.rollen"
-                      :key="rolle.id"
+                      v-for="rollenerweiterung in serviceProviderStore.rollenerweiterungen?.items"
+                      :key="rollenerweiterung.rolleName"
                       class="ma-1"
                       color="primary"
                       variant="tonal"
                     >
-                      {{ rolle.name }}
+                      {{ rollenerweiterung.rolleName }}
                     </v-chip>
                   </v-col>
                 </v-row>

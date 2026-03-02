@@ -14,7 +14,14 @@
   import SchulenFilter from '@/components/filter/SchulenFilter.vue';
   import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
   import { RollenSystemRecht } from '@/stores/RolleStore';
-  import { onBeforeRouteLeave, useRoute, useRouter, type LocationQueryValue, type Router } from 'vue-router';
+  import {
+    onBeforeRouteLeave,
+    useRoute,
+    useRouter,
+    type LocationQueryValue,
+    type RouteLocationNormalizedLoaded,
+    type Router,
+  } from 'vue-router';
   import { SortOrder } from '@/utils/sorting';
   import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
   import type { RollenerweiterungForManageableServiceProviderResponse } from '@/api-client/generated';
@@ -31,7 +38,7 @@
 
   const { t }: Composer = useI18n();
   const router: Router = useRouter();
-  const route = useRoute();
+  const route: RouteLocationNormalizedLoaded = useRoute();
 
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
@@ -109,7 +116,7 @@
         organisationStore.currentOrganisation = null;
       }
     },
-    { immediate: true }
+    { immediate: true },
   );
 
   function navigateToServiceProviderDetails(_$event: PointerEvent, { item }: { item: ServiceProviderRow }): void {
