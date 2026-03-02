@@ -131,7 +131,7 @@
 
                       <!-- Administrationsebene -->
                       <LabeledField
-                        :label="t('angebot.administrationsebene')"
+                        :label="t('angebot.providedBy')"
                         :value="serviceProviderStore.currentServiceProvider.administrationsebene.name"
                         test-id="service-provider-administrationsebene"
                         no-margin-top
