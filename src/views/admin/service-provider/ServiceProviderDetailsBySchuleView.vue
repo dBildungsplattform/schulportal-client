@@ -56,7 +56,10 @@
     await Promise.all([
       serviceProviderStore.getManageableServiceProviderById(currentServiceProviderId),
       serviceProviderStore.getServiceProviderLogoById(currentServiceProviderId),
-      serviceProviderStore.getRollenerweiterungenById({ id: currentServiceProviderId }),
+      serviceProviderStore.getRollenerweiterungenById({
+        serviceProviderId: currentServiceProviderId,
+        organisationId: organisationIdFromQuery.value,
+      }),
     ]);
 
     // Restore filter context if missing
