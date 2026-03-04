@@ -61,7 +61,7 @@
 
   async function fetchRollenerweiterungen(): Promise<void> {
     await serviceProviderStore.getRollenerweiterungenById({
-      id: currentServiceProviderId,
+      serviceProviderId: currentServiceProviderId,
       offset: (rollenerweiterungPage.value - 1) * rollenerweiterungPerPage.value,
       limit: rollenerweiterungPerPage.value,
     });

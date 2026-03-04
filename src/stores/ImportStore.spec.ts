@@ -253,7 +253,7 @@ describe('ImportStore', () => {
     describe('ImportStore stopImportStatusPolling', () => {
       it('should clear interval and delete pollingInterval when interval exists', () => {
         // Simulate an existing interval
-        const mockInterval: number = setInterval(() => {
+        const mockInterval: ReturnType<typeof setInterval> = setInterval(() => {
           // mock interval function
         }, 1000);
         importStore.pollingInterval = mockInterval;
