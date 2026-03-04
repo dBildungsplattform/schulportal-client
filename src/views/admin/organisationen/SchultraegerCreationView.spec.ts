@@ -12,7 +12,6 @@ import { nextTick, type Component } from 'vue';
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import type { OrganisationResponse } from '@/api-client/generated';
 import SchultraegerCreationView from './SchultraegerCreationView.vue';
-import type Module from 'module';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -37,7 +36,8 @@ let { storedBeforeRouteLeaveCallback }: { storedBeforeRouteLeaveCallback: OnBefo
   },
 );
 
-function mountComponent(): ReturnType<typeof mount<typeof SchultraegerCreationView>> {
+async function mountComponent(): Promise<ReturnType<typeof mount<typeof SchultraegerCreationView>>> {
+  await vi.dynamicImportSettled();
   return mount(SchultraegerCreationView, {
     attachTo: document.getElementById('app') || '',
     global: {
@@ -105,7 +105,7 @@ beforeEach(async () => {
   router.push({ name: 'create-schultraeger' });
   await router.isReady();
 
-  wrapper = mountComponent();
+  wrapper = await mountComponent();
 });
 
 afterEach(() => {
@@ -194,8 +194,8 @@ describe('SchultraegerCreationView', () => {
     test('triggers unsaved changes dialog when form is dirty', async () => {
       const expectedCallsToNext: number = 0;
       // Mock onBeforeRouteLeave to capture the callback
-      vi.mock('vue-router', async (importOriginal: () => Promise<Module>) => {
-        const mod: Module = await importOriginal();
+      vi.mock('vue-router', async (importOriginal: () => Promise<object>) => {
+        const mod: object = await importOriginal();
         return {
           ...mod,
           onBeforeRouteLeave: vi.fn((actualCallback: OnBeforeRouteLeaveCallback) => {
@@ -205,7 +205,7 @@ describe('SchultraegerCreationView', () => {
       });
 
       // Remount the component to make sure the form is empty at first
-      wrapper = mountComponent();
+      wrapper = await mountComponent();
       await nextTick();
 
       // Fill the form to make it dirty

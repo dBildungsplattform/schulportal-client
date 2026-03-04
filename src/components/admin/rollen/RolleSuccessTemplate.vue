@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { defineProps, defineEmits, type Ref } from 'vue';
+  import { type Ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
 
@@ -109,6 +109,7 @@
   .text-body {
     font-weight: normal;
   }
+
   .bold {
     font-weight: bold;
   }

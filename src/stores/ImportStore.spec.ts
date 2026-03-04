@@ -14,8 +14,8 @@ describe('ImportStore', () => {
 
     vi.useFakeTimers();
     // Mock setInterval and clearInterval to control timing
-    vi.spyOn(global, 'setInterval');
-    vi.spyOn(global, 'clearInterval');
+    vi.spyOn(globalThis, 'setInterval');
+    vi.spyOn(globalThis, 'clearInterval');
 
     // Reset the store state
     importStore.$reset();
@@ -253,7 +253,7 @@ describe('ImportStore', () => {
     describe('ImportStore stopImportStatusPolling', () => {
       it('should clear interval and delete pollingInterval when interval exists', () => {
         // Simulate an existing interval
-        const mockInterval: NodeJS.Timeout = setInterval(() => {
+        const mockInterval: number = setInterval(() => {
           // mock interval function
         }, 1000);
         importStore.pollingInterval = mockInterval;

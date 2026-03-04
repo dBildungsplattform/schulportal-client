@@ -8,7 +8,6 @@ import routes from '@/router/routes';
 import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
 import { RollenMerkmal, useRolleStore, type RolleResponse, type RolleStore } from '@/stores/RolleStore';
 import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
-import type Module from 'module';
 import { DoFactory } from 'test/DoFactory';
 import { expect, test, type Mock, type MockInstance } from 'vitest';
 import { nextTick, type Component } from 'vue';
@@ -49,7 +48,8 @@ let { storedBeforeRouteLeaveCallback }: { storedBeforeRouteLeaveCallback: OnBefo
   },
 );
 
-function mountComponent(): ReturnType<typeof mount<typeof RolleCreationView>> {
+async function mountComponent(): Promise<ReturnType<typeof mount<typeof RolleCreationView>>> {
+  await vi.dynamicImportSettled();
   return mount(RolleCreationView, {
     attachTo: document.getElementById('app') || '',
     global: {
@@ -163,7 +163,7 @@ beforeEach(async () => {
   router.push('/');
   await router.isReady();
 
-  wrapper = mountComponent();
+  wrapper = await mountComponent();
 
   personenkontextStore = usePersonenkontextStore();
   rolleStore.errorCode = '';
@@ -482,8 +482,8 @@ describe('RolleCreationView', () => {
     });
     test('triggers, if form is dirty', async () => {
       const expectedCallsToNext: number = 0;
-      vi.mock('vue-router', async (importOriginal: () => Promise<Module>) => {
-        const mod: Module = await importOriginal();
+      vi.mock('vue-router', async (importOriginal: () => Promise<object>) => {
+        const mod: object = await importOriginal();
         return {
           ...mod,
           onBeforeRouteLeave: vi.fn((actualCallback: OnBeforeRouteLeaveCallback) => {
@@ -491,7 +491,7 @@ describe('RolleCreationView', () => {
           }),
         };
       });
-      wrapper = mountComponent();
+      wrapper = await mountComponent();
       await fillForm({
         organisation: organisationObject.id,
         rollenart: 'LERN',
@@ -510,10 +510,10 @@ describe('RolleCreationView', () => {
       expect(spy).toHaveBeenCalledOnce();
     });
 
-    test('does not trigger, if form is not dirty', () => {
+    test('does not trigger, if form is not dirty', async () => {
       const expectedCallsToNext: number = 1;
-      vi.mock('vue-router', async (importOriginal: () => Promise<Module>) => {
-        const mod: Module = await importOriginal();
+      vi.mock('vue-router', async (importOriginal: () => Promise<object>) => {
+        const mod: object = await importOriginal();
         return {
           ...mod,
           onBeforeRouteLeave: vi.fn((actualCallback: OnBeforeRouteLeaveCallback) => {
@@ -521,7 +521,7 @@ describe('RolleCreationView', () => {
           }),
         };
       });
-      wrapper = mountComponent();
+      wrapper = await mountComponent();
       const spy: Mock = vi.fn();
       storedBeforeRouteLeaveCallback({} as RouteLocationNormalized, {} as RouteLocationNormalized, spy);
       expect(spy).toHaveBeenCalledTimes(expectedCallsToNext);

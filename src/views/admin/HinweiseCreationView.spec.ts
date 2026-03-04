@@ -11,7 +11,6 @@ import routes from '@/router/routes';
 import { nextTick, type Component } from 'vue';
 import { MeldungStatus, useMeldungStore, type MeldungStore } from '@/stores/MeldungStore';
 import HinweiseManagementView from './HinweiseCreationView.vue';
-import type Module from 'module';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -36,7 +35,8 @@ let { storedBeforeRouteLeaveCallback }: { storedBeforeRouteLeaveCallback: OnBefo
   },
 );
 
-function mountComponent(): ReturnType<typeof mount<typeof HinweiseManagementView>> {
+async function mountComponent(): Promise<ReturnType<typeof mount<typeof HinweiseManagementView>>> {
+  await vi.dynamicImportSettled();
   return mount(HinweiseManagementView, {
     attachTo: document.getElementById('app') || '',
     global: {
@@ -92,7 +92,7 @@ describe('HinweiseCreationView', () => {
     router.push({ name: 'hinweise-creation' });
     await router.isReady();
 
-    wrapper = mountComponent();
+    wrapper = await mountComponent();
     vi.restoreAllMocks();
   });
 
@@ -118,7 +118,7 @@ describe('HinweiseCreationView', () => {
   });
 
   test('it fills form and triggers submit', async () => {
-    wrapper = mountComponent();
+    wrapper = await mountComponent();
     meldungStore.createOrUpdateMeldung = vi.fn().mockResolvedValue(undefined);
     meldungStore.getAllMeldungen = vi.fn().mockResolvedValue(undefined);
 
@@ -161,8 +161,8 @@ describe('HinweiseCreationView', () => {
     test('triggers unsaved changes dialog when form is dirty', async () => {
       const expectedCallsToNext: number = 0;
       // Mock onBeforeRouteLeave to capture the callback
-      vi.mock('vue-router', async (importOriginal: () => Promise<Module>) => {
-        const mod: Module = await importOriginal();
+      vi.mock('vue-router', async (importOriginal: () => Promise<object>) => {
+        const mod: object = await importOriginal();
         return {
           ...mod,
           onBeforeRouteLeave: vi.fn((actualCallback: OnBeforeRouteLeaveCallback) => {
@@ -172,7 +172,7 @@ describe('HinweiseCreationView', () => {
       });
 
       // Remount the component to make sure the form is empty at first
-      wrapper = mountComponent();
+      wrapper = await mountComponent();
       await nextTick();
 
       // Fill the form to make it dirty

@@ -21,7 +21,6 @@ import {
   type RolleWithServiceProvidersResponse,
 } from '@/stores/RolleStore';
 import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
-import type Module from 'module';
 import { DoFactory } from 'test/DoFactory';
 import { expect, test, type Mock, type MockInstance } from 'vitest';
 import { nextTick, type Component } from 'vue';
@@ -32,6 +31,7 @@ import {
   type RouteLocationNormalized,
   type Router,
 } from 'vue-router';
+import { noop } from 'vuetify/lib/util/helpers.mjs';
 import PersonCreationView from './PersonCreationView.vue';
 
 let wrapper: VueWrapper | null = null;
@@ -206,7 +206,8 @@ let { storedBeforeRouteLeaveCallback }: { storedBeforeRouteLeaveCallback: OnBefo
   },
 );
 
-function mountComponent(): ReturnType<typeof mount<typeof PersonCreationView>> {
+async function mountComponent(): Promise<ReturnType<typeof mount<typeof PersonCreationView>>> {
+  await vi.dynamicImportSettled();
   return mount(PersonCreationView, {
     attachTo: document.getElementById('app') || '',
     global: {
@@ -323,7 +324,7 @@ beforeEach(async () => {
   router.push('/');
   await router.isReady();
 
-  wrapper = mountComponent();
+  wrapper = await mountComponent();
   personStore.errorCode = '';
   personenkontextStore.errorCode = '';
   personenkontextStore.createdPersonWithKontext = null;
@@ -378,7 +379,7 @@ describe('PersonCreationView', () => {
     const rolleSelect: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'rollen-select' });
-    await rolleSelect?.setValue('1');
+    await rolleSelect?.setValue(['1']);
     await nextTick();
 
     // Get the BefristungInput component
@@ -407,7 +408,7 @@ describe('PersonCreationView', () => {
     const rolleSelect: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'rollen-select' });
-    await rolleSelect?.setValue('1');
+    await rolleSelect?.setValue(['1']);
     await nextTick();
 
     // Get the BefristungInput component
@@ -505,7 +506,7 @@ describe('PersonCreationView', () => {
     await kopersInput?.setValue('23234');
     await nextTick();
 
-    wrapper?.find('[data-testid="person-creation-form-submit-button"]').trigger('click');
+    await wrapper?.find('[data-testid="person-creation-form-submit-button"]').trigger('click');
     await nextTick();
     await flushPromises();
 
@@ -586,7 +587,7 @@ describe('PersonCreationView', () => {
     await kopersInput?.setValue('23234');
     await nextTick();
 
-    wrapper?.find('[data-testid="person-creation-form-submit-button"]').trigger('click');
+    await wrapper?.find('[data-testid="person-creation-form-submit-button"]').trigger('click');
     await nextTick();
     await flushPromises();
 
@@ -614,7 +615,7 @@ describe('PersonCreationView', () => {
 
     personenkontextStore.createdPersonWithKontext = mockCreatedPersonWithKontext;
 
-    wrapper?.find('[data-testid="person-creation-form-submit-button"]').trigger('click');
+    await wrapper?.find('[data-testid="person-creation-form-submit-button"]').trigger('click');
     await flushPromises();
 
     // Form is resetting after submit so orga should be undefined
@@ -632,9 +633,9 @@ describe('PersonCreationView', () => {
 
     expect(wrapper?.find('[data-testid="create-another-person-button"]').isVisible()).toBe(true);
 
-    wrapper?.find('[data-testid="create-another-person-button"]').trigger('click');
+    await wrapper?.find('[data-testid="create-another-person-button"]').trigger('click');
 
-    expect(wrapper?.find('[data-testid="person-success-text"]').isVisible()).toBe(true);
+    expect(wrapper?.find('[data-testid="person-success-text"]').exists()).toBe(false);
   });
 
   test('it fills form for Landesbediensteter, triggers submit and then shows success template', async () => {
@@ -648,7 +649,7 @@ describe('PersonCreationView', () => {
     await router.push({ name: 'add-person-to-own-schule' });
     await router.isReady();
 
-    wrapper = mountComponent();
+    wrapper = await mountComponent();
     await nextTick();
     personenkontextStore.workflowStepResponse = DoFactory.getPersonenkontextWorkflowResponse({
       organisations: [
@@ -673,7 +674,7 @@ describe('PersonCreationView', () => {
     await rollenSelect.setValue([rolleId]);
     await nextTick();
 
-    wrapper.find('[data-testid="person-creation-form-submit-button"]').trigger('click');
+    await wrapper.find('[data-testid="person-creation-form-submit-button"]').trigger('click');
     await nextTick();
     await flushPromises();
 
@@ -697,7 +698,7 @@ describe('PersonCreationView', () => {
     await router.push({ name: 'add-person-to-own-schule' });
     await router.isReady();
 
-    wrapper = mountComponent();
+    wrapper = await mountComponent();
 
     await nextTick();
     personenkontextStore.landesbediensteteCommitResponse = mockLandesbediensteteCommitResponse;
@@ -707,9 +708,9 @@ describe('PersonCreationView', () => {
 
     expect(wrapper.find('[data-testid="search-another-state-employee-button"]').isVisible()).toBe(true);
 
-    wrapper.find('[data-testid="search-another-state-employee-button"]').trigger('click');
+    await wrapper.find('[data-testid="search-another-state-employee-button"]').trigger('click');
 
-    expect(wrapper.find('[data-testid="state-employee-success-text"]').isVisible()).toBe(true);
+    expect(wrapper.find('[data-testid="state-employee-success-text"]').exists()).toBe(false);
   });
 
   test('it navigates to person details when clicking on btn in success template', async () => {
@@ -718,7 +719,7 @@ describe('PersonCreationView', () => {
     expect(wrapper?.find('[data-testid="go-to-details-button"]').isVisible()).toBe(true);
 
     const push: MockInstance = vi.spyOn(router, 'push');
-    wrapper?.find('[data-testid="go-to-details-button"]').trigger('click');
+    await wrapper?.find('[data-testid="go-to-details-button"]').trigger('click');
     await nextTick();
     expect(push).toHaveBeenCalledWith({ name: 'person-details', params: { id: '1' } });
   });
@@ -730,8 +731,8 @@ describe('PersonCreationView', () => {
 
     test('it triggers if form is dirty', async () => {
       const expectedCallsToNext: number = 0;
-      vi.mock('vue-router', async (importOriginal: () => Promise<Module>) => {
-        const mod: Module = await importOriginal();
+      vi.mock('vue-router', async (importOriginal: () => Promise<object>) => {
+        const mod: object = await importOriginal();
         return {
           ...mod,
           onBeforeRouteLeave: vi.fn((actualCallback: OnBeforeRouteLeaveCallback) => {
@@ -740,7 +741,7 @@ describe('PersonCreationView', () => {
         };
       });
 
-      wrapper = mountComponent();
+      wrapper = await mountComponent();
       await fillForm({
         organisationsebene: '9876',
         rollen: ['1'],
@@ -762,11 +763,11 @@ describe('PersonCreationView', () => {
       expect(spy).toHaveBeenCalledOnce();
     });
 
-    test('it does not trigger if form is not dirty', () => {
+    test('it does not trigger if form is not dirty', async () => {
       // autoselected orgnisation doesnt count as dirty
       const expectedCallsToNext: number = 1;
-      vi.mock('vue-router', async (importOriginal: () => Promise<Module>) => {
-        const mod: Module = await importOriginal();
+      vi.mock('vue-router', async (importOriginal: () => Promise<object>) => {
+        const mod: object = await importOriginal();
         return {
           ...mod,
           onBeforeRouteLeave: vi.fn((actualCallback: OnBeforeRouteLeaveCallback) => {
@@ -774,7 +775,7 @@ describe('PersonCreationView', () => {
           }),
         };
       });
-      wrapper = mountComponent();
+      wrapper = await mountComponent();
       const spy: Mock = vi.fn();
       storedBeforeRouteLeaveCallback({} as RouteLocationNormalized, {} as RouteLocationNormalized, spy);
       expect(spy).toHaveBeenCalledTimes(expectedCallsToNext);
@@ -799,6 +800,7 @@ describe('PersonCreationView', () => {
     test('it handles unloading', () => {
       const event: Event = new Event('beforeunload');
       const spy: MockInstance = vi.spyOn(event, 'preventDefault');
+      spy.mockClear();
       window.dispatchEvent(event);
       // TODO: why is spy called 12 times?
       // if (isFormDirty) expect(spy).toHaveBeenCalledOnce();
@@ -816,7 +818,7 @@ describe('PersonCreationView', () => {
       await nextTick();
 
       const push: MockInstance = vi.spyOn(router, 'push');
-      wrapper?.find('[data-testid$="alert-button"]').trigger('click');
+      await wrapper?.find('[data-testid$="alert-button"]').trigger('click');
       await nextTick();
 
       expect(push).toHaveBeenCalledTimes(1);
@@ -827,9 +829,14 @@ describe('PersonCreationView', () => {
       personenkontextStore.errorCode = 'REQUIRED_STEP_UP_LEVEL_NOT_MET';
       await nextTick();
 
+      const push: MockInstance = vi.spyOn(router, 'push');
+      vi.spyOn(router, 'go').mockImplementationOnce(noop);
       expect(wrapper?.find('[data-testid$="alert-title"]').isVisible()).toBe(true);
 
-      wrapper?.find('[data-testid$="alert-button"]').trigger('click');
+      await wrapper?.find('[data-testid$="alert-button"]').trigger('click');
+      await nextTick();
+
+      expect(push).toHaveBeenCalledTimes(1);
       await nextTick();
 
       personenkontextStore.errorCode = '';

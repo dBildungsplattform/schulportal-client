@@ -134,7 +134,7 @@
                 v-for="(serviceProvider, index) in item.serviceProviders"
                 :key="serviceProvider.id"
               >
-                {{ serviceProvider.name }}{{ index < item.serviceProviders.length - 1 ? ', ' : '' }}
+                {{ serviceProvider.name }}{{ Number(index) < item.serviceProviders.length - 1 ? ', ' : '' }}
               </span>
             </span>
           </div>

@@ -355,7 +355,7 @@ describe('PersonImportView', () => {
       pageTotal: 5,
     };
 
-    global.URL.createObjectURL = vi.fn();
+    globalThis.URL.createObjectURL = vi.fn();
     importStore.importProgress = 100;
     await nextTick();
 
@@ -390,7 +390,7 @@ describe('PersonImportView', () => {
       pageTotal: 5,
     };
 
-    global.URL.createObjectURL = vi.fn();
+    globalThis.URL.createObjectURL = vi.fn();
     importStore.importProgress = 100;
     await nextTick();
 
@@ -417,7 +417,7 @@ describe('PersonImportView', () => {
       pageTotal: 5,
     };
 
-    global.URL.createObjectURL = vi.fn();
+    globalThis.URL.createObjectURL = vi.fn();
     importStore.importProgress = 100;
     await nextTick();
 
