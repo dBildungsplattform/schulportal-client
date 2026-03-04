@@ -2,7 +2,6 @@ import type { OrganisationResponse } from '@/api-client/generated';
 import routes from '@/router/routes';
 import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
-import type Module from 'module';
 import { beforeEach, describe, expect, test, vi, type Mock, type MockInstance } from 'vitest';
 import { nextTick, type Component } from 'vue';
 import {
@@ -38,7 +37,8 @@ let { storedBeforeRouteLeaveCallback }: { storedBeforeRouteLeaveCallback: OnBefo
   },
 );
 
-function mountComponent(): ReturnType<typeof mount<typeof KlasseCreationView>> {
+async function mountComponent(): Promise<ReturnType<typeof mount<typeof KlasseCreationView>>> {
+  await vi.dynamicImportSettled();
   return mount(KlasseCreationView, {
     attachTo: document.getElementById('app') || '',
     global: {
@@ -103,7 +103,7 @@ beforeEach(async () => {
   router.push('/');
   await router.isReady();
 
-  wrapper = mountComponent();
+  wrapper = await mountComponent();
   organisationStore.errorCode = '';
   organisationStore.createdKlasse = null;
 });
@@ -179,8 +179,8 @@ describe('KlasseCreationView', () => {
 
     test('it triggers if form is dirty', async () => {
       const expectedCallsToNext: number = 0;
-      vi.mock('vue-router', async (importOriginal: () => Promise<Module>) => {
-        const mod: Module = await importOriginal();
+      vi.mock('vue-router', async (importOriginal: () => Promise<object>) => {
+        const mod: object = await importOriginal();
         return {
           ...mod,
           onBeforeRouteLeave: vi.fn((actualCallback: OnBeforeRouteLeaveCallback) => {
@@ -188,7 +188,7 @@ describe('KlasseCreationView', () => {
           }),
         };
       });
-      wrapper = mountComponent();
+      wrapper = await mountComponent();
       await fillForm({
         schule: '1',
         klassenname: '11b',
@@ -205,10 +205,10 @@ describe('KlasseCreationView', () => {
       expect(spy).toHaveBeenCalledOnce();
     });
 
-    test('it does not trigger if form is not dirty', () => {
+    test('it does not trigger if form is not dirty', async () => {
       const expectedCallsToNext: number = 1;
-      vi.mock('vue-router', async (importOriginal: () => Promise<Module>) => {
-        const mod: Module = await importOriginal();
+      vi.mock('vue-router', async (importOriginal: () => Promise<object>) => {
+        const mod: object = await importOriginal();
         return {
           ...mod,
           onBeforeRouteLeave: vi.fn((actualCallback: OnBeforeRouteLeaveCallback) => {
@@ -216,7 +216,7 @@ describe('KlasseCreationView', () => {
           }),
         };
       });
-      wrapper = mountComponent();
+      wrapper = await mountComponent();
       const spy: Mock = vi.fn();
       storedBeforeRouteLeaveCallback({} as RouteLocationNormalized, {} as RouteLocationNormalized, spy);
       expect(spy).toHaveBeenCalledTimes(expectedCallsToNext);

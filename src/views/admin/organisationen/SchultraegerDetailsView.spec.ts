@@ -17,7 +17,6 @@ import {
   type OrganisationStore,
 } from '@/stores/OrganisationStore';
 import SchultraegerDetailsView from './SchultraegerDetailsView.vue';
-import type Module from 'module';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -67,7 +66,8 @@ async function fillForm(args: Partial<FormFields>): Promise<Partial<FormSelector
   return selectors;
 }
 
-function mountComponent(): ReturnType<typeof mount<typeof SchultraegerDetailsView>> {
+async function mountComponent(): Promise<ReturnType<typeof mount<typeof SchultraegerDetailsView>>> {
+  await vi.dynamicImportSettled();
   return mount(SchultraegerDetailsView, {
     attachTo: document.getElementById('app') || '',
     global: {
@@ -218,7 +218,7 @@ beforeEach(async () => {
   router.push({ name: 'schultraeger-details', params: { id: '2' } });
   await router.isReady();
 
-  wrapper = mountComponent();
+  wrapper = await mountComponent();
 });
 
 afterEach(() => {
@@ -524,8 +524,8 @@ describe('SchultraegerDetailsView', () => {
 
     test('it triggers if form is dirty', async () => {
       const expectedCallsToNext: number = 0;
-      vi.mock('vue-router', async (importOriginal: () => Promise<Module>) => {
-        const mod: Module = await importOriginal();
+      vi.mock('vue-router', async (importOriginal: () => Promise<object>) => {
+        const mod: object = await importOriginal();
         return {
           ...mod,
           onBeforeRouteLeave: vi.fn((actualCallback: OnBeforeRouteLeaveCallback) => {
@@ -534,7 +534,7 @@ describe('SchultraegerDetailsView', () => {
         };
       });
 
-      wrapper = mountComponent();
+      wrapper = await mountComponent();
       await fillForm({
         schultraegerName: 'Traeger 1',
       });
@@ -551,10 +551,10 @@ describe('SchultraegerDetailsView', () => {
       expect(spy).toHaveBeenCalledOnce();
     });
 
-    test('it does not trigger if form is not dirty', () => {
+    test('it does not trigger if form is not dirty', async () => {
       const expectedCallsToNext: number = 1;
-      vi.mock('vue-router', async (importOriginal: () => Promise<Module>) => {
-        const mod: Module = await importOriginal();
+      vi.mock('vue-router', async (importOriginal: () => Promise<object>) => {
+        const mod: object = await importOriginal();
         return {
           ...mod,
           onBeforeRouteLeave: vi.fn((actualCallback: OnBeforeRouteLeaveCallback) => {
@@ -562,7 +562,7 @@ describe('SchultraegerDetailsView', () => {
           }),
         };
       });
-      wrapper = mountComponent();
+      wrapper = await mountComponent();
       const spy: Mock = vi.fn();
       storedBeforeRouteLeaveCallback({} as RouteLocationNormalized, {} as RouteLocationNormalized, spy);
       expect(spy).toHaveBeenCalledTimes(expectedCallsToNext);

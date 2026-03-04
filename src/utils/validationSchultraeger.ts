@@ -62,5 +62,8 @@ export const getSchultraegerFieldDefinitions = (
 };
 
 export const getDirtyState = (formContext: ReturnType<typeof useForm>): boolean => {
-  return formContext.isFieldDirty('selectedSchultraegerform') || formContext.isFieldDirty('selectedSchultraegername');
+  return (
+    (formContext.isFieldDirty('selectedSchultraegerform') && formContext.isFieldTouched('selectedSchultraegerform')) ||
+    formContext.isFieldDirty('selectedSchultraegername')
+  );
 };

@@ -17,7 +17,6 @@ import {
   type OrganisationStore,
 } from '@/stores/OrganisationStore';
 import type { OrganisationResponse } from '@/api-client/generated';
-import type Module from 'module';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -64,7 +63,8 @@ let { storedBeforeRouteLeaveCallback }: { storedBeforeRouteLeaveCallback: OnBefo
   },
 );
 
-function mountComponent(): ReturnType<typeof mount<typeof SchuleCreationView>> {
+async function mountComponent(): Promise<ReturnType<typeof mount<typeof SchuleCreationView>>> {
+  await vi.dynamicImportSettled();
   return mount(SchuleCreationView, {
     attachTo: document.getElementById('app') || '',
     global: {
@@ -124,7 +124,7 @@ beforeEach(async () => {
   router.push('/');
   await router.isReady();
 
-  wrapper = mountComponent();
+  wrapper = await mountComponent();
   organisationStore.errorCode = '';
   organisationStore.createdSchule = null;
   organisationStore.schultraeger = mockSchultraeger;
@@ -149,6 +149,7 @@ describe('SchuleCreationView', () => {
 
   test('it navigates back to schulen table', async () => {
     const push: MockInstance = vi.spyOn(router, 'push');
+    vi.spyOn(router, 'go').mockImplementationOnce(() => Promise.resolve());
     await wrapper?.find('[data-testid="close-layout-card-button"]').trigger('click');
     expect(push).toHaveBeenCalledTimes(1);
   });
@@ -193,8 +194,8 @@ describe('SchuleCreationView', () => {
 
     test('it triggers if form is dirty', async () => {
       const expectedCallsToNext: number = 0;
-      vi.mock('vue-router', async (importOriginal: () => Promise<Module>) => {
-        const mod: Module = await importOriginal();
+      vi.mock('vue-router', async (importOriginal: () => Promise<object>) => {
+        const mod: object = await importOriginal();
         return {
           ...mod,
           onBeforeRouteLeave: vi.fn((actualCallback: OnBeforeRouteLeaveCallback) => {
@@ -203,7 +204,7 @@ describe('SchuleCreationView', () => {
         };
       });
 
-      wrapper = mountComponent();
+      wrapper = await mountComponent();
       await fillForm({
         dienststellennummer: '9356494',
         schulname: 'Random Schulname Gymnasium',
@@ -221,10 +222,10 @@ describe('SchuleCreationView', () => {
       expect(spy).toHaveBeenCalledOnce();
     });
 
-    test('it does not trigger if form is not dirty', () => {
+    test('it does not trigger if form is not dirty', async () => {
       const expectedCallsToNext: number = 1;
-      vi.mock('vue-router', async (importOriginal: () => Promise<Module>) => {
-        const mod: Module = await importOriginal();
+      vi.mock('vue-router', async (importOriginal: () => Promise<object>) => {
+        const mod: object = await importOriginal();
         return {
           ...mod,
           onBeforeRouteLeave: vi.fn((actualCallback: OnBeforeRouteLeaveCallback) => {
@@ -232,7 +233,7 @@ describe('SchuleCreationView', () => {
           }),
         };
       });
-      wrapper = mountComponent();
+      wrapper = await mountComponent();
       const spy: Mock = vi.fn();
       storedBeforeRouteLeaveCallback({} as RouteLocationNormalized, {} as RouteLocationNormalized, spy);
       expect(spy).toHaveBeenCalledTimes(expectedCallsToNext);
@@ -280,6 +281,7 @@ describe('SchuleCreationView', () => {
     test('shows error message if REQUIRED_STEP_UP_LEVEL_NOT_MET error is present and click close button', async () => {
       organisationStore.errorCode = 'REQUIRED_STEP_UP_LEVEL_NOT_MET';
       await nextTick();
+      vi.spyOn(router, 'go').mockImplementationOnce(() => Promise.resolve());
 
       expect(wrapper?.find('[data-testid$="alert-title"]').isVisible()).toBe(true);
 

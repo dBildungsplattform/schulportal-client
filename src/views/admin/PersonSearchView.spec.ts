@@ -1,7 +1,6 @@
 import routes from '@/router/routes';
 import { usePersonStore, type PersonLandesbediensteterSearchResponse, type PersonStore } from '@/stores/PersonStore';
 import { DOMWrapper, VueWrapper, flushPromises, mount } from '@vue/test-utils';
-import type Module from 'module';
 import { DoFactory } from 'test/DoFactory';
 import { expect, test, type Mock, type MockInstance } from 'vitest';
 import { nextTick, type Component } from 'vue';
@@ -37,7 +36,8 @@ let { storedBeforeRouteLeaveCallback }: { storedBeforeRouteLeaveCallback: OnBefo
   },
 );
 
-function mountComponent(): VueWrapper<InstanceType<typeof PersonSearchView>> {
+async function mountComponent(): Promise<VueWrapper<InstanceType<typeof PersonSearchView>>> {
+  await vi.dynamicImportSettled();
   return mount(PersonSearchView, {
     attachTo: document.getElementById('app') || '',
     global: {
@@ -100,7 +100,7 @@ describe('PersonSearchView', () => {
     router.push({ name: 'search-person-limited' });
     await router.isReady();
 
-    wrapper = mountComponent();
+    wrapper = await mountComponent();
     vi.restoreAllMocks();
   });
 
@@ -467,8 +467,8 @@ describe('PersonSearchView', () => {
       const expectedCallsToNext: number = 0;
 
       // Mock onBeforeRouteLeave to capture the callback
-      vi.mock('vue-router', async (importOriginal: () => Promise<Module>) => {
-        const mod: Module = await importOriginal();
+      vi.mock('vue-router', async (importOriginal: () => Promise<object>) => {
+        const mod: object = await importOriginal();
         return {
           ...mod,
           onBeforeRouteLeave: vi.fn((actualCallback: OnBeforeRouteLeaveCallback) => {
@@ -478,7 +478,7 @@ describe('PersonSearchView', () => {
       });
 
       // Remount the component
-      wrapper = mountComponent();
+      wrapper = await mountComponent();
       await nextTick();
 
       // Fill the form to make it dirty
@@ -502,8 +502,8 @@ describe('PersonSearchView', () => {
 
     test('allows navigation when form is clean', async () => {
       // Mock onBeforeRouteLeave
-      vi.mock('vue-router', async (importOriginal: () => Promise<Module>) => {
-        const mod: Module = await importOriginal();
+      vi.mock('vue-router', async (importOriginal: () => Promise<object>) => {
+        const mod: object = await importOriginal();
         return {
           ...mod,
           onBeforeRouteLeave: vi.fn((actualCallback: OnBeforeRouteLeaveCallback) => {
@@ -512,7 +512,7 @@ describe('PersonSearchView', () => {
         };
       });
 
-      wrapper = mountComponent();
+      wrapper = await mountComponent();
       await nextTick();
 
       // Don't fill any form fields
@@ -524,11 +524,11 @@ describe('PersonSearchView', () => {
     });
   });
 
-  test('it sets up and removes beforeunload event listener', () => {
+  test('it sets up and removes beforeunload event listener', async () => {
     const addEventListener: MockInstance = vi.spyOn(window, 'addEventListener');
     const removeEventListener: MockInstance = vi.spyOn(window, 'removeEventListener');
 
-    wrapper = mountComponent();
+    wrapper = await mountComponent();
 
     // Should add event listener on mount
     expect(addEventListener).toHaveBeenCalledWith('beforeunload', expect.any(Function));
