@@ -126,7 +126,7 @@
       </v-container>
 
       <template v-if="!serviceProviderStore.errorCode">
-        <v-container class="service-provider-info">
+        <v-container>
           <div v-if="serviceProviderStore.currentServiceProvider">
             <v-row data-testid="service-provider-info-row">
               <v-col
