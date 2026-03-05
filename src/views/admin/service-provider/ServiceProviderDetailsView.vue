@@ -255,7 +255,7 @@
                 <v-row class="mt-4 align-center">
                   <v-col
                     cols="auto"
-                    class="d-flex align-center pr-2"
+                    class="d-flex align-center pr-0"
                   >
                     <span class="subtitle-2">{{ t('angebot.assignedRollen') }}:</span>
                   </v-col>
@@ -265,7 +265,7 @@
                     data-testid="service-provider-rollen"
                   >
                     <span
-                      class="text-body ml-n3"
+                      class="text-body"
                       v-if="serviceProviderStore.currentServiceProvider.rollen.length === 0"
                       >{{ t('none') }}</span
                     >

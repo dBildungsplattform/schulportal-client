@@ -38,7 +38,7 @@
     }
   });
 
-  const alertButtonActionKopers: ComputedRef<() => void> = computed(() => {
+  const alertButtonAction: ComputedRef<() => void> = computed(() => {
     switch (serviceProviderStore.errorCode) {
       default:
         return navigateToServiceProviderBySchuleTable;
@@ -70,7 +70,7 @@
 </script>
 
 <template>
-  <div class="admin">
+  <div>
     <h1
       class="text-center headline"
       data-testid="admin-headline"
@@ -95,7 +95,7 @@
           <SpshAlert
             :modelValue="!!serviceProviderStore.errorCode"
             :buttonText="alertButtonText"
-            :buttonAction="alertButtonActionKopers"
+            :buttonAction="alertButtonAction"
             :closable="false"
             ref="service-provider-store-error-alert"
             :showButton="true"
@@ -107,12 +107,11 @@
         </v-container>
       </v-container>
 
-      <div v-if="!serviceProviderStore.errorCode">
+      <template v-if="!serviceProviderStore.errorCode">
         <v-container class="service-provider-info">
           <div v-if="serviceProviderStore.currentServiceProvider">
-            <v-row id="service-provider-info-row">
+            <v-row data-testid="service-provider-info-row">
               <v-col
-                class="custom-offset"
                 offset="1"
                 offset-sm="1"
                 offset-md="1"
@@ -214,13 +213,12 @@
               </v-col>
             </v-row>
             <v-divider
-              class="border-opacity-100 rounded mt-16"
+              class="border-opacity-100 rounded mt-16 mb-0 pb-0"
               color="#E5EAEF"
               thickness="6"
             ></v-divider>
-            <v-row class="mt-n6">
+            <v-row>
               <v-col
-                class="custom-offset"
                 offset="1"
                 offset-sm="1"
                 offset-md="1"
@@ -229,7 +227,7 @@
                 <v-row class="mt-4 align-center">
                   <v-col
                     cols="auto"
-                    class="d-flex align-center pr-2"
+                    class="d-flex align-center pr-0"
                   >
                     <span class="subtitle-2">{{ t('angebot.erweiterteRollenAnDerSchule') }}:</span>
                   </v-col>
@@ -239,7 +237,7 @@
                     data-testid="service-provider-rollenerweiterungen"
                   >
                     <span
-                      class="text-body ml-n3"
+                      class="text-body"
                       v-if="serviceProviderStore.rollenerweiterungen?.items?.length === 0"
                       >{{ t('none') }}</span
                     >
@@ -259,13 +257,19 @@
             </v-row>
           </div>
 
-          <div v-else-if="serviceProviderStore.loading">
+          <template v-else-if="serviceProviderStore.loading">
             <v-progress-circular indeterminate></v-progress-circular>
-          </div>
+          </template>
         </v-container>
-      </div>
+      </template>
     </LayoutCard>
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+  @media (min-width: 1280px) and (max-width: 1600px) {
+    .custom-offset {
+      margin-left: 0 !important; /* removes the Vuetify offset */
+    }
+  }
+</style>
