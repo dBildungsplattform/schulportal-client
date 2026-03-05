@@ -4,16 +4,19 @@ import { defineStore, type Store, type StoreDefinition } from 'pinia';
 
 import {
   ProviderApiFactory,
+  RolleApiFactory,
   ServiceProviderKategorie,
   ServiceProviderMerkmal,
   type ManageableServiceProviderResponse,
   type ProviderApiInterface,
   type ProviderControllerFindRollenerweiterungenByServiceProviderId200Response,
   type ProviderControllerGetManageableServiceProviders200Response,
+  type RolleApiInterface,
   type RollenerweiterungForManageableServiceProviderResponse,
 } from '../api-client/generated/api';
 
 const serviceProviderApi: ProviderApiInterface = ProviderApiFactory(undefined, '', axiosApiInstance);
+const rolleApi: RolleApiInterface = RolleApiFactory(undefined, '', axiosApiInstance);
 
 export type BaseServiceProvider = {
   id: string;
@@ -285,6 +288,17 @@ export const useServiceProviderStore: StoreDefinition<
         }));
         this.rollenerweiterungenUebersicht = rollenerweiterungenUebersicht;
       } catch (error: unknown) {
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async persistRollenerweiterungenForServiceProvider(serviceProviderId: string) {
+      this.loading = true;
+      try {
+        await rolleApi.rollenerweiterungControllerApplyRollenerweiterungChanges(serviceProviderId);
+      } catch (error) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
         this.loading = false;
