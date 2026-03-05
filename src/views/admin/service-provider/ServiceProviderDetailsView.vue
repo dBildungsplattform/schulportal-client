@@ -59,19 +59,13 @@
     }
   });
 
-  const errorTitle: ComputedRef<string> = computed(() => {
-    if (!serviceProviderStore.errorCode) {
-      return '';
-    }
+  const errorTitleServiceProvider: ComputedRef<string> = computed(() => {
     return serviceProviderStore.errorCode === 'UNSPECIFIED_ERROR'
       ? t('angebot.loadingErrorTitle')
       : t(`angebot.title.${serviceProviderStore.errorCode}`);
   });
 
-  const errorText: ComputedRef<string> = computed(() => {
-    if (!serviceProviderStore.errorCode) {
-      return '';
-    }
+  const errorTextServiceProvider: ComputedRef<string> = computed(() => {
     return serviceProviderStore.errorCode === 'UNSPECIFIED_ERROR'
       ? t('angebot.loadingErrorText')
       : t(`angebot.errors.${serviceProviderStore.errorCode}`);
@@ -143,8 +137,8 @@
             :closable="false"
             ref="service-provider-store-error-alert"
             :showButton="true"
-            :text="errorText"
-            :title="errorTitle"
+            :text="errorTextServiceProvider"
+            :title="errorTitleServiceProvider"
             :type="'error'"
             @update:modelValue="handleAlertClose"
           />

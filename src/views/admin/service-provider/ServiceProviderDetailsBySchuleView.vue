@@ -46,18 +46,12 @@
   });
 
   const errorTitle: ComputedRef<string> = computed(() => {
-    if (!serviceProviderStore.errorCode) {
-      return '';
-    }
     return serviceProviderStore.errorCode === 'UNSPECIFIED_ERROR'
       ? t('angebot.loadingErrorTitle')
       : t(`angebot.title.${serviceProviderStore.errorCode}`);
   });
 
   const errorText: ComputedRef<string> = computed(() => {
-    if (!serviceProviderStore.errorCode) {
-      return '';
-    }
     return serviceProviderStore.errorCode === 'UNSPECIFIED_ERROR'
       ? t('angebot.loadingErrorText')
       : t(`angebot.errors.${serviceProviderStore.errorCode}`);
