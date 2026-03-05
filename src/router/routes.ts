@@ -198,6 +198,7 @@ const routes: readonly RouteRecordRaw[] = [
       requiresAuth: true,
       requiredStepUpLevel: StepUpLevel.GOLD,
       requiresPermission: 'schulspezifischeangebotsverwaltung',
+      requiresOrga: true,
     },
   },
   {

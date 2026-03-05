@@ -64,8 +64,8 @@
       return '';
     }
     return serviceProviderStore.errorCode === 'UNSPECIFIED_ERROR'
-      ? t('admin.angebot.loadingErrorTitle')
-      : t(`admin.angebot.title.${serviceProviderStore.errorCode}`);
+      ? t('angebot.loadingErrorTitle')
+      : t(`angebot.title.${serviceProviderStore.errorCode}`);
   });
 
   const errorText: ComputedRef<string> = computed(() => {
@@ -73,8 +73,8 @@
       return '';
     }
     return serviceProviderStore.errorCode === 'UNSPECIFIED_ERROR'
-      ? t('admin.angebot.loadingErrorText')
-      : t(`admin.angebot.errors.${serviceProviderStore.errorCode}`);
+      ? t('angebot.loadingErrorText')
+      : t(`angebot.errors.${serviceProviderStore.errorCode}`);
   });
 
   async function fetchRollenerweiterungen(): Promise<void> {

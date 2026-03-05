@@ -82,6 +82,11 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
     return false;
   }
 
+  // Redirect if orga query is missing on routes that require it
+  if (to.meta['requiresOrga'] && (!to.query['orga'] || typeof to.query['orga'] !== 'string')) {
+    return { name: 'angebot-management-schulspezifisch' };
+  }
+
   if (to.meta['requiredStepUpLevel'] === StepUpLevel.GOLD && authStore.acr !== StepUpLevel.GOLD) {
     const personId: string | null | undefined = authStore.currentUser?.personId;
     if (!personId) {

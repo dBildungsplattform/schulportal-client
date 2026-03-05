@@ -45,6 +45,24 @@
     }
   });
 
+  const errorTitle: ComputedRef<string> = computed(() => {
+    if (!serviceProviderStore.errorCode) {
+      return '';
+    }
+    return serviceProviderStore.errorCode === 'UNSPECIFIED_ERROR'
+      ? t('angebot.loadingErrorTitle')
+      : t(`angebot.title.${serviceProviderStore.errorCode}`);
+  });
+
+  const errorText: ComputedRef<string> = computed(() => {
+    if (!serviceProviderStore.errorCode) {
+      return '';
+    }
+    return serviceProviderStore.errorCode === 'UNSPECIFIED_ERROR'
+      ? t('angebot.loadingErrorText')
+      : t(`angebot.errors.${serviceProviderStore.errorCode}`);
+  });
+
   const organisationIdFromQuery: ComputedRef<string | undefined> = computed(
     () => route.query['orga'] as string | undefined,
   );
@@ -99,8 +117,8 @@
             :closable="false"
             ref="service-provider-store-error-alert"
             :showButton="true"
-            :text="t(`admin.service-provider.errors.${serviceProviderStore.errorCode}`)"
-            :title="t(`admin.service-provider.title.${serviceProviderStore.errorCode}`)"
+            :text="errorText"
+            :title="errorTitle"
             :type="'error'"
             @update:modelValue="handleAlertClose"
           />
