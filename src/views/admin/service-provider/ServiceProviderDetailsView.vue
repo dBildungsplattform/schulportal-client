@@ -59,6 +59,24 @@
     }
   });
 
+  const errorTitle: ComputedRef<string> = computed(() => {
+    if (!serviceProviderStore.errorCode) {
+      return '';
+    }
+    return serviceProviderStore.errorCode === 'UNSPECIFIED_ERROR'
+      ? t('admin.angebot.loadingErrorTitle')
+      : t(`admin.angebot.title.${serviceProviderStore.errorCode}`);
+  });
+
+  const errorText: ComputedRef<string> = computed(() => {
+    if (!serviceProviderStore.errorCode) {
+      return '';
+    }
+    return serviceProviderStore.errorCode === 'UNSPECIFIED_ERROR'
+      ? t('admin.angebot.loadingErrorText')
+      : t(`admin.angebot.errors.${serviceProviderStore.errorCode}`);
+  });
+
   async function fetchRollenerweiterungen(): Promise<void> {
     await serviceProviderStore.getRollenerweiterungenById({
       serviceProviderId: currentServiceProviderId,
@@ -125,8 +143,8 @@
             :closable="false"
             ref="service-provider-store-error-alert"
             :showButton="true"
-            :text="t(`admin.service-provider.errors.${serviceProviderStore.errorCode}`)"
-            :title="t(`admin.service-provider.title.${serviceProviderStore.errorCode}`)"
+            :text="errorText"
+            :title="errorTitle"
             :type="'error'"
             @update:modelValue="handleAlertClose"
           />
