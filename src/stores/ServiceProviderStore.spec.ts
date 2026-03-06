@@ -391,7 +391,7 @@ describe('serviceProviderStore', () => {
 
       mockadapter.onGet(url).replyOnce(200, mockResponse);
 
-      await serviceProviderStore.getRollenerweiterungenById({ id: serviceProviderId });
+      await serviceProviderStore.getRollenerweiterungenById({ serviceProviderId: serviceProviderId });
 
       const expectedRollenerweiterungUebersicht: RollenErweiterungenUebersicht[] =
         DoFactory.buildRollenerweiterungenUebersicht(apiItems);
@@ -403,7 +403,7 @@ describe('serviceProviderStore', () => {
 
     it('should handle errors', async () => {
       mockadapter.onGet(url).replyOnce(500, 'some error');
-      await serviceProviderStore.getRollenerweiterungenById({ id: serviceProviderId });
+      await serviceProviderStore.getRollenerweiterungenById({ serviceProviderId: serviceProviderId });
       expect(serviceProviderStore.rollenerweiterungenUebersicht).toEqual([]);
       expect(serviceProviderStore.errorCode).toBe('UNSPECIFIED_ERROR');
       expect(serviceProviderStore.loading).toBe(false);
@@ -411,7 +411,7 @@ describe('serviceProviderStore', () => {
 
     it('should handle error code', async () => {
       mockadapter.onGet(url).replyOnce(500, { code: 'some mock server error' });
-      await serviceProviderStore.getRollenerweiterungenById({ id: serviceProviderId });
+      await serviceProviderStore.getRollenerweiterungenById({ serviceProviderId: serviceProviderId });
       expect(serviceProviderStore.rollenerweiterungenUebersicht).toEqual([]);
       expect(serviceProviderStore.errorCode).toBe('some mock server error');
       expect(serviceProviderStore.loading).toBe(false);

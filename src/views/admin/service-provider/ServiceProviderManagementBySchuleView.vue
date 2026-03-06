@@ -1,8 +1,8 @@
 <script setup lang="ts">
-  import { computed, onMounted, ref, watchEffect, type ComputedRef, type Ref } from 'vue';
+  import { computed, onMounted, ref, watch, watchEffect, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
 
-  import ResultTable, { type Headers } from '@/components/admin/ResultTable.vue';
+  import ResultTable, { type Headers, type TableRow } from '@/components/admin/ResultTable.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
   import {
@@ -14,7 +14,14 @@
   import SchulenFilter from '@/components/filter/SchulenFilter.vue';
   import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
   import { RollenSystemRecht } from '@/stores/RolleStore';
-  import { onBeforeRouteLeave } from 'vue-router';
+  import {
+    onBeforeRouteLeave,
+    useRoute,
+    useRouter,
+    type LocationQueryValue,
+    type RouteLocationNormalizedLoaded,
+    type Router,
+  } from 'vue-router';
   import { SortOrder } from '@/utils/sorting';
   import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
   import type { RollenerweiterungForManageableServiceProviderResponse } from '@/api-client/generated';
@@ -30,6 +37,8 @@
   const selectedOrganisationId: Ref<string> = ref('');
 
   const { t }: Composer = useI18n();
+  const router: Router = useRouter();
+  const route: RouteLocationNormalizedLoaded = useRoute();
 
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
@@ -98,6 +107,25 @@
       ]);
     }
   });
+
+  watch(
+    () => route.query['orga'],
+    (orgaId: LocationQueryValue | LocationQueryValue[] | undefined) => {
+      if (!orgaId) {
+        // clears stale context
+        organisationStore.currentOrganisation = null;
+      }
+    },
+    { immediate: true },
+  );
+
+  function navigateToServiceProviderDetails(_$event: PointerEvent, { item }: { item: ServiceProviderRow }): void {
+    router.push({
+      name: 'angebot-details-schulspezifisch',
+      params: { id: item.id },
+      query: { orga: organisationStore.currentOrganisation?.id },
+    });
+  }
 
   onBeforeRouteLeave(() => {
     serviceProviderStore.errorCode = '';
@@ -206,6 +234,10 @@
       "
       @onItemsPerPageUpdate="(val: number) => (searchFilterStore.serviceProviderSchulePerPage = val)"
       @onPageUpdate="(val: number) => (searchFilterStore.serviceProviderSchulePage = val)"
+      @onHandleRowClick="
+        (event: PointerEvent, item: TableRow<unknown>) =>
+          navigateToServiceProviderDetails(event, item as TableRow<ServiceProviderRow>)
+      "
     >
       <template v-slot:[`item.rollenerweiterungen`]="{ item }">
         <div
