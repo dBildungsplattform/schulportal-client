@@ -121,7 +121,7 @@
 
       <template v-if="!serviceProviderStore.errorCode">
         <v-container>
-          <div v-if="serviceProviderStore.currentServiceProvider">
+          <template v-if="serviceProviderStore.currentServiceProvider">
             <v-row data-testid="service-provider-info-row">
               <v-col
                 offset="1"
@@ -135,7 +135,7 @@
                     cols="12"
                     md="6"
                   >
-                    <div class="compact-spacing">
+                    <div>
                       <!-- Name -->
                       <LabeledField
                         :label="t('angebot.name')"
@@ -267,7 +267,7 @@
                 </v-row>
               </v-col>
             </v-row>
-          </div>
+          </template>
 
           <template v-else-if="serviceProviderStore.loading">
             <v-progress-circular indeterminate></v-progress-circular>
