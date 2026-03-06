@@ -84,7 +84,7 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
 
   // Redirect if orga query is missing on routes that require it
   if (to.meta['requiresOrga'] && (!to.query['orga'] || typeof to.query['orga'] !== 'string')) {
-    return { name: 'angebot-management-schulspezifisch' };
+    return to.meta['missingOrgaRedirect'] ?? { name: 'angebot-management-schulspezifisch' };
   }
 
   if (to.meta['requiredStepUpLevel'] === StepUpLevel.GOLD && authStore.acr !== StepUpLevel.GOLD) {
