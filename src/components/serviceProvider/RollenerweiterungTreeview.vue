@@ -8,7 +8,7 @@
   export type RolleForSelection = {
     id: string;
     name: string;
-    rollenart: 'LEHR' | 'LERN' | 'LEIT' | string;
+    rollenart: RollenArt;
   };
 
   type TreeNode = {
@@ -25,14 +25,16 @@
     loading?: boolean;
   };
 
-  const props = withDefaults(defineProps<Props>(), {
+  type Emits = {
+    (e: 'update:selectedRolleIds', ids: string[]): void;
+  };
+
+  const props: Props = withDefaults(defineProps<Props>(), {
     initiallySelectedRolleIds: () => [],
     loading: false,
   });
 
-  const emit = defineEmits<{
-    (e: 'update:selectedRolleIds', ids: string[]): void;
-  }>();
+  const emit: Emits = defineEmits<Emits>();
 
   const GROUP_DEFINITIONS: { key: RollenArt; labelKey: string }[] = [
     { key: RollenArt.Lehr, labelKey: 'angebot.groupLehr' },
@@ -42,13 +44,13 @@
 
   // ── State ──────────────────────────────────────────────────────────────────
   const searchQuery: Ref<string> = ref('');
-  const selected: Ref<string[]> = ref([...props.initiallySelectedRolleIds]);
+  const selected: Ref<string[]> = ref([...(props.initiallySelectedRolleIds ?? [])]);
   const opened: Ref<string[]> = ref(['group-LEHR', 'group-LERN', 'group-LEIT']);
 
   watch(
     () => props.initiallySelectedRolleIds,
-    (ids: string[]) => {
-      selected.value = [...ids];
+    (ids: string[] | undefined) => {
+      selected.value = [...(ids ?? [])];
     },
   );
 
@@ -206,15 +208,24 @@
       item-children="children"
       select-strategy="leaf"
       selected-color="primary"
+      hide-expand-icon
       :model-value="selected"
+      ripple="false"
       @update:model-value="onSelectionUpdate"
     >
+      <!-- Suppress default title for group nodes (title is rendered in #prepend) -->
+      <template #title="{ item }">
+        <template v-if="!(item as TreeNode).isGroup">
+          {{ item.title }}
+        </template>
+      </template>
       <template #prepend="{ item }">
         <!-- ── Group header ──────────────────────────────────────────────── -->
         <template v-if="(item as TreeNode).isGroup">
           <div
             class="group-row d-flex align-center w-100"
             :data-testid="`treeview-group-${(item as TreeNode).rollenart}`"
+            @click="toggleGroupSelection((item as TreeNode).rollenart!)"
           >
             <!-- Our own checkbox for group-level select/deselect -->
             <v-checkbox-btn
@@ -230,7 +241,7 @@
               @click.stop="toggleGroupSelection((item as TreeNode).rollenart!)"
             />
 
-            <span class="group-title font-weight-bold">
+            <span class="group-title font-weight-bold text-body">
               {{ item.title }}
             </span>
             <span class="group-count ml-2">
@@ -244,7 +255,6 @@
         <!-- ── Leaf (individual rolle) ──────────────────────────────────── -->
         <template v-else>
           <v-checkbox-btn
-            color="primary"
             :model-value="selected.includes(item.id)"
             @click.stop="
               onSelectionUpdate(

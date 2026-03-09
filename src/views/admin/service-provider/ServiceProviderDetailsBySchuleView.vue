@@ -349,11 +349,8 @@
                     class="d-flex align-center pl-2"
                   >
                     <v-btn
-                      color="primary"
+                      class="primary"
                       data-testid="rollenerweiterung-bearbeiten-button"
-                      prepend-icon="mdi-pencil-outline"
-                      size="small"
-                      variant="tonal"
                       @click="openEditMode"
                     >
                       {{ t('edit') }}
