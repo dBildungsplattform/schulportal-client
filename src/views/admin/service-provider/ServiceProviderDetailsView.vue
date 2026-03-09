@@ -59,6 +59,18 @@
     }
   });
 
+  const errorTitleServiceProvider: ComputedRef<string> = computed(() => {
+    return serviceProviderStore.errorCode === 'UNSPECIFIED_ERROR'
+      ? t('angebot.loadingErrorTitle')
+      : t(`angebot.title.${serviceProviderStore.errorCode}`);
+  });
+
+  const errorTextServiceProvider: ComputedRef<string> = computed(() => {
+    return serviceProviderStore.errorCode === 'UNSPECIFIED_ERROR'
+      ? t('angebot.loadingErrorText')
+      : t(`angebot.errors.${serviceProviderStore.errorCode}`);
+  });
+
   async function fetchRollenerweiterungen(): Promise<void> {
     await serviceProviderStore.getRollenerweiterungenById({
       serviceProviderId: currentServiceProviderId,
@@ -125,8 +137,8 @@
             :closable="false"
             ref="service-provider-store-error-alert"
             :showButton="true"
-            :text="t(`admin.service-provider.errors.${serviceProviderStore.errorCode}`)"
-            :title="t(`admin.service-provider.title.${serviceProviderStore.errorCode}`)"
+            :text="errorTextServiceProvider"
+            :title="errorTitleServiceProvider"
             :type="'error'"
             @update:modelValue="handleAlertClose"
           />
@@ -255,7 +267,7 @@
                 <v-row class="mt-4 align-center">
                   <v-col
                     cols="auto"
-                    class="d-flex align-center pr-2"
+                    class="d-flex align-center pr-0"
                   >
                     <span class="subtitle-2">{{ t('angebot.assignedRollen') }}:</span>
                   </v-col>
@@ -265,7 +277,7 @@
                     data-testid="service-provider-rollen"
                   >
                     <span
-                      class="text-body ml-n3"
+                      class="text-body"
                       v-if="serviceProviderStore.currentServiceProvider.rollen.length === 0"
                       >{{ t('none') }}</span
                     >

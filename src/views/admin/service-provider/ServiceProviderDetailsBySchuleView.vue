@@ -38,11 +38,23 @@
     }
   });
 
-  const alertButtonActionKopers: ComputedRef<() => void> = computed(() => {
+  const alertButtonAction: ComputedRef<() => void> = computed(() => {
     switch (serviceProviderStore.errorCode) {
       default:
         return navigateToServiceProviderBySchuleTable;
     }
+  });
+
+  const errorTitle: ComputedRef<string> = computed(() => {
+    return serviceProviderStore.errorCode === 'UNSPECIFIED_ERROR'
+      ? t('angebot.loadingErrorTitle')
+      : t(`angebot.title.${serviceProviderStore.errorCode}`);
+  });
+
+  const errorText: ComputedRef<string> = computed(() => {
+    return serviceProviderStore.errorCode === 'UNSPECIFIED_ERROR'
+      ? t('angebot.loadingErrorText')
+      : t(`angebot.errors.${serviceProviderStore.errorCode}`);
   });
 
   const organisationIdFromQuery: ComputedRef<string | undefined> = computed(
@@ -70,7 +82,7 @@
 </script>
 
 <template>
-  <div class="admin">
+  <div>
     <h1
       class="text-center headline"
       data-testid="admin-headline"
@@ -95,24 +107,23 @@
           <SpshAlert
             :modelValue="!!serviceProviderStore.errorCode"
             :buttonText="alertButtonText"
-            :buttonAction="alertButtonActionKopers"
+            :buttonAction="alertButtonAction"
             :closable="false"
             ref="service-provider-store-error-alert"
             :showButton="true"
-            :text="t(`admin.service-provider.errors.${serviceProviderStore.errorCode}`)"
-            :title="t(`admin.service-provider.title.${serviceProviderStore.errorCode}`)"
+            :text="errorText"
+            :title="errorTitle"
             :type="'error'"
             @update:modelValue="handleAlertClose"
           />
         </v-container>
       </v-container>
 
-      <div v-if="!serviceProviderStore.errorCode">
-        <v-container class="service-provider-info">
-          <div v-if="serviceProviderStore.currentServiceProvider">
-            <v-row id="service-provider-info-row">
+      <template v-if="!serviceProviderStore.errorCode">
+        <v-container>
+          <template v-if="serviceProviderStore.currentServiceProvider">
+            <v-row data-testid="service-provider-info-row">
               <v-col
-                class="custom-offset"
                 offset="1"
                 offset-sm="1"
                 offset-md="1"
@@ -124,7 +135,7 @@
                     cols="12"
                     md="6"
                   >
-                    <div class="compact-spacing">
+                    <div>
                       <!-- Name -->
                       <LabeledField
                         :label="t('angebot.name')"
@@ -214,13 +225,12 @@
               </v-col>
             </v-row>
             <v-divider
-              class="border-opacity-100 rounded mt-16"
+              class="border-opacity-100 rounded mt-16 mb-0 pb-0"
               color="#E5EAEF"
               thickness="6"
             ></v-divider>
-            <v-row class="mt-n6">
+            <v-row>
               <v-col
-                class="custom-offset"
                 offset="1"
                 offset-sm="1"
                 offset-md="1"
@@ -229,7 +239,7 @@
                 <v-row class="mt-4 align-center">
                   <v-col
                     cols="auto"
-                    class="d-flex align-center pr-2"
+                    class="d-flex align-center pr-0"
                   >
                     <span class="subtitle-2">{{ t('angebot.erweiterteRollenAnDerSchule') }}:</span>
                   </v-col>
@@ -239,7 +249,7 @@
                     data-testid="service-provider-rollenerweiterungen"
                   >
                     <span
-                      class="text-body ml-n3"
+                      class="text-body"
                       v-if="serviceProviderStore.rollenerweiterungen?.items?.length === 0"
                       >{{ t('none') }}</span
                     >
@@ -257,15 +267,21 @@
                 </v-row>
               </v-col>
             </v-row>
-          </div>
+          </template>
 
-          <div v-else-if="serviceProviderStore.loading">
+          <template v-else-if="serviceProviderStore.loading">
             <v-progress-circular indeterminate></v-progress-circular>
-          </div>
+          </template>
         </v-container>
-      </div>
+      </template>
     </LayoutCard>
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+  @media (min-width: 1280px) and (max-width: 1600px) {
+    .custom-offset {
+      margin-left: 0 !important; /* removes the Vuetify offset */
+    }
+  }
+</style>

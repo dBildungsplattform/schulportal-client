@@ -198,7 +198,9 @@ const routes: readonly RouteRecordRaw[] = [
       requiresAuth: true,
       requiredStepUpLevel: StepUpLevel.GOLD,
       requiresPermission: 'schulspezifischeangebotsverwaltung',
-    },
+      requiresOrga: true,
+      missingOrgaRedirect: { name: 'angebot-management-schulspezifisch' },
+    }
   },
   {
     path: '/admin/schulen/new',
