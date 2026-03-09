@@ -64,9 +64,10 @@ export type ServiceProviderIdNameResponse = {
 };
 
 export type RollenerweiterungFilter = {
-  id: string;
+  serviceProviderId: string;
   limit?: number;
   offset?: number;
+  organisationId?: string;
 };
 
 type ServiceProviderState = {
@@ -249,9 +250,10 @@ export const useServiceProviderStore: StoreDefinition<
       try {
         const { data }: { data: ProviderControllerFindRollenerweiterungenByServiceProviderId200Response } =
           await serviceProviderApi.providerControllerFindRollenerweiterungenByServiceProviderId(
-            filter.id,
+            filter.serviceProviderId,
             filter.offset,
             filter.limit,
+            filter.organisationId,
           );
 
         this.rollenerweiterungen = data;
