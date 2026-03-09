@@ -7,6 +7,7 @@ import {
   RolleApiFactory,
   ServiceProviderKategorie,
   ServiceProviderMerkmal,
+  type ApplyRollenerweiterungBodyParams,
   type ManageableServiceProviderResponse,
   type ProviderApiInterface,
   type ProviderControllerFindRollenerweiterungenByServiceProviderId200Response,
@@ -73,6 +74,13 @@ export type RollenerweiterungFilter = {
   organisationId?: string;
 };
 
+export type PersistRollenerweiterung = {
+  serviceProviderId: string;
+  organisationId: string;
+  addErweiterungenForRolleIds: Array<string>;
+  removeErweiterungenForRolleIds: Array<string>;
+};
+
 type ServiceProviderState = {
   allServiceProviders: StartPageServiceProvider[];
   availableServiceProviders: StartPageServiceProvider[];
@@ -102,6 +110,7 @@ type ServiceProviderActions = {
   getManageableServiceProviderById: (serviceProviderId: string) => Promise<void>;
   getServiceProviderLogoById: (serviceProviderId: string) => Promise<void>;
   getRollenerweiterungenById: (filter: RollenerweiterungFilter) => Promise<void>;
+  persistRollenerweiterungenForServiceProvider: (filter: PersistRollenerweiterung) => Promise<void>;
 };
 
 export { ServiceProviderKategorie };
@@ -294,10 +303,18 @@ export const useServiceProviderStore: StoreDefinition<
       }
     },
 
-    async persistRollenerweiterungenForServiceProvider(serviceProviderId: string) {
+    async persistRollenerweiterungenForServiceProvider(filter: PersistRollenerweiterung): Promise<void> {
       this.loading = true;
       try {
-        await rolleApi.rollenerweiterungControllerApplyRollenerweiterungChanges(serviceProviderId);
+        const bodyParams: ApplyRollenerweiterungBodyParams = {
+          addErweiterungenForRolleIds: filter.addErweiterungenForRolleIds,
+          removeErweiterungenForRolleIds: filter.removeErweiterungenForRolleIds,
+        };
+        await rolleApi.rollenerweiterungControllerApplyRollenerweiterungChanges(
+          filter.serviceProviderId,
+          filter.organisationId,
+          bodyParams,
+        );
       } catch (error) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
