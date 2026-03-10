@@ -199,7 +199,7 @@
         <!-- ── Group header ──────────────────────────────────────────────── -->
         <template v-if="(item as TreeNode).isGroup">
           <div
-            class="group-row d-flex align-center w-100"
+            class="group-row d-flex align-center w-100 flex-wrap" 
             :data-testid="`treeview-group-${(item as TreeNode).rollenart}`"
             @click="toggleGroupSelection((item as TreeNode).rollenart!)"
           >

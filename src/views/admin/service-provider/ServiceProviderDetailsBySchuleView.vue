@@ -22,10 +22,12 @@
     type RolleForSelection,
   } from '@/components/serviceProvider/RollenerweiterungTreeview.vue';
   import { RollenSystemRechtEnum } from '@/api-client/generated';
+  import { useDisplay } from 'vuetify';
 
   const router: Router = useRouter();
   const route: RouteLocationNormalizedLoaded = useRoute();
   const { t }: Composer = useI18n({ useScope: 'global' });
+  const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
@@ -373,9 +375,14 @@
                       class="mt-4"
                       justify="end"
                     >
-                      <v-col cols="auto">
+                      <v-col
+                        cols="12"
+                        sm="6"
+                        md="auto"
+                      >
                         <v-btn
-                          class="mr-2 secondary"
+                          class="secondary"
+                          :block="mdAndDown"
                           :disabled="isSaving"
                           variant="text"
                           data-testid="rollenerweiterung-cancel-button"
@@ -383,12 +390,18 @@
                         >
                           {{ t('cancel') }}
                         </v-btn>
+                      </v-col>
+                      <v-col
+                        cols="12"
+                        sm="6"
+                        md="auto"
+                      >
                         <v-btn
                           color="primary"
+                          :block="mdAndDown"
                           data-testid="rollenerweiterung-save-button"
                           :disabled="rolleStore.loading"
                           :loading="isSaving"
-                          variant="elevated"
                           @click="saveRollenerweiterungen"
                         >
                           {{ t('save') }}
