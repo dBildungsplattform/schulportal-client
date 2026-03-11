@@ -39,6 +39,13 @@
   const isEditingRollenerweiterungen: Ref<boolean> = ref(false);
   const selectedRolleIds: Ref<string[]> = ref([]);
   const isSaving: Ref<boolean> = ref(false);
+  const saveSuccessDialogVisible: Ref<boolean> = ref(false);
+
+  function closeSaveSuccessDialog(): void {
+    saveSuccessDialogVisible.value = false;
+    isEditingRollenerweiterungen.value = false;
+    selectedRolleIds.value = [];
+  }
 
   function navigateToServiceProviderBySchuleTable(): void {
     router.push({ name: 'angebot-management-schulspezifisch' });
@@ -133,12 +140,12 @@
     isSaving.value = false;
 
     if (!serviceProviderStore.errorCode) {
-      isEditingRollenerweiterungen.value = false;
       // Refresh rollenerweiterungen to reflect saved state
       await serviceProviderStore.getRollenerweiterungenById({
         serviceProviderId: currentServiceProviderId,
         organisationId: organisationIdFromQuery.value,
       });
+      saveSuccessDialogVisible.value = true;
     }
   }
 
@@ -420,6 +427,50 @@
         </v-container>
       </template>
     </LayoutCard>
+
+    <!-- ── Save success dialog ──────────────────────────────────────────────── -->
+    <v-dialog
+      v-model="saveSuccessDialogVisible"
+      persistent
+      max-width="600px"
+    >
+      <LayoutCard
+        :closable="true"
+        :header="t('admin.angebot.edit')"
+        @on-close-clicked="closeSaveSuccessDialog"
+      >
+        <v-card-text>
+          <v-container>
+            <v-row class="text-body text-center bold ">
+              <v-col
+                offset="1"
+                cols="10"
+              >
+                <span>{{ t('angebot.saveRollenerweiterungenSuccess') }}</span>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions class="justify-center">
+          <v-row class="justify-center">
+            <v-col
+              cols="12"
+              sm="6"
+              md="4"
+            >
+              <v-btn
+                :block="mdAndDown"
+                class="primary"
+                data-testid="close-rollenerweiterung-save-success-button"
+                @click.stop="closeSaveSuccessDialog"
+              >
+                {{ t('close') }}
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-card-actions>
+      </LayoutCard>
+    </v-dialog>
   </div>
 </template>
 
