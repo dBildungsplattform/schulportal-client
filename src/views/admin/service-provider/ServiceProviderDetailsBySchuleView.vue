@@ -366,59 +366,72 @@
                     </v-btn>
                   </v-col>
                 </v-row>
+              </v-col>
+            </v-row>
 
-                <!-- Inline treeview (shown while editing) -->
-                <v-expand-transition>
-                  <div v-if="isEditingRollenerweiterungen">
+            <!-- Inline treeview (shown while editing, full-width, no offset) -->
+            <v-expand-transition>
+              <div
+                v-if="isEditingRollenerweiterungen"
+                class="mt-n8"
+              >
+                <LayoutCard
+                  :closable="false"
+                  :header="t('angebot.editRollenerweiterungen')"
+                  :padded="true"
+                  :variant="'text'"
+                  :subCards="true"
+                >
+                  <v-col class="ml-10">
                     <RollenerweiterungTreeview
                       :available-rollen="availableRollen"
                       :initially-selected-rolle-ids="existingRolleIds"
                       :loading="rolleStore.loading"
                       @update:selectedRolleIds="selectedRolleIds = $event"
                     />
+                  </v-col>
 
-                    <!-- Save / Cancel actions -->
-                    <v-row
-                      class="mt-4"
-                      justify="end"
+                  <!-- Save / Cancel actions -->
+                  <v-row
+                    class="mt-4"
+                    justify="end"
+                  >
+                    <v-col
+                      cols="12"
+                      sm="6"
+                      md="auto"
                     >
-                      <v-col
-                        cols="12"
-                        sm="6"
-                        md="auto"
+                      <v-btn
+                        class="secondary"
+                        :block="mdAndDown"
+                        :disabled="isSaving"
+                        variant="text"
+                        data-testid="rollenerweiterung-cancel-button"
+                        @click="cancelEdit"
                       >
-                        <v-btn
-                          class="secondary"
-                          :block="mdAndDown"
-                          :disabled="isSaving"
-                          variant="text"
-                          data-testid="rollenerweiterung-cancel-button"
-                          @click="cancelEdit"
-                        >
-                          {{ t('cancel') }}
-                        </v-btn>
-                      </v-col>
-                      <v-col
-                        cols="12"
-                        sm="6"
-                        md="auto"
+                        {{ t('cancel') }}
+                      </v-btn>
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      sm="6"
+                      md="auto"
+                    >
+                      <v-btn
+                        color="primary"
+                        :block="mdAndDown"
+                        data-testid="rollenerweiterung-save-button"
+                        :disabled="rolleStore.loading"
+                        :loading="isSaving"
+                        @click="saveRollenerweiterungen"
                       >
-                        <v-btn
-                          color="primary"
-                          :block="mdAndDown"
-                          data-testid="rollenerweiterung-save-button"
-                          :disabled="rolleStore.loading"
-                          :loading="isSaving"
-                          @click="saveRollenerweiterungen"
-                        >
-                          {{ t('save') }}
-                        </v-btn>
-                      </v-col>
-                    </v-row>
-                  </div>
-                </v-expand-transition>
-              </v-col>
-            </v-row>
+                        {{ t('save') }}
+                      </v-btn>
+                    </v-col>
+                  </v-row>
+                </LayoutCard>
+              </div>
+            </v-expand-transition>
           </template>
 
           <template v-else-if="serviceProviderStore.loading">
@@ -436,12 +449,12 @@
     >
       <LayoutCard
         :closable="true"
-        :header="t('admin.angebot.edit')"
+        :header="t('angebot.editRollenerweiterungen')"
         @on-close-clicked="closeSaveSuccessDialog"
       >
         <v-card-text>
           <v-container>
-            <v-row class="text-body text-center bold ">
+            <v-row class="text-body text-center bold">
               <v-col
                 offset="1"
                 cols="10"

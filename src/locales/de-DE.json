@@ -43,7 +43,8 @@
     "noServiceProvidersAvailable": "Keine passenden Angebote gefunden.",
     "providedBy": "Bereitgestellt von",
     "noRolesFound": "Es konnten keine Rollen gefunden werden.",
-    "saveRollenerweiterungenSuccess": "Die Rollenerweiterungen wurden erfolgreich gespeichert."
+    "saveRollenerweiterungenSuccess": "Die Rollenerweiterungen wurden erfolgreich gespeichert.",
+    "editRollenerweiterungen": "Rollenauswahl bearbeiten"
   },
   "action": "Aktion",
   "admin": {
