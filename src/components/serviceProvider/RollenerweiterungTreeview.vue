@@ -77,7 +77,8 @@
     return GROUP_DEFINITIONS.flatMap((def: { key: RollenArt; labelKey: string }) => {
       const allChildren: RolleForSelection[] = props.availableRollen.filter(
         (r: RolleForSelection) => r.rollenart === def.key,
-      );
+      ).sort((a: RolleForSelection, b: RolleForSelection) => a.name.localeCompare(b.name));
+
       if (allChildren.length === 0) {
         return [];
       }
