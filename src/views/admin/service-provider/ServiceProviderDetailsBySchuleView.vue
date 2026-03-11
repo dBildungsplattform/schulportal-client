@@ -355,7 +355,7 @@
                       serviceProviderStore.currentServiceProvider.availableForRollenerweiterung
                     "
                     cols="auto"
-                    class="d-flex align-center pl-2"
+                    class="d-flex align-center pl-2 mr-2"
                   >
                     <v-btn
                       class="primary"
