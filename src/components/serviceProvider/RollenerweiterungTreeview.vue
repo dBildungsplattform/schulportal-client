@@ -179,7 +179,6 @@
 
     <!-- Treeview -->
     <v-treeview
-      class="rollenerweiterung-tree"
       v-else
       v-model:opened="opened"
       data-testId="rollenerweiterung-tree"
@@ -246,4 +245,3 @@
     </v-treeview>
   </div>
 </template>
-<style scoped></style>
