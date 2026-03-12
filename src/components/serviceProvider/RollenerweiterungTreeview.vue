@@ -33,9 +33,7 @@
     loading?: boolean;
   };
 
-  type Emits = {
-    (e: 'update:selectedRolleIds', ids: string[]): void;
-  };
+  type Emits = (e: 'update:selectedRolleIds', ids: string[]) => void;
 
   const props: Props = withDefaults(defineProps<Props>(), {
     initiallySelectedRolleIds: () => [],

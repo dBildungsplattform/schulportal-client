@@ -449,11 +449,7 @@
       persistent
       max-width="600px"
     >
-      <LayoutCard
-        :closable="true"
-        :header="t('angebot.editRollenerweiterungen')"
-        @on-close-clicked="closeSaveSuccessDialog"
-      >
+      <LayoutCard :header="t('angebot.editRollenerweiterungen')">
         <v-card-text>
           <v-container>
             <v-row class="text-body text-center bold">

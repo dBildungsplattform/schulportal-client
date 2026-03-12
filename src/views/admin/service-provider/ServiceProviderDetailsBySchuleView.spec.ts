@@ -1,5 +1,5 @@
 import routes from '@/router/routes';
-import { VueWrapper, mount } from '@vue/test-utils';
+import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import ServiceProviderDetailsBySchuleView from './ServiceProviderDetailsBySchuleView.vue';
@@ -14,11 +14,13 @@ import type { MockInstance } from 'vitest';
 import { nextTick, type Component } from 'vue';
 import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 import type { RollenerweiterungWithExtendedDataResponse } from '@/api-client/generated';
+import { RollenArt, useRolleStore, type RolleStore } from '@/stores/RolleStore';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
 const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
 const authStore: AuthStore = useAuthStore();
+const rolleStore: RolleStore = useRolleStore();
 
 const mockServiceProvider: ManageableServiceProviderDetail = DoFactory.getManageableServiceProviderDetail({
   kategorie: ServiceProviderKategorie.Hinweise,
@@ -62,6 +64,10 @@ beforeEach(async () => {
   serviceProviderStore.rollenerweiterungen = DoFactory.getRollenerweiterungenResponse(mockItems);
   serviceProviderStore.rollenerweiterungenUebersicht = DoFactory.buildRollenerweiterungenUebersicht(mockItems);
   authStore.hasRollenerweiternPermission = true;
+  rolleStore.allRollen = [
+    DoFactory.getRolleWithServiceProviders({ rollenart: RollenArt.Lehr }),
+    DoFactory.getRolleWithServiceProviders({ rollenart: RollenArt.Lern }),
+  ];
 });
 
 describe('ServiceProviderDetailsBySchuleView', () => {
@@ -95,5 +101,47 @@ describe('ServiceProviderDetailsBySchuleView', () => {
     await wrapper?.find('[data-testid$="alert-button"]').trigger('click');
 
     expect(push).toHaveBeenCalledTimes(1);
+  });
+
+  describe('ServiceProviderDetailsBySchuleView - Edit mode', () => {
+    test('opens edit mode when bearbeiten button is clicked', async () => {
+      await nextTick();
+      expect(wrapper?.find('[data-testid="rollenerweiterung-bearbeiten-button"]').exists()).toBe(true);
+      await wrapper?.find('[data-testid="rollenerweiterung-bearbeiten-button"]').trigger('click');
+      await nextTick();
+
+      expect(wrapper?.find('[data-testid="rollenerweiterung-cancel-button"]').exists()).toBe(true);
+      expect(wrapper?.find('[data-testid="rollenerweiterung-save-button"]').exists()).toBe(true);
+      expect(wrapper?.find('[data-testid="rollenerweiterung-bearbeiten-button"]').exists()).toBe(false);
+    });
+
+    test('cancels edit mode when cancel button is clicked', async () => {
+      await nextTick();
+      await wrapper?.find('[data-testid="rollenerweiterung-bearbeiten-button"]').trigger('click');
+      await nextTick();
+
+      await wrapper?.find('[data-testid="rollenerweiterung-cancel-button"]').trigger('click');
+      await nextTick();
+
+      expect(wrapper?.find('[data-testid="rollenerweiterung-bearbeiten-button"]').exists()).toBe(true);
+      expect(wrapper?.find('[data-testid="rollenerweiterung-cancel-button"]').exists()).toBe(false);
+    });
+
+    test('bearbeiten button is hidden when availableForRollenerweiterung is false', async () => {
+      serviceProviderStore.currentServiceProvider = DoFactory.getManageableServiceProviderDetail({
+        availableForRollenerweiterung: false,
+      });
+      await nextTick();
+
+      expect(wrapper?.find('[data-testid="rollenerweiterung-bearbeiten-button"]').exists()).toBe(false);
+    });
+
+    test('shows existing rollenerweiterungen as chips in read-only mode', async () => {
+      await nextTick();
+      const chips: DOMWrapper<Element>[] | undefined = wrapper?.findAll(
+        '[data-testid="service-provider-rollenerweiterungen"] .v-chip',
+      );
+      expect(chips?.length).toBe(2);
+    });
   });
 });
