@@ -40,7 +40,8 @@ beforeEach(async () => {
     routes,
   });
 
-  router.push('/');
+  router.push({ path: '/', query: { orga: 'some-org-id' } });
+  await router.isReady();
   await router.isReady();
 
   wrapper = mount(ServiceProviderDetailsBySchuleView, {
@@ -142,6 +143,66 @@ describe('ServiceProviderDetailsBySchuleView', () => {
         '[data-testid="service-provider-rollenerweiterungen"] .v-chip',
       );
       expect(chips?.length).toBe(2);
+    });
+  });
+
+  describe('ServiceProviderDetailsBySchuleView - Save', () => {
+    let persistSpy: MockInstance;
+
+    beforeEach(() => {
+      persistSpy = vi
+        .spyOn(serviceProviderStore, 'persistRollenerweiterungenForServiceProvider')
+        .mockResolvedValue(undefined);
+    });
+
+    async function openEditMode(): Promise<void> {
+      await nextTick();
+      await wrapper?.find('[data-testid="rollenerweiterung-bearbeiten-button"]').trigger('click');
+      await nextTick();
+    }
+
+    test('calls persistRollenerweiterungenForServiceProvider with correct add/remove ids on save', async () => {
+      await openEditMode();
+
+      const treeview: VueWrapper | undefined = wrapper?.findComponent({ name: 'RollenerweiterungTreeview' });
+      treeview?.vm.$emit('update:selectedRolleIds', ['new-rolle-1']);
+      await nextTick();
+
+      await wrapper?.find('[data-testid="rollenerweiterung-save-button"]').trigger('click');
+      await nextTick();
+
+      expect(persistSpy).toHaveBeenCalledTimes(1);
+      expect(persistSpy).toHaveBeenCalledWith(
+        expect.objectContaining<{ addErweiterungenForRolleIds: string[] }>({
+          addErweiterungenForRolleIds: expect.arrayContaining(['new-rolle-1']) as string[],
+        }),
+      );
+    });
+
+    test('shows success dialog after successful save', async () => {
+      serviceProviderStore.errorCode = '';
+      await openEditMode();
+
+      await wrapper?.find('[data-testid="rollenerweiterung-save-button"]').trigger('click');
+      await nextTick();
+
+      expect(document.querySelector('[data-testid="close-rollenerweiterung-save-success-button"]')).not.toBeNull();
+    });
+
+    test('closes success dialog and exits edit mode when close button clicked', async () => {
+      serviceProviderStore.errorCode = '';
+      await openEditMode();
+
+      await wrapper?.find('[data-testid="rollenerweiterung-save-button"]').trigger('click');
+      await nextTick();
+
+      document
+        .querySelector('[data-testid="close-rollenerweiterung-save-success-button"]')
+        ?.dispatchEvent(new Event('click'));
+      await nextTick();
+
+      expect(document.querySelector('[data-testid="close-rollenerweiterung-save-success-button"]')).not.toBeNull();
+      expect(wrapper?.find('[data-testid="rollenerweiterung-bearbeiten-button"]').exists()).toBe(true);
     });
   });
 });
