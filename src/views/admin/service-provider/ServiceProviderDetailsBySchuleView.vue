@@ -312,7 +312,6 @@
                 offset-md="1"
                 offset-lg="1"
               >
-                <!-- Section header row: label + chips + edit button -->
                 <!-- Bearbeiten button -->
                 <v-row
                   class="mt-4 mr-10"
