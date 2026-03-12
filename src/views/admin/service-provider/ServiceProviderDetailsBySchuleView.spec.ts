@@ -42,7 +42,6 @@ beforeEach(async () => {
 
   router.push({ path: '/', query: { orga: 'some-org-id' } });
   await router.isReady();
-  await router.isReady();
 
   wrapper = mount(ServiceProviderDetailsBySchuleView, {
     attachTo: document.getElementById('app') || '',
@@ -69,6 +68,11 @@ beforeEach(async () => {
     DoFactory.getRolleWithServiceProviders({ rollenart: RollenArt.Lehr }),
     DoFactory.getRolleWithServiceProviders({ rollenart: RollenArt.Lern }),
   ];
+});
+
+afterEach(() => {
+  vi.clearAllTimers();
+  wrapper?.unmount();
 });
 
 describe('ServiceProviderDetailsBySchuleView', () => {
