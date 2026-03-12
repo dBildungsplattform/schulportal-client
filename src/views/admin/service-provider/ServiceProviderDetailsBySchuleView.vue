@@ -313,21 +313,39 @@
                 offset-lg="1"
               >
                 <!-- Section header row: label + chips + edit button -->
+                <!-- Bearbeiten button -->
                 <v-row
-                  class="mt-4 align-center"
-                  :class="{ 'mb-4': isEditingRollenerweiterungen }"
+                  class="mt-4 mr-10"
+                  justify="end"
                 >
                   <v-col
-                    v-if="!isEditingRollenerweiterungen"
+                    cols="12"
+                    md="auto"
+                  >
+                    <v-btn
+                      v-if="
+                        !isEditingRollenerweiterungen &&
+                        serviceProviderStore.currentServiceProvider.availableForRollenerweiterung
+                      "
+                      class="primary"
+                      :block="mdAndDown"
+                      data-testid="rollenerweiterung-bearbeiten-button"
+                      @click="openEditMode"
+                    >
+                      {{ t('edit') }}
+                    </v-btn>
+                  </v-col>
+                </v-row>
+
+                <!-- Read-only chips -->
+                <v-row v-if="!isEditingRollenerweiterungen">
+                  <v-col
                     cols="auto"
                     class="d-flex align-center pr-0"
                   >
                     <span class="subtitle-2">{{ t('angebot.erweiterteRollenAnDerSchule') }}:</span>
                   </v-col>
-
-                  <!-- Read-only chips (hidden while editing) -->
                   <v-col
-                    v-if="!isEditingRollenerweiterungen"
                     class="d-flex align-center flex-wrap"
                     data-testid="service-provider-rollenerweiterungen"
                   >
@@ -346,24 +364,6 @@
                     >
                       {{ rollenerweiterung.rolleName }}
                     </v-chip>
-                  </v-col>
-
-                  <!-- Bearbeiten button (only when not editing and rollenerweiterung is available) -->
-                  <v-col
-                    v-if="
-                      !isEditingRollenerweiterungen &&
-                      serviceProviderStore.currentServiceProvider.availableForRollenerweiterung
-                    "
-                    cols="auto"
-                    class="d-flex align-center pl-2 mr-2"
-                  >
-                    <v-btn
-                      class="primary"
-                      data-testid="rollenerweiterung-bearbeiten-button"
-                      @click="openEditMode"
-                    >
-                      {{ t('edit') }}
-                    </v-btn>
                   </v-col>
                 </v-row>
               </v-col>

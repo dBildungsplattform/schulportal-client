@@ -1,0 +1,9 @@
+.rollenerweiterung-tree {
+  .v-treeview-item .v-checkbox .v-input__details {
+    display: none !important;
+  }
+
+  .v-treeview-item .v-list-item--density-default {
+    max-height: 32px !important;
+  }
+}

@@ -179,6 +179,7 @@
 
     <!-- Treeview -->
     <v-treeview
+      class="rollenerweiterung-tree"
       v-else
       v-model:opened="opened"
       data-testId="rollenerweiterung-tree"
@@ -187,6 +188,7 @@
       item-title="title"
       item-children="children"
       select-strategy="independent"
+      density="compact"
       :model-value="selected"
       @update:model-value="onSelectionUpdate"
     >
@@ -244,8 +246,4 @@
     </v-treeview>
   </div>
 </template>
-<style scoped>
-  :deep(.v-treeview-item .v-checkbox .v-input__details) {
-    display: none !important;
-  }
-</style>
+<style scoped></style>
