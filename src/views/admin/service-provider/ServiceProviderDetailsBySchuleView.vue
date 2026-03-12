@@ -383,12 +383,14 @@
                   :subCards="true"
                 >
                   <v-col class="ml-10">
-                    <RollenerweiterungTreeview
-                      :available-rollen="availableRollen"
-                      :initially-selected-rolle-ids="existingRolleIds"
-                      :loading="rolleStore.loading"
-                      @update:selectedRolleIds="selectedRolleIds = $event"
-                    />
+                    <div :class="{ 'treeview-scrollable': availableRollen.length > 15 }">
+                      <RollenerweiterungTreeview
+                        :available-rollen="availableRollen"
+                        :initially-selected-rolle-ids="existingRolleIds"
+                        :loading="rolleStore.loading"
+                        @update:selectedRolleIds="selectedRolleIds = $event"
+                      />
+                    </div>
                   </v-col>
 
                   <!-- Save / Cancel actions -->
@@ -418,6 +420,7 @@
                       md="auto"
                     >
                       <v-btn
+                        v-if="availableRollen.length > 0"
                         color="primary"
                         :block="mdAndDown"
                         data-testid="rollenerweiterung-save-button"
@@ -492,5 +495,9 @@
     .custom-offset {
       margin-left: 0 !important;
     }
+  }
+  .treeview-scrollable {
+    max-height: 700px;
+    overflow-y: auto;
   }
 </style>

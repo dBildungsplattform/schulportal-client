@@ -75,9 +75,9 @@
 
   const treeItems: ComputedRef<TreeNode[]> = computed(() => {
     return GROUP_DEFINITIONS.flatMap((def: { key: RollenArt; labelKey: string }) => {
-      const allChildren: RolleForSelection[] = props.availableRollen.filter(
-        (r: RolleForSelection) => r.rollenart === def.key,
-      ).sort((a: RolleForSelection, b: RolleForSelection) => a.name.localeCompare(b.name));
+      const allChildren: RolleForSelection[] = props.availableRollen
+        .filter((r: RolleForSelection) => r.rollenart === def.key)
+        .sort((a: RolleForSelection, b: RolleForSelection) => a.name.localeCompare(b.name));
 
       if (allChildren.length === 0) {
         return [];
@@ -200,7 +200,7 @@
         <!-- ── Group header ──────────────────────────────────────────────── -->
         <template v-if="(item as TreeNode).isGroup">
           <div
-            class="group-row d-flex align-center w-100 flex-wrap" 
+            class="group-row d-flex align-center w-100 flex-wrap"
             :data-testid="`treeview-group-${(item as TreeNode).rollenart}`"
             @click="toggleGroupSelection((item as TreeNode).rollenart!)"
           >
