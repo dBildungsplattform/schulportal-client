@@ -373,10 +373,7 @@
 
             <!-- Inline treeview (shown while editing, full-width, no offset) -->
             <v-expand-transition>
-              <div
-                v-if="isEditingRollenerweiterungen"
-                class="mt-n8"
-              >
+              <div v-if="isEditingRollenerweiterungen">
                 <LayoutCard
                   :closable="false"
                   :header="t('angebot.editRollenerweiterungen')"
