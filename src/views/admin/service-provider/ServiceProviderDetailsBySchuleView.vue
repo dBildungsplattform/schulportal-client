@@ -312,32 +312,11 @@
                 offset-md="1"
                 offset-lg="1"
               >
-                <!-- Bearbeiten button -->
-                <v-row
-                  class="mt-4 mr-10"
-                  justify="end"
-                >
-                  <v-col
-                    cols="12"
-                    md="auto"
-                  >
-                    <v-btn
-                      v-if="
-                        !isEditingRollenerweiterungen &&
-                        serviceProviderStore.currentServiceProvider.availableForRollenerweiterung
-                      "
-                      class="primary"
-                      :block="mdAndDown"
-                      data-testid="rollenerweiterung-bearbeiten-button"
-                      @click="openEditMode"
-                    >
-                      {{ t('edit') }}
-                    </v-btn>
-                  </v-col>
-                </v-row>
-
                 <!-- Read-only chips -->
-                <v-row v-if="!isEditingRollenerweiterungen">
+                <v-row
+                  class="mt-5"
+                  v-if="!isEditingRollenerweiterungen"
+                >
                   <v-col
                     cols="auto"
                     class="d-flex align-center pr-0"
@@ -363,6 +342,30 @@
                     >
                       {{ rollenerweiterung.rolleName }}
                     </v-chip>
+                  </v-col>
+                </v-row>
+
+                <!-- Bearbeiten button -->
+                <v-row
+                  class="mr-10"
+                  justify="end"
+                >
+                  <v-col
+                    cols="12"
+                    md="auto"
+                  >
+                    <v-btn
+                      v-if="
+                        !isEditingRollenerweiterungen &&
+                        serviceProviderStore.currentServiceProvider.availableForRollenerweiterung
+                      "
+                      class="primary"
+                      :block="mdAndDown"
+                      data-testid="rollenerweiterung-bearbeiten-button"
+                      @click="openEditMode"
+                    >
+                      {{ t('edit') }}
+                    </v-btn>
                   </v-col>
                 </v-row>
               </v-col>
