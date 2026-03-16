@@ -9,6 +9,7 @@ import {
   type ServiceProviderStore,
   type ManageableServiceProviderDetail,
   type RollenErweiterungenUebersicht,
+  type PersistRollenerweiterung,
 } from './ServiceProviderStore';
 import { faker } from '@faker-js/faker';
 import type {
@@ -414,6 +415,49 @@ describe('serviceProviderStore', () => {
       await serviceProviderStore.getRollenerweiterungenById({ serviceProviderId: serviceProviderId });
       expect(serviceProviderStore.rollenerweiterungenUebersicht).toEqual([]);
       expect(serviceProviderStore.errorCode).toBe('some mock server error');
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+  });
+
+  describe('persistRollenerweiterungenForServiceProvider', () => {
+    const serviceProviderId: string = faker.string.uuid();
+    const organisationId: string = faker.string.uuid();
+    const url: string = `/api/rollen-erweiterung/angebot/${serviceProviderId}/organisation/${organisationId}/apply`;
+
+    const filter: PersistRollenerweiterung = {
+      serviceProviderId,
+      organisationId,
+      addErweiterungenForRolleIds: [faker.string.uuid(), faker.string.uuid()],
+      removeErweiterungenForRolleIds: [faker.string.uuid()],
+    };
+
+    it('should persist rollenerweiterungen and update loading state', async () => {
+      mockadapter.onPost(url).replyOnce(200);
+
+      const promise: Promise<void> = serviceProviderStore.persistRollenerweiterungenForServiceProvider(filter);
+      expect(serviceProviderStore.loading).toBe(true);
+      await promise;
+      expect(serviceProviderStore.errorCode).toEqual('');
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+
+    it('should handle string error', async () => {
+      mockadapter.onPost(url).replyOnce(500, 'some mock server error');
+
+      const promise: Promise<void> = serviceProviderStore.persistRollenerweiterungenForServiceProvider(filter);
+      expect(serviceProviderStore.loading).toBe(true);
+      await promise;
+      expect(serviceProviderStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+
+    it('should handle error code', async () => {
+      mockadapter.onPost(url).replyOnce(500, { code: 'some mock server error' });
+
+      const promise: Promise<void> = serviceProviderStore.persistRollenerweiterungenForServiceProvider(filter);
+      expect(serviceProviderStore.loading).toBe(true);
+      await promise;
+      expect(serviceProviderStore.errorCode).toEqual('some mock server error');
       expect(serviceProviderStore.loading).toBe(false);
     });
   });
