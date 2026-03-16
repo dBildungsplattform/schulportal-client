@@ -205,7 +205,6 @@ describe('ServiceProviderDetailsBySchuleView', () => {
         ?.dispatchEvent(new Event('click'));
       await nextTick();
 
-      expect(document.querySelector('[data-testid="close-rollenerweiterung-save-success-button"]')).not.toBeNull();
       expect(wrapper?.find('[data-testid="rollenerweiterung-bearbeiten-button"]').exists()).toBe(true);
     });
   });

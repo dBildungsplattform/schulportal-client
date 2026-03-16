@@ -81,19 +81,13 @@
         return [];
       }
 
-      const filteredChildren: RolleForSelection[] = allChildren;
-
-      if (filteredChildren.length === 0) {
-        return [];
-      }
-
       return [
         {
           id: `group-${def.key}`,
           title: t(def.labelKey),
           isGroup: true,
           rollenart: def.key,
-          children: filteredChildren.map((r: RolleForSelection) => ({
+          children: allChildren.map((r: RolleForSelection) => ({
             id: r.id,
             title: r.name,
             isGroup: false,
@@ -146,7 +140,6 @@
   }
 
   function onSelectionUpdate(val: unknown): void {
-    // v-treeview with select-strategy="leaf" only emits leaf IDs — still guard just in case
     const ids: string[] = Array.isArray(val) ? val.filter((id: unknown): id is string => typeof id === 'string') : [];
     const leafIds: string[] = ids.filter((id: string) => allRolleIds.value.has(id));
     selected.value = leafIds;
@@ -179,7 +172,7 @@
     <v-treeview
       v-else
       v-model:opened="opened"
-      data-testId="rollenerweiterung-tree"
+      data-testid="rollenerweiterung-tree"
       :items="treeItems"
       item-value="id"
       item-title="title"

@@ -188,7 +188,7 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
             filter.limit,
             filter.searchString,
             filter.organisationId,
-            filter.systemrecht
+            filter.systemrecht,
           );
         this.allRollen = response.data;
         this.totalRollen = +response.headers['x-paging-total'];

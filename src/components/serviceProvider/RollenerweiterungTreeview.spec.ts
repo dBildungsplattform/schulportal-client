@@ -2,7 +2,6 @@ import { expect, test, describe } from 'vitest';
 import { DOMWrapper, mount, VueWrapper } from '@vue/test-utils';
 import RollenerweiterungTreeview, { type RolleForSelection } from './RollenerweiterungTreeview.vue';
 import { RollenArt } from '@/stores/RolleStore';
-import type WrapperLike from 'node_modules/@vue/test-utils/dist/interfaces/wrapperLike';
 
 const mockRollen: RolleForSelection[] = [
   { id: 'lehr-1', name: 'Lehrer A', rollenart: RollenArt.Lehr },
@@ -59,9 +58,9 @@ describe('RollenerweiterungTreeview - Group rendering', () => {
   });
 
   test('does not render group when no rollen exist for that rollenart', () => {
-    const wrapper: WrapperLike = mountComponent({
+    const wrapper: VueWrapper = mountComponent({
       availableRollen: [{ id: 'lehr-1', name: 'Lehrer A', rollenart: RollenArt.Lehr }],
-    });
+    }) as VueWrapper;
     expect(wrapper.find('[data-testid="treeview-group-LEHR"]').exists()).toBe(true);
     expect(wrapper.find('[data-testid="treeview-group-LERN"]').exists()).toBe(false);
     expect(wrapper.find('[data-testid="treeview-group-LEIT"]').exists()).toBe(false);
