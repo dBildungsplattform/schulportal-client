@@ -50,7 +50,7 @@
 
   // ── State ──────────────────────────────────────────────────────────────────
   const selected: Ref<string[]> = ref([...(props.initiallySelectedRolleIds ?? [])]);
-  const opened: Ref<string[]> = ref(['group-LEHR', 'group-LERN', 'group-LEIT']);
+  const opened: Ref<string[]> = ref(['group-LEHR', 'group-LERN']);
 
   watch(
     () => props.initiallySelectedRolleIds,
