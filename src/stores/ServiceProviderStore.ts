@@ -4,16 +4,20 @@ import { defineStore, type Store, type StoreDefinition } from 'pinia';
 
 import {
   ProviderApiFactory,
+  RolleApiFactory,
   ServiceProviderKategorie,
   ServiceProviderMerkmal,
+  type ApplyRollenerweiterungBodyParams,
   type ManageableServiceProviderResponse,
   type ProviderApiInterface,
   type ProviderControllerFindRollenerweiterungenByServiceProviderId200Response,
   type ProviderControllerGetManageableServiceProviders200Response,
+  type RolleApiInterface,
   type RollenerweiterungForManageableServiceProviderResponse,
 } from '../api-client/generated/api';
 
 const serviceProviderApi: ProviderApiInterface = ProviderApiFactory(undefined, '', axiosApiInstance);
+const rolleApi: RolleApiInterface = RolleApiFactory(undefined, '', axiosApiInstance);
 
 export type BaseServiceProvider = {
   id: string;
@@ -70,6 +74,13 @@ export type RollenerweiterungFilter = {
   organisationId?: string;
 };
 
+export type PersistRollenerweiterung = {
+  serviceProviderId: string;
+  organisationId: string;
+  addErweiterungenForRolleIds: Array<string>;
+  removeErweiterungenForRolleIds: Array<string>;
+};
+
 type ServiceProviderState = {
   allServiceProviders: StartPageServiceProvider[];
   availableServiceProviders: StartPageServiceProvider[];
@@ -99,6 +110,7 @@ type ServiceProviderActions = {
   getManageableServiceProviderById: (serviceProviderId: string) => Promise<void>;
   getServiceProviderLogoById: (serviceProviderId: string) => Promise<void>;
   getRollenerweiterungenById: (filter: RollenerweiterungFilter) => Promise<void>;
+  persistRollenerweiterungenForServiceProvider: (filter: PersistRollenerweiterung) => Promise<void>;
 };
 
 export { ServiceProviderKategorie };
@@ -285,6 +297,25 @@ export const useServiceProviderStore: StoreDefinition<
         }));
         this.rollenerweiterungenUebersicht = rollenerweiterungenUebersicht;
       } catch (error: unknown) {
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async persistRollenerweiterungenForServiceProvider(filter: PersistRollenerweiterung): Promise<void> {
+      this.loading = true;
+      try {
+        const bodyParams: ApplyRollenerweiterungBodyParams = {
+          addErweiterungenForRolleIds: filter.addErweiterungenForRolleIds,
+          removeErweiterungenForRolleIds: filter.removeErweiterungenForRolleIds,
+        };
+        await rolleApi.rollenerweiterungControllerApplyRollenerweiterungChanges(
+          filter.serviceProviderId,
+          filter.organisationId,
+          bodyParams,
+        );
+      } catch (error) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
         this.loading = false;

@@ -110,6 +110,8 @@ export type RolleFilter = {
   limit?: number;
   offset?: number;
   searchString?: string;
+  organisationId?: string;
+  systemrecht?: RollenSystemRechtEnum;
 };
 
 export type RolleStore = Store<'rolleStore', RolleState, RolleGetters, RolleActions>;
@@ -181,7 +183,13 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
       this.loading = true;
       try {
         const response: AxiosResponse<Array<RolleWithServiceProvidersResponse>> =
-          await rolleApi.rolleControllerFindRollen(filter.offset, filter.limit, filter.searchString);
+          await rolleApi.rolleControllerFindRollen(
+            filter.offset,
+            filter.limit,
+            filter.searchString,
+            filter.organisationId,
+            filter.systemrecht,
+          );
         this.allRollen = response.data;
         this.totalRollen = +response.headers['x-paging-total'];
       } catch (error: unknown) {

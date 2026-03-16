@@ -7,11 +7,15 @@
     headlineTestId?: string;
     subCards?: boolean;
     headerHoverText?: string;
+    variant?: 'text' | 'elevated' | 'outlined' | 'tonal' | 'flat';
   }>();
 </script>
 
 <template>
-  <v-card class="layout-card pb-1">
+  <v-card
+    :variant="variant"
+    class="layout-card pb-1"
+  >
     <v-row
       align="center"
       class="flex-nowrap ml-md-6 ml-1"

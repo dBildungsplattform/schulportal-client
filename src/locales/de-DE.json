@@ -4,6 +4,9 @@
     "assignedRollen": "Zugeordnete Rollen",
     "erweiterteRollen": "Erweiterte Rollen",
     "erweiterteRollenAnDerSchule": "Erweiterte Rollen an der Schule",
+    "groupLehr": "Lehrkräfte",
+    "groupLern": "Schüler",
+    "groupLeit": "Administratoren",
     "name": "Name",
     "kategorie": "Kategorie",
     "administrationsebene": "Administrationsebene",
@@ -42,7 +45,10 @@
     "loadingErrorTitle": "Fehler beim Laden des Angebots",
     "chooseSchuleFirst": "Bitte wählen Sie zunächst im Filter eine Schule aus.",
     "noServiceProvidersAvailable": "Keine passenden Angebote gefunden.",
-    "providedBy": "Bereitgestellt von"
+    "providedBy": "Bereitgestellt von",
+    "noRolesFound": "Es konnten keine Rollen gefunden werden.",
+    "saveRollenerweiterungenSuccess": "Die Rollenerweiterungen wurden erfolgreich gespeichert.",
+    "editRollenerweiterungen": "Rollenauswahl bearbeiten"
   },
   "action": "Aktion",
   "admin": {
@@ -811,6 +817,7 @@
     "backToPreviousPage": "Zurück zur vorherigen Seite"
   },
   "no": "Nein",
+  "from": "von",
   "noDataFound": "Keine Daten gefunden.",
   "pagination": {
     "all": "Alle",
