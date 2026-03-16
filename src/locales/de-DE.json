@@ -31,6 +31,7 @@
       "VALIDATION_ERROR": "Die Anfrage für das Angebot ist ungültig.",
       "401": "Sie sind nicht autorisiert, auf dieses Angebot zuzugreifen.",
       "403": "Der Zugriff auf dieses Angebot ist verboten.",
+      "AUTHENTICATION_ERROR": "Der Zugriff auf dieses Angebot ist verboten.",
       "404": "Das Angebot konnte nicht gefunden werden.",
       "ENTITY_NOT_FOUND": "Das Angebot konnte nicht gefunden werden.",
       "500": "Es ist ein technischer Fehler aufgetreten.",
