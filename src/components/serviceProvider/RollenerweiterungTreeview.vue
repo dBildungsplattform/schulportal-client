@@ -229,9 +229,12 @@
 </template>
 <style scoped>
   .rolle-treeview :deep(.v-list-group__items) {
-    max-height: 400px;
     overflow-y: scroll !important;
     width: 1050px;
+  }
+
+  .rolle-treeview :deep(.v-list-group:has([data-scrollable]) .v-list-group__items) {
+    max-height: 400px;
   }
 
   .rolle-treeview :deep(.v-list-group__items::-webkit-scrollbar) {
