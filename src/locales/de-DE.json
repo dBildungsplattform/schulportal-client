@@ -532,7 +532,8 @@
           "LANDESBEDIENSTETE_SUCHEN_UND_HINZUFUEGEN": "Darf Landesbedienstete suchen und hinzufügen",
           "EINGESCHRAENKT_NEUE_BENUTZER_ERSTELLEN": "Darf eingeschränkt neue Benutzer erstellen",
           "ROLLEN_ERWEITERN": "Darf Rollen schulspezifisch erweitern",
-          "ANGEBOTE_VERWALTEN": "Darf Angebote verwalten"
+          "ANGEBOTE_VERWALTEN": "Darf Angebote verwalten",
+          "ANGEBOTE_EINGESCHRAENKT_VERWALTEN": "Darf Angebote eingeschränkt verwalten"
         },
         "rollenarten": {
           "LERN": "Lern",
