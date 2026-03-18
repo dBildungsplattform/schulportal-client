@@ -195,6 +195,7 @@
         <template v-if="item.isGroup">
           <div
             class="group-row d-flex align-center w-100 flex-wrap"
+            :data-testid="`treeview-group-${item.rollenart}`"
             :data-scrollable="item.scrollable || undefined"
             :class="{ 'group-children-scrollable': item.scrollable }"
             @click="toggleGroupSelection(item.rollenart!)"
@@ -227,17 +228,18 @@
   </div>
 </template>
 <style scoped>
-  .rolle-treeview :deep(.v-list-group:has([data-scrollable]) .v-list-group__items) {
+  .rolle-treeview :deep(.v-list-group__items) {
     max-height: 400px;
     overflow-y: scroll !important;
+    width: 1050px;
   }
 
-  .rolle-treeview :deep(.v-list-group:has([data-scrollable]) .v-list-group__items::-webkit-scrollbar) {
+  .rolle-treeview :deep(.v-list-group__items::-webkit-scrollbar) {
     width: 6px;
     display: block;
   }
 
-  .rolle-treeview :deep(.v-list-group:has([data-scrollable]) .v-list-group__items::-webkit-scrollbar-thumb) {
+  .rolle-treeview :deep(.v-list-group__items::-webkit-scrollbar-thumb) {
     background-color: rgba(0, 0, 0, 0.25);
     border-radius: 3px;
   }
