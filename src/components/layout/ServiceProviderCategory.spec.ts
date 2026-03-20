@@ -16,7 +16,7 @@ const mockServiceProviders: Array<StartPageServiceProvider> = [
     target: 'URL',
     requires2fa: true,
     logoUrl: '/logo-a.png',
-    kategorie: ServiceProviderKategorie.Angebote,
+    kategorie: ServiceProviderKategorie.Hinweise,
     hasLogo: false,
   },
   {
@@ -26,7 +26,7 @@ const mockServiceProviders: Array<StartPageServiceProvider> = [
     requires2fa: false,
     logoUrl: '/logo-b.png',
     url: 'https://service-b.com',
-    kategorie: ServiceProviderKategorie.Angebote,
+    kategorie: ServiceProviderKategorie.Hinweise,
     hasLogo: false,
   },
   {
@@ -36,7 +36,7 @@ const mockServiceProviders: Array<StartPageServiceProvider> = [
     requires2fa: true,
     logoUrl: '/logo-c.png',
     url: '',
-    kategorie: ServiceProviderKategorie.Angebote,
+    kategorie: ServiceProviderKategorie.Hinweise,
     hasLogo: false,
   },
 ];

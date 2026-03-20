@@ -30,7 +30,7 @@ import {
 import type { Organisation } from '@/stores/OrganisationStore';
 import type { PersonenkontextWorkflowResponse } from '@/stores/PersonenkontextStore';
 import { type Personendatensatz } from '@/stores/PersonStore';
-import type { Rolle, RolleResponse } from '@/stores/RolleStore';
+import type { Rolle, RolleResponse, RolleWithServiceProvidersResponse } from '@/stores/RolleStore';
 import {
   type RollenErweiterungenUebersicht,
   type RollenerweiterungMap,
@@ -281,6 +281,26 @@ export class DoFactory {
         RollenSystemRechtEnum.PersonSynchronisieren,
       ],
       serviceProviderIds: [faker.string.uuid()],
+      ...props,
+    };
+  }
+
+  public static getRolleWithServiceProviders(
+    props?: Partial<RolleWithServiceProvidersResponse>,
+  ): RolleWithServiceProvidersResponse {
+    return {
+      id: faker.string.uuid(),
+      createdAt: faker.date.past().toISOString(),
+      updatedAt: faker.date.past().toISOString(),
+      name: faker.string.alpha(4),
+      administeredBySchulstrukturknoten: faker.string.uuid(),
+      administeredBySchulstrukturknotenName: faker.string.alpha(4),
+      administeredBySchulstrukturknotenKennung: faker.string.alpha(4),
+      rollenart: RollenArt.Lehr,
+      merkmale: new Set<RollenMerkmal>(),
+      systemrechte: new Set<SystemRechtResponse>(),
+      version: 1,
+      serviceProviders: [],
       ...props,
     };
   }

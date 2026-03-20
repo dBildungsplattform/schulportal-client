@@ -8,18 +8,44 @@
   import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { computed, onMounted, type ComputedRef } from 'vue';
+  import { computed, onMounted, ref, type ComputedRef, type Ref } from 'vue';
   import SchulPortalLogo from '@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg';
   import LabeledField from '@/components/admin/LabeledField.vue';
   import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+  import {
+    RollenArt,
+    useRolleStore,
+    type RolleStore,
+    type RolleWithServiceProvidersResponse,
+  } from '@/stores/RolleStore';
+  import RollenerweiterungTreeview, {
+    type RolleForSelection,
+  } from '@/components/serviceProvider/RollenerweiterungTreeview.vue';
+  import { RollenSystemRechtEnum } from '@/api-client/generated';
+  import { useDisplay } from 'vuetify';
+
   const router: Router = useRouter();
   const route: RouteLocationNormalizedLoaded = useRoute();
   const { t }: Composer = useI18n({ useScope: 'global' });
+  const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
+  const rolleStore: RolleStore = useRolleStore();
 
   const currentServiceProviderId: string = route.params['id'] as string;
+
+  // ── Edit mode state ────────────────────────────────────────────────────────
+  const isEditingRollenerweiterungen: Ref<boolean> = ref(false);
+  const selectedRolleIds: Ref<string[]> = ref([]);
+  const isSaving: Ref<boolean> = ref(false);
+  const saveSuccessDialogVisible: Ref<boolean> = ref(false);
+
+  function closeSaveSuccessDialog(): void {
+    saveSuccessDialogVisible.value = false;
+    isEditingRollenerweiterungen.value = false;
+    selectedRolleIds.value = [];
+  }
 
   function navigateToServiceProviderBySchuleTable(): void {
     router.push({ name: 'angebot-management-schulspezifisch' });
@@ -30,7 +56,6 @@
     navigateToServiceProviderBySchuleTable();
   };
 
-  // Default for now - in the future when Edit functionality is added, this will have more error codes as cases to handle accordingly
   const alertButtonText: ComputedRef<string> = computed(() => {
     switch (serviceProviderStore.errorCode) {
       default:
@@ -61,6 +86,70 @@
     () => route.query['orga'] as string | undefined,
   );
 
+  // ── Derived data ──────────────────────────────────────────────────────────
+  const existingRolleIds: ComputedRef<string[]> = computed(
+    () => serviceProviderStore.rollenerweiterungen?.items?.map((item: { rolleId: string }) => item.rolleId) ?? [],
+  );
+
+  const availableRollen: ComputedRef<RolleForSelection[]> = computed(() =>
+    (rolleStore.allRollen ?? [])
+      .filter((r: RolleWithServiceProvidersResponse) =>
+        ([RollenArt.Lehr, RollenArt.Lern, RollenArt.Leit] as RollenArt[]).includes(r.rollenart),
+      )
+      .map((r: RolleWithServiceProvidersResponse) => ({ id: r.id, name: r.name, rollenart: r.rollenart })),
+  );
+
+  // ── Edit mode actions ─────────────────────────────────────────────────────
+  async function openEditMode(): Promise<void> {
+    // Load available rollen for this organisation if not yet loaded
+    if (organisationIdFromQuery.value) {
+      await rolleStore.getAllRollen({
+        organisationId: organisationIdFromQuery.value,
+        systemrecht: RollenSystemRechtEnum.RollenErweitern,
+      });
+    }
+    selectedRolleIds.value = [...existingRolleIds.value];
+    isEditingRollenerweiterungen.value = true;
+  }
+
+  function cancelEdit(): void {
+    isEditingRollenerweiterungen.value = false;
+    selectedRolleIds.value = [];
+  }
+
+  async function saveRollenerweiterungen(): Promise<void> {
+    if (!organisationIdFromQuery.value) {
+      return;
+    }
+
+    isSaving.value = true;
+
+    const existingSet: Set<string> = new Set(existingRolleIds.value);
+    const selectedSet: Set<string> = new Set(selectedRolleIds.value);
+
+    const addErweiterungenForRolleIds: string[] = [...selectedSet].filter((id: string) => !existingSet.has(id));
+    const removeErweiterungenForRolleIds: string[] = [...existingSet].filter((id: string) => !selectedSet.has(id));
+
+    await serviceProviderStore.persistRollenerweiterungenForServiceProvider({
+      serviceProviderId: currentServiceProviderId,
+      organisationId: organisationIdFromQuery.value,
+      addErweiterungenForRolleIds,
+      removeErweiterungenForRolleIds,
+    });
+
+    isSaving.value = false;
+
+    if (!serviceProviderStore.errorCode) {
+      // Refresh rollenerweiterungen to reflect saved state
+      await serviceProviderStore.getRollenerweiterungenById({
+        serviceProviderId: currentServiceProviderId,
+        organisationId: organisationIdFromQuery.value,
+      });
+      saveSuccessDialogVisible.value = true;
+    }
+  }
+
+  // ── Lifecycle ─────────────────────────────────────────────────────────────
   onMounted(async () => {
     serviceProviderStore.errorCode = '';
     serviceProviderStore.serviceProviderLogos.clear();
@@ -74,7 +163,6 @@
       }),
     ]);
 
-    // Restore filter context if missing
     if (!organisationStore.currentOrganisation && organisationIdFromQuery.value) {
       await organisationStore.getOrganisationById(organisationIdFromQuery.value);
     }
@@ -103,7 +191,6 @@
         class="px-3 px-sm-16"
       >
         <v-container class="px-lg-16">
-          <!-- Error Message Display if the serviceProviderStore throws any kind of error (Not being able to load the service provider) -->
           <SpshAlert
             :modelValue="!!serviceProviderStore.errorCode"
             :buttonText="alertButtonText"
@@ -130,36 +217,29 @@
                 offset-lg="1"
               >
                 <v-row>
-                  <!-- Left column (first 4 fields) -->
+                  <!-- Left column -->
                   <v-col
                     cols="12"
                     md="6"
                   >
                     <div>
-                      <!-- Name -->
                       <LabeledField
                         :label="t('angebot.name')"
                         :value="serviceProviderStore.currentServiceProvider.name"
                         test-id="service-provider-name"
                       />
-
-                      <!-- Administrationsebene -->
                       <LabeledField
                         :label="t('angebot.providedBy')"
                         :value="serviceProviderStore.currentServiceProvider.administrationsebene.name"
                         test-id="service-provider-administrationsebene"
                         no-margin-top
                       />
-
-                      <!-- Requires 2FA -->
                       <LabeledField
                         :label="t('angebot.requires2FA')"
                         :value="serviceProviderStore.currentServiceProvider.requires2fa ? t('yes') : t('no')"
                         test-id="service-provider-requires-2fa"
                         no-margin-top
                       />
-
-                      <!-- Can be assigned to Rollen? -->
                       <LabeledField
                         :label="t('angebot.canBeAssignedToRollen')"
                         :value="
@@ -180,7 +260,6 @@
                     cols="12"
                     md="6"
                   >
-                    <!-- Logo -->
                     <LabeledField
                       :label="t('angebot.logo')"
                       is-logo
@@ -189,8 +268,6 @@
                       test-id="service-provider-logo"
                       md-margin-top
                     />
-
-                    <!-- Kategorie -->
                     <LabeledField
                       :label="t('angebot.kategorie')"
                       :value="
@@ -201,8 +278,6 @@
                       test-id="service-provider-kategorie"
                       no-margin-top
                     />
-
-                    <!-- URL -->
                     <LabeledField
                       :label="t('angebot.link')"
                       :value="serviceProviderStore.currentServiceProvider.url || t('missing')"
@@ -210,8 +285,6 @@
                       word-break-all
                       no-margin-top
                     />
-
-                    <!-- Rollenerweiterung -->
                     <LabeledField
                       :label="t('angebot.schulspezifischeRollenerweiterung')"
                       :value="
@@ -224,11 +297,14 @@
                 </v-row>
               </v-col>
             </v-row>
+
             <v-divider
               class="border-opacity-100 rounded mt-16 mb-0 pb-0"
               color="#E5EAEF"
               thickness="6"
-            ></v-divider>
+            />
+
+            <!-- ── Rollenerweiterungen section ──────────────────────────────── -->
             <v-row>
               <v-col
                 offset="1"
@@ -236,25 +312,28 @@
                 offset-md="1"
                 offset-lg="1"
               >
-                <v-row class="mt-4 align-center">
+                <!-- Read-only chips -->
+                <v-row
+                  class="mt-5"
+                  v-if="!isEditingRollenerweiterungen"
+                >
                   <v-col
                     cols="auto"
                     class="d-flex align-center pr-0"
                   >
                     <span class="subtitle-2">{{ t('angebot.erweiterteRollenAnDerSchule') }}:</span>
                   </v-col>
-
                   <v-col
                     class="d-flex align-center flex-wrap"
                     data-testid="service-provider-rollenerweiterungen"
                   >
                     <span
-                      class="text-body"
                       v-if="serviceProviderStore.rollenerweiterungen?.items?.length === 0"
-                      >{{ t('none') }}</span
+                      class="text-body"
                     >
+                      {{ t('none') }}
+                    </span>
                     <v-chip
-                      else
                       v-for="rollenerweiterung in serviceProviderStore.rollenerweiterungen?.items"
                       :key="rollenerweiterung.rolleName"
                       class="ma-1"
@@ -265,23 +344,155 @@
                     </v-chip>
                   </v-col>
                 </v-row>
+
+                <!-- Bearbeiten button -->
+                <v-row
+                  class="mr-10"
+                  justify="end"
+                >
+                  <v-col
+                    cols="12"
+                    md="auto"
+                  >
+                    <v-btn
+                      v-if="
+                        !isEditingRollenerweiterungen &&
+                        serviceProviderStore.currentServiceProvider.availableForRollenerweiterung
+                      "
+                      class="primary"
+                      :block="mdAndDown"
+                      data-testid="rollenerweiterung-bearbeiten-button"
+                      @click="openEditMode"
+                    >
+                      {{ t('edit') }}
+                    </v-btn>
+                  </v-col>
+                </v-row>
               </v-col>
             </v-row>
+
+            <!-- Inline treeview (shown while editing, full-width, no offset) -->
+            <v-expand-transition>
+              <div v-if="isEditingRollenerweiterungen">
+                <LayoutCard
+                  :closable="false"
+                  :header="t('angebot.editRollenerweiterungen')"
+                  :padded="true"
+                  :variant="'text'"
+                  :subCards="true"
+                >
+                  <v-col class="ml-10">
+                    <div :class="{ 'treeview-scrollable': availableRollen.length > 15 }">
+                      <RollenerweiterungTreeview
+                        :available-rollen="availableRollen"
+                        :initially-selected-rolle-ids="existingRolleIds"
+                        :loading="rolleStore.loading"
+                        @update:selectedRolleIds="selectedRolleIds = $event"
+                      />
+                    </div>
+                  </v-col>
+
+                  <!-- Save / Cancel actions -->
+                  <v-row
+                    class="mt-4"
+                    justify="end"
+                  >
+                    <v-col
+                      cols="12"
+                      sm="6"
+                      md="auto"
+                    >
+                      <v-btn
+                        class="secondary"
+                        :block="mdAndDown"
+                        :disabled="isSaving"
+                        variant="text"
+                        data-testid="rollenerweiterung-cancel-button"
+                        @click="cancelEdit"
+                      >
+                        {{ t('cancel') }}
+                      </v-btn>
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      sm="6"
+                      md="auto"
+                    >
+                      <v-btn
+                        v-if="availableRollen.length > 0"
+                        color="primary"
+                        :block="mdAndDown"
+                        data-testid="rollenerweiterung-save-button"
+                        :disabled="rolleStore.loading"
+                        :loading="isSaving"
+                        @click="saveRollenerweiterungen"
+                      >
+                        {{ t('save') }}
+                      </v-btn>
+                    </v-col>
+                  </v-row>
+                </LayoutCard>
+              </div>
+            </v-expand-transition>
           </template>
 
           <template v-else-if="serviceProviderStore.loading">
-            <v-progress-circular indeterminate></v-progress-circular>
+            <v-progress-circular indeterminate />
           </template>
         </v-container>
       </template>
     </LayoutCard>
+
+    <!-- ── Save success dialog ──────────────────────────────────────────────── -->
+    <v-dialog
+      v-model="saveSuccessDialogVisible"
+      persistent
+      max-width="600px"
+    >
+      <LayoutCard :header="t('angebot.editRollenerweiterungen')">
+        <v-card-text>
+          <v-container>
+            <v-row class="text-body text-center bold">
+              <v-col
+                offset="1"
+                cols="10"
+              >
+                <span>{{ t('angebot.saveRollenerweiterungenSuccess') }}</span>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions class="justify-center">
+          <v-row class="justify-center">
+            <v-col
+              cols="12"
+              sm="6"
+              md="4"
+            >
+              <v-btn
+                :block="mdAndDown"
+                class="primary"
+                data-testid="close-rollenerweiterung-save-success-button"
+                @click.stop="closeSaveSuccessDialog"
+              >
+                {{ t('close') }}
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-card-actions>
+      </LayoutCard>
+    </v-dialog>
   </div>
 </template>
 
 <style scoped>
   @media (min-width: 1280px) and (max-width: 1600px) {
     .custom-offset {
-      margin-left: 0 !important; /* removes the Vuetify offset */
+      margin-left: 0 !important;
     }
+  }
+  .treeview-scrollable {
+    max-height: 700px;
+    overflow-y: auto;
   }
 </style>
