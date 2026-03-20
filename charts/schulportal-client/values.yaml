@@ -34,13 +34,13 @@ resources:
     memory: 200Mi
 
 ingress:
-  # Only enable if 2nd host name is defined 
-  enabled2nd: false
   enabled: true
   ingressClassName: nginx
   path: /
   pathType: Prefix
   annotations: {}
+  tls: false
+  tlsSecretName: ""
 
 containerPorts: 
   name: http 
