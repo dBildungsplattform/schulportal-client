@@ -30,6 +30,7 @@
       "400": "Die Anfrage für das Angebot ist ungültig.",
       "VALIDATION_ERROR": "Die Anfrage für das Angebot ist ungültig.",
       "401": "Sie sind nicht autorisiert, auf dieses Angebot zuzugreifen.",
+      "UNAUTHORIZED": "Sie sind nicht autorisiert, auf dieses Angebot zuzugreifen.",
       "403": "Der Zugriff auf dieses Angebot ist verboten.",
       "AUTHENTICATION_ERROR": "Der Zugriff auf dieses Angebot ist verboten.",
       "404": "Das Angebot konnte nicht gefunden werden.",
