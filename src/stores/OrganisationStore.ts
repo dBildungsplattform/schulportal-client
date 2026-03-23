@@ -9,6 +9,7 @@ import {
   TraegerschaftTyp,
   type CreateOrganisationBodyParams,
   type OrganisationByIdBodyParams,
+  type OrganisationByIdParams,
   type OrganisationByNameBodyParams,
   type OrganisationenApiInterface,
   type OrganisationResponse,
@@ -630,9 +631,13 @@ export const useOrganisationStore: StoreDefinition<
       this.errorCode = '';
       this.loading = true;
       try {
-        await organisationApi.organisationControllerAddZugehoerigeOrganisation(schultraegerId, {
+        const parentOrgaParam: OrganisationByIdParams = {
+          organisationId: schultraegerId,
+        };
+        const childOrgaParam: OrganisationByIdParams = {
           organisationId: organisationIdBodyParams.organisationId,
-        });
+        };
+        await organisationApi.organisationControllerAddZugehoerigeOrganisation(parentOrgaParam, childOrgaParam);
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'SCHULTRAEGER_ERROR');
       } finally {
