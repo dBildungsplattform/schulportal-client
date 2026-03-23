@@ -16,6 +16,7 @@
     title: string;
     isGroup: boolean;
     rollenart?: RollenArt;
+    scrollable?: boolean;
     children?: TreeNode[];
   };
 
@@ -87,6 +88,7 @@
           title: t(def.labelKey),
           isGroup: true,
           rollenart: def.key,
+          scrollable: allChildren.length > 15,
           children: allChildren.map((r: RolleForSelection) => ({
             id: r.id,
             title: r.name,
@@ -178,6 +180,7 @@
       item-title="title"
       item-children="children"
       select-strategy="independent"
+      class="rolle-treeview"
       density="compact"
       :model-value="selected"
       @update:model-value="onSelectionUpdate"
@@ -189,39 +192,27 @@
         </template>
       </template>
       <template #prepend="{ item }">
-        <!-- ── Group header ──────────────────────────────────────────────── -->
-        <template v-if="(item as TreeNode).isGroup">
+        <template v-if="item.isGroup">
           <div
             class="group-row d-flex align-center w-100 flex-wrap"
-            :data-testid="`treeview-group-${(item as TreeNode).rollenart}`"
-            @click="toggleGroupSelection((item as TreeNode).rollenart!)"
+            :data-testid="`treeview-group-${item.rollenart}`"
+            :data-scrollable="item.scrollable || undefined"
+            :class="{ 'group-children-scrollable': item.scrollable }"
+            @click="toggleGroupSelection(item.rollenart!)"
           >
-            <!-- Our own checkbox for group-level select/deselect -->
             <v-checkbox
-              class="flex-shrink-0"
-              :data-testid="`treeview-group-checkbox-${(item as TreeNode).rollenart}`"
-              :false-icon="
-                getGroupSelectionState((item as TreeNode).rollenart!) === StateSelection.None
-                  ? 'mdi-checkbox-blank-outline'
-                  : undefined
-              "
-              :indeterminate="getGroupSelectionState((item as TreeNode).rollenart!) === StateSelection.Some"
-              :model-value="getGroupSelectionState((item as TreeNode).rollenart!) === StateSelection.All"
-              @click.stop="toggleGroupSelection((item as TreeNode).rollenart!)"
+              :data-testid="`treeview-group-checkbox-${item.rollenart}`"
+              :model-value="getGroupSelectionState(item.rollenart!) === StateSelection.All"
+              :indeterminate="getGroupSelectionState(item.rollenart!) === StateSelection.Some"
+              @click.stop="toggleGroupSelection(item.rollenart!)"
             />
-
-            <span class="group-title font-weight-bold text-body">
-              {{ item.title }}
-            </span>
+            <span class="group-title font-weight-bold text-body">{{ item.title }}</span>
             <span class="ml-2 text-body">
-              ({{ getGroupSelectedCount((item as TreeNode).rollenart!) }}
-              {{ t('from') }}
-              {{ getGroupTotalCount((item as TreeNode).rollenart!) }})
+              ({{ getGroupSelectedCount(item.rollenart!) }} {{ t('from') }} {{ getGroupTotalCount(item.rollenart!) }})
             </span>
           </div>
         </template>
 
-        <!-- ── Leaf (individual rolle) ──────────────────────────────────── -->
         <template v-else>
           <v-checkbox
             :model-value="selected.includes(item.id)"
