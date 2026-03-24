@@ -31,10 +31,15 @@
     },
     "errors": {
       "400": "Die Anfrage für das Angebot ist ungültig.",
+      "VALIDATION_ERROR": "Die Anfrage für das Angebot ist ungültig.",
       "401": "Sie sind nicht autorisiert, auf dieses Angebot zuzugreifen.",
+      "UNAUTHORIZED": "Sie sind nicht autorisiert, auf dieses Angebot zuzugreifen.",
       "403": "Der Zugriff auf dieses Angebot ist verboten.",
+      "AUTHENTICATION_ERROR": "Der Zugriff auf dieses Angebot ist verboten.",
       "404": "Das Angebot konnte nicht gefunden werden.",
+      "ENTITY_NOT_FOUND": "Das Angebot konnte nicht gefunden werden.",
       "500": "Es ist ein technischer Fehler aufgetreten.",
+      "INTERNAL": "Es ist ein technischer Fehler aufgetreten.",
       "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Die letzte Aktion konnte nicht ausgeführt werden. Aufgrund von längerer Inaktivität ist eine erneute Authentifizierung mit einem zweiten Faktor erforderlich. Um fortzufahren, klicken Sie bitte auf „Zurück zur Ergebnisliste“ oder „Schließen“. Sie werden anschließend zur Eingabe Ihres zweiten Faktors aufgefordert."
     },
     "loadingErrorText": "Es konnten keine Angebotdaten geladen werden.",
@@ -312,6 +317,7 @@
       "editPersonalInfo": "Persönliche Informationen bearbeiten",
       "errors": {
         "404": "Der Benutzer konnte nicht gefunden werden.",
+        "ENTITY_NOT_FOUND": "Der Benutzer konnte nicht gefunden werden.",
         "PERSONALNUMMER_NICHT_EINDEUTIG": "Die eingegebene KoPers.-Nr. ist bereits vergeben. Bitte korrigieren Sie Ihre Eingabe.",
         "ERROR_LOADING_USER": "Es konnten keine Benutzerdaten geladen werden.",
         "PERSONALNUMMER_REQUIRED": "Die Änderungen wurden nicht gespeichert, da keine KoPers.-Nr. eingegeben wurde.",
@@ -408,6 +414,7 @@
           "UNKNOWN_ERROR": "Ein unbekannter Fehler ist aufgetreten.",
           "TOKEN_RESET_ERROR": "Leider konnte der Token aus technischen Gründen nicht zurückgesetzt werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut. Sollte das Problem weiterhin bestehen, geben Sie dazu bitte ein Ticket über den {0} auf.",
           "500": "Ein unbekannter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+          "INTERNAL": "Ein unbekannter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
           "SOFTWARE_TOKEN_VERIFICATION_ERROR": "Beim Verifizieren Ihres Tokens ist leider ein Problem aufgetreten.",
           "connection": "Der Server für die Zwei-Faktor-Authentifizierung kann aktuell nicht erreicht werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut.",
           "softwareTokenInitError": "Leider konnte aus technischen Gründen kein QR-Code erzeugt werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut. Sollte das Problem weiterhin bestehen, geben Sie dazu bitte ein Ticket über den {0} auf.",
@@ -454,7 +461,9 @@
       "errors": {
         "fallbackError": "Es ist ein technischer Fehler aufgetreten.",
         "500": "Es ist ein technischer Fehler aufgetreten.",
+        "INTERNAL": "Es ist ein technischer Fehler aufgetreten.",
         "404": "Der Benutzer konnte nicht gefunden werden.",
+        "ENTITY_NOT_FOUND": "Der Benutzer konnte nicht gefunden werden.",
         "COUNT_MISMATCHING": "Der Benutzer wurde zwischenzeitlich von einer anderen Administratorin oder einem anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut.",
         "INVALID_PERSONENKONTEXT_FOR_PERSON_WITH_ROLLENART_LERN": "Die neue Rolle kann diesem Benutzer aufgrund seiner bestehenden Rolle nicht zugeordnet werden.",
         "NEWER_VERSION_OF_PERSONENKONTEXTE_AVAILABLE": "Der Benutzer wurde zwischenzeitlich von einer anderen Administratorin oder einem anderen Administrator bearbeitet. Bitte aktualisieren Sie die Daten und versuchen Sie es erneut.",
@@ -636,7 +645,8 @@
         "ORGANISATION_HAT_PERSONENKONTEXTE": "Es existieren noch zugeordnete Benutzer (Personenkontexte).",
         "ORGANISATION_HAT_ANGEBOTE": "Es existieren noch schulspezifische Angebote.",
         "ORGANISATION_HAT_ROLLENERWEITERUNGEN": "Es existieren noch schulspezifische Rollenerweiterungen.",
-        "500": "Die Schule konnte nicht gelöscht werden, da ein technischer Fehleraufgetreten ist. Bitte versuchen Sie es erneut."
+        "500": "Die Schule konnte nicht gelöscht werden, da ein technischer Fehleraufgetreten ist. Bitte versuchen Sie es erneut.",
+        "INTERNAL": "Die Schule konnte nicht gelöscht werden, da ein technischer Fehleraufgetreten ist. Bitte versuchen Sie es erneut."
       },
       "loadingErrorText": "Es konnten keine Schuldaten geladen werden.",
       "loadingErrorTitle": "Fehler beim Laden der Schulen",
