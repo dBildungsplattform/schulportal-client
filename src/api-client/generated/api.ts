@@ -592,7 +592,7 @@ export interface DBiamPersonenzuordnungResponse {
      * @type {OrganisationsTyp}
      * @memberof DBiamPersonenzuordnungResponse
      */
-    'typ': OrganisationsTyp;
+    'typ': OrganisationsTyp | null;
     /**
      * 
      * @type {boolean}
@@ -619,6 +619,53 @@ export interface DBiamPersonenzuordnungResponse {
     'admins': Array<string> | null;
 }
 
+
+/**
+ * 
+ * @export
+ * @interface DbiamApplyRollenerweiterungMultiError
+ */
+export interface DbiamApplyRollenerweiterungMultiError {
+    /**
+     * Corresponds to HTTP Status code like 200, 404, 500
+     * @type {number}
+     * @memberof DbiamApplyRollenerweiterungMultiError
+     */
+    'code': number;
+    /**
+     * 
+     * @type {Array<DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInner>}
+     * @memberof DbiamApplyRollenerweiterungMultiError
+     */
+    'rolleIdsWithI18nKeys': Array<DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInner>;
+}
+/**
+ * 
+ * @export
+ * @interface DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInner
+ */
+export interface DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInner {
+    /**
+     * 
+     * @type {string}
+     * @memberof DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInner
+     */
+    'rolleId'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInner
+     */
+    'i18nKey'?: DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInnerI18nKeyEnum;
+}
+
+export const DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInnerI18nKeyEnum = {
+    RollenerweiterungTechnicalError: 'ROLLENERWEITERUNG_TECHNICAL_ERROR',
+    NotFound: 'NOT_FOUND',
+    NoRedundantRollenerweiterung: 'NO_REDUNDANT_ROLLENERWEITERUNG'
+} as const;
+
+export type DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInnerI18nKeyEnum = typeof DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInnerI18nKeyEnum[keyof typeof DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInnerI18nKeyEnum];
 
 /**
  * 
@@ -7533,7 +7580,7 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
     return {
         /**
          * 
-         * @param {string} organisationId The id of an organization
+         * @param {string} organisationId The ID of the parent organisation to which another organisation will be added as a subordinate.
          * @param {OrganisationByIdBodyParams} organisationByIdBodyParams The ID of the child organisation that will be assigned to the parent organisation.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -8172,7 +8219,7 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
-         * @param {string} organisationId The id of an organization
+         * @param {string} organisationId The ID of the parent organisation to which another organisation will be added as a subordinate.
          * @param {OrganisationByIdBodyParams} organisationByIdBodyParams The ID of the child organisation that will be assigned to the parent organisation.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -8330,7 +8377,7 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
     return {
         /**
          * 
-         * @param {string} organisationId The id of an organization
+         * @param {string} organisationId The ID of the parent organisation to which another organisation will be added as a subordinate.
          * @param {OrganisationByIdBodyParams} organisationByIdBodyParams The ID of the child organisation that will be assigned to the parent organisation.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -8474,7 +8521,7 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
 export interface OrganisationenApiInterface {
     /**
      * 
-     * @param {string} organisationId The id of an organization
+     * @param {string} organisationId The ID of the parent organisation to which another organisation will be added as a subordinate.
      * @param {OrganisationByIdBodyParams} organisationByIdBodyParams The ID of the child organisation that will be assigned to the parent organisation.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -8618,7 +8665,7 @@ export interface OrganisationenApiInterface {
 export class OrganisationenApi extends BaseAPI implements OrganisationenApiInterface {
     /**
      * 
-     * @param {string} organisationId The id of an organization
+     * @param {string} organisationId The ID of the parent organisation to which another organisation will be added as a subordinate.
      * @param {OrganisationByIdBodyParams} organisationByIdBodyParams The ID of the child organisation that will be assigned to the parent organisation.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -8974,7 +9021,7 @@ export const PersonInfoApiAxiosParamCreator = function (configuration?: Configur
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personInfoControllerInfoV1: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        personInfoControllerInfoV1V1: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/person-info`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -9032,8 +9079,8 @@ export const PersonInfoApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async personInfoControllerInfoV1(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonInfoResponseV1>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.personInfoControllerInfoV1(options);
+        async personInfoControllerInfoV1V1(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonInfoResponseV1>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.personInfoControllerInfoV1V1(options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -9061,8 +9108,8 @@ export const PersonInfoApiFactory = function (configuration?: Configuration, bas
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personInfoControllerInfoV1(options?: any): AxiosPromise<PersonInfoResponseV1> {
-            return localVarFp.personInfoControllerInfoV1(options).then((request) => request(axios, basePath));
+        personInfoControllerInfoV1V1(options?: any): AxiosPromise<PersonInfoResponseV1> {
+            return localVarFp.personInfoControllerInfoV1V1(options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -9089,7 +9136,7 @@ export interface PersonInfoApiInterface {
      * @throws {RequiredError}
      * @memberof PersonInfoApiInterface
      */
-    personInfoControllerInfoV1(options?: AxiosRequestConfig): AxiosPromise<PersonInfoResponseV1>;
+    personInfoControllerInfoV1V1(options?: AxiosRequestConfig): AxiosPromise<PersonInfoResponseV1>;
 
 }
 
@@ -9118,8 +9165,8 @@ export class PersonInfoApi extends BaseAPI implements PersonInfoApiInterface {
      * @throws {RequiredError}
      * @memberof PersonInfoApi
      */
-    public personInfoControllerInfoV1(options?: AxiosRequestConfig) {
-        return PersonInfoApiFp(this.configuration).personInfoControllerInfoV1(options).then((request) => request(this.axios, this.basePath));
+    public personInfoControllerInfoV1V1(options?: AxiosRequestConfig) {
+        return PersonInfoApiFp(this.configuration).personInfoControllerInfoV1V1(options).then((request) => request(this.axios, this.basePath));
     }
 }
 
