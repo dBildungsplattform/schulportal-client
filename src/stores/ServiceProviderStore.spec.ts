@@ -460,5 +460,80 @@ describe('serviceProviderStore', () => {
       expect(serviceProviderStore.errorCode).toEqual('some mock server error');
       expect(serviceProviderStore.loading).toBe(false);
     });
+
+    it('should handle MultiError with valid rolleIdsWithI18nKeys', async () => {
+      const multiError = {
+        code: 400,
+        rolleIdsWithI18nKeys: [
+          { rolleId: 'role-1', i18nKey: 'ROLLENERWEITERUNG_TECHNICAL_ERROR' },
+          { rolleId: 'role-2', i18nKey: 'NOT_FOUND' },
+        ],
+      };
+      mockadapter.onPost(url).replyOnce(multiError.code, multiError);
+
+      const promise = serviceProviderStore.persistRollenerweiterungenForServiceProvider(filter);
+      expect(serviceProviderStore.loading).toBe(true);
+      await promise;
+      expect(serviceProviderStore.errors.size).toBe(2);
+      expect(serviceProviderStore.errors.get('role-1')).toBe('ROLLENERWEITERUNG_TECHNICAL_ERROR');
+      expect(serviceProviderStore.errors.get('role-2')).toBe('NOT_FOUND');
+      expect(serviceProviderStore.errorCode).toBe('');
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+
+    it('should handle MultiError with empty rolleIdsWithI18nKeys', async () => {
+      const multiError = {
+        code: 400,
+        rolleIdsWithI18nKeys: [],
+      };
+      mockadapter.onPost(url).replyOnce(multiError.code, multiError);
+
+      const promise = serviceProviderStore.persistRollenerweiterungenForServiceProvider(filter);
+      expect(serviceProviderStore.loading).toBe(true);
+      await promise;
+      expect(serviceProviderStore.errors.size).toBe(0);
+      expect(serviceProviderStore.errorCode).toBe('');
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+
+    it('should handle MultiError with missing code property', async () => {
+      const multiError = {
+        rolleIdsWithI18nKeys: [{ rolleId: 'role-1', i18nKey: 'ROLLENERWEITERUNG_TECHNICAL_ERROR' }],
+      };
+      mockadapter.onPost(url).replyOnce(500, multiError);
+
+      const promise = serviceProviderStore.persistRollenerweiterungenForServiceProvider(filter);
+      expect(serviceProviderStore.loading).toBe(true);
+      await promise;
+      expect(serviceProviderStore.errorCode).toBe('UNSPECIFIED_ERROR');
+      expect(serviceProviderStore.errors.size).toBe(0);
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+
+    it('should handle MultiError with non-array rolleIdsWithI18nKeys', async () => {
+      const multiError = {
+        code: 400,
+        rolleIdsWithI18nKeys: 'not-an-array',
+      };
+      mockadapter.onPost(url).replyOnce(multiError.code, multiError);
+
+      const promise = serviceProviderStore.persistRollenerweiterungenForServiceProvider(filter);
+      expect(serviceProviderStore.loading).toBe(true);
+      await promise;
+      expect(serviceProviderStore.errorCode).toBe(multiError.code);
+      expect(serviceProviderStore.errors.size).toBe(0);
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+
+    it('should handle MultiError with null error', async () => {
+      mockadapter.onPost(url).replyOnce(500, null);
+
+      const promise = serviceProviderStore.persistRollenerweiterungenForServiceProvider(filter);
+      expect(serviceProviderStore.loading).toBe(true);
+      await promise;
+      expect(serviceProviderStore.errorCode).toBe('UNSPECIFIED_ERROR');
+      expect(serviceProviderStore.errors.size).toBe(0);
+      expect(serviceProviderStore.loading).toBe(false);
+    });
   });
 });

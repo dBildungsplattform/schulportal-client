@@ -2,12 +2,16 @@ import axiosApiInstance from '@/services/ApiService';
 import { getResponseErrorCode } from '@/utils/errorHandlers';
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 
+import type { AxiosError } from 'axios';
 import {
+  DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInnerI18nKeyEnum,
   ProviderApiFactory,
   RolleApiFactory,
   ServiceProviderKategorie,
   ServiceProviderMerkmal,
   type ApplyRollenerweiterungBodyParams,
+  type DbiamApplyRollenerweiterungMultiError,
+  type DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInner,
   type ManageableServiceProviderResponse,
   type ProviderApiInterface,
   type ProviderControllerFindRollenerweiterungenByServiceProviderId200Response,
@@ -95,7 +99,36 @@ type ServiceProviderState = {
   rollenerweiterungenUebersicht: RollenErweiterungenUebersicht[];
   errorCode: string;
   loading: boolean;
+  errors: Map<string, DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInnerI18nKeyEnum>;
 };
+
+function containsMultiError(error: unknown): error is AxiosError<DbiamApplyRollenerweiterungMultiError> {
+  const domainError: DbiamApplyRollenerweiterungMultiError | undefined = (error as AxiosError)?.response?.data as
+    | DbiamApplyRollenerweiterungMultiError
+    | undefined;
+  if (!domainError) {
+    return false;
+  }
+  if (typeof domainError !== 'object') {
+    return false;
+  }
+  if (domainError === null) {
+    return false;
+  }
+  if (!('code' in domainError)) {
+    return false;
+  }
+  if (!(typeof domainError.code === 'string' || typeof domainError.code === 'number')) {
+    return false;
+  }
+  if (!('rolleIdsWithI18nKeys' in domainError)) {
+    return false;
+  }
+  if (!Array.isArray(domainError.rolleIdsWithI18nKeys)) {
+    return false;
+  }
+  return true;
+}
 
 type ServiceProviderGetters = object;
 type ServiceProviderActions = {
@@ -143,6 +176,7 @@ export const useServiceProviderStore: StoreDefinition<
       rollenerweiterungenUebersicht: [],
       errorCode: '',
       loading: false,
+      errors: new Map<string, DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInnerI18nKeyEnum>(),
     };
   },
   actions: {
@@ -316,7 +350,24 @@ export const useServiceProviderStore: StoreDefinition<
           bodyParams,
         );
       } catch (error) {
-        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+        if (containsMultiError(error)) {
+          this.errors = new Map<string, DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInnerI18nKeyEnum>(
+            error.response?.data.rolleIdsWithI18nKeys.reduce(
+              (
+                acc: [string, DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInnerI18nKeyEnum][],
+                item: DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInner,
+              ) => {
+                if (item.rolleId && item.i18nKey) {
+                  acc.push([item.rolleId, item.i18nKey]);
+                }
+                return acc;
+              },
+              [],
+            ),
+          );
+        } else {
+          this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+        }
       } finally {
         this.loading = false;
       }

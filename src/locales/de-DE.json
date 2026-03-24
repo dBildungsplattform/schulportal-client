@@ -29,6 +29,20 @@
     "title": {
       "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Zwei-Faktor-Authentifizierung (2FA) erforderlich"
     },
+    "schulspezifischeErweiterungen": {
+      "assignErrorTitle": "Fehler beim Speichern",
+      "assignErrorMessage": {
+        "ROLLENERWEITERUNG_TECHNICAL_ERROR": "Beim Speichern der Erweiterung für die Rolle {rollenname} ist leider ein technischer Fehler aufgetreten. Bitte wiederholen Sie die Zuordnung.",
+        "NOT_FOUND": "Die gewählte Rolle {rollenname} ist an der Schule {dstNr} nicht verfügbar. Die Erweiterung wurde nicht gespeichert.",
+        "NO_REDUNDANT_ROLLENERWEITERUNG": "Das Angebot ist der Rolle {rollenname} bereits direkt zugeordnet und kann daher nicht zusätzlich als Rollenerweiterung festgelegt werden. Die Erweiterungen wurde nicht gespeichert.",
+        "400": "Für dieses Angebot sind Rollenerweiterungen generell nicht erlaubt. Die Erweiterungen wurden nicht gespeichert.",
+        "403": "Sie verfügen nicht über die nötigen Berechtigungen, um diese Aktion auszuführen. Die Erweiterungen wurden nicht gespeichert.",
+        "500": "Beim Speichern ist ein technischer Fehler aufgetreten. Bitte führen Sie die Aktion zu einem späteren Zeitpunkt erneut aus.",
+        "MISSING_MERKMAL_VERFUEGBAR_FUER_ROLLENERWEITERUNG_ERROR": "Für dieses Angebot sind Rollenerweiterungen generell nicht erlaubt. Die Erweiterungen wurden nicht gespeichert.",
+        "MISSING_PERMISSIONS": "Sie verfügen nicht über die nötigen Berechtigungen, um diese Aktion auszuführen. Die Erweiterungen wurden nicht gespeichert."
+      },
+      "errorCsvIntroText": "Bei der Erstellung der schulspezifischen Rollenerweiterungen sind folgende Fehler aufgetreten:"
+    },
     "errors": {
       "400": "Die Anfrage für das Angebot ist ungültig.",
       "VALIDATION_ERROR": "Die Anfrage für das Angebot ist ungültig.",
