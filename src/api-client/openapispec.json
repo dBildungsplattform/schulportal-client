@@ -1944,6 +1944,7 @@
                         "in": "path",
                         "description": "The ID of the parent organisation to which another organisation will be added as a subordinate.",
                         "schema": {
+                            "nullable": false,
                             "type": "string"
                         }
                     }
