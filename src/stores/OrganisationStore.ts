@@ -620,7 +620,7 @@ export const useOrganisationStore: StoreDefinition<
         this.errorCode = getResponseErrorCode(error, 'SCHULTRAEGER_ERROR');
       } finally {
         this.loading = false;
-       }
+      }
     },
 
     async assignSchuleToTraeger(
@@ -630,7 +630,7 @@ export const useOrganisationStore: StoreDefinition<
       this.errorCode = '';
       this.loading = true;
       try {
-          await organisationApi.organisationControllerAddZugehoerigeOrganisation(
+        await organisationApi.organisationControllerAddZugehoerigeOrganisation(
           { organisationId: schultraegerId },
           { organisationId: organisationIdBodyParams.organisationId },
         );
