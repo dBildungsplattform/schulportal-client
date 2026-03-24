@@ -1633,19 +1633,6 @@ export interface OrganisationByIdBodyParams {
 /**
  * 
  * @export
- * @interface OrganisationByIdParams
- */
-export interface OrganisationByIdParams {
-    /**
-     * The id of an organization
-     * @type {string}
-     * @memberof OrganisationByIdParams
-     */
-    'organisationId': string;
-}
-/**
- * 
- * @export
  * @interface OrganisationByNameBodyParams
  */
 export interface OrganisationByNameBodyParams {
@@ -7546,12 +7533,12 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
     return {
         /**
          * 
-         * @param {OrganisationByIdParams} organisationId The ID of the parent organisation to which another organisation will be added as a subordinate.
+         * @param {string} organisationId The ID of the parent organisation to which another organisation will be added as a subordinate.
          * @param {OrganisationByIdBodyParams} organisationByIdBodyParams The ID of the child organisation that will be assigned to the parent organisation.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerAddZugehoerigeOrganisation: async (organisationId: OrganisationByIdParams, organisationByIdBodyParams: OrganisationByIdBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        organisationControllerAddZugehoerigeOrganisation: async (organisationId: string, organisationByIdBodyParams: OrganisationByIdBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'organisationId' is not null or undefined
             assertParamExists('organisationControllerAddZugehoerigeOrganisation', 'organisationId', organisationId)
             // verify required parameter 'organisationByIdBodyParams' is not null or undefined
@@ -8185,12 +8172,12 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
-         * @param {OrganisationByIdParams} organisationId The ID of the parent organisation to which another organisation will be added as a subordinate.
+         * @param {string} organisationId The ID of the parent organisation to which another organisation will be added as a subordinate.
          * @param {OrganisationByIdBodyParams} organisationByIdBodyParams The ID of the child organisation that will be assigned to the parent organisation.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async organisationControllerAddZugehoerigeOrganisation(organisationId: OrganisationByIdParams, organisationByIdBodyParams: OrganisationByIdBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async organisationControllerAddZugehoerigeOrganisation(organisationId: string, organisationByIdBodyParams: OrganisationByIdBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerAddZugehoerigeOrganisation(organisationId, organisationByIdBodyParams, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -8343,12 +8330,12 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
     return {
         /**
          * 
-         * @param {OrganisationByIdParams} organisationId The ID of the parent organisation to which another organisation will be added as a subordinate.
+         * @param {string} organisationId The ID of the parent organisation to which another organisation will be added as a subordinate.
          * @param {OrganisationByIdBodyParams} organisationByIdBodyParams The ID of the child organisation that will be assigned to the parent organisation.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        organisationControllerAddZugehoerigeOrganisation(organisationId: OrganisationByIdParams, organisationByIdBodyParams: OrganisationByIdBodyParams, options?: any): AxiosPromise<void> {
+        organisationControllerAddZugehoerigeOrganisation(organisationId: string, organisationByIdBodyParams: OrganisationByIdBodyParams, options?: any): AxiosPromise<void> {
             return localVarFp.organisationControllerAddZugehoerigeOrganisation(organisationId, organisationByIdBodyParams, options).then((request) => request(axios, basePath));
         },
         /**
@@ -8487,13 +8474,13 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
 export interface OrganisationenApiInterface {
     /**
      * 
-     * @param {OrganisationByIdParams} organisationId The ID of the parent organisation to which another organisation will be added as a subordinate.
+     * @param {string} organisationId The ID of the parent organisation to which another organisation will be added as a subordinate.
      * @param {OrganisationByIdBodyParams} organisationByIdBodyParams The ID of the child organisation that will be assigned to the parent organisation.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganisationenApiInterface
      */
-    organisationControllerAddZugehoerigeOrganisation(organisationId: OrganisationByIdParams, organisationByIdBodyParams: OrganisationByIdBodyParams, options?: AxiosRequestConfig): AxiosPromise<void>;
+    organisationControllerAddZugehoerigeOrganisation(organisationId: string, organisationByIdBodyParams: OrganisationByIdBodyParams, options?: AxiosRequestConfig): AxiosPromise<void>;
 
     /**
      * 
@@ -8631,13 +8618,13 @@ export interface OrganisationenApiInterface {
 export class OrganisationenApi extends BaseAPI implements OrganisationenApiInterface {
     /**
      * 
-     * @param {OrganisationByIdParams} organisationId The ID of the parent organisation to which another organisation will be added as a subordinate.
+     * @param {string} organisationId The ID of the parent organisation to which another organisation will be added as a subordinate.
      * @param {OrganisationByIdBodyParams} organisationByIdBodyParams The ID of the child organisation that will be assigned to the parent organisation.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OrganisationenApi
      */
-    public organisationControllerAddZugehoerigeOrganisation(organisationId: OrganisationByIdParams, organisationByIdBodyParams: OrganisationByIdBodyParams, options?: AxiosRequestConfig) {
+    public organisationControllerAddZugehoerigeOrganisation(organisationId: string, organisationByIdBodyParams: OrganisationByIdBodyParams, options?: AxiosRequestConfig) {
         return OrganisationenApiFp(this.configuration).organisationControllerAddZugehoerigeOrganisation(organisationId, organisationByIdBodyParams, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -8987,7 +8974,7 @@ export const PersonInfoApiAxiosParamCreator = function (configuration?: Configur
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personInfoControllerInfoV1V1: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        personInfoControllerInfoV1: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/person-info`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -9045,8 +9032,8 @@ export const PersonInfoApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async personInfoControllerInfoV1V1(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonInfoResponseV1>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.personInfoControllerInfoV1V1(options);
+        async personInfoControllerInfoV1(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonInfoResponseV1>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.personInfoControllerInfoV1(options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -9074,8 +9061,8 @@ export const PersonInfoApiFactory = function (configuration?: Configuration, bas
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personInfoControllerInfoV1V1(options?: any): AxiosPromise<PersonInfoResponseV1> {
-            return localVarFp.personInfoControllerInfoV1V1(options).then((request) => request(axios, basePath));
+        personInfoControllerInfoV1(options?: any): AxiosPromise<PersonInfoResponseV1> {
+            return localVarFp.personInfoControllerInfoV1(options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -9102,7 +9089,7 @@ export interface PersonInfoApiInterface {
      * @throws {RequiredError}
      * @memberof PersonInfoApiInterface
      */
-    personInfoControllerInfoV1V1(options?: AxiosRequestConfig): AxiosPromise<PersonInfoResponseV1>;
+    personInfoControllerInfoV1(options?: AxiosRequestConfig): AxiosPromise<PersonInfoResponseV1>;
 
 }
 
@@ -9131,8 +9118,8 @@ export class PersonInfoApi extends BaseAPI implements PersonInfoApiInterface {
      * @throws {RequiredError}
      * @memberof PersonInfoApi
      */
-    public personInfoControllerInfoV1V1(options?: AxiosRequestConfig) {
-        return PersonInfoApiFp(this.configuration).personInfoControllerInfoV1V1(options).then((request) => request(this.axios, this.basePath));
+    public personInfoControllerInfoV1(options?: AxiosRequestConfig) {
+        return PersonInfoApiFp(this.configuration).personInfoControllerInfoV1(options).then((request) => request(this.axios, this.basePath));
     }
 }
 

@@ -630,10 +630,9 @@ export const useOrganisationStore: StoreDefinition<
       this.errorCode = '';
       this.loading = true;
       try {
-        await organisationApi.organisationControllerAddZugehoerigeOrganisation(
-          { organisationId: schultraegerId },
-          { organisationId: organisationIdBodyParams.organisationId },
-        );
+        await organisationApi.organisationControllerAddZugehoerigeOrganisation(schultraegerId, {
+          organisationId: organisationIdBodyParams.organisationId,
+        });
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'SCHULTRAEGER_ERROR');
       } finally {

@@ -1944,7 +1944,7 @@
                         "in": "path",
                         "description": "The ID of the parent organisation to which another organisation will be added as a subordinate.",
                         "schema": {
-                            "$ref": "#/components/schemas/OrganisationByIdParams"
+                            "type": "string"
                         }
                     }
                 ],
@@ -5495,7 +5495,7 @@
         },
         "/api/v1/person-info": {
             "get": {
-                "operationId": "PersonInfoController_infoV1_v1",
+                "operationId": "personInfoControllerInfoV1",
                 "parameters": [],
                 "responses": {
                     "200": {
@@ -6842,19 +6842,6 @@
                     "HINWEISE_BEARBEITEN",
                     "ROLLEN_ERWEITERN",
                     "ANGEBOTE_VERWALTEN"
-                ]
-            },
-            "OrganisationByIdParams": {
-                "type": "object",
-                "properties": {
-                    "organisationId": {
-                        "type": "string",
-                        "description": "The id of an organization",
-                        "nullable": false
-                    }
-                },
-                "required": [
-                    "organisationId"
                 ]
             },
             "OrganisationByIdBodyParams": {
