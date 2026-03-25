@@ -11,7 +11,6 @@ image:
 restartPolicy: Always
 
 frontendHostname: ""
-frontend2ndHostname: ""
 
 containerSecurityContext:
   enabled: true
@@ -34,13 +33,13 @@ resources:
     memory: 200Mi
 
 ingress:
-  # Only enable if 2nd host name is defined 
-  enabled2nd: false
   enabled: true
   ingressClassName: nginx
   path: /
   pathType: Prefix
   annotations: {}
+  tls: false
+  tlsSecretName: ""
 
 containerPorts: 
   name: http 
