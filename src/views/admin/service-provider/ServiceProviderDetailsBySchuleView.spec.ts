@@ -1,20 +1,21 @@
+import type { RollenerweiterungWithExtendedDataResponse } from '@/api-client/generated';
+import type { RollenerweiterungAssignErrorDialogProps } from '@/components/admin/service-provider/types';
 import routes from '@/router/routes';
-import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
-import { createPinia, setActivePinia } from 'pinia';
-import { createRouter, createWebHistory, type Router } from 'vue-router';
-import ServiceProviderDetailsBySchuleView from './ServiceProviderDetailsBySchuleView.vue';
+import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+import { RollenArt, useRolleStore, type RolleStore } from '@/stores/RolleStore';
 import {
   ServiceProviderKategorie,
   useServiceProviderStore,
   type ManageableServiceProviderDetail,
   type ServiceProviderStore,
 } from '@/stores/ServiceProviderStore';
+import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
+import { createPinia, setActivePinia } from 'pinia';
 import { DoFactory } from 'test/DoFactory';
 import type { MockInstance } from 'vitest';
-import { nextTick, type Component } from 'vue';
-import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
-import type { RollenerweiterungWithExtendedDataResponse } from '@/api-client/generated';
-import { RollenArt, useRolleStore, type RolleStore } from '@/stores/RolleStore';
+import { nextTick, type Component, type ComponentPublicInstance } from 'vue';
+import { createRouter, createWebHistory, type Router } from 'vue-router';
+import ServiceProviderDetailsBySchuleView from './ServiceProviderDetailsBySchuleView.vue';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -218,11 +219,11 @@ describe('ServiceProviderDetailsBySchuleView', () => {
       await wrapper?.find('[data-testid="rollenerweiterung-save-button"]').trigger('click');
       await nextTick();
 
-      const errorDialog = wrapper?.findComponent({ name: 'RollenerweiterungAssignErrorDialog' });
+      const errorDialog: VueWrapper<ComponentPublicInstance<RollenerweiterungAssignErrorDialogProps>> | undefined = wrapper?.findComponent({ name: 'RollenerweiterungAssignErrorDialog' });
       expect(errorDialog?.exists()).toBe(true);
       expect(errorDialog?.props('isDialogVisible')).toBe(true);
 
-      const errorItems = document.querySelectorAll('ol > li');
+      const errorItems: NodeList = document.querySelectorAll('ol > li');
       expect(errorItems.length).toBe(2);
 
       const closeButton: HTMLElement | null = document.querySelector(
