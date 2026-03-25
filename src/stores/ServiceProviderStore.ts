@@ -112,9 +112,6 @@ function containsMultiError(error: unknown): error is AxiosError<DbiamApplyRolle
   if (typeof domainError !== 'object') {
     return false;
   }
-  if (domainError === null) {
-    return false;
-  }
   if (!('code' in domainError)) {
     return false;
   }

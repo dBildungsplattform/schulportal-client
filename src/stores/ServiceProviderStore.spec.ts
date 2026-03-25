@@ -510,6 +510,21 @@ describe('serviceProviderStore', () => {
       expect(serviceProviderStore.loading).toBe(false);
     });
 
+    it('should handle MultiError with wrong code type', async () => {
+      const multiError = {
+        code: null,
+        rolleIdsWithI18nKeys: 'not-an-array',
+      };
+      mockadapter.onPost(url).replyOnce(400, multiError);
+
+      const promise = serviceProviderStore.persistRollenerweiterungenForServiceProvider(filter);
+      expect(serviceProviderStore.loading).toBe(true);
+      await promise;
+      expect(serviceProviderStore.errorCode).toBe('UNSPECIFIED_ERROR');
+      expect(serviceProviderStore.errors.size).toBe(0);
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+
     it('should handle MultiError with non-array rolleIdsWithI18nKeys', async () => {
       const multiError = {
         code: 400,
