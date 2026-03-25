@@ -3,15 +3,16 @@ import { mount, VueWrapper } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from 'vitest';
 import { nextTick, type Component } from 'vue';
 import RollenerweiterungAssignErrorDialog from './RollenerweiterungAssignErrorDialog.vue';
+import type { MappedRollenerweiterungAssignError, RollenerweiterungAssignErrorDialogProps } from './types';
 
 let wrapper: VueWrapper | null = null;
 
-const errorsMock: { rolle: string; message: string }[] = [
+const errorsMock: MappedRollenerweiterungAssignError[] = [
   { rolle: 'Admin', message: 'Fehlende Berechtigung' },
   { rolle: 'User', message: 'Unbekannter Fehler' },
 ];
 
-const defaultProps = {
+const defaultProps: RollenerweiterungAssignErrorDialogProps = {
   isDialogVisible: true,
   filename: undefined,
   dstNr: '1234567',

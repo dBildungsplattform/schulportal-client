@@ -2,21 +2,36 @@ import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
 import { createPinia, setActivePinia } from 'pinia';
 
-import { DoFactory } from 'test/DoFactory';
-import {
-  useServiceProviderStore,
-  type StartPageServiceProvider,
-  type ServiceProviderStore,
-  type ManageableServiceProviderDetail,
-  type RollenErweiterungenUebersicht,
-  type PersistRollenerweiterung,
-} from './ServiceProviderStore';
-import { faker } from '@faker-js/faker';
 import type {
   ProviderControllerFindRollenerweiterungenByServiceProviderId200Response,
   ProviderControllerGetManageableServiceProviders200Response,
   RollenerweiterungWithExtendedDataResponse,
 } from '@/api-client/generated';
+import { faker } from '@faker-js/faker';
+import { DoFactory } from 'test/DoFactory';
+import {
+  useServiceProviderStore,
+  type ManageableServiceProviderDetail,
+  type PersistRollenerweiterung,
+  type RollenErweiterungenUebersicht,
+  type ServiceProviderStore,
+  type StartPageServiceProvider,
+} from './ServiceProviderStore';
+
+interface MultiErrorRolleIdWithI18nKey {
+  rolleId: string;
+  i18nKey: string;
+}
+
+interface MultiError {
+  code: number;
+  rolleIdsWithI18nKeys: MultiErrorRolleIdWithI18nKey[];
+}
+
+interface MalformedMultiError {
+  code?: unknown;
+  rolleIdsWithI18nKeys?: unknown;
+}
 
 const mockadapter: MockAdapter = new MockAdapter(ApiService);
 
@@ -462,16 +477,17 @@ describe('serviceProviderStore', () => {
     });
 
     it('should handle MultiError with valid rolleIdsWithI18nKeys', async () => {
-      const multiError = {
-        code: 400,
+      const code: number = 400;
+      const multiError: MultiError = {
+        code,
         rolleIdsWithI18nKeys: [
           { rolleId: 'role-1', i18nKey: 'ROLLENERWEITERUNG_TECHNICAL_ERROR' },
           { rolleId: 'role-2', i18nKey: 'NOT_FOUND' },
         ],
       };
-      mockadapter.onPost(url).replyOnce(multiError.code, multiError);
+      mockadapter.onPost(url).replyOnce(code, multiError);
 
-      const promise = serviceProviderStore.persistRollenerweiterungenForServiceProvider(filter);
+      const promise: Promise<void> = serviceProviderStore.persistRollenerweiterungenForServiceProvider(filter);
       expect(serviceProviderStore.loading).toBe(true);
       await promise;
       expect(serviceProviderStore.errors.size).toBe(2);
@@ -482,13 +498,14 @@ describe('serviceProviderStore', () => {
     });
 
     it('should handle MultiError with empty rolleIdsWithI18nKeys', async () => {
-      const multiError = {
-        code: 400,
+      const code: number = 400;
+      const multiError: MultiError = {
+        code,
         rolleIdsWithI18nKeys: [],
       };
-      mockadapter.onPost(url).replyOnce(multiError.code, multiError);
+      mockadapter.onPost(url).replyOnce(code, multiError);
 
-      const promise = serviceProviderStore.persistRollenerweiterungenForServiceProvider(filter);
+      const promise: Promise<void> = serviceProviderStore.persistRollenerweiterungenForServiceProvider(filter);
       expect(serviceProviderStore.loading).toBe(true);
       await promise;
       expect(serviceProviderStore.errors.size).toBe(0);
@@ -497,12 +514,12 @@ describe('serviceProviderStore', () => {
     });
 
     it('should handle MultiError with missing code property', async () => {
-      const multiError = {
+      const multiError: MalformedMultiError = {
         rolleIdsWithI18nKeys: [{ rolleId: 'role-1', i18nKey: 'ROLLENERWEITERUNG_TECHNICAL_ERROR' }],
       };
       mockadapter.onPost(url).replyOnce(500, multiError);
 
-      const promise = serviceProviderStore.persistRollenerweiterungenForServiceProvider(filter);
+      const promise: Promise<void> = serviceProviderStore.persistRollenerweiterungenForServiceProvider(filter);
       expect(serviceProviderStore.loading).toBe(true);
       await promise;
       expect(serviceProviderStore.errorCode).toBe('UNSPECIFIED_ERROR');
@@ -511,13 +528,13 @@ describe('serviceProviderStore', () => {
     });
 
     it('should handle MultiError with wrong code type', async () => {
-      const multiError = {
+      const multiError: MalformedMultiError = {
         code: null,
         rolleIdsWithI18nKeys: 'not-an-array',
       };
       mockadapter.onPost(url).replyOnce(400, multiError);
 
-      const promise = serviceProviderStore.persistRollenerweiterungenForServiceProvider(filter);
+      const promise: Promise<void> = serviceProviderStore.persistRollenerweiterungenForServiceProvider(filter);
       expect(serviceProviderStore.loading).toBe(true);
       await promise;
       expect(serviceProviderStore.errorCode).toBe('UNSPECIFIED_ERROR');
@@ -526,13 +543,14 @@ describe('serviceProviderStore', () => {
     });
 
     it('should handle MultiError with non-array rolleIdsWithI18nKeys', async () => {
-      const multiError = {
-        code: 400,
+      const code: number = 400;
+      const multiError: MalformedMultiError = {
+        code,
         rolleIdsWithI18nKeys: 'not-an-array',
       };
-      mockadapter.onPost(url).replyOnce(multiError.code, multiError);
+      mockadapter.onPost(url).replyOnce(code, multiError);
 
-      const promise = serviceProviderStore.persistRollenerweiterungenForServiceProvider(filter);
+      const promise: Promise<void> = serviceProviderStore.persistRollenerweiterungenForServiceProvider(filter);
       expect(serviceProviderStore.loading).toBe(true);
       await promise;
       expect(serviceProviderStore.errorCode).toBe(multiError.code);
@@ -543,7 +561,7 @@ describe('serviceProviderStore', () => {
     it('should handle MultiError with null error', async () => {
       mockadapter.onPost(url).replyOnce(500, null);
 
-      const promise = serviceProviderStore.persistRollenerweiterungenForServiceProvider(filter);
+      const promise: Promise<void> = serviceProviderStore.persistRollenerweiterungenForServiceProvider(filter);
       expect(serviceProviderStore.loading).toBe(true);
       await promise;
       expect(serviceProviderStore.errorCode).toBe('UNSPECIFIED_ERROR');

@@ -4,22 +4,12 @@
   import { ref, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
+  import type { RollenerweiterungAssignErrorDialogProps } from './types';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   const confirmCloseDialog: Ref<boolean> = ref(false);
-
-  type Props = {
-    isDialogVisible: boolean;
-    filename?: string;
-    dstNr: string;
-    serviceProviderName: string;
-    errors: {
-      rolle: string;
-      message: string;
-    }[];
-  };
 
   type Emits = {
     (event: 'update:isDialogVisible', isDialogVisible: boolean): void;
@@ -28,7 +18,7 @@
   type CSVHeaders = 'Dienststellennummer' | 'Angebot' | 'Rolle' | 'Fehlermeldung';
   type CSVRow = Record<CSVHeaders, string | undefined>;
 
-  const props: Props = defineProps<Props>();
+  const props: RollenerweiterungAssignErrorDialogProps = defineProps<RollenerweiterungAssignErrorDialogProps>();
   const emit: Emits = defineEmits<Emits>();
 
   // Saves the errors as a text file
@@ -39,7 +29,7 @@
     const headers: CSVHeaders[] = ['Dienststellennummer', 'Angebot', 'Rolle', 'Fehlermeldung'];
     const fileName: string = `Fehler-Rollenerweiterung-${new Date().toLocaleDateString('de-DE').replace(/\./g, '-')}.txt`;
 
-    const csvRows: CSVRow[] = props.errors?.map((entry: Props['errors'][number]) => ({
+    const csvRows: CSVRow[] = props.errors?.map((entry: RollenerweiterungAssignErrorDialogProps['errors'][number]) => ({
       Dienststellennummer: props.dstNr,
       Angebot: props.serviceProviderName,
       Rolle: entry.rolle,
