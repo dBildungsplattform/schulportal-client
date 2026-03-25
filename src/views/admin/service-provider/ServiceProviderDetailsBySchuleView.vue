@@ -185,10 +185,15 @@
     }
   }
 
-  function clearErrorVisibility(isVisible: boolean): void {
+  async function clearErrorVisibility(isVisible: boolean): Promise<void> {
     if (!isVisible) {
       saveFailureDialogVisible.value = false;
       serviceProviderStore.errors.clear();
+      isEditingRollenerweiterungen.value = false;
+      await serviceProviderStore.getRollenerweiterungenById({
+        serviceProviderId: currentServiceProviderId,
+        organisationId: organisationIdFromQuery.value,
+      });
     }
   }
 

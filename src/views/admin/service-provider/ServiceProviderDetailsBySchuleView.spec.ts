@@ -243,6 +243,8 @@ describe('ServiceProviderDetailsBySchuleView', () => {
         false,
       );
       expect(serviceProviderStore.errors.size).toBe(0);
+
+      expect(wrapper?.find('[data-testid="rollenerweiterung-bearbeiten-button"]').exists()).toBe(true);
     });
   });
 });
