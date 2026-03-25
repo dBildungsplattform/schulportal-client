@@ -62,7 +62,7 @@ export const usePersonInfoStore: StoreDefinition<
     async initPersonInfo() {
       this.loading = true;
       try {
-        const { data }: AxiosResponse<PersonInfoResponse> = await personenInfoApi.personInfoControllerInfo();
+        const { data }: AxiosResponse<PersonInfoResponse> = await personenInfoApi.personInfoControllerInfoV1();
         this.personInfo = data;
       } catch (error) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');

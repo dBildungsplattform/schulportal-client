@@ -1,5 +1,5 @@
 import type { DBiamPersonenzuordnungResponse } from '@/api-client/generated';
-import { OrganisationsTyp } from '../OrganisationStore';
+import type { OrganisationsTyp } from '../OrganisationStore';
 import type { RollenArt, RollenMerkmal } from '../RolleStore';
 
 export class Zuordnung {
@@ -11,7 +11,7 @@ export class Zuordnung {
     public rolle: string,
     public rollenArt: RollenArt,
     public administriertVon: string,
-    public typ: OrganisationsTyp,
+    public typ: OrganisationsTyp | null,
     public editable: boolean,
     public befristung: string | null,
     public merkmale: Array<RollenMerkmal>,
@@ -44,7 +44,7 @@ export class Zuordnung {
       response.rolle,
       response.rollenArt,
       response.administriertVon,
-      response.typ ?? OrganisationsTyp.Unbestaetigt,
+      response.typ,
       response.editable,
       response.befristung !== '' ? response.befristung : null,
       response.merkmale,

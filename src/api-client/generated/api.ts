@@ -8983,7 +8983,7 @@ export const PersonInfoApiAxiosParamCreator = function (configuration?: Configur
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personInfoControllerInfo: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        personInfoControllerInfoV1: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/person-info`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -9069,8 +9069,8 @@ export const PersonInfoApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async personInfoControllerInfo(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonInfoResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.personInfoControllerInfo(options);
+        async personInfoControllerInfoV1(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonInfoResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.personInfoControllerInfoV1(options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -9099,8 +9099,8 @@ export const PersonInfoApiFactory = function (configuration?: Configuration, bas
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        personInfoControllerInfo(options?: any): AxiosPromise<PersonInfoResponse> {
-            return localVarFp.personInfoControllerInfo(options).then((request) => request(axios, basePath));
+        personInfoControllerInfoV1(options?: any): AxiosPromise<PersonInfoResponse> {
+            return localVarFp.personInfoControllerInfoV1(options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -9127,7 +9127,7 @@ export interface PersonInfoApiInterface {
      * @throws {RequiredError}
      * @memberof PersonInfoApiInterface
      */
-    personInfoControllerInfo(options?: AxiosRequestConfig): AxiosPromise<PersonInfoResponse>;
+    personInfoControllerInfoV1(options?: AxiosRequestConfig): AxiosPromise<PersonInfoResponse>;
 
     /**
      * 
@@ -9154,8 +9154,8 @@ export class PersonInfoApi extends BaseAPI implements PersonInfoApiInterface {
      * @throws {RequiredError}
      * @memberof PersonInfoApi
      */
-    public personInfoControllerInfo(options?: AxiosRequestConfig) {
-        return PersonInfoApiFp(this.configuration).personInfoControllerInfo(options).then((request) => request(this.axios, this.basePath));
+    public personInfoControllerInfoV1(options?: AxiosRequestConfig) {
+        return PersonInfoApiFp(this.configuration).personInfoControllerInfoV1(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
