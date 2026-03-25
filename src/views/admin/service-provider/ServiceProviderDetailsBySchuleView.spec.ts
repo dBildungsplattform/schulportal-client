@@ -207,5 +207,42 @@ describe('ServiceProviderDetailsBySchuleView', () => {
 
       expect(wrapper?.find('[data-testid="rollenerweiterung-bearbeiten-button"]').exists()).toBe(true);
     });
+
+    test('displays multiple errors and closes the error dialog', async () => {
+      persistSpy.mockImplementationOnce(() => {
+        serviceProviderStore.errors.set('role-1', 'ROLLENERWEITERUNG_TECHNICAL_ERROR');
+        serviceProviderStore.errors.set('role-2', 'NOT_FOUND');
+      });
+
+      await openEditMode();
+      await wrapper?.find('[data-testid="rollenerweiterung-save-button"]').trigger('click');
+      await nextTick();
+
+      const errorDialog = wrapper?.findComponent({ name: 'RollenerweiterungAssignErrorDialog' });
+      expect(errorDialog?.exists()).toBe(true);
+      expect(errorDialog?.props('isDialogVisible')).toBe(true);
+
+      const errorItems = document.querySelectorAll('ol > li');
+      expect(errorItems.length).toBe(2);
+
+      const closeButton: HTMLElement | null = document.querySelector(
+        '[data-testid="rollenerweiterung-error-discard-button"]',
+      );
+      expect(closeButton).not.toBeNull();
+      closeButton?.dispatchEvent(new Event('click'));
+      await nextTick();
+      const confirmCloseButton: HTMLElement | null = document.querySelector(
+        '[data-testid="confirm-close-bulk-error-dialog-button"]',
+      );
+      expect(confirmCloseButton).not.toBeNull();
+      confirmCloseButton?.dispatchEvent(new Event('click'));
+      await nextTick();
+
+      // The dialog should be closed and errors cleared
+      expect(wrapper?.findComponent({ name: 'RollenerweiterungAssignErrorDialog' })?.props('isDialogVisible')).toBe(
+        false,
+      );
+      expect(serviceProviderStore.errors.size).toBe(0);
+    });
   });
 });
