@@ -27,7 +27,7 @@
       return;
     }
     const headers: CSVHeaders[] = ['Dienststellennummer', 'Angebot', 'Rolle', 'Fehlermeldung'];
-    const fileName: string = `Fehler-Rollenerweiterung-${new Date().toLocaleDateString('de-DE').replace(/\./g, '-')}.txt`;
+    const fileName: string = `Fehler-Rollenerweiterung-${new Date().toLocaleDateString('de-DE').replaceAll('.', '-')}.txt`;
 
     const csvRows: CSVRow[] = props.errors?.map((entry: RollenerweiterungAssignErrorDialogProps['errors'][number]) => ({
       Dienststellennummer: props.dstNr,
