@@ -200,7 +200,7 @@ const routes: readonly RouteRecordRaw[] = [
       requiresPermission: 'schulspezifischeangebotsverwaltung',
       requiresOrga: true,
       missingOrgaRedirect: { name: 'angebot-management-schulspezifisch' },
-    }
+    },
   },
   {
     path: '/admin/schulen/new',

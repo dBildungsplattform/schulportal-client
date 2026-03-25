@@ -888,7 +888,7 @@ describe('OrganisationStore', () => {
 
   describe('assignSchuleToTraeger', () => {
     it('should assign schule to traeger', async () => {
-      mockadapter.onPost('api/organisationen/2/zugehoerig').replyOnce(201);
+      mockadapter.onPost('/api/organisationen/2/zugehoerig').replyOnce(201);
       const assignSchuleToTraegerPromise: Promise<void> = organisationStore.assignSchuleToTraeger('2', {
         organisationId: '11',
       });

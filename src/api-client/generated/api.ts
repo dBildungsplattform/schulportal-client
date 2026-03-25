@@ -592,7 +592,7 @@ export interface DBiamPersonenzuordnungResponse {
      * @type {OrganisationsTyp}
      * @memberof DBiamPersonenzuordnungResponse
      */
-    'typ': OrganisationsTyp;
+    'typ': OrganisationsTyp | null;
     /**
      * 
      * @type {boolean}
@@ -7533,7 +7533,7 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
     return {
         /**
          * 
-         * @param {string} organisationId The id of an organization
+         * @param {string} organisationId The ID of the parent organisation to which another organisation will be added as a subordinate.
          * @param {OrganisationByIdBodyParams} organisationByIdBodyParams The ID of the child organisation that will be assigned to the parent organisation.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -8172,7 +8172,7 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
-         * @param {string} organisationId The id of an organization
+         * @param {string} organisationId The ID of the parent organisation to which another organisation will be added as a subordinate.
          * @param {OrganisationByIdBodyParams} organisationByIdBodyParams The ID of the child organisation that will be assigned to the parent organisation.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -8330,7 +8330,7 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
     return {
         /**
          * 
-         * @param {string} organisationId The id of an organization
+         * @param {string} organisationId The ID of the parent organisation to which another organisation will be added as a subordinate.
          * @param {OrganisationByIdBodyParams} organisationByIdBodyParams The ID of the child organisation that will be assigned to the parent organisation.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -8474,7 +8474,7 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
 export interface OrganisationenApiInterface {
     /**
      * 
-     * @param {string} organisationId The id of an organization
+     * @param {string} organisationId The ID of the parent organisation to which another organisation will be added as a subordinate.
      * @param {OrganisationByIdBodyParams} organisationByIdBodyParams The ID of the child organisation that will be assigned to the parent organisation.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -8618,7 +8618,7 @@ export interface OrganisationenApiInterface {
 export class OrganisationenApi extends BaseAPI implements OrganisationenApiInterface {
     /**
      * 
-     * @param {string} organisationId The id of an organization
+     * @param {string} organisationId The ID of the parent organisation to which another organisation will be added as a subordinate.
      * @param {OrganisationByIdBodyParams} organisationByIdBodyParams The ID of the child organisation that will be assigned to the parent organisation.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}

@@ -4,7 +4,6 @@
         "/api/auth/login": {
             "get": {
                 "operationId": "AuthenticationController_login",
-                "summary": "Used to start OIDC authentication.",
                 "parameters": [
                     {
                         "required": false,
@@ -20,6 +19,7 @@
                         "description": "Redirection to orchestrate OIDC flow."
                     }
                 },
+                "summary": "Used to start OIDC authentication.",
                 "tags": [
                     "auth"
                 ]
@@ -28,7 +28,6 @@
         "/api/auth/logout": {
             "get": {
                 "operationId": "AuthenticationController_logout",
-                "summary": "Used to log out the current user.",
                 "parameters": [],
                 "responses": {
                     "302": {
@@ -38,9 +37,6 @@
                         "description": "Internal server error while trying to log out."
                     }
                 },
-                "tags": [
-                    "auth"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -50,13 +46,16 @@
                     {
                         "bearer": []
                     }
+                ],
+                "summary": "Used to log out the current user.",
+                "tags": [
+                    "auth"
                 ]
             }
         },
         "/api/auth/logininfo": {
             "get": {
                 "operationId": "AuthenticationController_info",
-                "summary": "Info about logged in user.",
                 "parameters": [],
                 "responses": {
                     "200": {
@@ -73,9 +72,6 @@
                         "description": "User is not logged in."
                     }
                 },
-                "tags": [
-                    "auth"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -85,13 +81,16 @@
                     {
                         "bearer": []
                     }
+                ],
+                "summary": "Info about logged in user.",
+                "tags": [
+                    "auth"
                 ]
             }
         },
         "/api/auth/reset-password": {
             "get": {
                 "operationId": "AuthenticationController_resetPassword",
-                "summary": "Redirect to Keycloak password reset.",
                 "parameters": [
                     {
                         "name": "redirectUrl",
@@ -115,6 +114,7 @@
                         "description": "Redirect to Keycloak password reset page."
                     }
                 },
+                "summary": "Redirect to Keycloak password reset.",
                 "tags": [
                     "auth"
                 ]
@@ -123,7 +123,6 @@
         "/keycloakinternal/externaldata": {
             "post": {
                 "operationId": "KeycloakInternalController_getExternalData",
-                "summary": "External Data about requested in user.",
                 "parameters": [],
                 "responses": {
                     "200": {
@@ -137,6 +136,7 @@
                         }
                     }
                 },
+                "summary": "External Data about requested in user.",
                 "tags": [
                     "Keycloakinternal"
                 ]
@@ -216,9 +216,6 @@
                         "description": "Internal server error while getting landesbedienstete."
                     }
                 },
-                "tags": [
-                    "personen"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -228,6 +225,9 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "personen"
                 ]
             }
         },
@@ -266,9 +266,6 @@
                         "description": "An internal server error occurred."
                     }
                 },
-                "tags": [
-                    "personen"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -278,6 +275,9 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "personen"
                 ]
             },
             "get": {
@@ -321,9 +321,6 @@
                         "description": "Internal server error while getting the person."
                     }
                 },
-                "tags": [
-                    "personen"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -333,6 +330,9 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "personen"
                 ]
             },
             "put": {
@@ -386,9 +386,6 @@
                         "description": "An internal server error occurred."
                     }
                 },
-                "tags": [
-                    "personen"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -398,14 +395,16 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "personen"
                 ]
             }
         },
         "/api/personen/{personId}/personenkontexte": {
             "post": {
-                "operationId": "PersonController_createPersonenkontext",
-                "summary": "",
                 "deprecated": true,
+                "operationId": "PersonController_createPersonenkontext",
                 "parameters": [
                     {
                         "name": "personId",
@@ -436,9 +435,6 @@
                         "description": "Internal server error while creating the personenkontext."
                     }
                 },
-                "tags": [
-                    "personen"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -448,6 +444,10 @@
                     {
                         "bearer": []
                     }
+                ],
+                "summary": "",
+                "tags": [
+                    "personen"
                 ]
             },
             "get": {
@@ -571,9 +571,6 @@
                         "description": "Internal server error while getting all personenkontexte."
                     }
                 },
-                "tags": [
-                    "personen"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -583,6 +580,9 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "personen"
                 ]
             }
         },
@@ -619,9 +619,6 @@
                         "description": "Internal server error."
                     }
                 },
-                "tags": [
-                    "personen"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -631,6 +628,9 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "personen"
                 ]
             }
         },
@@ -681,9 +681,6 @@
                         "description": "A downstream server returned an error."
                     }
                 },
-                "tags": [
-                    "personen"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -693,6 +690,9 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "personen"
                 ]
             }
         },
@@ -726,9 +726,6 @@
                         "description": "A downstream server returned an error."
                     }
                 },
-                "tags": [
-                    "personen"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -738,6 +735,9 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "personen"
                 ]
             }
         },
@@ -797,9 +797,6 @@
                         "description": "Internal server error while updating the metadata for user."
                     }
                 },
-                "tags": [
-                    "personen"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -809,6 +806,9 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "personen"
                 ]
             }
         },
@@ -845,9 +845,6 @@
                         "description": "Internal server error."
                     }
                 },
-                "tags": [
-                    "personen"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -857,6 +854,9 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "personen"
                 ]
             }
         },
@@ -882,9 +882,6 @@
                         "description": "Internal server error."
                     }
                 },
-                "tags": [
-                    "personen"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -894,6 +891,9 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "personen"
                 ]
             }
         },
@@ -953,11 +953,11 @@
                         "schema": {
                             "nullable": true,
                             "default": "nein",
+                            "type": "string",
                             "enum": [
                                 "ja",
                                 "nein"
-                            ],
-                            "type": "string"
+                            ]
                         }
                     },
                     {
@@ -1051,9 +1051,6 @@
                         "description": "Internal server error while getting all persons."
                     }
                 },
-                "tags": [
-                    "personen-frontend"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -1063,6 +1060,9 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "personen-frontend"
                 ]
             }
         },
@@ -1132,9 +1132,6 @@
                         "description": "Internal server error while getting personenuebersichten."
                     }
                 },
-                "tags": [
-                    "dbiam-personenuebersicht"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -1144,6 +1141,9 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "dbiam-personenuebersicht"
                 ]
             }
         },
@@ -1182,9 +1182,6 @@
                         "description": "Internal server error while getting personenuebersicht."
                     }
                 },
-                "tags": [
-                    "dbiam-personenuebersicht"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -1194,6 +1191,9 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "dbiam-personenuebersicht"
                 ]
             }
         },
@@ -1242,9 +1242,6 @@
                         "description": "Internal server error while creating the organisation."
                     }
                 },
-                "tags": [
-                    "organisationen"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -1254,6 +1251,9 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "organisationen"
                 ]
             },
             "get": {
@@ -1376,11 +1376,11 @@
                         "description": "Order to sort by.",
                         "schema": {
                             "nullable": true,
+                            "type": "string",
                             "enum": [
                                 "asc",
                                 "desc"
-                            ],
-                            "type": "string"
+                            ]
                         }
                     },
                     {
@@ -1390,11 +1390,11 @@
                         "description": "Field to sort by.",
                         "schema": {
                             "nullable": true,
+                            "type": "string",
                             "enum": [
                                 "name",
                                 "kennung"
-                            ],
-                            "type": "string"
+                            ]
                         }
                     },
                     {
@@ -1445,9 +1445,6 @@
                         "description": "Internal server error while getting all organizations."
                     }
                 },
-                "tags": [
-                    "organisationen"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -1457,6 +1454,9 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "organisationen"
                 ]
             }
         },
@@ -1519,9 +1519,6 @@
                         "description": "An internal server error occurred."
                     }
                 },
-                "tags": [
-                    "organisationen"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -1531,6 +1528,9 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "organisationen"
                 ]
             },
             "get": {
@@ -1574,9 +1574,6 @@
                         "description": "Internal server error while getting the organization."
                     }
                 },
-                "tags": [
-                    "organisationen"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -1586,12 +1583,14 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "organisationen"
                 ]
             },
             "delete": {
-                "operationId": "OrganisationController_deleteOrganisation",
-                "summary": "",
                 "description": "Delete an organisation by id.",
+                "operationId": "OrganisationController_deleteOrganisation",
                 "parameters": [
                     {
                         "name": "organisationId",
@@ -1625,9 +1624,6 @@
                         "description": "The organisation that should be deleted does not exist."
                     }
                 },
-                "tags": [
-                    "organisationen"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -1637,6 +1633,10 @@
                     {
                         "bearer": []
                     }
+                ],
+                "summary": "",
+                "tags": [
+                    "organisationen"
                 ]
             }
         },
@@ -1668,9 +1668,6 @@
                         "description": "Internal server error while getting the root organization."
                     }
                 },
-                "tags": [
-                    "organisationen"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -1680,6 +1677,9 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "organisationen"
                 ]
             }
         },
@@ -1708,9 +1708,6 @@
                         "description": "Internal server error while getting the organization."
                     }
                 },
-                "tags": [
-                    "organisationen"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -1720,6 +1717,9 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "organisationen"
                 ]
             }
         },
@@ -1758,9 +1758,6 @@
                         "description": "Internal server error while getting the organization."
                     }
                 },
-                "tags": [
-                    "organisationen"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -1770,6 +1767,9 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "organisationen"
                 ]
             }
         },
@@ -1853,9 +1853,6 @@
                         "description": "Internal server error while getting all organizations."
                     }
                 },
-                "tags": [
-                    "organisationen"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -1865,6 +1862,9 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "organisationen"
                 ]
             }
         },
@@ -1921,9 +1921,6 @@
                         "description": "Internal server error while getting all organizations."
                     }
                 },
-                "tags": [
-                    "organisationen"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -1933,16 +1930,19 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "organisationen"
                 ]
             },
             "post": {
                 "operationId": "OrganisationController_addZugehoerigeOrganisation",
                 "parameters": [
                     {
-                        "description": "The id of an organization",
-                        "required": true,
                         "name": "organisationId",
+                        "required": true,
                         "in": "path",
+                        "description": "The ID of the parent organisation to which another organisation will be added as a subordinate.",
                         "schema": {
                             "nullable": false,
                             "type": "string"
@@ -1984,9 +1984,6 @@
                         "description": "Internal server error while modifying the organisation."
                     }
                 },
-                "tags": [
-                    "organisationen"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -1996,6 +1993,9 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "organisationen"
                 ]
             }
         },
@@ -2069,9 +2069,6 @@
                         "description": "Internal server error while modifying the organisation."
                     }
                 },
-                "tags": [
-                    "organisationen"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -2081,6 +2078,9 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "organisationen"
                 ]
             }
         },
@@ -2144,9 +2144,6 @@
                         "description": "Internal server error while modifying the organisation."
                     }
                 },
-                "tags": [
-                    "organisationen"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -2156,14 +2153,16 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "organisationen"
                 ]
             }
         },
         "/api/rolle": {
             "get": {
-                "operationId": "RolleController_findRollen",
-                "summary": "",
                 "description": "List all rollen.",
+                "operationId": "RolleController_findRollen",
                 "parameters": [
                     {
                         "name": "offset",
@@ -2261,9 +2260,6 @@
                         "description": "Internal server error while getting all rollen."
                     }
                 },
-                "tags": [
-                    "rolle"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -2273,12 +2269,15 @@
                     {
                         "bearer": []
                     }
+                ],
+                "summary": "",
+                "tags": [
+                    "rolle"
                 ]
             },
             "post": {
-                "operationId": "RolleController_createRolle",
-                "summary": "",
                 "description": "Create a new rolle.",
+                "operationId": "RolleController_createRolle",
                 "parameters": [],
                 "requestBody": {
                     "required": true,
@@ -2321,9 +2320,6 @@
                         "description": "Internal server error while creating the rolle."
                     }
                 },
-                "tags": [
-                    "rolle"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -2333,14 +2329,17 @@
                     {
                         "bearer": []
                     }
+                ],
+                "summary": "",
+                "tags": [
+                    "rolle"
                 ]
             }
         },
         "/api/rolle/systemrechte": {
             "get": {
-                "operationId": "RolleController_getAllSystemrechte",
-                "summary": "",
                 "description": "Get all systemrechte for rollen.",
+                "operationId": "RolleController_getAllSystemrechte",
                 "parameters": [],
                 "responses": {
                     "200": {
@@ -2360,9 +2359,6 @@
                         "description": "Internal server error"
                     }
                 },
-                "tags": [
-                    "rolle"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -2372,14 +2368,17 @@
                     {
                         "bearer": []
                     }
+                ],
+                "summary": "",
+                "tags": [
+                    "rolle"
                 ]
             }
         },
         "/api/rolle/{rolleId}": {
             "get": {
-                "operationId": "RolleController_findRolleByIdWithServiceProviders",
-                "summary": "",
                 "description": "Get rolle by id.",
+                "operationId": "RolleController_findRolleByIdWithServiceProviders",
                 "parameters": [
                     {
                         "name": "rolleId",
@@ -2413,9 +2412,6 @@
                         "description": "Internal server error while getting rolle by id."
                     }
                 },
-                "tags": [
-                    "rolle"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -2425,12 +2421,15 @@
                     {
                         "bearer": []
                     }
+                ],
+                "summary": "",
+                "tags": [
+                    "rolle"
                 ]
             },
             "patch": {
-                "operationId": "RolleController_addSystemRecht",
-                "summary": "",
                 "description": "Add systemrecht to a rolle.",
+                "operationId": "RolleController_addSystemRecht",
                 "parameters": [
                     {
                         "name": "rolleId",
@@ -2470,9 +2469,6 @@
                         "description": "Internal server error while adding systemrecht to rolle."
                     }
                 },
-                "tags": [
-                    "rolle"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -2482,12 +2478,15 @@
                     {
                         "bearer": []
                     }
+                ],
+                "summary": "",
+                "tags": [
+                    "rolle"
                 ]
             },
             "put": {
-                "operationId": "RolleController_updateRolle",
-                "summary": "",
                 "description": "Update rolle.",
+                "operationId": "RolleController_updateRolle",
                 "parameters": [
                     {
                         "name": "rolleId",
@@ -2541,9 +2540,6 @@
                         "description": "Internal server error while updating the rolle."
                     }
                 },
-                "tags": [
-                    "rolle"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -2553,12 +2549,15 @@
                     {
                         "bearer": []
                     }
+                ],
+                "summary": "",
+                "tags": [
+                    "rolle"
                 ]
             },
             "delete": {
-                "operationId": "RolleController_deleteRolle",
-                "summary": "",
                 "description": "Delete a role by id.",
+                "operationId": "RolleController_deleteRolle",
                 "parameters": [
                     {
                         "name": "rolleId",
@@ -2592,9 +2591,6 @@
                         "description": "The rolle that should be deleted does not exist."
                     }
                 },
-                "tags": [
-                    "rolle"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -2604,14 +2600,17 @@
                     {
                         "bearer": []
                     }
+                ],
+                "summary": "",
+                "tags": [
+                    "rolle"
                 ]
             }
         },
         "/api/rolle/{rolleId}/serviceProviders": {
             "get": {
-                "operationId": "RolleController_getRolleServiceProviderIds",
-                "summary": "",
                 "description": "Get service-providers for a rolle by its id.",
+                "operationId": "RolleController_getRolleServiceProviderIds",
                 "parameters": [
                     {
                         "name": "rolleId",
@@ -2642,9 +2641,6 @@
                         "description": "The rolle does not exist."
                     }
                 },
-                "tags": [
-                    "rolle"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -2654,12 +2650,15 @@
                     {
                         "bearer": []
                     }
+                ],
+                "summary": "",
+                "tags": [
+                    "rolle"
                 ]
             },
             "put": {
-                "operationId": "RolleController_updateServiceProvidersById",
-                "summary": "",
                 "description": "Add a service-provider to a rolle by id.",
+                "operationId": "RolleController_updateServiceProvidersById",
                 "parameters": [
                     {
                         "name": "rolleId",
@@ -2709,9 +2708,6 @@
                         "description": "Internal server error, the service-provider may could not be found after attaching to rolle."
                     }
                 },
-                "tags": [
-                    "rolle"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -2721,12 +2717,15 @@
                     {
                         "bearer": []
                     }
+                ],
+                "summary": "",
+                "tags": [
+                    "rolle"
                 ]
             },
             "delete": {
-                "operationId": "RolleController_removeServiceProviderById",
-                "summary": "",
                 "description": "Remove a service-provider from a rolle by id.",
+                "operationId": "RolleController_removeServiceProviderById",
                 "parameters": [
                     {
                         "name": "rolleId",
@@ -2760,9 +2759,6 @@
                         "description": "The rolle or the service-provider that should be removed does not exist."
                     }
                 },
-                "tags": [
-                    "rolle"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -2772,14 +2768,17 @@
                     {
                         "bearer": []
                     }
+                ],
+                "summary": "",
+                "tags": [
+                    "rolle"
                 ]
             }
         },
         "/api/rolle/erweiterung": {
             "post": {
-                "operationId": "RolleController_createRollenerweiterung",
-                "summary": "",
                 "description": "Create a new rollenerweiterung.",
+                "operationId": "RolleController_createRollenerweiterung",
                 "parameters": [],
                 "requestBody": {
                     "required": true,
@@ -2822,9 +2821,6 @@
                         "description": "Internal server error while creating the rollenerweiterung."
                     }
                 },
-                "tags": [
-                    "rolle"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -2834,14 +2830,17 @@
                     {
                         "bearer": []
                     }
+                ],
+                "summary": "",
+                "tags": [
+                    "rolle"
                 ]
             }
         },
         "/api/rollen-erweiterung/angebot/{angebotId}/organisation/{organisationId}/apply": {
             "post": {
-                "operationId": "RollenerweiterungController_applyRollenerweiterungChanges",
-                "summary": "",
                 "description": "Apply changes to rollen-erweiterung for a given angebot and organisation.",
+                "operationId": "RollenerweiterungController_applyRollenerweiterungChanges",
                 "parameters": [
                     {
                         "name": "angebotId",
@@ -2882,9 +2881,6 @@
                         "description": "Internal server error"
                     }
                 },
-                "tags": [
-                    "rolle"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -2894,14 +2890,17 @@
                     {
                         "bearer": []
                     }
+                ],
+                "summary": "",
+                "tags": [
+                    "rolle"
                 ]
             }
         },
         "/api/provider/all": {
             "get": {
-                "operationId": "ProviderController_getAllServiceProviders",
-                "summary": "",
                 "description": "Get all service-providers.",
+                "operationId": "ProviderController_getAllServiceProviders",
                 "parameters": [],
                 "responses": {
                     "200": {
@@ -2927,9 +2926,6 @@
                         "description": "Internal server error while getting all service-providers."
                     }
                 },
-                "tags": [
-                    "provider"
-                ],
                 "security": [
                     {
                         "bearer": []
@@ -2939,14 +2935,17 @@
                             "openid"
                         ]
                     }
+                ],
+                "summary": "",
+                "tags": [
+                    "provider"
                 ]
             }
         },
         "/api/provider": {
             "get": {
-                "operationId": "ProviderController_getAvailableServiceProviders",
-                "summary": "",
                 "description": "Get service-providers available for logged-in user.",
+                "operationId": "ProviderController_getAvailableServiceProviders",
                 "parameters": [],
                 "responses": {
                     "200": {
@@ -2972,9 +2971,6 @@
                         "description": "Internal server error while getting all service-providers."
                     }
                 },
-                "tags": [
-                    "provider"
-                ],
                 "security": [
                     {
                         "bearer": []
@@ -2984,12 +2980,15 @@
                             "openid"
                         ]
                     }
+                ],
+                "summary": "",
+                "tags": [
+                    "provider"
                 ]
             },
             "post": {
-                "operationId": "ProviderController_createServiceProvider",
-                "summary": "",
                 "description": "Create a new service-provider (Angebot).",
+                "operationId": "ProviderController_createServiceProvider",
                 "parameters": [],
                 "requestBody": {
                     "required": true,
@@ -3025,9 +3024,6 @@
                         "description": "Internal server error."
                     }
                 },
-                "tags": [
-                    "provider"
-                ],
                 "security": [
                     {
                         "bearer": []
@@ -3037,6 +3033,10 @@
                             "openid"
                         ]
                     }
+                ],
+                "summary": "",
+                "tags": [
+                    "provider"
                 ]
             }
         },
@@ -3083,9 +3083,6 @@
                         "description": "Internal server error while getting the logo."
                     }
                 },
-                "tags": [
-                    "provider"
-                ],
                 "security": [
                     {
                         "bearer": []
@@ -3095,14 +3092,16 @@
                             "openid"
                         ]
                     }
+                ],
+                "tags": [
+                    "provider"
                 ]
             }
         },
         "/api/provider/{angebotId}/rollenerweiterung": {
             "get": {
-                "operationId": "ProviderController_findRollenerweiterungenByServiceProviderId",
-                "summary": "",
                 "description": "Get rollenerweiterungen for service-provider with provided id. Total is the amount of organisations.",
+                "operationId": "ProviderController_findRollenerweiterungenByServiceProviderId",
                 "parameters": [
                     {
                         "name": "angebotId",
@@ -3181,9 +3180,6 @@
                         "description": "Internal server error while getting rollenerweiterungen."
                     }
                 },
-                "tags": [
-                    "provider"
-                ],
                 "security": [
                     {
                         "bearer": []
@@ -3193,14 +3189,17 @@
                             "openid"
                         ]
                     }
+                ],
+                "summary": "",
+                "tags": [
+                    "provider"
                 ]
             }
         },
         "/api/provider/manageable": {
             "get": {
-                "operationId": "ProviderController_getManageableServiceProviders",
-                "summary": "",
                 "description": "Get service-providers the logged-in user is allowed to manage.",
+                "operationId": "ProviderController_getManageableServiceProviders",
                 "parameters": [
                     {
                         "name": "offset",
@@ -3259,9 +3258,6 @@
                         "description": "Internal server error while getting all service-providers."
                     }
                 },
-                "tags": [
-                    "provider"
-                ],
                 "security": [
                     {
                         "bearer": []
@@ -3271,14 +3267,17 @@
                             "openid"
                         ]
                     }
+                ],
+                "summary": "",
+                "tags": [
+                    "provider"
                 ]
             }
         },
         "/api/provider/manageable-by-organisation": {
             "get": {
-                "operationId": "ProviderController_getManageableServiceProvidersForOrganisationId",
-                "summary": "",
                 "description": "Get service-providers the logged-in user is allowed to manage for an Organisation.",
+                "operationId": "ProviderController_getManageableServiceProvidersForOrganisationId",
                 "parameters": [
                     {
                         "name": "offset",
@@ -3347,9 +3346,6 @@
                         "description": "Internal server error while getting all service-providers."
                     }
                 },
-                "tags": [
-                    "provider"
-                ],
                 "security": [
                     {
                         "bearer": []
@@ -3359,14 +3355,17 @@
                             "openid"
                         ]
                     }
+                ],
+                "summary": "",
+                "tags": [
+                    "provider"
                 ]
             }
         },
         "/api/provider/manageable/{angebotId}": {
             "get": {
-                "operationId": "ProviderController_getManageableServiceProviderById",
-                "summary": "",
                 "description": "Get service-provider the logged-in user is allowed to manage.",
+                "operationId": "ProviderController_getManageableServiceProviderById",
                 "parameters": [
                     {
                         "name": "angebotId",
@@ -3400,9 +3399,6 @@
                         "description": "Internal server error while getting service-provider."
                     }
                 },
-                "tags": [
-                    "provider"
-                ],
                 "security": [
                     {
                         "bearer": []
@@ -3412,6 +3408,10 @@
                             "openid"
                         ]
                     }
+                ],
+                "summary": "",
+                "tags": [
+                    "provider"
                 ]
             }
         },
@@ -3457,9 +3457,6 @@
                         "description": "An internal server error occurred."
                     }
                 },
-                "tags": [
-                    "personenkontexte"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -3469,12 +3466,14 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "personenkontexte"
                 ]
             },
             "put": {
-                "operationId": "PersonenkontextController_updatePersonenkontextWithId",
-                "summary": "",
                 "deprecated": true,
+                "operationId": "PersonenkontextController_updatePersonenkontextWithId",
                 "parameters": [
                     {
                         "name": "personenkontextId",
@@ -3512,9 +3511,6 @@
                         "description": "An internal server error occurred."
                     }
                 },
-                "tags": [
-                    "personenkontexte"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -3524,6 +3520,10 @@
                     {
                         "bearer": []
                     }
+                ],
+                "summary": "",
+                "tags": [
+                    "personenkontexte"
                 ]
             },
             "delete": {
@@ -3570,9 +3570,6 @@
                         "description": "An internal server error occurred."
                     }
                 },
-                "tags": [
-                    "personenkontexte"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -3582,6 +3579,9 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "personenkontexte"
                 ]
             }
         },
@@ -3686,9 +3686,6 @@
                         "description": "An internal server error occurred."
                     }
                 },
-                "tags": [
-                    "personenkontexte"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -3698,6 +3695,9 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "personenkontexte"
                 ]
             }
         },
@@ -3807,9 +3807,6 @@
                         "description": "Internal server error while getting data for personenkontext."
                     }
                 },
-                "tags": [
-                    "personenkontext"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -3819,6 +3816,9 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "personenkontext"
                 ]
             }
         },
@@ -3888,9 +3888,6 @@
                         "description": "Internal server error while updating personenkontexte."
                     }
                 },
-                "tags": [
-                    "personenkontext"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -3900,6 +3897,9 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "personenkontext"
                 ]
             }
         },
@@ -3948,9 +3948,6 @@
                         "description": "Internal server error while creating person with personenkontext."
                     }
                 },
-                "tags": [
-                    "personenkontext"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -3960,6 +3957,9 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "personenkontext"
                 ]
             }
         },
@@ -4021,9 +4021,6 @@
                         "description": "Internal server error while getting rollen for the logged-in user."
                     }
                 },
-                "tags": [
-                    "person-administration"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -4033,6 +4030,9 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "person-administration"
                 ]
             }
         },
@@ -4077,9 +4077,6 @@
                         "description": "Internal server error while creating a token."
                     }
                 },
-                "tags": [
-                    "2FA"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -4089,6 +4086,9 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "2FA"
                 ]
             }
         },
@@ -4132,9 +4132,6 @@
                         "description": "Internal server error while retrieving token state."
                     }
                 },
-                "tags": [
-                    "2FA"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -4144,6 +4141,9 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "2FA"
                 ]
             }
         },
@@ -4187,9 +4187,6 @@
                         "description": "Internal server error while reseting a token."
                     }
                 },
-                "tags": [
-                    "2FA"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -4199,6 +4196,9 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "2FA"
                 ]
             }
         },
@@ -4243,9 +4243,6 @@
                         "description": "Internal server error while assigning a hardware token."
                     }
                 },
-                "tags": [
-                    "2FA"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -4255,6 +4252,9 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "2FA"
                 ]
             }
         },
@@ -4292,9 +4292,6 @@
                         "description": "Internal server error while verifying a token."
                     }
                 },
-                "tags": [
-                    "2FA"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -4304,6 +4301,9 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "2FA"
                 ]
             }
         },
@@ -4347,9 +4347,6 @@
                         "description": "Internal server error while getting requirement information."
                     }
                 },
-                "tags": [
-                    "2FA"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -4359,6 +4356,9 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "2FA"
                 ]
             }
         },
@@ -4393,9 +4393,6 @@
                         "description": "Internal server error while trying to lock user."
                     }
                 },
-                "tags": [
-                    "cron"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -4405,6 +4402,9 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "cron"
                 ]
             }
         },
@@ -4439,9 +4439,6 @@
                         "description": "Internal server error while trying to remove personenkontexte from users."
                     }
                 },
-                "tags": [
-                    "cron"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -4451,6 +4448,9 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "cron"
                 ]
             }
         },
@@ -4485,9 +4485,6 @@
                         "description": "Internal server error while trying to remove users."
                     }
                 },
-                "tags": [
-                    "cron"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -4497,6 +4494,9 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "cron"
                 ]
             }
         },
@@ -4528,9 +4528,6 @@
                         "description": "Internal server error while trying to unlock users."
                     }
                 },
-                "tags": [
-                    "cron"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -4540,6 +4537,9 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "cron"
                 ]
             }
         },
@@ -4574,9 +4574,6 @@
                         "description": "Internal server error while trying to update VIDIS Angebote."
                     }
                 },
-                "tags": [
-                    "cron"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -4586,6 +4583,9 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "cron"
                 ]
             }
         },
@@ -4620,9 +4620,6 @@
                         "description": "Internal server error while trying to delete EmailAddresses."
                     }
                 },
-                "tags": [
-                    "cron"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -4632,6 +4629,9 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "cron"
                 ]
             }
         },
@@ -4673,9 +4673,6 @@
                         "description": "Internal server error while importing data with a CSV file."
                     }
                 },
-                "tags": [
-                    "import"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -4685,6 +4682,9 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "import"
                 ]
             }
         },
@@ -4729,9 +4729,6 @@
                         "description": "Internal server error while executing the import transaction."
                     }
                 },
-                "tags": [
-                    "import"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -4741,14 +4738,16 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "import"
                 ]
             }
         },
         "/api/import/{importvorgangId}": {
             "delete": {
-                "operationId": "ImportController_deleteImportTransaction",
-                "summary": "",
                 "description": "Delete a role by id.",
+                "operationId": "ImportController_deleteImportTransaction",
                 "parameters": [
                     {
                         "name": "importvorgangId",
@@ -4782,9 +4781,6 @@
                         "description": "The import transaction that should be deleted does not exist."
                     }
                 },
-                "tags": [
-                    "import"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -4794,14 +4790,17 @@
                     {
                         "bearer": []
                     }
+                ],
+                "summary": "",
+                "tags": [
+                    "import"
                 ]
             }
         },
         "/api/import/history": {
             "get": {
-                "operationId": "ImportController_findImportTransactions",
-                "summary": "",
                 "description": "Get the history of import.",
+                "operationId": "ImportController_findImportTransactions",
                 "parameters": [
                     {
                         "name": "offset",
@@ -4891,9 +4890,6 @@
                         "description": "Internal server error while getting import transactions."
                     }
                 },
-                "tags": [
-                    "import"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -4903,15 +4899,18 @@
                     {
                         "bearer": []
                     }
+                ],
+                "summary": "",
+                "tags": [
+                    "import"
                 ]
             }
         },
         "/api/import/{importvorgangId}/download": {
             "get": {
-                "operationId": "ImportController_downloadFile",
-                "summary": "",
                 "deprecated": true,
                 "description": "Download the import result file by importvorgangId as text file is deprecated, please use the  GET/api/import/importedUsers.",
+                "operationId": "ImportController_downloadFile",
                 "parameters": [
                     {
                         "name": "importvorgangId",
@@ -4959,9 +4958,6 @@
                         "description": "Internal server error while generating the import result file."
                     }
                 },
-                "tags": [
-                    "import"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -4971,14 +4967,17 @@
                     {
                         "bearer": []
                     }
+                ],
+                "summary": "",
+                "tags": [
+                    "import"
                 ]
             }
         },
         "/api/import/{importvorgangId}/status": {
             "get": {
-                "operationId": "ImportController_getImportStatus",
-                "summary": "",
                 "description": "Get status for the import transaction by id.",
+                "operationId": "ImportController_getImportStatus",
                 "parameters": [
                     {
                         "name": "importvorgangId",
@@ -5012,9 +5011,6 @@
                         "description": "Internal server error while getting status for the import transaction by id."
                     }
                 },
-                "tags": [
-                    "import"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -5024,14 +5020,17 @@
                     {
                         "bearer": []
                     }
+                ],
+                "summary": "",
+                "tags": [
+                    "import"
                 ]
             }
         },
         "/api/import/importedUsers": {
             "get": {
-                "operationId": "ImportController_getImportedUsers",
-                "summary": "",
                 "description": "Get the list of imported users. The maximum limit is 100. After receiving all the imported users, please use the DELETE endpoint to remove imported data.",
+                "operationId": "ImportController_getImportedUsers",
                 "parameters": [
                     {
                         "name": "offset",
@@ -5097,9 +5096,6 @@
                         "description": "Internal server error while getting list of imported users."
                     }
                 },
-                "tags": [
-                    "import"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -5109,19 +5105,23 @@
                     {
                         "bearer": []
                     }
+                ],
+                "summary": "",
+                "tags": [
+                    "import"
                 ]
             }
         },
         "/metrics": {
             "get": {
                 "operationId": "MetricsController_getMetrics",
-                "summary": "Get Prometheus metrics",
                 "parameters": [],
                 "responses": {
                     "200": {
                         "description": "Prometheus metrics."
                     }
                 },
+                "summary": "Get Prometheus metrics",
                 "tags": [
                     "Metrics"
                 ]
@@ -5167,9 +5167,8 @@
         },
         "/api/portal/meldung": {
             "get": {
-                "operationId": "MeldungController_getAllMeldungen",
-                "summary": "",
                 "description": "Get all meldungen.",
+                "operationId": "MeldungController_getAllMeldungen",
                 "parameters": [],
                 "responses": {
                     "200": {
@@ -5195,9 +5194,6 @@
                         "description": "Internal server error while getting all meldungen."
                     }
                 },
-                "tags": [
-                    "meldung"
-                ],
                 "security": [
                     {
                         "bearer": []
@@ -5207,6 +5203,10 @@
                             "openid"
                         ]
                     }
+                ],
+                "summary": "",
+                "tags": [
+                    "meldung"
                 ]
             },
             "put": {
@@ -5236,9 +5236,6 @@
                         "description": "Internal server error while modifying the meldung."
                     }
                 },
-                "tags": [
-                    "meldung"
-                ],
                 "security": [
                     {
                         "bearer": []
@@ -5248,14 +5245,16 @@
                             "openid"
                         ]
                     }
+                ],
+                "tags": [
+                    "meldung"
                 ]
             }
         },
         "/api/portal/meldung/current": {
             "get": {
-                "operationId": "MeldungController_getCurrentMeldung",
-                "summary": "",
                 "description": "Get current veroeffentlicht meldung.",
+                "operationId": "MeldungController_getCurrentMeldung",
                 "parameters": [],
                 "responses": {
                     "200": {
@@ -5278,9 +5277,6 @@
                         "description": "Internal server error while getting current veroeffentlicht meldung."
                     }
                 },
-                "tags": [
-                    "meldung"
-                ],
                 "security": [
                     {
                         "bearer": []
@@ -5290,6 +5286,10 @@
                             "openid"
                         ]
                     }
+                ],
+                "summary": "",
+                "tags": [
+                    "meldung"
                 ]
             }
         },
@@ -5371,9 +5371,6 @@
                         "description": "Internal server error while getting data."
                     }
                 },
-                "tags": [
-                    "landesbediensteter"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -5383,6 +5380,9 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "landesbediensteter"
                 ]
             }
         },
@@ -5444,9 +5444,6 @@
                         "description": "Internal server error while updating personenkontexte."
                     }
                 },
-                "tags": [
-                    "landesbediensteter"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -5456,13 +5453,15 @@
                     {
                         "bearer": []
                     }
+                ],
+                "tags": [
+                    "landesbediensteter"
                 ]
             }
         },
         "/api/person-info": {
             "get": {
                 "operationId": "PersonInfoController_info",
-                "summary": "Info about logged in person.",
                 "parameters": [],
                 "responses": {
                     "200": {
@@ -5479,9 +5478,6 @@
                         "description": "person is not logged in."
                     }
                 },
-                "tags": [
-                    "person-info"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -5491,13 +5487,16 @@
                     {
                         "bearer": []
                     }
+                ],
+                "summary": "Info about logged in person.",
+                "tags": [
+                    "person-info"
                 ]
             }
         },
         "/api/v1/person-info": {
             "get": {
-                "operationId": "PersonInfoController_infoV1",
-                "summary": "Info about logged in person.",
+                "operationId": "personInfoControllerInfoV1",
                 "parameters": [],
                 "responses": {
                     "200": {
@@ -5514,9 +5513,6 @@
                         "description": "person is not logged in."
                     }
                 },
-                "tags": [
-                    "person-info"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -5526,14 +5522,17 @@
                     {
                         "bearer": []
                     }
+                ],
+                "summary": "Info about logged in person.",
+                "tags": [
+                    "person-info"
                 ]
             }
         },
         "/api/personen-info": {
             "get": {
-                "operationId": "PersonenInfoController_infoV1",
-                "summary": "liefert Personeninformationen basierend auf den Berechtigungen auf Service Provider des aufrufenden Nutzers.",
                 "description": "liefert Personeninformationen basierend auf den Berechtigungen auf Service Provider des aufrufenden Nutzers.",
+                "operationId": "PersonenInfoController_infoV1",
                 "parameters": [
                     {
                         "name": "x-offset",
@@ -5569,9 +5568,6 @@
                         "description": "person is not logged in."
                     }
                 },
-                "tags": [
-                    "personen-info"
-                ],
                 "security": [
                     {
                         "oauth2": [
@@ -5581,6 +5577,10 @@
                     {
                         "bearer": []
                     }
+                ],
+                "summary": "liefert Personeninformationen basierend auf den Berechtigungen auf Service Provider des aufrufenden Nutzers.",
+                "tags": [
+                    "personen-info"
                 ]
             }
         }
@@ -5666,10 +5666,18 @@
                         "type": "string"
                     },
                     "typ": {
-                        "$ref": "#/components/schemas/OrganisationsTyp"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/OrganisationsTyp"
+                            }
+                        ]
                     },
                     "traegerschaft": {
-                        "$ref": "#/components/schemas/TraegerschaftTyp"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/TraegerschaftTyp"
+                            }
+                        ]
                     },
                     "itslearningEnabled": {
                         "type": "boolean"
@@ -6125,7 +6133,11 @@
                 "type": "object",
                 "properties": {
                     "status": {
-                        "$ref": "#/components/schemas/EmailAddressStatus"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/EmailAddressStatus"
+                            }
+                        ]
                     },
                     "address": {
                         "type": "string"
@@ -6521,14 +6533,22 @@
                     },
                     "rollenArt": {
                         "nullable": false,
-                        "$ref": "#/components/schemas/RollenArt"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/RollenArt"
+                            }
+                        ]
                     },
                     "administriertVon": {
                         "type": "string"
                     },
                     "typ": {
                         "nullable": true,
-                        "$ref": "#/components/schemas/OrganisationsTyp"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/OrganisationsTyp"
+                            }
+                        ]
                     },
                     "editable": {
                         "type": "boolean"
@@ -6642,10 +6662,18 @@
                         "type": "string"
                     },
                     "typ": {
-                        "$ref": "#/components/schemas/OrganisationsTyp"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/OrganisationsTyp"
+                            }
+                        ]
                     },
                     "traegerschaft": {
-                        "$ref": "#/components/schemas/TraegerschaftTyp"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/TraegerschaftTyp"
+                            }
+                        ]
                     },
                     "emailAdress": {
                         "type": "string"
@@ -6725,10 +6753,18 @@
                         "type": "string"
                     },
                     "typ": {
-                        "$ref": "#/components/schemas/OrganisationsTyp"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/OrganisationsTyp"
+                            }
+                        ]
                     },
                     "traegerschaft": {
-                        "$ref": "#/components/schemas/TraegerschaftTyp"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/TraegerschaftTyp"
+                            }
+                        ]
                     },
                     "emailAdress": {
                         "type": "string"
@@ -6863,7 +6899,11 @@
                         "type": "string"
                     },
                     "typ": {
-                        "$ref": "#/components/schemas/OrganisationsTyp"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/OrganisationsTyp"
+                            }
+                        ]
                     }
                 },
                 "required": [
@@ -6880,8 +6920,13 @@
                 "type": "object",
                 "properties": {
                     "name": {
+                        "description": "The unique identifier of the system right",
                         "example": "ROLLEN_VERWALTEN",
-                        "$ref": "#/components/schemas/RollenSystemRechtEnum"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/RollenSystemRechtEnum"
+                            }
+                        ]
                     },
                     "isTechnical": {
                         "type": "boolean",
@@ -6929,7 +6974,11 @@
                         "type": "string"
                     },
                     "rollenart": {
-                        "$ref": "#/components/schemas/RollenArt"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/RollenArt"
+                            }
+                        ]
                     },
                     "merkmale": {
                         "type": "array",
@@ -6988,7 +7037,11 @@
                         "type": "string"
                     },
                     "rollenart": {
-                        "$ref": "#/components/schemas/RollenArt"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/RollenArt"
+                            }
+                        ]
                     },
                     "merkmale": {
                         "type": "array",
@@ -7034,7 +7087,11 @@
                         "type": "string"
                     },
                     "rollenart": {
-                        "$ref": "#/components/schemas/RollenArt"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/RollenArt"
+                            }
+                        ]
                     },
                     "merkmale": {
                         "type": "array",
@@ -7108,7 +7165,11 @@
                 "type": "object",
                 "properties": {
                     "systemRecht": {
-                        "$ref": "#/components/schemas/RollenSystemRechtEnum"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/RollenSystemRechtEnum"
+                            }
+                        ]
                     }
                 },
                 "required": [
@@ -7185,14 +7246,22 @@
                         "type": "string"
                     },
                     "target": {
-                        "$ref": "#/components/schemas/ServiceProviderTarget"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/ServiceProviderTarget"
+                            }
+                        ]
                     },
                     "url": {
                         "type": "string",
                         "description": "Can be undefined, if `target` is not equal to `URL`"
                     },
                     "kategorie": {
-                        "$ref": "#/components/schemas/ServiceProviderKategorie"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/ServiceProviderKategorie"
+                            }
+                        ]
                     },
                     "hasLogo": {
                         "type": "boolean"
@@ -7446,7 +7515,11 @@
                         "$ref": "#/components/schemas/OrganisationRefResponse"
                     },
                     "kategorie": {
-                        "$ref": "#/components/schemas/ServiceProviderKategorie"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/ServiceProviderKategorie"
+                            }
+                        ]
                     },
                     "requires2fa": {
                         "type": "boolean"
@@ -7494,7 +7567,11 @@
                         "$ref": "#/components/schemas/OrganisationRefResponse"
                     },
                     "kategorie": {
-                        "$ref": "#/components/schemas/ServiceProviderKategorie"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/ServiceProviderKategorie"
+                            }
+                        ]
                     },
                     "requires2fa": {
                         "type": "boolean"
@@ -8253,7 +8330,11 @@
                         "type": "number"
                     },
                     "status": {
-                        "$ref": "#/components/schemas/ImportStatus"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/ImportStatus"
+                            }
+                        ]
                     }
                 },
                 "required": [
@@ -8273,7 +8354,11 @@
                         "type": "number"
                     },
                     "status": {
-                        "$ref": "#/components/schemas/ImportStatus"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/ImportStatus"
+                            }
+                        ]
                     },
                     "totalDataItemImported": {
                         "type": "number"
@@ -8313,7 +8398,11 @@
                         "description": "Initiales Benutzerpasswort, muss nach der ersten Anmeldung geändert werden"
                     },
                     "status": {
-                        "$ref": "#/components/schemas/ImportDataItemStatus"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/ImportDataItemStatus"
+                            }
+                        ]
                     }
                 },
                 "required": [
