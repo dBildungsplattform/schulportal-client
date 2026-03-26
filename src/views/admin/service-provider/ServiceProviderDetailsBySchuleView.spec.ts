@@ -219,7 +219,8 @@ describe('ServiceProviderDetailsBySchuleView', () => {
       await wrapper?.find('[data-testid="rollenerweiterung-save-button"]').trigger('click');
       await nextTick();
 
-      const errorDialog: VueWrapper<ComponentPublicInstance<RollenerweiterungAssignErrorDialogProps>> | undefined = wrapper?.findComponent({ name: 'RollenerweiterungAssignErrorDialog' });
+      const errorDialog: VueWrapper<ComponentPublicInstance<RollenerweiterungAssignErrorDialogProps>> | undefined =
+        wrapper?.findComponent({ name: 'RollenerweiterungAssignErrorDialog' });
       expect(errorDialog?.exists()).toBe(true);
       expect(errorDialog?.props('isDialogVisible')).toBe(true);
 

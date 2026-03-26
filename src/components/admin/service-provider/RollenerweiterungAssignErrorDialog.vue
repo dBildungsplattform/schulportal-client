@@ -66,9 +66,7 @@
     >
       <v-container>
         <p class="text-body bold pre-line">
-          {{
-            t('angebot.schulspezifischeErweiterungen.assignErrorIntroText')
-          }}
+          {{ t('angebot.schulspezifischeErweiterungen.assignErrorIntroText') }}
         </p>
         <!-- Error list -->
         <ol>
