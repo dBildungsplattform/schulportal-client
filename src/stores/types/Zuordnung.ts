@@ -44,7 +44,7 @@ export class Zuordnung {
       response.rolle,
       response.rollenArt,
       response.administriertVon,
-      response.typ,
+      response.typ ?? null,
       response.editable,
       response.befristung !== '' ? response.befristung : null,
       response.merkmale,
