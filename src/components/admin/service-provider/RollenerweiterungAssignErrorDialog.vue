@@ -65,6 +65,11 @@
       @on-close-clicked="confirmCloseDialog = true"
     >
       <v-container>
+        <p class="text-body bold pre-line">
+          {{
+            t('angebot.schulspezifischeErweiterungen.assignErrorIntroText')
+          }}
+        </p>
         <!-- Error list -->
         <ol>
           <li
@@ -108,7 +113,7 @@
               data-testid="rollenerweiterung-error-discard-button"
               @click="confirmCloseDialog = true"
             >
-              {{ t('admin.person.bulk.closeList') }}
+              {{ t('angebot.schulspezifischeErweiterungen.closeList') }}
             </v-btn>
           </v-col>
 
@@ -123,7 +128,7 @@
               data-testid="rollenerweiterung-error-save-button"
               @click="saveErrorsAsCSV"
             >
-              {{ t('admin.person.bulk.saveList') }}
+              {{ t('angebot.schulspezifischeErweiterungen.saveList') }}
             </v-btn>
           </v-col>
         </v-row>
@@ -137,7 +142,7 @@
     max-width="900"
   >
     <LayoutCard
-      :header="$t('admin.person.bulk.bulkErrorTitle')"
+      :header="t('angebot.schulspezifischeErweiterungen.assignErrorTitle')"
       @on-close-clicked="confirmCloseDialog = false"
     >
       <v-card-text>
@@ -155,7 +160,7 @@
                 icon="mdi-alert"
               />
               <span>
-                {{ t('admin.person.bulk.closeBulkErrorDialogConfirmationMessage') }}
+                {{ t('angebot.schulspezifischeErweiterungen.closeConfirmationMessage') }}
               </span>
             </v-col>
           </v-row>
