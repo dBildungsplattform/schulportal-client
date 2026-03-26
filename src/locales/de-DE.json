@@ -1,12 +1,17 @@
 {
   "angebot": {
+    "angebotAddedSuccessfully": "Das Angebot wurde erfolgreich hinzugefügt.",
+    "angebotCreateErrorTitle": "Fehler beim Anlegen des Angebots",
+    "addNew": "Neues Angebot hinzufügen",
     "allServiceProviders": "Alle Angebote",
     "assignedRollen": "Zugeordnete Rollen",
+    "backToCreateAngebot": "Zurück zur Angebotsanlage",
     "discard": "Angebot verwerfen",
     "enterName": "Name eingeben",
     "enterUrl": "URL eingeben",
     "selectKategorie": "Kategorie auswählen",
     "createNew": "Neues Angebot anlegen",
+    "createAnother": "Weiteres Angebot anlegen",
     "create": "Angebot anlegen",
     "erweiterteRollen": "Erweiterte Rollen",
     "erweiterteRollenAnDerSchule": "Erweiterte Rollen an der Schule",
@@ -55,7 +60,8 @@
       "ENTITY_NOT_FOUND": "Das Angebot konnte nicht gefunden werden.",
       "500": "Es ist ein technischer Fehler aufgetreten.",
       "INTERNAL": "Es ist ein technischer Fehler aufgetreten.",
-      "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Die letzte Aktion konnte nicht ausgeführt werden. Aufgrund von längerer Inaktivität ist eine erneute Authentifizierung mit einem zweiten Faktor erforderlich. Um fortzufahren, klicken Sie bitte auf „Zurück zur Ergebnisliste“ oder „Schließen“. Sie werden anschließend zur Eingabe Ihres zweiten Faktors aufgefordert."
+      "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Die letzte Aktion konnte nicht ausgeführt werden. Aufgrund von längerer Inaktivität ist eine erneute Authentifizierung mit einem zweiten Faktor erforderlich. Um fortzufahren, klicken Sie bitte auf „Zurück zur Ergebnisliste“ oder „Schließen“. Sie werden anschließend zur Eingabe Ihres zweiten Faktors aufgefordert.",
+      "DUPLICATE_NAME": "Der Angebotsname ist bereits vergeben. Bitte korrigieren Sie Ihre Eingabe."
     },
     "rules": {
         "organisation": {

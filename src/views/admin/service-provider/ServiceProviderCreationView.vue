@@ -23,11 +23,15 @@
   } from 'vue-router';
   import { boolean, object, string } from 'yup';
   import { DIN_91379A_EXT, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
+  import ServiceProviderSuccessTemplate from '@/components/admin/serviceProvider/serviceProviderSuccessTemplate.vue';
 
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
 
   const router: Router = useRouter();
   const { t }: Composer = useI18n({ useScope: 'global' });
+
+  const showSuccess: Ref<boolean> = ref(false);
+  const successData: Ref<ServiceProviderForm | null> = ref(null);
 
   const validationSchema: TypedSchema = toTypedSchema(
     object({
@@ -37,7 +41,7 @@
         .matches(DIN_91379A_EXT, t('angebot.rules.name.matches'))
         .matches(NO_LEADING_TRAILING_SPACES, t('angebot.rules.name.noLeadingTrailingSpaces'))
         .required(t('angebot.rules.name.required')),
-      url: string().required(t('angebot.rules.url.required')).url(t('angebot.rules.url.invalid')),
+      url: string().required(t('angebot.rules.url.required')),
       kategorie: string().required(t('angebot.rules.kategorie.required')),
       nachtraeglichZuweisbar: boolean().required(),
       verfuegbarFuerRollenerweiterung: boolean().required(),
@@ -58,7 +62,7 @@
     selectedOrganisationId: string | undefined;
     name: string;
     url: string;
-    kategorie: string | undefined;
+    kategorie: ServiceProviderKategorie;
     nachtraeglichZuweisbar: boolean;
     verfuegbarFuerRollenerweiterung: boolean;
     requires2fa: boolean;
@@ -67,6 +71,7 @@
   const formContext: FormContext<ServiceProviderForm, ServiceProviderForm> = useForm<ServiceProviderForm>({
     validationSchema,
     initialValues: {
+      kategorie: ServiceProviderKategorie.Schulisch,
       nachtraeglichZuweisbar: true,
       verfuegbarFuerRollenerweiterung: true,
       requires2fa: false,
@@ -105,7 +110,7 @@
   ] = formContext.defineField('verfuegbarFuerRollenerweiterung', vuetifyConfig);
 
   const kategorieItems: ComputedRef<{ title: string; value: string }[]> = computed(() =>
-    Object.values(ServiceProviderKategorie).map((k) => ({
+    Object.values(ServiceProviderKategorie).map((k: ServiceProviderKategorie) => ({
       title: t(`angebot.kategorien.${k}`),
       value: k,
     })),
@@ -115,6 +120,27 @@
     formContext.resetForm();
     serviceProviderStore.errorCode = '';
     router.push({ name: 'service-provider-management' });
+  }
+
+  function navigateToCreatePersonRoute(reload: boolean = false): void | Promise<void> {
+    let routeName: string;
+    routeName = 'create-angebot';
+
+    if (reload) {
+      return router.push({ name: routeName }).then(() => router.go(0));
+    } else {
+      router.push({ name: routeName });
+    }
+  }
+
+  function navigateBackToAngebotForm(): void {
+    if (serviceProviderStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
+      formContext.resetForm();
+      navigateToCreatePersonRoute(true);
+    } else {
+      serviceProviderStore.errorCode = '';
+      navigateToCreatePersonRoute();
+    }
   }
 
   function updateSelectedOrganisation(id: string | undefined): void {
@@ -165,13 +191,14 @@
         organisationId: values.selectedOrganisationId!,
         name: values.name,
         url: values.url,
-        kategorie: values.kategorie as ServiceProviderKategorie,
+        kategorie: values.kategorie,
         requires2fa: values.requires2fa,
         merkmale,
       });
 
       if (!serviceProviderStore.errorCode) {
-        navigateToServiceProviderTable();
+        successData.value = values;
+        showSuccess.value = true;
       }
     },
   );
@@ -205,223 +232,260 @@
     </h1>
     <LayoutCard
       :closable="true"
-      :header="$t('admin.serviceProvider.create')"
+      :header="$t('angebot.addNew')"
       headlineTestId="service-provider-create-headline"
       @onCloseClicked="navigateToServiceProviderTable"
       :padded="true"
       :showCloseText="true"
     >
-      <FormWrapper
-        id="service-provider-create-form"
-        :confirm-unsaved-changes-action="handleConfirmUnsavedChanges"
-        :create-button-label="$t('angebot.create')"
-        :discard-button-label="$t('angebot.discard')"
-        :hide-actions="false"
-        :is-loading="serviceProviderStore.loading"
-        :on-discard="navigateToServiceProviderTable"
-        :on-submit="onSubmit"
-        :show-unsaved-changes-dialog="showUnsavedChangesDialog"
-        @on-show-dialog-change="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
-      >
-        <!-- Error Message -->
-        <SpshAlert
-          :model-value="!!serviceProviderStore.errorCode"
-          :title="$t('admin.serviceProvider.createErrorTitle')"
-          :type="'error'"
-          :closable="false"
-          :show-button="false"
-          :text="$t(`admin.serviceProvider.errors.${serviceProviderStore.errorCode}`)"
+      <!-- The form to create a new Rolle -->
+      <template v-if="!serviceProviderStore.createdServiceProvider">
+        <FormWrapper
+          id="service-provider-create-form"
+          :confirm-unsaved-changes-action="handleConfirmUnsavedChanges"
+          :create-button-label="$t('angebot.create')"
+          :discard-button-label="$t('angebot.discard')"
+          :hide-actions="!!serviceProviderStore.errorCode"
+          :is-loading="serviceProviderStore.loading"
+          :on-discard="navigateToServiceProviderTable"
+          :on-submit="onSubmit"
+          :show-unsaved-changes-dialog="showUnsavedChangesDialog"
+          @on-show-dialog-change="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
+        >
+          <!-- Error Message -->
+          <SpshAlert
+            :model-value="!!serviceProviderStore.errorCode"
+            :title="$t('angebot.angebotCreateErrorTitle')"
+            :type="'error'"
+            :closable="false"
+            :show-button="true"
+            :button-action="navigateBackToAngebotForm"
+            :button-text="$t('angebot.backToCreateAngebot')"
+            :text="$t(`angebot.errors.${serviceProviderStore.errorCode}`)"
+          />
+          <template v-if="!serviceProviderStore.errorCode">
+            <!-- 1. Wer stellt das Angebot bereit? -->
+            <v-row>
+              <v-col>
+                <h3 class="headline-3">1. {{ $t('angebot.whoProvidesThisAngebot') }}</h3>
+              </v-col>
+            </v-row>
+            <FormRow
+              :error-label="selectedOrganisationIdProps['error']"
+              :is-required="true"
+              label-for-id="organisation-select"
+              :label="$t('angebot.providedBy')"
+            >
+              <SchulenFilter
+                :multiple="false"
+                parent-id="service-provider-create"
+                :placeholderText="$t('admin.organisation.selectOrganisation')"
+                :includeAll="true"
+                :selected-schule-props="selectedOrganisationIdProps"
+                :selected-schulen="selectedOrganisationId"
+                @update:selected-schulen="updateSelectedOrganisation"
+              />
+            </FormRow>
+
+            <!-- 2. Name des Angebots -->
+            <v-row>
+              <v-col>
+                <h3 class="headline-3">2. {{ $t('angebot.nameOfAngebotInTheStartPage') }}</h3>
+              </v-col>
+            </v-row>
+            <FormRow
+              :error-label="nameProps['error']"
+              :is-required="true"
+              label-for-id="name-input"
+              :label="$t('angebot.name')"
+            >
+              <v-text-field
+                id="name-input"
+                v-bind="nameProps"
+                v-model="name"
+                autocomplete="off"
+                data-testid="name-input"
+                density="compact"
+                :placeholder="$t('angebot.enterName')"
+                required
+                variant="outlined"
+              />
+            </FormRow>
+
+            <!-- 3. URL des Angebots -->
+            <v-row>
+              <v-col>
+                <h3 class="headline-3">3. {{ $t('angebot.urlOfTheAngebot') }}</h3>
+              </v-col>
+            </v-row>
+            <FormRow
+              :error-label="urlProps['error']"
+              :is-required="true"
+              label-for-id="url-input"
+              :label="$t('angebot.url')"
+            >
+              <v-text-field
+                id="url-input"
+                v-bind="urlProps"
+                v-model="url"
+                autocomplete="off"
+                data-testid="url-input"
+                density="compact"
+                :placeholder="$t('angebot.enterUrl')"
+                required
+                variant="outlined"
+              />
+            </FormRow>
+
+            <!-- 4. Kategorie des Angebots -->
+            <v-row>
+              <v-col>
+                <h3 class="headline-3">4. {{ $t('angebot.kategorieOfTheAngebotInTheStartPage') }}</h3>
+              </v-col>
+            </v-row>
+            <FormRow
+              :error-label="kategorieProps['error']"
+              :is-required="true"
+              label-for-id="kategorie-select"
+              :label="$t('angebot.kategorie')"
+            >
+              <v-autocomplete
+                id="kategorie-select"
+                v-bind="kategorieProps"
+                v-model="kategorie"
+                autocomplete="off"
+                clearable
+                data-testid="kategorie-select"
+                density="compact"
+                :items="kategorieItems"
+                item-value="value"
+                item-title="title"
+                :no-data-text="$t('noDataFound')"
+                :placeholder="$t('angebot.selectKategorie')"
+                required
+                variant="outlined"
+              />
+            </FormRow>
+
+            <!-- 5. Darf dieses Angebot Rollen zugewiesen werden? -->
+            <v-row>
+              <v-col>
+                <h3 class="headline-3">5. {{ $t('angebot.canThisAngebotBeAssignedToRollen') }}</h3>
+              </v-col>
+            </v-row>
+            <FormRow
+              :error-label="nachtraeglichZuweisbarProps['error']"
+              :is-required="false"
+              label-for-id="nachtraeglich-zuweisbar-select"
+              :label="$t('angebot.canBeAssigned')"
+            >
+              <v-select
+                id="nachtraeglich-zuweisbar-select"
+                v-bind="nachtraeglichZuweisbarProps"
+                v-model="nachtraeglichZuweisbar"
+                data-testid="nachtraeglich-zuweisbar-select"
+                density="compact"
+                :items="[
+                  { title: $t('yes'), value: true },
+                  { title: $t('no'), value: false },
+                ]"
+                item-value="value"
+                item-title="title"
+                variant="outlined"
+              />
+            </FormRow>
+
+            <!-- 6. Darf dieses Angebot für schulspezifische Rollenerweiterungen genutzt werden? -->
+            <v-row>
+              <v-col>
+                <h3 class="headline-3">
+                  6. {{ $t('angebot.canThisAngebotBeUsedForSchulspezifischeRollenerweiterungen') }}
+                </h3>
+              </v-col>
+            </v-row>
+            <FormRow
+              :error-label="verfuegbarFuerRollenerweiterungProps['error']"
+              :is-required="false"
+              label-for-id="verfuegbar-fuer-rollenerweiterung-select"
+              :label="$t('angebot.canBeUsed')"
+            >
+              <v-select
+                id="verfuegbar-fuer-rollenerweiterung-select"
+                v-bind="verfuegbarFuerRollenerweiterungProps"
+                v-model="verfuegbarFuerRollenerweiterung"
+                data-testid="verfuegbar-fuer-rollenerweiterung-select"
+                density="compact"
+                :items="[
+                  { title: $t('yes'), value: true },
+                  { title: $t('no'), value: false },
+                ]"
+                item-value="value"
+                item-title="title"
+                variant="outlined"
+              />
+            </FormRow>
+
+            <!-- 7. Ist zur Nutzung eine Zwei-Faktor-Authentifizierung erforderlich? -->
+            <v-row>
+              <v-col>
+                <h3 class="headline-3">7. {{ $t('angebot.is2FARequired') }}</h3>
+              </v-col>
+            </v-row>
+            <FormRow
+              :error-label="requires2faProps['error']"
+              :is-required="false"
+              label-for-id="requires2fa-select"
+              :label="$t('angebot.requires2FA')"
+            >
+              <v-select
+                id="requires2fa-select"
+                v-bind="requires2faProps"
+                v-model="requires2fa"
+                data-testid="requires2fa-select"
+                density="compact"
+                :items="[
+                  { title: $t('yes'), value: true },
+                  { title: $t('no'), value: false },
+                ]"
+                item-value="value"
+                item-title="title"
+                variant="outlined"
+              />
+            </FormRow>
+          </template>
+        </FormWrapper>
+      </template>
+
+      <!-- Result template on success after submit  -->
+      <template v-if="serviceProviderStore.createdServiceProvider && !serviceProviderStore.errorCode">
+        <ServiceProviderSuccessTemplate
+          v-if="showSuccess && successData"
+          :successMessage="$t('angebot.angebotAddedSuccessfully')"
+          :followingDataChanged="$t('admin.followingDataCreated')"
+          :changedData="[
+            { label: $t('angebot.name'), value: successData.name, testId: 'success-name' },
+            { label: $t('angebot.url'), value: successData.url, testId: 'success-url' },
+            {
+              label: $t('angebot.kategorie'),
+              value: $t(`angebot.kategorien.${successData.kategorie}`),
+              testId: 'success-kategorie',
+            },
+          ]"
+          :showBackButton="true"
+          :showCreateAnotherButton="true"
+          :backButtonText="$t('nav.backToList')"
+          :createAnotherButtonText="$t('angebot.createAnother')"
+          backButtonTestId="back-button"
+          createAnotherButtonTestId="create-another-button"
+          @back="navigateToServiceProviderTable"
+          @createAnother="
+            () => {
+              formContext.resetForm();
+              showSuccess = false;
+            }
+          "
         />
-
-        <!-- 1. Wer stellt das Angebot bereit? -->
-        <v-row>
-          <v-col>
-            <h3 class="headline-3">1. {{ $t('angebot.whoProvidesThisAngebot') }}</h3>
-          </v-col>
-        </v-row>
-        <FormRow
-          :error-label="selectedOrganisationIdProps['error']"
-          :is-required="true"
-          label-for-id="organisation-select"
-          :label="$t('angebot.providedBy')"
-        >
-          <SchulenFilter
-            :multiple="false"
-            parent-id="service-provider-create"
-            :placeholderText="$t('admin.organisation.selectOrganisation')"
-            :includeAll="true"
-            :selected-schule-props="selectedOrganisationIdProps"
-            :selected-schulen="selectedOrganisationId"
-            @update:selected-schulen="updateSelectedOrganisation"
-          />
-        </FormRow>
-
-        <!-- 2. Name des Angebots -->
-        <v-row>
-          <v-col>
-            <h3 class="headline-3">2. {{ $t('angebot.nameOfAngebotInTheStartPage') }}</h3>
-          </v-col>
-        </v-row>
-        <FormRow
-          :error-label="nameProps['error']"
-          :is-required="true"
-          label-for-id="name-input"
-          :label="$t('angebot.name')"
-        >
-          <v-text-field
-            id="name-input"
-            v-bind="nameProps"
-            v-model="name"
-            autocomplete="off"
-            data-testid="name-input"
-            density="compact"
-            :placeholder="$t('angebot.enterName')"
-            required
-            variant="outlined"
-          />
-        </FormRow>
-
-        <!-- 3. URL des Angebots -->
-        <v-row>
-          <v-col>
-            <h3 class="headline-3">3. {{ $t('angebot.urlOfTheAngebot') }}</h3>
-          </v-col>
-        </v-row>
-        <FormRow
-          :error-label="urlProps['error']"
-          :is-required="true"
-          label-for-id="url-input"
-          :label="$t('angebot.url')"
-        >
-          <v-text-field
-            id="url-input"
-            v-bind="urlProps"
-            v-model="url"
-            autocomplete="off"
-            data-testid="url-input"
-            density="compact"
-            :placeholder="$t('angebot.enterUrl')"
-            required
-            variant="outlined"
-          />
-        </FormRow>
-
-        <!-- 4. Kategorie des Angebots -->
-        <v-row>
-          <v-col>
-            <h3 class="headline-3">4. {{ $t('angebot.kategorieOfTheAngebotInTheStartPage') }}</h3>
-          </v-col>
-        </v-row>
-        <FormRow
-          :error-label="kategorieProps['error']"
-          :is-required="true"
-          label-for-id="kategorie-select"
-          :label="$t('angebot.kategorie')"
-        >
-          <v-autocomplete
-            id="kategorie-select"
-            v-bind="kategorieProps"
-            v-model="kategorie"
-            autocomplete="off"
-            clearable
-            data-testid="kategorie-select"
-            density="compact"
-            :items="kategorieItems"
-            item-value="value"
-            item-title="title"
-            :no-data-text="$t('noDataFound')"
-            :placeholder="$t('angebot.selectKategorie')"
-            required
-            variant="outlined"
-          />
-        </FormRow>
-
-        <!-- 5. Darf dieses Angebot Rollen zugewiesen werden? -->
-        <v-row>
-          <v-col>
-            <h3 class="headline-3">5. {{ $t('angebot.canThisAngebotBeAssignedToRollen') }}</h3>
-          </v-col>
-        </v-row>
-        <FormRow
-          :error-label="nachtraeglichZuweisbarProps['error']"
-          :is-required="false"
-          label-for-id="nachtraeglich-zuweisbar-select"
-          :label="$t('angebot.canBeAssigned')"
-        >
-          <v-select
-            id="nachtraeglich-zuweisbar-select"
-            v-bind="nachtraeglichZuweisbarProps"
-            v-model="nachtraeglichZuweisbar"
-            data-testid="nachtraeglich-zuweisbar-select"
-            density="compact"
-            :items="[
-              { title: $t('yes'), value: true },
-              { title: $t('no'), value: false },
-            ]"
-            item-value="value"
-            item-title="title"
-            variant="outlined"
-          />
-        </FormRow>
-
-        <!-- 6. Darf dieses Angebot für schulspezifische Rollenerweiterungen genutzt werden? -->
-        <v-row>
-          <v-col>
-            <h3 class="headline-3">
-              6. {{ $t('angebot.canThisAngebotBeUsedForSchulspezifischeRollenerweiterungen') }}
-            </h3>
-          </v-col>
-        </v-row>
-        <FormRow
-          :error-label="verfuegbarFuerRollenerweiterungProps['error']"
-          :is-required="false"
-          label-for-id="verfuegbar-fuer-rollenerweiterung-select"
-          :label="$t('angebot.canBeUsed')"
-        >
-          <v-select
-            id="verfuegbar-fuer-rollenerweiterung-select"
-            v-bind="verfuegbarFuerRollenerweiterungProps"
-            v-model="verfuegbarFuerRollenerweiterung"
-            data-testid="verfuegbar-fuer-rollenerweiterung-select"
-            density="compact"
-            :items="[
-              { title: $t('yes'), value: true },
-              { title: $t('no'), value: false },
-            ]"
-            item-value="value"
-            item-title="title"
-            variant="outlined"
-          />
-        </FormRow>
-
-        <!-- 7. Ist zur Nutzung eine Zwei-Faktor-Authentifizierung erforderlich? -->
-        <v-row>
-          <v-col>
-            <h3 class="headline-3">7. {{ $t('angebot.is2FARequired') }}</h3>
-          </v-col>
-        </v-row>
-        <FormRow
-          :error-label="requires2faProps['error']"
-          :is-required="false"
-          label-for-id="requires2fa-select"
-          :label="$t('angebot.requires2FA')"
-        >
-          <v-select
-            id="requires2fa-select"
-            v-bind="requires2faProps"
-            v-model="requires2fa"
-            data-testid="requires2fa-select"
-            density="compact"
-            :items="[
-              { title: $t('yes'), value: true },
-              { title: $t('no'), value: false },
-            ]"
-            item-value="value"
-            item-title="title"
-            variant="outlined"
-          />
-        </FormRow>
-      </FormWrapper>
+      </template>
     </LayoutCard>
   </div>
 </template>
