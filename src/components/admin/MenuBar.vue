@@ -233,7 +233,13 @@
     </div>
 
     <!-- Angebotsverwaltung -->
-    <div v-if="authStore.hasAngeboteVerwaltenPermission || authStore.hasRollenerweiternPermission">
+    <div
+      v-if="
+        authStore.hasAngeboteVerwaltenPermission ||
+        authStore.hasRollenerweiternPermission ||
+        authStore.hasEingeschränktAngeboteVerwaltenPermission
+      "
+    >
       <v-list-item
         class="menu-bar-main-item headline-2"
         data-testid="angebot-management-title"
@@ -258,7 +264,7 @@
         to="/admin/angebote/schulspezifisch"
       ></v-list-item>
       <v-list-item
-        v-if="authStore.hasEingeschränktAngeboteVerwaltenPermission"
+        v-if=" authStore.hasAngeboteVerwaltenPermission || authStore.hasEingeschränktAngeboteVerwaltenPermission"
         class="menu-bar-sub-item caption"
         data-testid="angebot-creation-menu-item"
         prepend-icon="mdi-plus-circle-outline"

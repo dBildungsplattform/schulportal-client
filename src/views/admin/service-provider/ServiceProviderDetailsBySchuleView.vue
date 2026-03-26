@@ -20,7 +20,7 @@
   } from '@/stores/RolleStore';
   import RollenerweiterungTreeview, {
     type RolleForSelection,
-  } from '@/components/serviceProvider/RollenerweiterungTreeview.vue';
+  } from '@/components/admin/serviceProvider/RollenerweiterungTreeview.vue';
   import { RollenSystemRechtEnum } from '@/api-client/generated';
   import { useDisplay } from 'vuetify';
 

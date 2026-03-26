@@ -24,14 +24,19 @@
   import { boolean, object, string } from 'yup';
   import { DIN_91379A_EXT, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
   import ServiceProviderSuccessTemplate from '@/components/admin/serviceProvider/serviceProviderSuccessTemplate.vue';
+  import { RollenSystemRecht } from '@/stores/RolleStore';
+  import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
+  const authStore: AuthStore = useAuthStore();
 
   const router: Router = useRouter();
   const { t }: Composer = useI18n({ useScope: 'global' });
 
   const showSuccess: Ref<boolean> = ref(false);
   const successData: Ref<ServiceProviderForm | null> = ref(null);
+
+  const hasAngeboteVerwaltenPermission: ComputedRef<boolean> = computed(() => authStore.hasAngeboteVerwaltenPermission);
 
   const validationSchema: TypedSchema = toTypedSchema(
     object({
@@ -119,7 +124,11 @@
   function navigateToServiceProviderTable(): void {
     formContext.resetForm();
     serviceProviderStore.errorCode = '';
-    router.push({ name: 'service-provider-management' });
+    if (hasAngeboteVerwaltenPermission.value) {
+      router.push({ name: 'angebot-management' });
+    } else {
+      router.push({ name: 'angebot-management-schulspezifisch' });
+    }
   }
 
   function navigateToCreatePersonRoute(reload: boolean = false): void | Promise<void> {
@@ -214,6 +223,7 @@
 
   onMounted(() => {
     serviceProviderStore.errorCode = '';
+    serviceProviderStore.createdServiceProvider = null;
     window.addEventListener('beforeunload', preventNavigation);
   });
 
@@ -231,14 +241,14 @@
       {{ $t('admin.headline') }}
     </h1>
     <LayoutCard
-      :closable="true"
+      :closable="!serviceProviderStore.errorCode"
       :header="$t('angebot.addNew')"
       headlineTestId="service-provider-create-headline"
       @onCloseClicked="navigateToServiceProviderTable"
       :padded="true"
       :showCloseText="true"
     >
-      <!-- The form to create a new Rolle -->
+      <!-- The form to create a new Angebot -->
       <template v-if="!serviceProviderStore.createdServiceProvider">
         <FormWrapper
           id="service-provider-create-form"
@@ -281,6 +291,11 @@
                 parent-id="service-provider-create"
                 :placeholderText="$t('admin.organisation.selectOrganisation')"
                 :includeAll="true"
+                :systemrechte-for-search="
+                  authStore.currentUserPermissions.includes(RollenSystemRecht.AngeboteVerwalten)
+                    ? [RollenSystemRecht.AngeboteVerwalten]
+                    : [RollenSystemRecht.AngeboteEingeschraenktVerwalten]
+                "
                 :selected-schule-props="selectedOrganisationIdProps"
                 :selected-schulen="selectedOrganisationId"
                 @update:selected-schulen="updateSelectedOrganisation"
@@ -351,6 +366,7 @@
             >
               <v-autocomplete
                 id="kategorie-select"
+                :disabled="!hasAngeboteVerwaltenPermission"
                 v-bind="kategorieProps"
                 v-model="kategorie"
                 autocomplete="off"
@@ -381,6 +397,7 @@
             >
               <v-select
                 id="nachtraeglich-zuweisbar-select"
+                :disabled="!hasAngeboteVerwaltenPermission"
                 v-bind="nachtraeglichZuweisbarProps"
                 v-model="nachtraeglichZuweisbar"
                 data-testid="nachtraeglich-zuweisbar-select"
@@ -411,6 +428,7 @@
             >
               <v-select
                 id="verfuegbar-fuer-rollenerweiterung-select"
+                :disabled="!hasAngeboteVerwaltenPermission"
                 v-bind="verfuegbarFuerRollenerweiterungProps"
                 v-model="verfuegbarFuerRollenerweiterung"
                 data-testid="verfuegbar-fuer-rollenerweiterung-select"
@@ -439,6 +457,7 @@
             >
               <v-select
                 id="requires2fa-select"
+                :disabled="!hasAngeboteVerwaltenPermission"
                 v-bind="requires2faProps"
                 v-model="requires2fa"
                 data-testid="requires2fa-select"

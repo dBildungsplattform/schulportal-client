@@ -109,8 +109,7 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
       ? (to.meta['requiresPermission'] as Permission[])
       : [to.meta['requiresPermission'] as Permission];
 
-    // Check if user has ALL required permissions
-    const hasAllPermissions: boolean = requiredPermissions.every((permission: Permission) => {
+    const checkPermission = (permission: Permission): boolean => {
       switch (permission) {
         case 'personenverwaltung':
           return authStore.hasPersonenverwaltungPermission;
@@ -131,7 +130,7 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
         case 'schulverwaltung':
           return authStore.hasSchulverwaltungPermission;
         case 'schultraegerverwaltung':
-          return authStore.hasSchulverwaltungPermission;
+          return authStore.hasSchultraegerverwaltungPermission;
         case 'portalverwaltung':
           return authStore.hasPortalVerwaltungPermission;
         case 'hinweisebearbeiten':
@@ -143,9 +142,16 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
         default:
           return false;
       }
-    });
+    };
 
-    if (hasAllPermissions) {
+    // 'any' = user needs at least one of the permissions (OR)
+    // default = user needs all of the permissions (AND)
+    const hasPermission: boolean =
+      to.meta['permissionMode'] === 'any'
+        ? requiredPermissions.some(checkPermission)
+        : requiredPermissions.every(checkPermission);
+
+    if (hasPermission) {
       return true;
     }
     return { path: 'not-found' };

@@ -211,6 +211,7 @@ const routes: readonly RouteRecordRaw[] = [
       requiresAuth: true,
       requiredStepUpLevel: StepUpLevel.GOLD,
       requiresPermission: ['angebotsverwaltung', 'eingeschränktangebotsverwaltung'],
+      permissionMode: 'any',
     },
   },
   {
