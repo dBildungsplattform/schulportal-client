@@ -115,7 +115,7 @@ describe('ServiceProviderManagementView', () => {
     const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ name: 'SchulenFilter' });
     schuleAutocomplete?.vm.$emit('update:selectedSchulen', schule.id);
     await nextTick();
-  
+
     await flushPromises();
 
     await wrapper?.find('.v-data-table__tr').trigger('click');
