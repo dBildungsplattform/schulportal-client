@@ -200,7 +200,18 @@ const routes: readonly RouteRecordRaw[] = [
       requiresPermission: 'schulspezifischeangebotsverwaltung',
       requiresOrga: true,
       missingOrgaRedirect: { name: 'angebot-management-schulspezifisch' },
-    }
+    },
+  },
+  {
+    path: '/admin/angebote/new',
+    name: 'create-angebot',
+    component: () => import('../views/admin/service-provider/ServiceProviderCreationView.vue'),
+    meta: {
+      layout: 'AdminLayout',
+      requiresAuth: true,
+      requiredStepUpLevel: StepUpLevel.GOLD,
+      requiresPermission: ['angebotsverwaltung', 'eingeschränktangebotsverwaltung'],
+    },
   },
   {
     path: '/admin/schulen/new',

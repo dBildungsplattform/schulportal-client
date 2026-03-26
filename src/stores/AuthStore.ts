@@ -63,6 +63,7 @@ type AuthState = {
   hasEingeschränktNeueBenutzerErstellenPermission: boolean;
   hasAngeboteVerwaltenPermission: boolean;
   hasRollenerweiternPermission: boolean;
+  hasEingeschränktAngeboteVerwaltenPermission: boolean;
   isAuthenticated: boolean;
   acr: StepUpLevel;
   timeLimitInfos: PersonTimeLimitInfoResponse[];
@@ -99,6 +100,7 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
     hasEingeschränktNeueBenutzerErstellenPermission: false,
     hasAngeboteVerwaltenPermission: false,
     hasRollenerweiternPermission: false,
+    hasEingeschränktAngeboteVerwaltenPermission: false,
     isAuthenticated: false,
     acr: StepUpLevel.NONE,
     timeLimitInfos: [],
@@ -151,6 +153,9 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
             RollenSystemRecht.AngeboteVerwalten,
           );
           this.hasRollenerweiternPermission = this.currentUserPermissions.includes(RollenSystemRecht.RollenErweitern);
+          this.hasEingeschränktAngeboteVerwaltenPermission = this.currentUserPermissions.includes(
+            'ANGEBOTE_EINGESCHRAENKT_VERWALTEN',
+          );
         } else {
           throw new Error('User info could not be retrieved.');
         }
@@ -173,6 +178,7 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
         this.hasLandesbediensteteSuchenUndHinzufügenPermission = false;
         this.hasEingeschränktNeueBenutzerErstellenPermission = false;
         this.hasAngeboteVerwaltenPermission = false;
+        this.hasEingeschränktAngeboteVerwaltenPermission = false;
         this.isAuthenticated = false;
         this.acr = StepUpLevel.NONE;
         this.timeLimitInfos = [];

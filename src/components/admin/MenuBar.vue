@@ -257,6 +257,15 @@
         :title="$t('admin.angebot.showSchoolSpecific')"
         to="/admin/angebote/schulspezifisch"
       ></v-list-item>
+      <v-list-item
+        v-if="authStore.hasEingeschränktAngeboteVerwaltenPermission"
+        class="menu-bar-sub-item caption"
+        data-testid="angebot-creation-menu-item"
+        prepend-icon="mdi-plus-circle-outline"
+        :title="$t('angebot.createNew')"
+        to="/admin/angebote/new"
+        @click="closeMenuOnMobile"
+      ></v-list-item>
     </div>
 
     <!-- Schulverwaltung -->

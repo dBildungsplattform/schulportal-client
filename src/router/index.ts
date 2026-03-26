@@ -14,6 +14,7 @@ type Permission =
   | 'personenverwaltung'
   | 'rollenverwaltung'
   | 'angebotsverwaltung'
+  | 'eingeschränktangebotsverwaltung'
   | 'schulspezifischeangebotsverwaltung'
   | 'schulverwaltung'
   | 'schultraegerverwaltung'
@@ -123,6 +124,8 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
           return authStore.hasRollenverwaltungPermission;
         case 'angebotsverwaltung':
           return authStore.hasAngeboteVerwaltenPermission;
+        case 'eingeschränktangebotsverwaltung':
+          return authStore.hasEingeschränktAngeboteVerwaltenPermission;
         case 'schulspezifischeangebotsverwaltung':
           return authStore.hasRollenerweiternPermission;
         case 'schulverwaltung':
