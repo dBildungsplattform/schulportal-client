@@ -121,6 +121,8 @@
     })),
   );
 
+  const canCommit: ComputedRef<boolean> = computed(() => formContext.meta.value.valid);
+
   function navigateToServiceProviderTable(): void {
     formContext.resetForm();
     serviceProviderStore.errorCode = '';
@@ -256,6 +258,7 @@
         <FormWrapper
           id="service-provider-create-form"
           :confirm-unsaved-changes-action="handleConfirmUnsavedChanges"
+          :can-commit="canCommit"
           :create-button-label="$t('angebot.create')"
           :discard-button-label="$t('angebot.discard')"
           :hide-actions="!!serviceProviderStore.errorCode"
