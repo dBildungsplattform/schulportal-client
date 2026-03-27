@@ -32,7 +32,6 @@
 
 <template>
   <v-container>
-    <!-- Success Message -->
     <v-row justify="center">
       <v-col
         cols="auto"
@@ -42,7 +41,6 @@
       </v-col>
     </v-row>
 
-    <!-- Icon -->
     <v-row justify="center">
       <v-col cols="auto">
         <v-icon
@@ -52,7 +50,6 @@
       </v-col>
     </v-row>
 
-    <!-- Subtitle -->
     <v-row justify="center">
       <v-col
         cols="auto"
@@ -62,12 +59,11 @@
       </v-col>
     </v-row>
 
-    <!-- Data -->
     <v-row
       v-for="(item, index) in changedData"
       :key="index"
     >
-      <v-col class="text-right font-weight-bold"> {{ item.label }}: </v-col>
+      <v-col class="text-body bold text-right"> {{ item.label }}: </v-col>
       <v-col class="text-body">
         <span :data-testid="item.testId">{{ item.value }}</span>
       </v-col>
@@ -75,7 +71,6 @@
 
     <v-divider class="my-6" />
 
-    <!-- Actions -->
     <v-row justify="end">
       <v-col
         v-if="showBackButton"

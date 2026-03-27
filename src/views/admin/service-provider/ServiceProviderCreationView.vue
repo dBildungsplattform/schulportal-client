@@ -124,11 +124,7 @@
   function navigateToServiceProviderTable(): void {
     formContext.resetForm();
     serviceProviderStore.errorCode = '';
-    if (hasAngeboteVerwaltenPermission.value) {
-      router.push({ name: 'angebot-management' });
-    } else {
-      router.push({ name: 'angebot-management-schulspezifisch' });
-    }
+    router.push({ name: 'angebot-management-schulspezifisch' });
   }
 
   function navigateToCreatePersonRoute(reload: boolean = false): void | Promise<void> {
@@ -151,6 +147,13 @@
       navigateToCreatePersonRoute();
     }
   }
+
+  const handleCreateAnotherAngebot = (): void => {
+    formContext.resetForm();
+    serviceProviderStore.createdServiceProvider = null;
+    serviceProviderStore.errorCode = '';
+    router.push({ name: 'create-angebot' });
+  };
 
   function updateSelectedOrganisation(id: string | undefined): void {
     formContext.setFieldValue('selectedOrganisationId', id);
@@ -489,6 +492,21 @@
               value: $t(`angebot.kategorien.${successData.kategorie}`),
               testId: 'success-kategorie',
             },
+            {
+              label: $t('angebot.canBeAssigned'),
+              value: successData.nachtraeglichZuweisbar ? $t('yes') : $t('no'),
+              testId: 'success-nachtraeglich-zuweisbar',
+            },
+            {
+              label: $t('angebot.canBeUsed'),
+              value: successData.verfuegbarFuerRollenerweiterung ? $t('yes') : $t('no'),
+              testId: 'success-verfuegbar-fuer-rollenerweiterung',
+            },
+            {
+              label: $t('angebot.requires2FA'),
+              value: successData.requires2fa ? $t('yes') : $t('no'),
+              testId: 'success-requires-2fa',
+            },
           ]"
           :showBackButton="true"
           :showCreateAnotherButton="true"
@@ -497,12 +515,7 @@
           backButtonTestId="back-button"
           createAnotherButtonTestId="create-another-button"
           @back="navigateToServiceProviderTable"
-          @createAnother="
-            () => {
-              formContext.resetForm();
-              showSuccess = false;
-            }
-          "
+          @createAnother="handleCreateAnotherAngebot"
         />
       </template>
     </LayoutCard>

@@ -65,17 +65,17 @@
     },
     "rules": {
         "organisation": {
-          "required": "Die Organisation muss ausgewählt werden."
+          "required": "Die Ebene der Bereitstellung muss ausgewählt werden."
         },
         "name": {
           "matches": "Der Name darf keine ungültigen Zeichen beinhalten.",
           "noLeadingTrailingSpaces": "Der Name darf nicht mit Leerzeichen beginnen oder enden.",
           "maxLength": "Der Name darf maximal 50 Zeichen lang sein.",
-          "required": "Der Name muss angegeben werden."
+          "required": "Der Name des Angebots muss angegeben werden."
         },
         "url": {
           "invalid": "Die URL muss eine gültige URL sein.",
-          "required": "Die URL muss angegeben werden."
+          "required": "Die URL des Angebots muss angegeben werden."
         },
         "kategorie": {
           "required": "Die Kategorie muss ausgewählt werden."

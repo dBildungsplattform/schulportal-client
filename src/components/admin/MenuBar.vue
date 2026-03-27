@@ -1,12 +1,15 @@
 <script setup lang="ts">
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+  import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
   import { onMounted, ref, type ComputedRef, type Ref } from 'vue';
   import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
   import { useDisplay } from 'vuetify';
 
   const router: Router = useRouter();
   const route: RouteLocationNormalizedLoaded = useRoute();
+
   const authStore: AuthStore = useAuthStore();
+  const configStore: ConfigStore = useConfigStore();
 
   const menuDrawer: Ref<boolean> = ref(true);
   const { mobile }: { mobile: ComputedRef<boolean> } = useDisplay();
@@ -264,7 +267,10 @@
         to="/admin/angebote/schulspezifisch"
       ></v-list-item>
       <v-list-item
-        v-if=" authStore.hasAngeboteVerwaltenPermission || authStore.hasEingeschränktAngeboteVerwaltenPermission"
+        v-if="
+          (authStore.hasAngeboteVerwaltenPermission || authStore.hasEingeschränktAngeboteVerwaltenPermission) &&
+          configStore.configData?.schulischeAngeboteErstellen
+        "
         class="menu-bar-sub-item caption"
         data-testid="angebot-creation-menu-item"
         prepend-icon="mdi-plus-circle-outline"

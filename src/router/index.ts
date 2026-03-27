@@ -6,6 +6,8 @@ import {
 } from '@/stores/TwoFactorAuthentificationStore';
 import routes from './routes';
 import { useMasterDataStore, type MasterDataStore } from '@/stores/MasterDataStore';
+import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
+import type { FeatureFlagResponse } from '@/api-client/generated/api';
 
 type Permission =
   | 'klassenverwaltung'
@@ -144,7 +146,8 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
       }
     };
 
-    // 'any' = user needs at least one of the permissions (OR)
+    // 'any' = user needs at least one of the permissions (OR). Necessary for the create-angebot route, where admins with either 'angebotsverwaltung' or
+    // 'eingeschränktangebotsverwaltung' should have access
     // default = user needs all of the permissions (AND)
     const hasPermission: boolean =
       to.meta['permissionMode'] === 'any'
@@ -153,6 +156,13 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
 
     if (hasPermission) {
       return true;
+    }
+    if (to.meta['requiresFeatureFlag']) {
+      const configStore: ConfigStore = useConfigStore();
+      const flag: keyof FeatureFlagResponse = to.meta['requiresFeatureFlag'] as keyof FeatureFlagResponse;
+      if (!configStore.configData?.[flag]) {
+        return { path: 'not-found' };
+      }
     }
     return { path: 'not-found' };
   }

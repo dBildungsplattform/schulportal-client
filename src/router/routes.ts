@@ -212,6 +212,7 @@ const routes: readonly RouteRecordRaw[] = [
       requiredStepUpLevel: StepUpLevel.GOLD,
       requiresPermission: ['angebotsverwaltung', 'eingeschränktangebotsverwaltung'],
       permissionMode: 'any',
+      requiresFeatureFlag: 'schulischeAngeboteErstellen',
     },
   },
   {
