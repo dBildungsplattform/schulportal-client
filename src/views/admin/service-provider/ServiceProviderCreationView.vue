@@ -123,6 +123,21 @@
 
   const canCommit: ComputedRef<boolean> = computed(() => formContext.meta.value.valid);
 
+  function openUrlInNewTab(): void {
+    if (!url.value) {
+      return;
+    }
+
+    let value: string = url.value.trim();
+
+    // If it doesn't already have a protocol → force https. Useful because we want to allow the admin to just enter "example.com" instead of "https://example.com"
+    if (!/^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(value)) {
+      value = 'https://' + value;
+    }
+
+    window.open(value, '_blank', 'noopener,noreferrer');
+  }
+
   function navigateToServiceProviderTable(): void {
     formContext.resetForm();
     serviceProviderStore.errorCode = '';
@@ -345,17 +360,28 @@
               label-for-id="url-input"
               :label="$t('angebot.url')"
             >
-              <v-text-field
-                id="url-input"
-                v-bind="urlProps"
-                v-model="url"
-                autocomplete="off"
-                data-testid="url-input"
-                density="compact"
-                :placeholder="$t('angebot.enterUrl')"
-                required
-                variant="outlined"
-              />
+              <div class="d-flex align-center ga-2">
+                <v-text-field
+                  id="url-input"
+                  v-bind="urlProps"
+                  v-model="url"
+                  autocomplete="off"
+                  data-testid="url-input"
+                  density="compact"
+                  :placeholder="$t('angebot.enterUrl')"
+                  required
+                  variant="outlined"
+                  class="flex-grow-1"
+                />
+                <v-btn
+                  class="mb-3"
+                  :disabled="!url"
+                  icon="mdi-open-in-new"
+                  size="small"
+                  variant="plain"
+                  @click="openUrlInNewTab"
+                />
+              </div>
             </FormRow>
 
             <!-- 4. Kategorie des Angebots -->
