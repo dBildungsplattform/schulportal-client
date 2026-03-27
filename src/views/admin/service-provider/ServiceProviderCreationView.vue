@@ -360,28 +360,19 @@
               label-for-id="url-input"
               :label="$t('angebot.url')"
             >
-              <div class="d-flex align-center ga-2">
-                <v-text-field
-                  id="url-input"
-                  v-bind="urlProps"
-                  v-model="url"
-                  autocomplete="off"
-                  data-testid="url-input"
-                  density="compact"
-                  :placeholder="$t('angebot.enterUrl')"
-                  required
-                  variant="outlined"
-                  class="flex-grow-1"
-                />
-                <v-btn
-                  class="mb-3"
-                  :disabled="!url"
-                  icon="mdi-open-in-new"
-                  size="small"
-                  variant="plain"
-                  @click="openUrlInNewTab"
-                />
-              </div>
+              <v-text-field
+                id="url-input"
+                v-bind="urlProps"
+                v-model="url"
+                autocomplete="off"
+                data-testid="url-input"
+                density="compact"
+                :placeholder="$t('angebot.enterUrl')"
+                required
+                variant="outlined"
+                :append-inner-icon="'mdi-open-in-new'"
+                @click:append-inner="openUrlInNewTab"
+              />
             </FormRow>
 
             <!-- 4. Kategorie des Angebots -->
