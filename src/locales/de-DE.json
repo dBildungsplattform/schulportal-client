@@ -36,6 +36,7 @@
     "is2FARequired": "Ist zur Nutzung eine Zwei-Faktor-Authentifizierung erforderlich?",
     "canBeAssigned": "Darf zugewiesen werden",
     "canBeUsed": "Darf genutzt werden",
+    "toServiceProviderDetails": "Zur Rollenauswahl",
     "link": "Link",
     "logo": "Logo",
     "requires2FA": "2FA erforderlich",

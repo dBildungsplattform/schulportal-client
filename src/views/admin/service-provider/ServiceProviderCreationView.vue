@@ -35,6 +35,7 @@
 
   const showSuccess: Ref<boolean> = ref(false);
   const successData: Ref<ServiceProviderForm | null> = ref(null);
+  const selectedOrganisationIdCache: Ref<string | undefined> = ref(undefined);
 
   const hasAngeboteVerwaltenPermission: ComputedRef<boolean> = computed(() => authStore.hasAngeboteVerwaltenPermission);
 
@@ -138,9 +139,26 @@
     window.open(value, '_blank', 'noopener,noreferrer');
   }
 
+  function navigateToServiceProviderDetails(): void {
+    if (serviceProviderStore.createdServiceProvider) {
+      const id: string = serviceProviderStore.createdServiceProvider.id;
+      formContext.resetForm();
+      serviceProviderStore.errorCode = '';
+      router.push({
+        name: 'angebot-details-schulspezifisch',
+        params: { id },
+        query: {
+          from: 'create-angebot',
+          orga: selectedOrganisationIdCache.value,
+        },
+      });
+    }
+  }
+
   function navigateToServiceProviderTable(): void {
     formContext.resetForm();
     serviceProviderStore.errorCode = '';
+    serviceProviderStore.createdServiceProvider = null;
     router.push({ name: 'angebot-management-schulspezifisch' });
   }
 
@@ -228,6 +246,7 @@
       if (!serviceProviderStore.errorCode) {
         successData.value = values;
         showSuccess.value = true;
+        selectedOrganisationIdCache.value = values.selectedOrganisationId;
       }
     },
   );
@@ -528,12 +547,16 @@
               testId: 'success-requires-2fa',
             },
           ]"
+          :show-to-service-provider-details-button="true"
+          :to-service-provider-details-button-text="$t('angebot.toServiceProviderDetails')"
           :showBackButton="true"
           :showCreateAnotherButton="true"
           :backButtonText="$t('nav.backToList')"
           :createAnotherButtonText="$t('angebot.createAnother')"
           backButtonTestId="back-button"
           createAnotherButtonTestId="create-another-button"
+          toServiceProviderDetailsButtonTestId="to-service-provider-details-button"
+          @toServiceProviderDetails="navigateToServiceProviderDetails"
           @back="navigateToServiceProviderTable"
           @createAnother="handleCreateAnotherAngebot"
         />

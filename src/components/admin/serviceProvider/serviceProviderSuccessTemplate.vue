@@ -7,12 +7,15 @@
     followingDataChanged: string;
     changedData: Array<{ label: string; value: string; testId: string }>;
 
+    showToServiceProviderDetailsButton: boolean;
     showBackButton: boolean;
     showCreateAnotherButton: boolean;
 
+    toServiceProviderDetailsButtonText: string;
     backButtonText: string;
     createAnotherButtonText: string;
 
+    toServiceProviderDetailsButtonTestId: string;
     backButtonTestId: string;
     createAnotherButtonTestId: string;
   }>();
@@ -20,12 +23,14 @@
   type Emits = {
     (event: 'back'): void;
     (event: 'createAnother'): void;
+    (event: 'toServiceProviderDetails'): void;
   };
 
   const emit: Emits = defineEmits<Emits>();
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
+  const navigateToServiceProviderDetails = (): void => emit('toServiceProviderDetails');
   const navigateBack = (): void => emit('back');
   const createAnother = (): void => emit('createAnother');
 </script>
@@ -72,6 +77,21 @@
     <v-divider class="my-6" />
 
     <v-row justify="end">
+      <v-col
+        v-if="showToServiceProviderDetailsButton"
+        cols="12"
+        sm="6"
+        md="auto"
+      >
+        <v-btn
+          class="secondary"
+          :block="mdAndDown"
+          :data-testid="toServiceProviderDetailsButtonTestId"
+          @click="navigateToServiceProviderDetails"
+        >
+          {{ toServiceProviderDetailsButtonText }}
+        </v-btn>
+      </v-col>
       <v-col
         v-if="showBackButton"
         cols="12"
