@@ -40,6 +40,9 @@
   const selectedRolleIds: Ref<string[]> = ref([]);
   const isSaving: Ref<boolean> = ref(false);
   const saveSuccessDialogVisible: Ref<boolean> = ref(false);
+    
+  const rollenerweiterungSection: Ref<HTMLElement | null> = ref(null);
+
 
   function closeSaveSuccessDialog(): void {
     saveSuccessDialogVisible.value = false;
@@ -112,6 +115,8 @@
     isEditingRollenerweiterungen.value = true;
   }
 
+  const autoEdit: ComputedRef<boolean> = computed(() => route.query['autoEdit'] === 'true');
+
   function cancelEdit(): void {
     isEditingRollenerweiterungen.value = false;
     selectedRolleIds.value = [];
@@ -165,6 +170,9 @@
 
     if (!organisationStore.currentOrganisation && organisationIdFromQuery.value) {
       await organisationStore.getOrganisationById(organisationIdFromQuery.value);
+    }
+    if (autoEdit.value) {
+      await openEditMode();
     }
   });
 </script>
@@ -373,7 +381,7 @@
 
             <!-- Inline treeview (shown while editing, full-width, no offset) -->
             <v-expand-transition>
-              <div v-if="isEditingRollenerweiterungen">
+              <div v-if="isEditingRollenerweiterungen" ref="rollenerweiterungSection">
                 <LayoutCard
                   :closable="false"
                   :header="t('angebot.editRollenerweiterungen')"

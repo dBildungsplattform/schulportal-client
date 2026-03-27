@@ -26,16 +26,20 @@
   import ServiceProviderSuccessTemplate from '@/components/admin/serviceProvider/serviceProviderSuccessTemplate.vue';
   import { RollenSystemRecht } from '@/stores/RolleStore';
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+  import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
 
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
   const authStore: AuthStore = useAuthStore();
+  const organisationStore: OrganisationStore = useOrganisationStore();
 
   const router: Router = useRouter();
   const { t }: Composer = useI18n({ useScope: 'global' });
 
   const showSuccess: Ref<boolean> = ref(false);
   const successData: Ref<ServiceProviderForm | null> = ref(null);
+
   const selectedOrganisationIdCache: Ref<string | undefined> = ref(undefined);
+  const selectedOrganisationNameCache: Ref<string> = ref('');
 
   const hasAngeboteVerwaltenPermission: ComputedRef<boolean> = computed(() => authStore.hasAngeboteVerwaltenPermission);
 
@@ -124,6 +128,8 @@
 
   const canCommit: ComputedRef<boolean> = computed(() => formContext.meta.value.valid);
 
+  const selectedOrganisationName: ComputedRef<string> = computed(() => selectedOrganisationNameCache.value);
+
   function openUrlInNewTab(): void {
     if (!url.value) {
       return;
@@ -143,6 +149,7 @@
     if (serviceProviderStore.createdServiceProvider) {
       const id: string = serviceProviderStore.createdServiceProvider.id;
       formContext.resetForm();
+      selectedOrganisationNameCache.value = '';
       serviceProviderStore.errorCode = '';
       router.push({
         name: 'angebot-details-schulspezifisch',
@@ -150,6 +157,7 @@
         query: {
           from: 'create-angebot',
           orga: selectedOrganisationIdCache.value,
+          autoEdit: 'true',
         },
       });
     }
@@ -157,6 +165,7 @@
 
   function navigateToServiceProviderTable(): void {
     formContext.resetForm();
+    selectedOrganisationNameCache.value = '';
     serviceProviderStore.errorCode = '';
     serviceProviderStore.createdServiceProvider = null;
     router.push({ name: 'angebot-management-schulspezifisch' });
@@ -176,6 +185,7 @@
   function navigateBackToAngebotForm(): void {
     if (serviceProviderStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
       formContext.resetForm();
+      selectedOrganisationNameCache.value = '';
       navigateToCreatePersonRoute(true);
     } else {
       serviceProviderStore.errorCode = '';
@@ -183,15 +193,19 @@
     }
   }
 
-  const handleCreateAnotherAngebot = (): void => {
-    formContext.resetForm();
-    serviceProviderStore.createdServiceProvider = null;
-    serviceProviderStore.errorCode = '';
-    router.push({ name: 'create-angebot' });
-  };
-
   function updateSelectedOrganisation(id: string | undefined): void {
     formContext.setFieldValue('selectedOrganisationId', id);
+    if (id) {
+      const orgsObj: { filterResult: Organisation[] } | undefined =
+        organisationStore.organisationenFilters.get('service-provider-create');
+      const orgs: Organisation[] = orgsObj && Array.isArray(orgsObj.filterResult) ? orgsObj.filterResult : [];
+      const match: Organisation | undefined = orgs.find((o: Organisation) => o.id === id);
+      if (match) {
+        selectedOrganisationNameCache.value = match.name;
+      }
+    } else {
+      selectedOrganisationNameCache.value = '';
+    }
   }
 
   function isFormDirty(): boolean {
@@ -247,6 +261,7 @@
         successData.value = values;
         showSuccess.value = true;
         selectedOrganisationIdCache.value = values.selectedOrganisationId;
+        selectedOrganisationNameCache.value = selectedOrganisationName.value;
       }
     },
   );
@@ -280,8 +295,9 @@
       {{ $t('admin.headline') }}
     </h1>
     <LayoutCard
-      :closable="!serviceProviderStore.errorCode"
-      :header="$t('angebot.addNew')"
+      :closable="!serviceProviderStore.errorCode && !serviceProviderStore.createdServiceProvider"
+      :header="`${t('angebot.addNew')} ${selectedOrganisationName}`"
+      :header-hover-text="selectedOrganisationName"
       headlineTestId="service-provider-create-headline"
       @onCloseClicked="navigateToServiceProviderTable"
       :padded="true"
@@ -368,17 +384,19 @@
             </FormRow>
 
             <!-- 3. URL des Angebots -->
-            <v-row>
+            <v-row class="mb-n8">
               <v-col>
                 <h3 class="headline-3">3. {{ $t('angebot.urlOfTheAngebot') }}</h3>
               </v-col>
             </v-row>
             <FormRow
+              class=""
               :error-label="urlProps['error']"
               :is-required="true"
               label-for-id="url-input"
               :label="$t('angebot.url')"
             >
+              <div class="mb-sm-8"></div>
               <v-text-field
                 id="url-input"
                 v-bind="urlProps"
@@ -389,9 +407,19 @@
                 :placeholder="$t('angebot.enterUrl')"
                 required
                 variant="outlined"
-                :append-inner-icon="'mdi-open-in-new'"
-                @click:append-inner="openUrlInNewTab"
               />
+              <div class="d-flex justify-end">
+                <v-btn
+                  :disabled="!url"
+                  class="primary smallest"
+                  data-testid="url-test-button"
+                  density="compact"
+                  variant="outlined"
+                  @click="openUrlInNewTab"
+                >
+                  {{ $t('angebot.testUrl') }}
+                </v-btn>
+              </div>
             </FormRow>
 
             <!-- 4. Kategorie des Angebots -->
@@ -524,6 +552,7 @@
           :successMessage="$t('angebot.angebotAddedSuccessfully')"
           :followingDataChanged="$t('admin.followingDataCreated')"
           :changedData="[
+            { label: $t('angebot.providedBy'), value: selectedOrganisationName, testId: 'success-organisation' },
             { label: $t('angebot.name'), value: successData.name, testId: 'success-name' },
             { label: $t('angebot.url'), value: successData.url, testId: 'success-url' },
             {
@@ -551,14 +580,9 @@
           :to-service-provider-details-button-text="$t('angebot.toServiceProviderDetails')"
           :showBackButton="true"
           :showCreateAnotherButton="true"
-          :backButtonText="$t('nav.backToList')"
           :createAnotherButtonText="$t('angebot.createAnother')"
-          backButtonTestId="back-button"
-          createAnotherButtonTestId="create-another-button"
           toServiceProviderDetailsButtonTestId="to-service-provider-details-button"
           @toServiceProviderDetails="navigateToServiceProviderDetails"
-          @back="navigateToServiceProviderTable"
-          @createAnother="handleCreateAnotherAngebot"
         />
       </template>
     </LayoutCard>

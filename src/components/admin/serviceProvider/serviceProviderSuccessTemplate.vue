@@ -12,12 +12,7 @@
     showCreateAnotherButton: boolean;
 
     toServiceProviderDetailsButtonText: string;
-    backButtonText: string;
-    createAnotherButtonText: string;
-
     toServiceProviderDetailsButtonTestId: string;
-    backButtonTestId: string;
-    createAnotherButtonTestId: string;
   }>();
 
   type Emits = {
@@ -31,8 +26,6 @@
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   const navigateToServiceProviderDetails = (): void => emit('toServiceProviderDetails');
-  const navigateBack = (): void => emit('back');
-  const createAnother = (): void => emit('createAnother');
 </script>
 
 <template>
@@ -90,37 +83,6 @@
           @click="navigateToServiceProviderDetails"
         >
           {{ toServiceProviderDetailsButtonText }}
-        </v-btn>
-      </v-col>
-      <v-col
-        v-if="showBackButton"
-        cols="12"
-        sm="6"
-        md="auto"
-      >
-        <v-btn
-          class="secondary"
-          :block="mdAndDown"
-          :data-testid="backButtonTestId"
-          @click="navigateBack"
-        >
-          {{ backButtonText }}
-        </v-btn>
-      </v-col>
-
-      <v-col
-        v-if="showCreateAnotherButton"
-        cols="12"
-        sm="6"
-        md="auto"
-      >
-        <v-btn
-          class="primary"
-          :block="mdAndDown"
-          :data-testid="createAnotherButtonTestId"
-          @click="createAnother"
-        >
-          {{ createAnotherButtonText }}
         </v-btn>
       </v-col>
     </v-row>

@@ -37,6 +37,7 @@
     "canBeAssigned": "Darf zugewiesen werden",
     "canBeUsed": "Darf genutzt werden",
     "toServiceProviderDetails": "Zur Rollenauswahl",
+    "testUrl": "URL testen",
     "link": "Link",
     "logo": "Logo",
     "requires2FA": "2FA erforderlich",
