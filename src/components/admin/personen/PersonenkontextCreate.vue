@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import BefristungInput, { type BefristungProps } from '@/components/admin/personen/BefristungInput.vue';
   import KlassenFilter from '@/components/filter/KlassenFilter.vue';
+  import SchulenFilter from '@/components/filter/SchulenFilter.vue';
   import FormRow from '@/components/form/FormRow.vue';
   import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
   import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
@@ -18,10 +19,10 @@
   import { RollenArt, RollenSystemRecht } from '@/stores/RolleStore';
   import type { Zuordnung } from '@/stores/types/Zuordnung';
   import { type TranslatedObject } from '@/types.d';
+  import { blurActiveElement } from '@/utils/focus';
   import type { BaseFieldProps } from 'vee-validate';
   import { computed, onMounted, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n } from 'vue-i18n';
-  import SchulenFilter from '@/components/filter/SchulenFilter.vue';
 
   useI18n({ useScope: 'global' });
 
@@ -236,6 +237,7 @@
           emits('fieldReset', 'selectedKlasse');
         }
         emits('update:selectedRolle', newRolle);
+        blurActiveElement();
       }
     },
     { deep: true },
