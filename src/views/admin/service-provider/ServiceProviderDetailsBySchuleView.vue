@@ -40,9 +40,6 @@
   const selectedRolleIds: Ref<string[]> = ref([]);
   const isSaving: Ref<boolean> = ref(false);
   const saveSuccessDialogVisible: Ref<boolean> = ref(false);
-    
-  const rollenerweiterungSection: Ref<HTMLElement | null> = ref(null);
-
 
   function closeSaveSuccessDialog(): void {
     saveSuccessDialogVisible.value = false;
@@ -381,7 +378,7 @@
 
             <!-- Inline treeview (shown while editing, full-width, no offset) -->
             <v-expand-transition>
-              <div v-if="isEditingRollenerweiterungen" ref="rollenerweiterungSection">
+              <div v-if="isEditingRollenerweiterungen">
                 <LayoutCard
                   :closable="false"
                   :header="t('angebot.editRollenerweiterungen')"
