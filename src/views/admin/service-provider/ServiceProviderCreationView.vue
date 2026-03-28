@@ -74,7 +74,7 @@
     selectedOrganisationId: string | undefined;
     name: string;
     url: string;
-    logo: string | undefined;
+    logo: string;
     kategorie: ServiceProviderKategorie;
     nachtraeglichZuweisbar: boolean;
     verfuegbarFuerRollenerweiterung: boolean;
@@ -103,10 +103,8 @@
   const [url, urlProps]: [Ref<string>, Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>] =
     formContext.defineField('url', vuetifyConfig);
 
-  const [logo, logoProps]: [
-    Ref<string | undefined>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = formContext.defineField('logo', vuetifyConfig);
+  const [logo, logoProps]: [Ref<string>, Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>] =
+    formContext.defineField('logo', vuetifyConfig);
 
   const [kategorie, kategorieProps]: [
     Ref<string | undefined>,
@@ -594,6 +592,11 @@
             { label: $t('angebot.providedBy'), value: selectedOrganisationName, testId: 'success-organisation' },
             { label: $t('angebot.name'), value: successData.name, testId: 'success-name' },
             { label: $t('angebot.url'), value: successData.url, testId: 'success-url' },
+            {
+              label: $t('angebot.logo'),
+              value: successData.logo ? successData.logo : $t('angebot.noLogoProvided'),
+              testId: 'success-logo',
+            },
             {
               label: $t('angebot.kategorie'),
               value: $t(`angebot.kategorien.${successData.kategorie}`),

@@ -62,8 +62,25 @@
       :key="index"
     >
       <v-col class="text-body bold text-right"> {{ item.label }}: </v-col>
+
       <v-col class="text-body">
-        <span :data-testid="item.testId">{{ item.value }}</span>
+        <!-- If it's the logo → show image -->
+        <template v-if="item.testId === 'success-logo' && item.value">
+          <v-img
+            class="mt-n2"
+            :src="item.value"
+            max-width="40"
+            max-height="40"
+            contain
+          />
+        </template>
+
+        <!-- Otherwise → show text -->
+        <template v-else>
+          <span :data-testid="item.testId">
+            {{ item.value }}
+          </span>
+        </template>
       </v-col>
     </v-row>
 
