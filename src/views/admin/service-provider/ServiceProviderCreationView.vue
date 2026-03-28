@@ -594,7 +594,7 @@
             { label: $t('angebot.url'), value: successData.url, testId: 'success-url' },
             {
               label: $t('angebot.logo'),
-              value: successData.logo ? successData.logo : $t('angebot.noLogoProvided'),
+              value: successData.logo,
               testId: 'success-logo',
             },
             {
