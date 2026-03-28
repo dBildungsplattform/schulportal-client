@@ -33,7 +33,7 @@
     <v-row justify="center">
       <v-col
         cols="auto"
-        class="subtitle-1"
+        class="subtitle-1 pre-line text-center"
       >
         {{ successMessage }}
       </v-col>
@@ -67,7 +67,11 @@
       </v-col>
     </v-row>
 
-    <v-divider class="my-6" />
+    <v-divider
+      class="border-opacity-100 rounded my-6"
+      color="#E5EAEF"
+      thickness="6"
+    />
 
     <v-row justify="end">
       <v-col
@@ -88,3 +92,9 @@
     </v-row>
   </v-container>
 </template>
+
+<style scoped>
+  .pre-line {
+    white-space: pre-wrap;
+  }
+</style>

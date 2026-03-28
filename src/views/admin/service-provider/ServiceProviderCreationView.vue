@@ -27,6 +27,7 @@
   import { RollenSystemRecht } from '@/stores/RolleStore';
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
+  import SchulPortalLogo from '@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg';
 
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
   const authStore: AuthStore = useAuthStore();
@@ -52,10 +53,11 @@
         .matches(NO_LEADING_TRAILING_SPACES, t('angebot.rules.name.noLeadingTrailingSpaces'))
         .required(t('angebot.rules.name.required')),
       url: string().required(t('angebot.rules.url.required')),
+      logo: string().optional(),
       kategorie: string().required(t('angebot.rules.kategorie.required')),
-      nachtraeglichZuweisbar: boolean().required(),
-      verfuegbarFuerRollenerweiterung: boolean().required(),
-      requires2fa: boolean().required(),
+      nachtraeglichZuweisbar: boolean().optional(),
+      verfuegbarFuerRollenerweiterung: boolean().optional(),
+      requires2fa: boolean().optional(),
     }),
   );
 
@@ -72,6 +74,7 @@
     selectedOrganisationId: string | undefined;
     name: string;
     url: string;
+    logo: string | undefined;
     kategorie: ServiceProviderKategorie;
     nachtraeglichZuweisbar: boolean;
     verfuegbarFuerRollenerweiterung: boolean;
@@ -85,6 +88,7 @@
       nachtraeglichZuweisbar: true,
       verfuegbarFuerRollenerweiterung: true,
       requires2fa: false,
+      logo: SchulPortalLogo,
     },
   });
 
@@ -98,6 +102,11 @@
 
   const [url, urlProps]: [Ref<string>, Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>] =
     formContext.defineField('url', vuetifyConfig);
+
+  const [logo, logoProps]: [
+    Ref<string | undefined>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = formContext.defineField('logo', vuetifyConfig);
 
   const [kategorie, kategorieProps]: [
     Ref<string | undefined>,
@@ -422,10 +431,40 @@
               </div>
             </FormRow>
 
-            <!-- 4. Kategorie des Angebots -->
+            <!-- 4. Logo des Angebots auf der Startseite der Anwender -->
             <v-row>
               <v-col>
-                <h3 class="headline-3">4. {{ $t('angebot.kategorieOfTheAngebotInTheStartPage') }}</h3>
+                <h3 class="headline-3">4. {{ $t('angebot.logoOfTheAngebotInTheStartPage') }}</h3>
+              </v-col>
+            </v-row>
+            <FormRow
+              :error-label="logoProps['error']"
+              :is-required="false"
+              label-for-id="logo-input"
+              :label="$t('angebot.logo')"
+            >
+              <!-- Hardcoding the Logo for now and outlining it. When migrating the Logos to this project there will be a dedicated component for logo selection -->
+              <v-card
+                class="d-flex align-center justify-center mb-5"
+                width="80"
+                height="80"
+                outlined
+              >
+                <div class="logo-box selected">
+                  <v-img
+                    :src="logo || SchulPortalLogo"
+                    max-height="48"
+                    max-width="48"
+                    contain
+                  />
+                </div>
+              </v-card>
+            </FormRow>
+
+            <!-- 5. Kategorie des Angebots -->
+            <v-row>
+              <v-col>
+                <h3 class="headline-3">5. {{ $t('angebot.kategorieOfTheAngebotInTheStartPage') }}</h3>
               </v-col>
             </v-row>
             <FormRow
@@ -453,10 +492,10 @@
               />
             </FormRow>
 
-            <!-- 5. Darf dieses Angebot Rollen zugewiesen werden? -->
+            <!-- 6. Darf dieses Angebot Rollen zugewiesen werden? -->
             <v-row>
               <v-col>
-                <h3 class="headline-3">5. {{ $t('angebot.canThisAngebotBeAssignedToRollen') }}</h3>
+                <h3 class="headline-3">6. {{ $t('angebot.canThisAngebotBeAssignedToRollen') }}</h3>
               </v-col>
             </v-row>
             <FormRow
@@ -482,11 +521,11 @@
               />
             </FormRow>
 
-            <!-- 6. Darf dieses Angebot für schulspezifische Rollenerweiterungen genutzt werden? -->
+            <!-- 7. Darf dieses Angebot für schulspezifische Rollenerweiterungen genutzt werden? -->
             <v-row>
               <v-col>
                 <h3 class="headline-3">
-                  6. {{ $t('angebot.canThisAngebotBeUsedForSchulspezifischeRollenerweiterungen') }}
+                  7. {{ $t('angebot.canThisAngebotBeUsedForSchulspezifischeRollenerweiterungen') }}
                 </h3>
               </v-col>
             </v-row>
@@ -513,10 +552,10 @@
               />
             </FormRow>
 
-            <!-- 7. Ist zur Nutzung eine Zwei-Faktor-Authentifizierung erforderlich? -->
+            <!-- 8. Ist zur Nutzung eine Zwei-Faktor-Authentifizierung erforderlich? -->
             <v-row>
               <v-col>
-                <h3 class="headline-3">7. {{ $t('angebot.is2FARequired') }}</h3>
+                <h3 class="headline-3">8. {{ $t('angebot.is2FARequired') }}</h3>
               </v-col>
             </v-row>
             <FormRow
@@ -549,7 +588,7 @@
       <template v-if="serviceProviderStore.createdServiceProvider && !serviceProviderStore.errorCode">
         <ServiceProviderSuccessTemplate
           v-if="showSuccess && successData"
-          :successMessage="$t('angebot.angebotAddedSuccessfully')"
+          :successMessage="$t('angebot.angebotAddedSuccessfully', { name: successData.name })"
           :followingDataChanged="$t('admin.followingDataCreated')"
           :changedData="[
             { label: $t('angebot.providedBy'), value: selectedOrganisationName, testId: 'success-organisation' },
@@ -588,3 +627,20 @@
     </LayoutCard>
   </div>
 </template>
+<style scoped>
+  .logo-box {
+    width: 80px;
+    height: 80px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+  }
+
+  .logo-box.selected {
+    border-color: #001e49;
+    box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+  }
+</style>

@@ -1,6 +1,6 @@
 {
   "angebot": {
-    "angebotAddedSuccessfully": "Das Angebot wurde erfolgreich hinzugefügt.",
+    "angebotAddedSuccessfully": "Das Angebot {name} wurde erfolgreich hinzugefügt. \n\nBitte wählen Sie nun die Rollen aus, die auf das Angebot zugreifen sollen.",
     "angebotCreateErrorTitle": "Fehler beim Anlegen des Angebots",
     "addNew": "Neues Angebot hinzufügen",
     "allServiceProviders": "Alle Angebote",
@@ -22,6 +22,9 @@
     "nameOfAngebotInTheStartPage": "Name des Angebots auf der Startseite der Anwender",
     "url": "URL",
     "urlOfTheAngebot": "URL des Angebots",
+    "logoOfTheAngebotInTheStartPage": "Logo des Angebots auf der Startseite der Anwender",
+    "logo": "Logo",
+    "enterLogoUrl": "Logo-URL eingeben",
     "kategorie": "Kategorie",
     "kategorieOfTheAngebotInTheStartPage": "Kategorie des Angebots auf der Startseite der Anwender",
     "administrationsebene": "Administrationsebene",
@@ -39,7 +42,6 @@
     "toServiceProviderDetails": "Zur Rollenauswahl",
     "testUrl": "URL testen",
     "link": "Link",
-    "logo": "Logo",
     "requires2FA": "2FA erforderlich",
     "kategorien": {
       "EMAIL": "Dienstliche Email",
