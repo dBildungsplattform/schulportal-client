@@ -40,7 +40,7 @@
   const successData: Ref<ServiceProviderForm | null> = ref(null);
 
   const selectedOrganisationIdCache: Ref<string | undefined> = ref(undefined);
-  const selectedOrganisationNameCache: Ref<string> = ref('');
+  const selectedOrganisationNameCache: Ref<string | undefined> = ref(undefined);
 
   const hasAngeboteVerwaltenPermission: ComputedRef<boolean> = computed(() => authStore.hasAngeboteVerwaltenPermission);
 
@@ -135,7 +135,7 @@
 
   const canCommit: ComputedRef<boolean> = computed(() => formContext.meta.value.valid);
 
-  const selectedOrganisationName: ComputedRef<string> = computed(() => selectedOrganisationNameCache.value);
+  const selectedOrganisationName: ComputedRef<string | undefined> = computed(() => selectedOrganisationNameCache.value);
 
   function openUrlInNewTab(): void {
     if (!url.value) {
@@ -211,7 +211,7 @@
         selectedOrganisationNameCache.value = match.name;
       }
     } else {
-      selectedOrganisationNameCache.value = '';
+      selectedOrganisationNameCache.value = undefined;
     }
   }
 
@@ -362,6 +362,13 @@
                 :selected-schule-props="selectedOrganisationIdProps"
                 :selected-schulen="selectedOrganisationId"
                 @update:selected-schulen="updateSelectedOrganisation"
+                @update:selected-schulen-objects="
+                  (orgs) => {
+                    if (orgs.length > 0) {
+                      selectedOrganisationNameCache = orgs[0]?.name;
+                    }
+                  }
+                "
               />
             </FormRow>
 
@@ -589,7 +596,7 @@
           :successMessage="$t('angebot.angebotAddedSuccessfully', { name: successData.name })"
           :followingDataChanged="$t('admin.followingDataCreated')"
           :changedData="[
-            { label: $t('angebot.providedBy'), value: selectedOrganisationName, testId: 'success-organisation' },
+            { label: $t('angebot.providedBy'), value: selectedOrganisationName!, testId: 'success-organisation' },
             { label: $t('angebot.name'), value: successData.name, testId: 'success-name' },
             { label: $t('angebot.url'), value: successData.url, testId: 'success-url' },
             {
