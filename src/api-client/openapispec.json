@@ -1944,6 +1944,7 @@
                         "in": "path",
                         "description": "The ID of the parent organisation to which another organisation will be added as a subordinate.",
                         "schema": {
+                            "nullable": false,
                             "type": "string"
                         }
                     }
@@ -5495,7 +5496,7 @@
         },
         "/api/v1/person-info": {
             "get": {
-                "operationId": "PersonInfoController_infoV1_v1",
+                "operationId": "personInfoControllerInfoV1",
                 "parameters": [],
                 "responses": {
                     "200": {
