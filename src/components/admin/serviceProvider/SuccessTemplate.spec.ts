@@ -104,7 +104,7 @@ describe('ServiceProviderSuccessTemplate', () => {
   });
 
   test('renders image when testId is "success-logo" and value is provided', () => {
-    const propsWithLogo: Props= {
+    const propsWithLogo: Props = {
       ...defaultProps,
       changedData: [{ label: 'Logo', value: 'https://example.com/logo.png', testId: 'success-logo' }],
     };

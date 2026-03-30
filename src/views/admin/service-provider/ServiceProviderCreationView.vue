@@ -171,11 +171,11 @@
   }
 
   function navigateToServiceProviderTable(): void {
+    router.push({ name: 'angebot-management-schulspezifisch' });
     formContext.resetForm();
     selectedOrganisationNameCache.value = '';
     serviceProviderStore.errorCode = '';
     serviceProviderStore.createdServiceProvider = null;
-    router.push({ name: 'angebot-management-schulspezifisch' });
   }
 
   function navigateToCreatePersonRoute(reload: boolean = false): void | Promise<void> {
