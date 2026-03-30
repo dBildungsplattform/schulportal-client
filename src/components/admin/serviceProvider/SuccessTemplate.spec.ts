@@ -1,6 +1,6 @@
 import { expect, test, describe, beforeEach, afterEach } from 'vitest';
 import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
-import ServiceProviderSuccessTemplate from './ServiceProviderSuccessTemplate.vue';
+import ServiceProviderSuccessTemplate from './SuccessTemplate.vue';
 import { createVuetify } from 'vuetify';
 import * as components from 'vuetify/components';
 import * as directives from 'vuetify/directives';

@@ -27,7 +27,7 @@
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
   import SchulPortalLogo from '@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg';
-  import SuccessTemplate from '@/components/admin/serviceProvider/ServiceProviderSuccessTemplate.vue';
+  import SuccessTemplate from '@/components/admin/serviceProvider/SuccessTemplate.vue';
 
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
   const authStore: AuthStore = useAuthStore();
