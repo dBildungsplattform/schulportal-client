@@ -23,7 +23,7 @@
   } from 'vue-router';
   import { boolean, object, string } from 'yup';
   import { DIN_91379A_EXT, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
-  import ServiceProviderSuccessTemplate from '@/components/admin/serviceProvider/serviceProviderSuccessTemplate.vue';
+  import ServiceProviderSuccessTemplate from '@/components/admin/serviceProvider/ServiceProviderSuccessTemplate.vue';
   import { RollenSystemRecht } from '@/stores/RolleStore';
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
