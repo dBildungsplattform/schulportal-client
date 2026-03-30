@@ -8,16 +8,12 @@
     changedData: Array<{ label: string; value: string; testId: string }>;
 
     showToServiceProviderDetailsButton: boolean;
-    showBackButton: boolean;
-    showCreateAnotherButton: boolean;
 
     toServiceProviderDetailsButtonText: string;
     toServiceProviderDetailsButtonTestId: string;
   }>();
 
   type Emits = {
-    (event: 'back'): void;
-    (event: 'createAnother'): void;
     (event: 'toServiceProviderDetails'): void;
   };
 

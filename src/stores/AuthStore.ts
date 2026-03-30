@@ -154,7 +154,7 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
           );
           this.hasRollenerweiternPermission = this.currentUserPermissions.includes(RollenSystemRecht.RollenErweitern);
           this.hasEingeschränktAngeboteVerwaltenPermission = this.currentUserPermissions.includes(
-            'ANGEBOTE_EINGESCHRAENKT_VERWALTEN',
+            RollenSystemRecht.AngeboteEingeschraenktVerwalten,
           );
         } else {
           throw new Error('User info could not be retrieved.');

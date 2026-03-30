@@ -161,10 +161,10 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
       const configStore: ConfigStore = useConfigStore();
       const flag: keyof FeatureFlagResponse = to.meta['requiresFeatureFlag'] as keyof FeatureFlagResponse;
       if (!configStore.configData?.[flag]) {
-        return { path: 'not-found' };
+        return { path: '/not-found' };
       }
     }
-    return { path: 'not-found' };
+    return { path: '/not-found' };
   }
 
   return true;

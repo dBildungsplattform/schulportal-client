@@ -629,7 +629,6 @@
           :to-service-provider-details-button-text="$t('angebot.toServiceProviderDetails')"
           :showBackButton="true"
           :showCreateAnotherButton="true"
-          :createAnotherButtonText="$t('angebot.createAnother')"
           toServiceProviderDetailsButtonTestId="to-service-provider-details-button"
           @toServiceProviderDetails="navigateToServiceProviderDetails"
         />
