@@ -154,9 +154,6 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
         ? requiredPermissions.some(checkPermission)
         : requiredPermissions.every(checkPermission);
 
-    if (hasPermission) {
-      return true;
-    }
     if (to.meta['requiresFeatureFlag']) {
       const configStore: ConfigStore = useConfigStore();
       const flag: keyof FeatureFlagResponse = to.meta['requiresFeatureFlag'] as keyof FeatureFlagResponse;
@@ -164,6 +161,11 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
         return { path: '/not-found' };
       }
     }
+
+    if (hasPermission) {
+      return true;
+    }
+
     return { path: '/not-found' };
   }
 
