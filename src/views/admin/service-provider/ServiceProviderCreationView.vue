@@ -23,11 +23,11 @@
   } from 'vue-router';
   import { boolean, object, string } from 'yup';
   import { DIN_91379A_EXT, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
-  import ServiceProviderSuccessTemplate from '@/components/admin/serviceProvider/ServiceProviderSuccessTemplate.vue';
   import { RollenSystemRecht } from '@/stores/RolleStore';
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
   import SchulPortalLogo from '@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg';
+  import SuccessTemplate from '@/components/admin/serviceProvider/ServiceProviderSuccessTemplate.vue';
 
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
   const authStore: AuthStore = useAuthStore();
@@ -591,7 +591,7 @@
 
       <!-- Result template on success after submit  -->
       <template v-if="serviceProviderStore.createdServiceProvider && !serviceProviderStore.errorCode">
-        <ServiceProviderSuccessTemplate
+        <SuccessTemplate
           v-if="showSuccess && successData"
           :successMessage="$t('angebot.angebotAddedSuccessfully', { name: successData.name })"
           :followingDataChanged="$t('admin.followingDataCreated')"
