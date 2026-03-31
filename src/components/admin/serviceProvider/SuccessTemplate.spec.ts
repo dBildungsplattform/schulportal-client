@@ -1,21 +1,16 @@
 import { expect, test, describe, beforeEach, afterEach } from 'vitest';
 import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
 import ServiceProviderSuccessTemplate from './SuccessTemplate.vue';
-import { createVuetify } from 'vuetify';
-import * as components from 'vuetify/components';
-import * as directives from 'vuetify/directives';
 
 let wrapper: VueWrapper | null = null;
 
-const vuetify: ReturnType<typeof createVuetify> = createVuetify({
-  components,
-  directives,
-});
-
-type Props = {
-  successMessage: string;
+type SuccessDetails = {
+  message: string;
   followingDataChanged: string;
-  changedData: Array<{ label: string; value: string; testId: string }>;
+  data: Array<{ label: string; value: string; testId: string }>;
+};
+type Props = {
+  success: SuccessDetails;
   showToServiceProviderDetailsButton: boolean;
   showBackButton: boolean;
   showCreateAnotherButton: boolean;
@@ -23,12 +18,14 @@ type Props = {
   toServiceProviderDetailsButtonTestId: string;
 };
 const defaultProps: Props = {
-  successMessage: 'Service provider updated successfully',
-  followingDataChanged: 'The following data was changed:',
-  changedData: [
-    { label: 'Name', value: 'Test Provider', testId: 'success-name' },
-    { label: 'Email', value: 'test@example.com', testId: 'success-email' },
-  ],
+  success: {
+    message: 'Service provider updated successfully',
+    followingDataChanged: 'The following data was changed:',
+    data: [
+      { label: 'Name', value: 'Test Provider', testId: 'success-name' },
+      { label: 'Email', value: 'test@example.com', testId: 'success-email' },
+    ],
+  },
   showToServiceProviderDetailsButton: true,
   showBackButton: true,
   showCreateAnotherButton: true,
@@ -54,9 +51,6 @@ describe('ServiceProviderSuccessTemplate', () => {
     wrapper = mount(ServiceProviderSuccessTemplate, {
       attachTo: document.getElementById('app') || '',
       props: defaultProps,
-      global: {
-        plugins: [vuetify],
-      },
     });
 
     expect(wrapper.text()).toContain('Service provider updated successfully');
@@ -66,9 +60,6 @@ describe('ServiceProviderSuccessTemplate', () => {
     wrapper = mount(ServiceProviderSuccessTemplate, {
       attachTo: document.getElementById('app') || '',
       props: defaultProps,
-      global: {
-        plugins: [vuetify],
-      },
     });
 
     const icon: VueWrapper<Element> = wrapper.findComponent({ name: 'VIcon' });
@@ -79,9 +70,6 @@ describe('ServiceProviderSuccessTemplate', () => {
     wrapper = mount(ServiceProviderSuccessTemplate, {
       attachTo: document.getElementById('app') || '',
       props: defaultProps,
-      global: {
-        plugins: [vuetify],
-      },
     });
 
     expect(wrapper.text()).toContain('The following data was changed:');
@@ -91,9 +79,6 @@ describe('ServiceProviderSuccessTemplate', () => {
     wrapper = mount(ServiceProviderSuccessTemplate, {
       attachTo: document.getElementById('app') || '',
       props: defaultProps,
-      global: {
-        plugins: [vuetify],
-      },
     });
 
     expect(wrapper.text()).toContain('Name:');
@@ -106,15 +91,15 @@ describe('ServiceProviderSuccessTemplate', () => {
   test('renders image when testId is "success-logo" and value is provided', () => {
     const propsWithLogo: Props = {
       ...defaultProps,
-      changedData: [{ label: 'Logo', value: 'https://example.com/logo.png', testId: 'success-logo' }],
+      success: {
+        ...defaultProps.success,
+        data: [{ label: 'Logo', value: 'https://example.com/logo.png', testId: 'success-logo' }],
+      },
     };
 
     wrapper = mount(ServiceProviderSuccessTemplate, {
       attachTo: document.getElementById('app') || '',
       props: propsWithLogo,
-      global: {
-        plugins: [vuetify],
-      },
     });
 
     const img: VueWrapper<Element> = wrapper.findComponent({ name: 'VImg' });
@@ -125,9 +110,6 @@ describe('ServiceProviderSuccessTemplate', () => {
     wrapper = mount(ServiceProviderSuccessTemplate, {
       attachTo: document.getElementById('app') || '',
       props: defaultProps,
-      global: {
-        plugins: [vuetify],
-      },
     });
 
     const nameSpan: Omit<DOMWrapper<Element>, 'exists'> = wrapper.get('[data-testid="success-name"]');
@@ -139,9 +121,6 @@ describe('ServiceProviderSuccessTemplate', () => {
     wrapper = mount(ServiceProviderSuccessTemplate, {
       attachTo: document.getElementById('app') || '',
       props: defaultProps,
-      global: {
-        plugins: [vuetify],
-      },
     });
 
     const button: DOMWrapper<Element> = wrapper.find('[data-testid="to-details-button"]');
@@ -158,9 +137,6 @@ describe('ServiceProviderSuccessTemplate', () => {
     wrapper = mount(ServiceProviderSuccessTemplate, {
       attachTo: document.getElementById('app') || '',
       props: propsWithoutButton,
-      global: {
-        plugins: [vuetify],
-      },
     });
 
     const button: DOMWrapper<Element> = wrapper.find('[data-testid="to-details-button"]');
@@ -171,9 +147,6 @@ describe('ServiceProviderSuccessTemplate', () => {
     wrapper = mount(ServiceProviderSuccessTemplate, {
       attachTo: document.getElementById('app') || '',
       props: defaultProps,
-      global: {
-        plugins: [vuetify],
-      },
     });
 
     const button: Omit<DOMWrapper<Element>, 'exists'> = wrapper.get('[data-testid="to-details-button"]');
@@ -186,15 +159,15 @@ describe('ServiceProviderSuccessTemplate', () => {
   test('handles empty changedData array', () => {
     const propsWithoutData: Props = {
       ...defaultProps,
-      changedData: [],
+      success: {
+        ...defaultProps.success,
+        data: [],
+      },
     };
 
     wrapper = mount(ServiceProviderSuccessTemplate, {
       attachTo: document.getElementById('app') || '',
       props: propsWithoutData,
-      global: {
-        plugins: [vuetify],
-      },
     });
 
     expect(wrapper.text()).toContain('Service provider updated successfully');
@@ -205,9 +178,6 @@ describe('ServiceProviderSuccessTemplate', () => {
     wrapper = mount(ServiceProviderSuccessTemplate, {
       attachTo: document.getElementById('app') || '',
       props: defaultProps,
-      global: {
-        plugins: [vuetify],
-      },
     });
 
     const divider: VueWrapper<Element> = wrapper.findComponent({ name: 'VDivider' });
@@ -217,19 +187,19 @@ describe('ServiceProviderSuccessTemplate', () => {
   test('handles multiple items in changedData', () => {
     const propsWithMultipleItems: Props = {
       ...defaultProps,
-      changedData: [
-        { label: 'Field 1', value: 'Value 1', testId: 'field-1' },
-        { label: 'Field 2', value: 'Value 2', testId: 'field-2' },
-        { label: 'Field 3', value: 'Value 3', testId: 'field-3' },
-      ],
+      success: {
+        ...defaultProps.success,
+        data: [
+          { label: 'Field 1', value: 'Value 1', testId: 'field-1' },
+          { label: 'Field 2', value: 'Value 2', testId: 'field-2' },
+          { label: 'Field 3', value: 'Value 3', testId: 'field-3' },
+        ],
+      },
     };
 
     wrapper = mount(ServiceProviderSuccessTemplate, {
       attachTo: document.getElementById('app') || '',
       props: propsWithMultipleItems,
-      global: {
-        plugins: [vuetify],
-      },
     });
 
     expect(wrapper.get('[data-testid="field-1"]').text()).toBe('Value 1');
@@ -241,15 +211,15 @@ describe('ServiceProviderSuccessTemplate', () => {
     const multilineMessage: string = 'Line 1\nLine 2\nLine 3';
     const propsWithMultilineMessage: Props = {
       ...defaultProps,
-      successMessage: multilineMessage,
+      success: {
+        ...defaultProps.success,
+        message: multilineMessage,
+      },
     };
 
     wrapper = mount(ServiceProviderSuccessTemplate, {
       attachTo: document.getElementById('app') || '',
       props: propsWithMultilineMessage,
-      global: {
-        plugins: [vuetify],
-      },
     });
 
     const messageElement: DOMWrapper<Element> = wrapper.find('.pre-line');

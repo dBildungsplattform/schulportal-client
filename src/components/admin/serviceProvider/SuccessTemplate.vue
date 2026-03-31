@@ -2,20 +2,28 @@
   import { type Ref } from 'vue';
   import { useDisplay } from 'vuetify';
 
-  defineProps<{
-    successMessage: string;
+  type SuccessDataItem = {
+    label: string;
+    value: string;
+    testId: string;
+    type?: 'text' | 'image';
+  };
+
+  type SuccessDetails = {
+    message: string;
     followingDataChanged: string;
-    changedData: Array<{ label: string; value: string; testId: string }>;
-
-    showToServiceProviderDetailsButton: boolean;
-
-    toServiceProviderDetailsButtonText: string;
-    toServiceProviderDetailsButtonTestId: string;
-  }>();
+    data: Array<SuccessDataItem>;
+  };
 
   type Emits = {
     (event: 'toServiceProviderDetails'): void;
   };
+  defineProps<{
+    success: SuccessDetails;
+    showToServiceProviderDetailsButton: boolean;
+    toServiceProviderDetailsButtonText: string;
+    toServiceProviderDetailsButtonTestId: string;
+  }>();
 
   const emit: Emits = defineEmits<Emits>();
 
@@ -31,7 +39,7 @@
         cols="auto"
         class="subtitle-1 pre-line text-center"
       >
-        {{ successMessage }}
+        {{ success.message }}
       </v-col>
     </v-row>
 
@@ -49,19 +57,19 @@
         cols="auto"
         class="subtitle-2"
       >
-        {{ followingDataChanged }}
+        {{ success.followingDataChanged }}
       </v-col>
     </v-row>
 
     <v-row
-      v-for="(item, index) in changedData"
+      v-for="(item, index) in success.data"
       :key="index"
     >
       <v-col class="text-body bold text-right"> {{ item.label }}: </v-col>
 
       <v-col class="text-body">
-        <!-- If it's the logo → show image -->
-        <template v-if="item.testId === 'success-logo' && item.value">
+        <!-- If it's an image type → show image -->
+        <template v-if="item.type === 'image' && item.value">
           <v-img
             class="mt-n2"
             :src="item.value"

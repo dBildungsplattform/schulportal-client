@@ -92,6 +92,15 @@ export type ServiceProviderCreationFilter = {
   merkmale: Array<ServiceProviderMerkmal>;
 };
 
+export type CreatedServiceProvider = {
+  id: string;
+  name: string;
+  url: string;
+  kategorie: ServiceProviderKategorie;
+  requires2fa: boolean;
+  merkmale: Array<ServiceProviderMerkmal>;
+};
+
 type ServiceProviderState = {
   allServiceProviders: StartPageServiceProvider[];
   availableServiceProviders: StartPageServiceProvider[];
@@ -104,7 +113,7 @@ type ServiceProviderState = {
   rollenerweiterungen: ProviderControllerFindRollenerweiterungenByServiceProviderId200Response | null;
   // ready-to-display, grouped for the result table:
   rollenerweiterungenUebersicht: RollenErweiterungenUebersicht[];
-  createdServiceProvider: ServiceProviderResponse | null;
+  createdServiceProvider: CreatedServiceProvider | null;
   errorCode: string;
   loading: boolean;
 };

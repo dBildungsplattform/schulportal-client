@@ -37,7 +37,6 @@
   const { t }: Composer = useI18n({ useScope: 'global' });
 
   const showSuccess: Ref<boolean> = ref(false);
-  const successData: Ref<ServiceProviderForm | null> = ref(null);
 
   const selectedOrganisationIdCache: Ref<string | undefined> = ref(undefined);
   const selectedOrganisationNameCache: Ref<string | undefined> = ref(undefined);
@@ -271,10 +270,6 @@
       });
 
       if (!serviceProviderStore.errorCode) {
-        successData.value = {
-          ...values,
-          url: normalizedUrl, // Show the normalized URL that was actually saved
-        };
         showSuccess.value = true;
         selectedOrganisationIdCache.value = values.selectedOrganisationId;
         selectedOrganisationNameCache.value = selectedOrganisationName.value;
@@ -601,39 +596,58 @@
       <!-- Result template on success after submit  -->
       <template v-if="serviceProviderStore.createdServiceProvider && !serviceProviderStore.errorCode">
         <SuccessTemplate
-          v-if="showSuccess && successData"
-          :successMessage="$t('angebot.angebotAddedSuccessfully', { name: successData.name })"
-          :followingDataChanged="$t('admin.followingDataCreated')"
-          :changedData="[
-            { label: $t('angebot.providedBy'), value: selectedOrganisationName!, testId: 'success-organisation' },
-            { label: $t('angebot.name'), value: successData.name, testId: 'success-name' },
-            { label: $t('angebot.url'), value: successData.url, testId: 'success-url' },
-            {
-              label: $t('angebot.logo'),
-              value: successData.logo,
-              testId: 'success-logo',
-            },
-            {
-              label: $t('angebot.kategorie'),
-              value: $t(`angebot.kategorien.${successData.kategorie}`),
-              testId: 'success-kategorie',
-            },
-            {
-              label: $t('angebot.canBeAssigned'),
-              value: successData.nachtraeglichZuweisbar ? $t('yes') : $t('no'),
-              testId: 'success-nachtraeglich-zuweisbar',
-            },
-            {
-              label: $t('angebot.canBeUsed'),
-              value: successData.verfuegbarFuerRollenerweiterung ? $t('yes') : $t('no'),
-              testId: 'success-verfuegbar-fuer-rollenerweiterung',
-            },
-            {
-              label: $t('angebot.requires2FA'),
-              value: successData.requires2fa ? $t('yes') : $t('no'),
-              testId: 'success-requires-2fa',
-            },
-          ]"
+          v-if="showSuccess && serviceProviderStore.createdServiceProvider"
+          :success="{
+            message: $t('angebot.angebotAddedSuccessfully', { name: serviceProviderStore.createdServiceProvider.name }),
+            followingDataChanged: $t('admin.followingDataCreated'),
+            data: [
+              { label: $t('angebot.providedBy'), value: selectedOrganisationName!, testId: 'success-organisation' },
+              {
+                label: $t('angebot.name'),
+                value: serviceProviderStore.createdServiceProvider.name,
+                testId: 'success-name',
+              },
+              {
+                label: $t('angebot.url'),
+                value: serviceProviderStore.createdServiceProvider.url,
+                testId: 'success-url',
+              },
+              {
+                label: $t('angebot.logo'),
+                value: SchulPortalLogo,
+                testId: 'success-logo',
+                type: 'image',
+              },
+              {
+                label: $t('angebot.kategorie'),
+                value: $t(`angebot.kategorien.${serviceProviderStore.createdServiceProvider.kategorie}`),
+                testId: 'success-kategorie',
+              },
+              {
+                label: $t('angebot.canBeAssigned'),
+                value: serviceProviderStore.createdServiceProvider.merkmale.includes(
+                  ServiceProviderMerkmal.NachtraeglichZuweisbar,
+                )
+                  ? $t('yes')
+                  : $t('no'),
+                testId: 'success-nachtraeglich-zuweisbar',
+              },
+              {
+                label: $t('angebot.canBeUsed'),
+                value: serviceProviderStore.createdServiceProvider.merkmale.includes(
+                  ServiceProviderMerkmal.VerfuegbarFuerRollenerweiterung,
+                )
+                  ? $t('yes')
+                  : $t('no'),
+                testId: 'success-verfuegbar-fuer-rollenerweiterung',
+              },
+              {
+                label: $t('angebot.requires2FA'),
+                value: serviceProviderStore.createdServiceProvider.requires2fa ? $t('yes') : $t('no'),
+                testId: 'success-requires-2fa',
+              },
+            ],
+          }"
           :show-to-service-provider-details-button="true"
           :to-service-provider-details-button-text="$t('angebot.toServiceProviderDetails')"
           :showBackButton="true"
