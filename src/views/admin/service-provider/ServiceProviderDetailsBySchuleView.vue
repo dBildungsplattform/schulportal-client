@@ -8,7 +8,7 @@
   import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { computed, onMounted, ref, type ComputedRef, type Ref } from 'vue';
+  import { computed, nextTick, onMounted, ref, type ComputedRef, type Ref } from 'vue';
   import SchulPortalLogo from '@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg';
   import LabeledField from '@/components/admin/LabeledField.vue';
   import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
@@ -34,6 +34,8 @@
   const rolleStore: RolleStore = useRolleStore();
 
   const currentServiceProviderId: string = route.params['id'] as string;
+
+  const treeviewContainer: Ref<HTMLElement | null> = ref(null);
 
   // ── Edit mode state ────────────────────────────────────────────────────────
   const isEditingRollenerweiterungen: Ref<boolean> = ref(false);
@@ -99,6 +101,31 @@
       .map((r: RolleWithServiceProvidersResponse) => ({ id: r.id, name: r.name, rollenart: r.rollenart })),
   );
 
+  function scrollToTreeview(offset: number = 120): void {
+    const el: HTMLElement | null = treeviewContainer.value;
+    if (!el) {
+      return;
+    }
+
+    const scroll = (): void => {
+      const top: number = el.getBoundingClientRect().top + window.scrollY;
+      window.scrollTo({
+        top: top - offset, // scroll a bit above the element
+        behavior: 'smooth',
+      });
+    };
+
+    const onTransitionEnd = (): void => {
+      scroll();
+      el.removeEventListener('transitionend', onTransitionEnd);
+    };
+
+    el.addEventListener('transitionend', onTransitionEnd);
+
+    // Fallback in case transitionend doesn't fire
+    setTimeout(scroll, 500);
+  }
+
   // ── Edit mode actions ─────────────────────────────────────────────────────
   async function openEditMode(): Promise<void> {
     // Load available rollen for this organisation if not yet loaded
@@ -110,6 +137,10 @@
     }
     selectedRolleIds.value = [...existingRolleIds.value];
     isEditingRollenerweiterungen.value = true;
+
+    // Wait until DOM updates, then scroll
+    await nextTick();
+    scrollToTreeview();
   }
 
   const autoEdit: ComputedRef<boolean> = computed(() => route.query['autoEdit'] === 'true');
@@ -378,7 +409,10 @@
 
             <!-- Inline treeview (shown while editing, full-width, no offset) -->
             <v-expand-transition>
-              <div v-if="isEditingRollenerweiterungen">
+              <div
+                v-if="isEditingRollenerweiterungen"
+                ref="treeviewContainer"
+              >
                 <LayoutCard
                   :closable="false"
                   :header="t('angebot.editRollenerweiterungen')"
