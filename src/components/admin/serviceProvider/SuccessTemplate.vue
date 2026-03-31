@@ -71,6 +71,7 @@
         <!-- If it's an image type → show image -->
         <template v-if="item.type === 'image' && item.value">
           <v-img
+            :data-testid="item.testId"
             class="mt-n2"
             :src="item.value"
             max-width="40"
