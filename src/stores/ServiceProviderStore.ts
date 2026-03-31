@@ -349,18 +349,17 @@ export const useServiceProviderStore: StoreDefinition<
       } catch (error) {
         if (containsMultiError(error)) {
           this.errors = new Map<string, DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInnerI18nKeyEnum>(
-            error.response?.data.rolleIdsWithI18nKeys.reduce(
-              (
-                acc: [string, DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInnerI18nKeyEnum][],
-                item: DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInner,
-              ) => {
-                if (item.rolleId && item.i18nKey) {
-                  acc.push([item.rolleId, item.i18nKey]);
-                }
-                return acc;
-              },
-              [],
-            ),
+            error.response?.data.rolleIdsWithI18nKeys
+              .filter(
+                (
+                  item: DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInner,
+                ): item is Required<DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInner> =>
+                  item.rolleId !== undefined && item.i18nKey !== undefined,
+              )
+              .map((item: Required<DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInner>) => [
+                item.rolleId,
+                item.i18nKey,
+              ]),
           );
         } else {
           this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
