@@ -2793,7 +2793,7 @@
     },
     "/api/person-info": {
       "get": {
-        "operationId": "personInfoControllerInfoV1",
+        "operationId": "PersonInfoController_info",
         "parameters": [],
         "responses": {
           "200": {
@@ -2809,7 +2809,7 @@
     },
     "/api/v1/person-info": {
       "get": {
-        "operationId": "PersonInfoController_infoV1_v1",
+        "operationId": "personInfoControllerInfoV1",
         "parameters": [],
         "responses": {
           "200": {

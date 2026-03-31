@@ -1,5 +1,7 @@
-import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import { type AxiosResponse } from 'axios';
+import { defineStore, type Store, type StoreDefinition } from 'pinia';
+
+import axiosApiInstance from '@/services/ApiService';
 import { getResponseErrorCode, getResponseErrorMessage } from '@/utils/errorHandlers';
 import {
   PersonInfoApiFactory,
@@ -7,7 +9,6 @@ import {
   type PersonInfoApiInterface,
   type PersonInfoResponse,
 } from '../api-client/generated/api';
-import axiosApiInstance from '@/services/ApiService';
 
 const personenInfoApi: PersonInfoApiInterface = PersonInfoApiFactory(undefined, '', axiosApiInstance);
 export type Person = {
@@ -62,7 +63,7 @@ export const usePersonInfoStore: StoreDefinition<
     async initPersonInfo() {
       this.loading = true;
       try {
-        const { data }: AxiosResponse<PersonInfoResponse> = await personenInfoApi.personInfoControllerInfoV1();
+        const { data }: AxiosResponse<PersonInfoResponse> = await personenInfoApi.personInfoControllerInfo();
         this.personInfo = data;
       } catch (error) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
