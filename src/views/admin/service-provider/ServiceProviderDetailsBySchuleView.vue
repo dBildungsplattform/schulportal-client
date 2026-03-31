@@ -97,23 +97,21 @@
   });
 
   const multipleErrors: ComputedRef<{ rolle: string; message: string }[]> = computed(() => {
-    if (serviceProviderStore.errors.size > 0) {
-      return Array.from(serviceProviderStore.errors.entries()).map(
-        ([rolleId, code]: [string, DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInnerI18nKeyEnum]) => {
-          const rolle: RolleWithServiceProvidersResponse | undefined = rolleStore.allRollen.find(
-            (r: RolleWithServiceProvidersResponse) => r.id === rolleId,
-          );
-          return {
-            rolle: rolle?.name ?? rolleId,
-            message: t(`angebot.schulspezifischeErweiterungen.assignErrorMessage.${code}`, {
-              rollenname: rolle?.name ?? rolleId,
-              dstNr: organisationStore.currentOrganisation?.kennung ?? '',
-            }),
-          };
-        },
-      );
-    }
-    return [];
+    const mappedRollen: Map<string, RolleWithServiceProvidersResponse> = new Map(
+      rolleStore.allRollen.map((r: RolleWithServiceProvidersResponse) => [r.id, r]),
+    );
+    return Array.from(serviceProviderStore.errors.entries()).map(
+      ([rolleId, code]: [string, DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInnerI18nKeyEnum]) => {
+        const rolle: RolleWithServiceProvidersResponse | undefined = mappedRollen.get(rolleId);
+        return {
+          rolle: rolle?.name ?? rolleId,
+          message: t(`angebot.schulspezifischeErweiterungen.assignErrorMessage.${code}`, {
+            rollenname: rolle?.name ?? rolleId,
+            dstNr: organisationStore.currentOrganisation?.kennung ?? '',
+          }),
+        };
+      },
+    );
   });
 
   const organisationIdFromQuery: ComputedRef<string | undefined> = computed(
