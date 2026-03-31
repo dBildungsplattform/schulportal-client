@@ -1,4 +1,10 @@
-import { createRouter, createWebHistory, type RouteLocationNormalized, type Router } from 'vue-router';
+import {
+  createRouter,
+  createWebHistory,
+  type RouteLocationNormalized,
+  type Router,
+  type RouteRecordRaw,
+} from 'vue-router';
 import { StepUpLevel, useAuthStore, type AuthStore } from '@/stores/AuthStore';
 import {
   useTwoFactorAuthentificationStore,
@@ -25,6 +31,21 @@ type Permission =
   | 'landesbedienstetesuchenundhinzufügen'
   | 'limitedpersonenanlegen';
 
+export type AppRoute = Omit<RouteRecordRaw, 'meta'> & {
+  meta?: AppRouteMeta;
+};
+export type AppRouteMeta = {
+  layout?: 'DefaultLayout' | 'AdminLayout';
+  requiresAuth?: boolean;
+  requiresOrga?: boolean;
+  missingOrgaRedirect?: string | { name: string };
+  requiredStepUpLevel?: StepUpLevel;
+  requiresPermission?: Permission | Permission[];
+  permissionMode?: 'any' | 'all';
+  requiresFeatureFlag?: keyof FeatureFlagResponse;
+  createType?: 'limited' | 'add-person-to-own-schule';
+};
+
 const router: Router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
@@ -47,6 +68,7 @@ function handleGoToPreviousPage(): void {
 }
 
 router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormalized) => {
+  const meta: AppRouteMeta | undefined = to.meta as AppRouteMeta | undefined;
   const authStore: AuthStore = useAuthStore();
   const masterDataStore: MasterDataStore = useMasterDataStore();
   if (!authStore.isAuthenticated && !masterDataStore.isInitialized()) {
@@ -80,17 +102,17 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
     return { path: '/start' };
   }
 
-  if (to.meta['requiresAuth'] && !authStore.isAuthenticated) {
+  if (meta?.requiresAuth && !authStore.isAuthenticated) {
     window.location.href = `/api/auth/login?redirectUrl=${to.fullPath}`;
     return false;
   }
 
   // Redirect if orga query is missing on routes that require it
-  if (to.meta['requiresOrga'] && (!to.query['orga'] || typeof to.query['orga'] !== 'string')) {
-    return to.meta['missingOrgaRedirect'] ?? { name: 'angebot-management-schulspezifisch' };
+  if (meta?.requiresOrga && (!to.query['orga'] || typeof to.query['orga'] !== 'string')) {
+    return meta?.missingOrgaRedirect ?? { name: 'angebot-management-schulspezifisch' };
   }
 
-  if (to.meta['requiredStepUpLevel'] === StepUpLevel.GOLD && authStore.acr !== StepUpLevel.GOLD) {
+  if (meta?.requiredStepUpLevel === StepUpLevel.GOLD && authStore.acr !== StepUpLevel.GOLD) {
     const personId: string | null | undefined = authStore.currentUser?.personId;
     if (!personId) {
       return false;
@@ -106,10 +128,10 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
     return false;
   }
 
-  if (to.meta['requiresPermission']) {
-    const requiredPermissions: Permission[] = Array.isArray(to.meta['requiresPermission'])
-      ? (to.meta['requiresPermission'] as Permission[])
-      : [to.meta['requiresPermission'] as Permission];
+  if (meta?.requiresPermission) {
+    const requiredPermissions: Permission[] = Array.isArray(meta.requiresPermission)
+      ? meta.requiresPermission
+      : [meta.requiresPermission];
 
     const checkPermission = (permission: Permission): boolean => {
       switch (permission) {
@@ -150,13 +172,13 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
     // 'eingeschränktangebotsverwaltung' should have access
     // default = user needs all of the permissions (AND)
     const hasPermission: boolean =
-      to.meta['permissionMode'] === 'any'
+      meta?.permissionMode === 'any'
         ? requiredPermissions.some(checkPermission)
         : requiredPermissions.every(checkPermission);
 
-    if (to.meta['requiresFeatureFlag']) {
+    if (typeof meta?.requiresFeatureFlag === 'string') {
       const configStore: ConfigStore = useConfigStore();
-      const flag: keyof FeatureFlagResponse = to.meta['requiresFeatureFlag'] as keyof FeatureFlagResponse;
+      const flag: keyof FeatureFlagResponse = meta.requiresFeatureFlag;
       if (!configStore.configData?.[flag]) {
         return { path: '/not-found' };
       }

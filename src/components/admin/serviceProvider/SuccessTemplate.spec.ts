@@ -4,10 +4,17 @@ import ServiceProviderSuccessTemplate from './SuccessTemplate.vue';
 
 let wrapper: VueWrapper | null = null;
 
+type SuccessDataItem = {
+  label: string;
+  value: string;
+  testId: string;
+  type?: 'image' | 'text';
+};
+
 type SuccessDetails = {
   message: string;
   followingDataChanged: string;
-  data: Array<{ label: string; value: string; testId: string }>;
+  data: Array<SuccessDataItem>;
 };
 type Props = {
   success: SuccessDetails;
@@ -88,12 +95,12 @@ describe('ServiceProviderSuccessTemplate', () => {
     expect(wrapper.get('[data-testid="success-email"]').text()).toBe('test@example.com');
   });
 
-  test('renders image when testId is "success-logo" and value is provided', () => {
+  test('renders image when type is image and value is provided', () => {
     const propsWithLogo: Props = {
       ...defaultProps,
       success: {
         ...defaultProps.success,
-        data: [{ label: 'Logo', value: 'https://example.com/logo.png', testId: 'success-logo' }],
+        data: [{ label: 'Logo', value: 'https://example.com/logo.png', testId: 'success-logo', type: 'image' }],
       },
     };
 
@@ -106,7 +113,7 @@ describe('ServiceProviderSuccessTemplate', () => {
     expect(img.exists()).toBe(true);
   });
 
-  test('renders text when testId is not "success-logo"', () => {
+  test('renders text when type is not image', () => {
     wrapper = mount(ServiceProviderSuccessTemplate, {
       attachTo: document.getElementById('app') || '',
       props: defaultProps,

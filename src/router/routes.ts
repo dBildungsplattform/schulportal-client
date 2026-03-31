@@ -1,5 +1,6 @@
 import { StepUpLevel } from '@/stores/AuthStore';
 import type { RouteRecordRaw } from 'vue-router';
+import type { AppRoute } from '.';
 
 const routes: readonly RouteRecordRaw[] = [
   {
@@ -316,6 +317,6 @@ const routes: readonly RouteRecordRaw[] = [
     name: 'no-second-factor',
     component: () => import('../views/NoSecondFactorView.vue'),
   },
-];
+] satisfies readonly AppRoute[];
 
 export default routes;
