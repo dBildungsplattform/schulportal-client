@@ -135,7 +135,7 @@
 
   const canCommit: ComputedRef<boolean> = computed(() => formContext.meta.value.valid);
 
-  const selectedOrganisationName: ComputedRef<string | undefined> = computed(() => selectedOrganisationNameCache.value);
+  const selectedOrganisationName: ComputedRef<string> = computed(() => selectedOrganisationNameCache.value || '');
 
   function openUrlInNewTab(): void {
     if (!url.value) {
@@ -255,17 +255,26 @@
         merkmale.push(ServiceProviderMerkmal.VerfuegbarFuerRollenerweiterung);
       }
 
+      // Normalize URL: add https:// if no protocol is present
+      let normalizedUrl: string = values.url.trim();
+      if (!/^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(normalizedUrl)) {
+        normalizedUrl = 'https://' + normalizedUrl;
+      }
+
       await serviceProviderStore.createServiceProvider({
         organisationId: values.selectedOrganisationId!,
         name: values.name,
-        url: values.url,
+        url: normalizedUrl,
         kategorie: values.kategorie,
         requires2fa: values.requires2fa,
         merkmale,
       });
 
       if (!serviceProviderStore.errorCode) {
-        successData.value = values;
+        successData.value = {
+          ...values,
+          url: normalizedUrl, // Show the normalized URL that was actually saved
+        };
         showSuccess.value = true;
         selectedOrganisationIdCache.value = values.selectedOrganisationId;
         selectedOrganisationNameCache.value = selectedOrganisationName.value;
