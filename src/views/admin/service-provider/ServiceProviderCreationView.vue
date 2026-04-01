@@ -448,7 +448,7 @@
             </v-row>
             <FormRow
               :error-label="logoProps['error']"
-              :is-required="true"
+              :is-required="false"
               label-for-id="logo-input"
               :label="$t('angebot.logo')"
             >
@@ -478,7 +478,7 @@
             </v-row>
             <FormRow
               :error-label="kategorieProps['error']"
-              :is-required="true"
+              :is-required="false"
               label-for-id="kategorie-select"
               :label="$t('angebot.kategorie')"
             >
