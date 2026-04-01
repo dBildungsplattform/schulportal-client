@@ -448,7 +448,7 @@
             </v-row>
             <FormRow
               :error-label="logoProps['error']"
-              :is-required="false"
+              :is-required="true"
               label-for-id="logo-input"
               :label="$t('angebot.logo')"
             >
