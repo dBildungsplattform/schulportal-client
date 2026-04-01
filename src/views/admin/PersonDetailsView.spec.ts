@@ -257,6 +257,7 @@ describe('PersonDetailsView', () => {
       rolleBearbeitenEnabled: true,
       rolleErweiternEnabled: true,
       setUemPasswordEnabled: true,
+      schulischeAngeboteErstellen: true,
     };
 
     document.body.innerHTML = `
@@ -1106,6 +1107,7 @@ describe('PersonDetailsView', () => {
         rolleBearbeitenEnabled: true,
         rolleErweiternEnabled: true,
         setUemPasswordEnabled: true,
+        schulischeAngeboteErstellen: true,
       };
       await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
       await nextTick();

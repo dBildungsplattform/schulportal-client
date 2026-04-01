@@ -326,12 +326,6 @@ export interface CreateServiceProviderBodyParams {
      * @type {string}
      * @memberof CreateServiceProviderBodyParams
      */
-    'target': CreateServiceProviderBodyParamsTargetEnum;
-    /**
-     * 
-     * @type {string}
-     * @memberof CreateServiceProviderBodyParams
-     */
     'url'?: string;
     /**
      * Optional logo as base64-encoded string
@@ -359,25 +353,12 @@ export interface CreateServiceProviderBodyParams {
     'requires2fa': boolean;
     /**
      * 
-     * @type {string}
-     * @memberof CreateServiceProviderBodyParams
-     */
-    'vidisAngebotId'?: string;
-    /**
-     * 
      * @type {Array<string>}
      * @memberof CreateServiceProviderBodyParams
      */
     'merkmale': Array<CreateServiceProviderBodyParamsMerkmaleEnum>;
 }
 
-export const CreateServiceProviderBodyParamsTargetEnum = {
-    Url: 'URL',
-    Email: 'EMAIL',
-    SchulportalAdministration: 'SCHULPORTAL_ADMINISTRATION'
-} as const;
-
-export type CreateServiceProviderBodyParamsTargetEnum = typeof CreateServiceProviderBodyParamsTargetEnum[keyof typeof CreateServiceProviderBodyParamsTargetEnum];
 export const CreateServiceProviderBodyParamsLogoMimeTypeEnum = {
     Png: 'image/png',
     Jpeg: 'image/jpeg',
@@ -1018,6 +999,12 @@ export interface FeatureFlagResponse {
      * @memberof FeatureFlagResponse
      */
     'setUemPasswordEnabled': boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof FeatureFlagResponse
+     */
+    'schulischeAngeboteErstellen': boolean;
 }
 /**
  * 
@@ -3441,7 +3428,8 @@ export const RollenSystemRechtEnum = {
     SchulportalVerwalten: 'SCHULPORTAL_VERWALTEN',
     HinweiseBearbeiten: 'HINWEISE_BEARBEITEN',
     RollenErweitern: 'ROLLEN_ERWEITERN',
-    AngeboteVerwalten: 'ANGEBOTE_VERWALTEN'
+    AngeboteVerwalten: 'ANGEBOTE_VERWALTEN',
+    AngeboteEingeschraenktVerwalten: 'ANGEBOTE_EINGESCHRAENKT_VERWALTEN'
 } as const;
 
 export type RollenSystemRechtEnum = typeof RollenSystemRechtEnum[keyof typeof RollenSystemRechtEnum];
