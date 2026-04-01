@@ -3188,6 +3188,66 @@
         "tags": ["provider"]
       }
     },
+    "/api/provider/{angebotId}": {
+      "patch": {
+        "description": "Update a service-provider (Angebot).",
+        "operationId": "ProviderController_updateServiceProvider",
+        "parameters": [
+          {
+            "name": "angebotId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateServiceProviderBodyParams"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The service-provider was successfully updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceProviderResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request body."
+          },
+          "401": {
+            "description": "Not authorized."
+          },
+          "403": {
+            "description": "Insufficient permissions."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "oauth2": ["openid"]
+          }
+        ],
+        "summary": "",
+        "tags": ["provider"]
+      }
+    },
     "/api/personenkontexte/{personenkontextId}": {
       "get": {
         "operationId": "PersonenkontextController_findPersonenkontextById",
@@ -6306,7 +6366,8 @@
           "SCHULPORTAL_VERWALTEN",
           "HINWEISE_BEARBEITEN",
           "ROLLEN_ERWEITERN",
-          "ANGEBOTE_VERWALTEN"
+          "ANGEBOTE_VERWALTEN",
+          "ANGEBOTE_EINGESCHRAENKT_VERWALTEN"
         ]
       },
       "OrganisationByIdBodyParams": {
@@ -6996,10 +7057,6 @@
           "name": {
             "type": "string"
           },
-          "target": {
-            "type": "string",
-            "enum": ["URL", "EMAIL", "SCHULPORTAL_ADMINISTRATION"]
-          },
           "url": {
             "type": "string"
           },
@@ -7019,9 +7076,6 @@
           "requires2fa": {
             "type": "boolean"
           },
-          "vidisAngebotId": {
-            "type": "string"
-          },
           "merkmale": {
             "type": "array",
             "items": {
@@ -7030,7 +7084,22 @@
             }
           }
         },
-        "required": ["organisationId", "name", "target", "kategorie", "requires2fa", "merkmale"]
+        "required": ["organisationId", "name", "kategorie", "requires2fa", "merkmale"]
+      },
+      "UpdateServiceProviderBodyParams": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "kategorie": {
+            "type": "string",
+            "enum": ["EMAIL", "UNTERRICHT", "VERWALTUNG", "SCHULISCH", "HINWEISE"]
+          }
+        }
       },
       "PersonResponseAutomapper": {
         "type": "object",
@@ -7682,13 +7751,17 @@
           },
           "setUemPasswordEnabled": {
             "type": "boolean"
+          },
+          "schulischeAngeboteErstellen": {
+            "type": "boolean"
           }
         },
         "required": [
           "rolleBearbeitenEnabled",
           "befristungBearbeitenEnabled",
           "rolleErweiternEnabled",
-          "setUemPasswordEnabled"
+          "setUemPasswordEnabled",
+          "schulischeAngeboteErstellen"
         ]
       },
       "MeldungResponse": {
