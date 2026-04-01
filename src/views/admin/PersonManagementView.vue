@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import ResultTable, { type TableItem, type TableRow, type Headers } from '@/components/admin/ResultTable.vue';
+  import ResultTable, { type Headers, type TableItem, type TableRow } from '@/components/admin/ResultTable.vue';
   import SearchField from '@/components/admin/SearchField.vue';
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
   import PersonBulkChangeKlasse from '@/components/admin/personen/PersonBulkChangeKlasse.vue';
@@ -30,8 +30,9 @@
   import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
   import { OperationType } from '@/stores/types/bulkOperationTypes';
   import { type TranslatedObject } from '@/types.d';
+  import { blurActiveElement } from '@/utils/focus';
   import { SortOrder } from '@/utils/sorting';
-  import { type ComputedRef, type Ref, computed, onMounted, ref, watch, type ComponentPublicInstance } from 'vue';
+  import { type ComponentPublicInstance, type ComputedRef, type Ref, computed, onMounted, ref, watch } from 'vue';
   import { type Composer, useI18n } from 'vue-i18n';
   import { type Router, useRouter } from 'vue-router';
 
@@ -579,6 +580,10 @@
     if (!newValue) {
       selectedPersonIds.value = [];
     }
+  });
+
+  watch(selectedStatus, () => {
+    blurActiveElement();
   });
 
   // Used for to show the number of klassen found in the filter
