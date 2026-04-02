@@ -21,6 +21,7 @@ describe('ConfigStore', () => {
         befristungBearbeitenEnabled: false,
         rolleErweiternEnabled: false,
         setUemPasswordEnabled: false,
+        schulischeAngeboteErstellen: false,
       };
 
       mockadapter.onGet('/api/config').replyOnce(200, mockFeatureFlags);

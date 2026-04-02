@@ -2,18 +2,24 @@ import axiosApiInstance from '@/services/ApiService';
 import { getResponseErrorCode } from '@/utils/errorHandlers';
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 
+import type { AxiosError } from 'axios';
 import {
+  DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInnerI18nKeyEnum,
   ProviderApiFactory,
   RolleApiFactory,
   ServiceProviderKategorie,
   ServiceProviderMerkmal,
   type ApplyRollenerweiterungBodyParams,
+  type CreateServiceProviderBodyParams,
+  type DbiamApplyRollenerweiterungMultiError,
+  type DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInner,
   type ManageableServiceProviderResponse,
   type ProviderApiInterface,
   type ProviderControllerFindRollenerweiterungenByServiceProviderId200Response,
   type ProviderControllerGetManageableServiceProviders200Response,
   type RolleApiInterface,
   type RollenerweiterungForManageableServiceProviderResponse,
+  type ServiceProviderResponse,
 } from '../api-client/generated/api';
 
 const serviceProviderApi: ProviderApiInterface = ProviderApiFactory(undefined, '', axiosApiInstance);
@@ -81,6 +87,24 @@ export type PersistRollenerweiterung = {
   removeErweiterungenForRolleIds: Array<string>;
 };
 
+export type ServiceProviderCreationFilter = {
+  organisationId: string;
+  name: string;
+  url: string;
+  kategorie: ServiceProviderKategorie;
+  requires2fa: boolean;
+  merkmale: Array<ServiceProviderMerkmal>;
+};
+
+export type CreatedServiceProvider = {
+  id: string;
+  name: string;
+  url: string;
+  kategorie: ServiceProviderKategorie;
+  requires2fa: boolean;
+  merkmale: Array<ServiceProviderMerkmal>;
+};
+
 type ServiceProviderState = {
   allServiceProviders: StartPageServiceProvider[];
   availableServiceProviders: StartPageServiceProvider[];
@@ -93,9 +117,36 @@ type ServiceProviderState = {
   rollenerweiterungen: ProviderControllerFindRollenerweiterungenByServiceProviderId200Response | null;
   // ready-to-display, grouped for the result table:
   rollenerweiterungenUebersicht: RollenErweiterungenUebersicht[];
+  createdServiceProvider: CreatedServiceProvider | null;
   errorCode: string;
   loading: boolean;
+  errors: Map<string, DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInnerI18nKeyEnum>;
 };
+
+function containsMultiError(error: unknown): error is AxiosError<DbiamApplyRollenerweiterungMultiError> {
+  const domainError: DbiamApplyRollenerweiterungMultiError | undefined = (error as AxiosError)?.response?.data as
+    | DbiamApplyRollenerweiterungMultiError
+    | undefined;
+  if (!domainError) {
+    return false;
+  }
+  if (typeof domainError !== 'object') {
+    return false;
+  }
+  if (!('code' in domainError)) {
+    return false;
+  }
+  if (!(typeof domainError.code === 'string' || typeof domainError.code === 'number')) {
+    return false;
+  }
+  if (!('rolleIdsWithI18nKeys' in domainError)) {
+    return false;
+  }
+  if (!Array.isArray(domainError.rolleIdsWithI18nKeys)) {
+    return false;
+  }
+  return true;
+}
 
 type ServiceProviderGetters = object;
 type ServiceProviderActions = {
@@ -111,6 +162,7 @@ type ServiceProviderActions = {
   getServiceProviderLogoById: (serviceProviderId: string) => Promise<void>;
   getRollenerweiterungenById: (filter: RollenerweiterungFilter) => Promise<void>;
   persistRollenerweiterungenForServiceProvider: (filter: PersistRollenerweiterung) => Promise<void>;
+  createServiceProvider: (filter: ServiceProviderCreationFilter) => Promise<void>;
 };
 
 export { ServiceProviderKategorie };
@@ -141,8 +193,10 @@ export const useServiceProviderStore: StoreDefinition<
       serviceProviderLogos: new Map<string, string>(),
       rollenerweiterungen: null,
       rollenerweiterungenUebersicht: [],
+      createdServiceProvider: null,
       errorCode: '',
       loading: false,
+      errors: new Map<string, DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInnerI18nKeyEnum>(),
     };
   },
   actions: {
@@ -315,6 +369,43 @@ export const useServiceProviderStore: StoreDefinition<
           filter.organisationId,
           bodyParams,
         );
+      } catch (error) {
+        if (containsMultiError(error)) {
+          this.errors = new Map<string, DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInnerI18nKeyEnum>(
+            error.response?.data.rolleIdsWithI18nKeys
+              .filter(
+                (
+                  item: DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInner,
+                ): item is Required<DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInner> =>
+                  item.rolleId !== undefined && item.i18nKey !== undefined,
+              )
+              .map((item: Required<DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInner>) => [
+                item.rolleId,
+                item.i18nKey,
+              ]),
+          );
+        } else {
+          this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+        }
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async createServiceProvider(filter: ServiceProviderCreationFilter): Promise<void> {
+      this.loading = true;
+      try {
+        const bodyParams: CreateServiceProviderBodyParams = {
+          organisationId: filter.organisationId,
+          name: filter.name,
+          url: filter.url,
+          kategorie: filter.kategorie,
+          requires2fa: filter.requires2fa,
+          merkmale: filter.merkmale,
+        };
+        const { data }: { data: ServiceProviderResponse } =
+          await serviceProviderApi.providerControllerCreateServiceProvider(bodyParams);
+        this.createdServiceProvider = data;
       } catch (error) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {

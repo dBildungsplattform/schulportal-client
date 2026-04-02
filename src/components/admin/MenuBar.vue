@@ -1,12 +1,15 @@
 <script setup lang="ts">
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+  import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
   import { onMounted, ref, type ComputedRef, type Ref } from 'vue';
   import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
   import { useDisplay } from 'vuetify';
 
   const router: Router = useRouter();
   const route: RouteLocationNormalizedLoaded = useRoute();
+
   const authStore: AuthStore = useAuthStore();
+  const configStore: ConfigStore = useConfigStore();
 
   const menuDrawer: Ref<boolean> = ref(true);
   const { mobile }: { mobile: ComputedRef<boolean> } = useDisplay();
@@ -233,7 +236,13 @@
     </div>
 
     <!-- Angebotsverwaltung -->
-    <div v-if="authStore.hasAngeboteVerwaltenPermission || authStore.hasRollenerweiternPermission">
+    <div
+      v-if="
+        authStore.hasAngeboteVerwaltenPermission ||
+        authStore.hasRollenerweiternPermission ||
+        authStore.hasEingeschränktAngeboteVerwaltenPermission
+      "
+    >
       <v-list-item
         class="menu-bar-main-item headline-2"
         data-testid="angebot-management-title"
@@ -256,6 +265,18 @@
         prepend-icon="mdi-format-list-bulleted"
         :title="$t('admin.angebot.showSchoolSpecific')"
         to="/admin/angebote/schulspezifisch"
+      ></v-list-item>
+      <v-list-item
+        v-if="
+          (authStore.hasAngeboteVerwaltenPermission || authStore.hasEingeschränktAngeboteVerwaltenPermission) &&
+          configStore.configData?.schulischeAngeboteErstellen
+        "
+        class="menu-bar-sub-item caption"
+        data-testid="angebot-creation-menu-item"
+        prepend-icon="mdi-plus-circle-outline"
+        :title="$t('angebot.createNew')"
+        to="/admin/angebote/new"
+        @click="closeMenuOnMobile"
       ></v-list-item>
     </div>
 
