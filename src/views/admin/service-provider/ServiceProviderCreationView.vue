@@ -1,18 +1,24 @@
 <script setup lang="ts">
+  import SchulPortalLogo from '@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg';
+  import SuccessTemplate from '@/components/admin/service-provider/SuccessTemplate.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SchulenFilter from '@/components/filter/SchulenFilter.vue';
   import FormRow from '@/components/form/FormRow.vue';
   import FormWrapper from '@/components/form/FormWrapper.vue';
+  import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+  import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
+  import { RollenSystemRecht } from '@/stores/RolleStore';
   import {
     ServiceProviderKategorie,
     ServiceProviderMerkmal,
     useServiceProviderStore,
     type ServiceProviderStore,
   } from '@/stores/ServiceProviderStore';
+  import { DIN_91379A_EXT, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
   import { toTypedSchema } from '@vee-validate/yup';
   import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
-  import { ref, computed, onMounted, onUnmounted, type Ref, type ComputedRef } from 'vue';
+  import { computed, onMounted, onUnmounted, ref, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import {
     onBeforeRouteLeave,
@@ -22,12 +28,6 @@
     type Router,
   } from 'vue-router';
   import { boolean, object, string } from 'yup';
-  import { DIN_91379A_EXT, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
-  import { RollenSystemRecht } from '@/stores/RolleStore';
-  import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
-  import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
-  import SchulPortalLogo from '@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg';
-  import SuccessTemplate from '@/components/admin/serviceProvider/SuccessTemplate.vue';
 
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
   const authStore: AuthStore = useAuthStore();

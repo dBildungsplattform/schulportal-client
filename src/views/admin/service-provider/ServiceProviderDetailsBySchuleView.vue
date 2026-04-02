@@ -13,7 +13,7 @@
   import RollenerweiterungAssignErrorDialog from '@/components/admin/service-provider/RollenerweiterungAssignErrorDialog.vue';
   import RollenerweiterungTreeview, {
     type RolleForSelection,
-  } from '@/components/admin/serviceProvider/RollenerweiterungTreeview.vue';
+  } from '@/components/admin/service-provider/RollenerweiterungTreeview.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
