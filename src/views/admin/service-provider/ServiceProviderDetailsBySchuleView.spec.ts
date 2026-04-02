@@ -69,10 +69,12 @@ beforeEach(async () => {
     DoFactory.getRolleWithServiceProviders({ rollenart: RollenArt.Lehr }),
     DoFactory.getRolleWithServiceProviders({ rollenart: RollenArt.Lern }),
   ];
+  vi.stubGlobal('window', Object.assign(window, { open: vi.fn(), scrollTo: vi.fn() }));
 });
 
 afterEach(() => {
   vi.clearAllTimers();
+  vi.unstubAllGlobals();
   wrapper?.unmount();
 });
 
