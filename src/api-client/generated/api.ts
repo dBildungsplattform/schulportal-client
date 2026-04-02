@@ -604,6 +604,53 @@ export interface DBiamPersonenzuordnungResponse {
 /**
  * 
  * @export
+ * @interface DbiamApplyRollenerweiterungMultiError
+ */
+export interface DbiamApplyRollenerweiterungMultiError {
+    /**
+     * Corresponds to HTTP Status code like 200, 404, 500
+     * @type {number}
+     * @memberof DbiamApplyRollenerweiterungMultiError
+     */
+    'code': number;
+    /**
+     * 
+     * @type {Array<DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInner>}
+     * @memberof DbiamApplyRollenerweiterungMultiError
+     */
+    'rolleIdsWithI18nKeys': Array<DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInner>;
+}
+/**
+ * 
+ * @export
+ * @interface DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInner
+ */
+export interface DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInner {
+    /**
+     * 
+     * @type {string}
+     * @memberof DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInner
+     */
+    'rolleId'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInner
+     */
+    'i18nKey'?: DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInnerI18nKeyEnum;
+}
+
+export const DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInnerI18nKeyEnum = {
+    RollenerweiterungTechnicalError: 'ROLLENERWEITERUNG_TECHNICAL_ERROR',
+    NotFound: 'NOT_FOUND',
+    NoRedundantRollenerweiterung: 'NO_REDUNDANT_ROLLENERWEITERUNG'
+} as const;
+
+export type DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInnerI18nKeyEnum = typeof DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInnerI18nKeyEnum[keyof typeof DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInnerI18nKeyEnum];
+
+/**
+ * 
+ * @export
  * @interface DbiamCreatePersonWithPersonenkontexteBodyParams
  */
 export interface DbiamCreatePersonWithPersonenkontexteBodyParams {

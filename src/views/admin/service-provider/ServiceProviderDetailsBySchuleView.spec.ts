@@ -1,20 +1,21 @@
+import type { RollenerweiterungWithExtendedDataResponse } from '@/api-client/generated';
+import type { RollenerweiterungAssignErrorDialogProps } from '@/components/admin/service-provider/types';
 import routes from '@/router/routes';
-import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
-import { createPinia, setActivePinia } from 'pinia';
-import { createRouter, createWebHistory, type Router } from 'vue-router';
-import ServiceProviderDetailsBySchuleView from './ServiceProviderDetailsBySchuleView.vue';
+import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+import { RollenArt, useRolleStore, type RolleStore } from '@/stores/RolleStore';
 import {
   ServiceProviderKategorie,
   useServiceProviderStore,
   type ManageableServiceProviderDetail,
   type ServiceProviderStore,
 } from '@/stores/ServiceProviderStore';
+import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
+import { createPinia, setActivePinia } from 'pinia';
 import { DoFactory } from 'test/DoFactory';
 import type { MockInstance } from 'vitest';
-import { nextTick, type Component } from 'vue';
-import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
-import type { RollenerweiterungWithExtendedDataResponse } from '@/api-client/generated';
-import { RollenArt, useRolleStore, type RolleStore } from '@/stores/RolleStore';
+import { nextTick, type Component, type ComponentPublicInstance } from 'vue';
+import { createRouter, createWebHistory, type Router } from 'vue-router';
+import ServiceProviderDetailsBySchuleView from './ServiceProviderDetailsBySchuleView.vue';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -68,10 +69,12 @@ beforeEach(async () => {
     DoFactory.getRolleWithServiceProviders({ rollenart: RollenArt.Lehr }),
     DoFactory.getRolleWithServiceProviders({ rollenart: RollenArt.Lern }),
   ];
+  vi.stubGlobal('window', Object.assign(window, { open: vi.fn(), scrollTo: vi.fn() }));
 });
 
 afterEach(() => {
   vi.clearAllTimers();
+  vi.unstubAllGlobals();
   wrapper?.unmount();
 });
 
@@ -204,6 +207,46 @@ describe('ServiceProviderDetailsBySchuleView', () => {
         .querySelector('[data-testid="close-rollenerweiterung-save-success-button"]')
         ?.dispatchEvent(new Event('click'));
       await nextTick();
+
+      expect(wrapper?.find('[data-testid="rollenerweiterung-bearbeiten-button"]').exists()).toBe(true);
+    });
+
+    test('displays multiple errors and closes the error dialog', async () => {
+      persistSpy.mockImplementationOnce(() => {
+        serviceProviderStore.errors.set('role-1', 'ROLLENERWEITERUNG_TECHNICAL_ERROR');
+        serviceProviderStore.errors.set('role-2', 'NOT_FOUND');
+      });
+
+      await openEditMode();
+      await wrapper?.find('[data-testid="rollenerweiterung-save-button"]').trigger('click');
+      await nextTick();
+
+      const errorDialog: VueWrapper<ComponentPublicInstance<RollenerweiterungAssignErrorDialogProps>> | undefined =
+        wrapper?.findComponent({ name: 'RollenerweiterungAssignErrorDialog' });
+      expect(errorDialog?.exists()).toBe(true);
+      expect(errorDialog?.props('isDialogVisible')).toBe(true);
+
+      const errorItems: NodeList = document.querySelectorAll('ol > li');
+      expect(errorItems.length).toBe(2);
+
+      const closeButton: HTMLElement | null = document.querySelector(
+        '[data-testid="rollenerweiterung-error-discard-button"]',
+      );
+      expect(closeButton).not.toBeNull();
+      closeButton?.dispatchEvent(new Event('click'));
+      await nextTick();
+      const confirmCloseButton: HTMLElement | null = document.querySelector(
+        '[data-testid="confirm-close-bulk-error-dialog-button"]',
+      );
+      expect(confirmCloseButton).not.toBeNull();
+      confirmCloseButton?.dispatchEvent(new Event('click'));
+      await nextTick();
+
+      // The dialog should be closed and errors cleared
+      expect(wrapper?.findComponent({ name: 'RollenerweiterungAssignErrorDialog' })?.props('isDialogVisible')).toBe(
+        false,
+      );
+      expect(serviceProviderStore.errors.size).toBe(0);
 
       expect(wrapper?.find('[data-testid="rollenerweiterung-bearbeiten-button"]').exists()).toBe(true);
     });

@@ -1,16 +1,21 @@
 <script setup lang="ts">
-  import {
-    ServiceProviderMerkmal,
-    useServiceProviderStore,
-    type ServiceProviderStore,
-  } from '@/stores/ServiceProviderStore';
+  import { computed, nextTick, onMounted, ref, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
-  import SpshAlert from '@/components/alert/SpshAlert.vue';
-  import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { computed, nextTick, onMounted, ref, type ComputedRef, type Ref } from 'vue';
+  import { useDisplay } from 'vuetify';
+
+  import {
+    DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInnerI18nKeyEnum,
+    RollenSystemRechtEnum,
+  } from '@/api-client/generated';
   import SchulPortalLogo from '@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg';
   import LabeledField from '@/components/admin/LabeledField.vue';
+  import RollenerweiterungAssignErrorDialog from '@/components/admin/service-provider/RollenerweiterungAssignErrorDialog.vue';
+  import RollenerweiterungTreeview, {
+    type RolleForSelection,
+  } from '@/components/admin/service-provider/RollenerweiterungTreeview.vue';
+  import SpshAlert from '@/components/alert/SpshAlert.vue';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
   import {
     RollenArt,
@@ -18,11 +23,11 @@
     type RolleStore,
     type RolleWithServiceProvidersResponse,
   } from '@/stores/RolleStore';
-  import RollenerweiterungTreeview, {
-    type RolleForSelection,
-  } from '@/components/admin/serviceProvider/RollenerweiterungTreeview.vue';
-  import { RollenSystemRechtEnum } from '@/api-client/generated';
-  import { useDisplay } from 'vuetify';
+  import {
+    ServiceProviderMerkmal,
+    useServiceProviderStore,
+    type ServiceProviderStore,
+  } from '@/stores/ServiceProviderStore';
 
   const router: Router = useRouter();
   const route: RouteLocationNormalizedLoaded = useRoute();
@@ -42,6 +47,7 @@
   const selectedRolleIds: Ref<string[]> = ref([]);
   const isSaving: Ref<boolean> = ref(false);
   const saveSuccessDialogVisible: Ref<boolean> = ref(false);
+  const saveFailureDialogVisible: Ref<boolean> = ref(false);
 
   function closeSaveSuccessDialog(): void {
     saveSuccessDialogVisible.value = false;
@@ -73,15 +79,42 @@
   });
 
   const errorTitle: ComputedRef<string> = computed(() => {
+    if (isEditingRollenerweiterungen.value && serviceProviderStore.errorCode !== '') {
+      return t('angebot.schulspezifischeErweiterungen.assignErrorTitle');
+    }
     return serviceProviderStore.errorCode === 'UNSPECIFIED_ERROR'
       ? t('angebot.loadingErrorTitle')
       : t(`angebot.title.${serviceProviderStore.errorCode}`);
   });
 
   const errorText: ComputedRef<string> = computed(() => {
+    if (isEditingRollenerweiterungen.value && serviceProviderStore.errorCode !== '') {
+      return t(
+        `angebot.schulspezifischeErweiterungen.assignErrorMessage.${serviceProviderStore.errorCode}`,
+        t('angebot.schulspezifischeErweiterungen.assignErrorMessage.500'),
+      );
+    }
     return serviceProviderStore.errorCode === 'UNSPECIFIED_ERROR'
       ? t('angebot.loadingErrorText')
       : t(`angebot.errors.${serviceProviderStore.errorCode}`);
+  });
+
+  const multipleErrors: ComputedRef<{ rolle: string; message: string }[]> = computed(() => {
+    const mappedRollen: Map<string, RolleWithServiceProvidersResponse> = new Map(
+      rolleStore.allRollen.map((r: RolleWithServiceProvidersResponse) => [r.id, r]),
+    );
+    return Array.from(serviceProviderStore.errors.entries()).map(
+      ([rolleId, code]: [string, DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInnerI18nKeyEnum]) => {
+        const rolle: RolleWithServiceProvidersResponse | undefined = mappedRollen.get(rolleId);
+        return {
+          rolle: rolle?.name ?? rolleId,
+          message: t(`angebot.schulspezifischeErweiterungen.assignErrorMessage.${code}`, {
+            rollenname: rolle?.name ?? rolleId,
+            dstNr: organisationStore.currentOrganisation?.kennung ?? '',
+          }),
+        };
+      },
+    );
   });
 
   const organisationIdFromQuery: ComputedRef<string | undefined> = computed(
@@ -172,19 +205,34 @@
 
     isSaving.value = false;
 
-    if (!serviceProviderStore.errorCode) {
+    if (!serviceProviderStore.errorCode && serviceProviderStore.errors.size === 0) {
       // Refresh rollenerweiterungen to reflect saved state
       await serviceProviderStore.getRollenerweiterungenById({
         serviceProviderId: currentServiceProviderId,
         organisationId: organisationIdFromQuery.value,
       });
       saveSuccessDialogVisible.value = true;
+    } else if (serviceProviderStore.errors.size > 0) {
+      saveFailureDialogVisible.value = true;
+    }
+  }
+
+  async function clearErrorVisibility(isVisible: boolean): Promise<void> {
+    if (!isVisible) {
+      saveFailureDialogVisible.value = false;
+      serviceProviderStore.errors.clear();
+      isEditingRollenerweiterungen.value = false;
+      await serviceProviderStore.getRollenerweiterungenById({
+        serviceProviderId: currentServiceProviderId,
+        organisationId: organisationIdFromQuery.value,
+      });
     }
   }
 
   // ── Lifecycle ─────────────────────────────────────────────────────────────
   onMounted(async () => {
     serviceProviderStore.errorCode = '';
+    serviceProviderStore.errors.clear();
     serviceProviderStore.serviceProviderLogos.clear();
 
     await Promise.all([
@@ -520,6 +568,14 @@
       </LayoutCard>
     </v-dialog>
   </div>
+  <!-- ── Save error dialog ──────────────────────────────────────────────── -->
+  <RollenerweiterungAssignErrorDialog
+    :isDialogVisible="saveFailureDialogVisible"
+    :dstNr="organisationStore.currentOrganisation?.kennung ?? ''"
+    :serviceProviderName="serviceProviderStore.currentServiceProvider?.name ?? ''"
+    :errors="multipleErrors"
+    @update:isDialogVisible="clearErrorVisibility"
+  />
 </template>
 
 <style scoped>
