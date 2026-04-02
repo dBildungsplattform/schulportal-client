@@ -236,6 +236,15 @@
     serviceProviderStore.errorCode = '';
   }
 
+  function handleDiscard(): void {
+    if (isFormDirty()) {
+      showUnsavedChangesDialog.value = true;
+      blockedNext = navigateToServiceProviderTable;
+    } else {
+      navigateToServiceProviderTable();
+    }
+  }
+
   function preventNavigation(event: BeforeUnloadEvent): void {
     if (!isFormDirty()) {
       return;
@@ -273,6 +282,7 @@
         showSuccess.value = true;
         selectedOrganisationIdCache.value = values.selectedOrganisationId;
         selectedOrganisationNameCache.value = selectedOrganisationName.value;
+        formContext.resetForm();
       }
     },
   );
@@ -324,7 +334,7 @@
           :discard-button-label="$t('angebot.discard')"
           :hide-actions="!!serviceProviderStore.errorCode"
           :is-loading="serviceProviderStore.loading"
-          :on-discard="navigateToServiceProviderTable"
+          :on-discard="handleDiscard"
           :on-submit="onSubmit"
           :show-unsaved-changes-dialog="showUnsavedChangesDialog"
           @on-show-dialog-change="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
