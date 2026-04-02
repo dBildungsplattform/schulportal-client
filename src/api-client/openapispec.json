@@ -2692,8 +2692,25 @@
           "204": {
             "description": "Changes applied successfully."
           },
+          "404": {
+            "description": "One or more of the specified objects were not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DbiamApplyRollenerweiterungMultiError"
+                }
+              }
+            }
+          },
           "500": {
-            "description": "Internal server error"
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DbiamApplyRollenerweiterungMultiError"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -6850,6 +6867,32 @@
           }
         },
         "required": ["addErweiterungenForRolleIds", "removeErweiterungenForRolleIds"]
+      },
+      "DbiamApplyRollenerweiterungMultiError": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "number",
+            "description": "Corresponds to HTTP Status code like 200, 404, 500"
+          },
+          "rolleIdsWithI18nKeys": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "rolleId": {
+                  "type": "string"
+                },
+                "i18nKey": {
+                  "type": "string",
+                  "enum": ["ROLLENERWEITERUNG_TECHNICAL_ERROR", "NOT_FOUND", "NO_REDUNDANT_ROLLENERWEITERUNG"]
+                }
+              },
+              "required": []
+            }
+          }
+        },
+        "required": ["code", "rolleIdsWithI18nKeys"]
       },
       "RollenerweiterungWithExtendedDataResponse": {
         "type": "object",
