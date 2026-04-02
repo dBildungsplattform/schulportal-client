@@ -53,6 +53,24 @@
     "title": {
       "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Zwei-Faktor-Authentifizierung (2FA) erforderlich"
     },
+    "schulspezifischeErweiterungen": {
+      "assignErrorTitle": "Fehler beim Speichern der Rollenerweiterungen",
+      "assignErrorIntroText": "Die Rollenerweiterung konnte für die folgenden Rollen nicht ausgeführt werden. \n\nSie können sich die Liste für eine spätere Bearbeitung abspeichern. Die Daten stehen nach dem Schließen dieses Dialogs nicht mehr zur Verfügung. Sollten Sie Hilfe benötigen, eröffnen Sie ein Störungsticket über den IQSH-Helpdesk und fügen Sie die Liste als Anhang an.",
+      "assignErrorMessage": {
+        "ROLLENERWEITERUNG_TECHNICAL_ERROR": "Beim Speichern der Erweiterung für die Rolle {rollenname} ist leider ein technischer Fehler aufgetreten. Bitte wiederholen Sie die Zuordnung.",
+        "NOT_FOUND": "Die gewählte Rolle {rollenname} ist an der Schule {dstNr} nicht verfügbar. Die Erweiterung wurde nicht gespeichert.",
+        "NO_REDUNDANT_ROLLENERWEITERUNG": "Das Angebot ist der Rolle {rollenname} bereits direkt zugeordnet und kann daher nicht zusätzlich als Rollenerweiterung festgelegt werden. Die Erweiterung wurde nicht gespeichert.",
+        "400": "Für dieses Angebot sind Rollenerweiterungen generell nicht erlaubt. Die Erweiterungen wurden nicht gespeichert.",
+        "403": "Sie verfügen nicht über die nötigen Berechtigungen, um diese Aktion auszuführen. Die Erweiterungen wurden nicht gespeichert.",
+        "500": "Beim Speichern ist ein technischer Fehler aufgetreten. Bitte führen Sie die Aktion zu einem späteren Zeitpunkt erneut aus.",
+        "MISSING_MERKMAL_VERFUEGBAR_FUER_ROLLENERWEITERUNG_ERROR": "Für dieses Angebot sind Rollenerweiterungen generell nicht erlaubt. Die Erweiterungen wurden nicht gespeichert.",
+        "MISSING_PERMISSIONS": "Sie verfügen nicht über die nötigen Berechtigungen, um diese Aktion auszuführen. Die Erweiterungen wurden nicht gespeichert."
+      },
+      "closeConfirmationMessage": "Bevor Sie den Dialog schließen, stellen Sie bitte sicher, dass Sie die Liste der Fehlermeldungen gespeichert haben. Die Daten stehen nach dem Schließen dieses Dialogs nicht mehr zur Verfügung.",
+      "errorCsvIntroText": "Bei der Erstellung der schulspezifischen Rollenerweiterungen sind folgende Fehler aufgetreten:",
+      "saveList": "Liste speichern",
+      "closeList": "Liste schließen"
+    },
     "errors": {
       "400": "Die Anfrage für das Angebot ist ungültig.",
       "VALIDATION_ERROR": "Die Anfrage für das Angebot ist ungültig.",
@@ -68,22 +86,22 @@
       "DUPLICATE_NAME": "Der Angebotsname ist bereits vergeben. Bitte korrigieren Sie Ihre Eingabe."
     },
     "rules": {
-        "organisation": {
-          "required": "Die Ebene der Bereitstellung muss ausgewählt werden."
-        },
-        "name": {
-          "matches": "Der Name darf keine ungültigen Zeichen beinhalten.",
-          "noLeadingTrailingSpaces": "Der Name darf nicht mit Leerzeichen beginnen oder enden.",
-          "maxLength": "Der Name darf maximal 50 Zeichen lang sein.",
-          "required": "Der Name des Angebots muss angegeben werden."
-        },
-        "url": {
-          "invalid": "Die URL muss eine gültige URL sein.",
-          "required": "Die URL des Angebots muss angegeben werden."
-        },
-        "kategorie": {
-          "required": "Die Kategorie muss ausgewählt werden."
-        }
+      "organisation": {
+        "required": "Die Ebene der Bereitstellung muss ausgewählt werden."
+      },
+      "name": {
+        "matches": "Der Name darf keine ungültigen Zeichen beinhalten.",
+        "noLeadingTrailingSpaces": "Der Name darf nicht mit Leerzeichen beginnen oder enden.",
+        "maxLength": "Der Name darf maximal 50 Zeichen lang sein.",
+        "required": "Der Name des Angebots muss angegeben werden."
+      },
+      "url": {
+        "invalid": "Die URL muss eine gültige URL sein.",
+        "required": "Die URL des Angebots muss angegeben werden."
+      },
+      "kategorie": {
+        "required": "Die Kategorie muss ausgewählt werden."
+      }
     },
     "loadingErrorText": "Es konnten keine Angebotdaten geladen werden.",
     "loadingErrorTitle": "Fehler beim Laden des Angebots",

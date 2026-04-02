@@ -1,18 +1,24 @@
 <script setup lang="ts">
+  import SchulPortalLogo from '@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg';
+  import SuccessTemplate from '@/components/admin/service-provider/SuccessTemplate.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SchulenFilter from '@/components/filter/SchulenFilter.vue';
   import FormRow from '@/components/form/FormRow.vue';
   import FormWrapper from '@/components/form/FormWrapper.vue';
+  import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+  import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
+  import { RollenSystemRecht } from '@/stores/RolleStore';
   import {
     ServiceProviderKategorie,
     ServiceProviderMerkmal,
     useServiceProviderStore,
     type ServiceProviderStore,
   } from '@/stores/ServiceProviderStore';
+  import { DIN_91379A_EXT, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
   import { toTypedSchema } from '@vee-validate/yup';
   import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
-  import { ref, computed, onMounted, onUnmounted, type Ref, type ComputedRef } from 'vue';
+  import { computed, onMounted, onUnmounted, ref, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import {
     onBeforeRouteLeave,
@@ -22,12 +28,6 @@
     type Router,
   } from 'vue-router';
   import { boolean, object, string } from 'yup';
-  import { DIN_91379A_EXT, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
-  import { RollenSystemRecht } from '@/stores/RolleStore';
-  import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
-  import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
-  import SchulPortalLogo from '@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg';
-  import SuccessTemplate from '@/components/admin/serviceProvider/SuccessTemplate.vue';
 
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
   const authStore: AuthStore = useAuthStore();
@@ -236,6 +236,15 @@
     serviceProviderStore.errorCode = '';
   }
 
+  function handleDiscard(): void {
+    if (isFormDirty()) {
+      showUnsavedChangesDialog.value = true;
+      blockedNext = navigateToServiceProviderTable;
+    } else {
+      navigateToServiceProviderTable();
+    }
+  }
+
   function preventNavigation(event: BeforeUnloadEvent): void {
     if (!isFormDirty()) {
       return;
@@ -273,6 +282,7 @@
         showSuccess.value = true;
         selectedOrganisationIdCache.value = values.selectedOrganisationId;
         selectedOrganisationNameCache.value = selectedOrganisationName.value;
+        formContext.resetForm();
       }
     },
   );
@@ -324,7 +334,7 @@
           :discard-button-label="$t('angebot.discard')"
           :hide-actions="!!serviceProviderStore.errorCode"
           :is-loading="serviceProviderStore.loading"
-          :on-discard="navigateToServiceProviderTable"
+          :on-discard="handleDiscard"
           :on-submit="onSubmit"
           :show-unsaved-changes-dialog="showUnsavedChangesDialog"
           @on-show-dialog-change="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
