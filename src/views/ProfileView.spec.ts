@@ -333,7 +333,7 @@ describe('ProfileView', () => {
         rolleBearbeitenEnabled: true,
         rolleErweiternEnabled: true,
         setUemPasswordEnabled: false,
-        schulischeAngeboteErstellen: false,
+        schulischeAngeboteErstellen: true,
       };
       await nextTick();
       if (!wrapper) {
@@ -354,7 +354,7 @@ describe('ProfileView', () => {
         rolleBearbeitenEnabled: true,
         rolleErweiternEnabled: true,
         setUemPasswordEnabled: true,
-        schulischeAngeboteErstellen: false,
+        schulischeAngeboteErstellen: true,
       };
       await nextTick();
       if (!wrapper) {

@@ -1,14 +1,32 @@
 {
   "angebot": {
+    "angebotAddedSuccessfully": "Das Angebot {name} wurde erfolgreich hinzugefügt. \n\nBitte wählen Sie nun die Rollen aus, die auf das Angebot zugreifen sollen.",
+    "angebotCreateErrorTitle": "Fehler beim Anlegen des Angebots",
+    "addNew": "Neues Angebot hinzufügen",
     "allServiceProviders": "Alle Angebote",
     "assignedRollen": "Zugeordnete Rollen",
+    "backToCreateAngebot": "Zurück zur Angebotsanlage",
+    "discard": "Angebot verwerfen",
+    "enterName": "Name eingeben",
+    "enterUrl": "URL eingeben",
+    "selectKategorie": "Kategorie auswählen",
+    "createNew": "Neues Angebot anlegen",
+    "createAnother": "Weiteres Angebot anlegen",
+    "create": "Angebot anlegen",
     "erweiterteRollen": "Erweiterte Rollen",
     "erweiterteRollenAnDerSchule": "Erweiterte Rollen an der Schule",
     "groupLehr": "Lehrkräfte",
     "groupLern": "Schüler",
     "groupLeit": "Administratoren",
     "name": "Name",
+    "nameOfAngebotInTheStartPage": "Name des Angebots auf der Startseite der Anwender",
+    "url": "URL",
+    "urlOfTheAngebot": "URL des Angebots",
+    "logoOfTheAngebotInTheStartPage": "Logo des Angebots auf der Startseite der Anwender",
+    "logo": "Logo",
+    "enterLogoUrl": "Logo-URL eingeben",
     "kategorie": "Kategorie",
+    "kategorieOfTheAngebotInTheStartPage": "Kategorie des Angebots auf der Startseite der Anwender",
     "administrationsebene": "Administrationsebene",
     "rollen": "Rollen",
     "schulspezifischErweitert": "Schulspezifisch erweitert",
@@ -16,8 +34,14 @@
     "showSchulspezifischeRollenerweiterungen": "Schulspezifische Rollenerweiterungen anzeigen",
     "notForSchulspezifischeRollenerweiterungenAvailable": "Dieses Angebot kann nicht für schulspezifische Rollenerweiterungen verwendet werden. In diesem Bereich werden daher keine Daten und Funktionen angeboten.",
     "canBeAssignedToRollen": "Darf Rollen hinzugefügt werden",
+    "canThisAngebotBeAssignedToRollen": "Darf dieses Angebot Rollen zugewiesen werden?",
+    "canThisAngebotBeUsedForSchulspezifischeRollenerweiterungen": "Darf dieses Angebot für schulspezifische Rollenerweiterungen genutzt werden?",
+    "is2FARequired": "Ist zur Nutzung eine Zwei-Faktor-Authentifizierung erforderlich?",
+    "canBeAssigned": "Darf zugewiesen werden",
+    "canBeUsed": "Darf genutzt werden",
+    "toServiceProviderDetails": "Zur Rollenauswahl",
+    "testUrl": "URL testen",
     "link": "Link",
-    "logo": "Logo",
     "requires2FA": "2FA erforderlich",
     "kategorien": {
       "EMAIL": "Dienstliche Email",
@@ -58,7 +82,26 @@
       "ENTITY_NOT_FOUND": "Das Angebot konnte nicht gefunden werden.",
       "500": "Es ist ein technischer Fehler aufgetreten.",
       "INTERNAL": "Es ist ein technischer Fehler aufgetreten.",
-      "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Die letzte Aktion konnte nicht ausgeführt werden. Aufgrund von längerer Inaktivität ist eine erneute Authentifizierung mit einem zweiten Faktor erforderlich. Um fortzufahren, klicken Sie bitte auf „Zurück zur Ergebnisliste“ oder „Schließen“. Sie werden anschließend zur Eingabe Ihres zweiten Faktors aufgefordert."
+      "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Die letzte Aktion konnte nicht ausgeführt werden. Aufgrund von längerer Inaktivität ist eine erneute Authentifizierung mit einem zweiten Faktor erforderlich. Um fortzufahren, klicken Sie bitte auf „Zurück zur Ergebnisliste“ oder „Schließen“. Sie werden anschließend zur Eingabe Ihres zweiten Faktors aufgefordert.",
+      "DUPLICATE_NAME": "Der Angebotsname ist bereits vergeben. Bitte korrigieren Sie Ihre Eingabe."
+    },
+    "rules": {
+      "organisation": {
+        "required": "Die Ebene der Bereitstellung muss ausgewählt werden."
+      },
+      "name": {
+        "matches": "Der Name darf keine ungültigen Zeichen beinhalten.",
+        "noLeadingTrailingSpaces": "Der Name darf nicht mit Leerzeichen beginnen oder enden.",
+        "maxLength": "Der Name darf maximal 50 Zeichen lang sein.",
+        "required": "Der Name des Angebots muss angegeben werden."
+      },
+      "url": {
+        "invalid": "Die URL muss eine gültige URL sein.",
+        "required": "Die URL des Angebots muss angegeben werden."
+      },
+      "kategorie": {
+        "required": "Die Kategorie muss ausgewählt werden."
+      }
     },
     "loadingErrorText": "Es konnten keine Angebotdaten geladen werden.",
     "loadingErrorTitle": "Fehler beim Laden des Angebots",
@@ -67,7 +110,8 @@
     "providedBy": "Bereitgestellt von",
     "noRolesFound": "Es konnten keine Rollen gefunden werden.",
     "saveRollenerweiterungenSuccess": "Die Rollenerweiterungen wurden erfolgreich gespeichert.",
-    "editRollenerweiterungen": "Rollenauswahl bearbeiten"
+    "editRollenerweiterungen": "Rollenauswahl bearbeiten",
+    "whoProvidesThisAngebot": "Wer stellt dieses Angebot bereit?"
   },
   "action": "Aktion",
   "admin": {
@@ -559,7 +603,8 @@
           "LANDESBEDIENSTETE_SUCHEN_UND_HINZUFUEGEN": "Darf Landesbedienstete suchen und hinzufügen",
           "EINGESCHRAENKT_NEUE_BENUTZER_ERSTELLEN": "Darf eingeschränkt neue Benutzer erstellen",
           "ROLLEN_ERWEITERN": "Darf Rollen schulspezifisch erweitern",
-          "ANGEBOTE_VERWALTEN": "Darf Angebote verwalten"
+          "ANGEBOTE_VERWALTEN": "Darf Angebote verwalten",
+          "ANGEBOTE_EINGESCHRAENKT_VERWALTEN": "Darf Angebote eingeschränkt verwalten"
         },
         "rollenarten": {
           "LERN": "Lern",

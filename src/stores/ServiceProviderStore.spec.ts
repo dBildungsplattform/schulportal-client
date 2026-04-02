@@ -2,18 +2,23 @@ import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
 import { createPinia, setActivePinia } from 'pinia';
 
-import type {
-  ProviderControllerFindRollenerweiterungenByServiceProviderId200Response,
-  ProviderControllerGetManageableServiceProviders200Response,
-  RollenerweiterungWithExtendedDataResponse,
+import {
+  ServiceProviderTarget,
+  type ProviderControllerFindRollenerweiterungenByServiceProviderId200Response,
+  type ProviderControllerGetManageableServiceProviders200Response,
+  type RollenerweiterungWithExtendedDataResponse,
+  type ServiceProviderResponse,
 } from '@/api-client/generated';
 import { faker } from '@faker-js/faker';
 import { DoFactory } from 'test/DoFactory';
 import {
+  ServiceProviderKategorie,
+  ServiceProviderMerkmal,
   useServiceProviderStore,
   type ManageableServiceProviderDetail,
   type PersistRollenerweiterung,
   type RollenErweiterungenUebersicht,
+  type ServiceProviderCreationFilter,
   type ServiceProviderStore,
   type StartPageServiceProvider,
 } from './ServiceProviderStore';
@@ -566,6 +571,57 @@ describe('serviceProviderStore', () => {
       await promise;
       expect(serviceProviderStore.errorCode).toBe('UNSPECIFIED_ERROR');
       expect(serviceProviderStore.errors.size).toBe(0);
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+  });
+
+  describe('createServiceProvider', () => {
+    const filter: ServiceProviderCreationFilter = {
+      organisationId: faker.string.uuid(),
+      name: 'Test Service Provider',
+      url: faker.internet.url(),
+      kategorie: ServiceProviderKategorie.Email,
+      requires2fa: true,
+      merkmale: [ServiceProviderMerkmal.NachtraeglichZuweisbar, ServiceProviderMerkmal.VerfuegbarFuerRollenerweiterung],
+    };
+    const url: string = '/api/provider';
+
+    it('should create a service provider and update state', async () => {
+      const mockResponse: ServiceProviderResponse = {
+        id: faker.string.uuid(),
+        name: filter.name,
+        url: filter.url,
+        target: ServiceProviderTarget.Url,
+        hasLogo: false,
+        kategorie: filter.kategorie,
+        requires2fa: filter.requires2fa,
+        merkmale: filter.merkmale,
+      };
+
+      mockadapter.onPost(url).replyOnce(200, mockResponse);
+      const promise: Promise<void> = serviceProviderStore.createServiceProvider(filter);
+      expect(serviceProviderStore.loading).toBe(true);
+      await promise;
+      expect(serviceProviderStore.createdServiceProvider).toEqual(mockResponse);
+      expect(serviceProviderStore.errorCode).toEqual('');
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+
+    it('should handle string error', async () => {
+      mockadapter.onPost(url).replyOnce(500, 'some mock server error');
+      const promise: Promise<void> = serviceProviderStore.createServiceProvider(filter);
+      expect(serviceProviderStore.loading).toBe(true);
+      await promise;
+      expect(serviceProviderStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+
+    it('should handle error code', async () => {
+      mockadapter.onPost(url).replyOnce(500, { code: 'some mock server error' });
+      const promise: Promise<void> = serviceProviderStore.createServiceProvider(filter);
+      expect(serviceProviderStore.loading).toBe(true);
+      await promise;
+      expect(serviceProviderStore.errorCode).toEqual('some mock server error');
       expect(serviceProviderStore.loading).toBe(false);
     });
   });

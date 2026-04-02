@@ -1,5 +1,6 @@
 import { StepUpLevel } from '@/stores/AuthStore';
 import type { RouteRecordRaw } from 'vue-router';
+import type { AppRoute } from '.';
 
 const routes: readonly RouteRecordRaw[] = [
   {
@@ -203,6 +204,19 @@ const routes: readonly RouteRecordRaw[] = [
     },
   },
   {
+    path: '/admin/angebote/new',
+    name: 'create-angebot',
+    component: () => import('../views/admin/service-provider/ServiceProviderCreationView.vue'),
+    meta: {
+      layout: 'AdminLayout',
+      requiresAuth: true,
+      requiredStepUpLevel: StepUpLevel.GOLD,
+      requiresPermission: ['angebotsverwaltung', 'eingeschränktangebotsverwaltung'],
+      permissionMode: 'any',
+      requiresFeatureFlag: 'schulischeAngeboteErstellen',
+    },
+  },
+  {
     path: '/admin/schulen/new',
     name: 'create-schule',
     component: () => import('../views/admin/organisationen/SchuleCreationView.vue'),
@@ -303,6 +317,6 @@ const routes: readonly RouteRecordRaw[] = [
     name: 'no-second-factor',
     component: () => import('../views/NoSecondFactorView.vue'),
   },
-];
+] satisfies readonly AppRoute[];
 
 export default routes;
