@@ -1785,6 +1785,37 @@
         "tags": ["provider"]
       }
     },
+    "/api/provider/{angebotId}": {
+      "delete": {
+        "description": "Delete a service-provider (Angebot) by id.",
+        "operationId": "ProviderController_deleteServiceProvider",
+        "parameters": [
+          {
+            "name": "angebotId",
+            "required": true,
+            "in": "path",
+            "description": "The id of the service provider",
+            "schema": { "nullable": false, "type": "string" }
+          }
+        ],
+        "responses": {
+          "204": { "description": "The service-provider was successfully deleted." },
+          "400": {
+            "description": "The input was not valid.",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/DbiamServiceProviderError" } }
+            }
+          },
+          "401": { "description": "Not authorized." },
+          "403": { "description": "Insufficient permissions." },
+          "404": { "description": "The service-provider does not exist." },
+          "500": { "description": "Internal server error." }
+        },
+        "security": [{ "bearer": [] }, { "oauth2": ["openid"] }],
+        "summary": "",
+        "tags": ["provider"]
+      }
+    },
     "/api/personenkontexte/{personenkontextId}": {
       "get": {
         "operationId": "PersonenkontextController_findPersonenkontextById",
@@ -3806,7 +3837,8 @@
             "type": "array",
             "items": { "$ref": "#/components/schemas/RollenerweiterungForManageableServiceProviderResponse" }
           },
-          "rollen": { "type": "array", "items": { "$ref": "#/components/schemas/RolleRefResponse" } }
+          "rollen": { "type": "array", "items": { "$ref": "#/components/schemas/RolleRefResponse" } },
+          "isDeleteAuthorized": { "type": "boolean" }
         },
         "required": [
           "id",
@@ -3816,7 +3848,8 @@
           "requires2fa",
           "merkmale",
           "rollenerweiterungen",
-          "rollen"
+          "rollen",
+          "isDeleteAuthorized"
         ]
       },
       "ManageableServiceProviderResponse": {
@@ -3869,6 +3902,17 @@
           }
         },
         "required": ["organisationId", "name", "kategorie", "requires2fa", "merkmale"]
+      },
+      "DbiamServiceProviderError": {
+        "type": "object",
+        "properties": {
+          "i18nKey": {
+            "type": "string",
+            "enum": ["SERVICE_PROVIDER_ERROR", "DUPLICATE_NAME", "ATTACHED_ROLLEN", "ATTACHED_ROLLENERWEITERUNGEN"]
+          },
+          "code": { "type": "number", "description": "Corresponds to HTTP Status code like 200, 404, 500" }
+        },
+        "required": ["i18nKey", "code"]
       },
       "PersonResponseAutomapper": {
         "type": "object",

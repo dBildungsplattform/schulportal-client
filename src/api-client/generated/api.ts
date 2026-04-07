@@ -962,6 +962,35 @@ export type DbiamRolleErrorI18nKeyEnum = typeof DbiamRolleErrorI18nKeyEnum[keyof
 /**
  * 
  * @export
+ * @interface DbiamServiceProviderError
+ */
+export interface DbiamServiceProviderError {
+    /**
+     * 
+     * @type {string}
+     * @memberof DbiamServiceProviderError
+     */
+    'i18nKey': DbiamServiceProviderErrorI18nKeyEnum;
+    /**
+     * Corresponds to HTTP Status code like 200, 404, 500
+     * @type {number}
+     * @memberof DbiamServiceProviderError
+     */
+    'code': number;
+}
+
+export const DbiamServiceProviderErrorI18nKeyEnum = {
+    ServiceProviderError: 'SERVICE_PROVIDER_ERROR',
+    DuplicateName: 'DUPLICATE_NAME',
+    AttachedRollen: 'ATTACHED_ROLLEN',
+    AttachedRollenerweiterungen: 'ATTACHED_ROLLENERWEITERUNGEN'
+} as const;
+
+export type DbiamServiceProviderErrorI18nKeyEnum = typeof DbiamServiceProviderErrorI18nKeyEnum[keyof typeof DbiamServiceProviderErrorI18nKeyEnum];
+
+/**
+ * 
+ * @export
  * @interface DbiamUpdatePersonenkontexteBodyParams
  */
 export interface DbiamUpdatePersonenkontexteBodyParams {
@@ -1514,6 +1543,12 @@ export interface ManageableServiceProviderListEntryResponse {
      * @memberof ManageableServiceProviderListEntryResponse
      */
     'rollen': Array<RolleRefResponse>;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof ManageableServiceProviderListEntryResponse
+     */
+    'isDeleteAuthorized': boolean;
 }
 
 
@@ -11502,6 +11537,48 @@ export const ProviderApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
+         * Delete a service-provider (Angebot) by id.
+         * @summary 
+         * @param {string} angebotId The id of the service provider
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        providerControllerDeleteServiceProvider: async (angebotId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'angebotId' is not null or undefined
+            assertParamExists('providerControllerDeleteServiceProvider', 'angebotId', angebotId)
+            const localVarPath = `/api/provider/{angebotId}`
+                .replace(`{${"angebotId"}}`, encodeURIComponent(String(angebotId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Get rollenerweiterungen for service-provider with provided id. Total is the amount of organisations.
          * @summary 
          * @param {string} angebotId The id of the service provider
@@ -11842,6 +11919,17 @@ export const ProviderApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * Delete a service-provider (Angebot) by id.
+         * @summary 
+         * @param {string} angebotId The id of the service provider
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async providerControllerDeleteServiceProvider(angebotId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.providerControllerDeleteServiceProvider(angebotId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * Get rollenerweiterungen for service-provider with provided id. Total is the amount of organisations.
          * @summary 
          * @param {string} angebotId The id of the service provider
@@ -11942,6 +12030,16 @@ export const ProviderApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.providerControllerCreateServiceProvider(createServiceProviderBodyParams, options).then((request) => request(axios, basePath));
         },
         /**
+         * Delete a service-provider (Angebot) by id.
+         * @summary 
+         * @param {string} angebotId The id of the service provider
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        providerControllerDeleteServiceProvider(angebotId: string, options?: any): AxiosPromise<void> {
+            return localVarFp.providerControllerDeleteServiceProvider(angebotId, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Get rollenerweiterungen for service-provider with provided id. Total is the amount of organisations.
          * @summary 
          * @param {string} angebotId The id of the service provider
@@ -12032,6 +12130,16 @@ export interface ProviderApiInterface {
      * @memberof ProviderApiInterface
      */
     providerControllerCreateServiceProvider(createServiceProviderBodyParams: CreateServiceProviderBodyParams, options?: AxiosRequestConfig): AxiosPromise<ServiceProviderResponse>;
+
+    /**
+     * Delete a service-provider (Angebot) by id.
+     * @summary 
+     * @param {string} angebotId The id of the service provider
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProviderApiInterface
+     */
+    providerControllerDeleteServiceProvider(angebotId: string, options?: AxiosRequestConfig): AxiosPromise<void>;
 
     /**
      * Get rollenerweiterungen for service-provider with provided id. Total is the amount of organisations.
@@ -12125,6 +12233,18 @@ export class ProviderApi extends BaseAPI implements ProviderApiInterface {
      */
     public providerControllerCreateServiceProvider(createServiceProviderBodyParams: CreateServiceProviderBodyParams, options?: AxiosRequestConfig) {
         return ProviderApiFp(this.configuration).providerControllerCreateServiceProvider(createServiceProviderBodyParams, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Delete a service-provider (Angebot) by id.
+     * @summary 
+     * @param {string} angebotId The id of the service provider
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProviderApi
+     */
+    public providerControllerDeleteServiceProvider(angebotId: string, options?: AxiosRequestConfig) {
+        return ProviderApiFp(this.configuration).providerControllerDeleteServiceProvider(angebotId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

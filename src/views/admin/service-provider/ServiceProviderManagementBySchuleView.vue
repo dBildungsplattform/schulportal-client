@@ -2,8 +2,14 @@
   import { computed, onMounted, ref, watch, watchEffect, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
 
+  import type { RollenerweiterungForManageableServiceProviderResponse } from '@/api-client/generated';
   import ResultTable, { type Headers, type TableRow } from '@/components/admin/ResultTable.vue';
+  import ServiceProviderDelete from '@/components/admin/service-provider/ServiceProviderDelete.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import SchulenFilter from '@/components/filter/SchulenFilter.vue';
+  import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
+  import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+  import { RollenSystemRecht } from '@/stores/RolleStore';
   import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
   import {
     useServiceProviderStore,
@@ -11,9 +17,7 @@
     type ServiceProviderStore,
   } from '@/stores/ServiceProviderStore';
   import { getDisplayNameForOrg } from '@/utils/formatting';
-  import SchulenFilter from '@/components/filter/SchulenFilter.vue';
-  import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
-  import { RollenSystemRecht } from '@/stores/RolleStore';
+  import { SortOrder } from '@/utils/sorting';
   import {
     onBeforeRouteLeave,
     useRoute,
@@ -22,9 +26,6 @@
     type RouteLocationNormalizedLoaded,
     type Router,
   } from 'vue-router';
-  import { SortOrder } from '@/utils/sorting';
-  import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
-  import type { RollenerweiterungForManageableServiceProviderResponse } from '@/api-client/generated';
 
   type ServiceProviderRow = {
     id: string;
@@ -55,6 +56,13 @@
     { title: t('angebot.name'), key: 'name', align: 'start', sortable: false },
     { title: t('angebot.providedBy'), key: 'administrationsebene', align: 'start', sortable: false },
     { title: t('angebot.erweiterteRollenAnDerSchule'), key: 'rollenerweiterungen', align: 'start', sortable: false },
+    {
+      title: t('action'),
+      key: 'actions',
+      align: 'center',
+      sortable: false,
+      width: '250px',
+    },
   ];
 
   const items: ComputedRef<ServiceProviderRow[]> = computed(() => {
@@ -125,6 +133,21 @@
       params: { id: item.id },
       query: { orga: organisationStore.currentOrganisation?.id },
     });
+  }
+
+  async function onDelete(id: string): Promise<void> {
+    await serviceProviderStore.deleteServiceProvider(id);
+  }
+
+  function onCloseDeleteDialog(): void {
+    serviceProviderStore.errorCode = '';
+    if (selectedOrganisationId.value) {
+      serviceProviderStore.getManageableServiceProvidersForOrganisation(
+        selectedOrganisationId.value,
+        searchFilterStore.serviceProviderSchulePage,
+        searchFilterStore.serviceProviderSchulePerPage,
+      );
+    }
   }
 
   onBeforeRouteLeave(() => {
@@ -239,6 +262,16 @@
           navigateToServiceProviderDetails(event, item as TableRow<ServiceProviderRow>)
       "
     >
+      <template #[`item.actions`]="{ item }">
+        <ServiceProviderDelete
+          :error-code="serviceProviderStore.errorCode"
+          :is-loading="serviceProviderStore.loading"
+          :service-provider-id="item.id"
+          :service-provider-name="item.name"
+          @on-delete-service-provider="onDelete"
+          @on-close="onCloseDeleteDialog"
+        />
+      </template>
       <template v-slot:[`item.rollenerweiterungen`]="{ item }">
         <div
           class="ellipsis-wrapper"

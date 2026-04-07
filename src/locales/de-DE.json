@@ -126,6 +126,16 @@
       "management": {
         "title": "Angebotsverwaltung"
       },
+      "delete": {
+        "confirmation": "Möchten Sie das Angebot {serviceProviderName} wirklich löschen?",
+        "success": "Das Angebot {serviceProviderName} wurde erfolgreich gelöscht",
+        "title": "Angebot löschen",
+        "action": "Löschen",
+        "errors": {
+          "ATTACHED_ROLLEN": "Das Angebot {serviceProviderName} kann nicht gelöscht werden, da es noch mindestens einer Rolle zugeordnet ist.",
+          "ATTACHED_ROLLENERWEITERUNGEN": "Das Angebot {serviceProviderName} kann nicht gelöscht werden, da noch schulpezifische Rollenerweiterungen existieren."
+        }
+      },
       "edit": "Angebot bearbeiten",
       "showAll": "Alle Angebote anzeigen",
       "showSchoolSpecific": "Schulische Angebote anzeigen"
@@ -791,6 +801,9 @@
       "assignServiceProvider": "Angebote zuordnen",
       "assignedServiceProvider": "Zugeordnete Angebote",
       "selectServiceProvider": "Angebote auswählen",
+      "deleteServiceProvider": "Angebot löschen",
+      "deleteServiceProviderSuccessMessage": "Das Angebot {name} wurde erfolgreich gelöscht.",
+      "deleteServiceProviderSuccessMessage": "Das Angebot {name} wurde erfolgreich gelöscht.",
       "serviceProvider": "Angebote"
     },
     "status": "Status",

@@ -45,6 +45,7 @@ export type ManageableServiceProviderListEntry = BaseServiceProvider & {
   administrationsebene: { id: string; name: string; kennung?: string };
   rollen: Array<{ id: string; name: string }>;
   rollenerweiterungen?: RollenerweiterungForManageableServiceProviderResponse[];
+  isDeleteAuthorized: boolean;
 };
 
 export type ManageableServiceProviderDetail = ManageableServiceProviderListEntry & {
@@ -163,6 +164,7 @@ type ServiceProviderActions = {
   getRollenerweiterungenById: (filter: RollenerweiterungFilter) => Promise<void>;
   persistRollenerweiterungenForServiceProvider: (filter: PersistRollenerweiterung) => Promise<void>;
   createServiceProvider: (filter: ServiceProviderCreationFilter) => Promise<void>;
+  deleteServiceProvider: (id: string) => Promise<void>;
 };
 
 export { ServiceProviderKategorie };
@@ -406,6 +408,26 @@ export const useServiceProviderStore: StoreDefinition<
         const { data }: { data: ServiceProviderResponse } =
           await serviceProviderApi.providerControllerCreateServiceProvider(bodyParams);
         this.createdServiceProvider = data;
+      } catch (error) {
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async deleteServiceProvider(id: string): Promise<void> {
+      this.loading = true;
+      try {
+        await serviceProviderApi.providerControllerDeleteServiceProvider(id);
+        // Remove from local state if present
+        this.allServiceProviders = this.allServiceProviders.filter((sp) => sp.id !== id);
+        this.manageableServiceProviders = this.manageableServiceProviders.filter((sp) => sp.id !== id);
+        this.manageableServiceProvidersForOrganisation = this.manageableServiceProvidersForOrganisation.filter(
+          (sp) => sp.id !== id,
+        );
+        if (this.currentServiceProvider && this.currentServiceProvider.id === id) {
+          this.currentServiceProvider = null;
+        }
       } catch (error) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
