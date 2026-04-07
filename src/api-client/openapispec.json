@@ -7141,12 +7141,6 @@
           "kategorie": {
             "type": "string",
             "enum": ["EMAIL", "UNTERRICHT", "VERWALTUNG", "SCHULISCH", "HINWEISE"]
-          },
-          "nachtraeglichZuweisbar": {
-            "type": "boolean"
-          },
-          "verfuegbarFuerRollenerweiterung": {
-            "type": "boolean"
           }
         }
       },

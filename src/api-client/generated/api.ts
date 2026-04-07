@@ -4054,18 +4054,6 @@ export interface UpdateServiceProviderBodyParams {
      * @memberof UpdateServiceProviderBodyParams
      */
     'kategorie'?: UpdateServiceProviderBodyParamsKategorieEnum;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof UpdateServiceProviderBodyParams
-     */
-    'nachtraeglichZuweisbar'?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof UpdateServiceProviderBodyParams
-     */
-    'verfuegbarFuerRollenerweiterung'?: boolean;
 }
 
 export const UpdateServiceProviderBodyParamsKategorieEnum = {
