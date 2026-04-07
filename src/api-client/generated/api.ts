@@ -4033,6 +4033,42 @@ export interface UpdateRolleBodyParams {
 /**
  * 
  * @export
+ * @interface UpdateServiceProviderBodyParams
+ */
+export interface UpdateServiceProviderBodyParams {
+    /**
+     * 
+     * @type {string}
+     * @memberof UpdateServiceProviderBodyParams
+     */
+    'name'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UpdateServiceProviderBodyParams
+     */
+    'url'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UpdateServiceProviderBodyParams
+     */
+    'kategorie'?: UpdateServiceProviderBodyParamsKategorieEnum;
+}
+
+export const UpdateServiceProviderBodyParamsKategorieEnum = {
+    Email: 'EMAIL',
+    Unterricht: 'UNTERRICHT',
+    Verwaltung: 'VERWALTUNG',
+    Schulisch: 'SCHULISCH',
+    Hinweise: 'HINWEISE'
+} as const;
+
+export type UpdateServiceProviderBodyParamsKategorieEnum = typeof UpdateServiceProviderBodyParamsKategorieEnum[keyof typeof UpdateServiceProviderBodyParamsKategorieEnum];
+
+/**
+ * 
+ * @export
  * @interface UserExeternalDataResponseItslearning
  */
 export interface UserExeternalDataResponseItslearning {
@@ -11820,6 +11856,54 @@ export const ProviderApiAxiosParamCreator = function (configuration?: Configurat
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * Update a service-provider (Angebot).
+         * @summary 
+         * @param {string} angebotId 
+         * @param {UpdateServiceProviderBodyParams} updateServiceProviderBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        providerControllerUpdateServiceProvider: async (angebotId: string, updateServiceProviderBodyParams: UpdateServiceProviderBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'angebotId' is not null or undefined
+            assertParamExists('providerControllerUpdateServiceProvider', 'angebotId', angebotId)
+            // verify required parameter 'updateServiceProviderBodyParams' is not null or undefined
+            assertParamExists('providerControllerUpdateServiceProvider', 'updateServiceProviderBodyParams', updateServiceProviderBodyParams)
+            const localVarPath = `/api/provider/{angebotId}`
+                .replace(`{${"angebotId"}}`, encodeURIComponent(String(angebotId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(updateServiceProviderBodyParams, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -11921,6 +12005,18 @@ export const ProviderApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.providerControllerGetServiceProviderLogo(angebotId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
+        /**
+         * Update a service-provider (Angebot).
+         * @summary 
+         * @param {string} angebotId 
+         * @param {UpdateServiceProviderBodyParams} updateServiceProviderBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async providerControllerUpdateServiceProvider(angebotId: string, updateServiceProviderBodyParams: UpdateServiceProviderBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ServiceProviderResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.providerControllerUpdateServiceProvider(angebotId, updateServiceProviderBodyParams, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
     }
 };
 
@@ -12014,6 +12110,17 @@ export const ProviderApiFactory = function (configuration?: Configuration, baseP
         providerControllerGetServiceProviderLogo(angebotId: string, options?: any): AxiosPromise<any> {
             return localVarFp.providerControllerGetServiceProviderLogo(angebotId, options).then((request) => request(axios, basePath));
         },
+        /**
+         * Update a service-provider (Angebot).
+         * @summary 
+         * @param {string} angebotId 
+         * @param {UpdateServiceProviderBodyParams} updateServiceProviderBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        providerControllerUpdateServiceProvider(angebotId: string, updateServiceProviderBodyParams: UpdateServiceProviderBodyParams, options?: any): AxiosPromise<ServiceProviderResponse> {
+            return localVarFp.providerControllerUpdateServiceProvider(angebotId, updateServiceProviderBodyParams, options).then((request) => request(axios, basePath));
+        },
     };
 };
 
@@ -12105,6 +12212,17 @@ export interface ProviderApiInterface {
      * @memberof ProviderApiInterface
      */
     providerControllerGetServiceProviderLogo(angebotId: string, options?: AxiosRequestConfig): AxiosPromise<any>;
+
+    /**
+     * Update a service-provider (Angebot).
+     * @summary 
+     * @param {string} angebotId 
+     * @param {UpdateServiceProviderBodyParams} updateServiceProviderBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProviderApiInterface
+     */
+    providerControllerUpdateServiceProvider(angebotId: string, updateServiceProviderBodyParams: UpdateServiceProviderBodyParams, options?: AxiosRequestConfig): AxiosPromise<ServiceProviderResponse>;
 
 }
 
@@ -12212,6 +12330,19 @@ export class ProviderApi extends BaseAPI implements ProviderApiInterface {
      */
     public providerControllerGetServiceProviderLogo(angebotId: string, options?: AxiosRequestConfig) {
         return ProviderApiFp(this.configuration).providerControllerGetServiceProviderLogo(angebotId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Update a service-provider (Angebot).
+     * @summary 
+     * @param {string} angebotId 
+     * @param {UpdateServiceProviderBodyParams} updateServiceProviderBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProviderApi
+     */
+    public providerControllerUpdateServiceProvider(angebotId: string, updateServiceProviderBodyParams: UpdateServiceProviderBodyParams, options?: AxiosRequestConfig) {
+        return ProviderApiFp(this.configuration).providerControllerUpdateServiceProvider(angebotId, updateServiceProviderBodyParams, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
