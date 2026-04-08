@@ -40,18 +40,23 @@ export type StartPageServiceProvider = BaseServiceProvider & {
   logoUrl?: string;
 };
 
-export type ManageableServiceProviderListEntry = BaseServiceProvider & {
+type ManageableServiceProviderDetails = {
   merkmale: Array<ServiceProviderMerkmal>;
   administrationsebene: { id: string; name: string; kennung?: string };
   rollen: Array<{ id: string; name: string }>;
-  rollenerweiterungen?: RollenerweiterungForManageableServiceProviderResponse[];
-  isDeleteAuthorized: boolean;
 };
 
-export type ManageableServiceProviderDetail = ManageableServiceProviderListEntry & {
-  url: string;
-  availableForRollenerweiterung: boolean;
-};
+export type ManageableServiceProviderListEntry = BaseServiceProvider &
+  ManageableServiceProviderDetails & {
+    rollenerweiterungen: RollenerweiterungForManageableServiceProviderResponse[];
+    isDeleteAuthorized: boolean;
+  };
+
+export type ManageableServiceProviderDetail = BaseServiceProvider &
+  ManageableServiceProviderDetails & {
+    url: string;
+    availableForRollenerweiterung: boolean;
+  };
 
 export type RollenerweiterungMap = {
   id: string;
