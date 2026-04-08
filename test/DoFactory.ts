@@ -32,9 +32,10 @@ import type { PersonenkontextWorkflowResponse } from '@/stores/PersonenkontextSt
 import { type Personendatensatz } from '@/stores/PersonStore';
 import type { Rolle, RolleResponse, RolleWithServiceProvidersResponse } from '@/stores/RolleStore';
 import {
+  type ManageableServiceProviderDetail,
   type RollenErweiterungenUebersicht,
   type RollenerweiterungMap,
-  type ManageableServiceProviderDetail,
+  type StartPageServiceProvider,
 } from '@/stores/ServiceProviderStore';
 import type { Person } from '@/stores/types/Person';
 import { PersonenUebersicht } from '@/stores/types/PersonenUebersicht';
@@ -465,6 +466,7 @@ export class DoFactory {
       requires2fa: faker.datatype.boolean(),
       merkmale: [],
       rollenerweiterungen: [],
+      isDeleteAuthorized: faker.datatype.boolean(),
       ...props,
     };
   }
@@ -565,6 +567,19 @@ export class DoFactory {
             address: person.email.address,
           }
         : null,
+      ...props,
+    };
+  }
+
+  public static getStartPageServiceProvider(props?: Partial<StartPageServiceProvider>): StartPageServiceProvider {
+    return {
+      id: faker.string.uuid(),
+      name: faker.company.name(),
+      url: faker.internet.url(),
+      kategorie: faker.helpers.enumValue(ServiceProviderKategorie),
+      requires2fa: faker.datatype.boolean(),
+      hasLogo: faker.datatype.boolean(),
+      target: ServiceProviderTarget.Url,
       ...props,
     };
   }

@@ -16,6 +16,7 @@ import {
   ServiceProviderMerkmal,
   useServiceProviderStore,
   type ManageableServiceProviderDetail,
+  type ManageableServiceProviderListEntry,
   type PersistRollenerweiterung,
   type RollenErweiterungenUebersicht,
   type ServiceProviderCreationFilter,
@@ -622,6 +623,120 @@ describe('serviceProviderStore', () => {
       expect(serviceProviderStore.loading).toBe(true);
       await promise;
       expect(serviceProviderStore.errorCode).toEqual('some mock server error');
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+  });
+
+  describe('deleteServiceProvider', () => {
+    const providerId: string = 'provider-to-delete';
+    const otherId: string = 'other-provider';
+    const apiUrl: string = `/api/provider/${providerId}`;
+
+    let allServiceProviders: StartPageServiceProvider[];
+    let manageableServiceProviders: ManageableServiceProviderListEntry[];
+    let manageableServiceProvidersForOrganisation: ManageableServiceProviderListEntry[];
+    let currentServiceProvider: ManageableServiceProviderDetail;
+
+    beforeEach(() => {
+      mockadapter.reset();
+
+      const sp1: StartPageServiceProvider = DoFactory.getStartPageServiceProvider({ id: providerId });
+      const sp2: StartPageServiceProvider = DoFactory.getStartPageServiceProvider({ id: otherId });
+      allServiceProviders = [sp1, sp2];
+      serviceProviderStore.allServiceProviders = allServiceProviders.map((sp) => ({ ...sp }));
+
+      const msp1: ManageableServiceProviderListEntry = DoFactory.getManageableServiceProviderListEntryResponse({
+        id: providerId,
+      });
+      const msp2: ManageableServiceProviderListEntry = DoFactory.getManageableServiceProviderListEntryResponse({
+        id: otherId,
+      });
+      manageableServiceProviders = [msp1, msp2];
+      serviceProviderStore.manageableServiceProviders = manageableServiceProviders.map((sp) => ({ ...sp }));
+
+      const mspo1: ManageableServiceProviderListEntry = DoFactory.getManageableServiceProviderListEntryResponse({
+        id: providerId,
+      });
+      const mspo2: ManageableServiceProviderListEntry = DoFactory.getManageableServiceProviderListEntryResponse({
+        id: otherId,
+      });
+      manageableServiceProvidersForOrganisation = [mspo1, mspo2];
+      serviceProviderStore.manageableServiceProvidersForOrganisation = manageableServiceProvidersForOrganisation.map(
+        (sp) => ({ ...sp }),
+      );
+
+      currentServiceProvider = DoFactory.getManageableServiceProviderDetail({ id: providerId });
+      serviceProviderStore.currentServiceProvider = { ...currentServiceProvider };
+
+      serviceProviderStore.errorCode = '';
+      serviceProviderStore.loading = false;
+    });
+
+    it('removes provider from all arrays and resets currentServiceProvider on success', async () => {
+      mockadapter.onDelete(apiUrl).replyOnce(200);
+      const promise: Promise<void> = serviceProviderStore.deleteServiceProvider(providerId);
+      expect(serviceProviderStore.loading).toBe(true);
+      await promise;
+      expect(serviceProviderStore.allServiceProviders).toEqual([expect.objectContaining({ id: otherId })]);
+      expect(serviceProviderStore.manageableServiceProviders).toEqual([expect.objectContaining({ id: otherId })]);
+      expect(serviceProviderStore.manageableServiceProvidersForOrganisation).toEqual([
+        expect.objectContaining({ id: otherId }),
+      ]);
+      expect(serviceProviderStore.currentServiceProvider).toBeNull();
+      expect(serviceProviderStore.errorCode).toBe('');
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+
+    it('does not remove anything if provider not present', async () => {
+      mockadapter.onDelete(`/api/provider/not-present`).replyOnce(200);
+      const beforeState: {
+        all: StartPageServiceProvider[];
+        manageable: ManageableServiceProviderListEntry[];
+        manageableOrg: ManageableServiceProviderListEntry[];
+        current: ManageableServiceProviderDetail | null;
+      } = {
+        all: [...serviceProviderStore.allServiceProviders],
+        manageable: [...serviceProviderStore.manageableServiceProviders],
+        manageableOrg: [...serviceProviderStore.manageableServiceProvidersForOrganisation],
+        current: serviceProviderStore.currentServiceProvider,
+      };
+      await serviceProviderStore.deleteServiceProvider('not-present');
+      expect(serviceProviderStore.allServiceProviders).toEqual(beforeState.all);
+      expect(serviceProviderStore.manageableServiceProviders).toEqual(beforeState.manageable);
+      expect(serviceProviderStore.manageableServiceProvidersForOrganisation).toEqual(beforeState.manageableOrg);
+      expect(serviceProviderStore.currentServiceProvider).toEqual(beforeState.current);
+      expect(serviceProviderStore.errorCode).toBe('');
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+
+    it('does not throw if currentServiceProvider is already null', async () => {
+      serviceProviderStore.currentServiceProvider = null;
+      mockadapter.onDelete(apiUrl).replyOnce(200);
+      await expect(serviceProviderStore.deleteServiceProvider(providerId)).resolves.not.toThrow();
+      expect(serviceProviderStore.currentServiceProvider).toBeNull();
+      expect(serviceProviderStore.errorCode).toBe('');
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+
+    it('sets errorCode to UNSPECIFIED_ERROR on string error', async () => {
+      mockadapter.onDelete(apiUrl).replyOnce(500, 'some error');
+      const before: StartPageServiceProvider[] = [...serviceProviderStore.allServiceProviders];
+      const promise: Promise<void> = serviceProviderStore.deleteServiceProvider(providerId);
+      expect(serviceProviderStore.loading).toBe(true);
+      await promise;
+      expect(serviceProviderStore.allServiceProviders).toEqual(before);
+      expect(serviceProviderStore.errorCode).toBe('UNSPECIFIED_ERROR');
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+
+    it('sets errorCode to error code if present in error response', async () => {
+      mockadapter.onDelete(apiUrl).replyOnce(500, { code: 'some error code' });
+      const before: StartPageServiceProvider[] = [...serviceProviderStore.allServiceProviders];
+      const promise: Promise<void> = serviceProviderStore.deleteServiceProvider(providerId);
+      expect(serviceProviderStore.loading).toBe(true);
+      await promise;
+      expect(serviceProviderStore.allServiceProviders).toEqual(before);
+      expect(serviceProviderStore.errorCode).toBe('some error code');
       expect(serviceProviderStore.loading).toBe(false);
     });
   });
