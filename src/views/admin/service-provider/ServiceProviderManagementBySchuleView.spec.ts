@@ -1,4 +1,4 @@
-import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
+import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import { type Router, createRouter, createWebHistory } from 'vue-router';
 
 import routes from '@/router/routes';
@@ -8,7 +8,7 @@ import { useServiceProviderStore, type ServiceProviderStore } from '@/stores/Ser
 import { DoFactory } from 'test/DoFactory';
 import type { Organisation } from '@/stores/OrganisationStore';
 import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
-import type { MockInstance } from 'vitest';
+import type { Mock, MockInstance } from 'vitest';
 
 let router: Router;
 const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
@@ -46,8 +46,8 @@ beforeEach(async () => {
   await router.isReady();
 
   serviceProviderStore.manageableServiceProvidersForOrganisation = [
-    DoFactory.getManageableServiceProviderListEntryResponse({isDeleteAuthorized: true}),
-    DoFactory.getManageableServiceProviderListEntryResponse({isDeleteAuthorized: false}),
+    DoFactory.getManageableServiceProviderListEntryResponse({ isDeleteAuthorized: true }),
+    DoFactory.getManageableServiceProviderListEntryResponse({ isDeleteAuthorized: false }),
   ];
 });
 
@@ -125,29 +125,31 @@ describe('ServiceProviderManagementView', () => {
   });
 
   describe('ServiceProviderDelete', () => {
-    it('renders ServiceProviderDelete button for each row', async () => {
-      const wrapper: VueWrapper = mountComponent() as VueWrapper;
+    it('renders ServiceProviderDelete button for each row', ():void => {
+      const wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementBySchuleView>> = mountComponent();
       // Find all delete icons (activators)
-      const deleteIcons = wrapper.findAll('[data-testid="open-service-provider-delete-dialog-icon"]');
-      expect(deleteIcons.length).toBe(serviceProviderStore.manageableServiceProvidersForOrganisation.filter(sp => sp.isDeleteAuthorized).length);
+      const deleteIcons: DOMWrapper<Element>[] = wrapper.findAll('[data-testid="open-service-provider-delete-dialog-icon"]');
+      expect(deleteIcons.length).toBe(
+        serviceProviderStore.manageableServiceProvidersForOrganisation.filter((sp: { isDeleteAuthorized: boolean }) => sp.isDeleteAuthorized).length,
+      );
     });
 
-    it('opens and confirms delete dialog, calls store method', async () => {
-      const wrapper: VueWrapper = mountComponent() as VueWrapper;
+    it('opens and confirms delete dialog, calls store method', async (): Promise<void> => {
+      const wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementBySchuleView>> = mountComponent();
       // Find first delete icon and click it
-      const deleteIcon = wrapper.find('[data-testid="open-service-provider-delete-dialog-icon"]');
+      const deleteIcon: DOMWrapper<Element> = wrapper.find('[data-testid="open-service-provider-delete-dialog-icon"]');
       await deleteIcon.trigger('click');
       await nextTick();
 
       // Find and click the confirm delete button
-      const confirmBtn = document.querySelector('[data-testid="service-provider-delete-button"]');
+      const confirmBtn: HTMLElement | null = document.querySelector('[data-testid="service-provider-delete-button"]');
       expect(confirmBtn).toBeTruthy();
 
       // Spy on the store method
-      const deleteSpy = vi.spyOn(serviceProviderStore, 'deleteServiceProvider').mockResolvedValue();
+      const deleteSpy: Mock<(id: string) => Promise<void>> = vi.spyOn(serviceProviderStore, 'deleteServiceProvider').mockResolvedValue();
       // Click confirm
       if (confirmBtn) {
-        (confirmBtn as HTMLElement).click();
+        (confirmBtn).click();
         await nextTick();
         expect(deleteSpy).toHaveBeenCalled();
       }
@@ -157,7 +159,7 @@ describe('ServiceProviderManagementView', () => {
     it('closes the delete dialog and resets error code', async () => {
       const wrapper: VueWrapper = mountComponent() as VueWrapper;
       // Open dialog
-      const deleteIcon = wrapper.find('[data-testid="open-service-provider-delete-dialog-icon"]');
+      const deleteIcon: DOMWrapper<Element> = wrapper.find('[data-testid="open-service-provider-delete-dialog-icon"]');
       await deleteIcon.trigger('click');
       await nextTick();
 
@@ -175,7 +177,7 @@ describe('ServiceProviderManagementView', () => {
       );
       expect(cancelBtn).toBeTruthy();
       if (cancelBtn) {
-        (cancelBtn as HTMLElement).click();
+        (cancelBtn).click();
         await nextTick();
         await flushPromises();
         expect(serviceProviderStore.errorCode).toBe('');

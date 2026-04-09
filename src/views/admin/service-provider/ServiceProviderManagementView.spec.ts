@@ -1,15 +1,15 @@
-import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
-import { type Router, createRouter, createWebHistory } from 'vue-router';
 
+import { flushPromises, mount, VueWrapper, type DOMWrapper } from '@vue/test-utils';
+import { type Router, createRouter, createWebHistory } from 'vue-router';
 import routes from '@/router/routes';
 import ServiceProviderManagementView from './ServiceProviderManagementView.vue';
 import type { MockInstance } from 'vitest';
 import { nextTick, type Component } from 'vue';
-import { useServiceProviderStore, type ServiceProviderStore } from '@/stores/ServiceProviderStore';
+import { useServiceProviderStore, type ManageableServiceProviderListEntry, type ServiceProviderStore } from '@/stores/ServiceProviderStore';
 import { DoFactory } from 'test/DoFactory';
 
 let router: Router;
-const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
+let serviceProviderStore: ServiceProviderStore;
 
 function mountComponent(): VueWrapper<InstanceType<typeof ServiceProviderManagementView>> {
   return mount(ServiceProviderManagementView, {
@@ -23,7 +23,8 @@ function mountComponent(): VueWrapper<InstanceType<typeof ServiceProviderManagem
   });
 }
 
-beforeEach(async () => {
+
+beforeEach(async (): Promise<void> => {
   document.body.innerHTML = `
     <div>
       <div id="app"></div>
@@ -38,20 +39,22 @@ beforeEach(async () => {
   router.push('/');
   await router.isReady();
 
+  serviceProviderStore = useServiceProviderStore();
   serviceProviderStore.manageableServiceProviders = [
-    DoFactory.getManageableServiceProviderListEntryResponse({isDeleteAuthorized: true}),
-    DoFactory.getManageableServiceProviderListEntryResponse({isDeleteAuthorized: false}),
+    DoFactory.getManageableServiceProviderListEntryResponse({ isDeleteAuthorized: true }),
+    DoFactory.getManageableServiceProviderListEntryResponse({ isDeleteAuthorized: false }),
   ];
 });
 
+
 describe('ServiceProviderManagementView', () => {
   it('should render', () => {
-    const wrapper: VueWrapper = mountComponent() as VueWrapper;
+    const wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementView>> = mountComponent();
     expect(wrapper.exists()).toBe(true);
   });
 
   it('routes to service provider details page', async () => {
-    const wrapper: VueWrapper = mountComponent() as VueWrapper;
+    const wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementView>> = mountComponent();
     const push: MockInstance = vi.spyOn(router, 'push');
 
     await wrapper.find('.v-data-table__tr').trigger('click');
@@ -61,29 +64,31 @@ describe('ServiceProviderManagementView', () => {
   });
 
   describe('ServiceProviderDelete', () => {
-    it('renders ServiceProviderDelete button for each row', async () => {
-      const wrapper: VueWrapper = mountComponent() as VueWrapper;
+    it('renders ServiceProviderDelete button for each row', () => {
+      const wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementView>> = mountComponent();
       // Find all delete icons (activators)
-      const deleteIcons = wrapper.findAll('[data-testid="open-service-provider-delete-dialog-icon"]');
-      expect(deleteIcons.length).toBe(serviceProviderStore.manageableServiceProviders.filter(sp => sp.isDeleteAuthorized).length);
+      const deleteIcons: DOMWrapper<Element>[] = wrapper.findAll('[data-testid="open-service-provider-delete-dialog-icon"]');
+      expect(deleteIcons.length).toBe(
+        serviceProviderStore.manageableServiceProviders.filter((sp: ManageableServiceProviderListEntry) => sp.isDeleteAuthorized).length,
+      );
     });
 
     it('opens and confirms delete dialog, calls store method', async () => {
-      const wrapper: VueWrapper = mountComponent() as VueWrapper;
+      const wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementView>> = mountComponent();
       // Find first delete icon and click it
-      const deleteIcon = wrapper.find('[data-testid="open-service-provider-delete-dialog-icon"]');
+      const deleteIcon: DOMWrapper<Element> = wrapper.find('[data-testid="open-service-provider-delete-dialog-icon"]');
       await deleteIcon.trigger('click');
       await nextTick();
 
       // Find and click the confirm delete button
-      const confirmBtn = document.querySelector('[data-testid="service-provider-delete-button"]');
+      const confirmBtn: HTMLElement | null = document.querySelector('[data-testid="service-provider-delete-button"]');
       expect(confirmBtn).toBeTruthy();
 
       // Spy on the store method
-      const deleteSpy = vi.spyOn(serviceProviderStore, 'deleteServiceProvider').mockResolvedValue();
+      const deleteSpy: MockInstance = vi.spyOn(serviceProviderStore, 'deleteServiceProvider').mockResolvedValue();
       // Click confirm
       if (confirmBtn) {
-        (confirmBtn as HTMLElement).click();
+        (confirmBtn).click();
         await nextTick();
         expect(deleteSpy).toHaveBeenCalled();
       }
@@ -91,9 +96,9 @@ describe('ServiceProviderManagementView', () => {
     });
 
     it('closes the delete dialog and resets error code', async () => {
-      const wrapper: VueWrapper = mountComponent() as VueWrapper;
+      const wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementView>> = mountComponent();
       // Open dialog
-      const deleteIcon = wrapper.find('[data-testid="open-service-provider-delete-dialog-icon"]');
+      const deleteIcon: DOMWrapper<Element> = wrapper.find('[data-testid="open-service-provider-delete-dialog-icon"]');
       await deleteIcon.trigger('click');
       await nextTick();
 
@@ -111,7 +116,7 @@ describe('ServiceProviderManagementView', () => {
       );
       expect(cancelBtn).toBeTruthy();
       if (cancelBtn) {
-        (cancelBtn as HTMLElement).click();
+        (cancelBtn).click();
         await nextTick();
         await flushPromises();
         expect(serviceProviderStore.errorCode).toBe('');

@@ -146,9 +146,10 @@
 
   function onCloseDeleteDialog(): void {
     serviceProviderStore.errorCode = '';
-    serviceProviderStore.manageableServiceProvidersForOrganisation = serviceProviderStore.manageableServiceProvidersForOrganisation.filter(
-      (sp: ManageableServiceProviderListEntry) => sp.id !== cachedServiceProviderId.value,
-    );
+    serviceProviderStore.manageableServiceProvidersForOrganisation =
+      serviceProviderStore.manageableServiceProvidersForOrganisation.filter(
+        (sp: ManageableServiceProviderListEntry) => sp.id !== cachedServiceProviderId.value,
+      );
     if (selectedOrganisationId.value) {
       serviceProviderStore.getManageableServiceProvidersForOrganisation(
         selectedOrganisationId.value,

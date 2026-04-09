@@ -155,14 +155,16 @@
               sm="6"
               md="4"
             >
-            <template>
-
-            </template>
+              <template> </template>
               <v-btn
                 v-if="state === State.COMPLETE"
                 :block="mdAndDown"
                 class="primary"
-                :data-testid="props.errorCode ? 'close-service-provider-delete-error-dialog-button' : 'close-service-provider-delete-success-dialog-button'"
+                :data-testid="
+                  props.errorCode
+                    ? 'close-service-provider-delete-error-dialog-button'
+                    : 'close-service-provider-delete-success-dialog-button'
+                "
                 @click.stop="closeSuccessDialog(isActive)"
               >
                 {{ $t('close') }}
