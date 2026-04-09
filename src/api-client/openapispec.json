@@ -1786,6 +1786,30 @@
       }
     },
     "/api/provider/{angebotId}": {
+      "patch": {
+        "description": "Update a service-provider (Angebot).",
+        "operationId": "ProviderController_updateServiceProvider",
+        "parameters": [{ "name": "angebotId", "required": true, "in": "path", "schema": { "type": "string" } }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/UpdateServiceProviderBodyParams" } }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The service-provider was successfully updated.",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ServiceProviderResponse" } } }
+          },
+          "400": { "description": "Invalid request body." },
+          "401": { "description": "Not authorized." },
+          "403": { "description": "Insufficient permissions." },
+          "500": { "description": "Internal server error." }
+        },
+        "security": [{ "bearer": [] }, { "oauth2": ["openid"] }],
+        "summary": "",
+        "tags": ["provider"]
+      },
       "delete": {
         "description": "Delete a service-provider (Angebot) by id.",
         "operationId": "ProviderController_deleteServiceProvider",
@@ -1800,15 +1824,12 @@
         ],
         "responses": {
           "204": { "description": "The service-provider was successfully deleted." },
-          "400": {
-            "description": "The input was not valid.",
-            "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/DbiamServiceProviderError" } }
-            }
-          },
           "401": { "description": "Not authorized." },
           "403": { "description": "Insufficient permissions." },
           "404": { "description": "The service-provider does not exist." },
+          "409": {
+            "description": "The service-provider has attached rollenerweiterungen or rollen and cannot be deleted."
+          },
           "500": { "description": "Internal server error." }
         },
         "security": [{ "bearer": [] }, { "oauth2": ["openid"] }],
@@ -3903,16 +3924,13 @@
         },
         "required": ["organisationId", "name", "kategorie", "requires2fa", "merkmale"]
       },
-      "DbiamServiceProviderError": {
+      "UpdateServiceProviderBodyParams": {
         "type": "object",
         "properties": {
-          "i18nKey": {
-            "type": "string",
-            "enum": ["SERVICE_PROVIDER_ERROR", "DUPLICATE_NAME", "ATTACHED_ROLLEN", "ATTACHED_ROLLENERWEITERUNGEN"]
-          },
-          "code": { "type": "number", "description": "Corresponds to HTTP Status code like 200, 404, 500" }
-        },
-        "required": ["i18nKey", "code"]
+          "name": { "type": "string" },
+          "url": { "type": "string" },
+          "kategorie": { "type": "string", "enum": ["EMAIL", "UNTERRICHT", "VERWALTUNG", "SCHULISCH", "HINWEISE"] }
+        }
       },
       "PersonResponseAutomapper": {
         "type": "object",
