@@ -424,15 +424,6 @@ export const useServiceProviderStore: StoreDefinition<
       this.loading = true;
       try {
         await serviceProviderApi.providerControllerDeleteServiceProvider(id);
-        // Remove from local state if present
-        this.allServiceProviders = this.allServiceProviders.filter((sp) => sp.id !== id);
-        this.manageableServiceProviders = this.manageableServiceProviders.filter((sp) => sp.id !== id);
-        this.manageableServiceProvidersForOrganisation = this.manageableServiceProvidersForOrganisation.filter(
-          (sp) => sp.id !== id,
-        );
-        if (this.currentServiceProvider && this.currentServiceProvider.id === id) {
-          this.currentServiceProvider = null;
-        }
       } catch (error) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {

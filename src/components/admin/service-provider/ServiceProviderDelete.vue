@@ -23,7 +23,7 @@
   enum State {
     CONFIRM,
     LOADING,
-    SUCCESS,
+    COMPLETE,
   }
 
   const props: Props = defineProps<Props>();
@@ -34,16 +34,16 @@
   const isClosing: Ref<boolean> = ref(false);
 
   const state: ComputedRef<State> = computed(() => {
-    // NOTE: order of checks and the two different paths into SUCCESS are important here
-    // this freezes the content of the dialog in the success state, while the close-animation is running
+    // NOTE: order of checks and the two different paths into COMPLETE are important here
+    // this freezes the content of the dialog in the complete state, while the close-animation is running
     // otherwise it will briefly show the initial template, because the isLoading-prop is true
     if (isClosing.value) {
-      return State.SUCCESS;
+      return State.COMPLETE;
     }
     if (props.isLoading) {
       return State.LOADING;
     }
-    return hasTriggeredAction.value ? State.SUCCESS : State.CONFIRM;
+    return hasTriggeredAction.value ? State.COMPLETE : State.CONFIRM;
   });
 
   function closeServiceProviderDeleteDialog(isActive: Ref<boolean>): void {
@@ -97,9 +97,9 @@
     <template #default="{ isActive }">
       <LayoutCard
         :headline-test-id="
-          state === State.SUCCESS ? 'service-provider-delete-success' : 'service-provider-delete-confirmation'
+          state === State.COMPLETE ? 'service-provider-delete-success' : 'service-provider-delete-confirmation'
         "
-        :closable="state === State.SUCCESS ? false : true"
+        :closable="state === State.COMPLETE ? false : true"
         :header="$t('admin.angebot.delete.title')"
         @on-close-clicked="closeServiceProviderDeleteDialog(isActive)"
       >
@@ -118,7 +118,7 @@
                   }}
                 </span>
                 <span
-                  v-else-if="state === State.SUCCESS && !props.errorCode"
+                  v-else-if="state === State.COMPLETE && !props.errorCode"
                   data-testid="service-provider-delete-success-text"
                 >
                   {{ deleteServiceProviderSuccessMessage }}
@@ -136,7 +136,7 @@
         <v-card-actions class="justify-center">
           <v-row class="justify-center">
             <v-col
-              v-if="state !== State.SUCCESS"
+              v-if="state !== State.COMPLETE"
               cols="12"
               sm="6"
               md="4"
@@ -155,11 +155,14 @@
               sm="6"
               md="4"
             >
+            <template>
+
+            </template>
               <v-btn
-                v-if="state === State.SUCCESS"
+                v-if="state === State.COMPLETE"
                 :block="mdAndDown"
                 class="primary"
-                data-testid="close-service-provider-delete-success-dialog-button"
+                :data-testid="props.errorCode ? 'close-service-provider-delete-error-dialog-button' : 'close-service-provider-delete-success-dialog-button'"
                 @click.stop="closeSuccessDialog(isActive)"
               >
                 {{ $t('close') }}

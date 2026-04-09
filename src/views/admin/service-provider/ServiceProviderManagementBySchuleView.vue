@@ -33,6 +33,7 @@
     name: string;
     administrationsebene: string;
     rollenerweiterungen: string;
+    isDeleteAuthorized: boolean;
   };
 
   const selectedOrganisationId: Ref<string> = ref('');
@@ -50,6 +51,8 @@
   }: {
     hasAutoselectedSchule: ComputedRef<boolean>;
   } = useAutoselectedSchule([RollenSystemRecht.RollenErweitern]);
+
+  const cachedServiceProviderId: Ref<string | null> = ref(null);
 
   const headers: Headers = [
     { title: t('angebot.kategorie'), key: 'kategorie', align: 'start' },
@@ -79,6 +82,7 @@
                   .map((re: RollenerweiterungForManageableServiceProviderResponse) => re.rolle.name)
                   .join(', ')
               : '---',
+          isDeleteAuthorized: sp.isDeleteAuthorized,
         };
       },
     );
@@ -137,10 +141,14 @@
 
   async function onDelete(id: string): Promise<void> {
     await serviceProviderStore.deleteServiceProvider(id);
+    cachedServiceProviderId.value = id;
   }
 
   function onCloseDeleteDialog(): void {
     serviceProviderStore.errorCode = '';
+    serviceProviderStore.manageableServiceProvidersForOrganisation = serviceProviderStore.manageableServiceProvidersForOrganisation.filter(
+      (sp: ManageableServiceProviderListEntry) => sp.id !== cachedServiceProviderId.value,
+    );
     if (selectedOrganisationId.value) {
       serviceProviderStore.getManageableServiceProvidersForOrganisation(
         selectedOrganisationId.value,
@@ -262,8 +270,9 @@
           navigateToServiceProviderDetails(event, item as TableRow<ServiceProviderRow>)
       "
     >
-      <template #[`item.actions`]="{ item }">
+      <template #[`item.actions`]="{ item }: { item: ServiceProviderRow }">
         <ServiceProviderDelete
+          v-if="item.isDeleteAuthorized"
           :error-code="serviceProviderStore.errorCode"
           :is-loading="serviceProviderStore.loading"
           :service-provider-id="item.id"
