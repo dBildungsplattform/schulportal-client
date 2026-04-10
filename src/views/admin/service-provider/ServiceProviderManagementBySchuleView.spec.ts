@@ -1,18 +1,18 @@
 import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
-import { type Router, createRouter, createWebHistory } from 'vue-router';
+import { nextTick, type Component } from 'vue';
+import { createRouter, createWebHistory, type Router } from 'vue-router';
 
 import routes from '@/router/routes';
-import ServiceProviderManagementBySchuleView from './ServiceProviderManagementBySchuleView.vue';
-import { nextTick, type Component } from 'vue';
+import { type Organisation } from '@/stores/OrganisationStore';
+import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
 import {
   useServiceProviderStore,
   type ManageableServiceProviderListEntry,
   type ServiceProviderStore,
 } from '@/stores/ServiceProviderStore';
 import { DoFactory } from 'test/DoFactory';
-import type { Organisation } from '@/stores/OrganisationStore';
-import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
 import type { Mock, MockInstance } from 'vitest';
+import ServiceProviderManagementBySchuleView from './ServiceProviderManagementBySchuleView.vue';
 
 let router: Router;
 const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
@@ -55,7 +55,7 @@ beforeEach(async () => {
   ];
 });
 
-describe('ServiceProviderManagementView', () => {
+describe('ServiceProviderManagementBySchuleView', () => {
   it('should render', () => {
     const wrapper: VueWrapper = mountComponent() as VueWrapper;
     expect(wrapper.exists()).toBe(true);
@@ -166,44 +166,16 @@ describe('ServiceProviderManagementView', () => {
       deleteSpy.mockRestore();
     });
 
-    it('closes the delete dialog and resets error code', async () => {
-      const wrapper: VueWrapper = mountComponent() as VueWrapper;
-      // Open dialog
-      const deleteIcon: DOMWrapper<Element> = wrapper.find('[data-testid="open-service-provider-delete-dialog-icon"]');
-      await deleteIcon.trigger('click');
-      await nextTick();
-
-      const confirmBtn: HTMLElement | null = document.querySelector('[data-testid="service-provider-delete-button"]');
-      expect(confirmBtn).toBeTruthy();
-      confirmBtn!.click();
-
-      // Simulate error code
-      serviceProviderStore.errorCode = 'SOME_ERROR';
-      await nextTick();
-
-      // Find and click close button
-      const closeBtn: HTMLElement | null = document.querySelector(
-        '[data-testid="close-service-provider-delete-error-dialog-button"]',
-      );
-      expect(closeBtn).toBeTruthy();
-      if (closeBtn) {
-        closeBtn.click();
-        await nextTick();
-        await flushPromises();
-        expect(serviceProviderStore.errorCode).toBe('');
-      }
-    });
-
     describe('onCloseDeleteDialog', () => {
       it('removes provider and reloads list if successful', async () => {
         const wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementBySchuleView>> = mountComponent();
-        // @ts-expect-error we need to set this to test the method, in real usage it would be set by the SchulenFilter component
-        wrapper.vm.selectedOrganisationId = 'some-id';
+        const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ name: 'SchulenFilter' });
+        schuleAutocomplete?.vm.$emit('update:selectedSchulen', 'some-id');
 
         const remainingProvider: ManageableServiceProviderListEntry =
           serviceProviderStore.manageableServiceProvidersForOrganisation[1]!;
 
-        const reloadSpy = vi
+        const reloadSpy: Mock<ServiceProviderStore['getManageableServiceProvidersForOrganisation']> = vi
           .spyOn(serviceProviderStore, 'getManageableServiceProvidersForOrganisation')
           .mockResolvedValue();
 
@@ -233,6 +205,37 @@ describe('ServiceProviderManagementView', () => {
         expect(reloadSpy).toHaveBeenCalled();
         reloadSpy.mockRestore();
       });
+    });
+
+    it('renders SpshAlert when errorCode is set', async () => {
+      const wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementBySchuleView>> = mountComponent();
+      serviceProviderStore.errorCode = 'UNSPECIFIED_ERROR';
+      await nextTick();
+      const alert: DOMWrapper<Element> = wrapper.find(
+        '[data-testid="service-provider-management-by-schule-error-alert"]',
+      );
+      expect(alert.exists()).toBe(true);
+    });
+
+    it('clears error and reloads data when alert button is clicked', async () => {
+      const wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementBySchuleView>> = mountComponent();
+      const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ name: 'SchulenFilter' });
+      schuleAutocomplete?.vm.$emit('update:selectedSchulen', 'some-id');
+
+      serviceProviderStore.errorCode = 'UNSPECIFIED_ERROR';
+      await nextTick();
+      const reloadSpy: Mock<ServiceProviderStore['getManageableServiceProvidersForOrganisation']> = vi
+        .spyOn(serviceProviderStore, 'getManageableServiceProvidersForOrganisation')
+        .mockResolvedValue();
+      const btn: DOMWrapper<Element> = wrapper.find(
+        '[data-testid="service-provider-management-by-schule-error-alert"] button',
+      );
+      expect(btn.exists()).toBe(true);
+      await btn.trigger('click');
+      await nextTick();
+      expect(serviceProviderStore.errorCode).toBe('');
+      expect(reloadSpy).toHaveBeenCalled();
+      reloadSpy.mockRestore();
     });
   });
 });

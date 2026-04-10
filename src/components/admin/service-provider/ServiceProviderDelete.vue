@@ -112,7 +112,7 @@
               >
                 <span v-if="props.errorCode">
                   {{
-                    t(`admin.angebot.delete.errors.${props.errorCode}`, {
+                    t(`admin.angebot.errors.${props.errorCode}`, {
                       serviceProviderName: props.serviceProviderName,
                     })
                   }}

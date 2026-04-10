@@ -5,6 +5,7 @@
   import ResultTable, { type Headers, type TableRow } from '@/components/admin/ResultTable.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import ServiceProviderDelete from '@/components/admin/service-provider/ServiceProviderDelete.vue';
+  import SpshAlert from '@/components/alert/SpshAlert.vue';
   import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
   import {
     useServiceProviderStore,
@@ -32,6 +33,26 @@
 
   const cachedServiceProviderId: Ref<string | null> = ref(null);
 
+  const errorTitle: ComputedRef<string> = computed(() => {
+    if (!serviceProviderStore.errorCode) {
+      return '';
+    }
+    return t(`admin.angebot.title.${serviceProviderStore.errorCode}`);
+  });
+
+  const errorText: ComputedRef<string> = computed(() => {
+    if (!serviceProviderStore.errorCode) {
+      return '';
+    }
+    const serviceProviderName: string =
+      serviceProviderStore.manageableServiceProviders.find(
+        (sp: ManageableServiceProviderListEntry) => sp.id === cachedServiceProviderId.value,
+      )?.name ?? '';
+    return t(`admin.angebot.errors.${serviceProviderStore.errorCode}`, {
+      serviceProviderName,
+    });
+  });
+
   const headers: Headers = [
     { title: t('angebot.kategorie'), key: 'kategorie', align: 'start' },
     { title: t('angebot.name'), key: 'name', align: 'start' },
@@ -47,6 +68,18 @@
     },
   ];
 
+  async function reloadData(): Promise<void> {
+    await serviceProviderStore.getManageableServiceProviders(
+      searchFilterStore.serviceProviderPage,
+      searchFilterStore.serviceProviderPerPage,
+    );
+  }
+
+  const handleAlertClose = async (): Promise<void> => {
+    serviceProviderStore.errorCode = '';
+    await reloadData();
+  };
+
   async function onDelete(id: string): Promise<void> {
     await serviceProviderStore.deleteServiceProvider(id);
     cachedServiceProviderId.value = id;
@@ -60,10 +93,7 @@
     serviceProviderStore.manageableServiceProviders = serviceProviderStore.manageableServiceProviders.filter(
       (sp: ManageableServiceProviderListEntry) => sp.id !== cachedServiceProviderId.value,
     );
-    await serviceProviderStore.getManageableServiceProviders(
-      searchFilterStore.serviceProviderPage,
-      searchFilterStore.serviceProviderPerPage,
-    );
+    await reloadData();
   }
 
   const items: ComputedRef<ServiceProviderRow[]> = computed(() => {
@@ -88,10 +118,7 @@
   }
 
   watchEffect(async () => {
-    await serviceProviderStore.getManageableServiceProviders(
-      searchFilterStore.serviceProviderPage,
-      searchFilterStore.serviceProviderPerPage,
-    );
+    await reloadData();
   });
 </script>
 
@@ -103,6 +130,17 @@
     {{ $t('admin.headline') }}
   </h1>
   <LayoutCard :header="t('admin.angebot.management.title')">
+    <SpshAlert
+      :button-action="handleAlertClose"
+      :button-text="t('nav.backToList')"
+      :closable="false"
+      data-test-id-prefix="service-provider-management-error"
+      :model-value="!!serviceProviderStore.errorCode"
+      :show-button="true"
+      :text="errorText"
+      :title="errorTitle"
+      :type="'error'"
+    />
     <ResultTable
       :headers
       :items

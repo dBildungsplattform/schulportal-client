@@ -55,7 +55,7 @@ describe('ServiceProviderDelete.vue', () => {
   it('renders error message if errorCode is set', async (): Promise<void> => {
     const wrapper: VueWrapper<InstanceType<typeof ServiceProviderDelete>> = mountDialog({ errorCode: 'someError' });
     await openDialog(wrapper);
-    expect(wrapper.html()).toContain('admin.angebot.delete.errors.someError');
+    expect(wrapper.html()).toContain('admin.angebot.errors.someError');
   });
 
   it('emits onDeleteServiceProvider when delete button is clicked', async (): Promise<void> => {

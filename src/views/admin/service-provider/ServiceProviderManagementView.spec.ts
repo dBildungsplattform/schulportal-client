@@ -2,7 +2,7 @@ import { flushPromises, mount, VueWrapper, type DOMWrapper } from '@vue/test-uti
 import { type Router, createRouter, createWebHistory } from 'vue-router';
 import routes from '@/router/routes';
 import ServiceProviderManagementView from './ServiceProviderManagementView.vue';
-import type { MockInstance } from 'vitest';
+import type { Mock, MockInstance } from 'vitest';
 import { nextTick, type Component } from 'vue';
 import {
   useServiceProviderStore,
@@ -90,7 +90,9 @@ describe('ServiceProviderManagementView', () => {
       expect(confirmBtn).toBeTruthy();
 
       // Spy on the store method
-      const deleteSpy: MockInstance = vi.spyOn(serviceProviderStore, 'deleteServiceProvider').mockResolvedValue();
+      const deleteSpy: Mock<ServiceProviderStore['deleteServiceProvider']> = vi
+        .spyOn(serviceProviderStore, 'deleteServiceProvider')
+        .mockResolvedValue();
       // Click confirm
       if (confirmBtn) {
         confirmBtn.click();
@@ -112,7 +114,7 @@ describe('ServiceProviderManagementView', () => {
       confirmBtn!.click();
 
       // Simulate error code
-      serviceProviderStore.errorCode = 'SOME_ERROR';
+      serviceProviderStore.errorCode = 'UNSPECIFIED_ERROR';
       await nextTick();
 
       // Find and click cancel button
@@ -133,7 +135,9 @@ describe('ServiceProviderManagementView', () => {
 
       const remainingProvider: ManageableServiceProviderListEntry = serviceProviderStore.manageableServiceProviders[1]!;
 
-      const reloadSpy = vi.spyOn(serviceProviderStore, 'getManageableServiceProviders').mockResolvedValue();
+      const reloadSpy: Mock<ServiceProviderStore['getManageableServiceProviders']> = vi
+        .spyOn(serviceProviderStore, 'getManageableServiceProviders')
+        .mockResolvedValue();
 
       const deleteIcon: DOMWrapper<Element> = wrapper.find('[data-testid="open-service-provider-delete-dialog-icon"]');
       await deleteIcon.trigger('click');
@@ -154,6 +158,30 @@ describe('ServiceProviderManagementView', () => {
       await flushPromises();
 
       expect(serviceProviderStore.manageableServiceProviders).toEqual([expect.objectContaining(remainingProvider)]);
+      expect(reloadSpy).toHaveBeenCalled();
+      reloadSpy.mockRestore();
+    });
+
+    it('renders SpshAlert when errorCode is set', async () => {
+      const wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementView>> = mountComponent();
+      serviceProviderStore.errorCode = 'UNSPECIFIED_ERROR';
+      await nextTick();
+      const alert: DOMWrapper<Element> = wrapper.find('[data-testid="service-provider-management-error-alert"]');
+      expect(alert.exists()).toBe(true);
+    });
+
+    it('clears error and reloads data when alert button is clicked', async () => {
+      const wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementView>> = mountComponent();
+      serviceProviderStore.errorCode = 'UNSPECIFIED_ERROR';
+      await nextTick();
+      const reloadSpy: Mock<ServiceProviderStore['getManageableServiceProviders']> = vi
+        .spyOn(serviceProviderStore, 'getManageableServiceProviders')
+        .mockResolvedValue();
+      const btn: DOMWrapper<Element> = wrapper.find('[data-testid="service-provider-management-error-alert"] button');
+      expect(btn.exists()).toBe(true);
+      await btn.trigger('click');
+      await nextTick();
+      expect(serviceProviderStore.errorCode).toBe('');
       expect(reloadSpy).toHaveBeenCalled();
       reloadSpy.mockRestore();
     });

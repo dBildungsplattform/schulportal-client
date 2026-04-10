@@ -2,6 +2,7 @@
   import { computed, onMounted, ref, watch, watchEffect, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
 
+  import SpshAlert from '@/components/alert/SpshAlert.vue';
   import type { RollenerweiterungForManageableServiceProviderResponse } from '@/api-client/generated';
   import ResultTable, { type Headers, type TableRow } from '@/components/admin/ResultTable.vue';
   import ServiceProviderDelete from '@/components/admin/service-provider/ServiceProviderDelete.vue';
@@ -88,6 +89,26 @@
     );
   });
 
+  const errorTitle: ComputedRef<string> = computed(() => {
+    if (!serviceProviderStore.errorCode) {
+      return '';
+    }
+    return t(`admin.angebot.title.${serviceProviderStore.errorCode}`);
+  });
+
+  const errorText: ComputedRef<string> = computed(() => {
+    if (!serviceProviderStore.errorCode) {
+      return '';
+    }
+    const serviceProviderName: string =
+      serviceProviderStore.manageableServiceProvidersForOrganisation.find(
+        (sp: ManageableServiceProviderListEntry) => sp.id === cachedServiceProviderId.value,
+      )?.name ?? '';
+    return t(`admin.angebot.errors.${serviceProviderStore.errorCode}`, {
+      serviceProviderName,
+    });
+  });
+
   function resetSearchAndFilter(): void {
     selectedOrganisationId.value = '';
     serviceProviderStore.manageableServiceProvidersForOrganisation = [];
@@ -107,16 +128,19 @@
     searchFilterStore.setSchuleForSchulischeServiceProvider(newValue);
   }
 
+  async function reloadData(): Promise<void> {
+    if (selectedOrganisationId.value) {
+      await serviceProviderStore.getManageableServiceProvidersForOrganisation(
+        selectedOrganisationId.value,
+        searchFilterStore.serviceProviderSchulePage,
+        searchFilterStore.serviceProviderSchulePerPage,
+      );
+    }
+  }
+
   watchEffect(async () => {
     if (selectedOrganisationId.value) {
-      await Promise.all([
-        serviceProviderStore.getManageableServiceProvidersForOrganisation(
-          selectedOrganisationId.value,
-          searchFilterStore.serviceProviderSchulePage,
-          searchFilterStore.serviceProviderSchulePerPage,
-        ),
-        organisationStore.getOrganisationById(selectedOrganisationId.value),
-      ]);
+      await Promise.all([reloadData(), organisationStore.getOrganisationById(selectedOrganisationId.value)]);
     }
   });
 
@@ -139,6 +163,11 @@
     });
   }
 
+  const handleAlertClose = async (): Promise<void> => {
+    serviceProviderStore.errorCode = '';
+    await reloadData();
+  };
+
   async function onDelete(id: string): Promise<void> {
     await serviceProviderStore.deleteServiceProvider(id);
     cachedServiceProviderId.value = id;
@@ -153,13 +182,7 @@
       serviceProviderStore.manageableServiceProvidersForOrganisation.filter(
         (sp: ManageableServiceProviderListEntry) => sp.id !== cachedServiceProviderId.value,
       );
-    if (selectedOrganisationId.value) {
-      await serviceProviderStore.getManageableServiceProvidersForOrganisation(
-        selectedOrganisationId.value,
-        searchFilterStore.serviceProviderSchulePage,
-        searchFilterStore.serviceProviderSchulePerPage,
-      );
-    }
+    await reloadData();
   }
 
   onBeforeRouteLeave(() => {
@@ -185,114 +208,128 @@
     :header="`${t('admin.angebot.management.title')} ${organisationStore.currentOrganisation?.name ?? ''}`"
     :header-hover-text="organisationStore.currentOrganisation?.name"
   >
-    <v-row
-      align="start"
-      class="ma-3"
-    >
-      <v-col
-        align-self="center"
-        cols="12"
-        md="2"
-        class="py-md-0 text-md-right"
+    <SpshAlert
+      :button-action="handleAlertClose"
+      :button-text="t('nav.backToList')"
+      :closable="false"
+      data-test-id-prefix="service-provider-management-by-schule-error"
+      :model-value="!!serviceProviderStore.errorCode"
+      :show-button="true"
+      :text="errorText"
+      :title="errorTitle"
+      :type="'error'"
+    />
+    <template>
+      <v-row
+        align="start"
+        class="ma-3"
       >
-        <v-btn
-          class="px-0 reset-filter"
-          data-testid="reset-filter-button"
-          :disabled="!selectedOrganisationId || hasAutoselectedSchule"
-          size="x-small"
-          variant="text"
-          width="auto"
-          @click="resetSearchAndFilter()"
+        <v-col
+          align-self="center"
+          cols="12"
+          md="2"
+          class="py-md-0 text-md-right"
         >
-          {{ $t('resetFilter') }}
-        </v-btn>
-      </v-col>
-      <v-col
-        cols="12"
-        md="3"
-        class="py-md-0"
+          <v-btn
+            class="px-0 reset-filter"
+            data-testid="reset-filter-button"
+            :disabled="!selectedOrganisationId || hasAutoselectedSchule"
+            size="x-small"
+            variant="text"
+            width="auto"
+            @click="resetSearchAndFilter()"
+          >
+            {{ $t('resetFilter') }}
+          </v-btn>
+        </v-col>
+        <v-col
+          cols="12"
+          md="3"
+          class="py-md-0"
+        >
+          <SchulenFilter
+            :multiple="false"
+            includeAll
+            highlightSelection
+            parentId="service-provider-management-by-schule"
+            ref="schulenFilter"
+            :systemrechteForSearch="[RollenSystemRecht.RollenErweitern]"
+            :selectedSchulen="selectedOrganisationId ? [selectedOrganisationId] : []"
+            @update:selected-schulen="setOrganisationFilter"
+            :placeholderText="$t('admin.schule.schule')"
+            hideDetails
+          >
+            <template #prepend-item>
+              <v-list-item>
+                <v-progress-circular
+                  v-if="organisationStore.loading"
+                  indeterminate
+                />
+                <span
+                  v-else
+                  class="filter-header"
+                  >{{
+                    $t(
+                      'admin.schule.schulenFound',
+                      {
+                        count: organisationStore.organisationenFilters.get('service-provider-management-by-schule')
+                          ?.total,
+                      },
+                      organisationStore.organisationenFilters.get('service-provider-management-by-schule')?.total ?? 0,
+                    )
+                  }}</span
+                >
+              </v-list-item>
+            </template>
+          </SchulenFilter>
+        </v-col>
+      </v-row>
+      <ResultTable
+        v-if="!serviceProviderStore.errorCode"
+        :headers
+        :hide-select="true"
+        :current-sort="{
+          key: 'kategorie',
+          order: SortOrder.Asc,
+        }"
+        :items
+        :itemsPerPage="searchFilterStore.serviceProviderSchulePerPage"
+        :currentPage="searchFilterStore.serviceProviderSchulePage"
+        :itemValuePath="'id'"
+        :loading="serviceProviderStore.loading"
+        :totalItems="serviceProviderStore.totalManageableServiceProvidersForOrganisation"
+        :no-data-text="
+          selectedOrganisationId && serviceProviderStore.manageableServiceProvidersForOrganisation.length === 0
+            ? $t('angebot.noServiceProvidersAvailable')
+            : $t('angebot.chooseSchuleFirst')
+        "
+        @onItemsPerPageUpdate="(val: number) => (searchFilterStore.serviceProviderSchulePerPage = val)"
+        @onPageUpdate="(val: number) => (searchFilterStore.serviceProviderSchulePage = val)"
+        @onHandleRowClick="
+          (event: PointerEvent, item: TableRow<unknown>) =>
+            navigateToServiceProviderDetails(event, item as TableRow<ServiceProviderRow>)
+        "
       >
-        <SchulenFilter
-          :multiple="false"
-          includeAll
-          highlightSelection
-          parentId="service-provider-management-by-schule"
-          ref="schulenFilter"
-          :systemrechteForSearch="[RollenSystemRecht.RollenErweitern]"
-          :selectedSchulen="selectedOrganisationId ? [selectedOrganisationId] : []"
-          @update:selectedSchulen="setOrganisationFilter"
-          :placeholderText="$t('admin.schule.schule')"
-          hideDetails
-        >
-          <template #prepend-item>
-            <v-list-item>
-              <v-progress-circular
-                v-if="organisationStore.loading"
-                indeterminate
-              />
-              <span
-                v-else
-                class="filter-header"
-                >{{
-                  $t(
-                    'admin.schule.schulenFound',
-                    {
-                      count: organisationStore.organisationenFilters.get('service-provider-management-by-schule')
-                        ?.total,
-                    },
-                    organisationStore.organisationenFilters.get('service-provider-management-by-schule')?.total ?? 0,
-                  )
-                }}</span
-              >
-            </v-list-item>
-          </template>
-        </SchulenFilter>
-      </v-col>
-    </v-row>
-    <ResultTable
-      :headers
-      :hide-select="true"
-      :current-sort="{
-        key: 'kategorie',
-        order: SortOrder.Asc,
-      }"
-      :items
-      :itemsPerPage="searchFilterStore.serviceProviderSchulePerPage"
-      :currentPage="searchFilterStore.serviceProviderSchulePage"
-      :itemValuePath="'id'"
-      :loading="serviceProviderStore.loading"
-      :totalItems="serviceProviderStore.totalManageableServiceProvidersForOrganisation"
-      :no-data-text="
-        selectedOrganisationId && serviceProviderStore.manageableServiceProvidersForOrganisation.length === 0
-          ? $t('angebot.noServiceProvidersAvailable')
-          : $t('angebot.chooseSchuleFirst')
-      "
-      @onItemsPerPageUpdate="(val: number) => (searchFilterStore.serviceProviderSchulePerPage = val)"
-      @onPageUpdate="(val: number) => (searchFilterStore.serviceProviderSchulePage = val)"
-      @onHandleRowClick="
-        (event: PointerEvent, item: TableRow<unknown>) =>
-          navigateToServiceProviderDetails(event, item as TableRow<ServiceProviderRow>)
-      "
-    >
-      <template #[`item.actions`]="{ item }: { item: ServiceProviderRow }">
-        <ServiceProviderDelete
-          v-if="item.isDeleteAuthorized"
-          :error-code="serviceProviderStore.errorCode"
-          :is-loading="serviceProviderStore.loading"
-          :service-provider-id="item.id"
-          :service-provider-name="item.name"
-          @on-delete-service-provider="onDelete"
-          @on-close="onCloseDeleteDialog"
-        />
-      </template>
-      <template v-slot:[`item.rollenerweiterungen`]="{ item }">
-        <div
-          class="ellipsis-wrapper"
-          :title="item.rollenerweiterungen"
-        >
-          {{ item.rollenerweiterungen }}
-        </div>
-      </template>
-    </ResultTable>
+        <template #[`item.actions`]="{ item }: { item: ServiceProviderRow }">
+          <ServiceProviderDelete
+            v-if="item.isDeleteAuthorized"
+            :error-code="serviceProviderStore.errorCode"
+            :is-loading="serviceProviderStore.loading"
+            :service-provider-id="item.id"
+            :service-provider-name="item.name"
+            @on-delete-service-provider="onDelete"
+            @on-close="onCloseDeleteDialog"
+          />
+        </template>
+        <template v-slot:[`item.rollenerweiterungen`]="{ item }">
+          <div
+            class="ellipsis-wrapper"
+            :title="item.rollenerweiterungen"
+          >
+            {{ item.rollenerweiterungen }}
+          </div>
+        </template>
+      </ResultTable>
+    </template>
   </LayoutCard>
 </template>
