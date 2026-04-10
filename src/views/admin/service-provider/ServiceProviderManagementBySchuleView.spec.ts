@@ -4,7 +4,11 @@ import { type Router, createRouter, createWebHistory } from 'vue-router';
 import routes from '@/router/routes';
 import ServiceProviderManagementBySchuleView from './ServiceProviderManagementBySchuleView.vue';
 import { nextTick, type Component } from 'vue';
-import { useServiceProviderStore, type ServiceProviderStore } from '@/stores/ServiceProviderStore';
+import {
+  useServiceProviderStore,
+  type ManageableServiceProviderListEntry,
+  type ServiceProviderStore,
+} from '@/stores/ServiceProviderStore';
 import { DoFactory } from 'test/DoFactory';
 import type { Organisation } from '@/stores/OrganisationStore';
 import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
@@ -125,12 +129,16 @@ describe('ServiceProviderManagementView', () => {
   });
 
   describe('ServiceProviderDelete', () => {
-    it('renders ServiceProviderDelete button for each row', ():void => {
+    it('renders ServiceProviderDelete button for each row', (): void => {
       const wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementBySchuleView>> = mountComponent();
       // Find all delete icons (activators)
-      const deleteIcons: DOMWrapper<Element>[] = wrapper.findAll('[data-testid="open-service-provider-delete-dialog-icon"]');
+      const deleteIcons: DOMWrapper<Element>[] = wrapper.findAll(
+        '[data-testid="open-service-provider-delete-dialog-icon"]',
+      );
       expect(deleteIcons.length).toBe(
-        serviceProviderStore.manageableServiceProvidersForOrganisation.filter((sp: { isDeleteAuthorized: boolean }) => sp.isDeleteAuthorized).length,
+        serviceProviderStore.manageableServiceProvidersForOrganisation.filter(
+          (sp: { isDeleteAuthorized: boolean }) => sp.isDeleteAuthorized,
+        ).length,
       );
     });
 
@@ -146,10 +154,12 @@ describe('ServiceProviderManagementView', () => {
       expect(confirmBtn).toBeTruthy();
 
       // Spy on the store method
-      const deleteSpy: Mock<(id: string) => Promise<void>> = vi.spyOn(serviceProviderStore, 'deleteServiceProvider').mockResolvedValue();
+      const deleteSpy: Mock<(id: string) => Promise<void>> = vi
+        .spyOn(serviceProviderStore, 'deleteServiceProvider')
+        .mockResolvedValue();
       // Click confirm
       if (confirmBtn) {
-        (confirmBtn).click();
+        confirmBtn.click();
         await nextTick();
         expect(deleteSpy).toHaveBeenCalled();
       }
@@ -171,17 +181,58 @@ describe('ServiceProviderManagementView', () => {
       serviceProviderStore.errorCode = 'SOME_ERROR';
       await nextTick();
 
-      // Find and click cancel button
-      const cancelBtn: HTMLElement | null = document.querySelector(
+      // Find and click close button
+      const closeBtn: HTMLElement | null = document.querySelector(
         '[data-testid="close-service-provider-delete-error-dialog-button"]',
       );
-      expect(cancelBtn).toBeTruthy();
-      if (cancelBtn) {
-        (cancelBtn).click();
+      expect(closeBtn).toBeTruthy();
+      if (closeBtn) {
+        closeBtn.click();
         await nextTick();
         await flushPromises();
         expect(serviceProviderStore.errorCode).toBe('');
       }
+    });
+
+    describe('onCloseDeleteDialog', () => {
+      it('removes provider and reloads list if successful', async () => {
+        const wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementBySchuleView>> = mountComponent();
+        // @ts-expect-error we need to set this to test the method, in real usage it would be set by the SchulenFilter component
+        wrapper.vm.selectedOrganisationId = 'some-id';
+
+        const remainingProvider: ManageableServiceProviderListEntry =
+          serviceProviderStore.manageableServiceProvidersForOrganisation[1]!;
+
+        const reloadSpy = vi
+          .spyOn(serviceProviderStore, 'getManageableServiceProvidersForOrganisation')
+          .mockResolvedValue();
+
+        const deleteIcon: DOMWrapper<Element> = wrapper.find(
+          '[data-testid="open-service-provider-delete-dialog-icon"]',
+        );
+        await deleteIcon.trigger('click');
+        await nextTick();
+
+        const confirmBtn: HTMLElement | null = document.querySelector('[data-testid="service-provider-delete-button"]');
+        expect(confirmBtn).toBeTruthy();
+        confirmBtn!.click();
+        await nextTick();
+
+        const closeBtn: HTMLElement | null = document.querySelector(
+          '[data-testid="close-service-provider-delete-success-dialog-button"]',
+        );
+        expect(closeBtn).toBeTruthy();
+        closeBtn!.click();
+        await nextTick();
+
+        await flushPromises();
+
+        expect(serviceProviderStore.manageableServiceProvidersForOrganisation).toEqual([
+          expect.objectContaining(remainingProvider),
+        ]);
+        expect(reloadSpy).toHaveBeenCalled();
+        reloadSpy.mockRestore();
+      });
     });
   });
 });

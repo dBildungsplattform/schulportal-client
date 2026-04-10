@@ -52,12 +52,15 @@
     cachedServiceProviderId.value = id;
   }
 
-  function onCloseDeleteDialog(): void {
-    serviceProviderStore.errorCode = '';
+  async function onCloseDeleteDialog(successful: boolean): Promise<void> {
+    if (!successful) {
+      serviceProviderStore.errorCode = '';
+      return;
+    }
     serviceProviderStore.manageableServiceProviders = serviceProviderStore.manageableServiceProviders.filter(
       (sp: ManageableServiceProviderListEntry) => sp.id !== cachedServiceProviderId.value,
     );
-    serviceProviderStore.getManageableServiceProviders(
+    await serviceProviderStore.getManageableServiceProviders(
       searchFilterStore.serviceProviderPage,
       searchFilterStore.serviceProviderPerPage,
     );

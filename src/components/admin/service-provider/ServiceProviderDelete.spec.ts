@@ -45,7 +45,9 @@ describe('ServiceProviderDelete.vue', () => {
   it('renders confirmation message by default', async (): Promise<void> => {
     const wrapper: VueWrapper<InstanceType<typeof ServiceProviderDelete>> = mountDialog();
     await openDialog(wrapper);
-    const confirmationText: DOMWrapper<HTMLElement> = wrapper.find('[data-testid="service-provider-delete-confirmation-text"]');
+    const confirmationText: DOMWrapper<HTMLElement> = wrapper.find(
+      '[data-testid="service-provider-delete-confirmation-text"]',
+    );
     expect(confirmationText.exists()).toBe(true);
     expect(wrapper.html()).toContain('Möchten Sie das Angebot Test Provider wirklich löschen');
   });
@@ -66,13 +68,15 @@ describe('ServiceProviderDelete.vue', () => {
     expect(wrapper.emitted('onDeleteServiceProvider')![0]).toEqual(['sp-123']);
   });
 
-  it('emits onClose when close button is clicked in success state', async (): Promise<void> => {
+  it('emits onClose when close button is clicked in complete state', async (): Promise<void> => {
     const wrapper: VueWrapper<InstanceType<typeof ServiceProviderDelete>> = mountDialog();
     await openDialog(wrapper);
     // Simulate state COMPLETE
     await wrapper.find('[data-testid="service-provider-delete-button"]')?.trigger('click');
     await nextTick();
-    const btn: DOMWrapper<HTMLElement> = wrapper.find('[data-testid="close-service-provider-delete-success-dialog-button"]');
+    const btn: DOMWrapper<HTMLElement> = wrapper.find(
+      '[data-testid="close-service-provider-delete-complete-dialog-button"]',
+    );
     if (btn.exists()) {
       await btn.trigger('click');
       expect(wrapper.emitted('onClose')).toBeTruthy();

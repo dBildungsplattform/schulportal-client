@@ -1,11 +1,14 @@
-
 import { flushPromises, mount, VueWrapper, type DOMWrapper } from '@vue/test-utils';
 import { type Router, createRouter, createWebHistory } from 'vue-router';
 import routes from '@/router/routes';
 import ServiceProviderManagementView from './ServiceProviderManagementView.vue';
 import type { MockInstance } from 'vitest';
 import { nextTick, type Component } from 'vue';
-import { useServiceProviderStore, type ManageableServiceProviderListEntry, type ServiceProviderStore } from '@/stores/ServiceProviderStore';
+import {
+  useServiceProviderStore,
+  type ManageableServiceProviderListEntry,
+  type ServiceProviderStore,
+} from '@/stores/ServiceProviderStore';
 import { DoFactory } from 'test/DoFactory';
 
 let router: Router;
@@ -22,7 +25,6 @@ function mountComponent(): VueWrapper<InstanceType<typeof ServiceProviderManagem
     },
   });
 }
-
 
 beforeEach(async (): Promise<void> => {
   document.body.innerHTML = `
@@ -46,7 +48,6 @@ beforeEach(async (): Promise<void> => {
   ];
 });
 
-
 describe('ServiceProviderManagementView', () => {
   it('should render', () => {
     const wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementView>> = mountComponent();
@@ -67,9 +68,13 @@ describe('ServiceProviderManagementView', () => {
     it('renders ServiceProviderDelete button for each row', () => {
       const wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementView>> = mountComponent();
       // Find all delete icons (activators)
-      const deleteIcons: DOMWrapper<Element>[] = wrapper.findAll('[data-testid="open-service-provider-delete-dialog-icon"]');
+      const deleteIcons: DOMWrapper<Element>[] = wrapper.findAll(
+        '[data-testid="open-service-provider-delete-dialog-icon"]',
+      );
       expect(deleteIcons.length).toBe(
-        serviceProviderStore.manageableServiceProviders.filter((sp: ManageableServiceProviderListEntry) => sp.isDeleteAuthorized).length,
+        serviceProviderStore.manageableServiceProviders.filter(
+          (sp: ManageableServiceProviderListEntry) => sp.isDeleteAuthorized,
+        ).length,
       );
     });
 
@@ -88,7 +93,7 @@ describe('ServiceProviderManagementView', () => {
       const deleteSpy: MockInstance = vi.spyOn(serviceProviderStore, 'deleteServiceProvider').mockResolvedValue();
       // Click confirm
       if (confirmBtn) {
-        (confirmBtn).click();
+        confirmBtn.click();
         await nextTick();
         expect(deleteSpy).toHaveBeenCalled();
       }
@@ -116,11 +121,41 @@ describe('ServiceProviderManagementView', () => {
       );
       expect(cancelBtn).toBeTruthy();
       if (cancelBtn) {
-        (cancelBtn).click();
+        cancelBtn.click();
         await nextTick();
         await flushPromises();
         expect(serviceProviderStore.errorCode).toBe('');
       }
+    });
+
+    it('closes the delete dialog and removes provider if successful', async () => {
+      const wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementView>> = mountComponent();
+
+      const remainingProvider: ManageableServiceProviderListEntry = serviceProviderStore.manageableServiceProviders[1]!;
+
+      const reloadSpy = vi.spyOn(serviceProviderStore, 'getManageableServiceProviders').mockResolvedValue();
+
+      const deleteIcon: DOMWrapper<Element> = wrapper.find('[data-testid="open-service-provider-delete-dialog-icon"]');
+      await deleteIcon.trigger('click');
+      await nextTick();
+
+      const confirmBtn: HTMLElement | null = document.querySelector('[data-testid="service-provider-delete-button"]');
+      expect(confirmBtn).toBeTruthy();
+      confirmBtn!.click();
+      await nextTick();
+
+      const closeBtn: HTMLElement | null = document.querySelector(
+        '[data-testid="close-service-provider-delete-success-dialog-button"]',
+      );
+      expect(closeBtn).toBeTruthy();
+      closeBtn!.click();
+      await nextTick();
+
+      await flushPromises();
+
+      expect(serviceProviderStore.manageableServiceProviders).toEqual([expect.objectContaining(remainingProvider)]);
+      expect(reloadSpy).toHaveBeenCalled();
+      reloadSpy.mockRestore();
     });
   });
 });

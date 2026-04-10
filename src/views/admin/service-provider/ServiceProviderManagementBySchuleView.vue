@@ -144,14 +144,17 @@
     cachedServiceProviderId.value = id;
   }
 
-  function onCloseDeleteDialog(): void {
-    serviceProviderStore.errorCode = '';
+  async function onCloseDeleteDialog(successful: boolean): Promise<void> {
+    if (!successful) {
+      serviceProviderStore.errorCode = '';
+      return;
+    }
     serviceProviderStore.manageableServiceProvidersForOrganisation =
       serviceProviderStore.manageableServiceProvidersForOrganisation.filter(
         (sp: ManageableServiceProviderListEntry) => sp.id !== cachedServiceProviderId.value,
       );
     if (selectedOrganisationId.value) {
-      serviceProviderStore.getManageableServiceProvidersForOrganisation(
+      await serviceProviderStore.getManageableServiceProvidersForOrganisation(
         selectedOrganisationId.value,
         searchFilterStore.serviceProviderSchulePage,
         searchFilterStore.serviceProviderSchulePerPage,

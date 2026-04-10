@@ -17,7 +17,7 @@
 
   type Emits = {
     (event: 'onDeleteServiceProvider', serviceProviderId: string): void;
-    (event: 'onClose'): void;
+    (event: 'onClose', completed: boolean): void;
   };
 
   enum State {
@@ -46,8 +46,9 @@
     return hasTriggeredAction.value ? State.COMPLETE : State.CONFIRM;
   });
 
-  function closeServiceProviderDeleteDialog(isActive: Ref<boolean>): void {
+  function closeServiceProviderDeleteDialog(isActive: Ref<boolean>, successful: boolean): void {
     isActive.value = false;
+    emit('onClose', successful);
   }
 
   function handleServiceProviderDelete(serviceProviderId: string): void {
@@ -57,8 +58,7 @@
 
   function closeSuccessDialog(isActive: Ref<boolean>): void {
     isClosing.value = true;
-    closeServiceProviderDeleteDialog(isActive);
-    emit('onClose');
+    closeServiceProviderDeleteDialog(isActive, props.errorCode === '');
   }
 
   const deleteServiceProviderConfirmationMessage: ComputedRef<string> = computed(() => {
@@ -97,11 +97,11 @@
     <template #default="{ isActive }">
       <LayoutCard
         :headline-test-id="
-          state === State.COMPLETE ? 'service-provider-delete-success' : 'service-provider-delete-confirmation'
+          state === State.COMPLETE ? 'service-provider-delete-complete' : 'service-provider-delete-confirmation'
         "
         :closable="state === State.COMPLETE ? false : true"
         :header="$t('admin.angebot.delete.title')"
-        @on-close-clicked="closeServiceProviderDeleteDialog(isActive)"
+        @on-close-clicked="closeServiceProviderDeleteDialog(isActive, false)"
       >
         <v-card-text>
           <v-container>
@@ -119,7 +119,7 @@
                 </span>
                 <span
                   v-else-if="state === State.COMPLETE && !props.errorCode"
-                  data-testid="service-provider-delete-success-text"
+                  data-testid="service-provider-delete-complete-text"
                 >
                   {{ deleteServiceProviderSuccessMessage }}
                 </span>
@@ -145,7 +145,7 @@
                 :block="mdAndDown"
                 class="secondary button"
                 data-testid="cancel-service-provider-delete-dialog-button"
-                @click.stop="closeServiceProviderDeleteDialog(isActive)"
+                @click.stop="closeServiceProviderDeleteDialog(isActive, false)"
               >
                 {{ $t('cancel') }}
               </v-btn>
