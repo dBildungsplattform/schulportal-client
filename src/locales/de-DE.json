@@ -143,8 +143,7 @@
         "confirmation": "Möchten Sie das Angebot {serviceProviderName} wirklich löschen?",
         "success": "Das Angebot {serviceProviderName} wurde erfolgreich gelöscht.",
         "title": "Angebot löschen",
-        "action": "Löschen",
-        "errors": {}
+        "action": "Löschen"
       },
       "edit": "Angebot bearbeiten",
       "showAll": "Alle Angebote anzeigen",
