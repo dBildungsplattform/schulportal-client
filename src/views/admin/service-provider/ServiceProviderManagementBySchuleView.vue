@@ -219,7 +219,7 @@
       :title="errorTitle"
       :type="'error'"
     />
-    <template>
+    <template v-if="!serviceProviderStore.errorCode">
       <v-row
         align="start"
         class="ma-3"
@@ -268,7 +268,8 @@
                 <span
                   v-else
                   class="filter-header"
-                  >{{
+                >
+                  {{
                     $t(
                       'admin.schule.schulenFound',
                       {
@@ -277,8 +278,8 @@
                       },
                       organisationStore.organisationenFilters.get('service-provider-management-by-schule')?.total ?? 0,
                     )
-                  }}</span
-                >
+                  }}
+                </span>
               </v-list-item>
             </template>
           </SchulenFilter>

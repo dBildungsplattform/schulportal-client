@@ -142,6 +142,7 @@
       :type="'error'"
     />
     <ResultTable
+      v-if="!serviceProviderStore.errorCode"
       :headers
       :items
       :itemsPerPage="searchFilterStore.serviceProviderPerPage"
