@@ -1,8 +1,9 @@
 <script setup lang="ts">
-  import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { computed, ref, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
+
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
 

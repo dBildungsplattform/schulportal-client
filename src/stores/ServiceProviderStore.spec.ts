@@ -16,7 +16,6 @@ import {
   ServiceProviderMerkmal,
   useServiceProviderStore,
   type ManageableServiceProviderDetail,
-  /* type ManageableServiceProviderListEntry, */
   type PersistRollenerweiterung,
   type RollenErweiterungenUebersicht,
   type ServiceProviderCreationFilter,

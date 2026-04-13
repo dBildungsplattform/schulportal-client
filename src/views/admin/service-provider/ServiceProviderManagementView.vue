@@ -1,11 +1,12 @@
 <script setup lang="ts">
   import { computed, ref, watchEffect, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
+  import { useRouter, type Router } from 'vue-router';
 
   import ResultTable, { type Headers, type TableRow } from '@/components/admin/ResultTable.vue';
-  import LayoutCard from '@/components/cards/LayoutCard.vue';
   import ServiceProviderDelete from '@/components/admin/service-provider/ServiceProviderDelete.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
   import {
     useServiceProviderStore,
@@ -13,7 +14,6 @@
     type ServiceProviderStore,
   } from '@/stores/ServiceProviderStore';
   import { getDisplayNameForOrg } from '@/utils/formatting';
-  import { useRouter, type Router } from 'vue-router';
 
   type ServiceProviderRow = {
     id: string;
