@@ -813,7 +813,6 @@
       "selectServiceProvider": "Angebote auswählen",
       "deleteServiceProvider": "Angebot löschen",
       "deleteServiceProviderSuccessMessage": "Das Angebot {name} wurde erfolgreich gelöscht.",
-      "deleteServiceProviderSuccessMessage": "Das Angebot {name} wurde erfolgreich gelöscht.",
       "serviceProvider": "Angebote"
     },
     "status": "Status",
