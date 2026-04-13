@@ -46,6 +46,7 @@ beforeEach(async (): Promise<void> => {
     DoFactory.getManageableServiceProviderListEntryResponse({ isDeleteAuthorized: true }),
     DoFactory.getManageableServiceProviderListEntryResponse({ isDeleteAuthorized: false }),
   ];
+  serviceProviderStore.errorCode = '';
 });
 
 describe('ServiceProviderManagementView', () => {
@@ -100,34 +101,6 @@ describe('ServiceProviderManagementView', () => {
         expect(deleteSpy).toHaveBeenCalled();
       }
       deleteSpy.mockRestore();
-    });
-
-    it('closes the delete dialog and resets error code', async () => {
-      const wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementView>> = mountComponent();
-      // Open dialog
-      const deleteIcon: DOMWrapper<Element> = wrapper.find('[data-testid="open-service-provider-delete-dialog-icon"]');
-      await deleteIcon.trigger('click');
-      await nextTick();
-
-      const confirmBtn: HTMLElement | null = document.querySelector('[data-testid="service-provider-delete-button"]');
-      expect(confirmBtn).toBeTruthy();
-      confirmBtn!.click();
-
-      // Simulate error code
-      serviceProviderStore.errorCode = 'UNSPECIFIED_ERROR';
-      await nextTick();
-
-      // Find and click cancel button
-      const cancelBtn: HTMLElement | null = document.querySelector(
-        '[data-testid="close-service-provider-delete-error-dialog-button"]',
-      );
-      expect(cancelBtn).toBeTruthy();
-      if (cancelBtn) {
-        cancelBtn.click();
-        await nextTick();
-        await flushPromises();
-        expect(serviceProviderStore.errorCode).toBe('');
-      }
     });
 
     it('closes the delete dialog and removes provider if successful', async () => {

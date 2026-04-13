@@ -53,6 +53,7 @@ beforeEach(async () => {
     DoFactory.getManageableServiceProviderListEntryResponse({ isDeleteAuthorized: true }),
     DoFactory.getManageableServiceProviderListEntryResponse({ isDeleteAuthorized: false }),
   ];
+  serviceProviderStore.errorCode = '';
 });
 
 describe('ServiceProviderManagementBySchuleView', () => {
