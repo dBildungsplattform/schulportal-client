@@ -625,4 +625,42 @@ describe('serviceProviderStore', () => {
       expect(serviceProviderStore.loading).toBe(false);
     });
   });
+
+  describe('deleteServiceProvider', () => {
+    const providerId: string = 'provider-to-delete';
+    const apiUrl: string = `/api/provider/${providerId}`;
+
+    beforeEach(() => {
+      mockadapter.reset();
+      serviceProviderStore.errorCode = '';
+      serviceProviderStore.loading = false;
+    });
+
+    it('removes provider from all arrays and resets currentServiceProvider on success', async () => {
+      mockadapter.onDelete(apiUrl).replyOnce(200);
+      const promise: Promise<void> = serviceProviderStore.deleteServiceProvider(providerId);
+      expect(serviceProviderStore.loading).toBe(true);
+      await promise;
+      expect(serviceProviderStore.errorCode).toBe('');
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+
+    it('sets errorCode to UNSPECIFIED_ERROR on string error', async () => {
+      mockadapter.onDelete(apiUrl).replyOnce(500, 'some error');
+      const promise: Promise<void> = serviceProviderStore.deleteServiceProvider(providerId);
+      expect(serviceProviderStore.loading).toBe(true);
+      await promise;
+      expect(serviceProviderStore.errorCode).toBe('UNSPECIFIED_ERROR');
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+
+    it('sets errorCode to error code if present in error response', async () => {
+      mockadapter.onDelete(apiUrl).replyOnce(500, { code: 'some error code' });
+      const promise: Promise<void> = serviceProviderStore.deleteServiceProvider(providerId);
+      expect(serviceProviderStore.loading).toBe(true);
+      await promise;
+      expect(serviceProviderStore.errorCode).toBe('some error code');
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+  });
 });

@@ -1,8 +1,11 @@
 <script setup lang="ts">
-  import { computed, watchEffect, type ComputedRef } from 'vue';
+  import { computed, ref, watchEffect, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
+  import { useRouter, type Router } from 'vue-router';
 
   import ResultTable, { type Headers, type TableRow } from '@/components/admin/ResultTable.vue';
+  import ServiceProviderDelete from '@/components/admin/service-provider/ServiceProviderDelete.vue';
+  import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
   import {
@@ -11,7 +14,6 @@
     type ServiceProviderStore,
   } from '@/stores/ServiceProviderStore';
   import { getDisplayNameForOrg } from '@/utils/formatting';
-  import { useRouter, type Router } from 'vue-router';
 
   type ServiceProviderRow = {
     id: string;
@@ -20,6 +22,7 @@
     administrationsebene: string;
     rollen: string;
     hasRollenerweiterung: string;
+    isDeleteAuthorized: boolean;
   };
 
   const router: Router = useRouter();
@@ -28,13 +31,71 @@
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
 
+  const cachedServiceProviderId: Ref<string | null> = ref(null);
+
+  const errorTitle: ComputedRef<string> = computed(() => {
+    if (!serviceProviderStore.errorCode) {
+      return '';
+    }
+    return t(`admin.angebot.title.${serviceProviderStore.errorCode}`);
+  });
+
+  const errorText: ComputedRef<string> = computed(() => {
+    if (!serviceProviderStore.errorCode) {
+      return '';
+    }
+    const serviceProviderName: string =
+      serviceProviderStore.manageableServiceProviders.find(
+        (sp: ManageableServiceProviderListEntry) => sp.id === cachedServiceProviderId.value,
+      )?.name ?? '';
+    return t(`admin.angebot.errors.${serviceProviderStore.errorCode}`, {
+      serviceProviderName,
+    });
+  });
+
   const headers: Headers = [
     { title: t('angebot.kategorie'), key: 'kategorie', align: 'start' },
     { title: t('angebot.name'), key: 'name', align: 'start' },
     { title: t('angebot.administrationsebene'), key: 'administrationsebene', align: 'start' },
     { title: t('angebot.rollen'), key: 'rollen', align: 'start' },
     { title: t('angebot.schulspezifischErweitert'), key: 'hasRollenerweiterung', align: 'start' },
+    {
+      title: t('action'),
+      key: 'actions',
+      align: 'center',
+      sortable: false,
+      width: '250px',
+    },
   ];
+
+  async function reloadData(): Promise<void> {
+    await serviceProviderStore.getManageableServiceProviders(
+      searchFilterStore.serviceProviderPage,
+      searchFilterStore.serviceProviderPerPage,
+    );
+  }
+
+  const handleAlertClose = async (): Promise<void> => {
+    serviceProviderStore.errorCode = '';
+    await reloadData();
+  };
+
+  async function onDelete(id: string): Promise<void> {
+    await serviceProviderStore.deleteServiceProvider(id);
+    cachedServiceProviderId.value = id;
+  }
+
+  async function onCloseDeleteDialog(successful: boolean): Promise<void> {
+    if (!successful) {
+      serviceProviderStore.errorCode = '';
+      return;
+    }
+    serviceProviderStore.manageableServiceProviders = serviceProviderStore.manageableServiceProviders.filter(
+      (sp: ManageableServiceProviderListEntry) => sp.id !== cachedServiceProviderId.value,
+    );
+    await reloadData();
+  }
+
   const items: ComputedRef<ServiceProviderRow[]> = computed(() => {
     return serviceProviderStore.manageableServiceProviders.map((sp: ManageableServiceProviderListEntry) => {
       return {
@@ -47,6 +108,7 @@
             ? sp.rollen.map((rolle: ManageableServiceProviderListEntry['rollen'][number]) => rolle.name).join(', ')
             : '---',
         hasRollenerweiterung: sp.rollenerweiterungen && sp.rollenerweiterungen.length > 0 ? t('yes') : t('no'),
+        isDeleteAuthorized: sp.isDeleteAuthorized,
       };
     });
   });
@@ -56,10 +118,7 @@
   }
 
   watchEffect(async () => {
-    await serviceProviderStore.getManageableServiceProviders(
-      searchFilterStore.serviceProviderPage,
-      searchFilterStore.serviceProviderPerPage,
-    );
+    await reloadData();
   });
 </script>
 
@@ -71,7 +130,19 @@
     {{ $t('admin.headline') }}
   </h1>
   <LayoutCard :header="t('admin.angebot.management.title')">
+    <SpshAlert
+      :button-action="handleAlertClose"
+      :button-text="t('nav.backToList')"
+      :closable="false"
+      data-test-id-prefix="service-provider-management-error"
+      :model-value="!!serviceProviderStore.errorCode"
+      :show-button="true"
+      :text="errorText"
+      :title="errorTitle"
+      :type="'error'"
+    />
     <ResultTable
+      v-if="!serviceProviderStore.errorCode"
       :headers
       :items
       :itemsPerPage="searchFilterStore.serviceProviderPerPage"
@@ -93,6 +164,17 @@
         >
           {{ item.rollen }}
         </div>
+      </template>
+      <template #[`item.actions`]="{ item }: { item: ServiceProviderRow }">
+        <ServiceProviderDelete
+          v-if="item.isDeleteAuthorized"
+          :error-code="serviceProviderStore.errorCode"
+          :is-loading="serviceProviderStore.loading"
+          :service-provider-id="item.id"
+          :service-provider-name="item.name"
+          @on-delete-service-provider="onDelete"
+          @on-close="onCloseDeleteDialog"
+        />
       </template>
     </ResultTable>
   </LayoutCard>
