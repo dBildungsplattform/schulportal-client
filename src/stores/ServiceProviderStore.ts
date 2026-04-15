@@ -20,7 +20,10 @@ import {
   type RolleApiInterface,
   type RollenerweiterungForManageableServiceProviderResponse,
   type ServiceProviderResponse,
+  type UpdateServiceProviderBodyParams,
 } from '../api-client/generated/api';
+import { updateFormatted } from 'vuetify/lib/labs/VCalendar/util/timestamp.mjs';
+import type { ServiceProviderFormSubmitData } from '@/components/admin/service-provider/types';
 
 const serviceProviderApi: ProviderApiInterface = ProviderApiFactory(undefined, '', axiosApiInstance);
 const rolleApi: RolleApiInterface = RolleApiFactory(undefined, '', axiosApiInstance);
@@ -169,6 +172,7 @@ type ServiceProviderActions = {
   getRollenerweiterungenById: (filter: RollenerweiterungFilter) => Promise<void>;
   persistRollenerweiterungenForServiceProvider: (filter: PersistRollenerweiterung) => Promise<void>;
   createServiceProvider: (filter: ServiceProviderCreationFilter) => Promise<void>;
+  updateServiceProvider: (value: ManageableServiceProviderDetail) => Promise<void>;
   deleteServiceProvider: (id: string) => Promise<void>;
 };
 
@@ -413,6 +417,27 @@ export const useServiceProviderStore: StoreDefinition<
         const { data }: { data: ServiceProviderResponse } =
           await serviceProviderApi.providerControllerCreateServiceProvider(bodyParams);
         this.createdServiceProvider = data;
+      } catch (error) {
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async updateServiceProvider(id: string, update: ServiceProviderFormSubmitData): Promise<void> {
+      this.loading = true;
+      try {
+        const updateServiceProviderBodyParams: UpdateServiceProviderBodyParams = {};
+        if (update.name) {
+          updateServiceProviderBodyParams.name = update.name;
+        }
+        if (update.url) {
+          updateServiceProviderBodyParams.url = update.url;
+        }
+        if (update.kategorie) {
+          updateServiceProviderBodyParams.kategorie = update.kategorie;
+        }
+        await serviceProviderApi.providerControllerUpdateServiceProvider(id, updateServiceProviderBodyParams);
       } catch (error) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
