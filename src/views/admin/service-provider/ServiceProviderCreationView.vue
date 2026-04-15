@@ -1,14 +1,12 @@
 <script setup lang="ts">
   import SchulPortalLogo from '@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg';
+  import ServiceProviderForm from '@/components/admin/service-provider/ServiceProviderForm.vue';
   import SuccessTemplate from '@/components/admin/service-provider/SuccessTemplate.vue';
+  import type { ServiceProviderFormSubmitData } from '@/components/admin/service-provider/types';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import SchulenFilter from '@/components/filter/SchulenFilter.vue';
-  import FormRow from '@/components/form/FormRow.vue';
-  import FormWrapper from '@/components/form/FormWrapper.vue';
   import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
-  import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
   import { RollenSystemRecht } from '@/stores/RolleStore';
   import {
     ServiceProviderKategorie,
@@ -16,9 +14,6 @@
     useServiceProviderStore,
     type ServiceProviderStore,
   } from '@/stores/ServiceProviderStore';
-  import { DIN_91379A_EXT, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
-  import { toTypedSchema } from '@vee-validate/yup';
-  import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
   import { computed, onMounted, onUnmounted, ref, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import {
@@ -28,12 +23,9 @@
     type RouteLocationNormalized,
     type Router,
   } from 'vue-router';
-  import { boolean, object, string } from 'yup';
-  import type { ServiceProviderForm } from './types';
 
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
   const authStore: AuthStore = useAuthStore();
-  const organisationStore: OrganisationStore = useOrganisationStore();
 
   const router: Router = useRouter();
   const { t }: Composer = useI18n({ useScope: 'global' });
@@ -43,116 +35,24 @@
   const selectedOrganisationIdCache: Ref<string | undefined> = ref(undefined);
   const selectedOrganisationNameCache: Ref<string | undefined> = ref(undefined);
 
-  const hasAngeboteVerwaltenPermission: ComputedRef<boolean> = computed(() => authStore.hasAngeboteVerwaltenPermission);
+  const isDirty: Ref<boolean> = ref(false);
 
-  const validationSchema: TypedSchema = toTypedSchema(
-    object({
-      selectedOrganisationId: string().required(t('angebot.rules.organisation.required')),
-      name: string()
-        .max(50, t('angebot.rules.name.maxLength'))
-        .matches(DIN_91379A_EXT, t('angebot.rules.name.matches'))
-        .matches(NO_LEADING_TRAILING_SPACES, t('angebot.rules.name.noLeadingTrailingSpaces'))
-        .required(t('angebot.rules.name.required')),
-      url: string().required(t('angebot.rules.url.required')),
-      logo: string().optional(),
-      kategorie: string().required(t('angebot.rules.kategorie.required')),
-      nachtraeglichZuweisbar: boolean().optional(),
-      verfuegbarFuerRollenerweiterung: boolean().optional(),
-      requires2fa: boolean().optional(),
-    }),
-  );
-
-  const vuetifyConfig: (state: { errors: Array<string> }) => {
-    props: { error: boolean; 'error-messages': Array<string> };
-  } = (state: { errors: string[] }) => ({
-    props: {
-      error: !!state.errors.length,
-      'error-messages': state.errors,
-    },
+  const relevantSystemrecht: ComputedRef<RollenSystemRecht> = computed(() => {
+    if (authStore.hasAngeboteVerwaltenPermission) {
+      return RollenSystemRecht.AngeboteVerwalten;
+    }
+    return RollenSystemRecht.AngeboteEingeschraenktVerwalten;
   });
-
-  const { autoselectedSchule } = useAutoselectedSchule([
-    hasAngeboteVerwaltenPermission.value
-      ? RollenSystemRecht.AngeboteVerwalten
-      : RollenSystemRecht.AngeboteEingeschraenktVerwalten,
-  ]);
-
-  const formContext: FormContext<ServiceProviderForm, ServiceProviderForm> = useForm<ServiceProviderForm>({
-    validationSchema,
-    initialValues: {
-      selectedOrganisationId: autoselectedSchule.value ? autoselectedSchule.value.id : undefined,
-      kategorie: ServiceProviderKategorie.Schulisch,
-      nachtraeglichZuweisbar: true,
-      verfuegbarFuerRollenerweiterung: true,
-      requires2fa: false,
-      logo: SchulPortalLogo,
-    },
+  const autoSelectedSchuleId: ComputedRef<string | undefined> = computed(() => {
+    const { autoselectedSchule } = useAutoselectedSchule([relevantSystemrecht.value]);
+    return autoselectedSchule.value?.id;
   });
-
-  const [selectedOrganisationId, selectedOrganisationIdProps]: [
-    Ref<string | undefined>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = formContext.defineField('selectedOrganisationId', vuetifyConfig);
-
-  const [name, nameProps]: [Ref<string>, Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>] =
-    formContext.defineField('name', vuetifyConfig);
-
-  const [url, urlProps]: [Ref<string>, Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>] =
-    formContext.defineField('url', vuetifyConfig);
-
-  const [logo, logoProps]: [Ref<string>, Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>] =
-    formContext.defineField('logo', vuetifyConfig);
-
-  const [kategorie, kategorieProps]: [
-    Ref<string | undefined>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = formContext.defineField('kategorie', vuetifyConfig);
-
-  const [requires2fa, requires2faProps]: [
-    Ref<boolean>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = formContext.defineField('requires2fa', vuetifyConfig);
-
-  const [nachtraeglichZuweisbar, nachtraeglichZuweisbarProps]: [
-    Ref<boolean>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = formContext.defineField('nachtraeglichZuweisbar', vuetifyConfig);
-
-  const [verfuegbarFuerRollenerweiterung, verfuegbarFuerRollenerweiterungProps]: [
-    Ref<boolean>,
-    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-  ] = formContext.defineField('verfuegbarFuerRollenerweiterung', vuetifyConfig);
-
-  const kategorieItems: ComputedRef<{ title: string; value: string }[]> = computed(() =>
-    Object.values(ServiceProviderKategorie).map((k: ServiceProviderKategorie) => ({
-      title: t(`angebot.kategorien.${k}`),
-      value: k,
-    })),
-  );
-
-  const canCommit: ComputedRef<boolean> = computed(() => formContext.meta.value.valid);
 
   const selectedOrganisationName: ComputedRef<string> = computed(() => selectedOrganisationNameCache.value || '');
-
-  function openUrlInNewTab(): void {
-    if (!url.value) {
-      return;
-    }
-
-    let value: string = url.value.trim();
-
-    // If it doesn't already have a protocol → force https. Useful because we want to allow the admin to just enter "example.com" instead of "https://example.com"
-    if (!/^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(value)) {
-      value = 'https://' + value;
-    }
-
-    window.open(value, '_blank', 'noopener,noreferrer');
-  }
 
   function navigateToServiceProviderDetails(): void {
     if (serviceProviderStore.createdServiceProvider) {
       const id: string = serviceProviderStore.createdServiceProvider.id;
-      formContext.resetForm();
       selectedOrganisationNameCache.value = '';
       serviceProviderStore.errorCode = '';
       router.push({
@@ -169,7 +69,6 @@
 
   function navigateToServiceProviderTable(): void {
     router.push({ name: 'angebot-management-schulspezifisch' });
-    formContext.resetForm();
     selectedOrganisationNameCache.value = '';
     serviceProviderStore.errorCode = '';
     serviceProviderStore.createdServiceProvider = null;
@@ -188,40 +87,12 @@
 
   function navigateBackToAngebotForm(): void {
     if (serviceProviderStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
-      formContext.resetForm();
       selectedOrganisationNameCache.value = '';
       navigateToCreatePersonRoute(true);
     } else {
       serviceProviderStore.errorCode = '';
       navigateToCreatePersonRoute();
     }
-  }
-
-  function updateSelectedOrganisation(id: string | undefined): void {
-    formContext.setFieldValue('selectedOrganisationId', id);
-    if (id) {
-      const orgsObj: { filterResult: Organisation[] } | undefined =
-        organisationStore.organisationenFilters.get('service-provider-create');
-      const orgs: Organisation[] = orgsObj && Array.isArray(orgsObj.filterResult) ? orgsObj.filterResult : [];
-      const match: Organisation | undefined = orgs.find((o: Organisation) => o.id === id);
-      if (match) {
-        selectedOrganisationNameCache.value = match.name;
-      }
-    } else {
-      selectedOrganisationNameCache.value = undefined;
-    }
-  }
-
-  function isFormDirty(): boolean {
-    return (
-      formContext.isFieldDirty('selectedOrganisationId') ||
-      formContext.isFieldDirty('name') ||
-      formContext.isFieldDirty('url') ||
-      formContext.isFieldDirty('kategorie') ||
-      formContext.isFieldDirty('nachtraeglichZuweisbar') ||
-      formContext.isFieldDirty('verfuegbarFuerRollenerweiterung') ||
-      formContext.isFieldDirty('requires2fa')
-    );
   }
 
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
@@ -235,7 +106,7 @@
   }
 
   function handleDiscard(): void {
-    if (isFormDirty()) {
+    if (isDirty.value) {
       showUnsavedChangesDialog.value = true;
       blockedNext = navigateToServiceProviderTable;
     } else {
@@ -244,49 +115,33 @@
   }
 
   function preventNavigation(event: BeforeUnloadEvent): void {
-    if (!isFormDirty()) {
+    if (!isDirty.value) {
       return;
     }
     event.preventDefault();
     event.returnValue = '';
   }
 
-  const onSubmit: (e?: Event) => Promise<Promise<void> | undefined> = formContext.handleSubmit(
-    async (values: ServiceProviderForm) => {
-      const merkmale: ServiceProviderMerkmal[] = [];
-      if (values.nachtraeglichZuweisbar) {
-        merkmale.push(ServiceProviderMerkmal.NachtraeglichZuweisbar);
-      }
-      if (values.verfuegbarFuerRollenerweiterung) {
-        merkmale.push(ServiceProviderMerkmal.VerfuegbarFuerRollenerweiterung);
-      }
+  const onSubmit = async (values: ServiceProviderFormSubmitData) => {
+    await serviceProviderStore.createServiceProvider({
+      organisationId: values.selectedOrganisation.id,
+      name: values.name,
+      url: values.url,
+      kategorie: values.kategorie,
+      requires2fa: values.requires2fa,
+      merkmale: values.merkmale,
+    });
 
-      // Normalize URL: add https:// if no protocol is present
-      let normalizedUrl: string = values.url.trim();
-      if (!/^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(normalizedUrl)) {
-        normalizedUrl = 'https://' + normalizedUrl;
-      }
-
-      await serviceProviderStore.createServiceProvider({
-        organisationId: values.selectedOrganisationId!,
-        name: values.name,
-        url: normalizedUrl,
-        kategorie: values.kategorie,
-        requires2fa: values.requires2fa,
-        merkmale,
-      });
-
-      if (!serviceProviderStore.errorCode) {
-        showSuccess.value = true;
-        selectedOrganisationIdCache.value = values.selectedOrganisationId;
-        selectedOrganisationNameCache.value = selectedOrganisationName.value;
-        formContext.resetForm();
-      }
-    },
-  );
+    if (!serviceProviderStore.errorCode) {
+      isDirty.value = false;
+      showSuccess.value = true;
+      selectedOrganisationIdCache.value = values.selectedOrganisation.id;
+      selectedOrganisationNameCache.value = values.selectedOrganisation.name;
+    }
+  };
 
   onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
-    if (isFormDirty()) {
+    if (isDirty.value) {
       showUnsavedChangesDialog.value = true;
       blockedNext = next;
     } else {
@@ -324,281 +179,41 @@
     >
       <!-- The form to create a new Angebot -->
       <template v-if="!serviceProviderStore.createdServiceProvider">
-        <FormWrapper
-          id="service-provider-create-form"
-          :confirm-unsaved-changes-action="handleConfirmUnsavedChanges"
-          :can-commit="canCommit"
-          :create-button-label="$t('angebot.create')"
-          :discard-button-label="$t('angebot.discard')"
-          :hide-actions="!!serviceProviderStore.errorCode"
-          :is-loading="serviceProviderStore.loading"
-          :on-discard="handleDiscard"
-          :on-submit="onSubmit"
-          :show-unsaved-changes-dialog="showUnsavedChangesDialog"
-          @on-show-dialog-change="(value?: boolean) => (showUnsavedChangesDialog = value || false)"
-        >
-          <!-- Error Message -->
-          <SpshAlert
-            :model-value="!!serviceProviderStore.errorCode"
-            :title="$t('angebot.angebotCreateErrorTitle')"
-            :type="'error'"
-            :closable="false"
-            :show-button="true"
-            :button-action="navigateBackToAngebotForm"
-            :button-text="$t('angebot.backToCreateAngebot')"
-            :text="$t(`angebot.errors.${serviceProviderStore.errorCode}`)"
-          />
-          <template v-if="!serviceProviderStore.errorCode">
-            <!-- 1. Wer stellt das Angebot bereit? -->
-            <v-row>
-              <v-col>
-                <h3 class="headline-3">1. {{ $t('angebot.whoProvidesThisAngebot') }}</h3>
-              </v-col>
-            </v-row>
-            <FormRow
-              :error-label="selectedOrganisationIdProps['error']"
-              :is-required="true"
-              label-for-id="organisation-select"
-              :label="$t('angebot.providedBy')"
-            >
-              <SchulenFilter
-                :multiple="false"
-                parent-id="service-provider-create"
-                :placeholderText="$t('admin.organisation.selectOrganisation')"
-                :includeAll="true"
-                :systemrechte-for-search="
-                  authStore.currentUserPermissions.includes(RollenSystemRecht.AngeboteVerwalten)
-                    ? [RollenSystemRecht.AngeboteVerwalten]
-                    : [RollenSystemRecht.AngeboteEingeschraenktVerwalten]
-                "
-                :selected-schule-props="selectedOrganisationIdProps"
-                :selected-schulen="selectedOrganisationId"
-                @update:selected-schulen="updateSelectedOrganisation"
-                @update:selected-schulen-objects="
-                  (orgs) => {
-                    if (orgs.length > 0) {
-                      selectedOrganisationNameCache = orgs[0]?.name;
-                    }
-                  }
-                "
-              />
-            </FormRow>
-
-            <!-- 2. Name des Angebots -->
-            <v-row>
-              <v-col>
-                <h3 class="headline-3">2. {{ $t('angebot.nameOfAngebotInTheStartPage') }}</h3>
-              </v-col>
-            </v-row>
-            <FormRow
-              :error-label="nameProps['error']"
-              :is-required="true"
-              label-for-id="name-input"
-              :label="$t('angebot.name')"
-            >
-              <v-text-field
-                id="name-input"
-                v-bind="nameProps"
-                v-model="name"
-                autocomplete="off"
-                data-testid="name-input"
-                density="compact"
-                :placeholder="$t('angebot.enterName')"
-                required
-                variant="outlined"
-              />
-            </FormRow>
-
-            <!-- 3. URL des Angebots -->
-            <v-row class="mb-n8">
-              <v-col>
-                <h3 class="headline-3">3. {{ $t('angebot.urlOfTheAngebot') }}</h3>
-              </v-col>
-            </v-row>
-            <FormRow
-              class=""
-              :error-label="urlProps['error']"
-              :is-required="true"
-              label-for-id="url-input"
-              :label="$t('angebot.url')"
-            >
-              <div class="mb-sm-8"></div>
-              <v-text-field
-                id="url-input"
-                v-bind="urlProps"
-                v-model="url"
-                autocomplete="off"
-                data-testid="url-input"
-                density="compact"
-                :placeholder="$t('angebot.enterUrl')"
-                required
-                variant="outlined"
-              />
-              <div class="d-flex justify-end">
-                <v-btn
-                  :disabled="!url"
-                  class="primary smallest"
-                  data-testid="url-test-button"
-                  density="compact"
-                  variant="outlined"
-                  @click="openUrlInNewTab"
-                >
-                  {{ $t('angebot.testUrl') }}
-                </v-btn>
-              </div>
-            </FormRow>
-
-            <!-- 4. Logo des Angebots auf der Startseite der Anwender -->
-            <v-row>
-              <v-col>
-                <h3 class="headline-3">4. {{ $t('angebot.logoOfTheAngebotInTheStartPage') }}</h3>
-              </v-col>
-            </v-row>
-            <FormRow
-              :error-label="logoProps['error']"
-              :is-required="true"
-              label-for-id="logo-input"
-              :label="$t('angebot.logo')"
-            >
-              <!-- Hardcoding the Logo for now and outlining it. When migrating the Logos to this project there will be a dedicated component for logo selection -->
-              <v-card
-                class="d-flex align-center justify-center mb-5"
-                width="80"
-                height="80"
-                outlined
-              >
-                <div class="logo-box selected">
-                  <v-img
-                    :src="logo || SchulPortalLogo"
-                    max-height="48"
-                    max-width="48"
-                    contain
-                  />
-                </div>
-              </v-card>
-            </FormRow>
-
-            <!-- 5. Kategorie des Angebots -->
-            <v-row>
-              <v-col>
-                <h3 class="headline-3">5. {{ $t('angebot.kategorieOfTheAngebotInTheStartPage') }}</h3>
-              </v-col>
-            </v-row>
-            <FormRow
-              :error-label="kategorieProps['error']"
-              :is-required="false"
-              label-for-id="kategorie-select"
-              :label="$t('angebot.kategorie')"
-            >
-              <v-autocomplete
-                id="kategorie-select"
-                :disabled="!hasAngeboteVerwaltenPermission"
-                v-bind="kategorieProps"
-                v-model="kategorie"
-                autocomplete="off"
-                clearable
-                data-testid="kategorie-select"
-                density="compact"
-                :items="kategorieItems"
-                item-value="value"
-                item-title="title"
-                :no-data-text="$t('noDataFound')"
-                :placeholder="$t('angebot.selectKategorie')"
-                required
-                variant="outlined"
-              />
-            </FormRow>
-
-            <!-- 6. Darf dieses Angebot Rollen zugewiesen werden? -->
-            <v-row>
-              <v-col>
-                <h3 class="headline-3">6. {{ $t('angebot.canThisAngebotBeAssignedToRollen') }}</h3>
-              </v-col>
-            </v-row>
-            <FormRow
-              :error-label="nachtraeglichZuweisbarProps['error']"
-              :is-required="false"
-              label-for-id="nachtraeglich-zuweisbar-select"
-              :label="$t('angebot.canBeAssigned')"
-            >
-              <v-select
-                id="nachtraeglich-zuweisbar-select"
-                :disabled="!hasAngeboteVerwaltenPermission"
-                v-bind="nachtraeglichZuweisbarProps"
-                v-model="nachtraeglichZuweisbar"
-                data-testid="nachtraeglich-zuweisbar-select"
-                density="compact"
-                :items="[
-                  { title: $t('yes'), value: true },
-                  { title: $t('no'), value: false },
-                ]"
-                item-value="value"
-                item-title="title"
-                variant="outlined"
-              />
-            </FormRow>
-
-            <!-- 7. Darf dieses Angebot für schulspezifische Rollenerweiterungen genutzt werden? -->
-            <v-row>
-              <v-col>
-                <h3 class="headline-3">
-                  7. {{ $t('angebot.canThisAngebotBeUsedForSchulspezifischeRollenerweiterungen') }}
-                </h3>
-              </v-col>
-            </v-row>
-            <FormRow
-              :error-label="verfuegbarFuerRollenerweiterungProps['error']"
-              :is-required="false"
-              label-for-id="verfuegbar-fuer-rollenerweiterung-select"
-              :label="$t('angebot.canBeUsed')"
-            >
-              <v-select
-                id="verfuegbar-fuer-rollenerweiterung-select"
-                :disabled="!hasAngeboteVerwaltenPermission"
-                v-bind="verfuegbarFuerRollenerweiterungProps"
-                v-model="verfuegbarFuerRollenerweiterung"
-                data-testid="verfuegbar-fuer-rollenerweiterung-select"
-                density="compact"
-                :items="[
-                  { title: $t('yes'), value: true },
-                  { title: $t('no'), value: false },
-                ]"
-                item-value="value"
-                item-title="title"
-                variant="outlined"
-              />
-            </FormRow>
-
-            <!-- 8. Ist zur Nutzung eine Zwei-Faktor-Authentifizierung erforderlich? -->
-            <v-row>
-              <v-col>
-                <h3 class="headline-3">8. {{ $t('angebot.is2FARequired') }}</h3>
-              </v-col>
-            </v-row>
-            <FormRow
-              :error-label="requires2faProps['error']"
-              :is-required="false"
-              label-for-id="requires2fa-select"
-              :label="$t('angebot.requires2FA')"
-            >
-              <v-select
-                id="requires2fa-select"
-                disabled
-                v-bind="requires2faProps"
-                v-model="requires2fa"
-                data-testid="requires2fa-select"
-                density="compact"
-                :items="[
-                  { title: $t('yes'), value: true },
-                  { title: $t('no'), value: false },
-                ]"
-                item-value="value"
-                item-title="title"
-                variant="outlined"
-              />
-            </FormRow>
-          </template>
-        </FormWrapper>
+        <!-- Error Message -->
+        <SpshAlert
+          :model-value="!!serviceProviderStore.errorCode"
+          :title="$t('angebot.angebotCreateErrorTitle')"
+          :type="'error'"
+          :closable="false"
+          :show-button="true"
+          :button-action="navigateBackToAngebotForm"
+          :button-text="$t('angebot.backToCreateAngebot')"
+          :text="$t(`angebot.errors.${serviceProviderStore.errorCode}`)"
+        />
+        <ServiceProviderForm
+          v-if="!serviceProviderStore.errorCode"
+          v-bind="{
+            initialValues: {
+              selectedOrganisationId: autoSelectedSchuleId,
+              name: '',
+              url: '',
+              logo: SchulPortalLogo,
+              kategorie: ServiceProviderKategorie.Schulisch,
+              nachtraeglichZuweisbar: true,
+              verfuegbarFuerRollenerweiterung: true,
+              requires2fa: false,
+            },
+            showUnsavedChangesDialog,
+            systemrecht: relevantSystemrecht,
+            errorCode: serviceProviderStore.errorCode,
+            loading: serviceProviderStore.loading,
+          }"
+          @update:dirty="(value: boolean) => (isDirty = value)"
+          @click:submit="onSubmit"
+          @click:discard="handleDiscard"
+          @update:showUnsavedChangesDialog="(visible: boolean) => (showUnsavedChangesDialog = visible)"
+          @click:confirmUnsaved="handleConfirmUnsavedChanges"
+        />
       </template>
 
       <!-- Result template on success after submit  -->

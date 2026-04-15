@@ -160,7 +160,7 @@
   }
 
   // ── Edit mode actions ─────────────────────────────────────────────────────
-  async function openEditMode(): Promise<void> {
+  async function openRollenerweiterungEditMode(): Promise<void> {
     // Load available rollen for this organisation if not yet loaded
     if (organisationIdFromQuery.value) {
       await rolleStore.getAllRollen({
@@ -175,6 +175,8 @@
     await nextTick();
     scrollToTreeview();
   }
+
+  async function openServiceProviderEditMode(): Promise<void> {}
 
   const autoEdit: ComputedRef<boolean> = computed(() => route.query['autoEdit'] === 'true');
 
@@ -248,7 +250,7 @@
       await organisationStore.getOrganisationById(organisationIdFromQuery.value);
     }
     if (autoEdit.value) {
-      await openEditMode();
+      await openRollenerweiterungEditMode();
     }
   });
 </script>
@@ -377,6 +379,27 @@
                       test-id="service-provider-rollenerweiterung"
                       no-margin-top
                     />
+
+                    <v-row
+                      class="mr-10"
+                      justify="end"
+                    >
+                      <v-col
+                        cols="12"
+                        md="auto"
+                        class="mt-4"
+                      >
+                        <v-btn
+                          :disabled="isEditingRollenerweiterungen"
+                          class="primary"
+                          :block="mdAndDown"
+                          data-testid="service-provider-bearbeiten-button"
+                          @click="openServiceProviderEditMode"
+                          :text="t('edit')"
+                        >
+                        </v-btn>
+                      </v-col>
+                    </v-row>
                   </v-col>
                 </v-row>
               </v-col>
@@ -446,7 +469,7 @@
                       class="primary"
                       :block="mdAndDown"
                       data-testid="rollenerweiterung-bearbeiten-button"
-                      @click="openEditMode"
+                      @click="openRollenerweiterungEditMode"
                     >
                       {{ t('edit') }}
                     </v-btn>
