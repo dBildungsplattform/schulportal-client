@@ -40,17 +40,23 @@ export type StartPageServiceProvider = BaseServiceProvider & {
   logoUrl?: string;
 };
 
-export type ManageableServiceProviderListEntry = BaseServiceProvider & {
+type ManageableServiceProviderDetails = {
   merkmale: Array<ServiceProviderMerkmal>;
   administrationsebene: { id: string; name: string; kennung?: string };
   rollen: Array<{ id: string; name: string }>;
-  rollenerweiterungen?: RollenerweiterungForManageableServiceProviderResponse[];
 };
 
-export type ManageableServiceProviderDetail = ManageableServiceProviderListEntry & {
-  url: string;
-  availableForRollenerweiterung: boolean;
-};
+export type ManageableServiceProviderListEntry = BaseServiceProvider &
+  ManageableServiceProviderDetails & {
+    rollenerweiterungen: RollenerweiterungForManageableServiceProviderResponse[];
+    isDeleteAuthorized: boolean;
+  };
+
+export type ManageableServiceProviderDetail = BaseServiceProvider &
+  ManageableServiceProviderDetails & {
+    url: string;
+    availableForRollenerweiterung: boolean;
+  };
 
 export type RollenerweiterungMap = {
   id: string;
@@ -163,6 +169,7 @@ type ServiceProviderActions = {
   getRollenerweiterungenById: (filter: RollenerweiterungFilter) => Promise<void>;
   persistRollenerweiterungenForServiceProvider: (filter: PersistRollenerweiterung) => Promise<void>;
   createServiceProvider: (filter: ServiceProviderCreationFilter) => Promise<void>;
+  deleteServiceProvider: (id: string) => Promise<void>;
 };
 
 export { ServiceProviderKategorie };
@@ -406,6 +413,17 @@ export const useServiceProviderStore: StoreDefinition<
         const { data }: { data: ServiceProviderResponse } =
           await serviceProviderApi.providerControllerCreateServiceProvider(bodyParams);
         this.createdServiceProvider = data;
+      } catch (error) {
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async deleteServiceProvider(id: string): Promise<void> {
+      this.loading = true;
+      try {
+        await serviceProviderApi.providerControllerDeleteServiceProvider(id);
       } catch (error) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {

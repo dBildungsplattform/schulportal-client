@@ -1,3 +1,9 @@
+import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
+import { createPinia, setActivePinia } from 'pinia';
+import type { MockInstance } from 'vitest';
+import { nextTick, type Component, type ComponentPublicInstance } from 'vue';
+import { createRouter, createWebHistory, type Router } from 'vue-router';
+
 import type { RollenerweiterungWithExtendedDataResponse } from '@/api-client/generated';
 import type { RollenerweiterungAssignErrorDialogProps } from '@/components/admin/service-provider/types';
 import routes from '@/router/routes';
@@ -9,12 +15,7 @@ import {
   type ManageableServiceProviderDetail,
   type ServiceProviderStore,
 } from '@/stores/ServiceProviderStore';
-import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
-import { createPinia, setActivePinia } from 'pinia';
 import { DoFactory } from 'test/DoFactory';
-import type { MockInstance } from 'vitest';
-import { nextTick, type Component, type ComponentPublicInstance } from 'vue';
-import { createRouter, createWebHistory, type Router } from 'vue-router';
 import ServiceProviderDetailsBySchuleView from './ServiceProviderDetailsBySchuleView.vue';
 
 let wrapper: VueWrapper | null = null;
