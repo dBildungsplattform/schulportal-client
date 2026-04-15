@@ -585,7 +585,7 @@
             >
               <v-select
                 id="requires2fa-select"
-                :disabled="!hasAngeboteVerwaltenPermission"
+                disabled
                 v-bind="requires2faProps"
                 v-model="requires2fa"
                 data-testid="requires2fa-select"
