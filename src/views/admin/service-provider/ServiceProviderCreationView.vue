@@ -6,6 +6,7 @@
   import SchulenFilter from '@/components/filter/SchulenFilter.vue';
   import FormRow from '@/components/form/FormRow.vue';
   import FormWrapper from '@/components/form/FormWrapper.vue';
+  import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
   import { RollenSystemRecht } from '@/stores/RolleStore';
@@ -28,6 +29,7 @@
     type Router,
   } from 'vue-router';
   import { boolean, object, string } from 'yup';
+  import type { ServiceProviderForm } from './types';
 
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
   const authStore: AuthStore = useAuthStore();
@@ -69,20 +71,16 @@
     },
   });
 
-  type ServiceProviderForm = {
-    selectedOrganisationId: string | undefined;
-    name: string;
-    url: string;
-    logo: string;
-    kategorie: ServiceProviderKategorie;
-    nachtraeglichZuweisbar: boolean;
-    verfuegbarFuerRollenerweiterung: boolean;
-    requires2fa: boolean;
-  };
+  const { autoselectedSchule } = useAutoselectedSchule([
+    hasAngeboteVerwaltenPermission.value
+      ? RollenSystemRecht.AngeboteVerwalten
+      : RollenSystemRecht.AngeboteEingeschraenktVerwalten,
+  ]);
 
   const formContext: FormContext<ServiceProviderForm, ServiceProviderForm> = useForm<ServiceProviderForm>({
     validationSchema,
     initialValues: {
+      selectedOrganisationId: autoselectedSchule.value ? autoselectedSchule.value.id : undefined,
       kategorie: ServiceProviderKategorie.Schulisch,
       nachtraeglichZuweisbar: true,
       verfuegbarFuerRollenerweiterung: true,
