@@ -44,7 +44,9 @@
     navigateToServiceProviderTable();
   };
 
-  function openServiceProviderEditMode(): void {}
+  async function openServiceProviderEditMode(): Promise<void> {
+    await router.push({ name: 'angebot-edit', params: { id: currentServiceProviderId } });
+  }
 
   // Default for now - in the future when Edit functionality is added, this will have more error codes as cases to handle accordingly
   const alertButtonText: ComputedRef<string> = computed(() => {

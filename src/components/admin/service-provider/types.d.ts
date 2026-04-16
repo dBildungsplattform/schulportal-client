@@ -26,7 +26,7 @@ export type ServiceProviderForm = {
 };
 
 export type ServiceProviderFormSubmitData = {
-  selectedOrganisation: Organisation;
+  selectedOrganisation?: Organisation;
   name: string;
   url: string;
   logo: string;

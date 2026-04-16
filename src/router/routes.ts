@@ -204,16 +204,14 @@ const routes: readonly RouteRecordRaw[] = [
     },
   },
   {
-    path: '/admin/angebote/schulspezifisch/:id/edit',
-    name: 'angebot-details-schulspezifisch-edit',
-    component: () => import('../views/admin/service-provider/ServiceProviderBySchuleEditView.vue'),
+    path: '/admin/angebote/:id/edit',
+    name: 'angebot-edit',
+    component: () => import('../views/admin/service-provider/ServiceProviderEditView.vue'),
     meta: {
       layout: 'AdminLayout',
       requiresAuth: true,
       requiredStepUpLevel: StepUpLevel.GOLD,
       requiresPermission: 'schulspezifischeangebotsverwaltung',
-      requiresOrga: true,
-      missingOrgaRedirect: { name: 'angebot-management-schulspezifisch' },
     },
   },
   {

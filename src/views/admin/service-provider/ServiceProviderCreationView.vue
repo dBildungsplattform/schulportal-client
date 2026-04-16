@@ -7,6 +7,7 @@
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+  import type { Organisation } from '@/stores/OrganisationStore';
   import { RollenSystemRecht } from '@/stores/RolleStore';
   import {
     ServiceProviderKategorie,
@@ -44,7 +45,9 @@
     return RollenSystemRecht.AngeboteEingeschraenktVerwalten;
   });
   const autoSelectedSchuleId: ComputedRef<string | undefined> = computed(() => {
-    const { autoselectedSchule } = useAutoselectedSchule([relevantSystemrecht.value]);
+    const { autoselectedSchule }: { autoselectedSchule: ComputedRef<Organisation | null> } = useAutoselectedSchule([
+      relevantSystemrecht.value,
+    ]);
     return autoselectedSchule.value?.id;
   });
 
@@ -122,7 +125,10 @@
     event.returnValue = '';
   }
 
-  const onSubmit = async (values: ServiceProviderFormSubmitData) => {
+  async function onSubmit(values: ServiceProviderFormSubmitData): Promise<void> {
+    if (!values.selectedOrganisation) {
+      return;
+    }
     await serviceProviderStore.createServiceProvider({
       organisationId: values.selectedOrganisation.id,
       name: values.name,
@@ -138,7 +144,7 @@
       selectedOrganisationIdCache.value = values.selectedOrganisation.id;
       selectedOrganisationNameCache.value = values.selectedOrganisation.name;
     }
-  };
+  }
 
   onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
     if (isDirty.value) {

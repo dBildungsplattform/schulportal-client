@@ -22,8 +22,8 @@ import {
   type ServiceProviderResponse,
   type UpdateServiceProviderBodyParams,
 } from '../api-client/generated/api';
-import { updateFormatted } from 'vuetify/lib/labs/VCalendar/util/timestamp.mjs';
 import type { ServiceProviderFormSubmitData } from '@/components/admin/service-provider/types';
+import type { RollenSystemRecht } from './RolleStore';
 
 const serviceProviderApi: ProviderApiInterface = ProviderApiFactory(undefined, '', axiosApiInstance);
 const rolleApi: RolleApiInterface = RolleApiFactory(undefined, '', axiosApiInstance);
@@ -59,6 +59,7 @@ export type ManageableServiceProviderDetail = BaseServiceProvider &
   ManageableServiceProviderDetails & {
     url: string;
     availableForRollenerweiterung: boolean;
+    applicableSystemrechte: Array<RollenSystemRecht>;
   };
 
 export type RollenerweiterungMap = {
@@ -105,12 +106,11 @@ export type ServiceProviderCreationFilter = {
   merkmale: Array<ServiceProviderMerkmal>;
 };
 
-export type CreatedServiceProvider = {
-  id: string;
-  name: string;
-  url: string;
-  kategorie: ServiceProviderKategorie;
-  requires2fa: boolean;
+export type CreatedServiceProvider = BaseServiceProvider & {
+  merkmale: Array<ServiceProviderMerkmal>;
+};
+
+export type UpdatedServiceProvider = BaseServiceProvider & {
   merkmale: Array<ServiceProviderMerkmal>;
 };
 
@@ -122,6 +122,7 @@ type ServiceProviderState = {
   totalManageableServiceProviders: number;
   totalManageableServiceProvidersForOrganisation: number;
   currentServiceProvider: ManageableServiceProviderDetail | null;
+  updatedServiceProvider: UpdatedServiceProvider | null;
   serviceProviderLogos: Map<string, string>;
   rollenerweiterungen: ProviderControllerFindRollenerweiterungenByServiceProviderId200Response | null;
   // ready-to-display, grouped for the result table:
@@ -172,7 +173,7 @@ type ServiceProviderActions = {
   getRollenerweiterungenById: (filter: RollenerweiterungFilter) => Promise<void>;
   persistRollenerweiterungenForServiceProvider: (filter: PersistRollenerweiterung) => Promise<void>;
   createServiceProvider: (filter: ServiceProviderCreationFilter) => Promise<void>;
-  updateServiceProvider: (value: ManageableServiceProviderDetail) => Promise<void>;
+  updateServiceProvider: (id: string, value: Partial<ServiceProviderFormSubmitData>) => Promise<void>;
   deleteServiceProvider: (id: string) => Promise<void>;
 };
 
@@ -190,8 +191,7 @@ export const useServiceProviderStore: StoreDefinition<
   ServiceProviderState,
   ServiceProviderGetters,
   ServiceProviderActions
-> = defineStore({
-  id: 'serviceProviderStore',
+> = defineStore('serviceProviderStore', {
   state: (): ServiceProviderState => {
     return {
       allServiceProviders: [],
@@ -201,6 +201,7 @@ export const useServiceProviderStore: StoreDefinition<
       totalManageableServiceProviders: 0,
       totalManageableServiceProvidersForOrganisation: 0,
       currentServiceProvider: null,
+      updatedServiceProvider: null,
       serviceProviderLogos: new Map<string, string>(),
       rollenerweiterungen: null,
       rollenerweiterungenUebersicht: [],
@@ -424,7 +425,7 @@ export const useServiceProviderStore: StoreDefinition<
       }
     },
 
-    async updateServiceProvider(id: string, update: ServiceProviderFormSubmitData): Promise<void> {
+    async updateServiceProvider(id: string, update: Partial<ServiceProviderFormSubmitData>): Promise<void> {
       this.loading = true;
       try {
         const updateServiceProviderBodyParams: UpdateServiceProviderBodyParams = {};
@@ -437,7 +438,10 @@ export const useServiceProviderStore: StoreDefinition<
         if (update.kategorie) {
           updateServiceProviderBodyParams.kategorie = update.kategorie;
         }
-        await serviceProviderApi.providerControllerUpdateServiceProvider(id, updateServiceProviderBodyParams);
+
+        const { data }: { data: ServiceProviderResponse } =
+          await serviceProviderApi.providerControllerUpdateServiceProvider(id, updateServiceProviderBodyParams);
+        this.updatedServiceProvider = data;
       } catch (error) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {

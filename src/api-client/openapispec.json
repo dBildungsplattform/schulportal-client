@@ -65,6 +65,23 @@
         "tags": ["Keycloakinternal"]
       }
     },
+    "/api/email-webhook/changed": {
+      "post": {
+        "operationId": "EmailWebhookController_emailChangedWebhook",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/EmailChangedBodyParams" } } }
+        },
+        "responses": {
+          "201": { "description": "Event received" },
+          "401": { "description": "Insufficient permissions to call webhook" },
+          "403": { "description": "Insufficient permissions to call webhook" },
+          "500": { "description": "Internal server error while processing webhook" }
+        },
+        "tags": ["email-webhook"]
+      }
+    },
     "/api/personen/landesbediensteter": {
       "get": {
         "operationId": "PersonController_findLandesbediensteter",
@@ -3107,6 +3124,23 @@
         },
         "required": ["itslearning", "vidis", "opsh", "onlineDateiablage"]
       },
+      "EmailChangedBodyParams": {
+        "type": "object",
+        "properties": {
+          "spshPersonId": { "type": "string" },
+          "previousPrimaryEmail": { "type": "string" },
+          "previousAlternativeEmail": { "type": "string" },
+          "newPrimaryEmail": { "type": "string" },
+          "newAlternativeEmail": { "type": "string" }
+        },
+        "required": [
+          "spshPersonId",
+          "previousPrimaryEmail",
+          "previousAlternativeEmail",
+          "newPrimaryEmail",
+          "newAlternativeEmail"
+        ]
+      },
       "PersonLandesbediensteterSearchPersonenkontextResponse": {
         "type": "object",
         "properties": {
@@ -3888,7 +3922,11 @@
             "type": "boolean",
             "description": "Indicates whether the service provider is available for rollenerweiterung."
           },
-          "rollen": { "type": "array", "items": { "$ref": "#/components/schemas/RolleRefResponse" } }
+          "rollen": { "type": "array", "items": { "$ref": "#/components/schemas/RolleRefResponse" } },
+          "applicableSystemrechte": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/RollenSystemRechtEnum" }
+          }
         },
         "required": [
           "id",
@@ -3900,7 +3938,8 @@
           "url",
           "hasRollenerweiterung",
           "availableForRollenerweiterung",
-          "rollen"
+          "rollen",
+          "applicableSystemrechte"
         ]
       },
       "CreateServiceProviderBodyParams": {

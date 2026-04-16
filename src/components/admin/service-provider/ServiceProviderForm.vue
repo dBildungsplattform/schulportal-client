@@ -3,34 +3,40 @@
   import SchulenFilter from '@/components/filter/SchulenFilter.vue';
   import FormRow from '@/components/form/FormRow.vue';
   import FormWrapper from '@/components/form/FormWrapper.vue';
-  import type { Organisation } from '@/stores/OrganisationStore';
+  import { type Organisation } from '@/stores/OrganisationStore';
   import { RollenSystemRecht } from '@/stores/RolleStore';
   import { ServiceProviderKategorie, ServiceProviderMerkmal } from '@/stores/ServiceProviderStore';
   import { DIN_91379A_EXT, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
   import { toTypedSchema } from '@vee-validate/yup';
-  import { useForm, type FormContext, type FormMeta, type TypedSchema } from 'vee-validate';
+  import { useForm, type BaseFieldProps, type FormContext, type FormMeta, type TypedSchema } from 'vee-validate';
   import { computed, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { boolean, object, string } from 'yup';
   import type { ServiceProviderForm, ServiceProviderFormSubmitData } from './types';
 
-  const props = defineProps<{
+  type Props = {
     initialValues: Partial<ServiceProviderForm>;
     systemrecht: RollenSystemRecht;
     showUnsavedChangesDialog: boolean;
     errorCode?: string;
     loading?: boolean;
     isEditMode?: boolean;
-  }>();
+  };
 
-  const emit = defineEmits<{
+  type Emits = {
     (e: 'click:confirmUnsaved'): void;
     (e: 'click:discard'): void;
     (e: 'click:submit', values: ServiceProviderFormSubmitData): void;
     (e: 'update:canSubmit', value: boolean): void;
     (e: 'update:dirty', value: boolean): void;
     (e: 'update:showUnsavedChangesDialog', visible: boolean): void;
-  }>();
+  };
+
+  type FieldDefinition<T> = [Ref<T>, Ref<BaseFieldProps & { error: boolean; 'error-messages': string[] }>];
+
+  const props: Props = defineProps<Props>();
+
+  const emit: Emits = defineEmits<Emits>();
 
   const { t }: Composer = useI18n({ useScope: 'global' });
 
@@ -51,7 +57,9 @@
     }),
   );
 
-  const vuetifyConfig = (state: { errors: string[] }) => ({
+  const vuetifyConfig: (state: { errors: string[] }) => {
+    props: { error: boolean; 'error-messages': string[] };
+  } = (state: { errors: string[] }) => ({
     props: {
       error: !!state.errors.length,
       'error-messages': state.errors,
@@ -70,25 +78,29 @@
     } as ServiceProviderForm,
   });
 
-  const [selectedOrganisationId, selectedOrganisationIdProps] = formContext.defineField(
+  const [selectedOrganisationId, selectedOrganisationIdProps]: FieldDefinition<string> = formContext.defineField(
     'selectedOrganisationId',
     vuetifyConfig,
   );
-  const [name, nameProps] = formContext.defineField('name', vuetifyConfig);
-  const [url, urlProps] = formContext.defineField('url', vuetifyConfig);
-  const [logo, logoProps] = formContext.defineField('logo', vuetifyConfig);
-  const [kategorie, kategorieProps] = formContext.defineField('kategorie', vuetifyConfig);
-  const [requires2fa, requires2faProps] = formContext.defineField('requires2fa', vuetifyConfig);
-  const [nachtraeglichZuweisbar, nachtraeglichZuweisbarProps] = formContext.defineField(
+  const [name, nameProps]: FieldDefinition<string> = formContext.defineField('name', vuetifyConfig);
+  const [url, urlProps]: FieldDefinition<string> = formContext.defineField('url', vuetifyConfig);
+  const [logo, logoProps]: FieldDefinition<string> = formContext.defineField('logo', vuetifyConfig);
+  const [kategorie, kategorieProps]: FieldDefinition<ServiceProviderKategorie> = formContext.defineField(
+    'kategorie',
+    vuetifyConfig,
+  );
+  const [requires2fa, requires2faProps]: FieldDefinition<boolean> = formContext.defineField(
+    'requires2fa',
+    vuetifyConfig,
+  );
+  const [nachtraeglichZuweisbar, nachtraeglichZuweisbarProps]: FieldDefinition<boolean> = formContext.defineField(
     'nachtraeglichZuweisbar',
     vuetifyConfig,
   );
-  const [verfuegbarFuerRollenerweiterung, verfuegbarFuerRollenerweiterungProps] = formContext.defineField(
-    'verfuegbarFuerRollenerweiterung',
-    vuetifyConfig,
-  );
+  const [verfuegbarFuerRollenerweiterung, verfuegbarFuerRollenerweiterungProps]: FieldDefinition<boolean> =
+    formContext.defineField('verfuegbarFuerRollenerweiterung', vuetifyConfig);
 
-  const canCommit: ComputedRef<boolean> = computed(() => formContext.meta.value.valid);
+  const canCommit: ComputedRef<boolean> = computed(() => formContext.meta.value.valid && formContext.meta.value.dirty);
 
   const kategorieItems: ComputedRef<{ title: string; value: string }[]> = computed(() =>
     Object.values(ServiceProviderKategorie).map((k: string) => ({
@@ -97,9 +109,12 @@
     })),
   );
 
-  const cachedOrga: Ref<Organisation | undefined> = ref(undefined);
+  const cachedOrga: Ref<Organisation | undefined> = ref();
 
-  function updateSelectedOrganisation(selectedOrgas: Organisation[]) {
+  function updateSelectedOrganisation(selectedOrgas: Organisation[]): void {
+    if (props.isEditMode) {
+      return;
+    }
     const org: Organisation | undefined = selectedOrgas.at(0);
     formContext.setFieldValue('selectedOrganisationId', org?.id ?? '');
     cachedOrga.value = org;
@@ -120,8 +135,11 @@
     window.open(value, '_blank', 'noopener,noreferrer');
   }
 
-  const onSubmit = formContext.handleSubmit((values: ServiceProviderForm) => {
-    if (!cachedOrga.value) return;
+  const onSubmit: (e?: Event) => Promise<void> = formContext.handleSubmit((values: ServiceProviderForm) => {
+    // in edit mode we don't care about the orga, since it can't be edited
+    if (!props.isEditMode && !cachedOrga.value) {
+      return;
+    }
 
     // Normalize URL: add https:// if no protocol is present
     let normalizedUrl: string = values.url.trim();
@@ -161,8 +179,8 @@
     id="service-provider-create-form"
     :confirm-unsaved-changes-action="() => emit('click:confirmUnsaved')"
     :can-commit="canCommit"
-    :create-button-label="$t('angebot.create')"
-    :discard-button-label="$t('angebot.discard')"
+    :create-button-label="isEditMode ? t('save') : t('angebot.create')"
+    :discard-button-label="isEditMode ? t('cancel') : t('angebot.discard')"
     :hide-actions="!!errorCode"
     :is-loading="loading"
     :on-discard="() => emit('click:discard')"
@@ -183,6 +201,8 @@
         :label="$t('angebot.providedBy')"
       >
         <SchulenFilter
+          :readonly="isEditMode"
+          :highlight-selection="true"
           :multiple="false"
           parent-id="service-provider-create"
           :placeholderText="$t('admin.organisation.selectOrganisation')"
@@ -293,7 +313,7 @@
         :label="$t('angebot.kategorie')"
       >
         <v-autocomplete
-          :disabled="isEditMode || systemrecht !== RollenSystemRecht.AngeboteVerwalten"
+          :disabled="systemrecht !== RollenSystemRecht.AngeboteVerwalten"
           id="kategorie-select"
           v-bind="kategorieProps"
           v-model="kategorie"
@@ -379,7 +399,7 @@
         :label="$t('angebot.requires2FA')"
       >
         <v-select
-          :disabled="isEditMode || systemrecht !== RollenSystemRecht.AngeboteVerwalten"
+          disabled
           id="requires2fa-select"
           v-bind="requires2faProps"
           v-model="requires2fa"

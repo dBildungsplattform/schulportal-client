@@ -156,7 +156,6 @@
               sm="6"
               md="4"
             >
-              <template> </template>
               <v-btn
                 v-if="state === State.COMPLETE"
                 :block="mdAndDown"

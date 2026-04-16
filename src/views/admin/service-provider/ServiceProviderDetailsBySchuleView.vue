@@ -134,6 +134,20 @@
       .map((r: RolleWithServiceProvidersResponse) => ({ id: r.id, name: r.name, rollenart: r.rollenart })),
   );
 
+  const isEditAllowed: ComputedRef<boolean> = computed(() => {
+    if (!serviceProviderStore.currentServiceProvider || serviceProviderStore.loading) {
+      return false;
+    }
+    return (
+      serviceProviderStore.currentServiceProvider.applicableSystemrechte.includes(
+        RollenSystemRechtEnum.AngeboteEingeschraenktVerwalten,
+      ) ||
+      serviceProviderStore.currentServiceProvider.applicableSystemrechte.includes(
+        RollenSystemRechtEnum.AngeboteVerwalten,
+      )
+    );
+  });
+
   function scrollToTreeview(offset: number = 120): void {
     const el: HTMLElement | null = treeviewContainer.value;
     if (!el) {
@@ -176,7 +190,13 @@
     scrollToTreeview();
   }
 
-  async function openServiceProviderEditMode(): Promise<void> {}
+  async function openServiceProviderEditMode(): Promise<void> {
+    await router.push({
+      name: 'angebot-edit',
+      params: { id: currentServiceProviderId },
+      query: organisationIdFromQuery.value ? { orga: organisationIdFromQuery.value } : undefined,
+    });
+  }
 
   const autoEdit: ComputedRef<boolean> = computed(() => route.query['autoEdit'] === 'true');
 
@@ -381,6 +401,7 @@
                     />
 
                     <v-row
+                      v-if="isEditAllowed"
                       class="mr-10"
                       justify="end"
                     >
