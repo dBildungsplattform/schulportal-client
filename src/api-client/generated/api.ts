@@ -1019,6 +1019,43 @@ export type EmailAddressStatus = typeof EmailAddressStatus[keyof typeof EmailAdd
 /**
  * 
  * @export
+ * @interface EmailChangedBodyParams
+ */
+export interface EmailChangedBodyParams {
+    /**
+     * 
+     * @type {string}
+     * @memberof EmailChangedBodyParams
+     */
+    'spshPersonId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof EmailChangedBodyParams
+     */
+    'previousPrimaryEmail': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof EmailChangedBodyParams
+     */
+    'previousAlternativeEmail': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof EmailChangedBodyParams
+     */
+    'newPrimaryEmail': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof EmailChangedBodyParams
+     */
+    'newAlternativeEmail': string;
+}
+/**
+ * 
+ * @export
  * @interface FeatureFlagResponse
  */
 export interface FeatureFlagResponse {
@@ -6108,6 +6145,126 @@ export class DbiamPersonenuebersichtApi extends BaseAPI implements DbiamPersonen
      */
     public dBiamPersonenuebersichtControllerFindPersonenuebersichtenByPerson(personId: string, options?: AxiosRequestConfig) {
         return DbiamPersonenuebersichtApiFp(this.configuration).dBiamPersonenuebersichtControllerFindPersonenuebersichtenByPerson(personId, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
+ * EmailWebhookApi - axios parameter creator
+ * @export
+ */
+export const EmailWebhookApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @param {EmailChangedBodyParams} emailChangedBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        emailWebhookControllerEmailChangedWebhook: async (emailChangedBodyParams: EmailChangedBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'emailChangedBodyParams' is not null or undefined
+            assertParamExists('emailWebhookControllerEmailChangedWebhook', 'emailChangedBodyParams', emailChangedBodyParams)
+            const localVarPath = `/api/email-webhook/changed`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(emailChangedBodyParams, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * EmailWebhookApi - functional programming interface
+ * @export
+ */
+export const EmailWebhookApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = EmailWebhookApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @param {EmailChangedBodyParams} emailChangedBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async emailWebhookControllerEmailChangedWebhook(emailChangedBodyParams: EmailChangedBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.emailWebhookControllerEmailChangedWebhook(emailChangedBodyParams, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * EmailWebhookApi - factory interface
+ * @export
+ */
+export const EmailWebhookApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = EmailWebhookApiFp(configuration)
+    return {
+        /**
+         * 
+         * @param {EmailChangedBodyParams} emailChangedBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        emailWebhookControllerEmailChangedWebhook(emailChangedBodyParams: EmailChangedBodyParams, options?: any): AxiosPromise<void> {
+            return localVarFp.emailWebhookControllerEmailChangedWebhook(emailChangedBodyParams, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * EmailWebhookApi - interface
+ * @export
+ * @interface EmailWebhookApi
+ */
+export interface EmailWebhookApiInterface {
+    /**
+     * 
+     * @param {EmailChangedBodyParams} emailChangedBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof EmailWebhookApiInterface
+     */
+    emailWebhookControllerEmailChangedWebhook(emailChangedBodyParams: EmailChangedBodyParams, options?: AxiosRequestConfig): AxiosPromise<void>;
+
+}
+
+/**
+ * EmailWebhookApi - object-oriented interface
+ * @export
+ * @class EmailWebhookApi
+ * @extends {BaseAPI}
+ */
+export class EmailWebhookApi extends BaseAPI implements EmailWebhookApiInterface {
+    /**
+     * 
+     * @param {EmailChangedBodyParams} emailChangedBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof EmailWebhookApi
+     */
+    public emailWebhookControllerEmailChangedWebhook(emailChangedBodyParams: EmailChangedBodyParams, options?: AxiosRequestConfig) {
+        return EmailWebhookApiFp(this.configuration).emailWebhookControllerEmailChangedWebhook(emailChangedBodyParams, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
