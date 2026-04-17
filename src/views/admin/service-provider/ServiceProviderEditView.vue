@@ -99,12 +99,7 @@
   }
 
   async function navigateToServiceProviderDetails(): Promise<void> {
-    if (
-      organisationIdFromQuery.value &&
-      serviceProviderStore.currentServiceProvider?.applicableSystemrechte.includes(
-        RollenSystemRecht.AngeboteEingeschraenktVerwalten,
-      )
-    ) {
+    if (organisationIdFromQuery.value) {
       await router.push({
         name: 'angebot-details-schulspezifisch',
         params: { id: serviceProviderId.value },

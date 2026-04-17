@@ -106,6 +106,7 @@ export type ServiceProviderCreationFilter = {
 };
 
 export type CreatedServiceProvider = BaseServiceProvider & {
+  url: string;
   merkmale: Array<ServiceProviderMerkmal>;
 };
 
@@ -426,6 +427,7 @@ export const useServiceProviderStore: StoreDefinition<
 
     async updateServiceProvider(id: string, update: Partial<ServiceProviderFormSubmitData>): Promise<void> {
       this.loading = true;
+      this.updatedServiceProvider = null;
       try {
         const updateServiceProviderBodyParams: UpdateServiceProviderBodyParams = {};
         if (update.name) {
@@ -441,8 +443,10 @@ export const useServiceProviderStore: StoreDefinition<
         const { data }: { data: ServiceProviderResponse } =
           await serviceProviderApi.providerControllerUpdateServiceProvider(id, updateServiceProviderBodyParams);
         this.updatedServiceProvider = data;
+        this.errorCode = '';
       } catch (error) {
-        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+        const code = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+        this.errorCode = code;
       } finally {
         this.loading = false;
       }

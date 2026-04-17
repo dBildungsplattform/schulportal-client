@@ -43,8 +43,8 @@ beforeEach(async (): Promise<void> => {
 
   serviceProviderStore = useServiceProviderStore();
   serviceProviderStore.manageableServiceProviders = [
-    DoFactory.getManageableServiceProviderListEntryResponse({ isDeleteAuthorized: true }),
-    DoFactory.getManageableServiceProviderListEntryResponse({ isDeleteAuthorized: false }),
+    DoFactory.getManageableServiceProviderListEntryResponse({ hasSomeVerwaltenPermission: true }),
+    DoFactory.getManageableServiceProviderListEntryResponse({ hasSomeVerwaltenPermission: false }),
   ];
   serviceProviderStore.errorCode = '';
 });

@@ -466,7 +466,7 @@ export class DoFactory {
       requires2fa: faker.datatype.boolean(),
       merkmale: [],
       rollenerweiterungen: [],
-      isDeleteAuthorized: faker.datatype.boolean(),
+      hasSomeVerwaltenPermission: faker.datatype.boolean(),
       ...props,
     };
   }
