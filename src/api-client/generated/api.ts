@@ -1556,7 +1556,7 @@ export interface ManageableServiceProviderListEntryResponse {
      * @type {boolean}
      * @memberof ManageableServiceProviderListEntryResponse
      */
-    'isDeleteAuthorized': boolean;
+    'hasSomeVerwaltenPermission': boolean;
 }
 
 
@@ -1628,10 +1628,10 @@ export interface ManageableServiceProviderResponse {
     'rollen': Array<RolleRefResponse>;
     /**
      * 
-     * @type {Array<RollenSystemRechtEnum>}
+     * @type {boolean}
      * @memberof ManageableServiceProviderResponse
      */
-    'applicableSystemrechte': Array<RollenSystemRechtEnum>;
+    'hasSomeVerwaltenPermission': boolean;
 }
 
 

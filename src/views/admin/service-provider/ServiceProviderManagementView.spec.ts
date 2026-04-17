@@ -74,7 +74,7 @@ describe('ServiceProviderManagementView', () => {
       );
       expect(deleteIcons.length).toBe(
         serviceProviderStore.manageableServiceProviders.filter(
-          (sp: ManageableServiceProviderListEntry) => sp.isDeleteAuthorized,
+          (sp: ManageableServiceProviderListEntry) => sp.hasSomeVerwaltenPermission,
         ).length,
       );
     });

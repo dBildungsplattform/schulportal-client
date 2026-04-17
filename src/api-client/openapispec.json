@@ -3893,7 +3893,7 @@
             "items": { "$ref": "#/components/schemas/RollenerweiterungForManageableServiceProviderResponse" }
           },
           "rollen": { "type": "array", "items": { "$ref": "#/components/schemas/RolleRefResponse" } },
-          "isDeleteAuthorized": { "type": "boolean" }
+          "hasSomeVerwaltenPermission": { "type": "boolean" }
         },
         "required": [
           "id",
@@ -3904,7 +3904,7 @@
           "merkmale",
           "rollenerweiterungen",
           "rollen",
-          "isDeleteAuthorized"
+          "hasSomeVerwaltenPermission"
         ]
       },
       "ManageableServiceProviderResponse": {
@@ -3923,10 +3923,7 @@
             "description": "Indicates whether the service provider is available for rollenerweiterung."
           },
           "rollen": { "type": "array", "items": { "$ref": "#/components/schemas/RolleRefResponse" } },
-          "applicableSystemrechte": {
-            "type": "array",
-            "items": { "$ref": "#/components/schemas/RollenSystemRechtEnum" }
-          }
+          "hasSomeVerwaltenPermission": { "type": "boolean" }
         },
         "required": [
           "id",
@@ -3939,7 +3936,7 @@
           "hasRollenerweiterung",
           "availableForRollenerweiterung",
           "rollen",
-          "applicableSystemrechte"
+          "hasSomeVerwaltenPermission"
         ]
       },
       "CreateServiceProviderBodyParams": {

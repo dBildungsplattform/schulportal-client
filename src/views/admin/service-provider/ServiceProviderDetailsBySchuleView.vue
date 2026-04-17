@@ -138,14 +138,7 @@
     if (!serviceProviderStore.currentServiceProvider || serviceProviderStore.loading) {
       return false;
     }
-    return (
-      serviceProviderStore.currentServiceProvider.applicableSystemrechte.includes(
-        RollenSystemRechtEnum.AngeboteEingeschraenktVerwalten,
-      ) ||
-      serviceProviderStore.currentServiceProvider.applicableSystemrechte.includes(
-        RollenSystemRechtEnum.AngeboteVerwalten,
-      )
-    );
+    return serviceProviderStore.currentServiceProvider.hasSomeVerwaltenPermission;
   });
 
   function scrollToTreeview(offset: number = 120): void {

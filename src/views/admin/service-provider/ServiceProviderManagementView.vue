@@ -108,7 +108,7 @@
             ? sp.rollen.map((rolle: ManageableServiceProviderListEntry['rollen'][number]) => rolle.name).join(', ')
             : '---',
         hasRollenerweiterung: sp.rollenerweiterungen && sp.rollenerweiterungen.length > 0 ? t('yes') : t('no'),
-        isDeleteAuthorized: sp.isDeleteAuthorized,
+        isDeleteAuthorized: sp.hasSomeVerwaltenPermission,
       };
     });
   });

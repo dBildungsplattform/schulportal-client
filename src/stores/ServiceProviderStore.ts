@@ -1,8 +1,9 @@
-import axiosApiInstance from '@/services/ApiService';
-import { getResponseErrorCode } from '@/utils/errorHandlers';
+import type { AxiosError } from 'axios';
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 
-import type { AxiosError } from 'axios';
+import type { ServiceProviderFormSubmitData } from '@/components/admin/service-provider/types';
+import axiosApiInstance from '@/services/ApiService';
+import { getResponseErrorCode } from '@/utils/errorHandlers';
 import {
   DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInnerI18nKeyEnum,
   ProviderApiFactory,
@@ -22,8 +23,6 @@ import {
   type ServiceProviderResponse,
   type UpdateServiceProviderBodyParams,
 } from '../api-client/generated/api';
-import type { ServiceProviderFormSubmitData } from '@/components/admin/service-provider/types';
-import type { RollenSystemRecht } from './RolleStore';
 
 const serviceProviderApi: ProviderApiInterface = ProviderApiFactory(undefined, '', axiosApiInstance);
 const rolleApi: RolleApiInterface = RolleApiFactory(undefined, '', axiosApiInstance);
@@ -52,14 +51,14 @@ type ManageableServiceProviderDetails = {
 export type ManageableServiceProviderListEntry = BaseServiceProvider &
   ManageableServiceProviderDetails & {
     rollenerweiterungen: RollenerweiterungForManageableServiceProviderResponse[];
-    isDeleteAuthorized: boolean;
+    hasSomeVerwaltenPermission: boolean;
   };
 
 export type ManageableServiceProviderDetail = BaseServiceProvider &
   ManageableServiceProviderDetails & {
     url: string;
     availableForRollenerweiterung: boolean;
-    applicableSystemrechte: Array<RollenSystemRecht>;
+    hasSomeVerwaltenPermission: boolean;
   };
 
 export type RollenerweiterungMap = {
