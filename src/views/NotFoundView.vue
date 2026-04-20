@@ -4,14 +4,14 @@
 
   const router: Router = useRouter();
 
-  function goBack(): void {
+  function goBackToStart(): void {
     router.push({ name: 'start' });
   }
 </script>
 
 <template>
   <SpshAlert
-    :button-action="goBack"
+    :button-action="goBackToStart"
     :button-text="$t('nav.backToStart')"
     :closable="false"
     :model-value="true"
