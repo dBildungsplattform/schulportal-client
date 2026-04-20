@@ -445,8 +445,7 @@ export const useServiceProviderStore: StoreDefinition<
         this.updatedServiceProvider = data;
         this.errorCode = '';
       } catch (error) {
-        const code = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
-        this.errorCode = code;
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
         this.loading = false;
       }

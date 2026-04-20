@@ -43,7 +43,7 @@ describe('ServiceProviderEditView', () => {
     });
   });
 
-  it('renders the headline and form', async () => {
+  it('renders the headline and form', () => {
     expect(wrapper?.find('[data-testid="admin-headline"]').exists()).toBe(true);
     expect(wrapper?.findComponent({ name: 'ServiceProviderForm' }).exists()).toBe(true);
   });
