@@ -64,6 +64,13 @@
     };
   });
 
+  const errorText: ComputedRef<string> = computed(() => {
+    if (!serviceProviderStore.errorCode) {
+      return '';
+    }
+    return t(`angebot.errors.${serviceProviderStore.errorCode}`);
+  });
+
   function preventNavigation(event: BeforeUnloadEvent): void {
     if (!isDirty.value) {
       return;
@@ -156,7 +163,7 @@
         :show-button="true"
         :button-action="discard"
         :button-text="$t('angebot.backToServiceProviderList')"
-        :text="$t(`angebot.errors.${serviceProviderStore.errorCode}`)"
+        :text="errorText"
       />
       <ServiceProviderForm
         v-if="!serviceProviderStore.errorCode && serviceProviderStore.currentServiceProvider"
