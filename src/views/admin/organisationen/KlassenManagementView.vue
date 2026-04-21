@@ -29,6 +29,9 @@
 
   const klasseColumnKey: string = 'name';
 
+  const klasseToDelete: Ref<Organisation | null> = ref(null);
+  const isDeleteDialogOpen: Ref<boolean, boolean> = ref(false);
+
   let defaultHeaders: Mutable<Headers> = [
     {
       title: t('admin.klasse.klasse'),
@@ -185,9 +188,10 @@
     await reloadData(klassenListFilter.value);
   };
 
-  const handleKlasseDeleteClose = async (): Promise<void> => {
+  async function handleKlasseDeleteCloseWrapper(): Promise<void> {
+    klasseToDelete.value = null;
     await reloadData(klassenListFilter.value);
-  };
+  }
 
   function navigateToKlassenDetails(_$event: PointerEvent, { item }: { item: Organisation }): void {
     router.push({ name: 'klasse-details', params: { id: item.id } });
@@ -400,18 +404,30 @@
             </div>
           </template>
           <template #[`item.actions`]="{ item }">
-            <KlasseDelete
-              :klassenname="item.name"
-              :klassen-id="item.id"
-              :schulname="item.schuleDetails ?? ''"
-              :error-code="organisationStore.errorCode"
-              :use-icon-activator="true"
-              :is-loading="organisationStore.loading"
-              @on-delete-klasse="deleteKlasse(item.id)"
-              @on-close="handleKlasseDeleteClose"
+            <v-icon
+              icon="mdi-delete"
+              size="small"
+              @click.stop="
+                () => {
+                  klasseToDelete = item;
+                  isDeleteDialogOpen = true;
+                }
+              "
             />
           </template>
         </ResultTable>
+        <KlasseDelete
+          v-if="klasseToDelete"
+          v-model="isDeleteDialogOpen"
+          :klassenname="klasseToDelete.name"
+          :klassen-id="klasseToDelete.id"
+          :schulname="klasseToDelete.schuleDetails ?? ''"
+          :error-code="organisationStore.errorCode"
+          :is-loading="organisationStore.loading"
+          :use-icon-activator="false"
+          @on-delete-klasse="deleteKlasse"
+          @on-close="handleKlasseDeleteCloseWrapper"
+        />
       </template>
     </LayoutCard>
   </div>

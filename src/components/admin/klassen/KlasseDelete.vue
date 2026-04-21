@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { computed, ref, type ComputedRef, type Ref } from 'vue';
+  import { computed, ref, type ComputedRef, type Ref, type WritableComputedRef } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
 
@@ -15,9 +15,11 @@
     schulname: string;
     isLoading: boolean;
     useIconActivator: boolean;
+    modelValue: boolean;
   };
 
   type Emits = {
+    (event: 'update:modelValue', value: boolean): void;
     (event: 'onDeleteKlasse', klasseId: string): void;
     (event: 'onClose'): void;
   };
@@ -34,6 +36,11 @@
 
   const hasTriggeredAction: Ref<boolean> = ref(false);
   const isClosing: Ref<boolean> = ref(false);
+
+  const model: WritableComputedRef<boolean, boolean> = computed({
+    get: () => props.modelValue,
+    set: (val: boolean) => emit('update:modelValue', val),
+  });
 
   const state: ComputedRef<State> = computed(() => {
     // NOTE: order of checks and the two different paths into SUCCESS are important here
@@ -57,9 +64,9 @@
     emit('onDeleteKlasse', klasseId);
   }
 
-  function closeSuccessDialog(isActive: Ref<boolean>): void {
+  function closeSuccessDialog(): void {
     isClosing.value = true;
-    closeKlasseDeleteDialog(isActive);
+    model.value = false;
     emit('onClose');
   }
 
@@ -85,6 +92,7 @@
 
 <template>
   <v-dialog
+    v-model="model"
     persistent
     @after-leave="resetState"
   >
@@ -165,7 +173,7 @@
                 :block="mdAndDown"
                 class="primary"
                 data-testid="close-klasse-delete-success-dialog-button"
-                @click.stop="closeSuccessDialog(isActive)"
+                @click.stop="closeSuccessDialog()"
               >
                 {{ $t('close') }}
               </v-btn>
