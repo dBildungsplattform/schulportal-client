@@ -1,19 +1,17 @@
-import { describe, test, expect, vi, beforeEach, type Mock } from 'vitest';
-import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
-import ServiceProviderForm from './ServiceProviderForm.vue';
-import { ServiceProviderKategorie, ServiceProviderMerkmal } from '@/stores/ServiceProviderStore';
-import { RollenSystemRecht } from '@/stores/RolleStore';
-import type {
-  ServiceProviderForm as ServiceProviderFormType,
-  ServiceProviderFormSubmitData,
-  ServiceProviderForm,
-  ServiceProviderFormProps,
-} from './types';
-import type { ComponentInstance } from 'vue';
-import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
-import { DoFactory } from 'test/DoFactory';
 import { OrganisationsTyp } from '@/api-client/generated';
 import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
+import { RollenSystemRecht } from '@/stores/RolleStore';
+import { ServiceProviderKategorie } from '@/stores/ServiceProviderStore';
+import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
+import { DoFactory } from 'test/DoFactory';
+import { beforeEach, describe, expect, test, vi, type Mock } from 'vitest';
+import type { ComponentInstance } from 'vue';
+import ServiceProviderForm from './ServiceProviderForm.vue';
+import type {
+  ServiceProviderFormProps,
+  ServiceProviderFormSubmitData,
+  ServiceProviderForm as ServiceProviderFormType,
+} from './types';
 
 const defaultProps: ServiceProviderFormProps = {
   initialValues: {
