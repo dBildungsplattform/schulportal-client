@@ -23,6 +23,7 @@ import {
   type ServiceProviderResponse,
   type UpdateServiceProviderBodyParams,
 } from '../api-client/generated/api';
+import type { RollenSystemRecht } from './RolleStore';
 
 const serviceProviderApi: ProviderApiInterface = ProviderApiFactory(undefined, '', axiosApiInstance);
 const rolleApi: RolleApiInterface = RolleApiFactory(undefined, '', axiosApiInstance);
@@ -58,7 +59,7 @@ export type ManageableServiceProviderDetail = BaseServiceProvider &
   ManageableServiceProviderDetails & {
     url: string;
     availableForRollenerweiterung: boolean;
-    hasSomeVerwaltenPermission: boolean;
+    relevantSystemrechte: Array<RollenSystemRecht>;
   };
 
 export type RollenerweiterungMap = {

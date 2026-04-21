@@ -3923,7 +3923,33 @@
             "description": "Indicates whether the service provider is available for rollenerweiterung."
           },
           "rollen": { "type": "array", "items": { "$ref": "#/components/schemas/RolleRefResponse" } },
-          "hasSomeVerwaltenPermission": { "type": "boolean" }
+          "relevantSystemrechte": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "ROLLEN_VERWALTEN",
+                "PERSONEN_SOFORT_LOESCHEN",
+                "PERSONEN_VERWALTEN",
+                "LANDESBEDIENSTETE_SUCHEN_UND_HINZUFUEGEN",
+                "EINGESCHRAENKT_NEUE_BENUTZER_ERSTELLEN",
+                "SCHULEN_VERWALTEN",
+                "KLASSEN_VERWALTEN",
+                "SCHULTRAEGER_VERWALTEN",
+                "PERSON_SYNCHRONISIEREN",
+                "CRON_DURCHFUEHREN",
+                "PERSONEN_ANLEGEN",
+                "IMPORT_DURCHFUEHREN",
+                "PERSONEN_LESEN",
+                "BULK_VERWALTEN",
+                "SCHULPORTAL_VERWALTEN",
+                "HINWEISE_BEARBEITEN",
+                "ROLLEN_ERWEITERN",
+                "ANGEBOTE_VERWALTEN",
+                "ANGEBOTE_EINGESCHRAENKT_VERWALTEN"
+              ]
+            }
+          }
         },
         "required": [
           "id",
@@ -3936,7 +3962,7 @@
           "hasRollenerweiterung",
           "availableForRollenerweiterung",
           "rollen",
-          "hasSomeVerwaltenPermission"
+          "relevantSystemrechte"
         ]
       },
       "CreateServiceProviderBodyParams": {

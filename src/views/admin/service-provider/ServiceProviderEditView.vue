@@ -6,7 +6,6 @@
   } from '@/components/admin/service-provider/types';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import { RollenSystemRecht } from '@/stores/RolleStore';
   import {
     ServiceProviderMerkmal,
@@ -25,7 +24,6 @@
   } from 'vue-router';
 
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
-  const authStore: AuthStore = useAuthStore();
   const route: RouteLocationNormalized = useRoute();
   const router: Router = useRouter();
   const { t }: Composer = useI18n({ useScope: 'global' });
@@ -42,6 +40,16 @@
   const organisationIdFromQuery: ComputedRef<string | undefined> = computed(
     () => route.query['orga'] as string | undefined,
   );
+
+  const systemrecht: ComputedRef<RollenSystemRecht> = computed(() => {
+    if (
+      serviceProviderStore.currentServiceProvider?.relevantSystemrechte.includes(RollenSystemRecht.AngeboteVerwalten)
+    ) {
+      return RollenSystemRecht.AngeboteVerwalten;
+    }
+    return RollenSystemRecht.AngeboteEingeschraenktVerwalten;
+  });
+
   const initialValues: ComputedRef<ServiceProviderFormType | null> = computed(() => {
     if (!serviceProviderStore.currentServiceProvider) {
       return null;
@@ -169,11 +177,7 @@
         v-if="!serviceProviderStore.errorCode && serviceProviderStore.currentServiceProvider"
         :is-edit-mode="true"
         :initialValues="initialValues ?? {}"
-        :systemrecht="
-          authStore.hasAngeboteVerwaltenPermission
-            ? RollenSystemRecht.AngeboteVerwalten
-            : RollenSystemRecht.AngeboteEingeschraenktVerwalten
-        "
+        :systemrecht
         :loading="serviceProviderStore.loading"
         :showUnsavedChangesDialog="showUnsavedChangesDialog"
         @update:dirty="(value: boolean) => (isDirty = value)"

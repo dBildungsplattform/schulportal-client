@@ -1,4 +1,5 @@
 import routes from '@/router/routes';
+import { RollenSystemRecht } from '@/stores/RolleStore';
 import {
   useServiceProviderStore,
   type ManageableServiceProviderDetail,
@@ -27,7 +28,9 @@ describe('ServiceProviderEditView', () => {
       history: createWebHistory(),
       routes,
     });
-    const testServiceProvider: ManageableServiceProviderDetail = DoFactory.getManageableServiceProviderDetail();
+    const testServiceProvider: ManageableServiceProviderDetail = DoFactory.getManageableServiceProviderDetail({
+      relevantSystemrechte: [RollenSystemRecht.AngeboteVerwalten],
+    });
     serviceProviderStore.currentServiceProvider = testServiceProvider;
     router.push({ name: 'angebot-details', params: { id: testServiceProvider.id } });
     await router.isReady();

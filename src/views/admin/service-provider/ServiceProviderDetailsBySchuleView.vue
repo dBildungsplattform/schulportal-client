@@ -28,6 +28,7 @@
     useServiceProviderStore,
     type ServiceProviderStore,
   } from '@/stores/ServiceProviderStore';
+  import { intersect } from '@/utils/arrays';
 
   const router: Router = useRouter();
   const route: RouteLocationNormalizedLoaded = useRoute();
@@ -138,7 +139,14 @@
     if (!serviceProviderStore.currentServiceProvider || serviceProviderStore.loading) {
       return false;
     }
-    return serviceProviderStore.currentServiceProvider.hasSomeVerwaltenPermission;
+
+    const hasSomeVerwaltenPermission: boolean =
+      intersect(serviceProviderStore.currentServiceProvider.relevantSystemrechte ?? [], [
+        RollenSystemRechtEnum.AngeboteVerwalten,
+        RollenSystemRechtEnum.AngeboteEingeschraenktVerwalten,
+      ]).length > 0;
+
+    return hasSomeVerwaltenPermission;
   });
 
   function scrollToTreeview(offset: number = 120): void {
