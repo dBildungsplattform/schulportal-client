@@ -93,16 +93,6 @@
     v-model="model"
     @after-leave="resetState"
   >
-    <template #activator="{ props }">
-      <v-icon
-        :title="$t('admin.angebot.delete.title')"
-        data-testid="open-service-provider-delete-dialog-icon"
-        icon="mdi-delete"
-        size="small"
-        v-bind="props"
-      />
-    </template>
-
     <template #default="{ isActive }">
       <LayoutCard
         :headline-test-id="

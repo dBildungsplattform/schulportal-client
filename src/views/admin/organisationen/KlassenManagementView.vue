@@ -405,6 +405,7 @@
           </template>
           <template #[`item.actions`]="{ item }">
             <v-icon
+              data-testid="open-klasse-delete-dialog-icon"
               icon="mdi-delete"
               size="small"
               @click.stop="
