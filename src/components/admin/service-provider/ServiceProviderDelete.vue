@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { computed, ref, type ComputedRef, type Ref } from 'vue';
+  import { computed, ref, type ComputedRef, type Ref, type WritableComputedRef } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
 
@@ -10,6 +10,7 @@
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   type Props = {
+    modelValue: boolean;
     errorCode: string;
     serviceProviderId: string;
     serviceProviderName: string;
@@ -17,6 +18,7 @@
   };
 
   type Emits = {
+    (event: 'update:modelValue', value: boolean): void;
     (event: 'onDeleteServiceProvider', serviceProviderId: string): void;
     (event: 'onClose', completed: boolean): void;
   };
@@ -30,6 +32,11 @@
   const props: Props = defineProps<Props>();
 
   const emit: Emits = defineEmits<Emits>();
+
+  const model: WritableComputedRef<boolean, boolean> = computed({
+    get: () => props.modelValue,
+    set: (val: boolean) => emit('update:modelValue', val),
+  });
 
   const hasTriggeredAction: Ref<boolean> = ref(false);
   const isClosing: Ref<boolean> = ref(false);
@@ -83,6 +90,7 @@
 <template>
   <v-dialog
     persistent
+    v-model="model"
     @after-leave="resetState"
   >
     <template #activator="{ props }">

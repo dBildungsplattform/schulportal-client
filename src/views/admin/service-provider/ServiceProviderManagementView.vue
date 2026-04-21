@@ -33,6 +33,9 @@
 
   const cachedServiceProviderId: Ref<string | null> = ref(null);
 
+  const serviceProviderToDelete: Ref<ServiceProviderRow | null> = ref(null);
+  const isDeleteDialogOpen: Ref<boolean, boolean> = ref(false);
+
   const errorTitle: ComputedRef<string> = computed(() => {
     if (!serviceProviderStore.errorCode) {
       return '';
@@ -85,15 +88,22 @@
     cachedServiceProviderId.value = id;
   }
 
-  async function onCloseDeleteDialog(successful: boolean): Promise<void> {
+  async function onCloseDeleteDialogWrapper(successful: boolean): Promise<void> {
+    isDeleteDialogOpen.value = false;
+
     if (!successful) {
       serviceProviderStore.errorCode = '';
+      serviceProviderToDelete.value = null;
       return;
     }
+
     serviceProviderStore.manageableServiceProviders = serviceProviderStore.manageableServiceProviders.filter(
       (sp: ManageableServiceProviderListEntry) => sp.id !== cachedServiceProviderId.value,
     );
+
     await reloadData();
+
+    serviceProviderToDelete.value = null;
   }
 
   const items: ComputedRef<ServiceProviderRow[]> = computed(() => {
@@ -166,16 +176,29 @@
         </div>
       </template>
       <template #[`item.actions`]="{ item }: { item: ServiceProviderRow }">
-        <ServiceProviderDelete
+        <v-icon
           v-if="item.isDeleteAuthorized"
-          :error-code="serviceProviderStore.errorCode"
-          :is-loading="serviceProviderStore.loading"
-          :service-provider-id="item.id"
-          :service-provider-name="item.name"
-          @on-delete-service-provider="onDelete"
-          @on-close="onCloseDeleteDialog"
+          icon="mdi-delete"
+          size="small"
+          data-testid="open-service-provider-delete-dialog-icon"
+          @click.stop="
+            () => {
+              serviceProviderToDelete = item;
+              isDeleteDialogOpen = true;
+            }
+          "
         />
       </template>
     </ResultTable>
+    <ServiceProviderDelete
+      v-if="serviceProviderToDelete"
+      v-model="isDeleteDialogOpen"
+      :error-code="serviceProviderStore.errorCode"
+      :is-loading="serviceProviderStore.loading"
+      :service-provider-id="serviceProviderToDelete.id"
+      :service-provider-name="serviceProviderToDelete.name"
+      @on-delete-service-provider="onDelete"
+      @on-close="onCloseDeleteDialogWrapper"
+    />
   </LayoutCard>
 </template>
