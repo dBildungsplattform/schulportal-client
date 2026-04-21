@@ -12,16 +12,7 @@
   import { computed, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { boolean, object, string } from 'yup';
-  import type { ServiceProviderForm, ServiceProviderFormSubmitData } from './types';
-
-  type Props = {
-    initialValues: Partial<ServiceProviderForm>;
-    systemrecht: RollenSystemRecht;
-    showUnsavedChangesDialog: boolean;
-    errorCode?: string;
-    loading?: boolean;
-    isEditMode?: boolean;
-  };
+  import type { ServiceProviderForm, ServiceProviderFormSubmitData, ServiceProviderFormProps as Props } from './types';
 
   type Emits = {
     (e: 'click:confirmUnsaved'): void;
@@ -176,7 +167,7 @@
 
 <template>
   <FormWrapper
-    id="service-provider-create-form"
+    :id="isEditMode ? 'service-provider-edit-form' : 'service-provider-create-form'"
     :confirm-unsaved-changes-action="() => emit('click:confirmUnsaved')"
     :can-commit="canCommit"
     :create-button-label="isEditMode ? t('save') : t('angebot.create')"
@@ -204,7 +195,7 @@
           :readonly="isEditMode"
           :highlight-selection="true"
           :multiple="false"
-          parent-id="service-provider-create"
+          :parent-id="isEditMode ? 'service-provider-edit' : 'service-provider-create'"
           :placeholderText="$t('admin.organisation.selectOrganisation')"
           :includeAll="true"
           :selected-schule-props="selectedOrganisationIdProps"

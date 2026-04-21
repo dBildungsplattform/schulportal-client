@@ -34,3 +34,12 @@ export type ServiceProviderFormSubmitData = {
   merkmale: ServiceProviderMerkmal[];
   requires2fa: boolean;
 };
+
+export type ServiceProviderFormProps = {
+  initialValues: Partial<ServiceProviderForm>;
+  systemrecht: RollenSystemRecht;
+  showUnsavedChangesDialog: boolean;
+  errorCode?: string;
+  loading?: boolean;
+  isEditMode?: boolean;
+};
