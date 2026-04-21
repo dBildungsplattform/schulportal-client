@@ -15,6 +15,7 @@ beforeEach(() => {
   wrapper = mount(KlasseDelete, {
     attachTo: document.getElementById('app') || '',
     props: {
+      modelValue: false,
       errorCode: '',
       isLoading: false,
       klassenId: '1',

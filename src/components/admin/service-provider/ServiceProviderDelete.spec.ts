@@ -5,6 +5,7 @@ import ServiceProviderDelete from './ServiceProviderDelete.vue';
 
 describe('ServiceProviderDelete.vue', () => {
   interface DefaultProps {
+    modelValue: boolean;
     errorCode: string;
     serviceProviderId: string;
     serviceProviderName: string;
@@ -12,6 +13,7 @@ describe('ServiceProviderDelete.vue', () => {
   }
 
   const defaultProps: DefaultProps = {
+    modelValue: false,
     errorCode: '',
     serviceProviderId: 'sp-123',
     serviceProviderName: 'Test Provider',
