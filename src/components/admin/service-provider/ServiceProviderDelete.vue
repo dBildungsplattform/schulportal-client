@@ -51,12 +51,11 @@
     if (props.isLoading) {
       return State.LOADING;
     }
-    return hasTriggeredAction.value ? State.COMPLETE : State.CONFIRM;
+    return hasTriggeredAction.value && !props.errorCode ? State.COMPLETE : State.CONFIRM;
   });
 
-  function closeServiceProviderDeleteDialog(isActive: Ref<boolean>, successful: boolean): void {
+  function closeServiceProviderDeleteDialog(isActive: Ref<boolean>): void {
     isActive.value = false;
-    emit('onClose', successful);
   }
 
   function handleServiceProviderDelete(serviceProviderId: string): void {
@@ -66,7 +65,7 @@
 
   function closeSuccessDialog(isActive: Ref<boolean>): void {
     isClosing.value = true;
-    closeServiceProviderDeleteDialog(isActive, props.errorCode === '');
+    closeServiceProviderDeleteDialog(isActive);
   }
 
   const deleteServiceProviderConfirmationMessage: ComputedRef<string> = computed(() => {
@@ -100,7 +99,7 @@
         "
         :closable="state === State.COMPLETE ? false : true"
         :header="$t('admin.angebot.delete.title')"
-        @on-close-clicked="closeServiceProviderDeleteDialog(isActive, false)"
+        @on-close-clicked="closeServiceProviderDeleteDialog(isActive)"
       >
         <v-card-text>
           <v-container>
@@ -137,7 +136,7 @@
                 :block="mdAndDown"
                 class="secondary button"
                 data-testid="cancel-service-provider-delete-dialog-button"
-                @click.stop="closeServiceProviderDeleteDialog(isActive, false)"
+                @click.stop="closeServiceProviderDeleteDialog(isActive)"
               >
                 {{ $t('cancel') }}
               </v-btn>
@@ -147,16 +146,11 @@
               sm="6"
               md="4"
             >
-              <template> </template>
               <v-btn
                 v-if="state === State.COMPLETE"
                 :block="mdAndDown"
                 class="primary"
-                :data-testid="
-                  props.errorCode
-                    ? 'close-service-provider-delete-error-dialog-button'
-                    : 'close-service-provider-delete-success-dialog-button'
-                "
+                :data-testid="'close-service-provider-delete-success-dialog-button'"
                 @click.stop="closeSuccessDialog(isActive)"
               >
                 {{ $t('close') }}

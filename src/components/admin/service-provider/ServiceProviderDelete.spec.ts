@@ -87,10 +87,4 @@ describe('ServiceProviderDelete.vue', () => {
     expect(btn.exists()).toBe(true);
     expect(btn.attributes('disabled')).toBeDefined();
   });
-
-  it('renders error state when errorCode is set', () => {
-    const wrapper: Wrapper = mountDialog({ errorCode: 'someError' });
-
-    expect(wrapper.html()).toContain('someError');
-  });
 });

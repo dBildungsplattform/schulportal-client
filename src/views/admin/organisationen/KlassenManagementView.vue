@@ -185,6 +185,8 @@
 
   const handleAlertClose = async (): Promise<void> => {
     organisationStore.errorCode = '';
+    isDeleteDialogOpen.value = false;
+    klasseToDelete.value = null;
     await reloadData(klassenListFilter.value);
   };
 

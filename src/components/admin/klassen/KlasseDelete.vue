@@ -42,16 +42,14 @@
   });
 
   const state: ComputedRef<State> = computed(() => {
-    // NOTE: order of checks and the two different paths into SUCCESS are important here
-    // this freezes the content of the dialog in the success state, while the close-animation is running
-    // otherwise it will briefly show the initial template, because the isLoading-prop is true
     if (isClosing.value) {
       return State.SUCCESS;
     }
     if (props.isLoading) {
       return State.LOADING;
     }
-    return hasTriggeredAction.value ? State.SUCCESS : State.CONFIRM;
+    // Only show success if action was triggered AND there's no error
+    return hasTriggeredAction.value && !props.errorCode ? State.SUCCESS : State.CONFIRM;
   });
 
   function closeKlasseDeleteDialog(isActive: Ref<boolean>): void {
@@ -110,7 +108,7 @@
                 cols="10"
               >
                 <span
-                  v-if="state === State.SUCCESS && !props.errorCode"
+                  v-if="state === State.SUCCESS"
                   data-testid="klasse-delete-success-text"
                 >
                   {{ deleteKlasseSuccessMessage }}

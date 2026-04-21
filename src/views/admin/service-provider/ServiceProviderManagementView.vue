@@ -79,6 +79,8 @@
   }
 
   const handleAlertClose = async (): Promise<void> => {
+    isDeleteDialogOpen.value = false;
+    serviceProviderToDelete.value = null;
     serviceProviderStore.errorCode = '';
     await reloadData();
   };
@@ -191,7 +193,7 @@
       </template>
     </ResultTable>
     <ServiceProviderDelete
-      v-if="serviceProviderToDelete"
+      v-if="serviceProviderToDelete && serviceProviderStore.errorCode === ''"
       v-model="isDeleteDialogOpen"
       :error-code="serviceProviderStore.errorCode"
       :is-loading="serviceProviderStore.loading"
