@@ -165,14 +165,14 @@
     });
   }
 
-  const handleAlertClose = async (): Promise<void> => {
+  const handleAlertCloseServiceProvider = async (): Promise<void> => {
     isDeleteDialogOpen.value = false;
     serviceProviderToDelete.value = null;
     serviceProviderStore.errorCode = '';
     await reloadData();
   };
 
-  async function onDelete(id: string): Promise<void> {
+  async function onDeleteServiceProvider(id: string): Promise<void> {
     await serviceProviderStore.deleteServiceProvider(id);
     cachedServiceProviderId.value = id;
   }
@@ -219,7 +219,7 @@
     :header-hover-text="organisationStore.currentOrganisation?.name"
   >
     <SpshAlert
-      :button-action="handleAlertClose"
+      :button-action="handleAlertCloseServiceProvider"
       :button-text="t('nav.backToList')"
       :closable="false"
       data-test-id-prefix="service-provider-management-by-schule-error"
@@ -351,7 +351,7 @@
         :is-loading="serviceProviderStore.loading"
         :service-provider-id="serviceProviderToDelete.id"
         :service-provider-name="serviceProviderToDelete.name"
-        @on-delete-service-provider="onDelete"
+        @on-delete-service-provider="onDeleteServiceProvider"
         @on-close="onCloseDeleteDialogWrapper"
       />
     </template>
