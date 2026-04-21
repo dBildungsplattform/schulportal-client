@@ -91,6 +91,7 @@
 
 <template>
   <v-dialog
+    persistent
     v-model="model"
     @after-leave="resetState"
   >
