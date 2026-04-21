@@ -56,6 +56,7 @@
 
   function closeServiceProviderDeleteDialog(isActive: Ref<boolean>): void {
     isActive.value = false;
+    emit('onClose', false);
   }
 
   function handleServiceProviderDelete(serviceProviderId: string): void {
@@ -66,6 +67,7 @@
   function closeSuccessDialog(isActive: Ref<boolean>): void {
     isClosing.value = true;
     closeServiceProviderDeleteDialog(isActive);
+    emit('onClose', true);
   }
 
   const deleteServiceProviderConfirmationMessage: ComputedRef<string> = computed(() => {
