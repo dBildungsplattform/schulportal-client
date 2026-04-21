@@ -109,15 +109,8 @@
                 class="text-center"
                 cols="10"
               >
-                <span v-if="props.errorCode">
-                  {{
-                    t(`admin.angebot.errors.${props.errorCode}`, {
-                      serviceProviderName: props.serviceProviderName,
-                    })
-                  }}
-                </span>
                 <span
-                  v-else-if="state === State.COMPLETE && !props.errorCode"
+                  v-if="state === State.COMPLETE && !props.errorCode"
                   data-testid="service-provider-delete-complete-text"
                 >
                   {{ deleteServiceProviderSuccessMessage }}
