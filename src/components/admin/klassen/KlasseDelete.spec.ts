@@ -12,7 +12,6 @@ interface DefaultProps {
   klassenname: string;
   schulname: string;
   isLoading: boolean;
-  useIconActivator: boolean;
 }
 
 const defaultProps: DefaultProps = {
@@ -22,7 +21,6 @@ const defaultProps: DefaultProps = {
   klassenname: '1A',
   schulname: 'schule',
   isLoading: false,
-  useIconActivator: false,
 };
 
 function mountDialog(props: Partial<DefaultProps> = {}): Wrapper {

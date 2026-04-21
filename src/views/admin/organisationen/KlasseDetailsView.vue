@@ -270,6 +270,14 @@
                     sm="6"
                   >
                     <div class="d-flex justify-sm-end">
+                      <v-btn
+                        class="secondary button"
+                        data-testid="open-klasse-delete-dialog-button"
+                        :block="mdAndDown"
+                        @click="isDeleteDialogOpen = true"
+                      >
+                        {{ $t('admin.klasse.deleteKlasse') }}
+                      </v-btn>
                       <KlasseDelete
                         ref="klasse-delete"
                         v-model="isDeleteDialogOpen"

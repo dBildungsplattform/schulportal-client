@@ -14,7 +14,6 @@
     klassenId: string;
     schulname: string;
     isLoading: boolean;
-    useIconActivator: boolean;
     modelValue: boolean;
   };
 
