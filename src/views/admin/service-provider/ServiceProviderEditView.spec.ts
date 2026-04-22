@@ -9,7 +9,7 @@ import {
 import ServiceProviderEditView from '@/views/admin/service-provider/ServiceProviderEditView.vue';
 import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import { DoFactory } from 'test/DoFactory';
-import type { Mock } from 'vitest';
+import type { Mock, MockInstance } from 'vitest';
 import { nextTick, type Component } from 'vue';
 import {
   createRouter,
@@ -198,6 +198,13 @@ describe('ServiceProviderEditView', () => {
     spy.mockRestore();
   });
 
+  test('it closes the view and navigates back to service provider table', async () => {
+    const push: MockInstance = vi.spyOn(router, 'push');
+    wrapper?.find('[data-testid="close-layout-card-button"]').trigger('click');
+    await nextTick();
+    expect(push).toHaveBeenCalledTimes(1);
+  });
+
   it('calls router.push with correct arguments when dismissing the success dialog', async () => {
     const pushSpy: Mock = vi.spyOn(router, 'push').mockResolvedValue();
     const form: VueWrapper = wrapper!.findComponent({ name: 'ServiceProviderForm' });
@@ -223,6 +230,29 @@ describe('ServiceProviderEditView', () => {
       params: { id: serviceProviderStore.currentServiceProvider?.id },
     });
     pushSpy.mockRestore();
+  });
+
+  describe.each([[false], [true]])('when form is dirty:%s', (isFormDirty: boolean) => {
+    test('it handles unloading', async () => {
+      wrapper = await mountComponent();
+      if (isFormDirty) {
+        await fillForm({
+          organisation: DoFactory.getOrganisation().id,
+          name: 'Test Service Provider',
+          url: 'https://test.example.com',
+        });
+        await flushPromises();
+      }
+      const event: Event = new Event('beforeunload');
+      const spy: MockInstance = vi.spyOn(event, 'preventDefault');
+
+      window.dispatchEvent(event);
+      if (isFormDirty) {
+        expect(spy).toHaveBeenCalledOnce();
+      } else {
+        expect(spy).not.toHaveBeenCalledOnce();
+      }
+    });
   });
 });
 
