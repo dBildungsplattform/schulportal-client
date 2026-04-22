@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { computed, ref, type ComputedRef, type Ref } from 'vue';
+  import { computed, ref, type ComputedRef, type ModelRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
 
@@ -10,6 +10,7 @@
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   type Props = {
+    modelValue: boolean;
     errorCode: string;
     serviceProviderId: string;
     serviceProviderName: string;
@@ -17,6 +18,7 @@
   };
 
   type Emits = {
+    (event: 'update:modelValue', value: boolean): void;
     (event: 'onDeleteServiceProvider', serviceProviderId: string): void;
     (event: 'onClose', completed: boolean): void;
   };
@@ -31,6 +33,8 @@
 
   const emit: Emits = defineEmits<Emits>();
 
+  const model: ModelRef<boolean | undefined> = defineModel<boolean>();
+
   const hasTriggeredAction: Ref<boolean> = ref(false);
   const isClosing: Ref<boolean> = ref(false);
 
@@ -44,12 +48,12 @@
     if (props.isLoading) {
       return State.LOADING;
     }
-    return hasTriggeredAction.value ? State.COMPLETE : State.CONFIRM;
+    return hasTriggeredAction.value && !props.errorCode ? State.COMPLETE : State.CONFIRM;
   });
 
-  function closeServiceProviderDeleteDialog(isActive: Ref<boolean>, successful: boolean): void {
+  function closeServiceProviderDeleteDialog(isActive: Ref<boolean>): void {
     isActive.value = false;
-    emit('onClose', successful);
+    emit('onClose', false);
   }
 
   function handleServiceProviderDelete(serviceProviderId: string): void {
@@ -59,7 +63,8 @@
 
   function closeSuccessDialog(isActive: Ref<boolean>): void {
     isClosing.value = true;
-    closeServiceProviderDeleteDialog(isActive, props.errorCode === '');
+    closeServiceProviderDeleteDialog(isActive);
+    emit('onClose', true);
   }
 
   const deleteServiceProviderConfirmationMessage: ComputedRef<string> = computed(() => {
@@ -83,18 +88,9 @@
 <template>
   <v-dialog
     persistent
+    v-model="model"
     @after-leave="resetState"
   >
-    <template #activator="{ props }">
-      <v-icon
-        :title="$t('admin.angebot.delete.title')"
-        data-testid="open-service-provider-delete-dialog-icon"
-        icon="mdi-delete"
-        size="small"
-        v-bind="props"
-      />
-    </template>
-
     <template #default="{ isActive }">
       <LayoutCard
         :headline-test-id="
@@ -102,7 +98,7 @@
         "
         :closable="state === State.COMPLETE ? false : true"
         :header="$t('admin.angebot.delete.title')"
-        @on-close-clicked="closeServiceProviderDeleteDialog(isActive, false)"
+        @on-close-clicked="closeServiceProviderDeleteDialog(isActive)"
       >
         <v-card-text>
           <v-container>
@@ -111,15 +107,8 @@
                 class="text-center"
                 cols="10"
               >
-                <span v-if="props.errorCode">
-                  {{
-                    t(`admin.angebot.errors.${props.errorCode}`, {
-                      serviceProviderName: props.serviceProviderName,
-                    })
-                  }}
-                </span>
                 <span
-                  v-else-if="state === State.COMPLETE && !props.errorCode"
+                  v-if="state === State.COMPLETE && !props.errorCode"
                   data-testid="service-provider-delete-complete-text"
                 >
                   {{ deleteServiceProviderSuccessMessage }}
@@ -146,7 +135,7 @@
                 :block="mdAndDown"
                 class="secondary button"
                 data-testid="cancel-service-provider-delete-dialog-button"
-                @click.stop="closeServiceProviderDeleteDialog(isActive, false)"
+                @click.stop="closeServiceProviderDeleteDialog(isActive)"
               >
                 {{ $t('cancel') }}
               </v-btn>
@@ -156,16 +145,11 @@
               sm="6"
               md="4"
             >
-              <template> </template>
               <v-btn
                 v-if="state === State.COMPLETE"
                 :block="mdAndDown"
                 class="primary"
-                :data-testid="
-                  props.errorCode
-                    ? 'close-service-provider-delete-error-dialog-button'
-                    : 'close-service-provider-delete-success-dialog-button'
-                "
+                :data-testid="'close-service-provider-delete-success-dialog-button'"
                 @click.stop="closeSuccessDialog(isActive)"
               >
                 {{ $t('close') }}

@@ -911,6 +911,7 @@
   "no": "Nein",
   "from": "von",
   "noDataFound": "Keine Daten gefunden.",
+  "loadingData": "Daten werden abgerufen...",
   "pagination": {
     "all": "Alle",
     "pageText": "{interval} von {total} Einträgen"

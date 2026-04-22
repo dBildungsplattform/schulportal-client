@@ -91,12 +91,6 @@
     }
   }
 
-  interface Slots {
-    default: (props: { default: string }) => string;
-    top: (props: { top: number }) => string;
-    bottom: (props: { bottom: boolean }) => string;
-  }
-
   type SortItem = {
     key: string;
     order?: boolean | 'asc' | 'desc';
@@ -170,6 +164,8 @@
     :items-per-page-options="[5, 30, 50, 100, 300]"
     :items-per-page-text="'itemsPerPage'"
     :item-value="itemValuePath"
+    :loading="loading"
+    :loading-text="$t('loadingData')"
     :page="currentPage"
     select-strategy="page"
     :show-current-page="true"
@@ -182,9 +178,22 @@
     @update:items-per-page="(limit: number) => $emit('onItemsPerPageUpdate', limit)"
     @update:model-value="emitSelectedRows"
   >
+    <template v-slot:loading>
+      <div class="d-flex flex-column align-center justify-center pa-4">
+        <v-progress-circular
+          color="primary"
+          indeterminate
+        />
+        <div class="mt-2">
+          {{ $t('loadingData') }}
+        </div>
+      </div>
+    </template>
+
     <template
-      v-for="(_, name) in $slots as unknown as Readonly<Slots>"
-      #[name]="slotProps"
+      v-for="(_, name) in $slots"
+      v-slot:[name]="slotProps"
+      :key="name"
     >
       <slot
         :name="name"
@@ -194,4 +203,9 @@
   </v-data-table-server>
 </template>
 
+<style scoped>
+  .result-table :deep(.v-data-table-progress) {
+    display: none !important;
+  }
+</style>
 <style></style>

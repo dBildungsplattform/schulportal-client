@@ -36,6 +36,7 @@
 
   const currentKlasseId: string = route.params['id'] as string;
   const isEditActive: Ref<boolean> = ref(false);
+  const isDeleteDialogOpen: Ref<boolean, boolean> = ref(false);
 
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
 
@@ -118,6 +119,7 @@
   }
 
   async function navigateToKlasseManagement(): Promise<void> {
+    isDeleteDialogOpen.value = false;
     await router.push({ name: 'klasse-management' });
   }
 
@@ -268,8 +270,17 @@
                     sm="6"
                   >
                     <div class="d-flex justify-sm-end">
+                      <v-btn
+                        class="secondary button"
+                        data-testid="open-klasse-delete-dialog-button"
+                        :block="mdAndDown"
+                        @click="isDeleteDialogOpen = true"
+                      >
+                        {{ $t('admin.klasse.deleteKlasse') }}
+                      </v-btn>
                       <KlasseDelete
                         ref="klasse-delete"
+                        v-model="isDeleteDialogOpen"
                         :error-code="organisationStore.errorCode"
                         :klassenname="organisationStore.currentKlasse?.name || ''"
                         :klassen-id="organisationStore.currentKlasse?.id || ''"
