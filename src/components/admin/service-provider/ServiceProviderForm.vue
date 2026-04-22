@@ -410,10 +410,19 @@
 </template>
 
 <style scoped>
-  .logo-box.selected {
-    border: 2px solid #1976d2;
+  .logo-box {
+    width: 80px;
+    height: 80px;
+    border: 2px solid #ddd;
     border-radius: 8px;
-    padding: 8px;
-    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+  }
+
+  .logo-box.selected {
+    border-color: #001e49;
+    box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
   }
 </style>
