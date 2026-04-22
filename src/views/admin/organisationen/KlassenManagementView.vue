@@ -78,7 +78,6 @@
     }
     return initialFilter;
   });
-  const administriertVonForKlassenFilter: Ref<Array<string>> = ref([]);
 
   const finalKlassen: ComputedRef<Organisation[]> = computed(() => {
     // If there are selected Klassen, filter allKlassen to show only those that are selected
@@ -228,11 +227,8 @@
     { immediate: true },
   );
 
-  watch(selectedSchule, (newValue: string | undefined) => {
-    administriertVonForKlassenFilter.value.shift();
-    if (newValue) {
-      administriertVonForKlassenFilter.value.push(newValue);
-    }
+  const administriertVonForKlassenFilter: ComputedRef<Array<string>> = computed(() => {
+    return selectedSchule.value ? [selectedSchule.value] : [];
   });
 
   watchEffect(async () => {
