@@ -14,8 +14,6 @@ import { DoFactory } from 'test/DoFactory';
 import type { MockInstance } from 'vitest';
 import { useBulkOperationStore, type BulkOperationStore } from './BulkOperationStore';
 import { OrganisationsTyp, type Organisation } from './OrganisationStore';
-import { usePersonStore, type PersonStore } from './PersonStore';
-import { usePersonenkontextStore, type PersonenkontextStore } from './PersonenkontextStore';
 import { RollenArt } from './RolleStore';
 import { PersonenUebersicht } from './types/PersonenUebersicht';
 import type { Zuordnung } from './types/Zuordnung';
@@ -25,8 +23,6 @@ const mockAdapter: MockAdapter = new MockAdapter(ApiService);
 
 describe('BulkOperationStore', () => {
   let bulkOperationStore: BulkOperationStore;
-  let personStore: PersonStore;
-  let personenkontextStore: PersonenkontextStore;
 
   const mockPersonId: string = '1';
   const mockSchule: Organisation = DoFactory.getSchule();
@@ -45,13 +41,8 @@ describe('BulkOperationStore', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
     bulkOperationStore = useBulkOperationStore();
-    personStore = usePersonStore();
-    personenkontextStore = usePersonenkontextStore();
     mockAdapter.reset();
-    personStore.$reset();
-    personenkontextStore.$reset();
     bulkOperationStore.$reset();
-    personStore.personenuebersicht = person;
     vi.restoreAllMocks();
   });
 
@@ -83,8 +74,6 @@ describe('BulkOperationStore', () => {
 
       await unassign;
 
-      expect(personStore.personenuebersicht).not.toBeNull();
-      expect(personStore.personenuebersicht).toEqual(mockPersonResponse);
       expect(bulkOperationStore.currentOperation?.progress).toBe(100);
       expect(bulkOperationStore.currentOperation?.errors.size).toBe(0);
     });
@@ -119,8 +108,6 @@ describe('BulkOperationStore', () => {
 
       await unassign;
 
-      expect(personStore.personenuebersicht).not.toBeNull();
-      expect(personStore.personenuebersicht).toEqual(PersonenUebersicht.fromResponse(mockPersonResponse));
       expect(bulkOperationStore.currentOperation?.progress).toBe(100);
       expect(bulkOperationStore.currentOperation?.errors.size).toBe(0);
       expect(spy).toHaveBeenCalledTimes(1);
@@ -234,19 +221,13 @@ describe('BulkOperationStore', () => {
   });
 
   describe('bulkModifyPersonenRolle', () => {
+    const orga: Organisation = DoFactory.getOrganisation();
+
     it('should update successfully with given values', async () => {
       const personIds: string[] = ['1', '2'];
-      const selectedOrganisationId: string = 'org-123';
       const selectedRolleId: string = 'rolle-456';
 
-      const workflowStepResponseOrganisations: Organisation[] = [
-        {
-          id: 'org-123',
-          name: 'Test Schule',
-          kennung: 'SCH123',
-          administriertVon: 'adminId',
-        } as Organisation,
-      ];
+      const workflowStepResponseOrganisations: Organisation[] = [orga];
 
       const mockPersonResponse: DBiamPersonenuebersichtResponse = {
         personId: '1',
@@ -261,7 +242,7 @@ describe('BulkOperationStore', () => {
         dBiamPersonenkontextResponses: [
           {
             personId: '1',
-            organisationId: 'org-123',
+            organisationId: orga.id,
             rolleId: 'rolle-456',
           } as DBiamPersonenkontextResponse,
         ],
@@ -275,7 +256,7 @@ describe('BulkOperationStore', () => {
 
       const modifyPromise: Promise<void> = bulkOperationStore.bulkModifyPersonenRolle(
         personIds,
-        selectedOrganisationId,
+        orga.id,
         selectedRolleId,
         workflowStepResponseOrganisations,
       );
@@ -294,14 +275,7 @@ describe('BulkOperationStore', () => {
       const selectedOrganisationId: string = 'non-existing-org';
       const selectedRolleId: string = 'rolle-456';
 
-      const workflowStepResponseOrganisations: Organisation[] = [
-        {
-          id: 'some-other-org',
-          name: 'Other Schule',
-          kennung: 'SCH999',
-          administriertVon: 'adminId',
-        } as Organisation,
-      ];
+      const workflowStepResponseOrganisations: Organisation[] = [orga];
 
       const modifyPromise: Promise<void> = bulkOperationStore.bulkModifyPersonenRolle(
         personIds,
