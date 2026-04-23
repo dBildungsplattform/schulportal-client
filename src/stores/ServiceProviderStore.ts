@@ -112,6 +112,7 @@ export type CreatedServiceProvider = BaseServiceProvider & {
 };
 
 export type UpdatedServiceProvider = BaseServiceProvider & {
+  url: string;
   merkmale: Array<ServiceProviderMerkmal>;
 };
 

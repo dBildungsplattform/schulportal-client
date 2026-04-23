@@ -17,6 +17,7 @@ import {
   type NavigationGuardNext,
   type RouteLocationNormalized,
   type RouteLocationNormalizedLoadedGeneric,
+  type Router,
 } from 'vue-router';
 
 let wrapper: VueWrapper | null = null;
@@ -56,13 +57,9 @@ async function mountComponent(): Promise<ReturnType<typeof mount<typeof ServiceP
 }
 
 type FormFields = {
-  organisation: string;
   name: string;
   url: string;
   kategorie: ServiceProviderKategorie;
-  nachtraeglichZuweisbar: boolean;
-  verfuegbarFuerRollenerweiterung: boolean;
-  requires2fa: boolean;
 };
 
 type FormSelectors = {
@@ -76,28 +73,8 @@ type FormSelectors = {
 };
 
 async function fillForm(args: Partial<FormFields>): Promise<Partial<FormSelectors>> {
-  const {
-    organisation,
-    name,
-    url,
-    kategorie,
-    nachtraeglichZuweisbar,
-    verfuegbarFuerRollenerweiterung,
-    requires2fa,
-  }: Partial<FormFields> = args;
+  const { name, url, kategorie }: Partial<FormFields> = args;
   const selectors: Partial<FormSelectors> = {};
-
-  if (organisation) {
-    const orgSelect: VueWrapper | undefined = wrapper?.findComponent({ name: 'SchulenFilter' });
-    await orgSelect?.setValue(organisation);
-    const schulenFilterComponent: VueWrapper | undefined = wrapper?.findComponent({ name: 'SchulenFilter' });
-    (schulenFilterComponent?.vm as unknown as { $emit: (event: string, ...args: unknown[]) => void }).$emit(
-      'update:selectedSchulen',
-      organisation,
-    );
-    await nextTick();
-    selectors.orgSelect = orgSelect;
-  }
 
   if (name) {
     const nameInput: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="name-input"]');
@@ -122,31 +99,6 @@ async function fillForm(args: Partial<FormFields>): Promise<Partial<FormSelector
     selectors.kategorieSelect = kategorieSelect;
   }
 
-  if (nachtraeglichZuweisbar !== undefined) {
-    const nachtraeglichZuweisbarSelect: DOMWrapper<Element> | undefined = wrapper?.find(
-      '[data-testid="nachtraeglich-zuweisbar-select"]',
-    );
-    nachtraeglichZuweisbarSelect?.setValue(nachtraeglichZuweisbar);
-    await nextTick();
-    selectors.nachtraeglichZuweisbarSelect = nachtraeglichZuweisbarSelect;
-  }
-
-  if (verfuegbarFuerRollenerweiterung !== undefined) {
-    const verfuegbarFuerRollenerweiterungSelect: DOMWrapper<Element> | undefined = wrapper?.find(
-      '[data-testid="verfuegbar-fuer-rollenerweiterung-select"]',
-    );
-    verfuegbarFuerRollenerweiterungSelect?.setValue(verfuegbarFuerRollenerweiterung);
-    await nextTick();
-    selectors.verfuegbarFuerRollenerweiterungSelect = verfuegbarFuerRollenerweiterungSelect;
-  }
-
-  if (requires2fa !== undefined) {
-    const requires2faSelect: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="requires2fa-select"]');
-    requires2faSelect?.setValue(requires2fa);
-    await nextTick();
-    selectors.requires2faSelect = requires2faSelect;
-  }
-
   return selectors;
 }
 
@@ -162,13 +114,13 @@ describe('ServiceProviderEditView', () => {
       history: createWebHistory(),
       routes,
     });
+    serviceProviderStore.$reset();
     const testServiceProvider: ManageableServiceProviderDetail = DoFactory.getManageableServiceProviderDetail({
       relevantSystemrechte: [RollenSystemRecht.AngeboteVerwalten],
     });
     serviceProviderStore.currentServiceProvider = testServiceProvider;
     router.push({ name: 'angebot-details', params: { id: testServiceProvider.id } });
     await router.isReady();
-
     wrapper = await mountComponent();
   });
 
@@ -205,31 +157,62 @@ describe('ServiceProviderEditView', () => {
     expect(push).toHaveBeenCalledTimes(1);
   });
 
-  it('calls router.push with correct arguments when dismissing the success dialog', async () => {
-    const pushSpy: Mock = vi.spyOn(router, 'push').mockResolvedValue();
-    const form: VueWrapper = wrapper!.findComponent({ name: 'ServiceProviderForm' });
-    const validEdit: Parameters<typeof serviceProviderStore.updateServiceProvider>[1] = {
-      name: 'Neuer Name',
-      url: 'https://neue-url.de',
-      logo: '',
-      kategorie: serviceProviderStore.currentServiceProvider?.kategorie,
-      merkmale: serviceProviderStore.currentServiceProvider?.merkmale || [],
-      requires2fa: false,
-    };
-    form.vm.$emit('click:submit', validEdit);
-    await flushPromises();
+  describe.each([[true], [false]])('when edit is schulspezifisch:%s', (isSchulspezifisch: boolean) => {
+    it.each([
+      [
+        'back to list',
+        '[data-testid="to-service-provider-list-button"]',
+        { name: isSchulspezifisch ? 'angebot-management-schulspezifisch' : 'angebot-management' },
+      ],
+      [
+        'back to service provider',
+        '[data-testid="to-service-provider-details-button"]',
+        { name: isSchulspezifisch ? 'angebot-details-schulspezifisch' : 'angebot-details', params: { id: '' } },
+      ],
+    ])(
+      'calls router.push with correct arguments when clicking "%s"',
+      async (_label: string, buttonSelector: string, args: Parameters<Router['push']>[0]) => {
+        if (isSchulspezifisch) {
+          await router.push({ name: 'angebot-edit', query: { orga: 'schule-id' } });
+        }
+        wrapper = await mountComponent();
+        const pushSpy: Mock = vi.spyOn(router, 'push').mockResolvedValue();
+        const form: VueWrapper = wrapper.findComponent({ name: 'ServiceProviderForm' });
+        const validEdit: Parameters<typeof serviceProviderStore.updateServiceProvider>[1] = {
+          name: 'Neuer Name',
+          url: 'https://neue-url.de',
+          logo: '',
+          kategorie: serviceProviderStore.currentServiceProvider?.kategorie,
+          merkmale: serviceProviderStore.currentServiceProvider?.merkmale || [],
+          requires2fa: false,
+        };
+        form.vm.$emit('click:submit', validEdit);
+        serviceProviderStore.updatedServiceProvider = {
+          id: serviceProviderStore.currentServiceProvider?.id ?? '',
+          name: validEdit.name!,
+          url: validEdit.url!,
+          kategorie: validEdit.kategorie!,
+          merkmale: validEdit.merkmale!,
+          requires2fa: validEdit.requires2fa!,
+        };
+        await flushPromises();
 
-    const closeButton: HTMLElement | null = document.querySelector(
-      '[data-testid="close-service-provider-success-dialog-button"]',
+        const closeButton: HTMLElement | null = document.querySelector(buttonSelector);
+        expect(closeButton).not.toBeNull();
+        (closeButton as HTMLElement).click();
+        await nextTick();
+        if (typeof args !== 'string') {
+          if ('params' in args) {
+            args.params = { id: serviceProviderStore.currentServiceProvider?.id };
+          }
+          if (isSchulspezifisch) {
+            args.query = { orga: 'schule-id' };
+          }
+        }
+        expect(pushSpy).toHaveBeenCalledWith(args);
+        pushSpy.mockRestore();
+      },
     );
-    expect(closeButton).not.toBeNull();
-    (closeButton as HTMLElement).click();
-    await nextTick();
-    expect(pushSpy).toHaveBeenCalledWith({
-      name: 'angebot-details',
-      params: { id: serviceProviderStore.currentServiceProvider?.id },
-    });
-    pushSpy.mockRestore();
   });
 
   describe.each([[false], [true]])('when form is dirty:%s', (isFormDirty: boolean) => {
@@ -237,7 +220,6 @@ describe('ServiceProviderEditView', () => {
       wrapper = await mountComponent();
       if (isFormDirty) {
         await fillForm({
-          organisation: DoFactory.getOrganisation().id,
           name: 'Test Service Provider',
           url: 'https://test.example.com',
         });

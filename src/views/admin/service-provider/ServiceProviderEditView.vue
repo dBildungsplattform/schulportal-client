@@ -1,5 +1,7 @@
 <script setup lang="ts">
+  import SchulPortalLogo from '@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg';
   import ServiceProviderForm from '@/components/admin/service-provider/ServiceProviderForm.vue';
+  import SuccessTemplate from '@/components/admin/service-provider/SuccessTemplate.vue';
   import type {
     ServiceProviderFormSubmitData,
     ServiceProviderForm as ServiceProviderFormType,
@@ -22,15 +24,20 @@
     type RouteLocationNormalized,
     type Router,
   } from 'vue-router';
+  import { useDisplay } from 'vuetify';
 
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
   const route: RouteLocationNormalized = useRoute();
   const router: Router = useRouter();
   const { t }: Composer = useI18n({ useScope: 'global' });
+  const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   const isDirty: Ref<boolean> = ref(false);
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
-  const showSuccessDialog: Ref<boolean> = ref(false);
+  const showSuccess: Ref<boolean> = ref(false);
+
+  const cachedOrganisationName: Ref<string> = ref(''); // for success template
+  const cachedLogo: Ref<string> = ref(''); // for success template
 
   let blockedNext: () => void = () => {
     /* empty */
@@ -49,18 +56,24 @@
     }
     return RollenSystemRecht.AngeboteEingeschraenktVerwalten;
   });
+  const currentLogo: ComputedRef<string> = computed(() => {
+    if (!serviceProviderStore.currentServiceProvider) {
+      return '';
+    }
+    return (
+      serviceProviderStore.serviceProviderLogos.get(serviceProviderStore.currentServiceProvider.id) ?? SchulPortalLogo
+    );
+  });
 
   const initialValues: ComputedRef<ServiceProviderFormType | null> = computed(() => {
     if (!serviceProviderStore.currentServiceProvider) {
       return null;
     }
-    const logo: string =
-      serviceProviderStore.serviceProviderLogos.get(serviceProviderStore.currentServiceProvider.id) ?? '';
     return {
       selectedOrganisationId: serviceProviderStore.currentServiceProvider.administrationsebene.id,
       name: serviceProviderStore.currentServiceProvider.name,
       url: serviceProviderStore.currentServiceProvider.url,
-      logo,
+      logo: currentLogo.value,
       kategorie: serviceProviderStore.currentServiceProvider.kategorie,
       requires2fa: serviceProviderStore.currentServiceProvider.requires2fa,
       nachtraeglichZuweisbar: serviceProviderStore.currentServiceProvider.merkmale.includes(
@@ -109,7 +122,9 @@
     await serviceProviderStore.updateServiceProvider(serviceProviderId.value, values);
     if (!serviceProviderStore.errorCode) {
       isDirty.value = false;
-      showSuccessDialog.value = true;
+      showSuccess.value = true;
+      cachedLogo.value = values.logo ?? currentLogo.value;
+      cachedOrganisationName.value = serviceProviderStore.currentServiceProvider?.administrationsebene.name ?? '';
     }
   }
 
@@ -122,6 +137,17 @@
       });
     } else {
       await router.push({ name: 'angebot-details', params: { id: serviceProviderId.value } });
+    }
+  }
+
+  async function navigateToServiceProviderList(): Promise<void> {
+    if (organisationIdFromQuery.value) {
+      await router.push({
+        name: 'angebot-management-schulspezifisch',
+        query: { orga: organisationIdFromQuery.value },
+      });
+    } else {
+      await router.push({ name: 'angebot-management' });
     }
   }
 
@@ -173,60 +199,104 @@
         :button-text="$t('angebot.backToServiceProviderList')"
         :text="errorText"
       />
-      <ServiceProviderForm
-        v-if="!serviceProviderStore.errorCode && serviceProviderStore.currentServiceProvider"
-        :is-edit-mode="true"
-        :initialValues="initialValues ?? {}"
-        :systemrecht
-        :loading="serviceProviderStore.loading"
-        :showUnsavedChangesDialog="showUnsavedChangesDialog"
-        @update:dirty="(value: boolean) => (isDirty = value)"
-        @click:submit="submit"
-        @click:discard="discard"
-        @update:showUnsavedChangesDialog="(visible: boolean) => (showUnsavedChangesDialog = visible)"
-        @click:confirmUnsaved="confirmUnsavedChanges"
-      />
-
-      <v-dialog
-        persistent
-        :model-value="showSuccessDialog"
-      >
-        <LayoutCard :header="t('angebot.angebotUpdated')">
-          <v-card-text>
-            <v-row class="text-body bold justify-center">
-              <v-col
-                class="text-center"
-                cols="10"
+      <template v-if="!serviceProviderStore.errorCode">
+        <template v-if="showSuccess">
+          <SuccessTemplate
+            v-if="serviceProviderStore.updatedServiceProvider"
+            :success="{
+              message: $t('angebot.angebotUpdatedSuccessfully', {
+                name: serviceProviderStore.updatedServiceProvider.name,
+              }),
+              followingDataChanged: $t('admin.followingDataCreated'),
+              data: [
+                {
+                  label: $t('angebot.providedBy'),
+                  value: cachedOrganisationName,
+                  testId: 'success-organisation',
+                },
+                {
+                  label: $t('angebot.name'),
+                  value: serviceProviderStore.updatedServiceProvider.name,
+                  testId: 'success-name',
+                },
+                {
+                  label: $t('angebot.url'),
+                  value: serviceProviderStore.updatedServiceProvider.url,
+                  testId: 'success-url',
+                },
+                {
+                  label: $t('angebot.logo'),
+                  value: cachedLogo,
+                  testId: 'success-logo',
+                  type: 'image',
+                },
+                {
+                  label: $t('angebot.kategorie'),
+                  value: $t(`angebot.kategorien.${serviceProviderStore.updatedServiceProvider.kategorie}`),
+                  testId: 'success-kategorie',
+                },
+                {
+                  label: $t('angebot.canBeAssigned'),
+                  value: serviceProviderStore.updatedServiceProvider.merkmale.includes(
+                    ServiceProviderMerkmal.NachtraeglichZuweisbar,
+                  )
+                    ? $t('yes')
+                    : $t('no'),
+                  testId: 'success-nachtraeglich-zuweisbar',
+                },
+                {
+                  label: $t('angebot.canBeUsed'),
+                  value: serviceProviderStore.updatedServiceProvider.merkmale.includes(
+                    ServiceProviderMerkmal.VerfuegbarFuerRollenerweiterung,
+                  )
+                    ? $t('yes')
+                    : $t('no'),
+                  testId: 'success-verfuegbar-fuer-rollenerweiterung',
+                },
+                {
+                  label: $t('angebot.requires2FA'),
+                  value: serviceProviderStore.updatedServiceProvider.requires2fa ? $t('yes') : $t('no'),
+                  testId: 'success-requires-2fa',
+                },
+              ],
+            }"
+            :show-to-service-provider-details-button="true"
+            :to-service-provider-details-button-text="$t('angebot.backToServiceProvider')"
+            toServiceProviderDetailsButtonTestId="to-service-provider-details-button"
+            @toServiceProviderDetails="navigateToServiceProviderDetails"
+          >
+            <v-col
+              cols="12"
+              sm="6"
+              md="auto"
+            >
+              <v-btn
+                class="secondary"
+                :block="mdAndDown"
+                data-testid="to-service-provider-list-button"
+                @click="navigateToServiceProviderList"
               >
-                <span>
-                  {{
-                    t('angebot.angebotUpdatedSuccessfully', {
-                      name: serviceProviderStore.updatedServiceProvider?.name ?? '',
-                    })
-                  }}
-                </span>
-              </v-col>
-            </v-row>
-          </v-card-text>
-          <v-card-actions class="justify-center">
-            <v-row class="justify-center">
-              <v-col
-                cols="12"
-                sm="6"
-                md="4"
-              >
-                <v-btn
-                  class="primary"
-                  :data-testid="'close-service-provider-success-dialog-button'"
-                  @click.stop="navigateToServiceProviderDetails()"
-                >
-                  {{ $t('close') }}
-                </v-btn>
-              </v-col>
-            </v-row>
-          </v-card-actions>
-        </LayoutCard>
-      </v-dialog>
+                {{ $t('angebot.backToServiceProviderList') }}
+              </v-btn>
+            </v-col>
+          </SuccessTemplate>
+        </template>
+        <template v-else>
+          <ServiceProviderForm
+            v-if="serviceProviderStore.currentServiceProvider"
+            :is-edit-mode="true"
+            :initialValues="initialValues ?? {}"
+            :systemrecht
+            :loading="serviceProviderStore.loading"
+            :showUnsavedChangesDialog="showUnsavedChangesDialog"
+            @update:dirty="(value: boolean) => (isDirty = value)"
+            @click:submit="submit"
+            @click:discard="discard"
+            @update:showUnsavedChangesDialog="(visible: boolean) => (showUnsavedChangesDialog = visible)"
+            @click:confirmUnsaved="confirmUnsavedChanges"
+          />
+        </template>
+      </template>
     </LayoutCard>
   </div>
 </template>
