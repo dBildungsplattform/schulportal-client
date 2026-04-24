@@ -79,7 +79,6 @@ describe('BulkOperationStore', () => {
     });
 
     it('should unassign and call updatePersonenkontexte if matching zuordnung exists', async () => {
-      const spy: MockInstance = vi.spyOn(personenkontextStore, 'updatePersonenkontexte');
       const remaining: DBiamPersonenzuordnungResponse = DoFactory.getDBiamPersonenzuordnungResponse();
       const klasse: Organisation = DoFactory.getKlasse(mockSchule);
       const mockPersonResponse: DBiamPersonenuebersichtResponse = DoFactory.getDBiamPersonenuebersichtResponse({
@@ -87,7 +86,12 @@ describe('BulkOperationStore', () => {
         zuordnungen: [
           remaining,
           DoFactory.getDBiamPersonenzuordnungResponse({}, { organisation: mockSchule }),
-          DoFactory.getDBiamPersonenzuordnungResponse({}, { organisation: klasse }),
+          DoFactory.getDBiamPersonenzuordnungResponse(
+            {
+              administriertVon: mockSchule.id,
+            },
+            { organisation: klasse },
+          ),
         ],
       });
 
@@ -110,36 +114,40 @@ describe('BulkOperationStore', () => {
 
       expect(bulkOperationStore.currentOperation?.progress).toBe(100);
       expect(bulkOperationStore.currentOperation?.errors.size).toBe(0);
-      expect(spy).toHaveBeenCalledTimes(1);
-      expect(spy).toHaveBeenLastCalledWith(
-        expect.arrayContaining([
-          { organisationId: remaining.sskId, rolleId: remaining.rolleId, befristung: remaining.befristung },
-        ]),
-        mockPersonId,
+      expect(mockAdapter.history['put']?.length).toBe(1);
+      expect(JSON.parse(mockAdapter.history['put']?.at(0)?.data as string)).toEqual(
+        expect.objectContaining({
+          personenkontexte: [
+            {
+              organisationId: remaining.sskId,
+              rolleId: remaining.rolleId,
+              befristung: remaining.befristung,
+              personId: mockPersonId,
+            },
+          ],
+        }),
       );
     });
 
     it('should skip if person has no zuordnungen', async () => {
-      const spy: MockInstance = vi.spyOn(personenkontextStore, 'updatePersonenkontexte');
       mockAdapter
         .onGet(`/api/dbiam/personenuebersicht/${mockPersonId}`)
-        .replyOnce(200, DoFactory.getDBiamPersonenuebersichtResponse({ zuordnungen: undefined }));
+        .replyOnce(200, DoFactory.getDBiamPersonenuebersichtResponse({ zuordnungen: [] }));
 
       await bulkOperationStore.bulkUnassignPersonenFromOrg('1234', [mockPersonId]);
 
       expect(bulkOperationStore.currentOperation?.progress).toBe(100);
-      expect(spy).not.toHaveBeenCalled();
+      expect(mockAdapter.history['put']?.length).toBe(0);
     });
 
     it('should skip if personenuebersicht is missing', async () => {
-      const spy: MockInstance = vi.spyOn(personenkontextStore, 'updatePersonenkontexte');
-      mockAdapter.onGet(`/api/dbiam/personenuebersicht/${mockPersonId}`).replyOnce(200);
+      mockAdapter.onGet(`/api/dbiam/personenuebersicht/${mockPersonId}`).replyOnce(404);
 
       await bulkOperationStore.bulkUnassignPersonenFromOrg('1234', [mockPersonId]);
 
       expect(bulkOperationStore.currentOperation?.progress).toBe(100);
 
-      expect(spy).not.toHaveBeenCalled();
+      expect(mockAdapter.history['put']?.length).toBe(0);
     });
 
     it('should handle errors if personenuebersicht replies with 500', async () => {
@@ -229,15 +237,6 @@ describe('BulkOperationStore', () => {
 
       const workflowStepResponseOrganisations: Organisation[] = [orga];
 
-      const mockPersonResponse: DBiamPersonenuebersichtResponse = {
-        personId: '1',
-        vorname: 'John',
-        nachname: 'Doe',
-        benutzername: 'jdoe',
-        lastModifiedZuordnungen: '2024-04-01T00:00:00.000Z',
-        zuordnungen: [],
-      };
-
       const mockUpdateResponse: PersonenkontexteUpdateResponse = {
         dBiamPersonenkontextResponses: [
           {
@@ -248,8 +247,12 @@ describe('BulkOperationStore', () => {
         ],
       };
 
-      mockAdapter.onGet('/api/dbiam/personenuebersicht/1').replyOnce(200, mockPersonResponse);
-      mockAdapter.onGet('/api/dbiam/personenuebersicht/2').replyOnce(200, mockPersonResponse);
+      mockAdapter
+        .onGet('/api/dbiam/personenuebersicht/1')
+        .replyOnce(200, DoFactory.getDBiamPersonenuebersichtResponse({ personId: '1' }, { organisation: orga }));
+      mockAdapter
+        .onGet('/api/dbiam/personenuebersicht/2')
+        .replyOnce(200, DoFactory.getDBiamPersonenuebersichtResponse({ personId: '2' }, { organisation: orga }));
 
       mockAdapter.onPut('/api/personenkontext-workflow/1').replyOnce(200, mockUpdateResponse);
       mockAdapter.onPut('/api/personenkontext-workflow/2').replyOnce(200, mockUpdateResponse);
@@ -268,6 +271,7 @@ describe('BulkOperationStore', () => {
       expect(bulkOperationStore.currentOperation?.isRunning).toBe(false);
       expect(bulkOperationStore.currentOperation?.complete).toBe(true);
       expect(bulkOperationStore.currentOperation?.progress).toBe(100);
+      expect(mockAdapter.history['put']?.length).toBe(2);
     });
 
     it('should return early if organisation is not found', async () => {
@@ -288,6 +292,7 @@ describe('BulkOperationStore', () => {
 
       expect(bulkOperationStore.currentOperation?.progress).toBe(0);
       expect(bulkOperationStore.currentOperation?.complete).toBe(false);
+      expect(mockAdapter.history['put']?.length).toBe(0);
     });
 
     it('should update successfully with default values for baseZuordnung', async () => {
@@ -296,22 +301,18 @@ describe('BulkOperationStore', () => {
       const selectedRolleId: string = 'rolle-456';
 
       const workflowStepResponseOrganisations: Organisation[] = [
-        {
+        DoFactory.getOrganisation({
           id: 'org-123',
           name: 'Test Schule',
           kennung: null,
           administriertVon: null,
-        } as Organisation,
+        }),
       ];
 
-      const mockPersonResponse: DBiamPersonenuebersichtResponse = {
-        personId: '1',
-        vorname: 'John',
-        nachname: 'Doe',
-        benutzername: 'jdoe',
-        lastModifiedZuordnungen: '2024-04-01T00:00:00.000Z',
-        zuordnungen: [],
-      };
+      const mockPersonResponse: DBiamPersonenuebersichtResponse = DoFactory.getDBiamPersonenuebersichtResponse(
+        { personId: '2' },
+        { organisation: workflowStepResponseOrganisations[0] },
+      );
 
       const mockUpdateResponse: PersonenkontexteUpdateResponse = {
         dBiamPersonenkontextResponses: [
@@ -323,7 +324,15 @@ describe('BulkOperationStore', () => {
         ],
       };
 
-      mockAdapter.onGet('/api/dbiam/personenuebersicht/1').replyOnce(200, []);
+      mockAdapter
+        .onGet('/api/dbiam/personenuebersicht/1')
+        .replyOnce(
+          200,
+          DoFactory.getDBiamPersonenuebersichtResponse(
+            { personId: '1' },
+            { organisation: workflowStepResponseOrganisations[0] },
+          ),
+        );
       mockAdapter.onGet('/api/dbiam/personenuebersicht/2').replyOnce(200, mockPersonResponse);
 
       mockAdapter.onPut('/api/personenkontext-workflow/1').replyOnce(200, mockUpdateResponse);
@@ -342,6 +351,7 @@ describe('BulkOperationStore', () => {
       expect(bulkOperationStore.currentOperation?.isRunning).toBe(false);
       expect(bulkOperationStore.currentOperation?.complete).toBe(true);
       expect(bulkOperationStore.currentOperation?.progress).toBe(100);
+      expect(mockAdapter.history['put']?.length).toBe(2);
     });
 
     it('should correctly handle befristungen', async () => {
@@ -349,7 +359,6 @@ describe('BulkOperationStore', () => {
       const selectedRolleTitle: string = 'Lehrer';
       const selectedRolleId: string = faker.string.uuid();
       const befristung: string = faker.date.future().toISOString();
-      const spy: MockInstance = vi.spyOn(personenkontextStore, 'updatePersonenkontexte');
 
       const selectedOrganisation: Organisation = DoFactory.getOrganisationResponse({ id: selectedOrganisationId });
       const workflowStepResponseOrganisations: Organisation[] = [selectedOrganisation];
@@ -431,14 +440,13 @@ describe('BulkOperationStore', () => {
 
       await modifyPromise;
 
-      expect(personenkontextStore.errorCode).toBe('');
       expect(bulkOperationStore.currentOperation?.isRunning).toBe(false);
       expect(bulkOperationStore.currentOperation?.complete).toBe(true);
       expect(bulkOperationStore.currentOperation?.progress).toBe(100);
       expect(bulkOperationStore.currentOperation?.successMessage).toBe('admin.rolle.rollenAssignedSuccessfully');
       expect(bulkOperationStore.currentOperation?.errors).toEqual(new Map());
 
-      mockPersonResponses.forEach((response: DBiamPersonenuebersichtResponse) => {
+      mockPersonResponses.forEach((response: DBiamPersonenuebersichtResponse, index: number) => {
         const personId: string = response.personId;
         const correctBefristung: string = isBefore(response.zuordnungen[0]!.befristung!, befristung)
           ? response.zuordnungen[0]!.befristung!
@@ -457,16 +465,20 @@ describe('BulkOperationStore', () => {
               befristung: zuordnung.befristung ?? undefined,
             }));
 
-        expect(spy).toHaveBeenCalledWith(
-          [
-            ...otherZuordnungen,
-            {
-              befristung: correctBefristung,
-              organisationId: selectedOrganisationId,
-              rolleId: selectedRolleId,
-            },
-          ],
-          personId,
+        expect(mockAdapter.history['put']?.[index]).toBeDefined();
+        const data: object = JSON.parse(mockAdapter.history['put']?.[index]?.data as string);
+        expect(data).toEqual(
+          expect.objectContaining({
+            personenkontexte: expect.arrayContaining([
+              ...otherZuordnungen,
+              {
+                befristung: correctBefristung,
+                organisationId: selectedOrganisationId,
+                rolleId: selectedRolleId,
+                personId,
+              },
+            ]),
+          }),
         );
       });
     });
@@ -514,8 +526,6 @@ describe('BulkOperationStore', () => {
         ],
       });
 
-      const spy: MockInstance = vi.spyOn(personenkontextStore, 'updatePersonenkontexte');
-
       mockAdapter.onGet(`/api/dbiam/personenuebersicht/${personId}`).replyOnce(200, mockPersonResponse);
       mockAdapter.onPut(`/api/personenkontext-workflow/${personId}`).replyOnce(200, mockUpdateResponse);
 
@@ -527,14 +537,15 @@ describe('BulkOperationStore', () => {
         undefined,
         selectedKlasseId,
       );
-
-      expect(spy).toHaveBeenCalledWith(
-        expect.arrayContaining([
-          { organisationId: selectedOrganisationId, rolleId: existingRolleId, befristung: undefined },
-          { organisationId: selectedOrganisationId, rolleId: selectedRolleId, befristung: undefined },
-          { organisationId: selectedKlasseId, rolleId: selectedRolleId, befristung: undefined },
-        ]),
-        personId,
+      const data: object = JSON.parse(mockAdapter.history['put']?.[0]?.data as string);
+      expect(data).toEqual(
+        expect.objectContaining({
+          personenkontexte: expect.arrayContaining([
+            { personId, organisationId: selectedOrganisationId, rolleId: existingRolleId, befristung: undefined },
+            { personId, organisationId: selectedOrganisationId, rolleId: selectedRolleId, befristung: undefined },
+            { personId, organisationId: selectedKlasseId, rolleId: selectedRolleId, befristung: undefined },
+          ]),
+        }),
       );
     });
 
@@ -596,8 +607,6 @@ describe('BulkOperationStore', () => {
         ],
       });
 
-      const spy: MockInstance = vi.spyOn(personenkontextStore, 'updatePersonenkontexte');
-
       mockAdapter.onGet(`/api/dbiam/personenuebersicht/${personId}`).replyOnce(200, mockPersonResponse);
       mockAdapter.onPut(`/api/personenkontext-workflow/${personId}`).replyOnce(200, mockUpdateResponse);
 
@@ -610,13 +619,16 @@ describe('BulkOperationStore', () => {
         undefined,
       );
 
-      expect(spy).toHaveBeenCalledWith(
-        expect.arrayContaining([
-          { organisationId: existingKlasseId, rolleId: existingRolleId, befristung: undefined },
-          { organisationId: existingKlasseId, rolleId: selectedRolleId, befristung: undefined },
-          { organisationId: selectedOrganisationId, rolleId: selectedRolleId, befristung: undefined },
-        ]),
-        personId,
+      const data: object = JSON.parse(mockAdapter.history['put']?.[0]?.data as string);
+
+      expect(data).toEqual(
+        expect.objectContaining({
+          personenkontexte: expect.arrayContaining([
+            { personId, organisationId: existingKlasseId, rolleId: existingRolleId, befristung: undefined },
+            { personId, organisationId: existingKlasseId, rolleId: selectedRolleId, befristung: undefined },
+            { personId, organisationId: selectedOrganisationId, rolleId: selectedRolleId, befristung: undefined },
+          ]),
+        }),
       );
     });
 
@@ -707,8 +719,6 @@ describe('BulkOperationStore', () => {
         ],
       });
 
-      const spy: MockInstance = vi.spyOn(personenkontextStore, 'updatePersonenkontexte');
-
       mockAdapter.onGet(`/api/dbiam/personenuebersicht/${personId}`).replyOnce(200, mockPersonResponse);
       mockAdapter.onPut(`/api/personenkontext-workflow/${personId}`).replyOnce(200, mockUpdateResponse);
 
@@ -721,19 +731,23 @@ describe('BulkOperationStore', () => {
         undefined,
       );
 
-      expect(spy).toHaveBeenCalledWith(
-        expect.arrayContaining([
-          { organisationId: existingKlasseIdA, rolleId: selectedRolleId, befristung: undefined },
-          { organisationId: selectedOrganisationId, rolleId: selectedRolleId, befristung: undefined },
-          { organisationId: existingKlasseIdB, rolleId: differentRolleId, befristung: undefined },
-        ]),
-        personId,
+      const data: object = JSON.parse(mockAdapter.history['put']?.[0]?.data as string);
+
+      expect(data).toEqual(
+        expect.objectContaining({
+          personenkontexte: expect.arrayContaining([
+            { personId, organisationId: existingKlasseIdA, rolleId: selectedRolleId, befristung: undefined },
+            { personId, organisationId: selectedOrganisationId, rolleId: selectedRolleId, befristung: undefined },
+            { personId, organisationId: existingKlasseIdB, rolleId: differentRolleId, befristung: undefined },
+          ]),
+        }),
       );
-      expect(spy).not.toHaveBeenCalledWith(
-        expect.arrayContaining([
-          { organisationId: existingKlasseIdB, rolleId: selectedRolleId, befristung: undefined },
-        ]),
-        personId,
+      expect(data).not.toEqual(
+        expect.objectContaining({
+          personenkontexte: expect.arrayContaining([
+            { personId, organisationId: existingKlasseIdB, rolleId: selectedRolleId, befristung: undefined },
+          ]),
+        }),
       );
     });
 
@@ -856,6 +870,7 @@ describe('BulkOperationStore', () => {
 
       expect(bulkOperationStore.currentOperation?.errors.size).toBe(0);
       expect(bulkOperationStore.currentOperation?.successMessage).toBe('admin.person.deletePersonBulkSuccessMessage');
+      expect(mockAdapter.history['delete']?.length).toBe(2);
     });
 
     it('should handle errors if endpoint replies with 500', async () => {
