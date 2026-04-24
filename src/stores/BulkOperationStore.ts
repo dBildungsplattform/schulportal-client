@@ -40,10 +40,6 @@ const personenuebersichtApi: DbiamPersonenuebersichtApiInterface = DbiamPersonen
 async function getPersonenuebersichtById(personId: string): Promise<DBiamPersonenuebersichtResponse> {
   const { data }: { data: DBiamPersonenuebersichtResponse } =
     await personenuebersichtApi.dBiamPersonenuebersichtControllerFindPersonenuebersichtenByPerson(personId);
-
-  if (!data) {
-    throw new Error('PERSON_DATA_NOT_FOUND');
-  }
   return data;
 }
 
