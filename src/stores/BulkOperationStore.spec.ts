@@ -465,7 +465,7 @@ describe('BulkOperationStore', () => {
             }));
 
         expect(mockAdapter.history['put']?.[index]).toBeDefined();
-        const data: object = JSON.parse(mockAdapter.history['put']?.[index]?.data as string);
+        const data: object = JSON.parse(mockAdapter.history['put']?.[index]?.data as string) as object;
         expect(data).toEqual(
           expect.objectContaining({
             personenkontexte: expect.arrayContaining([
@@ -536,7 +536,7 @@ describe('BulkOperationStore', () => {
         undefined,
         selectedKlasseId,
       );
-      const data: object = JSON.parse(mockAdapter.history['put']?.[0]?.data as string);
+      const data: object = JSON.parse(mockAdapter.history['put']?.[0]?.data as string) as object;
       expect(data).toEqual(
         expect.objectContaining({
           personenkontexte: expect.arrayContaining([
@@ -618,7 +618,7 @@ describe('BulkOperationStore', () => {
         undefined,
       );
 
-      const data: object = JSON.parse(mockAdapter.history['put']?.[0]?.data as string);
+      const data: object = JSON.parse(mockAdapter.history['put']?.[0]?.data as string) as object;
 
       expect(data).toEqual(
         expect.objectContaining({
@@ -730,7 +730,7 @@ describe('BulkOperationStore', () => {
         undefined,
       );
 
-      const data: object = JSON.parse(mockAdapter.history['put']?.[0]?.data as string);
+      const data: object = JSON.parse(mockAdapter.history['put']?.[0]?.data as string) as object;
 
       expect(data).toEqual(
         expect.objectContaining({
@@ -1350,6 +1350,19 @@ describe('BulkOperationStore', () => {
       expect(bulkOperationStore.currentOperation?.errors.size).toBe(2);
       expect(bulkOperationStore.currentOperation?.errors.get(personIds[0]!)).toBe('getError');
       expect(bulkOperationStore.currentOperation?.errors.get(personIds[1]!)).toBe('putError');
+    });
+  });
+
+  describe.only('getPersonenuebersichtById', () => {
+    it('should handle null data from personenuebersicht endpoint', async () => {
+      const personId: string = faker.string.uuid();
+
+      mockAdapter.onGet(`/api/dbiam/personenuebersicht/${personId}`).replyOnce(200, { data: null });
+
+      await bulkOperationStore.bulkModifyPersonenRolle([personId], mockSchule.id, faker.string.uuid(), [mockSchule]);
+
+      expect(bulkOperationStore.currentOperation?.errors.size).toBe(1);
+      expect(bulkOperationStore.currentOperation?.errors.get(personId)).toBe('UNSPECIFIED_ERROR');
     });
   });
 });

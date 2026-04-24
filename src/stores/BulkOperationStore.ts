@@ -40,23 +40,23 @@ const personenuebersichtApi: DbiamPersonenuebersichtApiInterface = DbiamPersonen
 async function getPersonenuebersichtById(personId: string): Promise<DBiamPersonenuebersichtResponse> {
   const { data }: { data: DBiamPersonenuebersichtResponse } =
     await personenuebersichtApi.dBiamPersonenuebersichtControllerFindPersonenuebersichtenByPerson(personId);
+
+  if (!data) {
+    throw new Error('PERSON_DATA_NOT_FOUND');
+  }
   return data;
 }
 
 async function updatePersonenkontexte(
   updatedPersonenkontexte: PersonenkontextUpdate[] | undefined,
   personId: string,
-  cachedUebersicht?: DBiamPersonenuebersichtResponse,
+  cachedUebersicht: DBiamPersonenuebersichtResponse,
 ): Promise<PersonenkontexteUpdateResponse> {
-  let uebersicht: DBiamPersonenuebersichtResponse | undefined = cachedUebersicht;
-
-  if (!uebersicht) {
-    uebersicht = await getPersonenuebersichtById(personId);
-  }
+  const uebersicht: DBiamPersonenuebersichtResponse = cachedUebersicht;
 
   const updateParams: DbiamUpdatePersonenkontexteBodyParams = {
-    lastModified: uebersicht?.lastModifiedZuordnungen ?? undefined,
-    count: uebersicht?.zuordnungen.length ?? 0,
+    lastModified: uebersicht.lastModifiedZuordnungen ?? undefined,
+    count: uebersicht.zuordnungen.length ?? 0,
     personenkontexte:
       updatedPersonenkontexte?.map((personenkontextUpdate: PersonenkontextUpdate) => ({
         personId: personId,
@@ -235,7 +235,7 @@ export const useBulkOperationStore: StoreDefinition<
 
             await updatePersonenkontexte(combinedZuordnungen, personId, uebersichtResponse);
           } catch (error: unknown) {
-            this.currentOperation?.errors.set(personId, getResponseErrorCode(error, 'UNKNOWN_ERROR'));
+            this.currentOperation?.errors.set(personId, getResponseErrorCode(error, 'UNSPECIFIED_ERROR'));
           }
         },
         'admin.rolle.rollenAssignedSuccessfully',
@@ -263,7 +263,7 @@ export const useBulkOperationStore: StoreDefinition<
             uebersichtResponse,
           );
         } catch (error: unknown) {
-          this.currentOperation?.errors.set(personId, getResponseErrorCode(error, 'PERSON_DATA_NOT_FOUND'));
+          this.currentOperation?.errors.set(personId, getResponseErrorCode(error, 'UNSPECIFIED_ERROR'));
         }
       });
     },
