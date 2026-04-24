@@ -35,7 +35,7 @@ export default defineConfig({
     clearMocks: true,
     coverage: {
       provider: 'istanbul',
-      reporter: ['text', 'lcov', 'html'],
+      reporter: ['text', 'lcov'],
       include: ['src/**'],
       exclude: [
         'src/api-client/**',
