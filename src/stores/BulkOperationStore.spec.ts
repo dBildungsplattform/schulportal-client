@@ -1353,7 +1353,7 @@ describe('BulkOperationStore', () => {
     });
   });
 
-  describe.only('getPersonenuebersichtById', () => {
+  describe('getPersonenuebersichtById', () => {
     it('should handle null data from personenuebersicht endpoint', async () => {
       const personId: string = faker.string.uuid();
 
