@@ -193,7 +193,7 @@
       >
         <SchulenFilter
           :readonly="isEditMode"
-          :highlight-selection="true"
+          :highlight-selection="isEditMode"
           :multiple="false"
           :parent-id="isEditMode ? 'service-provider-edit' : 'service-provider-create'"
           :placeholderText="$t('admin.organisation.selectOrganisation')"
