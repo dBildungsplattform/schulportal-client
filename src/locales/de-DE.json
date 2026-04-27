@@ -4,7 +4,7 @@
     "angebotCreateErrorTitle": "Fehler beim Anlegen des Angebots",
     "angebotEditErrorTitle": "Fehler beim Bearbeiten des Angebots",
     "angebotUpdated": "Angebot aktualisiert",
-    "angebotUpdatedSuccessfully": "Das Angebot {name} wurde erfolgreich gespeichert.",
+    "angebotUpdatedSuccessfully": "Das Angebot {name} wurde erfolgreich geändert.",
     "addNew": "Neues Angebot hinzufügen",
     "allServiceProviders": "Alle Angebote",
     "assignedRollen": "Zugeordnete Rollen",
