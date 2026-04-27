@@ -65,6 +65,16 @@
     );
   });
 
+  const cachedValues: Ref<Partial<ServiceProviderFormType> | undefined> = ref(undefined);
+  function cacheSubmittedValues(values: ServiceProviderFormSubmitData): void {
+    cachedValues.value = {
+      name: values.name,
+      url: values.url,
+      kategorie: values.kategorie,
+      logo: values.logo,
+    };
+  }
+
   const initialValues: ComputedRef<ServiceProviderFormType | null> = computed(() => {
     if (!serviceProviderStore.currentServiceProvider) {
       return null;
@@ -106,19 +116,8 @@
     serviceProviderStore.errorCode = '';
   }
 
-  async function discard(): Promise<void> {
-    if (isDirty.value) {
-      showUnsavedChangesDialog.value = true;
-    } else {
-      await router.push({
-        name: 'angebot-details-schulspezifisch',
-        params: { id: serviceProviderId.value },
-        query: organisationIdFromQuery.value ? { orga: organisationIdFromQuery.value } : undefined,
-      });
-    }
-  }
-
   async function submit(values: ServiceProviderFormSubmitData): Promise<void> {
+    cacheSubmittedValues(values);
     await serviceProviderStore.updateServiceProvider(serviceProviderId.value, values);
     if (!serviceProviderStore.errorCode) {
       isDirty.value = false;
@@ -126,6 +125,10 @@
       cachedLogo.value = values.logo ?? currentLogo.value;
       cachedOrganisationName.value = serviceProviderStore.currentServiceProvider?.administrationsebene.name ?? '';
     }
+  }
+
+  function clearError(): void {
+    serviceProviderStore.errorCode = '';
   }
 
   async function navigateToServiceProviderDetails(): Promise<void> {
@@ -151,8 +154,16 @@
     }
   }
 
+  async function discard(): Promise<void> {
+    if (!serviceProviderStore.errorCode && isDirty.value) {
+      showUnsavedChangesDialog.value = true;
+    } else {
+      await navigateToServiceProviderList();
+    }
+  }
+
   onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
-    if (isDirty.value) {
+    if (!serviceProviderStore.errorCode && isDirty.value) {
       showUnsavedChangesDialog.value = true;
       blockedNext = next;
     } else {
@@ -170,6 +181,7 @@
 
   onUnmounted(() => {
     window.removeEventListener('beforeunload', preventNavigation);
+    serviceProviderStore.errorCode = '';
   });
 </script>
 
@@ -195,8 +207,8 @@
         :type="'error'"
         :closable="false"
         :show-button="true"
-        :button-action="discard"
-        :button-text="$t('angebot.backToServiceProviderList')"
+        :button-action="clearError"
+        :button-text="$t('angebot.backToServiceProviderEdit')"
         :text="errorText"
       />
       <template v-if="!serviceProviderStore.errorCode">
@@ -286,6 +298,7 @@
             v-if="serviceProviderStore.currentServiceProvider"
             :is-edit-mode="true"
             :initialValues="initialValues ?? {}"
+            :cachedValues
             :systemrecht
             :loading="serviceProviderStore.loading"
             :showUnsavedChangesDialog="showUnsavedChangesDialog"
