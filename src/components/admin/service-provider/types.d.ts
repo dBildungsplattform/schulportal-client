@@ -15,7 +15,7 @@ export type MappedRollenerweiterungAssignError = {
 };
 
 export type ServiceProviderForm = {
-  selectedOrganisationId: string;
+  selectedOrganisationId: string | undefined;
   name: string;
   url: string;
   logo: string;
@@ -37,6 +37,10 @@ export type ServiceProviderFormSubmitData = {
 
 export type ServiceProviderFormProps = {
   initialValues: Partial<ServiceProviderForm>;
+  /**
+   * Sets fields into dirty states
+   */
+  cachedValues?: Partial<ServiceProviderForm>;
   systemrecht: RollenSystemRecht;
   showUnsavedChangesDialog: boolean;
   errorCode?: string;

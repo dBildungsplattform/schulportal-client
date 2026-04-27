@@ -9,10 +9,10 @@
   import { DIN_91379A_EXT, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
   import { toTypedSchema } from '@vee-validate/yup';
   import { useForm, type BaseFieldProps, type FormContext, type FormMeta, type TypedSchema } from 'vee-validate';
-  import { computed, ref, watch, type ComputedRef, type Ref } from 'vue';
+  import { computed, onMounted, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { boolean, object, string } from 'yup';
-  import type { ServiceProviderForm, ServiceProviderFormSubmitData, ServiceProviderFormProps as Props } from './types';
+  import type { ServiceProviderFormProps as Props, ServiceProviderForm, ServiceProviderFormSubmitData } from './types';
 
   type Emits = {
     (e: 'click:confirmUnsaved'): void;
@@ -100,6 +100,14 @@
     })),
   );
 
+  function initializeFormWithCachedValues(): void {
+    if (!props.cachedValues) {
+      return;
+    }
+    const cached: Partial<ServiceProviderForm> = props.cachedValues;
+    formContext.setValues(cached);
+  }
+
   const cachedOrga: Ref<Organisation | undefined> = ref();
 
   function updateSelectedOrganisation(selectedOrgas: Organisation[]): void {
@@ -107,8 +115,10 @@
       return;
     }
     const org: Organisation | undefined = selectedOrgas.at(0);
-    formContext.setFieldValue('selectedOrganisationId', org?.id ?? '');
-    cachedOrga.value = org;
+    if (org) {
+      formContext.setFieldValue('selectedOrganisationId', org.id);
+      cachedOrga.value = org;
+    }
   }
 
   function openUrlInNewTab(): void {
@@ -162,6 +172,10 @@
 
   watch(canCommit, () => {
     emit('update:canSubmit', canCommit.value);
+  });
+
+  onMounted(() => {
+    initializeFormWithCachedValues();
   });
 </script>
 

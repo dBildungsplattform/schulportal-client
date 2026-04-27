@@ -2,7 +2,10 @@
   import SchulPortalLogo from '@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg';
   import ServiceProviderForm from '@/components/admin/service-provider/ServiceProviderForm.vue';
   import SuccessTemplate from '@/components/admin/service-provider/SuccessTemplate.vue';
-  import type { ServiceProviderFormSubmitData } from '@/components/admin/service-provider/types';
+  import type {
+    ServiceProviderFormSubmitData,
+    ServiceProviderForm as ServiceProviderFormType,
+  } from '@/components/admin/service-provider/types';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
@@ -52,6 +55,22 @@
   });
 
   const selectedOrganisationName: ComputedRef<string> = computed(() => selectedOrganisationNameCache.value || '');
+  /**
+   * Stores submitted data to restore it in case of an error.
+   */
+  const cachedValues: Ref<ServiceProviderFormType | undefined> = ref(undefined);
+  function cacheSubmittedValues(values: ServiceProviderFormSubmitData): void {
+    cachedValues.value = {
+      selectedOrganisationId: values.selectedOrganisation?.id,
+      name: values.name,
+      url: values.url,
+      kategorie: values.kategorie,
+      logo: values.logo,
+      requires2fa: values.requires2fa,
+      nachtraeglichZuweisbar: values.merkmale.includes(ServiceProviderMerkmal.NachtraeglichZuweisbar),
+      verfuegbarFuerRollenerweiterung: values.merkmale.includes(ServiceProviderMerkmal.VerfuegbarFuerRollenerweiterung),
+    };
+  }
 
   function navigateToServiceProviderDetails(): void {
     if (serviceProviderStore.createdServiceProvider) {
@@ -129,6 +148,7 @@
     if (!values.selectedOrganisation) {
       return;
     }
+    cacheSubmittedValues(values);
     await serviceProviderStore.createServiceProvider({
       organisationId: values.selectedOrganisation.id,
       name: values.name,
@@ -209,6 +229,7 @@
               verfuegbarFuerRollenerweiterung: true,
               requires2fa: false,
             },
+            cachedValues,
             showUnsavedChangesDialog,
             systemrecht: relevantSystemrecht,
             errorCode: serviceProviderStore.errorCode,
