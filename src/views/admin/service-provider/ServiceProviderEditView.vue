@@ -133,28 +133,24 @@
 
   async function navigateToServiceProviderDetails(): Promise<void> {
     if (organisationIdFromQuery.value) {
-      await router
-        .push({
-          name: 'angebot-details-schulspezifisch',
-          params: { id: serviceProviderId.value },
-          query: { orga: organisationIdFromQuery.value },
-        })
-        .then(() => router.go(0));
+      await router.push({
+        name: 'angebot-details-schulspezifisch',
+        params: { id: serviceProviderId.value },
+        query: { orga: organisationIdFromQuery.value },
+      });
     } else {
-      router.push({ name: 'angebot-details', params: { id: serviceProviderId.value } });
+      await router.push({ name: 'angebot-details', params: { id: serviceProviderId.value } });
     }
   }
 
   async function navigateToServiceProviderList(): Promise<void> {
     if (organisationIdFromQuery.value) {
-      await router
-        .push({
-          name: 'angebot-management-schulspezifisch',
-          query: { orga: organisationIdFromQuery.value },
-        })
-        .then(() => router.go(0));
+      await router.push({
+        name: 'angebot-management-schulspezifisch',
+        query: { orga: organisationIdFromQuery.value },
+      });
     } else {
-      router.push({ name: 'angebot-management' });
+      await router.push({ name: 'angebot-management' });
     }
   }
 
