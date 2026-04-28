@@ -206,6 +206,7 @@
         :label="$t('angebot.providedBy')"
       >
         <SchulenFilter
+          :systemrechte-for-search="[props.systemrecht]"
           :readonly="isEditMode"
           :highlight-selection="isEditMode"
           :multiple="false"
