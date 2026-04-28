@@ -1,9 +1,14 @@
+import type { ServiceProviderFormSubmitData } from '@/components/admin/service-provider/types';
+import routes from '@/router/routes';
+import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
+import { RollenSystemRecht } from '@/stores/RolleStore';
 import {
   ServiceProviderKategorie,
   useServiceProviderStore,
   type ServiceProviderStore,
 } from '@/stores/ServiceProviderStore';
-import { DOMWrapper, mount, VueWrapper } from '@vue/test-utils';
+import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import { DoFactory } from 'test/DoFactory';
 import { expect, test, type Mock, type MockInstance } from 'vitest';
 import { nextTick, type Component } from 'vue';
@@ -15,10 +20,6 @@ import {
   type Router,
 } from 'vue-router';
 import ServiceProviderCreationView from './ServiceProviderCreationView.vue';
-import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
-import routes from '@/router/routes';
-import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
-import { RollenSystemRecht } from '@/stores/RolleStore';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -196,6 +197,49 @@ describe('ServiceProviderCreationView', () => {
     expect(wrapper?.getComponent({ name: 'SpshAlert' })).toBeTruthy();
     expect(wrapper?.getComponent({ name: 'FormWrapper' })).toBeTruthy();
     expect(wrapper?.getComponent({ name: 'FormRow' })).toBeTruthy();
+  });
+
+  test('it calls the correct function in the store, when the form is submitted', async () => {
+    const createServiceProviderSpy: MockInstance = vi.spyOn(serviceProviderStore, 'createServiceProvider');
+    const payload: ServiceProviderFormSubmitData = {
+      name: 'Test Service Provider',
+      url: 'https://test.example.com',
+      kategorie: ServiceProviderKategorie.Schulisch,
+      merkmale: [],
+      requires2fa: false,
+      logo: '',
+      selectedOrganisation: DoFactory.getOrganisation(),
+    };
+    await fillForm({
+      organisation: payload.selectedOrganisation!.id,
+      name: payload.name,
+      url: payload.url,
+    });
+
+    await flushPromises();
+
+    expect(createServiceProviderSpy).not.toHaveBeenCalled();
+
+    const submitButton: Element | null = document.querySelector(
+      '[data-testid="service-provider-create-form-submit-button"]',
+    );
+    expect(submitButton).not.toBeNull();
+    expect(submitButton?.hasAttribute('disabled')).toBe(false);
+    submitButton!.dispatchEvent(new Event('click'));
+
+    const form: VueWrapper = wrapper!.findComponent({ name: 'ServiceProviderForm' });
+    form.vm.$emit('click:submit', payload); // in tests the event does not fire, so we do it manually
+    await flushPromises();
+
+    expect(createServiceProviderSpy).toHaveBeenCalledOnce();
+    expect(createServiceProviderSpy).toHaveBeenCalledWith({
+      organisationId: payload.selectedOrganisation!.id,
+      name: payload.name,
+      url: payload.url,
+      kategorie: payload.kategorie,
+      requires2fa: payload.requires2fa,
+      merkmale: payload.merkmale,
+    });
   });
 
   test('it renders an error', async () => {

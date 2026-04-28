@@ -28,6 +28,7 @@
     useServiceProviderStore,
     type ServiceProviderStore,
   } from '@/stores/ServiceProviderStore';
+  import { intersect } from '@/utils/arrays';
 
   const router: Router = useRouter();
   const route: RouteLocationNormalizedLoaded = useRoute();
@@ -134,6 +135,20 @@
       .map((r: RolleWithServiceProvidersResponse) => ({ id: r.id, name: r.name, rollenart: r.rollenart })),
   );
 
+  const isEditAllowed: ComputedRef<boolean> = computed(() => {
+    if (!serviceProviderStore.currentServiceProvider || serviceProviderStore.loading) {
+      return false;
+    }
+
+    const hasSomeVerwaltenPermission: boolean =
+      intersect(serviceProviderStore.currentServiceProvider.relevantSystemrechte ?? [], [
+        RollenSystemRechtEnum.AngeboteVerwalten,
+        RollenSystemRechtEnum.AngeboteEingeschraenktVerwalten,
+      ]).length > 0;
+
+    return hasSomeVerwaltenPermission;
+  });
+
   function scrollToTreeview(offset: number = 120): void {
     const el: HTMLElement | null = treeviewContainer.value;
     if (!el) {
@@ -160,7 +175,7 @@
   }
 
   // ── Edit mode actions ─────────────────────────────────────────────────────
-  async function openEditMode(): Promise<void> {
+  async function openRollenerweiterungEditMode(): Promise<void> {
     // Load available rollen for this organisation if not yet loaded
     if (organisationIdFromQuery.value) {
       await rolleStore.getAllRollen({
@@ -174,6 +189,14 @@
     // Wait until DOM updates, then scroll
     await nextTick();
     scrollToTreeview();
+  }
+
+  async function openServiceProviderEditMode(): Promise<void> {
+    await router.push({
+      name: 'angebot-edit',
+      params: { id: currentServiceProviderId },
+      query: organisationIdFromQuery.value ? { orga: organisationIdFromQuery.value } : undefined,
+    });
   }
 
   const autoEdit: ComputedRef<boolean> = computed(() => route.query['autoEdit'] === 'true');
@@ -248,7 +271,7 @@
       await organisationStore.getOrganisationById(organisationIdFromQuery.value);
     }
     if (autoEdit.value) {
-      await openEditMode();
+      await openRollenerweiterungEditMode();
     }
   });
 </script>
@@ -377,6 +400,28 @@
                       test-id="service-provider-rollenerweiterung"
                       no-margin-top
                     />
+
+                    <v-row
+                      v-if="isEditAllowed"
+                      class="mr-10"
+                      justify="end"
+                    >
+                      <v-col
+                        cols="12"
+                        md="auto"
+                        class="mt-4"
+                      >
+                        <v-btn
+                          :disabled="isEditingRollenerweiterungen"
+                          class="primary"
+                          :block="mdAndDown"
+                          data-testid="service-provider-bearbeiten-button"
+                          @click="openServiceProviderEditMode"
+                          :text="t('edit')"
+                        >
+                        </v-btn>
+                      </v-col>
+                    </v-row>
                   </v-col>
                 </v-row>
               </v-col>
@@ -446,7 +491,7 @@
                       class="primary"
                       :block="mdAndDown"
                       data-testid="rollenerweiterung-bearbeiten-button"
-                      @click="openEditMode"
+                      @click="openRollenerweiterungEditMode"
                     >
                       {{ t('edit') }}
                     </v-btn>

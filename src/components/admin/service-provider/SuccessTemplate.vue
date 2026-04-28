@@ -96,6 +96,7 @@
     />
 
     <v-row justify="end">
+      <slot> </slot>
       <v-col
         v-if="showToServiceProviderDetailsButton"
         cols="12"

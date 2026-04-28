@@ -1,8 +1,9 @@
-import axiosApiInstance from '@/services/ApiService';
-import { getResponseErrorCode } from '@/utils/errorHandlers';
+import type { AxiosError } from 'axios';
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 
-import type { AxiosError } from 'axios';
+import type { ServiceProviderFormSubmitData } from '@/components/admin/service-provider/types';
+import axiosApiInstance from '@/services/ApiService';
+import { getResponseErrorCode } from '@/utils/errorHandlers';
 import {
   DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInnerI18nKeyEnum,
   ProviderApiFactory,
@@ -20,7 +21,9 @@ import {
   type RolleApiInterface,
   type RollenerweiterungForManageableServiceProviderResponse,
   type ServiceProviderResponse,
+  type UpdateServiceProviderBodyParams,
 } from '../api-client/generated/api';
+import type { RollenSystemRecht } from './RolleStore';
 
 const serviceProviderApi: ProviderApiInterface = ProviderApiFactory(undefined, '', axiosApiInstance);
 const rolleApi: RolleApiInterface = RolleApiFactory(undefined, '', axiosApiInstance);
@@ -49,13 +52,14 @@ type ManageableServiceProviderDetails = {
 export type ManageableServiceProviderListEntry = BaseServiceProvider &
   ManageableServiceProviderDetails & {
     rollenerweiterungen: RollenerweiterungForManageableServiceProviderResponse[];
-    isDeleteAuthorized: boolean;
+    hasSomeVerwaltenPermission: boolean;
   };
 
 export type ManageableServiceProviderDetail = BaseServiceProvider &
   ManageableServiceProviderDetails & {
     url: string;
     availableForRollenerweiterung: boolean;
+    relevantSystemrechte: Array<RollenSystemRecht>;
   };
 
 export type RollenerweiterungMap = {
@@ -102,12 +106,13 @@ export type ServiceProviderCreationFilter = {
   merkmale: Array<ServiceProviderMerkmal>;
 };
 
-export type CreatedServiceProvider = {
-  id: string;
-  name: string;
+export type CreatedServiceProvider = BaseServiceProvider & {
   url: string;
-  kategorie: ServiceProviderKategorie;
-  requires2fa: boolean;
+  merkmale: Array<ServiceProviderMerkmal>;
+};
+
+export type UpdatedServiceProvider = BaseServiceProvider & {
+  url: string;
   merkmale: Array<ServiceProviderMerkmal>;
 };
 
@@ -119,6 +124,7 @@ type ServiceProviderState = {
   totalManageableServiceProviders: number;
   totalManageableServiceProvidersForOrganisation: number;
   currentServiceProvider: ManageableServiceProviderDetail | null;
+  updatedServiceProvider: UpdatedServiceProvider | null;
   serviceProviderLogos: Map<string, string>;
   rollenerweiterungen: ProviderControllerFindRollenerweiterungenByServiceProviderId200Response | null;
   // ready-to-display, grouped for the result table:
@@ -169,6 +175,7 @@ type ServiceProviderActions = {
   getRollenerweiterungenById: (filter: RollenerweiterungFilter) => Promise<void>;
   persistRollenerweiterungenForServiceProvider: (filter: PersistRollenerweiterung) => Promise<void>;
   createServiceProvider: (filter: ServiceProviderCreationFilter) => Promise<void>;
+  updateServiceProvider: (id: string, value: Partial<ServiceProviderFormSubmitData>) => Promise<void>;
   deleteServiceProvider: (id: string) => Promise<void>;
 };
 
@@ -186,8 +193,7 @@ export const useServiceProviderStore: StoreDefinition<
   ServiceProviderState,
   ServiceProviderGetters,
   ServiceProviderActions
-> = defineStore({
-  id: 'serviceProviderStore',
+> = defineStore('serviceProviderStore', {
   state: (): ServiceProviderState => {
     return {
       allServiceProviders: [],
@@ -197,6 +203,7 @@ export const useServiceProviderStore: StoreDefinition<
       totalManageableServiceProviders: 0,
       totalManageableServiceProvidersForOrganisation: 0,
       currentServiceProvider: null,
+      updatedServiceProvider: null,
       serviceProviderLogos: new Map<string, string>(),
       rollenerweiterungen: null,
       rollenerweiterungenUebersicht: [],
@@ -413,6 +420,32 @@ export const useServiceProviderStore: StoreDefinition<
         const { data }: { data: ServiceProviderResponse } =
           await serviceProviderApi.providerControllerCreateServiceProvider(bodyParams);
         this.createdServiceProvider = data;
+      } catch (error) {
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async updateServiceProvider(id: string, update: Partial<ServiceProviderFormSubmitData>): Promise<void> {
+      this.loading = true;
+      this.updatedServiceProvider = null;
+      try {
+        const updateServiceProviderBodyParams: UpdateServiceProviderBodyParams = {};
+        if (update.name) {
+          updateServiceProviderBodyParams.name = update.name;
+        }
+        if (update.url) {
+          updateServiceProviderBodyParams.url = update.url;
+        }
+        if (update.kategorie) {
+          updateServiceProviderBodyParams.kategorie = update.kategorie;
+        }
+
+        const { data }: { data: ServiceProviderResponse } =
+          await serviceProviderApi.providerControllerUpdateServiceProvider(id, updateServiceProviderBodyParams);
+        this.updatedServiceProvider = data;
+        this.errorCode = '';
       } catch (error) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {

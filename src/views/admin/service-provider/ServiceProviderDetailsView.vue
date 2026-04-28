@@ -1,18 +1,18 @@
 <script setup lang="ts">
+  import SchulPortalLogo from '@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg';
+  import LabeledField from '@/components/admin/LabeledField.vue';
+  import ResultTable, { type Headers } from '@/components/admin/ResultTable.vue';
+  import SpshAlert from '@/components/alert/SpshAlert.vue';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import {
     ServiceProviderMerkmal,
     useServiceProviderStore,
     type ServiceProviderStore,
   } from '@/stores/ServiceProviderStore';
+  import { computed, onMounted, ref, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
-  import SpshAlert from '@/components/alert/SpshAlert.vue';
-  import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { computed, onMounted, ref, type ComputedRef, type Ref } from 'vue';
-  import SchulPortalLogo from '@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg';
-  import LabeledField from '@/components/admin/LabeledField.vue';
-  import ResultTable, { type Headers } from '@/components/admin/ResultTable.vue';
-  import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 
   const router: Router = useRouter();
   const route: RouteLocationNormalizedLoaded = useRoute();
@@ -43,6 +43,10 @@
     serviceProviderStore.errorCode = '';
     navigateToServiceProviderTable();
   };
+
+  async function openServiceProviderEditMode(): Promise<void> {
+    await router.push({ name: 'angebot-edit', params: { id: currentServiceProviderId } });
+  }
 
   // Default for now - in the future when Edit functionality is added, this will have more error codes as cases to handle accordingly
   const alertButtonText: ComputedRef<string> = computed(() => {
@@ -247,6 +251,23 @@
                       test-id="service-provider-rollenerweiterung"
                       no-margin-top
                     />
+                  </v-col>
+                </v-row>
+                <v-row
+                  class="mr-10"
+                  justify="end"
+                >
+                  <v-col
+                    cols="12"
+                    md="auto"
+                  >
+                    <v-btn
+                      class="primary mt-4"
+                      data-testid="service-provider-bearbeiten-button"
+                      @click="openServiceProviderEditMode"
+                      :text="t('edit')"
+                    >
+                    </v-btn>
                   </v-col>
                 </v-row>
               </v-col>

@@ -204,6 +204,18 @@ const routes: readonly RouteRecordRaw[] = [
     },
   },
   {
+    path: '/admin/angebote/:id/edit',
+    name: 'angebot-edit',
+    component: () => import('../views/admin/service-provider/ServiceProviderEditView.vue'),
+    meta: {
+      layout: 'AdminLayout',
+      requiresAuth: true,
+      requiredStepUpLevel: StepUpLevel.GOLD,
+      requiresPermission: ['angebotsverwaltung', 'eingeschränktangebotsverwaltung'],
+      permissionMode: 'any',
+    },
+  },
+  {
     path: '/admin/angebote/new',
     name: 'create-angebot',
     component: () => import('../views/admin/service-provider/ServiceProviderCreationView.vue'),

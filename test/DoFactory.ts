@@ -466,7 +466,7 @@ export class DoFactory {
       requires2fa: faker.datatype.boolean(),
       merkmale: [],
       rollenerweiterungen: [],
-      isDeleteAuthorized: faker.datatype.boolean(),
+      hasSomeVerwaltenPermission: faker.datatype.boolean(),
       ...props,
     };
   }
@@ -478,6 +478,7 @@ export class DoFactory {
       ...this.getManageableServiceProviderListEntryResponse(props),
       url: props?.url ?? faker.internet.url(),
       availableForRollenerweiterung: props?.availableForRollenerweiterung ?? false,
+      relevantSystemrechte: props?.relevantSystemrechte ?? [],
     };
   }
 

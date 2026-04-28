@@ -85,7 +85,7 @@
                   .map((re: RollenerweiterungForManageableServiceProviderResponse) => re.rolle.name)
                   .join(', ')
               : '---',
-          isDeleteAuthorized: sp.isDeleteAuthorized,
+          isDeleteAuthorized: sp.hasSomeVerwaltenPermission,
         };
       },
     );

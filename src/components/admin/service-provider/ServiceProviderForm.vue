@@ -1,0 +1,443 @@
+<script setup lang="ts">
+  import SchulPortalLogo from '@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg';
+  import SchulenFilter from '@/components/filter/SchulenFilter.vue';
+  import FormRow from '@/components/form/FormRow.vue';
+  import FormWrapper from '@/components/form/FormWrapper.vue';
+  import { type Organisation } from '@/stores/OrganisationStore';
+  import { RollenSystemRecht } from '@/stores/RolleStore';
+  import { ServiceProviderKategorie, ServiceProviderMerkmal } from '@/stores/ServiceProviderStore';
+  import { DIN_91379A_EXT, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
+  import { toTypedSchema } from '@vee-validate/yup';
+  import { useForm, type BaseFieldProps, type FormContext, type FormMeta, type TypedSchema } from 'vee-validate';
+  import { computed, onMounted, ref, watch, watchEffect, type ComputedRef, type Ref } from 'vue';
+  import { useI18n, type Composer } from 'vue-i18n';
+  import { boolean, object, string } from 'yup';
+  import type { ServiceProviderFormProps as Props, ServiceProviderForm, ServiceProviderFormSubmitData } from './types';
+
+  type Emits = {
+    (e: 'click:confirmUnsaved'): void;
+    (e: 'click:discard'): void;
+    (e: 'click:submit', values: ServiceProviderFormSubmitData): void;
+    (e: 'update:canSubmit', value: boolean): void;
+    (e: 'update:dirty', value: boolean): void;
+    (e: 'update:showUnsavedChangesDialog', visible: boolean): void;
+  };
+
+  type FieldDefinition<T> = [Ref<T>, Ref<BaseFieldProps & { error: boolean; 'error-messages': string[] }>];
+
+  const props: Props = defineProps<Props>();
+
+  const emit: Emits = defineEmits<Emits>();
+
+  const { t }: Composer = useI18n({ useScope: 'global' });
+
+  const validationSchema: TypedSchema<ServiceProviderForm> = toTypedSchema(
+    object({
+      selectedOrganisationId: string().required(t('angebot.rules.organisation.required')),
+      name: string()
+        .max(50, t('angebot.rules.name.maxLength'))
+        .matches(DIN_91379A_EXT, t('angebot.rules.name.matches'))
+        .matches(NO_LEADING_TRAILING_SPACES, t('angebot.rules.name.noLeadingTrailingSpaces'))
+        .required(t('angebot.rules.name.required')),
+      url: string().required(t('angebot.rules.url.required')),
+      logo: string().optional(),
+      kategorie: string().required(t('angebot.rules.kategorie.required')),
+      nachtraeglichZuweisbar: boolean().optional(),
+      verfuegbarFuerRollenerweiterung: boolean().optional(),
+      requires2fa: boolean().optional(),
+    }),
+  );
+
+  const vuetifyConfig: (state: { errors: string[] }) => {
+    props: { error: boolean; 'error-messages': string[] };
+  } = (state: { errors: string[] }) => ({
+    props: {
+      error: !!state.errors.length,
+      'error-messages': state.errors,
+    },
+  });
+
+  const formContext: FormContext<ServiceProviderForm> = useForm({
+    validationSchema,
+    initialValues: {
+      kategorie: ServiceProviderKategorie.Schulisch,
+      nachtraeglichZuweisbar: true,
+      verfuegbarFuerRollenerweiterung: true,
+      requires2fa: false,
+      logo: SchulPortalLogo,
+      ...props.initialValues,
+    } as ServiceProviderForm,
+  });
+
+  const [selectedOrganisationId, selectedOrganisationIdProps]: FieldDefinition<string> = formContext.defineField(
+    'selectedOrganisationId',
+    vuetifyConfig,
+  );
+  const [name, nameProps]: FieldDefinition<string> = formContext.defineField('name', vuetifyConfig);
+  const [url, urlProps]: FieldDefinition<string> = formContext.defineField('url', vuetifyConfig);
+  const [logo, logoProps]: FieldDefinition<string> = formContext.defineField('logo', vuetifyConfig);
+  const [kategorie, kategorieProps]: FieldDefinition<ServiceProviderKategorie> = formContext.defineField(
+    'kategorie',
+    vuetifyConfig,
+  );
+  const [requires2fa, requires2faProps]: FieldDefinition<boolean> = formContext.defineField(
+    'requires2fa',
+    vuetifyConfig,
+  );
+  const [nachtraeglichZuweisbar, nachtraeglichZuweisbarProps]: FieldDefinition<boolean> = formContext.defineField(
+    'nachtraeglichZuweisbar',
+    vuetifyConfig,
+  );
+  const [verfuegbarFuerRollenerweiterung, verfuegbarFuerRollenerweiterungProps]: FieldDefinition<boolean> =
+    formContext.defineField('verfuegbarFuerRollenerweiterung', vuetifyConfig);
+
+  const canCommit: ComputedRef<boolean> = computed(() => formContext.meta.value.valid && formContext.meta.value.dirty);
+
+  const kategorieItems: ComputedRef<{ title: string; value: string }[]> = computed(() =>
+    Object.values(ServiceProviderKategorie).map((k: string) => ({
+      title: t(`angebot.kategorien.${k}`),
+      value: k,
+    })),
+  );
+
+  function initializeFormWithCachedValues(): void {
+    if (!props.cachedValues) {
+      return;
+    }
+    const cached: Partial<ServiceProviderForm> = props.cachedValues;
+    formContext.setValues(cached);
+  }
+
+  const cachedOrga: Ref<Organisation | undefined> = ref();
+
+  function updateSelectedOrganisation(selectedOrgas: Organisation[]): void {
+    if (props.isEditMode) {
+      return;
+    }
+    const org: Organisation | undefined = selectedOrgas.at(0);
+    if (org) {
+      formContext.setFieldValue('selectedOrganisationId', org.id);
+      cachedOrga.value = org;
+    }
+  }
+
+  function openUrlInNewTab(): void {
+    if (!url.value) {
+      return;
+    }
+
+    let value: string = url.value.trim();
+
+    // If it doesn't already have a protocol → force https. Useful because we want to allow the admin to just enter "example.com" instead of "https://example.com"
+    if (!/^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(value)) {
+      value = 'https://' + value;
+    }
+
+    window.open(value, '_blank', 'noopener,noreferrer');
+  }
+
+  const onSubmit: (e?: Event) => Promise<void> = formContext.handleSubmit((values: ServiceProviderForm) => {
+    // in edit mode we don't care about the orga, since it can't be edited
+    if (!props.isEditMode && !cachedOrga.value) {
+      return;
+    }
+
+    // Normalize URL: add https:// if no protocol is present
+    let normalizedUrl: string = values.url.trim();
+    if (!/^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(normalizedUrl)) {
+      normalizedUrl = 'https://' + normalizedUrl;
+    }
+
+    const payload: ServiceProviderFormSubmitData = {
+      selectedOrganisation: cachedOrga.value,
+      name: values.name,
+      url: normalizedUrl,
+      logo: values.logo,
+      kategorie: values.kategorie,
+      merkmale: [],
+      requires2fa: values.requires2fa,
+    };
+    if (values.nachtraeglichZuweisbar) {
+      payload.merkmale.push(ServiceProviderMerkmal.NachtraeglichZuweisbar);
+    }
+    if (values.verfuegbarFuerRollenerweiterung) {
+      payload.merkmale.push(ServiceProviderMerkmal.VerfuegbarFuerRollenerweiterung);
+    }
+    emit('click:submit', payload);
+  });
+
+  watch(formContext.meta, ({ dirty }: FormMeta<ServiceProviderForm>) => {
+    emit('update:dirty', dirty);
+  });
+
+  watchEffect(() => {
+    emit('update:canSubmit', canCommit.value);
+  });
+
+  onMounted(() => {
+    initializeFormWithCachedValues();
+  });
+</script>
+
+<template>
+  <FormWrapper
+    :id="isEditMode ? 'service-provider-edit-form' : 'service-provider-create-form'"
+    :confirm-unsaved-changes-action="() => emit('click:confirmUnsaved')"
+    :can-commit="canCommit"
+    :create-button-label="isEditMode ? t('save') : t('angebot.create')"
+    :discard-button-label="isEditMode ? t('cancel') : t('angebot.discard')"
+    :hide-actions="!!errorCode"
+    :is-loading="loading"
+    :on-discard="() => emit('click:discard')"
+    :on-submit="onSubmit"
+    :show-unsaved-changes-dialog
+    @on-show-dialog-change="(value?: boolean) => emit('update:showUnsavedChangesDialog', !!value)"
+  >
+    <template v-if="!errorCode">
+      <v-row>
+        <v-col>
+          <h3 class="headline-3">1. {{ $t('angebot.whoProvidesThisAngebot') }}</h3>
+        </v-col>
+      </v-row>
+      <FormRow
+        :error-label="selectedOrganisationIdProps['error']"
+        :is-required="true"
+        label-for-id="organisation-select"
+        :label="$t('angebot.providedBy')"
+      >
+        <SchulenFilter
+          :systemrechte-for-search="[props.systemrecht]"
+          :readonly="isEditMode"
+          :highlight-selection="isEditMode"
+          :multiple="false"
+          :parent-id="isEditMode ? 'service-provider-edit' : 'service-provider-create'"
+          :placeholderText="$t('admin.organisation.selectOrganisation')"
+          :includeAll="true"
+          :selected-schule-props="selectedOrganisationIdProps"
+          :selected-schulen="selectedOrganisationId"
+          @update:selected-schulen-objects="updateSelectedOrganisation"
+        />
+      </FormRow>
+
+      <v-row>
+        <v-col>
+          <h3 class="headline-3">2. {{ $t('angebot.nameOfAngebotInTheStartPage') }}</h3>
+        </v-col>
+      </v-row>
+      <FormRow
+        :error-label="nameProps['error']"
+        :is-required="true"
+        label-for-id="name-input"
+        :label="$t('angebot.name')"
+      >
+        <v-text-field
+          id="name-input"
+          v-bind="nameProps"
+          v-model="name"
+          autocomplete="off"
+          data-testid="name-input"
+          density="compact"
+          :placeholder="$t('angebot.enterName')"
+          required
+          variant="outlined"
+        />
+      </FormRow>
+
+      <v-row class="mb-n8">
+        <v-col>
+          <h3 class="headline-3">3. {{ $t('angebot.urlOfTheAngebot') }}</h3>
+        </v-col>
+      </v-row>
+      <FormRow
+        :error-label="urlProps['error']"
+        :is-required="true"
+        label-for-id="url-input"
+        :label="$t('angebot.url')"
+      >
+        <v-text-field
+          id="url-input"
+          v-bind="urlProps"
+          v-model="url"
+          autocomplete="off"
+          data-testid="url-input"
+          density="compact"
+          :placeholder="$t('angebot.enterUrl')"
+          required
+          variant="outlined"
+        />
+        <div class="d-flex justify-end">
+          <v-btn
+            :disabled="!url"
+            class="primary smallest"
+            data-testid="url-test-button"
+            density="compact"
+            variant="outlined"
+            @click="openUrlInNewTab"
+          >
+            {{ $t('angebot.testUrl') }}
+          </v-btn>
+        </div>
+      </FormRow>
+
+      <v-row>
+        <v-col>
+          <h3 class="headline-3">4. {{ $t('angebot.logoOfTheAngebotInTheStartPage') }}</h3>
+        </v-col>
+      </v-row>
+      <FormRow
+        :error-label="logoProps['error']"
+        :is-required="true"
+        label-for-id="logo-input"
+        :label="$t('angebot.logo')"
+      >
+        <v-card
+          class="d-flex align-center justify-center mb-5"
+          width="80"
+          height="80"
+          outlined
+        >
+          <div class="logo-box selected">
+            <v-img
+              :src="logo || SchulPortalLogo"
+              max-height="48"
+              max-width="48"
+              contain
+            />
+          </div>
+        </v-card>
+      </FormRow>
+
+      <v-row>
+        <v-col>
+          <h3 class="headline-3">5. {{ $t('angebot.kategorieOfTheAngebotInTheStartPage') }}</h3>
+        </v-col>
+      </v-row>
+      <FormRow
+        :error-label="kategorieProps['error']"
+        :is-required="false"
+        label-for-id="kategorie-select"
+        :label="$t('angebot.kategorie')"
+      >
+        <v-autocomplete
+          :disabled="systemrecht !== RollenSystemRecht.AngeboteVerwalten"
+          id="kategorie-select"
+          v-bind="kategorieProps"
+          v-model="kategorie"
+          autocomplete="off"
+          clearable
+          data-testid="kategorie-select"
+          density="compact"
+          :items="kategorieItems"
+          item-value="value"
+          item-title="title"
+          :no-data-text="$t('noDataFound')"
+          :placeholder="$t('angebot.selectKategorie')"
+          required
+          variant="outlined"
+        />
+      </FormRow>
+
+      <v-row>
+        <v-col>
+          <h3 class="headline-3">6. {{ $t('angebot.canThisAngebotBeAssignedToRollen') }}</h3>
+        </v-col>
+      </v-row>
+      <FormRow
+        :error-label="nachtraeglichZuweisbarProps['error']"
+        :is-required="false"
+        label-for-id="nachtraeglich-zuweisbar-select"
+        :label="$t('angebot.canBeAssigned')"
+      >
+        <v-select
+          :disabled="isEditMode || systemrecht !== RollenSystemRecht.AngeboteVerwalten"
+          id="nachtraeglich-zuweisbar-select"
+          v-bind="nachtraeglichZuweisbarProps"
+          v-model="nachtraeglichZuweisbar"
+          data-testid="nachtraeglich-zuweisbar-select"
+          density="compact"
+          :items="[
+            { title: $t('yes'), value: true },
+            { title: $t('no'), value: false },
+          ]"
+          item-value="value"
+          item-title="title"
+          variant="outlined"
+        />
+      </FormRow>
+
+      <v-row>
+        <v-col>
+          <h3 class="headline-3">7. {{ $t('angebot.canThisAngebotBeUsedForSchulspezifischeRollenerweiterungen') }}</h3>
+        </v-col>
+      </v-row>
+      <FormRow
+        :error-label="verfuegbarFuerRollenerweiterungProps['error']"
+        :is-required="false"
+        label-for-id="verfuegbar-fuer-rollenerweiterung-select"
+        :label="$t('angebot.canBeUsed')"
+      >
+        <v-select
+          :disabled="isEditMode || systemrecht !== RollenSystemRecht.AngeboteVerwalten"
+          id="verfuegbar-fuer-rollenerweiterung-select"
+          v-bind="verfuegbarFuerRollenerweiterungProps"
+          v-model="verfuegbarFuerRollenerweiterung"
+          data-testid="verfuegbar-fuer-rollenerweiterung-select"
+          density="compact"
+          :items="[
+            { title: $t('yes'), value: true },
+            { title: $t('no'), value: false },
+          ]"
+          item-value="value"
+          item-title="title"
+          variant="outlined"
+        />
+      </FormRow>
+
+      <v-row>
+        <v-col>
+          <h3 class="headline-3">8. {{ $t('angebot.is2FARequired') }}</h3>
+        </v-col>
+      </v-row>
+      <FormRow
+        :error-label="requires2faProps['error']"
+        :is-required="false"
+        label-for-id="requires2fa-select"
+        :label="$t('angebot.requires2FA')"
+      >
+        <v-select
+          disabled
+          id="requires2fa-select"
+          v-bind="requires2faProps"
+          v-model="requires2fa"
+          data-testid="requires2fa-select"
+          density="compact"
+          :items="[
+            { title: $t('yes'), value: true },
+            { title: $t('no'), value: false },
+          ]"
+          item-value="value"
+          item-title="title"
+          variant="outlined"
+        />
+      </FormRow>
+    </template>
+  </FormWrapper>
+</template>
+
+<style scoped>
+  .logo-box {
+    width: 80px;
+    height: 80px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+  }
+
+  .logo-box.selected {
+    border-color: #001e49;
+    box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+  }
+</style>

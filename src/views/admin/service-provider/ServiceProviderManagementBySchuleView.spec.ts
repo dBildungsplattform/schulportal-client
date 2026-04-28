@@ -50,8 +50,8 @@ beforeEach(async () => {
   await router.isReady();
 
   serviceProviderStore.manageableServiceProvidersForOrganisation = [
-    DoFactory.getManageableServiceProviderListEntryResponse({ isDeleteAuthorized: true }),
-    DoFactory.getManageableServiceProviderListEntryResponse({ isDeleteAuthorized: false }),
+    DoFactory.getManageableServiceProviderListEntryResponse({ hasSomeVerwaltenPermission: true }),
+    DoFactory.getManageableServiceProviderListEntryResponse({ hasSomeVerwaltenPermission: false }),
   ];
   serviceProviderStore.errorCode = '';
 });
@@ -138,7 +138,7 @@ describe('ServiceProviderManagementBySchuleView', () => {
       );
       expect(deleteIcons.length).toBe(
         serviceProviderStore.manageableServiceProvidersForOrganisation.filter(
-          (sp: { isDeleteAuthorized: boolean }) => sp.isDeleteAuthorized,
+          (sp: { hasSomeVerwaltenPermission: boolean }) => sp.hasSomeVerwaltenPermission,
         ).length,
       );
     });

@@ -43,8 +43,8 @@ beforeEach(async (): Promise<void> => {
 
   serviceProviderStore = useServiceProviderStore();
   serviceProviderStore.manageableServiceProviders = [
-    DoFactory.getManageableServiceProviderListEntryResponse({ isDeleteAuthorized: true }),
-    DoFactory.getManageableServiceProviderListEntryResponse({ isDeleteAuthorized: false }),
+    DoFactory.getManageableServiceProviderListEntryResponse({ hasSomeVerwaltenPermission: true }),
+    DoFactory.getManageableServiceProviderListEntryResponse({ hasSomeVerwaltenPermission: false }),
   ];
   serviceProviderStore.errorCode = '';
 });
@@ -74,7 +74,7 @@ describe('ServiceProviderManagementView', () => {
       );
       expect(deleteIcons.length).toBe(
         serviceProviderStore.manageableServiceProviders.filter(
-          (sp: ManageableServiceProviderListEntry) => sp.isDeleteAuthorized,
+          (sp: ManageableServiceProviderListEntry) => sp.hasSomeVerwaltenPermission,
         ).length,
       );
     });

@@ -626,6 +626,58 @@ describe('serviceProviderStore', () => {
     });
   });
 
+  describe('updateServiceProvider', () => {
+    beforeEach(() => {
+      serviceProviderStore.updatedServiceProvider = null;
+    });
+    const providerId: string = 'provider-to-update';
+    const apiUrl: string = `/api/provider/${providerId}`;
+    const update: Partial<{ name: string; url: string; kategorie: ServiceProviderKategorie }> = {
+      name: 'Updated Service Provider',
+      url: 'https://updated-url.com',
+      kategorie: ServiceProviderKategorie.Email,
+    };
+
+    it('should update a service provider and update state', async () => {
+      const mockResponse: ServiceProviderResponse = {
+        id: providerId,
+        name: update.name!,
+        url: update.url!,
+        target: ServiceProviderTarget.Url,
+        hasLogo: false,
+        kategorie: update.kategorie!,
+        requires2fa: false,
+        merkmale: [],
+      };
+
+      mockadapter.onPatch(apiUrl).replyOnce(200, mockResponse);
+      const promise: Promise<void> = serviceProviderStore.updateServiceProvider(providerId, update);
+      expect(serviceProviderStore.loading).toBe(true);
+      await promise;
+      expect(serviceProviderStore.updatedServiceProvider).toEqual(mockResponse);
+      expect(serviceProviderStore.errorCode).toEqual('');
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+
+    it('should handle string error', async () => {
+      mockadapter.onPatch(apiUrl).replyOnce(500, 'some mock server error');
+      const promise: Promise<void> = serviceProviderStore.updateServiceProvider(providerId, update);
+      expect(serviceProviderStore.loading).toBe(true);
+      await promise;
+      expect(serviceProviderStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+
+    it('should handle error code', async () => {
+      mockadapter.onPatch(apiUrl).replyOnce(500, { code: 'some mock server error' });
+      const promise: Promise<void> = serviceProviderStore.updateServiceProvider(providerId, update);
+      expect(serviceProviderStore.loading).toBe(true);
+      await promise;
+      expect(serviceProviderStore.errorCode).toEqual('some mock server error');
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+  });
+
   describe('deleteServiceProvider', () => {
     const providerId: string = 'provider-to-delete';
     const apiUrl: string = `/api/provider/${providerId}`;

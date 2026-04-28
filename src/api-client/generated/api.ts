@@ -1556,7 +1556,7 @@ export interface ManageableServiceProviderListEntryResponse {
      * @type {boolean}
      * @memberof ManageableServiceProviderListEntryResponse
      */
-    'isDeleteAuthorized': boolean;
+    'hasSomeVerwaltenPermission': boolean;
 }
 
 
@@ -1626,8 +1626,37 @@ export interface ManageableServiceProviderResponse {
      * @memberof ManageableServiceProviderResponse
      */
     'rollen': Array<RolleRefResponse>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof ManageableServiceProviderResponse
+     */
+    'relevantSystemrechte': Array<ManageableServiceProviderResponseRelevantSystemrechteEnum>;
 }
 
+export const ManageableServiceProviderResponseRelevantSystemrechteEnum = {
+    RollenVerwalten: 'ROLLEN_VERWALTEN',
+    PersonenSofortLoeschen: 'PERSONEN_SOFORT_LOESCHEN',
+    PersonenVerwalten: 'PERSONEN_VERWALTEN',
+    LandesbediensteteSuchenUndHinzufuegen: 'LANDESBEDIENSTETE_SUCHEN_UND_HINZUFUEGEN',
+    EingeschraenktNeueBenutzerErstellen: 'EINGESCHRAENKT_NEUE_BENUTZER_ERSTELLEN',
+    SchulenVerwalten: 'SCHULEN_VERWALTEN',
+    KlassenVerwalten: 'KLASSEN_VERWALTEN',
+    SchultraegerVerwalten: 'SCHULTRAEGER_VERWALTEN',
+    PersonSynchronisieren: 'PERSON_SYNCHRONISIEREN',
+    CronDurchfuehren: 'CRON_DURCHFUEHREN',
+    PersonenAnlegen: 'PERSONEN_ANLEGEN',
+    ImportDurchfuehren: 'IMPORT_DURCHFUEHREN',
+    PersonenLesen: 'PERSONEN_LESEN',
+    BulkVerwalten: 'BULK_VERWALTEN',
+    SchulportalVerwalten: 'SCHULPORTAL_VERWALTEN',
+    HinweiseBearbeiten: 'HINWEISE_BEARBEITEN',
+    RollenErweitern: 'ROLLEN_ERWEITERN',
+    AngeboteVerwalten: 'ANGEBOTE_VERWALTEN',
+    AngeboteEingeschraenktVerwalten: 'ANGEBOTE_EINGESCHRAENKT_VERWALTEN'
+} as const;
+
+export type ManageableServiceProviderResponseRelevantSystemrechteEnum = typeof ManageableServiceProviderResponseRelevantSystemrechteEnum[keyof typeof ManageableServiceProviderResponseRelevantSystemrechteEnum];
 
 /**
  * 
