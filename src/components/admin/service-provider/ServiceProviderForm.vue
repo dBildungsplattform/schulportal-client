@@ -9,7 +9,7 @@
   import { DIN_91379A_EXT, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
   import { toTypedSchema } from '@vee-validate/yup';
   import { useForm, type BaseFieldProps, type FormContext, type FormMeta, type TypedSchema } from 'vee-validate';
-  import { computed, onMounted, ref, watch, type ComputedRef, type Ref } from 'vue';
+  import { computed, onMounted, ref, watch, watchEffect, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { boolean, object, string } from 'yup';
   import type { ServiceProviderFormProps as Props, ServiceProviderForm, ServiceProviderFormSubmitData } from './types';
@@ -170,7 +170,7 @@
     emit('update:dirty', dirty);
   });
 
-  watch(canCommit, () => {
+  watchEffect(() => {
     emit('update:canSubmit', canCommit.value);
   });
 
