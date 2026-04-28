@@ -127,15 +127,6 @@
     serviceProviderStore.errorCode = '';
   }
 
-  function handleDiscard(): void {
-    if (isDirty.value) {
-      showUnsavedChangesDialog.value = true;
-      blockedNext = navigateToServiceProviderTable;
-    } else {
-      navigateToServiceProviderTable();
-    }
-  }
-
   function preventNavigation(event: BeforeUnloadEvent): void {
     if (!isDirty.value) {
       return;
@@ -237,7 +228,7 @@
           }"
           @update:dirty="(value: boolean) => (isDirty = value)"
           @click:submit="onSubmit"
-          @click:discard="handleDiscard"
+          @click:discard="navigateToServiceProviderTable"
           @update:showUnsavedChangesDialog="(visible: boolean) => (showUnsavedChangesDialog = visible)"
           @click:confirmUnsaved="handleConfirmUnsavedChanges"
         />
