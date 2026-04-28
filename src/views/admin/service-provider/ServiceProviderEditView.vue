@@ -133,32 +133,28 @@
 
   async function navigateToServiceProviderDetails(): Promise<void> {
     if (organisationIdFromQuery.value) {
-      await router.push({
-        name: 'angebot-details-schulspezifisch',
-        params: { id: serviceProviderId.value },
-        query: { orga: organisationIdFromQuery.value },
-      });
+      await router
+        .push({
+          name: 'angebot-details-schulspezifisch',
+          params: { id: serviceProviderId.value },
+          query: { orga: organisationIdFromQuery.value },
+        })
+        .then(() => router.go(0));
     } else {
-      await router.push({ name: 'angebot-details', params: { id: serviceProviderId.value } });
+      router.push({ name: 'angebot-details', params: { id: serviceProviderId.value } });
     }
   }
 
   async function navigateToServiceProviderList(): Promise<void> {
     if (organisationIdFromQuery.value) {
-      await router.push({
-        name: 'angebot-management-schulspezifisch',
-        query: { orga: organisationIdFromQuery.value },
-      });
+      await router
+        .push({
+          name: 'angebot-management-schulspezifisch',
+          query: { orga: organisationIdFromQuery.value },
+        })
+        .then(() => router.go(0));
     } else {
-      await router.push({ name: 'angebot-management' });
-    }
-  }
-
-  async function discard(): Promise<void> {
-    if (!serviceProviderStore.errorCode && isDirty.value) {
-      showUnsavedChangesDialog.value = true;
-    } else {
-      await navigateToServiceProviderList();
+      router.push({ name: 'angebot-management' });
     }
   }
 
@@ -197,7 +193,7 @@
       :closable="!serviceProviderStore.errorCode"
       :header="t('angebot.edit')"
       headlineTestId="service-provider-edit-headline"
-      @onCloseClicked="discard"
+      @onCloseClicked="navigateToServiceProviderList"
       :padded="true"
       :showCloseText="true"
     >
@@ -304,7 +300,7 @@
             :showUnsavedChangesDialog="showUnsavedChangesDialog"
             @update:dirty="(value: boolean) => (isDirty = value)"
             @click:submit="submit"
-            @click:discard="discard"
+            @click:discard="navigateToServiceProviderList"
             @update:showUnsavedChangesDialog="(visible: boolean) => (showUnsavedChangesDialog = visible)"
             @click:confirmUnsaved="confirmUnsavedChanges"
           />

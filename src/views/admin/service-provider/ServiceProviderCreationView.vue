@@ -90,10 +90,10 @@
   }
 
   function navigateToServiceProviderTable(): void {
-    router.push({ name: 'angebot-management-schulspezifisch' });
     selectedOrganisationNameCache.value = '';
     serviceProviderStore.errorCode = '';
     serviceProviderStore.createdServiceProvider = null;
+    router.push({ name: 'angebot-management-schulspezifisch' }).then(() => router.go(0));
   }
 
   function navigateToCreatePersonRoute(reload: boolean = false): void | Promise<void> {
