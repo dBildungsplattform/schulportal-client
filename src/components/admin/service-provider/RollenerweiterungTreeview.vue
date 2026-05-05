@@ -188,7 +188,7 @@
       <!-- Suppress default title for group nodes (title is rendered in #prepend) -->
       <template #title="{ item }">
         <template v-if="!(item as TreeNode).isGroup">
-          {{ item.title }}
+          <span>{{ item.title }}</span>
         </template>
       </template>
       <template #prepend="{ item }">

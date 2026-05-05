@@ -513,14 +513,16 @@
                   :variant="'text'"
                   :subCards="true"
                 >
-                  <v-col class="ml-10">
-                    <RollenerweiterungTreeview
-                      :available-rollen="availableRollen"
-                      :initially-selected-rolle-ids="existingRolleIds"
-                      :loading="rolleStore.loading"
-                      @update:selectedRolleIds="selectedRolleIds = $event"
-                    />
-                  </v-col>
+                  <v-row>
+                    <v-col class="ml-md-10 pr-sm-12">
+                      <RollenerweiterungTreeview
+                        :available-rollen="availableRollen"
+                        :initially-selected-rolle-ids="existingRolleIds"
+                        :loading="rolleStore.loading"
+                        @update:selectedRolleIds="selectedRolleIds = $event"
+                      />
+                    </v-col>
+                  </v-row>
 
                   <!-- Save / Cancel actions -->
                   <v-row
