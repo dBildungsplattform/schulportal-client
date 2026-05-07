@@ -593,6 +593,7 @@ describe('serviceProviderStore', () => {
         url: filter.url,
         target: ServiceProviderTarget.Url,
         hasLogo: false,
+        logoId: 1,
         kategorie: filter.kategorie,
         requires2fa: filter.requires2fa,
         merkmale: filter.merkmale,
@@ -648,6 +649,7 @@ describe('serviceProviderStore', () => {
         kategorie: update.kategorie!,
         requires2fa: false,
         merkmale: [],
+        logoId: 1,
       };
 
       mockadapter.onPatch(apiUrl).replyOnce(200, mockResponse);

@@ -4,7 +4,7 @@
 
   type SuccessDataItem = {
     label: string;
-    value: string;
+    value: string | number | undefined;
     testId: string;
     type?: 'text' | 'image';
   };
@@ -73,7 +73,7 @@
           <v-img
             :data-testid="item.testId"
             class="mt-n2"
-            :src="item.value"
+            :src="`/path/to/logos/${item.value}.svg`"
             max-width="40"
             max-height="40"
             contain

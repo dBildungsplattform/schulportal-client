@@ -1,5 +1,4 @@
 <script setup lang="ts">
-  import SchulPortalLogo from '@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg';
   import ServiceProviderForm from '@/components/admin/service-provider/ServiceProviderForm.vue';
   import SuccessTemplate from '@/components/admin/service-provider/SuccessTemplate.vue';
   import type {
@@ -65,7 +64,7 @@
       name: values.name,
       url: values.url,
       kategorie: values.kategorie,
-      logo: values.logo,
+      logoId: values.logoId,
       requires2fa: values.requires2fa,
       nachtraeglichZuweisbar: values.merkmale.includes(ServiceProviderMerkmal.NachtraeglichZuweisbar),
       verfuegbarFuerRollenerweiterung: values.merkmale.includes(ServiceProviderMerkmal.VerfuegbarFuerRollenerweiterung),
@@ -214,7 +213,7 @@
               selectedOrganisationId: autoSelectedSchuleId,
               name: '',
               url: '',
-              logo: SchulPortalLogo,
+              logoId: undefined,
               kategorie: ServiceProviderKategorie.Schulisch,
               nachtraeglichZuweisbar: true,
               verfuegbarFuerRollenerweiterung: true,
@@ -255,7 +254,7 @@
               },
               {
                 label: $t('angebot.logo'),
-                value: SchulPortalLogo,
+                value: serviceProviderStore.createdServiceProvider.logoId,
                 testId: 'success-logo',
                 type: 'image',
               },

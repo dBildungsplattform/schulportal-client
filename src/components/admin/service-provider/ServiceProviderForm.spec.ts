@@ -18,7 +18,7 @@ const defaultProps: ServiceProviderFormProps = {
     selectedOrganisationId: '',
     name: '',
     url: '',
-    logo: '',
+    logoId: undefined,
     kategorie: ServiceProviderKategorie.Schulisch,
     nachtraeglichZuweisbar: true,
     verfuegbarFuerRollenerweiterung: true,
@@ -120,7 +120,7 @@ describe('ServiceProviderForm', () => {
       name: 'Test Name',
       url: 'https://test-url.com',
       kategorie: ServiceProviderKategorie.Schulisch,
-      logo: 'logo.png',
+      logoId: undefined,
       nachtraeglichZuweisbar: true,
       verfuegbarFuerRollenerweiterung: true,
       requires2fa: false,
@@ -163,7 +163,7 @@ describe('ServiceProviderForm', () => {
       url: `https://${newUrl}`,
       selectedOrganisation: org,
       kategorie: initialValues.kategorie,
-      logo: initialValues.logo,
+      logoId: initialValues.logoId,
     });
   });
 });
