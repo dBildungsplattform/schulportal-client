@@ -46,7 +46,13 @@
         class="logo-item"
         :class="{ selected: isSelected(logo.id), disabled: disabled || readonly }"
         :title="`${logo.name}`"
+        :tabindex="disabled || readonly ? -1 : 0"
+        role="button"
+        :aria-pressed="isSelected(logo.id)"
+        :aria-label="logo.name"
         @click="selectLogo(logo.id)"
+        @keydown.enter.prevent="selectLogo(logo.id)"
+        @keydown.space.prevent="selectLogo(logo.id)"
       >
         <div class="logo-container">
           <v-img
