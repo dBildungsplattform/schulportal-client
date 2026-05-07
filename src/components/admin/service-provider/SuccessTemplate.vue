@@ -1,4 +1,5 @@
 <script setup lang="ts">
+  import { getLogoPath } from '@/utils/logosConfig';
   import { type Ref } from 'vue';
   import { useDisplay } from 'vuetify';
 
@@ -69,11 +70,11 @@
 
       <v-col class="text-body">
         <!-- If it's an image type → show image -->
-        <template v-if="item.type === 'image' && item.value">
+        <template v-if="item.type === 'image' && typeof item.value === 'number'">
           <v-img
             :data-testid="item.testId"
             class="mt-n2"
-            :src="`/path/to/logos/${item.value}.svg`"
+            :src="getLogoPath(item.value)"
             max-width="40"
             max-height="40"
             contain

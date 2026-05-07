@@ -157,7 +157,7 @@
       selectedOrganisation: cachedOrga.value,
       name: values.name,
       url: normalizedUrl,
-      logoId: values.logoId, // integer ID sent to backend
+      logoId: values.logoId,
       kategorie: values.kategorie,
       merkmale: [],
       requires2fa: values.requires2fa,

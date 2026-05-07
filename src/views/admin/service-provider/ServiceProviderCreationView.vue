@@ -143,6 +143,7 @@
       organisationId: values.selectedOrganisation.id,
       name: values.name,
       url: values.url,
+      logoId: values.logoId,
       kategorie: values.kategorie,
       requires2fa: values.requires2fa,
       merkmale: values.merkmale,
@@ -207,24 +208,21 @@
           :text="$t(`angebot.errors.${serviceProviderStore.errorCode}`)"
         />
         <ServiceProviderForm
-          v-if="!serviceProviderStore.errorCode"
-          v-bind="{
-            initialValues: {
-              selectedOrganisationId: autoSelectedSchuleId,
-              name: '',
-              url: '',
-              logoId: undefined,
-              kategorie: ServiceProviderKategorie.Schulisch,
-              nachtraeglichZuweisbar: true,
-              verfuegbarFuerRollenerweiterung: true,
-              requires2fa: false,
-            },
-            cachedValues,
-            showUnsavedChangesDialog,
-            systemrecht: relevantSystemrecht,
-            errorCode: serviceProviderStore.errorCode,
-            loading: serviceProviderStore.loading,
+          :initial-values="{
+            selectedOrganisationId: autoSelectedSchuleId,
+            name: '',
+            url: '',
+            logoId: undefined,
+            kategorie: ServiceProviderKategorie.Schulisch,
+            nachtraeglichZuweisbar: true,
+            verfuegbarFuerRollenerweiterung: true,
+            requires2fa: false,
           }"
+          :cached-values="cachedValues"
+          :show-unsaved-changes-dialog="showUnsavedChangesDialog"
+          :systemrecht="relevantSystemrecht"
+          :error-code="serviceProviderStore.errorCode"
+          :loading="serviceProviderStore.loading"
           @update:dirty="(value: boolean) => (isDirty = value)"
           @click:submit="onSubmit"
           @click:discard="navigateToServiceProviderTable"
