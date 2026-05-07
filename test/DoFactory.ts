@@ -479,6 +479,7 @@ export class DoFactory {
       ...this.getManageableServiceProviderListEntryResponse(props),
       url: props?.url ?? faker.internet.url(),
       availableForRollenerweiterung: props?.availableForRollenerweiterung ?? false,
+      logoId: props?.logoId ?? 1,
       relevantSystemrechte: props?.relevantSystemrechte ?? [],
     };
   }
