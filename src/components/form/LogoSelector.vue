@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { getAvailableLogos, type LogoConfig } from '@/config/logosConfig';
+  import { getAvailableLogos, type LogoConfig } from '@/utils/logosConfig';
   import { computed, type ComputedRef } from 'vue';
 
   interface Props {

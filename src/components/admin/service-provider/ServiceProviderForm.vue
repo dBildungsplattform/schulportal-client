@@ -3,7 +3,7 @@
   import FormRow from '@/components/form/FormRow.vue';
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import LogoSelector from '@/components/form/LogoSelector.vue';
-  import { getLogoPath } from '@/config/logosConfig';
+  import { getLogoPath } from '@/utils/logosConfig';
   import { type Organisation } from '@/stores/OrganisationStore';
   import { RollenSystemRecht } from '@/stores/RolleStore';
   import { ServiceProviderKategorie, ServiceProviderMerkmal } from '@/stores/ServiceProviderStore';
