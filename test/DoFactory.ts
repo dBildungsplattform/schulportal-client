@@ -448,6 +448,7 @@ export class DoFactory {
       url: faker.internet.url(),
       kategorie: faker.helpers.enumValue(ServiceProviderKategorie),
       hasLogo: true,
+      logoId: 1,
       requires2fa: false,
       merkmale: [],
       ...props,
