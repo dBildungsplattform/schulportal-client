@@ -1558,7 +1558,7 @@
           }
         },
         "responses": {
-          "200": {
+          "201": {
             "description": "The service-provider was successfully created.",
             "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ServiceProviderResponse" } } }
           },
@@ -3751,11 +3751,12 @@
           "target": { "allOf": [{ "$ref": "#/components/schemas/ServiceProviderTarget" }] },
           "url": { "type": "string", "description": "Can be undefined, if `target` is not equal to `URL`" },
           "kategorie": { "allOf": [{ "$ref": "#/components/schemas/ServiceProviderKategorie" }] },
+          "logoId": { "type": "number", "description": "Optional logoId for use with standard logos" },
           "hasLogo": { "type": "boolean" },
           "requires2fa": { "type": "boolean" },
           "merkmale": { "type": "array", "items": { "$ref": "#/components/schemas/ServiceProviderMerkmal" } }
         },
-        "required": ["id", "name", "target", "url", "kategorie", "hasLogo", "requires2fa", "merkmale"]
+        "required": ["id", "name", "target", "url", "kategorie", "logoId", "hasLogo", "requires2fa", "merkmale"]
       },
       "UpdateRolleBodyParams": {
         "type": "object",
@@ -3914,6 +3915,7 @@
           "name": { "type": "string" },
           "administrationsebene": { "$ref": "#/components/schemas/OrganisationRefResponse" },
           "kategorie": { "allOf": [{ "$ref": "#/components/schemas/ServiceProviderKategorie" }] },
+          "logoId": { "type": "number", "description": "Optional logoId for use with standard logos" },
           "requires2fa": { "type": "boolean" },
           "merkmale": { "type": "array", "items": { "$ref": "#/components/schemas/ServiceProviderMerkmal" } },
           "url": { "type": "string", "description": "Can be undefined, if `target` is not equal to `URL`" },
@@ -3956,6 +3958,7 @@
           "name",
           "administrationsebene",
           "kategorie",
+          "logoId",
           "requires2fa",
           "merkmale",
           "url",
@@ -3971,7 +3974,16 @@
           "organisationId": { "type": "string", "description": "The id of an organization", "nullable": false },
           "name": { "type": "string" },
           "url": { "type": "string" },
-          "logoBase64": { "type": "string", "description": "Optional logo as base64-encoded string" },
+          "logoId": {
+            "type": "number",
+            "description": "Optional logoId to use a standard logo. Has to be an integer. Only one of logoId or logoBase64 with logoMimeType can be provided, not both.",
+            "maximum": 2147483647,
+            "minimum": 0
+          },
+          "logoBase64": {
+            "type": "string",
+            "description": "Optional logo as base64-encoded string. Only one of logoId or logoBase64 with logoMimeType can be provided, not both."
+          },
           "logoMimeType": {
             "type": "string",
             "enum": ["image/png", "image/jpeg", "image/webp", "image/svg+xml"],
@@ -3991,7 +4003,14 @@
         "properties": {
           "name": { "type": "string" },
           "url": { "type": "string" },
-          "kategorie": { "type": "string", "enum": ["EMAIL", "UNTERRICHT", "VERWALTUNG", "SCHULISCH", "HINWEISE"] }
+          "kategorie": { "type": "string", "enum": ["EMAIL", "UNTERRICHT", "VERWALTUNG", "SCHULISCH", "HINWEISE"] },
+          "logoId": {
+            "type": "object",
+            "nullable": true,
+            "description": "Optional logoId to use a standard logo. Has to be an integer. Can not be provided, if the service provider already has a custom logo. Null removes the logo.",
+            "maximum": 2147483647,
+            "minimum": 0
+          }
         }
       },
       "PersonResponseAutomapper": {

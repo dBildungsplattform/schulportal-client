@@ -1,8 +1,9 @@
 <script setup lang="ts">
-  import SchulPortalLogo from '@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg';
   import SchulenFilter from '@/components/filter/SchulenFilter.vue';
   import FormRow from '@/components/form/FormRow.vue';
   import FormWrapper from '@/components/form/FormWrapper.vue';
+  import LogoSelector from '@/components/form/LogoSelector.vue';
+  import { getLogoPath } from '@/config/logosConfig';
   import { type Organisation } from '@/stores/OrganisationStore';
   import { RollenSystemRecht } from '@/stores/RolleStore';
   import { ServiceProviderKategorie, ServiceProviderMerkmal } from '@/stores/ServiceProviderStore';
@@ -11,7 +12,7 @@
   import { useForm, type BaseFieldProps, type FormContext, type FormMeta, type TypedSchema } from 'vee-validate';
   import { computed, onMounted, ref, watch, watchEffect, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
-  import { boolean, object, string } from 'yup';
+  import { boolean, number, object, string } from 'yup';
   import type { ServiceProviderFormProps as Props, ServiceProviderForm, ServiceProviderFormSubmitData } from './types';
 
   type Emits = {
@@ -40,7 +41,7 @@
         .matches(NO_LEADING_TRAILING_SPACES, t('angebot.rules.name.noLeadingTrailingSpaces'))
         .required(t('angebot.rules.name.required')),
       url: string().required(t('angebot.rules.url.required')),
-      logo: string().optional(),
+      logoId: number().required(t('angebot.rules.logo.required')),
       kategorie: string().required(t('angebot.rules.kategorie.required')),
       nachtraeglichZuweisbar: boolean().optional(),
       verfuegbarFuerRollenerweiterung: boolean().optional(),
@@ -64,7 +65,7 @@
       nachtraeglichZuweisbar: true,
       verfuegbarFuerRollenerweiterung: true,
       requires2fa: false,
-      logo: SchulPortalLogo,
+      // No default logoId — admin must actively pick one
       ...props.initialValues,
     } as ServiceProviderForm,
   });
@@ -75,7 +76,7 @@
   );
   const [name, nameProps]: FieldDefinition<string> = formContext.defineField('name', vuetifyConfig);
   const [url, urlProps]: FieldDefinition<string> = formContext.defineField('url', vuetifyConfig);
-  const [logo, logoProps]: FieldDefinition<string> = formContext.defineField('logo', vuetifyConfig);
+  const [logoId, logoIdProps]: FieldDefinition<number> = formContext.defineField('logoId', vuetifyConfig);
   const [kategorie, kategorieProps]: FieldDefinition<ServiceProviderKategorie> = formContext.defineField(
     'kategorie',
     vuetifyConfig,
@@ -99,6 +100,12 @@
       value: k,
     })),
   );
+
+  // Resolve the SVG path for the currently selected logoId — used for the preview
+  const selectedLogoPath: ComputedRef<string | undefined> = computed(() => getLogoPath(logoId.value));
+
+  // Show preview only when both name and logo are selected
+  const showPreview: ComputedRef<boolean> = computed(() => !!name.value && !!logoId.value);
 
   function initializeFormWithCachedValues(): void {
     if (!props.cachedValues) {
@@ -128,7 +135,6 @@
 
     let value: string = url.value.trim();
 
-    // If it doesn't already have a protocol → force https. Useful because we want to allow the admin to just enter "example.com" instead of "https://example.com"
     if (!/^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(value)) {
       value = 'https://' + value;
     }
@@ -137,12 +143,10 @@
   }
 
   const onSubmit: (e?: Event) => Promise<void> = formContext.handleSubmit((values: ServiceProviderForm) => {
-    // in edit mode we don't care about the orga, since it can't be edited
     if (!props.isEditMode && !cachedOrga.value) {
       return;
     }
 
-    // Normalize URL: add https:// if no protocol is present
     let normalizedUrl: string = values.url.trim();
     if (!/^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(normalizedUrl)) {
       normalizedUrl = 'https://' + normalizedUrl;
@@ -152,7 +156,7 @@
       selectedOrganisation: cachedOrga.value,
       name: values.name,
       url: normalizedUrl,
-      logo: values.logo,
+      logoId: values.logoId, // integer ID sent to backend
       kategorie: values.kategorie,
       merkmale: [],
       requires2fa: values.requires2fa,
@@ -194,6 +198,7 @@
     @on-show-dialog-change="(value?: boolean) => emit('update:showUnsavedChangesDialog', !!value)"
   >
     <template v-if="!errorCode">
+      <!-- 1. Organisation -->
       <v-row>
         <v-col>
           <h3 class="headline-3">1. {{ $t('angebot.whoProvidesThisAngebot') }}</h3>
@@ -219,6 +224,7 @@
         />
       </FormRow>
 
+      <!-- 2. Name -->
       <v-row>
         <v-col>
           <h3 class="headline-3">2. {{ $t('angebot.nameOfAngebotInTheStartPage') }}</h3>
@@ -243,6 +249,7 @@
         />
       </FormRow>
 
+      <!-- 3. URL -->
       <v-row class="mb-n8">
         <v-col>
           <h3 class="headline-3">3. {{ $t('angebot.urlOfTheAngebot') }}</h3>
@@ -279,34 +286,58 @@
         </div>
       </FormRow>
 
+      <!-- 4. Logo -->
       <v-row>
         <v-col>
           <h3 class="headline-3">4. {{ $t('angebot.logoOfTheAngebotInTheStartPage') }}</h3>
         </v-col>
       </v-row>
       <FormRow
-        :error-label="logoProps['error']"
+        :error-label="logoIdProps['error']"
         :is-required="true"
-        label-for-id="logo-input"
+        label-for-id="logo-selector"
         :label="$t('angebot.logo')"
       >
-        <v-card
-          class="d-flex align-center justify-center mb-5"
-          width="80"
-          height="80"
-          outlined
-        >
-          <div class="logo-box selected">
-            <v-img
-              :src="logo || SchulPortalLogo"
-              max-height="48"
-              max-width="48"
-              contain
-            />
-          </div>
-        </v-card>
+        <LogoSelector
+          id="logo-selector"
+          v-model="logoId"
+          v-bind="logoIdProps"
+          :readonly="false"
+          data-testid="logo-selector"
+        />
       </FormRow>
 
+      <!-- Preview: visible as soon as name + logo are both set -->
+      <template v-if="showPreview">
+        <v-row>
+          <v-col>
+            <h3 class="headline-3">{{ $t('angebot.preview') }}</h3>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col
+            cols="12"
+            sm="6"
+            md="4"
+          >
+            <v-card
+              class="preview-card d-flex align-center pa-4 ga-4"
+              variant="outlined"
+            >
+              <v-img
+                :src="selectedLogoPath"
+                max-height="48"
+                max-width="48"
+                contain
+              />
+              <span class="preview-name">{{ name }}</span>
+            </v-card>
+            <p class="preview-hint mt-2">{{ $t('angebot.previewHint') }}</p>
+          </v-col>
+        </v-row>
+      </template>
+
+      <!-- 5. Kategorie -->
       <v-row>
         <v-col>
           <h3 class="headline-3">5. {{ $t('angebot.kategorieOfTheAngebotInTheStartPage') }}</h3>
@@ -337,6 +368,7 @@
         />
       </FormRow>
 
+      <!-- 6. Nachträglich zuweisbar -->
       <v-row>
         <v-col>
           <h3 class="headline-3">6. {{ $t('angebot.canThisAngebotBeAssignedToRollen') }}</h3>
@@ -365,6 +397,7 @@
         />
       </FormRow>
 
+      <!-- 7. Rollenerweiterung -->
       <v-row>
         <v-col>
           <h3 class="headline-3">7. {{ $t('angebot.canThisAngebotBeUsedForSchulspezifischeRollenerweiterungen') }}</h3>
@@ -393,6 +426,7 @@
         />
       </FormRow>
 
+      <!-- 8. 2FA -->
       <v-row>
         <v-col>
           <h3 class="headline-3">8. {{ $t('angebot.is2FARequired') }}</h3>
@@ -425,19 +459,20 @@
 </template>
 
 <style scoped>
-  .logo-box {
-    width: 80px;
-    height: 80px;
-    border: 2px solid #ddd;
+  .preview-card {
+    border-color: #001e49;
     border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
   }
 
-  .logo-box.selected {
-    border-color: #001e49;
-    box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+  .preview-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #001e49;
+  }
+
+  .preview-hint {
+    font-size: 0.75rem;
+    color: #666;
+    font-style: italic;
   }
 </style>
