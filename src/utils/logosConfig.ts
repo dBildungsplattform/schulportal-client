@@ -14,11 +14,11 @@ export enum LogoId {
   Hilfe = 6,
   Information = 7,
   Internet = 8,
-  Kls = 9,
+  KI = 9,
   Kommunikation = 10,
   Lesen = 11,
   Mathematik = 12,
-  Medizin = 13,
+  Medien = 13,
   Naturwissenschaften = 14,
   Organisation = 15,
   Schreiben = 16,
@@ -95,11 +95,11 @@ export const LOGO_CATALOG: Record<LogoId, LogoConfig> = {
     name: 'Internet',
     filename: 'Internet.svg',
   },
-  [LogoId.Kls]: {
-    id: LogoId.Kls,
-    path: new URL('@/assets/logos/Kls.svg', import.meta.url).href,
-    name: 'KLS',
-    filename: 'Kls.svg',
+  [LogoId.KI]: {
+    id: LogoId.KI,
+    path: new URL('@/assets/logos/KI.svg', import.meta.url).href,
+    name: 'KI',
+    filename: 'KI.svg',
   },
   [LogoId.Kommunikation]: {
     id: LogoId.Kommunikation,
@@ -119,11 +119,11 @@ export const LOGO_CATALOG: Record<LogoId, LogoConfig> = {
     name: 'Mathematik',
     filename: 'Mathematik.svg',
   },
-  [LogoId.Medizin]: {
-    id: LogoId.Medizin,
-    path: new URL('@/assets/logos/Medizin.svg', import.meta.url).href,
-    name: 'Medizin',
-    filename: 'Medizin.svg',
+  [LogoId.Medien]: {
+    id: LogoId.Medien,
+    path: new URL('@/assets/logos/Medien.svg', import.meta.url).href,
+    name: 'Medien',
+    filename: 'Medien.svg',
   },
   [LogoId.Naturwissenschaften]: {
     id: LogoId.Naturwissenschaften,

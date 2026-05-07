@@ -45,7 +45,7 @@
         :key="logo.id"
         class="logo-item"
         :class="{ selected: isSelected(logo.id), disabled: disabled || readonly }"
-        :title="`${logo.name} (ID: ${logo.id})`"
+        :title="`${logo.name}`"
         @click="selectLogo(logo.id)"
       >
         <div class="logo-container">
@@ -56,10 +56,6 @@
             max-width="48"
             contain
           />
-        </div>
-        <div class="logo-label">
-          <span class="logo-name">{{ logo.name }}</span>
-          <span class="logo-id">#{{ logo.id }}</span>
         </div>
       </div>
     </div>

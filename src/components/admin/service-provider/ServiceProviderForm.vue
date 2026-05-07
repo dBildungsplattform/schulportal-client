@@ -14,6 +14,7 @@
   import { useI18n, type Composer } from 'vue-i18n';
   import { boolean, number, object, string } from 'yup';
   import type { ServiceProviderFormProps as Props, ServiceProviderForm, ServiceProviderFormSubmitData } from './types';
+  import ServiceProviderCard from '@/components/cards/ServiceProviderCard.vue';
 
   type Emits = {
     (e: 'click:confirmUnsaved'): void;
@@ -308,34 +309,31 @@
       </FormRow>
 
       <!-- Preview: visible as soon as name + logo are both set -->
-      <template v-if="showPreview">
-        <v-row>
-          <v-col>
-            <h3 class="headline-3">{{ $t('angebot.preview') }}</h3>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col
-            cols="12"
-            sm="6"
-            md="4"
-          >
-            <v-card
-              class="preview-card d-flex align-center pa-4 ga-4"
-              variant="outlined"
-            >
-              <v-img
-                :src="selectedLogoPath"
-                max-height="48"
-                max-width="48"
-                contain
-              />
-              <span class="preview-name">{{ name }}</span>
-            </v-card>
-            <p class="preview-hint mt-2">{{ $t('angebot.previewHint') }}</p>
-          </v-col>
-        </v-row>
-      </template>
+      <!-- Preview: always visible below the logo selector -->
+      <v-row>
+        <v-col>
+          <h3 class="headline-3">{{ $t('angebot.previewHeadline') }}</h3>
+        </v-col>
+      </v-row>
+      <FormRow
+        :is-required="false"
+        label-for-id="preview"
+        :label="$t('angebot.previewLabel')"
+      >
+        <ServiceProviderCard
+          v-if="showPreview"
+          :logo-url="selectedLogoPath"
+          :test-id="'service-provider-preview-card'"
+          :title="name"
+        />
+        <v-card
+          v-else
+          class="preview-placeholder d-flex align-center justify-center pa-4"
+          variant="outlined"
+        >
+          <span class="preview-placeholder-text">{{ $t('angebot.previewPlaceholder') }}</span>
+        </v-card>
+      </FormRow>
 
       <!-- 5. Kategorie -->
       <v-row>
