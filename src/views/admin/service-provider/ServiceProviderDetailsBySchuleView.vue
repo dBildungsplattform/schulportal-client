@@ -29,6 +29,7 @@
     type ServiceProviderStore,
   } from '@/stores/ServiceProviderStore';
   import { intersect } from '@/utils/arrays';
+  import { getLogoPath } from '@/utils/logosConfig';
 
   const router: Router = useRouter();
   const route: RouteLocationNormalizedLoaded = useRoute();
@@ -252,6 +253,10 @@
     }
   }
 
+  const resolvedLogo: string | undefined = serviceProviderStore.currentServiceProvider?.logoId
+    ? getLogoPath(serviceProviderStore.currentServiceProvider.logoId)
+    : serviceProviderStore.serviceProviderLogos.get(currentServiceProviderId);
+
   // ── Lifecycle ─────────────────────────────────────────────────────────────
   onMounted(async () => {
     serviceProviderStore.errorCode = '';
@@ -370,7 +375,7 @@
                     <LabeledField
                       :label="t('angebot.logo')"
                       is-logo
-                      :logo-src="serviceProviderStore.serviceProviderLogos.get(currentServiceProviderId)"
+                      :logo-src="resolvedLogo"
                       :default-logo-src="SchulPortalLogo"
                       test-id="service-provider-logo"
                       md-margin-top

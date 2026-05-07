@@ -58,6 +58,7 @@ export type ManageableServiceProviderListEntry = BaseServiceProvider &
 export type ManageableServiceProviderDetail = BaseServiceProvider &
   ManageableServiceProviderDetails & {
     url: string;
+    logoId: number | undefined;
     availableForRollenerweiterung: boolean;
     relevantSystemrechte: Array<RollenSystemRecht>;
   };

@@ -85,9 +85,9 @@
 
   .logo-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 1rem;
-    padding: 0.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+    gap: 0.4rem;
+    padding: 0.25rem;
   }
 
   .logo-item {
