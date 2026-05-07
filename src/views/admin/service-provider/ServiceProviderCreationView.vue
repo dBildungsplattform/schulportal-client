@@ -1,5 +1,4 @@
 <script setup lang="ts">
-  import SchulPortalLogo from '@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg';
   import ServiceProviderForm from '@/components/admin/service-provider/ServiceProviderForm.vue';
   import SuccessTemplate from '@/components/admin/service-provider/SuccessTemplate.vue';
   import type {
@@ -65,7 +64,7 @@
       name: values.name,
       url: values.url,
       kategorie: values.kategorie,
-      logo: values.logo,
+      logoId: values.logoId,
       requires2fa: values.requires2fa,
       nachtraeglichZuweisbar: values.merkmale.includes(ServiceProviderMerkmal.NachtraeglichZuweisbar),
       verfuegbarFuerRollenerweiterung: values.merkmale.includes(ServiceProviderMerkmal.VerfuegbarFuerRollenerweiterung),
@@ -144,6 +143,7 @@
       organisationId: values.selectedOrganisation.id,
       name: values.name,
       url: values.url,
+      logoId: values.logoId,
       kategorie: values.kategorie,
       requires2fa: values.requires2fa,
       merkmale: values.merkmale,
@@ -208,24 +208,21 @@
           :text="$t(`angebot.errors.${serviceProviderStore.errorCode}`)"
         />
         <ServiceProviderForm
-          v-if="!serviceProviderStore.errorCode"
-          v-bind="{
-            initialValues: {
-              selectedOrganisationId: autoSelectedSchuleId,
-              name: '',
-              url: '',
-              logo: SchulPortalLogo,
-              kategorie: ServiceProviderKategorie.Schulisch,
-              nachtraeglichZuweisbar: true,
-              verfuegbarFuerRollenerweiterung: true,
-              requires2fa: false,
-            },
-            cachedValues,
-            showUnsavedChangesDialog,
-            systemrecht: relevantSystemrecht,
-            errorCode: serviceProviderStore.errorCode,
-            loading: serviceProviderStore.loading,
+          :initial-values="{
+            selectedOrganisationId: autoSelectedSchuleId,
+            name: '',
+            url: '',
+            logoId: undefined,
+            kategorie: ServiceProviderKategorie.Schulisch,
+            nachtraeglichZuweisbar: true,
+            verfuegbarFuerRollenerweiterung: true,
+            requires2fa: false,
           }"
+          :cached-values="cachedValues"
+          :show-unsaved-changes-dialog="showUnsavedChangesDialog"
+          :systemrecht="relevantSystemrecht"
+          :error-code="serviceProviderStore.errorCode"
+          :loading="serviceProviderStore.loading"
           @update:dirty="(value: boolean) => (isDirty = value)"
           @click:submit="onSubmit"
           @click:discard="navigateToServiceProviderTable"
@@ -255,7 +252,7 @@
               },
               {
                 label: $t('angebot.logo'),
-                value: SchulPortalLogo,
+                value: serviceProviderStore.createdServiceProvider.logoId,
                 testId: 'success-logo',
                 type: 'image',
               },

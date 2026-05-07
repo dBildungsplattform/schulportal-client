@@ -58,6 +58,7 @@ export type ManageableServiceProviderListEntry = BaseServiceProvider &
 export type ManageableServiceProviderDetail = BaseServiceProvider &
   ManageableServiceProviderDetails & {
     url: string;
+    logoId: number | undefined;
     availableForRollenerweiterung: boolean;
     relevantSystemrechte: Array<RollenSystemRecht>;
   };
@@ -101,6 +102,7 @@ export type ServiceProviderCreationFilter = {
   organisationId: string;
   name: string;
   url: string;
+  logoId?: number;
   kategorie: ServiceProviderKategorie;
   requires2fa: boolean;
   merkmale: Array<ServiceProviderMerkmal>;
@@ -109,11 +111,13 @@ export type ServiceProviderCreationFilter = {
 export type CreatedServiceProvider = BaseServiceProvider & {
   url: string;
   merkmale: Array<ServiceProviderMerkmal>;
+  logoId?: number;
 };
 
 export type UpdatedServiceProvider = BaseServiceProvider & {
   url: string;
   merkmale: Array<ServiceProviderMerkmal>;
+  logoId?: number;
 };
 
 type ServiceProviderState = {
@@ -413,6 +417,7 @@ export const useServiceProviderStore: StoreDefinition<
           organisationId: filter.organisationId,
           name: filter.name,
           url: filter.url,
+          logoId: filter.logoId,
           kategorie: filter.kategorie,
           requires2fa: filter.requires2fa,
           merkmale: filter.merkmale,

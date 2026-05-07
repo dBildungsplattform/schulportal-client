@@ -118,7 +118,10 @@
     "noRolesFound": "Es konnten keine Rollen gefunden werden.",
     "saveRollenerweiterungenSuccess": "Die Rollenerweiterungen wurden erfolgreich gespeichert.",
     "editRollenerweiterungen": "Rollenauswahl bearbeiten",
-    "whoProvidesThisAngebot": "Wer stellt dieses Angebot bereit?"
+    "whoProvidesThisAngebot": "Wer stellt dieses Angebot bereit?",
+    "previewHeadline": "Vorschau der Angebotsdarstellung auf der Startseite",
+    "previewLabel": "Bitte prüfen Sie vor dem Speichern die Darstellung.",
+    "previewPlaceholder": "Eine Vorschau wird angezeigt, sobald Name und Logo festgelegt wurden."
   },
   "action": "Aktion",
   "admin": {

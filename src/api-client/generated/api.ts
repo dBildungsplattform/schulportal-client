@@ -328,7 +328,13 @@ export interface CreateServiceProviderBodyParams {
      */
     'url'?: string;
     /**
-     * Optional logo as base64-encoded string
+     * Optional logoId to use a standard logo. Has to be an integer. Only one of logoId or logoBase64 with logoMimeType can be provided, not both.
+     * @type {number}
+     * @memberof CreateServiceProviderBodyParams
+     */
+    'logoId'?: number;
+    /**
+     * Optional logo as base64-encoded string. Only one of logoId or logoBase64 with logoMimeType can be provided, not both.
      * @type {string}
      * @memberof CreateServiceProviderBodyParams
      */
@@ -1590,6 +1596,12 @@ export interface ManageableServiceProviderResponse {
      * @memberof ManageableServiceProviderResponse
      */
     'kategorie': ServiceProviderKategorie;
+    /**
+     * Optional logoId for use with standard logos
+     * @type {number}
+     * @memberof ManageableServiceProviderResponse
+     */
+    'logoId': number;
     /**
      * 
      * @type {boolean}
@@ -3797,6 +3809,12 @@ export interface ServiceProviderResponse {
      */
     'kategorie': ServiceProviderKategorie;
     /**
+     * Optional logoId for use with standard logos
+     * @type {number}
+     * @memberof ServiceProviderResponse
+     */
+    'logoId': number;
+    /**
      * 
      * @type {boolean}
      * @memberof ServiceProviderResponse
@@ -4126,6 +4144,12 @@ export interface UpdateServiceProviderBodyParams {
      * @memberof UpdateServiceProviderBodyParams
      */
     'kategorie'?: UpdateServiceProviderBodyParamsKategorieEnum;
+    /**
+     * Optional logoId to use a standard logo. Has to be an integer. Can not be provided, if the service provider already has a custom logo. Null removes the logo.
+     * @type {object}
+     * @memberof UpdateServiceProviderBodyParams
+     */
+    'logoId'?: object | null;
 }
 
 export const UpdateServiceProviderBodyParamsKategorieEnum = {
