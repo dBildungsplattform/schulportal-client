@@ -118,9 +118,9 @@
   }
 
   .logo-item.selected {
-    border-color: var(--v-primary, #001e49);
-    background-color: var(--v-primary-container, rgba(25, 118, 210, 0.08));
-    box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.2);
+    border-color: #001e49;
+    background-color: rgba(0, 30, 73, 0.28);
+    box-shadow: 0 0 0 3px rgba(0, 30, 73, 0.45);
   }
 
   .logo-item.selected::before {
@@ -167,21 +167,6 @@
     text-align: center;
     gap: 0.25rem;
   }
-
-  .logo-name {
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--v-on-surface, #000000);
-    line-height: 1.2;
-    word-break: break-word;
-  }
-
-  .logo-id {
-    font-size: 0.65rem;
-    color: var(--v-on-surface-variant, #999999);
-    font-weight: 400;
-  }
-
   /* Error state */
   .logo-selector:has(.error-messages) .logo-grid {
     border: 1px solid var(--v-error, #d32f2f);
