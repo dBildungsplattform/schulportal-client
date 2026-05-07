@@ -298,6 +298,7 @@
         :is-required="true"
         label-for-id="logo-selector"
         :label="$t('angebot.logo')"
+        wide-content
       >
         <LogoSelector
           id="logo-selector"
@@ -308,11 +309,10 @@
         />
       </FormRow>
 
-      <!-- Preview: visible as soon as name + logo are both set -->
       <!-- Preview: always visible below the logo selector -->
       <v-row>
         <v-col>
-          <h3 class="headline-3">{{ $t('angebot.previewHeadline') }}</h3>
+          <h3 class="headline-3">5. {{ $t('angebot.previewHeadline') }}</h3>
         </v-col>
       </v-row>
       <FormRow
@@ -338,7 +338,7 @@
       <!-- 5. Kategorie -->
       <v-row>
         <v-col>
-          <h3 class="headline-3">5. {{ $t('angebot.kategorieOfTheAngebotInTheStartPage') }}</h3>
+          <h3 class="headline-3">6. {{ $t('angebot.kategorieOfTheAngebotInTheStartPage') }}</h3>
         </v-col>
       </v-row>
       <FormRow
@@ -369,7 +369,7 @@
       <!-- 6. Nachträglich zuweisbar -->
       <v-row>
         <v-col>
-          <h3 class="headline-3">6. {{ $t('angebot.canThisAngebotBeAssignedToRollen') }}</h3>
+          <h3 class="headline-3">7. {{ $t('angebot.canThisAngebotBeAssignedToRollen') }}</h3>
         </v-col>
       </v-row>
       <FormRow
@@ -398,7 +398,7 @@
       <!-- 7. Rollenerweiterung -->
       <v-row>
         <v-col>
-          <h3 class="headline-3">7. {{ $t('angebot.canThisAngebotBeUsedForSchulspezifischeRollenerweiterungen') }}</h3>
+          <h3 class="headline-3">8. {{ $t('angebot.canThisAngebotBeUsedForSchulspezifischeRollenerweiterungen') }}</h3>
         </v-col>
       </v-row>
       <FormRow
@@ -427,7 +427,7 @@
       <!-- 8. 2FA -->
       <v-row>
         <v-col>
-          <h3 class="headline-3">8. {{ $t('angebot.is2FARequired') }}</h3>
+          <h3 class="headline-3">9. {{ $t('angebot.is2FARequired') }}</h3>
         </v-col>
       </v-row>
       <FormRow

@@ -26,6 +26,7 @@
   import {
     ServiceProviderMerkmal,
     useServiceProviderStore,
+    type ManageableServiceProviderDetail,
     type ServiceProviderStore,
   } from '@/stores/ServiceProviderStore';
   import { intersect } from '@/utils/arrays';
@@ -253,9 +254,15 @@
     }
   }
 
-  const resolvedLogo: string | undefined = serviceProviderStore.currentServiceProvider?.logoId
-    ? getLogoPath(serviceProviderStore.currentServiceProvider.logoId)
-    : serviceProviderStore.serviceProviderLogos.get(currentServiceProviderId);
+  const resolvedLogo: ComputedRef<string | undefined> = computed(() => {
+    const provider: ManageableServiceProviderDetail | null = serviceProviderStore.currentServiceProvider;
+
+    if (provider?.logoId != null) {
+      return getLogoPath(provider.logoId);
+    }
+
+    return serviceProviderStore.serviceProviderLogos.get(currentServiceProviderId);
+  });
 
   // ── Lifecycle ─────────────────────────────────────────────────────────────
   onMounted(async () => {

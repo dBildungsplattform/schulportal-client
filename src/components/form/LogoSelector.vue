@@ -14,14 +14,14 @@
     (e: 'update:modelValue', value: number): void;
   }
 
-  const props = withDefaults(defineProps<Props>(), {
+  const props: Props = withDefaults(defineProps<Props>(), {
     error: false,
     errorMessages: () => [],
     readonly: false,
     disabled: false,
   });
 
-  const emit = defineEmits<Emits>();
+  const emit: Emits = defineEmits<Emits>();
 
   const availableLogos: ComputedRef<LogoConfig[]> = computed(() => getAvailableLogos());
 
@@ -62,7 +62,7 @@
 
     <!-- Error messages -->
     <div
-      v-if="error && errorMessages.length"
+      v-if="error && errorMessages?.length"
       class="error-messages mt-2"
     >
       <div
@@ -124,7 +124,7 @@
     right: 4px;
     width: 20px;
     height: 20px;
-    background-color: var(--v-primary, #001e49);
+    background-color: var(--v-primary, #148034);
     color: white;
     border-radius: 50%;
     display: flex;
