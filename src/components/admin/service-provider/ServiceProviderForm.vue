@@ -44,7 +44,7 @@
       url: string().required(t('angebot.rules.url.required')).max(2000, t('angebot.rules.url.maxLength')),
       logoId:
         props.isEditMode && !props.initialValues.logoId && !!props.initialValues.legacyLogo
-          ? number().optional() // legacy SP — no selector shown, no validation needed
+          ? number().nullable().optional() // legacy SP — no selector shown, no validation needed
           : number().required(t('angebot.rules.logo.required')), // create or new SP edit
       kategorie: string().required(t('angebot.rules.kategorie.required')),
       nachtraeglichZuweisbar: boolean().optional(),
@@ -317,13 +317,12 @@
       >
         <!-- Legacy SP in edit mode: logo URL from backend, read-only, no selector -->
         <template v-if="isLegacyLogoMode">
-          <v-avatar rounded="0">
-            <v-img
-              alt="provider-logo"
-              class="service-provider-logo"
-              :src="props.initialValues.legacyLogo"
-            />
-          </v-avatar>
+          <v-img
+            alt="provider-logo"
+            max-height="48"
+            max-width="48"
+            :src="props.initialValues.legacyLogo"
+          />
         </template>
 
         <!-- New SP: show selector (preselected when logoId is in initialValues) -->

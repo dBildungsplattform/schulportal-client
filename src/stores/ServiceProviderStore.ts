@@ -447,6 +447,9 @@ export const useServiceProviderStore: StoreDefinition<
         if (update.kategorie) {
           updateServiceProviderBodyParams.kategorie = update.kategorie;
         }
+        if (update.logoId !== undefined) {
+          updateServiceProviderBodyParams.logoId = update.logoId as unknown as object;
+        }
 
         const { data }: { data: ServiceProviderResponse } =
           await serviceProviderApi.providerControllerUpdateServiceProvider(id, updateServiceProviderBodyParams);
