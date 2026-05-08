@@ -42,7 +42,10 @@
         .matches(NO_LEADING_TRAILING_SPACES, t('angebot.rules.name.noLeadingTrailingSpaces'))
         .required(t('angebot.rules.name.required')),
       url: string().required(t('angebot.rules.url.required')).max(2000, t('angebot.rules.url.maxLength')),
-      logoId: number().required(t('angebot.rules.logo.required')),
+      logoId:
+        props.isEditMode && !props.initialValues.logoId && !!props.initialValues.legacyLogo
+          ? number().optional() // legacy SP — no selector shown, no validation needed
+          : number().required(t('angebot.rules.logo.required')), // create or new SP edit
       kategorie: string().required(t('angebot.rules.kategorie.required')),
       nachtraeglichZuweisbar: boolean().optional(),
       verfuegbarFuerRollenerweiterung: boolean().optional(),
@@ -102,11 +105,19 @@
     })),
   );
 
-  // Resolve the SVG path for the currently selected logoId — used for the preview
-  const selectedLogoPath: ComputedRef<string | undefined> = computed(() => getLogoPath(logoId.value));
+  // Resolve the SVG path for the currently selected logoId or legacy logo — used for the preview
+  const selectedLogoPath: ComputedRef<string | undefined> = computed(() =>
+    props.isEditMode
+      ? props.initialValues.logoId
+        ? getLogoPath(logoId.value)
+        : props.initialValues.legacyLogo
+      : getLogoPath(logoId.value),
+  );
 
   // Show preview only when both name and logo are selected
-  const showPreview: ComputedRef<boolean> = computed(() => !!name.value && !!logoId.value);
+  const showPreview: ComputedRef<boolean> = computed(
+    () => !!name.value && (!!logoId.value || !!props.initialValues.legacyLogo),
+  );
 
   function initializeFormWithCachedValues(): void {
     if (!props.cachedValues) {
@@ -170,6 +181,10 @@
     }
     emit('click:submit', payload);
   });
+
+  const isLegacyLogoMode: ComputedRef<boolean> = computed(
+    () => !!props.isEditMode && !logoId.value && !!props.initialValues.legacyLogo,
+  );
 
   watch(formContext.meta, ({ dirty }: FormMeta<ServiceProviderForm>) => {
     emit('update:dirty', dirty);
@@ -295,12 +310,25 @@
       </v-row>
       <FormRow
         :error-label="logoIdProps['error']"
-        :is-required="true"
+        :is-required="!isLegacyLogoMode"
         label-for-id="logo-selector"
         :label="$t('angebot.logo')"
-        wide-content
+        :wide-content="isLegacyLogoMode ? false : true"
       >
+        <!-- Legacy SP in edit mode: logo URL from backend, read-only, no selector -->
+        <template v-if="isLegacyLogoMode">
+          <v-avatar rounded="0">
+            <v-img
+              alt="provider-logo"
+              class="service-provider-logo"
+              :src="props.initialValues.legacyLogo"
+            />
+          </v-avatar>
+        </template>
+
+        <!-- New SP: show selector (preselected when logoId is in initialValues) -->
         <LogoSelector
+          v-else
           id="logo-selector"
           v-model="logoId"
           v-bind="logoIdProps"

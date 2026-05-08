@@ -81,6 +81,17 @@
           />
         </template>
 
+        <template v-else-if="item.type === 'image' && typeof item.value === 'string'">
+          <v-img
+            :data-testid="item.testId"
+            class="mt-n2"
+            :src="item.value"
+            max-width="40"
+            max-height="40"
+            contain
+          />
+        </template>
+
         <!-- Otherwise → show text -->
         <template v-else>
           <span :data-testid="item.testId">

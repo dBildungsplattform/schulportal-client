@@ -24,6 +24,7 @@
     type Router,
   } from 'vue-router';
   import { useDisplay } from 'vuetify';
+  import SchulPortalLogo from '@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg';
 
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
   const route: RouteLocationNormalized = useRoute();
@@ -36,7 +37,7 @@
   const showSuccess: Ref<boolean> = ref(false);
 
   const cachedOrganisationName: Ref<string> = ref(''); // for success template
-  const cachedLogoId: Ref<number | undefined> = ref(undefined); // for success template
+  const cachedLogo: Ref<number | string | undefined> = ref(undefined); // for success template
 
   let blockedNext: () => void = () => {
     /* empty */
@@ -54,6 +55,15 @@
       return RollenSystemRecht.AngeboteVerwalten;
     }
     return RollenSystemRecht.AngeboteEingeschraenktVerwalten;
+  });
+
+  const legacyLogo: ComputedRef<string> = computed(() => {
+    if (!serviceProviderStore.currentServiceProvider) {
+      return '';
+    }
+    return (
+      serviceProviderStore.serviceProviderLogos.get(serviceProviderStore.currentServiceProvider.id) ?? SchulPortalLogo
+    );
   });
 
   const cachedValues: Ref<Partial<ServiceProviderFormType> | undefined> = ref(undefined);
@@ -74,7 +84,8 @@
       selectedOrganisationId: serviceProviderStore.currentServiceProvider.administrationsebene.id,
       name: serviceProviderStore.currentServiceProvider.name,
       url: serviceProviderStore.currentServiceProvider.url,
-      logoId: undefined,
+      logoId: serviceProviderStore.currentServiceProvider.logoId,
+      legacyLogo: legacyLogo.value,
       kategorie: serviceProviderStore.currentServiceProvider.kategorie,
       requires2fa: serviceProviderStore.currentServiceProvider.requires2fa,
       nachtraeglichZuweisbar: serviceProviderStore.currentServiceProvider.merkmale.includes(
@@ -113,7 +124,7 @@
     if (!serviceProviderStore.errorCode) {
       isDirty.value = false;
       showSuccess.value = true;
-      cachedLogoId.value = values.logoId;
+      cachedLogo.value = values.logoId ?? legacyLogo.value;
       cachedOrganisationName.value = serviceProviderStore.currentServiceProvider?.administrationsebene.name ?? '';
     }
   }
@@ -221,7 +232,7 @@
                 },
                 {
                   label: $t('angebot.logo'),
-                  value: cachedLogoId,
+                  value: cachedLogo,
                   testId: 'success-logo',
                   type: 'image',
                 },

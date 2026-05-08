@@ -41,6 +41,7 @@ export type StartPageServiceProvider = BaseServiceProvider & {
   target: string;
   // Could be undefined if the logo is not provided by the backend
   logoUrl?: string;
+  logoId?: number;
 };
 
 type ManageableServiceProviderDetails = {
