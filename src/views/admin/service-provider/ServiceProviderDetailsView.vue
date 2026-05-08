@@ -5,11 +5,13 @@
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+  import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
   import {
     ServiceProviderMerkmal,
     useServiceProviderStore,
     type ServiceProviderStore,
   } from '@/stores/ServiceProviderStore';
+  import { config } from 'process';
   import { computed, onMounted, ref, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
@@ -20,6 +22,11 @@
 
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
   const authStore: AuthStore = useAuthStore();
+  const configStore: ConfigStore = useConfigStore();
+
+  const isEditModeAvailable: ComputedRef<boolean> = computed(() => {
+    return configStore.configData?.schulischeAngeboteErstellen ?? false;
+  });
 
   const currentServiceProviderId: string = route.params['id'] as string;
 
@@ -254,6 +261,7 @@
                   </v-col>
                 </v-row>
                 <v-row
+                  v-if="isEditModeAvailable"
                   class="mr-10"
                   justify="end"
                 >
