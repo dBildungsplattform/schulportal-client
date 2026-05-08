@@ -104,7 +104,8 @@
       },
       "url": {
         "invalid": "Die URL muss eine gültige URL sein.",
-        "required": "Die URL des Angebots muss angegeben werden."
+        "required": "Die URL des Angebots muss angegeben werden.",
+        "maxLength": "Die URL darf maximal 2000 Zeichen lang sein."
       },
       "kategorie": {
         "required": "Die Kategorie muss ausgewählt werden."

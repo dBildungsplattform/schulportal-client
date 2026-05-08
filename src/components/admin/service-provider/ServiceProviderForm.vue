@@ -41,7 +41,7 @@
         .matches(DIN_91379A_EXT, t('angebot.rules.name.matches'))
         .matches(NO_LEADING_TRAILING_SPACES, t('angebot.rules.name.noLeadingTrailingSpaces'))
         .required(t('angebot.rules.name.required')),
-      url: string().required(t('angebot.rules.url.required')),
+      url: string().required(t('angebot.rules.url.required')).max(2000, t('angebot.rules.url.maxLength')),
       logoId: number().required(t('angebot.rules.logo.required')),
       kategorie: string().required(t('angebot.rules.kategorie.required')),
       nachtraeglichZuweisbar: boolean().optional(),
