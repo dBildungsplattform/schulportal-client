@@ -23,9 +23,9 @@
   <v-row :class="`${noTopMargin ? 'align-start' : 'align-start mt-8'}`">
     <!-- Label column -->
     <v-col
-      :class="`${isAlignedWithRadio ? 'pb-sm-8 pt-sm-3 text-sm-right mb-sm-10' : 'pb-sm-8 pt-sm-3 text-sm-right'}`"
+      :class="`${isAlignedWithRadio ? 'pb-sm-8 pt-sm-3 text-sm-right mb-sm-10' : 'pb-sm-8 pt-sm-3 text-sm-right'} ${wideContent ? 'ml-sm-5' : ''}`"
       cols="12"
-      :sm="wideContent ? '3' : '5'"
+      :sm="wideContent ? '1' : '5'"
     >
       <label
         :for="labelForId"
@@ -40,7 +40,7 @@
     <v-col
       class="py-0"
       cols="12"
-      :sm="wideContent ? '9' : '7'"
+      :sm="wideContent ? '10' : '7'"
     >
       <slot />
     </v-col>
