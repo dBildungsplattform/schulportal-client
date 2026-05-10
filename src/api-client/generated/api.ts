@@ -328,7 +328,7 @@ export interface CreateServiceProviderBodyParams {
      */
     'url'?: string;
     /**
-     * Optional logoId to use a standard logo. Has to be an integer. Only one of logoId or logoBase64 with logoMimeType can be provided, not both.
+     * Optional logoId to use a standard logo. Has to be a positive integer. Only one of logoId or logoBase64 with logoMimeType can be provided, not both.
      * @type {number}
      * @memberof CreateServiceProviderBodyParams
      */

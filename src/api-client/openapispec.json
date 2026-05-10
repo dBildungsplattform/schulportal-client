@@ -1,6 +1,23 @@
 {
   "openapi": "3.0.0",
   "paths": {
+    "/api/email-webhook/changed": {
+      "post": {
+        "operationId": "EmailWebhookController_emailChangedWebhook",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/EmailChangedBodyParams" } } }
+        },
+        "responses": {
+          "201": { "description": "Event received" },
+          "401": { "description": "Insufficient permissions to call webhook" },
+          "403": { "description": "Insufficient permissions to call webhook" },
+          "500": { "description": "Internal server error while processing webhook" }
+        },
+        "tags": ["email-webhook"]
+      }
+    },
     "/api/auth/login": {
       "get": {
         "operationId": "AuthenticationController_login",
@@ -63,23 +80,6 @@
         },
         "summary": "External Data about requested in user.",
         "tags": ["Keycloakinternal"]
-      }
-    },
-    "/api/email-webhook/changed": {
-      "post": {
-        "operationId": "EmailWebhookController_emailChangedWebhook",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/EmailChangedBodyParams" } } }
-        },
-        "responses": {
-          "201": { "description": "Event received" },
-          "401": { "description": "Insufficient permissions to call webhook" },
-          "403": { "description": "Insufficient permissions to call webhook" },
-          "500": { "description": "Internal server error while processing webhook" }
-        },
-        "tags": ["email-webhook"]
       }
     },
     "/api/personen/landesbediensteter": {
@@ -2949,6 +2949,23 @@
       "bearer": { "scheme": "bearer", "bearerFormat": "JWT", "type": "http" }
     },
     "schemas": {
+      "EmailChangedBodyParams": {
+        "type": "object",
+        "properties": {
+          "spshPersonId": { "type": "string" },
+          "previousPrimaryEmail": { "type": "string" },
+          "previousAlternativeEmail": { "type": "string" },
+          "newPrimaryEmail": { "type": "string" },
+          "newAlternativeEmail": { "type": "string" }
+        },
+        "required": [
+          "spshPersonId",
+          "previousPrimaryEmail",
+          "previousAlternativeEmail",
+          "newPrimaryEmail",
+          "newAlternativeEmail"
+        ]
+      },
       "OrganisationsTyp": {
         "type": "string",
         "enum": [
@@ -3123,23 +3140,6 @@
           "onlineDateiablage": { "$ref": "#/components/schemas/UserExeternalDataResponseOnlineDateiablage" }
         },
         "required": ["itslearning", "vidis", "opsh", "onlineDateiablage"]
-      },
-      "EmailChangedBodyParams": {
-        "type": "object",
-        "properties": {
-          "spshPersonId": { "type": "string" },
-          "previousPrimaryEmail": { "type": "string" },
-          "previousAlternativeEmail": { "type": "string" },
-          "newPrimaryEmail": { "type": "string" },
-          "newAlternativeEmail": { "type": "string" }
-        },
-        "required": [
-          "spshPersonId",
-          "previousPrimaryEmail",
-          "previousAlternativeEmail",
-          "newPrimaryEmail",
-          "newAlternativeEmail"
-        ]
       },
       "PersonLandesbediensteterSearchPersonenkontextResponse": {
         "type": "object",
@@ -3976,9 +3976,9 @@
           "url": { "type": "string" },
           "logoId": {
             "type": "number",
-            "description": "Optional logoId to use a standard logo. Has to be an integer. Only one of logoId or logoBase64 with logoMimeType can be provided, not both.",
+            "description": "Optional logoId to use a standard logo. Has to be a positive integer. Only one of logoId or logoBase64 with logoMimeType can be provided, not both.",
             "maximum": 2147483647,
-            "minimum": 0
+            "minimum": 1
           },
           "logoBase64": {
             "type": "string",
@@ -4009,7 +4009,7 @@
             "nullable": true,
             "description": "Optional logoId to use a standard logo. Has to be an integer. Can not be provided, if the service provider already has a custom logo. Null removes the logo.",
             "maximum": 2147483647,
-            "minimum": 0
+            "minimum": 1
           }
         }
       },

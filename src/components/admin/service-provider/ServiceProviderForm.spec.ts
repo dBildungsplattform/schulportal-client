@@ -120,7 +120,7 @@ describe('ServiceProviderForm', () => {
       name: 'Test Name',
       url: 'https://test-url.com',
       kategorie: ServiceProviderKategorie.Schulisch,
-      logoId: undefined,
+      logoId: 1,
       legacyLogo: undefined,
       nachtraeglichZuweisbar: true,
       verfuegbarFuerRollenerweiterung: true,
