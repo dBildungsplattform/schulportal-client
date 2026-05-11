@@ -4146,10 +4146,10 @@ export interface UpdateServiceProviderBodyParams {
     'kategorie'?: UpdateServiceProviderBodyParamsKategorieEnum;
     /**
      * Optional logoId to use a standard logo. Has to be an integer. Can not be provided, if the service provider already has a custom logo. Null removes the logo.
-     * @type {object}
+     * @type {number}
      * @memberof UpdateServiceProviderBodyParams
      */
-    'logoId'?: object | null;
+    'logoId'?: number | null;
 }
 
 export const UpdateServiceProviderBodyParamsKategorieEnum = {

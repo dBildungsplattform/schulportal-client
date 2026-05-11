@@ -447,8 +447,8 @@ export const useServiceProviderStore: StoreDefinition<
         if (update.kategorie) {
           updateServiceProviderBodyParams.kategorie = update.kategorie;
         }
-        if (update.logoId !== undefined && typeof update.logoId === 'number') {
-          updateServiceProviderBodyParams.logoId = update.logoId as unknown as object;
+        if (update.logoId) {
+          updateServiceProviderBodyParams.logoId = update.logoId;
         }
 
         const { data }: { data: ServiceProviderResponse } =
