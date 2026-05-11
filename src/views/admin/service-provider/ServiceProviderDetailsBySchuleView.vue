@@ -29,6 +29,7 @@
     type ServiceProviderStore,
   } from '@/stores/ServiceProviderStore';
   import { intersect } from '@/utils/arrays';
+  import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
 
   const router: Router = useRouter();
   const route: RouteLocationNormalizedLoaded = useRoute();
@@ -38,6 +39,11 @@
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
   const rolleStore: RolleStore = useRolleStore();
+  const configStore: ConfigStore = useConfigStore();
+
+  const isEditModeAvailable: ComputedRef<boolean> = computed(() => {
+    return configStore.configData?.schulischeAngeboteErstellen ?? false;
+  });
 
   const currentServiceProviderId: string = route.params['id'] as string;
 
@@ -402,7 +408,7 @@
                     />
 
                     <v-row
-                      v-if="isEditAllowed"
+                      v-if="isEditModeAvailable && isEditAllowed"
                       class="mr-10"
                       justify="end"
                     >
