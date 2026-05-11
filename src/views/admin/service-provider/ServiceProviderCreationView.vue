@@ -208,6 +208,7 @@
           :text="$t(`angebot.errors.${serviceProviderStore.errorCode}`)"
         />
         <ServiceProviderForm
+          v-if="!serviceProviderStore.errorCode"
           :initial-values="{
             selectedOrganisationId: autoSelectedSchuleId,
             name: '',
