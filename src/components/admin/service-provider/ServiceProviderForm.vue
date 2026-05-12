@@ -43,7 +43,7 @@
         .required(t('angebot.rules.name.required')),
       url: string().required(t('angebot.rules.url.required')).max(2000, t('angebot.rules.url.maxLength')),
       logoId:
-        props.isEditMode && !props.initialValues.logoId && !!props.initialValues.legacyLogo
+        props.isEditMode && !props.initialValues.logoId && !!props.initialValues.customLogo
           ? number().nullable().optional() // legacy SP — no selector shown, no validation needed
           : number().required(t('angebot.rules.logo.required')), // create or new SP edit
       kategorie: string().required(t('angebot.rules.kategorie.required')),
@@ -110,13 +110,13 @@
     props.isEditMode
       ? props.initialValues.logoId
         ? getLogoPath(logoId.value)
-        : props.initialValues.legacyLogo
+        : props.initialValues.customLogo
       : getLogoPath(logoId.value),
   );
 
   // Show preview only when both name and logo are selected
   const showPreview: ComputedRef<boolean> = computed(
-    () => !!name.value && (!!logoId.value || !!props.initialValues.legacyLogo),
+    () => !!name.value && (!!logoId.value || !!props.initialValues.customLogo),
   );
 
   function initializeFormWithCachedValues(): void {
@@ -182,8 +182,8 @@
     emit('click:submit', payload);
   });
 
-  const isLegacyLogoMode: ComputedRef<boolean> = computed(
-    () => !!props.isEditMode && !logoId.value && !!props.initialValues.legacyLogo,
+  const isCustomLogoMode: ComputedRef<boolean> = computed(
+    () => !!props.isEditMode && !logoId.value && !!props.initialValues.customLogo,
   );
 
   watch(formContext.meta, ({ dirty }: FormMeta<ServiceProviderForm>) => {
@@ -217,7 +217,7 @@
       <!-- 1. Organisation -->
       <v-row>
         <v-col>
-          <h3 class="headline-3">1. {{ $t('angebot.whoProvidesThisAngebot') }}</h3>
+          <h3 class="headline-3">{{ $t('angebot.whoProvidesThisAngebot') }}</h3>
         </v-col>
       </v-row>
       <FormRow
@@ -243,7 +243,7 @@
       <!-- 2. Name -->
       <v-row>
         <v-col>
-          <h3 class="headline-3">2. {{ $t('angebot.nameOfAngebotInTheStartPage') }}</h3>
+          <h3 class="headline-3">{{ $t('angebot.nameOfAngebotInTheStartPage') }}</h3>
         </v-col>
       </v-row>
       <FormRow
@@ -268,7 +268,7 @@
       <!-- 3. URL -->
       <v-row class="mb-n8">
         <v-col>
-          <h3 class="headline-3">3. {{ $t('angebot.urlOfTheAngebot') }}</h3>
+          <h3 class="headline-3">{{ $t('angebot.urlOfTheAngebot') }}</h3>
         </v-col>
       </v-row>
       <FormRow
@@ -305,23 +305,23 @@
       <!-- 4. Logo -->
       <v-row>
         <v-col>
-          <h3 class="headline-3">4. {{ $t('angebot.logoOfTheAngebotInTheStartPage') }}</h3>
+          <h3 class="headline-3">{{ $t('angebot.logoOfTheAngebotInTheStartPage') }}</h3>
         </v-col>
       </v-row>
       <FormRow
         :error-label="logoIdProps['error']"
-        :is-required="!isLegacyLogoMode"
+        :is-required="!isCustomLogoMode"
         label-for-id="logo-selector"
         :label="$t('angebot.logo')"
-        :wide-content="isLegacyLogoMode ? false : true"
+        :wide-content="isCustomLogoMode ? false : true"
       >
-        <!-- Legacy SP in edit mode: logo URL from backend, read-only, no selector -->
-        <template v-if="isLegacyLogoMode">
+        <!-- Custom SP in edit mode: logo URL from backend, read-only, no selector -->
+        <template v-if="isCustomLogoMode">
           <v-img
             alt="provider-logo"
             max-height="48"
             max-width="48"
-            :src="props.initialValues.legacyLogo"
+            :src="props.initialValues.customLogo"
           />
         </template>
 
@@ -339,7 +339,7 @@
       <!-- Preview: always visible below the logo selector -->
       <v-row>
         <v-col>
-          <h3 class="headline-3">5. {{ $t('angebot.previewHeadline') }}</h3>
+          <h3 class="headline-3">{{ $t('angebot.previewHeadline') }}</h3>
         </v-col>
       </v-row>
       <FormRow
@@ -365,7 +365,7 @@
       <!-- 5. Kategorie -->
       <v-row>
         <v-col>
-          <h3 class="headline-3">6. {{ $t('angebot.kategorieOfTheAngebotInTheStartPage') }}</h3>
+          <h3 class="headline-3">{{ $t('angebot.kategorieOfTheAngebotInTheStartPage') }}</h3>
         </v-col>
       </v-row>
       <FormRow
@@ -396,7 +396,7 @@
       <!-- 6. Nachträglich zuweisbar -->
       <v-row>
         <v-col>
-          <h3 class="headline-3">7. {{ $t('angebot.canThisAngebotBeAssignedToRollen') }}</h3>
+          <h3 class="headline-3">{{ $t('angebot.canThisAngebotBeAssignedToRollen') }}</h3>
         </v-col>
       </v-row>
       <FormRow
@@ -425,7 +425,7 @@
       <!-- 7. Rollenerweiterung -->
       <v-row>
         <v-col>
-          <h3 class="headline-3">8. {{ $t('angebot.canThisAngebotBeUsedForSchulspezifischeRollenerweiterungen') }}</h3>
+          <h3 class="headline-3">{{ $t('angebot.canThisAngebotBeUsedForSchulspezifischeRollenerweiterungen') }}</h3>
         </v-col>
       </v-row>
       <FormRow
@@ -454,7 +454,7 @@
       <!-- 8. 2FA -->
       <v-row>
         <v-col>
-          <h3 class="headline-3">9. {{ $t('angebot.is2FARequired') }}</h3>
+          <h3 class="headline-3">{{ $t('angebot.is2FARequired') }}</h3>
         </v-col>
       </v-row>
       <FormRow
@@ -484,6 +484,36 @@
 </template>
 
 <style scoped>
+  .preview-card {
+    border-color: #001e49;
+    border-radius: 8px;
+  }
+
+  .preview-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #001e49;
+  }
+
+  .preview-hint {
+    font-size: 0.75rem;
+    color: #666;
+    font-style: italic;
+  }
+
+  #service-provider-create-form,
+  #service-provider-edit-form {
+    counter-reset: section-counter;
+  }
+
+  .headline-3 {
+    counter-increment: section-counter;
+  }
+
+  .headline-3::before {
+    content: counter(section-counter) '. ';
+  }
+
   .preview-card {
     border-color: #001e49;
     border-radius: 8px;

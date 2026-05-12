@@ -57,7 +57,7 @@
     return RollenSystemRecht.AngeboteEingeschraenktVerwalten;
   });
 
-  const legacyLogo: ComputedRef<string> = computed(() => {
+  const customLogo: ComputedRef<string> = computed(() => {
     if (!serviceProviderStore.currentServiceProvider) {
       return '';
     }
@@ -85,7 +85,7 @@
       name: serviceProviderStore.currentServiceProvider.name,
       url: serviceProviderStore.currentServiceProvider.url,
       logoId: serviceProviderStore.currentServiceProvider.logoId,
-      legacyLogo: legacyLogo.value,
+      customLogo: customLogo.value,
       kategorie: serviceProviderStore.currentServiceProvider.kategorie,
       requires2fa: serviceProviderStore.currentServiceProvider.requires2fa,
       nachtraeglichZuweisbar: serviceProviderStore.currentServiceProvider.merkmale.includes(
@@ -124,7 +124,7 @@
     if (!serviceProviderStore.errorCode) {
       isDirty.value = false;
       showSuccess.value = true;
-      cachedLogo.value = values.logoId ?? legacyLogo.value;
+      cachedLogo.value = values.logoId ?? customLogo.value;
       cachedOrganisationName.value = serviceProviderStore.currentServiceProvider?.administrationsebene.name ?? '';
     }
   }

@@ -19,7 +19,7 @@ export type ServiceProviderForm = {
   name: string;
   url: string;
   logoId: number | undefined;
-  legacyLogo?: string | undefined;
+  customLogo?: string | undefined;
   kategorie: ServiceProviderKategorie;
   nachtraeglichZuweisbar: boolean;
   verfuegbarFuerRollenerweiterung: boolean;
