@@ -214,295 +214,279 @@
     @on-show-dialog-change="(value?: boolean) => emit('update:showUnsavedChangesDialog', !!value)"
   >
     <template v-if="!errorCode">
-      <!-- 1. Organisation -->
-      <v-row>
-        <v-col>
-          <h3 class="headline-3">{{ $t('angebot.whoProvidesThisAngebot') }}</h3>
-        </v-col>
-      </v-row>
-      <FormRow
-        :error-label="selectedOrganisationIdProps['error']"
-        :is-required="true"
-        label-for-id="organisation-select"
-        :label="$t('angebot.providedBy')"
-      >
-        <SchulenFilter
-          :systemrechte-for-search="[props.systemrecht]"
-          :readonly="isEditMode"
-          :highlight-selection="isEditMode"
-          :multiple="false"
-          :parent-id="isEditMode ? 'service-provider-edit' : 'service-provider-create'"
-          :placeholderText="$t('admin.organisation.selectOrganisation')"
-          :includeAll="true"
-          :selected-schule-props="selectedOrganisationIdProps"
-          :selected-schulen="selectedOrganisationId"
-          @update:selected-schulen-objects="updateSelectedOrganisation"
-        />
-      </FormRow>
-
-      <!-- 2. Name -->
-      <v-row>
-        <v-col>
-          <h3 class="headline-3">{{ $t('angebot.nameOfAngebotInTheStartPage') }}</h3>
-        </v-col>
-      </v-row>
-      <FormRow
-        :error-label="nameProps['error']"
-        :is-required="true"
-        label-for-id="name-input"
-        :label="$t('angebot.name')"
-      >
-        <v-text-field
-          id="name-input"
-          v-bind="nameProps"
-          v-model="name"
-          autocomplete="off"
-          data-testid="name-input"
-          density="compact"
-          :placeholder="$t('angebot.enterName')"
-          required
-          variant="outlined"
-        />
-      </FormRow>
-
-      <!-- 3. URL -->
-      <v-row class="mb-n8">
-        <v-col>
-          <h3 class="headline-3">{{ $t('angebot.urlOfTheAngebot') }}</h3>
-        </v-col>
-      </v-row>
-      <FormRow
-        :error-label="urlProps['error']"
-        :is-required="true"
-        label-for-id="url-input"
-        :label="$t('angebot.url')"
-      >
-        <v-text-field
-          id="url-input"
-          v-bind="urlProps"
-          v-model="url"
-          autocomplete="off"
-          data-testid="url-input"
-          density="compact"
-          :placeholder="$t('angebot.enterUrl')"
-          required
-          variant="outlined"
-        />
-        <div class="d-flex justify-end">
-          <v-btn
-            :disabled="!url"
-            class="primary smallest"
-            data-testid="url-test-button"
-            density="compact"
-            variant="outlined"
-            @click="openUrlInNewTab"
-          >
-            {{ $t('angebot.testUrl') }}
-          </v-btn>
-        </div>
-      </FormRow>
-
-      <!-- 4. Logo -->
-      <v-row>
-        <v-col>
-          <h3 class="headline-3">{{ $t('angebot.logoOfTheAngebotInTheStartPage') }}</h3>
-        </v-col>
-      </v-row>
-      <FormRow
-        :error-label="logoIdProps['error']"
-        :is-required="!isCustomLogoMode"
-        label-for-id="logo-selector"
-        :label="$t('angebot.logo')"
-        :wide-content="isCustomLogoMode ? false : true"
-      >
-        <!-- Custom SP in edit mode: logo URL from backend, read-only, no selector -->
-        <template v-if="isCustomLogoMode">
-          <v-img
-            alt="provider-logo"
-            max-height="48"
-            max-width="48"
-            :src="props.initialValues.customLogo"
-          />
-        </template>
-
-        <!-- New SP: show selector (preselected when logoId is in initialValues) -->
-        <LogoSelector
-          v-else
-          id="logo-selector"
-          v-model="logoId"
-          v-bind="logoIdProps"
-          :readonly="false"
-          data-testid="logo-selector"
-        />
-      </FormRow>
-
-      <!-- Preview: always visible below the logo selector -->
-      <v-row>
-        <v-col>
-          <h3 class="headline-3">{{ $t('angebot.previewHeadline') }}</h3>
-        </v-col>
-      </v-row>
-      <FormRow
-        :is-required="false"
-        label-for-id="preview"
-        :label="$t('angebot.previewLabel')"
-      >
-        <ServiceProviderCard
-          v-if="showPreview"
-          :logo-url="selectedLogoPath"
-          :test-id="'service-provider-preview-card'"
-          :title="name"
-        />
-        <v-card
-          v-else
-          class="preview-placeholder d-flex align-center justify-center pa-4"
-          variant="outlined"
+      <div class="form-sections">
+        <!-- Organisation -->
+        <v-row>
+          <v-col>
+            <h3 class="headline-3">{{ $t('angebot.whoProvidesThisAngebot') }}</h3>
+          </v-col>
+        </v-row>
+        <FormRow
+          :error-label="selectedOrganisationIdProps['error']"
+          :is-required="true"
+          label-for-id="organisation-select"
+          :label="$t('angebot.providedBy')"
         >
-          <span class="preview-placeholder-text">{{ $t('angebot.previewPlaceholder') }}</span>
-        </v-card>
-      </FormRow>
+          <SchulenFilter
+            :systemrechte-for-search="[props.systemrecht]"
+            :readonly="isEditMode"
+            :highlight-selection="isEditMode"
+            :multiple="false"
+            :parent-id="isEditMode ? 'service-provider-edit' : 'service-provider-create'"
+            :placeholderText="$t('admin.organisation.selectOrganisation')"
+            :includeAll="true"
+            :selected-schule-props="selectedOrganisationIdProps"
+            :selected-schulen="selectedOrganisationId"
+            @update:selected-schulen-objects="updateSelectedOrganisation"
+          />
+        </FormRow>
 
-      <!-- 5. Kategorie -->
-      <v-row>
-        <v-col>
-          <h3 class="headline-3">{{ $t('angebot.kategorieOfTheAngebotInTheStartPage') }}</h3>
-        </v-col>
-      </v-row>
-      <FormRow
-        :error-label="kategorieProps['error']"
-        :is-required="false"
-        label-for-id="kategorie-select"
-        :label="$t('angebot.kategorie')"
-      >
-        <v-autocomplete
-          :disabled="systemrecht !== RollenSystemRecht.AngeboteVerwalten"
-          id="kategorie-select"
-          v-bind="kategorieProps"
-          v-model="kategorie"
-          autocomplete="off"
-          clearable
-          data-testid="kategorie-select"
-          density="compact"
-          :items="kategorieItems"
-          item-value="value"
-          item-title="title"
-          :no-data-text="$t('noDataFound')"
-          :placeholder="$t('angebot.selectKategorie')"
-          required
-          variant="outlined"
-        />
-      </FormRow>
+        <!-- Name -->
+        <v-row>
+          <v-col>
+            <h3 class="headline-3">{{ $t('angebot.nameOfAngebotInTheStartPage') }}</h3>
+          </v-col>
+        </v-row>
+        <FormRow
+          :error-label="nameProps['error']"
+          :is-required="true"
+          label-for-id="name-input"
+          :label="$t('angebot.name')"
+        >
+          <v-text-field
+            id="name-input"
+            v-bind="nameProps"
+            v-model="name"
+            autocomplete="off"
+            data-testid="name-input"
+            density="compact"
+            :placeholder="$t('angebot.enterName')"
+            required
+            variant="outlined"
+          />
+        </FormRow>
 
-      <!-- 6. Nachträglich zuweisbar -->
-      <v-row>
-        <v-col>
-          <h3 class="headline-3">{{ $t('angebot.canThisAngebotBeAssignedToRollen') }}</h3>
-        </v-col>
-      </v-row>
-      <FormRow
-        :error-label="nachtraeglichZuweisbarProps['error']"
-        :is-required="false"
-        label-for-id="nachtraeglich-zuweisbar-select"
-        :label="$t('angebot.canBeAssigned')"
-      >
-        <v-select
-          :disabled="isEditMode || systemrecht !== RollenSystemRecht.AngeboteVerwalten"
-          id="nachtraeglich-zuweisbar-select"
-          v-bind="nachtraeglichZuweisbarProps"
-          v-model="nachtraeglichZuweisbar"
-          data-testid="nachtraeglich-zuweisbar-select"
-          density="compact"
-          :items="[
-            { title: $t('yes'), value: true },
-            { title: $t('no'), value: false },
-          ]"
-          item-value="value"
-          item-title="title"
-          variant="outlined"
-        />
-      </FormRow>
+        <!-- URL -->
+        <v-row class="mb-n8">
+          <v-col>
+            <h3 class="headline-3">{{ $t('angebot.urlOfTheAngebot') }}</h3>
+          </v-col>
+        </v-row>
+        <FormRow
+          :error-label="urlProps['error']"
+          :is-required="true"
+          label-for-id="url-input"
+          :label="$t('angebot.url')"
+        >
+          <v-text-field
+            id="url-input"
+            v-bind="urlProps"
+            v-model="url"
+            autocomplete="off"
+            data-testid="url-input"
+            density="compact"
+            :placeholder="$t('angebot.enterUrl')"
+            required
+            variant="outlined"
+          />
+          <div class="d-flex justify-end">
+            <v-btn
+              :disabled="!url"
+              class="primary smallest"
+              data-testid="url-test-button"
+              density="compact"
+              variant="outlined"
+              @click="openUrlInNewTab"
+            >
+              {{ $t('angebot.testUrl') }}
+            </v-btn>
+          </div>
+        </FormRow>
 
-      <!-- 7. Rollenerweiterung -->
-      <v-row>
-        <v-col>
-          <h3 class="headline-3">{{ $t('angebot.canThisAngebotBeUsedForSchulspezifischeRollenerweiterungen') }}</h3>
-        </v-col>
-      </v-row>
-      <FormRow
-        :error-label="verfuegbarFuerRollenerweiterungProps['error']"
-        :is-required="false"
-        label-for-id="verfuegbar-fuer-rollenerweiterung-select"
-        :label="$t('angebot.canBeUsed')"
-      >
-        <v-select
-          :disabled="isEditMode || systemrecht !== RollenSystemRecht.AngeboteVerwalten"
-          id="verfuegbar-fuer-rollenerweiterung-select"
-          v-bind="verfuegbarFuerRollenerweiterungProps"
-          v-model="verfuegbarFuerRollenerweiterung"
-          data-testid="verfuegbar-fuer-rollenerweiterung-select"
-          density="compact"
-          :items="[
-            { title: $t('yes'), value: true },
-            { title: $t('no'), value: false },
-          ]"
-          item-value="value"
-          item-title="title"
-          variant="outlined"
-        />
-      </FormRow>
+        <!-- Logo -->
+        <v-row>
+          <v-col>
+            <h3 class="headline-3">{{ $t('angebot.logoOfTheAngebotInTheStartPage') }}</h3>
+          </v-col>
+        </v-row>
+        <FormRow
+          :error-label="logoIdProps['error']"
+          :is-required="!isCustomLogoMode"
+          label-for-id="logo-selector"
+          :label="$t('angebot.logo')"
+          :wide-content="isCustomLogoMode ? false : true"
+        >
+          <!-- Custom SP in edit mode: logo URL from backend, read-only, no selector -->
+          <template v-if="isCustomLogoMode">
+            <v-img
+              alt="provider-logo"
+              max-height="48"
+              max-width="48"
+              :src="props.initialValues.customLogo"
+            />
+          </template>
 
-      <!-- 8. 2FA -->
-      <v-row>
-        <v-col>
-          <h3 class="headline-3">{{ $t('angebot.is2FARequired') }}</h3>
-        </v-col>
-      </v-row>
-      <FormRow
-        :error-label="requires2faProps['error']"
-        :is-required="false"
-        label-for-id="requires2fa-select"
-        :label="$t('angebot.requires2FA')"
-      >
-        <v-select
-          disabled
-          id="requires2fa-select"
-          v-bind="requires2faProps"
-          v-model="requires2fa"
-          data-testid="requires2fa-select"
-          density="compact"
-          :items="[
-            { title: $t('yes'), value: true },
-            { title: $t('no'), value: false },
-          ]"
-          item-value="value"
-          item-title="title"
-          variant="outlined"
-        />
-      </FormRow>
+          <!-- New SP: show selector (preselected when logoId is in initialValues) -->
+          <LogoSelector
+            v-else
+            id="logo-selector"
+            v-model="logoId"
+            v-bind="logoIdProps"
+            :readonly="false"
+            data-testid="logo-selector"
+          />
+        </FormRow>
+
+        <!-- Preview: always visible below the logo selector -->
+        <v-row>
+          <v-col>
+            <h3 class="headline-3">{{ $t('angebot.previewHeadline') }}</h3>
+          </v-col>
+        </v-row>
+        <FormRow
+          :is-required="false"
+          label-for-id="preview"
+          :label="$t('angebot.previewLabel')"
+        >
+          <ServiceProviderCard
+            v-if="showPreview"
+            :logo-url="selectedLogoPath"
+            :test-id="'service-provider-preview-card'"
+            :title="name"
+          />
+          <v-card
+            v-else
+            class="preview-placeholder d-flex align-center justify-center pa-4"
+            variant="outlined"
+          >
+            <span class="preview-placeholder-text">{{ $t('angebot.previewPlaceholder') }}</span>
+          </v-card>
+        </FormRow>
+
+        <!-- Kategorie -->
+        <v-row>
+          <v-col>
+            <h3 class="headline-3">{{ $t('angebot.kategorieOfTheAngebotInTheStartPage') }}</h3>
+          </v-col>
+        </v-row>
+        <FormRow
+          :error-label="kategorieProps['error']"
+          :is-required="false"
+          label-for-id="kategorie-select"
+          :label="$t('angebot.kategorie')"
+        >
+          <v-autocomplete
+            :disabled="systemrecht !== RollenSystemRecht.AngeboteVerwalten"
+            id="kategorie-select"
+            v-bind="kategorieProps"
+            v-model="kategorie"
+            autocomplete="off"
+            clearable
+            data-testid="kategorie-select"
+            density="compact"
+            :items="kategorieItems"
+            item-value="value"
+            item-title="title"
+            :no-data-text="$t('noDataFound')"
+            :placeholder="$t('angebot.selectKategorie')"
+            required
+            variant="outlined"
+          />
+        </FormRow>
+
+        <!-- Nachträglich zuweisbar -->
+        <v-row>
+          <v-col>
+            <h3 class="headline-3">{{ $t('angebot.canThisAngebotBeAssignedToRollen') }}</h3>
+          </v-col>
+        </v-row>
+        <FormRow
+          :error-label="nachtraeglichZuweisbarProps['error']"
+          :is-required="false"
+          label-for-id="nachtraeglich-zuweisbar-select"
+          :label="$t('angebot.canBeAssigned')"
+        >
+          <v-select
+            :disabled="isEditMode || systemrecht !== RollenSystemRecht.AngeboteVerwalten"
+            id="nachtraeglich-zuweisbar-select"
+            v-bind="nachtraeglichZuweisbarProps"
+            v-model="nachtraeglichZuweisbar"
+            data-testid="nachtraeglich-zuweisbar-select"
+            density="compact"
+            :items="[
+              { title: $t('yes'), value: true },
+              { title: $t('no'), value: false },
+            ]"
+            item-value="value"
+            item-title="title"
+            variant="outlined"
+          />
+        </FormRow>
+
+        <!-- Rollenerweiterung -->
+        <v-row>
+          <v-col>
+            <h3 class="headline-3">{{ $t('angebot.canThisAngebotBeUsedForSchulspezifischeRollenerweiterungen') }}</h3>
+          </v-col>
+        </v-row>
+        <FormRow
+          :error-label="verfuegbarFuerRollenerweiterungProps['error']"
+          :is-required="false"
+          label-for-id="verfuegbar-fuer-rollenerweiterung-select"
+          :label="$t('angebot.canBeUsed')"
+        >
+          <v-select
+            :disabled="isEditMode || systemrecht !== RollenSystemRecht.AngeboteVerwalten"
+            id="verfuegbar-fuer-rollenerweiterung-select"
+            v-bind="verfuegbarFuerRollenerweiterungProps"
+            v-model="verfuegbarFuerRollenerweiterung"
+            data-testid="verfuegbar-fuer-rollenerweiterung-select"
+            density="compact"
+            :items="[
+              { title: $t('yes'), value: true },
+              { title: $t('no'), value: false },
+            ]"
+            item-value="value"
+            item-title="title"
+            variant="outlined"
+          />
+        </FormRow>
+
+        <!-- 2FA -->
+        <v-row>
+          <v-col>
+            <h3 class="headline-3">{{ $t('angebot.is2FARequired') }}</h3>
+          </v-col>
+        </v-row>
+        <FormRow
+          :error-label="requires2faProps['error']"
+          :is-required="false"
+          label-for-id="requires2fa-select"
+          :label="$t('angebot.requires2FA')"
+        >
+          <v-select
+            disabled
+            id="requires2fa-select"
+            v-bind="requires2faProps"
+            v-model="requires2fa"
+            data-testid="requires2fa-select"
+            density="compact"
+            :items="[
+              { title: $t('yes'), value: true },
+              { title: $t('no'), value: false },
+            ]"
+            item-value="value"
+            item-title="title"
+            variant="outlined"
+          />
+        </FormRow>
+      </div>
     </template>
   </FormWrapper>
 </template>
 
 <style scoped>
-  .preview-card {
-    border-color: #001e49;
-    border-radius: 8px;
-  }
-
-  .preview-name {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #001e49;
-  }
-
-  .preview-hint {
-    font-size: 0.75rem;
-    color: #666;
-    font-style: italic;
-  }
-
-  #service-provider-create-form,
-  #service-provider-edit-form {
+  .form-sections {
     counter-reset: section-counter;
   }
 
@@ -512,6 +496,8 @@
 
   .headline-3::before {
     content: counter(section-counter) '. ';
+    margin-right: 0.25em;
+    font-weight: bold;
   }
 
   .preview-card {
