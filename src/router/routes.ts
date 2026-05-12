@@ -211,6 +211,7 @@ const routes: readonly RouteRecordRaw[] = [
       layout: 'AdminLayout',
       requiresAuth: true,
       requiredStepUpLevel: StepUpLevel.GOLD,
+      requiresFeatureFlag: 'schulischeAngeboteErstellen',
       requiresPermission: ['angebotsverwaltung', 'eingeschränktangebotsverwaltung'],
       permissionMode: 'any',
     },
