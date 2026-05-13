@@ -68,7 +68,10 @@
     >
       <v-col class="text-body bold text-right"> {{ item.label }}: </v-col>
 
-      <v-col class="text-body">
+      <v-col
+        class="text-body"
+        style="word-break: break-word"
+      >
         <!-- If it's an image type → show image -->
         <template v-if="item.type === 'image' && typeof item.value === 'number'">
           <v-img
