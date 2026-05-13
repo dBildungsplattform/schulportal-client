@@ -207,7 +207,7 @@ describe('ServiceProviderCreationView', () => {
       kategorie: ServiceProviderKategorie.Schulisch,
       merkmale: [],
       requires2fa: false,
-      logo: '',
+      logoId: undefined,
       selectedOrganisation: DoFactory.getOrganisation(),
     };
     await fillForm({

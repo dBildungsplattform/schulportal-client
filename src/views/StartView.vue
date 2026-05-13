@@ -19,6 +19,7 @@
   } from '@/stores/TwoFactorAuthentificationStore';
   import type { Zuordnung } from '@/stores/types/Zuordnung';
   import { adjustDateForTimezoneAndFormat } from '@/utils/date';
+  import { getLogoPath } from '@/utils/logosConfig';
   import { computed, onBeforeMount, onMounted, ref, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
 
@@ -147,12 +148,16 @@
     await serviceProviderStore.getAvailableServiceProviders();
 
     // Load all logos in parallel and assign them to the respective service providers
-    const logoPromises: Promise<void>[] = serviceProviderStore.availableServiceProviders
-      .filter((p: StartPageServiceProvider) => p.hasLogo)
-      .map(async (p: StartPageServiceProvider) => {
-        await serviceProviderStore.getServiceProviderLogoById(p.id);
-        p.logoUrl = serviceProviderStore.serviceProviderLogos.get(p.id);
-      });
+    const logoPromises: Promise<void>[] = serviceProviderStore.availableServiceProviders.map(
+      async (p: StartPageServiceProvider) => {
+        if (p.logoId) {
+          p.logoUrl = getLogoPath(p.logoId);
+        } else if (p.hasLogo) {
+          await serviceProviderStore.getServiceProviderLogoById(p.id);
+          p.logoUrl = serviceProviderStore.serviceProviderLogos.get(p.id);
+        }
+      },
+    );
 
     const twoFAStatePromise: Promise<void> = personId
       ? twoFactorAuthentificationStore.get2FAState(personId)

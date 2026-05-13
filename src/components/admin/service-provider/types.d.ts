@@ -18,7 +18,8 @@ export type ServiceProviderForm = {
   selectedOrganisationId: string | undefined;
   name: string;
   url: string;
-  logo: string;
+  logoId: number | undefined;
+  customLogo?: string | undefined;
   kategorie: ServiceProviderKategorie;
   nachtraeglichZuweisbar: boolean;
   verfuegbarFuerRollenerweiterung: boolean;
@@ -29,7 +30,7 @@ export type ServiceProviderFormSubmitData = {
   selectedOrganisation?: Organisation;
   name: string;
   url: string;
-  logo: string;
+  logoId: number | undefined;
   kategorie: ServiceProviderKategorie;
   merkmale: ServiceProviderMerkmal[];
   requires2fa: boolean;

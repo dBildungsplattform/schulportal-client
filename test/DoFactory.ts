@@ -448,6 +448,7 @@ export class DoFactory {
       url: faker.internet.url(),
       kategorie: faker.helpers.enumValue(ServiceProviderKategorie),
       hasLogo: true,
+      logoId: 1,
       requires2fa: false,
       merkmale: [],
       ...props,
@@ -478,6 +479,7 @@ export class DoFactory {
       ...this.getManageableServiceProviderListEntryResponse(props),
       url: props?.url ?? faker.internet.url(),
       availableForRollenerweiterung: props?.availableForRollenerweiterung ?? false,
+      logoId: props?.logoId ?? 1,
       relevantSystemrechte: props?.relevantSystemrechte ?? [],
     };
   }

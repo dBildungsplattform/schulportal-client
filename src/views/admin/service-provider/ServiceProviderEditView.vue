@@ -1,5 +1,4 @@
 <script setup lang="ts">
-  import SchulPortalLogo from '@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg';
   import ServiceProviderForm from '@/components/admin/service-provider/ServiceProviderForm.vue';
   import SuccessTemplate from '@/components/admin/service-provider/SuccessTemplate.vue';
   import type {
@@ -25,6 +24,7 @@
     type Router,
   } from 'vue-router';
   import { useDisplay } from 'vuetify';
+  import SchulPortalLogo from '@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg';
 
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
   const route: RouteLocationNormalized = useRoute();
@@ -37,7 +37,7 @@
   const showSuccess: Ref<boolean> = ref(false);
 
   const cachedOrganisationName: Ref<string> = ref(''); // for success template
-  const cachedLogo: Ref<string> = ref(''); // for success template
+  const cachedLogo: Ref<number | string | undefined> = ref(undefined); // for success template
 
   let blockedNext: () => void = () => {
     /* empty */
@@ -56,7 +56,8 @@
     }
     return RollenSystemRecht.AngeboteEingeschraenktVerwalten;
   });
-  const currentLogo: ComputedRef<string> = computed(() => {
+
+  const customLogo: ComputedRef<string> = computed(() => {
     if (!serviceProviderStore.currentServiceProvider) {
       return '';
     }
@@ -71,7 +72,7 @@
       name: values.name,
       url: values.url,
       kategorie: values.kategorie,
-      logo: values.logo,
+      logoId: values.logoId,
     };
   }
 
@@ -83,7 +84,8 @@
       selectedOrganisationId: serviceProviderStore.currentServiceProvider.administrationsebene.id,
       name: serviceProviderStore.currentServiceProvider.name,
       url: serviceProviderStore.currentServiceProvider.url,
-      logo: currentLogo.value,
+      logoId: serviceProviderStore.currentServiceProvider.logoId,
+      customLogo: customLogo.value,
       kategorie: serviceProviderStore.currentServiceProvider.kategorie,
       requires2fa: serviceProviderStore.currentServiceProvider.requires2fa,
       nachtraeglichZuweisbar: serviceProviderStore.currentServiceProvider.merkmale.includes(
@@ -122,7 +124,7 @@
     if (!serviceProviderStore.errorCode) {
       isDirty.value = false;
       showSuccess.value = true;
-      cachedLogo.value = values.logo ?? currentLogo.value;
+      cachedLogo.value = values.logoId ?? customLogo.value;
       cachedOrganisationName.value = serviceProviderStore.currentServiceProvider?.administrationsebene.name ?? '';
     }
   }

@@ -1,6 +1,6 @@
 import { expect, test, describe, beforeEach, afterEach } from 'vitest';
 import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
-import ServiceProviderSuccessTemplate from '../service-provider/SuccessTemplate.vue';
+import ServiceProviderSuccessTemplate from './SuccessTemplate.vue';
 
 let wrapper: VueWrapper | null = null;
 
