@@ -1,10 +1,11 @@
 <script setup lang="ts">
+  import { getLogoPath } from '@/utils/logosConfig';
   import { type Ref } from 'vue';
   import { useDisplay } from 'vuetify';
 
   type SuccessDataItem = {
     label: string;
-    value: string;
+    value: string | number | undefined;
     testId: string;
     type?: 'text' | 'image';
   };
@@ -67,9 +68,23 @@
     >
       <v-col class="text-body bold text-right"> {{ item.label }}: </v-col>
 
-      <v-col class="text-body">
+      <v-col
+        class="text-body"
+        style="word-break: break-word"
+      >
         <!-- If it's an image type → show image -->
-        <template v-if="item.type === 'image' && item.value">
+        <template v-if="item.type === 'image' && typeof item.value === 'number'">
+          <v-img
+            :data-testid="item.testId"
+            class="mt-n2"
+            :src="getLogoPath(item.value)"
+            max-width="40"
+            max-height="40"
+            contain
+          />
+        </template>
+
+        <template v-else-if="item.type === 'image' && typeof item.value === 'string'">
           <v-img
             :data-testid="item.testId"
             class="mt-n2"

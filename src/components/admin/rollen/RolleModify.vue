@@ -197,7 +197,11 @@
       showErrorDialog.value = true;
     }
 
-    emit('update:getUebersichten');
+    if (bulkOperationStore.currentOperation?.errors?.size) {
+      showErrorDialog.value = true;
+    } else {
+      emit('update:getUebersichten');
+    }
   }
 
   const onSubmitModifyRolle: (e?: Event) => Promise<Promise<void> | undefined> = formContext.handleSubmit(async () => {

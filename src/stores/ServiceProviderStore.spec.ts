@@ -593,6 +593,7 @@ describe('serviceProviderStore', () => {
         url: filter.url,
         target: ServiceProviderTarget.Url,
         hasLogo: false,
+        logoId: 1,
         kategorie: filter.kategorie,
         requires2fa: filter.requires2fa,
         merkmale: filter.merkmale,
@@ -632,10 +633,11 @@ describe('serviceProviderStore', () => {
     });
     const providerId: string = 'provider-to-update';
     const apiUrl: string = `/api/provider/${providerId}`;
-    const update: Partial<{ name: string; url: string; kategorie: ServiceProviderKategorie }> = {
+    const update: Partial<{ name: string; url: string; kategorie: ServiceProviderKategorie; logoId: number }> = {
       name: 'Updated Service Provider',
       url: 'https://updated-url.com',
       kategorie: ServiceProviderKategorie.Email,
+      logoId: 1,
     };
 
     it('should update a service provider and update state', async () => {
@@ -645,6 +647,7 @@ describe('serviceProviderStore', () => {
         url: update.url!,
         target: ServiceProviderTarget.Url,
         hasLogo: false,
+        logoId: 1,
         kategorie: update.kategorie!,
         requires2fa: false,
         merkmale: [],

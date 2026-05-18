@@ -104,7 +104,8 @@
       },
       "url": {
         "invalid": "Die URL muss eine gültige URL sein.",
-        "required": "Die URL des Angebots muss angegeben werden."
+        "required": "Die URL des Angebots muss angegeben werden.",
+        "maxLength": "Die URL darf maximal 2000 Zeichen lang sein."
       },
       "kategorie": {
         "required": "Die Kategorie muss ausgewählt werden."
@@ -118,7 +119,10 @@
     "noRolesFound": "Es konnten keine Rollen gefunden werden.",
     "saveRollenerweiterungenSuccess": "Die Rollenerweiterungen wurden erfolgreich gespeichert.",
     "editRollenerweiterungen": "Rollenauswahl bearbeiten",
-    "whoProvidesThisAngebot": "Wer stellt dieses Angebot bereit?"
+    "whoProvidesThisAngebot": "Wer stellt dieses Angebot bereit?",
+    "previewHeadline": "Vorschau der Angebotsdarstellung auf der Startseite",
+    "previewLabel": "Bitte prüfen Sie vor dem Speichern die Darstellung.",
+    "previewPlaceholder": "Eine Vorschau wird angezeigt, sobald Name und Logo festgelegt wurden."
   },
   "action": "Aktion",
   "admin": {

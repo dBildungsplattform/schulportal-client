@@ -138,7 +138,7 @@ describe('ServiceProviderEditView', () => {
     const validEdit: Parameters<typeof serviceProviderStore.updateServiceProvider>[1] = {
       name: 'Neuer Name',
       url: 'https://neue-url.de',
-      logo: '',
+      logoId: undefined,
       kategorie: serviceProviderStore.currentServiceProvider?.kategorie,
       merkmale: serviceProviderStore.currentServiceProvider?.merkmale || [],
       requires2fa: false,
@@ -181,7 +181,7 @@ describe('ServiceProviderEditView', () => {
         const validEdit: Parameters<typeof serviceProviderStore.updateServiceProvider>[1] = {
           name: 'Neuer Name',
           url: 'https://neue-url.de',
-          logo: '',
+          logoId: undefined,
           kategorie: serviceProviderStore.currentServiceProvider?.kategorie,
           merkmale: serviceProviderStore.currentServiceProvider?.merkmale || [],
           requires2fa: false,
