@@ -1,20 +1,21 @@
+import type { RollenerweiterungWithExtendedDataResponse } from '@/api-client/generated';
 import routes from '@/router/routes';
-import { VueWrapper, mount } from '@vue/test-utils';
-import { createPinia, setActivePinia } from 'pinia';
-import { createRouter, createWebHistory, type Router } from 'vue-router';
-import ServiceProviderDetailsView from './ServiceProviderDetailsView.vue';
+import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 import {
   ServiceProviderKategorie,
   useServiceProviderStore,
   type ManageableServiceProviderDetail,
   type ServiceProviderStore,
 } from '@/stores/ServiceProviderStore';
+import { getLogoPath } from '@/utils/logosConfig';
+import { VueWrapper, mount } from '@vue/test-utils';
+import type WrapperLike from 'node_modules/@vue/test-utils/dist/interfaces/wrapperLike';
+import { createPinia, setActivePinia } from 'pinia';
 import { DoFactory } from 'test/DoFactory';
 import type { MockInstance } from 'vitest';
 import { nextTick, type Component } from 'vue';
-import type WrapperLike from 'node_modules/@vue/test-utils/dist/interfaces/wrapperLike';
-import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
-import type { RollenerweiterungWithExtendedDataResponse } from '@/api-client/generated';
+import { createRouter, createWebHistory, type Router } from 'vue-router';
+import ServiceProviderDetailsView from './ServiceProviderDetailsView.vue';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -76,6 +77,10 @@ describe('ServiceProviderDetailsView', () => {
     expect(wrapper?.find('[data-testid="service-provider-requires-2fa"]').text()).toBe(
       mockServiceProvider.requires2fa ? 'Ja' : 'Nein',
     );
+
+    expect(
+      wrapper?.find('[data-testid="service-provider-logo"] [alt="provider-logo"]').element.getAttribute('src'),
+    ).toBe(getLogoPath(mockServiceProvider.logoId));
     expect(wrapper?.find('[data-testid="service-provider-kategorie"]').text()).toBe('Hinweise');
     expect(wrapper?.find('[data-testid="service-provider-link"]').text()).toBe(
       mockServiceProvider.url ? mockServiceProvider.url : 'fehlt',

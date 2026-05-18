@@ -9,8 +9,10 @@
   import {
     ServiceProviderMerkmal,
     useServiceProviderStore,
+    type ManageableServiceProviderDetail,
     type ServiceProviderStore,
   } from '@/stores/ServiceProviderStore';
+  import { getLogoPath } from '@/utils/logosConfig';
   import { computed, onMounted, ref, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
@@ -103,6 +105,16 @@
     rollenerweiterungPerPage.value = limit;
     fetchRollenerweiterungen();
   }
+
+  const resolvedLogo: ComputedRef<string | undefined> = computed(() => {
+    const provider: ManageableServiceProviderDetail | null = serviceProviderStore.currentServiceProvider;
+
+    if (provider?.logoId != null) {
+      return getLogoPath(provider.logoId);
+    }
+
+    return serviceProviderStore.serviceProviderLogos.get(currentServiceProviderId);
+  });
 
   onMounted(async () => {
     serviceProviderStore.errorCode = '';
@@ -221,7 +233,7 @@
                     <LabeledField
                       :label="t('angebot.logo')"
                       is-logo
-                      :logo-src="serviceProviderStore.serviceProviderLogos.get(currentServiceProviderId)"
+                      :logo-src="resolvedLogo"
                       :default-logo-src="SchulPortalLogo"
                       test-id="service-provider-logo"
                       md-margin-top
