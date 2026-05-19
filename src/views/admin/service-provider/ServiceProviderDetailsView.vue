@@ -43,6 +43,16 @@
 
   const isOpen: Ref<boolean> = ref(false);
 
+  const resolvedLogo: ComputedRef<string | undefined> = computed(() => {
+    const provider: ManageableServiceProviderDetail | null = serviceProviderStore.currentServiceProvider;
+
+    if (provider?.logoId != null) {
+      return getLogoPath(provider.logoId);
+    }
+
+    return serviceProviderStore.serviceProviderLogos.get(currentServiceProviderId);
+  });
+
   function navigateToServiceProviderTable(): void {
     router.push({ name: 'angebot-management' });
   }
@@ -105,16 +115,6 @@
     rollenerweiterungPerPage.value = limit;
     fetchRollenerweiterungen();
   }
-
-  const resolvedLogo: ComputedRef<string | undefined> = computed(() => {
-    const provider: ManageableServiceProviderDetail | null = serviceProviderStore.currentServiceProvider;
-
-    if (provider?.logoId != null) {
-      return getLogoPath(provider.logoId);
-    }
-
-    return serviceProviderStore.serviceProviderLogos.get(currentServiceProviderId);
-  });
 
   onMounted(async () => {
     serviceProviderStore.errorCode = '';
