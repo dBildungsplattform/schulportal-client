@@ -1,30 +1,54 @@
+import type { RollenerweiterungWithExtendedDataResponse } from '@/api-client/generated';
 import routes from '@/router/routes';
-import { VueWrapper, mount } from '@vue/test-utils';
-import { createPinia, setActivePinia } from 'pinia';
-import { createRouter, createWebHistory, type Router } from 'vue-router';
-import ServiceProviderDetailsView from './ServiceProviderDetailsView.vue';
+import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 import {
   ServiceProviderKategorie,
   useServiceProviderStore,
   type ManageableServiceProviderDetail,
   type ServiceProviderStore,
 } from '@/stores/ServiceProviderStore';
+import { getLogoPath } from '@/utils/logosConfig';
+import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
+import type WrapperLike from 'node_modules/@vue/test-utils/dist/interfaces/wrapperLike';
+import { createPinia, setActivePinia } from 'pinia';
 import { DoFactory } from 'test/DoFactory';
 import type { MockInstance } from 'vitest';
 import { nextTick, type Component } from 'vue';
-import type WrapperLike from 'node_modules/@vue/test-utils/dist/interfaces/wrapperLike';
-import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
-import type { RollenerweiterungWithExtendedDataResponse } from '@/api-client/generated';
+import { createRouter, createWebHistory, type Router } from 'vue-router';
+import ServiceProviderDetailsView from './ServiceProviderDetailsView.vue';
 
-let wrapper: VueWrapper | null = null;
+let wrapper: VueWrapper<InstanceType<typeof ServiceProviderDetailsView>> | null = null;
 let router: Router;
 const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
 const authStore: AuthStore = useAuthStore();
 
 const mockServiceProvider: ManageableServiceProviderDetail = DoFactory.getManageableServiceProviderDetail({
-  kategorie: ServiceProviderKategorie.Hinweise,
+  kategorie: ServiceProviderKategorie.Schulisch,
   availableForRollenerweiterung: true,
+  logoId: 1,
 });
+
+async function mountComponent(): Promise<VueWrapper<InstanceType<typeof ServiceProviderDetailsView>>> {
+  const wrapper: VueWrapper<InstanceType<typeof ServiceProviderDetailsView>> = mount(ServiceProviderDetailsView, {
+    attachTo: document.getElementById('app') || '',
+    global: {
+      components: {
+        ServiceProviderDetailsView: ServiceProviderDetailsView as Component,
+      },
+      mocks: {
+        route: {
+          fullPath: 'full/path',
+          params: {
+            id: mockServiceProvider.id,
+          },
+        },
+      },
+      plugins: [router],
+    },
+  });
+  await flushPromises();
+  return wrapper;
+}
 
 beforeEach(async () => {
   setActivePinia(createPinia());
@@ -42,20 +66,7 @@ beforeEach(async () => {
   router.push('/');
   await router.isReady();
 
-  wrapper = mount(ServiceProviderDetailsView, {
-    attachTo: document.getElementById('app') || '',
-    global: {
-      components: {
-        ServiceProviderDetailsView: ServiceProviderDetailsView as Component,
-      },
-      mocks: {
-        route: {
-          fullPath: 'full/path',
-        },
-      },
-      plugins: [router],
-    },
-  });
+  serviceProviderStore.$reset();
   serviceProviderStore.currentServiceProvider = mockServiceProvider;
   const mockItems: RollenerweiterungWithExtendedDataResponse[] = Array.from({ length: 2 }, () =>
     DoFactory.getRollenerweiterungItem(),
@@ -63,6 +74,7 @@ beforeEach(async () => {
   serviceProviderStore.rollenerweiterungen = DoFactory.getRollenerweiterungenResponse(mockItems);
   serviceProviderStore.rollenerweiterungenUebersicht = DoFactory.buildRollenerweiterungenUebersicht(mockItems);
   authStore.hasRollenerweiternPermission = true;
+  wrapper = await mountComponent();
 });
 
 describe('ServiceProviderDetailsView', () => {
@@ -76,9 +88,46 @@ describe('ServiceProviderDetailsView', () => {
     expect(wrapper?.find('[data-testid="service-provider-requires-2fa"]').text()).toBe(
       mockServiceProvider.requires2fa ? 'Ja' : 'Nein',
     );
-    expect(wrapper?.find('[data-testid="service-provider-kategorie"]').text()).toBe('Hinweise');
+
+    expect(
+      wrapper?.find('[data-testid="service-provider-logo"] [alt="provider-logo"]').element.getAttribute('src'),
+    ).toBe(getLogoPath(mockServiceProvider.logoId));
+    expect(wrapper?.find('[data-testid="service-provider-kategorie"]').text()).toBe('Schulische Angebote');
     expect(wrapper?.find('[data-testid="service-provider-link"]').text()).toBe(
       mockServiceProvider.url ? mockServiceProvider.url : 'fehlt',
+    );
+  });
+
+  test('it renders the service provider details page and shows its data with logo', async () => {
+    const providerWithLogo: ManageableServiceProviderDetail = DoFactory.getManageableServiceProviderDetail({
+      id: mockServiceProvider.id,
+      logoId: undefined,
+      kategorie: ServiceProviderKategorie.Hinweise,
+    });
+    serviceProviderStore.currentServiceProvider = providerWithLogo;
+    vi.spyOn(serviceProviderStore, 'getServiceProviderLogoById').mockImplementationOnce(
+      async (id: string): Promise<void> => {
+        serviceProviderStore.serviceProviderLogos.set(id, 'test-logo');
+        return Promise.resolve();
+      },
+    );
+    wrapper = await mountComponent();
+
+    expect(wrapper).toBeTruthy();
+    expect(wrapper?.find('[data-testid="service-provider-details-card"]').isVisible()).toBe(true);
+    expect(wrapper?.find('[data-testid="service-provider-name"]').text()).toBe(providerWithLogo.name);
+    expect(wrapper?.find('[data-testid="service-provider-administrationsebene"]').text()).toBe(
+      providerWithLogo.administrationsebene.name,
+    );
+    expect(wrapper?.find('[data-testid="service-provider-requires-2fa"]').text()).toBe(
+      providerWithLogo.requires2fa ? 'Ja' : 'Nein',
+    );
+    expect(
+      wrapper?.find('[data-testid="service-provider-logo"] [alt="provider-logo"]').element.getAttribute('src'),
+    ).toBe('test-logo');
+    expect(wrapper?.find('[data-testid="service-provider-kategorie"]').text()).toBe('Hinweise');
+    expect(wrapper?.find('[data-testid="service-provider-link"]').text()).toBe(
+      providerWithLogo.url ? providerWithLogo.url : 'fehlt',
     );
   });
 
@@ -90,7 +139,7 @@ describe('ServiceProviderDetailsView', () => {
 
   test('it sets errorCode and goes back to list on alert close', async () => {
     const push: MockInstance = vi.spyOn(router, 'push');
-    serviceProviderStore.errorCode = 'error';
+    serviceProviderStore.errorCode = 'REQUIRED_STEP_UP_LEVEL_NOT_MET';
     await nextTick();
 
     await wrapper?.find('[data-testid$="alert-button"]').trigger('click');
