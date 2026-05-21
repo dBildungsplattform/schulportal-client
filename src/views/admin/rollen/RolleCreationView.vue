@@ -193,7 +193,7 @@
     rolleStore.createdRolle = null;
   });
 
-  onMounted(async () => {
+  onMounted(() => {
     rolleStore.createdRolle = null;
 
     // Iterate over the enum values

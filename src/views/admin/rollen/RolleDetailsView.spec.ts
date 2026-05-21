@@ -1,23 +1,21 @@
-import { expect, test, type Mock } from 'vitest';
-import { DOMWrapper, VueWrapper, flushPromises, mount } from '@vue/test-utils';
-import RolleDetailsView from './RolleDetailsView.vue';
-import { setActivePinia, createPinia } from 'pinia';
+import { OrganisationsTyp, type SystemRechtResponse } from '@/api-client/generated';
 import routes from '@/router/routes';
-import { type Router, createRouter, createWebHistory } from 'vue-router';
+import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
 import {
-  RollenMerkmal,
-  RollenSystemRecht,
   useRolleStore,
   type Rolle,
   type RolleStore,
   type RolleWithServiceProvidersResponse,
 } from '@/stores/RolleStore';
-import { nextTick, type Component } from 'vue';
-import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
-import { OrganisationsTyp, RollenSystemRechtEnum, type SystemRechtResponse } from '@/api-client/generated';
-import { DoFactory } from 'test/DoFactory';
-import { faker } from '@faker-js/faker';
 import { useServiceProviderStore, type ServiceProviderStore } from '@/stores/ServiceProviderStore';
+import { faker } from '@faker-js/faker';
+import { DOMWrapper, VueWrapper, flushPromises, mount } from '@vue/test-utils';
+import { createPinia, setActivePinia } from 'pinia';
+import { DoFactory } from 'test/DoFactory';
+import { expect, test, type Mock } from 'vitest';
+import { nextTick, type Component } from 'vue';
+import { createRouter, createWebHistory, type Router } from 'vue-router';
+import RolleDetailsView from './RolleDetailsView.vue';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
