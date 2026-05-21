@@ -960,7 +960,8 @@ export const DbiamRolleErrorI18nKeyEnum = {
     RolleNameUniqueOnSsk: 'ROLLE_NAME_UNIQUE_ON_SSK',
     ServiceProviderNichtNachtraeglichZuweisbar: 'SERVICE_PROVIDER_NICHT_NACHTRAEGLICH_ZUWEISBAR',
     ServiceProviderNichtVerfuegbarFuerRollenerweiterung: 'SERVICE_PROVIDER_NICHT_VERFUEGBAR_FUER_ROLLENERWEITERUNG',
-    NoRedundantRollenerweiterung: 'NO_REDUNDANT_ROLLENERWEITERUNG'
+    NoRedundantRollenerweiterung: 'NO_REDUNDANT_ROLLENERWEITERUNG',
+    ServiceProviderProvidedOutOfTree: 'SERVICE_PROVIDER_PROVIDED_OUT_OF_TREE'
 } as const;
 
 export type DbiamRolleErrorI18nKeyEnum = typeof DbiamRolleErrorI18nKeyEnum[keyof typeof DbiamRolleErrorI18nKeyEnum];
@@ -4317,6 +4318,62 @@ export interface UserExternalDataResponse {
      * @memberof UserExternalDataResponse
      */
     'onlineDateiablage': UserExeternalDataResponseOnlineDateiablage;
+    /**
+     * 
+     * @type {UserExternalDataResponseIqshHelpdesk}
+     * @memberof UserExternalDataResponse
+     */
+    'iqshHelpdesk': UserExternalDataResponseIqshHelpdesk;
+}
+/**
+ * 
+ * @export
+ * @interface UserExternalDataResponseIqshHelpdesk
+ */
+export interface UserExternalDataResponseIqshHelpdesk {
+    /**
+     * 
+     * @type {string}
+     * @memberof UserExternalDataResponseIqshHelpdesk
+     */
+    'vorname': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserExternalDataResponseIqshHelpdesk
+     */
+    'nachname': string;
+    /**
+     * 
+     * @type {Array<UserExternalDataResponseIqshHelpdeskPk>}
+     * @memberof UserExternalDataResponseIqshHelpdesk
+     */
+    'personenkontexte': Array<UserExternalDataResponseIqshHelpdeskPk>;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserExternalDataResponseIqshHelpdesk
+     */
+    'emailAdresse': string;
+}
+/**
+ * 
+ * @export
+ * @interface UserExternalDataResponseIqshHelpdeskPk
+ */
+export interface UserExternalDataResponseIqshHelpdeskPk {
+    /**
+     * 
+     * @type {string}
+     * @memberof UserExternalDataResponseIqshHelpdeskPk
+     */
+    'rolleId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserExternalDataResponseIqshHelpdeskPk
+     */
+    'dstNr': string;
 }
 /**
  * 
@@ -11855,10 +11912,11 @@ export const ProviderApiAxiosParamCreator = function (configuration?: Configurat
         /**
          * Get all service-providers.
          * @summary 
+         * @param {string} [organisationId] The id of the organisation where the service provider should be assignable on
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        providerControllerGetAllServiceProviders: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        providerControllerGetAllServiceProviders: async (organisationId?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/provider/all`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -11878,6 +11936,10 @@ export const ProviderApiAxiosParamCreator = function (configuration?: Configurat
             // authentication oauth2 required
             // oauth required
             await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+            if (organisationId !== undefined) {
+                localVarQueryParameter['organisationId'] = organisationId;
+            }
 
 
     
@@ -12211,11 +12273,12 @@ export const ProviderApiFp = function(configuration?: Configuration) {
         /**
          * Get all service-providers.
          * @summary 
+         * @param {string} [organisationId] The id of the organisation where the service provider should be assignable on
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async providerControllerGetAllServiceProviders(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ServiceProviderResponse>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.providerControllerGetAllServiceProviders(options);
+        async providerControllerGetAllServiceProviders(organisationId?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ServiceProviderResponse>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.providerControllerGetAllServiceProviders(organisationId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -12332,11 +12395,12 @@ export const ProviderApiFactory = function (configuration?: Configuration, baseP
         /**
          * Get all service-providers.
          * @summary 
+         * @param {string} [organisationId] The id of the organisation where the service provider should be assignable on
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        providerControllerGetAllServiceProviders(options?: any): AxiosPromise<Array<ServiceProviderResponse>> {
-            return localVarFp.providerControllerGetAllServiceProviders(options).then((request) => request(axios, basePath));
+        providerControllerGetAllServiceProviders(organisationId?: string, options?: any): AxiosPromise<Array<ServiceProviderResponse>> {
+            return localVarFp.providerControllerGetAllServiceProviders(organisationId, options).then((request) => request(axios, basePath));
         },
         /**
          * Get service-providers available for logged-in user.
@@ -12445,11 +12509,12 @@ export interface ProviderApiInterface {
     /**
      * Get all service-providers.
      * @summary 
+     * @param {string} [organisationId] The id of the organisation where the service provider should be assignable on
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ProviderApiInterface
      */
-    providerControllerGetAllServiceProviders(options?: AxiosRequestConfig): AxiosPromise<Array<ServiceProviderResponse>>;
+    providerControllerGetAllServiceProviders(organisationId?: string, options?: AxiosRequestConfig): AxiosPromise<Array<ServiceProviderResponse>>;
 
     /**
      * Get service-providers available for logged-in user.
@@ -12564,12 +12629,13 @@ export class ProviderApi extends BaseAPI implements ProviderApiInterface {
     /**
      * Get all service-providers.
      * @summary 
+     * @param {string} [organisationId] The id of the organisation where the service provider should be assignable on
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ProviderApi
      */
-    public providerControllerGetAllServiceProviders(options?: AxiosRequestConfig) {
-        return ProviderApiFp(this.configuration).providerControllerGetAllServiceProviders(options).then((request) => request(this.axios, this.basePath));
+    public providerControllerGetAllServiceProviders(organisationId?: string, options?: AxiosRequestConfig) {
+        return ProviderApiFp(this.configuration).providerControllerGetAllServiceProviders(organisationId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

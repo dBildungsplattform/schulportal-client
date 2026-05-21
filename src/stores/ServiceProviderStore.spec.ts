@@ -55,35 +55,27 @@ describe('serviceProviderStore', () => {
   });
 
   describe('getAllServiceProviders', () => {
-    it('should load service providers and update state', async () => {
-      const mockResponse: StartPageServiceProvider[] = [
-        {
-          id: '1234',
-          name: 'itslearning mock',
-          url: 'example.org/itslearning',
-          target: 'URL',
-          kategorie: 'EMAIL',
-          hasLogo: true,
-          requires2fa: true,
-        },
-        {
-          id: '5678',
-          name: 'administration mock',
-          url: '/admin',
-          target: 'URL',
-          kategorie: 'VERWALTUNG',
-          hasLogo: true,
-          requires2fa: false,
-        },
-      ];
+    describe.each([[faker.string.uuid()], [undefined]])(
+      'when query for organisation is %s',
+      (queryString: string | undefined) => {
+        const mockResponse: StartPageServiceProvider[] = [
+          DoFactory.getStartPageServiceProvider(),
+          DoFactory.getStartPageServiceProvider(),
+        ];
+        beforeEach(() => {
+          const url: string = queryString ? `/api/provider/all?organisationId=${queryString}` : '/api/provider/all';
+          mockadapter.onGet(url).replyOnce(200, mockResponse);
+        });
 
-      mockadapter.onGet('/api/provider/all').replyOnce(200, mockResponse);
-      const getAllServiceProvidersPromise: Promise<void> = serviceProviderStore.getAllServiceProviders();
-      expect(serviceProviderStore.loading).toBe(true);
-      await getAllServiceProvidersPromise;
-      expect(serviceProviderStore.allServiceProviders).toEqual([...mockResponse]);
-      expect(serviceProviderStore.loading).toBe(false);
-    });
+        it('should load service providers and update state', async () => {
+          const getAllServiceProvidersPromise: Promise<void> = serviceProviderStore.getAllServiceProviders(queryString);
+          expect(serviceProviderStore.loading).toBe(true);
+          await getAllServiceProvidersPromise;
+          expect(serviceProviderStore.allServiceProviders).toEqual([...mockResponse]);
+          expect(serviceProviderStore.loading).toBe(false);
+        });
+      },
+    );
 
     it('should handle string error', async () => {
       mockadapter.onGet('/api/provider/all').replyOnce(500, 'some mock server error');
