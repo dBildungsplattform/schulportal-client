@@ -27,7 +27,7 @@
     type RolleFieldDefinitions,
   } from '@/utils/validationRolle';
   import { useForm, type FormContext, type TypedSchema } from 'vee-validate';
-  import { computed, onMounted, onUnmounted, ref, type ComputedRef, type Ref } from 'vue';
+  import { computed, onMounted, onUnmounted, ref, watchEffect, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import {
     onBeforeRouteLeave,
@@ -195,7 +195,6 @@
 
   onMounted(async () => {
     rolleStore.createdRolle = null;
-    await serviceProviderStore.getAllServiceProviders();
 
     // Iterate over the enum values
     Object.values(RollenArt).forEach((enumValue: RollenArt) => {
@@ -264,6 +263,12 @@
           OrganisationsTyp.Schule,
         );
       }
+    }
+  });
+
+  watchEffect(async () => {
+    if (selectedAdministrationsebene.value) {
+      await serviceProviderStore.getAllServiceProviders(selectedAdministrationsebene.value);
     }
   });
 </script>

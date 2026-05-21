@@ -1,4 +1,4 @@
-import { expect, test } from 'vitest';
+import { expect, test, type Mock } from 'vitest';
 import { DOMWrapper, VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import RolleDetailsView from './RolleDetailsView.vue';
 import { setActivePinia, createPinia } from 'pinia';
@@ -13,44 +13,53 @@ import {
   type RolleWithServiceProvidersResponse,
 } from '@/stores/RolleStore';
 import { nextTick, type Component } from 'vue';
-import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
-import { RollenSystemRechtEnum, type SystemRechtResponse } from '@/api-client/generated';
+import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
+import { OrganisationsTyp, RollenSystemRechtEnum, type SystemRechtResponse } from '@/api-client/generated';
+import { DoFactory } from 'test/DoFactory';
+import { faker } from '@faker-js/faker';
+import { useServiceProviderStore, type ServiceProviderStore } from '@/stores/ServiceProviderStore';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
 const rolleStore: RolleStore = useRolleStore();
 const organisationStore: OrganisationStore = useOrganisationStore();
+const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
 
-const mockCurrentRolle: Rolle = {
-  administeredBySchulstrukturknoten: '1234',
-  rollenart: 'LEHR',
-  name: 'Lehrer',
-  // TODO: remove type casting when generator is fixed
-  merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
-  systemrechte: ['ROLLEN_VERWALTEN'] as unknown as Set<RollenSystemRecht>,
-  id: '1',
-  version: 1,
-};
-
+const mockOrga: Organisation = DoFactory.getOrganisation({ typ: OrganisationsTyp.Schule });
+const mockCurrentRolle: Rolle = DoFactory.getRolle({ administeredBySchulstrukturknoten: mockOrga.id });
 const mockUpdatedRolle: RolleWithServiceProvidersResponse = {
-  administeredBySchulstrukturknoten: '1234',
-  rollenart: 'LEHR',
+  ...mockCurrentRolle,
+  administeredBySchulstrukturknotenName: mockOrga.name,
+  administeredBySchulstrukturknotenKennung: mockOrga.kennung!,
   name: 'Updated Lehrer',
-  merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
-  systemrechte: [
-    { name: RollenSystemRechtEnum.RollenVerwalten, isTechnical: false },
-  ] as unknown as Set<SystemRechtResponse>,
-  createdAt: '2022',
-  updatedAt: '2023',
-  id: '1',
   serviceProviders: [{ id: 'sp1', name: 'ServiceProvider1' }],
-  administeredBySchulstrukturknotenName: 'Land SH',
-  administeredBySchulstrukturknotenKennung: '',
   version: 2,
+  createdAt: faker.date.past().toISOString(),
+  updatedAt: faker.date.recent().toISOString(),
+  systemrechte: new Set<SystemRechtResponse>(),
 };
 
 rolleStore.currentRolle = mockCurrentRolle;
 rolleStore.updatedRolle = mockUpdatedRolle;
+
+async function mountComponent(): Promise<VueWrapper<InstanceType<typeof RolleDetailsView>>> {
+  const wrapper: VueWrapper<InstanceType<typeof RolleDetailsView>> = mount(RolleDetailsView, {
+    attachTo: document.getElementById('app') || '',
+    global: {
+      components: {
+        RolleDetailsView: RolleDetailsView as Component,
+      },
+      mocks: {
+        route: {
+          fullPath: 'full/path',
+        },
+      },
+      plugins: [router],
+    },
+  });
+  await flushPromises();
+  return wrapper;
+}
 
 beforeEach(async () => {
   setActivePinia(createPinia());
@@ -68,20 +77,7 @@ beforeEach(async () => {
   router.push('/');
   await router.isReady();
 
-  wrapper = mount(RolleDetailsView, {
-    attachTo: document.getElementById('app') || '',
-    global: {
-      components: {
-        RolleDetailsView: RolleDetailsView as Component,
-      },
-      mocks: {
-        route: {
-          fullPath: 'full/path',
-        },
-      },
-      plugins: [router],
-    },
-  });
+  wrapper = await mountComponent();
 });
 
 describe('RolleDetailsView', () => {
@@ -92,53 +88,34 @@ describe('RolleDetailsView', () => {
   test('it renders data for current rolle', async () => {
     rolleStore.errorCode = '';
     rolleStore.updatedRolle = null;
-    rolleStore.currentRolle = {
-      administeredBySchulstrukturknoten: '1234',
-      rollenart: 'LEHR',
-      name: 'Current Lehrer',
-      merkmale: [] as unknown as Set<RollenMerkmal>,
-      systemrechte: [] as unknown as Set<RollenSystemRecht>,
-      id: '1',
-      serviceProviders: [],
-      version: 2,
-    };
-    organisationStore.currentOrganisation = {
-      id: '1234',
-      kennung: '',
-      name: 'Current Schule',
-      namensergaenzung: 'Current Schule',
-      kuerzel: 'CurrentSchool',
-      typ: 'SCHULE',
-      administriertVon: '1',
-      schuleDetails: 'SchuleDetails',
-      version: 1,
-      itslearningEnabled: true,
-    };
-    await flushPromises();
-
-    // TODO: the computed value does not render inside the input
-    // const orgaSelectInput: DOMWrapper<Element> | undefined = wrapper?.find('input#administrationsebene-select');
-    // expect(wrapper?.find('[data-testid="administrationsebene-select"]').text()).toEqual('---');
-
     rolleStore.currentRolle = mockCurrentRolle;
+    organisationStore.currentOrganisation = mockOrga;
+    organisationStore.organisationenFilters.set('rolle-form', {
+      filterResult: [mockOrga],
+      loading: false,
+      total: 1,
+    });
+    wrapper = await mountComponent();
+
+    expect(
+      wrapper
+        ?.findComponent({ ref: 'rolle-form' })
+        .findComponent({ name: 'SchulenFilter' })
+        .findComponent({ ref: 'rolle-form-organisation-select' })
+        .text(),
+    ).toContain(mockOrga.name);
+
     rolleStore.updatedRolle = mockUpdatedRolle;
   });
 
   test('it renders data in success template', async () => {
-    rolleStore.updatedRolle = {
-      administeredBySchulstrukturknoten: '1234',
-      rollenart: 'LEHR',
+    rolleStore.updatedRolle = DoFactory.getRolleWithServiceProviders({
       name: 'Updated Lehrer',
-      merkmale: [] as unknown as Set<RollenMerkmal>,
-      systemrechte: [] as unknown as Set<SystemRechtResponse>,
-      createdAt: '2022',
-      updatedAt: '2023',
-      id: '1',
+      merkmale: new Set(),
+      systemrechte: new Set<SystemRechtResponse>(),
       serviceProviders: [],
-      administeredBySchulstrukturknotenName: 'Land SH',
-      administeredBySchulstrukturknotenKennung: '',
       version: 2,
-    };
+    });
     await flushPromises();
 
     const rolleName: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="updated-rolle-name"]');
@@ -152,8 +129,6 @@ describe('RolleDetailsView', () => {
     expect(rolleMerkmale?.text()).toEqual('---');
     expect(rolleAngebote?.text()).toEqual('---');
     expect(rolleSystemrechte?.text()).toEqual('---');
-
-    rolleStore.updatedRolle = mockUpdatedRolle;
   });
 
   test('it activates editing mode', async () => {
@@ -244,5 +219,17 @@ describe('RolleDetailsView', () => {
     });
     // reset errorCode after test
     rolleStore.errorCode = '';
+  });
+
+  test('it calls getAllServiceProviders on mount', async () => {
+    const rolle: Rolle = DoFactory.getRolle();
+    vi.spyOn(rolleStore, 'getRolleById').mockImplementationOnce(async () => {
+      rolleStore.currentRolle = rolle;
+      return Promise.resolve();
+    });
+    const getAllServiceProvidersSpy: Mock = vi.spyOn(serviceProviderStore, 'getAllServiceProviders');
+    getAllServiceProvidersSpy.mockClear(); // Clear the mock call history before the assertion
+    await mountComponent();
+    expect(getAllServiceProvidersSpy).toHaveBeenCalledWith(rolle.administeredBySchulstrukturknoten);
   });
 });
