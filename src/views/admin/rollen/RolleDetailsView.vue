@@ -241,7 +241,11 @@
   onBeforeMount(async () => {
     rolleStore.errorCode = '';
     await rolleStore.getRolleById(currentRolleId);
-    await serviceProviderStore.getAllServiceProviders(rolleStore.currentRolle?.administeredBySchulstrukturknoten);
+    if (rolleStore.currentRolle) {
+      await serviceProviderStore.getAssignableServiceProvidersForRolle(
+        rolleStore.currentRolle.administeredBySchulstrukturknoten,
+      );
+    }
 
     Object.values(RollenMerkmal).forEach((enumValue: RollenMerkmal) => {
       const i18nPath: string = `admin.rolle.mappingFrontBackEnd.merkmale.${enumValue}`;

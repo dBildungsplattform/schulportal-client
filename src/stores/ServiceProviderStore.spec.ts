@@ -54,32 +54,28 @@ describe('serviceProviderStore', () => {
     expect(serviceProviderStore.loading).toBe(false);
   });
 
-  describe('getAllServiceProviders', () => {
-    describe.each([[faker.string.uuid()], [undefined]])(
-      'when query for organisation is %s',
-      (queryString: string | undefined) => {
-        const mockResponse: StartPageServiceProvider[] = [
-          DoFactory.getStartPageServiceProvider(),
-          DoFactory.getStartPageServiceProvider(),
-        ];
-        beforeEach(() => {
-          const url: string = queryString ? `/api/provider/all?organisationId=${queryString}` : '/api/provider/all';
-          mockadapter.onGet(url).replyOnce(200, mockResponse);
-        });
+  describe('getAssignableServiceProvidersForRolle', () => {
+    const schulstrukturknotenOfRolle: string = faker.string.uuid();
+    const url: string = `/api/provider/assignable-for-rolle?schulstrukturknotenOfRolle=${schulstrukturknotenOfRolle}`;
 
-        it('should load service providers and update state', async () => {
-          const getAllServiceProvidersPromise: Promise<void> = serviceProviderStore.getAllServiceProviders(queryString);
-          expect(serviceProviderStore.loading).toBe(true);
-          await getAllServiceProvidersPromise;
-          expect(serviceProviderStore.allServiceProviders).toEqual([...mockResponse]);
-          expect(serviceProviderStore.loading).toBe(false);
-        });
-      },
-    );
+    it('should load service providers and update state', async () => {
+      const mockResponse: StartPageServiceProvider[] = [
+        DoFactory.getStartPageServiceProvider(),
+        DoFactory.getStartPageServiceProvider(),
+      ];
+      mockadapter.onGet(url).replyOnce(200, mockResponse);
+      const getAllServiceProvidersPromise: Promise<void> =
+        serviceProviderStore.getAssignableServiceProvidersForRolle(schulstrukturknotenOfRolle);
+      expect(serviceProviderStore.loading).toBe(true);
+      await getAllServiceProvidersPromise;
+      expect(serviceProviderStore.allServiceProviders).toEqual([...mockResponse]);
+      expect(serviceProviderStore.loading).toBe(false);
+    });
 
     it('should handle string error', async () => {
-      mockadapter.onGet('/api/provider/all').replyOnce(500, 'some mock server error');
-      const getAllServiceProvidersPromise: Promise<void> = serviceProviderStore.getAllServiceProviders();
+      mockadapter.onGet(url).replyOnce(500, 'some mock server error');
+      const getAllServiceProvidersPromise: Promise<void> =
+        serviceProviderStore.getAssignableServiceProvidersForRolle(schulstrukturknotenOfRolle);
       expect(serviceProviderStore.loading).toBe(true);
       await getAllServiceProvidersPromise;
       expect(serviceProviderStore.allServiceProviders).toEqual([]);
@@ -88,8 +84,9 @@ describe('serviceProviderStore', () => {
     });
 
     it('should handle error code', async () => {
-      mockadapter.onGet('/api/provider/all').replyOnce(500, { code: 'some mock server error' });
-      const getAllServiceProvidersPromise: Promise<void> = serviceProviderStore.getAllServiceProviders();
+      mockadapter.onGet(url).replyOnce(500, { code: 'some mock server error' });
+      const getAllServiceProvidersPromise: Promise<void> =
+        serviceProviderStore.getAssignableServiceProvidersForRolle(schulstrukturknotenOfRolle);
       expect(serviceProviderStore.loading).toBe(true);
       await getAllServiceProvidersPromise;
       expect(serviceProviderStore.allServiceProviders).toEqual([]);

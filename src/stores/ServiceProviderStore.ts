@@ -1,4 +1,4 @@
-import type { AxiosError } from 'axios';
+import type { AxiosError, AxiosResponse } from 'axios';
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 
 import type { ServiceProviderFormSubmitData } from '@/components/admin/service-provider/types';
@@ -167,7 +167,7 @@ function containsMultiError(error: unknown): error is AxiosError<DbiamApplyRolle
 
 type ServiceProviderGetters = object;
 type ServiceProviderActions = {
-  getAllServiceProviders: (administeredBySchulstrukturknoten?: string) => Promise<void>;
+  getAssignableServiceProvidersForRolle: (administeredBySchulstrukturknoten: string) => Promise<void>;
   getAvailableServiceProviders: () => Promise<void>;
   getManageableServiceProviders: (page: number, entriesPerPage: number) => Promise<void>;
   getManageableServiceProvidersForOrganisation: (
@@ -219,11 +219,13 @@ export const useServiceProviderStore: StoreDefinition<
     };
   },
   actions: {
-    async getAllServiceProviders(administeredBySchulstrukturknoten?: string) {
+    async getAssignableServiceProvidersForRolle(administeredBySchulstrukturknoten: string) {
       this.loading = true;
       try {
-        const { data }: { data: StartPageServiceProvider[] } =
-          await serviceProviderApi.providerControllerGetAllServiceProviders(administeredBySchulstrukturknoten);
+        const { data }: AxiosResponse<ServiceProviderResponse[]> =
+          await serviceProviderApi.providerControllerGetAssignableServiceProvidersForRolle(
+            administeredBySchulstrukturknoten,
+          );
         this.allServiceProviders = data;
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');

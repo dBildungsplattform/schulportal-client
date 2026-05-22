@@ -219,15 +219,18 @@ describe('RolleDetailsView', () => {
     rolleStore.errorCode = '';
   });
 
-  test('it calls getAllServiceProviders on mount', async () => {
+  test('it calls getAssignableServiceProvidersForRolle on mount', async () => {
     const rolle: Rolle = DoFactory.getRolle();
     vi.spyOn(rolleStore, 'getRolleById').mockImplementationOnce(async () => {
       rolleStore.currentRolle = rolle;
       return Promise.resolve();
     });
-    const getAllServiceProvidersSpy: Mock = vi.spyOn(serviceProviderStore, 'getAllServiceProviders');
-    getAllServiceProvidersSpy.mockClear(); // Clear the mock call history before the assertion
+    const getAssignableServiceProvidersSpy: Mock = vi.spyOn(
+      serviceProviderStore,
+      'getAssignableServiceProvidersForRolle',
+    );
+    getAssignableServiceProvidersSpy.mockClear(); // Clear the mock call history before the assertion
     await mountComponent();
-    expect(getAllServiceProvidersSpy).toHaveBeenCalledWith(rolle.administeredBySchulstrukturknoten);
+    expect(getAssignableServiceProvidersSpy).toHaveBeenCalledWith(rolle.administeredBySchulstrukturknoten);
   });
 });

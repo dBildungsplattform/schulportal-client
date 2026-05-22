@@ -213,14 +213,17 @@ describe('RolleCreationView', () => {
     expect(push).toHaveBeenCalledTimes(1);
   });
 
-  test('it calls getAllServiceProviders with the correct id after organisation selection', async () => {
-    const getAllServiceProvidersSpy: MockInstance = vi.spyOn(serviceProviderStore, 'getAllServiceProviders');
-    expect(getAllServiceProvidersSpy).not.toHaveBeenCalled();
+  test('it calls getAssignableServiceProvidersForRolle with the correct id after organisation selection', async () => {
+    const getAssignableServiceProvidersSpy: MockInstance = vi.spyOn(
+      serviceProviderStore,
+      'getAssignableServiceProvidersForRolle',
+    );
+    expect(getAssignableServiceProvidersSpy).not.toHaveBeenCalled();
     await fillForm({
       organisation: organisationObject.id,
     });
     await flushPromises();
-    expect(getAllServiceProvidersSpy).toHaveBeenCalledWith(organisationObject.id);
+    expect(getAssignableServiceProvidersSpy).toHaveBeenCalledWith(organisationObject.id);
   });
 
   test('it fills form and triggers dirty warning', async () => {

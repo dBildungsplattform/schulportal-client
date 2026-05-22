@@ -11910,14 +11910,16 @@ export const ProviderApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
-         * Get all service-providers.
+         * Get all service-providers assignable for a role.
          * @summary 
-         * @param {string} [organisationId] The id of the organisation where the service provider should be assignable on
+         * @param {string} schulstrukturknotenOfRolle The id of the organisation where the service provider should be assignable on
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        providerControllerGetAllServiceProviders: async (organisationId?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/provider/all`;
+        providerControllerGetAssignableServiceProvidersForRolle: async (schulstrukturknotenOfRolle: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'schulstrukturknotenOfRolle' is not null or undefined
+            assertParamExists('providerControllerGetAssignableServiceProvidersForRolle', 'schulstrukturknotenOfRolle', schulstrukturknotenOfRolle)
+            const localVarPath = `/api/provider/assignable-for-rolle`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -11937,8 +11939,8 @@ export const ProviderApiAxiosParamCreator = function (configuration?: Configurat
             // oauth required
             await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
 
-            if (organisationId !== undefined) {
-                localVarQueryParameter['organisationId'] = organisationId;
+            if (schulstrukturknotenOfRolle !== undefined) {
+                localVarQueryParameter['schulstrukturknotenOfRolle'] = schulstrukturknotenOfRolle;
             }
 
 
@@ -12271,14 +12273,14 @@ export const ProviderApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Get all service-providers.
+         * Get all service-providers assignable for a role.
          * @summary 
-         * @param {string} [organisationId] The id of the organisation where the service provider should be assignable on
+         * @param {string} schulstrukturknotenOfRolle The id of the organisation where the service provider should be assignable on
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async providerControllerGetAllServiceProviders(organisationId?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ServiceProviderResponse>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.providerControllerGetAllServiceProviders(organisationId, options);
+        async providerControllerGetAssignableServiceProvidersForRolle(schulstrukturknotenOfRolle: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ServiceProviderResponse>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.providerControllerGetAssignableServiceProvidersForRolle(schulstrukturknotenOfRolle, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -12393,14 +12395,14 @@ export const ProviderApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.providerControllerFindRollenerweiterungenByServiceProviderId(angebotId, offset, limit, organisationId, options).then((request) => request(axios, basePath));
         },
         /**
-         * Get all service-providers.
+         * Get all service-providers assignable for a role.
          * @summary 
-         * @param {string} [organisationId] The id of the organisation where the service provider should be assignable on
+         * @param {string} schulstrukturknotenOfRolle The id of the organisation where the service provider should be assignable on
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        providerControllerGetAllServiceProviders(organisationId?: string, options?: any): AxiosPromise<Array<ServiceProviderResponse>> {
-            return localVarFp.providerControllerGetAllServiceProviders(organisationId, options).then((request) => request(axios, basePath));
+        providerControllerGetAssignableServiceProvidersForRolle(schulstrukturknotenOfRolle: string, options?: any): AxiosPromise<Array<ServiceProviderResponse>> {
+            return localVarFp.providerControllerGetAssignableServiceProvidersForRolle(schulstrukturknotenOfRolle, options).then((request) => request(axios, basePath));
         },
         /**
          * Get service-providers available for logged-in user.
@@ -12507,14 +12509,14 @@ export interface ProviderApiInterface {
     providerControllerFindRollenerweiterungenByServiceProviderId(angebotId: string, offset?: number, limit?: number, organisationId?: string, options?: AxiosRequestConfig): AxiosPromise<ProviderControllerFindRollenerweiterungenByServiceProviderId200Response>;
 
     /**
-     * Get all service-providers.
+     * Get all service-providers assignable for a role.
      * @summary 
-     * @param {string} [organisationId] The id of the organisation where the service provider should be assignable on
+     * @param {string} schulstrukturknotenOfRolle The id of the organisation where the service provider should be assignable on
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ProviderApiInterface
      */
-    providerControllerGetAllServiceProviders(organisationId?: string, options?: AxiosRequestConfig): AxiosPromise<Array<ServiceProviderResponse>>;
+    providerControllerGetAssignableServiceProvidersForRolle(schulstrukturknotenOfRolle: string, options?: AxiosRequestConfig): AxiosPromise<Array<ServiceProviderResponse>>;
 
     /**
      * Get service-providers available for logged-in user.
@@ -12627,15 +12629,15 @@ export class ProviderApi extends BaseAPI implements ProviderApiInterface {
     }
 
     /**
-     * Get all service-providers.
+     * Get all service-providers assignable for a role.
      * @summary 
-     * @param {string} [organisationId] The id of the organisation where the service provider should be assignable on
+     * @param {string} schulstrukturknotenOfRolle The id of the organisation where the service provider should be assignable on
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ProviderApi
      */
-    public providerControllerGetAllServiceProviders(organisationId?: string, options?: AxiosRequestConfig) {
-        return ProviderApiFp(this.configuration).providerControllerGetAllServiceProviders(organisationId, options).then((request) => request(this.axios, this.basePath));
+    public providerControllerGetAssignableServiceProvidersForRolle(schulstrukturknotenOfRolle: string, options?: AxiosRequestConfig) {
+        return ProviderApiFp(this.configuration).providerControllerGetAssignableServiceProvidersForRolle(schulstrukturknotenOfRolle, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

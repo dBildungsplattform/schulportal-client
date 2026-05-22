@@ -268,7 +268,7 @@
 
   watchEffect(async () => {
     if (selectedAdministrationsebene.value) {
-      await serviceProviderStore.getAllServiceProviders(selectedAdministrationsebene.value);
+      await serviceProviderStore.getAssignableServiceProvidersForRolle(selectedAdministrationsebene.value);
     }
   });
 </script>

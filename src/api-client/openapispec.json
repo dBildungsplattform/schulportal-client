@@ -1502,17 +1502,17 @@
         "tags": ["rolle"]
       }
     },
-    "/api/provider/all": {
+    "/api/provider/assignable-for-rolle": {
       "get": {
-        "description": "Get all service-providers.",
-        "operationId": "ProviderController_getAllServiceProviders",
+        "description": "Get all service-providers assignable for a role.",
+        "operationId": "ProviderController_getAssignableServiceProvidersForRolle",
         "parameters": [
           {
-            "name": "organisationId",
-            "required": false,
+            "name": "schulstrukturknotenOfRolle",
+            "required": true,
             "in": "query",
             "description": "The id of the organisation where the service provider should be assignable on",
-            "schema": { "nullable": true, "type": "string" }
+            "schema": { "nullable": false, "type": "string" }
           }
         ],
         "responses": {
