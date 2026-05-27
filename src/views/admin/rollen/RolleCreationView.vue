@@ -27,7 +27,7 @@
     type RolleFieldDefinitions,
   } from '@/utils/validationRolle';
   import { useForm, type FormContext, type TypedSchema } from 'vee-validate';
-  import { computed, onMounted, onUnmounted, ref, watchEffect, type ComputedRef, type Ref } from 'vue';
+  import { computed, onMounted, onUnmounted, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import {
     onBeforeRouteLeave,
@@ -266,11 +266,16 @@
     }
   });
 
-  watchEffect(async () => {
-    if (selectedAdministrationsebene.value) {
-      await serviceProviderStore.getAssignableServiceProvidersForRolle(selectedAdministrationsebene.value);
-    }
-  });
+  watch(
+    selectedAdministrationsebene,
+    async () => {
+      selectedServiceProviders.value = [];
+      if (selectedAdministrationsebene.value) {
+        await serviceProviderStore.getAssignableServiceProvidersForRolle(selectedAdministrationsebene.value);
+      }
+    },
+    { immediate: true },
+  );
 </script>
 
 <template>

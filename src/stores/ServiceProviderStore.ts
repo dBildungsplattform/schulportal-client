@@ -222,6 +222,7 @@ export const useServiceProviderStore: StoreDefinition<
     async getAssignableServiceProvidersForRolle(administeredBySchulstrukturknoten: string) {
       this.loading = true;
       try {
+        this.allServiceProviders = [];
         const { data }: AxiosResponse<ServiceProviderResponse[]> =
           await serviceProviderApi.providerControllerGetAssignableServiceProvidersForRolle(
             administeredBySchulstrukturknoten,
