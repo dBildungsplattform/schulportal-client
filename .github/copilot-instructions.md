@@ -15,7 +15,7 @@
 ## Priorities
 
 - Security: command injection, path traversal, missing external input validation, sensitive error leaks.
-- Correctness: logic errors, resource leaks, boundary/off-by-one bugs, optional booleans that should default to `false`.
+- Correctness: logic errors, resource leaks, boundary/off-by-one bugs, risky defaults.
 
 ## CI Awareness
 
