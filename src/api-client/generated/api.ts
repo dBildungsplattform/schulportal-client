@@ -3802,7 +3802,7 @@ export interface ServiceProviderResponse {
      * @type {string}
      * @memberof ServiceProviderResponse
      */
-    'url': string;
+    'url'?: string;
     /**
      * 
      * @type {ServiceProviderKategorie}
@@ -3814,19 +3814,19 @@ export interface ServiceProviderResponse {
      * @type {number}
      * @memberof ServiceProviderResponse
      */
-    'logoId': number;
+    'logoId'?: number;
     /**
-     * 
+     * Indicates if a custom logo is available for fetching
      * @type {boolean}
      * @memberof ServiceProviderResponse
      */
     'hasLogo': boolean;
     /**
-     * 
+     * Optional, indicates if 2FA is required
      * @type {boolean}
      * @memberof ServiceProviderResponse
      */
-    'requires2fa': boolean;
+    'requires2fa'?: boolean;
     /**
      * 
      * @type {Array<ServiceProviderMerkmal>}
@@ -5764,43 +5764,6 @@ export const CronApiAxiosParamCreator = function (configuration?: Configuration)
                 options: localVarRequestOptions,
             };
         },
-        /**
-         * 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        cronControllerUpdateServiceProvidersForVidisAngebote: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/cron/vidis-angebote`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication bearer required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            // authentication oauth2 required
-            // oauth required
-            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
     }
 };
 
@@ -5856,15 +5819,6 @@ export const CronApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.cronControllerUnlockUsersWithExpiredLocks(options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
-        /**
-         * 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async cronControllerUpdateServiceProvidersForVidisAngebote(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<boolean>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.cronControllerUpdateServiceProvidersForVidisAngebote(options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
     }
 };
 
@@ -5915,14 +5869,6 @@ export const CronApiFactory = function (configuration?: Configuration, basePath?
         cronControllerUnlockUsersWithExpiredLocks(options?: any): AxiosPromise<boolean> {
             return localVarFp.cronControllerUnlockUsersWithExpiredLocks(options).then((request) => request(axios, basePath));
         },
-        /**
-         * 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        cronControllerUpdateServiceProvidersForVidisAngebote(options?: any): AxiosPromise<boolean> {
-            return localVarFp.cronControllerUpdateServiceProvidersForVidisAngebote(options).then((request) => request(axios, basePath));
-        },
     };
 };
 
@@ -5971,14 +5917,6 @@ export interface CronApiInterface {
      * @memberof CronApiInterface
      */
     cronControllerUnlockUsersWithExpiredLocks(options?: AxiosRequestConfig): AxiosPromise<boolean>;
-
-    /**
-     * 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof CronApiInterface
-     */
-    cronControllerUpdateServiceProvidersForVidisAngebote(options?: AxiosRequestConfig): AxiosPromise<boolean>;
 
 }
 
@@ -6037,16 +5975,6 @@ export class CronApi extends BaseAPI implements CronApiInterface {
      */
     public cronControllerUnlockUsersWithExpiredLocks(options?: AxiosRequestConfig) {
         return CronApiFp(this.configuration).cronControllerUnlockUsersWithExpiredLocks(options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof CronApi
-     */
-    public cronControllerUpdateServiceProvidersForVidisAngebote(options?: AxiosRequestConfig) {
-        return CronApiFp(this.configuration).cronControllerUpdateServiceProvidersForVidisAngebote(options).then((request) => request(this.axios, this.basePath));
     }
 }
 

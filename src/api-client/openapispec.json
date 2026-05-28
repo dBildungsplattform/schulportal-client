@@ -1526,6 +1526,7 @@
           },
           "401": { "description": "Not authorized to get available service providers." },
           "403": { "description": "Insufficient permissions to get service-providers." },
+          "404": { "description": "No service-providers found or lacking permissions." },
           "500": { "description": "Internal server error while getting all service-providers." }
         },
         "security": [{ "bearer": [] }, { "oauth2": ["openid"] }],
@@ -2383,25 +2384,6 @@
           "403": { "description": "Insufficient permissions to unlock users." },
           "404": { "description": "Insufficient permissions to unlock users." },
           "500": { "description": "Internal server error while trying to unlock users." }
-        },
-        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }],
-        "tags": ["cron"]
-      }
-    },
-    "/api/cron/vidis-angebote": {
-      "put": {
-        "operationId": "CronController_updateServiceProvidersForVidisAngebote",
-        "parameters": [],
-        "responses": {
-          "201": {
-            "description": "VIDIS Angebote were successfully updated.",
-            "content": { "application/json": { "schema": { "type": "boolean" } } }
-          },
-          "400": { "description": "VIDIS Angebote were not successfully updated." },
-          "401": { "description": "Not authorized to update VIDIS Angebote." },
-          "403": { "description": "Insufficient permissions to update VIDIS Angebote." },
-          "404": { "description": "Insufficient permissions to update VIDIS Angebote." },
-          "500": { "description": "Internal server error while trying to update VIDIS Angebote." }
         },
         "security": [{ "oauth2": ["openid"] }, { "bearer": [] }],
         "tags": ["cron"]
@@ -3780,11 +3762,11 @@
           "url": { "type": "string", "description": "Can be undefined, if `target` is not equal to `URL`" },
           "kategorie": { "allOf": [{ "$ref": "#/components/schemas/ServiceProviderKategorie" }] },
           "logoId": { "type": "number", "description": "Optional logoId for use with standard logos" },
-          "hasLogo": { "type": "boolean" },
-          "requires2fa": { "type": "boolean" },
+          "hasLogo": { "type": "boolean", "description": "Indicates if a custom logo is available for fetching" },
+          "requires2fa": { "type": "boolean", "description": "Optional, indicates if 2FA is required" },
           "merkmale": { "type": "array", "items": { "$ref": "#/components/schemas/ServiceProviderMerkmal" } }
         },
-        "required": ["id", "name", "target", "url", "kategorie", "logoId", "hasLogo", "requires2fa", "merkmale"]
+        "required": ["id", "name", "target", "kategorie", "hasLogo", "merkmale"]
       },
       "UpdateRolleBodyParams": {
         "type": "object",
