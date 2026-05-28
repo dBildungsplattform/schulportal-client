@@ -193,7 +193,7 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
 
     async getCsrfToken(): Promise<void> {
       try {
-        const response = await authApi.authenticationControllerGetCsrfToken();
+        const response: AxiosResponse<CsrfTokenResponse> = await authApi.authenticationControllerGetCsrfToken();
 
         this.csrfToken = response.data.csrfToken;
       } catch {
