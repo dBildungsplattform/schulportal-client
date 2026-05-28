@@ -201,6 +201,10 @@
   watch(
     () => (props.allowMultipleRollen ? selectedRollen.value : selectedRolle.value),
     async (newValue: string | string[] | undefined, oldValue: string | string[] | undefined) => {
+      // Cancel any pending debounced search to prevent a stale request from overwriting
+      // the workflow response triggered by this selection.
+      clearTimeout(timerId.value);
+
       if (props.allowMultipleRollen) {
         const newRollen: string[] | undefined = newValue as string[] | undefined;
         if (newRollen && newRollen.length > 0) {
