@@ -36,7 +36,7 @@ export type BaseServiceProvider = {
 };
 
 export type StartPageServiceProvider = BaseServiceProvider & {
-  url: string;
+  url?: string;
   hasLogo: boolean;
   target: string;
   // Could be undefined if the logo is not provided by the backend
@@ -110,13 +110,13 @@ export type ServiceProviderCreationFilter = {
 };
 
 export type CreatedServiceProvider = BaseServiceProvider & {
-  url: string;
+  url?: string;
   merkmale: Array<ServiceProviderMerkmal>;
   logoId?: number;
 };
 
 export type UpdatedServiceProvider = BaseServiceProvider & {
-  url: string;
+  url?: string;
   merkmale: Array<ServiceProviderMerkmal>;
   logoId?: number;
 };

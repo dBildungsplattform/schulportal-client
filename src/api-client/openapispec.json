@@ -1569,7 +1569,9 @@
         "responses": {
           "201": {
             "description": "The service-provider was successfully created.",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ServiceProviderResponse" } } }
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/CreateServiceProviderResponse" } }
+            }
           },
           "400": { "description": "Invalid request body." },
           "401": { "description": "Not authorized." },
@@ -3763,10 +3765,10 @@
           "kategorie": { "allOf": [{ "$ref": "#/components/schemas/ServiceProviderKategorie" }] },
           "logoId": { "type": "number", "description": "Optional logoId for use with standard logos" },
           "hasLogo": { "type": "boolean", "description": "Indicates if a custom logo is available for fetching" },
-          "requires2fa": { "type": "boolean", "description": "Optional, indicates if 2FA is required" },
+          "requires2fa": { "type": "boolean", "description": "Indicates if 2FA is required" },
           "merkmale": { "type": "array", "items": { "$ref": "#/components/schemas/ServiceProviderMerkmal" } }
         },
-        "required": ["id", "name", "target", "kategorie", "hasLogo", "merkmale"]
+        "required": ["id", "name", "target", "kategorie", "hasLogo", "requires2fa", "merkmale"]
       },
       "UpdateRolleBodyParams": {
         "type": "object",
@@ -4006,7 +4008,22 @@
             "items": { "type": "string", "enum": ["NACHTRAEGLICH_ZUWEISBAR", "VERFUEGBAR_FUER_ROLLENERWEITERUNG"] }
           }
         },
-        "required": ["organisationId", "name", "kategorie", "requires2fa", "merkmale"]
+        "required": ["organisationId", "name", "url", "kategorie", "requires2fa", "merkmale"]
+      },
+      "CreateServiceProviderResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "target": { "allOf": [{ "$ref": "#/components/schemas/ServiceProviderTarget" }] },
+          "url": { "type": "string", "description": "Can be undefined, if `target` is not equal to `URL`" },
+          "kategorie": { "allOf": [{ "$ref": "#/components/schemas/ServiceProviderKategorie" }] },
+          "logoId": { "type": "number", "description": "Optional logoId for use with standard logos" },
+          "hasLogo": { "type": "boolean", "description": "Indicates if a custom logo is available for fetching" },
+          "requires2fa": { "type": "boolean", "description": "Indicates if 2FA is required" },
+          "merkmale": { "type": "array", "items": { "$ref": "#/components/schemas/ServiceProviderMerkmal" } }
+        },
+        "required": ["id", "name", "target", "kategorie", "hasLogo", "requires2fa", "merkmale"]
       },
       "UpdateServiceProviderBodyParams": {
         "type": "object",

@@ -326,7 +326,7 @@ export interface CreateServiceProviderBodyParams {
      * @type {string}
      * @memberof CreateServiceProviderBodyParams
      */
-    'url'?: string;
+    'url': string;
     /**
      * Optional logoId to use a standard logo. Has to be a positive integer. Only one of logoId or logoBase64 with logoMimeType can be provided, not both.
      * @type {number}
@@ -388,6 +388,69 @@ export const CreateServiceProviderBodyParamsMerkmaleEnum = {
 } as const;
 
 export type CreateServiceProviderBodyParamsMerkmaleEnum = typeof CreateServiceProviderBodyParamsMerkmaleEnum[keyof typeof CreateServiceProviderBodyParamsMerkmaleEnum];
+
+/**
+ * 
+ * @export
+ * @interface CreateServiceProviderResponse
+ */
+export interface CreateServiceProviderResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateServiceProviderResponse
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateServiceProviderResponse
+     */
+    'name': string;
+    /**
+     * 
+     * @type {ServiceProviderTarget}
+     * @memberof CreateServiceProviderResponse
+     */
+    'target': ServiceProviderTarget;
+    /**
+     * Can be undefined, if `target` is not equal to `URL`
+     * @type {string}
+     * @memberof CreateServiceProviderResponse
+     */
+    'url'?: string;
+    /**
+     * 
+     * @type {ServiceProviderKategorie}
+     * @memberof CreateServiceProviderResponse
+     */
+    'kategorie': ServiceProviderKategorie;
+    /**
+     * Optional logoId for use with standard logos
+     * @type {number}
+     * @memberof CreateServiceProviderResponse
+     */
+    'logoId'?: number;
+    /**
+     * Indicates if a custom logo is available for fetching
+     * @type {boolean}
+     * @memberof CreateServiceProviderResponse
+     */
+    'hasLogo': boolean;
+    /**
+     * Indicates if 2FA is required
+     * @type {boolean}
+     * @memberof CreateServiceProviderResponse
+     */
+    'requires2fa': boolean;
+    /**
+     * 
+     * @type {Array<ServiceProviderMerkmal>}
+     * @memberof CreateServiceProviderResponse
+     */
+    'merkmale': Array<ServiceProviderMerkmal>;
+}
+
 
 /**
  * 
@@ -3822,11 +3885,11 @@ export interface ServiceProviderResponse {
      */
     'hasLogo': boolean;
     /**
-     * Optional, indicates if 2FA is required
+     * Indicates if 2FA is required
      * @type {boolean}
      * @memberof ServiceProviderResponse
      */
-    'requires2fa'?: boolean;
+    'requires2fa': boolean;
     /**
      * 
      * @type {Array<ServiceProviderMerkmal>}
@@ -12171,7 +12234,7 @@ export const ProviderApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async providerControllerCreateServiceProvider(createServiceProviderBodyParams: CreateServiceProviderBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ServiceProviderResponse>> {
+        async providerControllerCreateServiceProvider(createServiceProviderBodyParams: CreateServiceProviderBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreateServiceProviderResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.providerControllerCreateServiceProvider(createServiceProviderBodyParams, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -12296,7 +12359,7 @@ export const ProviderApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        providerControllerCreateServiceProvider(createServiceProviderBodyParams: CreateServiceProviderBodyParams, options?: any): AxiosPromise<ServiceProviderResponse> {
+        providerControllerCreateServiceProvider(createServiceProviderBodyParams: CreateServiceProviderBodyParams, options?: any): AxiosPromise<CreateServiceProviderResponse> {
             return localVarFp.providerControllerCreateServiceProvider(createServiceProviderBodyParams, options).then((request) => request(axios, basePath));
         },
         /**
@@ -12411,7 +12474,7 @@ export interface ProviderApiInterface {
      * @throws {RequiredError}
      * @memberof ProviderApiInterface
      */
-    providerControllerCreateServiceProvider(createServiceProviderBodyParams: CreateServiceProviderBodyParams, options?: AxiosRequestConfig): AxiosPromise<ServiceProviderResponse>;
+    providerControllerCreateServiceProvider(createServiceProviderBodyParams: CreateServiceProviderBodyParams, options?: AxiosRequestConfig): AxiosPromise<CreateServiceProviderResponse>;
 
     /**
      * Delete a service-provider (Angebot) by id.
