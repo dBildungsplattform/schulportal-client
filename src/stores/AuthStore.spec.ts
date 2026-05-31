@@ -1,19 +1,18 @@
 import type { CsrfTokenResponse, UserinfoResponse } from '@/api-client/generated';
-import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
 import { createPinia, setActivePinia } from 'pinia';
 import { DoFactory } from 'test/DoFactory';
 import { useAuthStore, type AuthStore } from './AuthStore';
-
-const mockadapter: MockAdapter = new MockAdapter(ApiService);
+import axiosApiInstance from '@/services/ApiService';
 
 describe('AuthStore', () => {
   let authStore: AuthStore;
+  let mockadapter: MockAdapter;
 
   beforeEach(() => {
     setActivePinia(createPinia());
     authStore = useAuthStore();
-    mockadapter.reset();
+    mockadapter = new MockAdapter(axiosApiInstance);
   });
 
   it('should initalize state correctly', () => {
