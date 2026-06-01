@@ -188,6 +188,7 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
         this.isAuthenticated = false;
         this.acr = StepUpLevel.NONE;
         this.timeLimitInfos = [];
+        this.csrfToken = null;
       }
     },
 
