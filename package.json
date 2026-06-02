@@ -5,6 +5,10 @@
   "private": true,
   "type": "module",
   "license": "EUPL-1.2",
+  "engines": {
+    "node": "= 24.14.1",
+    "npm": ">=11.10.0"
+  },
   "scripts": {
     "build": "npm run type-check && npm run build-only",
     "build-only": "vite build",
