@@ -4016,14 +4016,14 @@
           "id": { "type": "string" },
           "name": { "type": "string" },
           "target": { "allOf": [{ "$ref": "#/components/schemas/ServiceProviderTarget" }] },
-          "url": { "type": "string", "description": "Can be undefined, if `target` is not equal to `URL`" },
+          "url": { "type": "string", "description": "URL of created service provider" },
           "kategorie": { "allOf": [{ "$ref": "#/components/schemas/ServiceProviderKategorie" }] },
           "logoId": { "type": "number", "description": "Optional logoId for use with standard logos" },
           "hasLogo": { "type": "boolean", "description": "Indicates if a custom logo is available for fetching" },
           "requires2fa": { "type": "boolean", "description": "Indicates if 2FA is required" },
           "merkmale": { "type": "array", "items": { "$ref": "#/components/schemas/ServiceProviderMerkmal" } }
         },
-        "required": ["id", "name", "target", "kategorie", "hasLogo", "requires2fa", "merkmale"]
+        "required": ["id", "name", "target", "url", "kategorie", "hasLogo", "requires2fa", "merkmale"]
       },
       "UpdateServiceProviderBodyParams": {
         "type": "object",

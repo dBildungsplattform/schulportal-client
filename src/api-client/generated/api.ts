@@ -414,11 +414,11 @@ export interface CreateServiceProviderResponse {
      */
     'target': ServiceProviderTarget;
     /**
-     * Can be undefined, if `target` is not equal to `URL`
+     * URL of created service provider
      * @type {string}
      * @memberof CreateServiceProviderResponse
      */
-    'url'?: string;
+    'url': string;
     /**
      * 
      * @type {ServiceProviderKategorie}

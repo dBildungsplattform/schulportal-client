@@ -12,6 +12,7 @@ import {
   ServiceProviderMerkmal,
   type ApplyRollenerweiterungBodyParams,
   type CreateServiceProviderBodyParams,
+  type CreateServiceProviderResponse,
   type DbiamApplyRollenerweiterungMultiError,
   type DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInner,
   type ManageableServiceProviderResponse,
@@ -110,7 +111,7 @@ export type ServiceProviderCreationFilter = {
 };
 
 export type CreatedServiceProvider = BaseServiceProvider & {
-  url?: string;
+  url: string;
   merkmale: Array<ServiceProviderMerkmal>;
   logoId?: number;
 };
@@ -426,7 +427,7 @@ export const useServiceProviderStore: StoreDefinition<
           requires2fa: filter.requires2fa,
           merkmale: filter.merkmale,
         };
-        const { data }: { data: ServiceProviderResponse } =
+        const { data }: { data: CreateServiceProviderResponse } =
           await serviceProviderApi.providerControllerCreateServiceProvider(bodyParams);
         this.createdServiceProvider = data;
       } catch (error) {
