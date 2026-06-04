@@ -271,7 +271,9 @@
     async () => {
       selectedServiceProviders.value = [];
       if (selectedAdministrationsebene.value) {
-        await serviceProviderStore.getAssignableServiceProvidersForRolle(selectedAdministrationsebene.value);
+        await serviceProviderStore.getAssignableServiceProvidersForRolleByOrganisationId(
+          selectedAdministrationsebene.value,
+        );
       }
     },
     { immediate: true },

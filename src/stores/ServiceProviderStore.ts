@@ -168,7 +168,7 @@ function containsMultiError(error: unknown): error is AxiosError<DbiamApplyRolle
 
 type ServiceProviderGetters = object;
 type ServiceProviderActions = {
-  getAssignableServiceProvidersForRolle: (administeredBySchulstrukturknoten: string) => Promise<void>;
+  getAssignableServiceProvidersForRolleByOrganisationId: (administeredBySchulstrukturknoten: string) => Promise<void>;
   getAvailableServiceProviders: () => Promise<void>;
   getManageableServiceProviders: (page: number, entriesPerPage: number) => Promise<void>;
   getManageableServiceProvidersForOrganisation: (
@@ -220,7 +220,7 @@ export const useServiceProviderStore: StoreDefinition<
     };
   },
   actions: {
-    async getAssignableServiceProvidersForRolle(administeredBySchulstrukturknoten: string) {
+    async getAssignableServiceProvidersForRolleByOrganisationId(administeredBySchulstrukturknoten: string) {
       this.loading = true;
       try {
         this.allServiceProviders = [];

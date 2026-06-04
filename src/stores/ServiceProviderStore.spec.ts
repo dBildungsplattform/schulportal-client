@@ -54,7 +54,7 @@ describe('serviceProviderStore', () => {
     expect(serviceProviderStore.loading).toBe(false);
   });
 
-  describe('getAssignableServiceProvidersForRolle', () => {
+  describe('getAssignableServiceProvidersForRolleByOrganisationId', () => {
     const schulstrukturknotenOfRolle: string = faker.string.uuid();
     const url: string = `/api/provider/assignable-for-rolle?schulstrukturknotenOfRolle=${schulstrukturknotenOfRolle}`;
 
@@ -65,7 +65,7 @@ describe('serviceProviderStore', () => {
       ];
       mockadapter.onGet(url).replyOnce(200, mockResponse);
       const getAllServiceProvidersPromise: Promise<void> =
-        serviceProviderStore.getAssignableServiceProvidersForRolle(schulstrukturknotenOfRolle);
+        serviceProviderStore.getAssignableServiceProvidersForRolleByOrganisationId(schulstrukturknotenOfRolle);
       expect(serviceProviderStore.loading).toBe(true);
       await getAllServiceProvidersPromise;
       expect(serviceProviderStore.allServiceProviders).toEqual([...mockResponse]);
@@ -75,7 +75,7 @@ describe('serviceProviderStore', () => {
     it('should handle string error', async () => {
       mockadapter.onGet(url).replyOnce(500, 'some mock server error');
       const getAllServiceProvidersPromise: Promise<void> =
-        serviceProviderStore.getAssignableServiceProvidersForRolle(schulstrukturknotenOfRolle);
+        serviceProviderStore.getAssignableServiceProvidersForRolleByOrganisationId(schulstrukturknotenOfRolle);
       expect(serviceProviderStore.loading).toBe(true);
       await getAllServiceProvidersPromise;
       expect(serviceProviderStore.allServiceProviders).toEqual([]);
@@ -86,7 +86,7 @@ describe('serviceProviderStore', () => {
     it('should handle error code', async () => {
       mockadapter.onGet(url).replyOnce(500, { code: 'some mock server error' });
       const getAllServiceProvidersPromise: Promise<void> =
-        serviceProviderStore.getAssignableServiceProvidersForRolle(schulstrukturknotenOfRolle);
+        serviceProviderStore.getAssignableServiceProvidersForRolleByOrganisationId(schulstrukturknotenOfRolle);
       expect(serviceProviderStore.loading).toBe(true);
       await getAllServiceProvidersPromise;
       expect(serviceProviderStore.allServiceProviders).toEqual([]);

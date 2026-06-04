@@ -213,10 +213,10 @@ describe('RolleCreationView', () => {
     expect(push).toHaveBeenCalledTimes(1);
   });
 
-  test('it calls getAssignableServiceProvidersForRolle with the correct id after organisation selection', async () => {
+  test('it calls getAssignableServiceProvidersForRolleByOrganisationId with the correct id after organisation selection', async () => {
     const getAssignableServiceProvidersSpy: MockInstance = vi.spyOn(
       serviceProviderStore,
-      'getAssignableServiceProvidersForRolle',
+      'getAssignableServiceProvidersForRolleByOrganisationId',
     );
     expect(getAssignableServiceProvidersSpy).not.toHaveBeenCalled();
     await fillForm({

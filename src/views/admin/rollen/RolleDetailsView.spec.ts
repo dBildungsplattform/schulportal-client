@@ -219,7 +219,7 @@ describe('RolleDetailsView', () => {
     rolleStore.errorCode = '';
   });
 
-  test('it calls getAssignableServiceProvidersForRolle on mount', async () => {
+  test('it calls getAssignableServiceProvidersForRolleByOrganisationId on mount', async () => {
     const rolle: Rolle = DoFactory.getRolle();
     vi.spyOn(rolleStore, 'getRolleById').mockImplementationOnce(async () => {
       rolleStore.currentRolle = rolle;
@@ -227,7 +227,7 @@ describe('RolleDetailsView', () => {
     });
     const getAssignableServiceProvidersSpy: Mock = vi.spyOn(
       serviceProviderStore,
-      'getAssignableServiceProvidersForRolle',
+      'getAssignableServiceProvidersForRolleByOrganisationId',
     );
     getAssignableServiceProvidersSpy.mockClear(); // Clear the mock call history before the assertion
     await mountComponent();

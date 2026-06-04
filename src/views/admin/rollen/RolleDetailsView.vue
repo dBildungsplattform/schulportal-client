@@ -242,7 +242,7 @@
     rolleStore.errorCode = '';
     await rolleStore.getRolleById(currentRolleId);
     if (rolleStore.currentRolle) {
-      await serviceProviderStore.getAssignableServiceProvidersForRolle(
+      await serviceProviderStore.getAssignableServiceProvidersForRolleByOrganisationId(
         rolleStore.currentRolle.administeredBySchulstrukturknoten,
       );
     }
