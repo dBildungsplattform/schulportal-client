@@ -2,7 +2,6 @@ import routes from '@/router/routes';
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import { nextTick, type Component } from 'vue';
 import { VueWrapper, mount } from '@vue/test-utils';
-import type WrapperLike from 'node_modules/@vue/test-utils/dist/interfaces/wrapperLike';
 import { expect, test } from 'vitest';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import SchuleManagementView from './SchuleManagementView.vue';
@@ -95,7 +94,7 @@ describe('SchuleManagementView', () => {
     expect(wrapper?.find('.v-data-table-footer__items-per-page').isVisible()).toBe(true);
     expect(wrapper?.find('.v-data-table-footer__items-per-page').text()).toContain('30');
 
-    const itemsPerPageSelection: WrapperLike | undefined = wrapper?.findComponent(
+    const itemsPerPageSelection: ReturnType<VueWrapper['findComponent']> | undefined = wrapper?.findComponent(
       '.v-data-table-footer__items-per-page .v-select',
     );
     await itemsPerPageSelection?.setValue(50);

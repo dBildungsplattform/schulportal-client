@@ -15,7 +15,6 @@ import type { Person } from '@/stores/types/Person';
 import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
 import type { Zuordnung } from '@/stores/types/Zuordnung';
 import { DOMWrapper, VueWrapper, flushPromises, mount } from '@vue/test-utils';
-import type WrapperLike from 'node_modules/@vue/test-utils/dist/interfaces/wrapperLike';
 import { DoFactory } from 'test/DoFactory';
 import { expect, test, type Mock, type MockInstance } from 'vitest';
 import {
@@ -310,7 +309,9 @@ describe('PersonManagementView', () => {
     expect(wrapper?.find('.v-data-table-footer__items-per-page').isVisible()).toBe(true);
     expect(wrapper?.find('.v-data-table-footer__items-per-page').text()).toContain('30');
 
-    const component: WrapperLike | undefined = wrapper?.findComponent('.v-data-table-footer__items-per-page .v-select');
+    const component: ReturnType<VueWrapper['findComponent']> | undefined = wrapper?.findComponent(
+      '.v-data-table-footer__items-per-page .v-select',
+    );
     await component?.setValue(50);
     expect(wrapper?.find('.v-data-table-footer__items-per-page').text()).toContain('50');
 

@@ -1,7 +1,6 @@
 import { expect, test, describe, beforeEach } from 'vitest';
 import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
 import ResultTable from './ResultTable.vue';
-import type { VueNode } from 'node_modules/@vue/test-utils/dist/types';
 import type { Headers } from '@/components/admin/ResultTable.vue';
 import type { Component } from 'vue-demi';
 
@@ -60,7 +59,7 @@ describe('Row Index and Item Retrieval', () => {
 
     rows?.forEach((row: DOMWrapper<HTMLTableRowElement>, domIndex: number) => {
       // Convert row to raw DOM element
-      const rowElement: VueNode<HTMLTableRowElement> = row.element;
+      const rowElement: HTMLTableRowElement = row.element;
 
       // Simulate finding parent and converting to array
       const rowsArray: Element[] = Array.from(rowElement.parentElement!.children);
@@ -88,7 +87,7 @@ describe('Row Index and Item Retrieval', () => {
     const rows: DOMWrapper<HTMLTableRowElement>[] | undefined = tbody?.findAll('tr');
 
     rows?.forEach((row: DOMWrapper<HTMLTableRowElement>, index: number) => {
-      const rowElement: VueNode<HTMLTableRowElement> = row.element;
+      const rowElement: HTMLTableRowElement = row.element;
       const rowsArray: Element[] = Array.from(rowElement.parentElement!.children);
       const calculatedIndex: number = rowsArray.indexOf(rowElement);
 
