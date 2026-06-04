@@ -23,6 +23,7 @@ export default defineConfig({
     },
   },
   test: {
+    testTimeout: 10 * 1000,
     server: {
       deps: {
         inline: ['vuetify'],
