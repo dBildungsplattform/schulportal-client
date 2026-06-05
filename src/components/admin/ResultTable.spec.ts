@@ -2,7 +2,7 @@ import { expect, test, describe, beforeEach } from 'vitest';
 import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
 import ResultTable from './ResultTable.vue';
 import type { Headers } from '@/components/admin/ResultTable.vue';
-import type { Component } from 'vue-demi';
+import type { Component } from 'vue';
 
 let wrapper: VueWrapper | null = null;
 
