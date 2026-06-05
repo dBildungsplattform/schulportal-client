@@ -1,28 +1,4 @@
 import routes from '@/router/routes';
-import { RollenSystemRecht } from '@/stores/RolleStore';
-import {
-  ServiceProviderKategorie,
-  useServiceProviderStore,
-  type ManageableServiceProviderDetail,
-  type ServiceProviderStore,
-} from '@/stores/ServiceProviderStore';
-import ServiceProviderEditView from '@/views/admin/service-provider/ServiceProviderEditView.vue';
-import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
-import { DoFactory } from 'test/DoFactory';
-import type { Mock, MockInstance } from 'vitest';
-import { nextTick, type Component } from 'vue';
-import {
-  createRouter,
-  createWebHistory,
-  type NavigationGuardNext,
-  type RouteLocationNormalized,
-  type RouteLocationNormalizedLoadedGeneric,
-  type Router,
-} from 'vue-router';
-
-let wrapper: VueWrapper | null = null;
-let router: ReturnType<typeof createRouter>;
-const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
 
 type OnBeforeRouteLeaveCallback = (
   _to: RouteLocationNormalized,
@@ -42,6 +18,39 @@ let { storedBeforeRouteLeaveCallback }: { storedBeforeRouteLeaveCallback: OnBefo
     };
   },
 );
+
+vi.mock('vue-router', async (importOriginal: () => Promise<object>) => {
+  const mod: object = await importOriginal();
+  return {
+    ...mod,
+    onBeforeRouteLeave: vi.fn((actualCallback: OnBeforeRouteLeaveCallback) => {
+      storedBeforeRouteLeaveCallback = actualCallback;
+    }),
+  };
+});
+import { RollenSystemRecht } from '@/stores/RolleStore';
+import {
+  ServiceProviderKategorie,
+  useServiceProviderStore,
+  type ManageableServiceProviderDetail,
+  type ServiceProviderStore,
+} from '@/stores/ServiceProviderStore';
+import ServiceProviderEditView from '@/views/admin/service-provider/ServiceProviderEditView.vue';
+import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
+import { DoFactory } from 'test/DoFactory';
+import type { Mock, MockInstance } from 'vitest';
+import { nextTick, type Component } from 'vue';
+import {
+  createRouter,
+  createWebHistory,
+  type NavigationGuardNext,
+  type RouteLocationNormalized,
+  type Router,
+} from 'vue-router';
+
+let wrapper: VueWrapper | null = null;
+let router: ReturnType<typeof createRouter>;
+const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
 
 async function mountComponent(): Promise<ReturnType<typeof mount<typeof ServiceProviderEditView>>> {
   await vi.dynamicImportSettled();
@@ -173,7 +182,11 @@ describe('ServiceProviderEditView', () => {
       'calls router.push with correct arguments when clicking "%s"',
       async (_label: string, buttonSelector: string, args: Parameters<Router['push']>[0]) => {
         if (isSchulspezifisch) {
-          await router.push({ name: 'angebot-edit', query: { orga: 'schule-id' } });
+          await router.push({
+            name: 'angebot-edit',
+            params: { id: serviceProviderStore.currentServiceProvider?.id },
+            query: { orga: 'schule-id' },
+          });
         }
         wrapper = await mountComponent();
         const pushSpy: Mock = vi.spyOn(router, 'push').mockResolvedValue();
@@ -200,7 +213,7 @@ describe('ServiceProviderEditView', () => {
         const closeButton: HTMLElement | null = document.querySelector(buttonSelector);
         expect(closeButton).not.toBeNull();
         (closeButton as HTMLElement).click();
-        await nextTick();
+        await flushPromises();
         if (typeof args !== 'string') {
           if ('params' in args) {
             args.params = { id: serviceProviderStore.currentServiceProvider?.id };
@@ -257,26 +270,6 @@ describe('ServiceProviderEditView navigation guard', () => {
 
   test('triggers, if form is dirty', async () => {
     const expectedCallsToNext: number = 0;
-    vi.mock('vue-router', async (importOriginal: () => Promise<object>) => {
-      const mod: object = await importOriginal();
-      return {
-        ...mod,
-        useRoute: (): RouteLocationNormalizedLoadedGeneric => ({
-          params: { id: serviceProviderStore.currentServiceProvider?.id ?? '' },
-          matched: [],
-          name: '',
-          fullPath: '',
-          hash: '',
-          query: {},
-          redirectedFrom: undefined,
-          meta: {},
-          path: '',
-        }),
-        onBeforeRouteLeave: vi.fn((actualCallback: OnBeforeRouteLeaveCallback) => {
-          storedBeforeRouteLeaveCallback = actualCallback;
-        }),
-      };
-    });
     wrapper = await mountComponent();
     await fillForm({
       name: 'Test Service Provider',
@@ -296,15 +289,6 @@ describe('ServiceProviderEditView navigation guard', () => {
 
   test('does not trigger, if form is not dirty', async () => {
     const expectedCallsToNext: number = 1;
-    vi.mock('vue-router', async (importOriginal: () => Promise<object>) => {
-      const mod: object = await importOriginal();
-      return {
-        ...mod,
-        onBeforeRouteLeave: vi.fn((actualCallback: OnBeforeRouteLeaveCallback) => {
-          storedBeforeRouteLeaveCallback = actualCallback;
-        }),
-      };
-    });
     wrapper = await mountComponent();
     const spy: Mock = vi.fn();
     storedBeforeRouteLeaveCallback({} as RouteLocationNormalized, {} as RouteLocationNormalized, spy);
