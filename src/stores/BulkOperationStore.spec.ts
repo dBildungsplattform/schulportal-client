@@ -410,9 +410,10 @@ describe('BulkOperationStore', () => {
               personId: response.personId,
               organisationId: selectedOrganisationId,
               rolleId: selectedRolleId,
-              befristung: isBefore(response.zuordnungen[0]!.befristung!, befristung)
-                ? response.zuordnungen[0]!.befristung
-                : befristung,
+              befristung:
+                response.zuordnungen[0]!.befristung && isBefore(response.zuordnungen[0]!.befristung, befristung)
+                  ? response.zuordnungen[0]!.befristung
+                  : befristung,
             }),
           );
           return DoFactory.getPersonenkontextUpdateResponse({ dBiamPersonenkontextResponses: zuordnungen });
@@ -447,9 +448,10 @@ describe('BulkOperationStore', () => {
 
       mockPersonResponses.forEach((response: DBiamPersonenuebersichtResponse, index: number) => {
         const personId: string = response.personId;
-        const correctBefristung: string = isBefore(response.zuordnungen[0]!.befristung!, befristung)
-          ? response.zuordnungen[0]!.befristung!
-          : befristung;
+        const correctBefristung: string =
+          response.zuordnungen[0]!.befristung && isBefore(response.zuordnungen[0]!.befristung, befristung)
+            ? response.zuordnungen[0]!.befristung
+            : befristung;
 
         // Filter out old zuordnungen that will be replaced by the new one (same orgId + rolleId)
         const otherZuordnungen: Array<{ organisationId: string; rolleId: string; befristung?: string }> =
