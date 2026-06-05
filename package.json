@@ -26,7 +26,7 @@
   "dependencies": {
     "@mdi/font": "^7.4.47",
     "@vee-validate/yup": "^4.15.1",
-    "axios": "^1.8.4",
+    "axios": "^1.16.1",
     "date-fns": "^3.6.0",
     "pinia": "^2.3.1",
     "vee-validate": "^4.15.1",
@@ -52,7 +52,7 @@
     "@vue/eslint-config-typescript": "^14.6.0",
     "@vue/test-utils": "^2.4.10",
     "@vue/tsconfig": "^0.5.1",
-    "axios-mock-adapter": "^1.22.0",
+    "axios-mock-adapter": "^2.1.0",
     "eslint": "^9.39.3",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.32.0",
