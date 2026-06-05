@@ -223,6 +223,7 @@ jobs:
       dbildungs_iam_ldap_branch: ${{ needs.branch_meta.outputs.ticket }}
       namespace: ${{ needs.create_branch_identifier.outputs.namespace_from_branch }}
       database_recreation: 'true' # to prevent database recreation this has to be set to false
+      pr_labels: ${{ needs.check_deployment_clearance.outputs.pr_labels }}
     secrets: inherit
 
   # On Delete
