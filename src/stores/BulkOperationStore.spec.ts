@@ -3,7 +3,6 @@ import type {
   DBiamPersonenuebersichtResponse,
   DBiamPersonenzuordnungResponse,
   PersonenkontexteUpdateResponse,
-  RollenMerkmal,
 } from '@/api-client/generated';
 import axiosApiInstance from '@/services/ApiService';
 import { faker } from '@faker-js/faker';
@@ -914,7 +913,7 @@ describe('BulkOperationStore', () => {
             typ: OrganisationsTyp.Schule,
             editable: true,
             befristung: 'unbefristet',
-            merkmale: [] as unknown as RollenMerkmal[],
+            merkmale: [],
             admins: ['admin1'],
           },
           {
@@ -928,7 +927,7 @@ describe('BulkOperationStore', () => {
             typ: OrganisationsTyp.Schule,
             editable: true,
             befristung: 'unbefristet',
-            merkmale: [] as unknown as RollenMerkmal[],
+            merkmale: [],
             admins: ['admin1'],
           },
         ],
@@ -990,7 +989,7 @@ describe('BulkOperationStore', () => {
             typ: OrganisationsTyp.Schule,
             editable: true,
             befristung: 'unbefristet',
-            merkmale: [] as unknown as RollenMerkmal[],
+            merkmale: [],
             admins: ['admin1'],
           },
           {
@@ -1004,7 +1003,7 @@ describe('BulkOperationStore', () => {
             typ: OrganisationsTyp.Klasse,
             editable: true,
             befristung: 'unbefristet',
-            merkmale: [] as unknown as RollenMerkmal[],
+            merkmale: [],
             admins: ['admin1'],
           },
           {
@@ -1018,7 +1017,7 @@ describe('BulkOperationStore', () => {
             typ: OrganisationsTyp.Schule,
             editable: true,
             befristung: 'unbefristet',
-            merkmale: [] as unknown as RollenMerkmal[],
+            merkmale: [],
             admins: ['admin1'],
           },
         ],
@@ -1074,7 +1073,7 @@ describe('BulkOperationStore', () => {
             typ: OrganisationsTyp.Schule,
             editable: true,
             befristung: 'unbefristet',
-            merkmale: [] as unknown as RollenMerkmal[],
+            merkmale: [],
             admins: ['admin1'],
           },
         ],
