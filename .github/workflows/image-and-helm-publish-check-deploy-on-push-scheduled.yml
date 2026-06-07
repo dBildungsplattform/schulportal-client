@@ -23,7 +23,7 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     outputs:
       deployment_clearance: ${{ steps.determine_deployment_clearance.outputs.deployment_clearance }}
-      pr_labels: ${{ env.PR_LABELS }}
+      pr_labels: ${{ steps.get_pr_labels.outputs.PR_LABELS }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -40,10 +40,11 @@ jobs:
 
       - name: Get PR labels
         id: get_pr_labels
-        if: ${{ env.PR_NUMBER != ''  }}
+        if: ${{ env.PR_NUMBER != '' }}
         run: |
           PR_LABELS=$(gh pr view ${{ env.PR_NUMBER }} --json labels --jq '.labels | map(.name) | join(",")')
           echo "PR_LABELS=$PR_LABELS" >> $GITHUB_ENV
+          echo "PR_LABELS=$PR_LABELS" >> $GITHUB_OUTPUT  # ← add this line
 
       - name: Determine deployment clearance
         id: determine_deployment_clearance
