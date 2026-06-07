@@ -1,4 +1,4 @@
-import ApiService from '@/services/ApiService';
+import axiosApiInstance from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
 import { createPinia, setActivePinia } from 'pinia';
 
@@ -38,7 +38,7 @@ interface MalformedMultiError {
   rolleIdsWithI18nKeys?: unknown;
 }
 
-const mockadapter: MockAdapter = new MockAdapter(ApiService);
+const mockadapter: MockAdapter = new MockAdapter(axiosApiInstance);
 
 describe('serviceProviderStore', () => {
   let serviceProviderStore: ServiceProviderStore;
