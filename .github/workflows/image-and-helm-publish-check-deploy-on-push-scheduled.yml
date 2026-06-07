@@ -286,5 +286,5 @@ jobs:
         if: ${{ steps.check_monday.outputs.date == '1' }}
         with:
           type: failure
-          job_name: 'Daily nightly image check failed. This notification will be sent only on Mondays, so the check may have been failing for several days. CVE scan results: https://github.com/dBildungsplattform/schulportal-client/security/code-scanning'
+          job_name: 'Daily nighdtly image check failed. This notification will be sent only on Mondays, so the check may have been failing for several days. CVE scan results: https://github.com/dBildungsplattform/schulportal-client/security/code-scanning'
           url: ${{ secrets.RC_WEBHOOK_SPSH_DEVELOPER_CHANNEL }}
