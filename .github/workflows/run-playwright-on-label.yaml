@@ -2,7 +2,7 @@ name: 'Run Playwright on Label'
 
 on:
   pull_request:
-    types: [labeled]
+    types: [labeled, synchronize]
 
 jobs:
   run_on_label:
@@ -23,10 +23,11 @@ jobs:
     steps:
       - name: Check if Playwright branch exists
         id: check_branch
+        env:
+          PLAYWRIGHT_BRANCH: ${{ github.head_ref }}
         run: |
-          playwright_branch="${{ github.head_ref }}"
-          if git ls-remote --heads --exit-code https://github.com/dBildungsplattform/schulportal-testautomatisierung $playwright_branch &> /dev/null; then
-            echo "playwright_branch=$playwright_branch" >> $GITHUB_OUTPUT
+          if git ls-remote --heads --exit-code https://github.com/dBildungsplattform/schulportal-testautomatisierung "$PLAYWRIGHT_BRANCH" &> /dev/null; then
+            echo "playwright_branch=$PLAYWRIGHT_BRANCH" >> $GITHUB_OUTPUT
           else
             echo "playwright_branch=main" >> $GITHUB_OUTPUT
           fi
