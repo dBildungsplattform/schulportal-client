@@ -5,7 +5,7 @@ import type {
   PersonenkontexteUpdateResponse,
   RollenMerkmal,
 } from '@/api-client/generated';
-import ApiService from '@/services/ApiService';
+import axiosApiInstance from '@/services/ApiService';
 import { faker } from '@faker-js/faker';
 import MockAdapter from 'axios-mock-adapter';
 import { isBefore } from 'date-fns';
@@ -18,7 +18,7 @@ import { PersonenUebersicht } from './types/PersonenUebersicht';
 import type { Zuordnung } from './types/Zuordnung';
 import { OperationType } from './types/bulkOperationTypes';
 
-const mockAdapter: MockAdapter = new MockAdapter(ApiService);
+const mockAdapter: MockAdapter = new MockAdapter(axiosApiInstance);
 
 describe('BulkOperationStore', () => {
   let bulkOperationStore: BulkOperationStore;

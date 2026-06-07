@@ -78,6 +78,37 @@
         "tags": ["auth"]
       }
     },
+    "/api/auth/csrf-token": {
+      "get": {
+        "description": "Returns a CSRF token that must be included in X-CSRF-Token header for state-changing requests (POST, PUT, DELETE). Call this endpoint after successful login. The token is stored in the session and automatically refreshed on each authenticated request.",
+        "operationId": "AuthenticationController_getCsrfToken",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "CSRF token successfully retrieved for authenticated user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CsrfTokenResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "User is not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CsrfTokenErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get CSRF token for session-based requests",
+        "tags": ["auth"]
+      }
+    },
     "/api/auth/logininfo": {
       "get": {
         "operationId": "AuthenticationController_info",
@@ -5421,6 +5452,21 @@
           "newAlternativeEmail"
         ]
       },
+      "CsrfTokenResponse": {
+        "type": "object",
+        "properties": {
+          "csrfToken": {
+            "type": "string",
+            "description": "The CSRF token to include in X-CSRF-Token header",
+            "example": "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6"
+          }
+        },
+        "required": ["csrfToken"]
+      },
+      "CsrfTokenErrorResponse": {
+        "type": "object",
+        "properties": {}
+      },
       "OrganisationsTyp": {
         "type": "string",
         "enum": [
@@ -5748,6 +5794,39 @@
         },
         "required": ["personId"]
       },
+      "UserExternalDataResponseIqshHelpdeskPk": {
+        "type": "object",
+        "properties": {
+          "rolleId": {
+            "type": "string"
+          },
+          "dstNr": {
+            "type": "string"
+          }
+        },
+        "required": ["rolleId", "dstNr"]
+      },
+      "UserExternalDataResponseIqshHelpdesk": {
+        "type": "object",
+        "properties": {
+          "vorname": {
+            "type": "string"
+          },
+          "nachname": {
+            "type": "string"
+          },
+          "personenkontexte": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserExternalDataResponseIqshHelpdeskPk"
+            }
+          },
+          "emailAdresse": {
+            "type": "string"
+          }
+        },
+        "required": ["vorname", "nachname", "personenkontexte", "emailAdresse"]
+      },
       "UserExternalDataResponse": {
         "type": "object",
         "properties": {
@@ -5765,9 +5844,12 @@
           },
           "onlineDateiablage": {
             "$ref": "#/components/schemas/UserExeternalDataResponseOnlineDateiablage"
+          },
+          "iqshHelpdesk": {
+            "$ref": "#/components/schemas/UserExternalDataResponseIqshHelpdesk"
           }
         },
-        "required": ["itslearning", "vidis", "opsh", "onlineDateiablage"]
+        "required": ["itslearning", "vidis", "opsh", "onlineDateiablage", "iqshHelpdesk"]
       },
       "PersonLandesbediensteterSearchPersonenkontextResponse": {
         "type": "object",

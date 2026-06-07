@@ -1,18 +1,18 @@
-import type { UserinfoResponse } from '@/api-client/generated';
-import ApiService from '@/services/ApiService';
+import type { CsrfTokenResponse, UserinfoResponse } from '@/api-client/generated';
 import MockAdapter from 'axios-mock-adapter';
 import { createPinia, setActivePinia } from 'pinia';
 import { DoFactory } from 'test/DoFactory';
 import { useAuthStore, type AuthStore } from './AuthStore';
-
-const mockadapter: MockAdapter = new MockAdapter(ApiService);
+import axiosApiInstance from '@/services/ApiService';
 
 describe('AuthStore', () => {
   let authStore: AuthStore;
+  let mockadapter: MockAdapter;
+
   beforeEach(() => {
     setActivePinia(createPinia());
     authStore = useAuthStore();
-    mockadapter.reset();
+    mockadapter = new MockAdapter(axiosApiInstance);
   });
 
   it('should initalize state correctly', () => {
@@ -22,11 +22,11 @@ describe('AuthStore', () => {
   describe('initializeAuthStatus', () => {
     it('should get login status', async () => {
       const mockInfo: UserinfoResponse = DoFactory.getUserinfoResponse();
-      mockInfo.personenkontexte[0]?.rolle.systemrechte.push(''); // for coverage
+      mockInfo.personenkontexte[0]?.rolle.systemrechte.push('');
 
-      const mockResponse: UserinfoResponse = mockInfo;
+      mockadapter.onGet('/api/auth/logininfo').replyOnce(200, mockInfo);
+      mockadapter.onGet('/api/auth/csrf-token').replyOnce(200, { csrfToken: 'mock-csrf-token' } as CsrfTokenResponse);
 
-      mockadapter.onGet('/api/auth/logininfo').replyOnce(200, mockResponse);
       const initializeAuthStatus: Promise<void> = authStore.initializeAuthStatus();
       expect(authStore.isAuthenticated).toBe(false);
       expect(authStore.currentUser).toBe(null);
@@ -47,12 +47,15 @@ describe('AuthStore', () => {
       expect(authStore.hasSchultraegerverwaltungPermission).toBe(false);
       expect(authStore.hasPersonenSyncPermission).toBe(true);
       expect(authStore.hasImportPermission).toBe(true);
+      expect(authStore.csrfToken).toBe('mock-csrf-token');
     });
 
     it('should save no system permissions if none are present', async () => {
       const mockResponse: UserinfoResponse = DoFactory.getUserinfoResponse({ personenkontexte: [] });
 
       mockadapter.onGet('/api/auth/logininfo').replyOnce(200, mockResponse);
+      mockadapter.onGet('/api/auth/csrf-token').replyOnce(200, { csrfToken: 'mock-csrf-token' } as CsrfTokenResponse);
+
       const initializeAuthStatus: Promise<void> = authStore.initializeAuthStatus();
       expect(authStore.isAuthenticated).toBe(false);
       expect(authStore.currentUserPermissions).toEqual([]);
@@ -63,10 +66,29 @@ describe('AuthStore', () => {
 
     it('should not authenticate on server error', async () => {
       mockadapter.onGet('/api/auth/logininfo').replyOnce(401, 'unauthorized error');
+
       const initializeAuthStatus: Promise<void> = authStore.initializeAuthStatus();
       expect(authStore.isAuthenticated).toBe(false);
       await initializeAuthStatus;
       expect(authStore.isAuthenticated).toBe(false);
+    });
+  });
+
+  describe('getCsrfToken', () => {
+    it('should store the csrf token on success', async () => {
+      mockadapter.onGet('/api/auth/csrf-token').replyOnce(200, { csrfToken: 'mock-csrf-token' } as CsrfTokenResponse);
+
+      await authStore.getCsrfToken();
+
+      expect(authStore.csrfToken).toBe('mock-csrf-token');
+    });
+
+    it('should set csrfToken to null on failure', async () => {
+      mockadapter.onGet('/api/auth/csrf-token').replyOnce(500);
+
+      await authStore.getCsrfToken();
+
+      expect(authStore.csrfToken).toBeNull();
     });
   });
 });
