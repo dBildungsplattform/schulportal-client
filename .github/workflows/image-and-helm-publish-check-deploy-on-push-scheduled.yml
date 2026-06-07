@@ -246,7 +246,7 @@ jobs:
             echo "playwright_branch=main" >> $GITHUB_OUTPUT
           fi
 
-  run_playwright_tests_haha:
+  run_playwright_tests:
     needs:
       - deploy
       - determine_playwright_branch
