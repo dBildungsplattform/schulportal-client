@@ -224,41 +224,8 @@ jobs:
       dbildungs_iam_ldap_branch: ${{ needs.branch_meta.outputs.ticket }}
       namespace: ${{ needs.create_branch_identifier.outputs.namespace_from_branch }}
       database_recreation: 'true' # to prevent database recreation this has to be set to false
+      run_playwright: ${{ contains(needs.check_deployment_clearance.outputs.pr_labels, 'run-tests') }}
     secrets: inherit
-
-  determine_playwright_branch:
-    needs: [check_deployment_clearance, deploy]
-    if: |
-      github.event_name == 'push' && 
-      !startsWith(github.ref_name,'dependabot/') &&
-      contains(needs.check_deployment_clearance.outputs.pr_labels, 'run-tests')
-    runs-on: ubuntu-latest
-    outputs:
-      playwright_branch: ${{ steps.check_branch.outputs.playwright_branch }}
-    steps:
-      - name: Check if Playwright branch exists
-        id: check_branch
-        run: |
-          playwright_branch="${{ github.ref_name }}"
-          if git ls-remote --heads --exit-code https://github.com/dBildungsplattform/schulportal-testautomatisierung $playwright_branch &> /dev/null; then
-            echo "playwright_branch=$playwright_branch" >> $GITHUB_OUTPUT
-          else
-            echo "playwright_branch=main" >> $GITHUB_OUTPUT
-          fi
-
-  run_playwright_tests:
-    needs:
-      - deploy
-      - determine_playwright_branch
-      - create_branch_identifier
-    uses: dBildungsplattform/schulportal-testautomatisierung/.github/workflows/run-playwright.yml@main
-    secrets: inherit
-    with:
-      frontendHostname: '${{ needs.create_branch_identifier.outputs.namespace_from_branch }}.dev.spsh.dbildungsplattform.de'
-      playwright_branch: ${{ needs.determine_playwright_branch.outputs.playwright_branch }}
-      namespace_to_use: '${{ needs.create_branch_identifier.outputs.namespace_from_branch }}'
-      tag: 'dev'
-      browser: 'chromium'
 
   # On Delete
   create_branch_identifier_for_deletion:
