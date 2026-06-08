@@ -326,7 +326,7 @@ export interface CreateServiceProviderBodyParams {
      * @type {string}
      * @memberof CreateServiceProviderBodyParams
      */
-    'url'?: string;
+    'url': string;
     /**
      * Optional logoId to use a standard logo. Has to be a positive integer. Only one of logoId or logoBase64 with logoMimeType can be provided, not both.
      * @type {number}
@@ -388,6 +388,69 @@ export const CreateServiceProviderBodyParamsMerkmaleEnum = {
 } as const;
 
 export type CreateServiceProviderBodyParamsMerkmaleEnum = typeof CreateServiceProviderBodyParamsMerkmaleEnum[keyof typeof CreateServiceProviderBodyParamsMerkmaleEnum];
+
+/**
+ * 
+ * @export
+ * @interface CreateServiceProviderResponse
+ */
+export interface CreateServiceProviderResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateServiceProviderResponse
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateServiceProviderResponse
+     */
+    'name': string;
+    /**
+     * 
+     * @type {ServiceProviderTarget}
+     * @memberof CreateServiceProviderResponse
+     */
+    'target': ServiceProviderTarget;
+    /**
+     * URL of created service provider
+     * @type {string}
+     * @memberof CreateServiceProviderResponse
+     */
+    'url': string;
+    /**
+     * 
+     * @type {ServiceProviderKategorie}
+     * @memberof CreateServiceProviderResponse
+     */
+    'kategorie': ServiceProviderKategorie;
+    /**
+     * Optional logoId for use with standard logos
+     * @type {number}
+     * @memberof CreateServiceProviderResponse
+     */
+    'logoId'?: number;
+    /**
+     * Indicates if a custom logo is available for fetching
+     * @type {boolean}
+     * @memberof CreateServiceProviderResponse
+     */
+    'hasLogo': boolean;
+    /**
+     * Indicates if 2FA is required
+     * @type {boolean}
+     * @memberof CreateServiceProviderResponse
+     */
+    'requires2fa': boolean;
+    /**
+     * 
+     * @type {Array<ServiceProviderMerkmal>}
+     * @memberof CreateServiceProviderResponse
+     */
+    'merkmale': Array<ServiceProviderMerkmal>;
+}
+
 
 /**
  * 
@@ -973,7 +1036,8 @@ export const DbiamRolleErrorI18nKeyEnum = {
     RolleNameUniqueOnSsk: 'ROLLE_NAME_UNIQUE_ON_SSK',
     ServiceProviderNichtNachtraeglichZuweisbar: 'SERVICE_PROVIDER_NICHT_NACHTRAEGLICH_ZUWEISBAR',
     ServiceProviderNichtVerfuegbarFuerRollenerweiterung: 'SERVICE_PROVIDER_NICHT_VERFUEGBAR_FUER_ROLLENERWEITERUNG',
-    NoRedundantRollenerweiterung: 'NO_REDUNDANT_ROLLENERWEITERUNG'
+    NoRedundantRollenerweiterung: 'NO_REDUNDANT_ROLLENERWEITERUNG',
+    ServiceProviderProvidedOutOfTree: 'SERVICE_PROVIDER_PROVIDED_OUT_OF_TREE'
 } as const;
 
 export type DbiamRolleErrorI18nKeyEnum = typeof DbiamRolleErrorI18nKeyEnum[keyof typeof DbiamRolleErrorI18nKeyEnum];
@@ -3814,7 +3878,7 @@ export interface ServiceProviderResponse {
      * @type {string}
      * @memberof ServiceProviderResponse
      */
-    'url': string;
+    'url'?: string;
     /**
      * 
      * @type {ServiceProviderKategorie}
@@ -3826,15 +3890,15 @@ export interface ServiceProviderResponse {
      * @type {number}
      * @memberof ServiceProviderResponse
      */
-    'logoId': number;
+    'logoId'?: number;
     /**
-     * 
+     * Indicates if a custom logo is available for fetching
      * @type {boolean}
      * @memberof ServiceProviderResponse
      */
     'hasLogo': boolean;
     /**
-     * 
+     * Indicates if 2FA is required
      * @type {boolean}
      * @memberof ServiceProviderResponse
      */
@@ -4572,7 +4636,7 @@ export interface UserinfoResponse {
 export const AuthApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * Returns a CSRF token that must be included in X-CSRF-Token header for state-changing requests (POST, PUT, DELETE). Call this endpoint after successful login. The token is stored in the session and automatically refreshed on each authenticated request.
+         * Returns a CSRF token that must be included in X-CSRF-Token header for state-changing requests (POST, PUT, DELETE). Call this endpoint after successful login. The token is stored in the session.
          * @summary Get CSRF token for session-based requests
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4767,7 +4831,7 @@ export const AuthApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = AuthApiAxiosParamCreator(configuration)
     return {
         /**
-         * Returns a CSRF token that must be included in X-CSRF-Token header for state-changing requests (POST, PUT, DELETE). Call this endpoint after successful login. The token is stored in the session and automatically refreshed on each authenticated request.
+         * Returns a CSRF token that must be included in X-CSRF-Token header for state-changing requests (POST, PUT, DELETE). Call this endpoint after successful login. The token is stored in the session.
          * @summary Get CSRF token for session-based requests
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4830,7 +4894,7 @@ export const AuthApiFactory = function (configuration?: Configuration, basePath?
     const localVarFp = AuthApiFp(configuration)
     return {
         /**
-         * Returns a CSRF token that must be included in X-CSRF-Token header for state-changing requests (POST, PUT, DELETE). Call this endpoint after successful login. The token is stored in the session and automatically refreshed on each authenticated request.
+         * Returns a CSRF token that must be included in X-CSRF-Token header for state-changing requests (POST, PUT, DELETE). Call this endpoint after successful login. The token is stored in the session.
          * @summary Get CSRF token for session-based requests
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4887,7 +4951,7 @@ export const AuthApiFactory = function (configuration?: Configuration, basePath?
  */
 export interface AuthApiInterface {
     /**
-     * Returns a CSRF token that must be included in X-CSRF-Token header for state-changing requests (POST, PUT, DELETE). Call this endpoint after successful login. The token is stored in the session and automatically refreshed on each authenticated request.
+     * Returns a CSRF token that must be included in X-CSRF-Token header for state-changing requests (POST, PUT, DELETE). Call this endpoint after successful login. The token is stored in the session.
      * @summary Get CSRF token for session-based requests
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -4944,7 +5008,7 @@ export interface AuthApiInterface {
  */
 export class AuthApi extends BaseAPI implements AuthApiInterface {
     /**
-     * Returns a CSRF token that must be included in X-CSRF-Token header for state-changing requests (POST, PUT, DELETE). Call this endpoint after successful login. The token is stored in the session and automatically refreshed on each authenticated request.
+     * Returns a CSRF token that must be included in X-CSRF-Token header for state-changing requests (POST, PUT, DELETE). Call this endpoint after successful login. The token is stored in the session.
      * @summary Get CSRF token for session-based requests
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -5845,43 +5909,6 @@ export const CronApiAxiosParamCreator = function (configuration?: Configuration)
                 options: localVarRequestOptions,
             };
         },
-        /**
-         * 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        cronControllerUpdateServiceProvidersForVidisAngebote: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/cron/vidis-angebote`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication bearer required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            // authentication oauth2 required
-            // oauth required
-            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
     }
 };
 
@@ -5937,15 +5964,6 @@ export const CronApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.cronControllerUnlockUsersWithExpiredLocks(options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
-        /**
-         * 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async cronControllerUpdateServiceProvidersForVidisAngebote(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<boolean>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.cronControllerUpdateServiceProvidersForVidisAngebote(options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
     }
 };
 
@@ -5996,14 +6014,6 @@ export const CronApiFactory = function (configuration?: Configuration, basePath?
         cronControllerUnlockUsersWithExpiredLocks(options?: any): AxiosPromise<boolean> {
             return localVarFp.cronControllerUnlockUsersWithExpiredLocks(options).then((request) => request(axios, basePath));
         },
-        /**
-         * 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        cronControllerUpdateServiceProvidersForVidisAngebote(options?: any): AxiosPromise<boolean> {
-            return localVarFp.cronControllerUpdateServiceProvidersForVidisAngebote(options).then((request) => request(axios, basePath));
-        },
     };
 };
 
@@ -6052,14 +6062,6 @@ export interface CronApiInterface {
      * @memberof CronApiInterface
      */
     cronControllerUnlockUsersWithExpiredLocks(options?: AxiosRequestConfig): AxiosPromise<boolean>;
-
-    /**
-     * 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof CronApiInterface
-     */
-    cronControllerUpdateServiceProvidersForVidisAngebote(options?: AxiosRequestConfig): AxiosPromise<boolean>;
 
 }
 
@@ -6118,16 +6120,6 @@ export class CronApi extends BaseAPI implements CronApiInterface {
      */
     public cronControllerUnlockUsersWithExpiredLocks(options?: AxiosRequestConfig) {
         return CronApiFp(this.configuration).cronControllerUnlockUsersWithExpiredLocks(options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof CronApi
-     */
-    public cronControllerUpdateServiceProvidersForVidisAngebote(options?: AxiosRequestConfig) {
-        return CronApiFp(this.configuration).cronControllerUpdateServiceProvidersForVidisAngebote(options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -11991,13 +11983,16 @@ export const ProviderApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
-         * Get all service-providers.
+         * Get all service-providers assignable for a role.
          * @summary 
+         * @param {string} schulstrukturknotenOfRolle The id of the organisation where the service provider should be assignable on
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        providerControllerGetAllServiceProviders: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/provider/all`;
+        providerControllerGetAssignableServiceProvidersForRolle: async (schulstrukturknotenOfRolle: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'schulstrukturknotenOfRolle' is not null or undefined
+            assertParamExists('providerControllerGetAssignableServiceProvidersForRolle', 'schulstrukturknotenOfRolle', schulstrukturknotenOfRolle)
+            const localVarPath = `/api/provider/assignable-for-rolle`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -12016,6 +12011,10 @@ export const ProviderApiAxiosParamCreator = function (configuration?: Configurat
             // authentication oauth2 required
             // oauth required
             await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+            if (schulstrukturknotenOfRolle !== undefined) {
+                localVarQueryParameter['schulstrukturknotenOfRolle'] = schulstrukturknotenOfRolle;
+            }
 
 
     
@@ -12317,7 +12316,7 @@ export const ProviderApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async providerControllerCreateServiceProvider(createServiceProviderBodyParams: CreateServiceProviderBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ServiceProviderResponse>> {
+        async providerControllerCreateServiceProvider(createServiceProviderBodyParams: CreateServiceProviderBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreateServiceProviderResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.providerControllerCreateServiceProvider(createServiceProviderBodyParams, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -12347,13 +12346,14 @@ export const ProviderApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Get all service-providers.
+         * Get all service-providers assignable for a role.
          * @summary 
+         * @param {string} schulstrukturknotenOfRolle The id of the organisation where the service provider should be assignable on
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async providerControllerGetAllServiceProviders(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ServiceProviderResponse>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.providerControllerGetAllServiceProviders(options);
+        async providerControllerGetAssignableServiceProvidersForRolle(schulstrukturknotenOfRolle: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ServiceProviderResponse>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.providerControllerGetAssignableServiceProvidersForRolle(schulstrukturknotenOfRolle, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -12441,7 +12441,7 @@ export const ProviderApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        providerControllerCreateServiceProvider(createServiceProviderBodyParams: CreateServiceProviderBodyParams, options?: any): AxiosPromise<ServiceProviderResponse> {
+        providerControllerCreateServiceProvider(createServiceProviderBodyParams: CreateServiceProviderBodyParams, options?: any): AxiosPromise<CreateServiceProviderResponse> {
             return localVarFp.providerControllerCreateServiceProvider(createServiceProviderBodyParams, options).then((request) => request(axios, basePath));
         },
         /**
@@ -12468,13 +12468,14 @@ export const ProviderApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.providerControllerFindRollenerweiterungenByServiceProviderId(angebotId, offset, limit, organisationId, options).then((request) => request(axios, basePath));
         },
         /**
-         * Get all service-providers.
+         * Get all service-providers assignable for a role.
          * @summary 
+         * @param {string} schulstrukturknotenOfRolle The id of the organisation where the service provider should be assignable on
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        providerControllerGetAllServiceProviders(options?: any): AxiosPromise<Array<ServiceProviderResponse>> {
-            return localVarFp.providerControllerGetAllServiceProviders(options).then((request) => request(axios, basePath));
+        providerControllerGetAssignableServiceProvidersForRolle(schulstrukturknotenOfRolle: string, options?: any): AxiosPromise<Array<ServiceProviderResponse>> {
+            return localVarFp.providerControllerGetAssignableServiceProvidersForRolle(schulstrukturknotenOfRolle, options).then((request) => request(axios, basePath));
         },
         /**
          * Get service-providers available for logged-in user.
@@ -12555,7 +12556,7 @@ export interface ProviderApiInterface {
      * @throws {RequiredError}
      * @memberof ProviderApiInterface
      */
-    providerControllerCreateServiceProvider(createServiceProviderBodyParams: CreateServiceProviderBodyParams, options?: AxiosRequestConfig): AxiosPromise<ServiceProviderResponse>;
+    providerControllerCreateServiceProvider(createServiceProviderBodyParams: CreateServiceProviderBodyParams, options?: AxiosRequestConfig): AxiosPromise<CreateServiceProviderResponse>;
 
     /**
      * Delete a service-provider (Angebot) by id.
@@ -12581,13 +12582,14 @@ export interface ProviderApiInterface {
     providerControllerFindRollenerweiterungenByServiceProviderId(angebotId: string, offset?: number, limit?: number, organisationId?: string, options?: AxiosRequestConfig): AxiosPromise<ProviderControllerFindRollenerweiterungenByServiceProviderId200Response>;
 
     /**
-     * Get all service-providers.
+     * Get all service-providers assignable for a role.
      * @summary 
+     * @param {string} schulstrukturknotenOfRolle The id of the organisation where the service provider should be assignable on
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ProviderApiInterface
      */
-    providerControllerGetAllServiceProviders(options?: AxiosRequestConfig): AxiosPromise<Array<ServiceProviderResponse>>;
+    providerControllerGetAssignableServiceProvidersForRolle(schulstrukturknotenOfRolle: string, options?: AxiosRequestConfig): AxiosPromise<Array<ServiceProviderResponse>>;
 
     /**
      * Get service-providers available for logged-in user.
@@ -12700,14 +12702,15 @@ export class ProviderApi extends BaseAPI implements ProviderApiInterface {
     }
 
     /**
-     * Get all service-providers.
+     * Get all service-providers assignable for a role.
      * @summary 
+     * @param {string} schulstrukturknotenOfRolle The id of the organisation where the service provider should be assignable on
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ProviderApi
      */
-    public providerControllerGetAllServiceProviders(options?: AxiosRequestConfig) {
-        return ProviderApiFp(this.configuration).providerControllerGetAllServiceProviders(options).then((request) => request(this.axios, this.basePath));
+    public providerControllerGetAssignableServiceProvidersForRolle(schulstrukturknotenOfRolle: string, options?: AxiosRequestConfig) {
+        return ProviderApiFp(this.configuration).providerControllerGetAssignableServiceProvidersForRolle(schulstrukturknotenOfRolle, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
