@@ -1,5 +1,5 @@
 import { OrganisationsTyp, type OrganisationRootChildrenResponse } from '@/api-client/generated';
-import ApiService from '@/services/ApiService';
+import axiosApiInstance from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
 import { createPinia, setActivePinia } from 'pinia';
 import { DoFactory } from 'test/DoFactory';
@@ -14,7 +14,7 @@ import {
 import { flushPromises } from '@vue/test-utils';
 import { faker } from '@faker-js/faker';
 
-const mockadapter: MockAdapter = new MockAdapter(ApiService);
+const mockadapter: MockAdapter = new MockAdapter(axiosApiInstance);
 
 describe('OrganisationStore', () => {
   let organisationStore: OrganisationStore;

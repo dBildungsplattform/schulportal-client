@@ -1,4 +1,3 @@
-import ApiService from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
 import { createPinia, setActivePinia } from 'pinia';
 import {
@@ -9,8 +8,9 @@ import {
 } from '../api-client/generated/api';
 import { useRolleStore, type RolleStore } from './RolleStore';
 import type { BaseServiceProvider, StartPageServiceProvider } from './ServiceProviderStore';
+import axiosApiInstance from '@/services/ApiService';
 
-const mockadapter: MockAdapter = new MockAdapter(ApiService);
+const mockadapter: MockAdapter = new MockAdapter(axiosApiInstance);
 
 describe('rolleStore', () => {
   let rolleStore: RolleStore;

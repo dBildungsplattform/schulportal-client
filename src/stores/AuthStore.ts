@@ -3,11 +3,13 @@ import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import {
   AuthApiFactory,
   type AuthApiInterface,
+  type CsrfTokenResponse,
   type PersonTimeLimitInfoResponse,
   type UserinfoResponse,
 } from '../api-client/generated/api';
 import type { Organisation } from './OrganisationStore';
 import { RollenSystemRecht } from './RolleStore';
+import type { AxiosResponse } from 'axios';
 
 export enum StepUpLevel {
   NONE = 'none',
@@ -67,10 +69,12 @@ type AuthState = {
   isAuthenticated: boolean;
   acr: StepUpLevel;
   timeLimitInfos: PersonTimeLimitInfoResponse[];
+  csrfToken: string | null;
 };
 
 type AuthActions = {
   initializeAuthStatus: () => Promise<void>;
+  getCsrfToken: () => Promise<void>;
 };
 
 type AuthGetters = object;
@@ -104,6 +108,7 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
     isAuthenticated: false,
     acr: StepUpLevel.NONE,
     timeLimitInfos: [],
+    csrfToken: null,
   }),
   actions: {
     async initializeAuthStatus() {
@@ -118,6 +123,7 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
           this.currentUser = data;
           this.acr = data.acr as StepUpLevel;
           this.timeLimitInfos = data.timeLimits;
+          await this.getCsrfToken();
 
           /* extract all system permissions from current user's personenkontexte */
           const personenkontexte: Array<PersonenkontextRolleFields> | null = this.currentUser.personenkontexte;
@@ -182,6 +188,16 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
         this.isAuthenticated = false;
         this.acr = StepUpLevel.NONE;
         this.timeLimitInfos = [];
+        this.csrfToken = null;
+      }
+    },
+
+    async getCsrfToken(): Promise<void> {
+      try {
+        const response: AxiosResponse<CsrfTokenResponse> = await authApi.authenticationControllerGetCsrfToken();
+        this.csrfToken = response.data.csrfToken;
+      } catch {
+        this.csrfToken = null;
       }
     },
   },

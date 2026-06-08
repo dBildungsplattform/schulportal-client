@@ -455,6 +455,19 @@ export interface CreateServiceProviderResponse {
 /**
  * 
  * @export
+ * @interface CsrfTokenResponse
+ */
+export interface CsrfTokenResponse {
+    /**
+     * The CSRF token to include in X-CSRF-Token header
+     * @type {string}
+     * @memberof CsrfTokenResponse
+     */
+    'csrfToken': string;
+}
+/**
+ * 
+ * @export
  * @interface DBiamPersonResponse
  */
 export interface DBiamPersonResponse {
@@ -4623,6 +4636,36 @@ export interface UserinfoResponse {
 export const AuthApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
+         * Returns a CSRF token that must be included in X-CSRF-Token header for state-changing requests (POST, PUT, DELETE). Call this endpoint after successful login. The token is stored in the session.
+         * @summary Get CSRF token for session-based requests
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        authenticationControllerGetCsrfToken: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/auth/csrf-token`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @summary Info about logged in user.
          * @param {*} [options] Override http request option.
@@ -4788,6 +4831,16 @@ export const AuthApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = AuthApiAxiosParamCreator(configuration)
     return {
         /**
+         * Returns a CSRF token that must be included in X-CSRF-Token header for state-changing requests (POST, PUT, DELETE). Call this endpoint after successful login. The token is stored in the session.
+         * @summary Get CSRF token for session-based requests
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async authenticationControllerGetCsrfToken(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CsrfTokenResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.authenticationControllerGetCsrfToken(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * 
          * @summary Info about logged in user.
          * @param {*} [options] Override http request option.
@@ -4841,6 +4894,15 @@ export const AuthApiFactory = function (configuration?: Configuration, basePath?
     const localVarFp = AuthApiFp(configuration)
     return {
         /**
+         * Returns a CSRF token that must be included in X-CSRF-Token header for state-changing requests (POST, PUT, DELETE). Call this endpoint after successful login. The token is stored in the session.
+         * @summary Get CSRF token for session-based requests
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        authenticationControllerGetCsrfToken(options?: any): AxiosPromise<CsrfTokenResponse> {
+            return localVarFp.authenticationControllerGetCsrfToken(options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @summary Info about logged in user.
          * @param {*} [options] Override http request option.
@@ -4889,6 +4951,15 @@ export const AuthApiFactory = function (configuration?: Configuration, basePath?
  */
 export interface AuthApiInterface {
     /**
+     * Returns a CSRF token that must be included in X-CSRF-Token header for state-changing requests (POST, PUT, DELETE). Call this endpoint after successful login. The token is stored in the session.
+     * @summary Get CSRF token for session-based requests
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AuthApiInterface
+     */
+    authenticationControllerGetCsrfToken(options?: AxiosRequestConfig): AxiosPromise<CsrfTokenResponse>;
+
+    /**
      * 
      * @summary Info about logged in user.
      * @param {*} [options] Override http request option.
@@ -4936,6 +5007,17 @@ export interface AuthApiInterface {
  * @extends {BaseAPI}
  */
 export class AuthApi extends BaseAPI implements AuthApiInterface {
+    /**
+     * Returns a CSRF token that must be included in X-CSRF-Token header for state-changing requests (POST, PUT, DELETE). Call this endpoint after successful login. The token is stored in the session.
+     * @summary Get CSRF token for session-based requests
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AuthApi
+     */
+    public authenticationControllerGetCsrfToken(options?: AxiosRequestConfig) {
+        return AuthApiFp(this.configuration).authenticationControllerGetCsrfToken(options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * 
      * @summary Info about logged in user.
