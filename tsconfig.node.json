@@ -1,18 +1,20 @@
 {
-  "extends": "@tsconfig/node18/tsconfig.json",
+  "extends": "./tsconfig.base.json",
+  "references": [{ "path": "./tsconfig.app.json" }],
   "include": [
+    "src/**/*.spec.ts",
+    "test/**/*.ts",
     "eslint.config.ts",
-    "src/specs/request-handlers.ts",
     "vite.config.ts",
     "vitest.config.ts",
-    "vitest.setup.ts",
-    "test/**/*.ts"
+    "vitest.setup.ts"
   ],
   "compilerOptions": {
     "composite": true,
+    "lib": ["ES2022"],
     "module": "ES2020",
     "moduleResolution": "Bundler",
-    "types": ["node"],
+    "types": ["@types/node", "vitest/globals"],
     "paths": {
       "@/*": ["./src/*"],
       "test/*": ["./test/*"]
