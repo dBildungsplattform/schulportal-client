@@ -167,6 +167,49 @@ describe('ServiceProviderManagementBySchuleView', () => {
       deleteSpy.mockRestore();
     });
 
+    it('opens vidis info dialog with provider name and closes it on ok click', async () => {
+      const wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementBySchuleView>> = mountComponent();
+      const vidisProvider: ManageableServiceProviderListEntry = DoFactory.getManageableServiceProviderListEntryResponse(
+        {
+          hasSomeVerwaltenPermission: true,
+          vidisAngebotId: 'vidis-angebot-1',
+        },
+      );
+      serviceProviderStore.manageableServiceProvidersForOrganisation = [vidisProvider];
+      await nextTick();
+
+      const deleteIcon: DOMWrapper<Element> = wrapper.find('[data-testid="open-service-provider-delete-dialog-icon"]');
+      await deleteIcon.trigger('click');
+
+      await vi.waitFor(() => {
+        const dialogHeadlineInActiveOverlay: HTMLElement | null = document.body.querySelector(
+          '.v-overlay--active [data-testid="vidis-info-dialog-headline"]',
+        );
+        expect(dialogHeadlineInActiveOverlay).toBeTruthy();
+      });
+
+      await vi.waitFor(() => {
+        const dialogTextInActiveOverlay: HTMLElement | null = document.body.querySelector(
+          '.v-overlay--active [data-testid="vidis-info-dialog-text"]',
+        );
+        expect(dialogTextInActiveOverlay).toBeTruthy();
+        expect(dialogTextInActiveOverlay?.textContent).toContain(vidisProvider.name);
+      });
+
+      const closeButton: HTMLElement | null = document.body.querySelector(
+        '.v-overlay--active [data-testid="close-vidis-info-dialog-button"]',
+      );
+      expect(closeButton).toBeTruthy();
+      closeButton?.click();
+
+      await vi.waitFor(() => {
+        const dialogHeadlineInActiveOverlay: HTMLElement | null = document.body.querySelector(
+          '.v-overlay--active [data-testid="vidis-info-dialog-headline"]',
+        );
+        expect(dialogHeadlineInActiveOverlay).toBeNull();
+      });
+    });
+
     describe('onCloseDeleteDialog', () => {
       it('removes provider and reloads list if successful', async () => {
         const wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementBySchuleView>> = mountComponent();
