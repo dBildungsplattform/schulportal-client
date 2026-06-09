@@ -26,7 +26,7 @@
   >
     <template #default>
       <LayoutCard
-        headline-test-id="vidis-info-dialog"
+        headline-test-id="vidis-info-dialog-headline"
         :header="header"
       >
         <v-card-text>
@@ -53,10 +53,10 @@
               <v-btn
                 :block="mdAndDown"
                 class="primary"
-                data-testid="close-klasse-delete-success-dialog-button"
+                data-testid="close-vidis-info-dialog-button"
                 @click.stop="emits('update:modelValue', false)"
               >
-                {{ $t('close') }}
+                {{ $t('ok') }}
               </v-btn>
             </v-col>
           </v-row>
