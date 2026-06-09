@@ -22,6 +22,9 @@ RUN npm run build
 # Deployment Stage
 FROM $BASE_IMAGE AS deployment
 
+# Patch CVE-2026-6732
+RUN apk upgrade -U libxml2>=2.13.9-r1
+
 COPY --from=build /app/dist/ /usr/share/nginx/html/
 
 RUN rm /etc/nginx/conf.d/default.conf
