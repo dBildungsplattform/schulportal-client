@@ -1,4 +1,23 @@
 import routes from '@/router/routes';
+import { RollenSystemRecht } from '@/stores/RolleStore';
+import {
+  ServiceProviderKategorie,
+  useServiceProviderStore,
+  type ManageableServiceProviderDetail,
+  type ServiceProviderStore,
+} from '@/stores/ServiceProviderStore';
+import ServiceProviderEditView from '@/views/admin/service-provider/ServiceProviderEditView.vue';
+import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
+import { DoFactory } from 'test/DoFactory';
+import type { Mock, MockInstance } from 'vitest';
+import { nextTick, type Component } from 'vue';
+import {
+  createRouter,
+  createWebHistory,
+  type NavigationGuardNext,
+  type RouteLocationNormalized,
+  type Router,
+} from 'vue-router';
 
 type OnBeforeRouteLeaveCallback = (
   _to: RouteLocationNormalized,
@@ -28,25 +47,6 @@ vi.mock('vue-router', async (importOriginal: () => Promise<object>) => {
     }),
   };
 });
-import { RollenSystemRecht } from '@/stores/RolleStore';
-import {
-  ServiceProviderKategorie,
-  useServiceProviderStore,
-  type ManageableServiceProviderDetail,
-  type ServiceProviderStore,
-} from '@/stores/ServiceProviderStore';
-import ServiceProviderEditView from '@/views/admin/service-provider/ServiceProviderEditView.vue';
-import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
-import { DoFactory } from 'test/DoFactory';
-import type { Mock, MockInstance } from 'vitest';
-import { nextTick, type Component } from 'vue';
-import {
-  createRouter,
-  createWebHistory,
-  type NavigationGuardNext,
-  type RouteLocationNormalized,
-  type Router,
-} from 'vue-router';
 
 let wrapper: VueWrapper | null = null;
 let router: ReturnType<typeof createRouter>;
