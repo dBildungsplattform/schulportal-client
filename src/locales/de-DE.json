@@ -650,9 +650,9 @@
           "ORGADMIN": "Orgadmin",
           "LEIT": "Leit",
           "SYSADMIN": "Sysadmin",
-          "SORGBER": "SORGBER",
-          "SCHB": "SCHB",
-          "NLEHR": "NLEHR"
+          "SORGBER": "Sorgeberechtigte/-r",
+          "SCHB": "Schulbegleiter/-in",
+          "NLEHR": "Nicht-lehrendes Personal"
         },
         "merkmale": {
           "BEFRISTUNG_PFLICHT": "Befristung ist Pflichtangabe",
