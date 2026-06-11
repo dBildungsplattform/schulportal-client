@@ -1,4 +1,4 @@
-import type { AxiosError } from 'axios';
+import type { AxiosError, AxiosResponse } from 'axios';
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 
 import type { ServiceProviderFormSubmitData } from '@/components/admin/service-provider/types';
@@ -12,6 +12,7 @@ import {
   ServiceProviderMerkmal,
   type ApplyRollenerweiterungBodyParams,
   type CreateServiceProviderBodyParams,
+  type CreateServiceProviderResponse,
   type DbiamApplyRollenerweiterungMultiError,
   type DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInner,
   type ManageableServiceProviderResponse,
@@ -36,7 +37,7 @@ export type BaseServiceProvider = {
 };
 
 export type StartPageServiceProvider = BaseServiceProvider & {
-  url: string;
+  url?: string;
   hasLogo: boolean;
   target: string;
   // Could be undefined if the logo is not provided by the backend
@@ -116,7 +117,7 @@ export type CreatedServiceProvider = BaseServiceProvider & {
 };
 
 export type UpdatedServiceProvider = BaseServiceProvider & {
-  url: string;
+  url?: string;
   merkmale: Array<ServiceProviderMerkmal>;
   logoId?: number;
 };
@@ -167,7 +168,7 @@ function containsMultiError(error: unknown): error is AxiosError<DbiamApplyRolle
 
 type ServiceProviderGetters = object;
 type ServiceProviderActions = {
-  getAllServiceProviders: () => Promise<void>;
+  getAssignableServiceProvidersForRolleByOrganisationId: (administeredBySchulstrukturknoten: string) => Promise<void>;
   getAvailableServiceProviders: () => Promise<void>;
   getManageableServiceProviders: (page: number, entriesPerPage: number) => Promise<void>;
   getManageableServiceProvidersForOrganisation: (
@@ -219,11 +220,14 @@ export const useServiceProviderStore: StoreDefinition<
     };
   },
   actions: {
-    async getAllServiceProviders() {
+    async getAssignableServiceProvidersForRolleByOrganisationId(administeredBySchulstrukturknoten: string) {
       this.loading = true;
       try {
-        const { data }: { data: StartPageServiceProvider[] } =
-          await serviceProviderApi.providerControllerGetAllServiceProviders();
+        this.allServiceProviders = [];
+        const { data }: AxiosResponse<ServiceProviderResponse[]> =
+          await serviceProviderApi.providerControllerGetAssignableServiceProvidersForRolle(
+            administeredBySchulstrukturknoten,
+          );
         this.allServiceProviders = data;
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
@@ -423,7 +427,7 @@ export const useServiceProviderStore: StoreDefinition<
           requires2fa: filter.requires2fa,
           merkmale: filter.merkmale,
         };
-        const { data }: { data: ServiceProviderResponse } =
+        const { data }: { data: CreateServiceProviderResponse } =
           await serviceProviderApi.providerControllerCreateServiceProvider(bodyParams);
         this.createdServiceProvider = data;
       } catch (error) {
