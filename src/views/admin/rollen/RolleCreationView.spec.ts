@@ -325,14 +325,6 @@ describe('RolleCreationView', () => {
     await vi.waitFor(() => {
       expect(rolleStore.createRolle).toHaveBeenCalled();
     });
-    expect(rolleStore.updateServiceProviderInRolle).toHaveBeenCalledWith(mockRolle.id, {
-      serviceProviderIds: ['1'],
-      version: mockRolle.version,
-    });
-    expect(rolleStore.updateServiceProviderInRolle).not.toHaveBeenCalledWith(oldmockRolle.id, {
-      serviceProviderIds: ['1'],
-      version: oldmockRolle.version,
-    });
   });
 
   test('It display the success template with no systemrechte nor merkmale', async () => {

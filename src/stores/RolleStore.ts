@@ -7,12 +7,10 @@ import {
   RollenArt,
   RollenMerkmal,
   RollenSystemRechtEnum,
-  type RolleServiceProviderBodyParams,
   type CreateRolleBodyParams,
   type RolleApiInterface,
   type RolleResponse,
   type RolleWithServiceProvidersResponse,
-  type ServiceProviderResponse,
   type UpdateRolleBodyParams,
   type SystemRechtResponse,
   type ServiceProviderIdNameResponse,
@@ -33,16 +31,13 @@ type RolleState = {
 
 type RolleGetters = object;
 type RolleActions = {
-  updateServiceProviderInRolle: (
-    rolleId: string,
-    rolleServiceProviderQueryParams: RolleServiceProviderBodyParams,
-  ) => Promise<void>;
   createRolle: (
     rollenName: string,
     administrationsebene: string,
     rollenArt: RollenArt,
     merkmale: RollenMerkmal[],
     systemrechte: RollenSystemRechtEnum[],
+    serviceProvider: string[],
   ) => Promise<void>;
   getAllRollen: (filter: RolleFilter) => Promise<void>;
   getRolleById: (rolleId: string) => Promise<void>;
@@ -130,30 +125,13 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
     };
   },
   actions: {
-    async updateServiceProviderInRolle(
-      rolleId: string,
-      rolleServiceProviderQueryParams: RolleServiceProviderBodyParams,
-    ) {
-      this.loading = true;
-      try {
-        const { data }: AxiosResponse<ServiceProviderResponse[]> =
-          await rolleApi.rolleControllerUpdateServiceProvidersById(rolleId, rolleServiceProviderQueryParams);
-        if (this.createdRolle) {
-          this.createdRolle.serviceProviders = data;
-        }
-      } catch (error: unknown) {
-        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
-      } finally {
-        this.loading = false;
-      }
-    },
-
     async createRolle(
       rollenName: string,
       administrationsebene: string,
       rollenArt: RollenArt,
       merkmale: RollenMerkmal[],
       systemrechte: RollenSystemRechtEnum[],
+      serviceProvider: string[],
     ): Promise<void> {
       this.loading = true;
       try {
@@ -165,6 +143,7 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
           // TODO Remove casting when generator issue is fixed from the server side
           merkmale: merkmale as unknown as Set<RollenMerkmal>,
           systemrechte: systemrechte as unknown as Set<RollenSystemRechtEnum>,
+          serviceProviderIds: serviceProvider as unknown as Set<string>,
         };
         const { data }: { data: RolleResponse } = await rolleApi.rolleControllerCreateRolle(createRolleBodyParams);
         const receivedSystemrechte: Set<RollenSystemRechtEnum> = new Set(
