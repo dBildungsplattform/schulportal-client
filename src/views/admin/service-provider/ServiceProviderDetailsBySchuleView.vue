@@ -144,7 +144,7 @@
       .map((r: RolleWithServiceProvidersResponse) => ({ id: r.id, name: r.name, rollenart: r.rollenart })),
   );
 
-  const isEditAllowed: ComputedRef<boolean> = computed(() => {
+  const hasEditPermissions: ComputedRef<boolean> = computed(() => {
     if (!serviceProviderStore.currentServiceProvider || serviceProviderStore.loading) {
       return false;
     }
@@ -438,7 +438,7 @@
                     />
 
                     <v-row
-                      v-if="isEditModeAvailable && isEditAllowed"
+                      v-if="isEditModeAvailable && hasEditPermissions"
                       class="mr-10"
                       justify="end"
                     >
@@ -457,6 +457,13 @@
                         >
                         </v-btn>
                       </v-col>
+                      <VidisInfoDialog
+                        :header="t('angebot.edit')"
+                        :text="
+                          t('angebot.vidisEditInfoText', { name: serviceProviderStore.currentServiceProvider.name })
+                        "
+                        v-model="vidisInfoDialogOpen"
+                      />
                     </v-row>
                   </v-col>
                 </v-row>
@@ -602,12 +609,6 @@
                 </LayoutCard>
               </div>
             </v-expand-transition>
-
-            <VidisInfoDialog
-              :header="t('angebot.edit')"
-              :text="t('angebot.vidisEditInfoText', { name: serviceProviderStore.currentServiceProvider?.name })"
-              v-model="vidisInfoDialogOpen"
-            />
           </template>
 
           <template v-else-if="serviceProviderStore.loading">

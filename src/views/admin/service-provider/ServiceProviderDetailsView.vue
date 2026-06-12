@@ -306,6 +306,11 @@
                     >
                     </v-btn>
                   </v-col>
+                  <VidisInfoDialog
+                    :header="t('angebot.edit')"
+                    :text="t('angebot.vidisEditInfoText', { name: serviceProviderStore.currentServiceProvider.name })"
+                    v-model="vidisInfoDialogOpen"
+                  />
                 </v-row>
               </v-col>
             </v-row>
@@ -460,11 +465,6 @@
             </v-row>
           </v-container>
         </div>
-        <VidisInfoDialog
-          :header="t('angebot.edit')"
-          :text="t('angebot.vidisEditInfoText', { name: serviceProviderStore.currentServiceProvider?.name })"
-          v-model="vidisInfoDialogOpen"
-        />
       </div>
     </LayoutCard>
   </div>
