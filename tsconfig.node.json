@@ -1,6 +1,5 @@
 {
   "extends": "./tsconfig.base.json",
-  "references": [{ "path": "./tsconfig.app.json" }],
   "include": [
     "src/**/*.spec.ts",
     "test/**/*.ts",
@@ -11,13 +10,12 @@
   ],
   "compilerOptions": {
     "composite": true,
-    "lib": ["ES2022"],
-    "module": "ES2020",
-    "moduleResolution": "Bundler",
+    "lib": ["es2024", "ESNext.Array", "ESNext.Collection", "ESNext.Error", "ESNext.Iterator", "ESNext.Promise"], // from @tsconfig/node24
     "types": ["@types/node", "vitest/globals"],
     "paths": {
       "@/*": ["./src/*"],
       "test/*": ["./test/*"]
-    }
+    },
+    "noEmit": true
   }
 }
