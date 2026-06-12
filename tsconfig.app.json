@@ -1,6 +1,6 @@
 {
   "extends": "./tsconfig.base.json",
-  "include": ["env.d.ts", "src/**/*", "vite.config.ts"],
+  "include": ["env.d.ts", "src/**/**/*.ts", "src/**/**/*.vue", "vite.config.ts"],
   "exclude": ["src/**/*.spec.ts", "src/**/*.test.ts", "src/**/**/*.spec.ts", "src/**/**/*.test.ts"],
   "compilerOptions": {
     "composite": true,
@@ -10,9 +10,11 @@
       "@/*": ["./src/*"]
     },
     "resolveJsonModule": true,
-    "incremental": true, /* Save .tsbuildinfo files to allow for incremental compilation of projects. */
+    "incremental": true /* Save .tsbuildinfo files to allow for incremental compilation of projects. */,
     /* Language and Environment */
-    "lib": ["ES2022", "DOM"],                                        /* Specify a set of bundled library declaration files that describe the target runtime environment. */
-       
+    "lib": [
+      "ES2022",
+      "DOM"
+    ] /* Specify a set of bundled library declaration files that describe the target runtime environment. */
   }
 }
