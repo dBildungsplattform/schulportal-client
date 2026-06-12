@@ -1,6 +1,7 @@
 import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
 import { nextTick, type Component } from 'vue';
 import VidisInfoDialog from './VidisInfoDialog.vue';
+import type { VDialog } from 'vuetify/components';
 
 let wrapper: VueWrapper | null = null;
 
@@ -54,7 +55,8 @@ describe('VidisInfoDialog.vue', () => {
   });
 
   test('emits after-leave when dialog after-leave is fired', async () => {
-    wrapper!.findComponent({ name: 'v-dialog' }).vm.$emit('after-leave');
+    const dialogComponent: VueWrapper<VDialog> = wrapper!.findComponent({ name: 'v-dialog' }) as VueWrapper<VDialog>;
+    dialogComponent.vm.$emit('after-leave');
     await nextTick();
 
     expect(wrapper!.emitted('after-leave')).toBeTruthy();
