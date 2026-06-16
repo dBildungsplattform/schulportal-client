@@ -10,7 +10,16 @@
   ],
   "compilerOptions": {
     "composite": true,
-    "lib": ["es2024", "ESNext.Array", "ESNext.Collection", "ESNext.Error", "ESNext.Iterator", "ESNext.Promise"], // from @tsconfig/node24
+    "lib": [
+      "DOM",
+      // from @tsconfig/node24
+      "es2024",
+      "ESNext.Array",
+      "ESNext.Collection",
+      "ESNext.Error",
+      "ESNext.Iterator",
+      "ESNext.Promise"
+    ],
     "types": ["@types/node", "vitest/globals"],
     "paths": {
       "@/*": ["./src/*"],
