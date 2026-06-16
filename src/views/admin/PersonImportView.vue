@@ -1,400 +1,404 @@
 <script setup lang="ts">
-      import { RollenSystemRechtEnum } from '@/api-client/generated';
-    import SpshAlert from '@/components/alert/SpshAlert.vue';
-      import LayoutCard from '@/components/cards/LayoutCard.vue';
-      import SchulenFilter from '@/components/filter/SchulenFilter.vue';
-      import FormRow from '@/components/form/FormRow.vue';
-      import FormWrapper from '@/components/form/FormWrapper.vue';
-      import {
-        ImportDataItemStatus,
-        useImportStore,
-        type ImportedUserResponse,
-        type ImportStore,
-      } from '@/stores/ImportStore';
-      import { RollenArt, useRolleStore, type RolleResponse, type RolleStore } from '@/stores/RolleStore';
+  import { ImportDataItemStatus, RollenSystemRechtEnum } from '@/api-client/generated';
+  import SpshAlert from '@/components/alert/SpshAlert.vue';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import SchulenFilter from '@/components/filter/SchulenFilter.vue';
+  import FormRow from '@/components/form/FormRow.vue';
+  import FormWrapper from '@/components/form/FormWrapper.vue';
+  import { useImportStore, type ImportedUserResponse, type ImportStore } from '@/stores/ImportStore';
+  import { RollenArt, useRolleStore, type RolleResponse, type RolleStore } from '@/stores/RolleStore';
   import type { TranslatedObject } from '@/types';
-      import { toTypedSchema } from '@vee-validate/yup';
-      import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
-      import { computed, onMounted, onUnmounted, ref, watch, type ComputedRef, type Ref } from 'vue';
-      import { useI18n, type Composer } from 'vue-i18n';
-      import {
-        onBeforeRouteLeave,
-        useRouter,
-        type NavigationGuardNext,
-        type RouteLocationNormalized,
-        type Router,
-      } from 'vue-router';
-      import { useDisplay } from 'vuetify';
-      import { mixed, object, string } from 'yup';
+  import { toTypedSchema } from '@vee-validate/yup';
+  import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
+  import { computed, onMounted, onUnmounted, ref, watch, type ComputedRef, type Ref } from 'vue';
+  import { useI18n, type Composer } from 'vue-i18n';
+  import {
+    onBeforeRouteLeave,
+    useRouter,
+    type NavigationGuardNext,
+    type RouteLocationNormalized,
+    type Router,
+  } from 'vue-router';
+  import { useDisplay } from 'vuetify';
+  import { mixed, object, string } from 'yup';
 
-      const importStore: ImportStore = useImportStore();
-      const rolleStore: RolleStore = useRolleStore();
+  const importStore: ImportStore = useImportStore();
+  const rolleStore: RolleStore = useRolleStore();
 
-      const router: Router = useRouter();
-      const { t }: Composer = useI18n({ useScope: 'global' });
-      const { smAndDown }: { smAndDown: Ref<boolean> } = useDisplay();
+  const router: Router = useRouter();
+  const { t }: Composer = useI18n({ useScope: 'global' });
+  const { smAndDown }: { smAndDown: Ref<boolean> } = useDisplay();
 
-      const confirmationDialogVisible: Ref<boolean> = ref(false);
+  const confirmationDialogVisible: Ref<boolean> = ref(false);
 
-      const isDownloadingFile: Ref<boolean> = ref(false);
+  const isDownloadingFile: Ref<boolean> = ref(false);
 
-      const validationSchema: TypedSchema = toTypedSchema(
-        object({
-          selectedSchule: string().required(t('admin.import.rules.schule.required')),
-          selectedRolle: string().required(t('admin.import.rules.rolle.required')),
-          selectedFiles: mixed().required(t('admin.import.rules.files.required')),
-        }),
-      );
+  const validationSchema: TypedSchema = toTypedSchema(
+    object({
+      selectedSchule: string().required(t('admin.import.rules.schule.required')),
+      selectedRolle: string().required(t('admin.import.rules.rolle.required')),
+      selectedFiles: mixed().required(t('admin.import.rules.files.required')),
+    }),
+  );
 
-      const vuetifyConfig = (state: {
-        errors: Array<string>;
-      }): { props: { error: boolean; 'error-messages': Array<string> } } => ({
-        props: {
-          error: !!state.errors.length,
-          'error-messages': state.errors,
-        },
+  const vuetifyConfig = (state: {
+    errors: Array<string>;
+  }): { props: { error: boolean; 'error-messages': Array<string> } } => ({
+    props: {
+      error: !!state.errors.length,
+      'error-messages': state.errors,
+    },
+  });
+
+  type PersonImportForm = {
+    selectedSchule: string | undefined;
+    selectedRolle: string;
+    selectedFiles: Array<File>;
+  };
+
+  const formContext: FormContext<PersonImportForm, PersonImportForm> = useForm<PersonImportForm>({
+    validationSchema,
+  });
+
+  const [selectedSchule, selectedSchuleProps]: [
+    Ref<string | undefined>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = formContext.defineField('selectedSchule', vuetifyConfig);
+
+  const [selectedRolle, selectedRolleProps]: [
+    Ref<string | undefined>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = formContext.defineField('selectedRolle', vuetifyConfig);
+
+  const [selectedFile, selectedFilesProps]: [
+    Ref<File | undefined>,
+    Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
+  ] = formContext.defineField('selectedFiles', vuetifyConfig);
+
+  const lernRollen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
+    return rolleStore.allRollen
+      .map((rolle: RolleResponse) => ({
+        value: rolle.id,
+        title: rolle.name,
+      }))
+      .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
+  });
+
+  watch(selectedSchule, async (newValue: string | undefined, oldValue: string | undefined) => {
+    if (newValue && newValue !== oldValue) {
+      // Fetch rollen after selecting the organization
+      await rolleStore.getAllRollen({
+        organisationId: newValue,
+        systemrecht: RollenSystemRechtEnum.ImportDurchfuehren,
+        rollenarten: [RollenArt.Lern],
       });
 
-      type PersonImportForm = {
-        selectedSchule: string | undefined;
-        selectedRolle: string;
-        selectedFiles: Array<File>;
-      };
-
-      const formContext: FormContext<PersonImportForm, PersonImportForm> = useForm<PersonImportForm>({
-        validationSchema,
-      });
-
-      const [selectedSchule, selectedSchuleProps]: [
-        Ref<string | undefined>,
-        Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-      ] = formContext.defineField('selectedSchule', vuetifyConfig);
-
-      const [selectedRolle, selectedRolleProps]: [
-        Ref<string | undefined>,
-        Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-      ] = formContext.defineField('selectedRolle', vuetifyConfig);
-
-      const [selectedFile, selectedFilesProps]: [
-        Ref<File | undefined>,
-        Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
-      ] = formContext.defineField('selectedFiles', vuetifyConfig);
-
-      const lernRollen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-        return rolleStore.allRollen.map((rolle: RolleResponse) => ({
-          value: rolle.id,
-          title: rolle.name,
-        })).sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
-      });
-
-      watch(selectedSchule, async (newValue: string | undefined, oldValue: string | undefined) => {
-        if (newValue && newValue !== oldValue) {
-          // Fetch rollen after selecting the organization
-          await rolleStore.getAllRollen({ organisationId: newValue, systemrecht: RollenSystemRechtEnum.ImportDurchfuehren, rollenarten: [RollenArt.Lern] });
-
-          // Reset the selectedRolle field only if oldValue was not undefined
-          if (oldValue !== undefined) {
-            selectedRolle.value = undefined;
-          }
-        } else if (!newValue) {
-          // If the organization is cleared, reset selectedRolle
-          selectedRolle.value = undefined;
-        }
-
-        importStore.uploadResponse = null;
-      });
-
-      watch(selectedFile, (newValue: File | undefined, oldValue: File | undefined) => {
-        if (newValue && newValue !== oldValue) {
-          importStore.uploadResponse = null;
-        }
-      });
-
-      const showUploadSuccessTemplate: ComputedRef<boolean> = computed(() => {
-        return (
-          (importStore.uploadResponse?.isValid as boolean) &&
-          !importStore.importResponse &&
-          !importStore.uploadIsLoading &&
-          !importStore.importIsLoading &&
-          !importStore.errorCode &&
-          importStore.importProgress === 0
-        );
-      });
-
-      const totalImportItems: ComputedRef<number> = computed(() => {
-        return importStore.uploadResponse?.totalImportDataItems as number;
-      });
-
-      function clearSelectedRolle(): void {
+      // Reset the selectedRolle field only if oldValue was not undefined
+      if (oldValue !== undefined) {
         selectedRolle.value = undefined;
       }
+    } else if (!newValue) {
+      // If the organization is cleared, reset selectedRolle
+      selectedRolle.value = undefined;
+    }
 
-      function navigateToPersonTable(): void {
-        formContext.resetForm();
-        importStore.errorCode = null;
-        importStore.uploadResponse = null;
-        importStore.importResponse = null;
-        importStore.importProgress = 0;
-        router.push({ name: 'person-management' });
+    importStore.uploadResponse = null;
+  });
+
+  watch(selectedFile, (newValue: File | undefined, oldValue: File | undefined) => {
+    if (newValue && newValue !== oldValue) {
+      importStore.uploadResponse = null;
+    }
+  });
+
+  const showUploadSuccessTemplate: ComputedRef<boolean> = computed(() => {
+    return (
+      (importStore.uploadResponse?.isValid as boolean) &&
+      !importStore.importResponse &&
+      !importStore.uploadIsLoading &&
+      !importStore.importIsLoading &&
+      !importStore.errorCode &&
+      importStore.importProgress === 0
+    );
+  });
+
+  const totalImportItems: ComputedRef<number> = computed(() => {
+    return importStore.uploadResponse?.totalImportDataItems as number;
+  });
+
+  function clearSelectedRolle(): void {
+    selectedRolle.value = undefined;
+  }
+
+  function navigateToPersonTable(): void {
+    formContext.resetForm();
+    importStore.errorCode = null;
+    importStore.uploadResponse = null;
+    importStore.importResponse = null;
+    importStore.importProgress = 0;
+    router.push({ name: 'person-management' });
+  }
+
+  function convertToUTF8(buffer: ArrayBuffer): string {
+    // Try decoding as UTF-8 first
+    const utf8Decoder: TextDecoder = new TextDecoder('utf-8', { fatal: false });
+    const utf8Text: string = utf8Decoder.decode(buffer);
+
+    // If decoding as UTF-8 doesn't result in invalid characters
+    if (utf8Text && !utf8Text.includes('�')) {
+      return utf8Text;
+    }
+
+    // Try other encodings (Windows-1252, ISO-8859-1, etc.)
+    const encodingsToTry: string[] = ['windows-1252', 'iso-8859-1', 'utf-16', 'utf-16le', 'utf-16be'];
+
+    for (const encoding of encodingsToTry) {
+      try {
+        const decoder: TextDecoder = new TextDecoder(encoding, { fatal: true });
+        const decodedText: string = decoder.decode(buffer);
+        // If it successfully decodes without errors, return the decoded text
+        return decodedText;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (e) {
+        // If the decoding fails, continue with the next encoding
+        continue;
       }
+    }
 
-      function convertToUTF8(buffer: ArrayBuffer): string {
-        // Try decoding as UTF-8 first
-        const utf8Decoder: TextDecoder = new TextDecoder('utf-8', { fatal: false });
-        const utf8Text: string = utf8Decoder.decode(buffer);
+    // If all decoding attempts fail, return a fallback (perhaps empty string or an error message)
+    throw new Error('Unable to decode file using known encodings.');
+  }
 
-        // If decoding as UTF-8 doesn't result in invalid characters
-        if (utf8Text && !utf8Text.includes('�')) {
-          return utf8Text;
-        }
+  // Reads the file and converts it to UTF-8
+  function readFileAsUTF8(file: File): Promise<string> {
+    return new Promise((resolve: (value: string | PromiseLike<string>) => void, reject: (reason?: unknown) => void) => {
+      const reader: FileReader = new FileReader();
 
-        // Try other encodings (Windows-1252, ISO-8859-1, etc.)
-        const encodingsToTry: string[] = ['windows-1252', 'iso-8859-1', 'utf-16', 'utf-16le', 'utf-16be'];
-
-        for (const encoding of encodingsToTry) {
-          try {
-            const decoder: TextDecoder = new TextDecoder(encoding, { fatal: true });
-            const decodedText: string = decoder.decode(buffer);
-            // If it successfully decodes without errors, return the decoded text
-            return decodedText;
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          } catch (e) {
-            // If the decoding fails, continue with the next encoding
-            continue;
-          }
-        }
-
-        // If all decoding attempts fail, return a fallback (perhaps empty string or an error message)
-        throw new Error('Unable to decode file using known encodings.');
-      }
-
-      // Reads the file and converts it to UTF-8
-      function readFileAsUTF8(file: File): Promise<string> {
-        return new Promise((resolve: (value: string | PromiseLike<string>) => void, reject: (reason?: unknown) => void) => {
-          const reader: FileReader = new FileReader();
-
-          reader.onload = (event: ProgressEvent<FileReader>): void => {
-            try {
-              // Convert from unknown encoding to UTF-8
-              const utf8Text: string = convertToUTF8(event.target?.result as ArrayBuffer);
-              resolve(utf8Text);
-            } catch (error) {
-              reject(error as Error);
-            }
-          };
-
-          reader.onerror = (): void => reject(new Error(`File reading error`));
-
-          // Read the file as ArrayBuffer
-          reader.readAsArrayBuffer(file);
-        });
-      }
-
-      async function uploadFile(): Promise<void> {
-        if (selectedSchule.value === undefined || selectedRolle.value === undefined || selectedFile.value === undefined) {
-          return;
-        }
-
-        const originalFile: File = selectedFile.value;
-
-        // Read the file content and convert to UTF-8
-        const fileText: string = await readFileAsUTF8(originalFile);
-
-        // Create a new File object with UTF-8 encoded content
-        const utf8Blob: Blob = new Blob(['\uFEFF' + fileText], { type: 'text/csv;charset=utf-8' });
-        const utf8File: File = new File([utf8Blob], originalFile.name, { type: 'text/csv;charset=utf-8' });
-
-        // Update selected files with the UTF-8 version
-        selectedFile.value = utf8File;
-        // Perform the upload with the UTF-8 encoded file
-        await importStore.uploadPersonenImportFile(selectedSchule.value, selectedRolle.value, utf8File);
-      }
-
-      function anotherImport(): void {
-        importStore.errorCode = '';
-        importStore.uploadResponse = null;
-        importStore.importResponse = null;
-        importStore.importProgress = 0;
-        formContext.resetForm();
-      }
-
-      function backToUpload(): void {
-        importStore.errorCode = null;
-        importStore.uploadResponse = null;
-        importStore.importResponse = null;
-      }
-
-      function cancelImport(): void {
-        backToUpload();
-        confirmationDialogVisible.value = false;
-      }
-
-      function openConfirmationDialog(): void {
-        confirmationDialogVisible.value = true;
-      }
-
-      async function executeImport(): Promise<void> {
-        confirmationDialogVisible.value = false;
-        const importvorgangId: string = importStore.uploadResponse?.importvorgangId as string;
-
-        await importStore.executePersonenImport(importvorgangId);
-
-        // Only start polling if the execution was successful (no error)
-        if (!importStore.errorCode) {
-          importStore.startImportStatusPolling(importvorgangId);
-        }
-      }
-
-      function downloadFileContent(fileContent: string): void {
-        const blob: Blob = new Blob([fileContent], { type: 'text/txt' });
-        const url: string = window.URL.createObjectURL(blob);
-
-        const link: HTMLAnchorElement = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', `${t('admin.import.fileName.person')}.txt`);
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-
-        window.URL.revokeObjectURL(url);
-      }
-
-      function createFileContentFromUsers(users: ImportedUserResponse[]): string {
-        const successfulUsers: ImportedUserResponse[] = users.filter(
-          (user: ImportedUserResponse) => user.status === ImportDataItemStatus.Success,
-        );
-        const failedUsers: ImportedUserResponse[] = users.filter(
-          (user: ImportedUserResponse) => user.status === ImportDataItemStatus.Failed,
-        );
-
-        /**
-         * make sure every (non-empty) line contains the correct amount of semicolons, otherwise the excel-data-import will not recognize the format
-         */
-
-        let fileContent: string = `Schule:;${importStore.importResponse?.organisationsname};Rolle:;${importStore.importResponse?.rollenname};`;
-        fileContent += `\n\n${t('admin.import.successfullyImportedUsersNotice')};;;;\n\n`;
-        fileContent += 'Klasse;Vorname;Nachname;Benutzername;Passwort\n';
-
-        successfulUsers.forEach((user: ImportedUserResponse) => {
-          fileContent += `${user.klasse};${user.vorname};${user.nachname};${user.benutzername};${user.startpasswort}\n`;
-        });
-
-        if (failedUsers.length > 0) {
-          fileContent += `\n\n${t('admin.import.failedToImportUsersNotice')};;;;\n\n`;
-          fileContent += 'Klasse;Vorname;Nachname;Benutzername;\n';
-
-          failedUsers.forEach((user: ImportedUserResponse) => {
-            fileContent += `${user.klasse};${user.vorname};${user.nachname};${user.benutzername};\n`;
-          });
-        }
-
-        return fileContent;
-      }
-
-      async function downloadFile(): Promise<void> {
-        isDownloadingFile.value = true;
+      reader.onload = (event: ProgressEvent<FileReader>): void => {
         try {
-          const totalUsers: number = importStore.importResponse?.total as number;
-          const itemsPerPage: number = importStore.importedUsersPerPage;
-          const totalPagesNumber: number = Math.ceil(totalUsers / itemsPerPage);
-
-          let allImportedUsers: ImportedUserResponse[] = [];
-
-          for (let pageIndex: number = 0; pageIndex < totalPagesNumber; pageIndex++) {
-            const offset: number = pageIndex * itemsPerPage;
-            // eslint-disable-next-line no-await-in-loop
-            await new Promise((resolve: (value: unknown) => void) => {
-              setTimeout(resolve, pageIndex * 600);
-            });
-
-            // eslint-disable-next-line no-await-in-loop
-            await importStore.getImportedPersons(
-              importStore.uploadResponse?.importvorgangId as string,
-              offset,
-              itemsPerPage,
-            );
-
-            allImportedUsers = allImportedUsers.concat(importStore.importResponse?.importedUsers || []);
-          }
-
-          const fileContent: string = createFileContentFromUsers(allImportedUsers);
-          downloadFileContent(fileContent);
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          // Convert from unknown encoding to UTF-8
+          const utf8Text: string = convertToUTF8(event.target?.result as ArrayBuffer);
+          resolve(utf8Text);
         } catch (error) {
-          // While downloading the file, it could happen that some users can't be downloaded even though they were imported successfully...
-          // In that case it makes sense to ignore errors and just go forward with the other users for better usability.
-          importStore.errorCode = '';
-        } finally {
-          isDownloadingFile.value = false;
+          reject(error as Error);
         }
-      }
-
-      const onSubmit: (e?: Event) => Promise<void | undefined> = formContext.handleSubmit(() => {
-        uploadFile();
-      });
-
-      function isFormDirty(): boolean {
-        // Form dirtiness check only if the import was not executed yet
-        if (importStore.importProgress === 0) {
-          return (
-            formContext.isFieldDirty('selectedSchule') ||
-            formContext.isFieldDirty('selectedRolle') ||
-            formContext.isFieldDirty('selectedFiles')
-          );
-        }
-        return false;
-      }
-      const showUnsavedChangesDialog: Ref<boolean> = ref(false);
-      let blockedNext: () => void = () => {
-        /* empty */
       };
 
-      function handleConfirmUnsavedChanges(): void {
-        blockedNext();
-        importStore.errorCode = '';
+      reader.onerror = (): void => reject(new Error(`File reading error`));
+
+      // Read the file as ArrayBuffer
+      reader.readAsArrayBuffer(file);
+    });
+  }
+
+  async function uploadFile(): Promise<void> {
+    if (selectedSchule.value === undefined || selectedRolle.value === undefined || selectedFile.value === undefined) {
+      return;
+    }
+
+    const originalFile: File = selectedFile.value;
+
+    // Read the file content and convert to UTF-8
+    const fileText: string = await readFileAsUTF8(originalFile);
+
+    // Create a new File object with UTF-8 encoded content
+    const utf8Blob: Blob = new Blob(['\uFEFF' + fileText], { type: 'text/csv;charset=utf-8' });
+    const utf8File: File = new File([utf8Blob], originalFile.name, { type: 'text/csv;charset=utf-8' });
+
+    // Update selected files with the UTF-8 version
+    selectedFile.value = utf8File;
+    // Perform the upload with the UTF-8 encoded file
+    await importStore.uploadPersonenImportFile(selectedSchule.value, selectedRolle.value, utf8File);
+  }
+
+  function anotherImport(): void {
+    importStore.errorCode = '';
+    importStore.uploadResponse = null;
+    importStore.importResponse = null;
+    importStore.importProgress = 0;
+    formContext.resetForm();
+  }
+
+  function backToUpload(): void {
+    importStore.errorCode = null;
+    importStore.uploadResponse = null;
+    importStore.importResponse = null;
+  }
+
+  function cancelImport(): void {
+    backToUpload();
+    confirmationDialogVisible.value = false;
+  }
+
+  function openConfirmationDialog(): void {
+    confirmationDialogVisible.value = true;
+  }
+
+  async function executeImport(): Promise<void> {
+    confirmationDialogVisible.value = false;
+    const importvorgangId: string = importStore.uploadResponse?.importvorgangId as string;
+
+    await importStore.executePersonenImport(importvorgangId);
+
+    // Only start polling if the execution was successful (no error)
+    if (!importStore.errorCode) {
+      importStore.startImportStatusPolling(importvorgangId);
+    }
+  }
+
+  function downloadFileContent(fileContent: string): void {
+    const blob: Blob = new Blob([fileContent], { type: 'text/txt' });
+    const url: string = window.URL.createObjectURL(blob);
+
+    const link: HTMLAnchorElement = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `${t('admin.import.fileName.person')}.txt`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    window.URL.revokeObjectURL(url);
+  }
+
+  function createFileContentFromUsers(users: ImportedUserResponse[]): string {
+    const successfulUsers: ImportedUserResponse[] = users.filter(
+      (user: ImportedUserResponse) => user.status === ImportDataItemStatus.Success,
+    );
+    const failedUsers: ImportedUserResponse[] = users.filter(
+      (user: ImportedUserResponse) => user.status === ImportDataItemStatus.Failed,
+    );
+
+    /**
+     * make sure every (non-empty) line contains the correct amount of semicolons, otherwise the excel-data-import will not recognize the format
+     */
+
+    let fileContent: string = `Schule:;${importStore.importResponse?.organisationsname};Rolle:;${importStore.importResponse?.rollenname};`;
+    fileContent += `\n\n${t('admin.import.successfullyImportedUsersNotice')};;;;\n\n`;
+    fileContent += 'Klasse;Vorname;Nachname;Benutzername;Passwort\n';
+
+    successfulUsers.forEach((user: ImportedUserResponse) => {
+      fileContent += `${user.klasse};${user.vorname};${user.nachname};${user.benutzername};${user.startpasswort}\n`;
+    });
+
+    if (failedUsers.length > 0) {
+      fileContent += `\n\n${t('admin.import.failedToImportUsersNotice')};;;;\n\n`;
+      fileContent += 'Klasse;Vorname;Nachname;Benutzername;\n';
+
+      failedUsers.forEach((user: ImportedUserResponse) => {
+        fileContent += `${user.klasse};${user.vorname};${user.nachname};${user.benutzername};\n`;
+      });
+    }
+
+    return fileContent;
+  }
+
+  async function downloadFile(): Promise<void> {
+    isDownloadingFile.value = true;
+    try {
+      const totalUsers: number = importStore.importResponse?.total as number;
+      const itemsPerPage: number = importStore.importedUsersPerPage;
+      const totalPagesNumber: number = Math.ceil(totalUsers / itemsPerPage);
+
+      let allImportedUsers: ImportedUserResponse[] = [];
+
+      for (let pageIndex: number = 0; pageIndex < totalPagesNumber; pageIndex++) {
+        const offset: number = pageIndex * itemsPerPage;
+        // eslint-disable-next-line no-await-in-loop
+        await new Promise((resolve: (value: unknown) => void) => {
+          setTimeout(resolve, pageIndex * 600);
+        });
+
+        // eslint-disable-next-line no-await-in-loop
+        await importStore.getImportedPersons(
+          importStore.uploadResponse?.importvorgangId as string,
+          offset,
+          itemsPerPage,
+        );
+
+        allImportedUsers = allImportedUsers.concat(importStore.importResponse?.importedUsers || []);
       }
 
-      function preventNavigation(event: BeforeUnloadEvent): void {
-        if (!isFormDirty()) {
-          return;
-        }
-        event.preventDefault();
-        /* Chrome requires returnValue to be set. */
-        event.returnValue = '';
+      const fileContent: string = createFileContentFromUsers(allImportedUsers);
+      downloadFileContent(fileContent);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      // While downloading the file, it could happen that some users can't be downloaded even though they were imported successfully...
+      // In that case it makes sense to ignore errors and just go forward with the other users for better usability.
+      importStore.errorCode = '';
+    } finally {
+      isDownloadingFile.value = false;
+    }
+  }
+
+  const onSubmit: (e?: Event) => Promise<void | undefined> = formContext.handleSubmit(() => {
+    uploadFile();
+  });
+
+  function isFormDirty(): boolean {
+    // Form dirtiness check only if the import was not executed yet
+    if (importStore.importProgress === 0) {
+      return (
+        formContext.isFieldDirty('selectedSchule') ||
+        formContext.isFieldDirty('selectedRolle') ||
+        formContext.isFieldDirty('selectedFiles')
+      );
+    }
+    return false;
+  }
+  const showUnsavedChangesDialog: Ref<boolean> = ref(false);
+  let blockedNext: () => void = () => {
+    /* empty */
+  };
+
+  function handleConfirmUnsavedChanges(): void {
+    blockedNext();
+    importStore.errorCode = '';
+  }
+
+  function preventNavigation(event: BeforeUnloadEvent): void {
+    if (!isFormDirty()) {
+      return;
+    }
+    event.preventDefault();
+    /* Chrome requires returnValue to be set. */
+    event.returnValue = '';
+  }
+
+  function updateSelectedSchule(id: string | undefined): void {
+    formContext.setFieldValue('selectedSchule', id);
+  }
+
+  onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
+    if (isFormDirty()) {
+      showUnsavedChangesDialog.value = true;
+      blockedNext = next;
+    } else {
+      // Delete the Imported items once the user leaves the page
+      if (importStore.importResponse) {
+        const importvorgangId: string = importStore.uploadResponse?.importvorgangId as string;
+        importStore.deleteImportVorgangById(importvorgangId);
       }
+      importStore.uploadResponse = null;
+      importStore.importResponse = null;
+      next();
+    }
+  });
 
-      function updateSelectedSchule(id: string | undefined): void {
-        formContext.setFieldValue('selectedSchule', id);
-      }
+  onMounted(async () => {
+    await rolleStore.getAllRollen({
+      systemrecht: RollenSystemRechtEnum.ImportDurchfuehren,
+      rollenarten: [RollenArt.Lern],
+    });
+    importStore.uploadResponse = null;
+    importStore.importResponse = null;
+    importStore.importProgress = 0;
+    /* listen for browser changes and prevent them when form is dirty */
+    window.addEventListener('beforeunload', preventNavigation);
+  });
 
-      onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
-        if (isFormDirty()) {
-          showUnsavedChangesDialog.value = true;
-          blockedNext = next;
-        } else {
-          // Delete the Imported items once the user leaves the page
-          if (importStore.importResponse) {
-            const importvorgangId: string = importStore.uploadResponse?.importvorgangId as string;
-            importStore.deleteImportVorgangById(importvorgangId);
-          }
-          importStore.uploadResponse = null;
-          importStore.importResponse = null;
-          next();
-        }
-      });
-
-      onMounted(async () => {
-        await rolleStore.getAllRollen({ systemrecht: RollenSystemRechtEnum.ImportDurchfuehren, rollenarten: [RollenArt.Lern] });
-        importStore.uploadResponse = null;
-        importStore.importResponse = null;
-        importStore.importProgress = 0;
-        /* listen for browser changes and prevent them when form is dirty */
-        window.addEventListener('beforeunload', preventNavigation);
-      });
-
-      onUnmounted(() => {
-        window.removeEventListener('beforeunload', preventNavigation);
-      });
+  onUnmounted(() => {
+    window.removeEventListener('beforeunload', preventNavigation);
+  });
 </script>
 
 <template>
