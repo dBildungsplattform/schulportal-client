@@ -25,7 +25,7 @@ describe('AuthStore', () => {
       mockInfo.personenkontexte[0]?.rolle.systemrechte.push('');
 
       mockadapter.onGet('/api/auth/logininfo').replyOnce(200, mockInfo);
-      mockadapter.onGet('/api/auth/csrf-token').replyOnce(200, { csrfToken: 'mock-csrf-token' } as CsrfTokenResponse);
+      mockadapter.onGet('/api/auth/csrf-token').replyOnce(200, { csrfToken: 'mock-csrf-token' });
 
       const initializeAuthStatus: Promise<void> = authStore.initializeAuthStatus();
       expect(authStore.isAuthenticated).toBe(false);
@@ -54,7 +54,7 @@ describe('AuthStore', () => {
       const mockResponse: UserinfoResponse = DoFactory.getUserinfoResponse({ personenkontexte: [] });
 
       mockadapter.onGet('/api/auth/logininfo').replyOnce(200, mockResponse);
-      mockadapter.onGet('/api/auth/csrf-token').replyOnce(200, { csrfToken: 'mock-csrf-token' } as CsrfTokenResponse);
+      mockadapter.onGet('/api/auth/csrf-token').replyOnce(200, { csrfToken: 'mock-csrf-token' });
 
       const initializeAuthStatus: Promise<void> = authStore.initializeAuthStatus();
       expect(authStore.isAuthenticated).toBe(false);
@@ -76,7 +76,7 @@ describe('AuthStore', () => {
 
   describe('getCsrfToken', () => {
     it('should store the csrf token on success', async () => {
-      mockadapter.onGet('/api/auth/csrf-token').replyOnce(200, { csrfToken: 'mock-csrf-token' } as CsrfTokenResponse);
+      mockadapter.onGet('/api/auth/csrf-token').replyOnce(200, { csrfToken: 'mock-csrf-token' });
 
       await authStore.getCsrfToken();
 

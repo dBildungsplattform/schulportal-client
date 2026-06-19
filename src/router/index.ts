@@ -68,7 +68,7 @@ function handleGoToPreviousPage(): void {
 }
 
 router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormalized) => {
-  const meta: AppRouteMeta | undefined = to.meta as AppRouteMeta | undefined;
+  const meta: AppRouteMeta | undefined = to.meta;
   const authStore: AuthStore = useAuthStore();
   const masterDataStore: MasterDataStore = useMasterDataStore();
   if (!authStore.isAuthenticated && !masterDataStore.isInitialized()) {

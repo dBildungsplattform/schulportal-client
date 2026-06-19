@@ -71,7 +71,7 @@
       requires2fa: false,
       // No default logoId — admin must actively pick one
       ...props.initialValues,
-    } as ServiceProviderForm,
+    },
   });
 
   const [selectedOrganisationId, selectedOrganisationIdProps]: FieldDefinition<string> = formContext.defineField(

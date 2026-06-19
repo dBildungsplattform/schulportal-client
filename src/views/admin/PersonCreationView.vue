@@ -433,7 +433,7 @@
     const bodyParams: CreatePersonBodyParams = {
       familienname: selectedFamilienname.value,
       vorname: selectedVorname.value,
-      personalnummer: selectedKopersNr.value as string,
+      personalnummer: selectedKopersNr.value,
       befristung: formattedBefristung,
       createPersonenkontexte:
         selectedRollen.value?.map(
@@ -441,7 +441,7 @@
             ({
               organisationId: selectedOrganisation.value as string,
               rolleId,
-            }) as DbiamCreatePersonenkontextBodyParams,
+            }),
         ) || [],
     };
     // Klasse is only allowed if the selectedRolle is of type LERN.

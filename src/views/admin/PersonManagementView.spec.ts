@@ -122,7 +122,7 @@ beforeEach(async () => {
       },
     ] as RolleResponse[],
     total: 1,
-  } as FindRollenResponse;
+  };
 
   personenkontextStore.workflowStepResponse = {
     rollen: [

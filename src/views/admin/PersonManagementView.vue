@@ -560,7 +560,7 @@
 
   function handleSelectedRows(selectedItems: TableItem[]): void {
     // Directly assign the selected items to selectedPersonIds since the emitted tableItems are always IDs of the specific rows
-    selectedPersonIds.value = selectedItems as unknown as string[];
+    selectedPersonIds.value = selectedItems;
   }
 
   // This method filters the selectedPersonIds to avoid items being selected when they are not included in the current table "items"

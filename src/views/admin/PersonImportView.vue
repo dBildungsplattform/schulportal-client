@@ -180,7 +180,7 @@
           const utf8Text: string = convertToUTF8(event.target?.result as ArrayBuffer);
           resolve(utf8Text);
         } catch (error) {
-          reject(error as Error);
+          reject(error);
         }
       };
 

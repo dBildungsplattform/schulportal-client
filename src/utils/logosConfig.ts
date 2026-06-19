@@ -207,7 +207,7 @@ export function getLogoConfig(logoId?: number | LogoId): LogoConfig | undefined 
   if (logoId === undefined || logoId === null) {
     return undefined;
   }
-  return LOGO_CATALOG[logoId as LogoId];
+  return LOGO_CATALOG[logoId];
 }
 
 /**
