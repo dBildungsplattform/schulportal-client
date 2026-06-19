@@ -1199,7 +1199,9 @@
         "responses": {
           "201": {
             "description": "The rolle was successfully created.",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RolleResponse" } } }
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/RolleWithServiceProvidersResponse" } }
+            }
           },
           "400": {
             "description": "The input was not valid.",
@@ -2243,6 +2245,20 @@
         "tags": ["2FA"]
       }
     },
+    "/api/cron/vidis-sync": {
+      "put": {
+        "operationId": "CronController_triggerVidisSync",
+        "parameters": [],
+        "responses": {
+          "200": { "description": "VIDIS sync was successfully triggered." },
+          "401": { "description": "Not authorized to trigger VIDIS sync." },
+          "403": { "description": "Insufficient permissions to trigger VIDIS sync." },
+          "500": { "description": "Internal server error while trying to trigger VIDIS sync." }
+        },
+        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }],
+        "tags": ["cron"]
+      }
+    },
     "/api/cron/kopers-lock": {
       "put": {
         "operationId": "CronController_koPersUserLock",
@@ -2858,9 +2874,9 @@
         "type": "oauth2",
         "flows": {
           "authorizationCode": {
-            "authorizationUrl": "http://localhost:8080/realms/SPSH/protocol/openid-connect/auth",
-            "tokenUrl": "http://localhost:8080/realms/SPSH/protocol/openid-connect/token",
-            "refreshUrl": "http://localhost:8080/realms/SPSH/protocol/openid-connect/token",
+            "authorizationUrl": "https://spsh-3773-keycloak.dev.spsh.dbildungsplattform.de/realms/SPSH/protocol/openid-connect/auth",
+            "tokenUrl": "https://spsh-3773-keycloak.dev.spsh.dbildungsplattform.de/realms/SPSH/protocol/openid-connect/token",
+            "refreshUrl": "https://spsh-3773-keycloak.dev.spsh.dbildungsplattform.de/realms/SPSH/protocol/openid-connect/token",
             "scopes": {}
           }
         }
@@ -3610,43 +3626,6 @@
           "serviceProviderIds"
         ]
       },
-      "RolleResponse": {
-        "type": "object",
-        "properties": {
-          "id": { "type": "string" },
-          "createdAt": { "format": "date-time", "type": "string" },
-          "updatedAt": { "format": "date-time", "type": "string" },
-          "name": { "type": "string" },
-          "administeredBySchulstrukturknoten": { "type": "string" },
-          "rollenart": { "allOf": [{ "$ref": "#/components/schemas/RollenArt" }] },
-          "merkmale": {
-            "type": "array",
-            "uniqueItems": true,
-            "items": { "$ref": "#/components/schemas/RollenMerkmal" }
-          },
-          "systemrechte": {
-            "uniqueItems": true,
-            "type": "array",
-            "items": { "$ref": "#/components/schemas/SystemRechtResponse" }
-          },
-          "administeredBySchulstrukturknotenName": { "type": "string", "nullable": true },
-          "administeredBySchulstrukturknotenKennung": { "type": "string", "nullable": true },
-          "version": { "type": "number" }
-        },
-        "required": [
-          "id",
-          "createdAt",
-          "updatedAt",
-          "name",
-          "administeredBySchulstrukturknoten",
-          "rollenart",
-          "merkmale",
-          "systemrechte",
-          "administeredBySchulstrukturknotenName",
-          "administeredBySchulstrukturknotenKennung",
-          "version"
-        ]
-      },
       "DbiamRolleError": {
         "type": "object",
         "properties": {
@@ -4020,6 +3999,43 @@
         "required": ["revision"]
       },
       "OperationContext": { "type": "string", "enum": ["PERSON_ANLEGEN", "PERSON_BEARBEITEN"] },
+      "RolleResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "createdAt": { "format": "date-time", "type": "string" },
+          "updatedAt": { "format": "date-time", "type": "string" },
+          "name": { "type": "string" },
+          "administeredBySchulstrukturknoten": { "type": "string" },
+          "rollenart": { "allOf": [{ "$ref": "#/components/schemas/RollenArt" }] },
+          "merkmale": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": { "$ref": "#/components/schemas/RollenMerkmal" }
+          },
+          "systemrechte": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/SystemRechtResponse" }
+          },
+          "administeredBySchulstrukturknotenName": { "type": "string", "nullable": true },
+          "administeredBySchulstrukturknotenKennung": { "type": "string", "nullable": true },
+          "version": { "type": "number" }
+        },
+        "required": [
+          "id",
+          "createdAt",
+          "updatedAt",
+          "name",
+          "administeredBySchulstrukturknoten",
+          "rollenart",
+          "merkmale",
+          "systemrechte",
+          "administeredBySchulstrukturknotenName",
+          "administeredBySchulstrukturknotenKennung",
+          "version"
+        ]
+      },
       "PersonenkontextWorkflowResponse": {
         "type": "object",
         "properties": {
