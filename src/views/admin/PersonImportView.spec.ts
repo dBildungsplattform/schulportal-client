@@ -9,7 +9,6 @@ import { useImportStore, type ImportStore } from '@/stores/ImportStore';
 import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
 import { RollenMerkmal, useRolleStore, type RolleStore } from '@/stores/RolleStore';
 import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
-import type WrapperLike from 'node_modules/@vue/test-utils/dist/interfaces/wrapperLike';
 import { DoFactory } from 'test/DoFactory';
 import { expect, test, type Mock, type MockInstance } from 'vitest';
 import { nextTick, type Component } from 'vue';
@@ -79,8 +78,8 @@ rolleStore.allRollen = [
   },
 ];
 
-async function selectSchule(value: string): Promise<WrapperLike | undefined> {
-  const schuleAutocomplete: WrapperLike | undefined = wrapper
+async function selectSchule(value: string): Promise<ReturnType<VueWrapper['findComponent']> | undefined> {
+  const schuleAutocomplete: ReturnType<VueWrapper['findComponent']> | undefined = wrapper
     ?.findComponent({ ref: 'schulFilter' })
     .findComponent('[data-testid="person-import-schule-select"]');
   await schuleAutocomplete?.setValue(value);
@@ -141,9 +140,11 @@ describe('PersonImportView', () => {
   });
 
   test('it clears selects', async () => {
-    const schuleAutocomplete: WrapperLike | undefined = await selectSchule(schule.id);
+    const schuleAutocomplete: ReturnType<VueWrapper['findComponent']> | undefined = await selectSchule(schule.id);
 
-    const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+    const rolleAutocomplete: ReturnType<VueWrapper['findComponent']> | undefined = wrapper?.findComponent({
+      ref: 'rolle-select',
+    });
     rolleAutocomplete?.setValue('SuS');
     await nextTick();
 
@@ -470,10 +471,12 @@ describe('PersonImportView', () => {
   });
 
   test('it resets the store and navigates when discarding', async () => {
-    const schuleAutocomplete: WrapperLike | undefined = wrapper
+    const schuleAutocomplete: ReturnType<VueWrapper['findComponent']> | undefined = wrapper
       ?.findComponent({ ref: 'schulFilter' })
       .findComponent({ ref: 'person-import-schule-select' });
-    const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+    const rolleAutocomplete: ReturnType<VueWrapper['findComponent']> | undefined = wrapper?.findComponent({
+      ref: 'rolle-select',
+    });
     const fileInput: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="file-input"] input');
     const mockFile: File = new File([''], 'personen.csv', { type: 'text/csv' });
 
@@ -581,7 +584,7 @@ describe('PersonImportView', () => {
   });
 
   test('it clears selected schule when clearSelectedSchule is called', async () => {
-    const schuleAutocomplete: WrapperLike | undefined = await selectSchule(schule.id);
+    const schuleAutocomplete: ReturnType<VueWrapper['findComponent']> | undefined = await selectSchule(schule.id);
     await nextTick();
 
     const clearButton: Element | null = document.body.querySelector('[data-testid="person-import-schule-select"] i');

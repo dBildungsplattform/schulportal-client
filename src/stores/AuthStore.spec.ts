@@ -1,4 +1,4 @@
-import type { CsrfTokenResponse, UserinfoResponse } from '@/api-client/generated';
+import type { UserinfoResponse } from '@/api-client/generated';
 import MockAdapter from 'axios-mock-adapter';
 import { createPinia, setActivePinia } from 'pinia';
 import { DoFactory } from 'test/DoFactory';

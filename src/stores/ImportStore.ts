@@ -2,6 +2,7 @@ import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import { getResponseErrorCode } from '@/utils/errorHandlers';
 import {
   ImportApiFactory,
+  ImportDataItemStatus,
   ImportStatus,
   type ImportApiInterface,
   type ImportedUserResponse,
@@ -16,11 +17,7 @@ const importApi: ImportApiInterface = ImportApiFactory(undefined, '', axiosApiIn
 // 2 hours polling time at maximum
 const MAX_POLLING_TIME: number = 120 * 60 * 1000;
 
-export enum ImportDataItemStatus {
-  Failed = 'FAILED',
-  Success = 'SUCCESS',
-  Pending = 'PENDING',
-}
+export { ImportDataItemStatus };
 
 export type { ImportResultResponse, ImportedUserResponse };
 

@@ -10,7 +10,6 @@
   import { type TranslatedRolleWithAttrs, useRollen } from '@/composables/useRollen';
   import { type Organisation, type OrganisationStore, useOrganisationStore } from '@/stores/OrganisationStore';
   import {
-    type DbiamCreatePersonenkontextBodyParams,
     type DBiamPersonenkontextResponse,
     OperationContext,
     type PersonenkontextStore,
@@ -43,7 +42,7 @@
     useRouter,
   } from 'vue-router';
   import { useDisplay } from 'vuetify';
-  import { array, ArraySchema, object, string, StringSchema, type AnyObject } from 'yup';
+  import { type AnyObject, array, ArraySchema, object, string, StringSchema } from 'yup';
 
   const { mdAndDown, mdAndUp }: { mdAndDown: Ref<boolean>; mdAndUp: Ref<boolean> } = useDisplay();
 
@@ -436,13 +435,10 @@
       personalnummer: selectedKopersNr.value,
       befristung: formattedBefristung,
       createPersonenkontexte:
-        selectedRollen.value?.map(
-          (rolleId: string) =>
-            ({
-              organisationId: selectedOrganisation.value as string,
-              rolleId,
-            }),
-        ) || [],
+        selectedRollen.value?.map((rolleId: string) => ({
+          organisationId: selectedOrganisation.value as string,
+          rolleId,
+        })) || [],
     };
     // Klasse is only allowed if the selectedRolle is of type LERN.
     if (

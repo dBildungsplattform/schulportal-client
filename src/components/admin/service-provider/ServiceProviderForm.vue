@@ -65,6 +65,10 @@
   const formContext: FormContext<ServiceProviderForm> = useForm({
     validationSchema,
     initialValues: {
+      selectedOrganisationId: undefined,
+      name: '',
+      url: '',
+      logoId: undefined,
       kategorie: ServiceProviderKategorie.Schulisch,
       nachtraeglichZuweisbar: true,
       verfuegbarFuerRollenerweiterung: true,

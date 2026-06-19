@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import ResultTable, { type Headers, type TableItem, type TableRow } from '@/components/admin/ResultTable.vue';
+  import ResultTable, { type Headers, type TableRow } from '@/components/admin/ResultTable.vue';
   import SearchField from '@/components/admin/SearchField.vue';
   import SpshTooltip from '@/components/admin/SpshTooltip.vue';
   import PersonBulkChangeKlasse from '@/components/admin/personen/PersonBulkChangeKlasse.vue';
@@ -558,8 +558,8 @@
     }
   };
 
-  function handleSelectedRows(selectedItems: TableItem[]): void {
-    // Directly assign the selected items to selectedPersonIds since the emitted tableItems are always IDs of the specific rows
+  function handleSelectedRows(selectedItems: string[]): void {
+    // Directly assign the selected item values to selectedPersonIds since itemValuePath resolves to the person ID.
     selectedPersonIds.value = selectedItems;
   }
 
@@ -949,7 +949,7 @@
         :loading="personStore.loading"
         :headers="headers"
         :current-sort="searchFilterStore.currentSort"
-        :model-value="selectedPersonIds as unknown as TableItem[]"
+        :model-value="selectedPersonIds"
         :total-items="personStore.totalPersons"
         item-value-path="id"
         @on-handle-row-click="
