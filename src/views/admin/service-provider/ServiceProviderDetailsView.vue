@@ -124,8 +124,7 @@
 
   function resetSearchAndFilter(): void {
     selectedOrganisationId.value = '';
-    serviceProviderStore.manageableServiceProvidersForOrganisation = [];
-    serviceProviderStore.totalManageableServiceProvidersForOrganisation = 0;
+    fetchRollenerweiterungen();
   }
 
   function setOrganisationFilter(newValue: string | undefined): void {
@@ -134,6 +133,7 @@
       return;
     }
     selectedOrganisationId.value = newValue;
+    fetchRollenerweiterungen();
   }
 
   onMounted(async () => {
