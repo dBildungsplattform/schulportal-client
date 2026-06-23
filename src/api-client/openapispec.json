@@ -2125,7 +2125,7 @@
             "name": "systemrecht",
             "required": false,
             "in": "query",
-            "description": "The system right for which the roles should be available. Can only be ROLLEN_VERWALTEN or ROLLEN_ERWEITERN.",
+            "description": "The system right for which the roles should be available. Can only be ROLLEN_VERWALTEN, ROLLEN_ERWEITERN or IMPORT_DURCHFUEHREN.",
             "schema": {
               "$ref": "#/components/schemas/RollenSystemRechtEnum"
             }
@@ -2908,7 +2908,7 @@
             }
           },
           "400": {
-            "description": "Invalid request body."
+            "description": "Invalid request body or VIDIS-linked service-provider."
           },
           "401": {
             "description": "Not authorized."
@@ -3358,6 +3358,9 @@
         "responses": {
           "204": {
             "description": "The service-provider was successfully deleted."
+          },
+          "400": {
+            "description": "The service-provider is linked to VIDIS and cannot be deleted."
           },
           "401": {
             "description": "Not authorized."
@@ -4276,6 +4279,35 @@
           }
         ],
         "tags": ["2FA"]
+      }
+    },
+    "/api/cron/vidis-sync": {
+      "put": {
+        "operationId": "CronController_triggerVidisSync",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "VIDIS sync was successfully triggered."
+          },
+          "401": {
+            "description": "Not authorized to trigger VIDIS sync."
+          },
+          "403": {
+            "description": "Insufficient permissions to trigger VIDIS sync."
+          },
+          "500": {
+            "description": "Internal server error while trying to trigger VIDIS sync."
+          }
+        },
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "tags": ["cron"]
       }
     },
     "/api/cron/kopers-lock": {
@@ -7228,7 +7260,6 @@
       "ManageableServiceProviderListEntryResponse": {
         "type": "object",
         "properties": {
-<<<<<<< HEAD
           "id": {
             "type": "string"
           },
@@ -7248,21 +7279,15 @@
           "requires2fa": {
             "type": "boolean"
           },
+          "vidisAngebotId": {
+            "type": "string"
+          },
           "merkmale": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ServiceProviderMerkmal"
             }
           },
-=======
-          "id": { "type": "string" },
-          "name": { "type": "string" },
-          "administrationsebene": { "$ref": "#/components/schemas/OrganisationRefResponse" },
-          "kategorie": { "allOf": [{ "$ref": "#/components/schemas/ServiceProviderKategorie" }] },
-          "requires2fa": { "type": "boolean" },
-          "vidisAngebotId": { "type": "string" },
-          "merkmale": { "type": "array", "items": { "$ref": "#/components/schemas/ServiceProviderMerkmal" } },
->>>>>>> main
           "rollenerweiterungen": {
             "type": "array",
             "items": {
@@ -7294,16 +7319,45 @@
       "ManageableServiceProviderResponse": {
         "type": "object",
         "properties": {
-          "id": { "type": "string" },
-          "name": { "type": "string" },
-          "administrationsebene": { "$ref": "#/components/schemas/OrganisationRefResponse" },
-          "kategorie": { "allOf": [{ "$ref": "#/components/schemas/ServiceProviderKategorie" }] },
-          "logoId": { "type": "number", "description": "Optional logoId for use with standard logos" },
-          "requires2fa": { "type": "boolean" },
-          "vidisAngebotId": { "type": "string" },
-          "merkmale": { "type": "array", "items": { "$ref": "#/components/schemas/ServiceProviderMerkmal" } },
-          "url": { "type": "string", "description": "Can be undefined, if `target` is not equal to `URL`" },
-          "hasRollenerweiterung": { "type": "boolean" },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "administrationsebene": {
+            "$ref": "#/components/schemas/OrganisationRefResponse"
+          },
+          "kategorie": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ServiceProviderKategorie"
+              }
+            ]
+          },
+          "logoId": {
+            "type": "number",
+            "description": "Optional logoId for use with standard logos"
+          },
+          "requires2fa": {
+            "type": "boolean"
+          },
+          "vidisAngebotId": {
+            "type": "string"
+          },
+          "merkmale": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ServiceProviderMerkmal"
+            }
+          },
+          "url": {
+            "type": "string",
+            "description": "Can be undefined, if `target` is not equal to `URL`"
+          },
+          "hasRollenerweiterung": {
+            "type": "boolean"
+          },
           "availableForRollenerweiterung": {
             "type": "boolean",
             "description": "Indicates whether the service provider is available for rollenerweiterung."
