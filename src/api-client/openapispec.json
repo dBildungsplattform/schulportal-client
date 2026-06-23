@@ -3940,6 +3940,7 @@
           "administrationsebene": { "$ref": "#/components/schemas/OrganisationRefResponse" },
           "kategorie": { "allOf": [{ "$ref": "#/components/schemas/ServiceProviderKategorie" }] },
           "requires2fa": { "type": "boolean" },
+          "vidisAngebotId": { "type": "string" },
           "merkmale": { "type": "array", "items": { "$ref": "#/components/schemas/ServiceProviderMerkmal" } },
           "rollenerweiterungen": {
             "type": "array",
@@ -3969,6 +3970,7 @@
           "kategorie": { "allOf": [{ "$ref": "#/components/schemas/ServiceProviderKategorie" }] },
           "logoId": { "type": "number", "description": "Optional logoId for use with standard logos" },
           "requires2fa": { "type": "boolean" },
+          "vidisAngebotId": { "type": "string" },
           "merkmale": { "type": "array", "items": { "$ref": "#/components/schemas/ServiceProviderMerkmal" } },
           "url": { "type": "string", "description": "Can be undefined, if `target` is not equal to `URL`" },
           "hasRollenerweiterung": { "type": "boolean" },
