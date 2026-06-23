@@ -188,6 +188,10 @@
     ]);
     if (authStore.hasRollenerweiternPermission) {
       fetchRollenerweiterungen();
+      rolleStore.getAllRollen({
+        systemrechte: [RollenSystemRecht.RollenVerwalten, RollenSystemRecht.RollenErweitern],
+        limit: 25,
+      });
     }
   });
 </script>
@@ -452,7 +456,7 @@
                   <v-row
                     align="start"
                     class="ma-3"
-                    data-testid="schulfilter-section"
+                    data-testid="filter-section"
                   >
                     <v-col
                       align-self="center"
