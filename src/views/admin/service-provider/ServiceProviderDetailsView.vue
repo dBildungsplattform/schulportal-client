@@ -2,6 +2,7 @@
   import SchulPortalLogo from '@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg';
   import LabeledField from '@/components/admin/LabeledField.vue';
   import ResultTable, { type Headers } from '@/components/admin/ResultTable.vue';
+  import VidisInfoDialog from '@/components/admin/service-provider/VidisInfoDialog.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
@@ -42,6 +43,7 @@
   const rollenerweiterungPerPage: Ref<number> = ref(30);
 
   const isOpen: Ref<boolean> = ref(false);
+  const vidisInfoDialogOpen: Ref<boolean> = ref(false);
 
   const resolvedLogo: ComputedRef<string | undefined> = computed(() => {
     const provider: ManageableServiceProviderDetail | null = serviceProviderStore.currentServiceProvider;
@@ -51,6 +53,10 @@
     }
 
     return serviceProviderStore.serviceProviderLogos.get(currentServiceProviderId);
+  });
+
+  const isVidisAngebot: ComputedRef<boolean> = computed(() => {
+    return Boolean(serviceProviderStore.currentServiceProvider?.vidisAngebotId);
   });
 
   function navigateToServiceProviderTable(): void {
@@ -63,6 +69,10 @@
   };
 
   async function openServiceProviderEditMode(): Promise<void> {
+    if (isVidisAngebot.value) {
+      vidisInfoDialogOpen.value = true;
+      return;
+    }
     await router.push({ name: 'angebot-edit', params: { id: currentServiceProviderId } });
   }
 
@@ -221,6 +231,14 @@
                         test-id="service-provider-can-be-assigned-to-rollen"
                         no-margin-top
                       />
+
+                      <!-- Is Vidis Angebot? -->
+                      <LabeledField
+                        :label="t('angebot.vidisAngebot')"
+                        :value="isVidisAngebot ? t('yes') : t('no')"
+                        test-id="service-provider-vidis-angebot"
+                        no-margin-top
+                      />
                     </div>
                   </v-col>
 
@@ -288,6 +306,11 @@
                     >
                     </v-btn>
                   </v-col>
+                  <VidisInfoDialog
+                    :header="t('angebot.edit')"
+                    :text="t('angebot.vidisEditInfoText', { name: serviceProviderStore.currentServiceProvider.name })"
+                    v-model="vidisInfoDialogOpen"
+                  />
                 </v-row>
               </v-col>
             </v-row>
