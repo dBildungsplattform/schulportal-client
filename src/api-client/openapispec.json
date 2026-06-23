@@ -7228,6 +7228,7 @@
       "ManageableServiceProviderListEntryResponse": {
         "type": "object",
         "properties": {
+<<<<<<< HEAD
           "id": {
             "type": "string"
           },
@@ -7253,6 +7254,15 @@
               "$ref": "#/components/schemas/ServiceProviderMerkmal"
             }
           },
+=======
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "administrationsebene": { "$ref": "#/components/schemas/OrganisationRefResponse" },
+          "kategorie": { "allOf": [{ "$ref": "#/components/schemas/ServiceProviderKategorie" }] },
+          "requires2fa": { "type": "boolean" },
+          "vidisAngebotId": { "type": "string" },
+          "merkmale": { "type": "array", "items": { "$ref": "#/components/schemas/ServiceProviderMerkmal" } },
+>>>>>>> main
           "rollenerweiterungen": {
             "type": "array",
             "items": {
@@ -7284,42 +7294,16 @@
       "ManageableServiceProviderResponse": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "administrationsebene": {
-            "$ref": "#/components/schemas/OrganisationRefResponse"
-          },
-          "kategorie": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ServiceProviderKategorie"
-              }
-            ]
-          },
-          "logoId": {
-            "type": "number",
-            "description": "Optional logoId for use with standard logos"
-          },
-          "requires2fa": {
-            "type": "boolean"
-          },
-          "merkmale": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ServiceProviderMerkmal"
-            }
-          },
-          "url": {
-            "type": "string",
-            "description": "Can be undefined, if `target` is not equal to `URL`"
-          },
-          "hasRollenerweiterung": {
-            "type": "boolean"
-          },
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "administrationsebene": { "$ref": "#/components/schemas/OrganisationRefResponse" },
+          "kategorie": { "allOf": [{ "$ref": "#/components/schemas/ServiceProviderKategorie" }] },
+          "logoId": { "type": "number", "description": "Optional logoId for use with standard logos" },
+          "requires2fa": { "type": "boolean" },
+          "vidisAngebotId": { "type": "string" },
+          "merkmale": { "type": "array", "items": { "$ref": "#/components/schemas/ServiceProviderMerkmal" } },
+          "url": { "type": "string", "description": "Can be undefined, if `target` is not equal to `URL`" },
+          "hasRollenerweiterung": { "type": "boolean" },
           "availableForRollenerweiterung": {
             "type": "boolean",
             "description": "Indicates whether the service provider is available for rollenerweiterung."

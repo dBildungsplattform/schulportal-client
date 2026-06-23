@@ -1,6 +1,7 @@
 import type { RollenerweiterungWithExtendedDataResponse } from '@/api-client/generated';
 import routes from '@/router/routes';
 import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
 import {
   ServiceProviderKategorie,
   useServiceProviderStore,
@@ -9,7 +10,6 @@ import {
 } from '@/stores/ServiceProviderStore';
 import { getLogoPath } from '@/utils/logosConfig';
 import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
-import type WrapperLike from 'node_modules/@vue/test-utils/dist/interfaces/wrapperLike';
 import { createPinia, setActivePinia } from 'pinia';
 import { DoFactory } from 'test/DoFactory';
 import type { MockInstance } from 'vitest';
@@ -21,6 +21,7 @@ let wrapper: VueWrapper<InstanceType<typeof ServiceProviderDetailsView>> | null 
 let router: Router;
 const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
 const authStore: AuthStore = useAuthStore();
+const configStore: ConfigStore = useConfigStore();
 
 const mockServiceProvider: ManageableServiceProviderDetail = DoFactory.getManageableServiceProviderDetail({
   kategorie: ServiceProviderKategorie.Schulisch,
@@ -68,6 +69,13 @@ beforeEach(async () => {
 
   serviceProviderStore.$reset();
   serviceProviderStore.currentServiceProvider = mockServiceProvider;
+  configStore.configData = {
+    befristungBearbeitenEnabled: true,
+    rolleBearbeitenEnabled: true,
+    rolleErweiternEnabled: true,
+    setUemPasswordEnabled: true,
+    schulischeAngeboteErstellen: true,
+  };
   const mockItems: RollenerweiterungWithExtendedDataResponse[] = Array.from({ length: 2 }, () =>
     DoFactory.getRollenerweiterungItem(),
   );
@@ -180,7 +188,7 @@ describe('ServiceProviderDetailsView', () => {
     expect(wrapper?.find('.v-data-table-footer__items-per-page').isVisible()).toBe(true);
     expect(wrapper?.find('.v-data-table-footer__items-per-page').text()).toContain('30');
 
-    const itemsPerPageSelection: WrapperLike | undefined = wrapper?.findComponent(
+    const itemsPerPageSelection: ReturnType<VueWrapper['findComponent']> | undefined = wrapper?.findComponent(
       '.v-data-table-footer__items-per-page .v-select',
     );
     await itemsPerPageSelection?.setValue(50);
@@ -196,5 +204,42 @@ describe('ServiceProviderDetailsView', () => {
     if (serviceProviderStore.rollenerweiterungen) {
       serviceProviderStore.rollenerweiterungen.total = 3;
     }
+  });
+
+  test('it opens vidis dialog with service provider name and closes it on ok click', async () => {
+    serviceProviderStore.currentServiceProvider = DoFactory.getManageableServiceProviderDetail({
+      id: mockServiceProvider.id,
+      vidisAngebotId: 'vidis-angebot-1',
+    });
+    await nextTick();
+
+    await wrapper?.find('[data-testid="service-provider-bearbeiten-button"]').trigger('click');
+    await vi.waitFor(() => {
+      const dialogHeadlineInActiveOverlay: HTMLElement | null = document.body.querySelector(
+        '.v-overlay--active [data-testid="vidis-info-dialog-headline"]',
+      );
+      expect(dialogHeadlineInActiveOverlay).toBeTruthy();
+    });
+
+    await vi.waitFor(() => {
+      const dialogTextInActiveOverlay: HTMLElement | null = document.body.querySelector(
+        '.v-overlay--active [data-testid="vidis-info-dialog-text"]',
+      );
+      expect(dialogTextInActiveOverlay).toBeTruthy();
+      expect(dialogTextInActiveOverlay?.textContent).toContain(serviceProviderStore.currentServiceProvider!.name);
+    });
+
+    const closeButton: HTMLElement | null = document.body.querySelector(
+      '.v-overlay--active [data-testid="close-vidis-info-dialog-button"]',
+    );
+    expect(closeButton).toBeTruthy();
+    closeButton?.click();
+
+    await vi.waitFor(() => {
+      const dialogHeadlineInActiveOverlay: HTMLElement | null = document.body.querySelector(
+        '.v-overlay--active [data-testid="vidis-info-dialog-headline"]',
+      );
+      expect(dialogHeadlineInActiveOverlay).toBeNull();
+    });
   });
 });

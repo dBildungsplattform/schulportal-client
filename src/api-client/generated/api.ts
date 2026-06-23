@@ -1618,6 +1618,12 @@ export interface ManageableServiceProviderListEntryResponse {
     'requires2fa': boolean;
     /**
      * 
+     * @type {string}
+     * @memberof ManageableServiceProviderListEntryResponse
+     */
+    'vidisAngebotId'?: string;
+    /**
+     * 
      * @type {Array<ServiceProviderMerkmal>}
      * @memberof ManageableServiceProviderListEntryResponse
      */
@@ -1685,6 +1691,12 @@ export interface ManageableServiceProviderResponse {
      * @memberof ManageableServiceProviderResponse
      */
     'requires2fa': boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof ManageableServiceProviderResponse
+     */
+    'vidisAngebotId'?: string;
     /**
      * 
      * @type {Array<ServiceProviderMerkmal>}
