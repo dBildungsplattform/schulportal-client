@@ -1,18 +1,13 @@
 <script setup lang="ts">
+  import { ImportDataItemStatus, RollenSystemRechtEnum } from '@/api-client/generated';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SchulenFilter from '@/components/filter/SchulenFilter.vue';
   import FormRow from '@/components/form/FormRow.vue';
   import FormWrapper from '@/components/form/FormWrapper.vue';
-  import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
-  import {
-    ImportDataItemStatus,
-    useImportStore,
-    type ImportedUserResponse,
-    type ImportStore,
-  } from '@/stores/ImportStore';
-  import { OperationContext, usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
-  import { RollenArt } from '@/stores/RolleStore';
+  import { useImportStore, type ImportedUserResponse, type ImportStore } from '@/stores/ImportStore';
+  import { RollenArt, useRolleStore, type RolleResponse, type RolleStore } from '@/stores/RolleStore';
+  import type { TranslatedObject } from '@/types';
   import { toTypedSchema } from '@vee-validate/yup';
   import { useForm, type BaseFieldProps, type FormContext, type TypedSchema } from 'vee-validate';
   import { computed, onMounted, onUnmounted, ref, watch, type ComputedRef, type Ref } from 'vue';
@@ -28,7 +23,7 @@
   import { mixed, object, string } from 'yup';
 
   const importStore: ImportStore = useImportStore();
-  const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
+  const rolleStore: RolleStore = useRolleStore();
 
   const router: Router = useRouter();
   const { t }: Composer = useI18n({ useScope: 'global' });
@@ -37,8 +32,6 @@
   const confirmationDialogVisible: Ref<boolean> = ref(false);
 
   const isDownloadingFile: Ref<boolean> = ref(false);
-
-  const allRollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
 
   const validationSchema: TypedSchema = toTypedSchema(
     object({
@@ -82,23 +75,22 @@
     Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>,
   ] = formContext.defineField('selectedFiles', vuetifyConfig);
 
-  const lernRollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = computed(() => {
-    if (!allRollen.value || selectedSchule.value === undefined) {
-      return [];
-    }
-
-    return allRollen.value.filter((rolle: TranslatedRolleWithAttrs) => {
-      return rolle.rollenart === RollenArt.Lern;
-    });
+  const lernRollen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
+    return rolleStore.allRollen
+      .map((rolle: RolleResponse) => ({
+        value: rolle.id,
+        title: rolle.name,
+      }))
+      .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
   });
 
   watch(selectedSchule, async (newValue: string | undefined, oldValue: string | undefined) => {
     if (newValue && newValue !== oldValue) {
       // Fetch rollen after selecting the organization
-      await personenkontextStore.processWorkflowStep({
-        operationContext: OperationContext.PERSON_ANLEGEN,
+      await rolleStore.getAllRollen({
         organisationId: newValue,
-        limit: 25,
+        systemrecht: RollenSystemRechtEnum.ImportDurchfuehren,
+        rollenarten: [RollenArt.Lern],
       });
 
       // Reset the selectedRolle field only if oldValue was not undefined
@@ -393,7 +385,10 @@
   });
 
   onMounted(async () => {
-    await personenkontextStore.processWorkflowStep({ operationContext: OperationContext.PERSON_ANLEGEN, limit: 25 });
+    await rolleStore.getAllRollen({
+      systemrecht: RollenSystemRechtEnum.ImportDurchfuehren,
+      rollenarten: [RollenArt.Lern],
+    });
     importStore.uploadResponse = null;
     importStore.importResponse = null;
     importStore.importProgress = 0;
