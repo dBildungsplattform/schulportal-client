@@ -188,7 +188,7 @@
     if (organisationIdFromQuery.value) {
       await rolleStore.getAllRollen({
         organisationId: organisationIdFromQuery.value,
-        systemrecht: RollenSystemRechtEnum.RollenErweitern,
+        systemrechte: [RollenSystemRechtEnum.RollenErweitern],
       });
     }
     selectedRolleIds.value = [...existingRolleIds.value];

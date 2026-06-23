@@ -17,8 +17,15 @@
   import { useI18n, type Composer } from 'vue-i18n';
   import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
   import SchulenFilter from '@/components/filter/SchulenFilter.vue';
-  import { RollenSystemRecht } from '@/stores/RolleStore';
+  import {
+    RollenSystemRecht,
+    useRolleStore,
+    type RolleResponse,
+    type RolleStore,
+    type RolleWithServiceProvidersResponse,
+  } from '@/stores/RolleStore';
   import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+  import type { TranslatedObject } from '@/types';
 
   const router: Router = useRouter();
   const route: RouteLocationNormalizedLoaded = useRoute();
@@ -28,6 +35,7 @@
   const authStore: AuthStore = useAuthStore();
   const configStore: ConfigStore = useConfigStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
+  const rolleStore: RolleStore = useRolleStore();
 
   const isEditModeAvailable: ComputedRef<boolean> = computed(() => {
     return configStore.configData?.schulischeAngeboteErstellen ?? false;
@@ -35,6 +43,8 @@
 
   const currentServiceProviderId: string = route.params['id'] as string;
   const selectedOrganisationId: Ref<string> = ref('');
+  const selectedRolleId: Ref<string> = ref('');
+  const searchInputRollen: Ref<string | undefined> = ref(undefined);
 
   type ReadonlyHeaders = Headers;
   const headers: ReadonlyHeaders = [
@@ -102,6 +112,7 @@
     await serviceProviderStore.getRollenerweiterungenById({
       serviceProviderId: currentServiceProviderId,
       organisationId: selectedOrganisationId.value || undefined,
+      rolleId: selectedRolleId.value || undefined,
       offset: (rollenerweiterungPage.value - 1) * rollenerweiterungPerPage.value,
       limit: rollenerweiterungPerPage.value,
     });
@@ -122,8 +133,20 @@
     fetchRollenerweiterungen();
   }
 
+  const rollen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
+    const rollen: RolleWithServiceProvidersResponse[] = rolleStore.allRollen || [];
+
+    return rollen
+      .map((rolle: RolleResponse) => ({
+        value: rolle.id,
+        title: rolle.name,
+      }))
+      .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
+  });
+
   function resetSearchAndFilter(): void {
     selectedOrganisationId.value = '';
+    selectedRolleId.value = '';
     fetchRollenerweiterungen();
   }
 
@@ -134,6 +157,25 @@
     }
     selectedOrganisationId.value = newValue;
     fetchRollenerweiterungen();
+  }
+
+  function setRolleFilter(newValue: string | undefined): void {
+    if (!newValue) {
+      resetSearchAndFilter();
+      return;
+    }
+    selectedRolleId.value = newValue;
+    fetchRollenerweiterungen();
+  }
+
+  function updateRollenSearch(searchValue: string): void {
+    if (!searchValue) {
+      selectedRolleId.value = '';
+      rolleStore.getAllRollen({
+        limit: 25,
+        searchString: searchValue,
+      });
+    }
   }
 
   onMounted(async () => {
@@ -473,6 +515,51 @@
                           </v-list-item>
                         </template>
                       </SchulenFilter>
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      md="3"
+                      class="py-md-0"
+                    >
+                      <v-autocomplete
+                        id="rolle-select"
+                        ref="rolle-select"
+                        v-model="selectedRolleId"
+                        v-model:search="searchInputRollen"
+                        autocomplete="off"
+                        class="filter-dropdown"
+                        :class="{ selected: selectedRolleId }"
+                        clearable
+                        data-testid="rolle-select"
+                        density="compact"
+                        hide-details
+                        :items="rollen"
+                        item-value="value"
+                        item-text="title"
+                        multiple
+                        :no-data-text="$t('noDataFound')"
+                        :placeholder="$t('admin.rolle.rolle')"
+                        required="true"
+                        variant="outlined"
+                        @update:model-value="setRolleFilter"
+                        @update:search="updateRollenSearch"
+                      >
+                        <template #prepend-item>
+                          <v-list-item>
+                            <v-progress-circular
+                              v-if="rolleStore.loading"
+                              indeterminate
+                            />
+                            <span
+                              v-else
+                              class="filter-header"
+                              >{{
+                                $t('admin.rolle.rollenFound', { count: rolleStore.totalRollen }, rolleStore.totalRollen)
+                              }}</span
+                            >
+                          </v-list-item>
+                        </template>
+                      </v-autocomplete>
                     </v-col>
                   </v-row>
                   <v-row

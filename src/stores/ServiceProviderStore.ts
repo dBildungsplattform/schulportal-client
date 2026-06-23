@@ -88,9 +88,10 @@ export type ServiceProviderIdNameResponse = {
 
 export type RollenerweiterungFilter = {
   serviceProviderId: string;
+  organisationId?: string;
+  rolleId?: string;
   limit?: number;
   offset?: number;
-  organisationId?: string;
 };
 
 export type PersistRollenerweiterung = {
@@ -343,6 +344,7 @@ export const useServiceProviderStore: StoreDefinition<
             filter.offset,
             filter.limit,
             filter.organisationId,
+            filter.rolleId,
           );
 
         this.rollenerweiterungen = data;
