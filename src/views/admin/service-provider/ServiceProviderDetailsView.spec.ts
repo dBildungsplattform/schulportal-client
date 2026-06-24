@@ -17,11 +17,13 @@ import type { MockInstance } from 'vitest';
 import { nextTick, type Component } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import ServiceProviderDetailsView from './ServiceProviderDetailsView.vue';
+import { RollenSystemRecht, useRolleStore, type RolleStore } from '@/stores/RolleStore.js';
 
 let wrapper: VueWrapper<InstanceType<typeof ServiceProviderDetailsView>> | null = null;
 let router: Router;
 const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
 const authStore: AuthStore = useAuthStore();
+const rolleStore: RolleStore = useRolleStore();
 
 const mockServiceProvider: ManageableServiceProviderDetail = DoFactory.getManageableServiceProviderDetail({
   kategorie: ServiceProviderKategorie.Schulisch,
@@ -278,6 +280,25 @@ describe('ServiceProviderDetailsView', () => {
     });
   });
 
+  test('it handles undefined rolle filter value by defaulting to empty array', async () => {
+    const getRollenerweiterungenByIdSpy: MockInstance = vi
+      .spyOn(serviceProviderStore, 'getRollenerweiterungenById')
+      .mockResolvedValue();
+    await openRollenerweiterungenSection();
+
+    const rollenFilter: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+    rollenFilter?.vm.$emit('update:model-value', undefined);
+    await flushPromises();
+
+    expect(getRollenerweiterungenByIdSpy).toHaveBeenLastCalledWith({
+      serviceProviderId: undefined,
+      organisationIds: undefined,
+      rolleIds: undefined,
+      offset: 0,
+      limit: 30,
+    });
+  });
+
   test('it resets both filters via reset button and reloads rollenerweiterungen', async () => {
     const getRollenerweiterungenByIdSpy: MockInstance = vi
       .spyOn(serviceProviderStore, 'getRollenerweiterungenById')
@@ -308,5 +329,29 @@ describe('ServiceProviderDetailsView', () => {
 
     // Reset button should now be disabled again
     expect(wrapper?.find('[data-testid="reset-filter-button"]').attributes('disabled')).toBeDefined();
+  });
+
+  test('it searches for rollen when search input changes', async () => {
+    vi.useFakeTimers();
+    const getAllRollenSpy: MockInstance = vi.spyOn(rolleStore, 'getAllRollen').mockResolvedValue();
+    await openRollenerweiterungenSection();
+
+    const rollenFilter: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+    rollenFilter?.vm.$emit('update:search', 'Lehrer');
+
+    // Should not have been called yet due to debounce
+    expect(getAllRollenSpy).not.toHaveBeenCalledWith(expect.objectContaining({ searchString: 'Lehrer' }));
+
+    vi.advanceTimersByTime(500);
+    await flushPromises();
+
+    expect(getAllRollenSpy).toHaveBeenLastCalledWith({
+      limit: 25,
+      searchString: 'Lehrer',
+      systemrechte: [RollenSystemRecht.RollenVerwalten, RollenSystemRecht.RollenErweitern],
+      rolleIds: undefined,
+    });
+
+    vi.useRealTimers();
   });
 });
