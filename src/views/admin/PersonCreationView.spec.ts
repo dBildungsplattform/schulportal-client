@@ -1,11 +1,9 @@
-import { type DBiamPersonResponse } from '@/api-client/generated';
 import {
-  EmailAddressStatus,
-  type DBiamPersonenkontextResponse,
-  type PersonenkontexteUpdateResponse,
+  OrganisationResponseLegacy,
+  PersonenkontexteUpdateResponse,
+  type DBiamPersonResponse,
   type PersonLandesbediensteterSearchResponse,
-  type SystemRechtResponse,
-} from '@/api-client/generated/api';
+} from '@/api-client/generated';
 import routes from '@/router/routes';
 import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import {
@@ -42,149 +40,59 @@ const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
 const organisationStore: OrganisationStore = useOrganisationStore();
 const rolleStore: RolleStore = useRolleStore();
 
-const mockCreatedPersonWithKontext: DBiamPersonResponse = {
-  person: {
-    id: '1',
-    name: {
-      familienname: 'Orton',
-      vorname: 'John',
-    },
-    username: 'jorton',
-    personalnummer: '123456',
-    mandant: '',
-    stammorganisation: null,
-    revision: '',
-    startpasswort: '',
-    isLocked: false,
-    userLock: null,
-    lastModified: '2024-12-22',
-    email: {
-      address: 'email',
-      status: EmailAddressStatus.Requested,
-    },
-  },
-  dBiamPersonenkontextResponses: [
-    {
-      befristung: '2024-05-06',
-      personId: '1',
-      organisationId: '9876',
-      rolleId: '1',
-    },
-  ],
-};
+const PERSON_ID: string = '1';
+const ORGANISATION_ID: string = '9876';
+const ROLLE_ID: string = '1';
 
-const mockWorkflowStepResponse: PersonenkontextWorkflowResponse = {
-  organisations: [
-    {
-      id: '9876',
-      kennung: '',
-      name: 'Organisation1',
-      namensergaenzung: 'string',
-      kuerzel: 'string',
-      typ: 'TRAEGER',
-      administriertVon: '1',
-    },
+const mockCreatedPersonWithKontext: DBiamPersonResponse = DoFactory.getDBiamPersonResponse({
+  person: DoFactory.getPersonResponse({ id: PERSON_ID }),
+  dBiamPersonenkontextResponses: [
+    DoFactory.getDBiamPersonenkontextResponse({
+      personId: PERSON_ID,
+      organisationId: ORGANISATION_ID,
+      rolleId: ROLLE_ID,
+    }),
   ],
+});
+
+const workflowOrganisation: OrganisationResponseLegacy = DoFactory.getOrganisationenResponseLegacy({
+  id: ORGANISATION_ID,
+});
+
+const mockWorkflowStepResponse: PersonenkontextWorkflowResponse = DoFactory.getPersonenkontextWorkflowResponse({
+  organisations: [workflowOrganisation],
   rollen: [
-    {
-      administeredBySchulstrukturknoten: '1234',
+    DoFactory.getRolleResponse({
+      id: ROLLE_ID,
       rollenart: 'LERN',
-      name: 'SuS',
-      merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
-      systemrechte: [{ name: 'ROLLEN_VERWALTEN', isTechnical: false }] as unknown as Set<SystemRechtResponse>,
-      createdAt: '2022',
-      updatedAt: '2022',
-      id: '1',
-      administeredBySchulstrukturknotenName: 'Land SH',
-      administeredBySchulstrukturknotenKennung: '',
-      version: 1,
-    },
+      administeredBySchulstrukturknoten: workflowOrganisation.id,
+      administeredBySchulstrukturknotenName: workflowOrganisation.name,
+      administeredBySchulstrukturknotenKennung: workflowOrganisation.kennung,
+      merkmale: new Set<RollenMerkmal>([RollenMerkmal.KopersPflicht]),
+    }),
   ],
-  selectedOrganisation: null,
-  selectedRollen: null,
   canCommit: true,
-};
+});
 
 organisationStore.allOrganisationen = [
-  {
-    id: '9876',
-    name: 'Random Schulname Gymnasium',
-    kennung: '9356494',
-    namensergaenzung: 'Schule',
-    kuerzel: 'rsg',
-    typ: 'LAND',
-    administriertVon: '1234',
-  },
-  {
-    id: '1123',
-    name: 'Albert-Emil-Hansebrot-Gymnasium',
-    kennung: '2745475',
-    namensergaenzung: 'Schule',
-    kuerzel: 'aehg',
-    typ: 'SCHULE',
-    administriertVon: '1234',
-  },
-  {
-    id: '1234',
-    name: 'Land SH',
-    kennung: '',
-    namensergaenzung: 'land',
-    kuerzel: 'LSH',
-    typ: 'TRAEGER',
-    administriertVon: '1',
-  },
+  DoFactory.getOrganisationenResponseLegacy({
+    id: ORGANISATION_ID,
+  }),
+  DoFactory.getOrganisationenResponseLegacy(),
+  DoFactory.getOrganisationenResponseLegacy(),
 ];
 
 rolleStore.allRollen = [
-  {
-    administeredBySchulstrukturknoten: '1234',
+  DoFactory.getRolleWithServiceProviders({
+    id: ROLLE_ID,
     rollenart: 'LERN',
-    name: 'SuS',
-    // TODO: remove type casting when generator is fixed
-    merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
-    systemrechte: [{ name: 'ROLLEN_VERWALTEN', isTechnical: false }] as unknown as Set<SystemRechtResponse>,
-    createdAt: '2022',
-    updatedAt: '2022',
-    id: '1',
-    serviceProviders: [
-      {
-        id: '1',
-        name: 'itslearning',
-      },
-      {
-        id: '2',
-        name: 'E-Mail',
-      },
-    ],
-  },
-  {
-    administeredBySchulstrukturknoten: '1234',
-    rollenart: 'LERN',
-    name: 'SuS',
-    // TODO: remove type casting when generator is fixed
-    merkmale: [] as unknown as Set<RollenMerkmal>,
-    systemrechte: [] as unknown as Set<SystemRechtResponse>,
-    createdAt: '2022',
-    updatedAt: '2022',
-    id: '2',
-    serviceProviders: [
-      {
-        id: '1',
-        name: 'itslearning',
-      },
-    ],
-  },
+    merkmale: new Set<RollenMerkmal>([RollenMerkmal.KopersPflicht]),
+  }),
+  DoFactory.getRolleWithServiceProviders(),
 ] as RolleWithServiceProvidersResponse[];
 
-const mockLandesbediensteteCommitResponse: PersonenkontexteUpdateResponse = {
-  dBiamPersonenkontextResponses: [
-    {
-      personId: '1',
-      organisationId: 'org-123',
-      rolleId: 'rolle-456',
-    } as DBiamPersonenkontextResponse,
-  ],
-};
+const mockLandesbediensteteCommitResponse: PersonenkontexteUpdateResponse =
+  DoFactory.getPersonenkontextUpdateResponse();
 
 type OnBeforeRouteLeaveCallback = (
   _to: RouteLocationNormalized,
@@ -373,13 +281,13 @@ describe('PersonCreationView', () => {
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'schulenFilter' })
       .findComponent({ ref: 'personenkontext-create-organisation-select' });
-    await organisationSelect?.setValue('9876');
+    await organisationSelect?.setValue(ORGANISATION_ID);
     await nextTick();
 
     const rolleSelect: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'rollen-select' });
-    await rolleSelect?.setValue(['1']);
+    await rolleSelect?.setValue([ROLLE_ID]);
     await nextTick();
 
     // Get the BefristungInput component
@@ -402,13 +310,13 @@ describe('PersonCreationView', () => {
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'schulenFilter' })
       .findComponent({ ref: 'personenkontext-create-organisation-select' });
-    await organisationSelect?.setValue('9876');
+    await organisationSelect?.setValue(ORGANISATION_ID);
     await nextTick();
 
     const rolleSelect: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'rollen-select' });
-    await rolleSelect?.setValue(['1']);
+    await rolleSelect?.setValue([ROLLE_ID]);
     await nextTick();
 
     // Get the BefristungInput component
@@ -434,49 +342,19 @@ describe('PersonCreationView', () => {
   });
 
   test('it fills form and triggers submit', async () => {
-    personenkontextStore.workflowStepResponse = {
-      organisations: [
-        {
-          id: '9876',
-          kennung: '',
-          name: 'Organisation1',
-          namensergaenzung: 'string',
-          kuerzel: 'string',
-          typ: 'TRAEGER',
-          administriertVon: '1',
-        },
-      ],
-      rollen: [
-        {
-          administeredBySchulstrukturknoten: '1234',
-          rollenart: 'LERN',
-          name: 'SuS',
-          merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
-          systemrechte: [{ name: 'ROLLEN_VERWALTEN', isTechnical: false }] as unknown as Set<SystemRechtResponse>,
-          createdAt: '2022',
-          updatedAt: '2022',
-          id: '1',
-          administeredBySchulstrukturknotenName: 'Land SH',
-          administeredBySchulstrukturknotenKennung: '',
-          version: 1,
-        },
-      ],
-      selectedOrganisation: null,
-      selectedRollen: null,
-      canCommit: true,
-    };
+    personenkontextStore.workflowStepResponse = mockWorkflowStepResponse;
 
     const organisationSelect: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'schulenFilter' })
       .findComponent({ ref: 'personenkontext-create-organisation-select' });
-    await organisationSelect?.setValue('9876');
+    await organisationSelect?.setValue(ORGANISATION_ID);
     await nextTick();
 
     const rollenSelect: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'rollen-select' });
-    await rollenSelect?.setValue(['1']);
+    await rollenSelect?.setValue([ROLLE_ID]);
     await nextTick();
 
     const klasseSelect: VueWrapper | undefined = wrapper
@@ -515,49 +393,19 @@ describe('PersonCreationView', () => {
   });
 
   test('it fills form, triggers submit and then show success template', async () => {
-    personenkontextStore.workflowStepResponse = {
-      organisations: [
-        {
-          id: '9876',
-          kennung: '',
-          name: 'Organisation1',
-          namensergaenzung: 'string',
-          kuerzel: 'string',
-          typ: 'TRAEGER',
-          administriertVon: '1',
-        },
-      ],
-      rollen: [
-        {
-          administeredBySchulstrukturknoten: '1234',
-          rollenart: 'LERN',
-          name: 'SuS',
-          merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
-          systemrechte: [{ name: 'ROLLEN_VERWALTEN', isTechnical: false }] as unknown as Set<SystemRechtResponse>,
-          createdAt: '2022',
-          updatedAt: '2022',
-          id: '1',
-          administeredBySchulstrukturknotenName: 'Land SH',
-          administeredBySchulstrukturknotenKennung: '',
-          version: 1,
-        },
-      ],
-      selectedOrganisation: null,
-      selectedRollen: null,
-      canCommit: true,
-    };
+    personenkontextStore.workflowStepResponse = mockWorkflowStepResponse;
 
     const organisationSelect: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'schulenFilter' })
       .findComponent({ ref: 'personenkontext-create-organisation-select' });
-    await organisationSelect?.setValue('9876');
+    await organisationSelect?.setValue(ORGANISATION_ID);
     await nextTick();
 
     const rollenSelect: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'rollen-select' });
-    await rollenSelect?.setValue(['1']);
+    await rollenSelect?.setValue([ROLLE_ID]);
     await nextTick();
 
     const klasseSelect: VueWrapper | undefined = wrapper
@@ -604,8 +452,8 @@ describe('PersonCreationView', () => {
     personenkontextStore.workflowStepResponse = mockWorkflowStepResponse;
 
     const selectors: Partial<FormSelectors> = await fillForm({
-      organisationsebene: '9876',
-      rollen: ['1'],
+      organisationsebene: ORGANISATION_ID,
+      rollen: [ROLLE_ID],
       befristung: '12.08.2099',
       vorname: 'Randy',
       nachname: 'Cena',
@@ -642,8 +490,8 @@ describe('PersonCreationView', () => {
     const mockLandesbedienstetePersonen: PersonLandesbediensteterSearchResponse[] = [
       DoFactory.getPersonLandesbediensteterSearchResponse(),
     ];
-    const organisationId: string = '9876';
-    const rolleId: string = '1';
+    const organisationId: string = ORGANISATION_ID;
+    const rolleId: string = ROLLE_ID;
 
     personStore.allLandesbedienstetePersonen = mockLandesbedienstetePersonen;
     await router.push({ name: 'add-person-to-own-schule' });
@@ -721,7 +569,7 @@ describe('PersonCreationView', () => {
     const push: MockInstance = vi.spyOn(router, 'push');
     await wrapper?.find('[data-testid="go-to-details-button"]').trigger('click');
     await nextTick();
-    expect(push).toHaveBeenCalledWith({ name: 'person-details', params: { id: '1' } });
+    expect(push).toHaveBeenCalledWith({ name: 'person-details', params: { id: PERSON_ID } });
   });
 
   describe('navigation interception', () => {
@@ -743,8 +591,8 @@ describe('PersonCreationView', () => {
 
       wrapper = await mountComponent();
       await fillForm({
-        organisationsebene: '9876',
-        rollen: ['1'],
+        organisationsebene: ORGANISATION_ID,
+        rollen: [ROLLE_ID],
         befristung: '12.08.2099',
         vorname: 'John',
         nachname: 'Orton',
@@ -786,8 +634,8 @@ describe('PersonCreationView', () => {
     beforeEach(async () => {
       if (isFormDirty) {
         await fillForm({
-          organisationsebene: '9876',
-          rollen: ['1'],
+          organisationsebene: ORGANISATION_ID,
+          rollen: [ROLLE_ID],
           befristung: '12.08.2099',
           vorname: 'John',
           nachname: 'Orton',
