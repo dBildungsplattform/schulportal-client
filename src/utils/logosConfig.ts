@@ -210,7 +210,7 @@ export function isValidLogoId(logoId: number): logoId is LogoId {
  * Get logo configuration by ID (number or enum)
  * Returns undefined if ID is not found
  */
-export function getLogoConfig(logoId?: number | LogoId): LogoConfig | undefined {
+export function getLogoConfig(logoId?: number | LogoId | null): LogoConfig | undefined {
   if (logoId === undefined || logoId === null) {
     return undefined;
   }
