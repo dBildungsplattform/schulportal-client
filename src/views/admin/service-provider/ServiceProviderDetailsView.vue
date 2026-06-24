@@ -172,6 +172,7 @@
     rolleStore.getAllRollen({
       limit: 25,
       searchString: searchValue,
+      systemrechte: [RollenSystemRecht.RollenVerwalten, RollenSystemRecht.RollenErweitern],
     });
   }
 
