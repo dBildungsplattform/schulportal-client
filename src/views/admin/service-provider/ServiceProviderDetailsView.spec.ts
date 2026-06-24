@@ -358,4 +358,28 @@ describe('ServiceProviderDetailsView', () => {
 
     vi.useRealTimers();
   });
+
+  test('it searches for rollen when search input changes and rolleIds is defined', async () => {
+    vi.useFakeTimers();
+    const getAllRollenSpy: MockInstance = vi.spyOn(rolleStore, 'getAllRollen').mockResolvedValue();
+    await openRollenerweiterungenSection();
+
+    const rollenFilter: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+    rollenFilter?.vm.$emit('update:model-value', ['rolle-1']);
+
+    // Should not have been called yet due to debounce
+    expect(getAllRollenSpy).not.toHaveBeenCalledWith(expect.objectContaining({ searchString: 'Lehrer' }));
+
+    vi.advanceTimersByTime(500);
+    await flushPromises();
+
+    expect(getAllRollenSpy).toHaveBeenLastCalledWith({
+      limit: 25,
+      searchString: 'Lehrer',
+      systemrechte: [RollenSystemRecht.RollenVerwalten, RollenSystemRecht.RollenErweitern],
+      rolleIds: ['rolle-1'],
+    });
+
+    vi.useRealTimers();
+  });
 });
