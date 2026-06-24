@@ -602,6 +602,7 @@
                             item-value-path="id"
                             :total-items="serviceProviderStore.rollenerweiterungen?.total || 0"
                             :items-per-page="rollenerweiterungPerPage"
+                            :noDataText="$t('noSchulenFound')"
                             @on-items-per-page-update="getPaginatedRollenerweiterungenWithLimit"
                             @on-page-update="getPaginatedRollenerweiterungen"
                           >
