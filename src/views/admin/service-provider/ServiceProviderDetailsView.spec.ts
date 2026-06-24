@@ -17,7 +17,7 @@ import type { MockInstance } from 'vitest';
 import { nextTick, type Component } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import ServiceProviderDetailsView from './ServiceProviderDetailsView.vue';
-import { RollenSystemRecht, useRolleStore, type RolleStore } from '@/stores/RolleStore.js';
+import { RollenArt, RollenSystemRecht, useRolleStore, type RolleStore } from '@/stores/RolleStore.js';
 
 let wrapper: VueWrapper<InstanceType<typeof ServiceProviderDetailsView>> | null = null;
 let router: Router;
@@ -84,6 +84,10 @@ beforeEach(async () => {
   serviceProviderStore.rollenerweiterungen = DoFactory.getRollenerweiterungenResponse(mockItems);
   serviceProviderStore.rollenerweiterungenUebersicht = DoFactory.buildRollenerweiterungenUebersicht(mockItems);
   authStore.hasRollenerweiternPermission = true;
+  rolleStore.allRollen = [
+    DoFactory.getRolleWithServiceProviders({ rollenart: RollenArt.Lehr }),
+    DoFactory.getRolleWithServiceProviders({ rollenart: RollenArt.Lern }),
+  ];
   wrapper = await mountComponent();
 });
 
