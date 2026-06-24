@@ -37,6 +37,8 @@
   const organisationStore: OrganisationStore = useOrganisationStore();
   const rolleStore: RolleStore = useRolleStore();
 
+  let timerId: ReturnType<typeof setTimeout>;
+
   const isEditModeAvailable: ComputedRef<boolean> = computed(() => {
     return configStore.configData?.schulischeAngeboteErstellen ?? false;
   });
@@ -152,30 +154,29 @@
   }
 
   function setOrganisationFilter(newValue: string[] | undefined): void {
-    if (!newValue || newValue.length === 0) {
-      resetSearchAndFilter();
-      return;
-    }
-    selectedOrganisationIds.value = newValue;
+    selectedOrganisationIds.value = newValue ?? [];
     fetchRollenerweiterungen();
   }
 
   function setRolleFilter(newValue: string[] | undefined): void {
-    if (!newValue || newValue.length === 0) {
-      resetSearchAndFilter();
-      return;
+    selectedRolleIds.value = newValue ?? [];
+    if (!newValue?.length) {
+      searchInputRollen.value = '';
     }
-    selectedRolleIds.value = newValue;
     fetchRollenerweiterungen();
   }
 
   function updateRollenSearch(searchValue: string): void {
-    rolleStore.getAllRollen({
-      limit: 25,
-      searchString: searchValue,
-      systemrechte: [RollenSystemRecht.RollenVerwalten, RollenSystemRecht.RollenErweitern],
-      rolleIds: selectedRolleIds.value.length > 0 ? selectedRolleIds.value : undefined,
-    });
+    clearTimeout(timerId);
+
+    timerId = setTimeout(() => {
+      rolleStore.getAllRollen({
+        limit: 25,
+        searchString: searchValue,
+        systemrechte: [RollenSystemRecht.RollenVerwalten, RollenSystemRecht.RollenErweitern],
+        rolleIds: selectedRolleIds.value.length > 0 ? selectedRolleIds.value : undefined,
+      });
+    }, 500);
   }
 
   onMounted(async () => {
