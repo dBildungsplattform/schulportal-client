@@ -922,6 +922,7 @@
   "no": "Nein",
   "from": "von",
   "noDataFound": "Keine Daten gefunden.",
+  "noSchulenFound": "Keine Schulen gefunden",
   "loadingData": "Daten werden abgerufen...",
   "pagination": {
     "all": "Alle",
