@@ -240,7 +240,7 @@
       // Refresh rollenerweiterungen to reflect saved state
       await serviceProviderStore.getRollenerweiterungenById({
         serviceProviderId: currentServiceProviderId,
-        organisationId: organisationIdFromQuery.value,
+        organisationIds: organisationIdFromQuery.value ? [organisationIdFromQuery.value] : [],
       });
       saveSuccessDialogVisible.value = true;
     } else if (serviceProviderStore.errors.size > 0) {
@@ -255,7 +255,7 @@
       isEditingRollenerweiterungen.value = false;
       await serviceProviderStore.getRollenerweiterungenById({
         serviceProviderId: currentServiceProviderId,
-        organisationId: organisationIdFromQuery.value,
+        organisationIds: organisationIdFromQuery.value ? [organisationIdFromQuery.value] : [],
       });
     }
   }
@@ -281,7 +281,7 @@
       serviceProviderStore.getServiceProviderLogoById(currentServiceProviderId),
       serviceProviderStore.getRollenerweiterungenById({
         serviceProviderId: currentServiceProviderId,
-        organisationId: organisationIdFromQuery.value,
+        organisationIds: organisationIdFromQuery.value ? [organisationIdFromQuery.value] : [],
       }),
     ]);
 

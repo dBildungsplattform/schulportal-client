@@ -1,4 +1,5 @@
 import type { RollenerweiterungWithExtendedDataResponse } from '@/api-client/generated';
+import SchulenFilter from '@/components/filter/SchulenFilter.vue';
 import routes from '@/router/routes';
 import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 import {
@@ -48,6 +49,13 @@ async function mountComponent(): Promise<VueWrapper<InstanceType<typeof ServiceP
   });
   await flushPromises();
   return wrapper;
+}
+
+async function openRollenerweiterungenSection(): Promise<void> {
+  await wrapper
+    ?.find('[data-testid="open-schulspezifische-rollenerweiterungen-section-headline-button"]')
+    .trigger('click');
+  await nextTick();
 }
 
 beforeEach(async () => {
@@ -148,10 +156,7 @@ describe('ServiceProviderDetailsView', () => {
   });
 
   test('it reloads data after changing page', async () => {
-    await wrapper
-      ?.find('[data-testid="open-schulspezifische-rollenerweiterungen-section-headline-button"]')
-      .trigger('click');
-    await nextTick();
+    await openRollenerweiterungenSection();
     expect(wrapper?.find('.v-pagination__next button.v-btn--disabled').isVisible()).toBe(true);
     expect(wrapper?.find('.v-data-table-footer__info').text()).toContain('1-2');
 
@@ -167,10 +172,7 @@ describe('ServiceProviderDetailsView', () => {
   });
 
   test('it reloads data after changing limit', async () => {
-    await wrapper
-      ?.find('[data-testid="open-schulspezifische-rollenerweiterungen-section-headline-button"]')
-      .trigger('click');
-    await nextTick();
+    await openRollenerweiterungenSection();
     /* check for both cases, first if total is greater than, afterwards if total is less or equal than chosen limit */
     if (serviceProviderStore.rollenerweiterungen) {
       serviceProviderStore.rollenerweiterungen.total = 50;
@@ -196,5 +198,45 @@ describe('ServiceProviderDetailsView', () => {
     if (serviceProviderStore.rollenerweiterungen) {
       serviceProviderStore.rollenerweiterungen.total = 3;
     }
+  });
+
+  test('it reloads rollenerweiterungen with selected schulen filter', async () => {
+    const getRollenerweiterungenByIdSpy: MockInstance = vi
+      .spyOn(serviceProviderStore, 'getRollenerweiterungenById')
+      .mockResolvedValue();
+    await openRollenerweiterungenSection();
+
+    const schulenFilter: VueWrapper | undefined = wrapper?.findComponent(SchulenFilter);
+    schulenFilter?.vm.$emit('update:selected-schulen', ['schule-1', 'schule-2']);
+    await flushPromises();
+
+    expect(getRollenerweiterungenByIdSpy).toHaveBeenCalled();
+    expect(getRollenerweiterungenByIdSpy).toHaveBeenLastCalledWith({
+      serviceProviderId: undefined,
+      organisationIds: ['schule-1', 'schule-2'],
+      rolleIds: undefined,
+      offset: 0,
+      limit: 30,
+    });
+  });
+
+  test('it reloads rollenerweiterungen with selected rollen filter', async () => {
+    const getRollenerweiterungenByIdSpy: MockInstance = vi
+      .spyOn(serviceProviderStore, 'getRollenerweiterungenById')
+      .mockResolvedValue();
+    await openRollenerweiterungenSection();
+
+    const rollenFilter: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+    rollenFilter?.vm.$emit('update:model-value', ['rolle-1']);
+    await flushPromises();
+
+    expect(getRollenerweiterungenByIdSpy).toHaveBeenCalled();
+    expect(getRollenerweiterungenByIdSpy).toHaveBeenLastCalledWith({
+      serviceProviderId: undefined,
+      organisationIds: undefined,
+      rolleIds: ['rolle-1'],
+      offset: 0,
+      limit: 30,
+    });
   });
 });
