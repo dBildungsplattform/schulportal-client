@@ -44,6 +44,7 @@
   const currentServiceProviderId: string = route.params['id'] as string;
   const selectedOrganisationIds: Ref<string[]> = ref([]);
   const selectedRolleIds: Ref<string[]> = ref([]);
+  const searchInputRollen: Ref<string> = ref('');
 
   type ReadonlyHeaders = Headers;
   const headers: ReadonlyHeaders = [
@@ -146,6 +147,7 @@
   function resetSearchAndFilter(): void {
     selectedOrganisationIds.value = [];
     selectedRolleIds.value = [];
+    searchInputRollen.value = '';
     fetchRollenerweiterungen();
   }
 
@@ -168,11 +170,11 @@
   }
 
   function updateRollenSearch(searchValue: string): void {
-    selectedRolleIds.value = [];
     rolleStore.getAllRollen({
       limit: 25,
       searchString: searchValue,
       systemrechte: [RollenSystemRecht.RollenVerwalten, RollenSystemRecht.RollenErweitern],
+      rolleIds: selectedRolleIds.value.length > 0 ? selectedRolleIds.value : undefined,
     });
   }
 
@@ -526,6 +528,8 @@
                       <v-autocomplete
                         id="rolle-select"
                         ref="rolle-select"
+                        v-model="selectedRolleIds"
+                        v-model:search="searchInputRollen"
                         autocomplete="off"
                         class="filter-dropdown"
                         :class="{ selected: selectedRolleIds.length > 0 }"
@@ -558,6 +562,14 @@
                               }}</span
                             >
                           </v-list-item>
+                        </template>
+                        <template #selection="{ item, index }">
+                          <v-chip v-if="selectedRolleIds.length < 2">
+                            <span>{{ item.title }}</span>
+                          </v-chip>
+                          <div v-else-if="index === 0">
+                            {{ $t('admin.rolle.rollenSelected', { count: selectedRolleIds.length }) }}
+                          </div>
                         </template>
                       </v-autocomplete>
                     </v-col>

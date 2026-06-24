@@ -2122,6 +2122,18 @@
             }
           },
           {
+            "name": "rolleIds",
+            "required": false,
+            "in": "query",
+            "description": "The ids of the selected Rollen",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
             "name": "systemrechte",
             "required": false,
             "in": "query",
