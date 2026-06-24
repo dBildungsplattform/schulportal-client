@@ -12003,12 +12003,12 @@ export const ProviderApiAxiosParamCreator = function (configuration?: Configurat
          * @param {string} angebotId The id of the service provider
          * @param {number} [offset] The offset of the paginated list.
          * @param {number} [limit] The requested limit for the page size.
-         * @param {string} [organisationId] The id of the organisation
-         * @param {string} [rolleId] The id of the rolle
+         * @param {Array<string>} [organisationIds] The ids of the organisations where the rollenerweiterung should be available.
+         * @param {Array<string>} [rolleIds] The ids of the rollen where the rollenerweiterung should be available.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        providerControllerFindRollenerweiterungenByServiceProviderId: async (angebotId: string, offset?: number, limit?: number, organisationId?: string, rolleId?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        providerControllerFindRollenerweiterungenByServiceProviderId: async (angebotId: string, offset?: number, limit?: number, organisationIds?: Array<string>, rolleIds?: Array<string>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'angebotId' is not null or undefined
             assertParamExists('providerControllerFindRollenerweiterungenByServiceProviderId', 'angebotId', angebotId)
             const localVarPath = `/api/provider/{angebotId}/rollenerweiterung`
@@ -12040,12 +12040,12 @@ export const ProviderApiAxiosParamCreator = function (configuration?: Configurat
                 localVarQueryParameter['limit'] = limit;
             }
 
-            if (organisationId !== undefined) {
-                localVarQueryParameter['organisationId'] = organisationId;
+            if (organisationIds) {
+                localVarQueryParameter['organisationIds'] = organisationIds;
             }
 
-            if (rolleId !== undefined) {
-                localVarQueryParameter['rolleId'] = rolleId;
+            if (rolleIds) {
+                localVarQueryParameter['rolleIds'] = rolleIds;
             }
 
 
@@ -12414,13 +12414,13 @@ export const ProviderApiFp = function(configuration?: Configuration) {
          * @param {string} angebotId The id of the service provider
          * @param {number} [offset] The offset of the paginated list.
          * @param {number} [limit] The requested limit for the page size.
-         * @param {string} [organisationId] The id of the organisation
-         * @param {string} [rolleId] The id of the rolle
+         * @param {Array<string>} [organisationIds] The ids of the organisations where the rollenerweiterung should be available.
+         * @param {Array<string>} [rolleIds] The ids of the rollen where the rollenerweiterung should be available.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async providerControllerFindRollenerweiterungenByServiceProviderId(angebotId: string, offset?: number, limit?: number, organisationId?: string, rolleId?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ProviderControllerFindRollenerweiterungenByServiceProviderId200Response>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.providerControllerFindRollenerweiterungenByServiceProviderId(angebotId, offset, limit, organisationId, rolleId, options);
+        async providerControllerFindRollenerweiterungenByServiceProviderId(angebotId: string, offset?: number, limit?: number, organisationIds?: Array<string>, rolleIds?: Array<string>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ProviderControllerFindRollenerweiterungenByServiceProviderId200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.providerControllerFindRollenerweiterungenByServiceProviderId(angebotId, offset, limit, organisationIds, rolleIds, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -12538,13 +12538,13 @@ export const ProviderApiFactory = function (configuration?: Configuration, baseP
          * @param {string} angebotId The id of the service provider
          * @param {number} [offset] The offset of the paginated list.
          * @param {number} [limit] The requested limit for the page size.
-         * @param {string} [organisationId] The id of the organisation
-         * @param {string} [rolleId] The id of the rolle
+         * @param {Array<string>} [organisationIds] The ids of the organisations where the rollenerweiterung should be available.
+         * @param {Array<string>} [rolleIds] The ids of the rollen where the rollenerweiterung should be available.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        providerControllerFindRollenerweiterungenByServiceProviderId(angebotId: string, offset?: number, limit?: number, organisationId?: string, rolleId?: string, options?: any): AxiosPromise<ProviderControllerFindRollenerweiterungenByServiceProviderId200Response> {
-            return localVarFp.providerControllerFindRollenerweiterungenByServiceProviderId(angebotId, offset, limit, organisationId, rolleId, options).then((request) => request(axios, basePath));
+        providerControllerFindRollenerweiterungenByServiceProviderId(angebotId: string, offset?: number, limit?: number, organisationIds?: Array<string>, rolleIds?: Array<string>, options?: any): AxiosPromise<ProviderControllerFindRollenerweiterungenByServiceProviderId200Response> {
+            return localVarFp.providerControllerFindRollenerweiterungenByServiceProviderId(angebotId, offset, limit, organisationIds, rolleIds, options).then((request) => request(axios, basePath));
         },
         /**
          * Get all service-providers assignable for a role.
@@ -12653,13 +12653,13 @@ export interface ProviderApiInterface {
      * @param {string} angebotId The id of the service provider
      * @param {number} [offset] The offset of the paginated list.
      * @param {number} [limit] The requested limit for the page size.
-     * @param {string} [organisationId] The id of the organisation
-     * @param {string} [rolleId] The id of the rolle
+     * @param {Array<string>} [organisationIds] The ids of the organisations where the rollenerweiterung should be available.
+     * @param {Array<string>} [rolleIds] The ids of the rollen where the rollenerweiterung should be available.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ProviderApiInterface
      */
-    providerControllerFindRollenerweiterungenByServiceProviderId(angebotId: string, offset?: number, limit?: number, organisationId?: string, rolleId?: string, options?: AxiosRequestConfig): AxiosPromise<ProviderControllerFindRollenerweiterungenByServiceProviderId200Response>;
+    providerControllerFindRollenerweiterungenByServiceProviderId(angebotId: string, offset?: number, limit?: number, organisationIds?: Array<string>, rolleIds?: Array<string>, options?: AxiosRequestConfig): AxiosPromise<ProviderControllerFindRollenerweiterungenByServiceProviderId200Response>;
 
     /**
      * Get all service-providers assignable for a role.
@@ -12772,14 +12772,14 @@ export class ProviderApi extends BaseAPI implements ProviderApiInterface {
      * @param {string} angebotId The id of the service provider
      * @param {number} [offset] The offset of the paginated list.
      * @param {number} [limit] The requested limit for the page size.
-     * @param {string} [organisationId] The id of the organisation
-     * @param {string} [rolleId] The id of the rolle
+     * @param {Array<string>} [organisationIds] The ids of the organisations where the rollenerweiterung should be available.
+     * @param {Array<string>} [rolleIds] The ids of the rollen where the rollenerweiterung should be available.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ProviderApi
      */
-    public providerControllerFindRollenerweiterungenByServiceProviderId(angebotId: string, offset?: number, limit?: number, organisationId?: string, rolleId?: string, options?: AxiosRequestConfig) {
-        return ProviderApiFp(this.configuration).providerControllerFindRollenerweiterungenByServiceProviderId(angebotId, offset, limit, organisationId, rolleId, options).then((request) => request(this.axios, this.basePath));
+    public providerControllerFindRollenerweiterungenByServiceProviderId(angebotId: string, offset?: number, limit?: number, organisationIds?: Array<string>, rolleIds?: Array<string>, options?: AxiosRequestConfig) {
+        return ProviderApiFp(this.configuration).providerControllerFindRollenerweiterungenByServiceProviderId(angebotId, offset, limit, organisationIds, rolleIds, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

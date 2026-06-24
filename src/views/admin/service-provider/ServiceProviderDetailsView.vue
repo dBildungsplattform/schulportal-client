@@ -42,9 +42,8 @@
   });
 
   const currentServiceProviderId: string = route.params['id'] as string;
-  const selectedOrganisationId: Ref<string> = ref('');
-  const selectedRolleId: Ref<string> = ref('');
-  const searchInputRollen: Ref<string | undefined> = ref(undefined);
+  const selectedOrganisationIds: Ref<string[]> = ref([]);
+  const selectedRolleIds: Ref<string[]> = ref([]);
 
   type ReadonlyHeaders = Headers;
   const headers: ReadonlyHeaders = [
@@ -111,8 +110,8 @@
   async function fetchRollenerweiterungen(): Promise<void> {
     await serviceProviderStore.getRollenerweiterungenById({
       serviceProviderId: currentServiceProviderId,
-      organisationId: selectedOrganisationId.value || undefined,
-      rolleId: selectedRolleId.value || undefined,
+      organisationIds: selectedOrganisationIds.value.length > 0 ? selectedOrganisationIds.value : undefined,
+      rolleIds: selectedRolleIds.value.length > 0 ? selectedRolleIds.value : undefined,
       offset: (rollenerweiterungPage.value - 1) * rollenerweiterungPerPage.value,
       limit: rollenerweiterungPerPage.value,
     });
@@ -145,37 +144,35 @@
   });
 
   function resetSearchAndFilter(): void {
-    selectedOrganisationId.value = '';
-    selectedRolleId.value = '';
+    selectedOrganisationIds.value = [];
+    selectedRolleIds.value = [];
     fetchRollenerweiterungen();
   }
 
-  function setOrganisationFilter(newValue: string | undefined): void {
-    if (!newValue) {
+  function setOrganisationFilter(newValue: string[] | undefined): void {
+    if (!newValue || newValue.length === 0) {
       resetSearchAndFilter();
       return;
     }
-    selectedOrganisationId.value = newValue;
+    selectedOrganisationIds.value = newValue;
     fetchRollenerweiterungen();
   }
 
-  function setRolleFilter(newValue: string | undefined): void {
-    if (!newValue) {
+  function setRolleFilter(newValue: string[] | undefined): void {
+    if (!newValue || newValue.length === 0) {
       resetSearchAndFilter();
       return;
     }
-    selectedRolleId.value = newValue;
+    selectedRolleIds.value = newValue;
     fetchRollenerweiterungen();
   }
 
   function updateRollenSearch(searchValue: string): void {
-    if (!searchValue) {
-      selectedRolleId.value = '';
-      rolleStore.getAllRollen({
-        limit: 25,
-        searchString: searchValue,
-      });
-    }
+    selectedRolleIds.value = [];
+    rolleStore.getAllRollen({
+      limit: 25,
+      searchString: searchValue,
+    });
   }
 
   onMounted(async () => {
@@ -467,7 +464,7 @@
                       <v-btn
                         class="px-0 reset-filter"
                         data-testid="reset-filter-button"
-                        :disabled="!selectedOrganisationId"
+                        :disabled="!selectedOrganisationIds.length && !selectedRolleIds.length"
                         size="x-small"
                         variant="text"
                         width="auto"
@@ -482,13 +479,13 @@
                       class="py-md-0"
                     >
                       <SchulenFilter
-                        :multiple="false"
+                        :multiple="true"
                         includeAll
                         highlightSelection
                         parentId="service-provider-management-by-schule"
                         ref="schulenFilter"
                         :systemrechteForSearch="[RollenSystemRecht.AngeboteVerwalten]"
-                        :selectedSchulen="selectedOrganisationId ? [selectedOrganisationId] : []"
+                        :selectedSchulen="selectedOrganisationIds.length > 0 ? selectedOrganisationIds : []"
                         @update:selected-schulen="setOrganisationFilter"
                         :placeholderText="$t('admin.schule.schule')"
                         hideDetails
@@ -528,11 +525,9 @@
                       <v-autocomplete
                         id="rolle-select"
                         ref="rolle-select"
-                        v-model="selectedRolleId"
-                        v-model:search="searchInputRollen"
                         autocomplete="off"
                         class="filter-dropdown"
-                        :class="{ selected: selectedRolleId }"
+                        :class="{ selected: selectedRolleIds.length > 0 }"
                         clearable
                         data-testid="rolle-select"
                         density="compact"
