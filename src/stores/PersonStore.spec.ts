@@ -774,7 +774,7 @@ describe('PersonStore', () => {
       const lockUserBodyParams: LockUserBodyParams = getUserLockBodyParams(true);
       const lockPersonPromise: Promise<void> = personStore.lockPerson(mockPerson.person.id, lockUserBodyParams);
       expect(personStore.loading).toBe(true);
-      expect(lockPersonPromise).resolves.toBeUndefined();
+      await expect(lockPersonPromise).resolves.toBeUndefined();
       await lockPersonPromise;
       expect(personStore.loading).toBe(false);
     });
@@ -801,41 +801,6 @@ describe('PersonStore', () => {
       await expect(lockPersonPromise).rejects.toEqual('LOCK_FAILED_ERROR');
       expect(personStore.loading).toBe(false);
       expect(personStore.errorCode).toEqual('LOCK_FAILED_ERROR');
-    });
-  });
-
-  describe('syncPersonById', () => {
-    it('should sync a person', async () => {
-      const personId: string = '1234';
-
-      mockadapter.onPost(`/api/personen/${personId}/sync`).replyOnce(200);
-
-      await personStore.syncPersonById(personId);
-
-      expect(personStore.loading).toBe(false);
-      expect(personStore.errorCode).toEqual('');
-    });
-
-    it('should handle string error', async () => {
-      const personId: string = '1234';
-
-      mockadapter.onPost(`/api/personen/${personId}/sync`).replyOnce(500, 'some error');
-
-      await personStore.syncPersonById(personId);
-
-      expect(personStore.errorCode).toEqual('UNSPECIFIED_ERROR');
-      expect(personStore.loading).toBe(false);
-    });
-
-    it('should handle error code', async () => {
-      const personId: string = '1234';
-
-      mockadapter.onPost(`/api/personen/${personId}/sync`).replyOnce(500, { code: 'some mock server error' });
-
-      await personStore.syncPersonById(personId);
-
-      expect(personStore.errorCode).toEqual('some mock server error');
-      expect(personStore.loading).toBe(false);
     });
   });
 

@@ -34,7 +34,6 @@ describe('AuthStore', () => {
       expect(authStore.hasRollenverwaltungPermission).toBe(false);
       expect(authStore.hasSchulverwaltungPermission).toBe(false);
       expect(authStore.hasSchultraegerverwaltungPermission).toBe(false);
-      expect(authStore.hasPersonenSyncPermission).toBe(false);
       expect(authStore.hasImportPermission).toBe(false);
       await initializeAuthStatus;
       expect(authStore.isAuthed).toBe(true);
@@ -44,7 +43,6 @@ describe('AuthStore', () => {
       expect(authStore.hasRollenverwaltungPermission).toBe(true);
       expect(authStore.hasSchulverwaltungPermission).toBe(true);
       expect(authStore.hasSchultraegerverwaltungPermission).toBe(false);
-      expect(authStore.hasPersonenSyncPermission).toBe(true);
       expect(authStore.hasImportPermission).toBe(true);
     });
 

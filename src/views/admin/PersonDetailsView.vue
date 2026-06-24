@@ -7,7 +7,6 @@
   import PasswordReset from '@/components/admin/personen/PasswordReset.vue';
   import PersonDelete from '@/components/admin/personen/PersonDelete.vue';
   import PersonLock from '@/components/admin/personen/PersonLock.vue';
-  import PersonSync from '@/components/admin/personen/PersonSync.vue';
   import PersonenMetadataChange from '@/components/admin/personen/PersonenMetadataChange.vue';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
   import PersonenkontextDelete from '@/components/admin/personen/PersonenkontextDelete.vue';
@@ -208,11 +207,6 @@
   // Deletes the person and all kontexte
   async function deletePerson(personId: string): Promise<void> {
     await personStore.deletePersonById(personId);
-  }
-
-  // Synchronizes the person with external systems
-  async function syncPerson(personId: string): Promise<void> {
-    await personStore.syncPersonById(personId);
   }
 
   function getOrganisationDisplayName(organisation: Organisation): string {
@@ -2788,18 +2782,6 @@
                     :isLoading="personStore.loading"
                   >
                   </PersonDelete>
-                </template>
-              </div>
-              <div class="d-flex justify-sm-end">
-                <template v-if="authStore.hasPersonenSyncPermission">
-                  <PersonSync
-                    :disabled="isEditActive || isEditPersonMetadataActive"
-                    :errorCode="personStore.errorCode"
-                    :person="personStore.currentPerson"
-                    @onSyncPerson="syncPerson(currentPersonId)"
-                    :isLoading="personStore.loading"
-                  >
-                  </PersonSync>
                 </template>
               </div>
             </v-col>

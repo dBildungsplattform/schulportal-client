@@ -232,7 +232,6 @@ type PersonActions = {
   resetDevicePassword: (personId?: string) => Promise<void>;
   deletePersonById: (personId: string) => Promise<void>;
   lockPerson: (personId: string, bodyParams: LockUserBodyParams) => Promise<void>;
-  syncPersonById: (personId: string) => Promise<void>;
   getPersonenuebersichtById: (personId: string) => Promise<void>;
   changePersonMetadataById: (
     personId: string,
@@ -448,17 +447,6 @@ export const usePersonStore: StoreDefinition<'personStore', PersonState, PersonG
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
         return await Promise.reject(this.errorCode);
-      } finally {
-        this.loading = false;
-      }
-    },
-
-    async syncPersonById(personId: string) {
-      this.loading = true;
-      try {
-        await personenApi.personControllerSyncPerson(personId);
-      } catch (error: unknown) {
-        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
         this.loading = false;
       }

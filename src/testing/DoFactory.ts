@@ -84,7 +84,7 @@ export class DoFactory {
         {
           organisation: this.getOrganisationResponse(),
           rolle: {
-            systemrechte: ['ROLLEN_VERWALTEN', 'SCHULEN_VERWALTEN', 'IMPORT_DURCHFUEHREN', 'PERSON_SYNCHRONISIEREN'],
+            systemrechte: ['ROLLEN_VERWALTEN', 'SCHULEN_VERWALTEN', 'IMPORT_DURCHFUEHREN'],
             serviceProviderIds: ['789897798'],
           },
         },
@@ -111,7 +111,6 @@ export class DoFactory {
         RollenSystemRecht.RollenVerwalten,
         RollenSystemRecht.SchulenVerwalten,
         RollenSystemRecht.ImportDurchfuehren,
-        RollenSystemRecht.PersonSynchronisieren,
       ],
       serviceProviderIds: [faker.string.uuid()],
       ...props,

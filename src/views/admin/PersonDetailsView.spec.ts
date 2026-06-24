@@ -49,7 +49,6 @@ interface PersonDetailsViewVm extends DefineComponent {
   handleSelectedKopersNrUpdate: (value: string | undefined | null) => void;
   onSubmitCreateZuordnung: (e?: Event) => Promise<void | undefined>;
   deletePerson: (personId: string) => Promise<void>;
-  syncPerson: (personId: string) => Promise<void>;
 }
 
 const waitForElement = async (
@@ -310,7 +309,6 @@ describe('PersonDetailsView', () => {
 
     authStore.currentUser = mockCurrentUser;
     authStore.hasPersonenLoeschenPermission = true;
-    authStore.hasPersonenSyncPermission = true;
     personStore.currentPerson = mockPerson;
     personStore.personenuebersicht = mockPersonenuebersicht;
 
@@ -1397,48 +1395,6 @@ describe('PersonDetailsView', () => {
     await flushPromises();
 
     expect(pushSpy).toHaveBeenCalledWith({ name: 'person-management' });
-  });
-
-  test('it submits the form to synchronize a user', async () => {
-    const syncSpy: MockInstance = vi
-      .spyOn(personStore, 'syncPersonById')
-      .mockResolvedValue(undefined as unknown as void);
-
-    const openSyncUserDialogButton: DOMWrapper<Element> | undefined = wrapper?.find(
-      '[data-testid="open-person-sync-dialog-button"]',
-    );
-
-    expect(openSyncUserDialogButton?.exists()).toBe(true);
-    await openSyncUserDialogButton!.trigger('click');
-    await nextTick();
-    await flushPromises();
-
-    expect(document.body.querySelector('[data-testid="person-sync-confirmation-text"]')).not.toBeNull();
-
-    const syncButton: Element | null = document.body.querySelector('[data-testid="person-sync-button"]');
-    expect(syncButton).not.toBeNull();
-
-    if (syncButton) {
-      syncButton.dispatchEvent(new Event('click'));
-    }
-
-    await flushPromises();
-
-    expect(syncSpy).toHaveBeenCalled();
-
-    const successText: Element | null = document.body.querySelector('[data-testid="person-sync-success-text"]');
-    expect(successText).not.toBeNull();
-
-    const closeSuccessButton: Element | null = document.body.querySelector(
-      '[data-testid="close-person-sync-success-dialog-button"]',
-    );
-    expect(closeSuccessButton).not.toBeNull();
-
-    if (closeSuccessButton) {
-      closeSuccessButton.dispatchEvent(new Event('click'));
-    }
-
-    await flushPromises();
   });
 
   describe('change befristung', () => {
