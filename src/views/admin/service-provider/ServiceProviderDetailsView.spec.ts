@@ -365,9 +365,17 @@ describe('ServiceProviderDetailsView', () => {
     await openRollenerweiterungenSection();
 
     const rollenFilter: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
-    rollenFilter?.vm.$emit('update:model-value', ['rolle-1']);
 
-    // Should not have been called yet due to debounce
+    // Set rolleIds state first
+    rollenFilter?.vm.$emit('update:model-value', ['rolle-1']);
+    vi.advanceTimersByTime(500);
+    await flushPromises();
+
+    getAllRollenSpy.mockClear();
+
+    // Now trigger the search
+    rollenFilter?.vm.$emit('update:search', 'Lehrer');
+
     expect(getAllRollenSpy).not.toHaveBeenCalledWith(expect.objectContaining({ searchString: 'Lehrer' }));
 
     vi.advanceTimersByTime(500);
