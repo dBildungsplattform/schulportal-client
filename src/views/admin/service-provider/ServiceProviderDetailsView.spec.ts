@@ -239,4 +239,74 @@ describe('ServiceProviderDetailsView', () => {
       limit: 30,
     });
   });
+
+  test('it reloads rollenerweiterungen with empty filter values when filters are cleared', async () => {
+    const getRollenerweiterungenByIdSpy: MockInstance = vi
+      .spyOn(serviceProviderStore, 'getRollenerweiterungenById')
+      .mockResolvedValue();
+    await openRollenerweiterungenSection();
+
+    const schulenFilter: VueWrapper | undefined = wrapper?.findComponent(SchulenFilter);
+    const rollenFilter: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+
+    schulenFilter?.vm.$emit('update:selected-schulen', ['schule-1']);
+    rollenFilter?.vm.$emit('update:model-value', ['rolle-1']);
+    await flushPromises();
+
+    // Clear organisation filter, empty array should send undefined
+    schulenFilter?.vm.$emit('update:selected-schulen', []);
+    await flushPromises();
+
+    expect(getRollenerweiterungenByIdSpy).toHaveBeenLastCalledWith({
+      serviceProviderId: undefined,
+      organisationIds: undefined,
+      rolleIds: ['rolle-1'],
+      offset: 0,
+      limit: 30,
+    });
+
+    // Clear rolle filter, empty array should send undefined and reset search
+    rollenFilter?.vm.$emit('update:model-value', []);
+    await flushPromises();
+
+    expect(getRollenerweiterungenByIdSpy).toHaveBeenLastCalledWith({
+      serviceProviderId: undefined,
+      organisationIds: undefined,
+      rolleIds: undefined,
+      offset: 0,
+      limit: 30,
+    });
+  });
+
+  test('it resets both filters via reset button and reloads rollenerweiterungen', async () => {
+    const getRollenerweiterungenByIdSpy: MockInstance = vi
+      .spyOn(serviceProviderStore, 'getRollenerweiterungenById')
+      .mockResolvedValue();
+    await openRollenerweiterungenSection();
+
+    // Set both filters first
+    const schulenFilter: VueWrapper | undefined = wrapper?.findComponent(SchulenFilter);
+    const rollenFilter: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+    schulenFilter?.vm.$emit('update:selected-schulen', ['schule-1']);
+    rollenFilter?.vm.$emit('update:model-value', ['rolle-1']);
+    await flushPromises();
+
+    // Reset button should only be enabled when filters are active
+    const resetButton: WrapperLike | undefined = wrapper?.find('[data-testid="reset-filter-button"]');
+    expect(resetButton?.attributes('disabled')).toBeUndefined();
+
+    await resetButton?.trigger('click');
+    await flushPromises();
+
+    expect(getRollenerweiterungenByIdSpy).toHaveBeenLastCalledWith({
+      serviceProviderId: undefined,
+      organisationIds: undefined,
+      rolleIds: undefined,
+      offset: 0,
+      limit: 30,
+    });
+
+    // Reset button should now be disabled again
+    expect(wrapper?.find('[data-testid="reset-filter-button"]').attributes('disabled')).toBeDefined();
+  });
 });
