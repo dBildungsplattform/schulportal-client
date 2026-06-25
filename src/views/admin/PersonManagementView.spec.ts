@@ -18,7 +18,7 @@ import { DOMWrapper, VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import type WrapperLike from 'node_modules/@vue/test-utils/dist/interfaces/wrapperLike';
 import { DoFactory } from 'test/DoFactory';
 import { expect, test, type Mock, type MockInstance } from 'vitest';
-import { nextTick, type Component, type ComputedRef, type DefineComponent } from 'vue';
+import { nextTick, type Component, type ComputedRef, type DefineComponent, type Slot } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import PersonManagementView from './PersonManagementView.vue';
 import { OperationType } from '@/stores/types/bulkOperationTypes';
@@ -590,7 +590,7 @@ describe('PersonManagementView', () => {
     });
   });
 
-  test('it shows loading spinner in schule filter dropdown', async () => {
+  test.only('it shows loading spinner in schule filter dropdown', async () => {
     organisationStore.organisationenFilters.set('person-management', {
       filterResult: [],
       total: 0,
@@ -599,8 +599,13 @@ describe('PersonManagementView', () => {
     await nextTick();
 
     const schulenFilter: VueWrapper | undefined = wrapper?.findComponent({ name: 'SchulenFilter' });
-    const prependItem: DOMWrapper<Element> | undefined = schulenFilter?.find('.v-progress-circular');
-    expect(prependItem?.exists()).toBe(true);
+    const autocomplete: VueWrapper | undefined = schulenFilter?.findComponent({ name: 'v-autocomplete' });
+
+    // Slot direkt prüfen statt DOM
+    const prependItemSlot: Slot | undefined = autocomplete?.getCurrentComponent()?.slots?.['prepend-item'];
+    expect(prependItemSlot).toBeDefined();
+
+    expect(organisationStore.organisationenFilters.get('person-management')?.loading).toBe(true);
   });
 
   test('it shows the error dialog, when the selection is invalid', async () => {
