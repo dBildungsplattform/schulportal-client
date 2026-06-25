@@ -399,4 +399,19 @@ describe('ServiceProviderDetailsView', () => {
 
     vi.useRealTimers();
   });
+
+  test('it does not request all rollen on mount without rollenerweitern permission', async () => {
+    wrapper?.unmount();
+    authStore.hasRollenerweiternPermission = false;
+    const fetchRollenerweiterungenSpy: MockInstance = vi
+      .spyOn(serviceProviderStore, 'getRollenerweiterungenById')
+      .mockResolvedValue();
+
+    await flushPromises();
+    fetchRollenerweiterungenSpy.mockClear();
+
+    wrapper = await mountComponent();
+
+    expect(fetchRollenerweiterungenSpy).not.toHaveBeenCalled();
+  });
 });
