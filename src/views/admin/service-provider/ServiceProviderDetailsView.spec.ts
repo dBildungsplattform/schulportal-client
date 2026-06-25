@@ -303,6 +303,15 @@ describe('ServiceProviderDetailsView', () => {
     });
   });
 
+  test('it shows no items in the rollen filter when allRollen is empty', async () => {
+    rolleStore.allRollen = [];
+    wrapper = await mountComponent();
+    await openRollenerweiterungenSection();
+
+    const rollenFilter: VueWrapper = wrapper.findComponent({ ref: 'rolle-select' }) as VueWrapper;
+    expect((rollenFilter as unknown as { props: (key: string) => never }).props('items')).toEqual([]);
+  });
+
   test('it resets both filters via reset button and reloads rollenerweiterungen', async () => {
     const getRollenerweiterungenByIdSpy: MockInstance = vi
       .spyOn(serviceProviderStore, 'getRollenerweiterungenById')
