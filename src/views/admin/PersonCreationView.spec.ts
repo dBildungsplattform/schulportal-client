@@ -176,6 +176,7 @@ async function fillForm(args: Partial<FormFields>): Promise<Partial<FormSelector
   expect(klasseSelect?.exists()).toBe(true);
 
   await klasseSelect?.setValue(klasse);
+  klasseSelect?.vm.$emit('update:selectedKlassen', klasse);
   await nextTick();
   selectors.klasseSelect = klasseSelect;
 
@@ -451,6 +452,11 @@ describe('PersonCreationView', () => {
   test('it fills form, triggers submit and then shows success template with new methods', async () => {
     personenkontextStore.workflowStepResponse = mockWorkflowStepResponse;
 
+    const spy: Mock = vi.spyOn(personenkontextStore, 'createPersonWithKontexte').mockImplementationOnce(async () => {
+      personenkontextStore.createdPersonWithKontext = mockCreatedPersonWithKontext;
+      return Promise.resolve();
+    });
+
     const selectors: Partial<FormSelectors> = await fillForm({
       organisationsebene: ORGANISATION_ID,
       rollen: [ROLLE_ID],
@@ -458,18 +464,18 @@ describe('PersonCreationView', () => {
       vorname: 'Randy',
       nachname: 'Cena',
       kopersNr: '23234',
+      klasse: '9a',
     });
-    await nextTick();
+    await flushPromises();
 
-    personenkontextStore.createdPersonWithKontext = mockCreatedPersonWithKontext;
-
-    await wrapper?.find('[data-testid="person-creation-form-submit-button"]').trigger('click');
+    await wrapper?.find('[data-testid="person-creation-form"]').trigger('submit');
     await flushPromises();
 
     // Form is resetting after submit so orga should be undefined
     expect(selectors.organisationsebeneSelect?.vm.$data).toStrictEqual({});
 
     await nextTick();
+    expect(spy).toHaveBeenCalledOnce();
     expect(wrapper?.find('[data-testid="person-success-text"]').isVisible()).toBe(true);
   });
 
