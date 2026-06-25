@@ -240,7 +240,7 @@
       // Refresh rollenerweiterungen to reflect saved state
       await serviceProviderStore.getRollenerweiterungenById({
         serviceProviderId: currentServiceProviderId,
-        organisationIds: organisationIdFromQuery.value ? [organisationIdFromQuery.value] : [],
+        organisationIds: [organisationIdFromQuery.value],
       });
       saveSuccessDialogVisible.value = true;
     } else if (serviceProviderStore.errors.size > 0) {

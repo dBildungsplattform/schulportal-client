@@ -50,7 +50,7 @@ beforeEach(async () => {
   });
 
   router.push({
-    name: 'angebot-edit',
+    name: 'angebot-details-schulspezifisch',
     params: { id: mockServiceProvider.id },
     query: { orga: 'some-org-id' },
   });
@@ -139,6 +139,31 @@ describe('ServiceProviderDetailsBySchuleView', () => {
       });
     });
 
+    test('navigates to service provider edit mode when bearbeiten button is clicked with no orgaId', async () => {
+      await router.push({
+        name: 'angebot-details-schulspezifisch',
+        params: { id: mockServiceProvider.id },
+      });
+      await router.isReady();
+
+      wrapper = mount(ServiceProviderDetailsBySchuleView, {
+        attachTo: document.getElementById('app') || '',
+        global: {
+          plugins: [router],
+        },
+      });
+      serviceProviderStore.currentServiceProvider = mockServiceProvider;
+
+      const push: MockInstance = vi.spyOn(router, 'push');
+      await wrapper.find('[data-testid="service-provider-bearbeiten-button"]').trigger('click');
+
+      expect(push).toHaveBeenCalledWith({
+        name: 'angebot-edit',
+        params: { id: mockServiceProvider.id },
+        query: undefined,
+      });
+    });
+
     test('opens edit mode when bearbeiten button is clicked', async () => {
       await nextTick();
       expect(wrapper?.find('[data-testid="rollenerweiterung-bearbeiten-button"]').exists()).toBe(true);
@@ -196,6 +221,29 @@ describe('ServiceProviderDetailsBySchuleView', () => {
     }
 
     test('calls persistRollenerweiterungenForServiceProvider with correct add/remove ids on save', async () => {
+      await openEditMode();
+
+      const treeview: VueWrapper | undefined = wrapper?.findComponent({ name: 'RollenerweiterungTreeview' });
+      treeview?.vm.$emit('update:selectedRolleIds', ['new-rolle-1']);
+      await nextTick();
+
+      await wrapper?.find('[data-testid="rollenerweiterung-save-button"]').trigger('click');
+      await nextTick();
+
+      expect(persistSpy).toHaveBeenCalledTimes(1);
+      expect(persistSpy).toHaveBeenCalledWith(
+        expect.objectContaining<{ addErweiterungenForRolleIds: string[] }>({
+          addErweiterungenForRolleIds: expect.arrayContaining(['new-rolle-1']) as string[],
+        }),
+      );
+    });
+
+    test('calls persistRollenerweiterungenForServiceProvider with correct add/remove ids on save with no orgaId', async () => {
+      await router.push({
+        name: 'angebot-details-schulspezifisch',
+        params: { id: mockServiceProvider.id },
+      });
+      await router.isReady();
       await openEditMode();
 
       const treeview: VueWrapper | undefined = wrapper?.findComponent({ name: 'RollenerweiterungTreeview' });
