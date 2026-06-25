@@ -136,7 +136,7 @@
   }
 
   const rollen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    const rollen: RolleWithServiceProvidersResponse[] = rolleStore.allRollen || [];
+    const rollen: RolleWithServiceProvidersResponse[] = rolleStore.allRollen;
 
     return rollen
       .map((rolle: RolleResponse) => ({
