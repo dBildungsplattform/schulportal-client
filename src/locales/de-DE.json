@@ -652,7 +652,10 @@
           "EXTERN": "Extern",
           "ORGADMIN": "Orgadmin",
           "LEIT": "Leit",
-          "SYSADMIN": "Sysadmin"
+          "SYSADMIN": "Sysadmin",
+          "SORGBER": "SorgBer",
+          "SCHB": "SchB",
+          "NLEHR": "NLehr"
         },
         "merkmale": {
           "BEFRISTUNG_PFLICHT": "Befristung ist Pflichtangabe",

@@ -3604,7 +3604,10 @@ export const RollenArt = {
     Extern: 'EXTERN',
     Orgadmin: 'ORGADMIN',
     Leit: 'LEIT',
-    Sysadmin: 'SYSADMIN'
+    Sysadmin: 'SYSADMIN',
+    Sorgber: 'SORGBER',
+    Schb: 'SCHB',
+    Nlehr: 'NLEHR'
 } as const;
 
 export type RollenArt = typeof RollenArt[keyof typeof RollenArt];
@@ -5889,6 +5892,43 @@ export const CronApiAxiosParamCreator = function (configuration?: Configuration)
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
+        cronControllerTriggerVidisSync: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/cron/vidis-sync`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
         cronControllerUnlockUsersWithExpiredLocks: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/cron/unlock`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -5972,6 +6012,15 @@ export const CronApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
+        async cronControllerTriggerVidisSync(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.cronControllerTriggerVidisSync(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
         async cronControllerUnlockUsersWithExpiredLocks(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<boolean>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.cronControllerUnlockUsersWithExpiredLocks(options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
@@ -6017,6 +6066,14 @@ export const CronApiFactory = function (configuration?: Configuration, basePath?
          */
         cronControllerRemovePersonenKontexteWithExpiredBefristungFromUsers(options?: any): AxiosPromise<boolean> {
             return localVarFp.cronControllerRemovePersonenKontexteWithExpiredBefristungFromUsers(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        cronControllerTriggerVidisSync(options?: any): AxiosPromise<void> {
+            return localVarFp.cronControllerTriggerVidisSync(options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -6073,6 +6130,14 @@ export interface CronApiInterface {
      * @throws {RequiredError}
      * @memberof CronApiInterface
      */
+    cronControllerTriggerVidisSync(options?: AxiosRequestConfig): AxiosPromise<void>;
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CronApiInterface
+     */
     cronControllerUnlockUsersWithExpiredLocks(options?: AxiosRequestConfig): AxiosPromise<boolean>;
 
 }
@@ -6122,6 +6187,16 @@ export class CronApi extends BaseAPI implements CronApiInterface {
      */
     public cronControllerRemovePersonenKontexteWithExpiredBefristungFromUsers(options?: AxiosRequestConfig) {
         return CronApiFp(this.configuration).cronControllerRemovePersonenKontexteWithExpiredBefristungFromUsers(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CronApi
+     */
+    public cronControllerTriggerVidisSync(options?: AxiosRequestConfig) {
+        return CronApiFp(this.configuration).cronControllerTriggerVidisSync(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -9435,6 +9510,44 @@ export const PersonInfoApiAxiosParamCreator = function (configuration?: Configur
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * 
+         * @summary Info about logged in person with intern role types.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        personInfoControllerInfoV2: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v2/person-info`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -9465,6 +9578,16 @@ export const PersonInfoApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.personInfoControllerInfoV1(options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
+        /**
+         * 
+         * @summary Info about logged in person with intern role types.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async personInfoControllerInfoV2(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonInfoResponseV1>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.personInfoControllerInfoV2(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
     }
 };
 
@@ -9493,6 +9616,15 @@ export const PersonInfoApiFactory = function (configuration?: Configuration, bas
         personInfoControllerInfoV1(options?: any): AxiosPromise<PersonInfoResponseV1> {
             return localVarFp.personInfoControllerInfoV1(options).then((request) => request(axios, basePath));
         },
+        /**
+         * 
+         * @summary Info about logged in person with intern role types.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        personInfoControllerInfoV2(options?: any): AxiosPromise<PersonInfoResponseV1> {
+            return localVarFp.personInfoControllerInfoV2(options).then((request) => request(axios, basePath));
+        },
     };
 };
 
@@ -9519,6 +9651,15 @@ export interface PersonInfoApiInterface {
      * @memberof PersonInfoApiInterface
      */
     personInfoControllerInfoV1(options?: AxiosRequestConfig): AxiosPromise<PersonInfoResponseV1>;
+
+    /**
+     * 
+     * @summary Info about logged in person with intern role types.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonInfoApiInterface
+     */
+    personInfoControllerInfoV2(options?: AxiosRequestConfig): AxiosPromise<PersonInfoResponseV1>;
 
 }
 
@@ -9549,6 +9690,17 @@ export class PersonInfoApi extends BaseAPI implements PersonInfoApiInterface {
      */
     public personInfoControllerInfoV1(options?: AxiosRequestConfig) {
         return PersonInfoApiFp(this.configuration).personInfoControllerInfoV1(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Info about logged in person with intern role types.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonInfoApi
+     */
+    public personInfoControllerInfoV2(options?: AxiosRequestConfig) {
+        return PersonInfoApiFp(this.configuration).personInfoControllerInfoV2(options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -10953,6 +11105,54 @@ export const PersonenInfoApiAxiosParamCreator = function (configuration?: Config
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * liefert Personeninformationen basierend auf den Berechtigungen auf Service Provider des aufrufenden Nutzers mit internen Rollentypen.
+         * @summary liefert Personeninformationen basierend auf den Berechtigungen auf Service Provider des aufrufenden Nutzers mit internen Rollentypen.
+         * @param {number} [xOffset] Offset für die Ergebnisse
+         * @param {number} [xLimit] Maximale Anzahl der Ergebnisse
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        personenInfoControllerInfoV2: async (xOffset?: number, xLimit?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v2/personen-info`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+            if (xOffset !== undefined) {
+                localVarQueryParameter['x-offset'] = xOffset;
+            }
+
+            if (xLimit !== undefined) {
+                localVarQueryParameter['x-limit'] = xLimit;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -10973,6 +11173,18 @@ export const PersonenInfoApiFp = function(configuration?: Configuration) {
          */
         async personenInfoControllerInfoV1(xOffset?: number, xLimit?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonInfoResponseV1>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.personenInfoControllerInfoV1(xOffset, xLimit, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * liefert Personeninformationen basierend auf den Berechtigungen auf Service Provider des aufrufenden Nutzers mit internen Rollentypen.
+         * @summary liefert Personeninformationen basierend auf den Berechtigungen auf Service Provider des aufrufenden Nutzers mit internen Rollentypen.
+         * @param {number} [xOffset] Offset für die Ergebnisse
+         * @param {number} [xLimit] Maximale Anzahl der Ergebnisse
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async personenInfoControllerInfoV2(xOffset?: number, xLimit?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonInfoResponseV1>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.personenInfoControllerInfoV2(xOffset, xLimit, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -10996,6 +11208,17 @@ export const PersonenInfoApiFactory = function (configuration?: Configuration, b
         personenInfoControllerInfoV1(xOffset?: number, xLimit?: number, options?: any): AxiosPromise<PersonInfoResponseV1> {
             return localVarFp.personenInfoControllerInfoV1(xOffset, xLimit, options).then((request) => request(axios, basePath));
         },
+        /**
+         * liefert Personeninformationen basierend auf den Berechtigungen auf Service Provider des aufrufenden Nutzers mit internen Rollentypen.
+         * @summary liefert Personeninformationen basierend auf den Berechtigungen auf Service Provider des aufrufenden Nutzers mit internen Rollentypen.
+         * @param {number} [xOffset] Offset für die Ergebnisse
+         * @param {number} [xLimit] Maximale Anzahl der Ergebnisse
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        personenInfoControllerInfoV2(xOffset?: number, xLimit?: number, options?: any): AxiosPromise<PersonInfoResponseV1> {
+            return localVarFp.personenInfoControllerInfoV2(xOffset, xLimit, options).then((request) => request(axios, basePath));
+        },
     };
 };
 
@@ -11015,6 +11238,17 @@ export interface PersonenInfoApiInterface {
      * @memberof PersonenInfoApiInterface
      */
     personenInfoControllerInfoV1(xOffset?: number, xLimit?: number, options?: AxiosRequestConfig): AxiosPromise<PersonInfoResponseV1>;
+
+    /**
+     * liefert Personeninformationen basierend auf den Berechtigungen auf Service Provider des aufrufenden Nutzers mit internen Rollentypen.
+     * @summary liefert Personeninformationen basierend auf den Berechtigungen auf Service Provider des aufrufenden Nutzers mit internen Rollentypen.
+     * @param {number} [xOffset] Offset für die Ergebnisse
+     * @param {number} [xLimit] Maximale Anzahl der Ergebnisse
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonenInfoApiInterface
+     */
+    personenInfoControllerInfoV2(xOffset?: number, xLimit?: number, options?: AxiosRequestConfig): AxiosPromise<PersonInfoResponseV1>;
 
 }
 
@@ -11036,6 +11270,19 @@ export class PersonenInfoApi extends BaseAPI implements PersonenInfoApiInterface
      */
     public personenInfoControllerInfoV1(xOffset?: number, xLimit?: number, options?: AxiosRequestConfig) {
         return PersonenInfoApiFp(this.configuration).personenInfoControllerInfoV1(xOffset, xLimit, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * liefert Personeninformationen basierend auf den Berechtigungen auf Service Provider des aufrufenden Nutzers mit internen Rollentypen.
+     * @summary liefert Personeninformationen basierend auf den Berechtigungen auf Service Provider des aufrufenden Nutzers mit internen Rollentypen.
+     * @param {number} [xOffset] Offset für die Ergebnisse
+     * @param {number} [xLimit] Maximale Anzahl der Ergebnisse
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PersonenInfoApi
+     */
+    public personenInfoControllerInfoV2(xOffset?: number, xLimit?: number, options?: AxiosRequestConfig) {
+        return PersonenInfoApiFp(this.configuration).personenInfoControllerInfoV2(xOffset, xLimit, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
