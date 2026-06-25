@@ -590,6 +590,19 @@ describe('PersonManagementView', () => {
     });
   });
 
+  test('it shows loading spinner in schule filter dropdown', async () => {
+    organisationStore.organisationenFilters.set('person-management', {
+      filterResult: [],
+      total: 0,
+      loading: true,
+    });
+    await nextTick();
+
+    const schulenFilter: VueWrapper | undefined = wrapper?.findComponent({ name: 'SchulenFilter' });
+    const prependItem: DOMWrapper<Element> | undefined = schulenFilter?.find('.v-progress-circular');
+    expect(prependItem?.exists()).toBe(true);
+  });
+
   test('it shows the error dialog, when the selection is invalid', async () => {
     wrapper = mountComponent();
     // don't select schule and select a person without LERN-rolle
