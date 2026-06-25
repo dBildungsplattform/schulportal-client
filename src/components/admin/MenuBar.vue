@@ -141,6 +141,7 @@
         :title="$t('admin.person.createNew')"
         to="/admin/personen/new"
       ></v-list-item>
+      <!--
       <v-list-item
         v-if="authStore.hasImportPermission"
         class="menu-bar-sub-item caption"
@@ -150,6 +151,7 @@
         :title="$t('admin.person.import')"
         to="/admin/personen/import"
       ></v-list-item>
+      -->
     </div>
 
     <!-- Klassenverwaltung -->
@@ -201,6 +203,7 @@
         to="/admin/rollen/new"
       ></v-list-item>
       <!-- Rollen-Mapping -->
+      <!--
       <v-list-item
         class="menu-bar-main-item headline-2"
         data-testid="rolle-mapping-item"
@@ -215,6 +218,7 @@
         :title="org.name"
         :to="`/admin/rolle/mapping/${org.name.toLowerCase()}?instance=${org.name}`"
       ></v-list-item>
+      -->
     </div>
 
     <!-- Schulverwaltung -->

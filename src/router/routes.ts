@@ -59,6 +59,7 @@ const routes: readonly RouteRecordRaw[] = [
       requiresPermission: ['personenverwaltung', 'personenanlegen'],
     },
   },
+  /*
   {
     path: '/admin/personen/import',
     name: 'person-import',
@@ -68,6 +69,7 @@ const routes: readonly RouteRecordRaw[] = [
       requiresPermission: 'personenimport',
     },
   },
+  */
   {
     path: '/admin/klassen',
     name: 'klasse-management',
@@ -176,6 +178,7 @@ const routes: readonly RouteRecordRaw[] = [
     name: 'no-second-factor',
     component: () => import('../views/NoSecondFactorView.vue'),
   },
+  /*
   {
     path: '/admin/rolle/mapping/:lms',
     name: 'rolle-mapping',
@@ -185,6 +188,7 @@ const routes: readonly RouteRecordRaw[] = [
       requiresPermission: 'rollenverwaltung',
     },
   },
+  */
   /*
   {
     path: '/admin/schultraeger',
