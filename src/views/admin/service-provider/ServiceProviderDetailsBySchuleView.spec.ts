@@ -4,7 +4,11 @@ import type { MockInstance } from 'vitest';
 import { nextTick, type Component, type ComponentPublicInstance } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 
-import type { RollenerweiterungWithExtendedDataResponse } from '@/api-client/generated';
+import {
+  RollenSystemRechtEnum,
+  type FeatureFlagResponse,
+  type RollenerweiterungWithExtendedDataResponse,
+} from '@/api-client/generated';
 import type { RollenerweiterungAssignErrorDialogProps } from '@/components/admin/service-provider/types';
 import routes from '@/router/routes';
 import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
@@ -17,16 +21,19 @@ import {
 } from '@/stores/ServiceProviderStore';
 import { DoFactory } from 'test/DoFactory';
 import ServiceProviderDetailsBySchuleView from './ServiceProviderDetailsBySchuleView.vue';
+import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore.js';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
 const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
 const authStore: AuthStore = useAuthStore();
 const rolleStore: RolleStore = useRolleStore();
+const configStore: ConfigStore = useConfigStore();
 
 const mockServiceProvider: ManageableServiceProviderDetail = DoFactory.getManageableServiceProviderDetail({
   kategorie: ServiceProviderKategorie.Hinweise,
   availableForRollenerweiterung: true,
+  relevantSystemrechte: [RollenSystemRechtEnum.AngeboteVerwalten, RollenSystemRechtEnum.RollenErweitern],
 });
 
 beforeEach(async () => {
@@ -42,7 +49,11 @@ beforeEach(async () => {
     routes,
   });
 
-  router.push({ path: '/', query: { orga: 'some-org-id' } });
+  router.push({
+    name: 'angebot-edit',
+    params: { id: mockServiceProvider.id },
+    query: { orga: 'some-org-id' },
+  });
   await router.isReady();
 
   wrapper = mount(ServiceProviderDetailsBySchuleView, {
@@ -66,6 +77,8 @@ beforeEach(async () => {
   serviceProviderStore.rollenerweiterungen = DoFactory.getRollenerweiterungenResponse(mockItems);
   serviceProviderStore.rollenerweiterungenUebersicht = DoFactory.buildRollenerweiterungenUebersicht(mockItems);
   authStore.hasRollenerweiternPermission = true;
+  configStore.configData = { schulischeAngeboteErstellen: true } as FeatureFlagResponse;
+
   rolleStore.allRollen = [
     DoFactory.getRolleWithServiceProviders({ rollenart: RollenArt.Lehr }),
     DoFactory.getRolleWithServiceProviders({ rollenart: RollenArt.Lern }),
@@ -113,6 +126,19 @@ describe('ServiceProviderDetailsBySchuleView', () => {
   });
 
   describe('ServiceProviderDetailsBySchuleView - Edit mode', () => {
+    test('navigates to service provider edit mode when bearbeiten button is clicked', async () => {
+      const push: MockInstance = vi.spyOn(router, 'push');
+
+      await nextTick();
+      await wrapper?.find('[data-testid="service-provider-bearbeiten-button"]').trigger('click');
+
+      expect(push).toHaveBeenCalledWith({
+        name: 'angebot-edit',
+        params: { id: mockServiceProvider.id },
+        query: { orga: 'some-org-id' },
+      });
+    });
+
     test('opens edit mode when bearbeiten button is clicked', async () => {
       await nextTick();
       expect(wrapper?.find('[data-testid="rollenerweiterung-bearbeiten-button"]').exists()).toBe(true);
