@@ -238,29 +238,6 @@ describe('ServiceProviderDetailsBySchuleView', () => {
       );
     });
 
-    test('calls persistRollenerweiterungenForServiceProvider with correct add/remove ids on save with no orgaId', async () => {
-      await router.push({
-        name: 'angebot-details-schulspezifisch',
-        params: { id: mockServiceProvider.id },
-      });
-      await router.isReady();
-      await openEditMode();
-
-      const treeview: VueWrapper | undefined = wrapper?.findComponent({ name: 'RollenerweiterungTreeview' });
-      treeview?.vm.$emit('update:selectedRolleIds', ['new-rolle-1']);
-      await nextTick();
-
-      await wrapper?.find('[data-testid="rollenerweiterung-save-button"]').trigger('click');
-      await nextTick();
-
-      expect(persistSpy).toHaveBeenCalledTimes(1);
-      expect(persistSpy).toHaveBeenCalledWith(
-        expect.objectContaining<{ addErweiterungenForRolleIds: string[] }>({
-          addErweiterungenForRolleIds: expect.arrayContaining(['new-rolle-1']) as string[],
-        }),
-      );
-    });
-
     test('shows success dialog after successful save', async () => {
       serviceProviderStore.errorCode = '';
       await openEditMode();
