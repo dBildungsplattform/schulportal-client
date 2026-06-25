@@ -590,7 +590,7 @@ describe('PersonManagementView', () => {
     });
   });
 
-  test.only('it shows loading spinner in schule filter dropdown', async () => {
+  test('it shows loading spinner in schule filter dropdown', async () => {
     organisationStore.organisationenFilters.set('person-management', {
       filterResult: [],
       total: 0,
