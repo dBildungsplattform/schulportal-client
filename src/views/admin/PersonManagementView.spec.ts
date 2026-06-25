@@ -626,6 +626,32 @@ describe('PersonManagementView', () => {
     expect(slotWrapper.findComponent({ name: 'v-progress-circular' }).exists()).toBe(true);
   });
 
+  test('it shows schule count in schule filter dropdown when not loading', async () => {
+    organisationStore.organisationenFilters.set('person-management', {
+      filterResult: [],
+      total: 5,
+      loading: false,
+    });
+    await nextTick();
+
+    const schulenFilter: VueWrapper | undefined = wrapper?.findComponent({ name: 'SchulenFilter' });
+    const prependItemSlot: Slot | undefined = schulenFilter?.getCurrentComponent()?.slots?.['prepend-item'];
+    expect(prependItemSlot).toBeDefined();
+
+    const slotVNodes: VNode[] | undefined = prependItemSlot?.();
+    const slotWrapper: VueWrapper | undefined = mount(
+      defineComponent({
+        render() {
+          return h('div', slotVNodes);
+        },
+      }),
+    );
+
+    expect(slotWrapper.findComponent({ name: 'v-progress-circular' }).exists()).toBe(false);
+    expect(slotWrapper.find('.filter-header').exists()).toBe(true);
+    expect(slotWrapper.find('.filter-header').text()).toContain('5');
+  });
+
   test('it shows the error dialog, when the selection is invalid', async () => {
     wrapper = mountComponent();
     // don't select schule and select a person without LERN-rolle
