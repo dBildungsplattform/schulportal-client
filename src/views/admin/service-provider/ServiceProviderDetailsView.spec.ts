@@ -73,7 +73,11 @@ beforeEach(async () => {
     routes,
   });
 
-  router.push('/');
+  router.push({
+    name: 'angebot-details',
+    params: { id: mockServiceProvider.id },
+    query: { orga: 'some-org-id' },
+  });
   await router.isReady();
 
   serviceProviderStore.$reset();
@@ -218,7 +222,7 @@ describe('ServiceProviderDetailsView', () => {
 
     expect(getRollenerweiterungenByIdSpy).toHaveBeenCalled();
     expect(getRollenerweiterungenByIdSpy).toHaveBeenLastCalledWith({
-      serviceProviderId: undefined,
+      serviceProviderId: mockServiceProvider.id,
       organisationIds: ['schule-1', 'schule-2'],
       rolleIds: undefined,
       offset: 0,
@@ -238,7 +242,7 @@ describe('ServiceProviderDetailsView', () => {
 
     expect(getRollenerweiterungenByIdSpy).toHaveBeenCalled();
     expect(getRollenerweiterungenByIdSpy).toHaveBeenLastCalledWith({
-      serviceProviderId: undefined,
+      serviceProviderId: mockServiceProvider.id,
       organisationIds: undefined,
       rolleIds: ['rolle-1'],
       offset: 0,
@@ -264,7 +268,7 @@ describe('ServiceProviderDetailsView', () => {
     await flushPromises();
 
     expect(getRollenerweiterungenByIdSpy).toHaveBeenLastCalledWith({
-      serviceProviderId: undefined,
+      serviceProviderId: mockServiceProvider.id,
       organisationIds: undefined,
       rolleIds: ['rolle-1'],
       offset: 0,
@@ -276,7 +280,7 @@ describe('ServiceProviderDetailsView', () => {
     await flushPromises();
 
     expect(getRollenerweiterungenByIdSpy).toHaveBeenLastCalledWith({
-      serviceProviderId: undefined,
+      serviceProviderId: mockServiceProvider.id,
       organisationIds: undefined,
       rolleIds: undefined,
       offset: 0,
@@ -295,7 +299,7 @@ describe('ServiceProviderDetailsView', () => {
     await flushPromises();
 
     expect(getRollenerweiterungenByIdSpy).toHaveBeenLastCalledWith({
-      serviceProviderId: undefined,
+      serviceProviderId: mockServiceProvider.id,
       organisationIds: undefined,
       rolleIds: undefined,
       offset: 0,
@@ -318,7 +322,6 @@ describe('ServiceProviderDetailsView', () => {
       .mockResolvedValue();
     await openRollenerweiterungenSection();
 
-    // Set both filters first
     const schulenFilter: VueWrapper | undefined = wrapper?.findComponent(SchulenFilter);
     const rollenFilter: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
     schulenFilter?.vm.$emit('update:selected-schulen', ['schule-1']);
@@ -333,7 +336,7 @@ describe('ServiceProviderDetailsView', () => {
     await flushPromises();
 
     expect(getRollenerweiterungenByIdSpy).toHaveBeenLastCalledWith({
-      serviceProviderId: undefined,
+      serviceProviderId: mockServiceProvider.id,
       organisationIds: undefined,
       rolleIds: undefined,
       offset: 0,
@@ -406,12 +409,15 @@ describe('ServiceProviderDetailsView', () => {
     const fetchRollenerweiterungenSpy: MockInstance = vi
       .spyOn(serviceProviderStore, 'getRollenerweiterungenById')
       .mockResolvedValue();
+    const getAllRollenSpy: MockInstance = vi.spyOn(rolleStore, 'getAllRollen').mockResolvedValue();
 
     await flushPromises();
     fetchRollenerweiterungenSpy.mockClear();
+    getAllRollenSpy.mockClear();
 
     wrapper = await mountComponent();
 
     expect(fetchRollenerweiterungenSpy).not.toHaveBeenCalled();
+    expect(getAllRollenSpy).not.toHaveBeenCalled();
   });
 });

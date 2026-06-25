@@ -502,7 +502,10 @@
                             <template #prepend-item>
                               <v-list-item>
                                 <v-progress-circular
-                                  v-if="organisationStore.loading"
+                                  v-if="
+                                    organisationStore.organisationenFilters.get('service-provider-management-by-schule')
+                                      ?.loading
+                                  "
                                   indeterminate
                                 />
                                 <span
