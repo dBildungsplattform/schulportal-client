@@ -107,6 +107,7 @@ export type RolleFilter = {
   searchString?: string;
   organisationId?: string;
   systemrecht?: RollenSystemRechtEnum;
+  rollenarten?: Array<RollenArt>;
 };
 
 export type RolleStore = Store<'rolleStore', RolleState, RolleGetters, RolleActions>;
@@ -168,6 +169,7 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
             filter.searchString,
             filter.organisationId,
             filter.systemrecht,
+            filter.rollenarten,
           );
         this.allRollen = response.data;
         this.totalRollen = +response.headers['x-paging-total'];

@@ -1149,7 +1149,7 @@
             "name": "systemrecht",
             "required": false,
             "in": "query",
-            "description": "The system right for which the roles should be available. Can only be ROLLEN_VERWALTEN or ROLLEN_ERWEITERN.",
+            "description": "The system right for which the roles should be available. Can only be ROLLEN_VERWALTEN, ROLLEN_ERWEITERN or IMPORT_DURCHFUEHREN.",
             "schema": { "$ref": "#/components/schemas/RollenSystemRechtEnum" }
           },
           {
@@ -1502,7 +1502,7 @@
               "application/json": { "schema": { "$ref": "#/components/schemas/CreateServiceProviderResponse" } }
             }
           },
-          "400": { "description": "Invalid request body." },
+          "400": { "description": "Invalid request body or VIDIS-linked service-provider." },
           "401": { "description": "Not authorized." },
           "403": { "description": "Insufficient permissions." },
           "500": { "description": "Internal server error." }
@@ -1781,6 +1781,7 @@
         ],
         "responses": {
           "204": { "description": "The service-provider was successfully deleted." },
+          "400": { "description": "The service-provider is linked to VIDIS and cannot be deleted." },
           "401": { "description": "Not authorized." },
           "403": { "description": "Insufficient permissions." },
           "404": { "description": "The service-provider does not exist." },
@@ -2827,10 +2828,26 @@
         "tags": ["person-info"]
       }
     },
+    "/api/v2/person-info": {
+      "get": {
+        "operationId": "personInfoControllerInfoV2",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Returns info about the person.",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PersonInfoResponseV1" } } }
+          },
+          "401": { "description": "person is not logged in." }
+        },
+        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }],
+        "summary": "Info about logged in person with intern role types.",
+        "tags": ["person-info"]
+      }
+    },
     "/api/personen-info": {
       "get": {
         "description": "liefert Personeninformationen basierend auf den Berechtigungen auf Service Provider des aufrufenden Nutzers.",
-        "operationId": "PersonenInfoController_infoV1",
+        "operationId": "personenInfoControllerInfoV1",
         "parameters": [
           {
             "name": "x-offset",
@@ -2858,6 +2875,38 @@
         "summary": "liefert Personeninformationen basierend auf den Berechtigungen auf Service Provider des aufrufenden Nutzers.",
         "tags": ["personen-info"]
       }
+    },
+    "/api/v2/personen-info": {
+      "get": {
+        "description": "liefert Personeninformationen basierend auf den Berechtigungen auf Service Provider des aufrufenden Nutzers mit internen Rollentypen.",
+        "operationId": "personenInfoControllerInfoV2",
+        "parameters": [
+          {
+            "name": "x-offset",
+            "required": false,
+            "in": "query",
+            "description": "Offset für die Ergebnisse",
+            "schema": { "type": "integer" }
+          },
+          {
+            "name": "x-limit",
+            "required": false,
+            "in": "query",
+            "description": "Maximale Anzahl der Ergebnisse",
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste von Personeninformationen",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PersonInfoResponseV1" } } }
+          },
+          "401": { "description": "person is not logged in." }
+        },
+        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }],
+        "summary": "liefert Personeninformationen basierend auf den Berechtigungen auf Service Provider des aufrufenden Nutzers mit internen Rollentypen.",
+        "tags": ["personen-info"]
+      }
     }
   },
   "info": {
@@ -2874,9 +2923,9 @@
         "type": "oauth2",
         "flows": {
           "authorizationCode": {
-            "authorizationUrl": "https://spsh-3773-keycloak.dev.spsh.dbildungsplattform.de/realms/SPSH/protocol/openid-connect/auth",
-            "tokenUrl": "https://spsh-3773-keycloak.dev.spsh.dbildungsplattform.de/realms/SPSH/protocol/openid-connect/token",
-            "refreshUrl": "https://spsh-3773-keycloak.dev.spsh.dbildungsplattform.de/realms/SPSH/protocol/openid-connect/token",
+            "authorizationUrl": "http://localhost:8080/realms/SPSH/protocol/openid-connect/auth",
+            "tokenUrl": "http://localhost:8080/realms/SPSH/protocol/openid-connect/token",
+            "refreshUrl": "http://localhost:8080/realms/SPSH/protocol/openid-connect/token",
             "scopes": {}
           }
         }
@@ -3332,7 +3381,10 @@
       },
       "ScopeOrder": { "type": "string", "enum": ["asc", "desc"] },
       "SortFieldPerson": { "type": "string", "enum": ["familienname", "vorname", "personalnummer", "username"] },
-      "RollenArt": { "type": "string", "enum": ["LERN", "LEHR", "EXTERN", "ORGADMIN", "LEIT", "SYSADMIN"] },
+      "RollenArt": {
+        "type": "string",
+        "enum": ["LERN", "LEHR", "EXTERN", "ORGADMIN", "LEIT", "SYSADMIN", "SORGBER", "SCHB", "NLEHR"]
+      },
       "RollenMerkmal": { "type": "string", "enum": ["BEFRISTUNG_PFLICHT", "KOPERS_PFLICHT"] },
       "DBiamPersonenzuordnungResponse": {
         "type": "object",
@@ -3808,6 +3860,7 @@
           "administrationsebene": { "$ref": "#/components/schemas/OrganisationRefResponse" },
           "kategorie": { "allOf": [{ "$ref": "#/components/schemas/ServiceProviderKategorie" }] },
           "requires2fa": { "type": "boolean" },
+          "vidisAngebotId": { "type": "string" },
           "merkmale": { "type": "array", "items": { "$ref": "#/components/schemas/ServiceProviderMerkmal" } },
           "rollenerweiterungen": {
             "type": "array",
@@ -3837,6 +3890,7 @@
           "kategorie": { "allOf": [{ "$ref": "#/components/schemas/ServiceProviderKategorie" }] },
           "logoId": { "type": "number", "description": "Optional logoId for use with standard logos" },
           "requires2fa": { "type": "boolean" },
+          "vidisAngebotId": { "type": "string" },
           "merkmale": { "type": "array", "items": { "$ref": "#/components/schemas/ServiceProviderMerkmal" } },
           "url": { "type": "string", "description": "Can be undefined, if `target` is not equal to `URL`" },
           "hasRollenerweiterung": { "type": "boolean" },

@@ -3,6 +3,7 @@
   import { useI18n, type Composer } from 'vue-i18n';
 
   import SpshAlert from '@/components/alert/SpshAlert.vue';
+  import VidisInfoDialog from '@/components/admin/service-provider/VidisInfoDialog.vue';
   import type { RollenerweiterungForManageableServiceProviderResponse } from '@/api-client/generated';
   import ResultTable, { type Headers, type TableRow } from '@/components/admin/ResultTable.vue';
   import ServiceProviderDelete from '@/components/admin/service-provider/ServiceProviderDelete.vue';
@@ -35,6 +36,7 @@
     administrationsebene: string;
     rollenerweiterungen: string;
     isDeleteAuthorized: boolean;
+    isVidisAngebot: boolean;
   };
 
   const selectedOrganisationId: Ref<string> = ref('');
@@ -56,6 +58,7 @@
   const cachedServiceProviderId: Ref<string | null> = ref(null);
   const serviceProviderToDelete: Ref<ServiceProviderRow | null> = ref(null);
   const isDeleteDialogOpen: Ref<boolean> = ref(false);
+  const isVidisInfoDialogOpen: Ref<boolean, boolean> = ref(false);
 
   const headers: Headers = [
     { title: t('angebot.kategorie'), key: 'kategorie', align: 'start' },
@@ -86,6 +89,7 @@
                   .join(', ')
               : '---',
           isDeleteAuthorized: sp.hasSomeVerwaltenPermission,
+          isVidisAngebot: Boolean(sp.vidisAngebotId),
         };
       },
     );
@@ -330,6 +334,10 @@
             @click.stop="
               () => {
                 serviceProviderToDelete = item;
+                if (item.isVidisAngebot) {
+                  isVidisInfoDialogOpen = true;
+                  return;
+                }
                 isDeleteDialogOpen = true;
               }
             "
@@ -353,6 +361,12 @@
         :service-provider-name="serviceProviderToDelete.name"
         @on-delete-service-provider="onDeleteServiceProvider"
         @on-close="onCloseDeleteDialogWrapper"
+      />
+      <VidisInfoDialog
+        :header="t('admin.angebot.delete.title')"
+        :text="t('angebot.vidisDeleteInfoText', { name: serviceProviderToDelete?.name ?? '' })"
+        v-model="isVidisInfoDialogOpen"
+        @after-leave="serviceProviderToDelete = null"
       />
     </template>
   </LayoutCard>

@@ -4,10 +4,11 @@ import type { MockInstance } from 'vitest';
 import { nextTick, type Component, type ComponentPublicInstance } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 
-import type { RollenerweiterungWithExtendedDataResponse } from '@/api-client/generated';
+import { RollenSystemRechtEnum, type RollenerweiterungWithExtendedDataResponse } from '@/api-client/generated';
 import type { RollenerweiterungAssignErrorDialogProps } from '@/components/admin/service-provider/types';
 import routes from '@/router/routes';
 import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
 import { RollenArt, useRolleStore, type RolleStore } from '@/stores/RolleStore';
 import {
   ServiceProviderKategorie,
@@ -23,6 +24,7 @@ let router: Router;
 const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
 const authStore: AuthStore = useAuthStore();
 const rolleStore: RolleStore = useRolleStore();
+const configStore: ConfigStore = useConfigStore();
 
 const mockServiceProvider: ManageableServiceProviderDetail = DoFactory.getManageableServiceProviderDetail({
   kategorie: ServiceProviderKategorie.Hinweise,
@@ -65,6 +67,13 @@ beforeEach(async () => {
   );
   serviceProviderStore.rollenerweiterungen = DoFactory.getRollenerweiterungenResponse(mockItems);
   serviceProviderStore.rollenerweiterungenUebersicht = DoFactory.buildRollenerweiterungenUebersicht(mockItems);
+  configStore.configData = {
+    befristungBearbeitenEnabled: true,
+    rolleBearbeitenEnabled: true,
+    rolleErweiternEnabled: true,
+    setUemPasswordEnabled: true,
+    schulischeAngeboteErstellen: true,
+  };
   authStore.hasRollenerweiternPermission = true;
   rolleStore.allRollen = [
     DoFactory.getRolleWithServiceProviders({ rollenart: RollenArt.Lehr }),
@@ -110,6 +119,45 @@ describe('ServiceProviderDetailsBySchuleView', () => {
     await wrapper?.find('[data-testid$="alert-button"]').trigger('click');
 
     expect(push).toHaveBeenCalledTimes(1);
+  });
+
+  test('it opens vidis dialog with service provider name and closes it on ok click', async () => {
+    serviceProviderStore.currentServiceProvider = DoFactory.getManageableServiceProviderDetail({
+      id: mockServiceProvider.id,
+      vidisAngebotId: 'vidis-angebot-1',
+      relevantSystemrechte: [RollenSystemRechtEnum.AngeboteVerwalten],
+    });
+    await nextTick();
+
+    await wrapper?.find('[data-testid="service-provider-bearbeiten-button"]').trigger('click');
+
+    await vi.waitFor(() => {
+      const dialogHeadlineInActiveOverlay: HTMLElement | null = document.body.querySelector(
+        '.v-overlay--active [data-testid="vidis-info-dialog-headline"]',
+      );
+      expect(dialogHeadlineInActiveOverlay).toBeTruthy();
+    });
+
+    await vi.waitFor(() => {
+      const dialogTextInActiveOverlay: HTMLElement | null = document.body.querySelector(
+        '.v-overlay--active [data-testid="vidis-info-dialog-text"]',
+      );
+      expect(dialogTextInActiveOverlay).toBeTruthy();
+      expect(dialogTextInActiveOverlay?.textContent).toContain(serviceProviderStore.currentServiceProvider!.name);
+    });
+
+    const closeButton: HTMLElement | null = document.body.querySelector(
+      '.v-overlay--active [data-testid="close-vidis-info-dialog-button"]',
+    );
+    expect(closeButton).toBeTruthy();
+    closeButton?.click();
+
+    await vi.waitFor(() => {
+      const dialogHeadlineInActiveOverlay: HTMLElement | null = document.body.querySelector(
+        '.v-overlay--active [data-testid="vidis-info-dialog-headline"]',
+      );
+      expect(dialogHeadlineInActiveOverlay).toBeNull();
+    });
   });
 
   describe('ServiceProviderDetailsBySchuleView - Edit mode', () => {

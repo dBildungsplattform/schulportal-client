@@ -5,6 +5,7 @@
 
   import ResultTable, { type Headers, type TableRow } from '@/components/admin/ResultTable.vue';
   import ServiceProviderDelete from '@/components/admin/service-provider/ServiceProviderDelete.vue';
+  import VidisInfoDialog from '@/components/admin/service-provider/VidisInfoDialog.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
@@ -23,6 +24,7 @@
     rollen: string;
     hasRollenerweiterung: string;
     isDeleteAuthorized: boolean;
+    isVidisAngebot: boolean;
   };
 
   const router: Router = useRouter();
@@ -35,6 +37,7 @@
 
   const serviceProviderToDelete: Ref<ServiceProviderRow | null> = ref(null);
   const isDeleteDialogOpen: Ref<boolean, boolean> = ref(false);
+  const isVidisInfoDialogOpen: Ref<boolean, boolean> = ref(false);
 
   const errorTitle: ComputedRef<string> = computed(() => {
     if (!serviceProviderStore.errorCode) {
@@ -121,6 +124,7 @@
             : '---',
         hasRollenerweiterung: sp.rollenerweiterungen && sp.rollenerweiterungen.length > 0 ? t('yes') : t('no'),
         isDeleteAuthorized: sp.hasSomeVerwaltenPermission,
+        isVidisAngebot: Boolean(sp.vidisAngebotId),
       };
     });
   });
@@ -186,6 +190,10 @@
           @click.stop="
             () => {
               serviceProviderToDelete = item;
+              if (item.isVidisAngebot) {
+                isVidisInfoDialogOpen = true;
+                return;
+              }
               isDeleteDialogOpen = true;
             }
           "
@@ -201,6 +209,12 @@
       :service-provider-name="serviceProviderToDelete.name"
       @on-delete-service-provider="onDelete"
       @on-close="onCloseDeleteDialogWrapper"
+    />
+    <VidisInfoDialog
+      :header="t('admin.angebot.delete.title')"
+      :text="t('angebot.vidisDeleteInfoText', { name: serviceProviderToDelete?.name ?? '' })"
+      v-model="isVidisInfoDialogOpen"
+      @after-leave="serviceProviderToDelete = null"
     />
   </LayoutCard>
 </template>
