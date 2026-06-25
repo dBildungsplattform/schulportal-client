@@ -255,7 +255,7 @@
       isEditingRollenerweiterungen.value = false;
       await serviceProviderStore.getRollenerweiterungenById({
         serviceProviderId: currentServiceProviderId,
-        organisationIds: organisationIdFromQuery.value ? [organisationIdFromQuery.value] : [],
+        organisationIds: [organisationIdFromQuery.value!],
       });
     }
   }
