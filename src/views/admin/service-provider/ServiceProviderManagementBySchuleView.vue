@@ -4,6 +4,7 @@
 
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import VidisInfoDialog from '@/components/admin/service-provider/VidisInfoDialog.vue';
+  import VidisSyncDialog from '@/components/admin/service-provider/VidisSyncDialog.vue';
   import type { RollenerweiterungForManageableServiceProviderResponse } from '@/api-client/generated';
   import ResultTable, { type Headers, type TableRow } from '@/components/admin/ResultTable.vue';
   import ServiceProviderDelete from '@/components/admin/service-provider/ServiceProviderDelete.vue';
@@ -28,6 +29,8 @@
     type RouteLocationNormalizedLoaded,
     type Router,
   } from 'vue-router';
+  import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+  import SpshTooltip from '@/components/admin/SpshTooltip.vue';
 
   type ServiceProviderRow = {
     id: string;
@@ -48,6 +51,7 @@
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
+  const authStore: AuthStore = useAuthStore();
 
   const {
     hasAutoselectedSchule,
@@ -59,6 +63,8 @@
   const serviceProviderToDelete: Ref<ServiceProviderRow | null> = ref(null);
   const isDeleteDialogOpen: Ref<boolean> = ref(false);
   const isVidisInfoDialogOpen: Ref<boolean, boolean> = ref(false);
+  const isVidisSyncDialogOpen: Ref<boolean> = ref(false);
+  const isVidisSyncing: Ref<boolean> = ref(false);
 
   const headers: Headers = [
     { title: t('angebot.kategorie'), key: 'kategorie', align: 'start' },
@@ -101,6 +107,8 @@
     }
     return t(`admin.angebot.title.${serviceProviderStore.errorCode}`);
   });
+
+  const isVidisApiError: ComputedRef<boolean> = computed(() => serviceProviderStore.errorCode === 'VIDIS_API_ERROR');
 
   const errorText: ComputedRef<string> = computed(() => {
     if (!serviceProviderStore.errorCode) {
@@ -199,6 +207,24 @@
 
     serviceProviderToDelete.value = null;
   }
+  async function onSyncVidis(): Promise<void> {
+    serviceProviderStore.errorCode = '';
+    isVidisSyncing.value = true;
+    try {
+      await serviceProviderStore.syncServiceProvidersForSchule(selectedOrganisationId.value);
+      if (!serviceProviderStore.errorCode) {
+        await reloadData();
+      }
+    } finally {
+      isVidisSyncing.value = false;
+    }
+  }
+
+  function onCloseSyncDialog(): void {
+    isVidisSyncDialogOpen.value = false;
+    serviceProviderStore.errorCode = '';
+  }
+
   onBeforeRouteLeave(() => {
     serviceProviderStore.errorCode = '';
     organisationStore.errorCode = '';
@@ -227,13 +253,13 @@
       :button-text="t('nav.backToList')"
       :closable="false"
       data-test-id-prefix="service-provider-management-by-schule-error"
-      :model-value="!!serviceProviderStore.errorCode"
+      :model-value="!!serviceProviderStore.errorCode && !isVidisApiError"
       :show-button="true"
       :text="errorText"
       :title="errorTitle"
       :type="'error'"
     />
-    <template v-if="!serviceProviderStore.errorCode">
+    <template v-if="!serviceProviderStore.errorCode || isVidisApiError">
       <v-row
         align="start"
         class="ma-3"
@@ -297,6 +323,27 @@
               </v-list-item>
             </template>
           </SchulenFilter>
+        </v-col>
+        <v-col
+          v-if="authStore.hasVidisPermission"
+          cols="12"
+          md="auto"
+          class="py-md-0 ml-auto"
+          align-self="center"
+        >
+          <SpshTooltip
+            :disabled-text="$t('angebot.chooseSchuleFirst')"
+            :enabled-condition="!!selectedOrganisationId"
+          >
+            <v-btn
+              class="primary"
+              data-testid="open-vidis-sync-dialog-button"
+              :disabled="!selectedOrganisationId"
+              @click="isVidisSyncDialogOpen = true"
+            >
+              {{ $t('admin.angebot.vidisSync.buttonLabel') }}
+            </v-btn>
+          </SpshTooltip>
         </v-col>
       </v-row>
       <ResultTable
@@ -367,6 +414,14 @@
         :text="t('angebot.vidisDeleteInfoText', { name: serviceProviderToDelete?.name ?? '' })"
         v-model="isVidisInfoDialogOpen"
         @after-leave="serviceProviderToDelete = null"
+      />
+      <VidisSyncDialog
+        v-model="isVidisSyncDialogOpen"
+        :error-code="serviceProviderStore.errorCode"
+        :is-loading="isVidisSyncing"
+        :schule-name="organisationStore.currentOrganisation?.name ?? ''"
+        @on-sync-vidis="onSyncVidis"
+        @on-close="onCloseSyncDialog"
       />
     </template>
   </LayoutCard>

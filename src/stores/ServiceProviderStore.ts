@@ -10,6 +10,7 @@ import {
   RolleApiFactory,
   ServiceProviderKategorie,
   ServiceProviderMerkmal,
+  VidisApiFactory,
   type ApplyRollenerweiterungBodyParams,
   type CreateServiceProviderBodyParams,
   type CreateServiceProviderResponse,
@@ -23,11 +24,13 @@ import {
   type RollenerweiterungForManageableServiceProviderResponse,
   type ServiceProviderResponse,
   type UpdateServiceProviderBodyParams,
+  type VidisApiInterface,
 } from '../api-client/generated/api';
 import type { RollenSystemRecht } from './RolleStore';
 
 const serviceProviderApi: ProviderApiInterface = ProviderApiFactory(undefined, '', axiosApiInstance);
 const rolleApi: RolleApiInterface = RolleApiFactory(undefined, '', axiosApiInstance);
+const vidisApi: VidisApiInterface = VidisApiFactory(undefined, '', axiosApiInstance);
 
 export type BaseServiceProvider = {
   id: string;
@@ -184,6 +187,7 @@ type ServiceProviderActions = {
   createServiceProvider: (filter: ServiceProviderCreationFilter) => Promise<void>;
   updateServiceProvider: (id: string, value: Partial<ServiceProviderFormSubmitData>) => Promise<void>;
   deleteServiceProvider: (id: string) => Promise<void>;
+  syncServiceProvidersForSchule: (id: string) => Promise<void>;
 };
 
 export { ServiceProviderKategorie };
@@ -471,6 +475,16 @@ export const useServiceProviderStore: StoreDefinition<
       this.loading = true;
       try {
         await serviceProviderApi.providerControllerDeleteServiceProvider(id);
+      } catch (error) {
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+      } finally {
+        this.loading = false;
+      }
+    },
+    async syncServiceProvidersForSchule(id: string): Promise<void> {
+      this.loading = true;
+      try {
+        await vidisApi.vidisControllerSyncAngeboteForSchool(id);
       } catch (error) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
