@@ -382,7 +382,9 @@ describe('ServiceProviderManagementBySchuleView', () => {
 
       vi.spyOn(serviceProviderStore, 'syncServiceProvidersForSchule').mockImplementation(() => {
         serviceProviderStore.errorCode = 'VIDIS_API_ERROR';
+        return Promise.resolve();
       });
+
       const reloadSpy: Mock<ServiceProviderStore['getManageableServiceProvidersForOrganisation']> = vi
         .spyOn(serviceProviderStore, 'getManageableServiceProvidersForOrganisation')
         .mockResolvedValue();
