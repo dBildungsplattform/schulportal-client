@@ -131,6 +131,21 @@
         />
       </template>
     </v-list-item>
+    <v-list-item
+      class="menu-bar-main-item caption"
+      data-testid="chat-nutzen-link"
+      :title="$t('nav.chatNutzen')"
+      href="https://llmoin.dataport.de/"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <template #prepend>
+        <v-icon
+          icon="mdi-robot-outline"
+          size="x-large"
+        />
+      </template>
+    </v-list-item>
     <v-divider />
     <v-divider />
 
