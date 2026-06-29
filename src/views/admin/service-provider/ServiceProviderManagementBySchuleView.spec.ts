@@ -425,7 +425,10 @@ describe('ServiceProviderManagementBySchuleView', () => {
       serviceProviderStore.errorCode = 'VIDIS_API_ERROR';
       await nextTick();
 
-      wrapper.findComponent({ name: 'VidisSyncDialog' })?.vm.$emit('onClose', false);
+      const dialog: VueWrapper | undefined = wrapper.findComponent({ name: 'VidisSyncDialog' });
+      if (dialog.exists()) {
+        dialog.vm.$emit('onClose', false);
+      }
       await nextTick();
 
       expect(serviceProviderStore.errorCode).toBe('');
