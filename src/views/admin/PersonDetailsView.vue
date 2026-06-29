@@ -1841,7 +1841,7 @@
                   >
                     <v-btn
                       :disabled="isEditActive"
-                      class="primary ml-lg-8"
+                      class="primary ml-lg-4 mr-2"
                       data-testid="metadata-edit-button"
                       :block="mdAndDown"
                       @click="triggerPersonMetadataEdit"
@@ -1951,7 +1951,7 @@
                     icon="mdi-help-circle-outline"
                     color="primary"
                   />
-                  <span class="text-primary mr-2">{{ t('nav.help') }}</span>
+                  <span class="text-primary">{{ t('nav.help') }}</span>
                 </a>
                 <PasswordReset
                   ref="password-reset"
@@ -2061,7 +2061,7 @@
                     position="start"
                   >
                     <v-btn
-                      class="primary ml-lg-8"
+                      class="primary ml-lg-4 mr-2"
                       data-testid="zuordnung-edit-button"
                       :disabled="isEditPersonMetadataActive"
                       :block="mdAndDown"
@@ -2720,6 +2720,18 @@
                       sm="6"
                       md="auto"
                     >
+                      <a
+                        href="https://medienberatung.iqsh.de/faq-administration-schulportal-sh.html#faq-adm-pwd"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="d-flex align-center gap-1 mr-4 text-decoration-none"
+                      >
+                        <v-icon
+                          icon="mdi-help-circle-outline"
+                          color="primary"
+                        />
+                        <span class="text-primary">{{ t('nav.help') }}</span>
+                      </a>
                       <SpshTooltip
                         :enabled-condition="!isEditActive && !isEditPersonMetadataActive"
                         :disabled-text="t('person.finishEditFirst')"
