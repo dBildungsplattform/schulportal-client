@@ -4,7 +4,11 @@ import type { MockInstance } from 'vitest';
 import { nextTick, type Component, type ComponentPublicInstance } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 
-import { RollenSystemRechtEnum, type RollenerweiterungWithExtendedDataResponse } from '@/api-client/generated';
+import {
+  RollenSystemRechtEnum,
+  type FeatureFlagResponse,
+  type RollenerweiterungWithExtendedDataResponse,
+} from '@/api-client/generated';
 import type { RollenerweiterungAssignErrorDialogProps } from '@/components/admin/service-provider/types';
 import routes from '@/router/routes';
 import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
@@ -29,6 +33,7 @@ const configStore: ConfigStore = useConfigStore();
 const mockServiceProvider: ManageableServiceProviderDetail = DoFactory.getManageableServiceProviderDetail({
   kategorie: ServiceProviderKategorie.Hinweise,
   availableForRollenerweiterung: true,
+  relevantSystemrechte: [RollenSystemRechtEnum.AngeboteVerwalten, RollenSystemRechtEnum.RollenErweitern],
 });
 
 beforeEach(async () => {
@@ -44,7 +49,11 @@ beforeEach(async () => {
     routes,
   });
 
-  router.push({ path: '/', query: { orga: 'some-org-id' } });
+  router.push({
+    name: 'angebot-details-schulspezifisch',
+    params: { id: mockServiceProvider.id },
+    query: { orga: 'some-org-id' },
+  });
   await router.isReady();
 
   wrapper = mount(ServiceProviderDetailsBySchuleView, {
@@ -75,6 +84,8 @@ beforeEach(async () => {
     schulischeAngeboteErstellen: true,
   };
   authStore.hasRollenerweiternPermission = true;
+  configStore.configData = { schulischeAngeboteErstellen: true } as FeatureFlagResponse;
+
   rolleStore.allRollen = [
     DoFactory.getRolleWithServiceProviders({ rollenart: RollenArt.Lehr }),
     DoFactory.getRolleWithServiceProviders({ rollenart: RollenArt.Lern }),
@@ -161,6 +172,44 @@ describe('ServiceProviderDetailsBySchuleView', () => {
   });
 
   describe('ServiceProviderDetailsBySchuleView - Edit mode', () => {
+    test('navigates to service provider edit mode when bearbeiten button is clicked', async () => {
+      const push: MockInstance = vi.spyOn(router, 'push');
+
+      await nextTick();
+      await wrapper?.find('[data-testid="service-provider-bearbeiten-button"]').trigger('click');
+
+      expect(push).toHaveBeenCalledWith({
+        name: 'angebot-edit',
+        params: { id: mockServiceProvider.id },
+        query: { orga: 'some-org-id' },
+      });
+    });
+
+    test('navigates to service provider edit mode when bearbeiten button is clicked with no orgaId', async () => {
+      await router.push({
+        name: 'angebot-details-schulspezifisch',
+        params: { id: mockServiceProvider.id },
+      });
+      await router.isReady();
+
+      wrapper = mount(ServiceProviderDetailsBySchuleView, {
+        attachTo: document.getElementById('app') || '',
+        global: {
+          plugins: [router],
+        },
+      });
+      serviceProviderStore.currentServiceProvider = mockServiceProvider;
+
+      const push: MockInstance = vi.spyOn(router, 'push');
+      await wrapper.find('[data-testid="service-provider-bearbeiten-button"]').trigger('click');
+
+      expect(push).toHaveBeenCalledWith({
+        name: 'angebot-edit',
+        params: { id: mockServiceProvider.id },
+        query: undefined,
+      });
+    });
+
     test('opens edit mode when bearbeiten button is clicked', async () => {
       await nextTick();
       expect(wrapper?.find('[data-testid="rollenerweiterung-bearbeiten-button"]').exists()).toBe(true);

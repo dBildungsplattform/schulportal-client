@@ -194,7 +194,7 @@
     if (organisationIdFromQuery.value) {
       await rolleStore.getAllRollen({
         organisationId: organisationIdFromQuery.value,
-        systemrecht: RollenSystemRechtEnum.RollenErweitern,
+        systemrechte: [RollenSystemRechtEnum.RollenErweitern],
       });
     }
     selectedRolleIds.value = [...existingRolleIds.value];
@@ -250,7 +250,7 @@
       // Refresh rollenerweiterungen to reflect saved state
       await serviceProviderStore.getRollenerweiterungenById({
         serviceProviderId: currentServiceProviderId,
-        organisationId: organisationIdFromQuery.value,
+        organisationIds: [organisationIdFromQuery.value],
       });
       saveSuccessDialogVisible.value = true;
     } else if (serviceProviderStore.errors.size > 0) {
@@ -265,7 +265,7 @@
       isEditingRollenerweiterungen.value = false;
       await serviceProviderStore.getRollenerweiterungenById({
         serviceProviderId: currentServiceProviderId,
-        organisationId: organisationIdFromQuery.value,
+        organisationIds: [organisationIdFromQuery.value!],
       });
     }
   }
@@ -291,7 +291,7 @@
       serviceProviderStore.getServiceProviderLogoById(currentServiceProviderId),
       serviceProviderStore.getRollenerweiterungenById({
         serviceProviderId: currentServiceProviderId,
-        organisationId: organisationIdFromQuery.value,
+        organisationIds: organisationIdFromQuery.value ? [organisationIdFromQuery.value] : [],
       }),
     ]);
 

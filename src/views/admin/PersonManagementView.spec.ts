@@ -18,7 +18,16 @@ import { DOMWrapper, VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import type WrapperLike from 'node_modules/@vue/test-utils/dist/interfaces/wrapperLike';
 import { DoFactory } from 'test/DoFactory';
 import { expect, test, type Mock, type MockInstance } from 'vitest';
-import { nextTick, type Component, type ComputedRef, type DefineComponent } from 'vue';
+import {
+  defineComponent,
+  h,
+  nextTick,
+  type Component,
+  type ComputedRef,
+  type DefineComponent,
+  type Slot,
+  type VNode,
+} from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import PersonManagementView from './PersonManagementView.vue';
 import { OperationType } from '@/stores/types/bulkOperationTypes';
@@ -588,6 +597,59 @@ describe('PersonManagementView', () => {
     (benutzerEditSelect.props() as { items: { value: string }[] })['items'].forEach((item: { value: string }) => {
       expect(item.value).not.toBe(operationType);
     });
+  });
+
+  test('it shows loading spinner in schule filter dropdown', async () => {
+    organisationStore.organisationenFilters.set('person-management', {
+      filterResult: [],
+      total: 0,
+      loading: true,
+    });
+    await nextTick();
+
+    const schulenFilter: VueWrapper | undefined = wrapper?.findComponent({ name: 'SchulenFilter' });
+
+    // Den Slot-Inhalt direkt aus SchulenFilter rendern
+    const prependItemSlot: Slot | undefined = schulenFilter?.getCurrentComponent()?.slots?.['prepend-item'];
+    expect(prependItemSlot).toBeDefined();
+
+    // Slot aufrufen und rendern
+    const slotVNodes: VNode[] | undefined = prependItemSlot?.();
+    const slotWrapper: VueWrapper | undefined = mount(
+      defineComponent({
+        render() {
+          return h('div', slotVNodes);
+        },
+      }),
+    );
+
+    expect(slotWrapper.findComponent({ name: 'v-progress-circular' }).exists()).toBe(true);
+  });
+
+  test('it shows schule count in schule filter dropdown when not loading', async () => {
+    organisationStore.organisationenFilters.set('person-management', {
+      filterResult: [],
+      total: 5,
+      loading: false,
+    });
+    await nextTick();
+
+    const schulenFilter: VueWrapper | undefined = wrapper?.findComponent({ name: 'SchulenFilter' });
+    const prependItemSlot: Slot | undefined = schulenFilter?.getCurrentComponent()?.slots?.['prepend-item'];
+    expect(prependItemSlot).toBeDefined();
+
+    const slotVNodes: VNode[] | undefined = prependItemSlot?.();
+    const slotWrapper: VueWrapper | undefined = mount(
+      defineComponent({
+        render() {
+          return h('div', slotVNodes);
+        },
+      }),
+    );
+
+    expect(slotWrapper.findComponent({ name: 'v-progress-circular' }).exists()).toBe(false);
+    expect(slotWrapper.find('.filter-header').exists()).toBe(true);
+    expect(slotWrapper.find('.filter-header').text()).toContain('5');
   });
 
   test('it shows the error dialog, when the selection is invalid', async () => {
