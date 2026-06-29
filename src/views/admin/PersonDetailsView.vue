@@ -1820,29 +1820,35 @@
                 cols="12"
                 md="auto"
               >
-                <div class="d-flex justify-sm-end">
-                  <v-col
-                    cols="12"
-                    sm="6"
-                    md="auto"
+                <div class="d-flex justify-sm-end align-center">
+                  <a
+                    href="https://medienberatung.iqsh.de/faq-administration-schulportal-sh.html#faq-adm-user"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="d-flex align-center gap-1 mr-4 text-decoration-none"
                   >
-                    <SpshTooltip
-                      :enabled-condition="!isEditActive"
-                      :disabled-text="t('person.finishEditFirst')"
-                      :enabled-text="t('admin.person.editPersonalInfo')"
-                      position="start"
+                    <v-icon
+                      icon="mdi-help-circle-outline"
+                      color="primary"
+                    />
+                    <span class="text-primary">{{ t('nav.help') }}</span>
+                  </a>
+                  <SpshTooltip
+                    :enabled-condition="!isEditActive"
+                    :disabled-text="t('person.finishEditFirst')"
+                    :enabled-text="t('admin.person.editPersonalInfo')"
+                    position="start"
+                  >
+                    <v-btn
+                      :disabled="isEditActive"
+                      class="primary ml-lg-8"
+                      data-testid="metadata-edit-button"
+                      :block="mdAndDown"
+                      @click="triggerPersonMetadataEdit"
                     >
-                      <v-btn
-                        :disabled="isEditActive"
-                        class="primary ml-lg-8"
-                        data-testid="metadata-edit-button"
-                        :block="mdAndDown"
-                        @click="triggerPersonMetadataEdit"
-                      >
-                        {{ t('edit') }}
-                      </v-btn>
-                    </SpshTooltip>
-                  </v-col>
+                      {{ t('edit') }}
+                    </v-btn>
+                  </SpshTooltip>
                 </div>
               </v-col>
             </v-row>
@@ -1934,7 +1940,19 @@
               cols="12"
               md="auto"
             >
-              <div class="d-flex justify-sm-end">
+              <div class="d-flex justify-sm-end align-center">
+                <a
+                  href="https://medienberatung.iqsh.de/faq-administration-schulportal-sh.html#faq-adm-pwd"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="d-flex align-center gap-1 mr-4 text-decoration-none"
+                >
+                  <v-icon
+                    icon="mdi-help-circle-outline"
+                    color="primary"
+                  />
+                  <span class="text-primary mr-2">{{ t('nav.help') }}</span>
+                </a>
                 <PasswordReset
                   ref="password-reset"
                   :button-text="t('admin.person.changePassword')"
@@ -2023,29 +2041,35 @@
                 cols="12"
                 md="auto"
               >
-                <div class="d-flex justify-sm-end">
-                  <v-col
-                    cols="12"
-                    sm="6"
-                    md="auto"
+                <div class="d-flex justify-sm-end align-center">
+                  <a
+                    href="https://medienberatung.iqsh.de/faq-administration-schulportal-sh.html#faq-adm-sz"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="d-flex align-center gap-1 mr-4 text-decoration-none"
                   >
-                    <SpshTooltip
-                      :enabled-condition="selectedZuordnungen.length === 0 && !isEditPersonMetadataActive"
-                      :disabled-text="t('person.finishEditFirst')"
-                      :enabled-text="t('person.editZuordnungen')"
-                      position="start"
+                    <v-icon
+                      icon="mdi-help-circle-outline"
+                      color="primary"
+                    />
+                    <span class="text-primary">{{ t('nav.help') }}</span>
+                  </a>
+                  <SpshTooltip
+                    :enabled-condition="selectedZuordnungen.length === 0 && !isEditPersonMetadataActive"
+                    :disabled-text="t('person.finishEditFirst')"
+                    :enabled-text="t('person.editZuordnungen')"
+                    position="start"
+                  >
+                    <v-btn
+                      class="primary ml-lg-8"
+                      data-testid="zuordnung-edit-button"
+                      :disabled="isEditPersonMetadataActive"
+                      :block="mdAndDown"
+                      @click="triggerEdit"
                     >
-                      <v-btn
-                        class="primary ml-lg-8"
-                        data-testid="zuordnung-edit-button"
-                        :disabled="isEditPersonMetadataActive"
-                        :block="mdAndDown"
-                        @click="triggerEdit"
-                      >
-                        {{ t('edit') }}
-                      </v-btn>
-                    </SpshTooltip>
-                  </v-col>
+                      {{ t('edit') }}
+                    </v-btn>
+                  </SpshTooltip>
                 </div>
               </v-col>
             </template>

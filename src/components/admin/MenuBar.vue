@@ -104,7 +104,7 @@
 
     <!-- Back to start page -->
     <v-list-item
-      class="menu-bar-back caption"
+      class="menu-bar-main-item caption"
       data-testid="back-to-start-link"
       :title="$t('nav.backToStart')"
       to="/start"
@@ -116,6 +116,22 @@
         />
       </template>
     </v-list-item>
+    <v-list-item
+      class="menu-bar-main-item caption"
+      data-testid="faq-administration-link"
+      :title="$t('nav.faqAdministration')"
+      href="https://medienberatung.iqsh.de/faq-administration-schulportal-sh.html"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <template #prepend>
+        <v-icon
+          icon="mdi-help-circle-outline"
+          size="x-large"
+        />
+      </template>
+    </v-list-item>
+    <v-divider />
     <v-divider />
 
     <!-- Benutzerverwaltung -->
@@ -163,8 +179,21 @@
       <v-list-item
         class="menu-bar-main-item headline-2"
         data-testid="person-add-title"
-        :title="$t('admin.person.stateEmployeeSearch.addPerson')"
-      />
+      >
+        <template #title>
+          <span class="headline-2 mr-1">{{ $t('admin.person.stateEmployeeSearch.addPerson') }}</span>
+          <a
+            href="https://medienberatung.iqsh.de/anleitungen-und-videos.html?_hash=UQfKXudxxsiNsBEBNlHC9uPRjxzQr-oWeVCHzUNISZs&ctx=a%3A1%3A%7Bs%3A2%3A%22id%22%3Bi%3A11177%3B%7D&d=attachment&f=2025_Oktober_Benutzerkonten_anlegen_zuordnen.pdf&p=Inhalte%2Fmaterial%2Fdok%2FSchulportal+SH%2FAusbaustufe+III%2F2025_Oktober_Benutzerkonten_anlegen_zuordnen.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            @click.stop
+            ><v-icon
+              icon="mdi-information-outline"
+              size="small"
+              color="primary"
+          /></a>
+        </template>
+      </v-list-item>
       <v-list-item
         v-if="authStore.hasLandesbediensteteSuchenUndHinzufügenPermission"
         class="menu-bar-sub-item caption"
@@ -182,6 +211,15 @@
         :title="$t('admin.person.stateEmployeeSearch.anotherPerson')"
         to="/admin/limited/personen/new"
         @click="closeMenuOnMobile"
+      />
+      <v-list-item
+        class="menu-bar-sub-item caption"
+        data-testid="person-add-help-menu-item"
+        prepend-icon="mdi-information-outline"
+        :title="$t('nav.helpForThisSection')"
+        href="https://medienberatung.iqsh.de/anleitungen-und-videos.html?_hash=UQfKXudxxsiNsBEBNlHC9uPRjxzQr-oWeVCHzUNISZs&ctx=a%3A1%3A%7Bs%3A2%3A%22id%22%3Bi%3A11177%3B%7D&d=attachment&f=2025_Oktober_Benutzerkonten_anlegen_zuordnen.pdf&p=Inhalte%2Fmaterial%2Fdok%2FSchulportal+SH%2FAusbaustufe+III%2F2025_Oktober_Benutzerkonten_anlegen_zuordnen.pdf"
+        target="_blank"
+        rel="noopener noreferrer"
       />
     </div>
 
