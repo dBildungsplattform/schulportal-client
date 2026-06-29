@@ -707,4 +707,42 @@ describe('serviceProviderStore', () => {
       expect(serviceProviderStore.loading).toBe(false);
     });
   });
+
+  describe('syncServiceProvidersForSchule', () => {
+    const organisationId: string = faker.string.uuid();
+    const apiUrl: string = `/api/vidis/${organisationId}/angebote-sync`;
+
+    beforeEach(() => {
+      mockadapter.reset();
+      serviceProviderStore.errorCode = '';
+      serviceProviderStore.loading = false;
+    });
+
+    it('should sync service providers for a school successfully', async () => {
+      mockadapter.onPut(apiUrl).replyOnce(200);
+      const promise: Promise<void> = serviceProviderStore.syncServiceProvidersForSchule(organisationId);
+      expect(serviceProviderStore.loading).toBe(true);
+      await promise;
+      expect(serviceProviderStore.errorCode).toBe('');
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+
+    it('should handle string error', async () => {
+      mockadapter.onPut(apiUrl).replyOnce(500, 'some mock server error');
+      const promise: Promise<void> = serviceProviderStore.syncServiceProvidersForSchule(organisationId);
+      expect(serviceProviderStore.loading).toBe(true);
+      await promise;
+      expect(serviceProviderStore.errorCode).toBe('UNSPECIFIED_ERROR');
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+
+    it('should handle error code', async () => {
+      mockadapter.onPut(apiUrl).replyOnce(500, { code: 'some error code' });
+      const promise: Promise<void> = serviceProviderStore.syncServiceProvidersForSchule(organisationId);
+      expect(serviceProviderStore.loading).toBe(true);
+      await promise;
+      expect(serviceProviderStore.errorCode).toBe('some error code');
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+  });
 });
