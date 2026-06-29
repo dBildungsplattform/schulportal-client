@@ -168,7 +168,7 @@
       },
       "vidisSync": {
         "title": "VIDIS synchronisieren",
-        "buttonLabel": "VIDIS synchronisieren",
+        "buttonLabel": "Mit VIDIS synchronisieren",
         "loading": "Die Daten der Angebote werden von VIDIS abgerufen.",
         "confirmation": "Möchten Sie die Angebotsliste für die Schule {schuleName} mit VIDIS synchronisieren?",
         "action": "Synchronisieren",

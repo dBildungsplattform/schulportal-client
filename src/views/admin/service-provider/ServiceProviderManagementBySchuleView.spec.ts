@@ -3,6 +3,7 @@ import { nextTick, type Component } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 
 import routes from '@/router/routes';
+import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 import { type Organisation } from '@/stores/OrganisationStore';
 import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
 import {
@@ -15,6 +16,7 @@ import type { Mock, MockInstance } from 'vitest';
 import ServiceProviderManagementBySchuleView from './ServiceProviderManagementBySchuleView.vue';
 
 let router: Router;
+const authStore: AuthStore = useAuthStore();
 const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
 const searchFilterStore: SearchFilterStore = useSearchFilterStore();
 
@@ -280,6 +282,148 @@ describe('ServiceProviderManagementBySchuleView', () => {
       expect(serviceProviderStore.errorCode).toBe('');
       expect(reloadSpy).toHaveBeenCalled();
       reloadSpy.mockRestore();
+    });
+  });
+
+  describe('VidisSyncDialog', () => {
+    const orgId: string = 'test-schule-id';
+
+    async function selectSchule(wrapper: VueWrapper): Promise<void> {
+      const schuleFilter: VueWrapper | undefined = wrapper.findComponent({ name: 'SchulenFilter' });
+      schuleFilter?.vm.$emit('update:selectedSchulen', orgId);
+      await nextTick();
+      await flushPromises();
+    }
+
+    beforeEach(() => {
+      authStore.hasVidisPermission = true;
+    });
+
+    it('does not render the sync button when the user lacks vidis permission', () => {
+      authStore.hasVidisPermission = false;
+      const wrapper: VueWrapper | undefined = mountComponent();
+      expect(wrapper.find('[data-testid="open-vidis-sync-dialog-button"]').exists()).toBe(false);
+    });
+
+    it('renders the sync button when the user has vidis permission', () => {
+      const wrapper: VueWrapper | undefined = mountComponent();
+      expect(wrapper.find('[data-testid="open-vidis-sync-dialog-button"]').exists()).toBe(true);
+    });
+
+    it('disables the sync button when no Schule is selected', () => {
+      const wrapper: VueWrapper | undefined = mountComponent();
+      const btn: DOMWrapper<Element> = wrapper.find('[data-testid="open-vidis-sync-dialog-button"]');
+      expect(btn.attributes('disabled')).toBeDefined();
+    });
+
+    it('enables the sync button once a Schule is selected', async () => {
+      const wrapper: VueWrapper | undefined = mountComponent();
+      await selectSchule(wrapper);
+      const btn: DOMWrapper<Element> = wrapper.find('[data-testid="open-vidis-sync-dialog-button"]');
+      expect(btn.attributes('disabled')).toBeUndefined();
+    });
+
+    it('opens the VidisSyncDialog when the button is clicked', async () => {
+      const wrapper: VueWrapper | undefined = mountComponent();
+      await selectSchule(wrapper);
+
+      await wrapper.find('[data-testid="open-vidis-sync-dialog-button"]').trigger('click');
+
+      await vi.waitFor(() => {
+        expect(document.body.querySelector('.v-overlay--active [data-testid="vidis-sync-confirmation"]')).toBeTruthy();
+      });
+    });
+
+    it('calls syncServiceProvidersForSchule with the selected organisation id', async () => {
+      const wrapper: VueWrapper | undefined = mountComponent();
+      await selectSchule(wrapper);
+
+      const syncSpy: Mock<ServiceProviderStore['syncServiceProvidersForSchule']> = vi
+        .spyOn(serviceProviderStore, 'syncServiceProvidersForSchule')
+        .mockResolvedValue();
+      vi.spyOn(serviceProviderStore, 'getManageableServiceProvidersForOrganisation').mockResolvedValue();
+
+      await wrapper.find('[data-testid="open-vidis-sync-dialog-button"]').trigger('click');
+      await vi.waitFor(() => {
+        expect(document.body.querySelector('.v-overlay--active [data-testid="vidis-sync-button"]')).toBeTruthy();
+      });
+
+      (document.body.querySelector('.v-overlay--active [data-testid="vidis-sync-button"]') as HTMLElement).click();
+      await flushPromises();
+
+      expect(syncSpy).toHaveBeenCalledWith(orgId);
+      syncSpy.mockRestore();
+    });
+
+    it('reloads the service provider list after a successful sync', async () => {
+      const wrapper: VueWrapper | undefined = mountComponent();
+      await selectSchule(wrapper);
+
+      vi.spyOn(serviceProviderStore, 'syncServiceProvidersForSchule').mockResolvedValue();
+      const reloadSpy: Mock<ServiceProviderStore['getManageableServiceProvidersForOrganisation']> = vi
+        .spyOn(serviceProviderStore, 'getManageableServiceProvidersForOrganisation')
+        .mockResolvedValue();
+
+      await wrapper.find('[data-testid="open-vidis-sync-dialog-button"]').trigger('click');
+      await vi.waitFor(() => {
+        expect(document.body.querySelector('.v-overlay--active [data-testid="vidis-sync-button"]')).toBeTruthy();
+      });
+
+      (document.body.querySelector('.v-overlay--active [data-testid="vidis-sync-button"]') as HTMLElement).click();
+      await flushPromises();
+
+      expect(reloadSpy).toHaveBeenCalled();
+      reloadSpy.mockRestore();
+    });
+
+    it('does not reload the list when sync fails', async () => {
+      const wrapper: VueWrapper | undefined = mountComponent();
+      await selectSchule(wrapper);
+
+      vi.spyOn(serviceProviderStore, 'syncServiceProvidersForSchule').mockImplementation(() => {
+        serviceProviderStore.errorCode = 'VIDIS_API_ERROR';
+      });
+      const reloadSpy: Mock<ServiceProviderStore['getManageableServiceProvidersForOrganisation']> = vi
+        .spyOn(serviceProviderStore, 'getManageableServiceProvidersForOrganisation')
+        .mockResolvedValue();
+
+      await wrapper.find('[data-testid="open-vidis-sync-dialog-button"]').trigger('click');
+      await vi.waitFor(() => {
+        expect(document.body.querySelector('.v-overlay--active [data-testid="vidis-sync-button"]')).toBeTruthy();
+      });
+
+      (document.body.querySelector('.v-overlay--active [data-testid="vidis-sync-button"]') as HTMLElement).click();
+      await flushPromises();
+
+      expect(reloadSpy).not.toHaveBeenCalled();
+      reloadSpy.mockRestore();
+    });
+
+    it('does not show SpshAlert when errorCode is VIDIS_API_ERROR', async () => {
+      const wrapper: VueWrapper | undefined = mountComponent();
+      serviceProviderStore.errorCode = 'VIDIS_API_ERROR';
+      await nextTick();
+
+      expect(wrapper.find('[data-testid="service-provider-management-by-schule-error-alert"]').exists()).toBe(false);
+    });
+
+    it('keeps the table visible when errorCode is VIDIS_API_ERROR', async () => {
+      const wrapper: VueWrapper | undefined = mountComponent();
+      serviceProviderStore.errorCode = 'VIDIS_API_ERROR';
+      await nextTick();
+
+      expect(wrapper.find('[data-testid="service-provider-management-by-schule-error-alert"]').exists()).toBe(false);
+    });
+
+    it('clears errorCode when the sync dialog is closed', async () => {
+      const wrapper: VueWrapper | undefined = mountComponent();
+      serviceProviderStore.errorCode = 'VIDIS_API_ERROR';
+      await nextTick();
+
+      wrapper.findComponent({ name: 'VidisSyncDialog' })?.vm.$emit('onClose', false);
+      await nextTick();
+
+      expect(serviceProviderStore.errorCode).toBe('');
     });
   });
 });
