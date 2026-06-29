@@ -89,7 +89,7 @@
       // Fetch rollen after selecting the organization
       await rolleStore.getAllRollen({
         organisationId: newValue,
-        systemrecht: RollenSystemRechtEnum.ImportDurchfuehren,
+        systemrechte: [RollenSystemRechtEnum.ImportDurchfuehren],
         rollenarten: [RollenArt.Lern],
       });
 
@@ -386,7 +386,7 @@
 
   onMounted(async () => {
     await rolleStore.getAllRollen({
-      systemrecht: RollenSystemRechtEnum.ImportDurchfuehren,
+      systemrechte: [RollenSystemRechtEnum.ImportDurchfuehren],
       rollenarten: [RollenArt.Lern],
     });
     importStore.uploadResponse = null;

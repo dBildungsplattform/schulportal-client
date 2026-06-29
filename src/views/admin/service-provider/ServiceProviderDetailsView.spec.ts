@@ -428,42 +428,42 @@ describe('ServiceProviderDetailsView', () => {
 
     expect(fetchRollenerweiterungenSpy).not.toHaveBeenCalled();
     expect(getAllRollenSpy).not.toHaveBeenCalled();
+  });
 
-    test('it opens vidis dialog with service provider name and closes it on ok click', async () => {
-      serviceProviderStore.currentServiceProvider = DoFactory.getManageableServiceProviderDetail({
-        id: mockServiceProvider.id,
-        vidisAngebotId: 'vidis-angebot-1',
-      });
-      await nextTick();
+  test('it opens vidis dialog with service provider name and closes it on ok click', async () => {
+    serviceProviderStore.currentServiceProvider = DoFactory.getManageableServiceProviderDetail({
+      id: mockServiceProvider.id,
+      vidisAngebotId: 'vidis-angebot-1',
+    });
+    await nextTick();
 
-      await wrapper?.find('[data-testid="service-provider-bearbeiten-button"]').trigger('click');
-      await vi.waitFor(() => {
-        const dialogHeadlineInActiveOverlay: HTMLElement | null = document.body.querySelector(
-          '.v-overlay--active [data-testid="vidis-info-dialog-headline"]',
-        );
-        expect(dialogHeadlineInActiveOverlay).toBeTruthy();
-      });
-
-      await vi.waitFor(() => {
-        const dialogTextInActiveOverlay: HTMLElement | null = document.body.querySelector(
-          '.v-overlay--active [data-testid="vidis-info-dialog-text"]',
-        );
-        expect(dialogTextInActiveOverlay).toBeTruthy();
-        expect(dialogTextInActiveOverlay?.textContent).toContain(serviceProviderStore.currentServiceProvider!.name);
-      });
-
-      const closeButton: HTMLElement | null = document.body.querySelector(
-        '.v-overlay--active [data-testid="close-vidis-info-dialog-button"]',
+    await wrapper?.find('[data-testid="service-provider-bearbeiten-button"]').trigger('click');
+    await vi.waitFor(() => {
+      const dialogHeadlineInActiveOverlay: HTMLElement | null = document.body.querySelector(
+        '.v-overlay--active [data-testid="vidis-info-dialog-headline"]',
       );
-      expect(closeButton).toBeTruthy();
-      closeButton?.click();
+      expect(dialogHeadlineInActiveOverlay).toBeTruthy();
+    });
 
-      await vi.waitFor(() => {
-        const dialogHeadlineInActiveOverlay: HTMLElement | null = document.body.querySelector(
-          '.v-overlay--active [data-testid="vidis-info-dialog-headline"]',
-        );
-        expect(dialogHeadlineInActiveOverlay).toBeNull();
-      });
+    await vi.waitFor(() => {
+      const dialogTextInActiveOverlay: HTMLElement | null = document.body.querySelector(
+        '.v-overlay--active [data-testid="vidis-info-dialog-text"]',
+      );
+      expect(dialogTextInActiveOverlay).toBeTruthy();
+      expect(dialogTextInActiveOverlay?.textContent).toContain(serviceProviderStore.currentServiceProvider!.name);
+    });
+
+    const closeButton: HTMLElement | null = document.body.querySelector(
+      '.v-overlay--active [data-testid="close-vidis-info-dialog-button"]',
+    );
+    expect(closeButton).toBeTruthy();
+    closeButton?.click();
+
+    await vi.waitFor(() => {
+      const dialogHeadlineInActiveOverlay: HTMLElement | null = document.body.querySelector(
+        '.v-overlay--active [data-testid="vidis-info-dialog-headline"]',
+      );
+      expect(dialogHeadlineInActiveOverlay).toBeNull();
     });
   });
 });
