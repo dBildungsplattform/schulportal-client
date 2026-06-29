@@ -378,16 +378,19 @@ describe('ServiceProviderManagementBySchuleView', () => {
 
     it('does not reload the list when sync fails', async () => {
       const wrapper: VueWrapper | undefined = mountComponent();
-      await selectSchule(wrapper);
+
+      const reloadSpy: Mock<ServiceProviderStore['getManageableServiceProvidersForOrganisation']> = vi
+        .spyOn(serviceProviderStore, 'getManageableServiceProvidersForOrganisation')
+        .mockResolvedValue();
 
       vi.spyOn(serviceProviderStore, 'syncServiceProvidersForSchule').mockImplementation(() => {
         serviceProviderStore.errorCode = 'VIDIS_API_ERROR';
         return Promise.resolve();
       });
 
-      const reloadSpy: Mock<ServiceProviderStore['getManageableServiceProvidersForOrganisation']> = vi
-        .spyOn(serviceProviderStore, 'getManageableServiceProvidersForOrganisation')
-        .mockResolvedValue();
+      await selectSchule(wrapper);
+
+      reloadSpy.mockClear();
 
       await wrapper.find('[data-testid="open-vidis-sync-dialog-button"]').trigger('click');
       await vi.waitFor(() => {
