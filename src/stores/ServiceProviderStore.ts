@@ -46,6 +46,7 @@ export type StartPageServiceProvider = BaseServiceProvider & {
 };
 
 type ManageableServiceProviderDetails = {
+  vidisAngebotId?: string;
   merkmale: Array<ServiceProviderMerkmal>;
   administrationsebene: { id: string; name: string; kennung?: string };
   rollen: Array<{ id: string; name: string }>;

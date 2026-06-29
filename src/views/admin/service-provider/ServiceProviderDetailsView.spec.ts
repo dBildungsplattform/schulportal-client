@@ -2,6 +2,7 @@ import type { RollenerweiterungWithExtendedDataResponse } from '@/api-client/gen
 import SchulenFilter from '@/components/filter/SchulenFilter.vue';
 import routes from '@/router/routes';
 import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
+import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
 import {
   ServiceProviderKategorie,
   useServiceProviderStore,
@@ -10,7 +11,6 @@ import {
 } from '@/stores/ServiceProviderStore';
 import { getLogoPath } from '@/utils/logosConfig';
 import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
-import type WrapperLike from 'node_modules/@vue/test-utils/dist/interfaces/wrapperLike';
 import { createPinia, setActivePinia } from 'pinia';
 import { DoFactory } from 'test/DoFactory';
 import type { MockInstance } from 'vitest';
@@ -18,12 +18,14 @@ import { nextTick, type Component } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import ServiceProviderDetailsView from './ServiceProviderDetailsView.vue';
 import { RollenArt, RollenSystemRecht, useRolleStore, type RolleStore } from '@/stores/RolleStore.js';
+import type WrapperLike from 'node_modules/@vue/test-utils/dist/interfaces/wrapperLike.js';
 
 let wrapper: VueWrapper<InstanceType<typeof ServiceProviderDetailsView>> | null = null;
 let router: Router;
 const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
 const authStore: AuthStore = useAuthStore();
 const rolleStore: RolleStore = useRolleStore();
+const configStore: ConfigStore = useConfigStore();
 
 const mockServiceProvider: ManageableServiceProviderDetail = DoFactory.getManageableServiceProviderDetail({
   kategorie: ServiceProviderKategorie.Schulisch,
@@ -82,6 +84,13 @@ beforeEach(async () => {
 
   serviceProviderStore.$reset();
   serviceProviderStore.currentServiceProvider = mockServiceProvider;
+  configStore.configData = {
+    befristungBearbeitenEnabled: true,
+    rolleBearbeitenEnabled: true,
+    rolleErweiternEnabled: true,
+    setUemPasswordEnabled: true,
+    schulischeAngeboteErstellen: true,
+  };
   const mockItems: RollenerweiterungWithExtendedDataResponse[] = Array.from({ length: 2 }, () =>
     DoFactory.getRollenerweiterungItem(),
   );
@@ -192,7 +201,7 @@ describe('ServiceProviderDetailsView', () => {
     expect(wrapper?.find('.v-data-table-footer__items-per-page').isVisible()).toBe(true);
     expect(wrapper?.find('.v-data-table-footer__items-per-page').text()).toContain('30');
 
-    const itemsPerPageSelection: WrapperLike | undefined = wrapper?.findComponent(
+    const itemsPerPageSelection: ReturnType<VueWrapper['findComponent']> | undefined = wrapper?.findComponent(
       '.v-data-table-footer__items-per-page .v-select',
     );
     await itemsPerPageSelection?.setValue(50);
@@ -419,5 +428,42 @@ describe('ServiceProviderDetailsView', () => {
 
     expect(fetchRollenerweiterungenSpy).not.toHaveBeenCalled();
     expect(getAllRollenSpy).not.toHaveBeenCalled();
+
+    test('it opens vidis dialog with service provider name and closes it on ok click', async () => {
+      serviceProviderStore.currentServiceProvider = DoFactory.getManageableServiceProviderDetail({
+        id: mockServiceProvider.id,
+        vidisAngebotId: 'vidis-angebot-1',
+      });
+      await nextTick();
+
+      await wrapper?.find('[data-testid="service-provider-bearbeiten-button"]').trigger('click');
+      await vi.waitFor(() => {
+        const dialogHeadlineInActiveOverlay: HTMLElement | null = document.body.querySelector(
+          '.v-overlay--active [data-testid="vidis-info-dialog-headline"]',
+        );
+        expect(dialogHeadlineInActiveOverlay).toBeTruthy();
+      });
+
+      await vi.waitFor(() => {
+        const dialogTextInActiveOverlay: HTMLElement | null = document.body.querySelector(
+          '.v-overlay--active [data-testid="vidis-info-dialog-text"]',
+        );
+        expect(dialogTextInActiveOverlay).toBeTruthy();
+        expect(dialogTextInActiveOverlay?.textContent).toContain(serviceProviderStore.currentServiceProvider!.name);
+      });
+
+      const closeButton: HTMLElement | null = document.body.querySelector(
+        '.v-overlay--active [data-testid="close-vidis-info-dialog-button"]',
+      );
+      expect(closeButton).toBeTruthy();
+      closeButton?.click();
+
+      await vi.waitFor(() => {
+        const dialogHeadlineInActiveOverlay: HTMLElement | null = document.body.querySelector(
+          '.v-overlay--active [data-testid="vidis-info-dialog-headline"]',
+        );
+        expect(dialogHeadlineInActiveOverlay).toBeNull();
+      });
+    });
   });
 });

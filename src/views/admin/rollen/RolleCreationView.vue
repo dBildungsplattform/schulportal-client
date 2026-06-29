@@ -244,17 +244,13 @@
         selectedRollenArt.value,
         merkmaleToSubmit,
         systemrechteToSubmit,
+        selectedServiceProviders.value ?? [],
       );
       // If the creation failed, do not proceed with assigning service providers
       if (rolleStore.errorCode) {
         return;
       }
-      if (selectedServiceProviders.value && selectedServiceProviders.value.length > 0) {
-        await rolleStore.updateServiceProviderInRolle(rolleStore.createdRolle?.id ?? '', {
-          serviceProviderIds: selectedServiceProviders.value,
-          version: rolleStore.currentRolle?.version || 1,
-        });
-      }
+
       formContext.resetForm();
 
       if (rolleStore.createdRolle) {

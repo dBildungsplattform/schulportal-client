@@ -14,8 +14,10 @@
   import RollenerweiterungTreeview, {
     type RolleForSelection,
   } from '@/components/admin/service-provider/RollenerweiterungTreeview.vue';
+  import VidisInfoDialog from '@/components/admin/service-provider/VidisInfoDialog.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
   import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
   import {
     RollenArt,
@@ -31,7 +33,6 @@
   } from '@/stores/ServiceProviderStore';
   import { intersect } from '@/utils/arrays';
   import { getLogoPath } from '@/utils/logosConfig';
-  import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
 
   const router: Router = useRouter();
   const route: RouteLocationNormalizedLoaded = useRoute();
@@ -143,7 +144,7 @@
       .map((r: RolleWithServiceProvidersResponse) => ({ id: r.id, name: r.name, rollenart: r.rollenart })),
   );
 
-  const isEditAllowed: ComputedRef<boolean> = computed(() => {
+  const hasEditPermissions: ComputedRef<boolean> = computed(() => {
     if (!serviceProviderStore.currentServiceProvider || serviceProviderStore.loading) {
       return false;
     }
@@ -156,6 +157,11 @@
 
     return hasSomeVerwaltenPermission;
   });
+
+  const isVidisAngebot: ComputedRef<boolean> = computed(() => {
+    return Boolean(serviceProviderStore.currentServiceProvider?.vidisAngebotId);
+  });
+  const vidisInfoDialogOpen: Ref<boolean> = ref(false);
 
   function scrollToTreeview(offset: number = 120): void {
     const el: HTMLElement | null = treeviewContainer.value;
@@ -200,6 +206,10 @@
   }
 
   async function openServiceProviderEditMode(): Promise<void> {
+    if (isVidisAngebot.value) {
+      vidisInfoDialogOpen.value = true;
+      return;
+    }
     await router.push({
       name: 'angebot-edit',
       params: { id: currentServiceProviderId },
@@ -377,6 +387,14 @@
                         test-id="service-provider-can-be-assigned-to-rollen"
                         no-margin-top
                       />
+
+                      <!-- Is Vidis Angebot? -->
+                      <LabeledField
+                        :label="t('angebot.vidisAngebot')"
+                        :value="isVidisAngebot ? t('yes') : t('no')"
+                        test-id="service-provider-vidis-angebot"
+                        no-margin-top
+                      />
                     </div>
                   </v-col>
 
@@ -420,7 +438,7 @@
                     />
 
                     <v-row
-                      v-if="isEditModeAvailable && isEditAllowed"
+                      v-if="isEditModeAvailable && hasEditPermissions"
                       class="mr-10"
                       justify="end"
                     >
@@ -439,6 +457,13 @@
                         >
                         </v-btn>
                       </v-col>
+                      <VidisInfoDialog
+                        :header="t('angebot.edit')"
+                        :text="
+                          t('angebot.vidisEditInfoText', { name: serviceProviderStore.currentServiceProvider.name })
+                        "
+                        v-model="vidisInfoDialogOpen"
+                      />
                     </v-row>
                   </v-col>
                 </v-row>

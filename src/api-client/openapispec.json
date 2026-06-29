@@ -2125,7 +2125,7 @@
             "name": "rolleIds",
             "required": false,
             "in": "query",
-            "description": "The ids of the selected Rollen",
+            "description": "The ids of the selected Rollen. If provided, these Rollen will be returned regardless of the other filters since they are required by the frontend",
             "schema": {
               "type": "array",
               "items": {
@@ -2137,7 +2137,7 @@
             "name": "systemrechte",
             "required": false,
             "in": "query",
-            "description": "The system rights for which the roles should be available. Can only be ROLLEN_VERWALTEN or ROLLEN_ERWEITERN or both.",
+            "description": "The system right for which the roles should be available. Can only be ROLLEN_VERWALTEN, ROLLEN_ERWEITERN or both or IMPORT_DURCHFUEHREN.",
             "schema": {
               "type": "array",
               "items": {
@@ -2227,7 +2227,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RolleResponse"
+                  "$ref": "#/components/schemas/RolleWithServiceProvidersResponse"
                 }
               }
             }
@@ -2334,59 +2334,6 @@
           },
           "500": {
             "description": "Internal server error while getting rolle by id."
-          }
-        },
-        "security": [
-          {
-            "oauth2": ["openid"]
-          },
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "",
-        "tags": ["rolle"]
-      },
-      "patch": {
-        "description": "Add systemrecht to a rolle.",
-        "operationId": "RolleController_addSystemRecht",
-        "parameters": [
-          {
-            "name": "rolleId",
-            "required": true,
-            "in": "path",
-            "description": "The id for the rolle.",
-            "schema": {
-              "nullable": false,
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AddSystemrechtBodyParams"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "The systemrecht was successfully added to rolle."
-          },
-          "400": {
-            "description": "The input was not valid."
-          },
-          "401": {
-            "description": "Not authorized to create the rolle."
-          },
-          "403": {
-            "description": "Insufficient permissions to create the rolle."
-          },
-          "500": {
-            "description": "Internal server error while adding systemrecht to rolle."
           }
         },
         "security": [
@@ -2547,116 +2494,6 @@
           },
           "404": {
             "description": "The rolle does not exist."
-          }
-        },
-        "security": [
-          {
-            "oauth2": ["openid"]
-          },
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "",
-        "tags": ["rolle"]
-      },
-      "put": {
-        "description": "Add a service-provider to a rolle by id.",
-        "operationId": "RolleController_updateServiceProvidersById",
-        "parameters": [
-          {
-            "name": "rolleId",
-            "required": true,
-            "in": "path",
-            "description": "The id for the rolle.",
-            "schema": {
-              "nullable": false,
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RolleServiceProviderBodyParams"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Adding service-provider finished successfully.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ServiceProviderResponse"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "The service-provider is already attached to rolle."
-          },
-          "401": {
-            "description": "Not authorized to retrieve service-providers for rolle."
-          },
-          "404": {
-            "description": "The rolle or the service-provider to add does not exist."
-          },
-          "500": {
-            "description": "Internal server error, the service-provider may could not be found after attaching to rolle."
-          }
-        },
-        "security": [
-          {
-            "oauth2": ["openid"]
-          },
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "",
-        "tags": ["rolle"]
-      },
-      "delete": {
-        "description": "Remove a service-provider from a rolle by id.",
-        "operationId": "RolleController_removeServiceProviderById",
-        "parameters": [
-          {
-            "name": "rolleId",
-            "required": true,
-            "in": "path",
-            "description": "The id for the rolle.",
-            "schema": {
-              "nullable": false,
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RolleServiceProviderBodyParams"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Removing service-provider finished successfully."
-          },
-          "401": {
-            "description": "Not authorized to retrieve service-providers for rolle."
-          },
-          "404": {
-            "description": "The rolle or the service-provider that should be removed does not exist."
           }
         },
         "security": [
@@ -2923,7 +2760,7 @@
             }
           },
           "400": {
-            "description": "Invalid request body."
+            "description": "Invalid request body or VIDIS-linked service-provider."
           },
           "401": {
             "description": "Not authorized."
@@ -3387,6 +3224,9 @@
         "responses": {
           "204": {
             "description": "The service-provider was successfully deleted."
+          },
+          "400": {
+            "description": "The service-provider is linked to VIDIS and cannot be deleted."
           },
           "401": {
             "description": "Not authorized."
@@ -5375,10 +5215,41 @@
         "tags": ["person-info"]
       }
     },
+    "/api/v2/person-info": {
+      "get": {
+        "operationId": "personInfoControllerInfoV2",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Returns info about the person.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonInfoResponseV1"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "person is not logged in."
+          }
+        },
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Info about logged in person with intern role types.",
+        "tags": ["person-info"]
+      }
+    },
     "/api/personen-info": {
       "get": {
         "description": "liefert Personeninformationen basierend auf den Berechtigungen auf Service Provider des aufrufenden Nutzers.",
-        "operationId": "PersonenInfoController_infoV1",
+        "operationId": "personenInfoControllerInfoV1",
         "parameters": [
           {
             "name": "x-offset",
@@ -5423,6 +5294,57 @@
           }
         ],
         "summary": "liefert Personeninformationen basierend auf den Berechtigungen auf Service Provider des aufrufenden Nutzers.",
+        "tags": ["personen-info"]
+      }
+    },
+    "/api/v2/personen-info": {
+      "get": {
+        "description": "liefert Personeninformationen basierend auf den Berechtigungen auf Service Provider des aufrufenden Nutzers mit internen Rollentypen.",
+        "operationId": "personenInfoControllerInfoV2",
+        "parameters": [
+          {
+            "name": "x-offset",
+            "required": false,
+            "in": "query",
+            "description": "Offset für die Ergebnisse",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "x-limit",
+            "required": false,
+            "in": "query",
+            "description": "Maximale Anzahl der Ergebnisse",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste von Personeninformationen",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonInfoResponseV1"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "person is not logged in."
+          }
+        },
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "liefert Personeninformationen basierend auf den Berechtigungen auf Service Provider des aufrufenden Nutzers mit internen Rollentypen.",
         "tags": ["personen-info"]
       }
     }
@@ -6292,7 +6214,7 @@
       },
       "RollenArt": {
         "type": "string",
-        "enum": ["LERN", "LEHR", "EXTERN", "ORGADMIN", "LEIT", "SYSADMIN"]
+        "enum": ["LERN", "LEHR", "EXTERN", "ORGADMIN", "LEIT", "SYSADMIN", "SORGBER", "SCHB", "NLEHR"]
       },
       "RollenMerkmal": {
         "type": "string",
@@ -6795,75 +6717,22 @@
             "items": {
               "$ref": "#/components/schemas/RollenSystemRechtEnum"
             }
-          }
-        },
-        "required": ["name", "administeredBySchulstrukturknoten", "rollenart", "merkmale", "systemrechte"]
-      },
-      "RolleResponse": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
           },
-          "createdAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "updatedAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "administeredBySchulstrukturknoten": {
-            "type": "string"
-          },
-          "rollenart": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/RollenArt"
-              }
-            ]
-          },
-          "merkmale": {
-            "type": "array",
-            "uniqueItems": true,
-            "items": {
-              "$ref": "#/components/schemas/RollenMerkmal"
-            }
-          },
-          "systemrechte": {
+          "serviceProviderIds": {
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/SystemRechtResponse"
+              "type": "string"
             }
-          },
-          "administeredBySchulstrukturknotenName": {
-            "type": "string",
-            "nullable": true
-          },
-          "administeredBySchulstrukturknotenKennung": {
-            "type": "string",
-            "nullable": true
-          },
-          "version": {
-            "type": "number"
           }
         },
         "required": [
-          "id",
-          "createdAt",
-          "updatedAt",
           "name",
           "administeredBySchulstrukturknoten",
           "rollenart",
           "merkmale",
           "systemrechte",
-          "administeredBySchulstrukturknotenName",
-          "administeredBySchulstrukturknotenKennung",
-          "version"
+          "serviceProviderIds"
         ]
       },
       "DbiamRolleError": {
@@ -6892,19 +6761,6 @@
         },
         "required": ["i18nKey", "code"]
       },
-      "AddSystemrechtBodyParams": {
-        "type": "object",
-        "properties": {
-          "systemRecht": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/RollenSystemRechtEnum"
-              }
-            ]
-          }
-        },
-        "required": ["systemRecht"]
-      },
       "RolleServiceProviderResponse": {
         "type": "object",
         "properties": {
@@ -6916,84 +6772,6 @@
           }
         },
         "required": ["serviceProviderIds"]
-      },
-      "RolleServiceProviderBodyParams": {
-        "type": "object",
-        "properties": {
-          "serviceProviderIds": {
-            "description": "An array of ids for the service providers.",
-            "nullable": false,
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "version": {
-            "type": "number",
-            "description": "The version for the rolle."
-          }
-        },
-        "required": ["serviceProviderIds", "version"]
-      },
-      "ServiceProviderTarget": {
-        "type": "string",
-        "enum": ["URL", "EMAIL", "SCHULPORTAL_ADMINISTRATION"]
-      },
-      "ServiceProviderKategorie": {
-        "type": "string",
-        "enum": ["EMAIL", "UNTERRICHT", "VERWALTUNG", "SCHULISCH", "HINWEISE"]
-      },
-      "ServiceProviderMerkmal": {
-        "type": "string",
-        "enum": ["NACHTRAEGLICH_ZUWEISBAR", "VERFUEGBAR_FUER_ROLLENERWEITERUNG"]
-      },
-      "ServiceProviderResponse": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "target": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ServiceProviderTarget"
-              }
-            ]
-          },
-          "url": {
-            "type": "string",
-            "description": "Can be undefined, if `target` is not equal to `URL`"
-          },
-          "kategorie": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ServiceProviderKategorie"
-              }
-            ]
-          },
-          "logoId": {
-            "type": "number",
-            "description": "Optional logoId for use with standard logos"
-          },
-          "hasLogo": {
-            "type": "boolean",
-            "description": "Indicates if a custom logo is available for fetching"
-          },
-          "requires2fa": {
-            "type": "boolean",
-            "description": "Indicates if 2FA is required"
-          },
-          "merkmale": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ServiceProviderMerkmal"
-            }
-          }
-        },
-        "required": ["id", "name", "target", "kategorie", "hasLogo", "requires2fa", "merkmale"]
       },
       "UpdateRolleBodyParams": {
         "type": "object",
@@ -7117,6 +6895,66 @@
         },
         "required": ["code", "rolleIdsWithI18nKeys"]
       },
+      "ServiceProviderTarget": {
+        "type": "string",
+        "enum": ["URL", "EMAIL", "SCHULPORTAL_ADMINISTRATION"]
+      },
+      "ServiceProviderKategorie": {
+        "type": "string",
+        "enum": ["EMAIL", "UNTERRICHT", "VERWALTUNG", "SCHULISCH", "HINWEISE"]
+      },
+      "ServiceProviderMerkmal": {
+        "type": "string",
+        "enum": ["NACHTRAEGLICH_ZUWEISBAR", "VERFUEGBAR_FUER_ROLLENERWEITERUNG"]
+      },
+      "ServiceProviderResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "target": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ServiceProviderTarget"
+              }
+            ]
+          },
+          "url": {
+            "type": "string",
+            "description": "Can be undefined, if `target` is not equal to `URL`"
+          },
+          "kategorie": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ServiceProviderKategorie"
+              }
+            ]
+          },
+          "logoId": {
+            "type": "number",
+            "description": "Optional logoId for use with standard logos"
+          },
+          "hasLogo": {
+            "type": "boolean",
+            "description": "Indicates if a custom logo is available for fetching"
+          },
+          "requires2fa": {
+            "type": "boolean",
+            "description": "Indicates if 2FA is required"
+          },
+          "merkmale": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ServiceProviderMerkmal"
+            }
+          }
+        },
+        "required": ["id", "name", "target", "kategorie", "hasLogo", "requires2fa", "merkmale"]
+      },
       "RollenerweiterungWithExtendedDataResponse": {
         "type": "object",
         "properties": {
@@ -7223,6 +7061,9 @@
           "requires2fa": {
             "type": "boolean"
           },
+          "vidisAngebotId": {
+            "type": "string"
+          },
           "merkmale": {
             "type": "array",
             "items": {
@@ -7282,6 +7123,9 @@
           },
           "requires2fa": {
             "type": "boolean"
+          },
+          "vidisAngebotId": {
+            "type": "string"
           },
           "merkmale": {
             "type": "array",
@@ -7558,6 +7402,73 @@
       "OperationContext": {
         "type": "string",
         "enum": ["PERSON_ANLEGEN", "PERSON_BEARBEITEN"]
+      },
+      "RolleResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "administeredBySchulstrukturknoten": {
+            "type": "string"
+          },
+          "rollenart": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RollenArt"
+              }
+            ]
+          },
+          "merkmale": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "$ref": "#/components/schemas/RollenMerkmal"
+            }
+          },
+          "systemrechte": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SystemRechtResponse"
+            }
+          },
+          "administeredBySchulstrukturknotenName": {
+            "type": "string",
+            "nullable": true
+          },
+          "administeredBySchulstrukturknotenKennung": {
+            "type": "string",
+            "nullable": true
+          },
+          "version": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "createdAt",
+          "updatedAt",
+          "name",
+          "administeredBySchulstrukturknoten",
+          "rollenart",
+          "merkmale",
+          "systemrechte",
+          "administeredBySchulstrukturknotenName",
+          "administeredBySchulstrukturknotenKennung",
+          "version"
+        ]
       },
       "PersonenkontextWorkflowResponse": {
         "type": "object",
