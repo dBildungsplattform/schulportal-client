@@ -210,14 +210,11 @@
   async function onSyncVidis(): Promise<void> {
     serviceProviderStore.errorCode = '';
     isVidisSyncing.value = true;
-    try {
-      await serviceProviderStore.syncServiceProvidersForSchule(selectedOrganisationId.value);
-      if (!serviceProviderStore.errorCode) {
-        await reloadData();
-      }
-    } finally {
-      isVidisSyncing.value = false;
+    await serviceProviderStore.syncServiceProvidersForSchule(selectedOrganisationId.value);
+    if (!serviceProviderStore.errorCode) {
+      await reloadData();
     }
+    isVidisSyncing.value = false;
   }
 
   function onCloseSyncDialog(): void {
