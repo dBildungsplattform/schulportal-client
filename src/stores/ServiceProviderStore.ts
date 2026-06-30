@@ -16,9 +16,11 @@ import {
   type DbiamApplyRollenerweiterungMultiError,
   type DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInner,
   type ManageableServiceProviderResponse,
+  type ManageableServiceProviderSimpleListEntryResponse,
   type ProviderApiInterface,
   type ProviderControllerFindRollenerweiterungenByServiceProviderId200Response,
   type ProviderControllerGetManageableServiceProviders200Response,
+  type ProviderControllerGetManageableServiceProvidersForOrganisationId200Response,
   type RolleApiInterface,
   type RollenerweiterungForManageableServiceProviderResponse,
   type ServiceProviderResponse,
@@ -51,6 +53,12 @@ type ManageableServiceProviderDetails = {
   administrationsebene: { id: string; name: string; kennung?: string };
   rollen: Array<{ id: string; name: string }>;
 };
+
+export type ManageableServiceProviderSimpleListEntry = BaseServiceProvider &
+  ManageableServiceProviderDetails & {
+    hasRollenerweiterungen: boolean;
+    hasSomeVerwaltenPermission: boolean;
+  };
 
 export type ManageableServiceProviderListEntry = BaseServiceProvider &
   ManageableServiceProviderDetails & {
@@ -127,7 +135,7 @@ export type UpdatedServiceProvider = BaseServiceProvider & {
 type ServiceProviderState = {
   allServiceProviders: StartPageServiceProvider[];
   availableServiceProviders: StartPageServiceProvider[];
-  manageableServiceProviders: ManageableServiceProviderListEntry[];
+  manageableServiceProviders: ManageableServiceProviderSimpleListEntryResponse[];
   manageableServiceProvidersForOrganisation: ManageableServiceProviderListEntry[];
   totalManageableServiceProviders: number;
   totalManageableServiceProvidersForOrganisation: number;
@@ -274,14 +282,14 @@ export const useServiceProviderStore: StoreDefinition<
       try {
         const limit: number = entriesPerPage;
         const offset: number = (page - 1) * entriesPerPage;
-        const response: ProviderControllerGetManageableServiceProviders200Response = (
+        const response: ProviderControllerGetManageableServiceProvidersForOrganisationId200Response = (
           await serviceProviderApi.providerControllerGetManageableServiceProvidersForOrganisationId(
             organisationId,
             offset,
             limit,
           )
         ).data;
-        const { items, total }: ProviderControllerGetManageableServiceProviders200Response = response;
+        const { items, total }: ProviderControllerGetManageableServiceProvidersForOrganisationId200Response = response;
         this.manageableServiceProvidersForOrganisation = items;
         this.totalManageableServiceProvidersForOrganisation = total;
       } catch (error: unknown) {

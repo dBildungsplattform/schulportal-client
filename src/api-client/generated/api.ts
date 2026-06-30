@@ -1753,6 +1753,75 @@ export type ManageableServiceProviderResponseRelevantSystemrechteEnum = typeof M
 /**
  * 
  * @export
+ * @interface ManageableServiceProviderSimpleListEntryResponse
+ */
+export interface ManageableServiceProviderSimpleListEntryResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof ManageableServiceProviderSimpleListEntryResponse
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ManageableServiceProviderSimpleListEntryResponse
+     */
+    'name': string;
+    /**
+     * 
+     * @type {OrganisationRefResponse}
+     * @memberof ManageableServiceProviderSimpleListEntryResponse
+     */
+    'administrationsebene': OrganisationRefResponse;
+    /**
+     * 
+     * @type {ServiceProviderKategorie}
+     * @memberof ManageableServiceProviderSimpleListEntryResponse
+     */
+    'kategorie': ServiceProviderKategorie;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof ManageableServiceProviderSimpleListEntryResponse
+     */
+    'requires2fa': boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof ManageableServiceProviderSimpleListEntryResponse
+     */
+    'vidisAngebotId'?: string;
+    /**
+     * 
+     * @type {Array<ServiceProviderMerkmal>}
+     * @memberof ManageableServiceProviderSimpleListEntryResponse
+     */
+    'merkmale': Array<ServiceProviderMerkmal>;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof ManageableServiceProviderSimpleListEntryResponse
+     */
+    'hasRollenerweiterungen': boolean;
+    /**
+     * 
+     * @type {Array<RolleRefResponse>}
+     * @memberof ManageableServiceProviderSimpleListEntryResponse
+     */
+    'rollen': Array<RolleRefResponse>;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof ManageableServiceProviderSimpleListEntryResponse
+     */
+    'hasSomeVerwaltenPermission': boolean;
+}
+
+
+/**
+ * 
+ * @export
  * @interface MeldungResponse
  */
 export interface MeldungResponse {
@@ -3327,10 +3396,10 @@ export interface ProviderControllerGetManageableServiceProviders200Response {
     'limit': number;
     /**
      * 
-     * @type {Array<ManageableServiceProviderListEntryResponse>}
+     * @type {Array<ManageableServiceProviderSimpleListEntryResponse>}
      * @memberof ProviderControllerGetManageableServiceProviders200Response
      */
-    'items': Array<ManageableServiceProviderListEntryResponse>;
+    'items': Array<ManageableServiceProviderSimpleListEntryResponse>;
 }
 /**
  * 
@@ -3340,8 +3409,52 @@ export interface ProviderControllerGetManageableServiceProviders200Response {
 export interface ProviderControllerGetManageableServiceProviders200ResponseAllOf {
     /**
      * 
-     * @type {Array<ManageableServiceProviderListEntryResponse>}
+     * @type {Array<ManageableServiceProviderSimpleListEntryResponse>}
      * @memberof ProviderControllerGetManageableServiceProviders200ResponseAllOf
+     */
+    'items': Array<ManageableServiceProviderSimpleListEntryResponse>;
+}
+/**
+ * 
+ * @export
+ * @interface ProviderControllerGetManageableServiceProvidersForOrganisationId200Response
+ */
+export interface ProviderControllerGetManageableServiceProvidersForOrganisationId200Response {
+    /**
+     * 
+     * @type {number}
+     * @memberof ProviderControllerGetManageableServiceProvidersForOrganisationId200Response
+     */
+    'total': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof ProviderControllerGetManageableServiceProvidersForOrganisationId200Response
+     */
+    'offset': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof ProviderControllerGetManageableServiceProvidersForOrganisationId200Response
+     */
+    'limit': number;
+    /**
+     * 
+     * @type {Array<ManageableServiceProviderListEntryResponse>}
+     * @memberof ProviderControllerGetManageableServiceProvidersForOrganisationId200Response
+     */
+    'items': Array<ManageableServiceProviderListEntryResponse>;
+}
+/**
+ * 
+ * @export
+ * @interface ProviderControllerGetManageableServiceProvidersForOrganisationId200ResponseAllOf
+ */
+export interface ProviderControllerGetManageableServiceProvidersForOrganisationId200ResponseAllOf {
+    /**
+     * 
+     * @type {Array<ManageableServiceProviderListEntryResponse>}
+     * @memberof ProviderControllerGetManageableServiceProvidersForOrganisationId200ResponseAllOf
      */
     'items': Array<ManageableServiceProviderListEntryResponse>;
 }
@@ -12635,7 +12748,7 @@ export const ProviderApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async providerControllerGetManageableServiceProvidersForOrganisationId(organisationId: string, offset?: number, limit?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ProviderControllerGetManageableServiceProviders200Response>> {
+        async providerControllerGetManageableServiceProvidersForOrganisationId(organisationId: string, offset?: number, limit?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ProviderControllerGetManageableServiceProvidersForOrganisationId200Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.providerControllerGetManageableServiceProvidersForOrganisationId(organisationId, offset, limit, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -12754,7 +12867,7 @@ export const ProviderApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        providerControllerGetManageableServiceProvidersForOrganisationId(organisationId: string, offset?: number, limit?: number, options?: any): AxiosPromise<ProviderControllerGetManageableServiceProviders200Response> {
+        providerControllerGetManageableServiceProvidersForOrganisationId(organisationId: string, offset?: number, limit?: number, options?: any): AxiosPromise<ProviderControllerGetManageableServiceProvidersForOrganisationId200Response> {
             return localVarFp.providerControllerGetManageableServiceProvidersForOrganisationId(organisationId, offset, limit, options).then((request) => request(axios, basePath));
         },
         /**
@@ -12870,7 +12983,7 @@ export interface ProviderApiInterface {
      * @throws {RequiredError}
      * @memberof ProviderApiInterface
      */
-    providerControllerGetManageableServiceProvidersForOrganisationId(organisationId: string, offset?: number, limit?: number, options?: AxiosRequestConfig): AxiosPromise<ProviderControllerGetManageableServiceProviders200Response>;
+    providerControllerGetManageableServiceProvidersForOrganisationId(organisationId: string, offset?: number, limit?: number, options?: AxiosRequestConfig): AxiosPromise<ProviderControllerGetManageableServiceProvidersForOrganisationId200Response>;
 
     /**
      * 

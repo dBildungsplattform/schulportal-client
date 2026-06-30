@@ -6,7 +6,7 @@ import type { Mock, MockInstance } from 'vitest';
 import { nextTick, type Component } from 'vue';
 import {
   useServiceProviderStore,
-  type ManageableServiceProviderListEntry,
+  type ManageableServiceProviderSimpleListEntry,
   type ServiceProviderStore,
 } from '@/stores/ServiceProviderStore';
 import { DoFactory } from 'test/DoFactory';
@@ -43,8 +43,8 @@ beforeEach(async (): Promise<void> => {
 
   serviceProviderStore = useServiceProviderStore();
   serviceProviderStore.manageableServiceProviders = [
-    DoFactory.getManageableServiceProviderListEntryResponse({ hasSomeVerwaltenPermission: true }),
-    DoFactory.getManageableServiceProviderListEntryResponse({ hasSomeVerwaltenPermission: false }),
+    DoFactory.getManageableServiceProviderSimpleListEntryResponse({ hasSomeVerwaltenPermission: true }),
+    DoFactory.getManageableServiceProviderSimpleListEntryResponse({ hasSomeVerwaltenPermission: false }),
   ];
   serviceProviderStore.errorCode = '';
 });
@@ -74,7 +74,7 @@ describe('ServiceProviderManagementView', () => {
       );
       expect(deleteIcons.length).toBe(
         serviceProviderStore.manageableServiceProviders.filter(
-          (sp: ManageableServiceProviderListEntry) => sp.hasSomeVerwaltenPermission,
+          (sp: ManageableServiceProviderSimpleListEntry) => sp.hasSomeVerwaltenPermission,
         ).length,
       );
     });
@@ -105,12 +105,11 @@ describe('ServiceProviderManagementView', () => {
 
     it('opens vidis info dialog with provider name and closes it on ok click', async () => {
       const wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementView>> = mountComponent();
-      const vidisProvider: ManageableServiceProviderListEntry = DoFactory.getManageableServiceProviderListEntryResponse(
-        {
+      const vidisProvider: ManageableServiceProviderSimpleListEntry =
+        DoFactory.getManageableServiceProviderSimpleListEntryResponse({
           hasSomeVerwaltenPermission: true,
           vidisAngebotId: 'vidis-angebot-1',
-        },
-      );
+        });
       serviceProviderStore.manageableServiceProviders = [vidisProvider];
       await nextTick();
 
@@ -149,7 +148,8 @@ describe('ServiceProviderManagementView', () => {
     it('closes the delete dialog and removes provider if successful', async () => {
       const wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementView>> = mountComponent();
 
-      const remainingProvider: ManageableServiceProviderListEntry = serviceProviderStore.manageableServiceProviders[1]!;
+      const remainingProvider: ManageableServiceProviderSimpleListEntry =
+        serviceProviderStore.manageableServiceProviders[1]!;
 
       const reloadSpy: Mock<ServiceProviderStore['getManageableServiceProviders']> = vi
         .spyOn(serviceProviderStore, 'getManageableServiceProviders')

@@ -4,6 +4,7 @@ import {
   type DBiamPersonenzuordnungResponse,
   EmailAddressStatus,
   type ManageableServiceProviderListEntryResponse,
+  type ManageableServiceProviderSimpleListEntryResponse,
   type OrganisationResponse,
   type OrganisationResponseLegacy,
   OrganisationsTyp,
@@ -451,6 +452,23 @@ export class DoFactory {
       logoId: 1,
       requires2fa: false,
       merkmale: [],
+      ...props,
+    };
+  }
+
+  public static getManageableServiceProviderSimpleListEntryResponse(
+    props?: Partial<ManageableServiceProviderSimpleListEntryResponse>,
+  ): ManageableServiceProviderSimpleListEntryResponse {
+    return {
+      id: faker.string.uuid(),
+      kategorie: faker.helpers.enumValue(ServiceProviderKategorie),
+      name: faker.company.name(),
+      administrationsebene: { id: faker.string.uuid(), name: faker.company.name(), kennung: faker.string.numeric(7) },
+      rollen: [{ id: faker.string.uuid(), name: faker.person.jobTitle() }],
+      requires2fa: faker.datatype.boolean(),
+      merkmale: [],
+      hasRollenerweiterungen: false,
+      hasSomeVerwaltenPermission: faker.datatype.boolean(),
       ...props,
     };
   }

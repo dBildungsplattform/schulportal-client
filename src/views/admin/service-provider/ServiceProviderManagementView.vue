@@ -11,7 +11,7 @@
   import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
   import {
     useServiceProviderStore,
-    type ManageableServiceProviderListEntry,
+    type ManageableServiceProviderSimpleListEntry,
     type ServiceProviderStore,
   } from '@/stores/ServiceProviderStore';
   import { getDisplayNameForOrg } from '@/utils/formatting';
@@ -52,7 +52,7 @@
     }
     const serviceProviderName: string =
       serviceProviderStore.manageableServiceProviders.find(
-        (sp: ManageableServiceProviderListEntry) => sp.id === cachedServiceProviderId.value,
+        (sp: ManageableServiceProviderSimpleListEntry) => sp.id === cachedServiceProviderId.value,
       )?.name ?? '';
     return t(`admin.angebot.errors.${serviceProviderStore.errorCode}`, {
       serviceProviderName,
@@ -103,7 +103,7 @@
     }
 
     serviceProviderStore.manageableServiceProviders = serviceProviderStore.manageableServiceProviders.filter(
-      (sp: ManageableServiceProviderListEntry) => sp.id !== cachedServiceProviderId.value,
+      (sp: ManageableServiceProviderSimpleListEntry) => sp.id !== cachedServiceProviderId.value,
     );
 
     await reloadData();
@@ -112,7 +112,7 @@
   }
 
   const items: ComputedRef<ServiceProviderRow[]> = computed(() => {
-    return serviceProviderStore.manageableServiceProviders.map((sp: ManageableServiceProviderListEntry) => {
+    return serviceProviderStore.manageableServiceProviders.map((sp: ManageableServiceProviderSimpleListEntry) => {
       return {
         id: sp.id,
         kategorie: t(`angebot.kategorien.${sp.kategorie}`),
@@ -120,9 +120,11 @@
         administrationsebene: getDisplayNameForOrg(sp.administrationsebene),
         rollen:
           sp.rollen.length > 0
-            ? sp.rollen.map((rolle: ManageableServiceProviderListEntry['rollen'][number]) => rolle.name).join(', ')
+            ? sp.rollen
+                .map((rolle: ManageableServiceProviderSimpleListEntry['rollen'][number]) => rolle.name)
+                .join(', ')
             : '---',
-        hasRollenerweiterung: sp.rollenerweiterungen && sp.rollenerweiterungen.length > 0 ? t('yes') : t('no'),
+        hasRollenerweiterung: sp.hasRollenerweiterungen ? t('yes') : t('no'),
         isDeleteAuthorized: sp.hasSomeVerwaltenPermission,
         isVidisAngebot: Boolean(sp.vidisAngebotId),
       };

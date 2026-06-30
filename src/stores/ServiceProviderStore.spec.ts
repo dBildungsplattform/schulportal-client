@@ -157,9 +157,9 @@ describe('serviceProviderStore', () => {
     it('should load service providers manageable by the user', async () => {
       const mockResponse: ProviderControllerGetManageableServiceProviders200Response = {
         items: [
-          DoFactory.getManageableServiceProviderListEntryResponse(),
-          DoFactory.getManageableServiceProviderListEntryResponse(),
-          DoFactory.getManageableServiceProviderListEntryResponse(),
+          DoFactory.getManageableServiceProviderSimpleListEntryResponse(),
+          DoFactory.getManageableServiceProviderSimpleListEntryResponse(),
+          DoFactory.getManageableServiceProviderSimpleListEntryResponse(),
         ],
         offset,
         limit,
@@ -208,9 +208,9 @@ describe('serviceProviderStore', () => {
     it('should load service providers manageable for the organisation', async () => {
       const mockResponse: ProviderControllerGetManageableServiceProviders200Response = {
         items: [
-          DoFactory.getManageableServiceProviderListEntryResponse(),
-          DoFactory.getManageableServiceProviderListEntryResponse(),
-          DoFactory.getManageableServiceProviderListEntryResponse(),
+          DoFactory.getManageableServiceProviderSimpleListEntryResponse(),
+          DoFactory.getManageableServiceProviderSimpleListEntryResponse(),
+          DoFactory.getManageableServiceProviderSimpleListEntryResponse(),
         ],
         offset,
         limit,
