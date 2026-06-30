@@ -17,6 +17,7 @@
     useServiceProviderStore,
     type ServiceProviderStore,
   } from '@/stores/ServiceProviderStore';
+  import { getLogoName } from '@/utils/logosConfig';
   import { computed, onMounted, onUnmounted, ref, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import {
@@ -256,6 +257,7 @@
                 value: serviceProviderStore.createdServiceProvider.logoId,
                 testId: 'success-logo',
                 type: 'image',
+                alt: getLogoName(serviceProviderStore.createdServiceProvider.logoId),
               },
               {
                 label: $t('angebot.kategorie'),
