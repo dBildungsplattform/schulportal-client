@@ -3,6 +3,7 @@ import SchulenFilter from '@/components/filter/SchulenFilter.vue';
 import routes from '@/router/routes';
 import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
+import { RollenArt, RollenSystemRecht, useRolleStore, type RolleStore } from '@/stores/RolleStore.js';
 import {
   ServiceProviderKategorie,
   useServiceProviderStore,
@@ -10,15 +11,13 @@ import {
   type ServiceProviderStore,
 } from '@/stores/ServiceProviderStore';
 import { getLogoPath } from '@/utils/logosConfig';
-import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
+import { DOMWrapper, VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import { DoFactory } from 'test/DoFactory';
 import type { MockInstance } from 'vitest';
 import { nextTick, type Component } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import ServiceProviderDetailsView from './ServiceProviderDetailsView.vue';
-import { RollenArt, RollenSystemRecht, useRolleStore, type RolleStore } from '@/stores/RolleStore.js';
-import type WrapperLike from 'node_modules/@vue/test-utils/dist/interfaces/wrapperLike.js';
 
 let wrapper: VueWrapper<InstanceType<typeof ServiceProviderDetailsView>> | null = null;
 let router: Router;
@@ -338,7 +337,7 @@ describe('ServiceProviderDetailsView', () => {
     await flushPromises();
 
     // Reset button should only be enabled when filters are active
-    const resetButton: WrapperLike | undefined = wrapper?.find('[data-testid="reset-filter-button"]');
+    const resetButton: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="reset-filter-button"]');
     expect(resetButton?.attributes('disabled')).toBeUndefined();
 
     await resetButton?.trigger('click');
