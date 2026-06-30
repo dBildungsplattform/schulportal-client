@@ -2122,12 +2122,27 @@
             }
           },
           {
-            "name": "systemrecht",
+            "name": "rolleIds",
             "required": false,
             "in": "query",
-            "description": "The system right for which the roles should be available. Can only be ROLLEN_VERWALTEN, ROLLEN_ERWEITERN or IMPORT_DURCHFUEHREN.",
+            "description": "The ids of the selected Rollen. If provided, these Rollen will be returned regardless of the other filters since they are required by the frontend",
             "schema": {
-              "$ref": "#/components/schemas/RollenSystemRechtEnum"
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "systemrechte",
+            "required": false,
+            "in": "query",
+            "description": "The system right for which the roles should be available. Can only be ROLLEN_VERWALTEN, ROLLEN_ERWEITERN or both or IMPORT_DURCHFUEHREN.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/RollenSystemRechtEnum"
+              }
             }
           },
           {
@@ -2857,13 +2872,27 @@
             }
           },
           {
-            "name": "organisationId",
+            "name": "organisationIds",
             "required": false,
             "in": "query",
-            "description": "The id of the organisation",
+            "description": "The ids of the organisations where the rollenerweiterung should be available.",
             "schema": {
-              "nullable": true,
-              "type": "string"
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "rolleIds",
+            "required": false,
+            "in": "query",
+            "description": "The ids of the rollen where the rollenerweiterung should be available.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             }
           }
         ],
@@ -5382,9 +5411,9 @@
         "type": "oauth2",
         "flows": {
           "authorizationCode": {
-            "authorizationUrl": "http://localhost:8080/realms/SPSH/protocol/openid-connect/auth",
-            "tokenUrl": "http://localhost:8080/realms/SPSH/protocol/openid-connect/token",
-            "refreshUrl": "http://localhost:8080/realms/SPSH/protocol/openid-connect/token",
+            "authorizationUrl": "https://spsh-3675-keycloak.dev.spsh.dbildungsplattform.de/realms/SPSH/protocol/openid-connect/auth",
+            "tokenUrl": "https://spsh-3675-keycloak.dev.spsh.dbildungsplattform.de/realms/SPSH/protocol/openid-connect/token",
+            "refreshUrl": "https://spsh-3675-keycloak.dev.spsh.dbildungsplattform.de/realms/SPSH/protocol/openid-connect/token",
             "scopes": {}
           }
         }

@@ -17,6 +17,16 @@
   import { computed, onMounted, ref, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
+  import SchulenFilter from '@/components/filter/SchulenFilter.vue';
+  import {
+    RollenSystemRecht,
+    useRolleStore,
+    type RolleResponse,
+    type RolleStore,
+    type RolleWithServiceProvidersResponse,
+  } from '@/stores/RolleStore';
+  import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+  import type { TranslatedObject } from '@/types';
 
   const router: Router = useRouter();
   const route: RouteLocationNormalizedLoaded = useRoute();
@@ -25,12 +35,19 @@
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
   const authStore: AuthStore = useAuthStore();
   const configStore: ConfigStore = useConfigStore();
+  const organisationStore: OrganisationStore = useOrganisationStore();
+  const rolleStore: RolleStore = useRolleStore();
+
+  let timerId: ReturnType<typeof setTimeout>;
 
   const isEditModeAvailable: ComputedRef<boolean> = computed(() => {
     return configStore.configData?.schulischeAngeboteErstellen ?? false;
   });
 
   const currentServiceProviderId: string = route.params['id'] as string;
+  const selectedOrganisationIds: Ref<string[]> = ref([]);
+  const selectedRolleIds: Ref<string[]> = ref([]);
+  const searchInputRollen: Ref<string> = ref('');
 
   type ReadonlyHeaders = Headers;
   const headers: ReadonlyHeaders = [
@@ -106,6 +123,8 @@
   async function fetchRollenerweiterungen(): Promise<void> {
     await serviceProviderStore.getRollenerweiterungenById({
       serviceProviderId: currentServiceProviderId,
+      organisationIds: selectedOrganisationIds.value.length > 0 ? selectedOrganisationIds.value : undefined,
+      rolleIds: selectedRolleIds.value.length > 0 ? selectedRolleIds.value : undefined,
       offset: (rollenerweiterungPage.value - 1) * rollenerweiterungPerPage.value,
       limit: rollenerweiterungPerPage.value,
     });
@@ -126,6 +145,50 @@
     fetchRollenerweiterungen();
   }
 
+  const rollen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
+    const rollen: RolleWithServiceProvidersResponse[] = rolleStore.allRollen;
+
+    return rollen
+      .map((rolle: RolleResponse) => ({
+        value: rolle.id,
+        title: rolle.name,
+      }))
+      .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
+  });
+
+  function resetSearchAndFilter(): void {
+    selectedOrganisationIds.value = [];
+    selectedRolleIds.value = [];
+    searchInputRollen.value = '';
+    fetchRollenerweiterungen();
+  }
+
+  function setOrganisationFilter(newValue: string[] | undefined): void {
+    selectedOrganisationIds.value = newValue ?? [];
+    fetchRollenerweiterungen();
+  }
+
+  function setRolleFilter(newValue: string[] | undefined): void {
+    selectedRolleIds.value = newValue ?? [];
+    if (!newValue?.length) {
+      searchInputRollen.value = '';
+    }
+    fetchRollenerweiterungen();
+  }
+
+  function updateRollenSearch(searchValue: string): void {
+    clearTimeout(timerId);
+
+    timerId = setTimeout(() => {
+      rolleStore.getAllRollen({
+        limit: 25,
+        searchString: searchValue,
+        systemrechte: [RollenSystemRecht.RollenVerwalten, RollenSystemRecht.RollenErweitern],
+        rolleIds: selectedRolleIds.value.length > 0 ? selectedRolleIds.value : undefined,
+      });
+    }, 500);
+  }
+
   onMounted(async () => {
     serviceProviderStore.errorCode = '';
     serviceProviderStore.serviceProviderLogos.clear();
@@ -136,6 +199,10 @@
     ]);
     if (authStore.hasRollenerweiternPermission) {
       fetchRollenerweiterungen();
+      rolleStore.getAllRollen({
+        systemrechte: [RollenSystemRecht.RollenVerwalten, RollenSystemRecht.RollenErweitern],
+        limit: 25,
+      });
     }
   });
 </script>
@@ -407,48 +474,184 @@
               </v-col>
             </v-row>
 
-            <!-- Expandable table -->
             <v-row
               align="center"
-              class="mx-16 mt-n4"
               justify="end"
             >
               <v-col cols="12">
                 <v-expand-transition>
                   <div v-show="isOpen">
                     <template v-if="serviceProviderStore.currentServiceProvider?.availableForRollenerweiterung">
-                      <ResultTable
-                        ref="result-table"
-                        :current-page="rollenerweiterungPage"
-                        data-testid="rollenerweiterungen-table"
-                        :items="serviceProviderStore.rollenerweiterungenUebersicht || []"
-                        :loading="serviceProviderStore.loading"
-                        :headers="headers"
-                        :hide-select="true"
-                        item-value-path="id"
-                        :total-items="serviceProviderStore.rollenerweiterungen?.total || 0"
-                        :items-per-page="rollenerweiterungPerPage"
-                        @on-items-per-page-update="getPaginatedRollenerweiterungenWithLimit"
-                        @on-page-update="getPaginatedRollenerweiterungen"
+                      <v-row
+                        align="start"
+                        class="ma-3"
+                        data-testid="filter-section"
                       >
-                        <template #[`item.schule`]="{ item }">
-                          <div
-                            class="ellipsis-wrapper"
-                            :title="item.schule"
+                        <v-col
+                          align-self="center"
+                          cols="12"
+                          md="2"
+                          class="py-md-0 text-md-right"
+                        >
+                          <v-btn
+                            class="px-0 reset-filter"
+                            data-testid="reset-filter-button"
+                            :disabled="!selectedOrganisationIds.length && !selectedRolleIds.length"
+                            size="x-small"
+                            variant="text"
+                            width="auto"
+                            @click="resetSearchAndFilter()"
                           >
-                            {{ item.schule }}
-                          </div>
-                        </template>
+                            {{ $t('resetFilter') }}
+                          </v-btn>
+                        </v-col>
+                        <v-col
+                          cols="12"
+                          md="3"
+                          class="py-md-0"
+                        >
+                          <SchulenFilter
+                            :multiple="true"
+                            includeAll
+                            highlightSelection
+                            parentId="service-provider-management-by-schule"
+                            ref="schulenFilter"
+                            :systemrechteForSearch="[RollenSystemRecht.AngeboteVerwalten]"
+                            :selectedSchulen="selectedOrganisationIds.length > 0 ? selectedOrganisationIds : []"
+                            @update:selected-schulen="setOrganisationFilter"
+                            :placeholderText="$t('admin.schule.schule')"
+                            hideDetails
+                          >
+                            <template #prepend-item>
+                              <v-list-item>
+                                <v-progress-circular
+                                  v-if="
+                                    organisationStore.organisationenFilters.get('service-provider-management-by-schule')
+                                      ?.loading
+                                  "
+                                  indeterminate
+                                />
+                                <span
+                                  v-else
+                                  class="filter-header"
+                                >
+                                  {{
+                                    $t(
+                                      'admin.schule.schulenFound',
+                                      {
+                                        count: organisationStore.organisationenFilters.get(
+                                          'service-provider-management-by-schule',
+                                        )?.total,
+                                      },
+                                      organisationStore.organisationenFilters.get(
+                                        'service-provider-management-by-schule',
+                                      )?.total ?? 0,
+                                    )
+                                  }}
+                                </span>
+                              </v-list-item>
+                            </template>
+                          </SchulenFilter>
+                        </v-col>
+                        <v-col
+                          cols="12"
+                          md="3"
+                          class="py-md-0"
+                        >
+                          <v-autocomplete
+                            id="rolle-select"
+                            ref="rolle-select"
+                            v-model="selectedRolleIds"
+                            v-model:search="searchInputRollen"
+                            autocomplete="off"
+                            class="filter-dropdown"
+                            :class="{ selected: selectedRolleIds.length > 0 }"
+                            clearable
+                            data-testid="rolle-select"
+                            density="compact"
+                            hide-details
+                            :items="rollen"
+                            item-value="value"
+                            item-text="title"
+                            multiple
+                            :no-data-text="$t('noDataFound')"
+                            :placeholder="$t('admin.rolle.rolle')"
+                            required="true"
+                            variant="outlined"
+                            @update:model-value="setRolleFilter"
+                            @update:search="updateRollenSearch"
+                          >
+                            <template #prepend-item>
+                              <v-list-item>
+                                <v-progress-circular
+                                  v-if="rolleStore.loading"
+                                  indeterminate
+                                />
+                                <span
+                                  v-else
+                                  class="filter-header"
+                                  >{{
+                                    $t(
+                                      'admin.rolle.rollenFound',
+                                      { count: rolleStore.totalRollen },
+                                      rolleStore.totalRollen,
+                                    )
+                                  }}</span
+                                >
+                              </v-list-item>
+                            </template>
+                            <template #selection="{ item, index }">
+                              <v-chip v-if="selectedRolleIds.length < 2">
+                                <span>{{ item.title }}</span>
+                              </v-chip>
+                              <div v-else-if="index === 0">
+                                {{ $t('admin.rolle.rollenSelected', { count: selectedRolleIds.length }) }}
+                              </div>
+                            </template>
+                          </v-autocomplete>
+                        </v-col>
+                      </v-row>
+                      <v-row
+                        align="center"
+                        class="mx-16 mt-n4"
+                        justify="end"
+                      >
+                        <v-col cols="12">
+                          <ResultTable
+                            ref="result-table"
+                            :current-page="rollenerweiterungPage"
+                            data-testid="rollenerweiterungen-table"
+                            :items="serviceProviderStore.rollenerweiterungenUebersicht || []"
+                            :loading="serviceProviderStore.loading"
+                            :headers="headers"
+                            :hide-select="true"
+                            item-value-path="id"
+                            :total-items="serviceProviderStore.rollenerweiterungen?.total || 0"
+                            :items-per-page="rollenerweiterungPerPage"
+                            :noDataText="$t('noSchulenFound')"
+                            @on-items-per-page-update="getPaginatedRollenerweiterungenWithLimit"
+                            @on-page-update="getPaginatedRollenerweiterungen"
+                          >
+                            <template #[`item.schule`]="{ item }">
+                              <div
+                                class="ellipsis-wrapper"
+                                :title="item.schule"
+                              >
+                                {{ item.schule }}
+                              </div>
+                            </template>
 
-                        <template #[`item.rollenerweiterungen`]="{ item }">
-                          <div
-                            class="ellipsis-wrapper"
-                            :title="item.rollenerweiterungen"
-                          >
-                            {{ item.rollenerweiterungen }}
-                          </div>
-                        </template>
-                      </ResultTable>
+                            <template #[`item.rollenerweiterungen`]="{ item }">
+                              <div
+                                class="ellipsis-wrapper"
+                                :title="item.rollenerweiterungen"
+                              >
+                                {{ item.rollenerweiterungen }}
+                              </div>
+                            </template>
+                          </ResultTable>
+                        </v-col>
+                      </v-row>
                     </template>
                     <template v-else>
                       <v-row>

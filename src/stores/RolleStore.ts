@@ -106,7 +106,8 @@ export type RolleFilter = {
   offset?: number;
   searchString?: string;
   organisationId?: string;
-  systemrecht?: RollenSystemRechtEnum;
+  rolleIds?: string[];
+  systemrechte?: RollenSystemRechtEnum[];
   rollenarten?: Array<RollenArt>;
 };
 
@@ -168,7 +169,8 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
             filter.limit,
             filter.searchString,
             filter.organisationId,
-            filter.systemrecht,
+            filter.rolleIds,
+            filter.systemrechte,
             filter.rollenarten,
           );
         this.allRollen = response.data;

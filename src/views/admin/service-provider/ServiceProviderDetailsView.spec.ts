@@ -1,4 +1,5 @@
 import type { RollenerweiterungWithExtendedDataResponse } from '@/api-client/generated';
+import SchulenFilter from '@/components/filter/SchulenFilter.vue';
 import routes from '@/router/routes';
 import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
@@ -16,11 +17,14 @@ import type { MockInstance } from 'vitest';
 import { nextTick, type Component } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import ServiceProviderDetailsView from './ServiceProviderDetailsView.vue';
+import { RollenArt, RollenSystemRecht, useRolleStore, type RolleStore } from '@/stores/RolleStore.js';
+import type WrapperLike from 'node_modules/@vue/test-utils/dist/interfaces/wrapperLike.js';
 
 let wrapper: VueWrapper<InstanceType<typeof ServiceProviderDetailsView>> | null = null;
 let router: Router;
 const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
 const authStore: AuthStore = useAuthStore();
+const rolleStore: RolleStore = useRolleStore();
 const configStore: ConfigStore = useConfigStore();
 
 const mockServiceProvider: ManageableServiceProviderDetail = DoFactory.getManageableServiceProviderDetail({
@@ -51,6 +55,13 @@ async function mountComponent(): Promise<VueWrapper<InstanceType<typeof ServiceP
   return wrapper;
 }
 
+async function openRollenerweiterungenSection(): Promise<void> {
+  await wrapper
+    ?.find('[data-testid="open-schulspezifische-rollenerweiterungen-section-headline-button"]')
+    .trigger('click');
+  await nextTick();
+}
+
 beforeEach(async () => {
   setActivePinia(createPinia());
   document.body.innerHTML = `
@@ -64,7 +75,11 @@ beforeEach(async () => {
     routes,
   });
 
-  router.push('/');
+  router.push({
+    name: 'angebot-details',
+    params: { id: mockServiceProvider.id },
+    query: { orga: 'some-org-id' },
+  });
   await router.isReady();
 
   serviceProviderStore.$reset();
@@ -82,6 +97,10 @@ beforeEach(async () => {
   serviceProviderStore.rollenerweiterungen = DoFactory.getRollenerweiterungenResponse(mockItems);
   serviceProviderStore.rollenerweiterungenUebersicht = DoFactory.buildRollenerweiterungenUebersicht(mockItems);
   authStore.hasRollenerweiternPermission = true;
+  rolleStore.allRollen = [
+    DoFactory.getRolleWithServiceProviders({ rollenart: RollenArt.Lehr }),
+    DoFactory.getRolleWithServiceProviders({ rollenart: RollenArt.Lern }),
+  ];
   wrapper = await mountComponent();
 });
 
@@ -156,10 +175,7 @@ describe('ServiceProviderDetailsView', () => {
   });
 
   test('it reloads data after changing page', async () => {
-    await wrapper
-      ?.find('[data-testid="open-schulspezifische-rollenerweiterungen-section-headline-button"]')
-      .trigger('click');
-    await nextTick();
+    await openRollenerweiterungenSection();
     expect(wrapper?.find('.v-pagination__next button.v-btn--disabled').isVisible()).toBe(true);
     expect(wrapper?.find('.v-data-table-footer__info').text()).toContain('1-2');
 
@@ -175,10 +191,7 @@ describe('ServiceProviderDetailsView', () => {
   });
 
   test('it reloads data after changing limit', async () => {
-    await wrapper
-      ?.find('[data-testid="open-schulspezifische-rollenerweiterungen-section-headline-button"]')
-      .trigger('click');
-    await nextTick();
+    await openRollenerweiterungenSection();
     /* check for both cases, first if total is greater than, afterwards if total is less or equal than chosen limit */
     if (serviceProviderStore.rollenerweiterungen) {
       serviceProviderStore.rollenerweiterungen.total = 50;
@@ -204,6 +217,217 @@ describe('ServiceProviderDetailsView', () => {
     if (serviceProviderStore.rollenerweiterungen) {
       serviceProviderStore.rollenerweiterungen.total = 3;
     }
+  });
+
+  test('it reloads rollenerweiterungen with selected schulen filter', async () => {
+    const getRollenerweiterungenByIdSpy: MockInstance = vi
+      .spyOn(serviceProviderStore, 'getRollenerweiterungenById')
+      .mockResolvedValue();
+    await openRollenerweiterungenSection();
+
+    const schulenFilter: VueWrapper | undefined = wrapper?.findComponent(SchulenFilter);
+    schulenFilter?.vm.$emit('update:selected-schulen', ['schule-1', 'schule-2']);
+    await flushPromises();
+
+    expect(getRollenerweiterungenByIdSpy).toHaveBeenCalled();
+    expect(getRollenerweiterungenByIdSpy).toHaveBeenLastCalledWith({
+      serviceProviderId: mockServiceProvider.id,
+      organisationIds: ['schule-1', 'schule-2'],
+      rolleIds: undefined,
+      offset: 0,
+      limit: 30,
+    });
+  });
+
+  test('it reloads rollenerweiterungen with selected rollen filter', async () => {
+    const getRollenerweiterungenByIdSpy: MockInstance = vi
+      .spyOn(serviceProviderStore, 'getRollenerweiterungenById')
+      .mockResolvedValue();
+    await openRollenerweiterungenSection();
+
+    const rollenFilter: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+    rollenFilter?.vm.$emit('update:model-value', ['rolle-1']);
+    await flushPromises();
+
+    expect(getRollenerweiterungenByIdSpy).toHaveBeenCalled();
+    expect(getRollenerweiterungenByIdSpy).toHaveBeenLastCalledWith({
+      serviceProviderId: mockServiceProvider.id,
+      organisationIds: undefined,
+      rolleIds: ['rolle-1'],
+      offset: 0,
+      limit: 30,
+    });
+  });
+
+  test('it reloads rollenerweiterungen with empty filter values when filters are cleared', async () => {
+    const getRollenerweiterungenByIdSpy: MockInstance = vi
+      .spyOn(serviceProviderStore, 'getRollenerweiterungenById')
+      .mockResolvedValue();
+    await openRollenerweiterungenSection();
+
+    const schulenFilter: VueWrapper | undefined = wrapper?.findComponent(SchulenFilter);
+    const rollenFilter: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+
+    schulenFilter?.vm.$emit('update:selected-schulen', ['schule-1']);
+    rollenFilter?.vm.$emit('update:model-value', ['rolle-1']);
+    await flushPromises();
+
+    // Clear organisation filter, empty array should send undefined
+    schulenFilter?.vm.$emit('update:selected-schulen', []);
+    await flushPromises();
+
+    expect(getRollenerweiterungenByIdSpy).toHaveBeenLastCalledWith({
+      serviceProviderId: mockServiceProvider.id,
+      organisationIds: undefined,
+      rolleIds: ['rolle-1'],
+      offset: 0,
+      limit: 30,
+    });
+
+    // Clear rolle filter, empty array should send undefined and reset search
+    rollenFilter?.vm.$emit('update:model-value', []);
+    await flushPromises();
+
+    expect(getRollenerweiterungenByIdSpy).toHaveBeenLastCalledWith({
+      serviceProviderId: mockServiceProvider.id,
+      organisationIds: undefined,
+      rolleIds: undefined,
+      offset: 0,
+      limit: 30,
+    });
+  });
+
+  test('it handles undefined rolle filter value by defaulting to empty array', async () => {
+    const getRollenerweiterungenByIdSpy: MockInstance = vi
+      .spyOn(serviceProviderStore, 'getRollenerweiterungenById')
+      .mockResolvedValue();
+    await openRollenerweiterungenSection();
+
+    const rollenFilter: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+    rollenFilter?.vm.$emit('update:model-value', undefined);
+    await flushPromises();
+
+    expect(getRollenerweiterungenByIdSpy).toHaveBeenLastCalledWith({
+      serviceProviderId: mockServiceProvider.id,
+      organisationIds: undefined,
+      rolleIds: undefined,
+      offset: 0,
+      limit: 30,
+    });
+  });
+
+  test('it shows no items in the rollen filter when allRollen is empty', async () => {
+    rolleStore.allRollen = [];
+    wrapper = await mountComponent();
+    await openRollenerweiterungenSection();
+
+    const rollenFilter: VueWrapper = wrapper.findComponent({ ref: 'rolle-select' }) as VueWrapper;
+    expect((rollenFilter as unknown as { props: (key: string) => never }).props('items')).toEqual([]);
+  });
+
+  test('it resets both filters via reset button and reloads rollenerweiterungen', async () => {
+    const getRollenerweiterungenByIdSpy: MockInstance = vi
+      .spyOn(serviceProviderStore, 'getRollenerweiterungenById')
+      .mockResolvedValue();
+    await openRollenerweiterungenSection();
+
+    const schulenFilter: VueWrapper | undefined = wrapper?.findComponent(SchulenFilter);
+    const rollenFilter: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+    schulenFilter?.vm.$emit('update:selected-schulen', ['schule-1']);
+    rollenFilter?.vm.$emit('update:model-value', ['rolle-1']);
+    await flushPromises();
+
+    // Reset button should only be enabled when filters are active
+    const resetButton: WrapperLike | undefined = wrapper?.find('[data-testid="reset-filter-button"]');
+    expect(resetButton?.attributes('disabled')).toBeUndefined();
+
+    await resetButton?.trigger('click');
+    await flushPromises();
+
+    expect(getRollenerweiterungenByIdSpy).toHaveBeenLastCalledWith({
+      serviceProviderId: mockServiceProvider.id,
+      organisationIds: undefined,
+      rolleIds: undefined,
+      offset: 0,
+      limit: 30,
+    });
+
+    // Reset button should now be disabled again
+    expect(wrapper?.find('[data-testid="reset-filter-button"]').attributes('disabled')).toBeDefined();
+  });
+
+  test('it searches for rollen when search input changes', async () => {
+    vi.useFakeTimers();
+    const getAllRollenSpy: MockInstance = vi.spyOn(rolleStore, 'getAllRollen').mockResolvedValue();
+    await openRollenerweiterungenSection();
+
+    const rollenFilter: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+    rollenFilter?.vm.$emit('update:search', 'Lehrer');
+
+    // Should not have been called yet due to debounce
+    expect(getAllRollenSpy).not.toHaveBeenCalledWith(expect.objectContaining({ searchString: 'Lehrer' }));
+
+    vi.advanceTimersByTime(500);
+    await flushPromises();
+
+    expect(getAllRollenSpy).toHaveBeenLastCalledWith({
+      limit: 25,
+      searchString: 'Lehrer',
+      systemrechte: [RollenSystemRecht.RollenVerwalten, RollenSystemRecht.RollenErweitern],
+      rolleIds: undefined,
+    });
+
+    vi.useRealTimers();
+  });
+
+  test('it searches for rollen when search input changes and rolleIds is defined', async () => {
+    vi.useFakeTimers();
+    const getAllRollenSpy: MockInstance = vi.spyOn(rolleStore, 'getAllRollen').mockResolvedValue();
+    await openRollenerweiterungenSection();
+
+    const rollenFilter: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+
+    // Set rolleIds state first
+    rollenFilter?.vm.$emit('update:model-value', ['rolle-1']);
+    vi.advanceTimersByTime(500);
+    await flushPromises();
+
+    getAllRollenSpy.mockClear();
+
+    // Now trigger the search
+    rollenFilter?.vm.$emit('update:search', 'Lehrer');
+
+    expect(getAllRollenSpy).not.toHaveBeenCalledWith(expect.objectContaining({ searchString: 'Lehrer' }));
+
+    vi.advanceTimersByTime(500);
+    await flushPromises();
+
+    expect(getAllRollenSpy).toHaveBeenLastCalledWith({
+      limit: 25,
+      searchString: 'Lehrer',
+      systemrechte: [RollenSystemRecht.RollenVerwalten, RollenSystemRecht.RollenErweitern],
+      rolleIds: ['rolle-1'],
+    });
+
+    vi.useRealTimers();
+  });
+
+  test('it does not request all rollen on mount without rollenerweitern permission', async () => {
+    wrapper?.unmount();
+    authStore.hasRollenerweiternPermission = false;
+    const fetchRollenerweiterungenSpy: MockInstance = vi
+      .spyOn(serviceProviderStore, 'getRollenerweiterungenById')
+      .mockResolvedValue();
+    const getAllRollenSpy: MockInstance = vi.spyOn(rolleStore, 'getAllRollen').mockResolvedValue();
+
+    await flushPromises();
+    fetchRollenerweiterungenSpy.mockClear();
+    getAllRollenSpy.mockClear();
+
+    wrapper = await mountComponent();
+
+    expect(fetchRollenerweiterungenSpy).not.toHaveBeenCalled();
+    expect(getAllRollenSpy).not.toHaveBeenCalled();
   });
 
   test('it opens vidis dialog with service provider name and closes it on ok click', async () => {

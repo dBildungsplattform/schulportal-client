@@ -661,7 +661,7 @@
             <template #prepend-item>
               <v-list-item>
                 <v-progress-circular
-                  v-if="organisationStore.loading"
+                  v-if="organisationStore.organisationenFilters.get('person-management')?.loading"
                   indeterminate
                 />
                 <span
