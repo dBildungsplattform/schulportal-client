@@ -4383,6 +4383,54 @@
         "tags": ["cron"]
       }
     },
+    "/api/vidis/{organisationId}/angebote-sync": {
+      "put": {
+        "description": "Sync VIDIS Angebote for a school organisation.",
+        "operationId": "VidisController_syncAngeboteForSchool",
+        "parameters": [
+          {
+            "name": "organisationId",
+            "required": true,
+            "in": "path",
+            "description": "The id of an organization",
+            "schema": {
+              "nullable": false,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The VIDIS Angebote sync was successfully triggered."
+          },
+          "400": {
+            "description": "The organisationId is invalid or cannot be synced."
+          },
+          "401": {
+            "description": "Not authorized to trigger the VIDIS Angebote sync."
+          },
+          "403": {
+            "description": "Insufficient permissions to trigger the VIDIS Angebote sync."
+          },
+          "404": {
+            "description": "The organisation does not exist or lacks required permissions."
+          },
+          "500": {
+            "description": "Internal server error while trying to trigger the VIDIS Angebote sync."
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "oauth2": ["openid"]
+          }
+        ],
+        "summary": "",
+        "tags": ["vidis"]
+      }
+    },
     "/api/import/upload": {
       "post": {
         "operationId": "ImportController_uploadFile",
@@ -5363,9 +5411,9 @@
         "type": "oauth2",
         "flows": {
           "authorizationCode": {
-            "authorizationUrl": "http://localhost:8080/realms/SPSH/protocol/openid-connect/auth",
-            "tokenUrl": "http://localhost:8080/realms/SPSH/protocol/openid-connect/token",
-            "refreshUrl": "http://localhost:8080/realms/SPSH/protocol/openid-connect/token",
+            "authorizationUrl": "https://spsh-3675-keycloak.dev.spsh.dbildungsplattform.de/realms/SPSH/protocol/openid-connect/auth",
+            "tokenUrl": "https://spsh-3675-keycloak.dev.spsh.dbildungsplattform.de/realms/SPSH/protocol/openid-connect/token",
+            "refreshUrl": "https://spsh-3675-keycloak.dev.spsh.dbildungsplattform.de/realms/SPSH/protocol/openid-connect/token",
             "scopes": {}
           }
         }
@@ -6522,7 +6570,8 @@
           "HINWEISE_BEARBEITEN",
           "ROLLEN_ERWEITERN",
           "ANGEBOTE_VERWALTEN",
-          "ANGEBOTE_EINGESCHRAENKT_VERWALTEN"
+          "ANGEBOTE_EINGESCHRAENKT_VERWALTEN",
+          "SCHULISCHE_VIDIS_ANGEBOTE_ABRUFEN"
         ]
       },
       "OrganisationByIdBodyParams": {
@@ -7173,7 +7222,8 @@
                 "HINWEISE_BEARBEITEN",
                 "ROLLEN_ERWEITERN",
                 "ANGEBOTE_VERWALTEN",
-                "ANGEBOTE_EINGESCHRAENKT_VERWALTEN"
+                "ANGEBOTE_EINGESCHRAENKT_VERWALTEN",
+                "SCHULISCHE_VIDIS_ANGEBOTE_ABRUFEN"
               ]
             }
           }

@@ -166,6 +166,15 @@
         "title": "Angebot löschen",
         "action": "Löschen"
       },
+      "vidisSync": {
+        "title": "VIDIS synchronisieren",
+        "buttonLabel": "Mit VIDIS synchronisieren",
+        "loading": "Die Daten der Angebote werden von VIDIS abgerufen.",
+        "confirmation": "Möchten Sie die Angebotsliste für die Schule {schuleName} mit VIDIS synchronisieren?",
+        "action": "Synchronisieren",
+        "success": "Die Angebotsliste wurde erfolgreich aktualisiert.",
+        "error": "Beim Abruf der Daten von VIDIS ist ein Fehler aufgetreten.\nBitte wiederholen Sie den Vorgang zu einem späteren Zeitpunkt. \n\nDie Angebotsliste wurde nicht aktualisiert."
+      },
       "edit": "Angebot bearbeiten",
       "showAll": "Alle Angebote anzeigen",
       "showSchoolSpecific": "Schulische Angebote anzeigen"
@@ -644,7 +653,8 @@
           "EINGESCHRAENKT_NEUE_BENUTZER_ERSTELLEN": "Darf eingeschränkt neue Benutzer erstellen",
           "ROLLEN_ERWEITERN": "Darf Rollen schulspezifisch erweitern",
           "ANGEBOTE_VERWALTEN": "Darf Angebote verwalten",
-          "ANGEBOTE_EINGESCHRAENKT_VERWALTEN": "Darf Angebote eingeschränkt verwalten"
+          "ANGEBOTE_EINGESCHRAENKT_VERWALTEN": "Darf Angebote eingeschränkt verwalten",
+          "SCHULISCHE_VIDIS_ANGEBOTE_ABRUFEN": "Darf schulische VIDIS-Angebote abrufen"
         },
         "rollenarten": {
           "LERN": "Lern",
