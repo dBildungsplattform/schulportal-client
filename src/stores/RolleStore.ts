@@ -113,129 +113,129 @@ export type RolleFilter = {
 
 export type RolleStore = Store<'rolleStore', RolleState, RolleGetters, RolleActions>;
 
-export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGetters, RolleActions> = defineStore({
-  id: 'rolleStore',
-  state: (): RolleState => {
-    return {
-      createdRolle: null,
-      updatedRolle: null,
-      currentRolle: null,
-      allRollen: [],
-      errorCode: '',
-      loading: false,
-      totalRollen: 0,
-    };
-  },
-  actions: {
-    async createRolle(
-      rollenName: string,
-      administrationsebene: string,
-      rollenArt: RollenArt,
-      merkmale: RollenMerkmal[],
-      systemrechte: RollenSystemRechtEnum[],
-      serviceProvider: string[],
-    ): Promise<void> {
-      this.loading = true;
-      try {
-        // Construct the body params object
-        const createRolleBodyParams: CreateRolleBodyParams = {
-          name: rollenName,
-          administeredBySchulstrukturknoten: administrationsebene,
-          rollenart: rollenArt,
-          // TODO Remove casting when generator issue is fixed from the server side
-          merkmale: merkmale as unknown as Set<RollenMerkmal>,
-          systemrechte: systemrechte as unknown as Set<RollenSystemRechtEnum>,
-          serviceProviderIds: serviceProvider as unknown as Set<string>,
-        };
-        const { data }: { data: RolleResponse } = await rolleApi.rolleControllerCreateRolle(createRolleBodyParams);
-        const receivedSystemrechte: Set<RollenSystemRechtEnum> = new Set(
-          Array.from(data.systemrechte).map((recht: SystemRechtResponse) => recht.name),
-        );
-        this.createdRolle = { ...data, systemrechte: receivedSystemrechte };
-        this.currentRolle = this.createdRolle;
-      } catch (error: unknown) {
-        this.errorCode = getResponseErrorCode(error, 'ROLLE_ERROR');
-      } finally {
-        this.loading = false;
-      }
+export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGetters, RolleActions> = defineStore(
+  'rolleStore',
+  {
+    state: (): RolleState => {
+      return {
+        createdRolle: null,
+        updatedRolle: null,
+        currentRolle: null,
+        allRollen: [],
+        errorCode: '',
+        loading: false,
+        totalRollen: 0,
+      };
     },
-
-    async getAllRollen(filter: RolleFilter) {
-      this.loading = true;
-      try {
-        const response: AxiosResponse<Array<RolleWithServiceProvidersResponse>> =
-          await rolleApi.rolleControllerFindRollen(
-            filter.offset,
-            filter.limit,
-            filter.searchString,
-            filter.organisationId,
-            filter.rolleIds,
-            filter.systemrechte,
-            filter.rollenarten,
+    actions: {
+      async createRolle(
+        rollenName: string,
+        administrationsebene: string,
+        rollenArt: RollenArt,
+        merkmale: RollenMerkmal[],
+        systemrechte: RollenSystemRechtEnum[],
+        serviceProvider: string[],
+      ): Promise<void> {
+        this.loading = true;
+        try {
+          // Construct the body params object
+          const createRolleBodyParams: CreateRolleBodyParams = {
+            name: rollenName,
+            administeredBySchulstrukturknoten: administrationsebene,
+            rollenart: rollenArt,
+            // TODO Remove casting when generator issue is fixed from the server side
+            merkmale: merkmale as unknown as Set<RollenMerkmal>,
+            systemrechte: systemrechte as unknown as Set<RollenSystemRechtEnum>,
+            serviceProviderIds: serviceProvider as unknown as Set<string>,
+          };
+          const { data }: { data: RolleResponse } = await rolleApi.rolleControllerCreateRolle(createRolleBodyParams);
+          const receivedSystemrechte: Set<RollenSystemRechtEnum> = new Set(
+            Array.from(data.systemrechte).map((recht: SystemRechtResponse) => recht.name),
           );
-        this.allRollen = response.data;
-        this.totalRollen = +response.headers['x-paging-total'];
-      } catch (error: unknown) {
-        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
-      } finally {
-        this.loading = false;
-      }
-    },
+          this.createdRolle = { ...data, systemrechte: receivedSystemrechte };
+          this.currentRolle = this.createdRolle;
+        } catch (error: unknown) {
+          this.errorCode = getResponseErrorCode(error, 'ROLLE_ERROR');
+        } finally {
+          this.loading = false;
+        }
+      },
 
-    async getRolleById(rolleId: string): Promise<void> {
-      this.loading = true;
-      this.errorCode = '';
-      try {
-        const { data }: { data: RolleWithServiceProvidersResponse } =
-          await rolleApi.rolleControllerFindRolleByIdWithServiceProviders(rolleId);
-        this.currentRolle = mapRolleResponseToRolle(data);
-      } catch (error) {
-        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
-      } finally {
-        this.loading = false;
-      }
-    },
+      async getAllRollen(filter: RolleFilter) {
+        this.loading = true;
+        try {
+          const response: AxiosResponse<Array<RolleWithServiceProvidersResponse>> =
+            await rolleApi.rolleControllerFindRollen(
+              filter.offset,
+              filter.limit,
+              filter.searchString,
+              filter.organisationId,
+              filter.systemrechte,
+            );
+          this.allRollen = response.data;
+          this.totalRollen = +response.headers['x-paging-total'];
+        } catch (error: unknown) {
+          this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+        } finally {
+          this.loading = false;
+        }
+      },
 
-    async updateRolle(
-      rolleId: string,
-      rollenName: string,
-      merkmale: RollenMerkmal[],
-      systemrechte: RollenSystemRechtEnum[],
-      serviceProviderIds: string[],
-      version: number,
-    ): Promise<void> {
-      this.loading = true;
-      this.errorCode = '';
-      try {
-        const updateRolleBodyParams: UpdateRolleBodyParams = {
-          name: rollenName,
-          merkmale: merkmale as unknown as Set<RollenMerkmal>,
-          systemrechte: systemrechte as unknown as Set<RollenSystemRechtEnum>,
-          serviceProviderIds: serviceProviderIds as unknown as Set<string>,
-          version: version,
-        };
-        const { data }: { data: RolleWithServiceProvidersResponse } = await rolleApi.rolleControllerUpdateRolle(
-          rolleId,
-          updateRolleBodyParams,
-        );
-        this.updatedRolle = data;
-      } catch (error) {
-        this.errorCode = getResponseErrorCode(error, 'ROLLE_UPDATE_ERROR');
-      } finally {
-        this.loading = false;
-      }
-    },
+      async getRolleById(rolleId: string): Promise<void> {
+        this.loading = true;
+        this.errorCode = '';
+        try {
+          const { data }: { data: RolleWithServiceProvidersResponse } =
+            await rolleApi.rolleControllerFindRolleByIdWithServiceProviders(rolleId);
+          this.currentRolle = mapRolleResponseToRolle(data);
+        } catch (error) {
+          this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+        } finally {
+          this.loading = false;
+        }
+      },
 
-    async deleteRolleById(rolleId: string): Promise<void> {
-      this.loading = true;
-      this.errorCode = '';
-      try {
-        await rolleApi.rolleControllerDeleteRolle(rolleId);
-      } catch (error) {
-        this.errorCode = getResponseErrorCode(error, 'ROLLE_ERROR');
-      } finally {
-        this.loading = false;
-      }
+      async updateRolle(
+        rolleId: string,
+        rollenName: string,
+        merkmale: RollenMerkmal[],
+        systemrechte: RollenSystemRechtEnum[],
+        serviceProviderIds: string[],
+        version: number,
+      ): Promise<void> {
+        this.loading = true;
+        this.errorCode = '';
+        try {
+          const updateRolleBodyParams: UpdateRolleBodyParams = {
+            name: rollenName,
+            merkmale: merkmale as unknown as Set<RollenMerkmal>,
+            systemrechte: systemrechte as unknown as Set<RollenSystemRechtEnum>,
+            serviceProviderIds: serviceProviderIds as unknown as Set<string>,
+            version: version,
+          };
+          const { data }: { data: RolleWithServiceProvidersResponse } = await rolleApi.rolleControllerUpdateRolle(
+            rolleId,
+            updateRolleBodyParams,
+          );
+          this.updatedRolle = data;
+        } catch (error) {
+          this.errorCode = getResponseErrorCode(error, 'ROLLE_UPDATE_ERROR');
+        } finally {
+          this.loading = false;
+        }
+      },
+
+      async deleteRolleById(rolleId: string): Promise<void> {
+        this.loading = true;
+        this.errorCode = '';
+        try {
+          await rolleApi.rolleControllerDeleteRolle(rolleId);
+        } catch (error) {
+          this.errorCode = getResponseErrorCode(error, 'ROLLE_ERROR');
+        } finally {
+          this.loading = false;
+        }
+      },
     },
   },
-});
+);

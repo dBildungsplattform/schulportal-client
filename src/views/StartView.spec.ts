@@ -5,12 +5,12 @@ import { usePersonInfoStore, type PersonInfoResponse, type PersonInfoStore } fro
 import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
 import {
   useServiceProviderStore,
-  type StartPageServiceProvider,
   type ServiceProviderStore,
+  type StartPageServiceProvider,
 } from '@/stores/ServiceProviderStore';
 import { PersonenUebersicht } from '@/stores/types/PersonenUebersicht';
 import { faker } from '@faker-js/faker';
-import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
+import { DOMWrapper, VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import { DoFactory } from 'test/DoFactory';
 import { expect, test, type Mock } from 'vitest';
 import { nextTick, type Component } from 'vue';
@@ -203,7 +203,7 @@ describe('StartView', () => {
     await flushPromises();
     await nextTick();
 
-    const banner: ReturnType<VueWrapper['findComponent']> | undefined = wrapper?.find('[data-testid="KOPERS-banner"]');
+    const banner: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="KOPERS-banner"]');
 
     expect(banner?.classes()).toContain('bg-errorLight');
   });
@@ -223,7 +223,7 @@ describe('StartView', () => {
     await nextTick();
     await nextTick();
 
-    const banner: ReturnType<VueWrapper['findComponent']> | undefined = wrapper?.find('[data-testid="hinweis-banner"]');
+    const banner: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="hinweis-banner"]');
 
     expect(banner?.isVisible()).toBe(true);
   });
@@ -262,9 +262,7 @@ describe('StartView', () => {
     ];
     await nextTick();
 
-    const categoryTitle: ReturnType<VueWrapper['findComponent']> | undefined = wrapper?.find(
-      '[data-testid="all-service-provider-title"]',
-    );
+    const categoryTitle: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="all-service-provider-title"]');
     expect(categoryTitle?.isVisible()).toBe(true);
   });
 
@@ -275,9 +273,7 @@ describe('StartView', () => {
     await nextTick();
 
     // Category title should still render but be empty for UNTERRICHT
-    const card: ReturnType<VueWrapper['findComponent']> | undefined = wrapper?.find(
-      '[data-testid="start-card-headline"]',
-    );
+    const card: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="start-card-headline"]');
     expect(card?.isVisible()).toBe(true);
   });
 
@@ -314,9 +310,7 @@ describe('StartView', () => {
     ];
     await nextTick();
 
-    const headline: ReturnType<VueWrapper['findComponent']> | undefined = wrapper?.find(
-      '[data-testid="all-service-provider-title"]',
-    );
+    const headline: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="all-service-provider-title"]');
     expect(headline?.isVisible()).toBe(true);
   });
 });

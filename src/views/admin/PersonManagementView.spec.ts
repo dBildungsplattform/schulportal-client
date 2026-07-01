@@ -670,7 +670,7 @@ describe('PersonManagementView', () => {
     // Trigger the checkbox click
     await checkbox.trigger('click');
     await nextTick();
-    const resultTable: VueWrapper = wrapper.findComponent({ name: 'ResultTable' }) as VueWrapper;
+    const resultTable: VueWrapper = wrapper.findComponent({ name: 'ResultTable' });
     resultTable.vm.$emit('update:selectedRows', [person.id]);
     await nextTick();
 

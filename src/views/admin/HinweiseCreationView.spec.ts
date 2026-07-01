@@ -35,6 +35,17 @@ let { storedBeforeRouteLeaveCallback }: { storedBeforeRouteLeaveCallback: OnBefo
   },
 );
 
+// Mock onBeforeRouteLeave to capture the callback
+vi.mock('vue-router', async (importOriginal: () => Promise<object>) => {
+  const mod: object = await importOriginal();
+  return {
+    ...mod,
+    onBeforeRouteLeave: vi.fn((actualCallback: OnBeforeRouteLeaveCallback) => {
+      storedBeforeRouteLeaveCallback = actualCallback;
+    }),
+  };
+});
+
 async function mountComponent(): Promise<ReturnType<typeof mount<typeof HinweiseManagementView>>> {
   await vi.dynamicImportSettled();
   return mount(HinweiseManagementView, {
@@ -75,6 +86,8 @@ describe('HinweiseCreationView', () => {
     `;
 
     meldungStore = useMeldungStore();
+    meldungStore.createOrUpdateMeldung = vi.fn().mockResolvedValue(undefined);
+    meldungStore.getAllMeldungen = vi.fn().mockResolvedValue(undefined);
     meldungStore.meldungen = [
       {
         id: '1',
@@ -93,7 +106,6 @@ describe('HinweiseCreationView', () => {
     await router.isReady();
 
     wrapper = await mountComponent();
-    vi.restoreAllMocks();
   });
 
   afterEach(() => {
@@ -118,10 +130,6 @@ describe('HinweiseCreationView', () => {
   });
 
   test('it fills form and triggers submit', async () => {
-    wrapper = await mountComponent();
-    meldungStore.createOrUpdateMeldung = vi.fn().mockResolvedValue(undefined);
-    meldungStore.getAllMeldungen = vi.fn().mockResolvedValue(undefined);
-
     meldungStore.meldungen = [
       {
         id: '1',
@@ -131,16 +139,23 @@ describe('HinweiseCreationView', () => {
     ];
     await flushPromises();
 
-    const meldungTextInput: VueWrapper | undefined = wrapper.findComponent({ ref: 'newsbox-text' });
-    await meldungTextInput.setValue('Updated Hinweis');
+    const meldungTextInput: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="newsbox-text"] textarea');
+    expect(meldungTextInput?.exists()).toBe(true);
+    await meldungTextInput?.setValue('Updated Hinweis');
+    await flushPromises();
 
-    const submitButton: DOMWrapper<Element> | undefined = wrapper.find('[data-testid="submit-newsbox"]');
+    const submitButton: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="submit-newsbox"]');
     expect(submitButton).toBeDefined();
-    await submitButton.trigger('click');
+    await submitButton?.trigger('click');
 
     await flushPromises();
 
-    expect(meldungStore.createOrUpdateMeldung).toHaveBeenCalled();
+    await vi.waitFor(() => {
+      expect(meldungStore.createOrUpdateMeldung).toHaveBeenCalled();
+    });
+    await vi.waitFor(() => {
+      expect(meldungStore.getAllMeldungen).toHaveBeenCalled();
+    });
   });
 
   test('it shows error message', async () => {
@@ -154,22 +169,8 @@ describe('HinweiseCreationView', () => {
   });
 
   describe('navigation interception', () => {
-    afterEach(() => {
-      vi.unmock('vue-router');
-    });
-
     test('triggers unsaved changes dialog when form is dirty', async () => {
       const expectedCallsToNext: number = 0;
-      // Mock onBeforeRouteLeave to capture the callback
-      vi.mock('vue-router', async (importOriginal: () => Promise<object>) => {
-        const mod: object = await importOriginal();
-        return {
-          ...mod,
-          onBeforeRouteLeave: vi.fn((actualCallback: OnBeforeRouteLeaveCallback) => {
-            storedBeforeRouteLeaveCallback = actualCallback;
-          }),
-        };
-      });
 
       // Remount the component to make sure the form is empty at first
       wrapper = await mountComponent();

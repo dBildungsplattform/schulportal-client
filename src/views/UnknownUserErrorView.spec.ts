@@ -1,9 +1,9 @@
 import routes from '@/router/routes';
-import { VueWrapper, mount } from '@vue/test-utils';
+import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
 import { expect, test } from 'vitest';
+import { nextTick, type Component } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import UnknownUserErrorView from './UnknownUserErrorView.vue';
-import { nextTick, type Component } from 'vue';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -36,25 +36,21 @@ beforeEach(async () => {
 
 describe('UnknownUserErrorView', () => {
   test('it renders the error card', () => {
-    const alertTitle: ReturnType<VueWrapper['findComponent']> | undefined =
-      wrapper?.find('[data-testid$="alert-title"]');
+    const alertTitle: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid$="alert-title"]');
 
     expect(alertTitle?.isVisible()).toBe(true);
     expect(alertTitle?.text()).toEqual('Unbekannter Benutzer');
   });
 
   test('it renders the error description', () => {
-    const alertTitle: ReturnType<VueWrapper['findComponent']> | undefined =
-      wrapper?.find('[data-testid$="alert-text"]');
+    const alertTitle: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid$="alert-text"]');
 
     expect(alertTitle?.isVisible()).toBe(true);
     expect(alertTitle?.text()).toEqual('Der Benutzer ist im Schulportal SH nicht bekannt');
   });
 
   test('it renders the logout button', async () => {
-    const logoutButton: ReturnType<VueWrapper['findComponent']> | undefined = wrapper?.find(
-      '[data-testid$="alert-button"]',
-    );
+    const logoutButton: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid$="alert-button"]');
 
     expect(logoutButton?.isVisible()).toBe(true);
     expect(logoutButton?.text()).toEqual('Abmelden');

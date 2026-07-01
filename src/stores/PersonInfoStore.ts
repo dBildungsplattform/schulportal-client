@@ -49,8 +49,7 @@ export const usePersonInfoStore: StoreDefinition<
   PersonInfoState,
   PersonInfoGetters,
   PersonInfoActions
-> = defineStore({
-  id: 'personInfoStore',
+> = defineStore('personInfoStore', {
   state: (): PersonInfoState => {
     return {
       personInfo: null,
