@@ -455,23 +455,23 @@ describe('BulkOperationStore', () => {
             : befristung;
 
         // Filter out old zuordnungen that will be replaced by the new one (same orgId + rolleId)
-        const otherZuordnungen: Array<DbiamPersonenkontextBodyParams> = response.zuordnungen
-          .filter(
-            (z: DBiamPersonenzuordnungResponse) =>
-              !(z.sskId === selectedOrganisationId && z.rolleId === selectedRolleId),
-          )
-          .map((zuordnung: DBiamPersonenzuordnungResponse) => ({
-            personId,
-            organisationId: zuordnung.sskId,
-            rolleId: zuordnung.rolleId,
-            befristung: zuordnung.befristung ?? undefined,
-          }));
+        const otherZuordnungen: Array<{ organisationId: string; rolleId: string; befristung?: string }> =
+          response.zuordnungen
+            .filter(
+              (z: DBiamPersonenzuordnungResponse) =>
+                !(z.sskId === selectedOrganisationId && z.rolleId === selectedRolleId),
+            )
+            .map((zuordnung: DBiamPersonenzuordnungResponse) => ({
+              organisationId: zuordnung.sskId,
+              rolleId: zuordnung.rolleId,
+              befristung: zuordnung.befristung ?? undefined,
+            }));
 
         expect(mockAdapter.history['put']?.[index]).toBeDefined();
         const data: object = JSON.parse(mockAdapter.history['put']?.[index]?.data as string) as object;
         expect(data).toEqual(
-          expect.objectContaining<Partial<DbiamUpdatePersonenkontexteBodyParams>>({
-            personenkontexte: expect.arrayContaining<DbiamPersonenkontextBodyParams>([
+          expect.objectContaining({
+            personenkontexte: expect.arrayContaining([
               ...otherZuordnungen,
               {
                 befristung: correctBefristung,

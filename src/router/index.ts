@@ -1,3 +1,11 @@
+import type { FeatureFlagResponse } from '@/api-client/generated/api';
+import { StepUpLevel, useAuthStore, type AuthStore } from '@/stores/AuthStore';
+import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
+import { useMasterDataStore, type MasterDataStore } from '@/stores/MasterDataStore';
+import {
+  useTwoFactorAuthentificationStore,
+  type TwoFactorAuthentificationStore,
+} from '@/stores/TwoFactorAuthentificationStore';
 import {
   createRouter,
   createWebHistory,
@@ -5,15 +13,7 @@ import {
   type Router,
   type RouteRecordRaw,
 } from 'vue-router';
-import { StepUpLevel, useAuthStore, type AuthStore } from '@/stores/AuthStore';
-import {
-  useTwoFactorAuthentificationStore,
-  type TwoFactorAuthentificationStore,
-} from '@/stores/TwoFactorAuthentificationStore';
 import routes from './routes';
-import { useMasterDataStore, type MasterDataStore } from '@/stores/MasterDataStore';
-import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
-import type { FeatureFlagResponse } from '@/api-client/generated/api';
 
 type Permission =
   | 'klassenverwaltung'

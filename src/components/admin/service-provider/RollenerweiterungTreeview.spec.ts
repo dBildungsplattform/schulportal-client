@@ -115,7 +115,7 @@ describe('RollenerweiterungTreeview - toggleGroupSelection', () => {
 describe('RollenerweiterungTreeview - onSelectionUpdate', () => {
   test('emits only valid leaf IDs on treeview model update', () => {
     const wrapper: VueWrapper = mountComponent() as VueWrapper;
-    const treeview: VueWrapper = wrapper.findComponent({ name: 'VTreeview' }) as VueWrapper;
+    const treeview: VueWrapper = wrapper.findComponent({ name: 'VTreeview' });
     treeview.vm.$emit('update:modelValue', ['lehr-1', 'lern-1']);
 
     const emitted: unknown[][] | undefined = wrapper.emitted('update:selectedRolleIds');
@@ -125,7 +125,7 @@ describe('RollenerweiterungTreeview - onSelectionUpdate', () => {
 
   test('filters out non-leaf (group) IDs', () => {
     const wrapper: VueWrapper = mountComponent() as VueWrapper;
-    const treeview: VueWrapper = wrapper.findComponent({ name: 'VTreeview' }) as VueWrapper;
+    const treeview: VueWrapper = wrapper.findComponent({ name: 'VTreeview' });
     treeview.vm.$emit('update:modelValue', ['lehr-1', 'group-LEHR']);
 
     const emitted: unknown[][] | undefined = wrapper.emitted('update:selectedRolleIds');
@@ -136,7 +136,7 @@ describe('RollenerweiterungTreeview - onSelectionUpdate', () => {
 
   test('emits empty array when called with non-array value', () => {
     const wrapper: VueWrapper = mountComponent() as VueWrapper;
-    const treeview: VueWrapper = wrapper.findComponent({ name: 'VTreeview' }) as VueWrapper;
+    const treeview: VueWrapper = wrapper.findComponent({ name: 'VTreeview' });
     treeview.vm.$emit('update:modelValue', null);
 
     const emitted: unknown[][] | undefined = wrapper.emitted('update:selectedRolleIds');
@@ -145,7 +145,7 @@ describe('RollenerweiterungTreeview - onSelectionUpdate', () => {
 
   test('filters out non-string values from array', () => {
     const wrapper: VueWrapper = mountComponent() as VueWrapper;
-    const treeview: VueWrapper = wrapper.findComponent({ name: 'VTreeview' }) as VueWrapper;
+    const treeview: VueWrapper = wrapper.findComponent({ name: 'VTreeview' });
     treeview.vm.$emit('update:modelValue', ['lehr-1', 123, null, 'lern-1']);
 
     const emitted: unknown[][] | undefined = wrapper.emitted('update:selectedRolleIds');

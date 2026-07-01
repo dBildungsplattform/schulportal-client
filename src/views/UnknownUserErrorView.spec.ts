@@ -1,9 +1,9 @@
 import routes from '@/router/routes';
 import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
 import { expect, test } from 'vitest';
+import { nextTick, type Component } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import UnknownUserErrorView from './UnknownUserErrorView.vue';
-import { nextTick, type Component } from 'vue';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;

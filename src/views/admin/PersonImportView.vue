@@ -180,7 +180,11 @@
           const utf8Text: string = convertToUTF8(event.target?.result as ArrayBuffer);
           resolve(utf8Text);
         } catch (error) {
-          reject(error as Error);
+          if (error instanceof Error) {
+            reject(error);
+          } else {
+            reject(new Error('An unknown error occurred during file reading.'));
+          }
         }
       };
 

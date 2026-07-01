@@ -200,14 +200,24 @@ export const LOGO_CATALOG: Record<LogoId, LogoConfig> = {
 };
 
 /**
+ * Check if a logo ID is valid
+ */
+export function isValidLogoId(logoId: number): logoId is LogoId {
+  return logoId in LOGO_CATALOG;
+}
+
+/**
  * Get logo configuration by ID (number or enum)
  * Returns undefined if ID is not found
  */
-export function getLogoConfig(logoId?: number | LogoId): LogoConfig | undefined {
+export function getLogoConfig(logoId?: number | LogoId | null): LogoConfig | undefined {
   if (logoId === undefined || logoId === null) {
     return undefined;
   }
-  return LOGO_CATALOG[logoId as LogoId];
+  if (isValidLogoId(logoId)) {
+    return LOGO_CATALOG[logoId];
+  }
+  return undefined;
 }
 
 /**
@@ -231,11 +241,4 @@ export function getLogoPath(logoId?: number | LogoId): string | undefined {
 export function getLogoName(logoId?: number | LogoId): string | undefined {
   const config: LogoConfig | undefined = getLogoConfig(logoId);
   return config?.name;
-}
-
-/**
- * Check if a logo ID is valid
- */
-export function isValidLogoId(logoId: number): logoId is LogoId {
-  return logoId in LOGO_CATALOG;
 }

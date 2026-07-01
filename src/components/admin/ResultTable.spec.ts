@@ -124,14 +124,8 @@ describe('Row Index and Item Retrieval', () => {
     }
   });
 
-  test('emits update:selectedRows event with selected items', () => {
-    const selectedItems: {
-      id: number;
-      name: string;
-    }[] = [
-      { id: 1, name: 'Alice' },
-      { id: 2, name: 'Bob' },
-    ];
+  test('emits update:selectedRows event with selected item values', () => {
+    const selectedItems: number[] = [1, 2];
     const table: VueWrapper | undefined = wrapper?.findComponent({ ref: 'v-data-table-server' });
     table?.vm.$emit('update:modelValue', selectedItems);
 

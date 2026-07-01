@@ -38,7 +38,7 @@ describe('SpshAlert Component', () => {
   });
 
   test('it renders the back button with correct text', () => {
-    const backbutton: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid$="alert-button"]');
+    const backbutton: DOMWrapper<HTMLButtonElement> | undefined = wrapper?.find('[data-testid$="alert-button"]');
 
     if (!backbutton) {
       return;
@@ -48,7 +48,7 @@ describe('SpshAlert Component', () => {
   });
 
   test('it triggers goBack action when back button is clicked', async () => {
-    const alertButton: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid$="alert-button"]');
+    const alertButton: DOMWrapper<HTMLButtonElement> | undefined = wrapper?.find('[data-testid$="alert-button"]');
     await alertButton?.trigger('click');
     await nextTick();
 
@@ -56,7 +56,9 @@ describe('SpshAlert Component', () => {
   });
 
   test('it renders the second factor setup button', () => {
-    const setupButton: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="toSecondFactorSetup-button"]');
+    const setupButton: DOMWrapper<HTMLButtonElement> | undefined = wrapper?.find(
+      '[data-testid="toSecondFactorSetup-button"]',
+    );
     expect(setupButton!.exists()).toBe(true);
   });
 
@@ -64,7 +66,9 @@ describe('SpshAlert Component', () => {
     const toSecondFactorSetupMock: Mock = vi.fn();
     await wrapper?.setProps({ buttonAction: toSecondFactorSetupMock });
 
-    const setupButton: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="toSecondFactorSetup-button"]');
+    const setupButton: DOMWrapper<HTMLButtonElement> | undefined = wrapper?.find(
+      '[data-testid="toSecondFactorSetup-button"]',
+    );
     await setupButton?.trigger('click');
     await nextTick();
     expect(window.location.href).toBe('/profile');

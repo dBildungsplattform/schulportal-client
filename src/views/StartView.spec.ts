@@ -5,8 +5,8 @@ import { usePersonInfoStore, type PersonInfoResponse, type PersonInfoStore } fro
 import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
 import {
   useServiceProviderStore,
-  type StartPageServiceProvider,
   type ServiceProviderStore,
+  type StartPageServiceProvider,
 } from '@/stores/ServiceProviderStore';
 import { PersonenUebersicht } from '@/stores/types/PersonenUebersicht';
 import { faker } from '@faker-js/faker';

@@ -1,13 +1,8 @@
-import {
-  ImportDataItemStatus,
-  RollenSystemRechtEnum,
-  type ImportUploadResponse,
-  type SystemRechtResponse,
-} from '@/api-client/generated';
+import { ImportDataItemStatus, type ImportUploadResponse } from '@/api-client/generated';
 import routes from '@/router/routes';
 import { useImportStore, type ImportStore } from '@/stores/ImportStore';
 import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
-import { RollenMerkmal, useRolleStore, type RolleStore } from '@/stores/RolleStore';
+import { RollenArt, useRolleStore, type RolleStore } from '@/stores/RolleStore';
 import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import { DoFactory } from 'test/DoFactory';
 import { expect, test, type Mock, type MockInstance } from 'vitest';
@@ -30,52 +25,12 @@ organisationStore.organisationenFilters.set('', {
 });
 
 rolleStore.allRollen = [
-  {
-    administeredBySchulstrukturknoten: '1234',
-    rollenart: 'LEHR',
-    name: 'Lehrer',
-    // TODO: remove type casting when generator is fixed
-    merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
-    systemrechte: [
-      { name: RollenSystemRechtEnum.RollenVerwalten, isTechnical: false },
-    ] as unknown as Set<SystemRechtResponse>,
-    createdAt: '2022',
-    updatedAt: '2022',
-    id: '1',
-    serviceProviders: [
-      {
-        id: '1',
-        name: 'itslearning',
-      },
-      {
-        id: '2',
-        name: 'E-Mail',
-      },
-    ],
-    administeredBySchulstrukturknotenName: 'Land SH',
-    administeredBySchulstrukturknotenKennung: '',
-    version: 1,
-  },
-  {
-    administeredBySchulstrukturknoten: '1234',
-    rollenart: 'LERN',
-    name: 'SuS',
-    // TODO: remove type casting when generator is fixed
-    merkmale: [] as unknown as Set<RollenMerkmal>,
-    systemrechte: [] as unknown as Set<SystemRechtResponse>,
-    createdAt: '2022',
-    updatedAt: '2022',
-    id: '2',
-    serviceProviders: [
-      {
-        id: '1',
-        name: 'itslearning',
-      },
-    ],
-    administeredBySchulstrukturknotenName: 'Land SH',
-    administeredBySchulstrukturknotenKennung: '1234567',
-    version: 1,
-  },
+  DoFactory.getRolleWithServiceProviders({
+    rollenart: RollenArt.Lehr,
+  }),
+  DoFactory.getRolleWithServiceProviders({
+    rollenart: RollenArt.Lern,
+  }),
 ];
 
 async function selectSchule(value: string): Promise<ReturnType<VueWrapper['findComponent']> | undefined> {
@@ -142,7 +97,9 @@ describe('PersonImportView', () => {
   test('it clears selects', async () => {
     const schuleAutocomplete: ReturnType<VueWrapper['findComponent']> | undefined = await selectSchule(schule.id);
 
-    const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+    const rolleAutocomplete: ReturnType<VueWrapper['findComponent']> | undefined = wrapper?.findComponent({
+      ref: 'rolle-select',
+    });
     rolleAutocomplete?.setValue('SuS');
     await nextTick();
 
@@ -472,7 +429,9 @@ describe('PersonImportView', () => {
     const schuleAutocomplete: ReturnType<VueWrapper['findComponent']> | undefined = wrapper
       ?.findComponent({ ref: 'schulFilter' })
       .findComponent({ ref: 'person-import-schule-select' });
-    const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+    const rolleAutocomplete: ReturnType<VueWrapper['findComponent']> | undefined = wrapper?.findComponent({
+      ref: 'rolle-select',
+    });
     const fileInput: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="file-input"] input');
     const mockFile: File = new File([''], 'personen.csv', { type: 'text/csv' });
 

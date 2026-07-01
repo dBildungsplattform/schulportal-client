@@ -320,7 +320,7 @@ describe('ServiceProviderDetailsView', () => {
     wrapper = await mountComponent();
     await openRollenerweiterungenSection();
 
-    const rollenFilter: VueWrapper = wrapper.findComponent({ ref: 'rolle-select' }) as VueWrapper;
+    const rollenFilter: VueWrapper = wrapper.findComponent({ ref: 'rolle-select' });
     expect((rollenFilter as unknown as { props: (key: string) => never }).props('items')).toEqual([]);
   });
 
@@ -337,7 +337,7 @@ describe('ServiceProviderDetailsView', () => {
     await flushPromises();
 
     // Reset button should only be enabled when filters are active
-    const resetButton: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="reset-filter-button"]');
+    const resetButton: DOMWrapper<HTMLButtonElement> | undefined = wrapper?.find('[data-testid="reset-filter-button"]');
     expect(resetButton?.attributes('disabled')).toBeUndefined();
 
     await resetButton?.trigger('click');
