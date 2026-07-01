@@ -1,4 +1,5 @@
 import {
+  type DBiamPersonResponse,
   type DBiamPersonenkontextResponse,
   type DBiamPersonenuebersichtResponse,
   type DBiamPersonenzuordnungResponse,
@@ -126,6 +127,22 @@ export class DoFactory {
   public static getPersonendatensatzResponse(props?: Partial<PersonResponse>): PersonendatensatzResponse {
     return {
       person: this.getPersonResponse(props),
+    };
+  }
+
+  public static getDBiamPersonResponse(props?: Partial<DBiamPersonResponse>): DBiamPersonResponse {
+    const person: PersonResponse = this.getPersonResponse(props?.person);
+    const dBiamPersonenkontextResponses: DBiamPersonenkontextResponse[] = props?.dBiamPersonenkontextResponses
+      ? props.dBiamPersonenkontextResponses.map((kontext: DBiamPersonenkontextResponse) => ({
+          ...kontext,
+          personId: kontext.personId ?? person.id,
+        }))
+      : [this.getDBiamPersonenkontextResponse({ personId: person.id })];
+
+    return {
+      ...props,
+      person,
+      dBiamPersonenkontextResponses,
     };
   }
 

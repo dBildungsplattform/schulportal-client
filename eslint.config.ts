@@ -95,11 +95,11 @@ export default defineConfig(
     languageOptions: {
       parser: vueParser,
       sourceType: 'module',
-      ecmaVersion: 2020,
+      ecmaVersion: 2022,
       parserOptions: {
         parser: tseslint.parser,
         extraFileExtensions: ['.vue'],
-        ecmaVersion: 2020,
+        ecmaVersion: 2022,
         sourceType: 'module',
         project: ['./tsconfig.json', './tsconfig.app.json', './tsconfig.node.json'],
       },

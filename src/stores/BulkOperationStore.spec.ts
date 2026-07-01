@@ -1,9 +1,10 @@
 import type {
+  DbiamPersonenkontextBodyParams,
   DBiamPersonenkontextResponse,
   DBiamPersonenuebersichtResponse,
   DBiamPersonenzuordnungResponse,
+  DbiamUpdatePersonenkontexteBodyParams,
   PersonenkontexteUpdateResponse,
-  RollenMerkmal,
 } from '@/api-client/generated';
 import axiosApiInstance from '@/services/ApiService';
 import { faker } from '@faker-js/faker';
@@ -452,22 +453,22 @@ describe('BulkOperationStore', () => {
           : befristung;
 
         // Filter out old zuordnungen that will be replaced by the new one (same orgId + rolleId)
-        const otherZuordnungen: Array<{ organisationId: string; rolleId: string; befristung?: string }> =
-          response.zuordnungen
-            .filter(
-              (z: DBiamPersonenzuordnungResponse) =>
-                !(z.sskId === selectedOrganisationId && z.rolleId === selectedRolleId),
-            )
-            .map((zuordnung: DBiamPersonenzuordnungResponse) => ({
-              organisationId: zuordnung.sskId,
-              rolleId: zuordnung.rolleId,
-              befristung: zuordnung.befristung ?? undefined,
-            }));
+        const otherZuordnungen: Array<DbiamPersonenkontextBodyParams> = response.zuordnungen
+          .filter(
+            (z: DBiamPersonenzuordnungResponse) =>
+              !(z.sskId === selectedOrganisationId && z.rolleId === selectedRolleId),
+          )
+          .map((zuordnung: DBiamPersonenzuordnungResponse) => ({
+            organisationId: zuordnung.sskId,
+            rolleId: zuordnung.rolleId,
+            befristung: zuordnung.befristung ?? undefined,
+            personId,
+          }));
 
         expect(mockAdapter.history['put']?.[index]).toBeDefined();
         const data: object = JSON.parse(mockAdapter.history['put']?.[index]?.data as string) as object;
         expect(data).toEqual(
-          expect.objectContaining({
+          expect.objectContaining<Partial<DbiamUpdatePersonenkontexteBodyParams>>({
             personenkontexte: expect.arrayContaining([
               ...otherZuordnungen,
               {
@@ -476,7 +477,7 @@ describe('BulkOperationStore', () => {
                 rolleId: selectedRolleId,
                 personId,
               },
-            ]),
+            ]) as Array<DbiamPersonenkontextBodyParams>,
           }),
         );
       });
@@ -543,7 +544,7 @@ describe('BulkOperationStore', () => {
             { personId, organisationId: selectedOrganisationId, rolleId: existingRolleId, befristung: undefined },
             { personId, organisationId: selectedOrganisationId, rolleId: selectedRolleId, befristung: undefined },
             { personId, organisationId: selectedKlasseId, rolleId: selectedRolleId, befristung: undefined },
-          ]),
+          ]) as Array<DbiamPersonenkontextBodyParams>,
         }),
       );
     });
@@ -626,7 +627,7 @@ describe('BulkOperationStore', () => {
             { personId, organisationId: existingKlasseId, rolleId: existingRolleId, befristung: undefined },
             { personId, organisationId: existingKlasseId, rolleId: selectedRolleId, befristung: undefined },
             { personId, organisationId: selectedOrganisationId, rolleId: selectedRolleId, befristung: undefined },
-          ]),
+          ]) as Array<DbiamPersonenkontextBodyParams>,
         }),
       );
     });
@@ -738,14 +739,14 @@ describe('BulkOperationStore', () => {
             { personId, organisationId: existingKlasseIdA, rolleId: selectedRolleId, befristung: undefined },
             { personId, organisationId: selectedOrganisationId, rolleId: selectedRolleId, befristung: undefined },
             { personId, organisationId: existingKlasseIdB, rolleId: differentRolleId, befristung: undefined },
-          ]),
+          ]) as Array<DbiamPersonenkontextBodyParams>,
         }),
       );
       expect(data).not.toEqual(
         expect.objectContaining({
           personenkontexte: expect.arrayContaining([
             { personId, organisationId: existingKlasseIdB, rolleId: selectedRolleId, befristung: undefined },
-          ]),
+          ]) as Array<DbiamPersonenkontextBodyParams>,
         }),
       );
     });
@@ -912,7 +913,7 @@ describe('BulkOperationStore', () => {
             typ: OrganisationsTyp.Schule,
             editable: true,
             befristung: 'unbefristet',
-            merkmale: [] as unknown as RollenMerkmal[],
+            merkmale: [],
             admins: ['admin1'],
           },
           {
@@ -926,7 +927,7 @@ describe('BulkOperationStore', () => {
             typ: OrganisationsTyp.Schule,
             editable: true,
             befristung: 'unbefristet',
-            merkmale: [] as unknown as RollenMerkmal[],
+            merkmale: [],
             admins: ['admin1'],
           },
         ],
@@ -988,7 +989,7 @@ describe('BulkOperationStore', () => {
             typ: OrganisationsTyp.Schule,
             editable: true,
             befristung: 'unbefristet',
-            merkmale: [] as unknown as RollenMerkmal[],
+            merkmale: [],
             admins: ['admin1'],
           },
           {
@@ -1002,7 +1003,7 @@ describe('BulkOperationStore', () => {
             typ: OrganisationsTyp.Klasse,
             editable: true,
             befristung: 'unbefristet',
-            merkmale: [] as unknown as RollenMerkmal[],
+            merkmale: [],
             admins: ['admin1'],
           },
           {
@@ -1016,7 +1017,7 @@ describe('BulkOperationStore', () => {
             typ: OrganisationsTyp.Schule,
             editable: true,
             befristung: 'unbefristet',
-            merkmale: [] as unknown as RollenMerkmal[],
+            merkmale: [],
             admins: ['admin1'],
           },
         ],
@@ -1072,7 +1073,7 @@ describe('BulkOperationStore', () => {
             typ: OrganisationsTyp.Schule,
             editable: true,
             befristung: 'unbefristet',
-            merkmale: [] as unknown as RollenMerkmal[],
+            merkmale: [],
             admins: ['admin1'],
           },
         ],
