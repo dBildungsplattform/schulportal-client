@@ -66,6 +66,7 @@ type AuthState = {
   hasAngeboteVerwaltenPermission: boolean;
   hasRollenerweiternPermission: boolean;
   hasEingeschränktAngeboteVerwaltenPermission: boolean;
+  hasVidisPermission: boolean;
   isAuthenticated: boolean;
   acr: StepUpLevel;
   timeLimitInfos: PersonTimeLimitInfoResponse[];
@@ -110,6 +111,7 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
       acr: StepUpLevel.NONE,
       timeLimitInfos: [],
       csrfToken: null,
+      hasVidisPermission: false,
     }),
     actions: {
       async initializeAuthStatus() {
@@ -124,6 +126,7 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
             this.currentUser = data;
             this.acr = data.acr as StepUpLevel;
             this.timeLimitInfos = data.timeLimits;
+            await this.getCsrfToken();
 
             /* extract all system permissions from current user's personenkontexte */
             const personenkontexte: Array<PersonenkontextRolleFields> | null = this.currentUser.personenkontexte;
@@ -162,6 +165,9 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
             this.hasEingeschränktAngeboteVerwaltenPermission = this.currentUserPermissions.includes(
               RollenSystemRecht.AngeboteEingeschraenktVerwalten,
             );
+            this.hasVidisPermission = this.currentUserPermissions.includes(
+              RollenSystemRecht.SchulischeVidisAngeboteAbrufen,
+            );
           } else {
             throw new Error('User info could not be retrieved.');
           }
@@ -185,6 +191,7 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
           this.hasEingeschränktNeueBenutzerErstellenPermission = false;
           this.hasAngeboteVerwaltenPermission = false;
           this.hasEingeschränktAngeboteVerwaltenPermission = false;
+          this.hasVidisPermission = false;
           this.isAuthenticated = false;
           this.acr = StepUpLevel.NONE;
           this.timeLimitInfos = [];

@@ -1745,7 +1745,8 @@ export const ManageableServiceProviderResponseRelevantSystemrechteEnum = {
     HinweiseBearbeiten: 'HINWEISE_BEARBEITEN',
     RollenErweitern: 'ROLLEN_ERWEITERN',
     AngeboteVerwalten: 'ANGEBOTE_VERWALTEN',
-    AngeboteEingeschraenktVerwalten: 'ANGEBOTE_EINGESCHRAENKT_VERWALTEN'
+    AngeboteEingeschraenktVerwalten: 'ANGEBOTE_EINGESCHRAENKT_VERWALTEN',
+    SchulischeVidisAngeboteAbrufen: 'SCHULISCHE_VIDIS_ANGEBOTE_ABRUFEN'
 } as const;
 
 export type ManageableServiceProviderResponseRelevantSystemrechteEnum = typeof ManageableServiceProviderResponseRelevantSystemrechteEnum[keyof typeof ManageableServiceProviderResponseRelevantSystemrechteEnum];
@@ -3624,7 +3625,8 @@ export const RollenSystemRechtEnum = {
     HinweiseBearbeiten: 'HINWEISE_BEARBEITEN',
     RollenErweitern: 'ROLLEN_ERWEITERN',
     AngeboteVerwalten: 'ANGEBOTE_VERWALTEN',
-    AngeboteEingeschraenktVerwalten: 'ANGEBOTE_EINGESCHRAENKT_VERWALTEN'
+    AngeboteEingeschraenktVerwalten: 'ANGEBOTE_EINGESCHRAENKT_VERWALTEN',
+    SchulischeVidisAngeboteAbrufen: 'SCHULISCHE_VIDIS_ANGEBOTE_ABRUFEN'
 } as const;
 
 export type RollenSystemRechtEnum = typeof RollenSystemRechtEnum[keyof typeof RollenSystemRechtEnum];
@@ -14025,6 +14027,137 @@ export class StatusApi extends BaseAPI implements StatusApiInterface {
      */
     public statusControllerGetStatus(options?: AxiosRequestConfig) {
         return StatusApiFp(this.configuration).statusControllerGetStatus(options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
+ * VidisApi - axios parameter creator
+ * @export
+ */
+export const VidisApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * Sync VIDIS Angebote for a school organisation.
+         * @summary 
+         * @param {string} organisationId The id of an organization
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        vidisControllerSyncAngeboteForSchool: async (organisationId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'organisationId' is not null or undefined
+            assertParamExists('vidisControllerSyncAngeboteForSchool', 'organisationId', organisationId)
+            const localVarPath = `/api/vidis/{organisationId}/angebote-sync`
+                .replace(`{${"organisationId"}}`, encodeURIComponent(String(organisationId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * VidisApi - functional programming interface
+ * @export
+ */
+export const VidisApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = VidisApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * Sync VIDIS Angebote for a school organisation.
+         * @summary 
+         * @param {string} organisationId The id of an organization
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async vidisControllerSyncAngeboteForSchool(organisationId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.vidisControllerSyncAngeboteForSchool(organisationId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * VidisApi - factory interface
+ * @export
+ */
+export const VidisApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = VidisApiFp(configuration)
+    return {
+        /**
+         * Sync VIDIS Angebote for a school organisation.
+         * @summary 
+         * @param {string} organisationId The id of an organization
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        vidisControllerSyncAngeboteForSchool(organisationId: string, options?: any): AxiosPromise<void> {
+            return localVarFp.vidisControllerSyncAngeboteForSchool(organisationId, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * VidisApi - interface
+ * @export
+ * @interface VidisApi
+ */
+export interface VidisApiInterface {
+    /**
+     * Sync VIDIS Angebote for a school organisation.
+     * @summary 
+     * @param {string} organisationId The id of an organization
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof VidisApiInterface
+     */
+    vidisControllerSyncAngeboteForSchool(organisationId: string, options?: AxiosRequestConfig): AxiosPromise<void>;
+
+}
+
+/**
+ * VidisApi - object-oriented interface
+ * @export
+ * @class VidisApi
+ * @extends {BaseAPI}
+ */
+export class VidisApi extends BaseAPI implements VidisApiInterface {
+    /**
+     * Sync VIDIS Angebote for a school organisation.
+     * @summary 
+     * @param {string} organisationId The id of an organization
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof VidisApi
+     */
+    public vidisControllerSyncAngeboteForSchool(organisationId: string, options?: AxiosRequestConfig) {
+        return VidisApiFp(this.configuration).vidisControllerSyncAngeboteForSchool(organisationId, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
