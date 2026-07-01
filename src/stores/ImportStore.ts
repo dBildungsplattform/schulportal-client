@@ -1,28 +1,25 @@
-import { defineStore, type Store, type StoreDefinition } from 'pinia';
+import axiosApiInstance from '@/services/ApiService';
 import { getResponseErrorCode } from '@/utils/errorHandlers';
+import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import {
   ImportApiFactory,
   ImportStatus,
   type ImportApiInterface,
-  type ImportedUserResponse,
   type ImportResultResponse,
   type ImportUploadResponse,
   type ImportVorgangStatusResponse,
 } from '../api-client/generated/api';
-import axiosApiInstance from '@/services/ApiService';
+
+export {
+  ImportDataItemStatus,
+  type ImportedUserResponse,
+  type ImportResultResponse,
+} from '../api-client/generated/api';
 
 const importApi: ImportApiInterface = ImportApiFactory(undefined, '', axiosApiInstance);
 
 // 2 hours polling time at maximum
 const MAX_POLLING_TIME: number = 120 * 60 * 1000;
-
-export enum ImportDataItemStatus {
-  Failed = 'FAILED',
-  Success = 'SUCCESS',
-  Pending = 'PENDING',
-}
-
-export type { ImportResultResponse, ImportedUserResponse };
 
 export type ImportState = {
   errorCode: string | null;

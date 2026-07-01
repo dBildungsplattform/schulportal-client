@@ -65,13 +65,17 @@
   const formContext: FormContext<ServiceProviderForm> = useForm({
     validationSchema,
     initialValues: {
+      selectedOrganisationId: undefined,
+      name: '',
+      url: '',
+      logoId: undefined,
       kategorie: ServiceProviderKategorie.Schulisch,
       nachtraeglichZuweisbar: true,
       verfuegbarFuerRollenerweiterung: true,
       requires2fa: false,
       // No default logoId — admin must actively pick one
       ...props.initialValues,
-    } as ServiceProviderForm,
+    },
   });
 
   const [selectedOrganisationId, selectedOrganisationIdProps]: FieldDefinition<string> = formContext.defineField(

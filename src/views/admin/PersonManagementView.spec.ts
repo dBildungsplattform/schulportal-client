@@ -1,9 +1,4 @@
-import {
-  RollenArt,
-  RollenSystemRechtEnum,
-  type FindRollenResponse,
-  type SystemRechtResponse,
-} from '@/api-client/generated/api';
+import { RollenArt, RollenSystemRechtEnum, type SystemRechtResponse } from '@/api-client/generated/api';
 import routes from '@/router/routes';
 import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
@@ -14,8 +9,8 @@ import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFil
 import type { Person } from '@/stores/types/Person';
 import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
 import type { Zuordnung } from '@/stores/types/Zuordnung';
+import { OperationType } from '@/stores/types/bulkOperationTypes';
 import { DOMWrapper, VueWrapper, flushPromises, mount } from '@vue/test-utils';
-import type WrapperLike from 'node_modules/@vue/test-utils/dist/interfaces/wrapperLike';
 import { DoFactory } from 'test/DoFactory';
 import { expect, test, type Mock, type MockInstance } from 'vitest';
 import {
@@ -30,7 +25,6 @@ import {
 } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import PersonManagementView from './PersonManagementView.vue';
-import { OperationType } from '@/stores/types/bulkOperationTypes';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
@@ -122,7 +116,7 @@ beforeEach(async () => {
       },
     ] as RolleResponse[],
     total: 1,
-  } as FindRollenResponse;
+  };
 
   personenkontextStore.workflowStepResponse = {
     rollen: [
@@ -310,7 +304,9 @@ describe('PersonManagementView', () => {
     expect(wrapper?.find('.v-data-table-footer__items-per-page').isVisible()).toBe(true);
     expect(wrapper?.find('.v-data-table-footer__items-per-page').text()).toContain('30');
 
-    const component: WrapperLike | undefined = wrapper?.findComponent('.v-data-table-footer__items-per-page .v-select');
+    const component: ReturnType<VueWrapper['findComponent']> | undefined = wrapper?.findComponent(
+      '.v-data-table-footer__items-per-page .v-select',
+    );
     await component?.setValue(50);
     expect(wrapper?.find('.v-data-table-footer__items-per-page').text()).toContain('50');
 

@@ -11,7 +11,6 @@ import {
 import { PersonenUebersicht } from '@/stores/types/PersonenUebersicht';
 import { faker } from '@faker-js/faker';
 import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
-import type WrapperLike from 'node_modules/@vue/test-utils/dist/interfaces/wrapperLike';
 import { DoFactory } from 'test/DoFactory';
 import { expect, test, type Mock } from 'vitest';
 import { nextTick, type Component } from 'vue';
@@ -156,7 +155,9 @@ describe('StartView', () => {
     authStore.hasPersonenverwaltungPermission = true;
     await nextTick();
 
-    const adminCard: WrapperLike | undefined = wrapper?.findComponent('[data-testid="service-provider-card-1"]');
+    const adminCard: ReturnType<VueWrapper['findComponent']> | undefined = wrapper?.findComponent(
+      '[data-testid="service-provider-card-1"]',
+    );
 
     expect(adminCard?.isVisible()).toBe(true);
     expect(adminCard?.attributes('href')).toEqual('/admin/personen');
@@ -166,7 +167,9 @@ describe('StartView', () => {
     authStore.hasSchulverwaltungPermission = true;
     await nextTick();
 
-    const adminCard: WrapperLike | undefined = wrapper?.findComponent('[data-testid="service-provider-card-1"]');
+    const adminCard: ReturnType<VueWrapper['findComponent']> | undefined = wrapper?.findComponent(
+      '[data-testid="service-provider-card-1"]',
+    );
 
     expect(adminCard?.isVisible()).toBe(true);
     expect(adminCard?.attributes('href')).toEqual('/admin/schulen');
@@ -176,7 +179,9 @@ describe('StartView', () => {
     authStore.hasRollenverwaltungPermission = true;
     await nextTick();
 
-    const adminCard: WrapperLike | undefined = wrapper?.findComponent('[data-testid="service-provider-card-1"]');
+    const adminCard: ReturnType<VueWrapper['findComponent']> | undefined = wrapper?.findComponent(
+      '[data-testid="service-provider-card-1"]',
+    );
 
     expect(adminCard?.isVisible()).toBe(true);
     expect(adminCard?.attributes('href')).toEqual('/admin/rollen');
@@ -186,7 +191,9 @@ describe('StartView', () => {
     authStore.hasKlassenverwaltungPermission = true;
     await nextTick();
 
-    const adminCard: WrapperLike | undefined = wrapper?.findComponent('[data-testid="service-provider-card-1"]');
+    const adminCard: ReturnType<VueWrapper['findComponent']> | undefined = wrapper?.findComponent(
+      '[data-testid="service-provider-card-1"]',
+    );
 
     expect(adminCard?.isVisible()).toBe(true);
     expect(adminCard?.attributes('href')).toEqual('/admin/klassen');
@@ -196,7 +203,7 @@ describe('StartView', () => {
     await flushPromises();
     await nextTick();
 
-    const banner: WrapperLike | undefined = wrapper?.find('[data-testid="KOPERS-banner"]');
+    const banner: ReturnType<VueWrapper['findComponent']> | undefined = wrapper?.find('[data-testid="KOPERS-banner"]');
 
     expect(banner?.classes()).toContain('bg-errorLight');
   });
@@ -216,7 +223,7 @@ describe('StartView', () => {
     await nextTick();
     await nextTick();
 
-    const banner: WrapperLike | undefined = wrapper?.find('[data-testid="hinweis-banner"]');
+    const banner: ReturnType<VueWrapper['findComponent']> | undefined = wrapper?.find('[data-testid="hinweis-banner"]');
 
     expect(banner?.isVisible()).toBe(true);
   });
@@ -255,7 +262,9 @@ describe('StartView', () => {
     ];
     await nextTick();
 
-    const categoryTitle: WrapperLike | undefined = wrapper?.find('[data-testid="all-service-provider-title"]');
+    const categoryTitle: ReturnType<VueWrapper['findComponent']> | undefined = wrapper?.find(
+      '[data-testid="all-service-provider-title"]',
+    );
     expect(categoryTitle?.isVisible()).toBe(true);
   });
 
@@ -266,7 +275,9 @@ describe('StartView', () => {
     await nextTick();
 
     // Category title should still render but be empty for UNTERRICHT
-    const card: WrapperLike | undefined = wrapper?.find('[data-testid="start-card-headline"]');
+    const card: ReturnType<VueWrapper['findComponent']> | undefined = wrapper?.find(
+      '[data-testid="start-card-headline"]',
+    );
     expect(card?.isVisible()).toBe(true);
   });
 
@@ -303,7 +314,9 @@ describe('StartView', () => {
     ];
     await nextTick();
 
-    const headline: WrapperLike | undefined = wrapper?.find('[data-testid="all-service-provider-title"]');
+    const headline: ReturnType<VueWrapper['findComponent']> | undefined = wrapper?.find(
+      '[data-testid="all-service-provider-title"]',
+    );
     expect(headline?.isVisible()).toBe(true);
   });
 });
