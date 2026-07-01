@@ -933,7 +933,10 @@
     "openMobileMenu": "Mobiles Menü öffnen",
     "help": "Hilfe",
     "profile": "Mein Profil",
-    "backToPreviousPage": "Zurück zur vorherigen Seite"
+    "backToPreviousPage": "Zurück zur vorherigen Seite",
+    "faqAdministration": "FAQ - Administration",
+    "chatNutzen": "Chat nutzen",
+    "helpForThisSection": "Hilfe zu diesem Bereich"
   },
   "no": "Nein",
   "from": "von",
