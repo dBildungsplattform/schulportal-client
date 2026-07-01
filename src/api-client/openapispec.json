@@ -2081,13 +2081,15 @@
             "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DBiamPersonResponse" } } }
           },
           "400": {
-            "description": "The person and the personenkontext could not be created, may due to unsatisfied specifications.",
+            "description": "Request has wrong format.\n\nThe person and the personenkontext could not be created, may due to unsatisfied specifications.",
             "content": {
               "application/json": { "schema": { "$ref": "#/components/schemas/DbiamPersonenkontextError" } }
             }
           },
           "401": { "description": "Not authorized to create person with personenkontext." },
-          "403": { "description": "Insufficient permission to create person with personenkontext." },
+          "403": {
+            "description": "Insufficient permissions to create the person with personenkontext.\n\nInsufficient permission to create person with personenkontext."
+          },
           "500": { "description": "Internal server error while creating person with personenkontext." }
         },
         "security": [{ "oauth2": ["openid"] }, { "bearer": [] }],
@@ -3283,6 +3285,7 @@
           "email": {
             "nullable": true,
             "description": "Contains status and address. Returns email-address verified by OX (enabled) if available, otherwise returns most recently updated one (no prioritized status)",
+            "type": "object",
             "allOf": [{ "$ref": "#/components/schemas/PersonEmailResponse" }]
           }
         },
@@ -3338,7 +3341,11 @@
             "nullable": true
           },
           "sichtfreigabe": { "type": "string", "enum": ["ja", "nein"], "nullable": true },
-          "loeschung": { "nullable": true, "allOf": [{ "$ref": "#/components/schemas/LoeschungResponse" }] },
+          "loeschung": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [{ "$ref": "#/components/schemas/LoeschungResponse" }]
+          },
           "revision": { "type": "string" }
         },
         "required": [
@@ -4637,7 +4644,11 @@
             "nullable": true
           },
           "sichtfreigabe": { "type": "string", "enum": ["ja", "nein"], "nullable": true },
-          "loeschung": { "nullable": true, "allOf": [{ "$ref": "#/components/schemas/LoeschungResponse" }] },
+          "loeschung": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [{ "$ref": "#/components/schemas/LoeschungResponse" }]
+          },
           "revision": { "type": "string" }
         },
         "required": [
@@ -4667,6 +4678,7 @@
           "email": {
             "nullable": true,
             "description": "Contains status and address. Returns email-address verified by OX (enabled) if available, otherwise returns most recently updated one (no prioritized status)",
+            "type": "object",
             "allOf": [{ "$ref": "#/components/schemas/PersonEmailResponse" }]
           }
         },

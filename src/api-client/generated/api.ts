@@ -3043,10 +3043,10 @@ export interface PersonenInfoKontextResponse {
     'sichtfreigabe': PersonenInfoKontextResponseSichtfreigabeEnum;
     /**
      * 
-     * @type {LoeschungResponse}
+     * @type {PersonenkontextResponseLoeschung}
      * @memberof PersonenInfoKontextResponse
      */
-    'loeschung': LoeschungResponse | null;
+    'loeschung': PersonenkontextResponseLoeschung | null;
     /**
      * 
      * @type {string}
@@ -3175,10 +3175,10 @@ export interface PersonenkontextResponse {
     'sichtfreigabe': PersonenkontextResponseSichtfreigabeEnum;
     /**
      * 
-     * @type {LoeschungResponse}
+     * @type {PersonenkontextResponseLoeschung}
      * @memberof PersonenkontextResponse
      */
-    'loeschung': LoeschungResponse | null;
+    'loeschung': PersonenkontextResponseLoeschung | null;
     /**
      * 
      * @type {string}
@@ -3213,6 +3213,19 @@ export const PersonenkontextResponseSichtfreigabeEnum = {
 
 export type PersonenkontextResponseSichtfreigabeEnum = typeof PersonenkontextResponseSichtfreigabeEnum[keyof typeof PersonenkontextResponseSichtfreigabeEnum];
 
+/**
+ * 
+ * @export
+ * @interface PersonenkontextResponseLoeschung
+ */
+export interface PersonenkontextResponseLoeschung {
+    /**
+     * 
+     * @type {string}
+     * @memberof PersonenkontextResponseLoeschung
+     */
+    'zeitpunkt': string;
+}
 /**
  * 
  * @export
