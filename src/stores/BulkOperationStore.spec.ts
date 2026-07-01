@@ -411,9 +411,10 @@ describe('BulkOperationStore', () => {
               personId: response.personId,
               organisationId: selectedOrganisationId,
               rolleId: selectedRolleId,
-              befristung: isBefore(response.zuordnungen[0]!.befristung!, befristung)
-                ? response.zuordnungen[0]!.befristung
-                : befristung,
+              befristung:
+                response.zuordnungen[0]!.befristung && isBefore(response.zuordnungen[0]!.befristung, befristung)
+                  ? response.zuordnungen[0]!.befristung
+                  : befristung,
             }),
           );
           return DoFactory.getPersonenkontextUpdateResponse({ dBiamPersonenkontextResponses: zuordnungen });
@@ -448,27 +449,28 @@ describe('BulkOperationStore', () => {
 
       mockPersonResponses.forEach((response: DBiamPersonenuebersichtResponse, index: number) => {
         const personId: string = response.personId;
-        const correctBefristung: string = isBefore(response.zuordnungen[0]!.befristung!, befristung)
-          ? response.zuordnungen[0]!.befristung!
-          : befristung;
+        const correctBefristung: string =
+          response.zuordnungen[0]!.befristung && isBefore(response.zuordnungen[0]!.befristung, befristung)
+            ? response.zuordnungen[0]!.befristung
+            : befristung;
 
         // Filter out old zuordnungen that will be replaced by the new one (same orgId + rolleId)
-        const otherZuordnungen: Array<DbiamPersonenkontextBodyParams> = response.zuordnungen
-          .filter(
-            (z: DBiamPersonenzuordnungResponse) =>
-              !(z.sskId === selectedOrganisationId && z.rolleId === selectedRolleId),
-          )
-          .map((zuordnung: DBiamPersonenzuordnungResponse) => ({
-            organisationId: zuordnung.sskId,
-            rolleId: zuordnung.rolleId,
-            befristung: zuordnung.befristung ?? undefined,
-            personId,
-          }));
+        const otherZuordnungen: Array<{ organisationId: string; rolleId: string; befristung?: string }> =
+          response.zuordnungen
+            .filter(
+              (z: DBiamPersonenzuordnungResponse) =>
+                !(z.sskId === selectedOrganisationId && z.rolleId === selectedRolleId),
+            )
+            .map((zuordnung: DBiamPersonenzuordnungResponse) => ({
+              organisationId: zuordnung.sskId,
+              rolleId: zuordnung.rolleId,
+              befristung: zuordnung.befristung ?? undefined,
+            }));
 
         expect(mockAdapter.history['put']?.[index]).toBeDefined();
         const data: object = JSON.parse(mockAdapter.history['put']?.[index]?.data as string) as object;
         expect(data).toEqual(
-          expect.objectContaining<Partial<DbiamUpdatePersonenkontexteBodyParams>>({
+          expect.objectContaining({
             personenkontexte: expect.arrayContaining([
               ...otherZuordnungen,
               {
@@ -539,8 +541,8 @@ describe('BulkOperationStore', () => {
       );
       const data: object = JSON.parse(mockAdapter.history['put']?.[0]?.data as string) as object;
       expect(data).toEqual(
-        expect.objectContaining({
-          personenkontexte: expect.arrayContaining([
+        expect.objectContaining<Partial<DbiamUpdatePersonenkontexteBodyParams>>({
+          personenkontexte: expect.arrayContaining<DbiamPersonenkontextBodyParams>([
             { personId, organisationId: selectedOrganisationId, rolleId: existingRolleId, befristung: undefined },
             { personId, organisationId: selectedOrganisationId, rolleId: selectedRolleId, befristung: undefined },
             { personId, organisationId: selectedKlasseId, rolleId: selectedRolleId, befristung: undefined },
@@ -622,8 +624,8 @@ describe('BulkOperationStore', () => {
       const data: object = JSON.parse(mockAdapter.history['put']?.[0]?.data as string) as object;
 
       expect(data).toEqual(
-        expect.objectContaining({
-          personenkontexte: expect.arrayContaining([
+        expect.objectContaining<Partial<DbiamUpdatePersonenkontexteBodyParams>>({
+          personenkontexte: expect.arrayContaining<DbiamPersonenkontextBodyParams>([
             { personId, organisationId: existingKlasseId, rolleId: existingRolleId, befristung: undefined },
             { personId, organisationId: existingKlasseId, rolleId: selectedRolleId, befristung: undefined },
             { personId, organisationId: selectedOrganisationId, rolleId: selectedRolleId, befristung: undefined },
@@ -734,8 +736,8 @@ describe('BulkOperationStore', () => {
       const data: object = JSON.parse(mockAdapter.history['put']?.[0]?.data as string) as object;
 
       expect(data).toEqual(
-        expect.objectContaining({
-          personenkontexte: expect.arrayContaining([
+        expect.objectContaining<Partial<DbiamUpdatePersonenkontexteBodyParams>>({
+          personenkontexte: expect.arrayContaining<DbiamPersonenkontextBodyParams>([
             { personId, organisationId: existingKlasseIdA, rolleId: selectedRolleId, befristung: undefined },
             { personId, organisationId: selectedOrganisationId, rolleId: selectedRolleId, befristung: undefined },
             { personId, organisationId: existingKlasseIdB, rolleId: differentRolleId, befristung: undefined },
@@ -743,8 +745,8 @@ describe('BulkOperationStore', () => {
         }),
       );
       expect(data).not.toEqual(
-        expect.objectContaining({
-          personenkontexte: expect.arrayContaining([
+        expect.objectContaining<Partial<DbiamUpdatePersonenkontexteBodyParams>>({
+          personenkontexte: expect.arrayContaining<DbiamPersonenkontextBodyParams>([
             { personId, organisationId: existingKlasseIdB, rolleId: selectedRolleId, befristung: undefined },
           ]) as Array<DbiamPersonenkontextBodyParams>,
         }),

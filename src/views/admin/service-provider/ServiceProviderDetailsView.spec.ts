@@ -3,6 +3,7 @@ import SchulenFilter from '@/components/filter/SchulenFilter.vue';
 import routes from '@/router/routes';
 import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
+import { RollenArt, RollenSystemRecht, useRolleStore, type RolleStore } from '@/stores/RolleStore.js';
 import {
   ServiceProviderKategorie,
   useServiceProviderStore,
@@ -17,7 +18,6 @@ import type { MockInstance } from 'vitest';
 import { nextTick, type Component } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import ServiceProviderDetailsView from './ServiceProviderDetailsView.vue';
-import { RollenArt, RollenSystemRecht, useRolleStore, type RolleStore } from '@/stores/RolleStore.js';
 
 let wrapper: VueWrapper<InstanceType<typeof ServiceProviderDetailsView>> | null = null;
 let router: Router;
@@ -320,7 +320,7 @@ describe('ServiceProviderDetailsView', () => {
     wrapper = await mountComponent();
     await openRollenerweiterungenSection();
 
-    const rollenFilter: VueWrapper = wrapper.findComponent({ ref: 'rolle-select' }) as VueWrapper;
+    const rollenFilter: VueWrapper = wrapper.findComponent({ ref: 'rolle-select' });
     expect((rollenFilter as unknown as { props: (key: string) => never }).props('items')).toEqual([]);
   });
 

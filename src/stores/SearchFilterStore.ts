@@ -60,8 +60,7 @@ export const useSearchFilterStore: StoreDefinition<
   SearchFilterState,
   SearchFilterGetters,
   SearchFilterActions
-> = defineStore({
-  id: 'searchFilterStore',
+> = defineStore('searchFilterStore', {
   state: (): SearchFilterState => ({
     klassenPage: 1,
     klassenPerPage: 30,
