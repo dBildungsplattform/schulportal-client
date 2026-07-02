@@ -8,6 +8,7 @@
     value: string | number | undefined;
     testId: string;
     type?: 'text' | 'image';
+    alt?: string;
   };
 
   type SuccessDetails = {
@@ -39,6 +40,7 @@
       <v-col
         cols="auto"
         class="subtitle-1 pre-line text-center"
+        data-testid="success-message"
       >
         {{ success.message }}
       </v-col>
@@ -78,6 +80,7 @@
             :data-testid="item.testId"
             class="mt-n2"
             :src="getLogoPath(item.value)"
+            :alt="item.alt"
             max-width="40"
             max-height="40"
             contain
@@ -89,6 +92,7 @@
             :data-testid="item.testId"
             class="mt-n2"
             :src="item.value"
+            :alt="item.alt"
             max-width="40"
             max-height="40"
             contain
