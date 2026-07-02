@@ -34,9 +34,6 @@ beforeEach(() => {
       components: {
         LogoSelector: LogoSelector as Component,
       },
-      stubs: {
-        'v-img': true,
-      },
     },
   });
 });
@@ -47,13 +44,15 @@ describe('LogoSelector', () => {
   });
 
   test('it renders all available logos', () => {
-    const logoItems: DOMWrapper<Element>[] | undefined = wrapper?.findAll('.logo-item');
+    const logoItems: DOMWrapper<Element>[] | undefined = wrapper?.findAll('[data-testid^="logo-"]');
     expect(logoItems).toHaveLength(3);
   });
 
   test('it renders logo with correct aria-label', () => {
-    const firstLogoItem: DOMWrapper<Element> | undefined = wrapper?.findAll('.logo-item')[0];
-    expect(firstLogoItem?.attributes('aria-label')).toBe('Logo One');
+    const logoItem: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="logo-1"]');
+    const img: DOMWrapper<Element> | undefined = logoItem?.find('img');
+    expect(logoItem?.attributes('aria-label')).toBe('Logo One');
+    expect(img?.attributes('alt')).toBe('Logo One');
   });
 
   test('it renders logo with correct title', () => {
@@ -62,8 +61,8 @@ describe('LogoSelector', () => {
   });
 
   test('it emits update:modelValue when logo is clicked', async () => {
-    const logoItems: DOMWrapper<Element>[] | undefined = wrapper?.findAll('.logo-item');
-    await logoItems?.[0]?.trigger('click');
+    const logoItem: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="logo-1"]');
+    await logoItem?.trigger('click');
     expect(wrapper?.emitted('update:modelValue')).toBeTruthy();
     expect(wrapper?.emitted('update:modelValue')?.[0]).toEqual([1]);
   });
@@ -76,42 +75,43 @@ describe('LogoSelector', () => {
 
   test('it does not emit when disabled', async () => {
     await wrapper?.setProps({ disabled: true });
-    const logoItems: DOMWrapper<Element>[] | undefined = wrapper?.findAll('.logo-item');
-    await logoItems?.[0]?.trigger('click');
+    const firstLogo: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="logo-1"]');
+    await firstLogo?.trigger('click');
     expect(wrapper?.emitted('update:modelValue')).toBeFalsy();
   });
 
   test('it does not emit when readonly', async () => {
     await wrapper?.setProps({ readonly: true });
-    const logoItems: DOMWrapper<Element>[] | undefined = wrapper?.findAll('.logo-item');
-    await logoItems?.[0]?.trigger('click');
+    const firstLogo: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="logo-1"]');
+    await firstLogo?.trigger('click');
     expect(wrapper?.emitted('update:modelValue')).toBeFalsy();
   });
 
   test('it applies disabled class when disabled prop is true', async () => {
     await wrapper?.setProps({ disabled: true });
-    const logoItems: DOMWrapper<Element>[] | undefined = wrapper?.findAll('.logo-item');
-    expect(logoItems?.[0]?.classes()).toContain('disabled');
+    const firstLogo: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="logo-1"]');
+    const firstLogoItem: Element | null | undefined = firstLogo?.element.parentElement?.parentElement;
+    expect(firstLogoItem?.classList.contains('disabled')).toBe(true);
   });
 
   test('it handles Enter key press', async () => {
-    const logoItems: DOMWrapper<Element>[] | undefined = wrapper?.findAll('.logo-item');
-    await logoItems?.[0]?.trigger('keydown.enter');
+    const firstLogo: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="logo-1"]');
+    await firstLogo?.trigger('keydown.enter');
     expect(wrapper?.emitted('update:modelValue')).toBeTruthy();
     expect(wrapper?.emitted('update:modelValue')?.[0]).toEqual([1]);
   });
 
   test('it handles Space key press', async () => {
-    const logoItems: DOMWrapper<Element>[] | undefined = wrapper?.findAll('.logo-item');
-    await logoItems?.[1]?.trigger('keydown.space');
+    const secondLogo: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="logo-2"]');
+    await secondLogo?.trigger('keydown.space');
     expect(wrapper?.emitted('update:modelValue')).toBeTruthy();
     expect(wrapper?.emitted('update:modelValue')?.[0]).toEqual([2]);
   });
 
   test('it does not emit on keyboard when disabled', async () => {
     await wrapper?.setProps({ disabled: true });
-    const logoItems: DOMWrapper<Element>[] | undefined = wrapper?.findAll('.logo-item');
-    await logoItems?.[0]?.trigger('keydown.enter');
+    const firstLogo: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="logo-1"]');
+    await firstLogo?.trigger('keydown.enter');
     expect(wrapper?.emitted('update:modelValue')).toBeFalsy();
   });
 
@@ -139,35 +139,35 @@ describe('LogoSelector', () => {
 
   test('it sets aria-pressed correctly for selected logo', async () => {
     await wrapper?.setProps({ modelValue: 1 });
-    const firstLogoItem: DOMWrapper<Element> | undefined = wrapper?.findAll('.logo-item')[0];
-    expect(firstLogoItem?.attributes('aria-pressed')).toBe('true');
+    const firstLogo: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="logo-1"]');
+    expect(firstLogo?.attributes('aria-pressed')).toBe('true');
   });
 
   test('it sets aria-pressed to false for unselected logos', async () => {
     await wrapper?.setProps({ modelValue: 1 });
-    const secondLogoItem: DOMWrapper<Element> | undefined = wrapper?.findAll('.logo-item')[1];
-    expect(secondLogoItem?.attributes('aria-pressed')).toBe('false');
+    const secondLogo: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="logo-2"]');
+    expect(secondLogo?.attributes('aria-pressed')).toBe('false');
   });
 
   test('it has correct tabindex when disabled', async () => {
     await wrapper?.setProps({ disabled: true });
-    const logoItems: DOMWrapper<Element>[] | undefined = wrapper?.findAll('.logo-item');
-    expect(logoItems?.[0]?.attributes('tabindex')).toBe('-1');
+    const firstLogo: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="logo-1"]');
+    expect(firstLogo?.attributes('tabindex')).toBe('-1');
   });
 
   test('it has correct tabindex when readonly', async () => {
     await wrapper?.setProps({ readonly: true });
-    const logoItems: DOMWrapper<Element>[] | undefined = wrapper?.findAll('.logo-item');
-    expect(logoItems?.[0]?.attributes('tabindex')).toBe('-1');
+    const firstLogo: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="logo-1"]');
+    expect(firstLogo?.attributes('tabindex')).toBe('-1');
   });
 
   test('it has correct tabindex when enabled and not readonly', () => {
-    const logoItems: DOMWrapper<Element>[] | undefined = wrapper?.findAll('.logo-item');
-    expect(logoItems?.[0]?.attributes('tabindex')).toBe('0');
+    const firstLogo: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="logo-1"]');
+    expect(firstLogo?.attributes('tabindex')).toBe('0');
   });
 
   test('it emits different logo ids when different logos are clicked', async () => {
-    const logoItems: DOMWrapper<Element>[] | undefined = wrapper?.findAll('.logo-item');
+    const logoItems: DOMWrapper<Element>[] | undefined = wrapper?.findAll('[data-testid^="logo-"]');
     await logoItems?.[0]?.trigger('click');
     await logoItems?.[1]?.trigger('click');
     await logoItems?.[2]?.trigger('click');
