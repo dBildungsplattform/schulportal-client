@@ -119,10 +119,7 @@
     >
       <v-card-text>
         <v-container class="my-4">
-          <v-row
-            class="text-body text-error justify-center"
-            align="center"
-          >
+          <v-row class="text-body text-error justify-center align-center">
             <v-col
               class="text-center"
               cols="12"

@@ -439,8 +439,7 @@
 
                     <v-row
                       v-if="isEditModeAvailable && hasEditPermissions"
-                      class="mr-10"
-                      justify="end"
+                      class="mr-10 justify-end"
                     >
                       <v-col
                         cols="12"
@@ -460,7 +459,9 @@
                       <VidisInfoDialog
                         :header="t('angebot.edit')"
                         :text="
-                          t('angebot.vidisEditInfoText', { name: serviceProviderStore.currentServiceProvider.name })
+                          t('angebot.vidisEditInfoText', {
+                            name: serviceProviderStore.currentServiceProvider.name,
+                          })
                         "
                         v-model="vidisInfoDialogOpen"
                       />
@@ -518,10 +519,7 @@
                 </v-row>
 
                 <!-- Bearbeiten button -->
-                <v-row
-                  class="mr-10"
-                  justify="end"
-                >
+                <v-row class="mr-10 justify-end">
                   <v-col
                     cols="12"
                     md="auto"
@@ -568,10 +566,7 @@
                   </v-row>
 
                   <!-- Save / Cancel actions -->
-                  <v-row
-                    class="mt-4"
-                    justify="end"
-                  >
+                  <v-row class="mt-4 justify-end">
                     <v-col
                       cols="12"
                       sm="6"

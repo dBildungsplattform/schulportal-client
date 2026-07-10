@@ -17,8 +17,7 @@
     class="layout-card pb-1"
   >
     <v-row
-      align="center"
-      class="flex-nowrap ml-md-6 ml-1"
+      class="flex-nowrap ml-md-6 ml-1 align-center"
       :class="!closable ? 'py-3' : ''"
     >
       <v-col cols="auto">

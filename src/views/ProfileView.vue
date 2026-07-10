@@ -246,7 +246,7 @@
         >
           <v-row class="ma-4">
             <v-col cols="12">
-              <v-table class="text-body-1">
+              <v-table class="text-body-large">
                 <template #default>
                   <tbody>
                     <tr
@@ -292,8 +292,8 @@
                         :data-testid="item.testIdValue"
                       >
                         <v-row
+                          class="align-center"
                           no-gutters
-                          align="center"
                         >
                           <SpshTooltip
                             v-if="item.tooltip"
@@ -316,7 +316,7 @@
                 </template>
               </v-table>
               <p
-                class="pt-4 text-center text-body-1 text-medium-emphasis"
+                class="pt-4 text-center text-body-large text-medium-emphasis"
                 data-testid="info-text-with-icon"
                 style="white-space: normal"
               >
@@ -338,18 +338,18 @@
           :header="$t('login.password')"
           class="text-body"
         >
-          <v-row
-            align="center"
-            justify="center"
-            class="ma-4 text-body"
-          >
+          <v-row class="ma-4 text-body align-center justify-center">
             <v-col class="text-center px-0">
               <v-row>
                 <p
                   v-if="lastPasswordChangeDate"
                   class="w-100"
                 >
-                  {{ t('profile.lastPasswordChange', { date: lastPasswordChangeDate }) }}
+                  {{
+                    t('profile.lastPasswordChange', {
+                      date: lastPasswordChangeDate,
+                    })
+                  }}
                 </p>
               </v-row>
               <v-row class="d-flex align-center justify-center">
@@ -430,11 +430,7 @@
           </v-dialog>
         </LayoutCard>
         <template v-if="loading2FA">
-          <v-row
-            align="center"
-            justify="center"
-            class="ma-3"
-          >
+          <v-row class="ma-3 align-center justify-center">
             <v-progress-circular
               indeterminate
               size="64"
@@ -448,11 +444,7 @@
           :headline-test-id="'two-factor-card'"
           :header="$t('profile.twoFactorAuth')"
         >
-          <v-row
-            align="center"
-            justify="center"
-            class="ma-4 text-body"
-          >
+          <v-row class="ma-4 text-body align-center justify-center">
             <v-col
               v-if="twoFactorAuthenticationStore.hasToken || twoFactorAuthError"
               cols="12"
@@ -460,8 +452,7 @@
               <v-row>
                 <v-col
                   cols="1"
-                  align-self="center"
-                  class="text-right"
+                  class="text-right align-self-center"
                 >
                   <v-icon
                     v-if="twoFactorAuthError"
@@ -497,10 +488,9 @@
               v-else
               cols="12"
             >
-              <v-row justify="center">
+              <v-row class="justify-center">
                 <v-col
-                  align-self="center"
-                  class="text-center"
+                  class="text-center align-self-center"
                   data-testid="two-factor-info"
                 >
                   <v-icon
@@ -527,8 +517,7 @@
                 <template v-else-if="twoFactorAuthenticationStore.hasToken === true">
                   <v-col
                     cols="1"
-                    align-self="center"
-                    class="text-right"
+                    class="text-right align-self-center"
                   >
                     <v-icon
                       class="mb-2"
@@ -552,11 +541,7 @@
           :header="$t('admin.person.devicePassword.header')"
           class="text-body"
         >
-          <v-row
-            align="center"
-            justify="center"
-            class="ma-4 text-body"
-          >
+          <v-row class="ma-4 text-body align-center justify-center">
             <v-col class="text-center px-0">
               <v-row class="d-flex align-center justify-center">
                 <PasswordReset

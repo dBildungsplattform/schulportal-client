@@ -97,11 +97,7 @@
     >
       <v-container>
         <template v-if="state === State.INITIAL">
-          <v-row
-            align="center"
-            justify="center"
-            class="pt-2"
-          >
+          <v-row class="pt-2 align-center justify-center">
             <v-col
               cols="12"
               sm="5"
@@ -131,7 +127,7 @@
           </v-row>
         </template>
         <template v-else>
-          <v-row justify="center">
+          <v-row class="justify-center">
             <v-col cols="auto">
               <v-icon
                 v-if="state === State.PROGRESSING"
