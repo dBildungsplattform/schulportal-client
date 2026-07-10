@@ -590,7 +590,7 @@
                     >
                       <v-btn
                         v-if="availableRollen.length > 0"
-                        color="primary"
+                        class="primary"
                         :block="mdAndDown"
                         data-testid="rollenerweiterung-save-button"
                         :disabled="rolleStore.loading"

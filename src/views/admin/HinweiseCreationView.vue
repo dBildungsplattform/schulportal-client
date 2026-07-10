@@ -191,7 +191,7 @@
               data-testid="submit-newsbox"
               :block="smAndDown"
               :disabled="meldungStore.loading"
-              color="primary"
+              class="primary"
               type="submit"
               @click="onSubmit"
             >
