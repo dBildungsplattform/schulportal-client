@@ -7,6 +7,7 @@ type RouteConfigExpectation = {
   layout?: 'DefaultLayout' | 'AdminLayout';
   requiresAuth?: boolean;
   requiresPermission?: string | string[];
+  redirect?: string;
 };
 
 const routeExpectations: RouteConfigExpectation[] = [
@@ -124,8 +125,7 @@ const routeExpectations: RouteConfigExpectation[] = [
   {
     name: 'instructions',
     path: '/anleitungen',
-    layout: 'DefaultLayout',
-    requiresAuth: true,
+    redirect: '/hilfe',
   },
   {
     name: 'not-found',
@@ -158,6 +158,10 @@ function assertRouteConfig(expectation: RouteConfigExpectation): void {
 
   if (expectation.requiresAuth !== undefined) {
     expect(route?.meta?.['requiresAuth']).toBe(expectation.requiresAuth);
+  }
+
+  if (expectation.redirect !== undefined) {
+    expect(route?.redirect).toBe(expectation.redirect);
   }
 
   if (expectation.requiresPermission !== undefined) {

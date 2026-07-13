@@ -15,7 +15,7 @@ describe('InstructionsView', () => {
   });
 
   test('instructions view renders view with correct title', async () => {
-    router.push('/anleitungen');
+    router.push('/hilfe');
     await router.isReady();
 
     const wrapper: VueWrapper = mount(InstructionsView, {
@@ -25,6 +25,6 @@ describe('InstructionsView', () => {
     });
 
     expect(wrapper.exists()).toBe(true);
-    expect(wrapper.text()).toContain('Anleitungen');
+    expect(wrapper.text()).toContain('Hilfe');
   });
 });

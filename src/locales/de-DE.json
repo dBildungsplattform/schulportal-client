@@ -497,13 +497,125 @@
     "privacyPolicy": "Datenschutzerklärung"
   },
   "help": {
-    "title": "Hilfe - ErWIn-Portal"
-  },
-  "info": {
-    "placeholder": "Diese Seite befindet sich derzeit im Aufbau. Weitere Informationen folgen in Kürze."
-  },
-  "instructions": {
-    "title": "Anleitungen - ErWIn-Portal"
+    "title": "Hilfe - ErWIn-Portal",
+    "subtitle": "Hier finden Sie Antworten und Anleitungen zur Nutzung des Identitätsmanagement (IDM) und Single Sign-On (SSO) des ErWIn-Portals.",
+    "tocTitle": "Inhalt dieses Bereichs:",
+    "tabs": {
+      "users": "Lehrkräfte, Schülerinnen & Schüler",
+      "admins": "Schuladministration"
+    },
+
+    "roles": {
+      "title": "Rollen & Berechtigungen",
+      "text": "Welche Dienste und Kacheln Sie im Portal sehen, hängt von Ihrer zugewiesenen Rolle und Schule ab. Nicht alle Benutzer sehen dieselben Anwendungen. Wenn Sie einen Dienst erwarten, dieser aber nicht angezeigt wird, wenden Sie sich bitte an Ihre Schuladministration.",
+      "adminText": "Welche Dienste und Kacheln Sie im Portal sehen, hängt von Ihrer zugewiesenen Rolle und Schule ab. Nicht alle Benutzer sehen dieselben Anwendungen. Wenn Sie einen Dienst erwarten, dieser aber nicht angezeigt wird, wenden Sie sich bitte an den Support oder an das ErWIn-Team."
+    },
+    "gettingStarted": {
+      "title": "1. Erste Schritte & Allgemeines",
+      "ssoTitle": "Was ist das ErWIn-Portal?",
+      "ssoText": "Das Portal dient als zentraler Einstiegspunkt (SSO – Single Sign-On) und Identitätsmanagement (IDM) für angebundene Schul- und Cloudsysteme. Nach dem Login können Sie direkt auf die für Sie freigegebenen Dienste zugreifen, ohne sich erneut anmelden zu müssen. Abkürzungen wie DSTNR (Dienststellennummer) werden im Portal zur Identifikation Ihrer Schule verwendet.",
+      "loginStepsTitle": "Schritt-für-Schritt-Anleitung zur Erstanmeldung",
+      "step1Title": "Schritt 1: Zugangsdaten erhalten",
+      "step1Text": "Sie erhalten Ihren Benutzernamen und Ihr Einstiegspasswort manuell von Ihrer Schuladministration. Es wird keine automatische E-Mail versendet.",
+      "step2Title": "Schritt 2: Anmeldung durchführen",
+      "step2Text": "Rufen Sie die Anmeldeseite des ErWIn-Portals auf und geben Sie Ihre empfangenen Zugangsdaten ein.",
+      "step3Title": "Schritt 3: Passwort ändern",
+      "step3Text": "Beim allerersten Login fordert das System Sie zwingend dazu auf, Ihr Einstiegspasswort in ein neues, sicheres Passwort Ihrer Wahl zu ändern. Eine Anzeige zur Passwortstärke ist derzeit noch nicht integriert.",
+      "step4Title": "Schritt 4: Dashboard nutzen",
+      "step4Text": "Nach der Passwortänderung gelangen Sie direkt auf das Dashboard, von wo aus Sie alle freigegebenen Dienste starten können."
+    },
+    "users": {
+      "title": "Anleitungen für Lehrkräfte, Schülerinnen & Schüler",
+      "intro": "Willkommen im Hilfebereich für Lehrkräfte sowie Schülerinnen und Schüler. Hier finden Sie alle wichtigen Informationen zur Verwaltung Ihres Profils und zum Zugriff auf Ihre freigegebenen Dienste.",
+      "loginTitle": "Erstanmeldung im Portal",
+      "resetPasswordTitle": "Passwort vergessen",
+      "resetPasswordText": "Derzeit steht keine Funktion zum selbstständigen Zurücksetzen des Passworts zur Verfügung. Bitte wenden Sie sich an Ihre Schuladministration.",
+      "profileTitle": "Profil- und Datenverwaltung",
+      "profileIntro": "Unter den Profileinstellungen können Sie Ihre Benutzerdaten einsehen. Die Bearbeitungsmöglichkeiten sind jedoch eingeschränkt. Stammdaten wie Name und E-Mail-Adresse können nicht selbst geändert werden, sondern werden zentral durch die Schuladministration gepflegt:",
+      "table": {
+        "action": "Aktion",
+        "allowed": "Erlaubt?",
+        "details": "Details / Besonderheiten",
+        "changePassword": "Passwort ändern",
+        "yes": "Ja",
+        "changePasswordDetails": "Im eingeloggten Zustand jederzeit über die Profileinstellungen möglich.",
+        "changeName": "Namen ändern",
+        "no": "Nein",
+        "changeNameDetails": "Namensänderungen müssen über die Administration veranlasst werden.",
+        "changeEmail": "E-Mail-Adresse ändern",
+        "changeEmailDetails": "Die E-Mail-Adresse wird automatisch zugewiesen und kann nur durch den Administrator geändert werden."
+      },
+      "navigationTitle": "Navigation zu angebundenen Systemen",
+      "navigationText1": "Wählen Sie den gewünschten Dienst auf dem Dashboard aus.",
+      "navigationText2": "Beim ersten Aufruf startet ein kurzer, automatischer Prozess, danach werden Sie direkt weitergeleitet.",
+      "navigationText3": "Fehlt ein Dienst? Bitte wenden Sie sich an Ihre Schuladministration, um Ihre Rollen- oder Schulzuordnung überprüfen zu lassen.",
+      "logoutWarningTitle": "WICHTIGER HINWEIS: Erneuter Login nach Abmeldung",
+      "logoutWarningText": "Wenn Sie sich aus einer der angebundenen Anwendungen abmelden, melden Sie sich beim nächsten Mal am einfachsten wieder über das ErWIn-Portal an. Alternativ können Sie sich auf der Anmeldeseite des Zielsystems über die Option „Login über ErWIn-Portal“ (sofern dort verfügbar) anmelden. Bitte beachten Sie, dass eine direkte Anmeldung im jeweiligen Dienst mit den Zugangsdaten des ErWIn-Portals nicht möglich ist. Nutzen Sie stattdessen immer den Weg über das Portal oder den entsprechenden Portal-Login-Button."
+    },
+    "admins": {
+      "title": "Anleitungen für die Schuladministration",
+      "intro": "Willkommen im Hilfebereich für die Schuladministration. Hier finden Sie alle wichtigen Informationen zur Verwaltung von Benutzerkonten für Ihre Schule, zum manuellen Anlegen von Konten und zur Vorbereitung der Systemanbindungen.",
+      "createUserTitle": "Nutzer manuell anlegen",
+      "createUserChecklist": "Beim Anlegen eines Nutzers sind folgende Schritte durchzuführen:",
+      "checkName": "Nutzer erstellen",
+      "checkRole": "Rolle auswählen",
+      "checkSchool": "Schule zuordnen",
+      "createStep1Title": "Schritt 1: Benutzer erstellen",
+      "createStep1Text": "Erstellen Sie im Administrations-Bereich ein neues Benutzerkonto mit dem Vor- und Nachnamen der Person.",
+      "createStep2Title": "Schritt 2: Rolle auswählen",
+      "createStep2Text": "Weisen Sie dem Benutzer die gewünschte Rolle (z. B. Lehrkraft oder Schüler) zu.",
+      "createStep3Title": "Schritt 3: Schule zuordnen",
+      "createStep3Text": "Ordnen Sie den Benutzer der entsprechenden Schule zu, damit die passenden Dienste freigeschaltet werden.",
+      "editUserTitle": "Nutzer bearbeiten",
+      "editUserText": "Vorhandene Benutzerkonten können jederzeit bearbeitet werden. Hierbei können Sie folgende Angaben anpassen:",
+      "editUserFields": {
+        "firstName": "Vorname",
+        "lastName": "Nachname",
+        "username": "Benutzername",
+        "password": "Passwort",
+        "school": "Schulzuordnung(en)",
+        "status": "Status (aktiv/gesperrt)"
+      },
+      "ldapTitle": "Nutzerimport via LDAP",
+      "ldapText": "Die Benutzeroberfläche für den automatischen Abgleich der Schuldaten via LDAP (Lightweight Directory Access Protocol) befindet sich in der Entwicklung. Die Konfiguration erfolgt über die angebundenen Zielsysteme und wird zu einem späteren Zeitpunkt vollständig dokumentiert.",
+      "classesTitle": "Klassen & Klassenzuordnungen",
+      "classesText": "Klassen werden im System angelegt. Um eine Person (z. B. eine Lehrkraft oder eine Schülerin bzw. einen Schüler) einer Klasse zuzuordnen, weisen Sie die Klasse direkt dem Benutzerkonto zu.",
+      "classesNoteText": "In der Klassenverwaltung können keine Personen Klassen zugeordnet werden. Nutzen Sie hierfür stattdessen folgenden Weg:",
+      "classesPath": {
+        "userManagement": "Benutzerverwaltung",
+        "schoolAssignment": "Schulzuordnung",
+        "selectSchool": "Schule auswählen",
+        "role": "Rolle",
+        "class": "Klasse"
+      }
+    },
+    "troubleshooting": {
+      "title": "Probleme lösen",
+      "q1": "Ich sehe einen Dienst nicht",
+      "a1": "Wenn Sie einen erwarteten Dienst nicht auf Ihrem Dashboard sehen, liegt dies in der Regel an fehlenden Berechtigungen oder einer nicht freigeschalteten Rolle. Bitte wenden Sie sich in diesem Fall direkt an Ihre Schuladministration.",
+      "q2": "Ich kann meine Daten nicht ändern",
+      "a2": "Persönliche Stammdaten (wie Name, E-Mail-Adresse und Schulzuordnung) werden zentral verwaltet und können von Ihnen nicht selbstständig geändert werden. Wenden Sie sich bei Änderungsbedarf bitte an Ihre Schuladministration.",
+      "q3": "Passwort vergessen",
+      "a3": "Es steht derzeit keine Funktion zum selbstständigen Zurücksetzen des Passworts zur Verfügung. Bitte wenden Sie sich direkt an Ihre lokale Schuladministration vor Ort.",
+      "q4": "Warum sehe ich andere Inhalte als meine Kolleginnen oder Kollegen?",
+      "a4": "Die auf Ihrem Dashboard angezeigten Dienste hängen direkt von der Ihnen zugewiesenen Rolle ab. Nicht alle Rollen haben Zugriff auf dieselben Anwendungen."
+    },
+    "faq": {
+      "title": "Häufige Fragen (FAQ)",
+      "subtitle": "Hier finden Sie Antworten auf häufig gestellte Fragen (FAQs) und nützliche allgemeine Informationen zur Problembehebung.",
+      "q1": "Mein Schulangebot taucht auf dem Dashboard nicht auf. Was kann ich tun?",
+      "a1": "Welches Angebot ein Nutzer sieht, hängt von seiner Rolle und der zugeordneten Schule ab (Service-Provider-Mapping). Wenden Sie sich an Ihre Administration, damit diese die korrekte Schulzuordnung und Rolle überprüft.",
+      "q2": "Wie kann ich mein Passwort ändern?",
+      "a2": "Im Profilbereich können Sie Ihr Passwort jederzeit ändern, sofern Sie eingeloggt sind. Sollten Sie Ihr Passwort vergessen haben, kann es nur durch die Administration zurückgesetzt werden.",
+      "q3": "Werden meine Daten automatisch mit den angebundenen Systemen synchronisiert?",
+      "a3": "Ja, nach dem Login werden Ihre Rechte und Rollen beim Absprung per Single Sign-On (SSO) automatisch an die angebundenen Dienste übermittelt.",
+      "q4": "An wen wende ich mich bei Problemen?",
+      "a4": "Ihre erste Anlaufstelle für alle Fragen rund um Accounts, Passwörter und Freischaltungen ist der lokale Administrator bzw. die IT-Lehrkraft an Ihrer Schule.",
+      "q5": "Wie melde ich mich nach dem Abmelden aus angebundenen Systemen wieder an?",
+      "a5": "Wenn Sie sich aus einer angebundenen Anwendung abgemeldet haben, nutzen Sie bitte auf der Login-Seite des Dienstes den Button 'Login über ErWIn-Portal'. Direkt-Logins im Zielsystem mit Portal-Zugangsdaten schlagen fehl.",
+      "q6": "Welche Browser werden unterstützt?",
+      "a6": "Das Portal ist für alle modernen Browser auf Desktop, Tablet und Smartphone optimiert (z. B. Chrome, Firefox, Edge, Safari)."
+    }
   },
   "itemsPerPage": "Einträge pro Seite",
   "landingTitle": "Willkommen im ErWIn Portal.",
@@ -519,6 +631,7 @@
   },
   "missing": "fehlt",
   "nav": {
+    "portalName": "ErWIn-Portal",
     "admin": "Schulportal-Administration",
     "backToDetails": "Zurück zur Gesamtübersicht",
     "backToList": "Zurück zur Ergebnisliste",
@@ -532,7 +645,9 @@
     "help": "Hilfe",
     "instructions": "Anleitungen",
     "profile": "Mein Profil",
-    "backToPreviousPage": "Zurück zur vorherigen Seite"
+    "backToPreviousPage": "Zurück zur vorherigen Seite",
+    "toContact": "Zum Kontaktformular",
+    "toFaq": "FAQ"
   },
   "no": "Nein",
   "noDataFound": "Keine Daten gefunden.",
