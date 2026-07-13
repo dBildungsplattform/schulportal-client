@@ -67,11 +67,10 @@
 <template>
   <v-footer
     absolute
-    :app="mobile"
     class="footer"
     data-testid="footer"
   >
-    <v-container>
+    <v-container class="ma-0">
       <v-row>
         <!-- Sponsor Logos -->
         <v-col
@@ -268,7 +267,6 @@
   .sponsor-logos-col,
   .footer-links-col {
     flex-wrap: wrap; /* Allow the items to wrap if needed */
-    justify-content: center; /* Center the items if they wrap */
   }
 
   @media (max-width: 540px) {
