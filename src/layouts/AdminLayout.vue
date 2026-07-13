@@ -4,11 +4,13 @@
 </script>
 
 <template>
-  <AdminMenuBar />
-  <v-container>
-    <slot />
-  </v-container>
-  <TheFooter />
+  <v-main>
+    <AdminMenuBar />
+    <v-container>
+      <slot />
+    </v-container>
+    <TheFooter />
+  </v-main>
 </template>
 
 <style scoped lang="scss">
