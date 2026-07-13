@@ -213,6 +213,7 @@
 <template>
   <v-dialog
     v-model="showModifyRolleDialog"
+    :capture-focus="false"
     persistent
   >
     <LayoutCard

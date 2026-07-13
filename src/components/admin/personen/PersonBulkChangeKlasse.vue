@@ -89,6 +89,7 @@
   <v-dialog
     ref="changeKlasseBulkDialog"
     :model-value="props.isDialogVisible"
+    :capture-focus="false"
     persistent
   >
     <LayoutCard

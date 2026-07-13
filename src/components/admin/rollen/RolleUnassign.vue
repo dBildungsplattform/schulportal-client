@@ -9,8 +9,8 @@
   import {
     OperationContext,
     type PersonenkontextStore,
-    usePersonenkontextStore,
     RolleDialogMode,
+    usePersonenkontextStore,
   } from '@/stores/PersonenkontextStore';
   import { RollenArt, type RolleResponse } from '@/stores/RolleStore';
   import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
@@ -145,6 +145,7 @@
 <template>
   <v-dialog
     :model-value="props.isDialogVisible"
+    :capture-focus="false"
     persistent
   >
     <LayoutCard
