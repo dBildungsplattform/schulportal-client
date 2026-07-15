@@ -76,7 +76,7 @@
     />
     <v-row
       v-if="!hideActions"
-      class="py-3 px-2 justify-center"
+      class="px-2 justify-center"
     >
       <v-spacer
         v-if="!centerButtons"

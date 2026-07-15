@@ -246,20 +246,21 @@
                 inline
                 data-testid="schulform-radio-group"
               >
-                <v-col
-                  v-for="(schultraeger, index) in schultraegerList"
-                  :key="schultraeger.id"
-                  offset-md="1"
-                  cols="12"
-                  sm="5"
-                  class="pb-0"
-                >
-                  <v-radio
-                    :label="schultraeger.name"
-                    :value="schultraeger.id"
-                    :data-testid="'schulform-radio-button-' + index"
-                  />
-                </v-col>
+                <v-row justify="center">
+                  <v-col
+                    v-for="(schultraeger, index) in schultraegerList"
+                    :key="schultraeger.id"
+                    cols="12"
+                    sm="5"
+                    class="pb-0"
+                  >
+                    <v-radio
+                      :label="schultraeger.name"
+                      :value="schultraeger.id"
+                      :data-testid="'schulform-radio-button-' + index"
+                    />
+                  </v-col>
+                </v-row>
               </v-radio-group>
             </v-row>
             <!-- Enter service number -->

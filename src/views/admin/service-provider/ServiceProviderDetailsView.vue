@@ -248,13 +248,7 @@
         <v-container class="service-provider-info">
           <div v-if="serviceProviderStore.currentServiceProvider">
             <v-row id="service-provider-info-row">
-              <v-col
-                class="custom-offset"
-                offset="1"
-                offset-sm="1"
-                offset-md="1"
-                offset-lg="1"
-              >
+              <v-col class="pl-16">
                 <v-row>
                   <!-- Left column (first 4 fields) -->
                   <v-col
