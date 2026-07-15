@@ -352,8 +352,7 @@
                 </v-row>
                 <v-row
                   v-if="isEditModeAvailable"
-                  class="mr-10"
-                  justify="end"
+                  class="mr-10 justify-end"
                 >
                   <v-col
                     cols="12"
@@ -369,7 +368,11 @@
                   </v-col>
                   <VidisInfoDialog
                     :header="t('angebot.edit')"
-                    :text="t('angebot.vidisEditInfoText', { name: serviceProviderStore.currentServiceProvider.name })"
+                    :text="
+                      t('angebot.vidisEditInfoText', {
+                        name: serviceProviderStore.currentServiceProvider.name,
+                      })
+                    "
                     v-model="vidisInfoDialogOpen"
                   />
                 </v-row>
@@ -435,8 +438,7 @@
 
             <!-- Header row + chevron -->
             <v-row
-              class="ml-sm-16 mt-2"
-              align="center"
+              class="ml-sm-16 mt-2 align-center"
               no-gutters
             >
               <v-col cols="auto">
@@ -460,7 +462,9 @@
                 >
                   <v-icon
                     class="chevron"
-                    :class="{ rotate: isOpen }"
+                    :class="{
+                      rotate: isOpen,
+                    }"
                   >
                     mdi-chevron-down
                   </v-icon>
@@ -468,24 +472,19 @@
               </v-col>
             </v-row>
 
-            <v-row
-              align="center"
-              justify="end"
-            >
+            <v-row class="align-center justify-end">
               <v-col cols="12">
                 <v-expand-transition>
                   <div v-show="isOpen">
                     <template v-if="serviceProviderStore.currentServiceProvider?.availableForRollenerweiterung">
                       <v-row
-                        align="start"
-                        class="ma-3"
+                        class="ma-3 align-start"
                         data-testid="filter-section"
                       >
                         <v-col
-                          align-self="center"
                           cols="12"
                           md="2"
-                          class="py-md-0 text-md-right"
+                          class="py-md-0 text-md-right align-self-center"
                         >
                           <v-btn
                             class="px-0 reset-filter"
@@ -559,7 +558,9 @@
                             v-model:search="searchInputRollen"
                             autocomplete="off"
                             class="filter-dropdown"
-                            :class="{ selected: selectedRolleIds.length > 0 }"
+                            :class="{
+                              selected: selectedRolleIds.length > 0,
+                            }"
                             clearable
                             data-testid="rolle-select"
                             density="compact"
@@ -587,29 +588,31 @@
                                   >{{
                                     $t(
                                       'admin.rolle.rollenFound',
-                                      { count: rolleStore.totalRollen },
+                                      {
+                                        count: rolleStore.totalRollen,
+                                      },
                                       rolleStore.totalRollen,
                                     )
                                   }}</span
                                 >
                               </v-list-item>
                             </template>
-                            <template #selection="{ item, index }">
+                            <template #selection="{ internalItem: item, index }">
                               <v-chip v-if="selectedRolleIds.length < 2">
                                 <span>{{ item.title }}</span>
                               </v-chip>
                               <div v-else-if="index === 0">
-                                {{ $t('admin.rolle.rollenSelected', { count: selectedRolleIds.length }) }}
+                                {{
+                                  $t('admin.rolle.rollenSelected', {
+                                    count: selectedRolleIds.length,
+                                  })
+                                }}
                               </div>
                             </template>
                           </v-autocomplete>
                         </v-col>
                       </v-row>
-                      <v-row
-                        align="center"
-                        class="mx-16 mt-n4"
-                        justify="end"
-                      >
+                      <v-row class="mx-16 mt-n4 align-center justify-end">
                         <v-col cols="12">
                           <ResultTable
                             ref="result-table"

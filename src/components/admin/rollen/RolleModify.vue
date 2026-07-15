@@ -213,6 +213,7 @@
 <template>
   <v-dialog
     v-model="showModifyRolleDialog"
+    :capture-focus="false"
     persistent
   >
     <LayoutCard
@@ -297,7 +298,7 @@
             class="mt-4"
           >
             <v-container v-if="successMessage">
-              <v-row justify="center">
+              <v-row class="justify-center">
                 <v-col cols="auto">
                   <v-icon
                     small
@@ -311,9 +312,8 @@
               </p>
             </v-container>
             <v-row
+              class="align-center justify-center"
               v-if="bulkOperationStore.currentOperation?.progress < 100"
-              align="center"
-              justify="center"
             >
               <v-col cols="auto">
                 <v-icon

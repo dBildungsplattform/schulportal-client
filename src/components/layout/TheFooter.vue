@@ -67,18 +67,16 @@
 <template>
   <v-footer
     absolute
-    :app="mobile"
     class="footer"
     data-testid="footer"
   >
-    <v-container>
+    <v-container class="ma-0">
       <v-row>
         <!-- Sponsor Logos -->
         <v-col
           cols="12"
           lg="5"
-          order-lg="2"
-          class="sponsor-logos-col justify-end"
+          class="sponsor-logos-col justify-end order-lg-2"
         >
           <div class="sponsor-logos-div">
             <template
@@ -107,8 +105,7 @@
         <v-col
           cols="12"
           lg="7"
-          order-lg="1"
-          class="footer-links-col justify-space-between"
+          class="footer-links-col justify-space-between order-lg-1"
         >
           <a
             v-for="link in footerLinks"
@@ -270,7 +267,6 @@
   .sponsor-logos-col,
   .footer-links-col {
     flex-wrap: wrap; /* Allow the items to wrap if needed */
-    justify-content: center; /* Center the items if they wrap */
   }
 
   @media (max-width: 540px) {

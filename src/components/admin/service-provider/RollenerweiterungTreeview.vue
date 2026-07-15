@@ -206,7 +206,7 @@
               :indeterminate="getGroupSelectionState(item.rollenart!) === StateSelection.Some"
               @click.stop="toggleGroupSelection(item.rollenart!)"
             />
-            <span class="group-title font-weight-bold text-body">{{ item.title }}</span>
+            <span class="group-title bold text-body">{{ item.title }}</span>
             <span class="ml-2 text-body">
               ({{ getGroupSelectedCount(item.rollenart!) }} {{ t('from') }} {{ getGroupTotalCount(item.rollenart!) }})
             </span>

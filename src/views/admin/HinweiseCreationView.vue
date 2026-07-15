@@ -181,7 +181,7 @@
           </v-col>
         </v-row>
 
-        <v-row justify="end">
+        <v-row class="justify-end">
           <v-col
             cols="12"
             sm="12"
@@ -191,7 +191,7 @@
               data-testid="submit-newsbox"
               :block="smAndDown"
               :disabled="meldungStore.loading"
-              color="primary"
+              class="primary"
               type="submit"
               @click="onSubmit"
             >

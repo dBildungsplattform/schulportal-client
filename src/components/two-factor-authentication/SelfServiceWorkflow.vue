@@ -196,10 +196,7 @@
             v-if="workflowStep === TwoFactorSteps.Verify"
             class="fill-height"
           >
-            <v-row
-              justify="center"
-              class="fill-height"
-            >
+            <v-row class="fill-height justify-center">
               <v-col
                 cols="12"
                 md="8"

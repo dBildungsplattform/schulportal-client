@@ -617,16 +617,11 @@
       :header="$t('admin.person.management')"
       headlineTestId="person-management-headline"
     >
-      <v-row
-        align="start"
-        class="ma-3"
-        justify="end"
-      >
+      <v-row class="ma-3 align-start justify-end">
         <v-col
-          align-self="center"
           cols="12"
           md="2"
-          class="py-md-0 text-md-right"
+          class="py-md-0 text-md-right align-self-center"
         >
           <v-btn
             class="px-0 reset-filter"
@@ -670,7 +665,9 @@
                   >{{
                     $t(
                       'admin.schule.schulenFound',
-                      { count: organisationStore.organisationenFilters.get('person-management')?.total },
+                      {
+                        count: organisationStore.organisationenFilters.get('person-management')?.total,
+                      },
                       organisationStore.organisationenFilters.get('person-management')?.total ?? 0,
                     )
                   }}</span
@@ -691,7 +688,9 @@
             v-model:search="searchInputRollen"
             autocomplete="off"
             class="filter-dropdown"
-            :class="{ selected: selectedRollen.length > 0 }"
+            :class="{
+              selected: selectedRollen.length > 0,
+            }"
             clearable
             data-testid="rolle-select"
             density="compact"
@@ -720,19 +719,25 @@
                   >{{
                     $t(
                       'admin.rolle.rollenFound',
-                      { count: personenkontextStore.totalFilteredRollen },
+                      {
+                        count: personenkontextStore.totalFilteredRollen,
+                      },
                       personenkontextStore.totalFilteredRollen,
                     )
                   }}</span
                 >
               </v-list-item>
             </template>
-            <template #selection="{ item, index }">
+            <template #selection="{ internalItem: item, index }">
               <v-chip v-if="selectedRollen.length < 2">
                 <span>{{ item.title }}</span>
               </v-chip>
               <div v-else-if="index === 0">
-                {{ $t('admin.rolle.rollenSelected', { count: selectedRollen.length }) }}
+                {{
+                  $t('admin.rolle.rollenSelected', {
+                    count: selectedRollen.length,
+                  })
+                }}
               </div>
             </template>
           </v-autocomplete>
@@ -770,7 +775,15 @@
                       <span
                         v-else
                         class="filter-header"
-                        >{{ t('admin.klasse.klassenFound', { count: totalKlassen }, totalKlassen) }}</span
+                        >{{
+                          t(
+                            'admin.klasse.klassenFound',
+                            {
+                              count: totalKlassen,
+                            },
+                            totalKlassen,
+                          )
+                        }}</span
                       >
                     </v-list-item>
                   </template>
@@ -805,10 +818,7 @@
           />
         </v-col>
       </v-row>
-      <v-row
-        class="ma-3 mb-n4"
-        justify="start"
-      >
+      <v-row class="ma-3 mb-n4 justify-start">
         <v-col
           md="3"
           cols="12"
@@ -869,7 +879,7 @@
             :is-loading="personenkontextStore.loading"
             :is-dialog-visible="rolleModifiyDialogVisible"
             :error-code="personenkontextStore.errorCode"
-            :selected-personen
+            :selected-personen="selectedPersonen"
             @update:is-dialog-visible="handleRolleModifyDialog($event)"
             @update:get-uebersichten="getPaginatedPersonen(searchFilterStore.personenPage)"
           >
@@ -880,7 +890,7 @@
             :error-code="personStore.errorCode"
             :is-loading="personStore.loading"
             :is-dialog-visible="benutzerDeleteDialogVisible"
-            :selected-personen
+            :selected-personen="selectedPersonen"
             @update:dialog-exit="handleBulkDeleteDialog($event)"
           />
           <PersonBulkPasswordReset
@@ -888,7 +898,7 @@
             ref="person-bulk-password-reset"
             :is-dialog-visible="passwordResetDialogVisible"
             :selected-schule-kennung="selectedOrganisationKennung"
-            :selected-personen
+            :selected-personen="selectedPersonen"
             @update:dialog-exit="handleBulkPasswordResetDialog($event)"
           />
           <OrganisationUnassign

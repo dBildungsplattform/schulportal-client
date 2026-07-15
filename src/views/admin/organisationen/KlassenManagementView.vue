@@ -265,11 +265,7 @@
         :type="'error'"
       />
       <template v-if="!organisationStore.errorCode">
-        <v-row
-          align="center"
-          class="ma-3"
-          justify="end"
-        >
+        <v-row class="ma-3 align-center justify-end">
           <v-col
             cols="12"
             md="2"
@@ -315,7 +311,9 @@
                     >{{
                       t(
                         'admin.schule.schulenFound',
-                        { count: organisationStore.organisationenFilters.get('klassen-management')?.total },
+                        {
+                          count: organisationStore.organisationenFilters.get('klassen-management')?.total,
+                        },
                         organisationStore.organisationenFilters.get('klassen-management')?.total ?? 0,
                       )
                     }}</span
@@ -359,7 +357,15 @@
                         <span
                           v-else
                           class="filter-header"
-                          >{{ t('admin.klasse.klassenFound', { count: totalKlassen }, totalKlassen) }}</span
+                          >{{
+                            t(
+                              'admin.klasse.klassenFound',
+                              {
+                                count: totalKlassen,
+                              },
+                              totalKlassen,
+                            )
+                          }}</span
                         >
                       </v-list-item>
                     </template>
