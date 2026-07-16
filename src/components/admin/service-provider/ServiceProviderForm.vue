@@ -5,14 +5,14 @@
   import LogoSelector from '@/components/form/LogoSelector.vue';
   import { getLogoPath } from '@/utils/logosConfig';
   import { type Organisation } from '@/stores/OrganisationStore';
-  import { RollenSystemRecht } from '@/stores/RolleStore';
+  import { RollenArt, RollenSystemRecht } from '@/stores/RolleStore';
   import { ServiceProviderKategorie, ServiceProviderMerkmal } from '@/stores/ServiceProviderStore';
   import { DIN_91379A_EXT, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
   import { toTypedSchema } from '@vee-validate/yup';
   import { useForm, type BaseFieldProps, type FormContext, type FormMeta, type TypedSchema } from 'vee-validate';
   import { computed, onMounted, ref, watch, watchEffect, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
-  import { boolean, number, object, string } from 'yup';
+  import { array, boolean, number, object, string } from 'yup';
   import type { ServiceProviderFormProps as Props, ServiceProviderForm, ServiceProviderFormSubmitData } from './types';
   import ServiceProviderCard from '@/components/cards/ServiceProviderCard.vue';
 
@@ -51,6 +51,7 @@
       verfuegbarFuerRollenerweiterung: boolean().optional(),
       anbietenInSchulischeAngebotsverwaltung: boolean().optional(),
       anbietenInSchulischeRollenverwaltung: boolean().optional(),
+      rollenartenWhitelist: array().of(string().required()).required(),
       requires2fa: boolean().optional(),
     }),
   );
@@ -76,6 +77,7 @@
       verfuegbarFuerRollenerweiterung: true,
       anbietenInSchulischeAngebotsverwaltung: true,
       anbietenInSchulischeRollenverwaltung: true,
+      rollenartenWhitelist: [],
       requires2fa: false,
       // No default logoId — admin must actively pick one
       ...props.initialValues,
@@ -109,6 +111,10 @@
   ]: FieldDefinition<boolean> = formContext.defineField('anbietenInSchulischeAngebotsverwaltung', vuetifyConfig);
   const [anbietenInSchulischeRollenverwaltung, anbietenInSchulischeRollenverwaltungProps]: FieldDefinition<boolean> =
     formContext.defineField('anbietenInSchulischeRollenverwaltung', vuetifyConfig);
+  const [rollenartenWhitelist, rollenartenWhitelistProps]: FieldDefinition<RollenArt[]> = formContext.defineField(
+    'rollenartenWhitelist',
+    vuetifyConfig,
+  );
   const hasAngeboteVerwalten: ComputedRef<boolean> = computed(
     () => props.systemrecht === RollenSystemRecht.AngeboteVerwalten,
   );
@@ -117,6 +123,13 @@
   );
 
   const canCommit: ComputedRef<boolean> = computed(() => formContext.meta.value.valid && formContext.meta.value.dirty);
+
+  const rollenartenWhitelistItems: ComputedRef<{ title: string; value: RollenArt }[]> = computed(() =>
+    Object.values(RollenArt).map((rollenart: RollenArt) => ({
+      title: t(`admin.rolle.mappingFrontBackEnd.rollenarten.${rollenart}`),
+      value: rollenart,
+    })),
+  );
 
   const kategorieItems: ComputedRef<{ title: string; value: string }[]> = computed(() =>
     Object.values(ServiceProviderKategorie).map((k: string) => ({
@@ -191,6 +204,7 @@
       logoId: values.logoId,
       kategorie: values.kategorie,
       merkmale: [],
+      rollenartenWhitelist: values.rollenartenWhitelist ?? [],
       requires2fa: values.requires2fa,
     };
     if (values.nachtraeglichZuweisbar) {
@@ -492,6 +506,7 @@
           :is-required="false"
           label-for-id="service-provider-display-merkmale"
           :label="$t('angebot.offeringScope')"
+          :noTopMargin="true"
         >
           <div id="service-provider-display-merkmale">
             <v-checkbox
@@ -513,6 +528,37 @@
               hide-details
             />
           </div>
+        </FormRow>
+
+        <!-- Rollenarten whitelist -->
+        <v-row class="mt-8">
+          <v-col class="pa-0">
+            <h3 class="headline-3">{{ $t('angebot.rollenartenWhitelistHeading') }}</h3>
+          </v-col>
+        </v-row>
+        <FormRow
+          :error-label="rollenartenWhitelistProps['error']"
+          :is-required="false"
+          label-for-id="rollenarten-whitelist-select"
+          :label="$t('angebot.rollenartenWhitelistLabel')"
+        >
+          <v-autocomplete
+            id="rollenarten-whitelist-select"
+            v-bind="rollenartenWhitelistProps"
+            v-model="rollenartenWhitelist"
+            chips
+            clearable
+            data-testid="rollenarten-whitelist-select"
+            density="compact"
+            :disabled="!hasAngeboteVerwalten"
+            :items="rollenartenWhitelistItems"
+            item-value="value"
+            item-title="title"
+            multiple
+            :no-data-text="$t('noDataFound')"
+            :placeholder="$t('angebot.noRestrictions')"
+            variant="outlined"
+          />
         </FormRow>
         <!-- 2FA -->
         <v-row>

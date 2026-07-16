@@ -1,4 +1,5 @@
 import type { Organisation } from '@/stores/OrganisationStore';
+import type { RollenArt } from '@/stores/RolleStore';
 import type { ServiceProviderKategorie, ServiceProviderMerkmal } from '@/stores/ServiceProviderStore';
 
 export type RollenerweiterungAssignErrorDialogProps = {
@@ -25,6 +26,7 @@ export type ServiceProviderForm = {
   verfuegbarFuerRollenerweiterung: boolean;
   anbietenInSchulischeAngebotsverwaltung: boolean;
   anbietenInSchulischeRollenverwaltung: boolean;
+  rollenartenWhitelist: RollenArt[];
   requires2fa: boolean;
 };
 
@@ -35,6 +37,7 @@ export type ServiceProviderFormSubmitData = {
   logoId: number | undefined;
   kategorie: ServiceProviderKategorie;
   merkmale: ServiceProviderMerkmal[];
+  rollenartenWhitelist: RollenArt[];
   requires2fa: boolean;
 };
 
@@ -49,4 +52,18 @@ export type ServiceProviderFormProps = {
   errorCode?: string;
   loading?: boolean;
   isEditMode?: boolean;
+};
+
+export type SuccessDataItem = {
+  label: string;
+  value: string | number | undefined;
+  testId: string;
+  type?: 'text' | 'image';
+  alt?: string;
+};
+
+export type SuccessDetails = {
+  message: string;
+  followingDataChanged: string;
+  data: Array<SuccessDataItem>;
 };

@@ -1,5 +1,6 @@
 <script setup lang="ts">
   import ServiceProviderForm from '@/components/admin/service-provider/ServiceProviderForm.vue';
+  import { formatServiceProviderRollenartenWhitelist } from '@/components/admin/service-provider/serviceProviderRollenarten';
   import SuccessTemplate from '@/components/admin/service-provider/SuccessTemplate.vue';
   import type {
     ServiceProviderFormSubmitData,
@@ -75,6 +76,7 @@
       anbietenInSchulischeRollenverwaltung: values.merkmale.includes(
         ServiceProviderMerkmal.AnbietenInSchulischerRollenverwaltung,
       ),
+      rollenartenWhitelist: values.rollenartenWhitelist,
     };
   }
 
@@ -154,6 +156,7 @@
       kategorie: values.kategorie,
       requires2fa: values.requires2fa,
       merkmale: values.merkmale,
+      rollenartenWhitelist: values.rollenartenWhitelist,
     });
 
     if (!serviceProviderStore.errorCode) {
@@ -226,6 +229,7 @@
             verfuegbarFuerRollenerweiterung: true,
             anbietenInSchulischeAngebotsverwaltung: true,
             anbietenInSchulischeRollenverwaltung: true,
+            rollenartenWhitelist: [],
             requires2fa: false,
           }"
           :cached-values="cachedValues"
@@ -289,6 +293,14 @@
                   ? $t('yes')
                   : $t('no'),
                 testId: 'success-verfuegbar-fuer-rollenerweiterung',
+              },
+              {
+                label: $t('angebot.rollenartenWhitelistLabel'),
+                value: formatServiceProviderRollenartenWhitelist(
+                  serviceProviderStore.createdServiceProvider.rollenartenWhitelist,
+                  $t,
+                ),
+                testId: 'success-rollenarten-whitelist',
               },
               {
                 label: $t('angebot.requires2FA'),

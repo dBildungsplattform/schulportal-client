@@ -1,5 +1,5 @@
 import routes from '@/router/routes';
-import { RollenSystemRecht } from '@/stores/RolleStore';
+import { RollenArt, RollenSystemRecht } from '@/stores/RolleStore';
 import {
   ServiceProviderKategorie,
   ServiceProviderMerkmal,
@@ -19,6 +19,7 @@ import {
   type RouteLocationNormalized,
   type Router,
 } from 'vue-router';
+import SuccessTemplate from '@/components/admin/service-provider/SuccessTemplate.vue';
 
 type OnBeforeRouteLeaveCallback = (
   _to: RouteLocationNormalized,
@@ -157,10 +158,12 @@ describe('ServiceProviderEditView', () => {
     await router.isReady();
     wrapper = await mountComponent();
 
-    const form: VueWrapper = wrapper.findComponent({ name: 'ServiceProviderForm' });
+    // eslint-disable-next-line @typescript-eslint/typedef
+    const form = wrapper.findComponent({ name: 'ServiceProviderForm' });
     expect(form.props('initialValues')).toMatchObject({
       anbietenInSchulischeAngebotsverwaltung: true,
       anbietenInSchulischeRollenverwaltung: true,
+      rollenartenWhitelist: [],
     });
   });
 
@@ -172,12 +175,52 @@ describe('ServiceProviderEditView', () => {
       logoId: undefined,
       kategorie: serviceProviderStore.currentServiceProvider?.kategorie,
       merkmale: serviceProviderStore.currentServiceProvider?.merkmale || [],
+      rollenartenWhitelist: serviceProviderStore.currentServiceProvider?.rollenartenWhitelist || [],
       requires2fa: false,
     };
     const form: VueWrapper = wrapper!.findComponent({ name: 'ServiceProviderForm' });
     form.vm.$emit('click:submit', validEdit);
     await flushPromises();
     expect(spy).toHaveBeenCalledWith(serviceProviderStore.currentServiceProvider?.id, validEdit);
+    spy.mockRestore();
+  });
+
+  it('renders rollenarten whitelist in success view from backend response, not cached submit values', async () => {
+    const spy: Mock = vi.spyOn(serviceProviderStore, 'updateServiceProvider').mockImplementation(() => {
+      const currentServiceProvider: ManageableServiceProviderDetail | null =
+        serviceProviderStore.currentServiceProvider;
+      if (!currentServiceProvider) {
+        throw new Error('Expected current service provider to be set');
+      }
+
+      serviceProviderStore.updatedServiceProvider = {
+        id: currentServiceProvider.id,
+        name: currentServiceProvider.name,
+        url: currentServiceProvider.url,
+        kategorie: currentServiceProvider.kategorie,
+        merkmale: currentServiceProvider.merkmale ?? [],
+        requires2fa: currentServiceProvider.requires2fa ?? false,
+        rollenartenWhitelist: [RollenArt.Orgadmin],
+      };
+      return Promise.resolve();
+    });
+
+    const form: VueWrapper = wrapper!.findComponent({ name: 'ServiceProviderForm' });
+    form.vm.$emit('click:submit', {
+      name: 'Neuer Name',
+      url: 'https://neue-url.de',
+      logoId: undefined,
+      kategorie: serviceProviderStore.currentServiceProvider?.kategorie,
+      merkmale: serviceProviderStore.currentServiceProvider?.merkmale || [],
+      rollenartenWhitelist: [RollenArt.Lern],
+      requires2fa: false,
+    });
+    await flushPromises();
+
+    expect(wrapper!.findComponent(SuccessTemplate).exists()).toBe(true);
+    expect(wrapper!.find('[data-testid="success-rollenarten-whitelist"]').text()).toBe(
+      'rollen.mappingFrontBackEnd.rollenarten.ORGADMIN',
+    );
     spy.mockRestore();
   });
 
@@ -219,6 +262,7 @@ describe('ServiceProviderEditView', () => {
           logoId: undefined,
           kategorie: serviceProviderStore.currentServiceProvider?.kategorie,
           merkmale: serviceProviderStore.currentServiceProvider?.merkmale || [],
+          rollenartenWhitelist: serviceProviderStore.currentServiceProvider?.rollenartenWhitelist || [],
           requires2fa: false,
         };
         form.vm.$emit('click:submit', validEdit);

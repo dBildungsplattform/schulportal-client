@@ -8,6 +8,7 @@ import {
   DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInnerI18nKeyEnum,
   ProviderApiFactory,
   RolleApiFactory,
+  RollenArt,
   ServiceProviderKategorie,
   ServiceProviderMerkmal,
   VidisApiFactory,
@@ -55,6 +56,7 @@ type ManageableServiceProviderDetails = {
   merkmale: Array<ServiceProviderMerkmal>;
   administrationsebene: { id: string; name: string; kennung?: string };
   rollen: Array<{ id: string; name: string }>;
+  rollenartenWhitelist?: Array<RollenArt>;
 };
 
 export type ManageableServiceProviderSimpleListEntry = BaseServiceProvider &
@@ -121,18 +123,21 @@ export type ServiceProviderCreationFilter = {
   kategorie: ServiceProviderKategorie;
   requires2fa: boolean;
   merkmale: Array<ServiceProviderMerkmal>;
+  rollenartenWhitelist: Array<RollenArt>;
 };
 
 export type CreatedServiceProvider = BaseServiceProvider & {
   url: string;
   merkmale: Array<ServiceProviderMerkmal>;
   logoId?: number;
+  rollenartenWhitelist?: Array<RollenArt>;
 };
 
 export type UpdatedServiceProvider = BaseServiceProvider & {
   url?: string;
   merkmale: Array<ServiceProviderMerkmal>;
   logoId?: number;
+  rollenartenWhitelist?: Array<RollenArt>;
 };
 
 type ServiceProviderState = {
@@ -441,6 +446,7 @@ export const useServiceProviderStore: StoreDefinition<
           kategorie: filter.kategorie,
           requires2fa: filter.requires2fa,
           merkmale: filter.merkmale,
+          rollenartenWhitelist: filter.rollenartenWhitelist,
         };
         const { data }: { data: CreateServiceProviderResponse } =
           await serviceProviderApi.providerControllerCreateServiceProvider(bodyParams);
@@ -471,6 +477,9 @@ export const useServiceProviderStore: StoreDefinition<
         }
         if (update.merkmale !== undefined) {
           updateServiceProviderBodyParams.merkmale = update.merkmale;
+        }
+        if (update.rollenartenWhitelist !== undefined) {
+          updateServiceProviderBodyParams.rollenartenWhitelist = update.rollenartenWhitelist;
         }
 
         const { data }: { data: ServiceProviderResponse } =

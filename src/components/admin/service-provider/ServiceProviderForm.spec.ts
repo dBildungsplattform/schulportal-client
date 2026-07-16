@@ -53,12 +53,29 @@ describe('ServiceProviderForm', () => {
     expect(wrapper.find('[data-testid="nachtraeglich-zuweisbar-select"]').exists()).toBe(true);
     expect(wrapper.find('[data-testid="verfuegbar-fuer-rollenerweiterung-select"]').exists()).toBe(true);
     expect(wrapper.find('[data-testid="requires2fa-select"]').exists()).toBe(true);
-    expect(wrapper.find('[data-testid="anbieten-in-schulische-angebotsverwaltung-checkbox"]').exists()).toBe(
-      true,
+    expect(wrapper.find('[data-testid="anbieten-in-schulische-angebotsverwaltung-checkbox"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="anbieten-in-schulische-rollenverwaltung-checkbox"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="rollenarten-whitelist-select"]').exists()).toBe(true);
+  });
+
+  test('shows no restriction text for empty rollenarten whitelist', () => {
+    const wrapper: VueWrapper<ComponentInstance<typeof ServiceProviderForm>> = mountComponent();
+
+    expect(wrapper.find('[data-testid="rollenarten-whitelist-select"] input').attributes('placeholder')).toBe(
+      'Keine Einschränkungen',
     );
-    expect(wrapper.find('[data-testid="anbieten-in-schulische-rollenverwaltung-checkbox"]').exists()).toBe(
-      true,
-    );
+  });
+
+  test('disables rollenarten whitelist when user lacks AngeboteVerwalten', () => {
+    const wrapper: VueWrapper<ComponentInstance<typeof ServiceProviderForm>> = mountComponent({
+      systemrecht: RollenSystemRecht.AngeboteEingeschraenktVerwalten,
+    });
+
+    const disabledAttr: string | undefined = wrapper
+      .find('[data-testid="rollenarten-whitelist-select"] input')
+      .attributes('disabled');
+
+    expect(disabledAttr).toBeDefined();
   });
 
   test('renders offering scope form text', () => {
@@ -227,8 +244,12 @@ describe('ServiceProviderForm', () => {
     ).element as HTMLInputElement;
     expect(anbietenInSchulischeAngebotsverwaltung.checked).toBe(false);
     expect(anbietenInSchulischeRollenverwaltung.checked).toBe(false);
-    expect(wrapper.find('[data-testid="anbieten-in-schulische-angebotsverwaltung-checkbox"] input').attributes('disabled')).toBeDefined();
-    expect(wrapper.find('[data-testid="anbieten-in-schulische-rollenverwaltung-checkbox"] input').attributes('disabled')).toBeDefined();
+    expect(
+      wrapper.find('[data-testid="anbieten-in-schulische-angebotsverwaltung-checkbox"] input').attributes('disabled'),
+    ).toBeDefined();
+    expect(
+      wrapper.find('[data-testid="anbieten-in-schulische-rollenverwaltung-checkbox"] input').attributes('disabled'),
+    ).toBeDefined();
   });
 
   test('unchecks both checkboxes when verfuegbarFuerRollenerweiterung transitions from true to false', async () => {
@@ -240,7 +261,10 @@ describe('ServiceProviderForm', () => {
         anbietenInSchulischeRollenverwaltung: true,
       },
     });
-    wrapper.findComponent('[data-testid="verfuegbar-fuer-rollenerweiterung-select"]').vm.$emit('update:modelValue', false);
+    (wrapper.findComponent('[data-testid="verfuegbar-fuer-rollenerweiterung-select"]') as VueWrapper).vm.$emit(
+      'update:modelValue',
+      false,
+    );
     await flushPromises();
     const anbietenInSchulischeAngebotsverwaltung: HTMLInputElement = wrapper.find(
       '[data-testid="anbieten-in-schulische-angebotsverwaltung-checkbox"] input',
@@ -271,6 +295,7 @@ describe('ServiceProviderForm', () => {
       verfuegbarFuerRollenerweiterung: true,
       anbietenInSchulischeAngebotsverwaltung: false,
       anbietenInSchulischeRollenverwaltung: false,
+      rollenartenWhitelist: [],
       requires2fa: false,
     };
     const newName: string = 'Updated Name';
@@ -297,8 +322,7 @@ describe('ServiceProviderForm', () => {
     expect(submitBtn.attributes()['disabled']).toBeUndefined();
     await submitBtn.trigger('click');
     // submit event is not triggered by click in test, so we trigger it manually
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-    wrapper.findComponent({ name: 'FormWrapper' }).vm['onSubmit']();
+    await wrapper.find('form').trigger('submit.prevent');
     await flushPromises();
 
     expect(wrapper.emitted('click:submit')).toBeTruthy();
@@ -334,6 +358,7 @@ describe('ServiceProviderForm', () => {
       verfuegbarFuerRollenerweiterung: true,
       anbietenInSchulischeAngebotsverwaltung: true,
       anbietenInSchulischeRollenverwaltung: true,
+      rollenartenWhitelist: [],
       requires2fa: false,
     };
     const wrapper: VueWrapper<ComponentInstance<typeof ServiceProviderForm>> = mountComponent({ initialValues });
@@ -350,8 +375,7 @@ describe('ServiceProviderForm', () => {
       '[data-testid="service-provider-create-form"] button[type="submit"]',
     );
     await submitBtn.trigger('click');
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-    wrapper.findComponent({ name: 'FormWrapper' }).vm['onSubmit']();
+    await wrapper.find('form').trigger('submit.prevent');
     await flushPromises();
 
     const emittedData: ServiceProviderFormSubmitData = wrapper

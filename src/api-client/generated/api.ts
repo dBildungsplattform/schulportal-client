@@ -461,6 +461,12 @@ export interface CreateServiceProviderResponse {
      * @memberof CreateServiceProviderResponse
      */
     'merkmale': Array<ServiceProviderMerkmal>;
+    /**
+     * 
+     * @type {Array<RollenArt>}
+     * @memberof CreateServiceProviderResponse
+     */
+    'rollenartenWhitelist': Array<RollenArt>;
 }
 
 
@@ -4065,6 +4071,12 @@ export interface ServiceProviderResponse {
      * @memberof ServiceProviderResponse
      */
     'merkmale': Array<ServiceProviderMerkmal>;
+    /**
+     * 
+     * @type {Array<RollenArt>}
+     * @memberof ServiceProviderResponse
+     */
+    'rollenartenWhitelist': Array<RollenArt>;
 }
 
 

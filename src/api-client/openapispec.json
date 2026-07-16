@@ -3858,9 +3858,10 @@
           "logoId": { "type": "number", "description": "Optional logoId for use with standard logos" },
           "hasLogo": { "type": "boolean", "description": "Indicates if a custom logo is available for fetching" },
           "requires2fa": { "type": "boolean", "description": "Indicates if 2FA is required" },
-          "merkmale": { "type": "array", "items": { "$ref": "#/components/schemas/ServiceProviderMerkmal" } }
+          "merkmale": { "type": "array", "items": { "$ref": "#/components/schemas/ServiceProviderMerkmal" } },
+          "rollenartenWhitelist": { "type": "array", "items": { "$ref": "#/components/schemas/RollenArt" } }
         },
-        "required": ["id", "name", "target", "kategorie", "hasLogo", "requires2fa", "merkmale"]
+        "required": ["id", "name", "target", "kategorie", "hasLogo", "requires2fa", "merkmale", "rollenartenWhitelist"]
       },
       "RollenerweiterungWithExtendedDataResponse": {
         "type": "object",
@@ -4084,9 +4085,20 @@
           "logoId": { "type": "number", "description": "Optional logoId for use with standard logos" },
           "hasLogo": { "type": "boolean", "description": "Indicates if a custom logo is available for fetching" },
           "requires2fa": { "type": "boolean", "description": "Indicates if 2FA is required" },
-          "merkmale": { "type": "array", "items": { "$ref": "#/components/schemas/ServiceProviderMerkmal" } }
+          "merkmale": { "type": "array", "items": { "$ref": "#/components/schemas/ServiceProviderMerkmal" } },
+          "rollenartenWhitelist": { "type": "array", "items": { "$ref": "#/components/schemas/RollenArt" } }
         },
-        "required": ["id", "name", "target", "url", "kategorie", "hasLogo", "requires2fa", "merkmale"]
+        "required": [
+          "id",
+          "name",
+          "target",
+          "url",
+          "kategorie",
+          "hasLogo",
+          "requires2fa",
+          "merkmale",
+          "rollenartenWhitelist"
+        ]
       },
       "UpdateServiceProviderBodyParams": {
         "type": "object",

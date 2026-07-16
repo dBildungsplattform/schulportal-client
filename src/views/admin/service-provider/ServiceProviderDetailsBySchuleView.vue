@@ -9,6 +9,7 @@
     RollenSystemRechtEnum,
   } from '@/api-client/generated';
   import SchulPortalLogo from '@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg';
+  import { formatServiceProviderRollenartenWhitelist } from '@/components/admin/service-provider/serviceProviderRollenarten';
   import LabeledField from '@/components/admin/LabeledField.vue';
   import RollenerweiterungAssignErrorDialog from '@/components/admin/service-provider/RollenerweiterungAssignErrorDialog.vue';
   import RollenerweiterungTreeview, {
@@ -434,6 +435,17 @@
                         serviceProviderStore.currentServiceProvider.availableForRollenerweiterung ? t('yes') : t('no')
                       "
                       test-id="service-provider-rollenerweiterung"
+                      no-margin-top
+                    />
+                    <LabeledField
+                      :label="t('angebot.rollenartenWhitelistLabel')"
+                      :value="
+                        formatServiceProviderRollenartenWhitelist(
+                          serviceProviderStore.currentServiceProvider.rollenartenWhitelist,
+                          t,
+                        )
+                      "
+                      test-id="service-provider-rollenarten-whitelist"
                       no-margin-top
                     />
 

@@ -111,9 +111,21 @@ describe('ServiceProviderDetailsBySchuleView', () => {
       mockServiceProvider.requires2fa ? 'Ja' : 'Nein',
     );
     expect(wrapper?.find('[data-testid="service-provider-kategorie"]').text()).toBe('Hinweise');
+    expect(wrapper?.find('[data-testid="service-provider-rollenarten-whitelist"]').text()).toBe(
+      'Keine Einschränkungen',
+    );
     expect(wrapper?.find('[data-testid="service-provider-link"]').text()).toBe(
       mockServiceProvider.url ? mockServiceProvider.url : 'fehlt',
     );
+  });
+
+  test('it shows rollenarten whitelist values when present', async () => {
+    serviceProviderStore.currentServiceProvider = DoFactory.getManageableServiceProviderDetail({
+      rollenartenWhitelist: [RollenArt.Sysadmin, RollenArt.Lehr],
+    });
+    await nextTick();
+
+    expect(wrapper?.find('[data-testid="service-provider-rollenarten-whitelist"]').text()).toBe('Sysadmin, Lehr');
   });
 
   test('it navigates back to service providers table', async () => {
