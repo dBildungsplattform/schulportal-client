@@ -932,11 +932,10 @@
         <!-- Display the number of selected checkboxes -->
         <v-col
           v-if="authStore.hasPersonenBulkPermission && selectedPersonIds.length > 0"
-          cols="12"
-          md="4"
-          class="mt-md-5 mt-n10"
+          cols="auto"
+          class="mb-5 d-flex align-center"
         >
-          <p class="text-body">{{ selectedPersonIds.length }} {{ $t('selected') }}</p>
+          <p class="text-body mb-0">{{ selectedPersonIds.length }} {{ $t('selected') }}</p>
         </v-col>
         <v-spacer />
         <SearchField

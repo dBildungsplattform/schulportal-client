@@ -1,9 +1,8 @@
 <script setup lang="ts">
-  import { type ComputedRef, ref, type Ref } from 'vue';
+  import { ref, type Ref } from 'vue';
   import SH_LOGO from '@/assets/logos/landesdachmarke_01_KORR.svg';
   import DIGITAL_PAKT_LOGO from '@/assets/logos/digitalPakt.svg';
   import { type Composer, useI18n } from 'vue-i18n';
-  import { useDisplay } from 'vuetify';
 
   const { t }: Composer = useI18n({ useScope: 'global' });
 
@@ -60,8 +59,6 @@
       href: 'https://www.schleswig-holstein.de/DE/landesportal/landesportal_node.html',
     },
   ]);
-
-  const { mobile }: { mobile: ComputedRef<boolean> } = useDisplay();
 </script>
 
 <template>

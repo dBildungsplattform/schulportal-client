@@ -71,7 +71,7 @@
       </v-col>
     </v-row>
     <v-divider
-      class="border-opacity-100 rounded pt-4"
+      class="border-opacity-100 rounded"
       color="#1EAE9C"
       thickness="5px"
     />
