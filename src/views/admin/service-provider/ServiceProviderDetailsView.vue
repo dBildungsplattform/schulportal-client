@@ -268,7 +268,6 @@
                         :label="t('angebot.administrationsebene')"
                         :value="serviceProviderStore.currentServiceProvider.administrationsebene.name"
                         test-id="service-provider-administrationsebene"
-                        no-margin-top
                       />
 
                       <!-- Requires 2FA -->
@@ -276,7 +275,6 @@
                         :label="t('angebot.requires2FA')"
                         :value="serviceProviderStore.currentServiceProvider.requires2fa ? t('yes') : t('no')"
                         test-id="service-provider-requires-2fa"
-                        no-margin-top
                       />
 
                       <!-- Can be assigned to Rollen? -->
@@ -290,7 +288,6 @@
                             : t('no')
                         "
                         test-id="service-provider-can-be-assigned-to-rollen"
-                        no-margin-top
                       />
 
                       <!-- Is Vidis Angebot? -->
@@ -298,7 +295,6 @@
                         :label="t('angebot.vidisAngebot')"
                         :value="isVidisAngebot ? t('yes') : t('no')"
                         test-id="service-provider-vidis-angebot"
-                        no-margin-top
                       />
                     </div>
                   </v-col>
@@ -327,7 +323,6 @@
                           : t('missing')
                       "
                       test-id="service-provider-kategorie"
-                      no-margin-top
                     />
 
                     <!-- URL -->
@@ -336,7 +331,6 @@
                       :value="serviceProviderStore.currentServiceProvider.url || t('missing')"
                       test-id="service-provider-link"
                       word-break-all
-                      no-margin-top
                     />
 
                     <!-- Rollenerweiterung -->
@@ -346,7 +340,6 @@
                         serviceProviderStore.currentServiceProvider.availableForRollenerweiterung ? t('yes') : t('no')
                       "
                       test-id="service-provider-rollenerweiterung"
-                      no-margin-top
                     />
                   </v-col>
                 </v-row>
@@ -383,7 +376,7 @@
               color="#E5EAEF"
               thickness="6"
             ></v-divider>
-            <v-row class="mt-n6">
+            <v-row>
               <v-col
                 class="custom-offset"
                 offset="1"

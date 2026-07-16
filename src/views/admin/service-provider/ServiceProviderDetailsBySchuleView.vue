@@ -367,13 +367,11 @@
                         :label="t('angebot.providedBy')"
                         :value="serviceProviderStore.currentServiceProvider.administrationsebene.name"
                         test-id="service-provider-administrationsebene"
-                        no-margin-top
                       />
                       <LabeledField
                         :label="t('angebot.requires2FA')"
                         :value="serviceProviderStore.currentServiceProvider.requires2fa ? t('yes') : t('no')"
                         test-id="service-provider-requires-2fa"
-                        no-margin-top
                       />
                       <LabeledField
                         :label="t('angebot.canBeAssignedToRollen')"
@@ -385,7 +383,6 @@
                             : t('no')
                         "
                         test-id="service-provider-can-be-assigned-to-rollen"
-                        no-margin-top
                       />
 
                       <!-- Is Vidis Angebot? -->
@@ -393,7 +390,6 @@
                         :label="t('angebot.vidisAngebot')"
                         :value="isVidisAngebot ? t('yes') : t('no')"
                         test-id="service-provider-vidis-angebot"
-                        no-margin-top
                       />
                     </div>
                   </v-col>
@@ -409,7 +405,6 @@
                       :logo-src="resolvedLogo"
                       :default-logo-src="SchulPortalLogo"
                       test-id="service-provider-logo"
-                      md-margin-top
                     />
                     <LabeledField
                       :label="t('angebot.kategorie')"
@@ -419,14 +414,12 @@
                           : t('missing')
                       "
                       test-id="service-provider-kategorie"
-                      no-margin-top
                     />
                     <LabeledField
                       :label="t('angebot.link')"
                       :value="serviceProviderStore.currentServiceProvider.url || t('missing')"
                       test-id="service-provider-link"
                       word-break-all
-                      no-margin-top
                     />
                     <LabeledField
                       :label="t('angebot.schulspezifischeRollenerweiterung')"
@@ -434,7 +427,6 @@
                         serviceProviderStore.currentServiceProvider.availableForRollenerweiterung ? t('yes') : t('no')
                       "
                       test-id="service-provider-rollenerweiterung"
-                      no-margin-top
                     />
 
                     <v-row

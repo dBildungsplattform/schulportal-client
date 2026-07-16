@@ -818,7 +818,7 @@
           />
         </v-col>
       </v-row>
-      <v-row class="ma-3 mb-n4 justify-start">
+      <v-row class="ma-3 mb-0 mb-md-n4 justify-start">
         <v-col
           md="3"
           cols="12"
