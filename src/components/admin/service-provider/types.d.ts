@@ -23,6 +23,8 @@ export type ServiceProviderForm = {
   kategorie: ServiceProviderKategorie;
   nachtraeglichZuweisbar: boolean;
   verfuegbarFuerRollenerweiterung: boolean;
+  anbietenInSchulischeAngebotsverwaltung: boolean;
+  anbietenInSchulischeRollenverwaltung: boolean;
   requires2fa: boolean;
 };
 

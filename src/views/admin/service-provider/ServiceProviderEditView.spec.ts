@@ -2,6 +2,7 @@ import routes from '@/router/routes';
 import { RollenSystemRecht } from '@/stores/RolleStore';
 import {
   ServiceProviderKategorie,
+  ServiceProviderMerkmal,
   useServiceProviderStore,
   type ManageableServiceProviderDetail,
   type ServiceProviderStore,
@@ -140,6 +141,27 @@ describe('ServiceProviderEditView', () => {
   it('renders the headline and form', () => {
     expect(wrapper?.find('[data-testid="admin-headline"]').exists()).toBe(true);
     expect(wrapper?.findComponent({ name: 'ServiceProviderForm' }).exists()).toBe(true);
+  });
+
+  it('passes both anbietung checkboxes as true in initialValues when corresponding merkmale exist', async () => {
+    const testServiceProvider: ManageableServiceProviderDetail = DoFactory.getManageableServiceProviderDetail({
+      relevantSystemrechte: [RollenSystemRecht.AngeboteVerwalten],
+      merkmale: [
+        ServiceProviderMerkmal.VerfuegbarFuerRollenerweiterung,
+        ServiceProviderMerkmal.AnbietenInSchulischerAngebotsverwaltung,
+        ServiceProviderMerkmal.AnbietenInSchulischerRollenverwaltung,
+      ],
+    });
+    serviceProviderStore.currentServiceProvider = testServiceProvider;
+    router.push({ name: 'angebot-details', params: { id: testServiceProvider.id } });
+    await router.isReady();
+    wrapper = await mountComponent();
+
+    const form: VueWrapper = wrapper.findComponent({ name: 'ServiceProviderForm' });
+    expect(form.props('initialValues')).toMatchObject({
+      anbietenInSchulischeAngebotsverwaltung: true,
+      anbietenInSchulischeRollenverwaltung: true,
+    });
   });
 
   it('edits and saves a service provider, calling the store', async () => {

@@ -73,6 +73,15 @@
       url: values.url,
       kategorie: values.kategorie,
       logoId: values.logoId,
+      requires2fa: values.requires2fa,
+      nachtraeglichZuweisbar: values.merkmale.includes(ServiceProviderMerkmal.NachtraeglichZuweisbar),
+      verfuegbarFuerRollenerweiterung: values.merkmale.includes(ServiceProviderMerkmal.VerfuegbarFuerRollenerweiterung),
+      anbietenInSchulischeAngebotsverwaltung: values.merkmale.includes(
+        ServiceProviderMerkmal.AnbietenInSchulischerAngebotsverwaltung,
+      ),
+      anbietenInSchulischeRollenverwaltung: values.merkmale.includes(
+        ServiceProviderMerkmal.AnbietenInSchulischerRollenverwaltung,
+      ),
     };
   }
 
@@ -93,6 +102,12 @@
       ),
       verfuegbarFuerRollenerweiterung: serviceProviderStore.currentServiceProvider.merkmale.includes(
         ServiceProviderMerkmal.VerfuegbarFuerRollenerweiterung,
+      ),
+      anbietenInSchulischeAngebotsverwaltung: serviceProviderStore.currentServiceProvider.merkmale.includes(
+        ServiceProviderMerkmal.AnbietenInSchulischerAngebotsverwaltung,
+      ),
+      anbietenInSchulischeRollenverwaltung: serviceProviderStore.currentServiceProvider.merkmale.includes(
+        ServiceProviderMerkmal.AnbietenInSchulischerRollenverwaltung,
       ),
     };
   });

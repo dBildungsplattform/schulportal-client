@@ -651,6 +651,37 @@ describe('serviceProviderStore', () => {
       expect(serviceProviderStore.loading).toBe(false);
     });
 
+    it('should include merkmale with anbietung values in patch request body', async () => {
+      const updateWithMerkmale = {
+        merkmale: [
+          ServiceProviderMerkmal.AnbietenInSchulischerAngebotsverwaltung,
+          ServiceProviderMerkmal.AnbietenInSchulischerRollenverwaltung,
+        ],
+      };
+      const mockResponse: ServiceProviderResponse = {
+        id: providerId,
+        name: 'Updated Service Provider',
+        url: 'https://updated-url.com',
+        target: ServiceProviderTarget.Url,
+        hasLogo: false,
+        logoId: 1,
+        kategorie: ServiceProviderKategorie.Email,
+        requires2fa: false,
+        merkmale: updateWithMerkmale.merkmale,
+      };
+
+      mockadapter.onPatch(apiUrl).replyOnce(200, mockResponse);
+      await serviceProviderStore.updateServiceProvider(providerId, updateWithMerkmale);
+
+      const patchData: unknown = mockadapter.history.patch[0]?.data;
+      const requestBodyRaw: unknown = JSON.parse(typeof patchData === 'string' ? patchData : '{}');
+      const requestBody: { merkmale?: ServiceProviderMerkmal[] } =
+        typeof requestBodyRaw === 'object' && requestBodyRaw !== null
+          ? (requestBodyRaw)
+          : {};
+      expect(requestBody.merkmale).toEqual(updateWithMerkmale.merkmale);
+    });
+
     it('should handle string error', async () => {
       mockadapter.onPatch(apiUrl).replyOnce(500, 'some mock server error');
       const promise: Promise<void> = serviceProviderStore.updateServiceProvider(providerId, update);

@@ -49,6 +49,8 @@
       kategorie: string().required(t('angebot.rules.kategorie.required')),
       nachtraeglichZuweisbar: boolean().optional(),
       verfuegbarFuerRollenerweiterung: boolean().optional(),
+      anbietenInSchulischeAngebotsverwaltung: boolean().optional(),
+      anbietenInSchulischeRollenverwaltung: boolean().optional(),
       requires2fa: boolean().optional(),
     }),
   );
@@ -72,6 +74,8 @@
       kategorie: ServiceProviderKategorie.Schulisch,
       nachtraeglichZuweisbar: true,
       verfuegbarFuerRollenerweiterung: true,
+      anbietenInSchulischeAngebotsverwaltung: true,
+      anbietenInSchulischeRollenverwaltung: true,
       requires2fa: false,
       // No default logoId — admin must actively pick one
       ...props.initialValues,
@@ -99,6 +103,18 @@
   );
   const [verfuegbarFuerRollenerweiterung, verfuegbarFuerRollenerweiterungProps]: FieldDefinition<boolean> =
     formContext.defineField('verfuegbarFuerRollenerweiterung', vuetifyConfig);
+  const [
+    anbietenInSchulischeAngebotsverwaltung,
+    anbietenInSchulischeAngebotsverwaltungProps,
+  ]: FieldDefinition<boolean> = formContext.defineField('anbietenInSchulischeAngebotsverwaltung', vuetifyConfig);
+  const [anbietenInSchulischeRollenverwaltung, anbietenInSchulischeRollenverwaltungProps]: FieldDefinition<boolean> =
+    formContext.defineField('anbietenInSchulischeRollenverwaltung', vuetifyConfig);
+  const hasAngeboteVerwalten: ComputedRef<boolean> = computed(
+    () => props.systemrecht === RollenSystemRecht.AngeboteVerwalten,
+  );
+  const areRoleExtensionCheckboxesDisabled: ComputedRef<boolean> = computed(
+    () => !hasAngeboteVerwalten.value || !verfuegbarFuerRollenerweiterung.value,
+  );
 
   const canCommit: ComputedRef<boolean> = computed(() => formContext.meta.value.valid && formContext.meta.value.dirty);
 
@@ -183,6 +199,12 @@
     if (values.verfuegbarFuerRollenerweiterung) {
       payload.merkmale.push(ServiceProviderMerkmal.VerfuegbarFuerRollenerweiterung);
     }
+    if (values.verfuegbarFuerRollenerweiterung && values.anbietenInSchulischeAngebotsverwaltung) {
+      payload.merkmale.push(ServiceProviderMerkmal.AnbietenInSchulischerAngebotsverwaltung);
+    }
+    if (values.verfuegbarFuerRollenerweiterung && values.anbietenInSchulischeRollenverwaltung) {
+      payload.merkmale.push(ServiceProviderMerkmal.AnbietenInSchulischerRollenverwaltung);
+    }
     emit('click:submit', payload);
   });
 
@@ -193,6 +215,15 @@
   watch(formContext.meta, ({ dirty }: FormMeta<ServiceProviderForm>) => {
     emit('update:dirty', dirty);
   });
+
+  watch(
+    verfuegbarFuerRollenerweiterung,
+    (isAvailableForRoleExtension: boolean): void => {
+      formContext.setFieldValue('anbietenInSchulischeAngebotsverwaltung', isAvailableForRoleExtension);
+      formContext.setFieldValue('anbietenInSchulischeRollenverwaltung', isAvailableForRoleExtension);
+    },
+    { immediate: true },
+  );
 
   watchEffect(() => {
     emit('update:canSubmit', canCommit.value);
@@ -228,7 +259,9 @@
         <FormRow
           :error-label="selectedOrganisationIdProps['error']"
           :is-required="true"
-          label-for-id="organisation-select"
+          :label-for-id="
+            isEditMode ? 'service-provider-edit-organisation-select' : 'service-provider-create-organisation-select'
+          "
           :label="$t('angebot.providedBy')"
         >
           <SchulenFilter
@@ -440,7 +473,7 @@
           :label="$t('angebot.canBeUsed')"
         >
           <v-select
-            :disabled="isEditMode || systemrecht !== RollenSystemRecht.AngeboteVerwalten"
+            :disabled="!hasAngeboteVerwalten"
             id="verfuegbar-fuer-rollenerweiterung-select"
             v-bind="verfuegbarFuerRollenerweiterungProps"
             v-model="verfuegbarFuerRollenerweiterung"
@@ -455,7 +488,32 @@
             variant="outlined"
           />
         </FormRow>
-
+        <FormRow
+          :is-required="false"
+          label-for-id="service-provider-display-merkmale"
+          :label="$t('angebot.offeringScope')"
+        >
+          <div id="service-provider-display-merkmale">
+            <v-checkbox
+              :disabled="areRoleExtensionCheckboxesDisabled"
+              id="anbieten-in-schulische-angebotsverwaltung-checkbox"
+              v-bind="anbietenInSchulischeAngebotsverwaltungProps"
+              v-model="anbietenInSchulischeAngebotsverwaltung"
+              :label="$t('angebot.schulischeAngebotsverwaltung')"
+              data-testid="anbieten-in-schulische-angebotsverwaltung-checkbox"
+              hide-details
+            />
+            <v-checkbox
+              :disabled="areRoleExtensionCheckboxesDisabled"
+              id="anbieten-in-schulische-rollenverwaltung-checkbox"
+              v-bind="anbietenInSchulischeRollenverwaltungProps"
+              v-model="anbietenInSchulischeRollenverwaltung"
+              :label="$t('angebot.schulischeRollenverwaltung')"
+              data-testid="anbieten-in-schulische-rollenverwaltung-checkbox"
+              hide-details
+            />
+          </div>
+        </FormRow>
         <!-- 2FA -->
         <v-row>
           <v-col>

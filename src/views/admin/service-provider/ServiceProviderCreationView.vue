@@ -69,6 +69,12 @@
       requires2fa: values.requires2fa,
       nachtraeglichZuweisbar: values.merkmale.includes(ServiceProviderMerkmal.NachtraeglichZuweisbar),
       verfuegbarFuerRollenerweiterung: values.merkmale.includes(ServiceProviderMerkmal.VerfuegbarFuerRollenerweiterung),
+      anbietenInSchulischeAngebotsverwaltung: values.merkmale.includes(
+        ServiceProviderMerkmal.AnbietenInSchulischerAngebotsverwaltung,
+      ),
+      anbietenInSchulischeRollenverwaltung: values.merkmale.includes(
+        ServiceProviderMerkmal.AnbietenInSchulischerRollenverwaltung,
+      ),
     };
   }
 
@@ -218,6 +224,8 @@
             kategorie: ServiceProviderKategorie.Schulisch,
             nachtraeglichZuweisbar: true,
             verfuegbarFuerRollenerweiterung: true,
+            anbietenInSchulischeAngebotsverwaltung: true,
+            anbietenInSchulischeRollenverwaltung: true,
             requires2fa: false,
           }"
           :cached-values="cachedValues"

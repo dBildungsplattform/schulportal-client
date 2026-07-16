@@ -199,6 +199,15 @@ describe('ServiceProviderCreationView', () => {
     expect(wrapper?.getComponent({ name: 'FormRow' })).toBeTruthy();
   });
 
+  test('it passes both anbietung checkboxes enabled by default to ServiceProviderForm initial-values', () => {
+    const form: VueWrapper | undefined = wrapper?.findComponent({ name: 'ServiceProviderForm' });
+    expect(form?.exists()).toBe(true);
+    expect(form?.props('initialValues')).toMatchObject({
+      anbietenInSchulischeAngebotsverwaltung: true,
+      anbietenInSchulischeRollenverwaltung: true,
+    });
+  });
+
   test('it calls the correct function in the store, when the form is submitted', async () => {
     const createServiceProviderSpy: MockInstance = vi.spyOn(serviceProviderStore, 'createServiceProvider');
     const payload: ServiceProviderFormSubmitData = {
