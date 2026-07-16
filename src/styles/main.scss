@@ -35,25 +35,20 @@ body {
   margin: 0;
 }
 
-// Vuetify 4 puts all component styles inside CSS @layers. The non-layered
-// * { margin: 0 } reset above has higher cascade priority than any @layer rule,
-// so it collapses the v-container auto side-margins and shifts content to the left.
-// This non-layered class rule (specificity 0-1-0 > 0-0-0) restores centering.
-.v-container {
-  margin-inline: auto;
-}
-
-// The same margin: 0 reset removes the margin: auto that Vuetify 4 applies to
-// .v-overlay__content for centering dialogs, causing them to appear at the far left.
-.v-overlay__content {
-  margin: auto;
-}
-
 #app {
   background: variables.$backgroundColor;
   color: variables.$bodyFontColor;
   font-family: Arial, sans-serif;
   font-weight: normal;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
 }
 
 .v-toolbar-title__placeholder {
