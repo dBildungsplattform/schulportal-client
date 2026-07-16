@@ -50,13 +50,14 @@
     <v-container class="px-3 px-sm-16">
       <v-row
         v-if="!hideActions && !hideNotice"
-        class="align-center flex-nowrap mx-auto py-6"
+        class="align-center flex-nowrap pb-4"
+        no-gutters
       >
         <v-icon
           aria-hidden="true"
-          class="mr-2"
           icon="mdi-alert-circle-outline"
           size="small"
+          class="mr-2"
         ></v-icon>
         <label
           class="subtitle-2"

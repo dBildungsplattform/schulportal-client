@@ -51,7 +51,7 @@
     <v-spacer />
 
     <v-toolbar-items>
-      <v-col class="align-self-center mr-2">
+      <v-col class="align-self-center mr-5">
         <a
           class="secondary"
           data-testid="help-button"
