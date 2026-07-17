@@ -45,23 +45,27 @@
         :key="logo.id"
         class="logo-item"
         :class="{ selected: isSelected(logo.id), disabled: disabled || readonly }"
-        :title="`${logo.name}`"
+        :title="logo.name"
       >
         <div class="logo-container">
-          <v-img
+          <div
             :tabindex="disabled || readonly ? -1 : 0"
             :data-testid="`logo-${logo.id}`"
             :aria-pressed="isSelected(logo.id)"
-            :src="logo.path"
-            :alt="logo.name"
+            :aria-label="logo.name"
             role="button"
-            max-height="48"
-            max-width="48"
-            contain
             @click="selectLogo(logo.id)"
             @keydown.enter.prevent="selectLogo(logo.id)"
             @keydown.space.prevent="selectLogo(logo.id)"
-          />
+          >
+            <v-img
+              :src="logo.path"
+              :alt="logo.name"
+              max-height="48"
+              max-width="48"
+              contain
+            />
+          </div>
         </div>
       </div>
     </div>
