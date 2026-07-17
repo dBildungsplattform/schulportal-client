@@ -34,6 +34,7 @@ import type { PersonenkontextWorkflowResponse } from '@/stores/PersonenkontextSt
 import { type Personendatensatz } from '@/stores/PersonStore';
 import type { Rolle, RolleResponse, RolleWithServiceProvidersResponse } from '@/stores/RolleStore';
 import {
+  ServiceProviderMerkmal,
   type ManageableServiceProviderDetail,
   type RollenErweiterungenUebersicht,
   type RollenerweiterungMap,
@@ -469,6 +470,7 @@ export class DoFactory {
       logoId: 1,
       requires2fa: false,
       merkmale: [],
+      rollenartenWhitelist: [],
       ...props,
     };
   }
@@ -486,6 +488,7 @@ export class DoFactory {
       merkmale: [],
       hasRollenerweiterungen: false,
       hasSomeVerwaltenPermission: faker.datatype.boolean(),
+      rollenartenWhitelist: [],
       ...props,
     };
   }
@@ -500,9 +503,14 @@ export class DoFactory {
       administrationsebene: { id: faker.string.uuid(), name: faker.company.name(), kennung: faker.string.numeric(7) },
       rollen: [{ id: faker.string.uuid(), name: faker.person.jobTitle() }],
       requires2fa: faker.datatype.boolean(),
-      merkmale: [],
+      merkmale: [
+        ServiceProviderMerkmal.VerfuegbarFuerRollenerweiterung,
+        ServiceProviderMerkmal.AnbietenInSchulischerAngebotsverwaltung,
+        ServiceProviderMerkmal.AnbietenInSchulischerRollenverwaltung,
+      ],
       rollenerweiterungen: [],
       hasSomeVerwaltenPermission: faker.datatype.boolean(),
+      rollenartenWhitelist: [],
       ...props,
     };
   }

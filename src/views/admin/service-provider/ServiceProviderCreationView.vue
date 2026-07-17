@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import ServiceProviderForm from '@/components/admin/service-provider/ServiceProviderForm.vue';
   import {
+    extractAnbietenInMerkmale,
     formatServiceProviderAnbietenMerkmale,
     formatServiceProviderRollenartenWhitelist,
   } from '@/components/admin/service-provider/serviceProvider.helper';
@@ -73,12 +74,7 @@
       requires2fa: values.requires2fa,
       nachtraeglichZuweisbar: values.merkmale.includes(ServiceProviderMerkmal.NachtraeglichZuweisbar),
       verfuegbarFuerRollenerweiterung: values.merkmale.includes(ServiceProviderMerkmal.VerfuegbarFuerRollenerweiterung),
-      anbietenInSchulischeAngebotsverwaltung: values.merkmale.includes(
-        ServiceProviderMerkmal.AnbietenInSchulischerAngebotsverwaltung,
-      ),
-      anbietenInSchulischeRollenverwaltung: values.merkmale.includes(
-        ServiceProviderMerkmal.AnbietenInSchulischerRollenverwaltung,
-      ),
+      anbietenInMerkmale: extractAnbietenInMerkmale(values.merkmale),
       rollenartenWhitelist: values.rollenartenWhitelist,
     };
   }
@@ -230,8 +226,7 @@
             kategorie: ServiceProviderKategorie.Schulisch,
             nachtraeglichZuweisbar: true,
             verfuegbarFuerRollenerweiterung: true,
-            anbietenInSchulischeAngebotsverwaltung: true,
-            anbietenInSchulischeRollenverwaltung: true,
+            anbietenInMerkmale: extractAnbietenInMerkmale(Object.values(ServiceProviderMerkmal)),
             rollenartenWhitelist: [],
             requires2fa: false,
           }"

@@ -12,6 +12,7 @@ import type {
   ServiceProviderFormSubmitData,
   ServiceProviderForm as ServiceProviderFormType,
 } from './types';
+import { extractAnbietenInMerkmale } from './serviceProvider.helper.js';
 
 const defaultProps: ServiceProviderFormProps = {
   initialValues: {
@@ -22,8 +23,7 @@ const defaultProps: ServiceProviderFormProps = {
     kategorie: ServiceProviderKategorie.Schulisch,
     nachtraeglichZuweisbar: true,
     verfuegbarFuerRollenerweiterung: true,
-    anbietenInSchulischeAngebotsverwaltung: true,
-    anbietenInSchulischeRollenverwaltung: true,
+    anbietenInMerkmale: extractAnbietenInMerkmale(Object.values(ServiceProviderMerkmal)),
     requires2fa: false,
     rollenartenWhitelist: [],
   },
@@ -59,8 +59,7 @@ describe('ServiceProviderForm', () => {
     expect(wrapper.find('[data-testid="nachtraeglich-zuweisbar-select"]').exists()).toBe(true);
     expect(wrapper.find('[data-testid="verfuegbar-fuer-rollenerweiterung-select"]').exists()).toBe(true);
     expect(wrapper.find('[data-testid="requires2fa-select"]').exists()).toBe(true);
-    expect(wrapper.find('[data-testid="anbieten-in-schulische-angebotsverwaltung-checkbox"]').exists()).toBe(true);
-    expect(wrapper.find('[data-testid="anbieten-in-schulische-rollenverwaltung-checkbox"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="service-provider-display-merkmale-select"]').exists()).toBe(true);
     expect(wrapper.find('[data-testid="rollenarten-whitelist-select"]').exists()).toBe(true);
   });
 
@@ -89,8 +88,8 @@ describe('ServiceProviderForm', () => {
     const formText: string = wrapper.text();
 
     expect(formText).toContain('Anbieten in');
-    expect(formText).toContain('schulische Angebotsverwaltung');
-    expect(formText).toContain('schulische Rollenverwaltung');
+    expect(formText).toContain('Schulische Angebotsverwaltung');
+    expect(formText).toContain('Schulische Rollenverwaltung');
   });
 
   test('validates required fields', async () => {
@@ -127,12 +126,7 @@ describe('ServiceProviderForm', () => {
     { testId: 'verfuegbar-fuer-rollenerweiterung-select', isEditMode: false, shouldBeDisabled: false },
     { testId: 'requires2fa-select', isEditMode: false, shouldBeDisabled: true },
     {
-      testId: 'anbieten-in-schulische-angebotsverwaltung-checkbox',
-      isEditMode: false,
-      shouldBeDisabled: false,
-    },
-    {
-      testId: 'anbieten-in-schulische-rollenverwaltung-checkbox',
+      testId: 'service-provider-display-merkmale-select',
       isEditMode: false,
       shouldBeDisabled: false,
     },
@@ -148,12 +142,7 @@ describe('ServiceProviderForm', () => {
     { testId: 'verfuegbar-fuer-rollenerweiterung-select', isEditMode: true, shouldBeDisabled: false },
     { testId: 'requires2fa-select', isEditMode: true, shouldBeDisabled: true },
     {
-      testId: 'anbieten-in-schulische-angebotsverwaltung-checkbox',
-      isEditMode: true,
-      shouldBeDisabled: false,
-    },
-    {
-      testId: 'anbieten-in-schulische-rollenverwaltung-checkbox',
+      testId: 'service-provider-display-merkmale-select',
       isEditMode: true,
       shouldBeDisabled: false,
     },
@@ -177,21 +166,19 @@ describe('ServiceProviderForm', () => {
     },
   );
 
-  test('defaults both checkboxes to checked when verfuegbarFuerRollenerweiterung is true', () => {
+  test('defaults both anbieten-in-merkmale to true when verfuegbarFuerRollenerweiterung is true', () => {
     const wrapper: VueWrapper<ComponentInstance<typeof ServiceProviderForm>> = mountComponent({
       initialValues: {
         ...defaultProps.initialValues,
         verfuegbarFuerRollenerweiterung: true,
       },
     });
-    const anbietenInSchulischeAngebotsverwaltung: HTMLInputElement = wrapper.find(
-      '[data-testid="anbieten-in-schulische-angebotsverwaltung-checkbox"] input',
+    const anbietenInMerkmale: HTMLInputElement = wrapper.find(
+      '[data-testid="service-provider-display-merkmale-select"] input',
     ).element as HTMLInputElement;
-    const anbietenInSchulischeRollenverwaltung: HTMLInputElement = wrapper.find(
-      '[data-testid="anbieten-in-schulische-rollenverwaltung-checkbox"] input',
-    ).element as HTMLInputElement;
-    expect(anbietenInSchulischeAngebotsverwaltung.checked).toBe(true);
-    expect(anbietenInSchulischeRollenverwaltung.checked).toBe(true);
+    expect(anbietenInMerkmale.value).toEqual(
+      extractAnbietenInMerkmale(Object.values(ServiceProviderMerkmal)).join(', '),
+    );
   });
 
   test('does not disable verfuegbar-fuer-rollenerweiterung-select in edit mode when user has AngeboteVerwalten', () => {
@@ -205,7 +192,7 @@ describe('ServiceProviderForm', () => {
     expect(disabledAttr).toBeUndefined();
   });
 
-  test('does not disable both checkboxes in edit mode when user has AngeboteVerwalten and verfuegbarFuerRollenerweiterung is true', () => {
+  test('does not disable anbieten-merkmale selection in edit mode when user has AngeboteVerwalten and verfuegbarFuerRollenerweiterung is true', () => {
     const wrapper: VueWrapper<ComponentInstance<typeof ServiceProviderForm>> = mountComponent({
       isEditMode: true,
       systemrecht: RollenSystemRecht.AngeboteVerwalten,
@@ -214,67 +201,45 @@ describe('ServiceProviderForm', () => {
         verfuegbarFuerRollenerweiterung: true,
       },
     });
-    const anbietenAngebotsverwaltungDisabledAttr: string | undefined = wrapper
-      .find('[data-testid="anbieten-in-schulische-angebotsverwaltung-checkbox"] input')
+    const anbietenInMerkmaleDisabledAttr: string | undefined = wrapper
+      .find('[data-testid="service-provider-display-merkmale-select"] input')
       .attributes('disabled');
-    const anbietenRollenverwaltungDisabledAttr: string | undefined = wrapper
-      .find('[data-testid="anbieten-in-schulische-rollenverwaltung-checkbox"] input')
-      .attributes('disabled');
-
-    expect(anbietenAngebotsverwaltungDisabledAttr).toBeUndefined();
-    expect(anbietenRollenverwaltungDisabledAttr).toBeUndefined();
+    expect(anbietenInMerkmaleDisabledAttr).toBeUndefined();
   });
 
-  test('disables verfuegbar-fuer-rollenerweiterung-select and both checkboxes when user lacks AngeboteVerwalten', () => {
+  test('disables verfuegbar-fuer-rollenerweiterung-select and anbieten-merkmale selection when user lacks AngeboteVerwalten', () => {
     const wrapper: VueWrapper<ComponentInstance<typeof ServiceProviderForm>> = mountComponent({
       systemrecht: RollenSystemRecht.AngeboteEingeschraenktVerwalten,
     });
     const verfuegbarDisabledAttr: string | undefined = wrapper
       .find('[data-testid="verfuegbar-fuer-rollenerweiterung-select"] input')
       .attributes('disabled');
-    const anbietenAngebotsverwaltungDisabledAttr: string | undefined = wrapper
-      .find('[data-testid="anbieten-in-schulische-angebotsverwaltung-checkbox"] input')
-      .attributes('disabled');
-    const anbietenRollenverwaltungDisabledAttr: string | undefined = wrapper
-      .find('[data-testid="anbieten-in-schulische-rollenverwaltung-checkbox"] input')
+    const anbietenInAttr: string | undefined = wrapper
+      .find('[data-testid="service-provider-display-merkmale-select"] input')
       .attributes('disabled');
     expect(verfuegbarDisabledAttr).toBeDefined();
-    expect(anbietenAngebotsverwaltungDisabledAttr).toBeDefined();
-    expect(anbietenRollenverwaltungDisabledAttr).toBeDefined();
+    expect(anbietenInAttr).toBeDefined();
   });
 
-  test('disables and unchecks both checkboxes when verfuegbarFuerRollenerweiterung is false', () => {
+  test('disables and deselects merkmale when verfuegbarFuerRollenerweiterung is false', () => {
     const wrapper: VueWrapper<ComponentInstance<typeof ServiceProviderForm>> = mountComponent({
       initialValues: {
         ...defaultProps.initialValues,
         verfuegbarFuerRollenerweiterung: false,
-        anbietenInSchulischeAngebotsverwaltung: true,
-        anbietenInSchulischeRollenverwaltung: true,
       },
     });
     const anbietenInSchulischeAngebotsverwaltung: HTMLInputElement = wrapper.find(
-      '[data-testid="anbieten-in-schulische-angebotsverwaltung-checkbox"] input',
+      '[data-testid="service-provider-display-merkmale-select"] input',
     ).element as HTMLInputElement;
-    const anbietenInSchulischeRollenverwaltung: HTMLInputElement = wrapper.find(
-      '[data-testid="anbieten-in-schulische-rollenverwaltung-checkbox"] input',
-    ).element as HTMLInputElement;
-    expect(anbietenInSchulischeAngebotsverwaltung.checked).toBe(false);
-    expect(anbietenInSchulischeRollenverwaltung.checked).toBe(false);
-    expect(
-      wrapper.find('[data-testid="anbieten-in-schulische-angebotsverwaltung-checkbox"] input').attributes('disabled'),
-    ).toBeDefined();
-    expect(
-      wrapper.find('[data-testid="anbieten-in-schulische-rollenverwaltung-checkbox"] input').attributes('disabled'),
-    ).toBeDefined();
+    expect(anbietenInSchulischeAngebotsverwaltung.value).toBe('');
+    expect(anbietenInSchulischeAngebotsverwaltung.disabled).toBe(true);
   });
 
-  test('unchecks both checkboxes when verfuegbarFuerRollenerweiterung transitions from true to false', async () => {
+  test('deselects merkmale when verfuegbarFuerRollenerweiterung transitions from true to false', async () => {
     const wrapper: VueWrapper<ComponentInstance<typeof ServiceProviderForm>> = mountComponent({
       initialValues: {
         ...defaultProps.initialValues,
         verfuegbarFuerRollenerweiterung: true,
-        anbietenInSchulischeAngebotsverwaltung: true,
-        anbietenInSchulischeRollenverwaltung: true,
       },
     });
     (wrapper.findComponent('[data-testid="verfuegbar-fuer-rollenerweiterung-select"]') as VueWrapper).vm.$emit(
@@ -283,13 +248,9 @@ describe('ServiceProviderForm', () => {
     );
     await flushPromises();
     const anbietenInSchulischeAngebotsverwaltung: HTMLInputElement = wrapper.find(
-      '[data-testid="anbieten-in-schulische-angebotsverwaltung-checkbox"] input',
+      '[data-testid="service-provider-display-merkmale-select"] input',
     ).element as HTMLInputElement;
-    const anbietenInSchulischeRollenverwaltung: HTMLInputElement = wrapper.find(
-      '[data-testid="anbieten-in-schulische-rollenverwaltung-checkbox"] input',
-    ).element as HTMLInputElement;
-    expect(anbietenInSchulischeAngebotsverwaltung.checked).toBe(false);
-    expect(anbietenInSchulischeRollenverwaltung.checked).toBe(false);
+    expect(anbietenInSchulischeAngebotsverwaltung.value).toBe('');
   });
 
   test('emits correct payload on submit', async () => {
@@ -309,8 +270,7 @@ describe('ServiceProviderForm', () => {
       customLogo: undefined,
       nachtraeglichZuweisbar: true,
       verfuegbarFuerRollenerweiterung: true,
-      anbietenInSchulischeAngebotsverwaltung: false,
-      anbietenInSchulischeRollenverwaltung: false,
+      anbietenInMerkmale: [],
       rollenartenWhitelist: [],
       requires2fa: false,
     };
@@ -355,7 +315,7 @@ describe('ServiceProviderForm', () => {
     });
   });
 
-  test('includes anbieten-in-*-merkmale on submit when rollenerweiterung is enabled and both checkboxes are checked', async () => {
+  test('includes anbieten-in-*-merkmale on submit when rollenerweiterung is enabled and both are selected', async () => {
     const orgaStore: OrganisationStore = useOrganisationStore();
     const org: Organisation = DoFactory.getOrganisation({ typ: OrganisationsTyp.Schule });
     orgaStore.organisationenFilters.set('service-provider-create', {
@@ -372,8 +332,7 @@ describe('ServiceProviderForm', () => {
       customLogo: undefined,
       nachtraeglichZuweisbar: true,
       verfuegbarFuerRollenerweiterung: true,
-      anbietenInSchulischeAngebotsverwaltung: true,
-      anbietenInSchulischeRollenverwaltung: true,
+      anbietenInMerkmale: extractAnbietenInMerkmale(Object.values(ServiceProviderMerkmal)),
       rollenartenWhitelist: [],
       requires2fa: false,
     };
@@ -416,8 +375,7 @@ describe('ServiceProviderForm', () => {
       customLogo: undefined,
       nachtraeglichZuweisbar: true,
       verfuegbarFuerRollenerweiterung: true,
-      anbietenInSchulischeAngebotsverwaltung: true,
-      anbietenInSchulischeRollenverwaltung: true,
+      anbietenInMerkmale: extractAnbietenInMerkmale(Object.values(ServiceProviderMerkmal)),
       rollenartenWhitelist: [],
       requires2fa: false,
     };
@@ -451,8 +409,7 @@ describe('ServiceProviderForm', () => {
       customLogo: undefined,
       nachtraeglichZuweisbar: true,
       verfuegbarFuerRollenerweiterung: true,
-      anbietenInSchulischeAngebotsverwaltung: true,
-      anbietenInSchulischeRollenverwaltung: true,
+      anbietenInMerkmale: extractAnbietenInMerkmale(Object.values(ServiceProviderMerkmal)),
       rollenartenWhitelist: [],
       requires2fa: false,
     };

@@ -14,9 +14,10 @@
   import { useForm, type BaseFieldProps, type FormContext, type FormMeta, type TypedSchema } from 'vee-validate';
   import { computed, onMounted, ref, watch, watchEffect, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
-  import { array, boolean, number, object, string } from 'yup';
-  import type { ServiceProviderFormProps as Props, ServiceProviderForm, ServiceProviderFormSubmitData } from './types';
   import { useDisplay } from 'vuetify';
+  import { array, boolean, number, object, string } from 'yup';
+  import { extractAnbietenInMerkmale } from './serviceProvider.helper';
+  import type { ServiceProviderFormProps as Props, ServiceProviderForm, ServiceProviderFormSubmitData } from './types';
 
   type Emits = {
     (e: 'click:confirmUnsaved'): void;
@@ -52,8 +53,7 @@
       kategorie: string().required(t('angebot.rules.kategorie.required')),
       nachtraeglichZuweisbar: boolean().optional(),
       verfuegbarFuerRollenerweiterung: boolean().optional(),
-      anbietenInSchulischeAngebotsverwaltung: boolean().optional(),
-      anbietenInSchulischeRollenverwaltung: boolean().optional(),
+      anbietenInMerkmale: array().of(string().required()).required(),
       rollenartenWhitelist: array().of(string().required()).required(),
       requires2fa: boolean().optional(),
     }),
@@ -78,8 +78,7 @@
       kategorie: ServiceProviderKategorie.Schulisch,
       nachtraeglichZuweisbar: true,
       verfuegbarFuerRollenerweiterung: true,
-      anbietenInSchulischeAngebotsverwaltung: true,
-      anbietenInSchulischeRollenverwaltung: true,
+      anbietenInMerkmale: extractAnbietenInMerkmale(Object.values(ServiceProviderMerkmal)),
       rollenartenWhitelist: [],
       requires2fa: false,
       // No default logoId — admin must actively pick one
@@ -108,12 +107,8 @@
   );
   const [verfuegbarFuerRollenerweiterung, verfuegbarFuerRollenerweiterungProps]: FieldDefinition<boolean> =
     formContext.defineField('verfuegbarFuerRollenerweiterung', vuetifyConfig);
-  const [
-    anbietenInSchulischeAngebotsverwaltung,
-    anbietenInSchulischeAngebotsverwaltungProps,
-  ]: FieldDefinition<boolean> = formContext.defineField('anbietenInSchulischeAngebotsverwaltung', vuetifyConfig);
-  const [anbietenInSchulischeRollenverwaltung, anbietenInSchulischeRollenverwaltungProps]: FieldDefinition<boolean> =
-    formContext.defineField('anbietenInSchulischeRollenverwaltung', vuetifyConfig);
+  const [anbietenInMerkmale, anbietenInMerkmaleProps]: FieldDefinition<ServiceProviderMerkmal[]> =
+    formContext.defineField('anbietenInMerkmale', vuetifyConfig);
   const [rollenartenWhitelist, rollenartenWhitelistProps]: FieldDefinition<RollenArt[]> = formContext.defineField(
     'rollenartenWhitelist',
     vuetifyConfig,
@@ -234,12 +229,7 @@
     }
     if (values.verfuegbarFuerRollenerweiterung) {
       payload.merkmale.push(ServiceProviderMerkmal.VerfuegbarFuerRollenerweiterung);
-    }
-    if (values.verfuegbarFuerRollenerweiterung && values.anbietenInSchulischeAngebotsverwaltung) {
-      payload.merkmale.push(ServiceProviderMerkmal.AnbietenInSchulischerAngebotsverwaltung);
-    }
-    if (values.verfuegbarFuerRollenerweiterung && values.anbietenInSchulischeRollenverwaltung) {
-      payload.merkmale.push(ServiceProviderMerkmal.AnbietenInSchulischerRollenverwaltung);
+      payload.merkmale.push(...anbietenInMerkmale.value);
     }
     emit('click:submit', payload);
   });
@@ -267,16 +257,11 @@
     (isAvailableForRoleExtension: boolean): void => {
       if (isAvailableForRoleExtension) {
         formContext.setFieldValue(
-          'anbietenInSchulischeAngebotsverwaltung',
-          props.initialValues.anbietenInSchulischeAngebotsverwaltung ?? true,
-        );
-        formContext.setFieldValue(
-          'anbietenInSchulischeRollenverwaltung',
-          props.initialValues.anbietenInSchulischeRollenverwaltung ?? true,
+          'anbietenInMerkmale',
+          props.initialValues.anbietenInMerkmale ?? extractAnbietenInMerkmale(Object.values(ServiceProviderMerkmal)),
         );
       } else {
-        formContext.setFieldValue('anbietenInSchulischeAngebotsverwaltung', false);
-        formContext.setFieldValue('anbietenInSchulischeRollenverwaltung', false);
+        formContext.setFieldValue('anbietenInMerkmale', []);
         if (props.isEditMode && formContext.isFieldDirty('verfuegbarFuerRollenerweiterung')) {
           showWarningDialog.value = true;
           warningDialogType.value = WarningDialogType.VerfuegbarFuerRollenerweiterungChanged;
@@ -552,28 +537,34 @@
         </FormRow>
         <FormRow
           :is-required="false"
-          label-for-id="service-provider-display-merkmale"
+          label-for-id="service-provider-display-merkmale-select"
           :label="$t('angebot.offeringScope')"
           :noTopMargin="true"
         >
           <div id="service-provider-display-merkmale">
-            <v-checkbox
+            <v-select
               :disabled="areRoleExtensionCheckboxesDisabled"
-              id="anbieten-in-schulische-angebotsverwaltung-checkbox"
-              v-bind="anbietenInSchulischeAngebotsverwaltungProps"
-              v-model="anbietenInSchulischeAngebotsverwaltung"
-              :label="$t('angebot.schulischeAngebotsverwaltung')"
-              data-testid="anbieten-in-schulische-angebotsverwaltung-checkbox"
-              hide-details
-            />
-            <v-checkbox
-              :disabled="areRoleExtensionCheckboxesDisabled"
-              id="anbieten-in-schulische-rollenverwaltung-checkbox"
-              v-bind="anbietenInSchulischeRollenverwaltungProps"
-              v-model="anbietenInSchulischeRollenverwaltung"
-              :label="$t('angebot.schulischeRollenverwaltung')"
-              data-testid="anbieten-in-schulische-rollenverwaltung-checkbox"
-              hide-details
+              id="service-provider-display-merkmale-select"
+              :multiple="true"
+              v-bind="anbietenInMerkmaleProps"
+              v-model="anbietenInMerkmale"
+              chips
+              data-testid="service-provider-display-merkmale-select"
+              density="compact"
+              :items="[
+                {
+                  title: $t('angebot.schulischeAngebotsverwaltung'),
+                  value: ServiceProviderMerkmal.AnbietenInSchulischerAngebotsverwaltung,
+                },
+                {
+                  title: $t('angebot.schulischeRollenverwaltung'),
+                  value: ServiceProviderMerkmal.AnbietenInSchulischerRollenverwaltung,
+                },
+              ]"
+              item-value="value"
+              item-title="title"
+              variant="outlined"
+              :placeholder="$t('none')"
             />
           </div>
         </FormRow>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import ServiceProviderForm from '@/components/admin/service-provider/ServiceProviderForm.vue';
   import {
+    extractAnbietenInMerkmale,
     formatServiceProviderAnbietenMerkmale,
     formatServiceProviderRollenartenWhitelist,
   } from '@/components/admin/service-provider/serviceProvider.helper';
@@ -80,12 +81,7 @@
       requires2fa: values.requires2fa,
       nachtraeglichZuweisbar: values.merkmale.includes(ServiceProviderMerkmal.NachtraeglichZuweisbar),
       verfuegbarFuerRollenerweiterung: values.merkmale.includes(ServiceProviderMerkmal.VerfuegbarFuerRollenerweiterung),
-      anbietenInSchulischeAngebotsverwaltung: values.merkmale.includes(
-        ServiceProviderMerkmal.AnbietenInSchulischerAngebotsverwaltung,
-      ),
-      anbietenInSchulischeRollenverwaltung: values.merkmale.includes(
-        ServiceProviderMerkmal.AnbietenInSchulischerRollenverwaltung,
-      ),
+      anbietenInMerkmale: extractAnbietenInMerkmale(values.merkmale),
       rollenartenWhitelist: values.rollenartenWhitelist,
     };
   }
@@ -108,12 +104,7 @@
       verfuegbarFuerRollenerweiterung: serviceProviderStore.currentServiceProvider.merkmale.includes(
         ServiceProviderMerkmal.VerfuegbarFuerRollenerweiterung,
       ),
-      anbietenInSchulischeAngebotsverwaltung: serviceProviderStore.currentServiceProvider.merkmale.includes(
-        ServiceProviderMerkmal.AnbietenInSchulischerAngebotsverwaltung,
-      ),
-      anbietenInSchulischeRollenverwaltung: serviceProviderStore.currentServiceProvider.merkmale.includes(
-        ServiceProviderMerkmal.AnbietenInSchulischerRollenverwaltung,
-      ),
+      anbietenInMerkmale: extractAnbietenInMerkmale(serviceProviderStore.currentServiceProvider.merkmale),
       rollenartenWhitelist: serviceProviderStore.currentServiceProvider.rollenartenWhitelist ?? [],
     };
   });
@@ -154,18 +145,6 @@
     serviceProviderStore.errorCode = '';
   }
 
-  async function navigateToServiceProviderDetails(): Promise<void> {
-    if (organisationIdFromQuery.value) {
-      await router.push({
-        name: 'angebot-details-schulspezifisch',
-        params: { id: serviceProviderId.value },
-        query: { orga: organisationIdFromQuery.value },
-      });
-    } else {
-      await router.push({ name: 'angebot-details', params: { id: serviceProviderId.value } });
-    }
-  }
-
   async function navigateToServiceProviderList(): Promise<void> {
     if (organisationIdFromQuery.value) {
       await router.push({
@@ -174,6 +153,30 @@
       });
     } else {
       await router.push({ name: 'angebot-management' });
+    }
+  }
+
+  async function navigateToServiceProviderDetails(): Promise<void> {
+    if (organisationIdFromQuery.value) {
+      if (
+        serviceProviderStore.updatedServiceProvider?.merkmale.includes(
+          ServiceProviderMerkmal.VerfuegbarFuerRollenerweiterung,
+        ) &&
+        serviceProviderStore.updatedServiceProvider?.merkmale.includes(
+          ServiceProviderMerkmal.AnbietenInSchulischerAngebotsverwaltung,
+        )
+      ) {
+        await router.push({
+          name: 'angebot-details-schulspezifisch',
+          params: { id: serviceProviderId.value },
+          query: { orga: organisationIdFromQuery.value },
+        });
+      } else {
+        // without VerfuegbarFuerRollenerweiterung or AnbietenInSchulischerAngebotsverwaltung, the service provider is not visible in the list view for schule, so we redirect to the normal details view
+        await router.push({ name: 'angebot-details', params: { id: serviceProviderId.value } });
+      }
+    } else {
+      await router.push({ name: 'angebot-details', params: { id: serviceProviderId.value } });
     }
   }
 

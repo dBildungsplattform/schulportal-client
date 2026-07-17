@@ -24,8 +24,7 @@ export type ServiceProviderForm = {
   kategorie: ServiceProviderKategorie;
   nachtraeglichZuweisbar: boolean;
   verfuegbarFuerRollenerweiterung: boolean;
-  anbietenInSchulischeAngebotsverwaltung: boolean;
-  anbietenInSchulischeRollenverwaltung: boolean;
+  anbietenInMerkmale: ServiceProviderMerkmal[];
   rollenartenWhitelist: RollenArt[];
   requires2fa: boolean;
 };

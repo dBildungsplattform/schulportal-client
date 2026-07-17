@@ -18,17 +18,29 @@ export function formatServiceProviderRollenartenWhitelist(
   return rollenartenWhitelist.map((rollenart: RollenArt) => getRollenartLabel(rollenart, t)).join(', ');
 }
 
+export function extractAnbietenInMerkmale(merkmale: ServiceProviderMerkmal[]): ServiceProviderMerkmal[] {
+  return merkmale.filter((merkmal: ServiceProviderMerkmal) => {
+    switch (merkmal) {
+      case ServiceProviderMerkmal.AnbietenInSchulischerAngebotsverwaltung:
+      case ServiceProviderMerkmal.AnbietenInSchulischerRollenverwaltung:
+        return true;
+      default:
+        return false;
+    }
+  });
+}
+
 export function formatServiceProviderAnbietenMerkmale(merkmale: ServiceProviderMerkmal[], t: Translate): string {
-  return merkmale
+  return extractAnbietenInMerkmale(merkmale)
     .map((merkmal: ServiceProviderMerkmal) => {
-      if (merkmal === ServiceProviderMerkmal.AnbietenInSchulischerAngebotsverwaltung) {
-        return t('angebot.schulischeAngebotsverwaltung');
+      switch (merkmal) {
+        case ServiceProviderMerkmal.AnbietenInSchulischerAngebotsverwaltung:
+          return t('angebot.schulischeAngebotsverwaltung');
+        case ServiceProviderMerkmal.AnbietenInSchulischerRollenverwaltung:
+          return t('angebot.schulischeRollenverwaltung');
+        default:
+          return '';
       }
-      if (merkmal === ServiceProviderMerkmal.AnbietenInSchulischerRollenverwaltung) {
-        return t('angebot.schulischeRollenverwaltung');
-      }
-      return '';
     })
-    .filter((merkmal: string) => merkmal !== '')
     .join(', ');
 }

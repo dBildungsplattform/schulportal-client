@@ -20,6 +20,7 @@ import {
   type Router,
 } from 'vue-router';
 import SuccessTemplate from '@/components/admin/service-provider/SuccessTemplate.vue';
+import { ServiceProviderFormProps } from '@/components/admin/service-provider/types';
 
 type OnBeforeRouteLeaveCallback = (
   _to: RouteLocationNormalized,
@@ -144,7 +145,7 @@ describe('ServiceProviderEditView', () => {
     expect(wrapper?.findComponent({ name: 'ServiceProviderForm' }).exists()).toBe(true);
   });
 
-  it('passes both anbietung checkboxes as true in initialValues when corresponding merkmale exist', async () => {
+  it('passes anbietenInMerkmale in initialValues when corresponding merkmale exist', async () => {
     const testServiceProvider: ManageableServiceProviderDetail = DoFactory.getManageableServiceProviderDetail({
       relevantSystemrechte: [RollenSystemRecht.AngeboteVerwalten],
       merkmale: [
@@ -160,9 +161,11 @@ describe('ServiceProviderEditView', () => {
 
     // eslint-disable-next-line @typescript-eslint/typedef
     const form = wrapper.findComponent({ name: 'ServiceProviderForm' });
-    expect(form.props('initialValues')).toMatchObject({
-      anbietenInSchulischeAngebotsverwaltung: true,
-      anbietenInSchulischeRollenverwaltung: true,
+    expect(form.props('initialValues')).toMatchObject<ServiceProviderFormProps['initialValues']>({
+      anbietenInMerkmale: [
+        ServiceProviderMerkmal.AnbietenInSchulischerAngebotsverwaltung,
+        ServiceProviderMerkmal.AnbietenInSchulischerRollenverwaltung,
+      ],
       rollenartenWhitelist: [],
     });
   });
@@ -218,9 +221,7 @@ describe('ServiceProviderEditView', () => {
     await flushPromises();
 
     expect(wrapper!.findComponent(SuccessTemplate).exists()).toBe(true);
-    expect(wrapper!.find('[data-testid="success-rollenarten-whitelist"]').text()).toBe(
-      'rollen.mappingFrontBackEnd.rollenarten.ORGADMIN',
-    );
+    expect(wrapper!.find('[data-testid="success-rollenarten-whitelist"]').text()).toBe('Orgadmin');
     spy.mockRestore();
   });
 

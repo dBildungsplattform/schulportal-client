@@ -9,6 +9,7 @@ import { useOrganisationStore, type Organisation, type OrganisationStore } from 
 import { RollenArt, RollenSystemRecht } from '@/stores/RolleStore';
 import {
   ServiceProviderKategorie,
+  ServiceProviderMerkmal,
   useServiceProviderStore,
   type ServiceProviderStore,
 } from '@/stores/ServiceProviderStore';
@@ -27,18 +28,6 @@ import ServiceProviderCreationView from './ServiceProviderCreationView.vue';
 import SuccessTemplate from '@/components/admin/service-provider/SuccessTemplate.vue';
 import ServiceProviderForm from '@/components/admin/service-provider/ServiceProviderForm.vue';
 
-let wrapper: VueWrapper | null = null;
-let router: Router;
-const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
-const organisationStore: OrganisationStore = useOrganisationStore();
-const authStore: AuthStore = useAuthStore();
-const organisationObject: Organisation = DoFactory.getOrganisation();
-
-type OnBeforeRouteLeaveCallback = (
-  _to: RouteLocationNormalized,
-  _from: RouteLocationNormalized,
-  _next: NavigationGuardNext,
-) => void;
 let { storedBeforeRouteLeaveCallback }: { storedBeforeRouteLeaveCallback: OnBeforeRouteLeaveCallback } = vi.hoisted(
   () => {
     return {
@@ -52,6 +41,29 @@ let { storedBeforeRouteLeaveCallback }: { storedBeforeRouteLeaveCallback: OnBefo
     };
   },
 );
+
+vi.mock('vue-router', async (importOriginal: () => Promise<object>) => {
+  const mod: object = await importOriginal();
+  return {
+    ...mod,
+    onBeforeRouteLeave: vi.fn((actualCallback: OnBeforeRouteLeaveCallback) => {
+      storedBeforeRouteLeaveCallback = actualCallback;
+    }),
+  };
+});
+
+let wrapper: VueWrapper | null = null;
+let router: Router;
+const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
+const organisationStore: OrganisationStore = useOrganisationStore();
+const authStore: AuthStore = useAuthStore();
+const organisationObject: Organisation = DoFactory.getOrganisation();
+
+type OnBeforeRouteLeaveCallback = (
+  _to: RouteLocationNormalized,
+  _from: RouteLocationNormalized,
+  _next: NavigationGuardNext,
+) => void;
 
 async function mountComponent(): Promise<ReturnType<typeof mount<typeof ServiceProviderCreationView>>> {
   await vi.dynamicImportSettled();
@@ -205,13 +217,15 @@ describe('ServiceProviderCreationView', () => {
     expect(wrapper?.getComponent({ name: 'FormRow' })).toBeTruthy();
   });
 
-  test('it passes both anbietung checkboxes enabled by default to ServiceProviderForm initial-values', () => {
+  test('it passes both anbieten-in merkmale by default to ServiceProviderForm initial-values', () => {
     // eslint-disable-next-line @typescript-eslint/typedef
     const form = wrapper?.findComponent(ServiceProviderForm);
     expect(form?.exists()).toBe(true);
     expect(form?.props('initialValues')).toMatchObject({
-      anbietenInSchulischeAngebotsverwaltung: true,
-      anbietenInSchulischeRollenverwaltung: true,
+      anbietenInMerkmale: [
+        ServiceProviderMerkmal.AnbietenInSchulischerAngebotsverwaltung,
+        ServiceProviderMerkmal.AnbietenInSchulischerRollenverwaltung,
+      ],
       rollenartenWhitelist: [],
     });
   });
@@ -372,15 +386,6 @@ describe('ServiceProviderCreationView', () => {
 
     test('triggers, if form is dirty', async () => {
       const expectedCallsToNext: number = 0;
-      vi.mock('vue-router', async (importOriginal: () => Promise<object>) => {
-        const mod: object = await importOriginal();
-        return {
-          ...mod,
-          onBeforeRouteLeave: vi.fn((actualCallback: OnBeforeRouteLeaveCallback) => {
-            storedBeforeRouteLeaveCallback = actualCallback;
-          }),
-        };
-      });
       wrapper = await mountComponent();
       await fillForm({
         organisation: organisationObject.id,
