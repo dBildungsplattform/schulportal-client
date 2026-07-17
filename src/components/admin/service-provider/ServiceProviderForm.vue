@@ -1,12 +1,14 @@
 <script setup lang="ts">
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import ServiceProviderCard from '@/components/cards/ServiceProviderCard.vue';
   import SchulenFilter from '@/components/filter/SchulenFilter.vue';
   import FormRow from '@/components/form/FormRow.vue';
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import LogoSelector from '@/components/form/LogoSelector.vue';
-  import { getLogoPath } from '@/utils/logosConfig';
   import { type Organisation } from '@/stores/OrganisationStore';
   import { RollenArt, RollenSystemRecht } from '@/stores/RolleStore';
   import { ServiceProviderKategorie, ServiceProviderMerkmal } from '@/stores/ServiceProviderStore';
+  import { getLogoPath } from '@/utils/logosConfig';
   import { DIN_91379A_EXT, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
   import { toTypedSchema } from '@vee-validate/yup';
   import { useForm, type BaseFieldProps, type FormContext, type FormMeta, type TypedSchema } from 'vee-validate';
@@ -14,7 +16,7 @@
   import { useI18n, type Composer } from 'vue-i18n';
   import { array, boolean, number, object, string } from 'yup';
   import type { ServiceProviderFormProps as Props, ServiceProviderForm, ServiceProviderFormSubmitData } from './types';
-  import ServiceProviderCard from '@/components/cards/ServiceProviderCard.vue';
+  import { useDisplay } from 'vuetify';
 
   type Emits = {
     (e: 'click:confirmUnsaved'): void;
@@ -32,6 +34,7 @@
   const emit: Emits = defineEmits<Emits>();
 
   const { t }: Composer = useI18n({ useScope: 'global' });
+  const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
 
   const validationSchema: TypedSchema<ServiceProviderForm> = toTypedSchema(
     object({
@@ -152,6 +155,22 @@
     () => !!name.value && (!!logoId.value || !!props.initialValues.customLogo),
   );
 
+  enum WarningDialogType {
+    None,
+    RollenartenWhitelistChanged,
+    VerfuegbarFuerRollenerweiterungChanged,
+  }
+
+  const showWarningDialog: Ref<boolean> = ref(false);
+  const warningDialogType: Ref<WarningDialogType> = ref(WarningDialogType.None);
+  const affectedRollenarten: ComputedRef<RollenArt[]> = computed(() => {
+    const initialWhitelist: RollenArt[] =
+      props.initialValues.rollenartenWhitelist && props.initialValues.rollenartenWhitelist.length > 0
+        ? props.initialValues.rollenartenWhitelist
+        : Object.values(RollenArt);
+    return initialWhitelist.filter((r: RollenArt) => !rollenartenWhitelist.value.includes(r));
+  });
+
   function initializeFormWithCachedValues(): void {
     if (!props.cachedValues) {
       return;
@@ -226,6 +245,16 @@
     () => !!props.isEditMode && !logoId.value && !!props.initialValues.customLogo,
   );
 
+  const onRollenartenWhitelistFocus: (isFocused: boolean) => void = (isFocused: boolean) => {
+    if (isFocused) {
+      return;
+    }
+    if (props.isEditMode && formContext.isFieldDirty('rollenartenWhitelist') && affectedRollenarten.value.length > 0) {
+      showWarningDialog.value = true;
+      warningDialogType.value = WarningDialogType.RollenartenWhitelistChanged;
+    }
+  };
+
   watch(formContext.meta, ({ dirty }: FormMeta<ServiceProviderForm>) => {
     emit('update:dirty', dirty);
   });
@@ -233,8 +262,23 @@
   watch(
     verfuegbarFuerRollenerweiterung,
     (isAvailableForRoleExtension: boolean): void => {
-      formContext.setFieldValue('anbietenInSchulischeAngebotsverwaltung', isAvailableForRoleExtension);
-      formContext.setFieldValue('anbietenInSchulischeRollenverwaltung', isAvailableForRoleExtension);
+      if (isAvailableForRoleExtension) {
+        formContext.setFieldValue(
+          'anbietenInSchulischeAngebotsverwaltung',
+          props.initialValues.anbietenInSchulischeAngebotsverwaltung ?? true,
+        );
+        formContext.setFieldValue(
+          'anbietenInSchulischeRollenverwaltung',
+          props.initialValues.anbietenInSchulischeRollenverwaltung ?? true,
+        );
+      } else {
+        formContext.setFieldValue('anbietenInSchulischeAngebotsverwaltung', false);
+        formContext.setFieldValue('anbietenInSchulischeRollenverwaltung', false);
+        if (props.isEditMode && formContext.isFieldDirty('verfuegbarFuerRollenerweiterung')) {
+          showWarningDialog.value = true;
+          warningDialogType.value = WarningDialogType.VerfuegbarFuerRollenerweiterungChanged;
+        }
+      }
     },
     { immediate: true },
   );
@@ -489,6 +533,7 @@
           <v-select
             :disabled="!hasAngeboteVerwalten"
             id="verfuegbar-fuer-rollenerweiterung-select"
+            ref="verfuegbar-fuer-rollenerweiterung-select"
             v-bind="verfuegbarFuerRollenerweiterungProps"
             v-model="verfuegbarFuerRollenerweiterung"
             data-testid="verfuegbar-fuer-rollenerweiterung-select"
@@ -543,6 +588,7 @@
           :label="$t('angebot.rollenartenWhitelistLabel')"
         >
           <v-autocomplete
+            @update:focused="onRollenartenWhitelistFocus"
             id="rollenarten-whitelist-select"
             v-bind="rollenartenWhitelistProps"
             v-model="rollenartenWhitelist"
@@ -590,6 +636,57 @@
         </FormRow>
       </div>
     </template>
+    <v-dialog
+      v-model="showWarningDialog"
+      persistent
+      max-width="500"
+    >
+      <LayoutCard
+        :header="t('angebot.edit')"
+        data-testid="warning-dialog"
+      >
+        <v-card-text>
+          <v-container>
+            <v-row class="text-body bold justify-center">
+              <v-col class="text-center">
+                <template v-if="warningDialogType == WarningDialogType.VerfuegbarFuerRollenerweiterungChanged">
+                  <p>{{ t('angebot.verfuegbarFuerRollenerweiterungChangedWarning') }}</p>
+                </template>
+                <template v-if="warningDialogType == WarningDialogType.RollenartenWhitelistChanged">
+                  <p>
+                    {{
+                      t('angebot.rollenartenWhitelistChangedWarning', {
+                        rollenarten: affectedRollenarten
+                          .map((r) => t(`admin.rolle.mappingFrontBackEnd.rollenarten.${r}`))
+                          .join(', '),
+                      })
+                    }}
+                  </p>
+                </template>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions class="justify-center">
+          <v-row class="justify-center">
+            <v-col
+              cols="12"
+              sm="6"
+              md="auto"
+            >
+              <v-btn
+                class="primary button"
+                data-testid="confirm-warning-dialog-button"
+                :block="mdAndDown"
+                @click.stop="showWarningDialog = false"
+              >
+                {{ $t('ok') }}
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-card-actions>
+      </LayoutCard>
+    </v-dialog>
   </FormWrapper>
 </template>
 

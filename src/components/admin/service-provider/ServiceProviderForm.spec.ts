@@ -25,6 +25,7 @@ const defaultProps: ServiceProviderFormProps = {
     anbietenInSchulischeAngebotsverwaltung: true,
     anbietenInSchulischeRollenverwaltung: true,
     requires2fa: false,
+    rollenartenWhitelist: [],
   },
   systemrecht: RollenSystemRecht.AngeboteVerwalten,
   showUnsavedChangesDialog: false,
@@ -42,6 +43,11 @@ function mountComponent(
 
 describe('ServiceProviderForm', () => {
   beforeEach(() => {
+    document.body.innerHTML = `
+    <div>
+      <div id="app"></div>
+    </div>
+  `;
     vi.restoreAllMocks();
   });
 
@@ -130,6 +136,11 @@ describe('ServiceProviderForm', () => {
       isEditMode: false,
       shouldBeDisabled: false,
     },
+    {
+      testId: 'rollenarten-whitelist-select',
+      isEditMode: false,
+      shouldBeDisabled: false,
+    },
     { testId: 'name-input', isEditMode: true, shouldBeDisabled: false },
     { testId: 'url-input', isEditMode: true, shouldBeDisabled: false },
     { testId: 'kategorie-select', isEditMode: true, shouldBeDisabled: false },
@@ -143,6 +154,11 @@ describe('ServiceProviderForm', () => {
     },
     {
       testId: 'anbieten-in-schulische-rollenverwaltung-checkbox',
+      isEditMode: true,
+      shouldBeDisabled: false,
+    },
+    {
+      testId: 'rollenarten-whitelist-select',
       isEditMode: true,
       shouldBeDisabled: false,
     },
@@ -339,7 +355,7 @@ describe('ServiceProviderForm', () => {
     });
   });
 
-  test('includes anbietung merkmale on submit when rollenerweiterung is enabled and both checkboxes are checked', async () => {
+  test('includes anbieten-in-*-merkmale on submit when rollenerweiterung is enabled and both checkboxes are checked', async () => {
     const orgaStore: OrganisationStore = useOrganisationStore();
     const org: Organisation = DoFactory.getOrganisation({ typ: OrganisationsTyp.Schule });
     orgaStore.organisationenFilters.set('service-provider-create', {
@@ -388,5 +404,72 @@ describe('ServiceProviderForm', () => {
         ServiceProviderMerkmal.AnbietenInSchulischerRollenverwaltung,
       ]),
     );
+  });
+
+  test('it opens warning dialog if rollenerweiterung is disabled on an existing service provider', async () => {
+    const initialValues: ServiceProviderFormType = {
+      selectedOrganisationId: 'org-id',
+      name: 'Test Name',
+      url: 'https://test-url.com',
+      kategorie: ServiceProviderKategorie.Schulisch,
+      logoId: 1,
+      customLogo: undefined,
+      nachtraeglichZuweisbar: true,
+      verfuegbarFuerRollenerweiterung: true,
+      anbietenInSchulischeAngebotsverwaltung: true,
+      anbietenInSchulischeRollenverwaltung: true,
+      rollenartenWhitelist: [],
+      requires2fa: false,
+    };
+    const wrapper: VueWrapper<ComponentInstance<typeof ServiceProviderForm>> = mountComponent({
+      initialValues,
+      isEditMode: true,
+    });
+    await flushPromises();
+
+    const verfuegbarFuerRollenerweiterungSelect: VueWrapper = wrapper.findComponent({
+      ref: 'verfuegbar-fuer-rollenerweiterung-select',
+    });
+    await verfuegbarFuerRollenerweiterungSelect.setValue(false);
+    verfuegbarFuerRollenerweiterungSelect.vm.$emit('update:modelValue', false);
+    await flushPromises();
+
+    const dialog: Element | null = await vi.waitUntil(() => document.querySelector('[data-testid="warning-dialog"]'));
+    expect(dialog).not.toBeNull();
+    expect(dialog?.textContent).toContain(
+      'Bitte beachten Sie, dass durch die Anpassung nach dem Speichern alle existierende Rollenerweiterungen automatisch entfernt werden.',
+    );
+  });
+
+  test('it does not open warning dialog if rollenerweiterung is disabled on new service provider', async () => {
+    const initialValues: ServiceProviderFormType = {
+      selectedOrganisationId: 'org-id',
+      name: 'Test Name',
+      url: 'https://test-url.com',
+      kategorie: ServiceProviderKategorie.Schulisch,
+      logoId: 1,
+      customLogo: undefined,
+      nachtraeglichZuweisbar: true,
+      verfuegbarFuerRollenerweiterung: true,
+      anbietenInSchulischeAngebotsverwaltung: true,
+      anbietenInSchulischeRollenverwaltung: true,
+      rollenartenWhitelist: [],
+      requires2fa: false,
+    };
+    const wrapper: VueWrapper<ComponentInstance<typeof ServiceProviderForm>> = mountComponent({
+      initialValues,
+      isEditMode: false,
+    });
+    await flushPromises();
+
+    const verfuegbarFuerRollenerweiterungSelect: VueWrapper = wrapper.findComponent({
+      ref: 'verfuegbar-fuer-rollenerweiterung-select',
+    });
+    await verfuegbarFuerRollenerweiterungSelect.setValue(false);
+    verfuegbarFuerRollenerweiterungSelect.vm.$emit('update:modelValue', false);
+    await flushPromises();
+
+    const dialog: Element | null = document.querySelector('[data-testid="warning-dialog"]');
+    expect(dialog).toBeNull();
   });
 });
