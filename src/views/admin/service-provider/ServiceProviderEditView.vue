@@ -1,6 +1,9 @@
 <script setup lang="ts">
   import ServiceProviderForm from '@/components/admin/service-provider/ServiceProviderForm.vue';
-  import { formatServiceProviderRollenartenWhitelist } from '@/components/admin/service-provider/serviceProviderRollenarten';
+  import {
+    formatServiceProviderAnbietenMerkmale,
+    formatServiceProviderRollenartenWhitelist,
+  } from '@/components/admin/service-provider/serviceProvider.helper';
   import SuccessTemplate from '@/components/admin/service-provider/SuccessTemplate.vue';
   import type {
     ServiceProviderFormSubmitData,
@@ -276,6 +279,14 @@
                     ? $t('yes')
                     : $t('no'),
                   testId: 'success-verfuegbar-fuer-rollenerweiterung',
+                },
+                {
+                  label: $t('angebot.offeringScope'),
+                  value: formatServiceProviderAnbietenMerkmale(
+                    serviceProviderStore.updatedServiceProvider.merkmale,
+                    $t,
+                  ),
+                  testId: 'success-anbieten-in-verwaltung',
                 },
                 {
                   label: $t('angebot.rollenartenWhitelistLabel'),

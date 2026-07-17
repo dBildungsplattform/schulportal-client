@@ -164,6 +164,9 @@
   const showWarningDialog: Ref<boolean> = ref(false);
   const warningDialogType: Ref<WarningDialogType> = ref(WarningDialogType.None);
   const affectedRollenarten: ComputedRef<RollenArt[]> = computed(() => {
+    if (rollenartenWhitelist.value.length === 0) {
+      return [];
+    }
     const initialWhitelist: RollenArt[] =
       props.initialValues.rollenartenWhitelist && props.initialValues.rollenartenWhitelist.length > 0
         ? props.initialValues.rollenartenWhitelist

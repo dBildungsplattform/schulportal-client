@@ -1,7 +1,7 @@
 import deDE from '@/locales/de-DE.json';
 import { RollenArt } from '@/stores/RolleStore';
 import { createI18n } from 'vue-i18n';
-import { formatServiceProviderRollenartenWhitelist } from './serviceProviderRollenarten';
+import { formatServiceProviderRollenartenWhitelist } from './serviceProvider.helper';
 
 const i18n: { global: { t: (key: string) => unknown } } = createI18n({
   legacy: false,
