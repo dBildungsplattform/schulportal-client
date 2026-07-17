@@ -24,7 +24,8 @@
   const headers: ReadonlyHeaders = [
     { title: t('admin.rolle.rollenname'), key: 'name', align: 'start' },
     { title: t('admin.rolle.rollenart'), key: 'rollenart', align: 'start' },
-    { title: t('admin.rolle.merkmale'), key: 'merkmale', align: 'start' },
+    // Not needed for Erwin Portal
+    // { title: t('admin.rolle.merkmale'), key: 'merkmale', align: 'start' },
     { title: t('admin.serviceProvider.serviceProvider'), key: 'serviceProviders', align: 'start' },
     {
       title: t('admin.administrationsebene.administrationsebene'),

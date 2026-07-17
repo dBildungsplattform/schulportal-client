@@ -1,11 +1,12 @@
 <script setup lang="ts">
-  import { useI18n, type Composer } from 'vue-i18n';
+  /* import { useI18n, type Composer } from 'vue-i18n'; */
   import type { BaseFieldProps } from 'vee-validate';
   import KopersInput from '@/components/admin/personen/KopersInput.vue';
   import { type Ref, ref } from 'vue';
   import FormRow from '@/components/form/FormRow.vue';
 
-  const { t }: Composer = useI18n({ useScope: 'global' });
+  /* Not needed for Erwin Portal 
+  const { t }: Composer = useI18n({ useScope: 'global' }); */
 
   type Props = {
     hasKopersRolle: boolean;
@@ -42,7 +43,8 @@
     emits('update:selectedFamilienname', value);
   }
 
-  type IQSHLink = {
+  /* Not needed for Erwin Portal 
+    type IQSHLink = {
     text: string;
     href: string;
     external: boolean;
@@ -52,7 +54,7 @@
     text: t('admin.person.homePageIQSH'),
     href: 'https://medienberatung.iqsh.de/schulportal-sh.html',
     external: true,
-  });
+  }); */
 </script>
 
 <template>
@@ -74,6 +76,7 @@
             ></v-icon>
             <span> {{ $t('admin.person.personalInfoChangeNotice') }} </span>
           </div>
+          <!-- Not needed for Erwin Portal
           <div class="mt-4">
             <p>
               {{ $t('admin.person.personalInfoChangeNotice2') }}
@@ -87,6 +90,7 @@
               </span>
             </p>
           </div>
+        -->
         </span>
       </v-col>
       <v-col

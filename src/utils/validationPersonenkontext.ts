@@ -1,12 +1,10 @@
 import type { ComputedRef, Ref } from 'vue';
 import { object, string, StringSchema, type AnyObject } from 'yup';
 import { toTypedSchema } from '@vee-validate/yup';
-import { DDMMYYYY, NO_LEADING_TRAILING_SPACES } from '@/utils/validation'; // Assuming you have this validation in place
+import { NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
 import { useForm, type BaseFieldProps, type TypedSchema } from 'vee-validate';
-import { isBefristungspflichtRolle } from './befristung';
 import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
 import { RollenArt, RollenMerkmal } from '@/stores/RolleStore';
-import { isValidDate, notInPast } from './date';
 
 // Define the form validation schema for the Personenkontext
 export type ZuordnungCreationForm = {
@@ -64,16 +62,18 @@ export function isKopersRolle(
   );
 }
 
-const bestfristungSchema = (t: (key: string) => string): StringSchema =>
-  string()
-    .test('notInPast', t('admin.befristung.rules.pastDateNotAllowed'), notInPast) // Custom rule to prevent past dates
-    .test('isValidDate', t('admin.befristung.rules.invalidDateNotAllowed'), isValidDate)
-    .matches(DDMMYYYY, t('admin.befristung.rules.format')) // Ensure the date matches the DDMMYYYY format
-    .when(['selectedRolle', 'selectedBefristungOption'], {
-      is: (selectedRolleId: string, selectedBefristungOption: string | undefined) =>
-        isBefristungspflichtRolle([selectedRolleId]) && selectedBefristungOption === undefined, // Conditional required
-      then: (schema: Schema) => schema.required(t('admin.befristung.rules.required')),
-    });
+// Not needed for Erwin Portal
+// const bestfristungSchema = (t: (key: string) => string): StringSchema =>
+//   string()
+//     .test('notInPast', t('admin.befristung.rules.pastDateNotAllowed'), notInPast)
+//     .test('isValidDate', t('admin.befristung.rules.invalidDateNotAllowed'), isValidDate)
+//     .matches(DDMMYYYY, t('admin.befristung.rules.format'))
+//     .when(['selectedRolle', 'selectedBefristungOption'], {
+//       is: (selectedRolleId: string, selectedBefristungOption: string | undefined) =>
+//         isBefristungspflichtRolle([selectedRolleId]) && selectedBefristungOption === undefined,
+//       then: (schema: Schema) => schema.required(t('admin.befristung.rules.required')),
+//     });
+const bestfristungSchema = (_t: (key: string) => string): Schema => string().optional();
 
 // Define the validation schema for Personenkontext form fields
 export const getValidationSchema = (

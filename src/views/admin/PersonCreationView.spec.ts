@@ -235,7 +235,7 @@ type FormSelectors = {
 };
 
 async function fillForm(args: Partial<FormFields>): Promise<Partial<FormSelectors>> {
-  const { organisationsebene, rollen, klasse, befristung, vorname, nachname, kopersNr }: Partial<FormFields> = args;
+  const { organisationsebene, rollen, klasse, vorname, nachname, kopersNr }: Partial<FormFields> = args;
   const selectors: Partial<FormSelectors> = {};
 
   const organisationsebeneSelect: VueWrapper | undefined = wrapper
@@ -265,6 +265,7 @@ async function fillForm(args: Partial<FormFields>): Promise<Partial<FormSelector
   await nextTick();
   selectors.klasseSelect = klasseSelect;
 
+  /* Not needed for Erwin Portal
   const befristungInput: VueWrapper | undefined = wrapper
     ?.findComponent({ ref: 'personenkontext-create' })
     .findComponent({ ref: 'befristung-input-wrapper' })
@@ -273,7 +274,7 @@ async function fillForm(args: Partial<FormFields>): Promise<Partial<FormSelector
 
   await befristungInput?.setValue(befristung);
   await nextTick();
-  selectors.befristungInput = befristungInput;
+  selectors.befristungInput = befristungInput; */
 
   const vornameInput: VueWrapper | undefined = wrapper?.findComponent({ ref: 'vorname-input' });
   expect(vornameInput?.exists()).toBe(true);
@@ -335,6 +336,7 @@ describe('PersonCreationView', () => {
     expect(wrapper?.getComponent({ name: 'PersonenkontextCreate' })).toBeTruthy();
   });
 
+  /*
   test('it emits update:calculatedBefristungOption event with a value', async () => {
     const organisationSelect: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
@@ -390,6 +392,7 @@ describe('PersonCreationView', () => {
       wrapper?.findComponent({ ref: 'personenkontext-create' }).emitted('update:calculatedBefristungOption')![0],
     ).toEqual([undefined]);
   });
+  */
 
   test('it navigates back to personen table', async () => {
     const push: MockInstance = vi.spyOn(router, 'push');
@@ -471,12 +474,13 @@ describe('PersonCreationView', () => {
     await klasseSelect?.setValue('9a');
     await nextTick();
 
+    /* Not needed for Erwin Portal
     const befristungInput: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'befristung-input-wrapper' })
       .findComponent({ ref: 'befristung-input' });
     await befristungInput?.setValue('12.08.2099');
-    await nextTick();
+    await nextTick(); */
 
     const vornameInput: VueWrapper | undefined = wrapper?.findComponent({ ref: 'vorname-input' });
     await vornameInput?.setValue('Randy');
@@ -551,12 +555,13 @@ describe('PersonCreationView', () => {
     await klasseSelect?.setValue('9a');
     await nextTick();
 
+    /* Not needed for Erwin Portal
     const befristungInput: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'befristung-input-wrapper' })
       .findComponent({ ref: 'befristung-input' });
     await befristungInput?.setValue('12.08.2099');
-    await nextTick();
+    await nextTick(); */
 
     const vornameInput: VueWrapper | undefined = wrapper?.findComponent({ ref: 'vorname-input' });
     await vornameInput?.setValue('Randy');

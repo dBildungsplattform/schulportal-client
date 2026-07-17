@@ -176,7 +176,7 @@
       "noKopersNr": "KoPers.-Nr. nicht vorhanden",
       "noKopersNrConfirmationDialogMessage": "Bitte beachten Sie, dass ein Benutzerkonto ohne KoPers.-Nr. nach 8 Wochen automatisch gesperrt wird. Tragen Sie daher die KoPers.-Nr. bitte in der Gesamtübersicht des Benutzers nach, sobald diese Ihnen vorliegt.",
       "personalInfo": "Persönliche Informationen",
-      "personalInfoChangeNotice": "Namensänderungen haben unmittelbare Auswirkungen auf den Benutzernamen im ErWIn Portal und auf die E-Mail-Adresse! \n\nWeitere Informationen finden Sie auf der Homepage der IQSH-Medienberatung.",
+      "personalInfoChangeNotice": "Namensänderungen haben unmittelbare Auswirkungen auf den Benutzernamen im ErWIn Portal und auf die E-Mail-Adresse!",
       "personalInfoChangeNotice2": "Weitere Informationen finden Sie auf der ",
       "personalInfoSuccessDialogMessage": "Die Stammdaten wurden erfolgreich geändert.",
       "personalInfoSuccessDialogMessageWithUsername": "Die Stammdaten wurden erfolgreich geändert.\n\nDas Passwort wurde nicht verändert und kann wie zuvor verwendet werden. \n\nBitte teilen Sie der betroffenen Person die Stammdatenänderung (Benutzername, Mail-Adresse) mit. \n\nDie neuen Daten können Sie in der Gesamtübersicht einsehen.",
@@ -365,8 +365,7 @@
         },
         "merkmale": {
           "BEFRISTUNG_PFLICHT": "Befristung ist Pflichtangabe",
-          "KOPERS_PFLICHT": "KoPers.-Nr. ist Pflichtangabe",
-          "MAPPING": "Mapping"
+          "KOPERS_PFLICHT": "KoPers.-Nr. ist Pflichtangabe"
         }
       },
       "merkmale": "Merkmale",

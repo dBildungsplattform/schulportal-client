@@ -13,7 +13,6 @@
   import { type TranslatedObject } from '@/types.d';
   import type { BaseFieldProps } from 'vee-validate';
   import type { TranslatedRolleWithAttrs } from '@/composables/useRollen';
-  import BefristungInput from '@/components/admin/personen/BefristungInput.vue';
   import type { BefristungProps } from '@/components/admin/personen/BefristungInput.vue';
   import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
 
@@ -332,13 +331,14 @@
     { immediate: true },
   );
 
+  /* Not needed for ErWIn Portal.
   const handleBefristungChange = (value: string | undefined): void => {
-    emits('update:befristung', value);
+  emits('update:befristung', value);
   };
 
   const handleCalculatedBefristungOptionChange = (value: string | undefined): void => {
-    emits('update:calculatedBefristungOption', value);
-  };
+  emits('update:calculatedBefristungOption', value);
+  }; */
 </script>
 
 <template>
@@ -466,6 +466,7 @@
         ></v-autocomplete>
       </FormRow>
       <!-- Befristung -->
+      <!-- Not needed for Erwin Portal
       <v-row
         v-if="
           selectedOrganisation &&
@@ -491,7 +492,7 @@
         ref="befristung-input-wrapper"
         @update:befristung="handleBefristungChange"
         @update:calculatedBefristungOption="handleCalculatedBefristungOptionChange"
-      />
+      /> -->
     </div>
   </div>
 </template>

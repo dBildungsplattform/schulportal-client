@@ -4,7 +4,7 @@
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import FormRow from '@/components/form/FormRow.vue';
   import { type TranslatedObject } from '@/types.d';
-  import type { RollenArt, RollenMerkmal, RollenSystemRecht } from '@/stores/RolleStore';
+  import type { RollenArt, RollenSystemRecht } from '@/stores/RolleStore';
 
   type Props = {
     administrationsebenen?: Array<{ value: string; title: string }>;
@@ -36,7 +36,7 @@
     defineModel('selectedAdministrationsebene');
   const selectedRollenArt: ModelRef<RollenArt | undefined, string> = defineModel('selectedRollenArt');
   const selectedRollenName: ModelRef<string | undefined, string> = defineModel('selectedRollenName');
-  const selectedMerkmale: ModelRef<RollenMerkmal[] | undefined, string> = defineModel('selectedMerkmale');
+  /* const selectedMerkmale: ModelRef<RollenMerkmal[] | undefined, string> = defineModel('selectedMerkmale'); */
   const selectedServiceProviders: ModelRef<string[] | undefined, string> = defineModel('selectedServiceProviders');
   const selectedSystemRechte: ModelRef<RollenSystemRecht[] | undefined, string> = defineModel('selectedSystemRechte');
 </script>
@@ -144,6 +144,7 @@
         </FormRow>
 
         <!-- 4. Merkmale zuordnen -->
+        <!-- Not needed for Erwin Portal
         <v-row>
           <h3 class="headline-3">4. {{ $t('admin.rolle.assignMerkmale') }}</h3>
         </v-row>
@@ -170,11 +171,11 @@
             v-bind="selectedMerkmaleProps"
             v-model="selectedMerkmale"
           ></v-select>
-        </FormRow>
+        </FormRow> -->
 
         <!-- 5. Angebote zuordnen -->
         <v-row>
-          <h3 class="headline-3">5. {{ $t('admin.serviceProvider.assignServiceProvider') }}</h3>
+          <h3 class="headline-3">4. {{ $t('admin.serviceProvider.assignServiceProvider') }}</h3>
         </v-row>
         <FormRow
           :errorLabel="selectedServiceProvidersProps?.error || ''"
@@ -204,7 +205,7 @@
 
         <!-- 6. Systemrechte zuordnen -->
         <v-row>
-          <h3 class="headline-3">6. {{ $t('admin.rolle.assignSystemrechte') }}</h3>
+          <h3 class="headline-3">5. {{ $t('admin.rolle.assignSystemrechte') }}</h3>
         </v-row>
         <!-- Iterate over each system right and create a checkbox for it -->
         <FormRow

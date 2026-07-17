@@ -215,7 +215,6 @@ describe('RolleCreationView', () => {
       organisation: '1',
       rollenart: 'LERN',
       rollenname: 'NewRolle',
-      merkmale: ['1'],
       provider: ['1'],
       systemrechte: ['1'],
     });

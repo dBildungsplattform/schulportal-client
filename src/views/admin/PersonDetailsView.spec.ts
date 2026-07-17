@@ -1017,12 +1017,13 @@ describe('PersonDetailsView', () => {
     await klasseAutocomplete?.vm.$emit('update:search', '9a');
     await nextTick();
 
+    /* Not needed for Erwin Portal
     const befristungInput: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'befristung-input-wrapper' })
       .findComponent({ ref: 'befristung-input' });
     await befristungInput?.setValue('12.08.2099');
-    await nextTick();
+    await nextTick(); */
 
     const submitButton: Element = await waitForElement('[data-testid="zuordnung-creation-submit-button"]', wrapper, 10);
     submitButton.dispatchEvent(new Event('click'));
@@ -1117,12 +1118,13 @@ describe('PersonDetailsView', () => {
         await nextTick();
       }
 
+      /* Not needed for Erwin Portal
       const befristungInput: VueWrapper | undefined = wrapper
         ?.findComponent({ ref: 'personenkontext-create' })
         .findComponent({ ref: 'befristung-input-wrapper' })
         .findComponent({ ref: 'befristung-input' });
       await befristungInput?.setValue('12.08.2099');
-      await nextTick();
+      await nextTick(); */
 
       const vm: PersonDetailsViewVm = wrapper?.vm as unknown as PersonDetailsViewVm;
       await vm.onSubmitCreateZuordnung();
@@ -1397,6 +1399,7 @@ describe('PersonDetailsView', () => {
     expect(pushSpy).toHaveBeenCalledWith({ name: 'person-management' });
   });
 
+  /*
   describe('change befristung', () => {
     test('it shows befristung change form', async () => {
       await wrapper?.find('[data-testid="zuordnung-edit-button"]').trigger('click');
@@ -1539,4 +1542,5 @@ describe('PersonDetailsView', () => {
       },
     );
   });
+  */
 });

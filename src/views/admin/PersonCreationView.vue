@@ -27,14 +27,14 @@
   import { useDisplay } from 'vuetify';
 
   const { mdAndDown }: { mdAndDown: Ref<boolean> } = useDisplay();
-  import { DDMMYYYY, DIN_91379A, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
+  import { DIN_91379A, NO_LEADING_TRAILING_SPACES } from '@/utils/validation';
   import { useOrganisationen } from '@/composables/useOrganisationen';
   import { useRollen, type TranslatedRolleWithAttrs } from '@/composables/useRollen';
   import { useKlassen } from '@/composables/useKlassen';
   import KopersInput from '@/components/admin/personen/KopersInput.vue';
   import PersonenkontextCreate from '@/components/admin/personen/PersonenkontextCreate.vue';
   import { type TranslatedObject } from '@/types.d';
-  import { getNextSchuljahresende, formatDateToISO, notInPast, isValidDate } from '@/utils/date';
+  import { getNextSchuljahresende, formatDateToISO } from '@/utils/date';
   import { isBefristungspflichtRolle, useBefristungUtils, type BefristungUtilsType } from '@/utils/befristung';
   import { isKopersRolle } from '@/utils/validationPersonenkontext';
 
@@ -99,16 +99,18 @@
           then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
             schema.required(t('admin.person.rules.kopersNr.required')),
         }),
-      selectedBefristung: string()
-        .test('notInPast', t('admin.befristung.rules.pastDateNotAllowed'), notInPast)
-        .test('isValidDate', t('admin.befristung.rules.invalidDateNotAllowed'), isValidDate)
-        .matches(DDMMYYYY, t('admin.befristung.rules.format'))
-        .when(['selectedRolle', 'selectedBefristungOption'], {
-          is: (selectedRolleIds: string[], selectedBefristungOption: string | undefined) =>
-            isBefristungspflichtRolle(selectedRolleIds) && selectedBefristungOption === undefined,
-          then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
-            schema.required(t('admin.befristung.rules.required')),
-        }),
+      // Not needed for Erwin Portal
+      // selectedBefristung: string()
+      //   .test('notInPast', t('admin.befristung.rules.pastDateNotAllowed'), notInPast)
+      //   .test('isValidDate', t('admin.befristung.rules.invalidDateNotAllowed'), isValidDate)
+      //   .matches(DDMMYYYY, t('admin.befristung.rules.format'))
+      //   .when(['selectedRolle', 'selectedBefristungOption'], {
+      //     is: (selectedRolleIds: string[], selectedBefristungOption: string | undefined) =>
+      //       isBefristungspflichtRolle(selectedRolleIds) && selectedBefristungOption === undefined,
+      //     then: (schema: StringSchema<string | undefined, AnyObject, undefined, ''>) =>
+      //       schema.required(t('admin.befristung.rules.required')),
+      //   }),
+      selectedBefristung: string().notRequired(),
     }),
   );
 
@@ -262,8 +264,9 @@
     );
   });
 
+  // Not needed for Erwin Portal
   // Converts the ISO UTC formatted Befristung to the german local format, also ISO.
-  const translatedBefristung: ComputedRef<string> = computed(() => {
+  /*   const translatedBefristung: ComputedRef<string> = computed(() => {
     const ISOFormattedDate: string | undefined = schuleZuordnungFromCreatedKontext.value[0]?.befristung;
 
     if (!ISOFormattedDate) {
@@ -284,7 +287,7 @@
     const germanDate: string = utcDate.toLocaleDateString('de-DE');
 
     return germanDate;
-  });
+  }); */
 
   const creationErrorText: Ref<string> = ref('');
 
@@ -718,12 +721,13 @@
               ><span data-testid="created-person-rolle">{{ translatedRollenname.join(', ') }}</span></v-col
             >
           </v-row>
+          <!-- Not needed for Erwin Portal 
           <v-row>
             <v-col class="text-body bold text-right"> {{ $t('admin.befristung.befristung') }}: </v-col>
             <v-col class="text-body"
               ><span data-testid="created-person-befristung">{{ translatedBefristung }}</span></v-col
             >
-          </v-row>
+          </v-row> -->
           <v-row
             v-if="
               isLernRolle(
