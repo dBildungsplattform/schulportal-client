@@ -252,12 +252,10 @@
     (newValue: string | undefined, oldValue: string | undefined) => {
       clearTimeout(timerId.value);
 
-      // this prevents duplicate requests because the input value changes between "" and null
       if (!newValue && !oldValue) {
         return;
       }
 
-      // this prevents duplicate requests when the user selects a value from the dropdown
       if (
         newValue &&
         (props.allowMultipleRollen
@@ -270,11 +268,14 @@
       const filter: WorkflowFilter = {
         personId: props.personId,
         organisationId: selectedOrganisation.value,
-        rollenIds: selectedRollen.value,
+        rollenIds: props.allowMultipleRollen
+          ? selectedRollen.value
+          : selectedRolle.value
+            ? [selectedRolle.value]
+            : undefined,
         limit: 25,
       };
 
-      // Add rolleName if user is typing
       if (!newValue) {
         // No rolleName (cleared)
       } else {
