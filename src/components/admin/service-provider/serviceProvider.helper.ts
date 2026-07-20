@@ -31,7 +31,11 @@ export function extractAnbietenInMerkmale(merkmale: ServiceProviderMerkmal[]): S
 }
 
 export function formatServiceProviderAnbietenMerkmale(merkmale: ServiceProviderMerkmal[], t: Translate): string {
-  return extractAnbietenInMerkmale(merkmale)
+  const anbietenInMerkmale: ServiceProviderMerkmal[] = extractAnbietenInMerkmale(merkmale);
+  if (anbietenInMerkmale.length === 0) {
+    return t('none');
+  }
+  return anbietenInMerkmale
     .map((merkmal: ServiceProviderMerkmal) => {
       switch (merkmal) {
         case ServiceProviderMerkmal.AnbietenInSchulischerAngebotsverwaltung:
