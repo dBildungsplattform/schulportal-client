@@ -926,7 +926,12 @@
           md="4"
           class="mt-md-5 mt-n10"
         >
-          <p class="text-body">{{ selectedPersonIds.length }} {{ $t('selected') }}</p>
+          <p
+            data-testid="selected-count"
+            class="text-body"
+          >
+            {{ selectedPersonIds.length }} {{ $t('selected') }}
+          </p>
         </v-col>
         <v-spacer />
         <SearchField
