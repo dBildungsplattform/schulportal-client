@@ -818,7 +818,7 @@
           />
         </v-col>
       </v-row>
-      <v-row class="ma-3 mb-0 mb-md-n4 justify-start">
+      <v-row class="ma-3 mb-0 mb-md-n4 mt-6 justify-start">
         <v-col
           md="3"
           cols="12"
@@ -847,6 +847,14 @@
               @update:model-value="handleOption"
             />
           </SpshTooltip>
+
+          <!-- Small screens only: count directly under the select -->
+          <p
+            v-if="authStore.hasPersonenBulkPermission && selectedPersonIds.length > 0"
+            class="text-body my-0 d-flex d-md-none"
+          >
+            {{ selectedPersonIds.length }} {{ $t('selected') }}
+          </p>
           <InfoDialog
             id="invalid-selection-alert-dialog"
             :is-dialog-visible="onlyOneOrganisationAlertDialogVisible"
@@ -929,11 +937,11 @@
             @update:dialog-exit="handleBulkKlasseChangeDialog"
           />
         </v-col>
-        <!-- Display the number of selected checkboxes -->
+        <!-- Display the number of selected checkboxes (md+ only) -->
         <v-col
           v-if="authStore.hasPersonenBulkPermission && selectedPersonIds.length > 0"
           cols="auto"
-          class="mb-5 d-flex align-center"
+          class="mb-5 d-none d-md-flex align-center"
         >
           <p class="text-body mb-0">{{ selectedPersonIds.length }} {{ $t('selected') }}</p>
         </v-col>

@@ -22,7 +22,7 @@
     >
       <v-col
         cols="auto"
-        class="pl-md-6 pl-1 my-2"
+        class="pl-md-6 pl-4 my-2"
       >
         <h2
           class="text-left ellipsis-wrapper ellipsis-wrapper--wide"
