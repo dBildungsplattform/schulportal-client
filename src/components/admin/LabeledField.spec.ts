@@ -1,8 +1,7 @@
-import { expect, test, describe, beforeEach } from 'vitest';
 import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
-import LabeledField from './LabeledField.vue';
+import { beforeEach, describe, expect, test } from 'vitest';
 import type { Component } from 'vue';
-import { VRow } from 'vuetify/components';
+import LabeledField from '@/components/admin/LabeledField.vue';
 
 let wrapper: VueWrapper | null = null;
 
