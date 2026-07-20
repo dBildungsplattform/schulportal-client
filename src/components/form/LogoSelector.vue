@@ -52,7 +52,6 @@
             :tabindex="disabled || readonly ? -1 : 0"
             :data-testid="`logo-${logo.id}`"
             :aria-pressed="isSelected(logo.id)"
-            :aria-label="logo.name"
             role="button"
             @click="selectLogo(logo.id)"
             @keydown.enter.prevent="selectLogo(logo.id)"
@@ -61,9 +60,8 @@
             <v-img
               :src="logo.path"
               :alt="logo.name"
-              max-height="48"
-              max-width="48"
-              contain
+              width="48"
+              height="48"
             />
           </div>
         </div>
