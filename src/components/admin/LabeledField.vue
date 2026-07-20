@@ -13,17 +13,24 @@
 </script>
 
 <template>
-  <v-row :class="[noMarginTop ? 'align-center mt-2' : mdMarginTop ? 'mt-md-4 align-center' : 'mt-4 align-center']">
+  <v-row :class="[noMarginTop ? 'mt-2' : mdMarginTop ? 'mt-md-4' : 'mt-4']">
     <v-col
       cols="12"
       sm="auto"
-      class="d-flex align-center pr-0 flex-shrink-1"
+      :class="{
+        'd-flex pr-0 flex-shrink-1': true,
+        'pt-0': !isLogo,
+        'align-center': isLogo,
+      }"
       style="max-width: fit-content"
     >
       <span class="subtitle-2 text-no-wrap">{{ label }}:</span>
     </v-col>
     <v-col
-      class="d-flex align-center flex-grow-1 pl-2"
+      :class="{
+        'd-flex flex-grow-1 pl-2': true,
+        'pt-0': !isLogo,
+      }"
       :data-testid="testId"
       :style="wordBreakAll ? 'word-break: break-all' : undefined"
     >
@@ -32,7 +39,7 @@
         <v-img
           v-if="logoSrc"
           alt="provider-logo"
-          class="service-provider-logo mt-n2"
+          class="service-provider-logo"
           :src="logoSrc"
           max-width="30"
         />

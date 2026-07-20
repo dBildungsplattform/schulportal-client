@@ -2,6 +2,7 @@ import { expect, test, describe, beforeEach } from 'vitest';
 import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
 import LabeledField from './LabeledField.vue';
 import type { Component } from 'vue';
+import { VRow } from 'vuetify/components';
 
 let wrapper: VueWrapper | null = null;
 
@@ -41,12 +42,15 @@ describe('LabeledField', () => {
         label: 'Test Label',
         value: 'Test Value',
         noMarginTop: true,
+        isLogo: false,
+        testId: 'text-content',
       },
     });
 
     const row: DOMWrapper<Element> = wrapper.find('.v-row');
     expect(row.classes()).not.toContain('mt-4');
-    expect(row.classes()).toContain('align-center');
+    const col: DOMWrapper<Element> = wrapper.find('[data-testid="text-content"]');
+    expect(col.classes()).toContain('pt-0');
   });
 
   test('it renders logo when isLogo is true with logoSrc', () => {
@@ -65,6 +69,9 @@ describe('LabeledField', () => {
     expect(img.exists()).toBe(true);
     expect(img.attributes('src')).toBe('https://example.com/logo.png');
     expect(wrapper.find('.text-body').exists()).toBe(false);
+
+    const col: DOMWrapper<Element> = wrapper.find('[data-testid="logo-field"]');
+    expect(col.classes()).not.toContain('pt-0');
   });
 
   test('it renders default logo when isLogo is true without logoSrc', () => {
