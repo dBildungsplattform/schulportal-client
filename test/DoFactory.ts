@@ -504,9 +504,9 @@ export class DoFactory {
       rollen: [{ id: faker.string.uuid(), name: faker.person.jobTitle() }],
       requires2fa: faker.datatype.boolean(),
       merkmale: [
-        ServiceProviderMerkmal.VerfuegbarFuerRollenerweiterung,
-        ServiceProviderMerkmal.AnbietenInSchulischerAngebotsverwaltung,
-        ServiceProviderMerkmal.AnbietenInSchulischerRollenverwaltung,
+        'VERFUEGBAR_FUER_ROLLENERWEITERUNG',
+        'ANBIETEN_IN_SCHULISCHER_ANGEBOTSVERWALTUNG',
+        'ANBIETEN_IN_SCHULISCHER_ROLLENVERWALTUNG',
       ],
       rollenerweiterungen: [],
       hasSomeVerwaltenPermission: faker.datatype.boolean(),
