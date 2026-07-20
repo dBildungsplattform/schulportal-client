@@ -34,12 +34,12 @@ import type { PersonenkontextWorkflowResponse } from '@/stores/PersonenkontextSt
 import { type Personendatensatz } from '@/stores/PersonStore';
 import type { Rolle, RolleResponse, RolleWithServiceProvidersResponse } from '@/stores/RolleStore';
 import {
-  ServiceProviderMerkmal,
   type ManageableServiceProviderDetail,
   type RollenErweiterungenUebersicht,
   type RollenerweiterungMap,
   type StartPageServiceProvider,
 } from '@/stores/ServiceProviderStore';
+import { ServiceProviderMerkmal } from '@/api-client/generated/api';
 import type { Person } from '@/stores/types/Person';
 import { PersonenUebersicht } from '@/stores/types/PersonenUebersicht';
 import { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
