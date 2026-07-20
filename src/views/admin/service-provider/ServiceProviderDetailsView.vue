@@ -251,7 +251,10 @@
       <div v-if="!serviceProviderStore.errorCode">
         <v-container class="service-provider-info">
           <div v-if="serviceProviderStore.currentServiceProvider">
-            <v-row id="service-provider-info-row">
+            <v-row
+              class="mt-2"
+              id="service-provider-info-row"
+            >
               <v-col
                 class="custom-offset"
                 offset="1"

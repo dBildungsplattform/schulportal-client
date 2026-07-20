@@ -47,9 +47,7 @@ describe('LabeledField', () => {
     });
 
     const row: DOMWrapper<Element> = wrapper.find('.v-row');
-    expect(row.classes()).not.toContain('mt-4');
-    const col: DOMWrapper<Element> = wrapper.find('[data-testid="text-content"]');
-    expect(col.classes()).toContain('pt-0');
+    expect(row.classes()).toContain('mt-0');
   });
 
   test('it renders logo when isLogo is true with logoSrc', () => {

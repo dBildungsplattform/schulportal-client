@@ -348,7 +348,10 @@
       <template v-if="!serviceProviderStore.errorCode">
         <v-container>
           <template v-if="serviceProviderStore.currentServiceProvider">
-            <v-row data-testid="service-provider-info-row">
+            <v-row
+              class="mt-2"
+              data-testid="service-provider-info-row"
+            >
               <v-col
                 offset="1"
                 offset-sm="1"
