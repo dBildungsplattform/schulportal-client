@@ -3432,7 +3432,7 @@
         "type": "string",
         "enum": ["LERN", "LEHR", "EXTERN", "ORGADMIN", "LEIT", "SYSADMIN", "SORGBER", "SCHB", "NLEHR"]
       },
-      "RollenMerkmal": { "type": "string", "enum": ["BEFRISTUNG_PFLICHT", "KOPERS_PFLICHT"] },
+      "RollenMerkmal": { "type": "string", "enum": ["BEFRISTUNG_PFLICHT", "KOPERS_PFLICHT", "MPT_ROLLE"] },
       "DBiamPersonenzuordnungResponse": {
         "type": "object",
         "properties": {
