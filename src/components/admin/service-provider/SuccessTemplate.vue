@@ -8,6 +8,7 @@
     value: string | number | undefined;
     testId: string;
     type?: 'text' | 'image';
+    alt?: string;
   };
 
   type SuccessDetails = {
@@ -35,16 +36,17 @@
 
 <template>
   <v-container>
-    <v-row justify="center">
+    <v-row class="justify-center">
       <v-col
         cols="auto"
         class="subtitle-1 pre-line text-center"
+        data-testid="success-message"
       >
         {{ success.message }}
       </v-col>
     </v-row>
 
-    <v-row justify="center">
+    <v-row class="justify-center">
       <v-col cols="auto">
         <v-icon
           color="success"
@@ -53,7 +55,7 @@
       </v-col>
     </v-row>
 
-    <v-row justify="center">
+    <v-row class="justify-center">
       <v-col
         cols="auto"
         class="subtitle-2"
@@ -78,6 +80,7 @@
             :data-testid="item.testId"
             class="mt-n2"
             :src="getLogoPath(item.value)"
+            :alt="item.alt"
             max-width="40"
             max-height="40"
             contain
@@ -89,6 +92,7 @@
             :data-testid="item.testId"
             class="mt-n2"
             :src="item.value"
+            :alt="item.alt"
             max-width="40"
             max-height="40"
             contain
@@ -110,7 +114,7 @@
       thickness="6"
     />
 
-    <v-row justify="end">
+    <v-row class="justify-end">
       <slot> </slot>
       <v-col
         v-if="showToServiceProviderDetailsButton"

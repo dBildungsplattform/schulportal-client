@@ -279,7 +279,7 @@
     <!-- Template to be displayed in case loading the providers throws an error -->
     <template v-else-if="serviceProviderStore.errorCode">
       <p
-        class="text-caption text-left"
+        class="text-body-small text-left"
         data-testid="error-text"
       >
         {{ $t(`errors.${serviceProviderStore.errorCode}`) }}

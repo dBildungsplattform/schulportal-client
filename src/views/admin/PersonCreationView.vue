@@ -1000,7 +1000,7 @@
         "
       >
         <v-container>
-          <v-row justify="center">
+          <v-row class="justify-center">
             <v-col
               class="subtitle-1"
               cols="auto"
@@ -1015,7 +1015,7 @@
               </span>
             </v-col>
           </v-row>
-          <v-row justify="center">
+          <v-row class="justify-center">
             <v-col cols="auto">
               <v-icon
                 aria-hidden="true"
@@ -1026,7 +1026,7 @@
               />
             </v-col>
           </v-row>
-          <v-row justify="center">
+          <v-row class="justify-center">
             <v-col
               class="subtitle-2"
               cols="auto"
@@ -1186,7 +1186,7 @@
             color="#E5EAEF"
             thickness="6"
           />
-          <v-row justify="end">
+          <v-row class="justify-end">
             <v-col
               cols="12"
               sm="6"
@@ -1241,7 +1241,7 @@
         "
       >
         <v-container>
-          <v-row justify="center">
+          <v-row class="justify-center">
             <v-col
               class="subtitle-1"
               cols="auto"
@@ -1256,7 +1256,7 @@
               </span>
             </v-col>
           </v-row>
-          <v-row justify="center">
+          <v-row class="justify-center">
             <v-col cols="auto">
               <v-icon
                 aria-hidden="true"
@@ -1267,7 +1267,7 @@
               />
             </v-col>
           </v-row>
-          <v-row justify="center">
+          <v-row class="justify-center">
             <v-col
               class="subtitle-2"
               cols="auto"
@@ -1366,7 +1366,7 @@
             color="#E5EAEF"
             thickness="6"
           />
-          <v-row justify="end">
+          <v-row class="justify-end">
             <v-col
               cols="12"
               sm="6"
