@@ -584,6 +584,7 @@
           <v-autocomplete
             @update:focused="onRollenartenWhitelistFocus"
             id="rollenarten-whitelist-select"
+            ref="rollenarten-whitelist-select"
             v-bind="rollenartenWhitelistProps"
             v-model="rollenartenWhitelist"
             chips

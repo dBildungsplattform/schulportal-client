@@ -1,6 +1,6 @@
 import { OrganisationsTyp } from '@/api-client/generated';
 import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
-import { RollenSystemRecht } from '@/stores/RolleStore';
+import { RollenArt, RollenSystemRecht } from '@/stores/RolleStore';
 import { ServiceProviderKategorie, ServiceProviderMerkmal } from '@/stores/ServiceProviderStore';
 import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import { DoFactory } from 'test/DoFactory';
@@ -424,6 +424,79 @@ describe('ServiceProviderForm', () => {
     });
     await verfuegbarFuerRollenerweiterungSelect.setValue(false);
     verfuegbarFuerRollenerweiterungSelect.vm.$emit('update:modelValue', false);
+    await flushPromises();
+
+    const dialog: Element | null = document.querySelector('[data-testid="warning-dialog"]');
+    expect(dialog).toBeNull();
+  });
+
+  test('it opens warning dialog if rollenartenWhitelist is changed on an existing service provider', async () => {
+    const initialValues: ServiceProviderFormType = {
+      selectedOrganisationId: 'org-id',
+      name: 'Test Name',
+      url: 'https://test-url.com',
+      kategorie: ServiceProviderKategorie.Schulisch,
+      logoId: 1,
+      customLogo: undefined,
+      nachtraeglichZuweisbar: true,
+      verfuegbarFuerRollenerweiterung: true,
+      anbietenInMerkmale: extractAnbietenInMerkmale(Object.values(ServiceProviderMerkmal)),
+      rollenartenWhitelist: [RollenArt.Sorgber, RollenArt.Nlehr],
+      requires2fa: false,
+    };
+    const wrapper: VueWrapper<ComponentInstance<typeof ServiceProviderForm>> = mountComponent({
+      initialValues,
+      isEditMode: true,
+    });
+    await flushPromises();
+
+    const rollenartenWhitelistSelect: VueWrapper = wrapper.findComponent({
+      ref: 'rollenarten-whitelist-select',
+    });
+
+    rollenartenWhitelistSelect.vm.$emit('update:focused', true);
+    await rollenartenWhitelistSelect.setValue([RollenArt.Nlehr]);
+    rollenartenWhitelistSelect.vm.$emit('update:modelValue', [RollenArt.Nlehr]);
+    rollenartenWhitelistSelect.vm.$emit('update:focused', false);
+    await flushPromises();
+
+    const dialog: Element | null = await vi.waitUntil(() => document.querySelector('[data-testid="warning-dialog"]'));
+    expect(dialog).not.toBeNull();
+    expect(dialog?.textContent).toContain(
+      'Bitte beachten Sie, dass durch die Anpassungen existierende Rollenerweiterungen für Rollen nicht mehr erlaubter Rollenarten nach dem Speichern automatisch entfernt werden.',
+    );
+    expect(dialog?.textContent).toContain('SorgBer');
+    expect(dialog?.textContent).not.toContain('NLehr');
+  });
+
+  test('it does not open warning dialog if rollenartenWhitelist is changed and whitelist is laxer than before', async () => {
+    const initialValues: ServiceProviderFormType = {
+      selectedOrganisationId: 'org-id',
+      name: 'Test Name',
+      url: 'https://test-url.com',
+      kategorie: ServiceProviderKategorie.Schulisch,
+      logoId: 1,
+      customLogo: undefined,
+      nachtraeglichZuweisbar: true,
+      verfuegbarFuerRollenerweiterung: true,
+      anbietenInMerkmale: extractAnbietenInMerkmale(Object.values(ServiceProviderMerkmal)),
+      rollenartenWhitelist: [RollenArt.Sorgber, RollenArt.Nlehr],
+      requires2fa: false,
+    };
+    const wrapper: VueWrapper<ComponentInstance<typeof ServiceProviderForm>> = mountComponent({
+      initialValues,
+      isEditMode: true,
+    });
+    await flushPromises();
+
+    const rollenartenWhitelistSelect: VueWrapper = wrapper.findComponent({
+      ref: 'rollenarten-whitelist-select',
+    });
+
+    rollenartenWhitelistSelect.vm.$emit('update:focused', true);
+    await rollenartenWhitelistSelect.setValue([]);
+    rollenartenWhitelistSelect.vm.$emit('update:modelValue', []);
+    rollenartenWhitelistSelect.vm.$emit('update:focused', false);
     await flushPromises();
 
     const dialog: Element | null = document.querySelector('[data-testid="warning-dialog"]');
