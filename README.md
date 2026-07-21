@@ -24,6 +24,18 @@ npm run build
 npm run lint
 ```
 
+### Run Prettier
+
+```sh
+npm run format
+```
+
+### Run Tests with Istanbul Coverage
+
+```sh
+npm run coverage
+```
+
 ## AI Agents and MCP
 
 ### Copilot Instructions

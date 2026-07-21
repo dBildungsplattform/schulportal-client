@@ -89,8 +89,8 @@ describe('MptRollenManagementView', () => {
 
   it('renders only rollenname and rollenart table headers', async () => {
     rolleStore.allRollen = [
-      DoFactory.getRolleWithServiceProviders({ name: 'Gamma', rollenart: RollenArt.Nlehr }),
-      DoFactory.getRolleWithServiceProviders({ name: 'Alpha', rollenart: RollenArt.Schb }),
+      DoFactory.getRolleWithServiceProviders({ name: 'Nichtlehrrolle', rollenart: RollenArt.Nlehr }),
+      DoFactory.getRolleWithServiceProviders({ name: 'Schulbegleitung', rollenart: RollenArt.Schb }),
     ];
     rolleStore.totalRollen = 2;
 
@@ -103,17 +103,22 @@ describe('MptRollenManagementView', () => {
   });
 
   it('sorts by rollenart and then by rollenname', async () => {
+    const wrapper: VueWrapper<InstanceType<typeof MptRollenManagementView>> = mountComponent();
+    await flushPromises();
+
     rolleStore.allRollen = [
-      DoFactory.getRolleWithServiceProviders({ name: 'Zulu', rollenart: RollenArt.Schb }),
-      DoFactory.getRolleWithServiceProviders({ name: 'Alpha', rollenart: RollenArt.Nlehr }),
+      DoFactory.getRolleWithServiceProviders({ name: 'Schulbegleitung', rollenart: RollenArt.Schb }),
+      DoFactory.getRolleWithServiceProviders({ name: 'Nichtlehrrolle', rollenart: RollenArt.Nlehr }),
     ];
     rolleStore.totalRollen = 2;
-
-    const wrapper: VueWrapper<InstanceType<typeof MptRollenManagementView>> = mountComponent();
     await nextTick();
 
-    const wrapperText: string = wrapper.text();
-    expect(wrapperText.indexOf('Alpha')).toBeLessThan(wrapperText.indexOf('Zulu'));
+    const resultTable: VueWrapper = wrapper.findComponent({ name: 'ResultTable' });
+    const tableItems: Array<{ name: string }> = (
+      resultTable as unknown as { props: (key: string) => Array<{ name: string }> }
+    ).props('items');
+    expect(tableItems[0]!.name).toBe('Nichtlehrrolle');
+    expect(tableItems[1]!.name).toBe('Schulbegleitung');
   });
 
   it('loads page 2 with updated offset', async () => {
