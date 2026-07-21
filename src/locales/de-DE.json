@@ -635,6 +635,11 @@
       "loadingErrorText": "Es konnten keine Rollendaten geladen werden.",
       "loadingErrorTitle": "Fehler beim Laden der Rolle",
       "management": "Rollenverwaltung",
+      "mptManagement": {
+        "title": "Rollen für multiprofessionelle Teams verwalten",
+        "menuItem": "Rollen für multiprofessionelle Teams verwalten",
+        "noSchuleSelected": "Bitte wählen Sie zunächst im Filter eine Schule aus"
+      },
       "mappingFrontBackEnd": {
         "systemrechte": {
           "IMPORT_DURCHFUEHREN": "Darf Import durchführen",
@@ -654,7 +659,8 @@
           "ROLLEN_ERWEITERN": "Darf Rollen schulspezifisch erweitern",
           "ANGEBOTE_VERWALTEN": "Darf Angebote verwalten",
           "ANGEBOTE_EINGESCHRAENKT_VERWALTEN": "Darf Angebote eingeschränkt verwalten",
-          "SCHULISCHE_VIDIS_ANGEBOTE_ABRUFEN": "Darf schulische VIDIS-Angebote abrufen"
+          "SCHULISCHE_VIDIS_ANGEBOTE_ABRUFEN": "Darf schulische VIDIS-Angebote abrufen",
+          "MPT_ROLLEN_VERWALTEN": "Darf Rollen für multiprofessionelle Teams verwalten"
         },
         "rollenarten": {
           "LERN": "Lern",

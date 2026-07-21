@@ -39,6 +39,12 @@ async function mountComponent(): Promise<VueWrapper<InstanceType<typeof ServiceP
       components: {
         ServiceProviderDetailsView: ServiceProviderDetailsView as Component,
       },
+          stubs: {
+            VImg: {
+              props: ['alt', 'src'],
+              template: '<img :alt="alt" :src="src" />',
+            },
+          },
       mocks: {
         route: {
           fullPath: 'full/path',
@@ -101,6 +107,11 @@ beforeEach(async () => {
     DoFactory.getRolleWithServiceProviders({ rollenart: RollenArt.Lern }),
   ];
   wrapper = await mountComponent();
+});
+
+afterEach(() => {
+  wrapper?.unmount();
+  wrapper = null;
 });
 
 describe('ServiceProviderDetailsView', () => {
