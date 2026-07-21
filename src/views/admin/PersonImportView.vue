@@ -424,7 +424,7 @@
       <!-- Import success template -->
       <template v-if="importStore.importProgress === 100 && !importStore.importIsLoading && !isDownloadingFile">
         <v-container>
-          <v-row justify="center">
+          <v-row class="justify-center">
             <v-col cols="auto">
               <v-icon
                 aria-hidden="true"
@@ -434,7 +434,7 @@
               />
             </v-col>
           </v-row>
-          <v-row justify="center">
+          <v-row class="justify-center">
             <v-col
               class="subtitle-1"
               cols="auto"
@@ -444,7 +444,7 @@
               </span>
             </v-col>
           </v-row>
-          <v-row justify="center">
+          <v-row class="justify-center">
             <v-col cols="auto">
               <v-btn
                 class="secondary"
@@ -483,7 +483,7 @@
               </span>
             </v-col>
           </v-row>
-          <v-row justify="center">
+          <v-row class="justify-center">
             <v-col cols="auto">
               <v-progress-circular
                 data-testid="loading-spinner"
@@ -513,7 +513,7 @@
               </span>
             </v-col>
           </v-row>
-          <v-row justify="center">
+          <v-row class="justify-center">
             <v-col cols="12">
               <v-progress-linear
                 data-testid="import-progress-bar"
@@ -563,7 +563,7 @@
         <!-- Upload success template -->
         <template v-if="showUploadSuccessTemplate">
           <v-container>
-            <v-row justify="center">
+            <v-row class="justify-center">
               <v-col cols="auto">
                 <v-icon
                   aria-hidden="true"
@@ -573,7 +573,7 @@
                 />
               </v-col>
             </v-row>
-            <v-row justify="center">
+            <v-row class="justify-center">
               <v-col
                 class="subtitle-1"
                 cols="auto"
@@ -584,7 +584,7 @@
                 </span>
               </v-col>
             </v-row>
-            <v-row justify="center">
+            <v-row class="justify-center">
               <v-col cols="auto">
                 <v-btn
                   class="secondary"
@@ -702,7 +702,7 @@
               :key="index"
               class="invalid-items"
               :data-testid="`invalid-item-row-${index + 1}`"
-              dense
+              density="compact"
             >
               <v-col
                 class="primary-text-color"

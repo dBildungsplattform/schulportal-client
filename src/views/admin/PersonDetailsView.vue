@@ -1692,7 +1692,7 @@
             >
               <v-col>
                 <!-- Vorname -->
-                <v-row class="mt-4 align-center">
+                <v-row class="mt-3 align-center">
                   <v-col
                     class="d-flex align-center justify-end"
                     sm="3"
@@ -1709,7 +1709,7 @@
                 </v-row>
 
                 <!-- Familienname -->
-                <v-row class="mt-0 align-center">
+                <v-row class="mt-3 align-center">
                   <v-col
                     class="d-flex align-center justify-end"
                     sm="3"
@@ -1726,7 +1726,7 @@
                 </v-row>
 
                 <!-- Benutzername -->
-                <v-row class="mt-0 align-center">
+                <v-row class="mt-3 align-center">
                   <v-col
                     class="d-flex align-center justify-end"
                     sm="3"
@@ -1744,7 +1744,7 @@
 
                 <!-- KoPers.-Nr. -->
                 <v-row
-                  class="mt-0 align-center"
+                  class="mt-3 align-center"
                   v-if="hasKopersRolle || personStore.currentPerson.person.personalnummer"
                 >
                   <v-col
@@ -1780,7 +1780,7 @@
                 <!-- Email -->
                 <v-row
                   v-if="emailStatusText.text !== t('person.emailStatusUnknown')"
-                  class="mt-0 align-center"
+                  class="mt-3 align-center"
                 >
                   <v-col
                     class="d-flex align-center justify-end"
@@ -2577,81 +2577,85 @@
                   >
                     {{ t('admin.person.twoFactorAuthentication.header') }}
                   </h3>
-                  <v-row class="mt-4 text-body">
-                    <v-col
-                      class="text-right"
-                      cols="1"
-                    >
+                  <div class="d-flex align-start mt-4 text-body">
+                    <div class="me-3">
                       <v-icon
                         v-if="twoFactorAuthentificationStore.hasToken"
                         icon="mdi-check-circle"
                         color="green"
                       />
+
                       <v-icon
                         v-else-if="twoFactorAuthenticationConnectionError"
                         color="warning"
                         icon="mdi-alert-outline"
                       />
-                    </v-col>
-                    <v-col>
+                    </div>
+
+                    <div>
                       <template
                         v-if="twoFactorAuthentificationStore.errorCode && !twoFactorAuthentificationStore.loading"
                       >
-                        <v-row v-if="twoFactorAuthentificationStore.errorCode === 'PI_UNAVAILABLE_ERROR'">
-                          <p
-                            class="text-body"
-                            data-testid="connection-error-text"
+                        <p
+                          v-if="twoFactorAuthentificationStore.errorCode === 'PI_UNAVAILABLE_ERROR'"
+                          class="ma-0 text-body"
+                          data-testid="connection-error-text"
+                        >
+                          {{ t('admin.person.twoFactorAuthentication.errors.connection') }}
+                        </p>
+
+                        <p
+                          v-else-if="twoFactorAuthentificationStore.errorCode === 'TOKEN_STATE_ERROR'"
+                          class="ma-0 text-body"
+                          data-testid="token-state-error-text"
+                        >
+                          <i18n-t
+                            keypath="admin.person.twoFactorAuthentication.errors.tokenStateError"
+                            for="admin.person.twoFactorAuthentication.errors.iqshHelpdesk"
+                            tag="label"
                           >
-                            {{ t('admin.person.twoFactorAuthentication.errors.connection') }}
-                          </p>
-                        </v-row>
-                        <v-row v-else-if="twoFactorAuthentificationStore.errorCode === 'TOKEN_STATE_ERROR'">
-                          <p
-                            class="text-body"
-                            data-testid="token-state-error-text"
-                          >
-                            <i18n-t
-                              keypath="admin.person.twoFactorAuthentication.errors.tokenStateError"
-                              for="admin.person.twoFactorAuthentication.errors.iqshHelpdesk"
-                              tag="label"
+                            <a
+                              :href="t('admin.person.twoFactorAuthentication.errors.iqshHelpdeskLink')"
+                              rel="noopener noreferrer"
+                              target="_blank"
                             >
-                              <a
-                                :href="t('admin.person.twoFactorAuthentication.errors.iqshHelpdeskLink')"
-                                rel="noopener noreferrer"
-                                target="_blank"
-                                >{{ t('admin.person.twoFactorAuthentication.errors.iqshHelpdesk') }}</a
-                              >
-                            </i18n-t>
-                          </p>
-                        </v-row>
+                              {{ t('admin.person.twoFactorAuthentication.errors.iqshHelpdesk') }}
+                            </a>
+                          </i18n-t>
+                        </p>
                       </template>
+
                       <template v-else-if="twoFactorAuthentificationStore.hasToken">
                         <p
                           v-if="twoFactorAuthentificationStore.tokenKind === TokenKind.software"
+                          class="ma-0"
                           data-testid="software-factor-setup-text"
                         >
                           {{ t('admin.person.twoFactorAuthentication.softwareTokenIsSetUp') }}
                         </p>
+
                         <p
                           v-if="twoFactorAuthentificationStore.tokenKind === TokenKind.hardware"
+                          class="ma-0"
                           data-testid="hardware-factor-setup-text"
                         >
                           {{ t('admin.person.twoFactorAuthentication.hardwareTokenIsSetUp') }}
                         </p>
+
                         <p
                           v-if="
                             twoFactorAuthentificationStore.serial &&
                             twoFactorAuthentificationStore.tokenKind == TokenKind.hardware
                           "
+                          class="ma-0"
                         >
                           {{
-                            `${t('admin.person.twoFactorAuthentication.serial')}: ` +
-                            `${twoFactorAuthentificationStore.serial}`
+                            `${t('admin.person.twoFactorAuthentication.serial')}: ${twoFactorAuthentificationStore.serial}`
                           }}
                         </p>
                       </template>
-                    </v-col>
-                  </v-row>
+                    </div>
+                  </div>
                   <v-row
                     v-if="!twoFactorAuthenticationConnectionError"
                     class="text-body"
@@ -2852,7 +2856,7 @@
                   @on-lock-user="onLockUser"
                 />
               </div>
-              <div class="d-flex justify-sm-end">
+              <div class="d-flex justify-sm-end mt-2">
                 <template v-if="authStore.hasPersonenLoeschenPermission">
                   <PersonDelete
                     :disabled="isEditActive || isEditPersonMetadataActive"
@@ -2863,7 +2867,7 @@
                   />
                 </template>
               </div>
-              <div class="d-flex justify-sm-end">
+              <div class="d-flex justify-sm-end mt-2">
                 <template v-if="authStore.hasPersonenSyncPermission">
                   <PersonSync
                     :disabled="isEditActive || isEditPersonMetadataActive"
@@ -2897,22 +2901,16 @@
                 {{ t('admin.person.devicePassword.header') }}
               </h3>
               <template v-if="!personStore.loading">
-                <v-row class="mt-4 text-body">
-                  <v-col
-                    class="text-right"
-                    cols="1"
-                  >
-                    <v-icon
-                      class="mb-2"
-                      icon="mdi-information"
-                    />
-                  </v-col>
-                  <v-col>
-                    <p>
-                      {{ t('admin.person.devicePassword.infoTextPersonDetails') }}
-                    </p>
-                  </v-col>
-                </v-row>
+                <div class="d-flex align-start mt-4 text-body">
+                  <v-icon
+                    class="me-2"
+                    icon="mdi-information"
+                  />
+
+                  <p class="ma-0">
+                    {{ t('admin.person.devicePassword.infoTextPersonDetails') }}
+                  </p>
+                </div>
               </template>
               <template v-else-if="personStore.loading">
                 <v-col> <v-progress-circular indeterminate /></v-col>

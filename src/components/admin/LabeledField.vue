@@ -13,7 +13,10 @@
 </script>
 
 <template>
-  <v-row :class="[noMarginTop ? 'align-center mt-2' : mdMarginTop ? 'mt-md-4 align-center' : 'mt-4 align-center']">
+  <v-row
+    no-gutters
+    :class="[noMarginTop ? 'align-center mt-0' : mdMarginTop ? 'mt-md-4 align-center' : 'mt-4 align-center']"
+  >
     <v-col
       cols="12"
       sm="auto"

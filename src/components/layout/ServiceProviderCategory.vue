@@ -52,10 +52,10 @@
 <template>
   <template v-if="serviceProviders?.length">
     <v-row>
-      <label class="mx-3">{{ categoryTitle }}</label>
+      <label>{{ categoryTitle }}</label>
       <v-col>
         <v-divider
-          class="border-opacity-100 rounded"
+          class="border-opacity-100 rounded mt-3"
           color="#E5EAEF"
           thickness="6"
         />
