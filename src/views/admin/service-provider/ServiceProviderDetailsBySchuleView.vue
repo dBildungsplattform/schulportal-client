@@ -374,13 +374,11 @@
                         :label="t('angebot.providedBy')"
                         :value="serviceProviderStore.currentServiceProvider.administrationsebene.name"
                         test-id="service-provider-administrationsebene"
-                        no-margin-top
                       />
                       <LabeledField
                         :label="t('angebot.requires2FA')"
                         :value="serviceProviderStore.currentServiceProvider.requires2fa ? t('yes') : t('no')"
                         test-id="service-provider-requires-2fa"
-                        no-margin-top
                       />
                       <LabeledField
                         :label="t('angebot.canBeAssignedToRollen')"
@@ -392,7 +390,6 @@
                             : t('no')
                         "
                         test-id="service-provider-can-be-assigned-to-rollen"
-                        no-margin-top
                       />
 
                       <!-- Is Vidis Angebot? -->
@@ -400,7 +397,6 @@
                         :label="t('angebot.vidisAngebot')"
                         :value="isVidisAngebot ? t('yes') : t('no')"
                         test-id="service-provider-vidis-angebot"
-                        no-margin-top
                       />
                     </div>
                   </v-col>
@@ -416,7 +412,6 @@
                       :logo-src="resolvedLogo"
                       :default-logo-src="SchulPortalLogo"
                       test-id="service-provider-logo"
-                      md-margin-top
                     />
                     <LabeledField
                       :label="t('angebot.kategorie')"
@@ -428,14 +423,12 @@
                           : t('missing')
                       "
                       test-id="service-provider-kategorie"
-                      no-margin-top
                     />
                     <LabeledField
                       :label="t('angebot.link')"
                       :value="serviceProviderStore.currentServiceProvider.url || t('missing')"
                       test-id="service-provider-link"
                       word-break-all
-                      no-margin-top
                     />
                     <LabeledField
                       :label="t('angebot.schulspezifischeRollenerweiterung')"
@@ -443,7 +436,6 @@
                         serviceProviderStore.currentServiceProvider.availableForRollenerweiterung ? t('yes') : t('no')
                       "
                       test-id="service-provider-rollenerweiterung"
-                      no-margin-top
                     />
                     <LabeledField
                       :label="t('angebot.offeringScope')"
@@ -467,8 +459,7 @@
 
                     <v-row
                       v-if="isEditModeAvailable && hasEditPermissions"
-                      class="mr-10"
-                      justify="end"
+                      class="mr-10 justify-end"
                     >
                       <v-col
                         cols="12"
@@ -488,7 +479,9 @@
                       <VidisInfoDialog
                         :header="t('angebot.edit')"
                         :text="
-                          t('angebot.vidisEditInfoText', { name: serviceProviderStore.currentServiceProvider.name })
+                          t('angebot.vidisEditInfoText', {
+                            name: serviceProviderStore.currentServiceProvider.name,
+                          })
                         "
                         v-model="vidisInfoDialogOpen"
                       />
@@ -546,10 +539,7 @@
                 </v-row>
 
                 <!-- Bearbeiten button -->
-                <v-row
-                  class="mr-10"
-                  justify="end"
-                >
+                <v-row class="mr-10 justify-end">
                   <v-col
                     cols="12"
                     md="auto"
@@ -596,10 +586,7 @@
                   </v-row>
 
                   <!-- Save / Cancel actions -->
-                  <v-row
-                    class="mt-4"
-                    justify="end"
-                  >
+                  <v-row class="mt-4 justify-end">
                     <v-col
                       cols="12"
                       sm="6"
@@ -623,7 +610,7 @@
                     >
                       <v-btn
                         v-if="availableRollen.length > 0"
-                        color="primary"
+                        class="primary"
                         :block="mdAndDown"
                         data-testid="rollenerweiterung-save-button"
                         :disabled="rolleStore.loading"

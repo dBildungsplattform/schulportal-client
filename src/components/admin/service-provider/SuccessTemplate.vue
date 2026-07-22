@@ -23,7 +23,7 @@
 
 <template>
   <v-container>
-    <v-row justify="center">
+    <v-row class="justify-center">
       <v-col
         cols="auto"
         class="subtitle-1 pre-line text-center"
@@ -33,7 +33,7 @@
       </v-col>
     </v-row>
 
-    <v-row justify="center">
+    <v-row class="justify-center">
       <v-col cols="auto">
         <v-icon
           color="success"
@@ -42,7 +42,7 @@
       </v-col>
     </v-row>
 
-    <v-row justify="center">
+    <v-row class="justify-center">
       <v-col
         cols="auto"
         class="subtitle-2"
@@ -101,7 +101,7 @@
       thickness="6"
     />
 
-    <v-row justify="end">
+    <v-row class="justify-end">
       <slot> </slot>
       <v-col
         v-if="showToServiceProviderDetailsButton"

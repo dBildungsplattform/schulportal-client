@@ -50,8 +50,10 @@ describe('LogoSelector', () => {
 
   test('it renders logo with correct aria-label', () => {
     const logoItem: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="logo-1"]');
+    const vImgRoot: DOMWrapper<Element> | undefined = logoItem?.find('.v-img');
     const img: DOMWrapper<Element> | undefined = logoItem?.find('img');
-    expect(logoItem?.attributes('aria-label')).toBe('Logo One');
+
+    expect(vImgRoot?.attributes('aria-label')).toBe('Logo One');
     expect(img?.attributes('alt')).toBe('Logo One');
   });
 

@@ -20,31 +20,33 @@
 </script>
 
 <template>
-  <v-row :class="`${noTopMargin ? 'align-start' : 'align-start mt-8'}`">
-    <!-- Label column -->
-    <v-col
-      :class="`${isAlignedWithRadio ? 'pb-sm-8 pt-sm-3 text-sm-right mb-sm-10' : 'pb-sm-8 pt-sm-3 text-sm-right'} ${wideContent ? 'ml-sm-5' : ''}`"
-      cols="12"
-      :sm="wideContent ? '1' : '5'"
-    >
-      <label
-        :for="labelForId"
-        :error="errorLabel"
-        :required="isRequired"
+  <div :class="noTopMargin ? '' : 'mt-8'">
+    <v-row class="align-start">
+      <!-- Label column -->
+      <v-col
+        :class="`${isAlignedWithRadio ? 'pb-sm-8 pt-sm-3 text-sm-right mb-sm-10' : 'pb-sm-8 pt-sm-3 text-sm-right'} ${wideContent ? 'ml-sm-5' : ''}`"
+        cols="12"
+        :sm="wideContent ? '1' : '5'"
       >
-        {{ label }}
-      </label>
-    </v-col>
+        <label
+          :for="labelForId"
+          :error="errorLabel"
+          :required="isRequired"
+        >
+          {{ label }}
+        </label>
+      </v-col>
 
-    <!-- Content column -->
-    <v-col
-      class="py-0"
-      cols="12"
-      :sm="wideContent ? '10' : '7'"
-    >
-      <slot />
-    </v-col>
-  </v-row>
+      <!-- Content column -->
+      <v-col
+        class="py-0"
+        cols="12"
+        :sm="wideContent ? '10' : '7'"
+      >
+        <slot />
+      </v-col>
+    </v-row>
+  </div>
 </template>
 
 <style scoped></style>

@@ -257,15 +257,11 @@
       :type="'error'"
     />
     <template v-if="!serviceProviderStore.errorCode || isVidisApiError">
-      <v-row
-        align="start"
-        class="ma-3"
-      >
+      <v-row class="ma-3 align-start">
         <v-col
-          align-self="center"
           cols="12"
           md="2"
-          class="py-md-0 text-md-right"
+          class="py-md-0 text-md-right align-self-center"
         >
           <v-btn
             class="px-0 reset-filter"
@@ -325,8 +321,7 @@
           v-if="authStore.hasVidisPermission"
           cols="12"
           md="auto"
-          class="py-md-0 ml-auto"
-          align-self="center"
+          class="py-md-0 ml-auto align-self-center"
         >
           <SpshTooltip
             :disabled-text="$t('angebot.chooseSchuleFirst')"

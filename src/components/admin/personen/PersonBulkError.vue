@@ -87,10 +87,7 @@
     @download="saveErrorsAsCSV"
   >
     <template v-if="props.bulkOperationName === t('admin.person.resetPassword') && props.passwords">
-      <v-row
-        class="my-4"
-        justify="center"
-      >
+      <v-row class="my-4 justify-center">
         <v-col cols="auto">
           <v-icon
             small
