@@ -4,7 +4,7 @@
     extractAnbietenInMerkmale,
     formatServiceProviderAnbietenMerkmale,
     formatServiceProviderRollenartenWhitelist,
-  } from '@/components/admin/service-provider/serviceProvider.helper';
+  } from '@/utils/serviceProvider.helper';
   import SuccessTemplate from '@/components/admin/service-provider/SuccessTemplate.vue';
   import type {
     ServiceProviderFormSubmitData,
@@ -262,7 +262,9 @@
                 },
                 {
                   label: $t('angebot.kategorie'),
-                  value: $t(`angebot.kategorien.${serviceProviderStore.updatedServiceProvider.kategorie}`),
+                  value: $t(
+                    `angebot.mappingFrontBackEnd.kategorien.${serviceProviderStore.updatedServiceProvider.kategorie}`,
+                  ),
                   testId: 'success-kategorie',
                 },
                 {

@@ -2,6 +2,7 @@ import { OrganisationsTyp } from '@/api-client/generated';
 import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
 import { RollenArt, RollenSystemRecht } from '@/stores/RolleStore';
 import { ServiceProviderKategorie, ServiceProviderMerkmal } from '@/stores/ServiceProviderStore';
+import { extractAnbietenInMerkmale } from '@/utils/serviceProvider.helper.js';
 import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import { DoFactory } from 'test/DoFactory';
 import { beforeEach, describe, expect, test, vi, type Mock } from 'vitest';
@@ -12,7 +13,6 @@ import type {
   ServiceProviderFormSubmitData,
   ServiceProviderForm as ServiceProviderFormType,
 } from './types';
-import { extractAnbietenInMerkmale } from './serviceProvider.helper.js';
 
 const defaultProps: ServiceProviderFormProps = {
   initialValues: {

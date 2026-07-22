@@ -55,18 +55,22 @@
     "canBeAssigned": "Darf zugewiesen werden",
     "canBeUsed": "Darf genutzt werden",
     "offeringScope": "Anbieten in",
-    "schulischeAngebotsverwaltung": "Schulische Angebotsverwaltung",
-    "schulischeRollenverwaltung": "Schulische Rollenverwaltung",
     "toServiceProviderDetails": "Zur Rollenauswahl",
     "testUrl": "URL testen",
     "link": "Link",
     "requires2FA": "2FA erforderlich",
-    "kategorien": {
-      "EMAIL": "Dienstliche Email",
-      "UNTERRICHT": "Unterricht",
-      "VERWALTUNG": "Verwaltung",
-      "SCHULISCH": "Schulische Angebote",
-      "HINWEISE": "Hinweise"
+    "mappingFrontBackEnd": {
+      "merkmale": {
+        "ANBIETEN_IN_SCHULISCHER_ANGEBOTSVERWALTUNG": "Schulische Angebotsverwaltung",
+        "ANBIETEN_IN_SCHULISCHER_ROLLENVERWALTUNG": "Schulische Rollenverwaltung"
+      },
+      "kategorien": {
+        "EMAIL": "Dienstliche Email",
+        "UNTERRICHT": "Unterricht",
+        "VERWALTUNG": "Verwaltung",
+        "SCHULISCH": "Schulische Angebote",
+        "HINWEISE": "Hinweise"
+      }
     },
     "title": {
       "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Zwei-Faktor-Authentifizierung (2FA) erforderlich"

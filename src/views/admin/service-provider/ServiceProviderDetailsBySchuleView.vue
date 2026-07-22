@@ -12,7 +12,7 @@
   import {
     formatServiceProviderAnbietenMerkmale,
     formatServiceProviderRollenartenWhitelist,
-  } from '@/components/admin/service-provider/serviceProvider.helper';
+  } from '@/utils/serviceProvider.helper';
   import LabeledField from '@/components/admin/LabeledField.vue';
   import RollenerweiterungAssignErrorDialog from '@/components/admin/service-provider/RollenerweiterungAssignErrorDialog.vue';
   import RollenerweiterungTreeview, {
@@ -422,7 +422,9 @@
                       :label="t('angebot.kategorie')"
                       :value="
                         serviceProviderStore.currentServiceProvider.kategorie
-                          ? t(`angebot.kategorien.${serviceProviderStore.currentServiceProvider.kategorie}`)
+                          ? t(
+                              `angebot.mappingFrontBackEnd.kategorien.${serviceProviderStore.currentServiceProvider.kategorie}`,
+                            )
                           : t('missing')
                       "
                       test-id="service-provider-kategorie"

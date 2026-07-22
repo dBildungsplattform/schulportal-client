@@ -290,7 +290,9 @@
       <!-- Categorie 1: Work Email -->
       <ServiceProviderCategory
         :category-title="
-          emailServiceProviders.length > 0 ? t(`angebot.kategorien.${emailServiceProviders[0]?.kategorie}`) : ''
+          emailServiceProviders.length > 0
+            ? t(`angebot.mappingFrontBackEnd.kategorien.${emailServiceProviders[0]?.kategorie}`)
+            : ''
         "
         :service-providers="emailServiceProviders"
         :has-token="getHasToken()"
@@ -298,7 +300,9 @@
       <!-- Categorie 2: Class -->
       <ServiceProviderCategory
         :category-title="
-          classServiceProviders.length > 0 ? t(`angebot.kategorien.${classServiceProviders[0]?.kategorie}`) : ''
+          classServiceProviders.length > 0
+            ? t(`angebot.mappingFrontBackEnd.kategorien.${classServiceProviders[0]?.kategorie}`)
+            : ''
         "
         :service-providers="classServiceProviders"
         :has-token="getHasToken()"
@@ -307,7 +311,7 @@
       <ServiceProviderCategory
         :category-title="
           administrationServiceProviders.length > 0
-            ? t(`angebot.kategorien.${administrationServiceProviders[0]?.kategorie}`)
+            ? t(`angebot.mappingFrontBackEnd.kategorien.${administrationServiceProviders[0]?.kategorie}`)
             : ''
         "
         :service-providers="administrationServiceProviders"
@@ -316,7 +320,9 @@
       <!-- Categorie 4: Schulisch -->
       <ServiceProviderCategory
         :category-title="
-          schulischServiceProviders.length > 0 ? t(`angebot.kategorien.${schulischServiceProviders[0]?.kategorie}`) : ''
+          schulischServiceProviders.length > 0
+            ? t(`angebot.mappingFrontBackEnd.kategorien.${schulischServiceProviders[0]?.kategorie}`)
+            : ''
         "
         :service-providers="schulischServiceProviders"
         :has-token="getHasToken()"
@@ -324,7 +330,9 @@
       <!-- Categorie 5: Hints -->
       <ServiceProviderCategory
         :category-title="
-          hintsServiceProviders.length > 0 ? t(`angebot.kategorien.${hintsServiceProviders[0]?.kategorie}`) : ''
+          hintsServiceProviders.length > 0
+            ? t(`angebot.mappingFrontBackEnd.kategorien.${hintsServiceProviders[0]?.kategorie}`)
+            : ''
         "
         :service-providers="hintsServiceProviders"
         :has-token="getHasToken()"

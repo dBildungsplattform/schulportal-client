@@ -16,8 +16,9 @@
   import { useI18n, type Composer } from 'vue-i18n';
   import { useDisplay } from 'vuetify';
   import { array, boolean, number, object, string } from 'yup';
-  import { extractAnbietenInMerkmale } from './serviceProvider.helper';
+  import { ANBIETEN_IN_MERKMALE, extractAnbietenInMerkmale } from '../../../utils/serviceProvider.helper';
   import type { ServiceProviderFormProps as Props, ServiceProviderForm, ServiceProviderFormSubmitData } from './types';
+  import { TranslatedObject } from '@/types';
 
   type Emits = {
     (e: 'click:confirmUnsaved'): void;
@@ -122,17 +123,24 @@
 
   const canCommit: ComputedRef<boolean> = computed(() => formContext.meta.value.valid && formContext.meta.value.dirty);
 
-  const rollenartenWhitelistItems: ComputedRef<{ title: string; value: RollenArt }[]> = computed(() =>
+  const rollenartenWhitelistItems: ComputedRef<TranslatedObject[]> = computed(() =>
     Object.values(RollenArt).map((rollenart: RollenArt) => ({
       title: t(`admin.rolle.mappingFrontBackEnd.rollenarten.${rollenart}`),
       value: rollenart,
     })),
   );
 
-  const kategorieItems: ComputedRef<{ title: string; value: string }[]> = computed(() =>
+  const kategorieItems: ComputedRef<TranslatedObject[]> = computed(() =>
     Object.values(ServiceProviderKategorie).map((k: string) => ({
-      title: t(`angebot.kategorien.${k}`),
+      title: t(`angebot.mappingFrontBackEnd.kategorien.${k}`),
       value: k,
+    })),
+  );
+
+  const anbietenInItems: ComputedRef<TranslatedObject[]> = computed(() =>
+    ANBIETEN_IN_MERKMALE.map((m: ServiceProviderMerkmal) => ({
+      title: t(`angebot.mappingFrontBackEnd.merkmale.${m}`),
+      value: m,
     })),
   );
 
@@ -256,10 +264,7 @@
     verfuegbarFuerRollenerweiterung,
     (isAvailableForRoleExtension: boolean): void => {
       if (isAvailableForRoleExtension) {
-        formContext.setFieldValue(
-          'anbietenInMerkmale',
-          props.initialValues.anbietenInMerkmale ?? extractAnbietenInMerkmale(Object.values(ServiceProviderMerkmal)),
-        );
+        formContext.setFieldValue('anbietenInMerkmale', props.initialValues.anbietenInMerkmale ?? ANBIETEN_IN_MERKMALE);
       } else {
         formContext.setFieldValue('anbietenInMerkmale', []);
         if (props.isEditMode && formContext.isFieldDirty('verfuegbarFuerRollenerweiterung')) {
@@ -551,16 +556,7 @@
               chips
               data-testid="service-provider-display-merkmale-select"
               density="compact"
-              :items="[
-                {
-                  title: $t('angebot.schulischeAngebotsverwaltung'),
-                  value: ServiceProviderMerkmal.AnbietenInSchulischerAngebotsverwaltung,
-                },
-                {
-                  title: $t('angebot.schulischeRollenverwaltung'),
-                  value: ServiceProviderMerkmal.AnbietenInSchulischerRollenverwaltung,
-                },
-              ]"
+              :items="anbietenInItems"
               item-value="value"
               item-title="title"
               variant="outlined"

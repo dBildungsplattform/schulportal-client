@@ -3,7 +3,7 @@
   import {
     formatServiceProviderAnbietenMerkmale,
     formatServiceProviderRollenartenWhitelist,
-  } from '@/components/admin/service-provider/serviceProvider.helper';
+  } from '@/utils/serviceProvider.helper';
   import LabeledField from '@/components/admin/LabeledField.vue';
   import ResultTable, { type Headers } from '@/components/admin/ResultTable.vue';
   import VidisInfoDialog from '@/components/admin/service-provider/VidisInfoDialog.vue';
@@ -336,7 +336,9 @@
                       :label="t('angebot.kategorie')"
                       :value="
                         serviceProviderStore.currentServiceProvider.kategorie
-                          ? t(`angebot.kategorien.${serviceProviderStore.currentServiceProvider.kategorie}`)
+                          ? t(
+                              `angebot.mappingFrontBackEnd.kategorien.${serviceProviderStore.currentServiceProvider.kategorie}`,
+                            )
                           : t('missing')
                       "
                       test-id="service-provider-kategorie"

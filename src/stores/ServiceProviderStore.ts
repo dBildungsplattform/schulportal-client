@@ -123,7 +123,7 @@ export type ServiceProviderCreationFilter = {
   kategorie: ServiceProviderKategorie;
   requires2fa: boolean;
   merkmale: Array<ServiceProviderMerkmal>;
-  rollenartenWhitelist: Array<RollenArt>;
+  rollenartenWhitelist?: Array<RollenArt>;
 };
 
 export type CreatedServiceProvider = BaseServiceProvider & {
