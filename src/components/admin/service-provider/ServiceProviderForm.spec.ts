@@ -176,9 +176,7 @@ describe('ServiceProviderForm', () => {
     const anbietenInMerkmale: HTMLInputElement = wrapper.find(
       '[data-testid="service-provider-display-merkmale-select"] input',
     ).element as HTMLInputElement;
-    expect(anbietenInMerkmale.value).toEqual(
-      extractAnbietenInMerkmale(Object.values(ServiceProviderMerkmal)).join(', '),
-    );
+    expect(anbietenInMerkmale.value).toEqual('Schulische Angebotsverwaltung, Schulische Rollenverwaltung');
   });
 
   test('does not disable verfuegbar-fuer-rollenerweiterung-select in edit mode when user has AngeboteVerwalten', () => {
