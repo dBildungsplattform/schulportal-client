@@ -13,7 +13,7 @@
 </script>
 
 <template>
-  <v-row :class="[noMarginTop ? 'mt-0' : mdMarginTop ? 'mt-md-2' : 'mt-2', 'mb-2']">
+  <v-row :class="[noMarginTop ? 'mt-0' : mdMarginTop ? 'mt-md-2' : 'mt-2', isLogo ? 'align-center' : '', 'ga-0 mb-2']">
     <v-col
       cols="12"
       sm="auto"
@@ -32,14 +32,12 @@
         <v-img
           v-if="logoSrc"
           alt="provider-logo"
-          class="mt-n2"
           :src="logoSrc"
           max-width="30"
         />
         <v-img
           v-else
           alt="schulportal-logo"
-          class="mt-n2"
           :src="defaultLogoSrc"
           contain
           max-width="30"
