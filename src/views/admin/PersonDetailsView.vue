@@ -2577,8 +2577,11 @@
                   >
                     {{ t('admin.person.twoFactorAuthentication.header') }}
                   </h3>
-                  <div class="d-flex align-start mt-4 text-body">
-                    <div class="me-3">
+                  <v-row class="align-top text-body mt-6">
+                    <v-col
+                      class="text-right"
+                      cols="1"
+                    >
                       <v-icon
                         v-if="twoFactorAuthentificationStore.hasToken"
                         icon="mdi-check-circle"
@@ -2590,9 +2593,9 @@
                         color="warning"
                         icon="mdi-alert-outline"
                       />
-                    </div>
+                    </v-col>
 
-                    <div>
+                    <v-col>
                       <template
                         v-if="twoFactorAuthentificationStore.errorCode && !twoFactorAuthentificationStore.loading"
                       >
@@ -2626,66 +2629,62 @@
                       </template>
 
                       <template v-else-if="twoFactorAuthentificationStore.hasToken">
-                        <p
+                        <span
                           v-if="twoFactorAuthentificationStore.tokenKind === TokenKind.software"
                           class="ma-0"
                           data-testid="software-factor-setup-text"
                         >
                           {{ t('admin.person.twoFactorAuthentication.softwareTokenIsSetUp') }}
-                        </p>
+                        </span>
 
-                        <p
+                        <span
                           v-if="twoFactorAuthentificationStore.tokenKind === TokenKind.hardware"
                           class="ma-0"
                           data-testid="hardware-factor-setup-text"
                         >
                           {{ t('admin.person.twoFactorAuthentication.hardwareTokenIsSetUp') }}
-                        </p>
+                        </span>
 
-                        <p
+                        <span
                           v-if="
                             twoFactorAuthentificationStore.serial &&
                             twoFactorAuthentificationStore.tokenKind == TokenKind.hardware
                           "
-                          class="ma-0"
                         >
                           {{
                             `${t('admin.person.twoFactorAuthentication.serial')}: ${twoFactorAuthentificationStore.serial}`
                           }}
-                        </p>
+                        </span>
                       </template>
-                    </div>
-                  </div>
+                    </v-col>
+                  </v-row>
                   <v-row
                     v-if="!twoFactorAuthenticationConnectionError"
-                    class="text-body"
+                    class="text-body align-top"
                   >
                     <v-col
                       class="text-right"
                       cols="1"
                     >
-                      <v-icon
-                        class="mb-2"
-                        icon="mdi-information"
-                      />
+                      <v-icon icon="mdi-information" />
                     </v-col>
-                    <div class="v-col">
-                      <p v-if="twoFactorAuthentificationStore.hasToken && !twoFactorAuthentificationStore.required">
+                    <v-col>
+                      <span v-if="twoFactorAuthentificationStore.hasToken && !twoFactorAuthentificationStore.required">
                         {{ t('admin.person.twoFactorAuthentication.noLongerNeedToken') }}
-                      </p>
-                      <p
+                      </span>
+                      <span
                         v-else-if="twoFactorAuthentificationStore.hasToken"
                         data-testid="two-factor-reset-info-text"
                       >
                         {{ t('admin.person.twoFactorAuthentication.resetInfo') }}
-                      </p>
-                      <p
+                      </span>
+                      <span
                         v-if="!twoFactorAuthentificationStore.hasToken"
                         data-testid="two-factor-not-setup-text"
                       >
                         {{ t('admin.person.twoFactorAuthentication.notSetUp') }}
-                      </p>
-                    </div>
+                      </span>
+                    </v-col>
                   </v-row>
                 </v-col>
                 <v-col
