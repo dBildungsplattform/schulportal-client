@@ -107,8 +107,8 @@ describe('MptRollenManagementView', () => {
     await flushPromises();
 
     rolleStore.allRollen = [
-      DoFactory.getRolleWithServiceProviders({ name: 'Schulbegleitung', rollenart: RollenArt.Schb }),
       DoFactory.getRolleWithServiceProviders({ name: 'Nichtlehrrolle', rollenart: RollenArt.Nlehr }),
+      DoFactory.getRolleWithServiceProviders({ name: 'Schulbegleitung', rollenart: RollenArt.Schb }),
     ];
     rolleStore.totalRollen = 2;
     await nextTick();
