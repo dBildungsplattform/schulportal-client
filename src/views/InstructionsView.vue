@@ -1,12 +1,12 @@
 <script setup lang="ts">
-  import { ref, computed, type Ref, type ComputedRef } from 'vue';
-  import { useI18n, type Composer } from 'vue-i18n';
+  import { ref, computed } from 'vue';
+  import { useI18n } from 'vue-i18n';
 
-  const { t }: Composer = useI18n({ useScope: 'global' });
-  const activeTab: Ref<string> = ref('users');
+  const { t } = useI18n({ useScope: 'global' });
+  const activeTab = ref('users');
 
   const scrollToSection = (id: string): void => {
-    const target: HTMLElement | null = document.getElementById(id);
+    const target = document.getElementById(id);
     if (target) {
       target.scrollIntoView({ behavior: 'smooth', block: 'start' });
       target.setAttribute('tabindex', '-1');
@@ -14,20 +14,7 @@
     }
   };
 
-  const breadcrumbItems: ComputedRef<
-    (
-      | {
-          title: string;
-          to: string;
-          disabled?: undefined;
-        }
-      | {
-          title: string;
-          disabled: boolean;
-          to?: undefined;
-        }
-    )[]
-  > = computed(() => [
+  const breadcrumbItems = computed(() => [
     { title: t('nav.portalName'), to: '/' },
     { title: t('help.title'), disabled: true },
   ]);
@@ -282,25 +269,14 @@
                     <v-table>
                       <thead>
                         <tr class="bg-grey-lighten-4">
+                          <th class="font-weight-bold text-caption">{{ t('help.users.table.action') }}</th>
                           <th
-                            id="helpUsersTableAction"
-                            class="font-weight-bold text-caption"
-                          >
-                            {{ t('help.users.table.action') }}
-                          </th>
-                          <th
-                            id="helpUsersTableAllowed"
                             class="text-center font-weight-bold text-caption"
                             style="width: 100px"
                           >
                             {{ t('help.users.table.allowed') }}
                           </th>
-                          <th
-                            id="helpUsersTableDetails"
-                            class="font-weight-bold text-caption"
-                          >
-                            {{ t('help.users.table.details') }}
-                          </th>
+                          <th class="font-weight-bold text-caption">{{ t('help.users.table.details') }}</th>
                         </tr>
                       </thead>
                       <tbody>

@@ -54,8 +54,23 @@
       <v-col class="align-self-center mr-2">
         <router-link
           class="secondary"
+          data-testid="faq-button"
+          to="/hilfe/faq"
+          :aria-label="$t('nav.toFaq')"
+        >
+          <v-icon
+            class="hidden-md-and-up mr-2"
+            icon="mdi-help-box-outline"
+          ></v-icon>
+          <span class="hidden-sm-and-down">{{ $t('nav.toFaq') }}</span>
+        </router-link>
+      </v-col>
+      <v-col class="align-self-center mr-2">
+        <router-link
+          class="secondary"
           data-testid="help-button"
           to="/hilfe"
+          :aria-label="$t('nav.help')"
         >
           <v-icon
             class="hidden-md-and-up mr-2"

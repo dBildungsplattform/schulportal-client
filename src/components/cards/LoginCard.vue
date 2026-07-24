@@ -44,14 +44,39 @@
       justify="center"
       no-gutters
     >
-      <v-col class="text-center">
+      <v-col
+        class="text-center"
+        cols="12"
+        sm="10"
+        md="8"
+      >
         <!-- Subtitle/welcome message -->
         <h1
-          class="headline-2"
+          class="headline-2 mb-4"
           data-testid="landing-headline"
         >
           {{ $t('landingTitle') }}
         </h1>
+
+        <!-- Subtil Portal Intro for Landing Page -->
+        <p class="text-body-1 text-medium-emphasis mb-3 leading-relaxed">
+          {{ $t('landingIntroText') }}
+        </p>
+        <p class="text-body-2 text-medium-emphasis mb-0">
+          <i18n-t
+            keypath="landingIntroHelpText"
+            tag="span"
+          >
+            <template v-slot:help>
+              <router-link
+                to="/hilfe"
+                class="text-primary font-weight-bold text-decoration-none hover-underline"
+              >
+                {{ $t('landingIntroHelpLinkText') }}
+              </router-link>
+            </template>
+          </i18n-t>
+        </p>
       </v-col>
     </v-row>
     <!-- Maintenance notice -->
@@ -65,12 +90,12 @@
         no-gutters
       >
         <v-col class="text-center">
-          <h1
+          <h2
             class="headline-2 text-red"
             data-testid="landing-maintenance-title"
           >
             {{ $t('login.maintenanceNoticeTitle') }}
-          </h1>
+          </h2>
         </v-col>
       </v-row>
 
@@ -80,12 +105,12 @@
         no-gutters
       >
         <v-col class="text-center">
-          <h1
+          <p
             class="text-body"
             data-testid="landing-maintenance-text"
           >
             {{ $t('login.maintenanceNoticeText') }}
-          </h1>
+          </p>
         </v-col>
       </v-row>
 
@@ -95,9 +120,9 @@
         no-gutters
       >
         <v-col class="text-center">
-          <h1 class="subtitle-2">
+          <h3 class="subtitle-2">
             {{ $t('login.doNotLogin') }}
-          </h1>
+          </h3>
         </v-col>
       </v-row>
     </div>
@@ -138,5 +163,13 @@
     border-radius: 4px;
     padding: 16px;
     margin-bottom: 20px;
+  }
+
+  .leading-relaxed {
+    line-height: 1.625;
+  }
+
+  .hover-underline:hover {
+    text-decoration: underline !important;
   }
 </style>

@@ -503,7 +503,6 @@
       "users": "Lehrkräfte, Schülerinnen & Schüler",
       "admins": "Schuladministration"
     },
-
     "roles": {
       "title": "Rollen & Berechtigungen",
       "text": "Welche Dienste und Kacheln Sie im Portal sehen, hängt von Ihrer zugewiesenen Rolle und Schule ab. Nicht alle Benutzer sehen dieselben Anwendungen. Wenn Sie einen Dienst erwarten, dieser aber nicht angezeigt wird, wenden Sie sich bitte an Ihre Schuladministration.",
@@ -618,6 +617,9 @@
   },
   "itemsPerPage": "Einträge pro Seite",
   "landingTitle": "Willkommen im ErWIn Portal.",
+  "landingIntroText": "Das ErWIn-Portal dient als zentraler Einstiegspunkt (Single Sign-On) für die Schul- und Cloudsysteme Ihrer Schule. Nach dem Login können Sie direkt auf alle freigegebenen Dienste zugreifen.",
+  "landingIntroHelpText": "Mehr Informationen und Anleitungen finden Sie auf unserer {help}.",
+  "landingIntroHelpLinkText": "Hilfeseite",
   "login": {
     "button": "Anmelden",
     "forgotPassword": "Passwort vergessen? \n Wenden Sie sich bitte an Ihre schulischen Administratorinnen und Administratoren.",
@@ -766,6 +768,9 @@
   "search": "Suchen",
   "start": {
     "allServiceProviders": "Alle Angebote",
+    "introText": "Das ErWIn-Portal dient als zentraler Einstiegspunkt (Single Sign-On) für die Schul- und Cloudsysteme Ihrer Schule. Klicken Sie einfach auf eine der untenstehenden Kacheln, um direkt zu dem jeweiligen Dienst weitergeleitet zu werden.",
+    "introHelpText": "Mehr Informationen und Anleitungen finden Sie auf unserer {help}.",
+    "introHelpLinkText": "Hilfeseite",
     "categories": {
       "administration": "Verwaltung",
       "class": "Unterricht",

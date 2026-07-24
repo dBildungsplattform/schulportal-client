@@ -188,6 +188,38 @@
       </v-col>
     </v-row>
 
+    <!-- Subtil Intro Text -->
+    <v-row
+      justify="center"
+      class="mb-4"
+    >
+      <v-col
+        cols="12"
+        md="10"
+        lg="8"
+        class="text-center"
+      >
+        <p class="text-body-1 text-medium-emphasis mb-2 leading-relaxed">
+          {{ t('start.introText') }}
+        </p>
+        <p class="text-body-2 text-medium-emphasis mb-0">
+          <i18n-t
+            keypath="start.introHelpText"
+            tag="span"
+          >
+            <template v-slot:help>
+              <router-link
+                to="/hilfe"
+                class="text-primary font-weight-bold text-decoration-none hover-underline"
+              >
+                {{ t('start.introHelpLinkText') }}
+              </router-link>
+            </template>
+          </i18n-t>
+        </p>
+      </v-col>
+    </v-row>
+
     <v-row class="flex-nowrap mb-1 justify-center">
       <v-col cols="12">
         <!-- Banner for hinweise -->
@@ -301,4 +333,12 @@
   </v-card>
 </template>
 
-<style></style>
+<style scoped>
+  .leading-relaxed {
+    line-height: 1.625;
+  }
+
+  .hover-underline:hover {
+    text-decoration: underline !important;
+  }
+</style>
