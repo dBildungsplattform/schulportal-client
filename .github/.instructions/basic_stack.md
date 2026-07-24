@@ -65,7 +65,7 @@
 | Migrations | MikroORM migrations (TypeScript files in `migrations/`) |
 | Seeding | Custom CLI via `nest-commander` (`npm run db:seed`) |
 | Cache | Redis `7.2.2` (`redis`, `@keyv/redis`, `connect-redis`) |
-| Session | `express-session` backed by Redis |
+| Session | `express-session` backed by Valkey |
 | Auth | Passport `^0.7` with JWT strategy (`passport-jwt`), OpenID Connect (`openid-client`), API key (`passport-headerapikey`), JWKS (`jwks-rsa`) |
 | IAM | Keycloak (custom image `dbildungs-iam-keycloak`); managed via `@keycloak/keycloak-admin-client` |
 | 2FA | privacyIDEA (HTTP API via `PrivacyIdeaAdministrationModule`) |

@@ -42,18 +42,7 @@
   ];
 
   const items: ComputedRef<MptRolleTableItem[]> = computed((): MptRolleTableItem[] => {
-    const sortedRollen: Array<RolleWithServiceProvidersResponse> = [...rolleStore.allRollen].sort(
-      (firstRolle: RolleWithServiceProvidersResponse, secondRolle: RolleWithServiceProvidersResponse): number => {
-        const rollenartCompare: number = firstRolle.rollenart.localeCompare(secondRolle.rollenart, 'de');
-        if (rollenartCompare !== 0) {
-          return rollenartCompare;
-        }
-
-        return firstRolle.name.localeCompare(secondRolle.name, 'de');
-      },
-    );
-
-    return sortedRollen.map((rolle: RolleWithServiceProvidersResponse): MptRolleTableItem => {
+    return rolleStore.allRollen.map((rolle: RolleWithServiceProvidersResponse): MptRolleTableItem => {
       return {
         id: rolle.id,
         name: rolle.name,
@@ -82,7 +71,7 @@
     searchFilterStore.setSchuleForMptRollen(newValue);
   }
 
-  async function loadMptRollen(): Promise<void> {
+  async function getMptRollen(): Promise<void> {
     if (!selectedOrganisationId.value) {
       return;
     }
@@ -98,7 +87,7 @@
 
   function getPaginatedRollen(page: number): void {
     searchFilterStore.mptRollenPage = page;
-    void loadMptRollen();
+    void getMptRollen();
   }
 
   function getPaginatedRollenWithLimit(limit: number): void {
@@ -107,12 +96,12 @@
     }
 
     searchFilterStore.mptRollenPerPage = limit;
-    void loadMptRollen();
+    void getMptRollen();
   }
 
   watchEffect(async (): Promise<void> => {
     if (selectedOrganisationId.value) {
-      await Promise.all([loadMptRollen(), organisationStore.getOrganisationById(selectedOrganisationId.value)]);
+      await Promise.all([getMptRollen(), organisationStore.getOrganisationById(selectedOrganisationId.value)]);
     }
   });
 

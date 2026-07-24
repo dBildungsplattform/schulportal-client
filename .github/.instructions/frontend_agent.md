@@ -1,7 +1,3 @@
----
-applyTo: "src/**"
----
-
 # Frontend Development — schulportal-client
 
 > **Scope:** All code under `src/`. These rules are mandatory unless marked optional.

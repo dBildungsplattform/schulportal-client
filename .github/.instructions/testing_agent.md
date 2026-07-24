@@ -1,7 +1,3 @@
----
-applyTo: "src/**/*.spec.ts"
----
-
 # Testing — schulportal-client
 
 > **Scope:** All `*.spec.ts` files under `src/`. Rules are mandatory unless marked optional.

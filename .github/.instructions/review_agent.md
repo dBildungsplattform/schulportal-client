@@ -1,7 +1,3 @@
----
-applyTo: "src/**"
----
-
 # Code Review — schulportal-client
 
 > **Scope:** All PRs touching `src/`. Rules are mandatory. Defer to `frontend_agent.md` for coding conventions; this file governs *how to review*.

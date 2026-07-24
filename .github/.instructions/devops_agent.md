@@ -1,7 +1,3 @@
----
-applyTo: "charts/**"
----
-
 # DevOps & Runtime Environment
 
 > **CRITICAL RULE FOR AI:** You MUST NOT run any command listed in this file without first asking the user for explicit confirmation. This applies to every command — including installs, builds, server starts, and Docker operations. Always describe what the command will do and ask: "Should I run this?" before proceeding.

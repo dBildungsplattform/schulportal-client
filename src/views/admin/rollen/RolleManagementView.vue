@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import {
     RollenMerkmal,
+    RollenSystemRecht,
     useRolleStore,
     type RolleTableItem,
     type RolleResponse,
@@ -68,6 +69,7 @@
       offset: (searchFilterStore.rollenPage - 1) * searchFilterStore.rollenPerPage,
       limit: searchFilterStore.rollenPerPage,
       searchString: '',
+      systemrechte: [RollenSystemRecht.RollenVerwalten, RollenSystemRecht.MptRollenVerwalten],
     });
   }
 
@@ -82,6 +84,7 @@
       offset: (searchFilterStore.rollenPage - 1) * searchFilterStore.rollenPerPage,
       limit: searchFilterStore.rollenPerPage,
       searchString: '',
+      systemrechte: [RollenSystemRecht.RollenVerwalten, RollenSystemRecht.MptRollenVerwalten],
     });
   }
 
@@ -90,6 +93,7 @@
       offset: (searchFilterStore.rollenPage - 1) * searchFilterStore.rollenPerPage,
       limit: searchFilterStore.rollenPerPage,
       searchString: '',
+      systemrechte: [RollenSystemRecht.RollenVerwalten, RollenSystemRecht.MptRollenVerwalten],
     });
   });
 </script>
