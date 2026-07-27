@@ -69,6 +69,7 @@
       labelKey: 'angebot.groupLeit',
       match: (r: RolleForSelection) => r.rollenart === RollenArt.Leit,
     },
+    // Group all MPT Rollen together, regardless of their RollenArt (e.g. Lehr, Nlehr, Schb)
     {
       key: 'MPT',
       labelKey: 'angebot.groupMPT',
