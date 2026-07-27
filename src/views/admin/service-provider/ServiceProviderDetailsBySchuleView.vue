@@ -21,6 +21,7 @@
   import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
   import {
     RollenArt,
+    RollenMerkmal,
     useRolleStore,
     type RolleStore,
     type RolleWithServiceProvidersResponse,
@@ -138,8 +139,10 @@
 
   const availableRollen: ComputedRef<RolleForSelection[]> = computed(() =>
     (rolleStore.allRollen ?? [])
-      .filter((r: RolleWithServiceProvidersResponse) =>
-        ([RollenArt.Lehr, RollenArt.Lern, RollenArt.Leit] as RollenArt[]).includes(r.rollenart),
+      .filter(
+        (r: RolleWithServiceProvidersResponse) =>
+          ([RollenArt.Lehr, RollenArt.Lern, RollenArt.Leit] as RollenArt[]).includes(r.rollenart) ||
+          (r.merkmale ?? new Set()).has(RollenMerkmal.MptRolle),
       )
       .map((r: RolleWithServiceProvidersResponse) => ({ id: r.id, name: r.name, rollenart: r.rollenart })),
   );
@@ -194,7 +197,7 @@
     if (organisationIdFromQuery.value) {
       await rolleStore.getAllRollen({
         organisationId: organisationIdFromQuery.value,
-        systemrechte: [RollenSystemRechtEnum.RollenErweitern],
+        systemrechte: [RollenSystemRechtEnum.RollenErweitern, RollenSystemRechtEnum.MptRollenVerwalten],
       });
     }
     selectedRolleIds.value = [...existingRolleIds.value];
