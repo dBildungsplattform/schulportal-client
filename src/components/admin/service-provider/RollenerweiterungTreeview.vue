@@ -9,7 +9,7 @@
     id: string;
     name: string;
     rollenart: RollenArt;
-    merkmale?: Set<RollenMerkmal>;
+    merkmale?: RollenMerkmal[];
   };
 
   type TreeNode = {
@@ -73,7 +73,7 @@
     {
       key: 'MPT',
       labelKey: 'angebot.groupMPT',
-      match: (r: RolleForSelection) => Array.isArray(r.merkmale) && r.merkmale.includes(RollenMerkmal.MptRolle),
+      match: (r: RolleForSelection) => r.merkmale?.includes(RollenMerkmal.MptRolle) ?? false,
     },
   ];
 
