@@ -142,9 +142,14 @@
       .filter(
         (r: RolleWithServiceProvidersResponse) =>
           ([RollenArt.Lehr, RollenArt.Lern, RollenArt.Leit] as RollenArt[]).includes(r.rollenart) ||
-          (r.merkmale ?? new Set()).has(RollenMerkmal.MptRolle),
+          ((r.merkmale as unknown as RollenMerkmal[]) ?? []).includes(RollenMerkmal.MptRolle), // Casting to unknown first because the API type is not correct (Known issue in the API client generation)
       )
-      .map((r: RolleWithServiceProvidersResponse) => ({ id: r.id, name: r.name, rollenart: r.rollenart })),
+      .map(({ id, name, rollenart, merkmale }: RolleWithServiceProvidersResponse) => ({
+        id,
+        name,
+        rollenart,
+        merkmale: merkmale as unknown as RollenMerkmal[],
+      })),
   );
 
   const hasEditPermissions: ComputedRef<boolean> = computed(() => {

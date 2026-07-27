@@ -8,7 +8,12 @@ const mockRollen: RolleForSelection[] = [
   { id: 'lehr-2', name: 'Lehrer B', rollenart: RollenArt.Lehr },
   { id: 'lern-1', name: 'Schüler A', rollenart: RollenArt.Lern },
   { id: 'leit-1', name: 'Schulleiter A', rollenart: RollenArt.Leit },
-  { id: 'mpt-1', name: 'MPT A', rollenart: RollenArt.Schb, merkmale: new Set([RollenMerkmal.MptRolle]) },
+  {
+    id: 'mpt-1',
+    name: 'MPT A',
+    rollenart: RollenArt.Schb,
+    merkmale: RollenMerkmal.MptRolle ? [RollenMerkmal.MptRolle] : undefined,
+  },
 ];
 
 function mountComponent(
@@ -62,7 +67,12 @@ describe('RollenerweiterungTreeview - Group rendering', () => {
     const wrapper: VueWrapper = mountComponent({
       availableRollen: [
         { id: 'lehr-1', name: 'Lehrer A', rollenart: RollenArt.Lehr },
-        { id: 'lehr-2', name: 'MPT Lehrer B', rollenart: RollenArt.Nlehr, merkmale: new Set([RollenMerkmal.MptRolle]) },
+        {
+          id: 'lehr-2',
+          name: 'MPT Lehrer B',
+          rollenart: RollenArt.Nlehr,
+          merkmale: RollenMerkmal.MptRolle ? [RollenMerkmal.MptRolle] : undefined,
+        },
       ],
     }) as VueWrapper;
     expect(wrapper.find('[data-testid="treeview-group-LEHR"]').exists()).toBe(true);
