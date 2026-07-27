@@ -73,7 +73,7 @@
     {
       key: 'MPT',
       labelKey: 'angebot.groupMPT',
-      match: (r: RolleForSelection) => r.merkmale?.includes(RollenMerkmal.MptRolle) ?? false,
+      match: (r: RolleForSelection) => Array.isArray(r.merkmale) && r.merkmale.includes(RollenMerkmal.MptRolle),
     },
   ];
 
