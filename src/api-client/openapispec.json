@@ -3667,11 +3667,7 @@
           "name": { "type": "string" },
           "administeredBySchulstrukturknoten": { "type": "string" },
           "rollenart": { "allOf": [{ "$ref": "#/components/schemas/RollenArt" }] },
-          "merkmale": {
-            "type": "array",
-            "uniqueItems": true,
-            "items": { "$ref": "#/components/schemas/RollenMerkmal" }
-          },
+          "merkmale": { "type": "array", "items": { "$ref": "#/components/schemas/RollenMerkmal" } },
           "systemrechte": {
             "uniqueItems": true,
             "type": "array",
@@ -4196,11 +4192,7 @@
           "name": { "type": "string" },
           "administeredBySchulstrukturknoten": { "type": "string" },
           "rollenart": { "allOf": [{ "$ref": "#/components/schemas/RollenArt" }] },
-          "merkmale": {
-            "type": "array",
-            "uniqueItems": true,
-            "items": { "$ref": "#/components/schemas/RollenMerkmal" }
-          },
+          "merkmale": { "type": "array", "items": { "$ref": "#/components/schemas/RollenMerkmal" } },
           "systemrechte": {
             "uniqueItems": true,
             "type": "array",

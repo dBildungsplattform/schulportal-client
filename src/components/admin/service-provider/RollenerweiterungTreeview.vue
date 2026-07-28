@@ -53,27 +53,30 @@
     match: (r: RolleForSelection) => boolean;
   };
 
+  const isMptRolle = (r: RolleForSelection): boolean =>
+    Array.isArray(r.merkmale) && r.merkmale.includes(RollenMerkmal.MptRolle);
+
   const GROUP_DEFINITIONS: GroupDefinition[] = [
     {
       key: RollenArt.Lehr,
       labelKey: 'angebot.groupLehr',
-      match: (r: RolleForSelection) => r.rollenart === RollenArt.Lehr,
+      match: (r: RolleForSelection) => r.rollenart === RollenArt.Lehr && !isMptRolle(r),
     },
     {
       key: RollenArt.Lern,
       labelKey: 'angebot.groupLern',
-      match: (r: RolleForSelection) => r.rollenart === RollenArt.Lern,
+      match: (r: RolleForSelection) => r.rollenart === RollenArt.Lern && !isMptRolle(r),
     },
     // Group all MPT Rollen together, regardless of their RollenArt (e.g. Lehr, Nlehr, Schb)
     {
       key: 'MPT',
       labelKey: 'angebot.groupMPT',
-      match: (r: RolleForSelection) => Array.isArray(r.merkmale) && r.merkmale.includes(RollenMerkmal.MptRolle),
+      match: (r: RolleForSelection) => isMptRolle(r),
     },
     {
       key: RollenArt.Leit,
       labelKey: 'angebot.groupLeit',
-      match: (r: RolleForSelection) => r.rollenart === RollenArt.Leit,
+      match: (r: RolleForSelection) => r.rollenart === RollenArt.Leit && !isMptRolle(r),
     },
   ];
 

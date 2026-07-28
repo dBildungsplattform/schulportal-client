@@ -3612,10 +3612,10 @@ export interface RolleResponse {
     'rollenart': RollenArt;
     /**
      * 
-     * @type {Set<RollenMerkmal>}
+     * @type {Array<RollenMerkmal>}
      * @memberof RolleResponse
      */
-    'merkmale': Set<RollenMerkmal>;
+    'merkmale': Array<RollenMerkmal>;
     /**
      * 
      * @type {Set<SystemRechtResponse>}
@@ -3700,10 +3700,10 @@ export interface RolleWithServiceProvidersResponse {
     'rollenart': RollenArt;
     /**
      * 
-     * @type {Set<RollenMerkmal>}
+     * @type {Array<RollenMerkmal>}
      * @memberof RolleWithServiceProvidersResponse
      */
-    'merkmale': Set<RollenMerkmal>;
+    'merkmale': Array<RollenMerkmal>;
     /**
      * 
      * @type {Set<SystemRechtResponse>}

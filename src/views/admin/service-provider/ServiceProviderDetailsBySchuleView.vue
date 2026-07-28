@@ -146,7 +146,7 @@
       .filter(
         (r: RolleWithServiceProvidersResponse) =>
           ([RollenArt.Lehr, RollenArt.Lern, RollenArt.Leit] as RollenArt[]).includes(r.rollenart) ||
-          ((r.merkmale as unknown as RollenMerkmal[]) ?? []).includes(RollenMerkmal.MptRolle), // Casting to unknown first because the API type is not correct so can't use .has() at runtime (Known issue in the API client generation)
+          r.merkmale.includes(RollenMerkmal.MptRolle),
       )
       .map(({ id, name, rollenart, merkmale }: RolleWithServiceProvidersResponse) => ({
         id,
