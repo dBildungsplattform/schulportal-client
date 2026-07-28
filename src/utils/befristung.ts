@@ -55,7 +55,7 @@ export async function isBefristungspflichtRolle(selectedRolleIds: string[] | und
       }
     }
 
-    if (rolle?.merkmale?.has(RollenMerkmal.BefristungPflicht)) {
+    if (rolle?.merkmale?.includes(RollenMerkmal.BefristungPflicht)) {
       return true;
     }
   }

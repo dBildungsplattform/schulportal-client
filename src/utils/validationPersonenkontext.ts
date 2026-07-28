@@ -61,7 +61,7 @@ export function isKopersRolle(
   return (
     translatedRollen?.some(
       (r: TranslatedRolleWithAttrs) =>
-        selectedRolleIds.includes(r.value) && r.merkmale?.has(RollenMerkmal.KopersPflicht),
+        selectedRolleIds.includes(r.value) && r.merkmale?.includes(RollenMerkmal.KopersPflicht),
     ) || false
   );
 }
