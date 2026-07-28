@@ -1,5 +1,10 @@
 <script setup lang="ts">
   import ServiceProviderForm from '@/components/admin/service-provider/ServiceProviderForm.vue';
+  import {
+    extractAnbietenInMerkmale,
+    formatServiceProviderAnbietenMerkmale,
+    formatServiceProviderRollenartenWhitelist,
+  } from '@/utils/serviceProvider.helper';
   import SuccessTemplate from '@/components/admin/service-provider/SuccessTemplate.vue';
   import type {
     ServiceProviderFormSubmitData,
@@ -69,6 +74,8 @@
       requires2fa: values.requires2fa,
       nachtraeglichZuweisbar: values.merkmale.includes(ServiceProviderMerkmal.NachtraeglichZuweisbar),
       verfuegbarFuerRollenerweiterung: values.merkmale.includes(ServiceProviderMerkmal.VerfuegbarFuerRollenerweiterung),
+      anbietenInMerkmale: extractAnbietenInMerkmale(values.merkmale),
+      rollenartenWhitelist: values.rollenartenWhitelist,
     };
   }
 
@@ -148,6 +155,7 @@
       kategorie: values.kategorie,
       requires2fa: values.requires2fa,
       merkmale: values.merkmale,
+      rollenartenWhitelist: values.rollenartenWhitelist,
     });
 
     if (!serviceProviderStore.errorCode) {
@@ -218,6 +226,8 @@
             kategorie: ServiceProviderKategorie.Schulisch,
             nachtraeglichZuweisbar: true,
             verfuegbarFuerRollenerweiterung: true,
+            anbietenInMerkmale: extractAnbietenInMerkmale(Object.values(ServiceProviderMerkmal)),
+            rollenartenWhitelist: [],
             requires2fa: false,
           }"
           :cached-values="cachedValues"
@@ -261,7 +271,9 @@
               },
               {
                 label: $t('angebot.kategorie'),
-                value: $t(`angebot.kategorien.${serviceProviderStore.createdServiceProvider.kategorie}`),
+                value: $t(
+                  `angebot.mappingFrontBackEnd.kategorien.${serviceProviderStore.createdServiceProvider.kategorie}`,
+                ),
                 testId: 'success-kategorie',
               },
               {
@@ -281,6 +293,19 @@
                   ? $t('yes')
                   : $t('no'),
                 testId: 'success-verfuegbar-fuer-rollenerweiterung',
+              },
+              {
+                label: $t('angebot.offeringScope'),
+                value: formatServiceProviderAnbietenMerkmale(serviceProviderStore.createdServiceProvider.merkmale, $t),
+                testId: 'success-anbieten-in-verwaltung',
+              },
+              {
+                label: $t('angebot.rollenartenWhitelistLabel'),
+                value: formatServiceProviderRollenartenWhitelist(
+                  serviceProviderStore.createdServiceProvider.rollenartenWhitelist,
+                  $t,
+                ),
+                testId: 'success-rollenarten-whitelist',
               },
               {
                 label: $t('angebot.requires2FA'),

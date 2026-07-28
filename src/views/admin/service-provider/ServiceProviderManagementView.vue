@@ -115,7 +115,7 @@
     return serviceProviderStore.manageableServiceProviders.map((sp: ManageableServiceProviderSimpleListEntry) => {
       return {
         id: sp.id,
-        kategorie: t(`angebot.kategorien.${sp.kategorie}`),
+        kategorie: t(`angebot.mappingFrontBackEnd.kategorien.${sp.kategorie}`),
         name: sp.name,
         administrationsebene: getDisplayNameForOrg(sp.administrationsebene),
         rollen:

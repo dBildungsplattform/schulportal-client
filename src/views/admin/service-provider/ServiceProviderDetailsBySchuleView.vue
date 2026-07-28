@@ -9,6 +9,10 @@
     RollenSystemRechtEnum,
   } from '@/api-client/generated';
   import SchulPortalLogo from '@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg';
+  import {
+    formatServiceProviderAnbietenMerkmale,
+    formatServiceProviderRollenartenWhitelist,
+  } from '@/utils/serviceProvider.helper';
   import LabeledField from '@/components/admin/LabeledField.vue';
   import RollenerweiterungAssignErrorDialog from '@/components/admin/service-provider/RollenerweiterungAssignErrorDialog.vue';
   import RollenerweiterungTreeview, {
@@ -344,7 +348,10 @@
       <template v-if="!serviceProviderStore.errorCode">
         <v-container>
           <template v-if="serviceProviderStore.currentServiceProvider">
-            <v-row data-testid="service-provider-info-row">
+            <v-row
+              class="mt-2"
+              data-testid="service-provider-info-row"
+            >
               <v-col
                 offset="1"
                 offset-sm="1"
@@ -410,7 +417,9 @@
                       :label="t('angebot.kategorie')"
                       :value="
                         serviceProviderStore.currentServiceProvider.kategorie
-                          ? t(`angebot.kategorien.${serviceProviderStore.currentServiceProvider.kategorie}`)
+                          ? t(
+                              `angebot.mappingFrontBackEnd.kategorien.${serviceProviderStore.currentServiceProvider.kategorie}`,
+                            )
                           : t('missing')
                       "
                       test-id="service-provider-kategorie"
@@ -427,6 +436,25 @@
                         serviceProviderStore.currentServiceProvider.availableForRollenerweiterung ? t('yes') : t('no')
                       "
                       test-id="service-provider-rollenerweiterung"
+                    />
+                    <LabeledField
+                      :label="t('angebot.offeringScope')"
+                      :value="
+                        formatServiceProviderAnbietenMerkmale(serviceProviderStore.currentServiceProvider.merkmale, t)
+                      "
+                      test-id="service-provider-anbieten-merkmale"
+                      no-margin-top
+                    />
+                    <LabeledField
+                      :label="t('angebot.rollenartenWhitelistLabel')"
+                      :value="
+                        formatServiceProviderRollenartenWhitelist(
+                          serviceProviderStore.currentServiceProvider.rollenartenWhitelist,
+                          t,
+                        )
+                      "
+                      test-id="service-provider-rollenarten-whitelist"
+                      no-margin-top
                     />
 
                     <v-row

@@ -354,6 +354,12 @@ export interface CreateServiceProviderBodyParams {
      * @memberof CreateServiceProviderBodyParams
      */
     'merkmale': Array<CreateServiceProviderBodyParamsMerkmaleEnum>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof CreateServiceProviderBodyParams
+     */
+    'rollenartenWhitelist'?: Array<CreateServiceProviderBodyParamsRollenartenWhitelistEnum>;
 }
 
 export const CreateServiceProviderBodyParamsLogoMimeTypeEnum = {
@@ -375,10 +381,25 @@ export const CreateServiceProviderBodyParamsKategorieEnum = {
 export type CreateServiceProviderBodyParamsKategorieEnum = typeof CreateServiceProviderBodyParamsKategorieEnum[keyof typeof CreateServiceProviderBodyParamsKategorieEnum];
 export const CreateServiceProviderBodyParamsMerkmaleEnum = {
     NachtraeglichZuweisbar: 'NACHTRAEGLICH_ZUWEISBAR',
-    VerfuegbarFuerRollenerweiterung: 'VERFUEGBAR_FUER_ROLLENERWEITERUNG'
+    VerfuegbarFuerRollenerweiterung: 'VERFUEGBAR_FUER_ROLLENERWEITERUNG',
+    AnbietenInSchulischerAngebotsverwaltung: 'ANBIETEN_IN_SCHULISCHER_ANGEBOTSVERWALTUNG',
+    AnbietenInSchulischerRollenverwaltung: 'ANBIETEN_IN_SCHULISCHER_ROLLENVERWALTUNG'
 } as const;
 
 export type CreateServiceProviderBodyParamsMerkmaleEnum = typeof CreateServiceProviderBodyParamsMerkmaleEnum[keyof typeof CreateServiceProviderBodyParamsMerkmaleEnum];
+export const CreateServiceProviderBodyParamsRollenartenWhitelistEnum = {
+    Lern: 'LERN',
+    Lehr: 'LEHR',
+    Extern: 'EXTERN',
+    Orgadmin: 'ORGADMIN',
+    Leit: 'LEIT',
+    Sysadmin: 'SYSADMIN',
+    Sorgber: 'SORGBER',
+    Schb: 'SCHB',
+    Nlehr: 'NLEHR'
+} as const;
+
+export type CreateServiceProviderBodyParamsRollenartenWhitelistEnum = typeof CreateServiceProviderBodyParamsRollenartenWhitelistEnum[keyof typeof CreateServiceProviderBodyParamsRollenartenWhitelistEnum];
 
 /**
  * 
@@ -440,6 +461,12 @@ export interface CreateServiceProviderResponse {
      * @memberof CreateServiceProviderResponse
      */
     'merkmale': Array<ServiceProviderMerkmal>;
+    /**
+     * 
+     * @type {Array<RollenArt>}
+     * @memberof CreateServiceProviderResponse
+     */
+    'rollenartenWhitelist': Array<RollenArt>;
 }
 
 
@@ -1621,6 +1648,12 @@ export interface ManageableServiceProviderListEntryResponse {
     'merkmale': Array<ServiceProviderMerkmal>;
     /**
      * 
+     * @type {Array<RollenArt>}
+     * @memberof ManageableServiceProviderListEntryResponse
+     */
+    'rollenartenWhitelist': Array<RollenArt>;
+    /**
+     * 
      * @type {Array<RollenerweiterungForManageableServiceProviderResponse>}
      * @memberof ManageableServiceProviderListEntryResponse
      */
@@ -1694,6 +1727,12 @@ export interface ManageableServiceProviderResponse {
      * @memberof ManageableServiceProviderResponse
      */
     'merkmale': Array<ServiceProviderMerkmal>;
+    /**
+     * 
+     * @type {Array<RollenArt>}
+     * @memberof ManageableServiceProviderResponse
+     */
+    'rollenartenWhitelist': Array<RollenArt>;
     /**
      * Can be undefined, if `target` is not equal to `URL`
      * @type {string}
@@ -1800,6 +1839,12 @@ export interface ManageableServiceProviderSimpleListEntryResponse {
      * @memberof ManageableServiceProviderSimpleListEntryResponse
      */
     'merkmale': Array<ServiceProviderMerkmal>;
+    /**
+     * 
+     * @type {Array<RollenArt>}
+     * @memberof ManageableServiceProviderSimpleListEntryResponse
+     */
+    'rollenartenWhitelist': Array<RollenArt>;
     /**
      * 
      * @type {boolean}
@@ -3961,7 +4006,9 @@ export type ServiceProviderKategorie = typeof ServiceProviderKategorie[keyof typ
 
 export const ServiceProviderMerkmal = {
     NachtraeglichZuweisbar: 'NACHTRAEGLICH_ZUWEISBAR',
-    VerfuegbarFuerRollenerweiterung: 'VERFUEGBAR_FUER_ROLLENERWEITERUNG'
+    VerfuegbarFuerRollenerweiterung: 'VERFUEGBAR_FUER_ROLLENERWEITERUNG',
+    AnbietenInSchulischerAngebotsverwaltung: 'ANBIETEN_IN_SCHULISCHER_ANGEBOTSVERWALTUNG',
+    AnbietenInSchulischerRollenverwaltung: 'ANBIETEN_IN_SCHULISCHER_ROLLENVERWALTUNG'
 } as const;
 
 export type ServiceProviderMerkmal = typeof ServiceProviderMerkmal[keyof typeof ServiceProviderMerkmal];
@@ -4027,6 +4074,12 @@ export interface ServiceProviderResponse {
      * @memberof ServiceProviderResponse
      */
     'merkmale': Array<ServiceProviderMerkmal>;
+    /**
+     * 
+     * @type {Array<RollenArt>}
+     * @memberof ServiceProviderResponse
+     */
+    'rollenartenWhitelist': Array<RollenArt>;
 }
 
 
@@ -4345,6 +4398,18 @@ export interface UpdateServiceProviderBodyParams {
      * @memberof UpdateServiceProviderBodyParams
      */
     'logoId'?: number | null;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof UpdateServiceProviderBodyParams
+     */
+    'merkmale'?: Array<UpdateServiceProviderBodyParamsMerkmaleEnum>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof UpdateServiceProviderBodyParams
+     */
+    'rollenartenWhitelist'?: Array<UpdateServiceProviderBodyParamsRollenartenWhitelistEnum>;
 }
 
 export const UpdateServiceProviderBodyParamsKategorieEnum = {
@@ -4356,6 +4421,27 @@ export const UpdateServiceProviderBodyParamsKategorieEnum = {
 } as const;
 
 export type UpdateServiceProviderBodyParamsKategorieEnum = typeof UpdateServiceProviderBodyParamsKategorieEnum[keyof typeof UpdateServiceProviderBodyParamsKategorieEnum];
+export const UpdateServiceProviderBodyParamsMerkmaleEnum = {
+    NachtraeglichZuweisbar: 'NACHTRAEGLICH_ZUWEISBAR',
+    VerfuegbarFuerRollenerweiterung: 'VERFUEGBAR_FUER_ROLLENERWEITERUNG',
+    AnbietenInSchulischerAngebotsverwaltung: 'ANBIETEN_IN_SCHULISCHER_ANGEBOTSVERWALTUNG',
+    AnbietenInSchulischerRollenverwaltung: 'ANBIETEN_IN_SCHULISCHER_ROLLENVERWALTUNG'
+} as const;
+
+export type UpdateServiceProviderBodyParamsMerkmaleEnum = typeof UpdateServiceProviderBodyParamsMerkmaleEnum[keyof typeof UpdateServiceProviderBodyParamsMerkmaleEnum];
+export const UpdateServiceProviderBodyParamsRollenartenWhitelistEnum = {
+    Lern: 'LERN',
+    Lehr: 'LEHR',
+    Extern: 'EXTERN',
+    Orgadmin: 'ORGADMIN',
+    Leit: 'LEIT',
+    Sysadmin: 'SYSADMIN',
+    Sorgber: 'SORGBER',
+    Schb: 'SCHB',
+    Nlehr: 'NLEHR'
+} as const;
+
+export type UpdateServiceProviderBodyParamsRollenartenWhitelistEnum = typeof UpdateServiceProviderBodyParamsRollenartenWhitelistEnum[keyof typeof UpdateServiceProviderBodyParamsRollenartenWhitelistEnum];
 
 /**
  * 

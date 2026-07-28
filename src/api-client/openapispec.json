@@ -3841,7 +3841,12 @@
       },
       "ServiceProviderMerkmal": {
         "type": "string",
-        "enum": ["NACHTRAEGLICH_ZUWEISBAR", "VERFUEGBAR_FUER_ROLLENERWEITERUNG"]
+        "enum": [
+          "NACHTRAEGLICH_ZUWEISBAR",
+          "VERFUEGBAR_FUER_ROLLENERWEITERUNG",
+          "ANBIETEN_IN_SCHULISCHER_ANGEBOTSVERWALTUNG",
+          "ANBIETEN_IN_SCHULISCHER_ROLLENVERWALTUNG"
+        ]
       },
       "ServiceProviderResponse": {
         "type": "object",
@@ -3854,9 +3859,10 @@
           "logoId": { "type": "number", "description": "Optional logoId for use with standard logos" },
           "hasLogo": { "type": "boolean", "description": "Indicates if a custom logo is available for fetching" },
           "requires2fa": { "type": "boolean", "description": "Indicates if 2FA is required" },
-          "merkmale": { "type": "array", "items": { "$ref": "#/components/schemas/ServiceProviderMerkmal" } }
+          "merkmale": { "type": "array", "items": { "$ref": "#/components/schemas/ServiceProviderMerkmal" } },
+          "rollenartenWhitelist": { "type": "array", "items": { "$ref": "#/components/schemas/RollenArt" } }
         },
-        "required": ["id", "name", "target", "kategorie", "hasLogo", "requires2fa", "merkmale"]
+        "required": ["id", "name", "target", "kategorie", "hasLogo", "requires2fa", "merkmale", "rollenartenWhitelist"]
       },
       "RollenerweiterungWithExtendedDataResponse": {
         "type": "object",
@@ -3903,6 +3909,7 @@
           "requires2fa": { "type": "boolean" },
           "vidisAngebotId": { "type": "string" },
           "merkmale": { "type": "array", "items": { "$ref": "#/components/schemas/ServiceProviderMerkmal" } },
+          "rollenartenWhitelist": { "type": "array", "items": { "$ref": "#/components/schemas/RollenArt" } },
           "hasRollenerweiterungen": { "type": "boolean" },
           "rollen": { "type": "array", "items": { "$ref": "#/components/schemas/RolleRefResponse" } },
           "hasSomeVerwaltenPermission": { "type": "boolean" }
@@ -3914,6 +3921,7 @@
           "kategorie",
           "requires2fa",
           "merkmale",
+          "rollenartenWhitelist",
           "hasRollenerweiterungen",
           "rollen",
           "hasSomeVerwaltenPermission"
@@ -3937,6 +3945,7 @@
           "requires2fa": { "type": "boolean" },
           "vidisAngebotId": { "type": "string" },
           "merkmale": { "type": "array", "items": { "$ref": "#/components/schemas/ServiceProviderMerkmal" } },
+          "rollenartenWhitelist": { "type": "array", "items": { "$ref": "#/components/schemas/RollenArt" } },
           "rollenerweiterungen": {
             "type": "array",
             "items": { "$ref": "#/components/schemas/RollenerweiterungForManageableServiceProviderResponse" }
@@ -3951,6 +3960,7 @@
           "kategorie",
           "requires2fa",
           "merkmale",
+          "rollenartenWhitelist",
           "rollenerweiterungen",
           "rollen",
           "hasSomeVerwaltenPermission"
@@ -3967,6 +3977,7 @@
           "requires2fa": { "type": "boolean" },
           "vidisAngebotId": { "type": "string" },
           "merkmale": { "type": "array", "items": { "$ref": "#/components/schemas/ServiceProviderMerkmal" } },
+          "rollenartenWhitelist": { "type": "array", "items": { "$ref": "#/components/schemas/RollenArt" } },
           "url": { "type": "string", "description": "Can be undefined, if `target` is not equal to `URL`" },
           "hasRollenerweiterung": { "type": "boolean" },
           "availableForRollenerweiterung": {
@@ -4012,6 +4023,7 @@
           "logoId",
           "requires2fa",
           "merkmale",
+          "rollenartenWhitelist",
           "url",
           "hasRollenerweiterung",
           "availableForRollenerweiterung",
@@ -4044,7 +4056,22 @@
           "requires2fa": { "type": "boolean" },
           "merkmale": {
             "type": "array",
-            "items": { "type": "string", "enum": ["NACHTRAEGLICH_ZUWEISBAR", "VERFUEGBAR_FUER_ROLLENERWEITERUNG"] }
+            "items": {
+              "type": "string",
+              "enum": [
+                "NACHTRAEGLICH_ZUWEISBAR",
+                "VERFUEGBAR_FUER_ROLLENERWEITERUNG",
+                "ANBIETEN_IN_SCHULISCHER_ANGEBOTSVERWALTUNG",
+                "ANBIETEN_IN_SCHULISCHER_ROLLENVERWALTUNG"
+              ]
+            }
+          },
+          "rollenartenWhitelist": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["LERN", "LEHR", "EXTERN", "ORGADMIN", "LEIT", "SYSADMIN", "SORGBER", "SCHB", "NLEHR"]
+            }
           }
         },
         "required": ["organisationId", "name", "url", "kategorie", "requires2fa", "merkmale"]
@@ -4060,9 +4087,20 @@
           "logoId": { "type": "number", "description": "Optional logoId for use with standard logos" },
           "hasLogo": { "type": "boolean", "description": "Indicates if a custom logo is available for fetching" },
           "requires2fa": { "type": "boolean", "description": "Indicates if 2FA is required" },
-          "merkmale": { "type": "array", "items": { "$ref": "#/components/schemas/ServiceProviderMerkmal" } }
+          "merkmale": { "type": "array", "items": { "$ref": "#/components/schemas/ServiceProviderMerkmal" } },
+          "rollenartenWhitelist": { "type": "array", "items": { "$ref": "#/components/schemas/RollenArt" } }
         },
-        "required": ["id", "name", "target", "url", "kategorie", "hasLogo", "requires2fa", "merkmale"]
+        "required": [
+          "id",
+          "name",
+          "target",
+          "url",
+          "kategorie",
+          "hasLogo",
+          "requires2fa",
+          "merkmale",
+          "rollenartenWhitelist"
+        ]
       },
       "UpdateServiceProviderBodyParams": {
         "type": "object",
@@ -4076,6 +4114,25 @@
             "description": "Optional logoId to use a standard logo. Has to be an integer. Can not be provided, if the service provider already has a custom logo. Null removes the logo.",
             "maximum": 2147483647,
             "minimum": 1
+          },
+          "merkmale": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "NACHTRAEGLICH_ZUWEISBAR",
+                "VERFUEGBAR_FUER_ROLLENERWEITERUNG",
+                "ANBIETEN_IN_SCHULISCHER_ANGEBOTSVERWALTUNG",
+                "ANBIETEN_IN_SCHULISCHER_ROLLENVERWALTUNG"
+              ]
+            }
+          },
+          "rollenartenWhitelist": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["LERN", "LEHR", "EXTERN", "ORGADMIN", "LEIT", "SYSADMIN", "SORGBER", "SCHB", "NLEHR"]
+            }
           }
         }
       },

@@ -2,20 +2,7 @@
   import { getLogoPath } from '@/utils/logosConfig';
   import { type Ref } from 'vue';
   import { useDisplay } from 'vuetify';
-
-  type SuccessDataItem = {
-    label: string;
-    value: string | number | undefined;
-    testId: string;
-    type?: 'text' | 'image';
-    alt?: string;
-  };
-
-  type SuccessDetails = {
-    message: string;
-    followingDataChanged: string;
-    data: Array<SuccessDataItem>;
-  };
+  import { SuccessDetails } from './types';
 
   type Emits = {
     (event: 'toServiceProviderDetails'): void;
