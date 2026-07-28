@@ -100,7 +100,6 @@ describe('rolleStore', () => {
           administeredBySchulstrukturknoten: '1234',
           rollenart: 'LEHR',
           name: 'Lehrer',
-          // TODO: remove type casting when generator is fixed
           merkmale: [RollenMerkmal.KopersPflicht],
           systemrechte: [{ name: 'ROLLEN_VERWALTEN', isTechnical: false }] as unknown as Set<SystemRechtResponse>,
           createdAt: '2022',
@@ -166,7 +165,7 @@ describe('rolleStore', () => {
         administeredBySchulstrukturknoten: '1234',
         rollenart: 'LEHR',
         name: 'Lehrer',
-        merkmale: new Set(['KOPERS_PFLICHT']),
+        merkmale: [RollenMerkmal.KopersPflicht],
         systemrechte: new Set(['ROLLEN_VERWALTEN']),
         id: '1',
         version: 1,

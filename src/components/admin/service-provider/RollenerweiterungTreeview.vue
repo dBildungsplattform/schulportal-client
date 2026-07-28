@@ -67,22 +67,22 @@
       labelKey: 'angebot.groupLern',
       match: (r: RolleForSelection) => r.rollenart === RollenArt.Lern && !isMptRolle(r),
     },
+    {
+      key: RollenArt.Leit,
+      labelKey: 'angebot.groupLeit',
+      match: (r: RolleForSelection) => r.rollenart === RollenArt.Leit && !isMptRolle(r),
+    },
     // Group all MPT Rollen together, regardless of their RollenArt (e.g. Lehr, Nlehr, Schb)
     {
       key: 'MPT',
       labelKey: 'angebot.groupMPT',
       match: (r: RolleForSelection) => isMptRolle(r),
     },
-    {
-      key: RollenArt.Leit,
-      labelKey: 'angebot.groupLeit',
-      match: (r: RolleForSelection) => r.rollenart === RollenArt.Leit && !isMptRolle(r),
-    },
   ];
 
   // ── State ──────────────────────────────────────────────────────────────────
   const selected: Ref<string[]> = ref([...(props.initiallySelectedRolleIds ?? [])]);
-  const opened: Ref<string[]> = ref(['group-LEHR', 'group-LERN', 'group-MPT']);
+  const opened: Ref<string[]> = ref(['group-LEHR', 'group-LERN']);
 
   watch(
     () => props.initiallySelectedRolleIds,
