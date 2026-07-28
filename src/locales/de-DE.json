@@ -37,6 +37,11 @@
     "kategorieOfTheAngebotInTheStartPage": "Kategorie des Angebots auf der Startseite der Anwender",
     "administrationsebene": "Administrationsebene",
     "rollen": "Rollen",
+    "rollenartenWhitelistChangedWarning": "Bitte beachten Sie, dass durch die Anpassungen existierende Rollenerweiterungen für Rollen nicht mehr erlaubter Rollenarten nach dem Speichern automatisch entfernt werden.\n\nDie folgenden Rollenarten sind von der Änderung betroffen: {rollenarten}",
+    "verfuegbarFuerRollenerweiterungChangedWarning": "Bitte beachten Sie, dass durch die Anpassung nach dem Speichern alle existierende Rollenerweiterungen automatisch entfernt werden.",
+    "rollenartenWhitelistHeading": "Ist die Nutzung auf bestimmte Rollenarten eingeschränkt?",
+    "rollenartenWhitelistLabel": "Eingeschränkt auf Rollenarten",
+    "noRestrictions": "Keine Einschränkungen",
     "schulspezifischErweitert": "Schulspezifisch erweitert",
     "schulspezifischeRollenerweiterung": "Schulspezifische Rollenerweiterung möglich",
     "showSchulspezifischeRollenerweiterungen": "Schulspezifische Rollenerweiterungen anzeigen",
@@ -50,16 +55,23 @@
     "is2FARequired": "Ist zur Nutzung eine Zwei-Faktor-Authentifizierung erforderlich?",
     "canBeAssigned": "Darf zugewiesen werden",
     "canBeUsed": "Darf genutzt werden",
+    "offeringScope": "Anbieten in",
     "toServiceProviderDetails": "Zur Rollenauswahl",
     "testUrl": "URL testen",
     "link": "Link",
     "requires2FA": "2FA erforderlich",
-    "kategorien": {
-      "EMAIL": "Dienstliche Email",
-      "UNTERRICHT": "Unterricht",
-      "VERWALTUNG": "Verwaltung",
-      "SCHULISCH": "Schulische Angebote",
-      "HINWEISE": "Hinweise"
+    "mappingFrontBackEnd": {
+      "merkmale": {
+        "ANBIETEN_IN_SCHULISCHER_ANGEBOTSVERWALTUNG": "Schulische Angebotsverwaltung",
+        "ANBIETEN_IN_SCHULISCHER_ROLLENVERWALTUNG": "Schulische Rollenverwaltung"
+      },
+      "kategorien": {
+        "EMAIL": "Dienstliche Email",
+        "UNTERRICHT": "Unterricht",
+        "VERWALTUNG": "Verwaltung",
+        "SCHULISCH": "Schulische Angebote",
+        "HINWEISE": "Hinweise"
+      }
     },
     "title": {
       "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Zwei-Faktor-Authentifizierung (2FA) erforderlich"
@@ -94,7 +106,8 @@
       "500": "Es ist ein technischer Fehler aufgetreten.",
       "INTERNAL": "Es ist ein technischer Fehler aufgetreten.",
       "REQUIRED_STEP_UP_LEVEL_NOT_MET": "Die letzte Aktion konnte nicht ausgeführt werden. Aufgrund von längerer Inaktivität ist eine erneute Authentifizierung mit einem zweiten Faktor erforderlich. Um fortzufahren, klicken Sie bitte auf „Zurück zur Ergebnisliste“ oder „Schließen“. Sie werden anschließend zur Eingabe Ihres zweiten Faktors aufgefordert.",
-      "DUPLICATE_NAME": "Der Name des Angebots wird auf dieser Ebene bereits verwendet. Bitte wählen Sie einen anderen Namen."
+      "DUPLICATE_NAME": "Der Name des Angebots wird auf dieser Ebene bereits verwendet. Bitte wählen Sie einen anderen Namen.",
+      "ATTACHED_ROLLEN": "Die Aktion konnte nicht ausgeführt werden, da das Angebot noch mindestens einer Rolle zugeordnet ist, die nicht zu den erlaubten Rollenarten gehört.\n\nBitte entfernen Sie zunächst die direkte Zuordnung dieses Angebots zu den Rollen."
     },
     "rules": {
       "organisation": {
@@ -105,6 +118,9 @@
         "noLeadingTrailingSpaces": "Der Name darf nicht mit Leerzeichen beginnen oder enden.",
         "maxLength": "Der Name darf maximal 50 Zeichen lang sein.",
         "required": "Der Name des Angebots muss angegeben werden."
+      },
+      "logo": {
+        "required": "Ein Logo muss ausgewählt werden."
       },
       "url": {
         "invalid": "Die URL muss eine gültige URL sein.",

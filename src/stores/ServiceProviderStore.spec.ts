@@ -3,6 +3,7 @@ import MockAdapter from 'axios-mock-adapter';
 import { createPinia, setActivePinia } from 'pinia';
 
 import {
+  RollenArt,
   ServiceProviderTarget,
   type ProviderControllerFindRollenerweiterungenByServiceProviderId200Response,
   type ProviderControllerGetManageableServiceProviders200Response,
@@ -572,6 +573,7 @@ describe('serviceProviderStore', () => {
       kategorie: ServiceProviderKategorie.Email,
       requires2fa: true,
       merkmale: [ServiceProviderMerkmal.NachtraeglichZuweisbar, ServiceProviderMerkmal.VerfuegbarFuerRollenerweiterung],
+      rollenartenWhitelist: [RollenArt.Lehr, RollenArt.Lern],
     };
     const url: string = '/api/provider';
 
@@ -586,6 +588,7 @@ describe('serviceProviderStore', () => {
         kategorie: filter.kategorie,
         requires2fa: filter.requires2fa,
         merkmale: filter.merkmale,
+        rollenartenWhitelist: filter.rollenartenWhitelist,
       };
 
       mockadapter.onPost(url).replyOnce(200, mockResponse);
@@ -622,11 +625,18 @@ describe('serviceProviderStore', () => {
     });
     const providerId: string = 'provider-to-update';
     const apiUrl: string = `/api/provider/${providerId}`;
-    const update: Partial<{ name: string; url: string; kategorie: ServiceProviderKategorie; logoId: number }> = {
+    const update: Partial<{
+      name: string;
+      url: string;
+      kategorie: ServiceProviderKategorie;
+      logoId: number;
+      rollenartenWhitelist: RollenArt[];
+    }> = {
       name: 'Updated Service Provider',
       url: 'https://updated-url.com',
       kategorie: ServiceProviderKategorie.Email,
       logoId: 1,
+      rollenartenWhitelist: [RollenArt.Lehr, RollenArt.Lern],
     };
 
     it('should update a service provider and update state', async () => {
@@ -637,6 +647,7 @@ describe('serviceProviderStore', () => {
         target: ServiceProviderTarget.Url,
         hasLogo: false,
         logoId: 1,
+        rollenartenWhitelist: update.rollenartenWhitelist!,
         kategorie: update.kategorie!,
         requires2fa: false,
         merkmale: [],
@@ -649,6 +660,36 @@ describe('serviceProviderStore', () => {
       expect(serviceProviderStore.updatedServiceProvider).toEqual(mockResponse);
       expect(serviceProviderStore.errorCode).toEqual('');
       expect(serviceProviderStore.loading).toBe(false);
+    });
+
+    it('should include merkmale with anbietung values in patch request body', async () => {
+      const updateWithMerkmale: { merkmale: ServiceProviderMerkmal[] } = {
+        merkmale: [
+          ServiceProviderMerkmal.AnbietenInSchulischerAngebotsverwaltung,
+          ServiceProviderMerkmal.AnbietenInSchulischerRollenverwaltung,
+        ],
+      };
+      const mockResponse: ServiceProviderResponse = {
+        id: providerId,
+        name: 'Updated Service Provider',
+        url: 'https://updated-url.com',
+        target: ServiceProviderTarget.Url,
+        hasLogo: false,
+        logoId: 1,
+        kategorie: ServiceProviderKategorie.Email,
+        requires2fa: false,
+        merkmale: updateWithMerkmale.merkmale,
+        rollenartenWhitelist: [],
+      };
+
+      mockadapter.onPatch(apiUrl).replyOnce(200, mockResponse);
+      await serviceProviderStore.updateServiceProvider(providerId, updateWithMerkmale);
+
+      const patchData: unknown = mockadapter.history.patch[0]?.data;
+      const requestBodyRaw: unknown = JSON.parse(typeof patchData === 'string' ? patchData : '{}');
+      const requestBody: { merkmale?: ServiceProviderMerkmal[] } =
+        typeof requestBodyRaw === 'object' && requestBodyRaw !== null ? requestBodyRaw : {};
+      expect(requestBody.merkmale).toEqual(updateWithMerkmale.merkmale);
     });
 
     it('should handle string error', async () => {

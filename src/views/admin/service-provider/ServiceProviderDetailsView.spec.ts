@@ -124,9 +124,21 @@ describe('ServiceProviderDetailsView', () => {
       wrapper?.find('[data-testid="service-provider-logo"] [alt="provider-logo"]').element.getAttribute('src'),
     ).toBe(getLogoPath(mockServiceProvider.logoId));
     expect(wrapper?.find('[data-testid="service-provider-kategorie"]').text()).toBe('Schulische Angebote');
+    expect(wrapper?.find('[data-testid="service-provider-rollenarten-whitelist"]').text()).toBe(
+      'Keine Einschränkungen',
+    );
     expect(wrapper?.find('[data-testid="service-provider-link"]').text()).toBe(
       mockServiceProvider.url ? mockServiceProvider.url : 'fehlt',
     );
+  });
+
+  test('it shows rollenarten whitelist values when present', async () => {
+    serviceProviderStore.currentServiceProvider = DoFactory.getManageableServiceProviderDetail({
+      rollenartenWhitelist: [RollenArt.Sysadmin, RollenArt.Lehr],
+    });
+    wrapper = await mountComponent();
+
+    expect(wrapper?.find('[data-testid="service-provider-rollenarten-whitelist"]').text()).toBe('Sysadmin, Lehr');
   });
 
   test('it renders the service provider details page and shows its data with logo', async () => {

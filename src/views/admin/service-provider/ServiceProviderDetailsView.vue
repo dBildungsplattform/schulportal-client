@@ -1,5 +1,9 @@
 <script setup lang="ts">
   import SchulPortalLogo from '@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg';
+  import {
+    formatServiceProviderAnbietenMerkmale,
+    formatServiceProviderRollenartenWhitelist,
+  } from '@/utils/serviceProvider.helper';
   import LabeledField from '@/components/admin/LabeledField.vue';
   import ResultTable, { type Headers } from '@/components/admin/ResultTable.vue';
   import VidisInfoDialog from '@/components/admin/service-provider/VidisInfoDialog.vue';
@@ -247,7 +251,10 @@
       <div v-if="!serviceProviderStore.errorCode">
         <v-container class="service-provider-info">
           <div v-if="serviceProviderStore.currentServiceProvider">
-            <v-row id="service-provider-info-row">
+            <v-row
+              class="mt-2"
+              id="service-provider-info-row"
+            >
               <v-col class="pl-16">
                 <v-row>
                   <!-- Left column (first 4 fields) -->
@@ -319,7 +326,9 @@
                       :label="t('angebot.kategorie')"
                       :value="
                         serviceProviderStore.currentServiceProvider.kategorie
-                          ? t(`angebot.kategorien.${serviceProviderStore.currentServiceProvider.kategorie}`)
+                          ? t(
+                              `angebot.mappingFrontBackEnd.kategorien.${serviceProviderStore.currentServiceProvider.kategorie}`,
+                            )
                           : t('missing')
                       "
                       test-id="service-provider-kategorie"
@@ -340,6 +349,28 @@
                         serviceProviderStore.currentServiceProvider.availableForRollenerweiterung ? t('yes') : t('no')
                       "
                       test-id="service-provider-rollenerweiterung"
+                      no-margin-top
+                    />
+
+                    <LabeledField
+                      :label="t('angebot.offeringScope')"
+                      :value="
+                        formatServiceProviderAnbietenMerkmale(serviceProviderStore.currentServiceProvider.merkmale, t)
+                      "
+                      test-id="service-provider-anbieten-merkmale"
+                      no-margin-top
+                    />
+
+                    <LabeledField
+                      :label="t('angebot.rollenartenWhitelistLabel')"
+                      :value="
+                        formatServiceProviderRollenartenWhitelist(
+                          serviceProviderStore.currentServiceProvider.rollenartenWhitelist,
+                          t,
+                        )
+                      "
+                      test-id="service-provider-rollenarten-whitelist"
+                      no-margin-top
                     />
                   </v-col>
                 </v-row>

@@ -1,10 +1,15 @@
-import type { ServiceProviderFormSubmitData } from '@/components/admin/service-provider/types';
+import type {
+  ServiceProviderFormSubmitData,
+  SuccessDataItem,
+  SuccessDetails,
+} from '@/components/admin/service-provider/types';
 import routes from '@/router/routes';
 import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
-import { RollenSystemRecht } from '@/stores/RolleStore';
+import { RollenArt, RollenSystemRecht } from '@/stores/RolleStore';
 import {
   ServiceProviderKategorie,
+  ServiceProviderMerkmal,
   useServiceProviderStore,
   type ServiceProviderStore,
 } from '@/stores/ServiceProviderStore';
@@ -20,19 +25,9 @@ import {
   type Router,
 } from 'vue-router';
 import ServiceProviderCreationView from './ServiceProviderCreationView.vue';
+import SuccessTemplate from '@/components/admin/service-provider/SuccessTemplate.vue';
+import ServiceProviderForm from '@/components/admin/service-provider/ServiceProviderForm.vue';
 
-let wrapper: VueWrapper | null = null;
-let router: Router;
-const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
-const organisationStore: OrganisationStore = useOrganisationStore();
-const authStore: AuthStore = useAuthStore();
-const organisationObject: Organisation = DoFactory.getOrganisation();
-
-type OnBeforeRouteLeaveCallback = (
-  _to: RouteLocationNormalized,
-  _from: RouteLocationNormalized,
-  _next: NavigationGuardNext,
-) => void;
 let { storedBeforeRouteLeaveCallback }: { storedBeforeRouteLeaveCallback: OnBeforeRouteLeaveCallback } = vi.hoisted(
   () => {
     return {
@@ -46,6 +41,29 @@ let { storedBeforeRouteLeaveCallback }: { storedBeforeRouteLeaveCallback: OnBefo
     };
   },
 );
+
+vi.mock('vue-router', async (importOriginal: () => Promise<object>) => {
+  const mod: object = await importOriginal();
+  return {
+    ...mod,
+    onBeforeRouteLeave: vi.fn((actualCallback: OnBeforeRouteLeaveCallback) => {
+      storedBeforeRouteLeaveCallback = actualCallback;
+    }),
+  };
+});
+
+let wrapper: VueWrapper | null = null;
+let router: Router;
+const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
+const organisationStore: OrganisationStore = useOrganisationStore();
+const authStore: AuthStore = useAuthStore();
+const organisationObject: Organisation = DoFactory.getOrganisation();
+
+type OnBeforeRouteLeaveCallback = (
+  _to: RouteLocationNormalized,
+  _from: RouteLocationNormalized,
+  _next: NavigationGuardNext,
+) => void;
 
 async function mountComponent(): Promise<ReturnType<typeof mount<typeof ServiceProviderCreationView>>> {
   await vi.dynamicImportSettled();
@@ -199,6 +217,25 @@ describe('ServiceProviderCreationView', () => {
     expect(wrapper?.getComponent({ name: 'FormRow' })).toBeTruthy();
   });
 
+  test('it passes both anbieten-in merkmale by default to ServiceProviderForm initial-values', () => {
+    // eslint-disable-next-line @typescript-eslint/typedef
+    const form = wrapper?.findComponent(ServiceProviderForm);
+    expect(form?.exists()).toBe(true);
+    expect(form?.props('initialValues')).toMatchObject({
+      anbietenInMerkmale: [
+        ServiceProviderMerkmal.AnbietenInSchulischerAngebotsverwaltung,
+        ServiceProviderMerkmal.AnbietenInSchulischerRollenverwaltung,
+      ],
+      rollenartenWhitelist: [],
+    });
+  });
+
+  test('it passes empty rollenarten whitelist by default to ServiceProviderForm initial-values', () => {
+    // eslint-disable-next-line @typescript-eslint/typedef
+    const form = wrapper?.findComponent({ name: 'ServiceProviderForm' });
+    expect(form?.props('initialValues')).toMatchObject({ rollenartenWhitelist: [] });
+  });
+
   test('it calls the correct function in the store, when the form is submitted', async () => {
     const createServiceProviderSpy: MockInstance = vi.spyOn(serviceProviderStore, 'createServiceProvider');
     const payload: ServiceProviderFormSubmitData = {
@@ -206,6 +243,7 @@ describe('ServiceProviderCreationView', () => {
       url: 'https://test.example.com',
       kategorie: ServiceProviderKategorie.Schulisch,
       merkmale: [],
+      rollenartenWhitelist: [],
       requires2fa: false,
       logoId: undefined,
       selectedOrganisation: DoFactory.getOrganisation(),
@@ -239,7 +277,52 @@ describe('ServiceProviderCreationView', () => {
       kategorie: payload.kategorie,
       requires2fa: payload.requires2fa,
       merkmale: payload.merkmale,
+      rollenartenWhitelist: payload.rollenartenWhitelist,
     });
+  });
+
+  test('it renders rollenarten whitelist in success view from backend response, not cached submit values', async () => {
+    vi.spyOn(serviceProviderStore, 'createServiceProvider').mockImplementation(() => {
+      serviceProviderStore.createdServiceProvider = {
+        id: 'sp-id',
+        name: 'Test Service Provider',
+        url: 'https://test.example.com',
+        logoId: undefined,
+        kategorie: ServiceProviderKategorie.Schulisch,
+        merkmale: [],
+        requires2fa: false,
+        rollenartenWhitelist: [RollenArt.Orgadmin],
+      };
+      return Promise.resolve();
+    });
+
+    const payload: ServiceProviderFormSubmitData = {
+      name: 'Test Service Provider',
+      url: 'https://test.example.com',
+      kategorie: ServiceProviderKategorie.Schulisch,
+      merkmale: [],
+      rollenartenWhitelist: [RollenArt.Lern],
+      requires2fa: false,
+      logoId: undefined,
+      selectedOrganisation: DoFactory.getOrganisation(),
+    };
+
+    const form: VueWrapper = wrapper!.findComponent({ name: 'ServiceProviderForm' });
+    form.vm.$emit('click:submit', payload);
+    await flushPromises();
+
+    // eslint-disable-next-line @typescript-eslint/typedef
+    const successTemplate = wrapper?.findComponent(SuccessTemplate);
+    expect(successTemplate?.exists()).toBe(true);
+    if (!successTemplate) {
+      throw new Error('Expected success template to be rendered');
+    }
+
+    const successProps: SuccessDetails = successTemplate.props('success') as SuccessDetails;
+    const dataRows: SuccessDataItem[] = successProps?.data ?? [];
+    expect(dataRows.find((row: SuccessDataItem) => row.testId === 'success-rollenarten-whitelist')?.value).toBe(
+      'Orgadmin',
+    );
   });
 
   test('it renders an error', async () => {
@@ -303,15 +386,6 @@ describe('ServiceProviderCreationView', () => {
 
     test('triggers, if form is dirty', async () => {
       const expectedCallsToNext: number = 0;
-      vi.mock('vue-router', async (importOriginal: () => Promise<object>) => {
-        const mod: object = await importOriginal();
-        return {
-          ...mod,
-          onBeforeRouteLeave: vi.fn((actualCallback: OnBeforeRouteLeaveCallback) => {
-            storedBeforeRouteLeaveCallback = actualCallback;
-          }),
-        };
-      });
       wrapper = await mountComponent();
       await fillForm({
         organisation: organisationObject.id,

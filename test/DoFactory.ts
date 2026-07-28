@@ -1,8 +1,8 @@
 import {
-  type DBiamPersonResponse,
   type DBiamPersonenkontextResponse,
   type DBiamPersonenuebersichtResponse,
   type DBiamPersonenzuordnungResponse,
+  type DBiamPersonResponse,
   EmailAddressStatus,
   type ManageableServiceProviderListEntryResponse,
   type ManageableServiceProviderSimpleListEntryResponse,
@@ -29,8 +29,8 @@ import {
   TraegerschaftTyp,
   type UserinfoResponse,
 } from '@/api-client/generated';
+import { PersonenkontextWorkflowResponse, ServiceProviderMerkmal } from '@/api-client/generated/api';
 import type { Organisation } from '@/stores/OrganisationStore';
-import type { PersonenkontextWorkflowResponse } from '@/stores/PersonenkontextStore';
 import { type Personendatensatz } from '@/stores/PersonStore';
 import type { Rolle, RolleResponse, RolleWithServiceProvidersResponse } from '@/stores/RolleStore';
 import {
@@ -469,6 +469,7 @@ export class DoFactory {
       logoId: 1,
       requires2fa: false,
       merkmale: [],
+      rollenartenWhitelist: [],
       ...props,
     };
   }
@@ -486,6 +487,7 @@ export class DoFactory {
       merkmale: [],
       hasRollenerweiterungen: false,
       hasSomeVerwaltenPermission: faker.datatype.boolean(),
+      rollenartenWhitelist: [],
       ...props,
     };
   }
@@ -500,9 +502,14 @@ export class DoFactory {
       administrationsebene: { id: faker.string.uuid(), name: faker.company.name(), kennung: faker.string.numeric(7) },
       rollen: [{ id: faker.string.uuid(), name: faker.person.jobTitle() }],
       requires2fa: faker.datatype.boolean(),
-      merkmale: [],
+      merkmale: [
+        ServiceProviderMerkmal.VerfuegbarFuerRollenerweiterung,
+        ServiceProviderMerkmal.AnbietenInSchulischerAngebotsverwaltung,
+        ServiceProviderMerkmal.AnbietenInSchulischerRollenverwaltung,
+      ],
       rollenerweiterungen: [],
       hasSomeVerwaltenPermission: faker.datatype.boolean(),
+      rollenartenWhitelist: [],
       ...props,
     };
   }
