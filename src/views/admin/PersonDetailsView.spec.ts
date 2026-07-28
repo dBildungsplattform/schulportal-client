@@ -469,13 +469,13 @@ describe('PersonDetailsView', () => {
         value: '54321',
         title: 'string',
         rollenart: RollenArt.Lern,
-        merkmale: new Set<RollenMerkmal>(['BEFRISTUNG_PFLICHT']),
+        merkmale: [RollenMerkmal.KopersPflicht],
       },
       {
         value: '1',
         title: 'SuS',
         rollenart: RollenArt.Lern,
-        merkmale: new Set<RollenMerkmal>(['BEFRISTUNG_PFLICHT']),
+        merkmale: [RollenMerkmal.BefristungPflicht],
       },
     ]);
   });
