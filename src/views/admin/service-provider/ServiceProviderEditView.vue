@@ -1,5 +1,10 @@
 <script setup lang="ts">
   import ServiceProviderForm from '@/components/admin/service-provider/ServiceProviderForm.vue';
+  import {
+    extractAnbietenInMerkmale,
+    formatServiceProviderAnbietenMerkmale,
+    formatServiceProviderRollenartenWhitelist,
+  } from '@/utils/serviceProvider.helper';
   import SuccessTemplate from '@/components/admin/service-provider/SuccessTemplate.vue';
   import type {
     ServiceProviderFormSubmitData,
@@ -73,6 +78,11 @@
       url: values.url,
       kategorie: values.kategorie,
       logoId: values.logoId,
+      requires2fa: values.requires2fa,
+      nachtraeglichZuweisbar: values.merkmale.includes(ServiceProviderMerkmal.NachtraeglichZuweisbar),
+      verfuegbarFuerRollenerweiterung: values.merkmale.includes(ServiceProviderMerkmal.VerfuegbarFuerRollenerweiterung),
+      anbietenInMerkmale: extractAnbietenInMerkmale(values.merkmale),
+      rollenartenWhitelist: values.rollenartenWhitelist,
     };
   }
 
@@ -94,6 +104,8 @@
       verfuegbarFuerRollenerweiterung: serviceProviderStore.currentServiceProvider.merkmale.includes(
         ServiceProviderMerkmal.VerfuegbarFuerRollenerweiterung,
       ),
+      anbietenInMerkmale: extractAnbietenInMerkmale(serviceProviderStore.currentServiceProvider.merkmale),
+      rollenartenWhitelist: serviceProviderStore.currentServiceProvider.rollenartenWhitelist ?? [],
     };
   });
 
@@ -133,18 +145,6 @@
     serviceProviderStore.errorCode = '';
   }
 
-  async function navigateToServiceProviderDetails(): Promise<void> {
-    if (organisationIdFromQuery.value) {
-      await router.push({
-        name: 'angebot-details-schulspezifisch',
-        params: { id: serviceProviderId.value },
-        query: { orga: organisationIdFromQuery.value },
-      });
-    } else {
-      await router.push({ name: 'angebot-details', params: { id: serviceProviderId.value } });
-    }
-  }
-
   async function navigateToServiceProviderList(): Promise<void> {
     if (organisationIdFromQuery.value) {
       await router.push({
@@ -153,6 +153,30 @@
       });
     } else {
       await router.push({ name: 'angebot-management' });
+    }
+  }
+
+  async function navigateToServiceProviderDetails(): Promise<void> {
+    if (organisationIdFromQuery.value) {
+      if (
+        serviceProviderStore.updatedServiceProvider?.merkmale.includes(
+          ServiceProviderMerkmal.VerfuegbarFuerRollenerweiterung,
+        ) &&
+        serviceProviderStore.updatedServiceProvider?.merkmale.includes(
+          ServiceProviderMerkmal.AnbietenInSchulischerAngebotsverwaltung,
+        )
+      ) {
+        await router.push({
+          name: 'angebot-details-schulspezifisch',
+          params: { id: serviceProviderId.value },
+          query: { orga: organisationIdFromQuery.value },
+        });
+      } else {
+        // without VerfuegbarFuerRollenerweiterung or AnbietenInSchulischerAngebotsverwaltung, the service provider is not visible in the list view for schule, so we redirect to the normal details view
+        await router.push({ name: 'angebot-details', params: { id: serviceProviderId.value } });
+      }
+    } else {
+      await router.push({ name: 'angebot-details', params: { id: serviceProviderId.value } });
     }
   }
 
@@ -238,7 +262,9 @@
                 },
                 {
                   label: $t('angebot.kategorie'),
-                  value: $t(`angebot.kategorien.${serviceProviderStore.updatedServiceProvider.kategorie}`),
+                  value: $t(
+                    `angebot.mappingFrontBackEnd.kategorien.${serviceProviderStore.updatedServiceProvider.kategorie}`,
+                  ),
                   testId: 'success-kategorie',
                 },
                 {
@@ -258,6 +284,22 @@
                     ? $t('yes')
                     : $t('no'),
                   testId: 'success-verfuegbar-fuer-rollenerweiterung',
+                },
+                {
+                  label: $t('angebot.offeringScope'),
+                  value: formatServiceProviderAnbietenMerkmale(
+                    serviceProviderStore.updatedServiceProvider.merkmale,
+                    $t,
+                  ),
+                  testId: 'success-anbieten-in-verwaltung',
+                },
+                {
+                  label: $t('angebot.rollenartenWhitelistLabel'),
+                  value: formatServiceProviderRollenartenWhitelist(
+                    serviceProviderStore.updatedServiceProvider.rollenartenWhitelist,
+                    $t,
+                  ),
+                  testId: 'success-rollenarten-whitelist',
                 },
                 {
                   label: $t('angebot.requires2FA'),
