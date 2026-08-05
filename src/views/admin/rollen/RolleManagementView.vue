@@ -2,6 +2,7 @@
   import ResultTable, { type Headers, type TableRow } from '@/components/admin/ResultTable.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import {
+    RollenArt,
     RollenMerkmal,
     RolleStore,
     useRolleStore,
@@ -24,6 +25,14 @@
     (merkmal: RollenMerkmal): MerkmalItem => ({
       title: t(`admin.rolle.mappingFrontBackEnd.merkmale.${merkmal}`),
       value: merkmal,
+    }),
+  );
+
+  type RollenartItem = { title: string; value: RollenArt };
+  const allRollenarten: readonly RollenartItem[] = Object.values(RollenArt).map(
+    (rollenart: RollenArt): RollenartItem => ({
+      title: t(`admin.rolle.mappingFrontBackEnd.rollenarten.${rollenart}`),
+      value: rollenart,
     }),
   );
 
@@ -67,7 +76,10 @@
   });
 
   const filterActive: ComputedRef<boolean> = computed(() => {
-    return (searchFilterStore.selectedMerkmaleForRollen?.length ?? 0) > 0;
+    return (
+      searchFilterStore.selectedMerkmaleForRollen?.length > 0 ||
+      searchFilterStore.selectedRollenartenForRollen?.length > 0
+    );
   });
 
   function navigateToRolleDetails(_$event: PointerEvent, { item }: { item: RolleTableItem }): void {
@@ -82,6 +94,9 @@
       merkmale: searchFilterStore.selectedMerkmaleForRollen?.length
         ? searchFilterStore.selectedMerkmaleForRollen
         : undefined,
+      rollenarten: searchFilterStore.selectedRollenartenForRollen?.length
+        ? searchFilterStore.selectedRollenartenForRollen
+        : undefined,
     });
   }
 
@@ -92,6 +107,12 @@
 
   async function setMerkmaleFilter(merkmale: RollenMerkmal[]): Promise<void> {
     searchFilterStore.setMerkmaleFilterForRollen(merkmale);
+    searchFilterStore.rollenPage = 1;
+    await getRollen();
+  }
+
+  async function setRollenartenFilter(rollenarten: RollenArt[]): Promise<void> {
+    searchFilterStore.setRollenartenFilterForRollen(rollenarten);
     searchFilterStore.rollenPage = 1;
     await getRollen();
   }
@@ -108,6 +129,7 @@
 
   async function resetFilter(): Promise<void> {
     searchFilterStore.setMerkmaleFilterForRollen([]);
+    searchFilterStore.setRollenartenFilterForRollen([]);
     searchFilterStore.rollenPage = 1;
     searchFilterStore.rollenPerPage = rollenPerPageDefault;
     await getRollen();
@@ -150,6 +172,43 @@
           >
             {{ $t('resetFilter') }}
           </v-btn>
+        </v-col>
+
+        <v-col
+          cols="12"
+          md="3"
+        >
+          <v-autocomplete
+            id="rollenarten-filter-select"
+            v-model="searchFilterStore.selectedRollenartenForRollen"
+            clearable
+            class="filter-dropdown"
+            :class="{ selected: searchFilterStore.selectedRollenartenForRollen?.length }"
+            data-testid="rollenarten-filter-select"
+            density="compact"
+            hide-details
+            :items="allRollenarten"
+            item-value="value"
+            item-title="title"
+            multiple
+            :no-data-text="$t('noDataFound')"
+            :placeholder="$t('admin.rolle.rollenart')"
+            variant="outlined"
+            @update:model-value="setRollenartenFilter"
+          >
+            <template #selection="{ internalItem: item, index }">
+              <v-chip v-if="searchFilterStore.selectedRollenartenForRollen.length < 2">
+                <span>{{ item.title }}</span>
+              </v-chip>
+              <div v-else-if="index === 0">
+                {{
+                  $t('admin.rolle.rollenartenSelected', {
+                    count: searchFilterStore.selectedRollenartenForRollen.length,
+                  })
+                }}
+              </div>
+            </template>
+          </v-autocomplete>
         </v-col>
 
         <v-col

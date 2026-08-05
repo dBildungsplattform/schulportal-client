@@ -2,7 +2,7 @@ import { SortOrder, type OrganisationSortField } from '@/utils/sorting';
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import type { Organisation } from './OrganisationStore';
 import { SortField } from './PersonStore';
-import { RollenMerkmal, type RolleResponse } from './RolleStore';
+import { RollenArt, RollenMerkmal, type RolleResponse } from './RolleStore';
 
 type SearchFilterState = {
   klassenPage: number;
@@ -35,6 +35,7 @@ type SearchFilterState = {
   selectedKlassenForKlassen: Array<string> | null;
   selectedSchuleForSchulischeServiceProvider: string | null;
   selectedMerkmaleForRollen: Array<RollenMerkmal>;
+  selectedRollenartenForRollen: Array<RollenArt>;
 };
 
 type SearchFilterActions = {
@@ -51,6 +52,7 @@ type SearchFilterActions = {
   setKlasseFilterForKlassen: (selectedKlassenForKlassen: Array<string> | null) => void;
   setSchuleForSchulischeServiceProvider: (selectedSchuleForSchulischeServiceProvider: string | null) => void;
   setMerkmaleFilterForRollen: (selectedMerkmale: Array<RollenMerkmal>) => void;
+  setRollenartenFilterForRollen: (selectedRollenarten: Array<RollenArt>) => void;
 };
 
 type SearchFilterGetters = object;
@@ -95,6 +97,7 @@ export const useSearchFilterStore: StoreDefinition<
     selectedKlassenForKlassen: [],
     selectedSchuleForSchulischeServiceProvider: null,
     selectedMerkmaleForRollen: [],
+    selectedRollenartenForRollen: [],
   }),
   actions: {
     setKlasseFilterForPersonen(selectedKlassen: Array<string> | null) {
@@ -137,6 +140,10 @@ export const useSearchFilterStore: StoreDefinition<
 
     setMerkmaleFilterForRollen(selectedMerkmale: Array<RollenMerkmal>) {
       this.selectedMerkmaleForRollen = selectedMerkmale;
+    },
+
+    setRollenartenFilterForRollen(selectedRollenarten: Array<RollenArt>) {
+      this.selectedRollenartenForRollen = selectedRollenarten;
     },
   },
 });
