@@ -200,13 +200,16 @@
               <v-chip v-if="searchFilterStore.selectedRollenartenForRollen.length < 2">
                 <span>{{ item.title }}</span>
               </v-chip>
-              <div v-else-if="index === 0">
+              <span
+                v-else-if="index === 0"
+                class="selection-count"
+              >
                 {{
                   $t('admin.rolle.rollenartenSelected', {
                     count: searchFilterStore.selectedRollenartenForRollen.length,
                   })
                 }}
-              </div>
+              </span>
             </template>
           </v-autocomplete>
         </v-col>
@@ -237,13 +240,16 @@
               <v-chip v-if="searchFilterStore.selectedMerkmaleForRollen.length < 2">
                 <span>{{ item.title }}</span>
               </v-chip>
-              <div v-else-if="index === 0">
+              <span
+                v-else-if="index === 0"
+                class="selection-count"
+              >
                 {{
                   $t('admin.rolle.merkmaleSelected', {
                     count: searchFilterStore.selectedMerkmaleForRollen.length,
                   })
                 }}
-              </div>
+              </span>
             </template>
           </v-autocomplete>
         </v-col>
@@ -286,4 +292,10 @@
   </div>
 </template>
 
-<style></style>
+<style scoped>
+  .selection-count {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+</style>
