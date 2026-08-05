@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { computed, ref, watchEffect, type ComputedRef, type Ref } from 'vue';
+  import { computed, ref, watch, watchEffect, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { useRouter, type Router } from 'vue-router';
 
@@ -10,6 +10,7 @@
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
   import {
+    ServiceProviderKategorie,
     useServiceProviderStore,
     type ManageableServiceProviderSimpleListEntry,
     type ServiceProviderStore,
@@ -34,6 +35,13 @@
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
 
   const cachedServiceProviderId: Ref<string | null> = ref(null);
+  const selectedKategorien: Ref<ServiceProviderKategorie[]> = ref([]);
+  const kategorien: ComputedRef<{ value: ServiceProviderKategorie; title: string }[]> = computed(() => {
+    return Object.values(ServiceProviderKategorie).map((item: ServiceProviderKategorie) => ({
+      value: item,
+      title: t(`angebot.mappingFrontBackEnd.kategorien.${item}`),
+    }));
+  });
 
   const serviceProviderToDelete: Ref<ServiceProviderRow | null> = ref(null);
   const isDeleteDialogOpen: Ref<boolean, boolean> = ref(false);
@@ -59,6 +67,10 @@
     });
   });
 
+  const filterOrSearchActive: ComputedRef<boolean> = computed(
+    () => selectedKategorien.value && selectedKategorien.value.length > 0,
+  );
+
   const headers: Headers = [
     { title: t('angebot.kategorie'), key: 'kategorie', align: 'start' },
     { title: t('angebot.name'), key: 'name', align: 'start' },
@@ -78,6 +90,7 @@
     await serviceProviderStore.getManageableServiceProviders(
       searchFilterStore.serviceProviderPage,
       searchFilterStore.serviceProviderPerPage,
+      { kategorien: selectedKategorien.value },
     );
   }
 
@@ -135,6 +148,14 @@
     router.push({ name: 'angebot-details', params: { id: item.id } });
   }
 
+  function resetSearchAndFilter(): void {
+    selectedKategorien.value = [];
+  }
+
+  watch(selectedKategorien, (newKategorien: Array<ServiceProviderKategorie>) => {
+    searchFilterStore.setKategorienForServiceProvider(newKategorien);
+  });
+
   watchEffect(async () => {
     await reloadData();
   });
@@ -159,6 +180,49 @@
       :title="errorTitle"
       :type="'error'"
     />
+    <v-row class="ma-3 align-start">
+      <v-col
+        cols="12"
+        md="2"
+        class="py-md-0 text-md-right align-self-center"
+      >
+        <v-btn
+          class="reset-filter"
+          data-testid="reset-filter-button"
+          :disabled="!filterOrSearchActive"
+          size="x-small"
+          variant="text"
+          width="auto"
+          @click="resetSearchAndFilter()"
+        >
+          {{ $t('resetFilter') }}
+        </v-btn>
+      </v-col>
+      <v-col
+        cols="12"
+        md="3"
+        class="py-md-0"
+      >
+        <v-autocomplete
+          id="kategorien-select"
+          v-model="selectedKategorien"
+          autocomplete="off"
+          multiple
+          class="filter-dropdown"
+          clearable
+          data-testid="kategorien-select"
+          density="compact"
+          hide-details
+          :items="kategorien"
+          item-value="value"
+          item-text="title"
+          :no-data-text="$t('noDataFound')"
+          :placeholder="$t('angebot.kategorie')"
+          required="true"
+          variant="outlined"
+        />
+      </v-col>
+    </v-row>
     <ResultTable
       v-if="!serviceProviderStore.errorCode"
       :headers

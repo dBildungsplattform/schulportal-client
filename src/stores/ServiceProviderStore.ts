@@ -126,6 +126,10 @@ export type ServiceProviderCreationFilter = {
   rollenartenWhitelist?: Array<RollenArt>;
 };
 
+export type ManageableServiceProviderFilter = {
+  kategorien: Array<ServiceProviderKategorie>;
+};
+
 export type CreatedServiceProvider = BaseServiceProvider & {
   url: string;
   merkmale: Array<ServiceProviderMerkmal>;
@@ -188,7 +192,11 @@ type ServiceProviderGetters = object;
 type ServiceProviderActions = {
   getAssignableServiceProvidersForRolleByOrganisationId: (administeredBySchulstrukturknoten: string) => Promise<void>;
   getAvailableServiceProviders: () => Promise<void>;
-  getManageableServiceProviders: (page: number, entriesPerPage: number) => Promise<void>;
+  getManageableServiceProviders: (
+    page: number,
+    entriesPerPage: number,
+    filter: ManageableServiceProviderFilter,
+  ) => Promise<void>;
   getManageableServiceProvidersForOrganisation: (
     organisationId: string,
     page: number,
@@ -268,13 +276,13 @@ export const useServiceProviderStore: StoreDefinition<
       }
     },
 
-    async getManageableServiceProviders(page: number, entriesPerPage: number) {
+    async getManageableServiceProviders(page: number, entriesPerPage: number, filter: ManageableServiceProviderFilter) {
       this.loading = true;
       try {
         const limit: number = entriesPerPage;
         const offset: number = (page - 1) * entriesPerPage;
         const response: ProviderControllerGetManageableServiceProviders200Response = (
-          await serviceProviderApi.providerControllerGetManageableServiceProviders(offset, limit)
+          await serviceProviderApi.providerControllerGetManageableServiceProviders(offset, limit, filter.kategorien)
         ).data;
         const { items, total }: ProviderControllerGetManageableServiceProviders200Response = response;
         this.manageableServiceProviders = items;
