@@ -1,40 +1,40 @@
 <script setup lang="ts">
   import ResultTable, { type Headers, type TableRow } from '@/components/admin/ResultTable.vue';
-import SearchField from '@/components/admin/SearchField.vue';
-import SpshTooltip from '@/components/admin/SpshTooltip.vue';
-import PersonBulkChangeKlasse from '@/components/admin/personen/PersonBulkChangeKlasse.vue';
-import PersonBulkDelete from '@/components/admin/personen/PersonBulkDelete.vue';
-import PersonBulkPasswordReset from '@/components/admin/personen/PersonBulkPasswordReset.vue';
-import RolleModify from '@/components/admin/rollen/RolleModify.vue';
-import RolleUnassign from '@/components/admin/rollen/RolleUnassign.vue';
-import OrganisationUnassign from '@/components/admin/schulen/OrganisationUnassign.vue';
-import InfoDialog from '@/components/alert/InfoDialog.vue';
-import LayoutCard from '@/components/cards/LayoutCard.vue';
-import KlassenFilter from '@/components/filter/KlassenFilter.vue';
-import SchulenFilter from '@/components/filter/SchulenFilter.vue';
-import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
-import { useOrganisationen } from '@/composables/useOrganisationen';
-import { type TranslatedRolleWithAttrs, useRollen } from '@/composables/useRollen';
-import { type AuthStore, useAuthStore } from '@/stores/AuthStore';
-import { type Organisation, type OrganisationStore, useOrganisationStore } from '@/stores/OrganisationStore';
-import { type PersonStore, SortField, usePersonStore } from '@/stores/PersonStore';
-import { type PersonenkontextStore, usePersonenkontextStore } from '@/stores/PersonenkontextStore';
-import {
-  type RolleResponse,
-  type RolleStore,
-  RollenArt,
-  RollenSystemRecht,
-  useRolleStore,
-} from '@/stores/RolleStore';
-import { type SearchFilterStore, useSearchFilterStore } from '@/stores/SearchFilterStore';
-import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
-import { OperationType } from '@/stores/types/bulkOperationTypes';
-import { type TranslatedObject } from '@/types.d';
-import { blurActiveElement } from '@/utils/focus';
-import { SortOrder } from '@/utils/sorting';
-import { type ComponentPublicInstance, type ComputedRef, type Ref, computed, onMounted, ref, watch } from 'vue';
-import { type Composer, useI18n } from 'vue-i18n';
-import { type Router, useRouter } from 'vue-router';
+  import SearchField from '@/components/admin/SearchField.vue';
+  import SpshTooltip from '@/components/admin/SpshTooltip.vue';
+  import PersonBulkChangeKlasse from '@/components/admin/personen/PersonBulkChangeKlasse.vue';
+  import PersonBulkDelete from '@/components/admin/personen/PersonBulkDelete.vue';
+  import PersonBulkPasswordReset from '@/components/admin/personen/PersonBulkPasswordReset.vue';
+  import RolleModify from '@/components/admin/rollen/RolleModify.vue';
+  import RolleUnassign from '@/components/admin/rollen/RolleUnassign.vue';
+  import OrganisationUnassign from '@/components/admin/schulen/OrganisationUnassign.vue';
+  import InfoDialog from '@/components/alert/InfoDialog.vue';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import KlassenFilter from '@/components/filter/KlassenFilter.vue';
+  import SchulenFilter from '@/components/filter/SchulenFilter.vue';
+  import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
+  import { useOrganisationen } from '@/composables/useOrganisationen';
+  import { type TranslatedRolleWithAttrs, useRollen } from '@/composables/useRollen';
+  import { type AuthStore, useAuthStore } from '@/stores/AuthStore';
+  import { type Organisation, type OrganisationStore, useOrganisationStore } from '@/stores/OrganisationStore';
+  import { type PersonStore, SortField, usePersonStore } from '@/stores/PersonStore';
+  import { type PersonenkontextStore, usePersonenkontextStore } from '@/stores/PersonenkontextStore';
+  import {
+    type RolleResponse,
+    type RolleStore,
+    RollenArt,
+    RollenSystemRecht,
+    useRolleStore,
+  } from '@/stores/RolleStore';
+  import { type SearchFilterStore, useSearchFilterStore } from '@/stores/SearchFilterStore';
+  import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
+  import { OperationType } from '@/stores/types/bulkOperationTypes';
+  import { type TranslatedObject } from '@/types.d';
+  import { blurActiveElement } from '@/utils/focus';
+  import { SortOrder } from '@/utils/sorting';
+  import { type ComponentPublicInstance, type ComputedRef, type Ref, computed, onMounted, ref, watch } from 'vue';
+  import { type Composer, useI18n } from 'vue-i18n';
+  import { type Router, useRouter } from 'vue-router';
 
   const searchFieldComponent: Ref<{ searchFilter?: string } | null> = ref(null);
 
