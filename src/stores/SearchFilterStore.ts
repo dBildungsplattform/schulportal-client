@@ -17,6 +17,8 @@ type SearchFilterState = {
   schulentraegerPerPage: number;
   serviceProviderPage: number;
   serviceProviderPerPage: number;
+  mptRollenPage: number;
+  mptRollenPerPage: number;
   serviceProviderSchulePage: number;
   serviceProviderSchulePerPage: number;
   searchFilterPersonen: string | null;
@@ -33,6 +35,7 @@ type SearchFilterState = {
   currentSort: { key: string; order: 'asc' | 'desc' } | null;
   selectedSchuleForKlassen: string | null;
   selectedKlassenForKlassen: Array<string> | null;
+  selectedSchuleForMptRollen: string | null;
   selectedSchuleForSchulischeServiceProvider: string | null;
 };
 
@@ -48,6 +51,7 @@ type SearchFilterActions = {
   setSearchFilterForSchulen: (searchFilter: string | null) => void;
   setSchuleFilterForKlassen: (selectedSchuleForKlassen: string | null) => void;
   setKlasseFilterForKlassen: (selectedKlassenForKlassen: Array<string> | null) => void;
+  setSchuleForMptRollen: (selectedSchuleForMptRollen: string | null) => void;
   setSchuleForSchulischeServiceProvider: (selectedSchuleForSchulischeServiceProvider: string | null) => void;
 };
 
@@ -74,6 +78,8 @@ export const useSearchFilterStore: StoreDefinition<
     schulentraegerPerPage: 30,
     serviceProviderPage: 1,
     serviceProviderPerPage: 30,
+    mptRollenPage: 1,
+    mptRollenPerPage: 30,
     serviceProviderSchulePage: 1,
     serviceProviderSchulePerPage: 30,
     searchFilterPersonen: '',
@@ -90,6 +96,7 @@ export const useSearchFilterStore: StoreDefinition<
     currentSort: { key: SortField.Familienname, order: SortOrder.Asc },
     selectedSchuleForKlassen: null,
     selectedKlassenForKlassen: [],
+    selectedSchuleForMptRollen: null,
     selectedSchuleForSchulischeServiceProvider: null,
   }),
   actions: {
@@ -125,6 +132,10 @@ export const useSearchFilterStore: StoreDefinition<
 
     setKlasseFilterForKlassen(selectedKlassenForKlassen: Array<string> | null) {
       this.selectedKlassenForKlassen = selectedKlassenForKlassen;
+    },
+
+    setSchuleForMptRollen(selectedSchuleForMptRollen: string | null) {
+      this.selectedSchuleForMptRollen = selectedSchuleForMptRollen;
     },
 
     setSchuleForSchulischeServiceProvider(selectedSchuleForSchulischeServiceProvider: string | null) {
