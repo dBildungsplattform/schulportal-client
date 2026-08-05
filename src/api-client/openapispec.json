@@ -1638,7 +1638,7 @@
             "schema": { "type": "number" }
           },
           {
-            "name": "kategorie",
+            "name": "kategorien",
             "required": false,
             "in": "query",
             "schema": {
