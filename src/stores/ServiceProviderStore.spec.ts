@@ -96,7 +96,7 @@ describe('serviceProviderStore', () => {
     });
   });
 
-  describe('getAvailableServiceProviders', () => {
+  describe('getMyServiceProviders', () => {
     it("should load user's available service providers and update state", async () => {
       const mockResponse: StartPageServiceProvider[] = [
         {
@@ -119,29 +119,29 @@ describe('serviceProviderStore', () => {
         },
       ];
 
-      mockadapter.onGet('/api/provider').replyOnce(200, mockResponse);
-      const getAvailableServiceProvidersPromise: Promise<void> = serviceProviderStore.getAvailableServiceProviders();
+      mockadapter.onGet('/api/provider/my-providers').replyOnce(200, mockResponse);
+      const getMyServiceProvidersPromise: Promise<void> = serviceProviderStore.getMyServiceProviders();
       expect(serviceProviderStore.loading).toBe(true);
-      await getAvailableServiceProvidersPromise;
+      await getMyServiceProvidersPromise;
       expect(serviceProviderStore.availableServiceProviders).toEqual([...mockResponse]);
       expect(serviceProviderStore.loading).toBe(false);
     });
 
     it('should handle string error', async () => {
-      mockadapter.onGet('/api/provider').replyOnce(500, 'some mock server error');
-      const getAvailableServiceProvidersPromise: Promise<void> = serviceProviderStore.getAvailableServiceProviders();
+      mockadapter.onGet('/api/provider/my-providers').replyOnce(500, 'some mock server error');
+      const getMyServiceProvidersPromise: Promise<void> = serviceProviderStore.getMyServiceProviders();
       expect(serviceProviderStore.loading).toBe(true);
-      await getAvailableServiceProvidersPromise;
+      await getMyServiceProvidersPromise;
       expect(serviceProviderStore.availableServiceProviders).toEqual([]);
       expect(serviceProviderStore.errorCode).toEqual('UNSPECIFIED_ERROR');
       expect(serviceProviderStore.loading).toBe(false);
     });
 
     it('should handle error code', async () => {
-      mockadapter.onGet('/api/provider').replyOnce(500, { code: 'some mock server error' });
-      const getAvailableServiceProvidersPromise: Promise<void> = serviceProviderStore.getAvailableServiceProviders();
+      mockadapter.onGet('/api/provider/my-providers').replyOnce(500, { code: 'some mock server error' });
+      const getMyServiceProvidersPromise: Promise<void> = serviceProviderStore.getMyServiceProviders();
       expect(serviceProviderStore.loading).toBe(true);
-      await getAvailableServiceProvidersPromise;
+      await getMyServiceProvidersPromise;
       expect(serviceProviderStore.availableServiceProviders).toEqual([]);
       expect(serviceProviderStore.errorCode).toEqual('some mock server error');
       expect(serviceProviderStore.loading).toBe(false);
