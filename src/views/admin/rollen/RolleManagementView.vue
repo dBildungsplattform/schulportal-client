@@ -1,23 +1,31 @@
 <script setup lang="ts">
+  import ResultTable, { type Headers, type TableRow } from '@/components/admin/ResultTable.vue';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
   import {
     RollenMerkmal,
+    RolleStore,
     useRolleStore,
-    type RolleTableItem,
     type RolleResponse,
-    type RolleStore,
+    type RolleTableItem,
   } from '@/stores/RolleStore';
+  import { rollenPerPageDefault, useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
   import { computed, onMounted, type ComputedRef } from 'vue';
-  import ResultTable, { type TableRow, type Headers } from '@/components/admin/ResultTable.vue';
-  import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { type Composer, useI18n } from 'vue-i18n';
+  import { useI18n, type Composer } from 'vue-i18n';
   import { useRouter, type Router } from 'vue-router';
-  import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
 
   const rolleStore: RolleStore = useRolleStore();
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
 
   const router: Router = useRouter();
   const { t }: Composer = useI18n({ useScope: 'global' });
+
+  type MerkmalItem = { title: string; value: RollenMerkmal };
+  const allMerkmale: readonly MerkmalItem[] = Object.values(RollenMerkmal).map(
+    (merkmal: RollenMerkmal): MerkmalItem => ({
+      title: t(`admin.rolle.mappingFrontBackEnd.merkmale.${merkmal}`),
+      value: merkmal,
+    }),
+  );
 
   type ReadonlyHeaders = Headers;
   const headers: ReadonlyHeaders = [
@@ -58,39 +66,55 @@
     });
   });
 
+  const filterActive: ComputedRef<boolean> = computed(() => {
+    return (searchFilterStore.selectedMerkmaleForRollen?.length ?? 0) > 0;
+  });
+
   function navigateToRolleDetails(_$event: PointerEvent, { item }: { item: RolleTableItem }): void {
     router.push({ name: 'rolle-details', params: { id: item.id } });
   }
 
-  function getPaginatedRollen(page: number): void {
-    searchFilterStore.rollenPage = page;
-    rolleStore.getAllRollen({
+  async function getRollen(): Promise<void> {
+    await rolleStore.getAllRollen({
       offset: (searchFilterStore.rollenPage - 1) * searchFilterStore.rollenPerPage,
       limit: searchFilterStore.rollenPerPage,
       searchString: '',
+      merkmale: searchFilterStore.selectedMerkmaleForRollen?.length
+        ? searchFilterStore.selectedMerkmaleForRollen
+        : undefined,
     });
   }
 
-  function getPaginatedRollenWithLimit(limit: number): void {
+  async function getPaginatedRollen(page: number): Promise<void> {
+    searchFilterStore.rollenPage = page;
+    await getRollen();
+  }
+
+  async function setMerkmaleFilter(merkmale: RollenMerkmal[]): Promise<void> {
+    searchFilterStore.setMerkmaleFilterForRollen(merkmale);
+    searchFilterStore.rollenPage = 1;
+    await getRollen();
+  }
+
+  async function getPaginatedRollenWithLimit(limit: number): Promise<void> {
     /* reset page to 1 if entries are equal to or less than selected limit */
     if (rolleStore.totalRollen <= limit) {
       searchFilterStore.rollenPage = 1;
     }
 
     searchFilterStore.rollenPerPage = limit;
-    rolleStore.getAllRollen({
-      offset: (searchFilterStore.rollenPage - 1) * searchFilterStore.rollenPerPage,
-      limit: searchFilterStore.rollenPerPage,
-      searchString: '',
-    });
+    await getRollen();
+  }
+
+  async function resetFilter(): Promise<void> {
+    searchFilterStore.setMerkmaleFilterForRollen([]);
+    searchFilterStore.rollenPage = 1;
+    searchFilterStore.rollenPerPage = rollenPerPageDefault;
+    await getRollen();
   }
 
   onMounted(async () => {
-    await rolleStore.getAllRollen({
-      offset: (searchFilterStore.rollenPage - 1) * searchFilterStore.rollenPerPage,
-      limit: searchFilterStore.rollenPerPage,
-      searchString: '',
-    });
+    await getRollen();
   });
 </script>
 
@@ -106,6 +130,65 @@
       :header="$t('admin.rolle.management')"
       headlineTestId="rolle-management-headline"
     >
+      <v-row
+        align="center"
+        class="ma-3"
+      >
+        <v-col
+          cols="12"
+          md="2"
+          class="py-md-0 text-md-right align-self-center"
+        >
+          <v-btn
+            class="px-0 reset-filter"
+            data-testid="reset-filter-button"
+            :disabled="!filterActive"
+            size="x-small"
+            variant="text"
+            width="auto"
+            @click="resetFilter()"
+          >
+            {{ $t('resetFilter') }}
+          </v-btn>
+        </v-col>
+
+        <v-col
+          cols="12"
+          md="3"
+        >
+          <v-autocomplete
+            id="merkmale-filter-select"
+            v-model="searchFilterStore.selectedMerkmaleForRollen"
+            clearable
+            class="filter-dropdown"
+            :class="{ selected: searchFilterStore.selectedMerkmaleForRollen?.length }"
+            data-testid="merkmale-filter-select"
+            density="compact"
+            hide-details
+            :items="allMerkmale"
+            item-value="value"
+            item-title="title"
+            multiple
+            :no-data-text="$t('noDataFound')"
+            :placeholder="$t('admin.rolle.merkmale')"
+            variant="outlined"
+            @update:model-value="setMerkmaleFilter"
+          >
+            <template #selection="{ internalItem: item, index }">
+              <v-chip v-if="searchFilterStore.selectedMerkmaleForRollen.length < 2">
+                <span>{{ item.title }}</span>
+              </v-chip>
+              <div v-else-if="index === 0">
+                {{
+                  $t('admin.rolle.merkmaleSelected', {
+                    count: searchFilterStore.selectedMerkmaleForRollen.length,
+                  })
+                }}
+              </div>
+            </template>
+          </v-autocomplete>
+        </v-col>
+      </v-row>
       <ResultTable
         :current-page="searchFilterStore.rollenPage"
         data-testid="rolle-table"

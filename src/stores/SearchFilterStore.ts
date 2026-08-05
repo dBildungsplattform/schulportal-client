@@ -1,8 +1,8 @@
-import { defineStore, type Store, type StoreDefinition } from 'pinia';
-import type { RolleResponse } from './RolleStore';
 import { SortOrder, type OrganisationSortField } from '@/utils/sorting';
+import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import type { Organisation } from './OrganisationStore';
 import { SortField } from './PersonStore';
+import { RollenMerkmal, type RolleResponse } from './RolleStore';
 
 type SearchFilterState = {
   klassenPage: number;
@@ -34,6 +34,7 @@ type SearchFilterState = {
   selectedSchuleForKlassen: string | null;
   selectedKlassenForKlassen: Array<string> | null;
   selectedSchuleForSchulischeServiceProvider: string | null;
+  selectedMerkmaleForRollen: Array<RollenMerkmal>;
 };
 
 type SearchFilterActions = {
@@ -49,12 +50,14 @@ type SearchFilterActions = {
   setSchuleFilterForKlassen: (selectedSchuleForKlassen: string | null) => void;
   setKlasseFilterForKlassen: (selectedKlassenForKlassen: Array<string> | null) => void;
   setSchuleForSchulischeServiceProvider: (selectedSchuleForSchulischeServiceProvider: string | null) => void;
+  setMerkmaleFilterForRollen: (selectedMerkmale: Array<RollenMerkmal>) => void;
 };
 
 type SearchFilterGetters = object;
 
 export type SearchFilterStore = Store<'searchFilterStore', SearchFilterState, SearchFilterGetters, SearchFilterActions>;
 
+export const rollenPerPageDefault: number = 30;
 export const useSearchFilterStore: StoreDefinition<
   'searchFilterStore',
   SearchFilterState,
@@ -67,7 +70,7 @@ export const useSearchFilterStore: StoreDefinition<
     personenPage: 1,
     personenPerPage: 30,
     rollenPage: 1,
-    rollenPerPage: 30,
+    rollenPerPage: rollenPerPageDefault,
     schulenPage: 1,
     schulenPerPage: 30,
     schultraegerPage: 1,
@@ -91,6 +94,7 @@ export const useSearchFilterStore: StoreDefinition<
     selectedSchuleForKlassen: null,
     selectedKlassenForKlassen: [],
     selectedSchuleForSchulischeServiceProvider: null,
+    selectedMerkmaleForRollen: [],
   }),
   actions: {
     setKlasseFilterForPersonen(selectedKlassen: Array<string> | null) {
@@ -129,6 +133,10 @@ export const useSearchFilterStore: StoreDefinition<
 
     setSchuleForSchulischeServiceProvider(selectedSchuleForSchulischeServiceProvider: string | null) {
       this.selectedSchuleForSchulischeServiceProvider = selectedSchuleForSchulischeServiceProvider;
+    },
+
+    setMerkmaleFilterForRollen(selectedMerkmale: Array<RollenMerkmal>) {
+      this.selectedMerkmaleForRollen = selectedMerkmale;
     },
   },
 });

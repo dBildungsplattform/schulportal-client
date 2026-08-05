@@ -11,9 +11,9 @@ import {
   type RolleApiInterface,
   type RolleResponse,
   type RolleWithServiceProvidersResponse,
-  type UpdateRolleBodyParams,
-  type SystemRechtResponse,
   type ServiceProviderIdNameResponse,
+  type SystemRechtResponse,
+  type UpdateRolleBodyParams,
 } from '../api-client/generated/api';
 import type { BaseServiceProvider } from './ServiceProviderStore';
 
@@ -52,11 +52,8 @@ type RolleActions = {
   deleteRolleById: (rolleId: string) => Promise<void>;
 };
 
-export { RollenArt };
-export { RollenMerkmal };
-export { RollenSystemRechtEnum as RollenSystemRecht };
-export type { RolleResponse };
-export type { RolleWithServiceProvidersResponse };
+export { RollenArt, RollenMerkmal, RollenSystemRechtEnum as RollenSystemRecht };
+export type { RolleResponse, RolleWithServiceProvidersResponse };
 
 export type Rolle = {
   administeredBySchulstrukturknoten: string;
@@ -109,6 +106,7 @@ export type RolleFilter = {
   rolleIds?: string[];
   systemrechte?: RollenSystemRechtEnum[];
   rollenarten?: Array<RollenArt>;
+  merkmale?: Array<RollenMerkmal>;
 };
 
 export type RolleStore = Store<'rolleStore', RolleState, RolleGetters, RolleActions>;
@@ -173,6 +171,7 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
               filter.rolleIds,
               filter.systemrechte,
               filter.rollenarten,
+              filter.merkmale,
             );
           this.allRollen = response.data;
           this.totalRollen = +response.headers['x-paging-total'];

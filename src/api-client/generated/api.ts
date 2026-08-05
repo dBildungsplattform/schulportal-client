@@ -13431,10 +13431,11 @@ export const RolleApiAxiosParamCreator = function (configuration?: Configuration
          * @param {Array<string>} [rolleIds] The ids of the selected Rollen. If provided, these Rollen will be returned regardless of the other filters since they are required by the frontend
          * @param {Array<RollenSystemRechtEnum>} [systemrechte] The system right for which the roles should be available. Can only be ROLLEN_VERWALTEN, ROLLEN_ERWEITERN or both or IMPORT_DURCHFUEHREN.
          * @param {Array<RollenArt>} [rollenarten] Filter roles by their role types.
+         * @param {Array<RollenMerkmal>} [merkmale] Filter roles by their characteristics.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        rolleControllerFindRollen: async (offset?: number, limit?: number, searchStr?: string, organisationId?: string, rolleIds?: Array<string>, systemrechte?: Array<RollenSystemRechtEnum>, rollenarten?: Array<RollenArt>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        rolleControllerFindRollen: async (offset?: number, limit?: number, searchStr?: string, organisationId?: string, rolleIds?: Array<string>, systemrechte?: Array<RollenSystemRechtEnum>, rollenarten?: Array<RollenArt>, merkmale?: Array<RollenMerkmal>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/rolle`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -13481,6 +13482,10 @@ export const RolleApiAxiosParamCreator = function (configuration?: Configuration
 
             if (rollenarten) {
                 localVarQueryParameter['rollenarten'] = rollenarten;
+            }
+
+            if (merkmale) {
+                localVarQueryParameter['merkmale'] = merkmale;
             }
 
 
@@ -13738,11 +13743,12 @@ export const RolleApiFp = function(configuration?: Configuration) {
          * @param {Array<string>} [rolleIds] The ids of the selected Rollen. If provided, these Rollen will be returned regardless of the other filters since they are required by the frontend
          * @param {Array<RollenSystemRechtEnum>} [systemrechte] The system right for which the roles should be available. Can only be ROLLEN_VERWALTEN, ROLLEN_ERWEITERN or both or IMPORT_DURCHFUEHREN.
          * @param {Array<RollenArt>} [rollenarten] Filter roles by their role types.
+         * @param {Array<RollenMerkmal>} [merkmale] Filter roles by their characteristics.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async rolleControllerFindRollen(offset?: number, limit?: number, searchStr?: string, organisationId?: string, rolleIds?: Array<string>, systemrechte?: Array<RollenSystemRechtEnum>, rollenarten?: Array<RollenArt>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<RolleWithServiceProvidersResponse>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.rolleControllerFindRollen(offset, limit, searchStr, organisationId, rolleIds, systemrechte, rollenarten, options);
+        async rolleControllerFindRollen(offset?: number, limit?: number, searchStr?: string, organisationId?: string, rolleIds?: Array<string>, systemrechte?: Array<RollenSystemRechtEnum>, rollenarten?: Array<RollenArt>, merkmale?: Array<RollenMerkmal>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<RolleWithServiceProvidersResponse>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.rolleControllerFindRollen(offset, limit, searchStr, organisationId, rolleIds, systemrechte, rollenarten, merkmale, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -13851,11 +13857,12 @@ export const RolleApiFactory = function (configuration?: Configuration, basePath
          * @param {Array<string>} [rolleIds] The ids of the selected Rollen. If provided, these Rollen will be returned regardless of the other filters since they are required by the frontend
          * @param {Array<RollenSystemRechtEnum>} [systemrechte] The system right for which the roles should be available. Can only be ROLLEN_VERWALTEN, ROLLEN_ERWEITERN or both or IMPORT_DURCHFUEHREN.
          * @param {Array<RollenArt>} [rollenarten] Filter roles by their role types.
+         * @param {Array<RollenMerkmal>} [merkmale] Filter roles by their characteristics.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        rolleControllerFindRollen(offset?: number, limit?: number, searchStr?: string, organisationId?: string, rolleIds?: Array<string>, systemrechte?: Array<RollenSystemRechtEnum>, rollenarten?: Array<RollenArt>, options?: any): AxiosPromise<Array<RolleWithServiceProvidersResponse>> {
-            return localVarFp.rolleControllerFindRollen(offset, limit, searchStr, organisationId, rolleIds, systemrechte, rollenarten, options).then((request) => request(axios, basePath));
+        rolleControllerFindRollen(offset?: number, limit?: number, searchStr?: string, organisationId?: string, rolleIds?: Array<string>, systemrechte?: Array<RollenSystemRechtEnum>, rollenarten?: Array<RollenArt>, merkmale?: Array<RollenMerkmal>, options?: any): AxiosPromise<Array<RolleWithServiceProvidersResponse>> {
+            return localVarFp.rolleControllerFindRollen(offset, limit, searchStr, organisationId, rolleIds, systemrechte, rollenarten, merkmale, options).then((request) => request(axios, basePath));
         },
         /**
          * Get all systemrechte for rollen.
@@ -13958,11 +13965,12 @@ export interface RolleApiInterface {
      * @param {Array<string>} [rolleIds] The ids of the selected Rollen. If provided, these Rollen will be returned regardless of the other filters since they are required by the frontend
      * @param {Array<RollenSystemRechtEnum>} [systemrechte] The system right for which the roles should be available. Can only be ROLLEN_VERWALTEN, ROLLEN_ERWEITERN or both or IMPORT_DURCHFUEHREN.
      * @param {Array<RollenArt>} [rollenarten] Filter roles by their role types.
+     * @param {Array<RollenMerkmal>} [merkmale] Filter roles by their characteristics.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof RolleApiInterface
      */
-    rolleControllerFindRollen(offset?: number, limit?: number, searchStr?: string, organisationId?: string, rolleIds?: Array<string>, systemrechte?: Array<RollenSystemRechtEnum>, rollenarten?: Array<RollenArt>, options?: AxiosRequestConfig): AxiosPromise<Array<RolleWithServiceProvidersResponse>>;
+    rolleControllerFindRollen(offset?: number, limit?: number, searchStr?: string, organisationId?: string, rolleIds?: Array<string>, systemrechte?: Array<RollenSystemRechtEnum>, rollenarten?: Array<RollenArt>, merkmale?: Array<RollenMerkmal>, options?: AxiosRequestConfig): AxiosPromise<Array<RolleWithServiceProvidersResponse>>;
 
     /**
      * Get all systemrechte for rollen.
@@ -14073,12 +14081,13 @@ export class RolleApi extends BaseAPI implements RolleApiInterface {
      * @param {Array<string>} [rolleIds] The ids of the selected Rollen. If provided, these Rollen will be returned regardless of the other filters since they are required by the frontend
      * @param {Array<RollenSystemRechtEnum>} [systemrechte] The system right for which the roles should be available. Can only be ROLLEN_VERWALTEN, ROLLEN_ERWEITERN or both or IMPORT_DURCHFUEHREN.
      * @param {Array<RollenArt>} [rollenarten] Filter roles by their role types.
+     * @param {Array<RollenMerkmal>} [merkmale] Filter roles by their characteristics.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof RolleApi
      */
-    public rolleControllerFindRollen(offset?: number, limit?: number, searchStr?: string, organisationId?: string, rolleIds?: Array<string>, systemrechte?: Array<RollenSystemRechtEnum>, rollenarten?: Array<RollenArt>, options?: AxiosRequestConfig) {
-        return RolleApiFp(this.configuration).rolleControllerFindRollen(offset, limit, searchStr, organisationId, rolleIds, systemrechte, rollenarten, options).then((request) => request(this.axios, this.basePath));
+    public rolleControllerFindRollen(offset?: number, limit?: number, searchStr?: string, organisationId?: string, rolleIds?: Array<string>, systemrechte?: Array<RollenSystemRechtEnum>, rollenarten?: Array<RollenArt>, merkmale?: Array<RollenMerkmal>, options?: AxiosRequestConfig) {
+        return RolleApiFp(this.configuration).rolleControllerFindRollen(offset, limit, searchStr, organisationId, rolleIds, systemrechte, rollenarten, merkmale, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
