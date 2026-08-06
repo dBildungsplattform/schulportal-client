@@ -2,6 +2,12 @@
   import ResultTable, { type Headers, type TableRow } from '@/components/admin/ResultTable.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import {
+    OrganisationsTyp,
+    useOrganisationStore,
+    type Organisation,
+    type OrganisationStore,
+  } from '@/stores/OrganisationStore';
+  import {
     RollenArt,
     RollenMerkmal,
     RolleStore,
@@ -15,6 +21,7 @@
   import { useRouter, type Router } from 'vue-router';
 
   const rolleStore: RolleStore = useRolleStore();
+  const organisationStore: OrganisationStore = useOrganisationStore();
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
 
   const router: Router = useRouter();
@@ -26,6 +33,16 @@
       title: t(`admin.rolle.mappingFrontBackEnd.merkmale.${merkmal}`),
       value: merkmal,
     }),
+  );
+
+  type OrganisationItem = { title: string; value: string };
+  const allOrganisationenItems: ComputedRef<OrganisationItem[]> = computed(() =>
+    organisationStore.allOrganisationen.map(
+      (org: Organisation): OrganisationItem => ({
+        title: org.kennung ? `${org.kennung} (${org.name})` : org.name,
+        value: org.id,
+      }),
+    ),
   );
 
   type RollenartItem = { title: string; value: RollenArt };
@@ -78,7 +95,8 @@
   const filterActive: ComputedRef<boolean> = computed(() => {
     return (
       searchFilterStore.selectedMerkmaleForRollen?.length > 0 ||
-      searchFilterStore.selectedRollenartenForRollen?.length > 0
+      searchFilterStore.selectedRollenartenForRollen?.length > 0 ||
+      searchFilterStore.selectedOrganisationenForRollen?.length > 0
     );
   });
 
@@ -91,6 +109,9 @@
       offset: (searchFilterStore.rollenPage - 1) * searchFilterStore.rollenPerPage,
       limit: searchFilterStore.rollenPerPage,
       searchString: '',
+      organisationenForFilter: searchFilterStore.selectedOrganisationenForRollen?.length
+        ? searchFilterStore.selectedOrganisationenForRollen
+        : undefined,
       merkmale: searchFilterStore.selectedMerkmaleForRollen?.length
         ? searchFilterStore.selectedMerkmaleForRollen
         : undefined,
@@ -117,6 +138,12 @@
     await getRollen();
   }
 
+  async function setOrganisationenFilter(organisationen: string[]): Promise<void> {
+    searchFilterStore.setOrganisationenFilterForRollen(organisationen ?? []);
+    searchFilterStore.rollenPage = 1;
+    await getRollen();
+  }
+
   async function getPaginatedRollenWithLimit(limit: number): Promise<void> {
     /* reset page to 1 if entries are equal to or less than selected limit */
     if (rolleStore.totalRollen <= limit) {
@@ -130,13 +157,19 @@
   async function resetFilter(): Promise<void> {
     searchFilterStore.setMerkmaleFilterForRollen([]);
     searchFilterStore.setRollenartenFilterForRollen([]);
+    searchFilterStore.setOrganisationenFilterForRollen([]);
     searchFilterStore.rollenPage = 1;
     searchFilterStore.rollenPerPage = rollenPerPageDefault;
     await getRollen();
   }
 
   onMounted(async () => {
-    await getRollen();
+    await Promise.all([
+      getRollen(),
+      organisationStore.getAllOrganisationen({
+        excludeTyp: [OrganisationsTyp.Klasse],
+      }),
+    ]);
   });
 </script>
 
@@ -172,6 +205,46 @@
           >
             {{ $t('resetFilter') }}
           </v-btn>
+        </v-col>
+
+        <v-col
+          cols="12"
+          md="3"
+        >
+          <v-autocomplete
+            id="organisationen-filter-select"
+            v-model="searchFilterStore.selectedOrganisationenForRollen"
+            clearable
+            class="filter-dropdown"
+            :class="{ selected: searchFilterStore.selectedOrganisationenForRollen?.length }"
+            data-testid="organisationen-filter-select"
+            density="compact"
+            hide-details
+            :items="allOrganisationenItems"
+            item-value="value"
+            item-title="title"
+            multiple
+            :no-data-text="$t('noDataFound')"
+            :placeholder="$t('admin.administrationsebene.administrationsebene')"
+            variant="outlined"
+            @update:model-value="setOrganisationenFilter"
+          >
+            <template #selection="{ internalItem: item, index }">
+              <v-chip v-if="searchFilterStore.selectedOrganisationenForRollen.length < 2">
+                <span>{{ item.title }}</span>
+              </v-chip>
+              <span
+                v-else-if="index === 0"
+                class="selection-count"
+              >
+                {{
+                  $t('admin.rolle.organisationenSelected', {
+                    count: searchFilterStore.selectedOrganisationenForRollen.length,
+                  })
+                }}
+              </span>
+            </template>
+          </v-autocomplete>
         </v-col>
 
         <v-col

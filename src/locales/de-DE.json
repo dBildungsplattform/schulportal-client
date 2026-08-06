@@ -700,6 +700,7 @@
       "rollenname": "Rollenname",
       "merkmaleSelected": "{count} Merkmale ausgewählt",
       "rollenartenSelected": "{count} Rollenarten ausgewählt",
+      "organisationenSelected": "{count} Organisationen ausgewählt",
       "rollenSelected": "{count} Rollen ausgewählt",
       "rolleAddedSuccessfully": "Die Rolle wurde erfolgreich hinzugefügt.",
       "rolleUpdatedSuccessfully": "Die Rolle wurde erfolgreich geändert.",

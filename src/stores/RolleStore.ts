@@ -102,7 +102,8 @@ export type RolleFilter = {
   limit?: number;
   offset?: number;
   searchString?: string;
-  organisationId?: string;
+  organisationContextForOperation?: string;
+  organisationenForFilter?: string[];
   rolleIds?: string[];
   systemrechte?: RollenSystemRechtEnum[];
   rollenarten?: Array<RollenArt>;
@@ -167,7 +168,8 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
               filter.offset,
               filter.limit,
               filter.searchString,
-              filter.organisationId,
+              filter.organisationContextForOperation,
+              filter.organisationenForFilter,
               filter.rolleIds,
               filter.systemrechte,
               filter.rollenarten,

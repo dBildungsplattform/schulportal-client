@@ -36,6 +36,7 @@ type SearchFilterState = {
   selectedSchuleForSchulischeServiceProvider: string | null;
   selectedMerkmaleForRollen: Array<RollenMerkmal>;
   selectedRollenartenForRollen: Array<RollenArt>;
+  selectedOrganisationenForRollen: Array<string>;
 };
 
 type SearchFilterActions = {
@@ -53,6 +54,7 @@ type SearchFilterActions = {
   setSchuleForSchulischeServiceProvider: (selectedSchuleForSchulischeServiceProvider: string | null) => void;
   setMerkmaleFilterForRollen: (selectedMerkmale: Array<RollenMerkmal>) => void;
   setRollenartenFilterForRollen: (selectedRollenarten: Array<RollenArt>) => void;
+  setOrganisationenFilterForRollen: (selectedOrganisationen: Array<string>) => void;
 };
 
 type SearchFilterGetters = object;
@@ -98,6 +100,7 @@ export const useSearchFilterStore: StoreDefinition<
     selectedSchuleForSchulischeServiceProvider: null,
     selectedMerkmaleForRollen: [],
     selectedRollenartenForRollen: [],
+    selectedOrganisationenForRollen: [],
   }),
   actions: {
     setKlasseFilterForPersonen(selectedKlassen: Array<string> | null) {
@@ -144,6 +147,9 @@ export const useSearchFilterStore: StoreDefinition<
 
     setRollenartenFilterForRollen(selectedRollenarten: Array<RollenArt>) {
       this.selectedRollenartenForRollen = selectedRollenarten;
+    },
+    setOrganisationenFilterForRollen(selectedOrganisationen: Array<string>) {
+      this.selectedOrganisationenForRollen = selectedOrganisationen;
     },
   },
 });
