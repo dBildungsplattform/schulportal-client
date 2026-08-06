@@ -1767,6 +1767,7 @@ export interface ManageableServiceProviderResponse {
 
 export const ManageableServiceProviderResponseRelevantSystemrechteEnum = {
     RollenVerwalten: 'ROLLEN_VERWALTEN',
+    MptRollenVerwalten: 'MPT_ROLLEN_VERWALTEN',
     PersonenSofortLoeschen: 'PERSONEN_SOFORT_LOESCHEN',
     PersonenVerwalten: 'PERSONEN_VERWALTEN',
     LandesbediensteteSuchenUndHinzufuegen: 'LANDESBEDIENSTETE_SUCHEN_UND_HINZUFUEGEN',
@@ -3611,10 +3612,10 @@ export interface RolleResponse {
     'rollenart': RollenArt;
     /**
      * 
-     * @type {Set<RollenMerkmal>}
+     * @type {Array<RollenMerkmal>}
      * @memberof RolleResponse
      */
-    'merkmale': Set<RollenMerkmal>;
+    'merkmale': Array<RollenMerkmal>;
     /**
      * 
      * @type {Set<SystemRechtResponse>}
@@ -3699,10 +3700,10 @@ export interface RolleWithServiceProvidersResponse {
     'rollenart': RollenArt;
     /**
      * 
-     * @type {Set<RollenMerkmal>}
+     * @type {Array<RollenMerkmal>}
      * @memberof RolleWithServiceProvidersResponse
      */
-    'merkmale': Set<RollenMerkmal>;
+    'merkmale': Array<RollenMerkmal>;
     /**
      * 
      * @type {Set<SystemRechtResponse>}
@@ -3765,7 +3766,8 @@ export type RollenArt = typeof RollenArt[keyof typeof RollenArt];
 
 export const RollenMerkmal = {
     BefristungPflicht: 'BEFRISTUNG_PFLICHT',
-    KopersPflicht: 'KOPERS_PFLICHT'
+    KopersPflicht: 'KOPERS_PFLICHT',
+    MptRolle: 'MPT_ROLLE'
 } as const;
 
 export type RollenMerkmal = typeof RollenMerkmal[keyof typeof RollenMerkmal];
@@ -3779,6 +3781,7 @@ export type RollenMerkmal = typeof RollenMerkmal[keyof typeof RollenMerkmal];
 
 export const RollenSystemRechtEnum = {
     RollenVerwalten: 'ROLLEN_VERWALTEN',
+    MptRollenVerwalten: 'MPT_ROLLEN_VERWALTEN',
     PersonenSofortLoeschen: 'PERSONEN_SOFORT_LOESCHEN',
     PersonenVerwalten: 'PERSONEN_VERWALTEN',
     LandesbediensteteSuchenUndHinzufuegen: 'LANDESBEDIENSTETE_SUCHEN_UND_HINZUFUEGEN',
@@ -13429,7 +13432,7 @@ export const RolleApiAxiosParamCreator = function (configuration?: Configuration
          * @param {string} [searchStr] The name for the role.
          * @param {string} [organisationId] The id of the organisation where the role should be available.
          * @param {Array<string>} [rolleIds] The ids of the selected Rollen. If provided, these Rollen will be returned regardless of the other filters since they are required by the frontend
-         * @param {Array<RollenSystemRechtEnum>} [systemrechte] The system right for which the roles should be available. Can only be ROLLEN_VERWALTEN, ROLLEN_ERWEITERN or both or IMPORT_DURCHFUEHREN.
+         * @param {Array<RollenSystemRechtEnum>} [systemrechte] The system right for which the roles should be available. Can only be ROLLEN_VERWALTEN, ROLLEN_ERWEITERN, MPT_ROLLEN_VERWALTEN or a combination of them or IMPORT_DURCHFUEHREN .
          * @param {Array<RollenArt>} [rollenarten] Filter roles by their role types.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -13736,7 +13739,7 @@ export const RolleApiFp = function(configuration?: Configuration) {
          * @param {string} [searchStr] The name for the role.
          * @param {string} [organisationId] The id of the organisation where the role should be available.
          * @param {Array<string>} [rolleIds] The ids of the selected Rollen. If provided, these Rollen will be returned regardless of the other filters since they are required by the frontend
-         * @param {Array<RollenSystemRechtEnum>} [systemrechte] The system right for which the roles should be available. Can only be ROLLEN_VERWALTEN, ROLLEN_ERWEITERN or both or IMPORT_DURCHFUEHREN.
+         * @param {Array<RollenSystemRechtEnum>} [systemrechte] The system right for which the roles should be available. Can only be ROLLEN_VERWALTEN, ROLLEN_ERWEITERN, MPT_ROLLEN_VERWALTEN or a combination of them or IMPORT_DURCHFUEHREN .
          * @param {Array<RollenArt>} [rollenarten] Filter roles by their role types.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -13849,7 +13852,7 @@ export const RolleApiFactory = function (configuration?: Configuration, basePath
          * @param {string} [searchStr] The name for the role.
          * @param {string} [organisationId] The id of the organisation where the role should be available.
          * @param {Array<string>} [rolleIds] The ids of the selected Rollen. If provided, these Rollen will be returned regardless of the other filters since they are required by the frontend
-         * @param {Array<RollenSystemRechtEnum>} [systemrechte] The system right for which the roles should be available. Can only be ROLLEN_VERWALTEN, ROLLEN_ERWEITERN or both or IMPORT_DURCHFUEHREN.
+         * @param {Array<RollenSystemRechtEnum>} [systemrechte] The system right for which the roles should be available. Can only be ROLLEN_VERWALTEN, ROLLEN_ERWEITERN, MPT_ROLLEN_VERWALTEN or a combination of them or IMPORT_DURCHFUEHREN .
          * @param {Array<RollenArt>} [rollenarten] Filter roles by their role types.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -13956,7 +13959,7 @@ export interface RolleApiInterface {
      * @param {string} [searchStr] The name for the role.
      * @param {string} [organisationId] The id of the organisation where the role should be available.
      * @param {Array<string>} [rolleIds] The ids of the selected Rollen. If provided, these Rollen will be returned regardless of the other filters since they are required by the frontend
-     * @param {Array<RollenSystemRechtEnum>} [systemrechte] The system right for which the roles should be available. Can only be ROLLEN_VERWALTEN, ROLLEN_ERWEITERN or both or IMPORT_DURCHFUEHREN.
+     * @param {Array<RollenSystemRechtEnum>} [systemrechte] The system right for which the roles should be available. Can only be ROLLEN_VERWALTEN, ROLLEN_ERWEITERN, MPT_ROLLEN_VERWALTEN or a combination of them or IMPORT_DURCHFUEHREN .
      * @param {Array<RollenArt>} [rollenarten] Filter roles by their role types.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -14071,7 +14074,7 @@ export class RolleApi extends BaseAPI implements RolleApiInterface {
      * @param {string} [searchStr] The name for the role.
      * @param {string} [organisationId] The id of the organisation where the role should be available.
      * @param {Array<string>} [rolleIds] The ids of the selected Rollen. If provided, these Rollen will be returned regardless of the other filters since they are required by the frontend
-     * @param {Array<RollenSystemRechtEnum>} [systemrechte] The system right for which the roles should be available. Can only be ROLLEN_VERWALTEN, ROLLEN_ERWEITERN or both or IMPORT_DURCHFUEHREN.
+     * @param {Array<RollenSystemRechtEnum>} [systemrechte] The system right for which the roles should be available. Can only be ROLLEN_VERWALTEN, ROLLEN_ERWEITERN, MPT_ROLLEN_VERWALTEN or a combination of them or IMPORT_DURCHFUEHREN .
      * @param {Array<RollenArt>} [rollenarten] Filter roles by their role types.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}

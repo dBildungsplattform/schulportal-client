@@ -1156,7 +1156,7 @@
             "name": "systemrechte",
             "required": false,
             "in": "query",
-            "description": "The system right for which the roles should be available. Can only be ROLLEN_VERWALTEN, ROLLEN_ERWEITERN or both or IMPORT_DURCHFUEHREN.",
+            "description": "The system right for which the roles should be available. Can only be ROLLEN_VERWALTEN, ROLLEN_ERWEITERN, MPT_ROLLEN_VERWALTEN or a combination of them or IMPORT_DURCHFUEHREN .",
             "schema": { "type": "array", "items": { "$ref": "#/components/schemas/RollenSystemRechtEnum" } }
           },
           {
@@ -3432,7 +3432,7 @@
         "type": "string",
         "enum": ["LERN", "LEHR", "EXTERN", "ORGADMIN", "LEIT", "SYSADMIN", "SORGBER", "SCHB", "NLEHR"]
       },
-      "RollenMerkmal": { "type": "string", "enum": ["BEFRISTUNG_PFLICHT", "KOPERS_PFLICHT"] },
+      "RollenMerkmal": { "type": "string", "enum": ["BEFRISTUNG_PFLICHT", "KOPERS_PFLICHT", "MPT_ROLLE"] },
       "DBiamPersonenzuordnungResponse": {
         "type": "object",
         "properties": {
@@ -3591,6 +3591,7 @@
         "type": "string",
         "enum": [
           "ROLLEN_VERWALTEN",
+          "MPT_ROLLEN_VERWALTEN",
           "PERSONEN_SOFORT_LOESCHEN",
           "PERSONEN_VERWALTEN",
           "LANDESBEDIENSTETE_SUCHEN_UND_HINZUFUEGEN",
@@ -3666,11 +3667,7 @@
           "name": { "type": "string" },
           "administeredBySchulstrukturknoten": { "type": "string" },
           "rollenart": { "allOf": [{ "$ref": "#/components/schemas/RollenArt" }] },
-          "merkmale": {
-            "type": "array",
-            "uniqueItems": true,
-            "items": { "$ref": "#/components/schemas/RollenMerkmal" }
-          },
+          "merkmale": { "type": "array", "items": { "$ref": "#/components/schemas/RollenMerkmal" } },
           "systemrechte": {
             "uniqueItems": true,
             "type": "array",
@@ -3990,6 +3987,7 @@
               "type": "string",
               "enum": [
                 "ROLLEN_VERWALTEN",
+                "MPT_ROLLEN_VERWALTEN",
                 "PERSONEN_SOFORT_LOESCHEN",
                 "PERSONEN_VERWALTEN",
                 "LANDESBEDIENSTETE_SUCHEN_UND_HINZUFUEGEN",
@@ -4194,11 +4192,7 @@
           "name": { "type": "string" },
           "administeredBySchulstrukturknoten": { "type": "string" },
           "rollenart": { "allOf": [{ "$ref": "#/components/schemas/RollenArt" }] },
-          "merkmale": {
-            "type": "array",
-            "uniqueItems": true,
-            "items": { "$ref": "#/components/schemas/RollenMerkmal" }
-          },
+          "merkmale": { "type": "array", "items": { "$ref": "#/components/schemas/RollenMerkmal" } },
           "systemrechte": {
             "uniqueItems": true,
             "type": "array",
