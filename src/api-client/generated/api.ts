@@ -734,38 +734,50 @@ export interface DbiamApplyRollenerweiterungMultiError {
     'code': number;
     /**
      * 
-     * @type {Array<DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInner>}
+     * @type {Array<DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInner>}
      * @memberof DbiamApplyRollenerweiterungMultiError
      */
-    'rolleIdsWithI18nKeys': Array<DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInner>;
+    'idsWithI18nKeys': Array<DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInner>;
 }
 /**
  * 
  * @export
- * @interface DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInner
+ * @interface DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInner
  */
-export interface DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInner {
+export interface DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInner {
     /**
      * 
      * @type {string}
-     * @memberof DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInner
+     * @memberof DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInner
      */
-    'rolleId'?: string;
+    'id'?: string;
     /**
      * 
      * @type {string}
-     * @memberof DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInner
+     * @memberof DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInner
      */
-    'i18nKey'?: DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInnerI18nKeyEnum;
+    'errorIdType'?: DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInnerErrorIdTypeEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInner
+     */
+    'i18nKey'?: DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInnerI18nKeyEnum;
 }
 
-export const DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInnerI18nKeyEnum = {
+export const DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInnerErrorIdTypeEnum = {
+    Rolle: 'ROLLE',
+    Angebot: 'ANGEBOT'
+} as const;
+
+export type DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInnerErrorIdTypeEnum = typeof DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInnerErrorIdTypeEnum[keyof typeof DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInnerErrorIdTypeEnum];
+export const DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInnerI18nKeyEnum = {
     RollenerweiterungTechnicalError: 'ROLLENERWEITERUNG_TECHNICAL_ERROR',
     NotFound: 'NOT_FOUND',
     NoRedundantRollenerweiterung: 'NO_REDUNDANT_ROLLENERWEITERUNG'
 } as const;
 
-export type DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInnerI18nKeyEnum = typeof DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInnerI18nKeyEnum[keyof typeof DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInnerI18nKeyEnum];
+export type DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInnerI18nKeyEnum = typeof DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInnerI18nKeyEnum[keyof typeof DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInnerI18nKeyEnum];
 
 /**
  * 
@@ -13397,7 +13409,7 @@ export const RolleApiAxiosParamCreator = function (configuration?: Configuration
          * Apply Erweiterte Angebote changes for a rolle.
          * @summary 
          * @param {string} rolleId The rolleId of the rolle.
-         * @param {string} organisationId The organisationId of the person.
+         * @param {string} organisationId The organisationId of the organisation.
          * @param {ApplyRollenerweiterungChangesBodyParams} applyRollenerweiterungChangesBodyParams 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -13931,7 +13943,7 @@ export const RolleApiFp = function(configuration?: Configuration) {
          * Apply Erweiterte Angebote changes for a rolle.
          * @summary 
          * @param {string} rolleId The rolleId of the rolle.
-         * @param {string} organisationId The organisationId of the person.
+         * @param {string} organisationId The organisationId of the organisation.
          * @param {ApplyRollenerweiterungChangesBodyParams} applyRollenerweiterungChangesBodyParams 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -14073,7 +14085,7 @@ export const RolleApiFactory = function (configuration?: Configuration, basePath
          * Apply Erweiterte Angebote changes for a rolle.
          * @summary 
          * @param {string} rolleId The rolleId of the rolle.
-         * @param {string} organisationId The organisationId of the person.
+         * @param {string} organisationId The organisationId of the organisation.
          * @param {ApplyRollenerweiterungChangesBodyParams} applyRollenerweiterungChangesBodyParams 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -14203,7 +14215,7 @@ export interface RolleApiInterface {
      * Apply Erweiterte Angebote changes for a rolle.
      * @summary 
      * @param {string} rolleId The rolleId of the rolle.
-     * @param {string} organisationId The organisationId of the person.
+     * @param {string} organisationId The organisationId of the organisation.
      * @param {ApplyRollenerweiterungChangesBodyParams} applyRollenerweiterungChangesBodyParams 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -14333,7 +14345,7 @@ export class RolleApi extends BaseAPI implements RolleApiInterface {
      * Apply Erweiterte Angebote changes for a rolle.
      * @summary 
      * @param {string} rolleId The rolleId of the rolle.
-     * @param {string} organisationId The organisationId of the person.
+     * @param {string} organisationId The organisationId of the organisation.
      * @param {ApplyRollenerweiterungChangesBodyParams} applyRollenerweiterungChangesBodyParams 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}

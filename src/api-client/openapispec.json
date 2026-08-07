@@ -2646,7 +2646,7 @@
             "name": "organisationId",
             "required": true,
             "in": "path",
-            "description": "The organisationId of the person.",
+            "description": "The organisationId of the organisation.",
             "schema": {
               "nullable": false,
               "type": "string"
@@ -7241,13 +7241,17 @@
             "type": "number",
             "description": "Corresponds to HTTP Status code like 200, 404, 500"
           },
-          "rolleIdsWithI18nKeys": {
+          "idsWithI18nKeys": {
             "type": "array",
             "items": {
               "type": "object",
               "properties": {
-                "rolleId": {
+                "id": {
                   "type": "string"
+                },
+                "errorIdType": {
+                  "type": "string",
+                  "enum": ["ROLLE", "ANGEBOT"]
                 },
                 "i18nKey": {
                   "type": "string",
@@ -7258,7 +7262,7 @@
             }
           }
         },
-        "required": ["code", "rolleIdsWithI18nKeys"]
+        "required": ["code", "idsWithI18nKeys"]
       },
       "RollenerweiterungWithExtendedDataResponse": {
         "type": "object",

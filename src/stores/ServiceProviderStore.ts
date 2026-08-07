@@ -5,7 +5,8 @@ import type { ServiceProviderFormSubmitData } from '@/components/admin/service-p
 import axiosApiInstance from '@/services/ApiService';
 import { getResponseErrorCode } from '@/utils/errorHandlers';
 import {
-  DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInnerI18nKeyEnum,
+  DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInner,
+  DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInnerI18nKeyEnum,
   ProviderApiFactory,
   RolleApiFactory,
   RollenArt,
@@ -16,7 +17,6 @@ import {
   type CreateServiceProviderBodyParams,
   type CreateServiceProviderResponse,
   type DbiamApplyRollenerweiterungMultiError,
-  type DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInner,
   type ManageableServiceProviderResponse,
   type ManageableServiceProviderSimpleListEntryResponse,
   type ProviderApiInterface,
@@ -156,7 +156,7 @@ type ServiceProviderState = {
   createdServiceProvider: CreatedServiceProvider | null;
   errorCode: string;
   loading: boolean;
-  errors: Map<string, DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInnerI18nKeyEnum>;
+  errors: Map<string, DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInnerI18nKeyEnum>;
 };
 
 function containsMultiError(error: unknown): error is AxiosError<DbiamApplyRollenerweiterungMultiError> {
@@ -175,10 +175,10 @@ function containsMultiError(error: unknown): error is AxiosError<DbiamApplyRolle
   if (!(typeof domainError.code === 'string' || typeof domainError.code === 'number')) {
     return false;
   }
-  if (!('rolleIdsWithI18nKeys' in domainError)) {
+  if (!('idsWithI18nKeys' in domainError)) {
     return false;
   }
-  if (!Array.isArray(domainError.rolleIdsWithI18nKeys)) {
+  if (!Array.isArray(domainError.idsWithI18nKeys)) {
     return false;
   }
   return true;
@@ -235,7 +235,7 @@ export const useServiceProviderStore: StoreDefinition<
       createdServiceProvider: null,
       errorCode: '',
       loading: false,
-      errors: new Map<string, DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInnerI18nKeyEnum>(),
+      errors: new Map<string, DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInnerI18nKeyEnum>(),
     };
   },
   actions: {
@@ -414,16 +414,16 @@ export const useServiceProviderStore: StoreDefinition<
         );
       } catch (error) {
         if (containsMultiError(error)) {
-          this.errors = new Map<string, DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInnerI18nKeyEnum>(
-            error.response?.data.rolleIdsWithI18nKeys
+          this.errors = new Map<string, DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInnerI18nKeyEnum>(
+            error.response?.data.idsWithI18nKeys
               .filter(
                 (
-                  item: DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInner,
-                ): item is Required<DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInner> =>
-                  item.rolleId !== undefined && item.i18nKey !== undefined,
+                  item: DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInner,
+                ): item is Required<DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInner> =>
+                  item.id !== undefined && item.i18nKey !== undefined,
               )
-              .map((item: Required<DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInner>) => [
-                item.rolleId,
+              .map((item: Required<DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInner>) => [
+                item.id,
                 item.i18nKey,
               ]),
           );
