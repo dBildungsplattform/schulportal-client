@@ -56,9 +56,7 @@ beforeEach(async (): Promise<void> => {
   searchFilterStore.$reset();
 });
 
-function getKategorienSelect(
-  wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementView>>,
-): VueWrapper {
+function getKategorienSelect(wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementView>>): VueWrapper {
   return wrapper.findComponent('[data-testid="kategorien-select"]') as VueWrapper;
 }
 
