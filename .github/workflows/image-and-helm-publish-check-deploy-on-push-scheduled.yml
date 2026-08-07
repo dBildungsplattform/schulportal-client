@@ -102,7 +102,8 @@ jobs:
       node_version: '24.16.0'
     permissions:
       contents: read
-    secrets: inherit
+    secrets:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   build_image_on_push:
     needs:
@@ -155,7 +156,8 @@ jobs:
     needs:
       - create_branch_identifier
       - select_helm_version_generation_and_image_tag_generation
-    secrets: inherit
+    secrets:
+      HELM_CHARTS_REGISTRY_PUBLISHER: ${{ secrets.HELM_CHARTS_REGISTRY_PUBLISHER }}
     with:
       chart_name: schulportal-client
       image_tag_generation: ${{ needs.select_helm_version_generation_and_image_tag_generation.outputs.SELECT_IMAGE_TAG_GENERATION }}
@@ -222,7 +224,8 @@ jobs:
       dbildungs_iam_ldap_branch: ${{ needs.branch_meta.outputs.ticket }}
       namespace: ${{ needs.create_branch_identifier.outputs.namespace_from_branch }}
       database_recreation: 'true' # to prevent database recreation this has to be set to false
-    secrets: inherit
+    secrets:
+      SPSH_DEV_KUBECONFIG: ${{ secrets.SPSH_DEV_KUBECONFIG }}
 
   # On Delete
   create_branch_identifier_for_deletion:
