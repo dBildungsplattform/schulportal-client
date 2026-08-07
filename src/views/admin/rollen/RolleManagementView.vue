@@ -1,15 +1,11 @@
 <script setup lang="ts">
   import ResultTable, { type Headers, type TableRow } from '@/components/admin/ResultTable.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import {
-    OrganisationsTyp,
-    useOrganisationStore,
-    type Organisation,
-    type OrganisationStore,
-  } from '@/stores/OrganisationStore';
+  import SchulenFilter from '@/components/filter/SchulenFilter.vue';
   import {
     RollenArt,
     RollenMerkmal,
+    RollenSystemRecht,
     RolleStore,
     useRolleStore,
     type RolleResponse,
@@ -21,7 +17,6 @@
   import { useRouter, type Router } from 'vue-router';
 
   const rolleStore: RolleStore = useRolleStore();
-  const organisationStore: OrganisationStore = useOrganisationStore();
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
 
   const router: Router = useRouter();
@@ -33,16 +28,6 @@
       title: t(`admin.rolle.mappingFrontBackEnd.merkmale.${merkmal}`),
       value: merkmal,
     }),
-  );
-
-  type OrganisationItem = { title: string; value: string };
-  const allOrganisationenItems: ComputedRef<OrganisationItem[]> = computed(() =>
-    organisationStore.allOrganisationen.map(
-      (org: Organisation): OrganisationItem => ({
-        title: org.kennung ? `${org.kennung} (${org.name})` : org.name,
-        value: org.id,
-      }),
-    ),
   );
 
   type RollenartItem = { title: string; value: RollenArt };
@@ -164,12 +149,7 @@
   }
 
   onMounted(async () => {
-    await Promise.all([
-      getRollen(),
-      organisationStore.getAllOrganisationen({
-        excludeTyp: [OrganisationsTyp.Klasse],
-      }),
-    ]);
+    await getRollen();
   });
 </script>
 
@@ -211,40 +191,17 @@
           cols="12"
           md="3"
         >
-          <v-autocomplete
-            id="organisationen-filter-select"
-            v-model="searchFilterStore.selectedOrganisationenForRollen"
-            clearable
-            class="filter-dropdown"
-            :class="{ selected: searchFilterStore.selectedOrganisationenForRollen?.length }"
-            data-testid="organisationen-filter-select"
-            density="compact"
-            hide-details
-            :items="allOrganisationenItems"
-            item-value="value"
-            item-title="title"
+          <SchulenFilter
             multiple
-            :no-data-text="$t('noDataFound')"
-            :placeholder="$t('admin.administrationsebene.administrationsebene')"
-            variant="outlined"
-            @update:model-value="setOrganisationenFilter"
-          >
-            <template #selection="{ internalItem: item, index }">
-              <v-chip v-if="searchFilterStore.selectedOrganisationenForRollen.length < 2">
-                <span>{{ item.title }}</span>
-              </v-chip>
-              <span
-                v-else-if="index === 0"
-                class="selection-count"
-              >
-                {{
-                  $t('admin.rolle.organisationenSelected', {
-                    count: searchFilterStore.selectedOrganisationenForRollen.length,
-                  })
-                }}
-              </span>
-            </template>
-          </v-autocomplete>
+            includeAll
+            highlightSelection
+            parentId="rolle-management"
+            :selectedSchulen="searchFilterStore.selectedOrganisationenForRollen"
+            :placeholderText="$t('admin.administrationsebene.administrationsebene')"
+            :systemrechteForSearch="[RollenSystemRecht.RollenVerwalten]"
+            hideDetails
+            @update:selectedSchulen="setOrganisationenFilter"
+          />
         </v-col>
 
         <v-col
