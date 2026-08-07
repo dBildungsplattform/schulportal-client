@@ -28,6 +28,11 @@
     isVidisAngebot: boolean;
   };
 
+  type ServiceProviderItem = {
+    value: ServiceProviderKategorie;
+    title: string;
+  };
+
   const router: Router = useRouter();
   const { t }: Composer = useI18n();
 
@@ -36,12 +41,12 @@
 
   const cachedServiceProviderId: Ref<string | null> = ref(null);
   const selectedKategorien: Ref<ServiceProviderKategorie[]> = ref([]);
-  const kategorien: ComputedRef<{ value: ServiceProviderKategorie; title: string }[]> = computed(() => {
-    return Object.values(ServiceProviderKategorie).map((item: ServiceProviderKategorie) => ({
+  const kategorien: readonly ServiceProviderItem[] = Object.values(ServiceProviderKategorie).map(
+    (item: ServiceProviderKategorie) => ({
       value: item,
       title: t(`angebot.mappingFrontBackEnd.kategorien.${item}`),
-    }));
-  });
+    }),
+  );
 
   const serviceProviderToDelete: Ref<ServiceProviderRow | null> = ref(null);
   const isDeleteDialogOpen: Ref<boolean, boolean> = ref(false);
@@ -87,11 +92,11 @@
   ];
 
   async function reloadData(): Promise<void> {
-    await serviceProviderStore.getManageableServiceProviders(
-      searchFilterStore.serviceProviderPage,
-      searchFilterStore.serviceProviderPerPage,
-      { kategorien: selectedKategorien.value },
-    );
+    await serviceProviderStore.getManageableServiceProviders({
+      kategorien: selectedKategorien.value,
+      page: searchFilterStore.serviceProviderPage,
+      entriesPerPage: searchFilterStore.serviceProviderPerPage,
+    });
   }
 
   const handleAlertClose = async (): Promise<void> => {
@@ -148,7 +153,7 @@
     router.push({ name: 'angebot-details', params: { id: item.id } });
   }
 
-  function resetSearchAndFilter(): void {
+  function resetFilter(): void {
     selectedKategorien.value = [];
   }
 
@@ -193,7 +198,7 @@
           size="x-small"
           variant="text"
           width="auto"
-          @click="resetSearchAndFilter()"
+          @click="resetFilter()"
         >
           {{ $t('resetFilter') }}
         </v-btn>
@@ -206,7 +211,6 @@
         <v-autocomplete
           id="kategorien-select"
           v-model="selectedKategorien"
-          autocomplete="off"
           multiple
           class="filter-dropdown"
           clearable
@@ -218,9 +222,24 @@
           item-text="title"
           :no-data-text="$t('noDataFound')"
           :placeholder="$t('angebot.kategorie')"
-          required="true"
           variant="outlined"
-        />
+        >
+          <template #selection="{ internalItem: item, index }">
+            <v-chip v-if="selectedKategorien.length < 2">
+              <span>{{ item.title }}</span>
+            </v-chip>
+            <span
+              v-else-if="index === 0"
+              class="selection-count"
+            >
+              {{
+                $t('admin.rolle.kategorienSelected', {
+                  count: selectedKategorien.length,
+                })
+              }}
+            </span>
+          </template>
+        </v-autocomplete>
       </v-col>
     </v-row>
     <ResultTable
@@ -284,3 +303,11 @@
     />
   </LayoutCard>
 </template>
+
+<style scoped>
+  .selection-count {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+</style>
