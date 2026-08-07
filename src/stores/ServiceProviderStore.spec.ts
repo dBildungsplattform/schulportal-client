@@ -173,7 +173,6 @@ describe('serviceProviderStore', () => {
       const kategorien: ServiceProviderKategorie[] = kategorienItems.map(
         (item: ManageableServiceProviderSimpleListEntryResponse) => item.kategorie,
       );
-      // the client appends each kategorie as its own repeated query param, in the same order as the request
       const urlWithKategorien: string = `${url}&${kategorien.map((kategorie: ServiceProviderKategorie) => `kategorien=${kategorie}`).join('&')}`;
       mockadapter.onGet(urlWithKategorien).replyOnce(200, mockResponse);
 
