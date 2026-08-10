@@ -1,3 +1,4 @@
+import axiosApiInstance from '@/services/ApiService';
 import MockAdapter from 'axios-mock-adapter';
 import { createPinia, setActivePinia } from 'pinia';
 import {
@@ -7,7 +8,6 @@ import {
   type SystemRechtResponse,
 } from '../api-client/generated/api';
 import { useRolleStore, type RolleStore } from './RolleStore';
-import axiosApiInstance from '@/services/ApiService';
 
 const mockadapter: MockAdapter = new MockAdapter(axiosApiInstance);
 
@@ -138,6 +138,23 @@ describe('rolleStore', () => {
       expect(rolleStore.errorCode).toEqual('some mock server error');
       expect(rolleStore.allRollen).toEqual([]);
       expect(rolleStore.loading).toBe(false);
+    });
+
+    it('should pass all filter params to the api', async () => {
+      mockadapter.onGet(/\/api\/rolle/).replyOnce(200, [], {});
+      await rolleStore.getAllRollen({
+        offset: 0,
+        limit: 30,
+        searchString: '',
+        organisationContextForOperation: 'org1',
+        organisationenForFilter: ['org2', 'org3'],
+        merkmale: ['KOPERS_PFLICHT'] as unknown as RollenMerkmal[],
+      });
+      const requestedUrl: string = mockadapter.history.get[0]!.url!;
+      expect(requestedUrl).toContain('organisationContextForOperation=org1');
+      expect(requestedUrl).toContain('organisationenForFilter=org2');
+      expect(requestedUrl).toContain('organisationenForFilter=org3');
+      expect(requestedUrl).toContain('merkmale=KOPERS_PFLICHT');
     });
   });
 

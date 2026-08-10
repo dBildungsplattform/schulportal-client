@@ -1,7 +1,7 @@
+import { createPinia, setActivePinia } from 'pinia';
 import { DoFactory } from 'test/DoFactory';
-import type { RolleResponse } from './RolleStore';
-import { useSearchFilterStore, type SearchFilterStore } from './SearchFilterStore';
-import { setActivePinia, createPinia } from 'pinia';
+import { RollenArt, RollenMerkmal, type RolleResponse } from './RolleStore';
+import { rollenPerPageDefault, useSearchFilterStore, type SearchFilterStore } from './SearchFilterStore';
 
 describe('SearchFilterStore', () => {
   let searchFilterStore: SearchFilterStore;
@@ -20,6 +20,10 @@ describe('SearchFilterStore', () => {
     expect(searchFilterStore.selectedSchuleForKlassen).toEqual(null);
     expect(searchFilterStore.selectedKlassenForKlassen).toEqual([]);
     expect(searchFilterStore.selectedSchuleForSchulischeServiceProvider).toEqual(null);
+    expect(searchFilterStore.selectedMerkmaleForRollen).toEqual([]);
+    expect(searchFilterStore.selectedRollenartenForRollen).toEqual([]);
+    expect(searchFilterStore.selectedOrganisationenForRollen).toEqual([]);
+    expect(searchFilterStore.rollenPerPage).toEqual(rollenPerPageDefault);
   });
 
   it('should change the state', () => {
@@ -62,5 +66,20 @@ describe('SearchFilterStore', () => {
 
     searchFilterStore.setSchuleForSchulischeServiceProvider('10');
     expect(searchFilterStore.selectedSchuleForSchulischeServiceProvider).toEqual('10');
+  });
+
+  it('should set merkmale filter for rollen', () => {
+    searchFilterStore.setMerkmaleFilterForRollen([RollenMerkmal.KopersPflicht]);
+    expect(searchFilterStore.selectedMerkmaleForRollen).toEqual([RollenMerkmal.KopersPflicht]);
+  });
+
+  it('should set rollenarten filter for rollen', () => {
+    searchFilterStore.setRollenartenFilterForRollen([RollenArt.Lehr]);
+    expect(searchFilterStore.selectedRollenartenForRollen).toEqual([RollenArt.Lehr]);
+  });
+
+  it('should set organisationen filter for rollen', () => {
+    searchFilterStore.setOrganisationenFilterForRollen(['org1', 'org2']);
+    expect(searchFilterStore.selectedOrganisationenForRollen).toEqual(['org1', 'org2']);
   });
 });
