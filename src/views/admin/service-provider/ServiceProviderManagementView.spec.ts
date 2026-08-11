@@ -106,7 +106,21 @@ describe('ServiceProviderManagementView', () => {
       expect(wrapper.find('[data-testid="reset-filter-button"]').attributes('disabled')).toBeUndefined();
     });
 
-    it('resets the kategorie filter and reloads data with an empty filter', async () => {
+    const defaultKategorien: ServiceProviderKategorie[] = [
+      ServiceProviderKategorie.Email,
+      ServiceProviderKategorie.Unterricht,
+      ServiceProviderKategorie.Verwaltung,
+      ServiceProviderKategorie.Hinweise,
+    ];
+
+    it('selects the default kategorien by default', () => {
+      const wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementView>> = mountComponent();
+      expect(
+        (wrapper.vm as unknown as { selectedKategorien: ServiceProviderKategorie[] }).selectedKategorien,
+      ).toEqual(defaultKategorien);
+    });
+
+    it('resets the kategorie filter and reloads data with the default kategorien selected', async () => {
       const wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementView>> = mountComponent();
       getKategorienSelect(wrapper).vm.$emit('update:model-value', [ServiceProviderKategorie.Email]);
       await flushPromises();
@@ -119,11 +133,23 @@ describe('ServiceProviderManagementView', () => {
       await flushPromises();
 
       expect(reloadSpy).toHaveBeenLastCalledWith({
-        kategorien: [],
+        kategorien: defaultKategorien,
         page: searchFilterStore.serviceProviderPage,
         entriesPerPage: searchFilterStore.serviceProviderPerPage,
       });
       expect(wrapper.find('[data-testid="reset-filter-button"]').attributes('disabled')).toBeDefined();
+    });
+
+    it('clears the selection when the clear (X) icon is used', async () => {
+      const wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementView>> = mountComponent();
+
+      getKategorienSelect(wrapper).vm.$emit('update:model-value', []);
+      await flushPromises();
+
+      expect(
+        (wrapper.vm as unknown as { selectedKategorien: ServiceProviderKategorie[] }).selectedKategorien,
+      ).toEqual([]);
+      expect(wrapper.find('[data-testid="reset-filter-button"]').attributes('disabled')).toBeUndefined();
     });
 
     it('renders a chip for a single selected kategorie and a count label for multiple selections', async () => {

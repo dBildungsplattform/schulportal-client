@@ -39,14 +39,31 @@
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
 
+  const allKategorien: readonly ServiceProviderKategorie[] = Object.values(ServiceProviderKategorie);
+  const defaultKategorien: readonly ServiceProviderKategorie[] = [
+    ServiceProviderKategorie.Email,
+    ServiceProviderKategorie.Unterricht,
+    ServiceProviderKategorie.Verwaltung,
+    ServiceProviderKategorie.Hinweise,
+  ];
+
+  function isDefaultKategorienSelection(selection: readonly ServiceProviderKategorie[]): boolean {
+    return (
+      selection.length === defaultKategorien.length &&
+      defaultKategorien.every((kategorie: ServiceProviderKategorie) => selection.includes(kategorie))
+    );
+  }
+
   const cachedServiceProviderId: Ref<string | null> = ref(null);
-  const selectedKategorien: Ref<ServiceProviderKategorie[]> = ref([]);
-  const kategorien: readonly ServiceProviderItem[] = Object.values(ServiceProviderKategorie).map(
-    (item: ServiceProviderKategorie) => ({
-      value: item,
-      title: t(`angebot.mappingFrontBackEnd.kategorien.${item}`),
-    }),
+  const selectedKategorien: Ref<ServiceProviderKategorie[]> = ref(
+    searchFilterStore.selectedKategorienForServiceProvider.length > 0
+      ? searchFilterStore.selectedKategorienForServiceProvider
+      : [...defaultKategorien],
   );
+  const kategorien: readonly ServiceProviderItem[] = allKategorien.map((item: ServiceProviderKategorie) => ({
+    value: item,
+    title: t(`angebot.mappingFrontBackEnd.kategorien.${item}`),
+  }));
 
   const serviceProviderToDelete: Ref<ServiceProviderRow | null> = ref(null);
   const isDeleteDialogOpen: Ref<boolean, boolean> = ref(false);
@@ -73,7 +90,7 @@
   });
 
   const filterOrSearchActive: ComputedRef<boolean> = computed(
-    () => selectedKategorien.value && selectedKategorien.value.length > 0,
+    () => !isDefaultKategorienSelection(selectedKategorien.value),
   );
 
   const headers: Headers = [
@@ -154,7 +171,7 @@
   }
 
   function resetFilter(): void {
-    selectedKategorien.value = [];
+    selectedKategorien.value = [...defaultKategorien];
   }
 
   watch(selectedKategorien, (newKategorien: Array<ServiceProviderKategorie>) => {
