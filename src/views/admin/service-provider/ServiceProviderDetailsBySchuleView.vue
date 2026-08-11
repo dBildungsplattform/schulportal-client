@@ -5,7 +5,7 @@
   import { useDisplay } from 'vuetify';
 
   import {
-    DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInnerI18nKeyEnum,
+    DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInnerI18nKeyEnum,
     RollenSystemRechtEnum,
   } from '@/api-client/generated';
   import SchulPortalLogo from '@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg';
@@ -119,7 +119,7 @@
       rolleStore.allRollen.map((r: RolleWithServiceProvidersResponse) => [r.id, r]),
     );
     return Array.from(serviceProviderStore.errors.entries()).map(
-      ([rolleId, code]: [string, DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInnerI18nKeyEnum]) => {
+      ([rolleId, code]: [string, DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInnerI18nKeyEnum]) => {
         const rolle: RolleWithServiceProvidersResponse | undefined = mappedRollen.get(rolleId);
         return {
           rolle: rolle?.name ?? rolleId,
@@ -152,7 +152,7 @@
         id,
         name,
         rollenart,
-        merkmale: merkmale as unknown as RollenMerkmal[],
+        merkmale,
       })),
   );
 
