@@ -13431,8 +13431,8 @@ export const RolleApiAxiosParamCreator = function (configuration?: Configuration
          * @param {Array<string>} [organisationenForFilter] Only relevant when systemrechte contains ROLLEN_VERWALTEN or no systemrechte is provided. Filters the result to roles administered by any of the given organisations. Mutually exclusive with organisationContextForOperation.
          * @param {Array<string>} [rolleIds] The ids of the selected Rollen. If provided, these Rollen will be returned regardless of the other filters since they are required by the frontend
          * @param {Array<RollenSystemRechtEnum>} [systemrechte] Determines the authorization context for this request. Use ROLLEN_VERWALTEN (default) with organisationIdsForFilter for general role administration. Use ROLLEN_ERWEITERN or IMPORT_DURCHFUEHREN with organisationIdContextForOperation for workflow-specific role lookups. Can only be ROLLEN_VERWALTEN, ROLLEN_ERWEITERN or both, or IMPORT_DURCHFUEHREN.
-         * @param {Array<RollenArt>} [rollenarten] Filter roles by their role types.
-         * @param {Array<RollenMerkmal>} [merkmale] Filter roles by their characteristics.
+         * @param {Array<RollenArt>} [rollenarten] Filter roles by rollenart.
+         * @param {Array<RollenMerkmal>} [merkmale] Filter roles by merkmal.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -13748,8 +13748,8 @@ export const RolleApiFp = function(configuration?: Configuration) {
          * @param {Array<string>} [organisationenForFilter] Only relevant when systemrechte contains ROLLEN_VERWALTEN or no systemrechte is provided. Filters the result to roles administered by any of the given organisations. Mutually exclusive with organisationContextForOperation.
          * @param {Array<string>} [rolleIds] The ids of the selected Rollen. If provided, these Rollen will be returned regardless of the other filters since they are required by the frontend
          * @param {Array<RollenSystemRechtEnum>} [systemrechte] Determines the authorization context for this request. Use ROLLEN_VERWALTEN (default) with organisationIdsForFilter for general role administration. Use ROLLEN_ERWEITERN or IMPORT_DURCHFUEHREN with organisationIdContextForOperation for workflow-specific role lookups. Can only be ROLLEN_VERWALTEN, ROLLEN_ERWEITERN or both, or IMPORT_DURCHFUEHREN.
-         * @param {Array<RollenArt>} [rollenarten] Filter roles by their role types.
-         * @param {Array<RollenMerkmal>} [merkmale] Filter roles by their characteristics.
+         * @param {Array<RollenArt>} [rollenarten] Filter roles by rollenart.
+         * @param {Array<RollenMerkmal>} [merkmale] Filter roles by merkmal.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -13863,8 +13863,8 @@ export const RolleApiFactory = function (configuration?: Configuration, basePath
          * @param {Array<string>} [organisationenForFilter] Only relevant when systemrechte contains ROLLEN_VERWALTEN or no systemrechte is provided. Filters the result to roles administered by any of the given organisations. Mutually exclusive with organisationContextForOperation.
          * @param {Array<string>} [rolleIds] The ids of the selected Rollen. If provided, these Rollen will be returned regardless of the other filters since they are required by the frontend
          * @param {Array<RollenSystemRechtEnum>} [systemrechte] Determines the authorization context for this request. Use ROLLEN_VERWALTEN (default) with organisationIdsForFilter for general role administration. Use ROLLEN_ERWEITERN or IMPORT_DURCHFUEHREN with organisationIdContextForOperation for workflow-specific role lookups. Can only be ROLLEN_VERWALTEN, ROLLEN_ERWEITERN or both, or IMPORT_DURCHFUEHREN.
-         * @param {Array<RollenArt>} [rollenarten] Filter roles by their role types.
-         * @param {Array<RollenMerkmal>} [merkmale] Filter roles by their characteristics.
+         * @param {Array<RollenArt>} [rollenarten] Filter roles by rollenart.
+         * @param {Array<RollenMerkmal>} [merkmale] Filter roles by merkmal.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -13972,8 +13972,8 @@ export interface RolleApiInterface {
      * @param {Array<string>} [organisationenForFilter] Only relevant when systemrechte contains ROLLEN_VERWALTEN or no systemrechte is provided. Filters the result to roles administered by any of the given organisations. Mutually exclusive with organisationContextForOperation.
      * @param {Array<string>} [rolleIds] The ids of the selected Rollen. If provided, these Rollen will be returned regardless of the other filters since they are required by the frontend
      * @param {Array<RollenSystemRechtEnum>} [systemrechte] Determines the authorization context for this request. Use ROLLEN_VERWALTEN (default) with organisationIdsForFilter for general role administration. Use ROLLEN_ERWEITERN or IMPORT_DURCHFUEHREN with organisationIdContextForOperation for workflow-specific role lookups. Can only be ROLLEN_VERWALTEN, ROLLEN_ERWEITERN or both, or IMPORT_DURCHFUEHREN.
-     * @param {Array<RollenArt>} [rollenarten] Filter roles by their role types.
-     * @param {Array<RollenMerkmal>} [merkmale] Filter roles by their characteristics.
+     * @param {Array<RollenArt>} [rollenarten] Filter roles by rollenart.
+     * @param {Array<RollenMerkmal>} [merkmale] Filter roles by merkmal.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof RolleApiInterface
@@ -14089,8 +14089,8 @@ export class RolleApi extends BaseAPI implements RolleApiInterface {
      * @param {Array<string>} [organisationenForFilter] Only relevant when systemrechte contains ROLLEN_VERWALTEN or no systemrechte is provided. Filters the result to roles administered by any of the given organisations. Mutually exclusive with organisationContextForOperation.
      * @param {Array<string>} [rolleIds] The ids of the selected Rollen. If provided, these Rollen will be returned regardless of the other filters since they are required by the frontend
      * @param {Array<RollenSystemRechtEnum>} [systemrechte] Determines the authorization context for this request. Use ROLLEN_VERWALTEN (default) with organisationIdsForFilter for general role administration. Use ROLLEN_ERWEITERN or IMPORT_DURCHFUEHREN with organisationIdContextForOperation for workflow-specific role lookups. Can only be ROLLEN_VERWALTEN, ROLLEN_ERWEITERN or both, or IMPORT_DURCHFUEHREN.
-     * @param {Array<RollenArt>} [rollenarten] Filter roles by their role types.
-     * @param {Array<RollenMerkmal>} [merkmale] Filter roles by their characteristics.
+     * @param {Array<RollenArt>} [rollenarten] Filter roles by rollenart.
+     * @param {Array<RollenMerkmal>} [merkmale] Filter roles by merkmal.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof RolleApi
