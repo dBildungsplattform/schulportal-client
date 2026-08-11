@@ -165,10 +165,7 @@
       :header="$t('admin.rolle.management')"
       headlineTestId="rolle-management-headline"
     >
-      <v-row
-        align="center"
-        class="ma-3"
-      >
+      <v-row class="ma-3 align-start">
         <v-col
           cols="12"
           md="2"
