@@ -196,6 +196,7 @@
             :selectedSchulen="searchFilterStore.selectedOrganisationenForRollen"
             :placeholderText="$t('admin.administrationsebene.administrationsebene')"
             :systemrechteForSearch="[RollenSystemRecht.RollenVerwalten]"
+            selectionCountKey="admin.rolle.administrationsebenenSelected"
             hideDetails
             @update:selectedSchulen="setOrganisationenFilter"
           />
