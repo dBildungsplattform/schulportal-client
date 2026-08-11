@@ -188,24 +188,6 @@
           cols="12"
           md="3"
         >
-          <SchulenFilter
-            multiple
-            includeAll
-            highlightSelection
-            parentId="rolle-management"
-            :selectedSchulen="searchFilterStore.selectedOrganisationenForRollen"
-            :placeholderText="$t('admin.administrationsebene.administrationsebene')"
-            :systemrechteForSearch="[RollenSystemRecht.RollenVerwalten]"
-            selectionCountKey="admin.rolle.administrationsebenenSelected"
-            hideDetails
-            @update:selectedSchulen="setOrganisationenFilter"
-          />
-        </v-col>
-
-        <v-col
-          cols="12"
-          md="3"
-        >
           <v-autocomplete
             id="rollenarten-filter-select"
             v-model="searchFilterStore.selectedRollenartenForRollen"
@@ -280,6 +262,24 @@
               </span>
             </template>
           </v-autocomplete>
+        </v-col>
+
+        <v-col
+          cols="12"
+          md="3"
+        >
+          <SchulenFilter
+            multiple
+            includeAll
+            highlightSelection
+            parentId="rolle-management"
+            :selectedSchulen="searchFilterStore.selectedOrganisationenForRollen"
+            :placeholderText="$t('admin.administrationsebene.administrationsebene')"
+            :systemrechteForSearch="[RollenSystemRecht.RollenVerwalten]"
+            selectionCountKey="admin.rolle.administrationsebenenSelected"
+            hideDetails
+            @update:selectedSchulen="setOrganisationenFilter"
+          />
         </v-col>
       </v-row>
       <ResultTable
