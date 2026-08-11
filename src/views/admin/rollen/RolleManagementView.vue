@@ -77,7 +77,7 @@
     });
   });
 
-  const filterActive: ComputedRef<boolean> = computed(() => {
+  const isFilterActive: ComputedRef<boolean> = computed(() => {
     return (
       searchFilterStore.selectedMerkmaleForRollen?.length > 0 ||
       searchFilterStore.selectedRollenartenForRollen?.length > 0 ||
@@ -174,7 +174,7 @@
           <v-btn
             class="px-0 reset-filter"
             data-testid="reset-filter-button"
-            :disabled="!filterActive"
+            :disabled="!isFilterActive"
             size="x-small"
             variant="text"
             width="auto"
