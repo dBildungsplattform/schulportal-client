@@ -1,4 +1,5 @@
 import type { SystemRechtResponse } from '@/api-client/generated';
+import SchulenFilter from '@/components/filter/SchulenFilter.vue';
 import routes from '@/router/routes';
 import { RollenArt, RollenMerkmal, useRolleStore, type RolleStore } from '@/stores/RolleStore';
 import { rollenPerPageDefault, useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
@@ -177,6 +178,7 @@ describe('RolleManagementView', () => {
     expect(wrapper?.find('[data-testid="reset-filter-button"]').exists()).toBe(true);
     expect(wrapper?.find('[data-testid="rollenarten-filter-select"]').exists()).toBe(true);
     expect(wrapper?.find('[data-testid="merkmale-filter-select"]').exists()).toBe(true);
+    expect(wrapper?.findComponent(SchulenFilter).exists()).toBe(true);
   });
 
   test('reset button is disabled when no filter is active', () => {
