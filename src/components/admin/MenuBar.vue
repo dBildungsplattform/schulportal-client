@@ -203,7 +203,6 @@
         to="/admin/rollen/new"
       ></v-list-item>
       <!-- Rollen-Mapping -->
-      <!--
       <v-list-item
         class="menu-bar-main-item headline-2"
         data-testid="rolle-mapping-item"
@@ -218,7 +217,6 @@
         :title="org.name"
         :to="`/admin/rolle/mapping/${org.name.toLowerCase()}?instance=${org.name}`"
       ></v-list-item>
-      -->
     </div>
 
     <!-- Schulverwaltung -->

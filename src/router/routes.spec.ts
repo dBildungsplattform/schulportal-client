@@ -135,13 +135,13 @@ const routeExpectations: RouteConfigExpectation[] = [
     name: 'no-second-factor',
     path: '/no-second-factor',
   },
-  // {
-  //   name: 'rolle-mapping',
-  //   path: '/admin/rolle/mapping/:lms',
-  //   layout: 'AdminLayout',
-  //   requiresAuth: true,
-  //   requiresPermission: 'rollenverwaltung',
-  // },
+  {
+    name: 'rolle-mapping',
+    path: '/admin/rolle/mapping/:lms',
+    layout: 'AdminLayout',
+    requiresAuth: true,
+    requiresPermission: 'rollenverwaltung',
+  },
 ];
 
 function assertRouteConfig(expectation: RouteConfigExpectation): void {

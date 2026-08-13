@@ -116,20 +116,20 @@ describe('MenuBar', () => {
       expect(wrapper?.find('[data-testid="rolle-management-menu-item"]').exists()).toBe(hasPermission);
       expect(wrapper?.find('[data-testid="rolle-creation-menu-item"]').exists()).toBe(hasPermission);
 
-      // expect(
-      //   wrapper
-      //     ?.find(
-      //       `[data-testid="rolle-mapping-menu-item-${organisationStore.retrievedLmsOrganisations[0]?.name.toLowerCase()}"]`,
-      //     )
-      //     .exists(),
-      // ).toBe(hasPermission);
-      // expect(
-      //   wrapper
-      //     ?.find(
-      //       `[data-testid="rolle-mapping-menu-item-${organisationStore.retrievedLmsOrganisations[1]?.name.toLowerCase()}"]`,
-      //     )
-      //     .exists(),
-      // ).toBe(hasPermission);
+      expect(
+        wrapper
+          ?.find(
+            `[data-testid="rolle-mapping-menu-item-${organisationStore.retrievedLmsOrganisations[0]?.name.toLowerCase()}"]`,
+          )
+          .exists(),
+      ).toBe(hasPermission);
+      expect(
+        wrapper
+          ?.find(
+            `[data-testid="rolle-mapping-menu-item-${organisationStore.retrievedLmsOrganisations[1]?.name.toLowerCase()}"]`,
+          )
+          .exists(),
+      ).toBe(hasPermission);
 
       expect(wrapper?.find('[data-testid="schule-management-title"]').exists()).toBe(hasPermission);
       expect(wrapper?.find('[data-testid="schule-management-menu-item"]').exists()).toBe(hasPermission);
@@ -146,17 +146,17 @@ describe('MenuBar', () => {
     },
   );
 
-  // test('renders menu items for each organisation', () => {
-  //   const svsItem = wrapper?.find(
-  //     `[data-testid="rolle-mapping-menu-item-${organisationStore.retrievedLmsOrganisations[0]?.name.toLowerCase()}"]`,
-  //   );
-  //   const moodleItem = wrapper?.find(
-  //     `[data-testid="rolle-mapping-menu-item-${organisationStore.retrievedLmsOrganisations[1]?.name.toLowerCase()}"]`,
-  //   );
+  test('renders menu items for each organisation', () => {
+    const svsItem = wrapper?.find(
+      `[data-testid="rolle-mapping-menu-item-${organisationStore.retrievedLmsOrganisations[0]?.name.toLowerCase()}"]`,
+    );
+    const moodleItem = wrapper?.find(
+      `[data-testid="rolle-mapping-menu-item-${organisationStore.retrievedLmsOrganisations[1]?.name.toLowerCase()}"]`,
+    );
 
-  //   expect(svsItem?.exists()).toBe(true);
-  //   expect(moodleItem?.exists()).toBe(true);
-  // });
+    expect(svsItem?.exists()).toBe(true);
+    expect(moodleItem?.exists()).toBe(true);
+  });
 
   test('hides elements when permissions are false', async () => {
     // Reset permissions to false
