@@ -949,7 +949,8 @@
     "openMobileMenu": "Mobiles Menü öffnen",
     "help": "Hilfe",
     "profile": "Mein Profil",
-    "backToPreviousPage": "Zurück zur vorherigen Seite"
+    "backToPreviousPage": "Zurück zur vorherigen Seite",
+    "faq": "FAQ - Administration"
   },
   "no": "Nein",
   "from": "von",
@@ -990,7 +991,7 @@
     "emailStatusActiveHover": "Das E-Mail-Konto ist aktiviert.",
     "emailStatusRequestedHover": "Das E-Mail-Konto wird zur Zeit angelegt. Dies kann einige Zeit in Anspruch nehmen. Bitte öffnen Sie die Gesamtübersicht zu einem späteren Zeitpunkt erneut, um die E-Mail-Adresse einzusehen.",
     "emailStatusDisabledHover": "Das E-Mail-Konto wurde deaktiviert.",
-    "emailStatusFailedHover": "Bei der Erstellung des E-Mail-Kontos ist ein Fehler aufgetreten. Bitte eröffnen Sie eine Fehlermeldung im Help-Desk System.",
+    "emailStatusFailedHover": "Bei der Erstellung des E-Mail-Kontos ist ein Fehler aufgetreten. Bitte eröffnen Sie eine Ticket-Anfrage beim IQSH-Helpdesk.",
     "emailStatusUnknownHover": "Der Status der E-Mail-Adresse ist unbekannt.",
     "enterFirstName": "Vorname eingeben",
     "enterEmail": "E-Mail-Adresse eingeben",
@@ -1047,7 +1048,7 @@
     "emailStatusFailed": "fehlerhaft",
     "emailStatusRequestedHover": "Das E-Mail-Konto wird zur Zeit angelegt. Dies kann einige Zeit in Anspruch nehmen. Bitte öffnen Sie Ihr Profil zu einem späteren Zeitpunkt erneut, um die E-Mail-Adresse einzusehen.",
     "emailStatusDisabledHover": "Das E-Mail-Konto wurde deaktiviert.",
-    "emailStatusFailedHover": "Bei der Erstellung des E-Mail-Kontos ist ein Fehler aufgetreten. Bitte eröffnen Sie eine Fehlermeldung im Help-Desk System.",
+    "emailStatusFailedHover": "Bei der Erstellung des E-Mail-Kontos ist ein Fehler aufgetreten. Bitte eröffnen Sie eine Ticket-Anfrage beim IQSH-Helpdesk.",
     "schule": "Schule",
     "dienstStellenNummer": "Dienststellennummer",
     "dienstStellenNummerAbbr": "DStNr.",
