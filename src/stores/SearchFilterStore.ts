@@ -1,9 +1,16 @@
-import { defineStore, type Store, type StoreDefinition } from 'pinia';
-import type { RolleResponse } from './RolleStore';
 import { SortOrder, type OrganisationSortField } from '@/utils/sorting';
+import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import type { Organisation } from './OrganisationStore';
 import { SortField } from './PersonStore';
+import type { RolleResponse } from './RolleStore';
 import { ServiceProviderKategorie } from './ServiceProviderStore';
+
+export const DEFAULT_SERVICE_PROVIDER_KATEGORIEN: ReadonlyArray<ServiceProviderKategorie> = [
+  ServiceProviderKategorie.Email,
+  ServiceProviderKategorie.Unterricht,
+  ServiceProviderKategorie.Verwaltung,
+  ServiceProviderKategorie.Hinweise,
+];
 
 type SearchFilterState = {
   klassenPage: number;
@@ -52,6 +59,7 @@ type SearchFilterActions = {
   setKlasseFilterForKlassen: (selectedKlassenForKlassen: Array<string> | null) => void;
   setSchuleForSchulischeServiceProvider: (selectedSchuleForSchulischeServiceProvider: string | null) => void;
   setKategorienForServiceProvider: (selectedKategorienForServiceProvider: Array<ServiceProviderKategorie>) => void;
+  resetKategorienForServiceProvider: () => void;
 };
 
 type SearchFilterGetters = object;
@@ -94,7 +102,7 @@ export const useSearchFilterStore: StoreDefinition<
     selectedSchuleForKlassen: null,
     selectedKlassenForKlassen: [],
     selectedSchuleForSchulischeServiceProvider: null,
-    selectedKategorienForServiceProvider: [],
+    selectedKategorienForServiceProvider: [...DEFAULT_SERVICE_PROVIDER_KATEGORIEN],
   }),
   actions: {
     setKlasseFilterForPersonen(selectedKlassen: Array<string> | null) {
@@ -137,6 +145,10 @@ export const useSearchFilterStore: StoreDefinition<
 
     setKategorienForServiceProvider(selectedKategorienForServiceProvider: Array<ServiceProviderKategorie>) {
       this.selectedKategorienForServiceProvider = selectedKategorienForServiceProvider;
+    },
+
+    resetKategorienForServiceProvider() {
+      this.selectedKategorienForServiceProvider = [...DEFAULT_SERVICE_PROVIDER_KATEGORIEN];
     },
   },
 });

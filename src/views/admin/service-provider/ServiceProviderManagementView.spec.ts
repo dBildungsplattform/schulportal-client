@@ -1,6 +1,10 @@
 import VidisInfoDialog from '@/components/admin/service-provider/VidisInfoDialog.vue';
 import routes from '@/router/routes';
-import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
+import {
+  DEFAULT_SERVICE_PROVIDER_KATEGORIEN,
+  useSearchFilterStore,
+  type SearchFilterStore,
+} from '@/stores/SearchFilterStore';
 import {
   ServiceProviderKategorie,
   useServiceProviderStore,
@@ -106,18 +110,13 @@ describe('ServiceProviderManagementView', () => {
       expect(wrapper.find('[data-testid="reset-filter-button"]').attributes('disabled')).toBeUndefined();
     });
 
-    const defaultKategorien: ServiceProviderKategorie[] = [
-      ServiceProviderKategorie.Email,
-      ServiceProviderKategorie.Unterricht,
-      ServiceProviderKategorie.Verwaltung,
-      ServiceProviderKategorie.Hinweise,
-    ];
+    const defaultKategorien: readonly ServiceProviderKategorie[] = DEFAULT_SERVICE_PROVIDER_KATEGORIEN;
 
     it('selects the default kategorien by default', () => {
       const wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementView>> = mountComponent();
-      expect(
-        (wrapper.vm as unknown as { selectedKategorien: ServiceProviderKategorie[] }).selectedKategorien,
-      ).toEqual(defaultKategorien);
+      expect((wrapper.vm as unknown as { selectedKategorien: ServiceProviderKategorie[] }).selectedKategorien).toEqual(
+        defaultKategorien,
+      );
     });
 
     it('resets the kategorie filter and reloads data with the default kategorien selected', async () => {
@@ -146,9 +145,9 @@ describe('ServiceProviderManagementView', () => {
       getKategorienSelect(wrapper).vm.$emit('update:model-value', []);
       await flushPromises();
 
-      expect(
-        (wrapper.vm as unknown as { selectedKategorien: ServiceProviderKategorie[] }).selectedKategorien,
-      ).toEqual([]);
+      expect((wrapper.vm as unknown as { selectedKategorien: ServiceProviderKategorie[] }).selectedKategorien).toEqual(
+        [],
+      );
       expect(wrapper.find('[data-testid="reset-filter-button"]').attributes('disabled')).toBeUndefined();
     });
 

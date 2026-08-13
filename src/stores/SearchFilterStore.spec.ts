@@ -1,7 +1,7 @@
 import { createPinia, setActivePinia } from 'pinia';
 import { DoFactory } from 'test/DoFactory';
 import type { RolleResponse } from './RolleStore';
-import { useSearchFilterStore, type SearchFilterStore } from './SearchFilterStore';
+import { DEFAULT_SERVICE_PROVIDER_KATEGORIEN, useSearchFilterStore, type SearchFilterStore } from './SearchFilterStore';
 import { ServiceProviderKategorie } from './ServiceProviderStore';
 
 describe('SearchFilterStore', () => {
@@ -21,7 +21,7 @@ describe('SearchFilterStore', () => {
     expect(searchFilterStore.selectedSchuleForKlassen).toEqual(null);
     expect(searchFilterStore.selectedKlassenForKlassen).toEqual([]);
     expect(searchFilterStore.selectedSchuleForSchulischeServiceProvider).toEqual(null);
-    expect(searchFilterStore.selectedKategorienForServiceProvider).toEqual([]);
+    expect(searchFilterStore.selectedKategorienForServiceProvider).toEqual(DEFAULT_SERVICE_PROVIDER_KATEGORIEN);
   });
 
   it('should change the state', () => {
@@ -67,5 +67,9 @@ describe('SearchFilterStore', () => {
 
     searchFilterStore.setKategorienForServiceProvider([ServiceProviderKategorie.Email]);
     expect(searchFilterStore.selectedKategorienForServiceProvider).toEqual([ServiceProviderKategorie.Email]);
+
+    // it resets the selectedKategorienForServiceProvider back to the default selection
+    searchFilterStore.resetKategorienForServiceProvider();
+    expect(searchFilterStore.selectedKategorienForServiceProvider).toEqual(DEFAULT_SERVICE_PROVIDER_KATEGORIEN);
   });
 });

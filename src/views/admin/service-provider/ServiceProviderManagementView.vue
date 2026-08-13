@@ -8,7 +8,11 @@
   import VidisInfoDialog from '@/components/admin/service-provider/VidisInfoDialog.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
+  import {
+    DEFAULT_SERVICE_PROVIDER_KATEGORIEN,
+    useSearchFilterStore,
+    type SearchFilterStore,
+  } from '@/stores/SearchFilterStore';
   import {
     ServiceProviderKategorie,
     useServiceProviderStore,
@@ -40,25 +44,17 @@
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
 
   const allKategorien: readonly ServiceProviderKategorie[] = Object.values(ServiceProviderKategorie);
-  const defaultKategorien: readonly ServiceProviderKategorie[] = [
-    ServiceProviderKategorie.Email,
-    ServiceProviderKategorie.Unterricht,
-    ServiceProviderKategorie.Verwaltung,
-    ServiceProviderKategorie.Hinweise,
-  ];
 
   function isDefaultKategorienSelection(selection: readonly ServiceProviderKategorie[]): boolean {
     return (
-      selection.length === defaultKategorien.length &&
-      defaultKategorien.every((kategorie: ServiceProviderKategorie) => selection.includes(kategorie))
+      selection.length === DEFAULT_SERVICE_PROVIDER_KATEGORIEN.length &&
+      DEFAULT_SERVICE_PROVIDER_KATEGORIEN.every((kategorie: ServiceProviderKategorie) => selection.includes(kategorie))
     );
   }
 
   const cachedServiceProviderId: Ref<string | null> = ref(null);
   const selectedKategorien: Ref<ServiceProviderKategorie[]> = ref(
-    searchFilterStore.selectedKategorienForServiceProvider.length > 0
-      ? searchFilterStore.selectedKategorienForServiceProvider
-      : [...defaultKategorien],
+    searchFilterStore.selectedKategorienForServiceProvider,
   );
   const kategorien: readonly ServiceProviderItem[] = allKategorien.map((item: ServiceProviderKategorie) => ({
     value: item,
@@ -171,7 +167,8 @@
   }
 
   function resetFilter(): void {
-    selectedKategorien.value = [...defaultKategorien];
+    searchFilterStore.resetKategorienForServiceProvider();
+    selectedKategorien.value = searchFilterStore.selectedKategorienForServiceProvider;
   }
 
   watch(selectedKategorien, (newKategorien: Array<ServiceProviderKategorie>) => {
