@@ -100,6 +100,11 @@ export type ServiceProviderIdNameResponse = {
   name: string;
 };
 
+export type ServiceProviderRollenVerwaltungFilter = {
+  offset?: number;
+  limit?: number;
+};
+
 export type RollenerweiterungFilter = {
   serviceProviderId: string;
   organisationIds?: string[];
@@ -145,6 +150,7 @@ type ServiceProviderState = {
   availableServiceProviders: StartPageServiceProvider[];
   manageableServiceProviders: ManageableServiceProviderSimpleListEntryResponse[];
   manageableServiceProvidersForOrganisation: ManageableServiceProviderListEntry[];
+  serviceProvidersForRollenVerwaltung: ServiceProviderIdNameResponse[];
   totalManageableServiceProviders: number;
   totalManageableServiceProvidersForOrganisation: number;
   currentServiceProvider: ManageableServiceProviderDetail | null;
@@ -195,6 +201,7 @@ type ServiceProviderActions = {
     entriesPerPage: number,
   ) => Promise<void>;
   getManageableServiceProviderById: (serviceProviderId: string) => Promise<void>;
+  getServiceProvidersForRollenVerwaltung: (filter?: ServiceProviderRollenVerwaltungFilter) => Promise<void>;
   getServiceProviderLogoById: (serviceProviderId: string) => Promise<void>;
   getRollenerweiterungenById: (filter: RollenerweiterungFilter) => Promise<void>;
   persistRollenerweiterungenForServiceProvider: (filter: PersistRollenerweiterung) => Promise<void>;
@@ -225,6 +232,7 @@ export const useServiceProviderStore: StoreDefinition<
       availableServiceProviders: [],
       manageableServiceProviders: [],
       manageableServiceProvidersForOrganisation: [],
+      serviceProvidersForRollenVerwaltung: [],
       totalManageableServiceProviders: 0,
       totalManageableServiceProvidersForOrganisation: 0,
       currentServiceProvider: null,
@@ -315,6 +323,27 @@ export const useServiceProviderStore: StoreDefinition<
           await serviceProviderApi.providerControllerGetManageableServiceProviderById(serviceProviderId);
         this.currentServiceProvider = data;
       } catch (error) {
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async getServiceProvidersForRollenVerwaltung(filter?: ServiceProviderRollenVerwaltungFilter) {
+      this.loading = true;
+      try {
+        const { data }: { data: ServiceProviderResponse[] } =
+          await serviceProviderApi.providerControllerGetServiceProvidersForRollenVerwaltung({
+            params: {
+              offset: filter?.offset,
+              limit: filter?.limit,
+            },
+          });
+        this.serviceProvidersForRollenVerwaltung = data.map((serviceProvider: ServiceProviderResponse) => ({
+          id: serviceProvider.id,
+          name: serviceProvider.name,
+        }));
+      } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
         this.loading = false;

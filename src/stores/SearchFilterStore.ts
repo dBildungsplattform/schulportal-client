@@ -37,6 +37,7 @@ type SearchFilterState = {
   selectedMerkmaleForRollen: Array<RollenMerkmal>;
   selectedRollenartenForRollen: Array<RollenArt>;
   selectedOrganisationenForRollen: Array<string>;
+  selectedAngeboteForRollen: Array<string>;
 };
 
 type SearchFilterActions = {
@@ -55,6 +56,7 @@ type SearchFilterActions = {
   setMerkmaleFilterForRollen: (selectedMerkmale: Array<RollenMerkmal>) => void;
   setRollenartenFilterForRollen: (selectedRollenarten: Array<RollenArt>) => void;
   setOrganisationenFilterForRollen: (selectedOrganisationen: Array<string>) => void;
+  setAngeboteFilterForRollen: (selectedAngebote: Array<string>) => void;
 };
 
 type SearchFilterGetters = object;
@@ -101,6 +103,7 @@ export const useSearchFilterStore: StoreDefinition<
     selectedMerkmaleForRollen: [],
     selectedRollenartenForRollen: [],
     selectedOrganisationenForRollen: [],
+    selectedAngeboteForRollen: [],
   }),
   actions: {
     setKlasseFilterForPersonen(selectedKlassen: Array<string> | null) {
@@ -150,6 +153,9 @@ export const useSearchFilterStore: StoreDefinition<
     },
     setOrganisationenFilterForRollen(selectedOrganisationen: Array<string>) {
       this.selectedOrganisationenForRollen = selectedOrganisationen;
+    },
+    setAngeboteFilterForRollen(selectedAngebote: Array<string>) {
+      this.selectedAngeboteForRollen = selectedAngebote;
     },
   },
 });
