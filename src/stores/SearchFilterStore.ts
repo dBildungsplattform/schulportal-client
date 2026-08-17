@@ -1,8 +1,16 @@
-import { defineStore, type Store, type StoreDefinition } from 'pinia';
-import type { RolleResponse } from './RolleStore';
 import { SortOrder, type OrganisationSortField } from '@/utils/sorting';
+import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import type { Organisation } from './OrganisationStore';
 import { SortField } from './PersonStore';
+import type { RolleResponse } from './RolleStore';
+import { ServiceProviderKategorie } from './ServiceProviderStore';
+
+export const DEFAULT_SERVICE_PROVIDER_KATEGORIEN: ReadonlyArray<ServiceProviderKategorie> = [
+  ServiceProviderKategorie.Email,
+  ServiceProviderKategorie.Unterricht,
+  ServiceProviderKategorie.Verwaltung,
+  ServiceProviderKategorie.Hinweise,
+];
 
 type SearchFilterState = {
   klassenPage: number;
@@ -34,6 +42,7 @@ type SearchFilterState = {
   selectedSchuleForKlassen: string | null;
   selectedKlassenForKlassen: Array<string> | null;
   selectedSchuleForSchulischeServiceProvider: string | null;
+  selectedKategorienForServiceProvider: Array<ServiceProviderKategorie>;
 };
 
 type SearchFilterActions = {
@@ -49,6 +58,8 @@ type SearchFilterActions = {
   setSchuleFilterForKlassen: (selectedSchuleForKlassen: string | null) => void;
   setKlasseFilterForKlassen: (selectedKlassenForKlassen: Array<string> | null) => void;
   setSchuleForSchulischeServiceProvider: (selectedSchuleForSchulischeServiceProvider: string | null) => void;
+  setKategorienForServiceProvider: (selectedKategorienForServiceProvider: Array<ServiceProviderKategorie>) => void;
+  resetKategorienForServiceProvider: () => void;
 };
 
 type SearchFilterGetters = object;
@@ -91,6 +102,7 @@ export const useSearchFilterStore: StoreDefinition<
     selectedSchuleForKlassen: null,
     selectedKlassenForKlassen: [],
     selectedSchuleForSchulischeServiceProvider: null,
+    selectedKategorienForServiceProvider: [...DEFAULT_SERVICE_PROVIDER_KATEGORIEN],
   }),
   actions: {
     setKlasseFilterForPersonen(selectedKlassen: Array<string> | null) {
@@ -129,6 +141,14 @@ export const useSearchFilterStore: StoreDefinition<
 
     setSchuleForSchulischeServiceProvider(selectedSchuleForSchulischeServiceProvider: string | null) {
       this.selectedSchuleForSchulischeServiceProvider = selectedSchuleForSchulischeServiceProvider;
+    },
+
+    setKategorienForServiceProvider(selectedKategorienForServiceProvider: Array<ServiceProviderKategorie>) {
+      this.selectedKategorienForServiceProvider = selectedKategorienForServiceProvider;
+    },
+
+    resetKategorienForServiceProvider() {
+      this.selectedKategorienForServiceProvider = [...DEFAULT_SERVICE_PROVIDER_KATEGORIEN];
     },
   },
 });
