@@ -3,6 +3,14 @@ import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import type { Organisation } from './OrganisationStore';
 import { SortField } from './PersonStore';
 import { RollenArt, RollenMerkmal, type RolleResponse } from './RolleStore';
+import { ServiceProviderKategorie } from './ServiceProviderStore';
+
+export const DEFAULT_SERVICE_PROVIDER_KATEGORIEN: ReadonlyArray<ServiceProviderKategorie> = [
+  ServiceProviderKategorie.Email,
+  ServiceProviderKategorie.Unterricht,
+  ServiceProviderKategorie.Verwaltung,
+  ServiceProviderKategorie.Hinweise,
+];
 
 type SearchFilterState = {
   klassenPage: number;
@@ -37,6 +45,7 @@ type SearchFilterState = {
   selectedMerkmaleForRollen: Array<RollenMerkmal>;
   selectedRollenartenForRollen: Array<RollenArt>;
   selectedOrganisationenForRollen: Array<string>;
+  selectedKategorienForServiceProvider: Array<ServiceProviderKategorie>;
 };
 
 type SearchFilterActions = {
@@ -55,6 +64,8 @@ type SearchFilterActions = {
   setMerkmaleFilterForRollen: (selectedMerkmale: Array<RollenMerkmal>) => void;
   setRollenartenFilterForRollen: (selectedRollenarten: Array<RollenArt>) => void;
   setOrganisationenFilterForRollen: (selectedOrganisationen: Array<string>) => void;
+  setKategorienForServiceProvider: (selectedKategorienForServiceProvider: Array<ServiceProviderKategorie>) => void;
+  resetKategorienForServiceProvider: () => void;
 };
 
 type SearchFilterGetters = object;
@@ -101,6 +112,7 @@ export const useSearchFilterStore: StoreDefinition<
     selectedMerkmaleForRollen: [],
     selectedRollenartenForRollen: [],
     selectedOrganisationenForRollen: [],
+    selectedKategorienForServiceProvider: [...DEFAULT_SERVICE_PROVIDER_KATEGORIEN],
   }),
   actions: {
     setKlasseFilterForPersonen(selectedKlassen: Array<string> | null) {
@@ -148,8 +160,17 @@ export const useSearchFilterStore: StoreDefinition<
     setRollenartenFilterForRollen(selectedRollenarten: Array<RollenArt>) {
       this.selectedRollenartenForRollen = selectedRollenarten;
     },
+
     setOrganisationenFilterForRollen(selectedOrganisationen: Array<string>) {
       this.selectedOrganisationenForRollen = selectedOrganisationen;
+    },
+
+    setKategorienForServiceProvider(selectedKategorienForServiceProvider: Array<ServiceProviderKategorie>) {
+      this.selectedKategorienForServiceProvider = selectedKategorienForServiceProvider;
+    },
+
+    resetKategorienForServiceProvider() {
+      this.selectedKategorienForServiceProvider = [...DEFAULT_SERVICE_PROVIDER_KATEGORIEN];
     },
   },
 });

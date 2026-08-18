@@ -701,6 +701,7 @@
       "merkmaleSelected": "{count} Merkmale ausgewählt",
       "rollenartenSelected": "{count} Rollenarten ausgewählt",
       "administrationsebenenSelected": "{count} Administrationsebenen ausgewählt",
+      "kategorienSelected": "{count} Kategorien ausgewählt",
       "rollenSelected": "{count} Rollen ausgewählt",
       "rolleAddedSuccessfully": "Die Rolle wurde erfolgreich hinzugefügt.",
       "rolleUpdatedSuccessfully": "Die Rolle wurde erfolgreich geändert.",

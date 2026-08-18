@@ -160,7 +160,7 @@
     }));
   });
 
-  const filterOrSearchActive: Ref<boolean> = computed(
+  const filterOrSearchActive: ComputedRef<boolean> = computed(
     () =>
       (!hasAutoselectedSchule.value && selectedOrganisationIds.value.length > 0) ||
       selectedRollen.value.length > 0 ||
