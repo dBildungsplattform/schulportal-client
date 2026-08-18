@@ -58,7 +58,7 @@ beforeEach(() => {
       rollenart: 'LERN',
       name: 'SuS',
       // TODO: remove type casting when generator is fixed
-      merkmale: [] as unknown as Set<RollenMerkmal>,
+      merkmale: [],
       systemrechte: [] as unknown as Set<SystemRechtResponse>,
       createdAt: '2022',
       updatedAt: '2022',
@@ -78,7 +78,7 @@ beforeEach(() => {
       rollenart: 'LERN',
       name: 'Rolle ohne Namen',
       // TODO: remove type casting when generator is fixed
-      merkmale: [] as unknown as Set<RollenMerkmal>,
+      merkmale: [],
       systemrechte: [] as unknown as Set<SystemRechtResponse>,
       createdAt: '2022',
       updatedAt: '2022',

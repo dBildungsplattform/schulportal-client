@@ -103,6 +103,11 @@ beforeEach(async () => {
   wrapper = await mountComponent();
 });
 
+afterEach(() => {
+  wrapper?.unmount();
+  wrapper = null;
+});
+
 describe('ServiceProviderDetailsView', () => {
   test('it renders the service provider details page and shows its data', () => {
     expect(wrapper).toBeTruthy();
