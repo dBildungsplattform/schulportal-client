@@ -10,6 +10,7 @@ import {
   ProviderApiFactory,
   RolleApiFactory,
   RollenArt,
+  RollenSystemRechtEnum,
   ServiceProviderKategorie,
   ServiceProviderMerkmal,
   VidisApiFactory,
@@ -184,9 +185,20 @@ function containsMultiError(error: unknown): error is AxiosError<DbiamApplyRolle
   return true;
 }
 
+function isPagedServiceProviderResponse(value: unknown): value is { items?: Array<ServiceProviderResponse> } {
+  if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+  if (!('items' in value)) {
+    return true;
+  }
+  return value.items === undefined || Array.isArray(value.items);
+}
+
 type ServiceProviderGetters = object;
 type ServiceProviderActions = {
   getAssignableServiceProvidersForRolleByOrganisationId: (administeredBySchulstrukturknoten: string) => Promise<void>;
+  getServiceProvidersForRollenerweiterung: (organisationId: string) => Promise<void>;
   getMyServiceProviders: () => Promise<void>;
   getManageableServiceProviders: (page: number, entriesPerPage: number) => Promise<void>;
   getManageableServiceProvidersForOrganisation: (
@@ -248,6 +260,34 @@ export const useServiceProviderStore: StoreDefinition<
             administeredBySchulstrukturknoten,
           );
         this.allServiceProviders = data;
+      } catch (error: unknown) {
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async getServiceProvidersForRollenerweiterung(organisationId: string): Promise<void> {
+      this.loading = true;
+      this.errorCode = '';
+      this.allServiceProviders = [];
+      try {
+        const response: AxiosResponse<Array<ServiceProviderResponse>> =
+          await serviceProviderApi.providerControllerGetAvailableServiceProviders(
+            undefined,
+            undefined,
+            undefined,
+            organisationId,
+            [RollenSystemRechtEnum.RollenErweitern],
+          );
+        const responseData: unknown = response.data;
+        if (Array.isArray(responseData)) {
+          this.allServiceProviders = responseData as Array<ServiceProviderResponse>;
+        } else if (isPagedServiceProviderResponse(responseData)) {
+          this.allServiceProviders = responseData.items ?? [];
+        } else {
+          this.allServiceProviders = [];
+        }
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
