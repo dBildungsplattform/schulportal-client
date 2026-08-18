@@ -2699,6 +2699,119 @@
         "tags": ["rolle"]
       }
     },
+    "/api/rolle/for-personenkontext-creation": {
+      "get": {
+        "description": "Find available rollen for personenkontext creation.",
+        "operationId": "RolleController_findAvailableRollenForPersonenkontextCreation",
+        "parameters": [
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "description": "The offset of the paginated list.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "The requested limit for the page size.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "organisationId",
+            "required": true,
+            "in": "query",
+            "description": "The organisationId for which the available rollen should be found",
+            "schema": {
+              "nullable": false,
+              "type": "string"
+            }
+          },
+          {
+            "name": "rollenartOfUser",
+            "required": false,
+            "in": "query",
+            "description": "The rollenart of the user for which the available rollen should be found",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          },
+          {
+            "name": "rolleName",
+            "required": false,
+            "in": "query",
+            "description": "The rolleName for which the available rollen should be found",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          },
+          {
+            "name": "rollenIds",
+            "required": false,
+            "in": "query",
+            "description": "The rollenIds for which the available rollen should be found",
+            "schema": {
+              "nullable": true,
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "systemrecht",
+            "required": false,
+            "in": "query",
+            "description": "The systemrecht for which the available rollen should be found",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The available rollen were successfully returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RolleResponse"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authorized to get available rollen for personenkontext creation."
+          },
+          "403": {
+            "description": "Insufficient permissions to get available rollen for personenkontext creation."
+          },
+          "500": {
+            "description": "Internal server error while getting available rollen for personenkontext creation."
+          }
+        },
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": ["rolle"]
+      }
+    },
     "/api/rollen-erweiterung/angebot/{angebotId}/organisation/{organisationId}/apply": {
       "post": {
         "description": "Apply changes to rollen-erweiterung for a given angebot and organisation.",
@@ -3792,16 +3905,6 @@
               "items": {
                 "type": "string"
               }
-            }
-          },
-          {
-            "name": "rolleName",
-            "required": false,
-            "in": "query",
-            "description": "Rolle name used to filter for rollen in personenkontext.",
-            "schema": {
-              "nullable": true,
-              "type": "string"
             }
           },
           {
@@ -6923,7 +7026,6 @@
             }
           },
           "systemrechte": {
-            "uniqueItems": true,
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/SystemRechtResponse"
@@ -7211,6 +7313,71 @@
           }
         },
         "required": ["addErweiterungenForServiceProviderIds", "removeErweiterungenForServiceProviderIds"]
+      },
+      "RolleResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "administeredBySchulstrukturknoten": {
+            "type": "string"
+          },
+          "rollenart": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RollenArt"
+              }
+            ]
+          },
+          "merkmale": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RollenMerkmal"
+            }
+          },
+          "systemrechte": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SystemRechtResponse"
+            }
+          },
+          "administeredBySchulstrukturknotenName": {
+            "type": "string",
+            "nullable": true
+          },
+          "administeredBySchulstrukturknotenKennung": {
+            "type": "string",
+            "nullable": true
+          },
+          "version": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "createdAt",
+          "updatedAt",
+          "name",
+          "administeredBySchulstrukturknoten",
+          "rollenart",
+          "merkmale",
+          "systemrechte",
+          "administeredBySchulstrukturknotenName",
+          "administeredBySchulstrukturknotenKennung",
+          "version"
+        ]
       },
       "ApplyRollenerweiterungBodyParams": {
         "type": "object",
@@ -7838,72 +8005,6 @@
         "type": "string",
         "enum": ["PERSON_ANLEGEN", "PERSON_BEARBEITEN"]
       },
-      "RolleResponse": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "createdAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "updatedAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "administeredBySchulstrukturknoten": {
-            "type": "string"
-          },
-          "rollenart": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/RollenArt"
-              }
-            ]
-          },
-          "merkmale": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RollenMerkmal"
-            }
-          },
-          "systemrechte": {
-            "uniqueItems": true,
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SystemRechtResponse"
-            }
-          },
-          "administeredBySchulstrukturknotenName": {
-            "type": "string",
-            "nullable": true
-          },
-          "administeredBySchulstrukturknotenKennung": {
-            "type": "string",
-            "nullable": true
-          },
-          "version": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "id",
-          "createdAt",
-          "updatedAt",
-          "name",
-          "administeredBySchulstrukturknoten",
-          "rollenart",
-          "merkmale",
-          "systemrechte",
-          "administeredBySchulstrukturknotenName",
-          "administeredBySchulstrukturknotenKennung",
-          "version"
-        ]
-      },
       "PersonenkontextWorkflowResponse": {
         "type": "object",
         "properties": {
@@ -7912,13 +8013,6 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/OrganisationResponseLegacy"
-            }
-          },
-          "rollen": {
-            "description": "List of available roles.",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RolleResponse"
             }
           },
           "selectedOrganisation": {
@@ -7939,7 +8033,7 @@
             "description": "Indicates whether the commit action can be performed."
           }
         },
-        "required": ["organisations", "rollen", "selectedOrganisation", "selectedRollen", "canCommit"]
+        "required": ["organisations", "selectedOrganisation", "selectedRollen", "canCommit"]
       },
       "DbiamPersonenkontextBodyParams": {
         "type": "object",

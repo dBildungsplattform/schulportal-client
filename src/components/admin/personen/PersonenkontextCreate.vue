@@ -16,7 +16,7 @@
     type WorkflowFilter,
   } from '@/stores/PersonenkontextStore';
   import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
-  import { RollenArt, RollenSystemRecht } from '@/stores/RolleStore';
+  import { RollenArt, RollenForPersonenkontextCreationQuery, RollenSystemRecht, RolleStore, useRolleStore } from '@/stores/RolleStore';
   import type { Zuordnung } from '@/stores/types/Zuordnung';
   import { type TranslatedObject } from '@/types.d';
   import { blurActiveElement } from '@/utils/focus';
@@ -28,6 +28,7 @@
 
   const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
   const personStore: PersonStore = usePersonStore();
+  const rolleStore: RolleStore = useRolleStore();
 
   const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
   const canCommit: Ref<boolean> = ref(false);
@@ -265,15 +266,20 @@
         return;
       }
 
-      const filter: WorkflowFilter = {
-        personId: props.personId,
+      if (!selectedOrganisation.value) {
+        return;
+      }
+
+      const filter: RollenForPersonenkontextCreationQuery = {
         organisationId: selectedOrganisation.value,
+        rollenartOfUser: personStore.personenuebersicht?.zuordnungen[0]?.rollenArt,
         rollenIds: props.allowMultipleRollen
           ? selectedRollen.value
           : selectedRolle.value
             ? [selectedRolle.value]
             : undefined,
         limit: 25,
+        systemrecht: props.createType === CreationType.Limited ? RollenSystemRecht.EingeschraenktNeueBenutzerErstellen : undefined,
       };
 
       if (!newValue) {
@@ -283,7 +289,7 @@
       }
 
       timerId.value = setTimeout(async () => {
-        await handleWorkflowStep(filter);
+        await rolleStore.getRollenForPersonenkontextCreation(filter);
       }, 500);
     },
   );
