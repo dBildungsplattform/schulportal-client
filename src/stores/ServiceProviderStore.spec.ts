@@ -55,6 +55,28 @@ describe('serviceProviderStore', () => {
     expect(serviceProviderStore.loading).toBe(false);
   });
 
+  describe('getServiceProvidersForRollenVerwaltung', () => {
+    const url: string = '/api/provider/available-for-rollen-verwaltung';
+
+    it('should load service providers and their total', async () => {
+      const mockResponse: ServiceProviderResponse[] = [
+        DoFactory.getServiceProviderResponse(),
+        DoFactory.getServiceProviderResponse(),
+      ];
+
+      mockadapter.onGet(url).replyOnce(200, mockResponse, { 'x-paging-total': '42' });
+      await serviceProviderStore.getServiceProvidersForRollenVerwaltung({ limit: 25 });
+
+      expect(serviceProviderStore.serviceProvidersForRollenVerwaltung).toEqual(
+        mockResponse.map((serviceProvider: ServiceProviderResponse) => ({
+          id: serviceProvider.id,
+          name: serviceProvider.name,
+        })),
+      );
+      expect(serviceProviderStore.totalServiceProvidersForRollenVerwaltung).toEqual(42);
+    });
+  });
+
   describe('getAssignableServiceProvidersForRolleByOrganisationId', () => {
     const schulstrukturknotenOfRolle: string = faker.string.uuid();
     const url: string = `/api/provider/assignable-for-rolle?schulstrukturknotenOfRolle=${schulstrukturknotenOfRolle}`;

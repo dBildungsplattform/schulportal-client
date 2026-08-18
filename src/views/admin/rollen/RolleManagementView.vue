@@ -332,10 +332,31 @@
             item-title="title"
             multiple
             :no-data-text="$t('noDataFound')"
-            :placeholder="$t('admin.serviceProvider.serviceProvider')"
+            :placeholder="$t('admin.rolle.landesangebote')"
             variant="outlined"
             @update:model-value="setAngeboteFilter"
           >
+            <template #prepend-item>
+              <v-list-item>
+                <v-progress-circular
+                  v-if="serviceProviderStore.loading"
+                  indeterminate
+                />
+                <span
+                  v-else
+                  class="filter-header"
+                  >{{
+                    $t(
+                      'admin.rolle.landesangeboteFound',
+                      {
+                        count: serviceProviderStore.totalServiceProvidersForRollenVerwaltung,
+                      },
+                      serviceProviderStore.totalServiceProvidersForRollenVerwaltung,
+                    )
+                  }}</span
+                >
+              </v-list-item>
+            </template>
             <template #selection="{ internalItem: item, index }">
               <v-chip v-if="searchFilterStore.selectedAngeboteForRollen.length < 2">
                 <span>{{ item.title }}</span>

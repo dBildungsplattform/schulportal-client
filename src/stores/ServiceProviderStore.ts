@@ -21,6 +21,7 @@ import {
   type ManageableServiceProviderSimpleListEntryResponse,
   type ProviderApiInterface,
   type ProviderControllerFindRollenerweiterungenByServiceProviderId200Response,
+  type ProviderControllerGetManageableLandRootServiceProviders200Response,
   type ProviderControllerGetManageableServiceProviders200Response,
   type ProviderControllerGetManageableServiceProvidersForOrganisationId200Response,
   type RolleApiInterface,
@@ -151,6 +152,7 @@ type ServiceProviderState = {
   manageableServiceProviders: ManageableServiceProviderSimpleListEntryResponse[];
   manageableServiceProvidersForOrganisation: ManageableServiceProviderListEntry[];
   serviceProvidersForRollenVerwaltung: ServiceProviderIdNameResponse[];
+  totalServiceProvidersForRollenVerwaltung: number;
   totalManageableServiceProviders: number;
   totalManageableServiceProvidersForOrganisation: number;
   currentServiceProvider: ManageableServiceProviderDetail | null;
@@ -233,6 +235,7 @@ export const useServiceProviderStore: StoreDefinition<
       manageableServiceProviders: [],
       manageableServiceProvidersForOrganisation: [],
       serviceProvidersForRollenVerwaltung: [],
+      totalServiceProvidersForRollenVerwaltung: 0,
       totalManageableServiceProviders: 0,
       totalManageableServiceProvidersForOrganisation: 0,
       currentServiceProvider: null,
@@ -332,17 +335,20 @@ export const useServiceProviderStore: StoreDefinition<
     async getServiceProvidersForRollenVerwaltung(filter?: ServiceProviderRollenVerwaltungFilter) {
       this.loading = true;
       try {
-        const { data }: { data: ServiceProviderResponse[] } =
-          await serviceProviderApi.providerControllerGetServiceProvidersForRollenVerwaltung({
-            params: {
-              offset: filter?.offset,
-              limit: filter?.limit,
-            },
-          });
-        this.serviceProvidersForRollenVerwaltung = data.map((serviceProvider: ServiceProviderResponse) => ({
-          id: serviceProvider.id,
-          name: serviceProvider.name,
-        }));
+        const response: ProviderControllerGetManageableLandRootServiceProviders200Response = (
+          await serviceProviderApi.providerControllerGetManageableLandRootServiceProviders(
+            filter?.offset,
+            filter?.limit,
+          )
+        ).data;
+
+        this.serviceProvidersForRollenVerwaltung = response.items.map(
+          (serviceProvider: ServiceProviderResponse) => ({
+            id: serviceProvider.id,
+            name: serviceProvider.name,
+          }),
+        );
+        this.totalServiceProvidersForRollenVerwaltung = response.total;
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
