@@ -1,6 +1,6 @@
 <script setup lang="ts">
-  import { onBeforeMount, ref, type Ref } from 'vue';
-  import { useI18n } from 'vue-i18n';
+import { onBeforeMount, ref, type Ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 
   useI18n({ useScope: 'global' });
 
@@ -62,6 +62,7 @@
         :title="props.hoverText"
         variant="outlined"
         @keyup.enter="applySearchFilter"
+        @click:clear="applySearchFilter"
       />
       <v-btn
         class="primary search button flex-shrink-0"
