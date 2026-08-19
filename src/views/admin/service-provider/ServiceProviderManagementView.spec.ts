@@ -104,6 +104,7 @@ describe('ServiceProviderManagementView', () => {
       expect(searchFilterStore.setKategorienForServiceProvider).toHaveBeenCalledWith([ServiceProviderKategorie.Email]);
       expect(reloadSpy).toHaveBeenLastCalledWith({
         kategorien: [ServiceProviderKategorie.Email],
+        searchFilter: '',
         page: searchFilterStore.serviceProviderPage,
         entriesPerPage: searchFilterStore.serviceProviderPerPage,
       });
@@ -133,6 +134,7 @@ describe('ServiceProviderManagementView', () => {
 
       expect(reloadSpy).toHaveBeenLastCalledWith({
         kategorien: defaultKategorien,
+        searchFilter: '',
         page: searchFilterStore.serviceProviderPage,
         entriesPerPage: searchFilterStore.serviceProviderPerPage,
       });
