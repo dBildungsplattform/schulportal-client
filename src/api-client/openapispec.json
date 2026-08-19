@@ -2771,8 +2771,7 @@
             "in": "query",
             "description": "The systemrecht for which the available rollen should be found",
             "schema": {
-              "nullable": true,
-              "type": "string"
+              "$ref": "#/components/schemas/RollenSystemRechtEnum"
             }
           }
         ],

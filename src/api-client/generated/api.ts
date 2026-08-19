@@ -13581,11 +13581,11 @@ export const RolleApiAxiosParamCreator = function (configuration?: Configuration
          * @param {string} [rollenartOfUser] The rollenart of the user for which the available rollen should be found
          * @param {string} [rolleName] The rolleName for which the available rollen should be found
          * @param {Array<string>} [rollenIds] The rollenIds for which the available rollen should be found
-         * @param {string} [systemrecht] The systemrecht for which the available rollen should be found
+         * @param {RollenSystemRechtEnum} [systemrecht] The systemrecht for which the available rollen should be found
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        rolleControllerFindAvailableRollenForPersonenkontextCreation: async (organisationId: string, offset?: number, limit?: number, rollenartOfUser?: string, rolleName?: string, rollenIds?: Array<string>, systemrecht?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        rolleControllerFindAvailableRollenForPersonenkontextCreation: async (organisationId: string, offset?: number, limit?: number, rollenartOfUser?: string, rolleName?: string, rollenIds?: Array<string>, systemrecht?: RollenSystemRechtEnum, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'organisationId' is not null or undefined
             assertParamExists('rolleControllerFindAvailableRollenForPersonenkontextCreation', 'organisationId', organisationId)
             const localVarPath = `/api/rolle/for-personenkontext-creation`;
@@ -14054,11 +14054,11 @@ export const RolleApiFp = function(configuration?: Configuration) {
          * @param {string} [rollenartOfUser] The rollenart of the user for which the available rollen should be found
          * @param {string} [rolleName] The rolleName for which the available rollen should be found
          * @param {Array<string>} [rollenIds] The rollenIds for which the available rollen should be found
-         * @param {string} [systemrecht] The systemrecht for which the available rollen should be found
+         * @param {RollenSystemRechtEnum} [systemrecht] The systemrecht for which the available rollen should be found
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async rolleControllerFindAvailableRollenForPersonenkontextCreation(organisationId: string, offset?: number, limit?: number, rollenartOfUser?: string, rolleName?: string, rollenIds?: Array<string>, systemrecht?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<RolleResponse>>> {
+        async rolleControllerFindAvailableRollenForPersonenkontextCreation(organisationId: string, offset?: number, limit?: number, rollenartOfUser?: string, rolleName?: string, rollenIds?: Array<string>, systemrecht?: RollenSystemRechtEnum, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<RolleResponse>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.rolleControllerFindAvailableRollenForPersonenkontextCreation(organisationId, offset, limit, rollenartOfUser, rolleName, rollenIds, systemrecht, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -14209,11 +14209,11 @@ export const RolleApiFactory = function (configuration?: Configuration, basePath
          * @param {string} [rollenartOfUser] The rollenart of the user for which the available rollen should be found
          * @param {string} [rolleName] The rolleName for which the available rollen should be found
          * @param {Array<string>} [rollenIds] The rollenIds for which the available rollen should be found
-         * @param {string} [systemrecht] The systemrecht for which the available rollen should be found
+         * @param {RollenSystemRechtEnum} [systemrecht] The systemrecht for which the available rollen should be found
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        rolleControllerFindAvailableRollenForPersonenkontextCreation(organisationId: string, offset?: number, limit?: number, rollenartOfUser?: string, rolleName?: string, rollenIds?: Array<string>, systemrecht?: string, options?: any): AxiosPromise<Array<RolleResponse>> {
+        rolleControllerFindAvailableRollenForPersonenkontextCreation(organisationId: string, offset?: number, limit?: number, rollenartOfUser?: string, rolleName?: string, rollenIds?: Array<string>, systemrecht?: RollenSystemRechtEnum, options?: any): AxiosPromise<Array<RolleResponse>> {
             return localVarFp.rolleControllerFindAvailableRollenForPersonenkontextCreation(organisationId, offset, limit, rollenartOfUser, rolleName, rollenIds, systemrecht, options).then((request) => request(axios, basePath));
         },
         /**
@@ -14355,12 +14355,12 @@ export interface RolleApiInterface {
      * @param {string} [rollenartOfUser] The rollenart of the user for which the available rollen should be found
      * @param {string} [rolleName] The rolleName for which the available rollen should be found
      * @param {Array<string>} [rollenIds] The rollenIds for which the available rollen should be found
-     * @param {string} [systemrecht] The systemrecht for which the available rollen should be found
+     * @param {RollenSystemRechtEnum} [systemrecht] The systemrecht for which the available rollen should be found
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof RolleApiInterface
      */
-    rolleControllerFindAvailableRollenForPersonenkontextCreation(organisationId: string, offset?: number, limit?: number, rollenartOfUser?: string, rolleName?: string, rollenIds?: Array<string>, systemrecht?: string, options?: AxiosRequestConfig): AxiosPromise<Array<RolleResponse>>;
+    rolleControllerFindAvailableRollenForPersonenkontextCreation(organisationId: string, offset?: number, limit?: number, rollenartOfUser?: string, rolleName?: string, rollenIds?: Array<string>, systemrecht?: RollenSystemRechtEnum, options?: AxiosRequestConfig): AxiosPromise<Array<RolleResponse>>;
 
     /**
      * Get rolle by id.
@@ -14509,12 +14509,12 @@ export class RolleApi extends BaseAPI implements RolleApiInterface {
      * @param {string} [rollenartOfUser] The rollenart of the user for which the available rollen should be found
      * @param {string} [rolleName] The rolleName for which the available rollen should be found
      * @param {Array<string>} [rollenIds] The rollenIds for which the available rollen should be found
-     * @param {string} [systemrecht] The systemrecht for which the available rollen should be found
+     * @param {RollenSystemRechtEnum} [systemrecht] The systemrecht for which the available rollen should be found
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof RolleApi
      */
-    public rolleControllerFindAvailableRollenForPersonenkontextCreation(organisationId: string, offset?: number, limit?: number, rollenartOfUser?: string, rolleName?: string, rollenIds?: Array<string>, systemrecht?: string, options?: AxiosRequestConfig) {
+    public rolleControllerFindAvailableRollenForPersonenkontextCreation(organisationId: string, offset?: number, limit?: number, rollenartOfUser?: string, rolleName?: string, rollenIds?: Array<string>, systemrecht?: RollenSystemRechtEnum, options?: AxiosRequestConfig) {
         return RolleApiFp(this.configuration).rolleControllerFindAvailableRollenForPersonenkontextCreation(organisationId, offset, limit, rollenartOfUser, rolleName, rollenIds, systemrecht, options).then((request) => request(this.axios, this.basePath));
     }
 
