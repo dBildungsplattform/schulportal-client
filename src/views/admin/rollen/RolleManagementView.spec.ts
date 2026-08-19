@@ -33,6 +33,7 @@ beforeEach(() => {
   searchFilterStore.selectedMerkmaleForRollen = [];
   searchFilterStore.selectedRollenartenForRollen = [];
   searchFilterStore.selectedOrganisationenForRollen = [];
+  searchFilterStore.searchFilterRollenname = '';
 
   rolleStore.allRollen = [
     {
@@ -213,6 +214,7 @@ describe('RolleManagementView', () => {
     expect(searchFilterStore.setMerkmaleFilterForRollen).toHaveBeenCalledWith([]);
     expect(searchFilterStore.setRollenartenFilterForRollen).toHaveBeenCalledWith([]);
     expect(searchFilterStore.setOrganisationenFilterForRollen).toHaveBeenCalledWith([]);
+    expect(searchFilterStore.searchFilterRollenname).toEqual('');
     expect(searchFilterStore.rollenPage).toEqual(1);
     expect(searchFilterStore.rollenPerPage).toEqual(rollenPerPageDefault);
     expect(rolleStore.getAllRollen).toHaveBeenCalled();
@@ -270,6 +272,28 @@ describe('RolleManagementView', () => {
       merkmale: undefined,
       rollenarten: undefined,
       organisationenForFilter: orgs,
+    });
+  });
+
+  test('search filter change calls store action and reloads rollen', async () => {
+    const searchString: string = 'search';
+    searchFilterStore.searchFilterRollenname = searchString;
+
+    const searchInput: VueWrapper | undefined = wrapper?.findComponent({
+      name: 'SearchField',
+    });
+    await searchInput?.setValue(searchString);
+    searchInput?.vm.$emit('onApplySearchFilter', searchString);
+    await flushPromises();
+
+    expect(searchFilterStore.setSearchFilterForRollenname).toHaveBeenCalledWith(searchString);
+    expect(rolleStore.getAllRollen).toHaveBeenLastCalledWith({
+      offset: 0,
+      limit: 30,
+      searchString: searchString,
+      merkmale: undefined,
+      rollenarten: undefined,
+      organisationenForFilter: undefined,
     });
   });
 });
