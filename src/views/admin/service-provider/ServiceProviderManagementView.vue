@@ -281,7 +281,7 @@
         :input-cols-md="3"
         :button-cols="6"
         :button-cols-md="2"
-        :hover-text="$t('angebot.name')"
+        :hover-text="$t('admin.angebot.management.name')"
         @on-apply-search-filter="handleSearchFilter"
       />
     </v-row>
