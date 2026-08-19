@@ -53,7 +53,7 @@ describe('SearchFilterStore', () => {
     searchFilterStore.setSearchFilterForPersonen(null);
     expect(searchFilterStore.searchFilterPersonen).toEqual('');
 
-    // it sets the searchFilter for personen
+    // it sets the searchFilter for rollen name
     searchFilterStore.setSearchFilterForRollenname('search');
     expect(searchFilterStore.searchFilterRollenname).toEqual('search');
     searchFilterStore.setSearchFilterForRollenname(null);
