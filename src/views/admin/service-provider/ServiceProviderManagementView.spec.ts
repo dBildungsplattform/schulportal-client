@@ -1,3 +1,4 @@
+import SearchField from '@/components/admin/SearchField.vue';
 import VidisInfoDialog from '@/components/admin/service-provider/VidisInfoDialog.vue';
 import routes from '@/router/routes';
 import {
@@ -168,6 +169,55 @@ describe('ServiceProviderManagementView', () => {
       await nextTick();
       expect(wrapper.find('.selection-count').exists()).toBe(true);
       expect(wrapper.find('.selection-count').text()).toContain('2');
+    });
+  });
+
+  describe('search filter', () => {
+    it('persists the applied search filter in the store and reloads data with it', async () => {
+      const wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementView>> = mountComponent();
+      searchFilterStore.searchFilterServiceProvider = 'meine-suche';
+
+      const reloadSpy: Mock<ServiceProviderStore['getManageableServiceProviders']> = vi
+        .spyOn(serviceProviderStore, 'getManageableServiceProviders')
+        .mockResolvedValue();
+
+      wrapper.findComponent(SearchField).vm.$emit('onApplySearchFilter', 'meine-suche');
+      await flushPromises();
+
+      expect(searchFilterStore.setSearchFilterForServiceProvider).toHaveBeenCalledWith('meine-suche');
+      expect(reloadSpy).toHaveBeenLastCalledWith({
+        kategorien: DEFAULT_SERVICE_PROVIDER_KATEGORIEN,
+        searchFilter: 'meine-suche',
+        page: searchFilterStore.serviceProviderPage,
+        entriesPerPage: searchFilterStore.serviceProviderPerPage,
+      });
+    });
+
+    it('enables the reset filter button when a search filter is applied', async () => {
+      const wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementView>> = mountComponent();
+      expect(wrapper.find('[data-testid="reset-filter-button"]').attributes('disabled')).toBeDefined();
+
+      wrapper.findComponent(SearchField).vm.$emit('onApplySearchFilter', 'meine-suche');
+      await flushPromises();
+
+      expect(wrapper.find('[data-testid="reset-filter-button"]').attributes('disabled')).toBeUndefined();
+    });
+
+    it('clears the search filter and search field when resetting', async () => {
+      const wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementView>> = mountComponent();
+      const searchField: VueWrapper = wrapper.findComponent(SearchField) as VueWrapper;
+      (searchField.vm as unknown as { searchFilter: string }).searchFilter = 'meine-suche';
+
+      searchField.vm.$emit('onApplySearchFilter', 'meine-suche');
+      await flushPromises();
+      expect(wrapper.find('[data-testid="reset-filter-button"]').attributes('disabled')).toBeUndefined();
+
+      await wrapper.find('[data-testid="reset-filter-button"]').trigger('click');
+      await flushPromises();
+
+      expect(searchFilterStore.setSearchFilterForServiceProvider).toHaveBeenLastCalledWith('');
+      expect((searchField.vm as unknown as { searchFilter: string }).searchFilter).toBe('');
+      expect(wrapper.find('[data-testid="reset-filter-button"]').attributes('disabled')).toBeDefined();
     });
   });
 
