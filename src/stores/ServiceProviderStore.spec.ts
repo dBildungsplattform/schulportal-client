@@ -186,6 +186,30 @@ describe('serviceProviderStore', () => {
       expect(serviceProviderStore.loading).toBe(false);
     });
 
+    it('should pass the search filter to the request', async () => {
+      const items: ManageableServiceProviderSimpleListEntryResponse[] = [
+        DoFactory.getManageableServiceProviderSimpleListEntryResponse(),
+      ];
+      const mockResponse: ProviderControllerGetManageableServiceProviders200Response = {
+        items,
+        offset,
+        limit,
+        total: 1,
+      };
+
+      const searchFilter: string = 'meine-suche';
+      const urlWithSearchFilter: string = `${url}&searchFilter=${searchFilter}`;
+      mockadapter.onGet(urlWithSearchFilter).replyOnce(200, mockResponse);
+
+      const filter: ManageableServiceProviderFilter = { kategorien: [], searchFilter, page, entriesPerPage };
+      const promise: Promise<void> = serviceProviderStore.getManageableServiceProviders(filter);
+      expect(serviceProviderStore.loading).toBe(true);
+      await promise;
+      expect(serviceProviderStore.manageableServiceProviders).toEqual(expect.arrayContaining(mockResponse.items));
+      expect(serviceProviderStore.totalManageableServiceProviders).toEqual(mockResponse.total);
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+
     it('should handle string error', async () => {
       mockadapter.onGet(url).replyOnce(500, 'some mock server error');
       const filter: ManageableServiceProviderFilter = { kategorien: [], page, entriesPerPage };
