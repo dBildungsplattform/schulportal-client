@@ -1,9 +1,6 @@
 <script setup lang="ts">
-  import { computed, ref, watch, watchEffect, type ComputedRef, type Ref } from 'vue';
-  import { useI18n, type Composer } from 'vue-i18n';
-  import { useRouter, type Router } from 'vue-router';
-
   import ResultTable, { type Headers, type TableRow } from '@/components/admin/ResultTable.vue';
+  import SearchField from '@/components/admin/SearchField.vue';
   import ServiceProviderDelete from '@/components/admin/service-provider/ServiceProviderDelete.vue';
   import VidisInfoDialog from '@/components/admin/service-provider/VidisInfoDialog.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
@@ -20,6 +17,9 @@
     type ServiceProviderStore,
   } from '@/stores/ServiceProviderStore';
   import { getDisplayNameForOrg } from '@/utils/formatting';
+  import { computed, ref, watch, watchEffect, type ComputedRef, type Ref } from 'vue';
+  import { useI18n, type Composer } from 'vue-i18n';
+  import { useRouter, type Router } from 'vue-router';
 
   type ServiceProviderRow = {
     id: string;
@@ -42,6 +42,9 @@
 
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
+
+  const searchFieldComponent: Ref<{ searchFilter?: string } | null> = ref(null);
+  const searchFilter: Ref<string> = ref('');
 
   const allKategorien: readonly ServiceProviderKategorie[] = Object.values(ServiceProviderKategorie);
 
@@ -86,7 +89,9 @@
   });
 
   const filterOrSearchActive: ComputedRef<boolean> = computed(
-    () => !isDefaultKategorienSelection(selectedKategorien.value),
+    () =>
+      !isDefaultKategorienSelection(selectedKategorien.value) ||
+      (!!searchFilter.value && searchFilter.value.length > 0),
   );
 
   const headers: Headers = [
@@ -109,6 +114,7 @@
       kategorien: selectedKategorien.value,
       page: searchFilterStore.serviceProviderPage,
       entriesPerPage: searchFilterStore.serviceProviderPerPage,
+      searchFilter: searchFilterStore.searchFilterServiceProvider || '',
     });
   }
 
@@ -166,9 +172,21 @@
     router.push({ name: 'angebot-details', params: { id: item.id } });
   }
 
-  function resetFilter(): void {
+  function resetSearchAndFilter(): void {
+    searchFilter.value = '';
+    if (searchFieldComponent.value) {
+      searchFieldComponent.value.searchFilter = '';
+    }
+    searchFilterStore.setSearchFilterForServiceProvider('');
+
     searchFilterStore.resetKategorienForServiceProvider();
     selectedKategorien.value = searchFilterStore.selectedKategorienForServiceProvider;
+  }
+
+  async function handleSearchFilter(filter: string): Promise<void> {
+    searchFilterStore.setSearchFilterForServiceProvider(filter);
+    searchFilter.value = filter;
+    await reloadData();
   }
 
   watch(selectedKategorien, (newKategorien: Array<ServiceProviderKategorie>) => {
@@ -212,7 +230,7 @@
           size="x-small"
           variant="text"
           width="auto"
-          @click="resetFilter()"
+          @click="resetSearchAndFilter()"
         >
           {{ $t('resetFilter') }}
         </v-btn>
@@ -255,6 +273,17 @@
           </template>
         </v-autocomplete>
       </v-col>
+      <v-spacer />
+      <SearchField
+        ref="searchFieldComponent"
+        :initial-value="''"
+        :input-cols="6"
+        :input-cols-md="3"
+        :button-cols="6"
+        :button-cols-md="2"
+        :hover-text="$t('angebot.name')"
+        @on-apply-search-filter="handleSearchFilter"
+      />
     </v-row>
     <ResultTable
       v-if="!serviceProviderStore.errorCode"
