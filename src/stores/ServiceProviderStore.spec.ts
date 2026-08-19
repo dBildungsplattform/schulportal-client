@@ -447,6 +447,21 @@ describe('serviceProviderStore', () => {
       expect(serviceProviderStore.loading).toBe(false);
     });
 
+    it('should fall back to an empty overview when the response has no items', async () => {
+      const mockResponse: Omit<ProviderControllerFindRollenerweiterungenByServiceProviderId200Response, 'items'> = {
+        total: 0,
+        offset: 0,
+        limit: 0,
+      };
+
+      mockadapter.onGet(url).replyOnce(200, mockResponse);
+
+      await serviceProviderStore.getRollenerweiterungenById({ serviceProviderId: serviceProviderId });
+
+      expect(serviceProviderStore.rollenerweiterungenUebersicht).toEqual([]);
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+
     it('should handle errors', async () => {
       mockadapter.onGet(url).replyOnce(500, 'some error');
       await serviceProviderStore.getRollenerweiterungenById({ serviceProviderId: serviceProviderId });
