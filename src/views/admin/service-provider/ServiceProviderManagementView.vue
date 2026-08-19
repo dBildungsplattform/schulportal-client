@@ -44,7 +44,7 @@
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
 
   const searchFieldComponent: Ref<{ searchFilter?: string } | null> = ref(null);
-  const searchFilter: Ref<string> = ref('');
+  const searchFilter: Ref<string> = ref(searchFilterStore.searchFilterServiceProvider ?? '');
 
   const allKategorien: readonly ServiceProviderKategorie[] = Object.values(ServiceProviderKategorie);
 
@@ -183,10 +183,10 @@
     selectedKategorien.value = searchFilterStore.selectedKategorienForServiceProvider;
   }
 
-  async function handleSearchFilter(filter: string): Promise<void> {
+  function handleSearchFilter(filter: string): void {
+    searchFilterStore.serviceProviderPage = 1;
     searchFilterStore.setSearchFilterForServiceProvider(filter);
     searchFilter.value = filter;
-    await reloadData();
   }
 
   watch(selectedKategorien, (newKategorien: Array<ServiceProviderKategorie>) => {
@@ -276,7 +276,7 @@
       <v-spacer />
       <SearchField
         ref="searchFieldComponent"
-        :initial-value="''"
+        :initial-value="searchFilter"
         :input-cols="6"
         :input-cols-md="3"
         :button-cols="6"

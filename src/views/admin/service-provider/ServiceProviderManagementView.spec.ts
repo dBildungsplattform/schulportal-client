@@ -173,6 +173,39 @@ describe('ServiceProviderManagementView', () => {
   });
 
   describe('search filter', () => {
+    it('initializes the search field with the persisted filter from the store', async () => {
+      searchFilterStore.searchFilterServiceProvider = 'persisted-suche';
+
+      const wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementView>> = mountComponent();
+      await flushPromises();
+
+      const searchField: VueWrapper = wrapper.findComponent(SearchField) as VueWrapper;
+      expect(searchField.props('initialValue')).toBe('persisted-suche');
+      expect((searchField.vm as unknown as { searchFilter: string }).searchFilter).toBe('persisted-suche');
+      expect(wrapper.find('[data-testid="reset-filter-button"]').attributes('disabled')).toBeUndefined();
+    });
+
+    it('resets the page to the first page when a search filter is applied', async () => {
+      searchFilterStore.serviceProviderPage = 3;
+      const wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementView>> = mountComponent();
+
+      const reloadSpy: Mock<ServiceProviderStore['getManageableServiceProviders']> = vi
+        .spyOn(serviceProviderStore, 'getManageableServiceProviders')
+        .mockResolvedValue();
+
+      searchFilterStore.searchFilterServiceProvider = 'meine-suche';
+      wrapper.findComponent(SearchField).vm.$emit('onApplySearchFilter', 'meine-suche');
+      await flushPromises();
+
+      expect(searchFilterStore.serviceProviderPage).toBe(1);
+      expect(reloadSpy).toHaveBeenLastCalledWith({
+        kategorien: DEFAULT_SERVICE_PROVIDER_KATEGORIEN,
+        searchFilter: 'meine-suche',
+        page: 1,
+        entriesPerPage: searchFilterStore.serviceProviderPerPage,
+      });
+    });
+
     it('persists the applied search filter in the store and reloads data with it', async () => {
       const wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementView>> = mountComponent();
       searchFilterStore.searchFilterServiceProvider = 'meine-suche';
