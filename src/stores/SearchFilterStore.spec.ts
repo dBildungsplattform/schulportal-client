@@ -23,6 +23,7 @@ describe('SearchFilterStore', () => {
     expect(searchFilterStore.selectedRollenObjects).toEqual([]);
     expect(searchFilterStore.searchFilterPersonen).toEqual('');
     expect(searchFilterStore.searchFilterSchulen).toEqual('');
+    expect(searchFilterStore.searchFilterServiceProvider).toEqual('');
     expect(searchFilterStore.selectedSchuleForKlassen).toEqual(null);
     expect(searchFilterStore.selectedKlassenForKlassen).toEqual([]);
     expect(searchFilterStore.selectedSchuleForSchulischeServiceProvider).toEqual(null);
@@ -57,6 +58,12 @@ describe('SearchFilterStore', () => {
     expect(searchFilterStore.searchFilterSchulen).toEqual('search');
     searchFilterStore.setSearchFilterForSchulen(null);
     expect(searchFilterStore.searchFilterSchulen).toEqual('');
+
+    // it sets the searchFilter for service provider
+    searchFilterStore.setSearchFilterForServiceProvider('search');
+    expect(searchFilterStore.searchFilterServiceProvider).toEqual('search');
+    searchFilterStore.setSearchFilterForServiceProvider(null);
+    expect(searchFilterStore.searchFilterServiceProvider).toEqual('');
 
     // it sets the selectedRolleFilterWithObjects
     const rolleFilterObject: RolleResponse = DoFactory.getRolleResponse();
