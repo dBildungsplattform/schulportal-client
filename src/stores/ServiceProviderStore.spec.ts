@@ -447,6 +447,32 @@ describe('serviceProviderStore', () => {
       expect(serviceProviderStore.loading).toBe(false);
     });
 
+    it('should group multiple items that belong to the same organisation into a single overview entry', async () => {
+      const sharedOrg: Partial<RollenerweiterungWithExtendedDataResponse> = {
+        organisationId: faker.string.uuid(),
+        organisationName: faker.company.name(),
+        organisationKennung: faker.string.alphanumeric(6),
+      };
+      const apiItems: RollenerweiterungWithExtendedDataResponse[] = [
+        DoFactory.getRollenerweiterungItem({ ...sharedOrg, rolleName: 'Rolle A' }),
+        DoFactory.getRollenerweiterungItem({ ...sharedOrg, rolleName: 'Rolle B' }),
+      ];
+
+      const mockResponse: ProviderControllerFindRollenerweiterungenByServiceProviderId200Response =
+        DoFactory.getRollenerweiterungenResponse(apiItems);
+
+      mockadapter.onGet(url).replyOnce(200, mockResponse);
+
+      await serviceProviderStore.getRollenerweiterungenById({ serviceProviderId: serviceProviderId });
+
+      const expectedRollenerweiterungUebersicht: RollenErweiterungenUebersicht[] =
+        DoFactory.buildRollenerweiterungenUebersicht(apiItems);
+
+      expect(expectedRollenerweiterungUebersicht).toHaveLength(1);
+      expect(serviceProviderStore.rollenerweiterungenUebersicht).toEqual(expectedRollenerweiterungUebersicht);
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+
     it('should fall back to an empty overview when the response has no items', async () => {
       const mockResponse: Omit<ProviderControllerFindRollenerweiterungenByServiceProviderId200Response, 'items'> = {
         total: 0,
