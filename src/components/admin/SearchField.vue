@@ -8,7 +8,6 @@
 
   type Emits = {
     (event: 'onApplySearchFilter', searchFilter: string): void;
-    (event: 'onClearSearchFilter'): void;
   };
 
   type Props = {
@@ -22,7 +21,6 @@
 
   const emit: Emits = defineEmits<{
     (event: 'onApplySearchFilter', searchFilter: string): void;
-    (event: 'onClearSearchFilter'): void;
   }>();
 
   const props: Props = defineProps<Props>();
@@ -64,7 +62,7 @@
         :title="props.hoverText"
         variant="outlined"
         @keyup.enter="applySearchFilter"
-        @click:clear="emit('onClearSearchFilter')"
+        @click:clear="applySearchFilter"
       />
       <v-btn
         class="primary search button flex-shrink-0"
