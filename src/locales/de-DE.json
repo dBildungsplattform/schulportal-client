@@ -705,6 +705,7 @@
       "angeboteFound": "{count} Angebot gefunden | {count} Angebote gefunden",
       "landesangebote": "Landesangebote",
       "landesangeboteFound": "{count} Landesangebot gefunden | {count} Landesangebote gefunden",
+      "kategorienSelected": "{count} Kategorien ausgewählt",
       "rollenSelected": "{count} Rollen ausgewählt",
       "rolleAddedSuccessfully": "Die Rolle wurde erfolgreich hinzugefügt.",
       "rolleUpdatedSuccessfully": "Die Rolle wurde erfolgreich geändert.",
