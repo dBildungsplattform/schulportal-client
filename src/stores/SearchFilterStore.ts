@@ -28,7 +28,7 @@ type SearchFilterState = {
   serviceProviderSchulePage: number;
   serviceProviderSchulePerPage: number;
   searchFilterPersonen: string | null;
-  searchFilterRollenname: string | null;
+  searchFilterRollen: string | null;
   searchFilterSchulen: string | null;
   selectedKlassen: Array<string> | null;
   selectedRollen: Array<string> | null;
@@ -58,7 +58,7 @@ type SearchFilterActions = {
     orgaObjects?: Organisation[],
   ) => void;
   setSearchFilterForPersonen: (searchFilter: string | null) => void;
-  setSearchFilterForRollenname: (searchFilter: string | null) => void;
+  setSearchFilterForRollen: (searchFilter: string | null) => void;
   setSearchFilterForSchulen: (searchFilter: string | null) => void;
   setSchuleFilterForKlassen: (selectedSchuleForKlassen: string | null) => void;
   setKlasseFilterForKlassen: (selectedKlassenForKlassen: Array<string> | null) => void;
@@ -97,7 +97,7 @@ export const useSearchFilterStore: StoreDefinition<
     serviceProviderSchulePage: 1,
     serviceProviderSchulePerPage: 30,
     searchFilterPersonen: '',
-    searchFilterRollenname: '',
+    searchFilterRollen: '',
     searchFilterSchulen: '',
     selectedKlassen: [],
     selectedRollen: [],
@@ -135,8 +135,8 @@ export const useSearchFilterStore: StoreDefinition<
       this.searchFilterPersonen = searchFilterPersonen ?? '';
     },
 
-    setSearchFilterForRollenname(searchFilterRollenname: string | null) {
-      this.searchFilterRollenname = searchFilterRollenname ?? '';
+    setSearchFilterForRollen(searchFilterRollen: string | null) {
+      this.searchFilterRollen = searchFilterRollen ?? '';
     },
 
     setSearchFilterForSchulen(searchFilterSchulen: string | null) {

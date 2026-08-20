@@ -94,7 +94,7 @@
     await rolleStore.getAllRollen({
       offset: (searchFilterStore.rollenPage - 1) * searchFilterStore.rollenPerPage,
       limit: searchFilterStore.rollenPerPage,
-      searchString: searchFilterStore.searchFilterRollenname ?? undefined,
+      searchString: searchFilterStore.searchFilterRollen ?? undefined,
       organisationenForFilter: searchFilterStore.selectedOrganisationenForRollen?.length
         ? searchFilterStore.selectedOrganisationenForRollen
         : undefined,
@@ -146,12 +146,12 @@
     searchFilterStore.setOrganisationenFilterForRollen([]);
     searchFilterStore.rollenPage = 1;
     searchFilterStore.rollenPerPage = rollenPerPageDefault;
-    searchFilterStore.setSearchFilterForRollenname(null);
+    searchFilterStore.setSearchFilterForRollen(null);
     await getRollen();
   }
 
   async function handleSearchFilter(filter: string): Promise<void> {
-    searchFilterStore.setSearchFilterForRollenname(filter);
+    searchFilterStore.setSearchFilterForRollen(filter);
     await getRollen();
   }
 
@@ -296,7 +296,7 @@
         >
           <SearchField
             ref="searchFieldComponent"
-            :initial-value="searchFilterStore.searchFilterRollenname ?? ''"
+            :initial-value="searchFilterStore.searchFilterRollen ?? ''"
             :input-cols="6"
             :input-cols-md="3"
             :button-cols="6"

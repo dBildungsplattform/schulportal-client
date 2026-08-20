@@ -33,7 +33,7 @@ beforeEach(() => {
   searchFilterStore.selectedMerkmaleForRollen = [];
   searchFilterStore.selectedRollenartenForRollen = [];
   searchFilterStore.selectedOrganisationenForRollen = [];
-  searchFilterStore.searchFilterRollenname = '';
+  searchFilterStore.searchFilterRollen = '';
 
   rolleStore.allRollen = [
     {
@@ -214,7 +214,7 @@ describe('RolleManagementView', () => {
     expect(searchFilterStore.setMerkmaleFilterForRollen).toHaveBeenCalledWith([]);
     expect(searchFilterStore.setRollenartenFilterForRollen).toHaveBeenCalledWith([]);
     expect(searchFilterStore.setOrganisationenFilterForRollen).toHaveBeenCalledWith([]);
-    expect(searchFilterStore.searchFilterRollenname).toEqual('');
+    expect(searchFilterStore.searchFilterRollen).toEqual('');
     expect(searchFilterStore.rollenPage).toEqual(1);
     expect(searchFilterStore.rollenPerPage).toEqual(rollenPerPageDefault);
     expect(rolleStore.getAllRollen).toHaveBeenCalled();
@@ -277,7 +277,7 @@ describe('RolleManagementView', () => {
 
   test('search filter change calls store action and reloads rollen', async () => {
     const searchString: string = 'search';
-    searchFilterStore.searchFilterRollenname = searchString;
+    searchFilterStore.searchFilterRollen = searchString;
 
     const searchInput: VueWrapper | undefined = wrapper?.findComponent({
       name: 'SearchField',
@@ -286,7 +286,7 @@ describe('RolleManagementView', () => {
     searchInput?.vm.$emit('onApplySearchFilter', searchString);
     await flushPromises();
 
-    expect(searchFilterStore.setSearchFilterForRollenname).toHaveBeenCalledWith(searchString);
+    expect(searchFilterStore.setSearchFilterForRollen).toHaveBeenCalledWith(searchString);
     expect(rolleStore.getAllRollen).toHaveBeenLastCalledWith({
       offset: 0,
       limit: 30,
