@@ -150,15 +150,16 @@
         testIdValue: 'rolle-value-' + (index + 1),
       });
 
-      if (zuordnung.sskDstNr) {
-        tempSchulDaten.labelAndValues.push({
-          label: t('profile.dienstStellenNummer'),
-          labelAbbr: t('profile.dienstStellenNummerAbbr'),
-          value: zuordnung.sskDstNr,
-          testIdLabel: 'dienststellennummer-label-' + (index + 1),
-          testIdValue: 'dienststellennummer-value-' + (index + 1),
-        });
-      }
+      // Not needed for ErWIn Portal atm.
+      // if (zuordnung.sskDstNr) {
+      //   tempSchulDaten.labelAndValues.push({
+      //     label: t('profile.dienstStellenNummer'),
+      //     labelAbbr: t('profile.dienstStellenNummerAbbr'),
+      //     value: zuordnung.sskDstNr,
+      //     testIdLabel: 'dienststellennummer-label-' + (index + 1),
+      //     testIdValue: 'dienststellennummer-value-' + (index + 1),
+      //   });
+      // }
 
       if (zuordnung.befristung) {
         tempSchulDaten.labelAndValues.push({

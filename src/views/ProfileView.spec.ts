@@ -315,9 +315,7 @@ describe('ProfileView', () => {
       uebersicht!.zuordnungen.forEach((mockZuordnung: Zuordnung, index: number) => {
         expect(wrapper?.find(`[data-testid="schule-value-${index + 1}"]`).text()).toContain(mockZuordnung.sskName);
         expect(wrapper?.find(`[data-testid="rolle-value-${index + 1}"]`).text()).toContain(mockZuordnung.rolle);
-        expect(wrapper?.find(`[data-testid="dienststellennummer-value-${index + 1}"]`).text()).toContain(
-          mockZuordnung.sskDstNr,
-        );
+        expect(wrapper?.find(`[data-testid="dienststellennummer-value-${index + 1}"]`).exists()).toBe(false);
       });
     },
   );
@@ -335,7 +333,7 @@ describe('ProfileView', () => {
     )!;
     expect(wrapper.find('[data-testid="schule-value-1"]').text()).toContain(schule.sskName);
     expect(wrapper.find('[data-testid="rolle-value-1"]').text()).toContain(schule.rolle);
-    expect(wrapper.find('[data-testid="dienststellennummer-value-1"]').text()).toContain(schule.sskDstNr);
+    expect(wrapper.find('[data-testid="dienststellennummer-value-1"]').exists()).toBe(false);
     expect(wrapper.find('[data-testid="klasse-value-1"]').text()).toContain(klasse.sskName);
     expect(wrapper.find('[data-testid="rolle-value-1"]').text()).toContain(klasse.rolle);
   });
