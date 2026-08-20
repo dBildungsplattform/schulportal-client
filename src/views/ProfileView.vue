@@ -121,7 +121,8 @@
     for (const [index, zuordnung] of zuordnungen.entries()) {
       const tempSchulDaten: SchulDaten = {
         title: zuordnung.sskName,
-        info: t('profile.yourSchuleAdminsAre'),
+        // Not needed for ErWIn Portal atm.
+        // info: t('profile.yourSchuleAdminsAre'),
         schulAdmins: zuordnung.admins,
         labelAndValues: [
           {
@@ -813,6 +814,7 @@
                   </tbody>
                 </template>
               </v-table>
+              <!-- Not needed for ErWIn Portal atm.
               <p
                 class="pt-4 text-center text-body-1 text-medium-emphasis"
                 data-testid="schuladmins-info-text-with-icon"
@@ -828,6 +830,7 @@
                   {{ `${schuleData.info} ${schuleData.schulAdmins?.join(', ') || ''}` }}
                 </span>
               </p>
+              -->
             </v-col>
           </v-row>
         </LayoutCard>
