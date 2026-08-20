@@ -366,7 +366,7 @@
                 class="selection-count"
               >
                 {{
-                  $t('admin.rolle.angeboteSelected', {
+                  $t('admin.rolle.landesangeboteSelected', {
                     count: searchFilterStore.selectedAngeboteForRollen.length,
                   })
                 }}
