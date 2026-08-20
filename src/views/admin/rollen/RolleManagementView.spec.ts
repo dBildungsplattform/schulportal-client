@@ -275,9 +275,10 @@ describe('RolleManagementView', () => {
     });
   });
 
-  test('search filter change calls store action and reloads rollen', async () => {
+  test('search filter change resets to first page, calls store action and reloads rollen', async () => {
     const searchString: string = 'search';
     searchFilterStore.searchFilterRollen = searchString;
+    searchFilterStore.rollenPage = 2;
 
     const searchInput: VueWrapper | undefined = wrapper?.findComponent({
       name: 'SearchField',
@@ -287,6 +288,7 @@ describe('RolleManagementView', () => {
     await flushPromises();
 
     expect(searchFilterStore.setSearchFilterForRollen).toHaveBeenCalledWith(searchString);
+    expect(searchFilterStore.rollenPage).toEqual(1);
     expect(rolleStore.getAllRollen).toHaveBeenLastCalledWith({
       offset: 0,
       limit: 30,
