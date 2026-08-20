@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { onBeforeMount, ref, type Ref } from 'vue';
-import { useI18n } from 'vue-i18n';
+  import { onBeforeMount, ref, type Ref } from 'vue';
+  import { useI18n } from 'vue-i18n';
 
   useI18n({ useScope: 'global' });
 
@@ -8,6 +8,7 @@ import { useI18n } from 'vue-i18n';
 
   type Emits = {
     (event: 'onApplySearchFilter', searchFilter: string): void;
+    (event: 'onClearSearchFilter'): void;
   };
 
   type Props = {
@@ -21,6 +22,7 @@ import { useI18n } from 'vue-i18n';
 
   const emit: Emits = defineEmits<{
     (event: 'onApplySearchFilter', searchFilter: string): void;
+    (event: 'onClearSearchFilter'): void;
   }>();
 
   const props: Props = defineProps<Props>();
@@ -62,7 +64,7 @@ import { useI18n } from 'vue-i18n';
         :title="props.hoverText"
         variant="outlined"
         @keyup.enter="applySearchFilter"
-        @click:clear="applySearchFilter"
+        @click:clear="emit('onClearSearchFilter')"
       />
       <v-btn
         class="primary search button flex-shrink-0"

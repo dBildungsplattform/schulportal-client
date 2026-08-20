@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import ResultTable, { type Headers, type TableRow } from '@/components/admin/ResultTable.vue';
-import SearchField from '@/components/admin/SearchField.vue';
-import LayoutCard from '@/components/cards/LayoutCard.vue';
-import SchulenFilter from '@/components/filter/SchulenFilter.vue';
-import {
+  import ResultTable, { type Headers, type TableRow } from '@/components/admin/ResultTable.vue';
+  import SearchField from '@/components/admin/SearchField.vue';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import SchulenFilter from '@/components/filter/SchulenFilter.vue';
+  import {
     RollenArt,
     RollenMerkmal,
     RollenSystemRecht,
@@ -11,11 +11,11 @@ import {
     useRolleStore,
     type RolleResponse,
     type RolleTableItem,
-} from '@/stores/RolleStore';
-import { rollenPerPageDefault, useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
-import { computed, onMounted, type ComputedRef } from 'vue';
-import { useI18n, type Composer } from 'vue-i18n';
-import { useRouter, type Router } from 'vue-router';
+  } from '@/stores/RolleStore';
+  import { rollenPerPageDefault, useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
+  import { computed, onMounted, type ComputedRef } from 'vue';
+  import { useI18n, type Composer } from 'vue-i18n';
+  import { useRouter, type Router } from 'vue-router';
 
   const rolleStore: RolleStore = useRolleStore();
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
@@ -289,16 +289,22 @@ import { useRouter, type Router } from 'vue-router';
           />
         </v-col>
         <v-spacer />
-        <SearchField
-          ref="searchFieldComponent"
-          :initial-value="searchFilterStore.searchFilterRollenname ?? ''"
-          :input-cols="6"
-          :input-cols-md="3"
-          :button-cols="6"
-          :button-cols-md="2"
-          :hover-text="$t('admin.rolle.rollenname')"
-          @on-apply-search-filter="handleSearchFilter"
-        />
+        <v-col
+          cols="12"
+          md="5"
+          offset-md="7"
+        >
+          <SearchField
+            ref="searchFieldComponent"
+            :initial-value="searchFilterStore.searchFilterRollenname ?? ''"
+            :input-cols="6"
+            :input-cols-md="3"
+            :button-cols="6"
+            :button-cols-md="2"
+            :hover-text="$t('admin.rolle.rollenname')"
+            @on-apply-search-filter="handleSearchFilter"
+          />
+        </v-col>
       </v-row>
       <ResultTable
         :current-page="searchFilterStore.rollenPage"
