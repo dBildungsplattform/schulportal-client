@@ -348,12 +348,10 @@ export const useServiceProviderStore: StoreDefinition<
           )
         ).data;
 
-        this.serviceProvidersForRollenVerwaltung = response.items.map(
-          (serviceProvider: ServiceProviderResponse) => ({
-            id: serviceProvider.id,
-            name: serviceProvider.name,
-          }),
-        );
+        this.serviceProvidersForRollenVerwaltung = response.items.map((serviceProvider: ServiceProviderResponse) => ({
+          id: serviceProvider.id,
+          name: serviceProvider.name,
+        }));
         this.totalServiceProvidersForRollenVerwaltung = response.total;
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');

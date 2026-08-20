@@ -58,19 +58,25 @@ describe('serviceProviderStore', () => {
   });
 
   describe('getServiceProvidersForRollenVerwaltung', () => {
-    const url: string = '/api/provider/available-for-rollen-verwaltung';
+    const url: string = '/api/provider/manageable-land-root?limit=25';
 
     it('should load service providers and their total', async () => {
-      const mockResponse: ServiceProviderResponse[] = [
+      const mockItems: ServiceProviderResponse[] = [
         DoFactory.getServiceProviderResponse(),
         DoFactory.getServiceProviderResponse(),
       ];
+      const mockResponse: { items: ServiceProviderResponse[]; total: number; offset: number; limit: number } = {
+        items: mockItems,
+        total: 42,
+        offset: 0,
+        limit: 25,
+      };
 
-      mockadapter.onGet(url).replyOnce(200, mockResponse, { 'x-paging-total': '42' });
+      mockadapter.onGet(url).replyOnce(200, mockResponse);
       await serviceProviderStore.getServiceProvidersForRollenVerwaltung({ limit: 25 });
 
       expect(serviceProviderStore.serviceProvidersForRollenVerwaltung).toEqual(
-        mockResponse.map((serviceProvider: ServiceProviderResponse) => ({
+        mockItems.map((serviceProvider: ServiceProviderResponse) => ({
           id: serviceProvider.id,
           name: serviceProvider.name,
         })),
