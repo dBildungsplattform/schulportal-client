@@ -185,72 +185,74 @@ describe('ServiceProviderManagementView', () => {
       expect(wrapper.find('[data-testid="reset-filter-button"]').attributes('disabled')).toBeUndefined();
     });
 
-    it('resets the page to the first page when a search filter is applied', async () => {
-      searchFilterStore.serviceProviderPage = 3;
-      const wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementView>> = mountComponent();
+    describe('when a search filter is applied', () => {
+      it('resets the page to the first page', async () => {
+        searchFilterStore.serviceProviderPage = 3;
+        const wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementView>> = mountComponent();
 
-      const reloadSpy: Mock<ServiceProviderStore['getManageableServiceProviders']> = vi
-        .spyOn(serviceProviderStore, 'getManageableServiceProviders')
-        .mockResolvedValue();
+        const reloadSpy: Mock<ServiceProviderStore['getManageableServiceProviders']> = vi
+          .spyOn(serviceProviderStore, 'getManageableServiceProviders')
+          .mockResolvedValue();
 
-      searchFilterStore.setSearchFilterForServiceProvider('meine-suche');
-      wrapper.findComponent(SearchField).vm.$emit('onApplySearchFilter', 'meine-suche');
-      await flushPromises();
+        searchFilterStore.setSearchFilterForServiceProvider('meine-suche');
+        wrapper.findComponent(SearchField).vm.$emit('onApplySearchFilter', 'meine-suche');
+        await flushPromises();
 
-      expect(searchFilterStore.serviceProviderPage).toBe(1);
-      expect(reloadSpy).toHaveBeenLastCalledWith({
-        kategorien: DEFAULT_SERVICE_PROVIDER_KATEGORIEN,
-        searchFilter: 'meine-suche',
-        page: 1,
-        entriesPerPage: searchFilterStore.serviceProviderPerPage,
+        expect(searchFilterStore.serviceProviderPage).toBe(1);
+        expect(reloadSpy).toHaveBeenLastCalledWith({
+          kategorien: DEFAULT_SERVICE_PROVIDER_KATEGORIEN,
+          searchFilter: 'meine-suche',
+          page: 1,
+          entriesPerPage: searchFilterStore.serviceProviderPerPage,
+        });
       });
-    });
 
-    it('persists the applied search filter in the store and reloads data with it', async () => {
-      const wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementView>> = mountComponent();
-      searchFilterStore.setSearchFilterForServiceProvider('meine-suche');
+      it('persists the applied search filter in the store and reloads data with it', async () => {
+        const wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementView>> = mountComponent();
+        searchFilterStore.setSearchFilterForServiceProvider('meine-suche');
 
-      const reloadSpy: Mock<ServiceProviderStore['getManageableServiceProviders']> = vi
-        .spyOn(serviceProviderStore, 'getManageableServiceProviders')
-        .mockResolvedValue();
+        const reloadSpy: Mock<ServiceProviderStore['getManageableServiceProviders']> = vi
+          .spyOn(serviceProviderStore, 'getManageableServiceProviders')
+          .mockResolvedValue();
 
-      wrapper.findComponent(SearchField).vm.$emit('onApplySearchFilter', 'meine-suche');
-      await flushPromises();
+        wrapper.findComponent(SearchField).vm.$emit('onApplySearchFilter', 'meine-suche');
+        await flushPromises();
 
-      expect(searchFilterStore.setSearchFilterForServiceProvider).toHaveBeenCalledWith('meine-suche');
-      expect(reloadSpy).toHaveBeenLastCalledWith({
-        kategorien: DEFAULT_SERVICE_PROVIDER_KATEGORIEN,
-        searchFilter: 'meine-suche',
-        page: searchFilterStore.serviceProviderPage,
-        entriesPerPage: searchFilterStore.serviceProviderPerPage,
+        expect(searchFilterStore.setSearchFilterForServiceProvider).toHaveBeenCalledWith('meine-suche');
+        expect(reloadSpy).toHaveBeenLastCalledWith({
+          kategorien: DEFAULT_SERVICE_PROVIDER_KATEGORIEN,
+          searchFilter: 'meine-suche',
+          page: searchFilterStore.serviceProviderPage,
+          entriesPerPage: searchFilterStore.serviceProviderPerPage,
+        });
       });
-    });
 
-    it('enables the reset filter button when a search filter is applied', async () => {
-      const wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementView>> = mountComponent();
-      expect(wrapper.find('[data-testid="reset-filter-button"]').attributes('disabled')).toBeDefined();
+      it('enables the reset filter button', async () => {
+        const wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementView>> = mountComponent();
+        expect(wrapper.find('[data-testid="reset-filter-button"]').attributes('disabled')).toBeDefined();
 
-      wrapper.findComponent(SearchField).vm.$emit('onApplySearchFilter', 'meine-suche');
-      await flushPromises();
+        wrapper.findComponent(SearchField).vm.$emit('onApplySearchFilter', 'meine-suche');
+        await flushPromises();
 
-      expect(wrapper.find('[data-testid="reset-filter-button"]').attributes('disabled')).toBeUndefined();
-    });
+        expect(wrapper.find('[data-testid="reset-filter-button"]').attributes('disabled')).toBeUndefined();
+      });
 
-    it('clears the search filter and search field when resetting', async () => {
-      const wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementView>> = mountComponent();
-      const searchField: VueWrapper = wrapper.findComponent(SearchField) as VueWrapper;
-      (searchField.vm as unknown as { searchFilter: string }).searchFilter = 'meine-suche';
+      it('clears the search filter and search field when resetting', async () => {
+        const wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementView>> = mountComponent();
+        const searchField: VueWrapper = wrapper.findComponent(SearchField) as VueWrapper;
+        (searchField.vm as unknown as { searchFilter: string }).searchFilter = 'meine-suche';
 
-      searchField.vm.$emit('onApplySearchFilter', 'meine-suche');
-      await flushPromises();
-      expect(wrapper.find('[data-testid="reset-filter-button"]').attributes('disabled')).toBeUndefined();
+        searchField.vm.$emit('onApplySearchFilter', 'meine-suche');
+        await flushPromises();
+        expect(wrapper.find('[data-testid="reset-filter-button"]').attributes('disabled')).toBeUndefined();
 
-      await wrapper.find('[data-testid="reset-filter-button"]').trigger('click');
-      await flushPromises();
+        await wrapper.find('[data-testid="reset-filter-button"]').trigger('click');
+        await flushPromises();
 
-      expect(searchFilterStore.setSearchFilterForServiceProvider).toHaveBeenLastCalledWith('');
-      expect((searchField.vm as unknown as { searchFilter: string }).searchFilter).toBe('');
-      expect(wrapper.find('[data-testid="reset-filter-button"]').attributes('disabled')).toBeDefined();
+        expect(searchFilterStore.setSearchFilterForServiceProvider).toHaveBeenLastCalledWith('');
+        expect((searchField.vm as unknown as { searchFilter: string }).searchFilter).toBe('');
+        expect(wrapper.find('[data-testid="reset-filter-button"]').attributes('disabled')).toBeDefined();
+      });
     });
   });
 
