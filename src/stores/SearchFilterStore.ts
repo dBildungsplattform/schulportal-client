@@ -117,7 +117,6 @@ export const useSearchFilterStore: StoreDefinition<
     selectedOrganisationenForRollen: [],
     selectedKategorienForServiceProvider: [...DEFAULT_SERVICE_PROVIDER_KATEGORIEN],
   }),
-  // test
   actions: {
     setKlasseFilterForPersonen(selectedKlassen: Array<string> | null) {
       this.selectedKlassen = selectedKlassen;
