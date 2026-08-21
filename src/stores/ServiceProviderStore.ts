@@ -340,6 +340,8 @@ export const useServiceProviderStore: StoreDefinition<
 
     async getServiceProvidersForRollenVerwaltung(filter?: ServiceProviderRollenVerwaltungFilter) {
       this.loading = true;
+      this.serviceProvidersForRollenVerwaltung = [];
+      this.totalServiceProvidersForRollenVerwaltung = 0;
       try {
         const response: ProviderControllerGetManageableLandRootServiceProviders200Response = (
           await serviceProviderApi.providerControllerGetManageableLandRootServiceProviders(

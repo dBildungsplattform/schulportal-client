@@ -108,6 +108,25 @@ describe('serviceProviderStore', () => {
         expect(serviceProviderStore.loading).toBe(false);
       });
     });
+
+    describe('when a previous successful load is followed by a failed request', () => {
+      it('should clear stale state instead of keeping previous results', async () => {
+        const mockItems: ServiceProviderResponse[] = [
+          DoFactory.getServiceProviderResponse(),
+          DoFactory.getServiceProviderResponse(),
+        ];
+        mockadapter.onGet(url).replyOnce(200, { items: mockItems, total: 2, offset: 0, limit: 25 });
+        await serviceProviderStore.getServiceProvidersForRollenVerwaltung({ limit: 25 });
+        expect(serviceProviderStore.serviceProvidersForRollenVerwaltung).toHaveLength(2);
+        expect(serviceProviderStore.totalServiceProvidersForRollenVerwaltung).toBe(2);
+
+        mockadapter.onGet(url).replyOnce(500, { code: 'UNSPECIFIED_ERROR' });
+        await serviceProviderStore.getServiceProvidersForRollenVerwaltung({ limit: 25 });
+
+        expect(serviceProviderStore.serviceProvidersForRollenVerwaltung).toEqual([]);
+        expect(serviceProviderStore.totalServiceProvidersForRollenVerwaltung).toBe(0);
+      });
+    });
   });
 
   describe('getAssignableServiceProvidersForRolleByOrganisationId', () => {
