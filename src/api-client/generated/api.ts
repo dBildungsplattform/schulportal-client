@@ -3464,6 +3464,50 @@ export interface ProviderControllerFindRollenerweiterungenByServiceProviderId200
 /**
  * 
  * @export
+ * @interface ProviderControllerGetAvailableServiceProviders200Response
+ */
+export interface ProviderControllerGetAvailableServiceProviders200Response {
+    /**
+     * 
+     * @type {number}
+     * @memberof ProviderControllerGetAvailableServiceProviders200Response
+     */
+    'total': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof ProviderControllerGetAvailableServiceProviders200Response
+     */
+    'offset': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof ProviderControllerGetAvailableServiceProviders200Response
+     */
+    'limit': number;
+    /**
+     * 
+     * @type {Array<ServiceProviderResponse>}
+     * @memberof ProviderControllerGetAvailableServiceProviders200Response
+     */
+    'items': Array<ServiceProviderResponse>;
+}
+/**
+ * 
+ * @export
+ * @interface ProviderControllerGetAvailableServiceProviders200ResponseAllOf
+ */
+export interface ProviderControllerGetAvailableServiceProviders200ResponseAllOf {
+    /**
+     * 
+     * @type {Array<ServiceProviderResponse>}
+     * @memberof ProviderControllerGetAvailableServiceProviders200ResponseAllOf
+     */
+    'items': Array<ServiceProviderResponse>;
+}
+/**
+ * 
+ * @export
  * @interface ProviderControllerGetManageableServiceProviders200Response
  */
 export interface ProviderControllerGetManageableServiceProviders200Response {
@@ -12920,7 +12964,7 @@ export const ProviderApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async providerControllerGetAvailableServiceProviders(offset?: number, limit?: number, searchStr?: string, organisationId?: string, systemrechte?: Array<RollenSystemRechtEnum>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ServiceProviderResponse>>> {
+        async providerControllerGetAvailableServiceProviders(offset?: number, limit?: number, searchStr?: string, organisationId?: string, systemrechte?: Array<RollenSystemRechtEnum>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ProviderControllerGetAvailableServiceProviders200Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.providerControllerGetAvailableServiceProviders(offset, limit, searchStr, organisationId, systemrechte, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -13058,7 +13102,7 @@ export const ProviderApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        providerControllerGetAvailableServiceProviders(offset?: number, limit?: number, searchStr?: string, organisationId?: string, systemrechte?: Array<RollenSystemRechtEnum>, options?: any): AxiosPromise<Array<ServiceProviderResponse>> {
+        providerControllerGetAvailableServiceProviders(offset?: number, limit?: number, searchStr?: string, organisationId?: string, systemrechte?: Array<RollenSystemRechtEnum>, options?: any): AxiosPromise<ProviderControllerGetAvailableServiceProviders200Response> {
             return localVarFp.providerControllerGetAvailableServiceProviders(offset, limit, searchStr, organisationId, systemrechte, options).then((request) => request(axios, basePath));
         },
         /**
@@ -13189,7 +13233,7 @@ export interface ProviderApiInterface {
      * @throws {RequiredError}
      * @memberof ProviderApiInterface
      */
-    providerControllerGetAvailableServiceProviders(offset?: number, limit?: number, searchStr?: string, organisationId?: string, systemrechte?: Array<RollenSystemRechtEnum>, options?: AxiosRequestConfig): AxiosPromise<Array<ServiceProviderResponse>>;
+    providerControllerGetAvailableServiceProviders(offset?: number, limit?: number, searchStr?: string, organisationId?: string, systemrechte?: Array<RollenSystemRechtEnum>, options?: AxiosRequestConfig): AxiosPromise<ProviderControllerGetAvailableServiceProviders200Response>;
 
     /**
      * Get service-provider the logged-in user is allowed to manage.
