@@ -31,6 +31,7 @@ describe('SearchFilterStore', () => {
     expect(searchFilterStore.selectedOrganisationenForRollen).toEqual([]);
     expect(searchFilterStore.rollenPerPage).toEqual(rollenPerPageDefault);
     expect(searchFilterStore.selectedKategorienForServiceProvider).toEqual(DEFAULT_SERVICE_PROVIDER_KATEGORIEN);
+    expect(searchFilterStore.selectedAngeboteForRollen).toEqual([]);
   });
 
   it('should change the state', () => {
@@ -95,5 +96,10 @@ describe('SearchFilterStore', () => {
   it('should set organisationen filter for rollen', () => {
     searchFilterStore.setOrganisationenFilterForRollen(['org1', 'org2']);
     expect(searchFilterStore.selectedOrganisationenForRollen).toEqual(['org1', 'org2']);
+  });
+
+  it('should set angebote filter for rollen', () => {
+    searchFilterStore.setAngeboteFilterForRollen(['angebot1', 'angebot2']);
+    expect(searchFilterStore.selectedAngeboteForRollen).toEqual(['angebot1', 'angebot2']);
   });
 });

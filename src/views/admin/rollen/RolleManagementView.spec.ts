@@ -3,6 +3,7 @@ import SchulenFilter from '@/components/filter/SchulenFilter.vue';
 import routes from '@/router/routes';
 import { RollenArt, RollenMerkmal, useRolleStore, type RolleStore } from '@/stores/RolleStore';
 import { rollenPerPageDefault, useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
+import { useServiceProviderStore, type ServiceProviderStore } from '@/stores/ServiceProviderStore';
 import { VueWrapper, flushPromises, mount } from '@vue/test-utils';
 import { expect, test, type MockInstance } from 'vitest';
 import { nextTick, type Component } from 'vue';
@@ -14,6 +15,7 @@ let wrapper: VueWrapper | null = null;
 let router: Router;
 let rolleStore: RolleStore;
 let searchFilterStore: SearchFilterStore;
+let serviceProviderStore: ServiceProviderStore;
 
 beforeEach(() => {
   document.body.innerHTML = `
@@ -29,10 +31,19 @@ beforeEach(() => {
 
   rolleStore = useRolleStore();
   searchFilterStore = useSearchFilterStore();
+  serviceProviderStore = useServiceProviderStore();
 
   searchFilterStore.selectedMerkmaleForRollen = [];
   searchFilterStore.selectedRollenartenForRollen = [];
   searchFilterStore.selectedOrganisationenForRollen = [];
+  searchFilterStore.selectedAngeboteForRollen = [];
+
+  serviceProviderStore.serviceProvidersForRollenVerwaltung = [
+    { id: 'sp1', name: 'Service Provider 1' },
+    { id: 'sp2', name: 'Service Provider 2' },
+  ];
+  serviceProviderStore.totalServiceProvidersForRollenVerwaltung = 2;
+  serviceProviderStore.loading = false;
 
   rolleStore.allRollen = [
     {
@@ -179,6 +190,7 @@ describe('RolleManagementView', () => {
     expect(wrapper?.find('[data-testid="rollenarten-filter-select"]').exists()).toBe(true);
     expect(wrapper?.find('[data-testid="merkmale-filter-select"]').exists()).toBe(true);
     expect(wrapper?.findComponent(SchulenFilter).exists()).toBe(true);
+    expect(wrapper?.find('[data-testid="angebote-filter-select"]').exists()).toBe(true);
   });
 
   test('reset button is disabled when no filter is active', () => {
@@ -203,6 +215,12 @@ describe('RolleManagementView', () => {
     expect(wrapper?.find('[data-testid="reset-filter-button"]').classes()).not.toContain('v-btn--disabled');
   });
 
+  test('reset button is enabled when angebote filter is active', async () => {
+    searchFilterStore.selectedAngeboteForRollen = ['sp1'];
+    await nextTick();
+    expect(wrapper?.find('[data-testid="reset-filter-button"]').classes()).not.toContain('v-btn--disabled');
+  });
+
   test('clicking reset button resets filters and reloads rollen', async () => {
     searchFilterStore.selectedMerkmaleForRollen = [RollenMerkmal.KopersPflicht];
     await nextTick();
@@ -213,6 +231,7 @@ describe('RolleManagementView', () => {
     expect(searchFilterStore.setMerkmaleFilterForRollen).toHaveBeenCalledWith([]);
     expect(searchFilterStore.setRollenartenFilterForRollen).toHaveBeenCalledWith([]);
     expect(searchFilterStore.setOrganisationenFilterForRollen).toHaveBeenCalledWith([]);
+    expect(searchFilterStore.setAngeboteFilterForRollen).toHaveBeenCalledWith([]);
     expect(searchFilterStore.rollenPage).toEqual(1);
     expect(searchFilterStore.rollenPerPage).toEqual(rollenPerPageDefault);
     expect(rolleStore.getAllRollen).toHaveBeenCalled();
@@ -232,6 +251,7 @@ describe('RolleManagementView', () => {
       merkmale: [RollenMerkmal.KopersPflicht],
       rollenarten: undefined,
       organisationenForFilter: undefined,
+      serviceProviderIds: undefined,
     });
   });
 
@@ -249,6 +269,7 @@ describe('RolleManagementView', () => {
       merkmale: undefined,
       rollenarten: [RollenArt.Lehr],
       organisationenForFilter: undefined,
+      serviceProviderIds: undefined,
     });
   });
 
@@ -270,6 +291,36 @@ describe('RolleManagementView', () => {
       merkmale: undefined,
       rollenarten: undefined,
       organisationenForFilter: orgs,
+      serviceProviderIds: undefined,
+    });
+  });
+
+  describe('when angebote is selected in filter', () => {
+    test('angebote filter change calls store action and reloads rollen', async () => {
+      const angeboteSelect: ReturnType<VueWrapper['findComponent']> | undefined = wrapper?.findComponent(
+        '[data-testid="angebote-filter-select"]',
+      );
+      await angeboteSelect?.setValue(['sp1']);
+
+      expect(searchFilterStore.setAngeboteFilterForRollen).toHaveBeenCalledWith(['sp1']);
+      expect(rolleStore.getAllRollen).toHaveBeenLastCalledWith({
+        offset: 0,
+        limit: 30,
+        searchString: '',
+        merkmale: undefined,
+        rollenarten: undefined,
+        organisationenForFilter: undefined,
+        serviceProviderIds: ['sp1'],
+      });
+    });
+
+    test('angebote filter shows selected items', async () => {
+      serviceProviderStore.loading = false;
+      serviceProviderStore.totalServiceProvidersForRollenVerwaltung = 5;
+      searchFilterStore.selectedAngeboteForRollen = ['sp1', 'sp2'];
+      await nextTick();
+
+      expect(wrapper?.find('[data-testid="angebote-filter-select"]').text()).toContain('Landesangebote ausgewählt');
     });
   });
 });

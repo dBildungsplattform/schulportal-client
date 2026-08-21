@@ -21,6 +21,7 @@ import {
   type ManageableServiceProviderSimpleListEntryResponse,
   type ProviderApiInterface,
   type ProviderControllerFindRollenerweiterungenByServiceProviderId200Response,
+  type ProviderControllerGetManageableLandRootServiceProviders200Response,
   type ProviderControllerGetManageableServiceProviders200Response,
   type ProviderControllerGetManageableServiceProvidersForOrganisationId200Response,
   type RolleApiInterface,
@@ -100,6 +101,11 @@ export type ServiceProviderIdNameResponse = {
   name: string;
 };
 
+export type ServiceProviderRollenVerwaltungFilter = {
+  offset?: number;
+  limit?: number;
+};
+
 export type RollenerweiterungFilter = {
   serviceProviderId: string;
   organisationIds?: string[];
@@ -151,6 +157,8 @@ type ServiceProviderState = {
   availableServiceProviders: StartPageServiceProvider[];
   manageableServiceProviders: ManageableServiceProviderSimpleListEntryResponse[];
   manageableServiceProvidersForOrganisation: ManageableServiceProviderListEntry[];
+  serviceProvidersForRollenVerwaltung: ServiceProviderIdNameResponse[];
+  totalServiceProvidersForRollenVerwaltung: number;
   totalManageableServiceProviders: number;
   totalManageableServiceProvidersForOrganisation: number;
   currentServiceProvider: ManageableServiceProviderDetail | null;
@@ -201,6 +209,7 @@ type ServiceProviderActions = {
     entriesPerPage: number,
   ) => Promise<void>;
   getManageableServiceProviderById: (serviceProviderId: string) => Promise<void>;
+  getServiceProvidersForRollenVerwaltung: (filter?: ServiceProviderRollenVerwaltungFilter) => Promise<void>;
   getServiceProviderLogoById: (serviceProviderId: string) => Promise<void>;
   getRollenerweiterungenById: (filter: RollenerweiterungFilter) => Promise<void>;
   persistRollenerweiterungenForServiceProvider: (filter: PersistRollenerweiterung) => Promise<void>;
@@ -231,6 +240,8 @@ export const useServiceProviderStore: StoreDefinition<
       availableServiceProviders: [],
       manageableServiceProviders: [],
       manageableServiceProvidersForOrganisation: [],
+      serviceProvidersForRollenVerwaltung: [],
+      totalServiceProvidersForRollenVerwaltung: 0,
       totalManageableServiceProviders: 0,
       totalManageableServiceProvidersForOrganisation: 0,
       currentServiceProvider: null,
@@ -321,6 +332,30 @@ export const useServiceProviderStore: StoreDefinition<
           await serviceProviderApi.providerControllerGetManageableServiceProviderById(serviceProviderId);
         this.currentServiceProvider = data;
       } catch (error) {
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async getServiceProvidersForRollenVerwaltung(filter?: ServiceProviderRollenVerwaltungFilter) {
+      this.loading = true;
+      this.serviceProvidersForRollenVerwaltung = [];
+      this.totalServiceProvidersForRollenVerwaltung = 0;
+      try {
+        const response: ProviderControllerGetManageableLandRootServiceProviders200Response = (
+          await serviceProviderApi.providerControllerGetManageableLandRootServiceProviders(
+            filter?.offset,
+            filter?.limit,
+          )
+        ).data;
+
+        this.serviceProvidersForRollenVerwaltung = response.items.map((serviceProvider: ServiceProviderResponse) => ({
+          id: serviceProvider.id,
+          name: serviceProvider.name,
+        }));
+        this.totalServiceProvidersForRollenVerwaltung = response.total;
+      } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
         this.loading = false;
