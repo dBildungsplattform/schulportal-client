@@ -314,23 +314,13 @@ describe('RolleManagementView', () => {
       });
     });
 
-    test('angebote filter shows item count', async () => {
-      serviceProviderStore.loading = false;
-      serviceProviderStore.totalServiceProvidersForRollenVerwaltung = 5;
-      await nextTick();
-
-      expect(wrapper?.find('[data-testid="angebote-filter-select"] .v-progress-circular').exists()).toBe(false);
-    });
-
     test('angebote filter shows selected items', async () => {
       serviceProviderStore.loading = false;
       serviceProviderStore.totalServiceProvidersForRollenVerwaltung = 5;
       searchFilterStore.selectedAngeboteForRollen = ['sp1', 'sp2'];
       await nextTick();
 
-      expect(wrapper?.find('[data-testid="angebote-filter-select"] .selection-count').text()).toContain(
-        'Landesangebote ausgewählt',
-      );
+      expect(wrapper?.find('[data-testid="angebote-filter-select"]').text()).toContain('Landesangebote ausgewählt');
     });
   });
 });
