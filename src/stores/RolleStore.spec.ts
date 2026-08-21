@@ -2,6 +2,7 @@ import MockAdapter from 'axios-mock-adapter';
 import { createPinia, setActivePinia } from 'pinia';
 import {
   RollenMerkmal,
+  type ApplyRollenerweiterungChangesBodyParams,
   type RolleResponse,
   type RolleWithServiceProvidersResponse,
   type ServiceProviderResponse,
@@ -290,45 +291,27 @@ describe('rolleStore', () => {
       expect(rolleStore.errorCode).toBe('ROLLE_EXTENSION_READ_ERROR');
       expect(rolleStore.loading).toBe(false);
     });
-
-    it('should handle a structured non-multi error', async () => {
-      mockadapter
-        .onPost('/api/rolle/rolle-1/organisation/organisation-1/apply')
-        .replyOnce(500, { code: 'ROLLE_EXTENSION_WRITE_ERROR' });
-
-      await rolleStore.persistRollenerweiterungenForRolle({
-        rolleId: 'rolle-1',
-        organisationId: 'organisation-1',
-        addErweiterungenForServiceProviderIds: [],
-        removeErweiterungenForServiceProviderIds: [],
-      });
-
-      expect(rolleStore.errorCode).toBe('ROLLE_EXTENSION_WRITE_ERROR');
-      expect(rolleStore.loading).toBe(false);
-    });
   });
 
   describe('persistRollenerweiterungenForRolle', () => {
     it('should persist added and removed service providers', async () => {
-      mockadapter
-        .onPost('/api/rolle/rolle-1/organisation/organisation-1/apply')
-        .replyOnce((config: { data?: unknown }) => {
-          expect(JSON.parse(config.data as string)).toEqual({
-            addErweiterungenForServiceProviderIds: ['service-provider-add'],
-            removeErweiterungenForServiceProviderIds: ['service-provider-remove'],
-          });
-          return [200, []];
-        });
+      const expectedBody: ApplyRollenerweiterungChangesBodyParams = {
+        addErweiterungenForServiceProviderIds: ['service-provider-add'],
+        removeErweiterungenForServiceProviderIds: ['service-provider-remove'],
+      };
+      mockadapter.onPost('/api/rolle/rolle-1/organisation/organisation-1/apply').replyOnce(200, []);
 
       const promise: Promise<void> = rolleStore.persistRollenerweiterungenForRolle({
         rolleId: 'rolle-1',
         organisationId: 'organisation-1',
-        addErweiterungenForServiceProviderIds: ['service-provider-add'],
-        removeErweiterungenForServiceProviderIds: ['service-provider-remove'],
+        existingServiceProviderIds: expectedBody.removeErweiterungenForServiceProviderIds,
+        selectedServiceProviderIds: expectedBody.addErweiterungenForServiceProviderIds,
       });
       expect(rolleStore.loading).toBe(true);
       await promise;
 
+      const requestBody: unknown = JSON.parse(String(mockadapter.history.post[0]?.data)) as unknown;
+      expect(requestBody).toEqual(expectedBody);
       expect(rolleStore.errorCode).toBe('');
       expect(rolleStore.errors).toEqual(new Map());
       expect(rolleStore.loading).toBe(false);
@@ -349,8 +332,8 @@ describe('rolleStore', () => {
       await rolleStore.persistRollenerweiterungenForRolle({
         rolleId: 'rolle-1',
         organisationId: 'organisation-1',
-        addErweiterungenForServiceProviderIds: ['service-provider-1'],
-        removeErweiterungenForServiceProviderIds: [],
+        existingServiceProviderIds: [],
+        selectedServiceProviderIds: ['service-provider-1'],
       });
 
       expect(rolleStore.errors.get('service-provider-1')).toBe('ROLLENERWEITERUNG_TECHNICAL_ERROR');
@@ -363,11 +346,27 @@ describe('rolleStore', () => {
       await rolleStore.persistRollenerweiterungenForRolle({
         rolleId: 'rolle-1',
         organisationId: 'organisation-1',
-        addErweiterungenForServiceProviderIds: [],
-        removeErweiterungenForServiceProviderIds: [],
+        existingServiceProviderIds: [],
+        selectedServiceProviderIds: [],
       });
 
       expect(rolleStore.errorCode).toBe('UNSPECIFIED_ERROR');
+      expect(rolleStore.loading).toBe(false);
+    });
+
+    it('should handle a structured non-multi error', async () => {
+      mockadapter
+        .onPost('/api/rolle/rolle-1/organisation/organisation-1/apply')
+        .replyOnce(500, { code: 'ROLLE_EXTENSION_WRITE_ERROR' });
+
+      await rolleStore.persistRollenerweiterungenForRolle({
+        rolleId: 'rolle-1',
+        organisationId: 'organisation-1',
+        existingServiceProviderIds: [],
+        selectedServiceProviderIds: [],
+      });
+
+      expect(rolleStore.errorCode).toBe('ROLLE_EXTENSION_WRITE_ERROR');
       expect(rolleStore.loading).toBe(false);
     });
   });

@@ -66,9 +66,9 @@
     (): Array<AngebotForSelection> => props.availableServiceProviders ?? [],
   );
 
-  const availableServiceProviderIds: ComputedRef<Set<string>> = computed(
-    (): Set<string> =>
-      new Set(availableServiceProviders.value.map((serviceProvider: AngebotForSelection) => serviceProvider.id)),
+  const availableServiceProviderIds: ComputedRef<Array<string>> = computed(
+    (): Array<string> =>
+      availableServiceProviders.value.map((serviceProvider: AngebotForSelection): string => serviceProvider.id),
   );
 
   const treeItems: ComputedRef<Array<TreeNode>> = computed((): Array<TreeNode> => {
@@ -123,7 +123,10 @@
     const ids: Array<string> = Array.isArray(value)
       ? value.filter((id: unknown): id is string => typeof id === 'string')
       : [];
-    const leafIds: Array<string> = ids.filter((id: string): boolean => availableServiceProviderIds.value.has(id));
+    const leafIds: Array<string> = ids.filter(
+      (id: string, index: number): boolean =>
+        availableServiceProviderIds.value.includes(id) && ids.indexOf(id) === index,
+    );
     selected.value = leafIds;
     emit('update:selectedServiceProviderIds', leafIds);
   }
@@ -145,13 +148,16 @@
       return;
     }
     const categoryIds: Array<string> = getServiceProviderIdsForCategory(kategorie);
-    const updatedSelection: Set<string> = new Set(selected.value);
+    let updatedSelection: Array<string>;
     if (getCategorySelectionState(kategorie) === SelectionState.All) {
-      categoryIds.forEach((id: string): boolean => updatedSelection.delete(id));
+      updatedSelection = selected.value.filter((id: string): boolean => !categoryIds.includes(id));
     } else {
-      categoryIds.forEach((id: string): Set<string> => updatedSelection.add(id));
+      updatedSelection = [
+        ...selected.value,
+        ...categoryIds.filter((id: string): boolean => !selected.value.includes(id)),
+      ];
     }
-    onSelectionUpdate(Array.from(updatedSelection));
+    onSelectionUpdate(updatedSelection);
   }
 
   function toggleServiceProvider(id: string): void {
@@ -232,17 +238,3 @@
     </template>
   </v-treeview>
 </template>
-
-<style scoped lang="scss">
-  .angebot-selection-tree {
-    max-width: 560px;
-  }
-
-  .angebot-selection-tree :deep(.v-list-item) {
-    min-height: 42px;
-  }
-
-  .angebot-selection-tree :deep(.v-list-item__prepend) {
-    align-self: center;
-  }
-</style>

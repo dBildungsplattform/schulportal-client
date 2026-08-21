@@ -1,6 +1,6 @@
 import axiosApiInstance from '@/services/ApiService';
-import { getResponseErrorCode } from '@/utils/errorHandlers';
-import { type AxiosError, type AxiosResponse } from 'axios';
+import { getResponseErrorCode, getRollenerweiterungErrors } from '@/utils/errorHandlers';
+import { type AxiosResponse } from 'axios';
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import {
   RolleApiFactory,
@@ -13,24 +13,14 @@ import {
   type RolleApiInterface,
   type RolleResponse,
   type RolleWithServiceProvidersResponse,
-  type UpdateRolleBodyParams,
-  type SystemRechtResponse,
   type ServiceProviderIdNameResponse,
   type ServiceProviderResponse,
+  type SystemRechtResponse,
+  type UpdateRolleBodyParams,
 } from '../api-client/generated/api';
 import type { BaseServiceProvider } from './ServiceProviderStore';
 
 const rolleApi: RolleApiInterface = RolleApiFactory(undefined, '', axiosApiInstance);
-
-type RollenerweiterungMultiErrorResponse = {
-  code: string | number;
-  idsWithI18nKeys: Array<{
-    id?: string;
-    i18nKey?: DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInnerI18nKeyEnum;
-  }>;
-};
-
-type RollenerweiterungMultiErrorItem = RollenerweiterungMultiErrorResponse['idsWithI18nKeys'][number];
 
 type RolleState = {
   createdRolle: Rolle | null;
@@ -70,11 +60,8 @@ type RolleActions = {
   deleteRolleById: (rolleId: string) => Promise<void>;
 };
 
-export { RollenArt };
-export { RollenMerkmal };
-export { RollenSystemRechtEnum as RollenSystemRecht };
-export type { RolleResponse };
-export type { RolleWithServiceProvidersResponse };
+export { RollenArt, RollenMerkmal, RollenSystemRechtEnum as RollenSystemRecht };
+export type { RolleResponse, RolleWithServiceProvidersResponse };
 
 export type Rolle = {
   administeredBySchulstrukturknoten: string;
@@ -132,22 +119,9 @@ export type RolleFilter = {
 export type PersistRollenerweiterungForRolle = {
   rolleId: string;
   organisationId: string;
-  addErweiterungenForServiceProviderIds: Array<string>;
-  removeErweiterungenForServiceProviderIds: Array<string>;
+  existingServiceProviderIds: Array<string>;
+  selectedServiceProviderIds: Array<string>;
 };
-
-function containsMultiError(error: unknown): error is AxiosError<RollenerweiterungMultiErrorResponse> {
-  const domainError: RollenerweiterungMultiErrorResponse | undefined = (
-    error as AxiosError<RollenerweiterungMultiErrorResponse>
-  ).response?.data;
-  return Boolean(
-    domainError &&
-    typeof domainError === 'object' &&
-    'code' in domainError &&
-    'idsWithI18nKeys' in domainError &&
-    Array.isArray(domainError.idsWithI18nKeys),
-  );
-}
 
 export type RolleStore = Store<'rolleStore', RolleState, RolleGetters, RolleActions>;
 
@@ -293,8 +267,12 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
         this.errors.clear();
         try {
           const bodyParams: ApplyRollenerweiterungChangesBodyParams = {
-            addErweiterungenForServiceProviderIds: filter.addErweiterungenForServiceProviderIds,
-            removeErweiterungenForServiceProviderIds: filter.removeErweiterungenForServiceProviderIds,
+            addErweiterungenForServiceProviderIds: filter.selectedServiceProviderIds.filter(
+              (id: string): boolean => !filter.existingServiceProviderIds.includes(id),
+            ),
+            removeErweiterungenForServiceProviderIds: filter.existingServiceProviderIds.filter(
+              (id: string): boolean => !filter.selectedServiceProviderIds.includes(id),
+            ),
           };
           await rolleApi.rolleControllerApplyRollenerweiterungChangesForRolle(
             filter.rolleId,
@@ -302,17 +280,13 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
             bodyParams,
           );
         } catch (error: unknown) {
-          if (containsMultiError(error)) {
-            const errors: RollenerweiterungMultiErrorResponse['idsWithI18nKeys'] =
-              error.response?.data.idsWithI18nKeys ?? [];
-            this.errors = new Map<string, DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInnerI18nKeyEnum>(
-              errors
-                .filter(
-                  (item: RollenerweiterungMultiErrorItem): item is Required<RollenerweiterungMultiErrorItem> =>
-                    item.id !== undefined && item.i18nKey !== undefined,
-                )
-                .map((item: Required<RollenerweiterungMultiErrorItem>) => [item.id, item.i18nKey]),
-            );
+          const rollenerweiterungErrors: Map<
+            string,
+            DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInnerI18nKeyEnum
+          > | null =
+            getRollenerweiterungErrors<DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInnerI18nKeyEnum>(error);
+          if (rollenerweiterungErrors) {
+            this.errors = rollenerweiterungErrors;
           } else {
             this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
           }

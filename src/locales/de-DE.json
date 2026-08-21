@@ -661,7 +661,7 @@
         "title": "Rolle bearbeiten",
         "editOffers": "Angebotsauswahl bearbeiten",
         "saveSuccess": "Die Angebotsauswahl wurde erfolgreich gespeichert.",
-        "loadErrorTitle": "Fehler beim Laden der Rolle",
+        "loadErrorTitle": "Fehler beim Laden der Rolle und ihrer Angebotsauswahl",
         "loadErrorText": "Die Rolle und ihre Angebotsauswahl konnten nicht geladen werden.",
         "saveErrorTitle": "Angebotsauswahl konnte nicht gespeichert werden",
         "saveErrorText": "Beim Speichern der Angebotsauswahl ist ein Fehler aufgetreten."

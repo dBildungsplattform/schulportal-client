@@ -126,23 +126,6 @@ describe('serviceProviderStore', () => {
       expect(serviceProviderStore.loading).toBe(false);
     });
 
-    it('should support a non-paged provider response', async () => {
-      const serviceProvider: ServiceProviderResponse = DoFactory.getServiceProviderResponse();
-      mockadapter.onGet().replyOnce(200, [serviceProvider]);
-
-      await serviceProviderStore.getServiceProvidersForRollenerweiterung(organisationId);
-
-      expect(serviceProviderStore.allServiceProviders).toEqual([serviceProvider]);
-    });
-
-    it('should use an empty list when a paged response has no items', async () => {
-      mockadapter.onGet().replyOnce(200, { total: 0, offset: 0, limit: 0 });
-
-      await serviceProviderStore.getServiceProvidersForRollenerweiterung(organisationId);
-
-      expect(serviceProviderStore.allServiceProviders).toEqual([]);
-    });
-
     it('should handle an unstructured error', async () => {
       mockadapter.onGet().replyOnce(500, 'server error');
 

@@ -73,7 +73,7 @@ describe('AngebotSelectionTreeview', (): void => {
   it('emits only selectable offer ids', (): void => {
     const component: VueWrapper<InstanceType<typeof AngebotSelectionTreeview>> = mountComponent();
     const treeview: VueWrapper = component.findComponent({ name: 'VTreeview' });
-    treeview.vm.$emit('update:modelValue', [emailAngebot.id, 'group-EMAIL', 123]);
+    treeview.vm.$emit('update:modelValue', [emailAngebot.id, emailAngebot.id, 'group-EMAIL', 123]);
 
     expect(component.emitted('update:selectedServiceProviderIds')?.at(-1)?.[0]).toEqual([emailAngebot.id]);
   });

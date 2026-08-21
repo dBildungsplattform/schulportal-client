@@ -80,8 +80,8 @@ describe('MptRolleDetailsView', (): void => {
     expect(rolleStore.persistRollenerweiterungenForRolle).toHaveBeenCalledWith({
       rolleId: rolle.id,
       organisationId: schule.id,
-      addErweiterungenForServiceProviderIds: [availableServiceProvider.id],
-      removeErweiterungenForServiceProviderIds: [existingServiceProvider.id],
+      existingServiceProviderIds: [existingServiceProvider.id],
+      selectedServiceProviderIds: [availableServiceProvider.id],
     });
   });
 
@@ -109,8 +109,8 @@ describe('MptRolleDetailsView', (): void => {
     expect(rolleStore.persistRollenerweiterungenForRolle).toHaveBeenCalledWith({
       rolleId: rolle.id,
       organisationId: schule.id,
-      addErweiterungenForServiceProviderIds: [],
-      removeErweiterungenForServiceProviderIds: [],
+      existingServiceProviderIds: [existingServiceProvider.id],
+      selectedServiceProviderIds: [existingServiceProvider.id],
     });
   });
 

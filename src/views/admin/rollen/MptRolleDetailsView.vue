@@ -78,20 +78,11 @@
     errorContext.value = 'save';
     isSaving.value = true;
 
-    const existingIds: Set<string> = new Set(existingServiceProviderIds.value);
-    const selectedIds: Set<string> = new Set(selectedServiceProviderIds.value);
-    const addErweiterungenForServiceProviderIds: Array<string> = [...selectedIds].filter(
-      (id: string): boolean => !existingIds.has(id),
-    );
-    const removeErweiterungenForServiceProviderIds: Array<string> = [...existingIds].filter(
-      (id: string): boolean => !selectedIds.has(id),
-    );
-
     await rolleStore.persistRollenerweiterungenForRolle({
       rolleId,
       organisationId,
-      addErweiterungenForServiceProviderIds,
-      removeErweiterungenForServiceProviderIds,
+      existingServiceProviderIds: existingServiceProviderIds.value,
+      selectedServiceProviderIds: selectedServiceProviderIds.value,
     });
 
     if (!rolleStore.errorCode && rolleStore.errors.size === 0) {
@@ -187,6 +178,7 @@
             <LabeledField
               :label="t('admin.rolle.rollenname')"
               :value="rolleStore.currentRolle.name"
+              no-margin-top
               test-id="mpt-rolle-name"
             />
           </v-col>
@@ -198,14 +190,14 @@
             <LabeledField
               :label="t('admin.rolle.rollenart')"
               :value="t(`admin.rolle.mappingFrontBackEnd.rollenarten.${rolleStore.currentRolle.rollenart}`)"
+              no-margin-top
               test-id="mpt-rolle-art"
             />
           </v-col>
         </v-row>
 
         <v-divider
-          class="border-opacity-100 rounded"
-          color="#E5EAEF"
+          class="rolle-summary-divider border-opacity-100 rounded"
           thickness="5"
         />
 
@@ -216,16 +208,15 @@
           {{ t('admin.rolle.mptDetails.editOffers') }}
         </h3>
         <v-divider
-          class="border-opacity-100 rounded"
-          color="#1EAE9C"
+          class="angebot-section-divider border-opacity-100 rounded"
           thickness="5"
         />
 
-        <v-row class="angebot-editor ma-0">
+        <v-row class="ma-0">
           <v-col
             cols="12"
-            md="6"
-            class="angebot-tree-column px-4 px-md-12 py-8"
+            md="5"
+            class="px-4 px-md-8 py-8"
           >
             <AngebotSelectionTreeview
               :key="treeviewKey"
@@ -234,6 +225,12 @@
               :loading="loading"
               @update:selected-service-provider-ids="selectedServiceProviderIds = $event"
             />
+            <v-divider class="angebot-mobile-divider hidden-md-and-up mt-6" />
+          </v-col>
+          <v-col
+            cols="auto"
+            class="angebot-desktop-divider-col hidden-sm-and-down mt-3"
+          >
           </v-col>
           <v-col
             cols="12"
@@ -309,32 +306,27 @@
 <style scoped lang="scss">
   @use '@/styles/variables';
 
-  .rolle-summary :deep(.v-row) {
-    margin-top: 0 !important;
-  }
-
   .angebot-section-title {
     color: variables.$primaryColor;
     font-size: variables.$mediumSubtitle1FontSize;
     font-weight: bold;
   }
 
-  .angebot-editor {
-    min-height: 500px;
+  .rolle-summary-divider {
+    color: variables.$lightGrey;
   }
 
-  .angebot-tree-column {
-    border-right: 1px solid variables.$lightGrey;
+  .angebot-section-divider {
+    color: variables.$cyan;
   }
 
-  @media (max-width: 959px) {
-    .angebot-editor {
-      min-height: 0;
-    }
-
-    .angebot-tree-column {
-      border-right: 0;
-      border-bottom: 1px solid variables.$lightGrey;
-    }
+  .angebot-mobile-divider {
+    border-color: variables.$lightGrey;
   }
+
+  .angebot-desktop-divider-col {
+    width: 2px;
+    align-self: stretch;
+    background-color: variables.$lightGrey;
+}
 </style>
