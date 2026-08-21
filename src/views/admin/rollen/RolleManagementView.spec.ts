@@ -298,4 +298,10 @@ describe('RolleManagementView', () => {
       organisationenForFilter: undefined,
     });
   });
+
+  test('reset button is enabled when rollen filter is active', async () => {
+    searchFilterStore.searchFilterRollen = 'search';
+    await nextTick();
+    expect(wrapper?.find('[data-testid="reset-filter-button"]').classes()).not.toContain('v-btn--disabled');
+  });
 });

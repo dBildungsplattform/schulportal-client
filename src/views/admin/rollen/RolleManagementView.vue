@@ -82,7 +82,8 @@
     return (
       searchFilterStore.selectedMerkmaleForRollen?.length > 0 ||
       searchFilterStore.selectedRollenartenForRollen?.length > 0 ||
-      searchFilterStore.selectedOrganisationenForRollen?.length > 0
+      searchFilterStore.selectedOrganisationenForRollen?.length > 0 ||
+      (searchFilterStore.searchFilterRollen !== null && searchFilterStore.searchFilterRollen !== '')
     );
   });
 
