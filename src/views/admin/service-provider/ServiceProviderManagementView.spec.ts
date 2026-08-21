@@ -174,7 +174,7 @@ describe('ServiceProviderManagementView', () => {
 
   describe('search filter', () => {
     it('initializes the search field with the persisted filter from the store', async () => {
-      searchFilterStore.searchFilterServiceProvider = 'persisted-suche';
+      searchFilterStore.setSearchFilterForServiceProvider('persisted-suche');
 
       const wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementView>> = mountComponent();
       await flushPromises();
@@ -193,7 +193,7 @@ describe('ServiceProviderManagementView', () => {
         .spyOn(serviceProviderStore, 'getManageableServiceProviders')
         .mockResolvedValue();
 
-      searchFilterStore.searchFilterServiceProvider = 'meine-suche';
+      searchFilterStore.setSearchFilterForServiceProvider('meine-suche');
       wrapper.findComponent(SearchField).vm.$emit('onApplySearchFilter', 'meine-suche');
       await flushPromises();
 
@@ -208,7 +208,7 @@ describe('ServiceProviderManagementView', () => {
 
     it('persists the applied search filter in the store and reloads data with it', async () => {
       const wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementView>> = mountComponent();
-      searchFilterStore.searchFilterServiceProvider = 'meine-suche';
+      searchFilterStore.setSearchFilterForServiceProvider('meine-suche');
 
       const reloadSpy: Mock<ServiceProviderStore['getManageableServiceProviders']> = vi
         .spyOn(serviceProviderStore, 'getManageableServiceProviders')

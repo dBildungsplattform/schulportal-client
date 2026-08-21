@@ -44,7 +44,7 @@
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
 
   const searchFieldComponent: Ref<{ searchFilter?: string } | null> = ref(null);
-  const searchFilter: Ref<string> = ref(searchFilterStore.searchFilterServiceProvider ?? '');
+  const searchFilter: Ref<string> = ref(searchFilterStore.searchStringForServiceProvider ?? '');
 
   const allKategorien: readonly ServiceProviderKategorie[] = Object.values(ServiceProviderKategorie);
 
@@ -114,7 +114,7 @@
       kategorien: selectedKategorien.value,
       page: searchFilterStore.serviceProviderPage,
       entriesPerPage: searchFilterStore.serviceProviderPerPage,
-      searchFilter: searchFilterStore.searchFilterServiceProvider || '',
+      searchFilter: searchFilterStore.searchStringForServiceProvider || '',
     });
   }
 
