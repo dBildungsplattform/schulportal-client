@@ -28,7 +28,7 @@ type SearchFilterState = {
   serviceProviderSchulePage: number;
   serviceProviderSchulePerPage: number;
   searchFilterPersonen: string | null;
-  searchFilterRollen: string | null;
+  searchStringForRollen: string | null;
   searchFilterSchulen: string | null;
   selectedKlassen: Array<string> | null;
   selectedRollen: Array<string> | null;
@@ -97,7 +97,7 @@ export const useSearchFilterStore: StoreDefinition<
     serviceProviderSchulePage: 1,
     serviceProviderSchulePerPage: 30,
     searchFilterPersonen: '',
-    searchFilterRollen: '',
+    searchStringForRollen: '',
     searchFilterSchulen: '',
     selectedKlassen: [],
     selectedRollen: [],
@@ -135,8 +135,8 @@ export const useSearchFilterStore: StoreDefinition<
       this.searchFilterPersonen = searchFilterPersonen ?? '';
     },
 
-    setSearchFilterForRollen(searchFilterRollen: string | null) {
-      this.searchFilterRollen = searchFilterRollen ?? '';
+    setSearchFilterForRollen(searchStringForRollen: string | null) {
+      this.searchStringForRollen = searchStringForRollen ?? '';
     },
 
     setSearchFilterForSchulen(searchFilterSchulen: string | null) {

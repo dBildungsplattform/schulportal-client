@@ -13,7 +13,7 @@
     type RolleTableItem,
   } from '@/stores/RolleStore';
   import { rollenPerPageDefault, useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
-  import { computed, onMounted, type ComputedRef } from 'vue';
+  import { computed, onMounted, Ref, ref, type ComputedRef } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { useRouter, type Router } from 'vue-router';
 
@@ -52,6 +52,9 @@
     },
   ];
 
+  const searchFieldComponent: Ref<{ searchFilter?: string } | null> = ref(null);
+  const searchFilter: Ref<string> = ref(searchFilterStore.searchStringForRollen ?? '');
+
   const transformedRollenAndMerkmale: ComputedRef<RolleTableItem[]> = computed(() => {
     return rolleStore.allRollen.map((rolle: RolleResponse) => {
       // If the name administeredBySchulstrukturknoten exists, format the administeredBySchulstrukturknoten field accordingly
@@ -83,7 +86,7 @@
       searchFilterStore.selectedMerkmaleForRollen?.length > 0 ||
       searchFilterStore.selectedRollenartenForRollen?.length > 0 ||
       searchFilterStore.selectedOrganisationenForRollen?.length > 0 ||
-      (searchFilterStore.searchFilterRollen !== null && searchFilterStore.searchFilterRollen !== '')
+      (searchFilterStore.searchStringForRollen !== null && searchFilterStore.searchStringForRollen?.length > 0)
     );
   });
 
@@ -95,7 +98,7 @@
     await rolleStore.getAllRollen({
       offset: (searchFilterStore.rollenPage - 1) * searchFilterStore.rollenPerPage,
       limit: searchFilterStore.rollenPerPage,
-      searchString: searchFilterStore.searchFilterRollen ?? undefined,
+      searchString: searchFilterStore.searchStringForRollen ?? undefined,
       organisationenForFilter: searchFilterStore.selectedOrganisationenForRollen?.length
         ? searchFilterStore.selectedOrganisationenForRollen
         : undefined,
@@ -147,6 +150,10 @@
     searchFilterStore.setOrganisationenFilterForRollen([]);
     searchFilterStore.rollenPage = 1;
     searchFilterStore.rollenPerPage = rollenPerPageDefault;
+    searchFilter.value = '';
+    if (searchFieldComponent.value) {
+      searchFieldComponent.value.searchFilter = '';
+    }
     searchFilterStore.setSearchFilterForRollen(null);
     await getRollen();
   }
@@ -297,7 +304,7 @@
         >
           <SearchField
             ref="searchFieldComponent"
-            :initial-value="searchFilterStore.searchFilterRollen ?? ''"
+            :initial-value="searchFilter"
             :input-cols="6"
             :input-cols-md="3"
             :button-cols="6"

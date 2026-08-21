@@ -33,7 +33,7 @@ beforeEach(() => {
   searchFilterStore.selectedMerkmaleForRollen = [];
   searchFilterStore.selectedRollenartenForRollen = [];
   searchFilterStore.selectedOrganisationenForRollen = [];
-  searchFilterStore.searchFilterRollen = '';
+  searchFilterStore.searchStringForRollen = '';
 
   rolleStore.allRollen = [
     {
@@ -214,7 +214,7 @@ describe('RolleManagementView', () => {
     expect(searchFilterStore.setMerkmaleFilterForRollen).toHaveBeenCalledWith([]);
     expect(searchFilterStore.setRollenartenFilterForRollen).toHaveBeenCalledWith([]);
     expect(searchFilterStore.setOrganisationenFilterForRollen).toHaveBeenCalledWith([]);
-    expect(searchFilterStore.searchFilterRollen).toEqual('');
+    expect(searchFilterStore.searchStringForRollen).toEqual('');
     expect(searchFilterStore.rollenPage).toEqual(1);
     expect(searchFilterStore.rollenPerPage).toEqual(rollenPerPageDefault);
     expect(rolleStore.getAllRollen).toHaveBeenCalled();
@@ -277,7 +277,7 @@ describe('RolleManagementView', () => {
 
   test('search filter change resets to first page, calls store action and reloads rollen', async () => {
     const searchString: string = 'search';
-    searchFilterStore.searchFilterRollen = searchString;
+    searchFilterStore.searchStringForRollen = searchString;
     searchFilterStore.rollenPage = 2;
 
     const searchInput: VueWrapper | undefined = wrapper?.findComponent({
@@ -300,7 +300,7 @@ describe('RolleManagementView', () => {
   });
 
   test('reset button is enabled when rollen filter is active', async () => {
-    searchFilterStore.searchFilterRollen = 'search';
+    searchFilterStore.searchStringForRollen = 'search';
     await nextTick();
     expect(wrapper?.find('[data-testid="reset-filter-button"]').classes()).not.toContain('v-btn--disabled');
   });
