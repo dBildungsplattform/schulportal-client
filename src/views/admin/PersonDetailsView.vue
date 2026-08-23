@@ -2202,6 +2202,7 @@
                     :error-code="personStore.errorCode"
                     :person="personStore.currentPerson"
                     :disabled="selectedZuordnungen.length === 0 || isDeleteExternZuordnungDisabled"
+                    :disabled-tooltip-text="isDeleteExternZuordnungDisabled ? '' : undefined"
                     :zuordnung-count="
                       zuordnungenWithPendingChanges?.filter((zuordnung: Zuordnung) => zuordnung.editable).length ?? 0
                     "
