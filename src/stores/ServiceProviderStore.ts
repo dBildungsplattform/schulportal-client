@@ -134,6 +134,7 @@ export type ServiceProviderCreationFilter = {
 
 export type ManageableServiceProviderFilter = {
   kategorien: Array<ServiceProviderKategorie>;
+  searchFilter?: string;
   page: number;
   entriesPerPage: number;
 };
@@ -291,7 +292,12 @@ export const useServiceProviderStore: StoreDefinition<
         const limit: number = filter.entriesPerPage;
         const offset: number = (filter.page - 1) * filter.entriesPerPage;
         const response: ProviderControllerGetManageableServiceProviders200Response = (
-          await serviceProviderApi.providerControllerGetManageableServiceProviders(offset, limit, filter.kategorien)
+          await serviceProviderApi.providerControllerGetManageableServiceProviders(
+            offset,
+            limit,
+            filter.kategorien,
+            filter.searchFilter,
+          )
         ).data;
         const { items, total }: ProviderControllerGetManageableServiceProviders200Response = response;
         this.manageableServiceProviders = items;

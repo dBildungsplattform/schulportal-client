@@ -258,6 +258,30 @@ describe('serviceProviderStore', () => {
       expect(serviceProviderStore.loading).toBe(false);
     });
 
+    it('should pass the search filter to the request', async () => {
+      const items: ManageableServiceProviderSimpleListEntryResponse[] = [
+        DoFactory.getManageableServiceProviderSimpleListEntryResponse(),
+      ];
+      const mockResponse: ProviderControllerGetManageableServiceProviders200Response = {
+        items,
+        offset,
+        limit,
+        total: 1,
+      };
+
+      const searchFilter: string = 'meine-suche';
+      const urlWithSearchFilter: string = `${url}&searchFilter=${searchFilter}`;
+      mockadapter.onGet(urlWithSearchFilter).replyOnce(200, mockResponse);
+
+      const filter: ManageableServiceProviderFilter = { kategorien: [], searchFilter, page, entriesPerPage };
+      const promise: Promise<void> = serviceProviderStore.getManageableServiceProviders(filter);
+      expect(serviceProviderStore.loading).toBe(true);
+      await promise;
+      expect(serviceProviderStore.manageableServiceProviders).toEqual(expect.arrayContaining(mockResponse.items));
+      expect(serviceProviderStore.totalManageableServiceProviders).toEqual(mockResponse.total);
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+
     it('should handle string error', async () => {
       mockadapter.onGet(url).replyOnce(500, 'some mock server error');
       const filter: ManageableServiceProviderFilter = { kategorien: [], page, entriesPerPage };
@@ -492,6 +516,47 @@ describe('serviceProviderStore', () => {
 
       // Assert the store built the same overview
       expect(serviceProviderStore.rollenerweiterungenUebersicht).toEqual(expectedRollenerweiterungUebersicht);
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+
+    it('should group multiple items that belong to the same organisation into a single overview entry', async () => {
+      const sharedOrg: Partial<RollenerweiterungWithExtendedDataResponse> = {
+        organisationId: faker.string.uuid(),
+        organisationName: faker.company.name(),
+        organisationKennung: faker.string.alphanumeric(6),
+      };
+      const apiItems: RollenerweiterungWithExtendedDataResponse[] = [
+        DoFactory.getRollenerweiterungItem({ ...sharedOrg, rolleName: 'Rolle A' }),
+        DoFactory.getRollenerweiterungItem({ ...sharedOrg, rolleName: 'Rolle B' }),
+      ];
+
+      const mockResponse: ProviderControllerFindRollenerweiterungenByServiceProviderId200Response =
+        DoFactory.getRollenerweiterungenResponse(apiItems);
+
+      mockadapter.onGet(url).replyOnce(200, mockResponse);
+
+      await serviceProviderStore.getRollenerweiterungenById({ serviceProviderId: serviceProviderId });
+
+      const expectedRollenerweiterungUebersicht: RollenErweiterungenUebersicht[] =
+        DoFactory.buildRollenerweiterungenUebersicht(apiItems);
+
+      expect(expectedRollenerweiterungUebersicht).toHaveLength(1);
+      expect(serviceProviderStore.rollenerweiterungenUebersicht).toEqual(expectedRollenerweiterungUebersicht);
+      expect(serviceProviderStore.loading).toBe(false);
+    });
+
+    it('should fall back to an empty overview when the response has no items', async () => {
+      const mockResponse: Omit<ProviderControllerFindRollenerweiterungenByServiceProviderId200Response, 'items'> = {
+        total: 0,
+        offset: 0,
+        limit: 0,
+      };
+
+      mockadapter.onGet(url).replyOnce(200, mockResponse);
+
+      await serviceProviderStore.getRollenerweiterungenById({ serviceProviderId: serviceProviderId });
+
+      expect(serviceProviderStore.rollenerweiterungenUebersicht).toEqual([]);
       expect(serviceProviderStore.loading).toBe(false);
     });
 

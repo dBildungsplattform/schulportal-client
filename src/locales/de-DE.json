@@ -154,7 +154,8 @@
     },
     "angebot": {
       "management": {
-        "title": "Angebotsverwaltung"
+        "title": "Angebotsverwaltung",
+        "name": "Name des Angebots"
       },
       "title": {
         "ATTACHED_ROLLEN": "Fehler beim Löschen",
