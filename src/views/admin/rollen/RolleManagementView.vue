@@ -1,20 +1,20 @@
 <script setup lang="ts">
   import ResultTable, { type Headers, type TableRow } from '@/components/admin/ResultTable.vue';
-import LayoutCard from '@/components/cards/LayoutCard.vue';
-import SchulenFilter from '@/components/filter/SchulenFilter.vue';
-import {
-  RollenArt,
-  RollenMerkmal,
-  RollenSystemRecht,
-  RolleStore,
-  useRolleStore,
-  type RolleResponse,
-  type RolleTableItem,
-} from '@/stores/RolleStore';
-import { rollenPerPageDefault, useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
-import { computed, onMounted, type ComputedRef } from 'vue';
-import { useI18n, type Composer } from 'vue-i18n';
-import { useRouter, type Router } from 'vue-router';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import SchulenFilter from '@/components/filter/SchulenFilter.vue';
+  import {
+    RollenArt,
+    RollenMerkmal,
+    RollenSystemRecht,
+    RolleStore,
+    useRolleStore,
+    type RolleResponse,
+    type RolleTableItem,
+  } from '@/stores/RolleStore';
+  import { rollenPerPageDefault, useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
+  import { computed, onMounted, type ComputedRef } from 'vue';
+  import { useI18n, type Composer } from 'vue-i18n';
+  import { useRouter, type Router } from 'vue-router';
 
   const rolleStore: RolleStore = useRolleStore();
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();

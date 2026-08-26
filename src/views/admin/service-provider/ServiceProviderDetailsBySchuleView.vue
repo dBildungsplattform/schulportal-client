@@ -1,43 +1,43 @@
 <script setup lang="ts">
   import { computed, nextTick, onMounted, ref, type ComputedRef, type Ref } from 'vue';
-import { useI18n, type Composer } from 'vue-i18n';
-import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
-import { useDisplay } from 'vuetify';
+  import { useI18n, type Composer } from 'vue-i18n';
+  import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
+  import { useDisplay } from 'vuetify';
 
   import {
-  DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInnerI18nKeyEnum,
-  RollenSystemRechtEnum,
-} from '@/api-client/generated';
-import SchulPortalLogo from '@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg';
-import LabeledField from '@/components/admin/LabeledField.vue';
-import RollenerweiterungAssignErrorDialog from '@/components/admin/service-provider/RollenerweiterungAssignErrorDialog.vue';
-import RollenerweiterungTreeview, {
-  type RolleForSelection,
-} from '@/components/admin/service-provider/RollenerweiterungTreeview.vue';
-import VidisInfoDialog from '@/components/admin/service-provider/VidisInfoDialog.vue';
-import SpshAlert from '@/components/alert/SpshAlert.vue';
-import LayoutCard from '@/components/cards/LayoutCard.vue';
-import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
-import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
-import {
-  RollenArt,
-  RollenMerkmal,
-  useRolleStore,
-  type RolleStore,
-  type RolleWithServiceProvidersResponse,
-} from '@/stores/RolleStore';
-import {
-  ServiceProviderMerkmal,
-  useServiceProviderStore,
-  type ManageableServiceProviderDetail,
-  type ServiceProviderStore,
-} from '@/stores/ServiceProviderStore';
-import { intersect } from '@/utils/arrays';
-import { getLogoPath } from '@/utils/logosConfig';
-import {
-  formatServiceProviderAnbietenMerkmale,
-  formatServiceProviderRollenartenWhitelist,
-} from '@/utils/serviceProvider.helper';
+    DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInnerI18nKeyEnum,
+    RollenSystemRechtEnum,
+  } from '@/api-client/generated';
+  import SchulPortalLogo from '@/assets/logos/Schulportal_SH_Bildmarke_RGB_Anwendung_HG_Blau.svg';
+  import LabeledField from '@/components/admin/LabeledField.vue';
+  import RollenerweiterungAssignErrorDialog from '@/components/admin/service-provider/RollenerweiterungAssignErrorDialog.vue';
+  import RollenerweiterungTreeview, {
+    type RolleForSelection,
+  } from '@/components/admin/service-provider/RollenerweiterungTreeview.vue';
+  import VidisInfoDialog from '@/components/admin/service-provider/VidisInfoDialog.vue';
+  import SpshAlert from '@/components/alert/SpshAlert.vue';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
+  import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
+  import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+  import {
+    RollenArt,
+    RollenMerkmal,
+    useRolleStore,
+    type RolleStore,
+    type RolleWithServiceProvidersResponse,
+  } from '@/stores/RolleStore';
+  import {
+    ServiceProviderMerkmal,
+    useServiceProviderStore,
+    type ManageableServiceProviderDetail,
+    type ServiceProviderStore,
+  } from '@/stores/ServiceProviderStore';
+  import { intersect } from '@/utils/arrays';
+  import { getLogoPath } from '@/utils/logosConfig';
+  import {
+    formatServiceProviderAnbietenMerkmale,
+    formatServiceProviderRollenartenWhitelist,
+  } from '@/utils/serviceProvider.helper';
 
   const router: Router = useRouter();
   const route: RouteLocationNormalizedLoaded = useRoute();
