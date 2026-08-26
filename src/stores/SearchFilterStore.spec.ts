@@ -21,9 +21,10 @@ describe('SearchFilterStore', () => {
     expect(searchFilterStore.selectedRollen).toEqual([]);
     expect(searchFilterStore.selectedOrganisationen).toEqual([]);
     expect(searchFilterStore.selectedRollenObjects).toEqual([]);
-    expect(searchFilterStore.searchFilterPersonen).toEqual('');
     expect(searchFilterStore.searchStringForRollen).toEqual('');
-    expect(searchFilterStore.searchFilterSchulen).toEqual('');
+    expect(searchFilterStore.searchStringForPersonen).toEqual('');
+    expect(searchFilterStore.searchStringForSchulen).toEqual('');
+    expect(searchFilterStore.searchStringForServiceProvider).toEqual('');
     expect(searchFilterStore.selectedSchuleForKlassen).toEqual(null);
     expect(searchFilterStore.selectedKlassenForKlassen).toEqual([]);
     expect(searchFilterStore.selectedSchuleForSchulischeServiceProvider).toEqual(null);
@@ -49,9 +50,9 @@ describe('SearchFilterStore', () => {
 
     // it sets the searchFilter for personen
     searchFilterStore.setSearchFilterForPersonen('search');
-    expect(searchFilterStore.searchFilterPersonen).toEqual('search');
+    expect(searchFilterStore.searchStringForPersonen).toEqual('search');
     searchFilterStore.setSearchFilterForPersonen(null);
-    expect(searchFilterStore.searchFilterPersonen).toEqual('');
+    expect(searchFilterStore.searchStringForPersonen).toEqual('');
 
     // it sets the searchFilter for rollen name
     searchFilterStore.setSearchFilterForRollen('search');
@@ -61,9 +62,15 @@ describe('SearchFilterStore', () => {
 
     // it sets the searchFilter for schulen
     searchFilterStore.setSearchFilterForSchulen('search');
-    expect(searchFilterStore.searchFilterSchulen).toEqual('search');
+    expect(searchFilterStore.searchStringForSchulen).toEqual('search');
     searchFilterStore.setSearchFilterForSchulen(null);
-    expect(searchFilterStore.searchFilterSchulen).toEqual('');
+    expect(searchFilterStore.searchStringForSchulen).toEqual('');
+
+    // it sets the searchFilter for service provider
+    searchFilterStore.setSearchFilterForServiceProvider('search');
+    expect(searchFilterStore.searchStringForServiceProvider).toEqual('search');
+    searchFilterStore.setSearchFilterForServiceProvider(null);
+    expect(searchFilterStore.searchStringForServiceProvider).toEqual('');
 
     // it sets the selectedRolleFilterWithObjects
     const rolleFilterObject: RolleResponse = DoFactory.getRolleResponse();
