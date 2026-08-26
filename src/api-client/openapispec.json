@@ -1406,7 +1406,7 @@
           },
           {
             "name": "organisationId",
-            "required": false,
+            "required": true,
             "in": "query",
             "description": "The id of the organisation where the role should be available.",
             "schema": { "type": "string" }

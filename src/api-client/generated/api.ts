@@ -13759,13 +13759,15 @@ export const RolleApiAxiosParamCreator = function (configuration?: Configuration
          * Get Erweiterte Angebote for a rolle.
          * @summary 
          * @param {string} rolleId The id for the rolle.
-         * @param {string} [organisationId] The id of the organisation where the role should be available.
+         * @param {string} organisationId The id of the organisation where the role should be available.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        rolleControllerFindRollenerweiterungenForRolleAndOrga: async (rolleId: string, organisationId?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        rolleControllerFindRollenerweiterungenForRolleAndOrga: async (rolleId: string, organisationId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'rolleId' is not null or undefined
             assertParamExists('rolleControllerFindRollenerweiterungenForRolleAndOrga', 'rolleId', rolleId)
+            // verify required parameter 'organisationId' is not null or undefined
+            assertParamExists('rolleControllerFindRollenerweiterungenForRolleAndOrga', 'organisationId', organisationId)
             const localVarPath = `/api/rolle/{rolleId}/angebote-via-rollenerweiterungen`
                 .replace(`{${"rolleId"}}`, encodeURIComponent(String(rolleId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -14070,11 +14072,11 @@ export const RolleApiFp = function(configuration?: Configuration) {
          * Get Erweiterte Angebote for a rolle.
          * @summary 
          * @param {string} rolleId The id for the rolle.
-         * @param {string} [organisationId] The id of the organisation where the role should be available.
+         * @param {string} organisationId The id of the organisation where the role should be available.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async rolleControllerFindRollenerweiterungenForRolleAndOrga(rolleId: string, organisationId?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ServiceProviderResponse>>> {
+        async rolleControllerFindRollenerweiterungenForRolleAndOrga(rolleId: string, organisationId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ServiceProviderResponse>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.rolleControllerFindRollenerweiterungenForRolleAndOrga(rolleId, organisationId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -14206,11 +14208,11 @@ export const RolleApiFactory = function (configuration?: Configuration, basePath
          * Get Erweiterte Angebote for a rolle.
          * @summary 
          * @param {string} rolleId The id for the rolle.
-         * @param {string} [organisationId] The id of the organisation where the role should be available.
+         * @param {string} organisationId The id of the organisation where the role should be available.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        rolleControllerFindRollenerweiterungenForRolleAndOrga(rolleId: string, organisationId?: string, options?: any): AxiosPromise<Array<ServiceProviderResponse>> {
+        rolleControllerFindRollenerweiterungenForRolleAndOrga(rolleId: string, organisationId: string, options?: any): AxiosPromise<Array<ServiceProviderResponse>> {
             return localVarFp.rolleControllerFindRollenerweiterungenForRolleAndOrga(rolleId, organisationId, options).then((request) => request(axios, basePath));
         },
         /**
@@ -14336,12 +14338,12 @@ export interface RolleApiInterface {
      * Get Erweiterte Angebote for a rolle.
      * @summary 
      * @param {string} rolleId The id for the rolle.
-     * @param {string} [organisationId] The id of the organisation where the role should be available.
+     * @param {string} organisationId The id of the organisation where the role should be available.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof RolleApiInterface
      */
-    rolleControllerFindRollenerweiterungenForRolleAndOrga(rolleId: string, organisationId?: string, options?: AxiosRequestConfig): AxiosPromise<Array<ServiceProviderResponse>>;
+    rolleControllerFindRollenerweiterungenForRolleAndOrga(rolleId: string, organisationId: string, options?: AxiosRequestConfig): AxiosPromise<Array<ServiceProviderResponse>>;
 
     /**
      * Get all systemrechte for rollen.
@@ -14478,12 +14480,12 @@ export class RolleApi extends BaseAPI implements RolleApiInterface {
      * Get Erweiterte Angebote for a rolle.
      * @summary 
      * @param {string} rolleId The id for the rolle.
-     * @param {string} [organisationId] The id of the organisation where the role should be available.
+     * @param {string} organisationId The id of the organisation where the role should be available.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof RolleApi
      */
-    public rolleControllerFindRollenerweiterungenForRolleAndOrga(rolleId: string, organisationId?: string, options?: AxiosRequestConfig) {
+    public rolleControllerFindRollenerweiterungenForRolleAndOrga(rolleId: string, organisationId: string, options?: AxiosRequestConfig) {
         return RolleApiFp(this.configuration).rolleControllerFindRollenerweiterungenForRolleAndOrga(rolleId, organisationId, options).then((request) => request(this.axios, this.basePath));
     }
 
