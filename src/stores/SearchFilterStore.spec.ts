@@ -1,7 +1,12 @@
 import { createPinia, setActivePinia } from 'pinia';
 import { DoFactory } from 'test/DoFactory';
-import type { RolleResponse } from './RolleStore';
-import { DEFAULT_SERVICE_PROVIDER_KATEGORIEN, useSearchFilterStore, type SearchFilterStore } from './SearchFilterStore';
+import { RollenArt, RollenMerkmal, type RolleResponse } from './RolleStore';
+import {
+  DEFAULT_SERVICE_PROVIDER_KATEGORIEN,
+  rollenPerPageDefault,
+  useSearchFilterStore,
+  type SearchFilterStore,
+} from './SearchFilterStore';
 import { ServiceProviderKategorie } from './ServiceProviderStore';
 
 describe('SearchFilterStore', () => {
@@ -16,14 +21,19 @@ describe('SearchFilterStore', () => {
     expect(searchFilterStore.selectedRollen).toEqual([]);
     expect(searchFilterStore.selectedOrganisationen).toEqual([]);
     expect(searchFilterStore.selectedRollenObjects).toEqual([]);
-    expect(searchFilterStore.searchFilterPersonen).toEqual('');
-    expect(searchFilterStore.searchFilterSchulen).toEqual('');
+    expect(searchFilterStore.searchStringForPersonen).toEqual('');
+    expect(searchFilterStore.searchStringForSchulen).toEqual('');
+    expect(searchFilterStore.searchStringForServiceProvider).toEqual('');
     expect(searchFilterStore.selectedSchuleForKlassen).toEqual(null);
     expect(searchFilterStore.selectedKlassenForKlassen).toEqual([]);
     expect(searchFilterStore.selectedSchuleForMptRollen).toEqual(null);
     expect(searchFilterStore.mptRollenPage).toEqual(1);
     expect(searchFilterStore.mptRollenPerPage).toEqual(30);
     expect(searchFilterStore.selectedSchuleForSchulischeServiceProvider).toEqual(null);
+    expect(searchFilterStore.selectedMerkmaleForRollen).toEqual([]);
+    expect(searchFilterStore.selectedRollenartenForRollen).toEqual([]);
+    expect(searchFilterStore.selectedOrganisationenForRollen).toEqual([]);
+    expect(searchFilterStore.rollenPerPage).toEqual(rollenPerPageDefault);
     expect(searchFilterStore.selectedKategorienForServiceProvider).toEqual(DEFAULT_SERVICE_PROVIDER_KATEGORIEN);
   });
 
@@ -42,15 +52,21 @@ describe('SearchFilterStore', () => {
 
     // it sets the searchFilter for personen
     searchFilterStore.setSearchFilterForPersonen('search');
-    expect(searchFilterStore.searchFilterPersonen).toEqual('search');
+    expect(searchFilterStore.searchStringForPersonen).toEqual('search');
     searchFilterStore.setSearchFilterForPersonen(null);
-    expect(searchFilterStore.searchFilterPersonen).toEqual('');
+    expect(searchFilterStore.searchStringForPersonen).toEqual('');
 
     // it sets the searchFilter for schulen
     searchFilterStore.setSearchFilterForSchulen('search');
-    expect(searchFilterStore.searchFilterSchulen).toEqual('search');
+    expect(searchFilterStore.searchStringForSchulen).toEqual('search');
     searchFilterStore.setSearchFilterForSchulen(null);
-    expect(searchFilterStore.searchFilterSchulen).toEqual('');
+    expect(searchFilterStore.searchStringForSchulen).toEqual('');
+
+    // it sets the searchFilter for service provider
+    searchFilterStore.setSearchFilterForServiceProvider('search');
+    expect(searchFilterStore.searchStringForServiceProvider).toEqual('search');
+    searchFilterStore.setSearchFilterForServiceProvider(null);
+    expect(searchFilterStore.searchStringForServiceProvider).toEqual('');
 
     // it sets the selectedRolleFilterWithObjects
     const rolleFilterObject: RolleResponse = DoFactory.getRolleResponse();
@@ -79,5 +95,20 @@ describe('SearchFilterStore', () => {
     // it resets the selectedKategorienForServiceProvider back to the default selection
     searchFilterStore.resetKategorienForServiceProvider();
     expect(searchFilterStore.selectedKategorienForServiceProvider).toEqual(DEFAULT_SERVICE_PROVIDER_KATEGORIEN);
+  });
+
+  it('should set merkmale filter for rollen', () => {
+    searchFilterStore.setMerkmaleFilterForRollen([RollenMerkmal.KopersPflicht]);
+    expect(searchFilterStore.selectedMerkmaleForRollen).toEqual([RollenMerkmal.KopersPflicht]);
+  });
+
+  it('should set rollenarten filter for rollen', () => {
+    searchFilterStore.setRollenartenFilterForRollen([RollenArt.Lehr]);
+    expect(searchFilterStore.selectedRollenartenForRollen).toEqual([RollenArt.Lehr]);
+  });
+
+  it('should set organisationen filter for rollen', () => {
+    searchFilterStore.setOrganisationenFilterForRollen(['org1', 'org2']);
+    expect(searchFilterStore.selectedOrganisationenForRollen).toEqual(['org1', 'org2']);
   });
 });
