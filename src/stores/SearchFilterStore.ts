@@ -27,8 +27,9 @@ type SearchFilterState = {
   serviceProviderPerPage: number;
   serviceProviderSchulePage: number;
   serviceProviderSchulePerPage: number;
-  searchFilterPersonen: string | null;
-  searchFilterSchulen: string | null;
+  searchStringForPersonen: string | null;
+  searchStringForSchulen: string | null;
+  searchStringForServiceProvider: string | null;
   selectedKlassen: Array<string> | null;
   selectedRollen: Array<string> | null;
   selectedRollenObjects: RolleResponse[];
@@ -56,8 +57,9 @@ type SearchFilterActions = {
     selectedOrganisationen: Array<string> | null,
     orgaObjects?: Organisation[],
   ) => void;
-  setSearchFilterForPersonen: (searchFilter: string | null) => void;
-  setSearchFilterForSchulen: (searchFilter: string | null) => void;
+  setSearchFilterForPersonen: (searchStringForPersonen: string | null) => void;
+  setSearchFilterForSchulen: (searchStringForSchulen: string | null) => void;
+  setSearchFilterForServiceProvider: (searchStringForServiceProvider: string | null) => void;
   setSchuleFilterForKlassen: (selectedSchuleForKlassen: string | null) => void;
   setKlasseFilterForKlassen: (selectedKlassenForKlassen: Array<string> | null) => void;
   setSchuleForSchulischeServiceProvider: (selectedSchuleForSchulischeServiceProvider: string | null) => void;
@@ -94,8 +96,9 @@ export const useSearchFilterStore: StoreDefinition<
     serviceProviderPerPage: 30,
     serviceProviderSchulePage: 1,
     serviceProviderSchulePerPage: 30,
-    searchFilterPersonen: '',
-    searchFilterSchulen: '',
+    searchStringForPersonen: '',
+    searchStringForSchulen: '',
+    searchStringForServiceProvider: '',
     selectedKlassen: [],
     selectedRollen: [],
     selectedRollenObjects: [],
@@ -128,12 +131,16 @@ export const useSearchFilterStore: StoreDefinition<
       this.selectedOrgaObjects = orgaObjects ?? [];
     },
 
-    setSearchFilterForPersonen(searchFilterPersonen: string | null) {
-      this.searchFilterPersonen = searchFilterPersonen ?? '';
+    setSearchFilterForPersonen(searchStringForPersonen: string | null) {
+      this.searchStringForPersonen = searchStringForPersonen ?? '';
     },
 
-    setSearchFilterForSchulen(searchFilterSchulen: string | null) {
-      this.searchFilterSchulen = searchFilterSchulen ?? '';
+    setSearchFilterForSchulen(searchStringForSchulen: string | null) {
+      this.searchStringForSchulen = searchStringForSchulen ?? '';
+    },
+
+    setSearchFilterForServiceProvider(searchStringForServiceProvider: string | null) {
+      this.searchStringForServiceProvider = searchStringForServiceProvider ?? '';
     },
 
     setRolleFilterWithObjectsForPersonen(selectedRollen: Array<string> | null, rollenObjects: RolleResponse[]) {
