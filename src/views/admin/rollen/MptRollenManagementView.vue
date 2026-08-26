@@ -1,19 +1,19 @@
 <script setup lang="ts">
   import ResultTable, { type Headers } from '@/components/admin/ResultTable.vue';
-  import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import SchulenFilter from '@/components/filter/SchulenFilter.vue';
-  import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
-  import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
-  import {
-    RollenSystemRecht,
-    useRolleStore,
-    type RolleStore,
-    type RolleWithServiceProvidersResponse,
-  } from '@/stores/RolleStore';
-  import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
-  import { computed, onMounted, ref, watchEffect, type ComputedRef, type Ref } from 'vue';
-  import { onBeforeRouteLeave } from 'vue-router';
-  import { useI18n, type Composer } from 'vue-i18n';
+import LayoutCard from '@/components/cards/LayoutCard.vue';
+import SchulenFilter from '@/components/filter/SchulenFilter.vue';
+import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
+import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
+import {
+  RollenSystemRecht,
+  useRolleStore,
+  type RolleStore,
+  type RolleWithServiceProvidersResponse,
+} from '@/stores/RolleStore';
+import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
+import { computed, onMounted, ref, watchEffect, type ComputedRef, type Ref } from 'vue';
+import { useI18n, type Composer } from 'vue-i18n';
+import { onBeforeRouteLeave } from 'vue-router';
 
   type MptRolleTableItem = {
     id: string;
@@ -80,7 +80,7 @@
       offset: (searchFilterStore.mptRollenPage - 1) * searchFilterStore.mptRollenPerPage,
       limit: searchFilterStore.mptRollenPerPage,
       searchString: '',
-      organisationId: selectedOrganisationId.value,
+      organisationenForFilter: [selectedOrganisationId.value],
       systemrechte: [RollenSystemRecht.MptRollenVerwalten],
     });
   }
