@@ -216,7 +216,7 @@
           <v-col
             cols="12"
             md="5"
-            class="px-4 px-md-8 py-8"
+            class="px-md-2"
           >
             <AngebotSelectionTreeview
               :key="treeviewKey"
@@ -328,5 +328,5 @@
     width: 2px;
     align-self: stretch;
     background-color: variables.$lightGrey;
-}
+  }
 </style>

@@ -203,38 +203,36 @@
     select-strategy="independent"
     @update:model-value="onSelectionUpdate"
   >
-    <template #prepend="{ item }">
-      <v-checkbox
-        v-if="item.isGroup"
-        :data-testid="`angebot-category-checkbox-${item.kategorie}`"
-        density="compact"
-        hide-details
-        :indeterminate="getCategorySelectionState(item.kategorie) === SelectionState.Some"
-        :model-value="getCategorySelectionState(item.kategorie) === SelectionState.All"
-        @click.stop="toggleCategorySelection(item.kategorie)"
-      />
-      <v-checkbox
-        v-else
-        :data-testid="`angebot-checkbox-${item.id}`"
-        density="compact"
-        hide-details
-        :model-value="selected.includes(item.id)"
-        @click.stop="toggleServiceProvider(item.id)"
-      />
-    </template>
+    <!-- Suppress default title for group nodes (title is rendered in #prepend) -->
     <template #title="{ item }">
-      <template v-if="item.isGroup">
-        <span class="font-weight-bold angebot-category-title">{{ item.title }}</span>
-        <span class="ml-1 font-weight-bold">
-          ({{ getSelectedCount(item.kategorie) }} {{ t('from') }} {{ getTotalCount(item.kategorie) }})
-        </span>
+      <template v-if="!(item as TreeNode).isGroup">
+        <span>{{ item.title }}</span>
       </template>
-      <span
-        v-else
-        class="font-weight-bold"
-      >
-        {{ item.title }}
-      </span>
+    </template>
+    <template #prepend="{ item }">
+      <template v-if="item.isGroup">
+        <div class="group-row d-flex align-center w-100 flex-wrap"
+            :data-testid="`angebot-category-${item.kategorie}`"
+            @click="toggleCategorySelection(item.kategorie)">
+          <v-checkbox
+            :data-testid="`angebot-category-checkbox-${item.kategorie}`"
+            :indeterminate="getCategorySelectionState(item.kategorie) === SelectionState.Some"
+            :model-value="getCategorySelectionState(item.kategorie) === SelectionState.All"
+            @click.stop="toggleCategorySelection(item.kategorie)"
+          />
+          <span class="bold text-body angebot-category-title">{{ item.title }}</span>
+          <span class="ml-2 text-body">
+            ({{ getSelectedCount(item.kategorie) }} {{ t('from') }} {{ getTotalCount(item.kategorie) }})
+          </span>
+        </div>
+      </template>
+      <template v-else>
+        <v-checkbox
+          :data-testid="`angebot-checkbox-${item.id}`"
+          :model-value="selected.includes(item.id)"
+          @click.stop="toggleServiceProvider(item.id)"
+        />
+      </template>
     </template>
   </v-treeview>
 </template>
