@@ -27,6 +27,7 @@ type SearchFilterState = {
   serviceProviderPerPage: number;
   serviceProviderSchulePage: number;
   serviceProviderSchulePerPage: number;
+  searchStringForRollen: string | null;
   searchStringForPersonen: string | null;
   searchStringForSchulen: string | null;
   searchStringForServiceProvider: string | null;
@@ -58,6 +59,7 @@ type SearchFilterActions = {
     selectedOrganisationen: Array<string> | null,
     orgaObjects?: Organisation[],
   ) => void;
+  setSearchFilterForRollen: (searchFilter: string | null) => void;
   setSearchFilterForPersonen: (searchStringForPersonen: string | null) => void;
   setSearchFilterForSchulen: (searchStringForSchulen: string | null) => void;
   setSearchFilterForServiceProvider: (searchStringForServiceProvider: string | null) => void;
@@ -101,6 +103,7 @@ export const useSearchFilterStore: StoreDefinition<
     searchStringForPersonen: '',
     searchStringForSchulen: '',
     searchStringForServiceProvider: '',
+    searchStringForRollen: '',
     selectedKlassen: [],
     selectedRollen: [],
     selectedRollenObjects: [],
@@ -136,6 +139,10 @@ export const useSearchFilterStore: StoreDefinition<
 
     setSearchFilterForPersonen(searchStringForPersonen: string | null) {
       this.searchStringForPersonen = searchStringForPersonen ?? '';
+    },
+
+    setSearchFilterForRollen(searchStringForRollen: string | null) {
+      this.searchStringForRollen = searchStringForRollen ?? '';
     },
 
     setSearchFilterForSchulen(searchStringForSchulen: string | null) {

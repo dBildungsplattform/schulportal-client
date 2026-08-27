@@ -21,6 +21,7 @@ describe('SearchFilterStore', () => {
     expect(searchFilterStore.selectedRollen).toEqual([]);
     expect(searchFilterStore.selectedOrganisationen).toEqual([]);
     expect(searchFilterStore.selectedRollenObjects).toEqual([]);
+    expect(searchFilterStore.searchStringForRollen).toEqual('');
     expect(searchFilterStore.searchStringForPersonen).toEqual('');
     expect(searchFilterStore.searchStringForSchulen).toEqual('');
     expect(searchFilterStore.searchStringForServiceProvider).toEqual('');
@@ -53,6 +54,12 @@ describe('SearchFilterStore', () => {
     expect(searchFilterStore.searchStringForPersonen).toEqual('search');
     searchFilterStore.setSearchFilterForPersonen(null);
     expect(searchFilterStore.searchStringForPersonen).toEqual('');
+
+    // it sets the searchFilter for rollen name
+    searchFilterStore.setSearchFilterForRollen('search');
+    expect(searchFilterStore.searchStringForRollen).toEqual('search');
+    searchFilterStore.setSearchFilterForRollen(null);
+    expect(searchFilterStore.searchStringForRollen).toEqual('');
 
     // it sets the searchFilter for schulen
     searchFilterStore.setSearchFilterForSchulen('search');
