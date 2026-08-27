@@ -216,6 +216,7 @@
       <v-row class="ma-3 align-start">
         <v-col
           cols="12"
+          md="2"
           class="py-md-0 text-md-right align-self-center"
         >
           <v-btn
@@ -233,7 +234,7 @@
 
         <v-col
           cols="12"
-          md="3"
+          md="2"
         >
           <v-autocomplete
             id="rollenarten-filter-select"
@@ -273,7 +274,7 @@
 
         <v-col
           cols="12"
-          md="3"
+          md="2"
         >
           <v-autocomplete
             id="merkmale-filter-select"
@@ -391,23 +392,19 @@
             </template>
           </v-autocomplete>
         </v-col>
+      </v-row>
+      <v-row class="ma-3 mt-0">
         <v-spacer />
-        <v-col
-          cols="12"
-          md="5"
-          offset-md="7"
-        >
-          <SearchField
-            ref="searchFieldComponent"
-            :initial-value="searchFilter"
-            :input-cols="6"
-            :input-cols-md="3"
-            :button-cols="6"
-            :button-cols-md="2"
-            :hover-text="$t('admin.rolle.rollenname')"
-            @on-apply-search-filter="handleSearchFilter"
-          />
-        </v-col>
+        <SearchField
+          ref="searchFieldComponent"
+          :initial-value="searchFilter"
+          :input-cols="6"
+          :input-cols-md="3"
+          :button-cols="6"
+          :button-cols-md="2"
+          :hover-text="$t('admin.rolle.rollenname')"
+          @on-apply-search-filter="handleSearchFilter"
+        />
       </v-row>
       <ResultTable
         :current-page="searchFilterStore.rollenPage"
