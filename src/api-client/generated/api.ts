@@ -12700,11 +12700,10 @@ export const ProviderApiAxiosParamCreator = function (configuration?: Configurat
          * @param {number} [offset] The offset of the paginated list.
          * @param {number} [limit] The requested limit for the page size.
          * @param {Array<ServiceProviderKategorie>} [kategorien] 
-         * @param {string} [searchFilter] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        providerControllerGetManageableServiceProviders: async (offset?: number, limit?: number, kategorien?: Array<ServiceProviderKategorie>, searchFilter?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        providerControllerGetManageableServiceProviders: async (offset?: number, limit?: number, kategorien?: Array<ServiceProviderKategorie>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/provider/manageable`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -12735,10 +12734,6 @@ export const ProviderApiAxiosParamCreator = function (configuration?: Configurat
 
             if (kategorien) {
                 localVarQueryParameter['kategorien'] = kategorien;
-            }
-
-            if (searchFilter !== undefined) {
-                localVarQueryParameter['searchFilter'] = searchFilter;
             }
 
 
@@ -12994,12 +12989,11 @@ export const ProviderApiFp = function(configuration?: Configuration) {
          * @param {number} [offset] The offset of the paginated list.
          * @param {number} [limit] The requested limit for the page size.
          * @param {Array<ServiceProviderKategorie>} [kategorien] 
-         * @param {string} [searchFilter] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async providerControllerGetManageableServiceProviders(offset?: number, limit?: number, kategorien?: Array<ServiceProviderKategorie>, searchFilter?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ProviderControllerGetManageableServiceProviders200Response>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.providerControllerGetManageableServiceProviders(offset, limit, kategorien, searchFilter, options);
+        async providerControllerGetManageableServiceProviders(offset?: number, limit?: number, kategorien?: Array<ServiceProviderKategorie>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ProviderControllerGetManageableServiceProviders200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.providerControllerGetManageableServiceProviders(offset, limit, kategorien, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -13128,12 +13122,11 @@ export const ProviderApiFactory = function (configuration?: Configuration, baseP
          * @param {number} [offset] The offset of the paginated list.
          * @param {number} [limit] The requested limit for the page size.
          * @param {Array<ServiceProviderKategorie>} [kategorien] 
-         * @param {string} [searchFilter] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        providerControllerGetManageableServiceProviders(offset?: number, limit?: number, kategorien?: Array<ServiceProviderKategorie>, searchFilter?: string, options?: any): AxiosPromise<ProviderControllerGetManageableServiceProviders200Response> {
-            return localVarFp.providerControllerGetManageableServiceProviders(offset, limit, kategorien, searchFilter, options).then((request) => request(axios, basePath));
+        providerControllerGetManageableServiceProviders(offset?: number, limit?: number, kategorien?: Array<ServiceProviderKategorie>, options?: any): AxiosPromise<ProviderControllerGetManageableServiceProviders200Response> {
+            return localVarFp.providerControllerGetManageableServiceProviders(offset, limit, kategorien, options).then((request) => request(axios, basePath));
         },
         /**
          * Get service-providers the logged-in user is allowed to manage for an Organisation.
@@ -13257,12 +13250,11 @@ export interface ProviderApiInterface {
      * @param {number} [offset] The offset of the paginated list.
      * @param {number} [limit] The requested limit for the page size.
      * @param {Array<ServiceProviderKategorie>} [kategorien] 
-     * @param {string} [searchFilter] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ProviderApiInterface
      */
-    providerControllerGetManageableServiceProviders(offset?: number, limit?: number, kategorien?: Array<ServiceProviderKategorie>, searchFilter?: string, options?: AxiosRequestConfig): AxiosPromise<ProviderControllerGetManageableServiceProviders200Response>;
+    providerControllerGetManageableServiceProviders(offset?: number, limit?: number, kategorien?: Array<ServiceProviderKategorie>, options?: AxiosRequestConfig): AxiosPromise<ProviderControllerGetManageableServiceProviders200Response>;
 
     /**
      * Get service-providers the logged-in user is allowed to manage for an Organisation.
@@ -13400,13 +13392,12 @@ export class ProviderApi extends BaseAPI implements ProviderApiInterface {
      * @param {number} [offset] The offset of the paginated list.
      * @param {number} [limit] The requested limit for the page size.
      * @param {Array<ServiceProviderKategorie>} [kategorien] 
-     * @param {string} [searchFilter] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ProviderApi
      */
-    public providerControllerGetManageableServiceProviders(offset?: number, limit?: number, kategorien?: Array<ServiceProviderKategorie>, searchFilter?: string, options?: AxiosRequestConfig) {
-        return ProviderApiFp(this.configuration).providerControllerGetManageableServiceProviders(offset, limit, kategorien, searchFilter, options).then((request) => request(this.axios, this.basePath));
+    public providerControllerGetManageableServiceProviders(offset?: number, limit?: number, kategorien?: Array<ServiceProviderKategorie>, options?: AxiosRequestConfig) {
+        return ProviderApiFp(this.configuration).providerControllerGetManageableServiceProviders(offset, limit, kategorien, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
