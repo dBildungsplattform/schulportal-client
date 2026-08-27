@@ -1,6 +1,7 @@
 import type { SystemRechtResponse } from '@/api-client/generated';
 import SchulenFilter from '@/components/filter/SchulenFilter.vue';
 import routes from '@/router/routes';
+import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 import { RollenArt, RollenMerkmal, useRolleStore, type RolleStore } from '@/stores/RolleStore';
 import { rollenPerPageDefault, useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
 import { useServiceProviderStore, type ServiceProviderStore } from '@/stores/ServiceProviderStore';
@@ -13,6 +14,7 @@ import RolleManagementView from './RolleManagementView.vue';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
+let authStore: AuthStore;
 let rolleStore: RolleStore;
 let searchFilterStore: SearchFilterStore;
 let serviceProviderStore: ServiceProviderStore;
@@ -29,6 +31,8 @@ beforeEach(() => {
     routes,
   });
 
+  authStore = useAuthStore();
+  authStore.hasAngeboteVerwaltenPermission = true;
   rolleStore = useRolleStore();
   searchFilterStore = useSearchFilterStore();
   serviceProviderStore = useServiceProviderStore();
@@ -293,6 +297,39 @@ describe('RolleManagementView', () => {
       organisationenForFilter: orgs,
       serviceProviderIds: undefined,
     });
+  });
+
+  test('angebote filter is visible when user has AngeboteVerwalten permission', async () => {
+    authStore.hasAngeboteVerwaltenPermission = true;
+    await nextTick();
+    expect(wrapper?.find('[data-testid="angebote-filter-select"]').exists()).toBe(true);
+  });
+
+  test('angebote filter is hidden when user lacks AngeboteVerwalten permission', async () => {
+    authStore.hasAngeboteVerwaltenPermission = false;
+    await nextTick();
+    expect(wrapper?.find('[data-testid="angebote-filter-select"]').exists()).toBe(false);
+  });
+
+  test('getServiceProvidersForRollenVerwaltung is called on mount when user has AngeboteVerwalten permission', async () => {
+    authStore.hasAngeboteVerwaltenPermission = true;
+    wrapper = mount(RolleManagementView, {
+      attachTo: document.getElementById('app') || '',
+      global: { plugins: [router] },
+    });
+    await flushPromises();
+    expect(serviceProviderStore.getServiceProvidersForRollenVerwaltung).toHaveBeenCalledWith({ limit: 25 });
+  });
+
+  test('getServiceProvidersForRollenVerwaltung is not called on mount when user lacks AngeboteVerwalten permission', async () => {
+    authStore.hasAngeboteVerwaltenPermission = false;
+    vi.mocked(serviceProviderStore.getServiceProvidersForRollenVerwaltung).mockClear();
+    wrapper = mount(RolleManagementView, {
+      attachTo: document.getElementById('app') || '',
+      global: { plugins: [router] },
+    });
+    await flushPromises();
+    expect(serviceProviderStore.getServiceProvidersForRollenVerwaltung).not.toHaveBeenCalled();
   });
 
   describe('when angebote is selected in filter', () => {

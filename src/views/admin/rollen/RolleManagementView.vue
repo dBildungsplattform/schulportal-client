@@ -2,6 +2,7 @@
   import ResultTable, { type Headers, type TableRow } from '@/components/admin/ResultTable.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SchulenFilter from '@/components/filter/SchulenFilter.vue';
+  import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import {
     RollenArt,
     RollenMerkmal,
@@ -15,13 +16,13 @@
   import {
     useServiceProviderStore,
     type ServiceProviderIdNameResponse,
-    type ServiceProviderRollenVerwaltungFilter,
     type ServiceProviderStore,
   } from '@/stores/ServiceProviderStore';
   import { computed, onMounted, type ComputedRef } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { useRouter, type Router } from 'vue-router';
 
+  const authStore: AuthStore = useAuthStore();
   const rolleStore: RolleStore = useRolleStore();
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
   const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
@@ -177,11 +178,13 @@
   }
 
   onMounted(async () => {
-    const serviceProviderFilter: ServiceProviderRollenVerwaltungFilter = { limit: 25 };
-    await Promise.all([
-      getRollen(),
-      serviceProviderStore.getServiceProvidersForRollenVerwaltung(serviceProviderFilter),
-    ]);
+    const tasks: Promise<unknown>[] = [getRollen()];
+
+    if (authStore.hasAngeboteVerwaltenPermission) {
+      tasks.push(serviceProviderStore.getServiceProvidersForRollenVerwaltung({ limit: 25 }));
+    }
+
+    await Promise.all(tasks);
   });
 </script>
 
@@ -314,6 +317,7 @@
         </v-col>
 
         <v-col
+          v-if="authStore.hasAngeboteVerwaltenPermission"
           cols="12"
           md="3"
         >
