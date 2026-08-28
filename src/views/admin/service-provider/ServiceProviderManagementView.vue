@@ -245,6 +245,7 @@
           v-model="selectedKategorien"
           multiple
           class="filter-dropdown"
+          :class="{ selected: selectedKategorien.length > 0 }"
           clearable
           data-testid="kategorien-select"
           density="compact"
