@@ -155,7 +155,8 @@
     },
     "angebot": {
       "management": {
-        "title": "Angebotsverwaltung"
+        "title": "Angebotsverwaltung",
+        "name": "Name des Angebots"
       },
       "title": {
         "ATTACHED_ROLLEN": "Fehler beim Löschen",
@@ -715,6 +716,9 @@
       "rollenart": "Rollenart",
       "rollenFound": "{count} Rolle gefunden | {count} Rollen gefunden",
       "rollenname": "Rollenname",
+      "merkmaleSelected": "{count} Merkmale ausgewählt",
+      "rollenartenSelected": "{count} Rollenarten ausgewählt",
+      "administrationsebenenSelected": "{count} Administrationsebenen ausgewählt",
       "kategorienSelected": "{count} Kategorien ausgewählt",
       "rollenSelected": "{count} Rollen ausgewählt",
       "rolleAddedSuccessfully": "Die Rolle wurde erfolgreich hinzugefügt.",

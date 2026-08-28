@@ -80,7 +80,7 @@
       offset: (searchFilterStore.mptRollenPage - 1) * searchFilterStore.mptRollenPerPage,
       limit: searchFilterStore.mptRollenPerPage,
       searchString: '',
-      organisationId: selectedOrganisationId.value,
+      organisationenForFilter: [selectedOrganisationId.value],
       systemrechte: [mptRollenVerwalten],
     });
   }

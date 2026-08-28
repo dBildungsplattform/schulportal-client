@@ -1,13 +1,13 @@
-import { flushPromises, mount, type VueWrapper } from '@vue/test-utils';
-import { createRouter, createWebHistory, type Router } from 'vue-router';
-import { nextTick, type Component } from 'vue';
 import routes from '@/router/routes';
 import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
 import { RollenArt, useRolleStore, type RolleStore } from '@/stores/RolleStore';
 import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
+import { flushPromises, mount, type VueWrapper } from '@vue/test-utils';
 import { DoFactory } from 'test/DoFactory';
 import type { Mock } from 'vitest';
+import { nextTick, type Component } from 'vue';
+import { createRouter, createWebHistory, type Router } from 'vue-router';
 import MptRollenManagementView from './MptRollenManagementView.vue';
 
 type MptRollenManagementViewVm = {
@@ -91,7 +91,7 @@ describe('MptRollenManagementView', () => {
 
     expect(rolleStore.getAllRollen).toHaveBeenCalledWith(
       expect.objectContaining({
-        organisationId: schuleId,
+        organisationenForFilter: [schuleId],
         systemrechte: [expect.stringMatching('MPT_ROLLEN_VERWALTEN')],
       }),
     );
@@ -196,7 +196,7 @@ describe('MptRollenManagementView', () => {
 
     expect(latestCallArgs).toEqual(
       expect.objectContaining({
-        organisationId: schuleId,
+        organisationenForFilter: [schuleId],
         offset: 30,
       }),
     );
@@ -220,7 +220,7 @@ describe('MptRollenManagementView', () => {
 
     expect(latestCallArgs).toEqual(
       expect.objectContaining({
-        organisationId: schuleId,
+        organisationenForFilter: [schuleId],
         limit: 50,
       }),
     );
@@ -255,7 +255,7 @@ describe('MptRollenManagementView', () => {
     expect((wrapper.vm as unknown as MptRollenManagementViewVm).selectedOrganisationId).toBe(schuleId);
     expect(rolleStore.getAllRollen).toHaveBeenCalledWith(
       expect.objectContaining({
-        organisationId: schuleId,
+        organisationenForFilter: [schuleId],
       }),
     );
   });
