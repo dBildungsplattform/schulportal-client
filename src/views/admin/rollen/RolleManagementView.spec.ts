@@ -299,6 +299,7 @@ describe('RolleManagementView', () => {
       merkmale: undefined,
       rollenarten: undefined,
       organisationenForFilter: undefined,
+      systemrechte: [RollenSystemRechtEnum.RollenVerwalten, RollenSystemRechtEnum.MptRollenVerwalten],
     });
   });
 
