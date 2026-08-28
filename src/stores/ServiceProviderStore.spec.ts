@@ -109,6 +109,24 @@ describe('serviceProviderStore', () => {
       });
     });
 
+    describe('when searchStr is provided', () => {
+      it('should pass searchStr as query parameter', async () => {
+        const mockItems: ServiceProviderResponse[] = [DoFactory.getServiceProviderResponse()];
+        const mockResponse: { items: ServiceProviderResponse[]; total: number; offset: number; limit: number } = {
+          items: mockItems,
+          total: 1,
+          offset: 0,
+          limit: 25,
+        };
+
+        mockadapter.onGet('/api/provider/manageable-land-root?limit=25&searchStr=test').replyOnce(200, mockResponse);
+        await serviceProviderStore.getServiceProvidersForRollenVerwaltung({ limit: 25, searchStr: 'test' });
+
+        expect(serviceProviderStore.serviceProvidersForRollenVerwaltung).toHaveLength(1);
+        expect(serviceProviderStore.totalServiceProvidersForRollenVerwaltung).toEqual(1);
+      });
+    });
+
     describe('when a previous successful load is followed by a failed request', () => {
       it('should clear stale state instead of keeping previous results', async () => {
         const mockItems: ServiceProviderResponse[] = [

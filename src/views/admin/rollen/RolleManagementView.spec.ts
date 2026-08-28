@@ -363,6 +363,46 @@ describe('RolleManagementView', () => {
     });
   });
 
+  describe('when typing string in angebote filter', () => {
+    test('triggers debounced server search', () => {
+      vi.useFakeTimers();
+      vi.mocked(serviceProviderStore.getServiceProvidersForRollenVerwaltung).mockClear();
+
+      const angeboteSelect: VueWrapper | undefined = wrapper?.findComponent({ ref: 'angeboteFilterSelect' });
+      angeboteSelect?.vm.$emit('update:search', 'test');
+
+      vi.runAllTimers();
+      vi.runAllTicks();
+
+      expect(serviceProviderStore.getServiceProvidersForRollenVerwaltung).toHaveBeenCalledWith({
+        limit: 25,
+        searchStr: 'test',
+      });
+
+      vi.useRealTimers();
+    });
+  });
+
+  describe('when typing empty string in angebote filter', () => {
+    test('angebote filter passes undefined as searchStr', () => {
+      vi.useFakeTimers();
+      vi.mocked(serviceProviderStore.getServiceProvidersForRollenVerwaltung).mockClear();
+
+      const angeboteSelect: VueWrapper | undefined = wrapper?.findComponent({ ref: 'angeboteFilterSelect' });
+      angeboteSelect?.vm.$emit('update:search', '');
+
+      vi.runAllTimers();
+      vi.runAllTicks();
+
+      expect(serviceProviderStore.getServiceProvidersForRollenVerwaltung).toHaveBeenCalledWith({
+        limit: 25,
+        searchStr: undefined,
+      });
+
+      vi.useRealTimers();
+    });
+  });
+
   test('search filter change resets to first page, calls store action and reloads rollen', async () => {
     const searchString: string = 'search';
     searchFilterStore.searchStringForRollen = searchString;

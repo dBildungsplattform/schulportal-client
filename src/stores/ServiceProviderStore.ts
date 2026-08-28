@@ -104,6 +104,7 @@ export type ServiceProviderIdNameResponse = {
 export type ServiceProviderRollenVerwaltungFilter = {
   offset?: number;
   limit?: number;
+  searchStr?: string;
 };
 
 export type RollenerweiterungFilter = {
@@ -353,6 +354,7 @@ export const useServiceProviderStore: StoreDefinition<
           await serviceProviderApi.providerControllerGetManageableLandRootServiceProviders(
             filter?.offset,
             filter?.limit,
+            filter?.searchStr,
           )
         ).data;
 

@@ -160,6 +160,14 @@
     await getRollen();
   }
 
+  let angeboteSearchTimerId: ReturnType<typeof setTimeout>;
+  function handleAngeboteSearch(searchStr: string): void {
+    clearTimeout(angeboteSearchTimerId);
+    angeboteSearchTimerId = setTimeout(() => {
+      serviceProviderStore.getServiceProvidersForRollenVerwaltung({ limit: 25, searchStr: searchStr || undefined });
+    }, 500);
+  }
+
   async function getPaginatedRollenWithLimit(limit: number): Promise<void> {
     /* reset page to 1 if entries are equal to or less than selected limit */
     if (rolleStore.totalRollen <= limit) {
@@ -337,6 +345,7 @@
         >
           <v-autocomplete
             id="angebote-filter-select"
+            ref="angeboteFilterSelect"
             v-model="searchFilterStore.selectedAngeboteForRollen"
             autocomplete="off"
             clearable
@@ -349,10 +358,12 @@
             item-value="value"
             item-title="title"
             multiple
+            :custom-filter="() => true"
             :no-data-text="$t('noDataFound')"
             :placeholder="$t('admin.rolle.landesangebote')"
             variant="outlined"
             @update:model-value="setAngeboteFilter"
+            @update:search="handleAngeboteSearch"
           >
             <template #prepend-item>
               <v-list-item>
