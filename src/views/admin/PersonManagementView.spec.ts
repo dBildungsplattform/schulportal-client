@@ -4,7 +4,7 @@ import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
 import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
-import { type RolleResponse, type RollenMerkmal } from '@/stores/RolleStore';
+import { useRolleStore, type RolleResponse, type RolleStore, type RollenMerkmal } from '@/stores/RolleStore';
 import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
 import type { Person } from '@/stores/types/Person';
 import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
@@ -32,6 +32,7 @@ let router: Router;
 let organisationStore: OrganisationStore;
 let personStore: PersonStore;
 let personenkontextStore: PersonenkontextStore;
+let rolleStore: RolleStore;
 let searchFilterStore: SearchFilterStore;
 let authStore: AuthStore;
 
@@ -67,6 +68,7 @@ beforeEach(async () => {
   organisationStore = useOrganisationStore();
   personStore = usePersonStore();
   personenkontextStore = usePersonenkontextStore();
+  rolleStore = useRolleStore();
   searchFilterStore = useSearchFilterStore();
   authStore = useAuthStore();
 
@@ -79,7 +81,7 @@ beforeEach(async () => {
   personStore.getAllPersons = vi.fn();
   organisationStore.getFilteredKlassen = vi.fn();
   organisationStore.getAllOrganisationen = vi.fn();
-  personenkontextStore.getPersonenkontextRolleWithFilter = vi.fn();
+  rolleStore.getRollenForPersonAdministration = vi.fn();
   personenkontextStore.processWorkflowStep = vi.fn();
 
   organisationStore.klassen = [
@@ -104,19 +106,16 @@ beforeEach(async () => {
 
   personStore.totalPersons = personStore.allUebersichten.size;
 
-  personenkontextStore.filteredRollen = {
-    moeglicheRollen: [
-      {
-        id: '10',
-        administeredBySchulstrukturknoten: '1',
-        merkmale: new Set(),
-        name: 'Rolle 1',
-        rollenart: 'LERN',
-        systemrechte: new Set(),
-      },
-    ] as RolleResponse[],
-    total: 1,
-  };
+  rolleStore.rollenForPersonAdministration = [
+    {
+      id: '10',
+      administeredBySchulstrukturknoten: '1',
+      merkmale: new Set(),
+      name: 'Rolle 1',
+      rollenart: 'LERN',
+      systemrechte: new Set(),
+    },
+  ] as RolleResponse[];
 
   personenkontextStore.workflowStepResponse = {
     rollen: [
@@ -467,12 +466,19 @@ describe('PersonManagementView', () => {
 
     searchFilterStore.searchStringForPersonen = 'test search';
 
-    // Mock the getPersonenkontextRolleWithFilter method
-    const mockGetPersonenkontextRolleWithFilter: Mock = vi.fn().mockResolvedValue({
-      moeglicheRollen: [{ id: '1', name: 'Test Rolle' }],
-      total: 1,
-    });
-    personenkontextStore.getPersonenkontextRolleWithFilter = mockGetPersonenkontextRolleWithFilter;
+    // Mock the getRollenForPersonAdministration method
+    const mockGetRollenForPersonAdministration: Mock = vi.fn().mockResolvedValue(undefined);
+    rolleStore.getRollenForPersonAdministration = mockGetRollenForPersonAdministration;
+    rolleStore.rollenForPersonAdministration = [
+      {
+        id: '1',
+        administeredBySchulstrukturknoten: '1',
+        merkmale: new Set(),
+        name: 'Test Rolle',
+        rollenart: 'LERN',
+        systemrechte: new Set(),
+      },
+    ] as RolleResponse[];
 
     // Trigger the search
     await rollenAutocomplete?.setValue(['name']);
@@ -485,11 +491,17 @@ describe('PersonManagementView', () => {
     vi.runAllTicks();
 
     // Assert that the method was called
-    expect(mockGetPersonenkontextRolleWithFilter).toHaveBeenCalledWith('name', 25, []);
+    expect(mockGetRollenForPersonAdministration).toHaveBeenCalledWith(
+      expect.objectContaining({
+        searchStr: 'name',
+        limit: 25,
+        organisationIds: [],
+      }),
+    );
 
     // Add more assertions here to check the state after the search
-    expect(personenkontextStore.filteredRollen).toBeDefined();
-    expect(personenkontextStore.filteredRollen?.moeglicheRollen).toHaveLength(1);
+    expect(rolleStore.rollenForPersonAdministration).toBeDefined();
+    expect(rolleStore.rollenForPersonAdministration).toHaveLength(1);
   });
 
   type BulkOperationTestParams = {

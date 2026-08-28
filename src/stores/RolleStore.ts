@@ -24,12 +24,22 @@ type RolleState = {
   updatedRolle: RolleWithServiceProvidersResponse | null;
   currentRolle: Rolle | null;
   allRollen: Array<RolleWithServiceProvidersResponse>;
+  rollenForPersonAdministration: Array<RolleResponse>;
+  totalRollenForPersonAdministration: number;
   errorCode: string;
   loading: boolean;
   totalRollen: number;
 };
 
 type RolleGetters = object;
+type RollenForPersonAdministrationParams = {
+  searchStr?: string;
+  limit?: number;
+  offset?: number;
+  organisationIds?: string[];
+  systemrechte?: RollenSystemRechtEnum[];
+};
+
 type RolleActions = {
   createRolle: (
     rollenName: string,
@@ -41,6 +51,7 @@ type RolleActions = {
   ) => Promise<void>;
   getAllRollen: (filter: RolleFilter) => Promise<void>;
   getRolleById: (rolleId: string) => Promise<void>;
+  getRollenForPersonAdministration: (params: RollenForPersonAdministrationParams) => Promise<void>;
   updateRolle: (
     rolleId: string,
     rollenName: string,
@@ -121,6 +132,8 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
         updatedRolle: null,
         currentRolle: null,
         allRollen: [],
+        rollenForPersonAdministration: [],
+        totalRollenForPersonAdministration: 0,
         errorCode: '',
         loading: false,
         totalRollen: 0,
@@ -191,6 +204,28 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
           const { data }: { data: RolleWithServiceProvidersResponse } =
             await rolleApi.rolleControllerFindRolleByIdWithServiceProviders(rolleId);
           this.currentRolle = mapRolleResponseToRolle(data);
+        } catch (error) {
+          this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+        } finally {
+          this.loading = false;
+        }
+      },
+
+      async getRollenForPersonAdministration(params: RollenForPersonAdministrationParams): Promise<void> {
+        this.loading = true;
+        this.errorCode = '';
+        try {
+          const response: AxiosResponse<Array<RolleResponse>> =
+            await rolleApi.rolleControllerFindRollenAvailableForPersonAdministration(
+              params.searchStr,
+              params.limit,
+              params.offset,
+              params.organisationIds,
+              params.systemrechte,
+            );
+          this.rollenForPersonAdministration = response.data;
+          this.totalRollenForPersonAdministration =
+            +(response.headers['x-paging-total'] as string | undefined) || response.data.length;
         } catch (error) {
           this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
         } finally {
