@@ -41,7 +41,7 @@ beforeEach(() => {
       rollenart: 'LEHR',
       name: 'Lehrer',
       // TODO: remove type casting when generator is fixed
-      merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
+      merkmale: ['KOPERS_PFLICHT'],
       systemrechte: [
         { name: RollenSystemRechtEnum.RollenVerwalten, isTechnical: false },
       ] as unknown as Set<SystemRechtResponse>,
@@ -299,6 +299,10 @@ describe('RolleManagementView', () => {
       merkmale: undefined,
       rollenarten: undefined,
       organisationenForFilter: undefined,
+      systemrechte: [
+        RollenSystemRechtEnum.RollenVerwalten,
+        RollenSystemRechtEnum.MptRollenVerwalten,
+      ],
     });
   });
 

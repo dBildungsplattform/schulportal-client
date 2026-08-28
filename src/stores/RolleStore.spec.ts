@@ -244,7 +244,7 @@ describe('rolleStore', () => {
       await promise;
 
       const requestUrl: string = mockadapter.history.get[0]?.url ?? '';
-      expect(requestUrl).toContain('organisationId=organisation-1');
+      expect(requestUrl).toContain('organisationContextForOperation=organisation-1');
       expect(requestUrl).toContain(rolle.id);
       expect(requestUrl).toContain('MPT_ROLLEN_VERWALTEN');
       expect(rolleStore.currentRolle?.id).toBe(rolle.id);
