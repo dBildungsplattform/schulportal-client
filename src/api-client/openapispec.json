@@ -2113,12 +2113,24 @@
             }
           },
           {
-            "name": "organisationId",
+            "name": "organisationContextForOperation",
             "required": false,
             "in": "query",
-            "description": "The id of the organisation where the role should be available.",
+            "description": "Only relevant when systemrechte contains ROLLEN_ERWEITERN or IMPORT_DURCHFUEHREN. Provides the organisation context for the requested workflow operation. If provided, only roles available for that organisation will be returned. Mutually exclusive with organisationenForFilter.",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "organisationenForFilter",
+            "required": false,
+            "in": "query",
+            "description": "Only relevant when systemrechte contains ROLLEN_VERWALTEN or no systemrechte is provided. Filters the result to roles administered by any of the given organisations. Mutually exclusive with organisationContextForOperation.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             }
           },
           {
@@ -2137,7 +2149,7 @@
             "name": "systemrechte",
             "required": false,
             "in": "query",
-            "description": "The system right for which the roles should be available. Can only be ROLLEN_VERWALTEN, ROLLEN_ERWEITERN, MPT_ROLLEN_VERWALTEN or a combination of them or IMPORT_DURCHFUEHREN .",
+            "description": "Determines the authorization context for this request. Use ROLLEN_VERWALTEN (default) with organisationIdsForFilter for general role administration. Use ROLLEN_ERWEITERN or IMPORT_DURCHFUEHREN with organisationIdContextForOperation for workflow-specific role lookups. Can only be ROLLEN_VERWALTEN, ROLLEN_ERWEITERN or both, or IMPORT_DURCHFUEHREN.",
             "schema": {
               "type": "array",
               "items": {
@@ -2149,11 +2161,23 @@
             "name": "rollenarten",
             "required": false,
             "in": "query",
-            "description": "Filter roles by their role types.",
+            "description": "Filter roles by rollenart.",
             "schema": {
               "type": "array",
               "items": {
                 "$ref": "#/components/schemas/RollenArt"
+              }
+            }
+          },
+          {
+            "name": "merkmale",
+            "required": false,
+            "in": "query",
+            "description": "Filter roles by merkmal.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/RollenMerkmal"
               }
             }
           }
@@ -2285,6 +2309,117 @@
           },
           "500": {
             "description": "Internal server error"
+          }
+        },
+        "security": [
+          {
+            "oauth2": ["openid"]
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": ["rolle"]
+      }
+    },
+    "/api/rolle/for-personenkontext-creation": {
+      "get": {
+        "description": "Find available rollen for personenkontext creation.",
+        "operationId": "RolleController_findAvailableRollenForPersonenkontextCreation",
+        "parameters": [
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "description": "The offset of the paginated list.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "The requested limit for the page size.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "organisationId",
+            "required": true,
+            "in": "query",
+            "description": "The organisationId for which the available rollen should be found",
+            "schema": {
+              "nullable": false,
+              "type": "string"
+            }
+          },
+          {
+            "name": "rollenartOfUser",
+            "required": false,
+            "in": "query",
+            "description": "The rollenart of the user for which the available rollen should be found",
+            "schema": {
+              "$ref": "#/components/schemas/RollenArt"
+            }
+          },
+          {
+            "name": "rolleName",
+            "required": false,
+            "in": "query",
+            "description": "The rolleName for which the available rollen should be found",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          },
+          {
+            "name": "rollenIds",
+            "required": false,
+            "in": "query",
+            "description": "The rollenIds for which the available rollen should be found",
+            "schema": {
+              "nullable": true,
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "systemrecht",
+            "required": false,
+            "in": "query",
+            "description": "The systemrecht for which the available rollen should be found",
+            "schema": {
+              "$ref": "#/components/schemas/RollenSystemRechtEnum"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The available rollen were successfully returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RolleResponse"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authorized to get available rollen for personenkontext creation."
+          },
+          "403": {
+            "description": "Insufficient permissions to get available rollen for personenkontext creation."
+          },
+          "500": {
+            "description": "Internal server error while getting available rollen for personenkontext creation."
           }
         },
         "security": [
@@ -2685,118 +2820,6 @@
           },
           "500": {
             "description": "Internal server error while updating RollenErweiterungen."
-          }
-        },
-        "security": [
-          {
-            "oauth2": ["openid"]
-          },
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "",
-        "tags": ["rolle"]
-      }
-    },
-    "/api/rolle/for-personenkontext-creation": {
-      "get": {
-        "description": "Find available rollen for personenkontext creation.",
-        "operationId": "RolleController_findAvailableRollenForPersonenkontextCreation",
-        "parameters": [
-          {
-            "name": "offset",
-            "required": false,
-            "in": "query",
-            "description": "The offset of the paginated list.",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "limit",
-            "required": false,
-            "in": "query",
-            "description": "The requested limit for the page size.",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "organisationId",
-            "required": true,
-            "in": "query",
-            "description": "The organisationId for which the available rollen should be found",
-            "schema": {
-              "nullable": false,
-              "type": "string"
-            }
-          },
-          {
-            "name": "rollenartOfUser",
-            "required": false,
-            "in": "query",
-            "description": "The rollenart of the user for which the available rollen should be found",
-            "schema": {
-              "nullable": true,
-              "type": "string"
-            }
-          },
-          {
-            "name": "rolleName",
-            "required": false,
-            "in": "query",
-            "description": "The rolleName for which the available rollen should be found",
-            "schema": {
-              "nullable": true,
-              "type": "string"
-            }
-          },
-          {
-            "name": "rollenIds",
-            "required": false,
-            "in": "query",
-            "description": "The rollenIds for which the available rollen should be found",
-            "schema": {
-              "nullable": true,
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          },
-          {
-            "name": "systemrecht",
-            "required": false,
-            "in": "query",
-            "description": "The systemrecht for which the available rollen should be found",
-            "schema": {
-              "$ref": "#/components/schemas/RollenSystemRechtEnum"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The available rollen were successfully returned.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/RolleResponse"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Not authorized to get available rollen for personenkontext creation."
-          },
-          "403": {
-            "description": "Insufficient permissions to get available rollen for personenkontext creation."
-          },
-          "500": {
-            "description": "Internal server error while getting available rollen for personenkontext creation."
           }
         },
         "security": [
@@ -3300,6 +3323,26 @@
             "description": "The requested limit for the page size.",
             "schema": {
               "type": "number"
+            }
+          },
+          {
+            "name": "kategorien",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/ServiceProviderKategorie"
+              }
+            }
+          },
+          {
+            "name": "searchFilter",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "nullable": true,
+              "type": "string"
             }
           }
         ],
@@ -6152,6 +6195,22 @@
         },
         "required": ["vorname", "nachname", "personenkontexte", "emailAdresse"]
       },
+      "UserExternalDataResponsePolyteia": {
+        "type": "object",
+        "properties": {
+          "rollenart": {
+            "type": "string",
+            "enum": ["LERN", "LEHR", "EXTERN", "ORGADMIN", "LEIT", "SYSADMIN", "SORGBER", "SCHB", "NLEHR"]
+          },
+          "dienststellenNummern": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["dienststellenNummern"]
+      },
       "UserExternalDataResponse": {
         "type": "object",
         "properties": {
@@ -6172,9 +6231,12 @@
           },
           "iqshHelpdesk": {
             "$ref": "#/components/schemas/UserExternalDataResponseIqshHelpdesk"
+          },
+          "polyteia": {
+            "$ref": "#/components/schemas/UserExternalDataResponsePolyteia"
           }
         },
-        "required": ["itslearning", "vidis", "opsh", "onlineDateiablage", "iqshHelpdesk"]
+        "required": ["itslearning", "vidis", "opsh", "onlineDateiablage", "iqshHelpdesk", "polyteia"]
       },
       "PersonLandesbediensteterSearchPersonenkontextResponse": {
         "type": "object",
@@ -7063,6 +7125,71 @@
           "serviceProviders"
         ]
       },
+      "RolleResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "administeredBySchulstrukturknoten": {
+            "type": "string"
+          },
+          "rollenart": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RollenArt"
+              }
+            ]
+          },
+          "merkmale": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RollenMerkmal"
+            }
+          },
+          "systemrechte": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SystemRechtResponse"
+            }
+          },
+          "administeredBySchulstrukturknotenName": {
+            "type": "string",
+            "nullable": true
+          },
+          "administeredBySchulstrukturknotenKennung": {
+            "type": "string",
+            "nullable": true
+          },
+          "version": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "createdAt",
+          "updatedAt",
+          "name",
+          "administeredBySchulstrukturknoten",
+          "rollenart",
+          "merkmale",
+          "systemrechte",
+          "administeredBySchulstrukturknotenName",
+          "administeredBySchulstrukturknotenKennung",
+          "version"
+        ]
+      },
       "CreateRolleBodyParams": {
         "type": "object",
         "properties": {
@@ -7312,71 +7439,6 @@
           }
         },
         "required": ["addErweiterungenForServiceProviderIds", "removeErweiterungenForServiceProviderIds"]
-      },
-      "RolleResponse": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "createdAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "updatedAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "administeredBySchulstrukturknoten": {
-            "type": "string"
-          },
-          "rollenart": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/RollenArt"
-              }
-            ]
-          },
-          "merkmale": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RollenMerkmal"
-            }
-          },
-          "systemrechte": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SystemRechtResponse"
-            }
-          },
-          "administeredBySchulstrukturknotenName": {
-            "type": "string",
-            "nullable": true
-          },
-          "administeredBySchulstrukturknotenKennung": {
-            "type": "string",
-            "nullable": true
-          },
-          "version": {
-            "type": "number"
-          }
-        },
-        "required": [
-          "id",
-          "createdAt",
-          "updatedAt",
-          "name",
-          "administeredBySchulstrukturknoten",
-          "rollenart",
-          "merkmale",
-          "systemrechte",
-          "administeredBySchulstrukturknotenName",
-          "administeredBySchulstrukturknotenKennung",
-          "version"
-        ]
       },
       "ApplyRollenerweiterungBodyParams": {
         "type": "object",

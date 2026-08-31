@@ -1,8 +1,16 @@
-import { defineStore, type Store, type StoreDefinition } from 'pinia';
-import type { RolleResponse } from './RolleStore';
 import { SortOrder, type OrganisationSortField } from '@/utils/sorting';
+import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import type { Organisation } from './OrganisationStore';
 import { SortField } from './PersonStore';
+import { RollenArt, RollenMerkmal, type RolleResponse } from './RolleStore';
+import { ServiceProviderKategorie } from './ServiceProviderStore';
+
+export const DEFAULT_SERVICE_PROVIDER_KATEGORIEN: ReadonlyArray<ServiceProviderKategorie> = [
+  ServiceProviderKategorie.Email,
+  ServiceProviderKategorie.Unterricht,
+  ServiceProviderKategorie.Verwaltung,
+  ServiceProviderKategorie.Hinweise,
+];
 
 type SearchFilterState = {
   klassenPage: number;
@@ -21,8 +29,10 @@ type SearchFilterState = {
   mptRollenPerPage: number;
   serviceProviderSchulePage: number;
   serviceProviderSchulePerPage: number;
-  searchFilterPersonen: string | null;
-  searchFilterSchulen: string | null;
+  searchStringForRollen: string | null;
+  searchStringForPersonen: string | null;
+  searchStringForSchulen: string | null;
+  searchStringForServiceProvider: string | null;
   selectedKlassen: Array<string> | null;
   selectedRollen: Array<string> | null;
   selectedRollenObjects: RolleResponse[];
@@ -37,6 +47,10 @@ type SearchFilterState = {
   selectedKlassenForKlassen: Array<string> | null;
   selectedSchuleForMptRollen: string | null;
   selectedSchuleForSchulischeServiceProvider: string | null;
+  selectedMerkmaleForRollen: Array<RollenMerkmal>;
+  selectedRollenartenForRollen: Array<RollenArt>;
+  selectedOrganisationenForRollen: Array<string>;
+  selectedKategorienForServiceProvider: Array<ServiceProviderKategorie>;
 };
 
 type SearchFilterActions = {
@@ -47,18 +61,26 @@ type SearchFilterActions = {
     selectedOrganisationen: Array<string> | null,
     orgaObjects?: Organisation[],
   ) => void;
-  setSearchFilterForPersonen: (searchFilter: string | null) => void;
-  setSearchFilterForSchulen: (searchFilter: string | null) => void;
+  setSearchFilterForRollen: (searchFilter: string | null) => void;
+  setSearchFilterForPersonen: (searchStringForPersonen: string | null) => void;
+  setSearchFilterForSchulen: (searchStringForSchulen: string | null) => void;
+  setSearchFilterForServiceProvider: (searchStringForServiceProvider: string | null) => void;
   setSchuleFilterForKlassen: (selectedSchuleForKlassen: string | null) => void;
   setKlasseFilterForKlassen: (selectedKlassenForKlassen: Array<string> | null) => void;
   setSchuleForMptRollen: (selectedSchuleForMptRollen: string | null) => void;
   setSchuleForSchulischeServiceProvider: (selectedSchuleForSchulischeServiceProvider: string | null) => void;
+  setMerkmaleFilterForRollen: (selectedMerkmale: Array<RollenMerkmal>) => void;
+  setRollenartenFilterForRollen: (selectedRollenarten: Array<RollenArt>) => void;
+  setOrganisationenFilterForRollen: (selectedOrganisationen: Array<string>) => void;
+  setKategorienForServiceProvider: (selectedKategorienForServiceProvider: Array<ServiceProviderKategorie>) => void;
+  resetKategorienForServiceProvider: () => void;
 };
 
 type SearchFilterGetters = object;
 
 export type SearchFilterStore = Store<'searchFilterStore', SearchFilterState, SearchFilterGetters, SearchFilterActions>;
 
+export const rollenPerPageDefault: number = 30;
 export const useSearchFilterStore: StoreDefinition<
   'searchFilterStore',
   SearchFilterState,
@@ -71,7 +93,7 @@ export const useSearchFilterStore: StoreDefinition<
     personenPage: 1,
     personenPerPage: 30,
     rollenPage: 1,
-    rollenPerPage: 30,
+    rollenPerPage: rollenPerPageDefault,
     schulenPage: 1,
     schulenPerPage: 30,
     schultraegerPage: 1,
@@ -82,8 +104,10 @@ export const useSearchFilterStore: StoreDefinition<
     mptRollenPerPage: 30,
     serviceProviderSchulePage: 1,
     serviceProviderSchulePerPage: 30,
-    searchFilterPersonen: '',
-    searchFilterSchulen: '',
+    searchStringForPersonen: '',
+    searchStringForSchulen: '',
+    searchStringForServiceProvider: '',
+    searchStringForRollen: '',
     selectedKlassen: [],
     selectedRollen: [],
     selectedRollenObjects: [],
@@ -98,6 +122,10 @@ export const useSearchFilterStore: StoreDefinition<
     selectedKlassenForKlassen: [],
     selectedSchuleForMptRollen: null,
     selectedSchuleForSchulischeServiceProvider: null,
+    selectedMerkmaleForRollen: [],
+    selectedRollenartenForRollen: [],
+    selectedOrganisationenForRollen: [],
+    selectedKategorienForServiceProvider: [...DEFAULT_SERVICE_PROVIDER_KATEGORIEN],
   }),
   actions: {
     setKlasseFilterForPersonen(selectedKlassen: Array<string> | null) {
@@ -113,12 +141,20 @@ export const useSearchFilterStore: StoreDefinition<
       this.selectedOrgaObjects = orgaObjects ?? [];
     },
 
-    setSearchFilterForPersonen(searchFilterPersonen: string | null) {
-      this.searchFilterPersonen = searchFilterPersonen ?? '';
+    setSearchFilterForPersonen(searchStringForPersonen: string | null) {
+      this.searchStringForPersonen = searchStringForPersonen ?? '';
     },
 
-    setSearchFilterForSchulen(searchFilterSchulen: string | null) {
-      this.searchFilterSchulen = searchFilterSchulen ?? '';
+    setSearchFilterForRollen(searchStringForRollen: string | null) {
+      this.searchStringForRollen = searchStringForRollen ?? '';
+    },
+
+    setSearchFilterForSchulen(searchStringForSchulen: string | null) {
+      this.searchStringForSchulen = searchStringForSchulen ?? '';
+    },
+
+    setSearchFilterForServiceProvider(searchStringForServiceProvider: string | null) {
+      this.searchStringForServiceProvider = searchStringForServiceProvider ?? '';
     },
 
     setRolleFilterWithObjectsForPersonen(selectedRollen: Array<string> | null, rollenObjects: RolleResponse[]) {
@@ -140,6 +176,26 @@ export const useSearchFilterStore: StoreDefinition<
 
     setSchuleForSchulischeServiceProvider(selectedSchuleForSchulischeServiceProvider: string | null) {
       this.selectedSchuleForSchulischeServiceProvider = selectedSchuleForSchulischeServiceProvider;
+    },
+
+    setMerkmaleFilterForRollen(selectedMerkmale: Array<RollenMerkmal>) {
+      this.selectedMerkmaleForRollen = selectedMerkmale;
+    },
+
+    setRollenartenFilterForRollen(selectedRollenarten: Array<RollenArt>) {
+      this.selectedRollenartenForRollen = selectedRollenarten;
+    },
+
+    setOrganisationenFilterForRollen(selectedOrganisationen: Array<string>) {
+      this.selectedOrganisationenForRollen = selectedOrganisationen;
+    },
+
+    setKategorienForServiceProvider(selectedKategorienForServiceProvider: Array<ServiceProviderKategorie>) {
+      this.selectedKategorienForServiceProvider = selectedKategorienForServiceProvider;
+    },
+
+    resetKategorienForServiceProvider() {
+      this.selectedKategorienForServiceProvider = [...DEFAULT_SERVICE_PROVIDER_KATEGORIEN];
     },
   },
 });
