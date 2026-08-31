@@ -474,8 +474,8 @@ describe('PersonCreationView', () => {
     // Form is resetting after submit so orga should be undefined
     expect(selectors.organisationsebeneSelect?.vm.$data).toStrictEqual({});
 
+    await vi.waitFor(() => expect(spy).toHaveBeenCalledOnce());
     await nextTick();
-    expect(spy).toHaveBeenCalledOnce();
     expect(wrapper?.find('[data-testid="person-success-text"]').isVisible()).toBe(true);
   });
 
