@@ -237,6 +237,7 @@ describe('RolleManagementView', () => {
     expect(searchFilterStore.setRollenartenFilterForRollen).toHaveBeenCalledWith([]);
     expect(searchFilterStore.setOrganisationenFilterForRollen).toHaveBeenCalledWith([]);
     expect(searchFilterStore.setAngeboteFilterForRollen).toHaveBeenCalledWith([]);
+    expect(searchFilterStore.setAngeboteNamesForRollen).toHaveBeenCalledWith({});
     expect(searchFilterStore.searchStringForRollen).toEqual('');
     expect(searchFilterStore.rollenPage).toEqual(1);
     expect(searchFilterStore.rollenPerPage).toEqual(rollenPerPageDefault);
@@ -360,6 +361,34 @@ describe('RolleManagementView', () => {
       await nextTick();
 
       expect(wrapper?.find('[data-testid="angebote-filter-select"]').text()).toContain('Landesangebote ausgewählt');
+    });
+
+    test('selecting an angebot stores its name in the cache', async () => {
+      const angeboteSelect: ReturnType<VueWrapper['findComponent']> | undefined = wrapper?.findComponent(
+        '[data-testid="angebote-filter-select"]',
+      );
+      await angeboteSelect?.setValue(['sp1']);
+
+      expect(searchFilterStore.setAngeboteNamesForRollen).toHaveBeenCalledWith({ sp1: 'Service Provider 1' });
+    });
+  });
+
+  describe('when selected angebot is not in current search results', () => {
+    test('chip still displays provider name from cache after search filters it out', async () => {
+      vi.mocked(searchFilterStore.setAngeboteNamesForRollen).mockImplementation((names: Record<string, string>) => {
+        searchFilterStore.selectedAngeboteNamesForRollen = names;
+      });
+
+      const angeboteSelect: ReturnType<VueWrapper['findComponent']> | undefined = wrapper?.findComponent(
+        '[data-testid="angebote-filter-select"]',
+      );
+      await angeboteSelect?.setValue(['sp1']);
+      await nextTick();
+
+      serviceProviderStore.serviceProvidersForRollenVerwaltung = [];
+      await nextTick();
+
+      expect(wrapper?.find('[data-testid="angebote-filter-select"]').text()).toContain('Service Provider 1');
     });
   });
 

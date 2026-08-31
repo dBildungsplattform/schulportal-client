@@ -34,6 +34,7 @@ describe('SearchFilterStore', () => {
     expect(searchFilterStore.rollenPerPage).toEqual(rollenPerPageDefault);
     expect(searchFilterStore.selectedKategorienForServiceProvider).toEqual(DEFAULT_SERVICE_PROVIDER_KATEGORIEN);
     expect(searchFilterStore.selectedAngeboteForRollen).toEqual([]);
+    expect(searchFilterStore.selectedAngeboteNamesForRollen).toEqual({});
   });
 
   it('should change the state', () => {
@@ -115,5 +116,16 @@ describe('SearchFilterStore', () => {
   it('should set angebote filter for rollen', () => {
     searchFilterStore.setAngeboteFilterForRollen(['angebot1', 'angebot2']);
     expect(searchFilterStore.selectedAngeboteForRollen).toEqual(['angebot1', 'angebot2']);
+  });
+
+  it('should set angebote names for rollen', () => {
+    searchFilterStore.setAngeboteNamesForRollen({ sp1: 'Provider One', sp2: 'Provider Two' });
+    expect(searchFilterStore.selectedAngeboteNamesForRollen).toEqual({ sp1: 'Provider One', sp2: 'Provider Two' });
+  });
+
+  it('should overwrite existing angebote names for rollen', () => {
+    searchFilterStore.setAngeboteNamesForRollen({ sp1: 'Provider One' });
+    searchFilterStore.setAngeboteNamesForRollen({ sp2: 'Provider Two' });
+    expect(searchFilterStore.selectedAngeboteNamesForRollen).toEqual({ sp2: 'Provider Two' });
   });
 });

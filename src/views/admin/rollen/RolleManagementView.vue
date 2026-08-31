@@ -1,5 +1,4 @@
 <script setup lang="ts">
-  import { ServiceProviderIdNameResponse } from '@/api-client/generated';
   import ResultTable, { type Headers, type TableRow } from '@/components/admin/ResultTable.vue';
   import SearchField from '@/components/admin/SearchField.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
@@ -15,7 +14,11 @@
     type RolleTableItem,
   } from '@/stores/RolleStore';
   import { rollenPerPageDefault, useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
-  import { ServiceProviderStore, useServiceProviderStore } from '@/stores/ServiceProviderStore';
+  import {
+    ServiceProviderIdNameResponse,
+    ServiceProviderStore,
+    useServiceProviderStore,
+  } from '@/stores/ServiceProviderStore';
   import { computed, ComputedRef, onMounted, ref, Ref } from 'vue';
 
   import { useI18n, type Composer } from 'vue-i18n';
@@ -154,7 +157,22 @@
     await getRollen();
   }
 
+  function setSelectedAngeboteCache(angebote: string[]): void {
+    const newCache: Record<string, string> = {};
+
+    for (const id of angebote) {
+      const found: AngebotItem | undefined = angeboteItems.value.find((i: AngebotItem) => i.value === id);
+
+      if (found) {
+        newCache[id] = found.title;
+      }
+    }
+
+    searchFilterStore.setAngeboteNamesForRollen(newCache);
+  }
+
   async function setAngeboteFilter(angebote: string[]): Promise<void> {
+    setSelectedAngeboteCache(angebote);
     searchFilterStore.setAngeboteFilterForRollen(angebote ?? []);
     searchFilterStore.rollenPage = 1;
     await getRollen();
@@ -183,6 +201,7 @@
     searchFilterStore.setRollenartenFilterForRollen([]);
     searchFilterStore.setOrganisationenFilterForRollen([]);
     searchFilterStore.setAngeboteFilterForRollen([]);
+    searchFilterStore.setAngeboteNamesForRollen({});
     searchFilterStore.rollenPage = 1;
     searchFilterStore.rollenPerPage = rollenPerPageDefault;
     searchFilter.value = '';
@@ -388,7 +407,7 @@
             </template>
             <template #selection="{ internalItem: item, index }">
               <v-chip v-if="searchFilterStore.selectedAngeboteForRollen.length < 2">
-                <span>{{ item.title }}</span>
+                <span>{{ searchFilterStore.selectedAngeboteNamesForRollen[item.value] ?? item.title }}</span>
               </v-chip>
               <span
                 v-else-if="index === 0"

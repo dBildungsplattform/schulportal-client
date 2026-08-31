@@ -48,6 +48,7 @@ type SearchFilterState = {
   selectedRollenartenForRollen: Array<RollenArt>;
   selectedOrganisationenForRollen: Array<string>;
   selectedAngeboteForRollen: Array<string>;
+  selectedAngeboteNamesForRollen: Record<string, string>;
   selectedKategorienForServiceProvider: Array<ServiceProviderKategorie>;
 };
 
@@ -70,6 +71,7 @@ type SearchFilterActions = {
   setRollenartenFilterForRollen: (selectedRollenarten: Array<RollenArt>) => void;
   setOrganisationenFilterForRollen: (selectedOrganisationen: Array<string>) => void;
   setAngeboteFilterForRollen: (selectedAngebote: Array<string>) => void;
+  setAngeboteNamesForRollen: (names: Record<string, string>) => void;
   setKategorienForServiceProvider: (selectedKategorienForServiceProvider: Array<ServiceProviderKategorie>) => void;
   resetKategorienForServiceProvider: () => void;
 };
@@ -121,6 +123,7 @@ export const useSearchFilterStore: StoreDefinition<
     selectedRollenartenForRollen: [],
     selectedOrganisationenForRollen: [],
     selectedAngeboteForRollen: [],
+    selectedAngeboteNamesForRollen: {},
     selectedKategorienForServiceProvider: [...DEFAULT_SERVICE_PROVIDER_KATEGORIEN],
   }),
   actions: {
@@ -184,6 +187,10 @@ export const useSearchFilterStore: StoreDefinition<
 
     setAngeboteFilterForRollen(selectedAngebote: Array<string>) {
       this.selectedAngeboteForRollen = selectedAngebote;
+    },
+
+    setAngeboteNamesForRollen(names: Record<string, string>) {
+      this.selectedAngeboteNamesForRollen = names;
     },
 
     setKategorienForServiceProvider(selectedKategorienForServiceProvider: Array<ServiceProviderKategorie>) {
