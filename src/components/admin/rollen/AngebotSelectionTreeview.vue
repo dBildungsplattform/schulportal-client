@@ -211,9 +211,11 @@
     </template>
     <template #prepend="{ item }">
       <template v-if="item.isGroup">
-        <div class="group-row d-flex align-center w-100 flex-wrap"
-            :data-testid="`angebot-category-${item.kategorie}`"
-            @click="toggleCategorySelection(item.kategorie)">
+        <div
+          class="group-row d-flex align-center w-100 flex-wrap"
+          :data-testid="`angebot-category-${item.kategorie}`"
+          @click="toggleCategorySelection(item.kategorie)"
+        >
           <v-checkbox
             :data-testid="`angebot-category-checkbox-${item.kategorie}`"
             :indeterminate="getCategorySelectionState(item.kategorie) === SelectionState.Some"
