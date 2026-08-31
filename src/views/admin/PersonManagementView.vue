@@ -23,6 +23,7 @@
     type RolleResponse,
     type RolleStore,
     RollenArt,
+    RollenMerkmal,
     RollenSystemRecht,
     useRolleStore,
   } from '@/stores/RolleStore';
@@ -217,9 +218,13 @@
   const rollenForForm: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
 
   // Only Rollen from type LEHR and LERN
-  const lehrAndLernRollen: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = computed(() => {
+  const rollenForRolleModify: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = computed(() => {
     return rollenForForm.value?.filter(
-      (rolle: TranslatedRolleWithAttrs) => rolle.rollenart === RollenArt.Lehr || rolle.rollenart === RollenArt.Lern,
+      (rolle: TranslatedRolleWithAttrs) =>
+        rolle.rollenart === RollenArt.Lehr ||
+        rolle.rollenart === RollenArt.Lern ||
+        // this assumes the incoming rollen have checked MPT-permission
+        rolle.merkmale?.includes(RollenMerkmal.MptRolle),
     );
   });
 
@@ -896,7 +901,7 @@
             v-if="rolleModifiyDialogVisible"
             ref="person-bulk-rolle-modify"
             :organisationen="organisationenForForm"
-            :rollen="lehrAndLernRollen"
+            :rollen="rollenForRolleModify"
             :is-loading="personenkontextStore.loading"
             :is-dialog-visible="rolleModifiyDialogVisible"
             :error-code="personenkontextStore.errorCode"
