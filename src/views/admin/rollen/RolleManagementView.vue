@@ -3,6 +3,7 @@
   import SearchField from '@/components/admin/SearchField.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SchulenFilter from '@/components/filter/SchulenFilter.vue';
+  import { AuthStore, useAuthStore } from '@/stores/AuthStore';
   import {
     RollenArt,
     RollenMerkmal,
@@ -17,6 +18,7 @@
   import { useI18n, type Composer } from 'vue-i18n';
   import { useRouter, type Router } from 'vue-router';
 
+  const authStore: AuthStore = useAuthStore();
   const rolleStore: RolleStore = useRolleStore();
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
 
@@ -90,6 +92,13 @@
     );
   });
 
+  const systemrechte: ComputedRef<RollenSystemRecht[]> = computed(() => {
+    if (authStore.hasMptRollenVerwaltenPermission) {
+      return [RollenSystemRecht.RollenVerwalten, RollenSystemRecht.MptRollenVerwalten];
+    }
+    return [RollenSystemRecht.RollenVerwalten];
+  });
+
   function navigateToRolleDetails(_$event: PointerEvent, { item }: { item: RolleTableItem }): void {
     router.push({ name: 'rolle-details', params: { id: item.id } });
   }
@@ -99,7 +108,7 @@
       offset: (searchFilterStore.rollenPage - 1) * searchFilterStore.rollenPerPage,
       limit: searchFilterStore.rollenPerPage,
       searchString: searchFilterStore.searchStringForRollen ?? undefined,
-      systemrechte: [RollenSystemRecht.RollenVerwalten, RollenSystemRecht.MptRollenVerwalten],
+      systemrechte: systemrechte.value,
       organisationenForFilter: searchFilterStore.selectedOrganisationenForRollen?.length
         ? searchFilterStore.selectedOrganisationenForRollen
         : undefined,

@@ -9,9 +9,11 @@ import { nextTick, type Component } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import { RollenSystemRechtEnum } from '../../../api-client/generated/api';
 import RolleManagementView from './RolleManagementView.vue';
+import { AuthStore, useAuthStore } from '@/stores/AuthStore';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
+let authStore: AuthStore;
 let rolleStore: RolleStore;
 let searchFilterStore: SearchFilterStore;
 
@@ -27,8 +29,11 @@ beforeEach(() => {
     routes,
   });
 
+  authStore = useAuthStore();
   rolleStore = useRolleStore();
   searchFilterStore = useSearchFilterStore();
+
+  authStore.hasMptRollenVerwaltenPermission = true;
 
   searchFilterStore.selectedMerkmaleForRollen = [];
   searchFilterStore.selectedRollenartenForRollen = [];
