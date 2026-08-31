@@ -224,8 +224,7 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
               params.systemrechte,
             );
           this.rollenForPersonAdministration = response.data;
-          this.totalRollenForPersonAdministration =
-            +(response.headers['x-paging-total'] as string | undefined) || response.data.length;
+          this.totalRollenForPersonAdministration = +response.headers['x-paging-total'];
         } catch (error) {
           this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
         } finally {
