@@ -475,7 +475,6 @@ describe('PersonCreationView', () => {
     expect(selectors.organisationsebeneSelect?.vm.$data).toStrictEqual({});
 
     await vi.waitFor(() => expect(spy).toHaveBeenCalledOnce());
-    await nextTick();
     expect(wrapper?.find('[data-testid="person-success-text"]').isVisible()).toBe(true);
   });
 
