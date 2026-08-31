@@ -144,12 +144,12 @@ describe('MptRolleDetailsView', (): void => {
     expect(wrapper.text()).toContain('Fehler beim Laden der Rolle');
   });
 
-  it('renders an empty tree and disables saving when the provider state is temporarily undefined', async (): Promise<void> => {
+  it('renders an empty tree and hides saving when the provider state is temporarily undefined', async (): Promise<void> => {
     Reflect.set(serviceProviderStore, 'allServiceProviders', undefined);
     await flushPromises();
 
     expect(wrapper?.find('[data-testid="angebot-selection-tree-empty"]').exists()).toBe(true);
-    expect(wrapper?.find('[data-testid="mpt-rolle-save-button"]').attributes('disabled')).toBeDefined();
+    expect(wrapper?.find('[data-testid="mpt-rolle-save-button"]').exists()).toBe(false);
   });
 
   it('clears store errors when the detail view is unmounted', (): void => {
