@@ -26,6 +26,7 @@ type RolleState = {
   createdRolle: Rolle | null;
   updatedRolle: RolleWithServiceProvidersResponse | null;
   currentRolle: Rolle | null;
+  currentMptRolle: Rolle | null;
   allRollen: Array<RolleWithServiceProvidersResponse>;
   rollenerweiterungServiceProviders: Array<ServiceProviderResponse>;
   errorCode: string;
@@ -135,6 +136,7 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
         createdRolle: null,
         updatedRolle: null,
         currentRolle: null,
+        currentMptRolle: null,
         allRollen: [],
         rollenerweiterungServiceProviders: [],
         errorCode: '',
@@ -218,13 +220,13 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
       async getMptRolleById(rolleId: string, organisationId: string): Promise<void> {
         this.loading = true;
         this.errorCode = '';
-        this.currentRolle = null;
+        this.currentMptRolle = null;
         try {
           const rolleFromList: RolleWithServiceProvidersResponse | undefined = this.allRollen.find(
             (rolle: RolleWithServiceProvidersResponse): boolean => rolle.id === rolleId,
           );
           if (rolleFromList) {
-            this.currentRolle = mapRolleResponseToRolle(rolleFromList);
+            this.currentMptRolle = mapRolleResponseToRolle(rolleFromList);
             return;
           }
 
@@ -243,7 +245,7 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
             this.errorCode = 'UNSPECIFIED_ERROR';
             return;
           }
-          this.currentRolle = mapRolleResponseToRolle(rolle);
+          this.currentMptRolle = mapRolleResponseToRolle(rolle);
         } catch (error: unknown) {
           this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
         } finally {

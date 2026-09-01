@@ -228,26 +228,26 @@ describe('rolleStore', () => {
 
       await rolleStore.getMptRolleById(rolle.id, 'organisation-1');
 
-      expect(rolleStore.currentRolle?.id).toBe(rolle.id);
+      expect(rolleStore.currentMptRolle?.id).toBe(rolle.id);
       expect(mockadapter.history.get).toHaveLength(0);
       expect(rolleStore.loading).toBe(false);
     });
 
     it('should load a role through the MPT-authorized list endpoint on direct navigation', async () => {
       const rolle: RolleWithServiceProvidersResponse = DoFactory.getRolleWithServiceProviders();
-      rolleStore.currentRolle = DoFactory.getRolle();
+      rolleStore.currentMptRolle = DoFactory.getRolle();
       mockadapter.onGet().replyOnce(200, [rolle]);
 
       const promise: Promise<void> = rolleStore.getMptRolleById(rolle.id, 'organisation-1');
       expect(rolleStore.loading).toBe(true);
-      expect(rolleStore.currentRolle).toBe(null);
+      expect(rolleStore.currentMptRolle).toBe(null);
       await promise;
 
       const requestUrl: string = mockadapter.history.get[0]?.url ?? '';
       expect(requestUrl).toContain('organisationenForFilter=organisation-1');
       expect(requestUrl).toContain(`rolleIds=${rolle.id}`);
       expect(requestUrl).toContain('systemrechte=MPT_ROLLEN_VERWALTEN');
-      expect(rolleStore.currentRolle?.id).toBe(rolle.id);
+      expect(rolleStore.currentMptRolle?.id).toBe(rolle.id);
       expect(rolleStore.errorCode).toBe('');
       expect(rolleStore.loading).toBe(false);
     });
@@ -257,7 +257,7 @@ describe('rolleStore', () => {
 
       await rolleStore.getMptRolleById('rolle-1', 'organisation-1');
 
-      expect(rolleStore.currentRolle).toBe(null);
+      expect(rolleStore.currentMptRolle).toBe(null);
       expect(rolleStore.errorCode).toBe('UNSPECIFIED_ERROR');
       expect(rolleStore.loading).toBe(false);
     });
@@ -267,7 +267,7 @@ describe('rolleStore', () => {
 
       await rolleStore.getMptRolleById('rolle-1', 'organisation-1');
 
-      expect(rolleStore.currentRolle).toBe(null);
+      expect(rolleStore.currentMptRolle).toBe(null);
       expect(rolleStore.errorCode).toBe('MPT_ROLLE_LOADING_ERROR');
       expect(rolleStore.loading).toBe(false);
     });

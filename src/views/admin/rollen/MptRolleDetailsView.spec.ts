@@ -37,7 +37,7 @@ beforeEach(async (): Promise<void> => {
   organisationStore.$reset();
   serviceProviderStore.$reset();
 
-  rolleStore.currentRolle = rolle;
+  rolleStore.currentMptRolle = rolle;
   rolleStore.rollenerweiterungServiceProviders = [existingServiceProvider];
   organisationStore.currentOrganisation = schule;
   serviceProviderStore.allServiceProviders = [existingServiceProvider, availableServiceProvider];
@@ -125,7 +125,7 @@ describe('MptRolleDetailsView', (): void => {
 
   it('stops loading dependent data when the MPT role cannot be loaded', async (): Promise<void> => {
     wrapper?.unmount();
-    rolleStore.currentRolle = null;
+    rolleStore.currentMptRolle = null;
     rolleStore.getMptRolleById = vi.fn((): Promise<void> => {
       rolleStore.errorCode = 'UNSPECIFIED_ERROR';
       return Promise.resolve();

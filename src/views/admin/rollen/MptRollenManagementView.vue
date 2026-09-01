@@ -24,7 +24,6 @@
   const searchFilterStore: SearchFilterStore = useSearchFilterStore();
   const organisationStore: OrganisationStore = useOrganisationStore();
   const router: Router = useRouter();
-  const mptRollenVerwalten: RollenSystemRechtEnum = 'MPT_ROLLEN_VERWALTEN';
 
   const {
     hasAutoselectedSchule,
@@ -32,7 +31,7 @@
   }: {
     hasAutoselectedSchule: ComputedRef<boolean>;
     autoselectedSchule: ComputedRef<Organisation | null>;
-  } = useAutoselectedSchule([mptRollenVerwalten]);
+  } = useAutoselectedSchule([RollenSystemRechtEnum.MptRollenVerwalten]);
 
   const selectedOrganisationId: Ref<string> = ref('');
 
@@ -81,7 +80,7 @@
       limit: searchFilterStore.mptRollenPerPage,
       searchString: '',
       organisationenForFilter: [selectedOrganisationId.value],
-      systemrechte: [mptRollenVerwalten],
+      systemrechte: [RollenSystemRechtEnum.MptRollenVerwalten],
     });
   }
 
@@ -182,7 +181,7 @@
           includeAll
           highlightSelection
           parentId="mpt-rolle-management"
-          :systemrechteForSearch="[mptRollenVerwalten]"
+          :systemrechteForSearch="[RollenSystemRechtEnum.MptRollenVerwalten]"
           :selectedSchulen="selectedOrganisationId ? [selectedOrganisationId] : []"
           @update:selected-schulen="setOrganisationFilter"
           :placeholderText="$t('admin.schule.schule')"

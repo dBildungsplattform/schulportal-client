@@ -107,7 +107,7 @@
     rolleStore.errors.clear();
 
     await rolleStore.getMptRolleById(rolleId, organisationId);
-    if (!rolleStore.currentRolle || rolleStore.errorCode) {
+    if (!rolleStore.currentMptRolle || rolleStore.errorCode) {
       return;
     }
 
@@ -166,7 +166,7 @@
       />
     </v-container>
 
-    <template v-else-if="rolleStore.currentRolle">
+    <template v-else-if="rolleStore.currentMptRolle">
       <v-container>
         <v-row
           class="mt-2"
@@ -185,7 +185,7 @@
               >
                 <LabeledField
                   :label="t('admin.rolle.rollenname')"
-                  :value="rolleStore.currentRolle.name"
+                  :value="rolleStore.currentMptRolle.name"
                   test-id="mpt-rolle-name"
                 />
               </v-col>
@@ -195,7 +195,7 @@
               >
                 <LabeledField
                   :label="t('admin.rolle.rollenart')"
-                  :value="t(`admin.rolle.mappingFrontBackEnd.rollenarten.${rolleStore.currentRolle.rollenart}`)"
+                  :value="t(`admin.rolle.mappingFrontBackEnd.rollenarten.${rolleStore.currentMptRolle.rollenart}`)"
                   test-id="mpt-rolle-art"
                 />
               </v-col>
