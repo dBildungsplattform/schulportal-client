@@ -150,6 +150,7 @@ describe('rolleStore', () => {
         organisationContextForOperation: 'org1',
         organisationenForFilter: ['org2', 'org3'],
         merkmale: [RollenMerkmal.KopersPflicht],
+        serviceProviderIds: ['sp1', 'sp2'],
       });
 
       const requestedUrl: string = mockadapter.history.get[0]!.url!;
@@ -157,6 +158,8 @@ describe('rolleStore', () => {
       expect(requestedUrl).toContain('organisationenForFilter=org2');
       expect(requestedUrl).toContain('organisationenForFilter=org3');
       expect(requestedUrl).toContain(`merkmale=${RollenMerkmal.KopersPflicht}`);
+      expect(requestedUrl).toContain('serviceProviderIds=sp1');
+      expect(requestedUrl).toContain('serviceProviderIds=sp2');
     });
   });
 
