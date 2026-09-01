@@ -236,6 +236,7 @@
               md="auto"
             >
               <v-btn
+                v-if="availableServiceProviders.length > 0"
                 :block="mdAndDown"
                 class="secondary"
                 data-testid="mpt-rolle-cancel-button"
