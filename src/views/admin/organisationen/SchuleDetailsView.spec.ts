@@ -88,7 +88,7 @@ describe('SchuleDetailsView', () => {
   });
 
   test('it fetches organisation and schultraeger data on mount', () => {
-    expect(organisationStore.getOrganisationById).toHaveBeenCalledWith('schule-1', 'SCHULE');
+    expect(organisationStore.getOrganisationById).toHaveBeenCalledWith('schule-1');
     expect(organisationStore.getOrganisationParentsTree).toHaveBeenCalledWith('schule-1');
   });
 
@@ -161,7 +161,7 @@ describe('SchuleDetailsView', () => {
 
   test('it uses correct route parameter as schule id', () => {
     // Verify the component extracted the id from the route
-    expect(organisationStore.getOrganisationById).toHaveBeenCalledWith('schule-1', 'SCHULE');
+    expect(organisationStore.getOrganisationById).toHaveBeenCalledWith('schule-1');
   });
 
   test('it does not show container when there is an error', async () => {
@@ -197,7 +197,7 @@ describe('SchuleDetailsView', () => {
   test('it calls store methods with correct parameters', () => {
     const calls = (organisationStore.getOrganisationById as any).mock.calls;
     expect(calls.length).toBeGreaterThan(0);
-    expect(calls[0]).toEqual(['schule-1', 'SCHULE']);
+    expect(calls[0]).toEqual(['schule-1']);
   });
 
   test('it has correct headline text attribute', () => {
