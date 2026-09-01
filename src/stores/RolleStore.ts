@@ -233,7 +233,8 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
               undefined,
               undefined,
               undefined,
-              organisationId,
+              undefined,
+              [organisationId],
               [rolleId],
               [RollenSystemRechtEnum.MptRollenVerwalten],
             );
