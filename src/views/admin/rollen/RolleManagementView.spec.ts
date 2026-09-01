@@ -82,7 +82,7 @@ beforeEach(() => {
       rollenart: 'LERN',
       name: 'SuS',
       // TODO: remove type casting when generator is fixed
-      merkmale: [] as unknown as Set<RollenMerkmal>,
+      merkmale: [],
       systemrechte: [] as unknown as Set<SystemRechtResponse>,
       createdAt: '2022',
       updatedAt: '2022',
@@ -102,7 +102,7 @@ beforeEach(() => {
       rollenart: 'LERN',
       name: 'Rolle ohne Namen',
       // TODO: remove type casting when generator is fixed
-      merkmale: [] as unknown as Set<RollenMerkmal>,
+      merkmale: [],
       systemrechte: [] as unknown as Set<SystemRechtResponse>,
       createdAt: '2022',
       updatedAt: '2022',
@@ -255,6 +255,7 @@ describe('RolleManagementView', () => {
       offset: 0,
       limit: 30,
       searchString: '',
+      systemrechte: [RollenSystemRechtEnum.RollenVerwalten, RollenSystemRechtEnum.MptRollenVerwalten],
       merkmale: [RollenMerkmal.KopersPflicht],
       rollenarten: undefined,
       organisationenForFilter: undefined,
@@ -273,6 +274,7 @@ describe('RolleManagementView', () => {
       offset: 0,
       limit: 30,
       searchString: '',
+      systemrechte: [RollenSystemRechtEnum.RollenVerwalten, RollenSystemRechtEnum.MptRollenVerwalten],
       merkmale: undefined,
       rollenarten: [RollenArt.Lehr],
       organisationenForFilter: undefined,
@@ -295,6 +297,7 @@ describe('RolleManagementView', () => {
       offset: 0,
       limit: 30,
       searchString: '',
+      systemrechte: [RollenSystemRechtEnum.RollenVerwalten, RollenSystemRechtEnum.MptRollenVerwalten],
       merkmale: undefined,
       rollenarten: undefined,
       organisationenForFilter: orgs,
@@ -453,6 +456,7 @@ describe('RolleManagementView', () => {
       merkmale: undefined,
       rollenarten: undefined,
       organisationenForFilter: undefined,
+      systemrechte: [RollenSystemRechtEnum.RollenVerwalten, RollenSystemRechtEnum.MptRollenVerwalten],
     });
   });
 

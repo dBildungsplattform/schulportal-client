@@ -58,7 +58,7 @@ export type { RolleResponse, RolleWithServiceProvidersResponse };
 export type Rolle = {
   administeredBySchulstrukturknoten: string;
   id: string;
-  merkmale: Set<RollenMerkmal>;
+  merkmale: RollenMerkmal[];
   name: string;
   rollenart: RollenArt;
   systemrechte?: Set<RollenSystemRechtEnum>;
@@ -70,7 +70,7 @@ function mapRolleResponseToRolle(response: RolleWithServiceProvidersResponse): R
   return {
     administeredBySchulstrukturknoten: response.administeredBySchulstrukturknoten,
     id: response.id,
-    merkmale: new Set(response.merkmale),
+    merkmale: response.merkmale,
     name: response.name,
     rollenart: response.rollenart,
     systemrechte: new Set(Array.from(response.systemrechte).map((recht: SystemRechtResponse) => recht.name)),

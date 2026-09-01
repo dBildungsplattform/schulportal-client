@@ -13,15 +13,15 @@
  */
 
 
-import type { Configuration } from './configuration';
-import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
+import type { AxiosInstance, AxiosPromise, AxiosRequestConfig } from 'axios';
 import globalAxios from 'axios';
+import type { Configuration } from './configuration';
 // Some imports not used depending on template conditions
 // @ts-ignore
-import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from './common';
 import type { RequestArgs } from './base';
+import { DUMMY_BASE_URL, assertParamExists, createRequestFunction, serializeDataIfNeeded, setBearerAuthToObject, setOAuthToObject, setSearchParams, toPathString } from './common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from './base';
+import { BASE_PATH, BaseAPI, RequiredError } from './base';
 
 /**
  * 
@@ -41,6 +41,25 @@ export interface ApplyRollenerweiterungBodyParams {
      * @memberof ApplyRollenerweiterungBodyParams
      */
     'removeErweiterungenForRolleIds': Array<string>;
+}
+/**
+ * 
+ * @export
+ * @interface ApplyRollenerweiterungChangesBodyParams
+ */
+export interface ApplyRollenerweiterungChangesBodyParams {
+    /**
+     * Array of ServiceProviderIds to add for the given rolle.
+     * @type {Array<string>}
+     * @memberof ApplyRollenerweiterungChangesBodyParams
+     */
+    'addErweiterungenForServiceProviderIds': Array<string>;
+    /**
+     * Array of ServiceProviderIds to remove for the given rolle.
+     * @type {Array<string>}
+     * @memberof ApplyRollenerweiterungChangesBodyParams
+     */
+    'removeErweiterungenForServiceProviderIds': Array<string>;
 }
 /**
  * 
@@ -715,38 +734,50 @@ export interface DbiamApplyRollenerweiterungMultiError {
     'code': number;
     /**
      * 
-     * @type {Array<DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInner>}
+     * @type {Array<DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInner>}
      * @memberof DbiamApplyRollenerweiterungMultiError
      */
-    'rolleIdsWithI18nKeys': Array<DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInner>;
+    'idsWithI18nKeys': Array<DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInner>;
 }
 /**
  * 
  * @export
- * @interface DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInner
+ * @interface DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInner
  */
-export interface DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInner {
+export interface DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInner {
     /**
      * 
      * @type {string}
-     * @memberof DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInner
+     * @memberof DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInner
      */
-    'rolleId'?: string;
+    'id'?: string;
     /**
      * 
      * @type {string}
-     * @memberof DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInner
+     * @memberof DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInner
      */
-    'i18nKey'?: DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInnerI18nKeyEnum;
+    'errorIdType'?: DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInnerErrorIdTypeEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInner
+     */
+    'i18nKey'?: DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInnerI18nKeyEnum;
 }
 
-export const DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInnerI18nKeyEnum = {
+export const DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInnerErrorIdTypeEnum = {
+    Rolle: 'ROLLE',
+    Angebot: 'ANGEBOT'
+} as const;
+
+export type DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInnerErrorIdTypeEnum = typeof DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInnerErrorIdTypeEnum[keyof typeof DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInnerErrorIdTypeEnum];
+export const DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInnerI18nKeyEnum = {
     RollenerweiterungTechnicalError: 'ROLLENERWEITERUNG_TECHNICAL_ERROR',
     NotFound: 'NOT_FOUND',
     NoRedundantRollenerweiterung: 'NO_REDUNDANT_ROLLENERWEITERUNG'
 } as const;
 
-export type DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInnerI18nKeyEnum = typeof DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInnerI18nKeyEnum[keyof typeof DbiamApplyRollenerweiterungMultiErrorRolleIdsWithI18nKeysInnerI18nKeyEnum];
+export type DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInnerI18nKeyEnum = typeof DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInnerI18nKeyEnum[keyof typeof DbiamApplyRollenerweiterungMultiErrorIdsWithI18nKeysInnerI18nKeyEnum];
 
 /**
  * 
@@ -1767,6 +1798,7 @@ export interface ManageableServiceProviderResponse {
 
 export const ManageableServiceProviderResponseRelevantSystemrechteEnum = {
     RollenVerwalten: 'ROLLEN_VERWALTEN',
+    MptRollenVerwalten: 'MPT_ROLLEN_VERWALTEN',
     PersonenSofortLoeschen: 'PERSONEN_SOFORT_LOESCHEN',
     PersonenVerwalten: 'PERSONEN_VERWALTEN',
     LandesbediensteteSuchenUndHinzufuegen: 'LANDESBEDIENSTETE_SUCHEN_UND_HINZUFUEGEN',
@@ -3655,10 +3687,10 @@ export interface RolleResponse {
     'rollenart': RollenArt;
     /**
      * 
-     * @type {Set<RollenMerkmal>}
+     * @type {Array<RollenMerkmal>}
      * @memberof RolleResponse
      */
-    'merkmale': Set<RollenMerkmal>;
+    'merkmale': Array<RollenMerkmal>;
     /**
      * 
      * @type {Set<SystemRechtResponse>}
@@ -3743,10 +3775,10 @@ export interface RolleWithServiceProvidersResponse {
     'rollenart': RollenArt;
     /**
      * 
-     * @type {Set<RollenMerkmal>}
+     * @type {Array<RollenMerkmal>}
      * @memberof RolleWithServiceProvidersResponse
      */
-    'merkmale': Set<RollenMerkmal>;
+    'merkmale': Array<RollenMerkmal>;
     /**
      * 
      * @type {Set<SystemRechtResponse>}
@@ -3809,7 +3841,8 @@ export type RollenArt = typeof RollenArt[keyof typeof RollenArt];
 
 export const RollenMerkmal = {
     BefristungPflicht: 'BEFRISTUNG_PFLICHT',
-    KopersPflicht: 'KOPERS_PFLICHT'
+    KopersPflicht: 'KOPERS_PFLICHT',
+    MptRolle: 'MPT_ROLLE'
 } as const;
 
 export type RollenMerkmal = typeof RollenMerkmal[keyof typeof RollenMerkmal];
@@ -3823,6 +3856,7 @@ export type RollenMerkmal = typeof RollenMerkmal[keyof typeof RollenMerkmal];
 
 export const RollenSystemRechtEnum = {
     RollenVerwalten: 'ROLLEN_VERWALTEN',
+    MptRollenVerwalten: 'MPT_ROLLEN_VERWALTEN',
     PersonenSofortLoeschen: 'PERSONEN_SOFORT_LOESCHEN',
     PersonenVerwalten: 'PERSONEN_VERWALTEN',
     LandesbediensteteSuchenUndHinzufuegen: 'LANDESBEDIENSTETE_SUCHEN_UND_HINZUFUEGEN',
@@ -12562,12 +12596,17 @@ export const ProviderApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
-         * Get service-providers available for logged-in user.
+         * Get service-providers.
          * @summary 
+         * @param {number} [offset] The offset of the paginated list.
+         * @param {number} [limit] The requested limit for the page size.
+         * @param {string} [searchStr] The name for the angebot.
+         * @param {string} [organisationId] The id of the organisation where the angebot should be available.
+         * @param {Array<RollenSystemRechtEnum>} [systemrechte] The system right for which the roles should be available. Can only be ROLLEN_VERWALTEN, ROLLEN_ERWEITERN or both or IMPORT_DURCHFUEHREN.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        providerControllerGetAvailableServiceProviders: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        providerControllerGetAvailableServiceProviders: async (offset?: number, limit?: number, searchStr?: string, organisationId?: string, systemrechte?: Array<RollenSystemRechtEnum>, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/provider`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -12587,6 +12626,26 @@ export const ProviderApiAxiosParamCreator = function (configuration?: Configurat
             // authentication oauth2 required
             // oauth required
             await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+            if (offset !== undefined) {
+                localVarQueryParameter['offset'] = offset;
+            }
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            if (searchStr !== undefined) {
+                localVarQueryParameter['searchStr'] = searchStr;
+            }
+
+            if (organisationId !== undefined) {
+                localVarQueryParameter['organisationId'] = organisationId;
+            }
+
+            if (systemrechte) {
+                localVarQueryParameter['systemrechte'] = systemrechte;
+            }
 
 
     
@@ -12808,6 +12867,44 @@ export const ProviderApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
+         * Get service-providers available for logged-in user.
+         * @summary 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        providerControllerGetMyServiceProviders: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/provider/my-providers`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @param {string} angebotId The id of the service provider
          * @param {*} [options] Override http request option.
@@ -12955,13 +13052,18 @@ export const ProviderApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Get service-providers available for logged-in user.
+         * Get service-providers.
          * @summary 
+         * @param {number} [offset] The offset of the paginated list.
+         * @param {number} [limit] The requested limit for the page size.
+         * @param {string} [searchStr] The name for the angebot.
+         * @param {string} [organisationId] The id of the organisation where the angebot should be available.
+         * @param {Array<RollenSystemRechtEnum>} [systemrechte] The system right for which the roles should be available. Can only be ROLLEN_VERWALTEN, ROLLEN_ERWEITERN or both or IMPORT_DURCHFUEHREN.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async providerControllerGetAvailableServiceProviders(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ServiceProviderResponse>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.providerControllerGetAvailableServiceProviders(options);
+        async providerControllerGetAvailableServiceProviders(offset?: number, limit?: number, searchStr?: string, organisationId?: string, systemrechte?: Array<RollenSystemRechtEnum>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ServiceProviderResponse>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.providerControllerGetAvailableServiceProviders(offset, limit, searchStr, organisationId, systemrechte, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -13013,6 +13115,16 @@ export const ProviderApiFp = function(configuration?: Configuration) {
          */
         async providerControllerGetManageableServiceProvidersForOrganisationId(organisationId: string, offset?: number, limit?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ProviderControllerGetManageableServiceProvidersForOrganisationId200Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.providerControllerGetManageableServiceProvidersForOrganisationId(organisationId, offset, limit, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Get service-providers available for logged-in user.
+         * @summary 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async providerControllerGetMyServiceProviders(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ServiceProviderResponse>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.providerControllerGetMyServiceProviders(options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -13092,13 +13204,18 @@ export const ProviderApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.providerControllerGetAssignableServiceProvidersForRolle(schulstrukturknotenOfRolle, options).then((request) => request(axios, basePath));
         },
         /**
-         * Get service-providers available for logged-in user.
+         * Get service-providers.
          * @summary 
+         * @param {number} [offset] The offset of the paginated list.
+         * @param {number} [limit] The requested limit for the page size.
+         * @param {string} [searchStr] The name for the angebot.
+         * @param {string} [organisationId] The id of the organisation where the angebot should be available.
+         * @param {Array<RollenSystemRechtEnum>} [systemrechte] The system right for which the roles should be available. Can only be ROLLEN_VERWALTEN, ROLLEN_ERWEITERN or both or IMPORT_DURCHFUEHREN.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        providerControllerGetAvailableServiceProviders(options?: any): AxiosPromise<Array<ServiceProviderResponse>> {
-            return localVarFp.providerControllerGetAvailableServiceProviders(options).then((request) => request(axios, basePath));
+        providerControllerGetAvailableServiceProviders(offset?: number, limit?: number, searchStr?: string, organisationId?: string, systemrechte?: Array<RollenSystemRechtEnum>, options?: any): AxiosPromise<Array<ServiceProviderResponse>> {
+            return localVarFp.providerControllerGetAvailableServiceProviders(offset, limit, searchStr, organisationId, systemrechte, options).then((request) => request(axios, basePath));
         },
         /**
          * Get service-providers provided at LAND or ROOT level. Requires root-level ANGEBOTE_VERWALTEN.
@@ -13146,6 +13263,15 @@ export const ProviderApiFactory = function (configuration?: Configuration, baseP
          */
         providerControllerGetManageableServiceProvidersForOrganisationId(organisationId: string, offset?: number, limit?: number, options?: any): AxiosPromise<ProviderControllerGetManageableServiceProvidersForOrganisationId200Response> {
             return localVarFp.providerControllerGetManageableServiceProvidersForOrganisationId(organisationId, offset, limit, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Get service-providers available for logged-in user.
+         * @summary 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        providerControllerGetMyServiceProviders(options?: any): AxiosPromise<Array<ServiceProviderResponse>> {
+            return localVarFp.providerControllerGetMyServiceProviders(options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -13221,13 +13347,18 @@ export interface ProviderApiInterface {
     providerControllerGetAssignableServiceProvidersForRolle(schulstrukturknotenOfRolle: string, options?: AxiosRequestConfig): AxiosPromise<Array<ServiceProviderResponse>>;
 
     /**
-     * Get service-providers available for logged-in user.
+     * Get service-providers.
      * @summary 
+     * @param {number} [offset] The offset of the paginated list.
+     * @param {number} [limit] The requested limit for the page size.
+     * @param {string} [searchStr] The name for the angebot.
+     * @param {string} [organisationId] The id of the organisation where the angebot should be available.
+     * @param {Array<RollenSystemRechtEnum>} [systemrechte] The system right for which the roles should be available. Can only be ROLLEN_VERWALTEN, ROLLEN_ERWEITERN or both or IMPORT_DURCHFUEHREN.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ProviderApiInterface
      */
-    providerControllerGetAvailableServiceProviders(options?: AxiosRequestConfig): AxiosPromise<Array<ServiceProviderResponse>>;
+    providerControllerGetAvailableServiceProviders(offset?: number, limit?: number, searchStr?: string, organisationId?: string, systemrechte?: Array<RollenSystemRechtEnum>, options?: AxiosRequestConfig): AxiosPromise<Array<ServiceProviderResponse>>;
 
     /**
      * Get service-providers provided at LAND or ROOT level. Requires root-level ANGEBOTE_VERWALTEN.
@@ -13275,6 +13406,15 @@ export interface ProviderApiInterface {
      * @memberof ProviderApiInterface
      */
     providerControllerGetManageableServiceProvidersForOrganisationId(organisationId: string, offset?: number, limit?: number, options?: AxiosRequestConfig): AxiosPromise<ProviderControllerGetManageableServiceProvidersForOrganisationId200Response>;
+
+    /**
+     * Get service-providers available for logged-in user.
+     * @summary 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProviderApiInterface
+     */
+    providerControllerGetMyServiceProviders(options?: AxiosRequestConfig): AxiosPromise<Array<ServiceProviderResponse>>;
 
     /**
      * 
@@ -13358,14 +13498,19 @@ export class ProviderApi extends BaseAPI implements ProviderApiInterface {
     }
 
     /**
-     * Get service-providers available for logged-in user.
+     * Get service-providers.
      * @summary 
+     * @param {number} [offset] The offset of the paginated list.
+     * @param {number} [limit] The requested limit for the page size.
+     * @param {string} [searchStr] The name for the angebot.
+     * @param {string} [organisationId] The id of the organisation where the angebot should be available.
+     * @param {Array<RollenSystemRechtEnum>} [systemrechte] The system right for which the roles should be available. Can only be ROLLEN_VERWALTEN, ROLLEN_ERWEITERN or both or IMPORT_DURCHFUEHREN.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ProviderApi
      */
-    public providerControllerGetAvailableServiceProviders(options?: AxiosRequestConfig) {
-        return ProviderApiFp(this.configuration).providerControllerGetAvailableServiceProviders(options).then((request) => request(this.axios, this.basePath));
+    public providerControllerGetAvailableServiceProviders(offset?: number, limit?: number, searchStr?: string, organisationId?: string, systemrechte?: Array<RollenSystemRechtEnum>, options?: AxiosRequestConfig) {
+        return ProviderApiFp(this.configuration).providerControllerGetAvailableServiceProviders(offset, limit, searchStr, organisationId, systemrechte, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -13424,6 +13569,17 @@ export class ProviderApi extends BaseAPI implements ProviderApiInterface {
     }
 
     /**
+     * Get service-providers available for logged-in user.
+     * @summary 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProviderApi
+     */
+    public providerControllerGetMyServiceProviders(options?: AxiosRequestConfig) {
+        return ProviderApiFp(this.configuration).providerControllerGetMyServiceProviders(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 
      * @param {string} angebotId The id of the service provider
      * @param {*} [options] Override http request option.
@@ -13455,6 +13611,58 @@ export class ProviderApi extends BaseAPI implements ProviderApiInterface {
  */
 export const RolleApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
+        /**
+         * Apply Erweiterte Angebote changes for a rolle.
+         * @summary 
+         * @param {string} rolleId The rolleId of the rolle.
+         * @param {string} organisationId The organisationId of the organisation.
+         * @param {ApplyRollenerweiterungChangesBodyParams} applyRollenerweiterungChangesBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rolleControllerApplyRollenerweiterungChangesForRolle: async (rolleId: string, organisationId: string, applyRollenerweiterungChangesBodyParams: ApplyRollenerweiterungChangesBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'rolleId' is not null or undefined
+            assertParamExists('rolleControllerApplyRollenerweiterungChangesForRolle', 'rolleId', rolleId)
+            // verify required parameter 'organisationId' is not null or undefined
+            assertParamExists('rolleControllerApplyRollenerweiterungChangesForRolle', 'organisationId', organisationId)
+            // verify required parameter 'applyRollenerweiterungChangesBodyParams' is not null or undefined
+            assertParamExists('rolleControllerApplyRollenerweiterungChangesForRolle', 'applyRollenerweiterungChangesBodyParams', applyRollenerweiterungChangesBodyParams)
+            const localVarPath = `/api/rolle/{rolleId}/organisation/{organisationId}/apply`
+                .replace(`{${"rolleId"}}`, encodeURIComponent(String(rolleId)))
+                .replace(`{${"organisationId"}}`, encodeURIComponent(String(organisationId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(applyRollenerweiterungChangesBodyParams, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
         /**
          * Create a new rolle.
          * @summary 
@@ -13636,8 +13844,8 @@ export const RolleApiAxiosParamCreator = function (configuration?: Configuration
          * @param {string} [organisationContextForOperation] Only relevant when systemrechte contains ROLLEN_ERWEITERN or IMPORT_DURCHFUEHREN. Provides the organisation context for the requested workflow operation. If provided, only roles available for that organisation will be returned. Mutually exclusive with organisationenForFilter.
          * @param {Array<string>} [organisationenForFilter] Only relevant when systemrechte contains ROLLEN_VERWALTEN or no systemrechte is provided. Filters the result to roles administered by any of the given organisations. Mutually exclusive with organisationContextForOperation.
          * @param {Array<string>} [rolleIds] The ids of the selected Rollen. If provided, these Rollen will be returned regardless of the other filters since they are required by the frontend
-         * @param {Array<RollenSystemRechtEnum>} [systemrechte] Determines the authorization context for this request. Use ROLLEN_VERWALTEN (default) with organisationIdsForFilter for general role administration. Use ROLLEN_ERWEITERN or IMPORT_DURCHFUEHREN with organisationIdContextForOperation for workflow-specific role lookups. Can only be ROLLEN_VERWALTEN, ROLLEN_ERWEITERN or both, or IMPORT_DURCHFUEHREN.
-         * @param {Array<RollenArt>} [rollenarten] Filter roles by rollenart.
+         * @param {Array<RollenSystemRechtEnum>} [systemrechte] The system right for which the roles should be available. Can only be ROLLEN_VERWALTEN, ROLLEN_ERWEITERN, MPT_ROLLEN_VERWALTEN or a combination of them or IMPORT_DURCHFUEHREN .
+         * @param {Array<RollenArt>} [rollenarten] Filter roles by their role types.
          * @param {Array<RollenMerkmal>} [merkmale] Filter roles by merkmal.
          * @param {Array<string>} [serviceProviderIds] Filter roles by service provider ids.
          * @param {*} [options] Override http request option.
@@ -13702,6 +13910,53 @@ export const RolleApiAxiosParamCreator = function (configuration?: Configuration
 
             if (serviceProviderIds) {
                 localVarQueryParameter['serviceProviderIds'] = serviceProviderIds;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Get Erweiterte Angebote for a rolle.
+         * @summary 
+         * @param {string} rolleId The id for the rolle.
+         * @param {string} [organisationId] The id of the organisation where the role should be available.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rolleControllerFindRollenerweiterungenForRolleAndOrga: async (rolleId: string, organisationId?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'rolleId' is not null or undefined
+            assertParamExists('rolleControllerFindRollenerweiterungenForRolleAndOrga', 'rolleId', rolleId)
+            const localVarPath = `/api/rolle/{rolleId}/angebote-via-rollenerweiterungen`
+                .replace(`{${"rolleId"}}`, encodeURIComponent(String(rolleId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+            if (organisationId !== undefined) {
+                localVarQueryParameter['organisationId'] = organisationId;
             }
 
 
@@ -13906,6 +14161,19 @@ export const RolleApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = RolleApiAxiosParamCreator(configuration)
     return {
         /**
+         * Apply Erweiterte Angebote changes for a rolle.
+         * @summary 
+         * @param {string} rolleId The rolleId of the rolle.
+         * @param {string} organisationId The organisationId of the organisation.
+         * @param {ApplyRollenerweiterungChangesBodyParams} applyRollenerweiterungChangesBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async rolleControllerApplyRollenerweiterungChangesForRolle(rolleId: string, organisationId: string, applyRollenerweiterungChangesBodyParams: ApplyRollenerweiterungChangesBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ServiceProviderResponse>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.rolleControllerApplyRollenerweiterungChangesForRolle(rolleId, organisationId, applyRollenerweiterungChangesBodyParams, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * Create a new rolle.
          * @summary 
          * @param {CreateRolleBodyParams} createRolleBodyParams 
@@ -13958,8 +14226,8 @@ export const RolleApiFp = function(configuration?: Configuration) {
          * @param {string} [organisationContextForOperation] Only relevant when systemrechte contains ROLLEN_ERWEITERN or IMPORT_DURCHFUEHREN. Provides the organisation context for the requested workflow operation. If provided, only roles available for that organisation will be returned. Mutually exclusive with organisationenForFilter.
          * @param {Array<string>} [organisationenForFilter] Only relevant when systemrechte contains ROLLEN_VERWALTEN or no systemrechte is provided. Filters the result to roles administered by any of the given organisations. Mutually exclusive with organisationContextForOperation.
          * @param {Array<string>} [rolleIds] The ids of the selected Rollen. If provided, these Rollen will be returned regardless of the other filters since they are required by the frontend
-         * @param {Array<RollenSystemRechtEnum>} [systemrechte] Determines the authorization context for this request. Use ROLLEN_VERWALTEN (default) with organisationIdsForFilter for general role administration. Use ROLLEN_ERWEITERN or IMPORT_DURCHFUEHREN with organisationIdContextForOperation for workflow-specific role lookups. Can only be ROLLEN_VERWALTEN, ROLLEN_ERWEITERN or both, or IMPORT_DURCHFUEHREN.
-         * @param {Array<RollenArt>} [rollenarten] Filter roles by rollenart.
+         * @param {Array<RollenSystemRechtEnum>} [systemrechte] The system right for which the roles should be available. Can only be ROLLEN_VERWALTEN, ROLLEN_ERWEITERN, MPT_ROLLEN_VERWALTEN or a combination of them or IMPORT_DURCHFUEHREN .
+         * @param {Array<RollenArt>} [rollenarten] Filter roles by their role types.
          * @param {Array<RollenMerkmal>} [merkmale] Filter roles by merkmal.
          * @param {Array<string>} [serviceProviderIds] Filter roles by service provider ids.
          * @param {*} [options] Override http request option.
@@ -13967,6 +14235,18 @@ export const RolleApiFp = function(configuration?: Configuration) {
          */
         async rolleControllerFindRollen(offset?: number, limit?: number, searchStr?: string, organisationContextForOperation?: string, organisationenForFilter?: Array<string>, rolleIds?: Array<string>, systemrechte?: Array<RollenSystemRechtEnum>, rollenarten?: Array<RollenArt>, merkmale?: Array<RollenMerkmal>, serviceProviderIds?: Array<string>, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<RolleWithServiceProvidersResponse>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.rolleControllerFindRollen(offset, limit, searchStr, organisationContextForOperation, organisationenForFilter, rolleIds, systemrechte, rollenarten, merkmale, serviceProviderIds, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Get Erweiterte Angebote for a rolle.
+         * @summary 
+         * @param {string} rolleId The id for the rolle.
+         * @param {string} [organisationId] The id of the organisation where the role should be available.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async rolleControllerFindRollenerweiterungenForRolleAndOrga(rolleId: string, organisationId?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ServiceProviderResponse>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.rolleControllerFindRollenerweiterungenForRolleAndOrga(rolleId, organisationId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -14026,6 +14306,18 @@ export const RolleApiFactory = function (configuration?: Configuration, basePath
     const localVarFp = RolleApiFp(configuration)
     return {
         /**
+         * Apply Erweiterte Angebote changes for a rolle.
+         * @summary 
+         * @param {string} rolleId The rolleId of the rolle.
+         * @param {string} organisationId The organisationId of the organisation.
+         * @param {ApplyRollenerweiterungChangesBodyParams} applyRollenerweiterungChangesBodyParams 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rolleControllerApplyRollenerweiterungChangesForRolle(rolleId: string, organisationId: string, applyRollenerweiterungChangesBodyParams: ApplyRollenerweiterungChangesBodyParams, options?: any): AxiosPromise<Array<ServiceProviderResponse>> {
+            return localVarFp.rolleControllerApplyRollenerweiterungChangesForRolle(rolleId, organisationId, applyRollenerweiterungChangesBodyParams, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Create a new rolle.
          * @summary 
          * @param {CreateRolleBodyParams} createRolleBodyParams 
@@ -14074,8 +14366,8 @@ export const RolleApiFactory = function (configuration?: Configuration, basePath
          * @param {string} [organisationContextForOperation] Only relevant when systemrechte contains ROLLEN_ERWEITERN or IMPORT_DURCHFUEHREN. Provides the organisation context for the requested workflow operation. If provided, only roles available for that organisation will be returned. Mutually exclusive with organisationenForFilter.
          * @param {Array<string>} [organisationenForFilter] Only relevant when systemrechte contains ROLLEN_VERWALTEN or no systemrechte is provided. Filters the result to roles administered by any of the given organisations. Mutually exclusive with organisationContextForOperation.
          * @param {Array<string>} [rolleIds] The ids of the selected Rollen. If provided, these Rollen will be returned regardless of the other filters since they are required by the frontend
-         * @param {Array<RollenSystemRechtEnum>} [systemrechte] Determines the authorization context for this request. Use ROLLEN_VERWALTEN (default) with organisationIdsForFilter for general role administration. Use ROLLEN_ERWEITERN or IMPORT_DURCHFUEHREN with organisationIdContextForOperation for workflow-specific role lookups. Can only be ROLLEN_VERWALTEN, ROLLEN_ERWEITERN or both, or IMPORT_DURCHFUEHREN.
-         * @param {Array<RollenArt>} [rollenarten] Filter roles by rollenart.
+         * @param {Array<RollenSystemRechtEnum>} [systemrechte] The system right for which the roles should be available. Can only be ROLLEN_VERWALTEN, ROLLEN_ERWEITERN, MPT_ROLLEN_VERWALTEN or a combination of them or IMPORT_DURCHFUEHREN .
+         * @param {Array<RollenArt>} [rollenarten] Filter roles by their role types.
          * @param {Array<RollenMerkmal>} [merkmale] Filter roles by merkmal.
          * @param {Array<string>} [serviceProviderIds] Filter roles by service provider ids.
          * @param {*} [options] Override http request option.
@@ -14083,6 +14375,17 @@ export const RolleApiFactory = function (configuration?: Configuration, basePath
          */
         rolleControllerFindRollen(offset?: number, limit?: number, searchStr?: string, organisationContextForOperation?: string, organisationenForFilter?: Array<string>, rolleIds?: Array<string>, systemrechte?: Array<RollenSystemRechtEnum>, rollenarten?: Array<RollenArt>, merkmale?: Array<RollenMerkmal>, serviceProviderIds?: Array<string>, options?: any): AxiosPromise<Array<RolleWithServiceProvidersResponse>> {
             return localVarFp.rolleControllerFindRollen(offset, limit, searchStr, organisationContextForOperation, organisationenForFilter, rolleIds, systemrechte, rollenarten, merkmale, serviceProviderIds, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Get Erweiterte Angebote for a rolle.
+         * @summary 
+         * @param {string} rolleId The id for the rolle.
+         * @param {string} [organisationId] The id of the organisation where the role should be available.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rolleControllerFindRollenerweiterungenForRolleAndOrga(rolleId: string, organisationId?: string, options?: any): AxiosPromise<Array<ServiceProviderResponse>> {
+            return localVarFp.rolleControllerFindRollenerweiterungenForRolleAndOrga(rolleId, organisationId, options).then((request) => request(axios, basePath));
         },
         /**
          * Get all systemrechte for rollen.
@@ -14136,6 +14439,18 @@ export const RolleApiFactory = function (configuration?: Configuration, basePath
  */
 export interface RolleApiInterface {
     /**
+     * Apply Erweiterte Angebote changes for a rolle.
+     * @summary 
+     * @param {string} rolleId The rolleId of the rolle.
+     * @param {string} organisationId The organisationId of the organisation.
+     * @param {ApplyRollenerweiterungChangesBodyParams} applyRollenerweiterungChangesBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RolleApiInterface
+     */
+    rolleControllerApplyRollenerweiterungChangesForRolle(rolleId: string, organisationId: string, applyRollenerweiterungChangesBodyParams: ApplyRollenerweiterungChangesBodyParams, options?: AxiosRequestConfig): AxiosPromise<Array<ServiceProviderResponse>>;
+
+    /**
      * Create a new rolle.
      * @summary 
      * @param {CreateRolleBodyParams} createRolleBodyParams 
@@ -14184,8 +14499,8 @@ export interface RolleApiInterface {
      * @param {string} [organisationContextForOperation] Only relevant when systemrechte contains ROLLEN_ERWEITERN or IMPORT_DURCHFUEHREN. Provides the organisation context for the requested workflow operation. If provided, only roles available for that organisation will be returned. Mutually exclusive with organisationenForFilter.
      * @param {Array<string>} [organisationenForFilter] Only relevant when systemrechte contains ROLLEN_VERWALTEN or no systemrechte is provided. Filters the result to roles administered by any of the given organisations. Mutually exclusive with organisationContextForOperation.
      * @param {Array<string>} [rolleIds] The ids of the selected Rollen. If provided, these Rollen will be returned regardless of the other filters since they are required by the frontend
-     * @param {Array<RollenSystemRechtEnum>} [systemrechte] Determines the authorization context for this request. Use ROLLEN_VERWALTEN (default) with organisationIdsForFilter for general role administration. Use ROLLEN_ERWEITERN or IMPORT_DURCHFUEHREN with organisationIdContextForOperation for workflow-specific role lookups. Can only be ROLLEN_VERWALTEN, ROLLEN_ERWEITERN or both, or IMPORT_DURCHFUEHREN.
-     * @param {Array<RollenArt>} [rollenarten] Filter roles by rollenart.
+     * @param {Array<RollenSystemRechtEnum>} [systemrechte] The system right for which the roles should be available. Can only be ROLLEN_VERWALTEN, ROLLEN_ERWEITERN, MPT_ROLLEN_VERWALTEN or a combination of them or IMPORT_DURCHFUEHREN .
+     * @param {Array<RollenArt>} [rollenarten] Filter roles by their role types.
      * @param {Array<RollenMerkmal>} [merkmale] Filter roles by merkmal.
      * @param {Array<string>} [serviceProviderIds] Filter roles by service provider ids.
      * @param {*} [options] Override http request option.
@@ -14193,6 +14508,17 @@ export interface RolleApiInterface {
      * @memberof RolleApiInterface
      */
     rolleControllerFindRollen(offset?: number, limit?: number, searchStr?: string, organisationContextForOperation?: string, organisationenForFilter?: Array<string>, rolleIds?: Array<string>, systemrechte?: Array<RollenSystemRechtEnum>, rollenarten?: Array<RollenArt>, merkmale?: Array<RollenMerkmal>, serviceProviderIds?: Array<string>, options?: AxiosRequestConfig): AxiosPromise<Array<RolleWithServiceProvidersResponse>>;
+
+    /**
+     * Get Erweiterte Angebote for a rolle.
+     * @summary 
+     * @param {string} rolleId The id for the rolle.
+     * @param {string} [organisationId] The id of the organisation where the role should be available.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RolleApiInterface
+     */
+    rolleControllerFindRollenerweiterungenForRolleAndOrga(rolleId: string, organisationId?: string, options?: AxiosRequestConfig): AxiosPromise<Array<ServiceProviderResponse>>;
 
     /**
      * Get all systemrechte for rollen.
@@ -14245,6 +14571,20 @@ export interface RolleApiInterface {
  * @extends {BaseAPI}
  */
 export class RolleApi extends BaseAPI implements RolleApiInterface {
+    /**
+     * Apply Erweiterte Angebote changes for a rolle.
+     * @summary 
+     * @param {string} rolleId The rolleId of the rolle.
+     * @param {string} organisationId The organisationId of the organisation.
+     * @param {ApplyRollenerweiterungChangesBodyParams} applyRollenerweiterungChangesBodyParams 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RolleApi
+     */
+    public rolleControllerApplyRollenerweiterungChangesForRolle(rolleId: string, organisationId: string, applyRollenerweiterungChangesBodyParams: ApplyRollenerweiterungChangesBodyParams, options?: AxiosRequestConfig) {
+        return RolleApiFp(this.configuration).rolleControllerApplyRollenerweiterungChangesForRolle(rolleId, organisationId, applyRollenerweiterungChangesBodyParams, options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * Create a new rolle.
      * @summary 
@@ -14302,8 +14642,8 @@ export class RolleApi extends BaseAPI implements RolleApiInterface {
      * @param {string} [organisationContextForOperation] Only relevant when systemrechte contains ROLLEN_ERWEITERN or IMPORT_DURCHFUEHREN. Provides the organisation context for the requested workflow operation. If provided, only roles available for that organisation will be returned. Mutually exclusive with organisationenForFilter.
      * @param {Array<string>} [organisationenForFilter] Only relevant when systemrechte contains ROLLEN_VERWALTEN or no systemrechte is provided. Filters the result to roles administered by any of the given organisations. Mutually exclusive with organisationContextForOperation.
      * @param {Array<string>} [rolleIds] The ids of the selected Rollen. If provided, these Rollen will be returned regardless of the other filters since they are required by the frontend
-     * @param {Array<RollenSystemRechtEnum>} [systemrechte] Determines the authorization context for this request. Use ROLLEN_VERWALTEN (default) with organisationIdsForFilter for general role administration. Use ROLLEN_ERWEITERN or IMPORT_DURCHFUEHREN with organisationIdContextForOperation for workflow-specific role lookups. Can only be ROLLEN_VERWALTEN, ROLLEN_ERWEITERN or both, or IMPORT_DURCHFUEHREN.
-     * @param {Array<RollenArt>} [rollenarten] Filter roles by rollenart.
+     * @param {Array<RollenSystemRechtEnum>} [systemrechte] The system right for which the roles should be available. Can only be ROLLEN_VERWALTEN, ROLLEN_ERWEITERN, MPT_ROLLEN_VERWALTEN or a combination of them or IMPORT_DURCHFUEHREN .
+     * @param {Array<RollenArt>} [rollenarten] Filter roles by their role types.
      * @param {Array<RollenMerkmal>} [merkmale] Filter roles by merkmal.
      * @param {Array<string>} [serviceProviderIds] Filter roles by service provider ids.
      * @param {*} [options] Override http request option.
@@ -14312,6 +14652,19 @@ export class RolleApi extends BaseAPI implements RolleApiInterface {
      */
     public rolleControllerFindRollen(offset?: number, limit?: number, searchStr?: string, organisationContextForOperation?: string, organisationenForFilter?: Array<string>, rolleIds?: Array<string>, systemrechte?: Array<RollenSystemRechtEnum>, rollenarten?: Array<RollenArt>, merkmale?: Array<RollenMerkmal>, serviceProviderIds?: Array<string>, options?: AxiosRequestConfig) {
         return RolleApiFp(this.configuration).rolleControllerFindRollen(offset, limit, searchStr, organisationContextForOperation, organisationenForFilter, rolleIds, systemrechte, rollenarten, merkmale, serviceProviderIds, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Get Erweiterte Angebote for a rolle.
+     * @summary 
+     * @param {string} rolleId The id for the rolle.
+     * @param {string} [organisationId] The id of the organisation where the role should be available.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof RolleApi
+     */
+    public rolleControllerFindRollenerweiterungenForRolleAndOrga(rolleId: string, organisationId?: string, options?: AxiosRequestConfig) {
+        return RolleApiFp(this.configuration).rolleControllerFindRollenerweiterungenForRolleAndOrga(rolleId, organisationId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
