@@ -1,5 +1,7 @@
-import { OrganisationsTyp, type OrganisationRootChildrenResponse } from '@/api-client/generated';
+import { OrganisationsTyp, ParentsTreeResponse, type OrganisationRootChildrenResponse } from '@/api-client/generated';
 import axiosApiInstance from '@/services/ApiService';
+import { faker } from '@faker-js/faker';
+import { flushPromises } from '@vue/test-utils';
 import MockAdapter from 'axios-mock-adapter';
 import { createPinia, setActivePinia } from 'pinia';
 import { DoFactory } from 'test/DoFactory';
@@ -11,8 +13,6 @@ import {
   type OrganisationenFilter,
   type OrganisationStore,
 } from './OrganisationStore';
-import { flushPromises } from '@vue/test-utils';
-import { faker } from '@faker-js/faker';
 
 const mockadapter: MockAdapter = new MockAdapter(axiosApiInstance);
 
@@ -629,6 +629,24 @@ describe('OrganisationStore', () => {
     });
   });
 
+  describe('getOrganisationParentsTree', () => {
+    it('should fetch organisation parents tree', async () => {
+      const mockResponse: ParentsTreeResponse = {
+        parentsTree: [
+          {
+            id: '1',
+            name: 'Organisation 1',
+            typ: OrganisationsTyp.Schule,
+          },
+        ],
+      };
+      mockadapter.onGet('/api/organisationen/1/parents-tree').replyOnce(200, mockResponse);
+      const updateOrganisationPromise: Promise<void> = organisationStore.getOrganisationParentsTree('1');
+      await updateOrganisationPromise;
+      expect(organisationStore.parentsTree).toEqual(mockResponse.parentsTree);
+    });
+  });
+
   describe('loadSchultraeger', () => {
     it('should update the schultraeger', async () => {
       const mockResponse: OrganisationRootChildrenResponse = {
@@ -644,6 +662,7 @@ describe('OrganisationStore', () => {
           zugehoerigZu: '1',
           version: 1,
           itslearningEnabled: true,
+          emailAdresse: 'oeffentlich@example.com',
         },
         ersatz: {
           id: '3',
@@ -657,6 +676,7 @@ describe('OrganisationStore', () => {
           zugehoerigZu: '1',
           version: 1,
           itslearningEnabled: true,
+          emailAdresse: 'ersatz@example.com',
         },
       };
 

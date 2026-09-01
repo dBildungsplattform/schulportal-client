@@ -13,10 +13,14 @@ import {
   type OrganisationenApiInterface,
   type OrganisationResponse,
   type OrganisationRootChildrenResponse,
+  type ParentInfoResponse,
   type ParentOrganisationenResponse,
+  type ParentsTreeResponse,
   type RollenSystemRechtEnum,
 } from '../api-client/generated/api';
 import { useSearchFilterStore, type SearchFilterStore } from './SearchFilterStore';
+
+export type ParentInfo = ParentInfoResponse;
 
 const organisationApi: OrganisationenApiInterface = OrganisationenApiFactory(undefined, '', axiosApiInstance);
 const searchFilterStore: SearchFilterStore = useSearchFilterStore();
@@ -33,6 +37,7 @@ export type Organisation = {
   schuleDetails?: string;
   version?: number;
   itslearningEnabled?: boolean;
+  emailAdresse?: string;
   /* isNotPersisted is optional and currently only used for SchultraegerDetailsView */
   isNotPersisted?: boolean;
 };
@@ -59,6 +64,7 @@ export type SchuleTableItem = {
   administriertVon?: string | null;
   createdAt?: string;
   updatedAt?: string;
+  emailAdresse?: string;
 };
 
 export type SchultraegerTableItem = {
@@ -109,6 +115,7 @@ type OrganisationState = {
   loading: boolean;
   loadingKlassen: boolean;
   parentOrganisationen: Array<Organisation>;
+  parentsTree: ParentsTreeResponse['parentsTree'];
   schultraeger: Array<Organisation>;
   activatedItslearningOrganisation: Organisation | null;
   cachedSchulenMap: Map<string, string>;
@@ -177,6 +184,7 @@ type OrganisationActions = {
   loadKlassenForFilter(filter?: OrganisationenFilter, storeKey?: string): Promise<void>;
   resetKlasseFilter(storeKey?: string): void;
   clearKlasseFilter(storeKey?: string): void;
+  getOrganisationParentsTree(organisationId: string): Promise<void>;
 };
 
 export { OrganisationsTyp };
@@ -218,6 +226,7 @@ export const useOrganisationStore: StoreDefinition<
       loading: false,
       loadingKlassen: false,
       parentOrganisationen: [],
+      parentsTree: [] as ParentsTreeResponse['parentsTree'],
       schultraeger: [],
       activatedItslearningOrganisation: null,
       cachedSchulenMap: new Map<string, string>(),
@@ -578,6 +587,16 @@ export const useOrganisationStore: StoreDefinition<
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
         this.loading = false;
+      }
+    },
+
+    async getOrganisationParentsTree(organisationId: string): Promise<void> {
+      try {
+        const response: AxiosResponse<ParentsTreeResponse> =
+          await organisationApi.organisationControllerGetParentsTree(organisationId);
+        this.parentsTree = response.data.parentsTree;
+      } catch (error: unknown) {
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       }
     },
 
