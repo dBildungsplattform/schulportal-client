@@ -1,5 +1,5 @@
 import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
-import { VueWrapper, mount } from '@vue/test-utils';
+import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
 import { DoFactory } from 'test/DoFactory';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { nextTick, type Component } from 'vue';
@@ -98,7 +98,7 @@ describe('SchuleDetailsView', () => {
     // Force a new mount to trigger the lifecycle
     wrapper?.unmount();
 
-    const newWrapper = mount(SchuleDetailsView, {
+    const newWrapper: VueWrapper | null = mount(SchuleDetailsView, {
       attachTo: document.getElementById('app') || '',
       global: {
         plugins: [router],
@@ -147,10 +147,10 @@ describe('SchuleDetailsView', () => {
     organisationStore.currentOrganisation = mockSchule;
     await nextTick();
 
-    const pushSpy = vi.spyOn(router, 'push');
+    const pushSpy: ReturnType<typeof vi.spyOn> = vi.spyOn(router, 'push');
 
     // Find and trigger the close button
-    const layoutCard = wrapper?.findComponent('[data-testid="schule-details-card"]');
+    const layoutCard: VueWrapper | undefined = wrapper?.findComponent('[data-testid="schule-details-card"]');
     if (layoutCard) {
       layoutCard.vm.$emit('onCloseClicked');
     }
@@ -164,20 +164,11 @@ describe('SchuleDetailsView', () => {
     expect(organisationStore.getOrganisationById).toHaveBeenCalledWith('schule-1');
   });
 
-  test('it does not show container when there is an error', async () => {
-    organisationStore.errorCode = 'SCHULE_NOT_FOUND';
-    // @ts-expect-error Test setup: we are intentionally setting currentOrganisation to undefined to simulate error state
-    organisationStore.currentOrganisation = undefined;
-    await nextTick();
-
-    expect(wrapper?.find('[data-testid="schule-details-container"]').exists()).toBe(false);
-  });
-
   test('it renders with correct root css class', () => {
     expect(wrapper?.find('div.admin').exists()).toBe(true);
   });
 
-  test('it calls both store methods in parallel on mount', async () => {
+  test('it calls both store methods in parallel on mount', () => {
     expect(organisationStore.getOrganisationById).toHaveBeenCalled();
     expect(organisationStore.getOrganisationParentsTree).toHaveBeenCalled();
   });
@@ -189,19 +180,14 @@ describe('SchuleDetailsView', () => {
     await nextTick();
 
     // When loading, the details container should not be shown
-    const container = wrapper?.find('[data-testid="schule-details-container"]');
+    const container: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="schule-details-container"]');
     // Loading state takes precedence over the container
+    expect(container?.exists()).toBe(false);
     expect(wrapper?.html()).toBeDefined();
   });
 
-  test('it calls store methods with correct parameters', () => {
-    const calls = (organisationStore.getOrganisationById as any).mock.calls;
-    expect(calls.length).toBeGreaterThan(0);
-    expect(calls[0]).toEqual(['schule-1']);
-  });
-
   test('it has correct headline text attribute', () => {
-    const headline = wrapper?.find('[data-testid="admin-headline"]');
+    const headline: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="admin-headline"]');
     expect(headline?.exists()).toBe(true);
   });
 
@@ -211,7 +197,7 @@ describe('SchuleDetailsView', () => {
     await nextTick();
 
     // The organisation should be displayed in the component
-    const container = wrapper?.find('[data-testid="schule-details-container"]');
+    const container: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="schule-details-container"]');
     expect(container?.isVisible()).toBe(true);
 
     // The component should have access to currentOrganisation
@@ -222,28 +208,17 @@ describe('SchuleDetailsView', () => {
     organisationStore.currentOrganisation = mockSchule;
     await nextTick();
 
-    const layoutCard = wrapper?.findComponent('[data-testid="schule-details-card"]');
+    const layoutCard: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="schule-details-card"]');
     expect(layoutCard?.exists()).toBe(true);
   });
 
   test('it renders wrapper div with admin class for styling', () => {
-    const adminDiv = wrapper?.find('div.admin');
+    const adminDiv: DOMWrapper<Element> | undefined = wrapper?.find('div.admin');
     expect(adminDiv?.exists()).toBe(true);
-  });
-
-  test('it uses schultraeger to map schulform values', async () => {
-    organisationStore.currentOrganisation = mockSchule;
-    organisationStore.schultraeger = [mockSchultraeger];
-    await nextTick();
-
-    // The component should have access to schultraeger for mapping
-    expect(organisationStore.schultraeger.length).toBe(1);
-    expect(organisationStore.schultraeger[0].id).toBe('schultraeger-1');
   });
 
   test('it sets currentOrganisation to undefined on error', async () => {
     organisationStore.errorCode = 'SOME_ERROR';
-    organisationStore.currentOrganisation = undefined;
     await nextTick();
 
     // When there's an error, the organisation should not be displayed
@@ -251,9 +226,7 @@ describe('SchuleDetailsView', () => {
   });
 
   test('it correctly extracts route parameter for API call', () => {
-    // The component should extract the 'id' parameter from the route
-    const getOrgCalls = (organisationStore.getOrganisationById as any).mock.calls;
-    expect(getOrgCalls[0][0]).toBe('schule-1');
+    expect(organisationStore.getOrganisationById).toHaveBeenCalledWith('schule-1');
   });
 
   test('it renders success state when organisation data is available', async () => {

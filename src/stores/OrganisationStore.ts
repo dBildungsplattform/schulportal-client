@@ -184,7 +184,7 @@ type OrganisationActions = {
   loadKlassenForFilter(filter?: OrganisationenFilter, storeKey?: string): Promise<void>;
   resetKlasseFilter(storeKey?: string): void;
   clearKlasseFilter(storeKey?: string): void;
-  getOrganisationParentsTree(organisationId: string): Promise<void>;
+  getOrganisationParentsTree: (organisationId: string) => Promise<void>;
 };
 
 export { OrganisationsTyp };
