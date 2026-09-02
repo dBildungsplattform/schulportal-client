@@ -1,5 +1,10 @@
 import LayoutCard from '@/components/cards/LayoutCard.vue';
-import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
+import {
+  OrganisationsTyp,
+  useOrganisationStore,
+  type Organisation,
+  type OrganisationStore,
+} from '@/stores/OrganisationStore';
 import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
 import { DoFactory } from 'test/DoFactory';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
@@ -85,7 +90,10 @@ describe('SchuleDetailsView', () => {
   });
 
   test('it displays organisation details when data is loaded', async () => {
-    organisationStore.currentOrganisation = mockSchule;
+    organisationStore.currentSchule = {
+      ...mockSchule,
+      schultraegerform: { id: 'schultraegerform-1', name: 'Kommunaler Schulträger', typ: OrganisationsTyp.Land },
+    };
     organisationStore.loading = false;
     organisationStore.errorCode = '';
 
@@ -93,13 +101,25 @@ describe('SchuleDetailsView', () => {
 
     const container: DOMWrapper<Element> | undefined = wrapper?.find('[data-testid="schule-details-container"]');
     expect(container?.isVisible()).toBe(true);
-    expect(organisationStore.currentOrganisation?.name).toBe('Test Grundschule');
+    expect(wrapper?.get('[data-testid="schule-dienststellennummer"]').text()).toBe('1234567');
+    expect(wrapper?.get('[data-testid="schule-name"]').text()).toBe('Test Grundschule');
+    expect(wrapper?.get('[data-testid="schule-email"]').text()).toBe('schule@example.com');
+    expect(wrapper?.get('[data-testid="schultraegerform"]').text()).toBe('Kommunaler Schulträger');
+    expect(wrapper?.get('[data-testid="schule-itslearning-enabled"]').text()).toBe('Ja');
+  });
+
+  test('it displays the unknown organisation fallback when no schultraegerform is available', async () => {
+    organisationStore.currentSchule = mockSchule;
+
+    await nextTick();
+
+    expect(wrapper?.get('[data-testid="schultraegerform"]').text()).toBe('Unbekannte Organisation');
+    expect(wrapper?.get('[data-testid="schule-itslearning-enabled"]').text()).toBe('Ja');
   });
 
   test('it hides content when error exists', async () => {
     organisationStore.errorCode = 'SCHULE_NOT_FOUND';
-    // @ts-expect-error Test setup: we are intentionally setting currentOrganisation to undefined to simulate error state
-    organisationStore.currentOrganisation = undefined;
+    organisationStore.currentSchule = null;
     await nextTick();
 
     // When there's an error, the organisation should not be displayed
@@ -107,7 +127,7 @@ describe('SchuleDetailsView', () => {
   });
 
   test('it navigates to schule management when close is clicked', async () => {
-    organisationStore.currentOrganisation = mockSchule;
+    organisationStore.currentSchule = mockSchule;
     await nextTick();
 
     const pushSpy: ReturnType<typeof vi.spyOn> = vi.spyOn(router, 'push');
@@ -128,8 +148,7 @@ describe('SchuleDetailsView', () => {
 
   test('it shows a loading indicator while data is loading', async () => {
     organisationStore.loading = true;
-    // @ts-expect-error Test setup: no organisation loaded yet while request is in flight
-    organisationStore.currentOrganisation = undefined;
+    organisationStore.currentSchule = null;
     await nextTick();
 
     expect(wrapper?.find('[data-testid="schule-details-container"]').exists()).toBe(true);
