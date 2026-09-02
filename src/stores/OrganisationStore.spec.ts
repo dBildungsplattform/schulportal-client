@@ -643,7 +643,7 @@ describe('OrganisationStore', () => {
           {
             id: 'schultraeger-1',
             name: 'Test Schultraeger',
-            typ: OrganisationsTyp.Traeger,
+            typ: OrganisationsTyp.Land,
           },
         ],
       };
@@ -656,7 +656,6 @@ describe('OrganisationStore', () => {
       expect(organisationStore.loading).toBe(true);
       await promise;
 
-      expect(organisationStore.currentOrganisation).toEqual(mockSchule);
       expect(organisationStore.currentSchule).toEqual({
         ...mockSchule,
         schultraegerform: mockParentsTree.parentsTree[0],
@@ -678,23 +677,14 @@ describe('OrganisationStore', () => {
       expect(organisationStore.errorCode).toBe('SCHULE_NOT_FOUND');
       expect(organisationStore.loading).toBe(false);
     });
-  });
 
-  describe('getOrganisationParentsTree', () => {
-    it('should fetch organisation parents tree', async () => {
-      const mockResponse: ParentsTreeResponse = {
-        parentsTree: [
-          {
-            id: '1',
-            name: 'Organisation 1',
-            typ: OrganisationsTyp.Schule,
-          },
-        ],
-      };
-      mockadapter.onGet('/api/organisationen/1/parents-tree').replyOnce(200, mockResponse);
-      const updateOrganisationPromise: Promise<void> = organisationStore.getOrganisationParentsTree('1');
-      await updateOrganisationPromise;
-      expect(organisationStore.parentsTree).toEqual(mockResponse.parentsTree);
+    it('should handle string error', async () => {
+      mockadapter.onGet('/api/organisationen/1').replyOnce(500, 'some mock server error');
+      const getOrganisationByIdPromise: Promise<void> = organisationStore.fetchSchulDetails('schule-1');
+      await getOrganisationByIdPromise;
+      expect(organisationStore.currentOrganisation).toEqual(null);
+      expect(organisationStore.errorCode).toEqual('UNSPECIFIED_ERROR');
+      expect(organisationStore.loading).toBe(false);
     });
   });
 

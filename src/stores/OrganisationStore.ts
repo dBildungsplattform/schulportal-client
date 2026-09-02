@@ -15,7 +15,6 @@ import {
   type OrganisationRootChildrenResponse,
   type ParentInfoResponse,
   type ParentOrganisationenResponse,
-  type ParentsTreeResponse,
   type RollenSystemRechtEnum,
 } from '../api-client/generated/api';
 import { useSearchFilterStore, type SearchFilterStore } from './SearchFilterStore';
@@ -118,7 +117,6 @@ type OrganisationState = {
   loading: boolean;
   loadingKlassen: boolean;
   parentOrganisationen: Array<Organisation>;
-  parentsTree: ParentsTreeResponse['parentsTree'];
   schultraeger: Array<Organisation>;
   activatedItslearningOrganisation: Organisation | null;
   cachedSchulenMap: Map<string, string>;
@@ -187,7 +185,6 @@ type OrganisationActions = {
   loadKlassenForFilter(filter?: OrganisationenFilter, storeKey?: string): Promise<void>;
   resetKlasseFilter(storeKey?: string): void;
   clearKlasseFilter(storeKey?: string): void;
-  getOrganisationParentsTree: (organisationId: string) => Promise<void>;
   fetchSchulDetails: (organisationId: string) => Promise<void>;
 };
 
@@ -231,7 +228,6 @@ export const useOrganisationStore: StoreDefinition<
       loading: false,
       loadingKlassen: false,
       parentOrganisationen: [],
-      parentsTree: [] as ParentsTreeResponse['parentsTree'],
       schultraeger: [],
       activatedItslearningOrganisation: null,
       cachedSchulenMap: new Map<string, string>(),
@@ -599,27 +595,24 @@ export const useOrganisationStore: StoreDefinition<
       this.errorCode = '';
       this.loading = true;
       try {
-        await Promise.all([this.getOrganisationById(organisationId), this.getOrganisationParentsTree(organisationId)]);
-        if (this.currentOrganisation?.typ === OrganisationsTyp.Schule && this.parentsTree?.length > 0) {
-          const schultraegerform: ParentInfo | undefined = this.parentsTree.find(
-            (parent: ParentInfo) => parent.id === this.currentOrganisation?.administriertVon,
+        const [organisationResponse, parentsTreeResponse] = await Promise.all([
+          organisationApi.organisationControllerFindOrganisationById(organisationId),
+          organisationApi.organisationControllerGetParentsTree(organisationId),
+        ]);
+
+        if (
+          organisationResponse.data.typ === OrganisationsTyp.Schule &&
+          parentsTreeResponse.data.parentsTree?.length > 0
+        ) {
+          const schultraegerform: ParentInfo | undefined = parentsTreeResponse.data.parentsTree.find(
+            (parent: ParentInfo) => parent.id === organisationResponse.data?.administriertVon,
           );
-          this.currentSchule = { ...this.currentOrganisation, schultraegerform };
+          this.currentSchule = { ...organisationResponse.data, schultraegerform };
         }
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
         this.loading = false;
-      }
-    },
-
-    async getOrganisationParentsTree(organisationId: string): Promise<void> {
-      try {
-        const response: AxiosResponse<ParentsTreeResponse> =
-          await organisationApi.organisationControllerGetParentsTree(organisationId);
-        this.parentsTree = response.data.parentsTree;
-      } catch (error: unknown) {
-        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       }
     },
 

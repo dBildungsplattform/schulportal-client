@@ -42,7 +42,7 @@
           class="px-3 px-sm-16"
           data-testid="schule-details-container"
         >
-          <div v-if="organisationStore.currentOrganisation">
+          <div v-if="organisationStore.currentSchule">
             <v-row class="mt-2">
               <v-col
                 cols="12"
@@ -51,17 +51,17 @@
                 <div class="compact-spacing">
                   <LabeledField
                     :label="t('admin.schule.dienststellennummer')"
-                    :value="organisationStore.currentOrganisation.kennung ?? ''"
+                    :value="organisationStore.currentSchule.kennung ?? ''"
                     test-id="schule-dienststellennummer"
                   />
                   <LabeledField
                     :label="t('admin.schule.schulname')"
-                    :value="organisationStore.currentOrganisation.name"
+                    :value="organisationStore.currentSchule.name"
                     test-id="schule-name"
                   />
                   <LabeledField
                     :label="t('admin.schule.emailAdresse')"
-                    :value="organisationStore.currentOrganisation.emailAdresse ?? ''"
+                    :value="organisationStore.currentSchule.emailAdresse ?? ''"
                     test-id="schule-email"
                   />
                 </div>
@@ -81,7 +81,7 @@
                   />
                   <LabeledField
                     :label="t('admin.schule.itsLearningActive')"
-                    :value="organisationStore.currentOrganisation.itslearningEnabled ? t('yes') : t('no')"
+                    :value="organisationStore.currentSchule.itslearningEnabled ? t('yes') : t('no')"
                     test-id="schule-itslearning-enabled"
                   />
                 </div>
