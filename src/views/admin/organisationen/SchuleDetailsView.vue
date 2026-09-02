@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import LabeledField from '@/components/admin/LabeledField.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
-  import { OrganisationStore, ParentInfo, useOrganisationStore } from '@/stores/OrganisationStore';
+  import { OrganisationStore, useOrganisationStore } from '@/stores/OrganisationStore';
   import { onMounted } from 'vue';
   import { Composer, useI18n } from 'vue-i18n';
   import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
@@ -17,19 +17,8 @@
     router.push({ name: 'schule-management' });
   };
 
-  const mapSchulform = (id: string | undefined | null): string => {
-    const schultraeger: ParentInfo | undefined = organisationStore.parentsTree.find(
-      (parent: ParentInfo) => parent.id === id,
-    );
-
-    return schultraeger?.name ?? t('admin.organisation.unknownOrganisation');
-  };
   onMounted(async () => {
-    organisationStore.errorCode = '';
-    await Promise.all([
-      organisationStore.getOrganisationById(currentSchuleId),
-      organisationStore.getOrganisationParentsTree(currentSchuleId),
-    ]);
+    await organisationStore.fetchSchulDetails(currentSchuleId);
   });
 </script>
 <template>
@@ -84,8 +73,11 @@
                 <div class="compact-spacing">
                   <LabeledField
                     :label="t('admin.schule.schulform')"
-                    :value="mapSchulform(organisationStore.currentOrganisation.administriertVon)"
-                    test-id="schule-schulform"
+                    :value="
+                      organisationStore.currentSchule?.schultraegerform?.name ??
+                      t('admin.organisation.unknownOrganisation')
+                    "
+                    test-id="schultraegerform"
                   />
                   <LabeledField
                     :label="t('admin.schule.itsLearningActive')"

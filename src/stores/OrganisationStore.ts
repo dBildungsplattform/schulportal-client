@@ -86,6 +86,8 @@ export type AutoCompleteStore<T> = {
   loading: boolean;
 };
 
+export type CurrentSchulDetails = Organisation & { schultraegerform?: ParentInfo };
+
 type OrganisationState = {
   allOrganisationen: Array<Organisation>;
   allKlassen: Array<Organisation>;
@@ -94,6 +96,7 @@ type OrganisationState = {
   klassenFilters: Map<string, AutoCompleteStore<Organisation>>;
   organisationenFilters: Map<string, AutoCompleteStore<Organisation>>;
   currentOrganisation: Organisation | null;
+  currentSchule: CurrentSchulDetails | null;
   currentKlasse: Organisation | null;
   updatedOrganisation: Organisation | null;
   createdKlasse: Organisation | null;
@@ -185,6 +188,7 @@ type OrganisationActions = {
   resetKlasseFilter(storeKey?: string): void;
   clearKlasseFilter(storeKey?: string): void;
   getOrganisationParentsTree: (organisationId: string) => Promise<void>;
+  fetchSchulDetails: (organisationId: string) => Promise<void>;
 };
 
 export { OrganisationsTyp };
@@ -206,6 +210,7 @@ export const useOrganisationStore: StoreDefinition<
       allSchultraeger: [],
       currentOrganisation: null,
       currentKlasse: null,
+      currentSchule: null,
       updatedOrganisation: null,
       createdKlasse: null,
       createdSchule: null,
@@ -583,6 +588,24 @@ export const useOrganisationStore: StoreDefinition<
       this.loading = true;
       try {
         await organisationApi.organisationControllerDeleteOrganisation(organisationId);
+      } catch (error: unknown) {
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async fetchSchulDetails(organisationId: string): Promise<void> {
+      this.errorCode = '';
+      this.loading = true;
+      try {
+        await Promise.all([this.getOrganisationById(organisationId), this.getOrganisationParentsTree(organisationId)]);
+        if (this.currentOrganisation?.typ === OrganisationsTyp.Schule && this.parentsTree?.length > 0) {
+          const schultraegerform: ParentInfo | undefined = this.parentsTree.find(
+            (parent: ParentInfo) => parent.id === this.currentOrganisation?.administriertVon,
+          );
+          this.currentSchule = { ...this.currentOrganisation, schultraegerform };
+        }
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
