@@ -2059,6 +2059,12 @@ export interface OrganisationResponse {
      * @memberof OrganisationResponse
      */
     'version': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof OrganisationResponse
+     */
+    'emailAdresse': string;
 }
 
 
@@ -2155,6 +2161,31 @@ export type OrganisationsTyp = typeof OrganisationsTyp[keyof typeof Organisation
 /**
  * 
  * @export
+ * @interface ParentInfoResponse
+ */
+export interface ParentInfoResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof ParentInfoResponse
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ParentInfoResponse
+     */
+    'name': string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof ParentInfoResponse
+     */
+    'typ': string | null;
+}
+/**
+ * 
+ * @export
  * @interface ParentOrganisationenResponse
  */
 export interface ParentOrganisationenResponse {
@@ -2177,6 +2208,19 @@ export interface ParentOrganisationsByIdsBodyParams {
      * @memberof ParentOrganisationsByIdsBodyParams
      */
     'organisationIds': Array<string>;
+}
+/**
+ * 
+ * @export
+ * @interface ParentsTreeResponse
+ */
+export interface ParentsTreeResponse {
+    /**
+     * 
+     * @type {Array<ParentInfoResponse>}
+     * @memberof ParentsTreeResponse
+     */
+    'parentsTree': Array<ParentInfoResponse>;
 }
 /**
  * 
@@ -8727,6 +8771,47 @@ export const OrganisationenApiAxiosParamCreator = function (configuration?: Conf
         },
         /**
          * 
+         * @param {string} organisationId The id of an organization
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        organisationControllerGetParentsTree: async (organisationId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'organisationId' is not null or undefined
+            assertParamExists('organisationControllerGetParentsTree', 'organisationId', organisationId)
+            const localVarPath = `/api/organisationen/{organisationId}/parents-tree`
+                .replace(`{${"organisationId"}}`, encodeURIComponent(String(organisationId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            // authentication oauth2 required
+            // oauth required
+            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -9044,6 +9129,16 @@ export const OrganisationenApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @param {string} organisationId The id of an organization
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async organisationControllerGetParentsTree(organisationId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ParentsTreeResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.organisationControllerGetParentsTree(organisationId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -9194,6 +9289,15 @@ export const OrganisationenApiFactory = function (configuration?: Configuration,
         },
         /**
          * 
+         * @param {string} organisationId The id of an organization
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        organisationControllerGetParentsTree(organisationId: string, options?: any): AxiosPromise<ParentsTreeResponse> {
+            return localVarFp.organisationControllerGetParentsTree(organisationId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -9335,6 +9439,15 @@ export interface OrganisationenApiInterface {
      * @memberof OrganisationenApiInterface
      */
     organisationControllerGetParentsByIds(parentOrganisationsByIdsBodyParams: ParentOrganisationsByIdsBodyParams, options?: AxiosRequestConfig): AxiosPromise<ParentOrganisationenResponse>;
+
+    /**
+     * 
+     * @param {string} organisationId The id of an organization
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganisationenApiInterface
+     */
+    organisationControllerGetParentsTree(organisationId: string, options?: AxiosRequestConfig): AxiosPromise<ParentsTreeResponse>;
 
     /**
      * 
@@ -9494,6 +9607,17 @@ export class OrganisationenApi extends BaseAPI implements OrganisationenApiInter
      */
     public organisationControllerGetParentsByIds(parentOrganisationsByIdsBodyParams: ParentOrganisationsByIdsBodyParams, options?: AxiosRequestConfig) {
         return OrganisationenApiFp(this.configuration).organisationControllerGetParentsByIds(parentOrganisationsByIdsBodyParams, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} organisationId The id of an organization
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof OrganisationenApi
+     */
+    public organisationControllerGetParentsTree(organisationId: string, options?: AxiosRequestConfig) {
+        return OrganisationenApiFp(this.configuration).organisationControllerGetParentsTree(organisationId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
