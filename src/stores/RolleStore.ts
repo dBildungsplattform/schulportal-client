@@ -24,6 +24,7 @@ type RolleState = {
   updatedRolle: RolleWithServiceProvidersResponse | null;
   currentRolle: Rolle | null;
   allRollen: Array<RolleWithServiceProvidersResponse>;
+  rollenForPersonenkontextCreation: Array<RolleResponse>;
   errorCode: string;
   loading: boolean;
   totalRollen: number;
@@ -50,6 +51,7 @@ type RolleActions = {
     version: number,
   ) => Promise<void>;
   deleteRolleById: (rolleId: string) => Promise<void>;
+  getRollenForPersonenkontextCreation: (params: RollenForPersonenkontextCreationQuery) => Promise<void>;
 };
 
 export { RollenArt, RollenMerkmal, RollenSystemRechtEnum as RollenSystemRecht };
@@ -111,6 +113,16 @@ export type RolleFilter = {
   serviceProviderIds?: Array<string>;
 };
 
+export type RollenForPersonenkontextCreationQuery = {
+  organisationId: string;
+  offset?: number;
+  limit?: number;
+  rollenartOfUser?: RollenArt;
+  rolleName?: string;
+  rollenIds?: Array<string>;
+  systemrecht?: RollenSystemRechtEnum;
+};
+
 export type RolleStore = Store<'rolleStore', RolleState, RolleGetters, RolleActions>;
 
 export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGetters, RolleActions> = defineStore(
@@ -122,6 +134,7 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
         updatedRolle: null,
         currentRolle: null,
         allRollen: [],
+        rollenForPersonenkontextCreation: [],
         errorCode: '',
         loading: false,
         totalRollen: 0,
@@ -235,6 +248,28 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
         this.errorCode = '';
         try {
           await rolleApi.rolleControllerDeleteRolle(rolleId);
+        } catch (error) {
+          this.errorCode = getResponseErrorCode(error, 'ROLLE_ERROR');
+        } finally {
+          this.loading = false;
+        }
+      },
+
+      async getRollenForPersonenkontextCreation(params: RollenForPersonenkontextCreationQuery): Promise<void> {
+        this.loading = true;
+        this.errorCode = '';
+        try {
+          const { data }: { data: Array<RolleResponse> } =
+            await rolleApi.rolleControllerFindAvailableRollenForPersonenkontextCreation(
+              params.organisationId,
+              params.offset,
+              params.limit,
+              params.rollenartOfUser,
+              params.rolleName,
+              params.rollenIds,
+              params.systemrecht,
+            );
+          this.rollenForPersonenkontextCreation = data;
         } catch (error) {
           this.errorCode = getResponseErrorCode(error, 'ROLLE_ERROR');
         } finally {
