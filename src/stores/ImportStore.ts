@@ -42,7 +42,11 @@ type ImportActions = {
   getPersonenImportStatus: (importVorgangId: string) => Promise<void>;
   startImportStatusPolling: (importvorgangId: string) => Promise<void>;
   stopImportStatusPolling: () => void;
-  getImportedPersons: (importVorgangId: string, offset?: number, limit?: number) => Promise<void>;
+  getImportedPersons: (
+    importVorgangId: string,
+    offset?: number,
+    limit?: number,
+  ) => Promise<ImportResultResponse | null>;
   deleteImportVorgangById: (importVorgangId: string) => Promise<void>;
 };
 
@@ -66,7 +70,11 @@ export const useImportStore: StoreDefinition<'importStore', ImportState, ImportG
       };
     },
     actions: {
-      async getImportedPersons(importvorgangId: string, offset?: number, limit?: number): Promise<void> {
+      async getImportedPersons(
+        importvorgangId: string,
+        offset?: number,
+        limit?: number,
+      ): Promise<ImportResultResponse | null> {
         this.retrievalIsLoading = true;
         try {
           const { data }: { data: ImportResultResponse } = await importApi.importControllerGetImportedUsers(
@@ -76,8 +84,10 @@ export const useImportStore: StoreDefinition<'importStore', ImportState, ImportG
           );
 
           this.importResponse = data;
+          return data;
         } catch (error: unknown) {
           this.errorCode = getResponseErrorCode(error, 'ERROR_IMPORTING_FILE');
+          return null;
         } finally {
           this.retrievalIsLoading = false;
         }
