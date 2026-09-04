@@ -248,6 +248,56 @@ describe('StartView', () => {
     ]);
   });
 
+  test('filterSortProviders filters out service providers with target NONE', () => {
+    const providersWithNone: StartPageServiceProvider[] = [
+      ...mockProviders,
+      {
+        id: '99',
+        name: 'Hidden Provider',
+        target: 'NONE',
+        url: '',
+        kategorie: ServiceProviderKategorie.Email,
+        hasLogo: false,
+        requires2fa: false,
+      },
+    ];
+
+    interface StartViewComponent {
+      filterSortProviders: (
+        providers: StartPageServiceProvider[],
+        kategorie: ServiceProviderKategorie,
+      ) => StartPageServiceProvider[];
+    }
+
+    const filteredSortProviders: StartPageServiceProvider[] = (
+      wrapper?.vm as unknown as StartViewComponent
+    ).filterSortProviders(providersWithNone, ServiceProviderKategorie.Email);
+
+    expect(filteredSortProviders.map((p: StartPageServiceProvider) => p.name)).toEqual([
+      'Not Squarepants',
+      'Spongebob Squarepants',
+    ]);
+  });
+
+  test('it does not render tiles for service providers with target NONE', async () => {
+    serviceProviderStore.availableServiceProviders = [
+      ...mockProviders,
+      {
+        id: '99',
+        name: 'Hidden Provider',
+        target: 'NONE',
+        url: '',
+        kategorie: ServiceProviderKategorie.Email,
+        hasLogo: false,
+        requires2fa: false,
+      },
+    ];
+    await nextTick();
+
+    expect(wrapper?.find('[data-testid="service-provider-card-99"]').exists()).toBe(false);
+    expect(wrapper?.find('[data-testid="service-provider-card-2"]').exists()).toBe(true);
+  });
+
   test('it renders category title for class service providers when providers exist', async () => {
     serviceProviderStore.availableServiceProviders = [
       {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import type { PersonTimeLimitInfoResponse } from '@/api-client/generated';
+  import { ServiceProviderTarget, type PersonTimeLimitInfoResponse } from '@/api-client/generated';
   import SpshBanner from '@/components/alert/SpshBanner.vue';
   import ServiceProviderCategory from '@/components/layout/ServiceProviderCategory.vue';
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
@@ -10,8 +10,8 @@
   import {
     ServiceProviderKategorie,
     useServiceProviderStore,
-    type StartPageServiceProvider,
     type ServiceProviderStore,
+    type StartPageServiceProvider,
   } from '@/stores/ServiceProviderStore';
   import {
     useTwoFactorAuthentificationStore,
@@ -44,7 +44,10 @@
     kategorie: ServiceProviderKategorie,
   ): StartPageServiceProvider[] {
     return providers
-      .filter((provider: StartPageServiceProvider) => provider.kategorie === kategorie)
+      .filter(
+        (provider: StartPageServiceProvider) =>
+          provider.kategorie === kategorie && provider.target !== ServiceProviderTarget.None,
+      )
       .sort((a: StartPageServiceProvider, b: StartPageServiceProvider) => a.name.localeCompare(b.name));
   }
 
