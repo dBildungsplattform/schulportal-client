@@ -1,4 +1,3 @@
-import type { SystemRechtResponse } from '@/api-client/generated';
 import SchulenFilter from '@/components/filter/SchulenFilter.vue';
 import routes from '@/router/routes';
 import { RollenArt, RollenMerkmal, useRolleStore, type RolleStore } from '@/stores/RolleStore';
@@ -45,11 +44,8 @@ beforeEach(() => {
       administeredBySchulstrukturknoten: '1234',
       rollenart: 'LEHR',
       name: 'Lehrer',
-      // TODO: remove type casting when generator is fixed
-      merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
-      systemrechte: [
-        { name: RollenSystemRechtEnum.RollenVerwalten, isTechnical: false },
-      ] as unknown as Set<SystemRechtResponse>,
+      merkmale: [RollenMerkmal.KopersPflicht],
+      systemrechte: [{ name: RollenSystemRechtEnum.RollenVerwalten, isTechnical: false }],
       createdAt: '2022',
       updatedAt: '2022',
       id: '1',
@@ -71,9 +67,8 @@ beforeEach(() => {
       administeredBySchulstrukturknoten: '1234',
       rollenart: 'LERN',
       name: 'SuS',
-      // TODO: remove type casting when generator is fixed
       merkmale: [],
-      systemrechte: [] as unknown as Set<SystemRechtResponse>,
+      systemrechte: [],
       createdAt: '2022',
       updatedAt: '2022',
       id: '2',
@@ -91,9 +86,8 @@ beforeEach(() => {
       administeredBySchulstrukturknoten: '42',
       rollenart: 'LERN',
       name: 'Rolle ohne Namen',
-      // TODO: remove type casting when generator is fixed
       merkmale: [],
-      systemrechte: [] as unknown as Set<SystemRechtResponse>,
+      systemrechte: [],
       createdAt: '2022',
       updatedAt: '2022',
       id: '2',

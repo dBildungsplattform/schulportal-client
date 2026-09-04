@@ -1,10 +1,10 @@
-import { RollenArt, RollenSystemRechtEnum, type SystemRechtResponse } from '@/api-client/generated/api';
+import { RollenArt, RollenMerkmal, RollenSystemRechtEnum } from '@/api-client/generated/api';
 import routes from '@/router/routes';
 import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
 import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
-import { useRolleStore, type RolleResponse, type RolleStore, type RollenMerkmal } from '@/stores/RolleStore';
+import { useRolleStore, type RolleStore } from '@/stores/RolleStore';
 import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
 import type { Person } from '@/stores/types/Person';
 import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
@@ -107,26 +107,24 @@ beforeEach(async () => {
   personStore.totalPersons = personStore.allUebersichten.size;
 
   rolleStore.rollenForPersonAdministration = [
-    {
+    DoFactory.getRolleResponse({
       id: '10',
       administeredBySchulstrukturknoten: '1',
-      merkmale: new Set(),
+      merkmale: [],
       name: 'Rolle 1',
-      rollenart: 'LERN',
-      systemrechte: new Set(),
-    },
-  ] as RolleResponse[];
+      rollenart: RollenArt.Lern,
+      systemrechte: [],
+    }),
+  ];
 
   personenkontextStore.workflowStepResponse = {
     rollen: [
       {
         administeredBySchulstrukturknoten: '1234',
-        rollenart: 'LEHR',
+        rollenart: RollenArt.Lehr,
         name: 'SuS',
-        merkmale: ['KOPERS_PFLICHT'] as unknown as Set<RollenMerkmal>,
-        systemrechte: [
-          { name: RollenSystemRechtEnum.RollenVerwalten, isTechnical: false },
-        ] as unknown as Set<SystemRechtResponse>,
+        merkmale: [RollenMerkmal.KopersPflicht],
+        systemrechte: [{ name: RollenSystemRechtEnum.RollenVerwalten, isTechnical: false }],
         createdAt: '2022',
         updatedAt: '2022',
         id: '54321',
@@ -452,15 +450,13 @@ describe('PersonManagementView', () => {
 
   test('it updates Rollen search correctly', async () => {
     searchFilterStore.selectedRollenObjects = [
-      {
+      DoFactory.getRolleResponse({
         id: '1',
         administeredBySchulstrukturknoten: '1',
-        merkmale: new Set(),
         name: 'Rolle 1',
-        rollenart: 'LERN',
-        systemrechte: new Set(),
-      },
-    ] as RolleResponse[];
+        rollenart: RollenArt.Lern,
+      }),
+    ];
 
     const rollenAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
 
@@ -470,15 +466,13 @@ describe('PersonManagementView', () => {
     const mockGetRollenForPersonAdministration: Mock = vi.fn().mockResolvedValue(undefined);
     rolleStore.getRollenForPersonAdministration = mockGetRollenForPersonAdministration;
     rolleStore.rollenForPersonAdministration = [
-      {
+      DoFactory.getRolleResponse({
         id: '1',
         administeredBySchulstrukturknoten: '1',
-        merkmale: new Set(),
         name: 'Test Rolle',
-        rollenart: 'LERN',
-        systemrechte: new Set(),
-      },
-    ] as RolleResponse[];
+        rollenart: RollenArt.Lern,
+      }),
+    ];
 
     // Trigger the search
     await rollenAutocomplete?.setValue(['name']);
