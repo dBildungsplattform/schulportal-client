@@ -28,6 +28,7 @@
     formatServiceProviderAnbietenMerkmale,
     formatServiceProviderRollenartenWhitelist,
   } from '@/utils/serviceProvider.helper';
+  import { dedup } from '@/utils/arrays';
   import { computed, onMounted, ref, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
@@ -51,6 +52,7 @@
   const currentServiceProviderId: string = route.params['id'] as string;
   const selectedOrganisationIds: Ref<string[]> = ref([]);
   const selectedRolleIds: Ref<string[]> = ref([]);
+  const selectedRollenObjects: Ref<RolleWithServiceProvidersResponse[]> = ref([]); 
   const searchInputRollen: Ref<string> = ref('');
 
   type ReadonlyHeaders = Headers;
@@ -150,7 +152,10 @@
   }
 
   const rollen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    const rollen: RolleWithServiceProvidersResponse[] = rolleStore.allRollen;
+    const rollen: RolleWithServiceProvidersResponse[] = dedup(
+      [...selectedRollenObjects.value, ...rolleStore.allRollen],
+      (rolle: RolleWithServiceProvidersResponse): string => rolle.id,
+    );
 
     return rollen
       .map((rolle: RolleResponse) => ({
@@ -163,6 +168,7 @@
   function resetSearchAndFilter(): void {
     selectedOrganisationIds.value = [];
     selectedRolleIds.value = [];
+    selectedRollenObjects.value = [];
     searchInputRollen.value = '';
     fetchRollenerweiterungen();
   }
@@ -174,6 +180,17 @@
 
   function setRolleFilter(newValue: string[] | undefined): void {
     selectedRolleIds.value = newValue ?? [];
+    selectedRollenObjects.value = dedup(
+      [
+        ...rolleStore.allRollen.filter((rolle: RolleWithServiceProvidersResponse) =>
+          selectedRolleIds.value.includes(rolle.id),
+        ),
+        ...selectedRollenObjects.value.filter((rolle: RolleWithServiceProvidersResponse) =>
+          selectedRolleIds.value.includes(rolle.id),
+        ),
+      ],
+      (rolle: RolleWithServiceProvidersResponse): string => rolle.id,
+    );
     if (!newValue?.length) {
       searchInputRollen.value = '';
     }
@@ -188,7 +205,6 @@
         limit: 25,
         searchString: searchValue,
         systemrechte: [RollenSystemRecht.RollenVerwalten, RollenSystemRecht.RollenErweitern],
-        rolleIds: selectedRolleIds.value.length > 0 ? selectedRolleIds.value : undefined,
       });
     }, 500);
   }

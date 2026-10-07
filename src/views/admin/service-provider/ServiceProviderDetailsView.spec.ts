@@ -18,6 +18,7 @@ import { afterEach, type MockInstance } from 'vitest';
 import { nextTick, type Component } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import ServiceProviderDetailsView from './ServiceProviderDetailsView.vue';
+import { TranslatedObject } from '@/types.js';
 
 let wrapper: VueWrapper<InstanceType<typeof ServiceProviderDetailsView>> | null = null;
 let router: Router;
@@ -345,6 +346,41 @@ describe('ServiceProviderDetailsView', () => {
     expect((rollenFilter as unknown as { props: (key: string) => never }).props('items')).toEqual([]);
   });
 
+  test('it retains selected rollen and deduplicates autocomplete items by id', async () => {
+    const selectedRolle = DoFactory.getRolleWithServiceProviders({ id: 'selected-rolle', name: 'Selected role' });
+    const searchResultRolle = DoFactory.getRolleWithServiceProviders({ id: 'search-result', name: 'Search result' });
+    rolleStore.allRollen = [selectedRolle];
+    wrapper = await mountComponent();
+    await openRollenerweiterungenSection();
+
+    const rollenFilter: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+    rollenFilter?.vm.$emit('update:model-value', [selectedRolle.id]);
+    await nextTick();
+
+    rolleStore.allRollen = [searchResultRolle];
+    await nextTick();
+
+    const retainedItems: TranslatedObject[] = (rollenFilter as unknown as {
+      props: (key: string) => TranslatedObject[];
+    }).props('items');
+    expect(retainedItems).toEqual(
+      expect.arrayContaining([
+        { value: selectedRolle.id, title: selectedRolle.name },
+        { value: searchResultRolle.id, title: searchResultRolle.name },
+      ]),
+    );
+
+    rolleStore.allRollen = [selectedRolle, searchResultRolle];
+    await nextTick();
+
+    const mergedItems: TranslatedObject[] = (rollenFilter as unknown as {
+      props: (key: string) => TranslatedObject[];
+    }).props('items');
+    expect(mergedItems.filter((item: TranslatedObject) => item.value === selectedRolle.id)).toHaveLength(
+      1,
+    );
+  });
+
   test('it resets both filters via reset button and reloads rollenerweiterungen', async () => {
     const getRollenerweiterungenByIdSpy: MockInstance = vi
       .spyOn(serviceProviderStore, 'getRollenerweiterungenById')
@@ -353,9 +389,12 @@ describe('ServiceProviderDetailsView', () => {
 
     const schulenFilter: VueWrapper | undefined = wrapper?.findComponent(SchulenFilter);
     const rollenFilter: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+    const selectedRolle: RolleWithServiceProvidersResponse = rolleStore.allRollen[0];
     schulenFilter?.vm.$emit('update:selected-schulen', ['schule-1']);
-    rollenFilter?.vm.$emit('update:model-value', ['rolle-1']);
+    rollenFilter?.vm.$emit('update:model-value', [selectedRolle.id]);
     await flushPromises();
+    rolleStore.allRollen = [];
+    await nextTick();
 
     // Reset button should only be enabled when filters are active
     const resetButton: DOMWrapper<HTMLButtonElement> | undefined = wrapper?.find('[data-testid="reset-filter-button"]');
@@ -371,6 +410,9 @@ describe('ServiceProviderDetailsView', () => {
       offset: 0,
       limit: 30,
     });
+    expect(
+      (rollenFilter as unknown as { props: (key: string) => TranslatedObject[] }).props('items'),
+    ).toEqual([]);
 
     // Reset button should now be disabled again
     expect(wrapper?.find('[data-testid="reset-filter-button"]').attributes('disabled')).toBeDefined();
@@ -394,13 +436,12 @@ describe('ServiceProviderDetailsView', () => {
       limit: 25,
       searchString: 'Lehrer',
       systemrechte: [RollenSystemRecht.RollenVerwalten, RollenSystemRecht.RollenErweitern],
-      rolleIds: undefined,
     });
 
     vi.useRealTimers();
   });
 
-  test('it searches for rollen when search input changes and rolleIds is defined', async () => {
+  test('it searches for rollen without sending selected rolleIds', async () => {
     vi.useFakeTimers();
     const getAllRollenSpy: MockInstance = vi.spyOn(rolleStore, 'getAllRollen').mockResolvedValue();
     await openRollenerweiterungenSection();
@@ -426,7 +467,6 @@ describe('ServiceProviderDetailsView', () => {
       limit: 25,
       searchString: 'Lehrer',
       systemrechte: [RollenSystemRecht.RollenVerwalten, RollenSystemRecht.RollenErweitern],
-      rolleIds: ['rolle-1'],
     });
 
     vi.useRealTimers();
