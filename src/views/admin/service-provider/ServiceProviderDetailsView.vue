@@ -12,7 +12,6 @@
   import {
     RollenSystemRecht,
     useRolleStore,
-    type RolleResponse,
     type RolleStore,
     type RolleWithServiceProvidersResponse,
   } from '@/stores/RolleStore';
@@ -22,13 +21,12 @@
     type ManageableServiceProviderDetail,
     type ServiceProviderStore,
   } from '@/stores/ServiceProviderStore';
-  import type { TranslatedObject } from '@/types';
+  import { useRollenAutocomplete, type UseRollenAutocompleteReturn } from '@/composables/useRollenAutocomplete';
   import { getLogoPath } from '@/utils/logosConfig';
   import {
     formatServiceProviderAnbietenMerkmale,
     formatServiceProviderRollenartenWhitelist,
   } from '@/utils/serviceProvider.helper';
-  import { dedup } from '@/utils/arrays';
   import { computed, onMounted, ref, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
   import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
@@ -43,17 +41,21 @@
   const organisationStore: OrganisationStore = useOrganisationStore();
   const rolleStore: RolleStore = useRolleStore();
 
-  let timerId: ReturnType<typeof setTimeout>;
-
   const isEditModeAvailable: ComputedRef<boolean> = computed(() => {
     return configStore.configData?.schulischeAngeboteErstellen ?? false;
   });
 
   const currentServiceProviderId: string = route.params['id'] as string;
   const selectedOrganisationIds: Ref<string[]> = ref([]);
-  const selectedRolleIds: Ref<string[]> = ref([]);
-  const selectedRollenObjects: Ref<RolleWithServiceProvidersResponse[]> = ref([]); 
-  const searchInputRollen: Ref<string> = ref('');
+  const {
+    selectedRollen,
+    searchInput: searchInputRollen,
+    items: rollenItems,
+    init: initRollen,
+  }: UseRollenAutocompleteReturn = useRollenAutocomplete({
+    limit: 25,
+    systemrechte: [RollenSystemRecht.RollenVerwalten, RollenSystemRecht.RollenErweitern],
+  });
 
   type ReadonlyHeaders = Headers;
   const headers: ReadonlyHeaders = [
@@ -130,7 +132,10 @@
     await serviceProviderStore.getRollenerweiterungenById({
       serviceProviderId: currentServiceProviderId,
       organisationIds: selectedOrganisationIds.value.length > 0 ? selectedOrganisationIds.value : undefined,
-      rolleIds: selectedRolleIds.value.length > 0 ? selectedRolleIds.value : undefined,
+      rolleIds:
+        selectedRollen.value.length > 0
+          ? selectedRollen.value.map((rolle: RolleWithServiceProvidersResponse) => rolle.id)
+          : undefined,
       offset: (rollenerweiterungPage.value - 1) * rollenerweiterungPerPage.value,
       limit: rollenerweiterungPerPage.value,
     });
@@ -151,24 +156,9 @@
     fetchRollenerweiterungen();
   }
 
-  const rollen: ComputedRef<TranslatedObject[] | undefined> = computed(() => {
-    const rollen: RolleWithServiceProvidersResponse[] = dedup(
-      [...selectedRollenObjects.value, ...rolleStore.allRollen],
-      (rolle: RolleWithServiceProvidersResponse): string => rolle.id,
-    );
-
-    return rollen
-      .map((rolle: RolleResponse) => ({
-        value: rolle.id,
-        title: rolle.name,
-      }))
-      .sort((a: TranslatedObject, b: TranslatedObject) => a.title.localeCompare(b.title));
-  });
-
   function resetSearchAndFilter(): void {
     selectedOrganisationIds.value = [];
-    selectedRolleIds.value = [];
-    selectedRollenObjects.value = [];
+    selectedRollen.value = [];
     searchInputRollen.value = '';
     fetchRollenerweiterungen();
   }
@@ -176,37 +166,6 @@
   function setOrganisationFilter(newValue: string[] | undefined): void {
     selectedOrganisationIds.value = newValue ?? [];
     fetchRollenerweiterungen();
-  }
-
-  function setRolleFilter(newValue: string[] | undefined): void {
-    selectedRolleIds.value = newValue ?? [];
-    selectedRollenObjects.value = dedup(
-      [
-        ...rolleStore.allRollen.filter((rolle: RolleWithServiceProvidersResponse) =>
-          selectedRolleIds.value.includes(rolle.id),
-        ),
-        ...selectedRollenObjects.value.filter((rolle: RolleWithServiceProvidersResponse) =>
-          selectedRolleIds.value.includes(rolle.id),
-        ),
-      ],
-      (rolle: RolleWithServiceProvidersResponse): string => rolle.id,
-    );
-    if (!newValue?.length) {
-      searchInputRollen.value = '';
-    }
-    fetchRollenerweiterungen();
-  }
-
-  function updateRollenSearch(searchValue: string): void {
-    clearTimeout(timerId);
-
-    timerId = setTimeout(() => {
-      rolleStore.getAllRollen({
-        limit: 25,
-        searchString: searchValue,
-        systemrechte: [RollenSystemRecht.RollenVerwalten, RollenSystemRecht.RollenErweitern],
-      });
-    }, 500);
   }
 
   onMounted(async () => {
@@ -218,11 +177,10 @@
       serviceProviderStore.getServiceProviderLogoById(currentServiceProviderId),
     ]);
     if (authStore.hasRollenerweiternPermission) {
-      fetchRollenerweiterungen();
-      rolleStore.getAllRollen({
-        systemrechte: [RollenSystemRecht.RollenVerwalten, RollenSystemRecht.RollenErweitern],
-        limit: 25,
-      });
+      await Promise.all([
+        fetchRollenerweiterungen(),
+        initRollen(),
+      ]);
     }
   });
 </script>
@@ -529,7 +487,7 @@
                           <v-btn
                             class="px-0 reset-filter"
                             data-testid="reset-filter-button"
-                            :disabled="!selectedOrganisationIds.length && !selectedRolleIds.length"
+                            :disabled="!selectedOrganisationIds.length && !selectedRollen.length"
                             size="x-small"
                             variant="text"
                             width="auto"
@@ -594,27 +552,27 @@
                           <v-autocomplete
                             id="rolle-select"
                             ref="rolle-select"
-                            v-model="selectedRolleIds"
+                            v-model="selectedRollen"
                             v-model:search="searchInputRollen"
                             autocomplete="off"
                             class="filter-dropdown"
                             :class="{
-                              selected: selectedRolleIds.length > 0,
+                              selected: selectedRollen.length > 0,
                             }"
                             clearable
                             data-testid="rolle-select"
                             density="compact"
                             hide-details
-                            :items="rollen"
-                            item-value="value"
-                            item-text="title"
+                            :items="rollenItems"
+                            item-value="id"
+                            item-title="name"
                             multiple
+                            return-object
                             :no-data-text="$t('noDataFound')"
                             :placeholder="$t('admin.rolle.rolle')"
                             required="true"
                             variant="outlined"
-                            @update:model-value="setRolleFilter"
-                            @update:search="updateRollenSearch"
+                            @update:model-value="fetchRollenerweiterungen"
                           >
                             <template #prepend-item>
                               <v-list-item>
@@ -638,13 +596,13 @@
                               </v-list-item>
                             </template>
                             <template #selection="{ internalItem: item, index }">
-                              <v-chip v-if="selectedRolleIds.length < 2">
+                              <v-chip v-if="selectedRollen.length < 2">
                                 <span>{{ item.title }}</span>
                               </v-chip>
                               <div v-else-if="index === 0">
                                 {{
                                   $t('admin.rolle.rollenSelected', {
-                                    count: selectedRolleIds.length,
+                                    count: selectedRollen.length,
                                   })
                                 }}
                               </div>

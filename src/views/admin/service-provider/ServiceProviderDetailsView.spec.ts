@@ -3,7 +3,13 @@ import SchulenFilter from '@/components/filter/SchulenFilter.vue';
 import routes from '@/router/routes';
 import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
-import { RollenArt, RollenSystemRecht, useRolleStore, type RolleStore } from '@/stores/RolleStore.js';
+import {
+  RollenArt,
+  RollenSystemRecht,
+  useRolleStore,
+  type RolleStore,
+  type RolleWithServiceProvidersResponse,
+} from '@/stores/RolleStore.js';
 import {
   ServiceProviderKategorie,
   useServiceProviderStore,
@@ -18,7 +24,6 @@ import { afterEach, type MockInstance } from 'vitest';
 import { nextTick, type Component } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 import ServiceProviderDetailsView from './ServiceProviderDetailsView.vue';
-import { TranslatedObject } from '@/types.js';
 
 let wrapper: VueWrapper<InstanceType<typeof ServiceProviderDetailsView>> | null = null;
 let router: Router;
@@ -114,6 +119,25 @@ afterEach(() => {
 });
 
 describe('ServiceProviderDetailsView', () => {
+  test('it requests rollen and rollenerweiterungen exactly once on mount with permission', async (): Promise<void> => {
+    wrapper?.unmount();
+    const getAllRollenSpy: MockInstance = vi.spyOn(rolleStore, 'getAllRollen').mockResolvedValue();
+    const getRollenerweiterungenByIdSpy: MockInstance = vi
+      .spyOn(serviceProviderStore, 'getRollenerweiterungenById')
+      .mockResolvedValue();
+    getAllRollenSpy.mockClear();
+    getRollenerweiterungenByIdSpy.mockClear();
+
+    wrapper = await mountComponent();
+
+    expect(getAllRollenSpy).toHaveBeenCalledOnce();
+    expect(getAllRollenSpy).toHaveBeenCalledWith({
+      limit: 25,
+      systemrechte: [RollenSystemRecht.RollenVerwalten, RollenSystemRecht.RollenErweitern],
+    });
+    expect(getRollenerweiterungenByIdSpy).toHaveBeenCalledOnce();
+  });
+
   test('it renders the service provider details page and shows its data', () => {
     expect(wrapper).toBeTruthy();
     expect(wrapper?.find('[data-testid="service-provider-details-card"]').isVisible()).toBe(true);
@@ -267,7 +291,8 @@ describe('ServiceProviderDetailsView', () => {
     await openRollenerweiterungenSection();
 
     const rollenFilter: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
-    rollenFilter?.vm.$emit('update:model-value', ['rolle-1']);
+    const selectedRolle: RolleWithServiceProvidersResponse = DoFactory.getRolleWithServiceProviders({ id: 'rolle-1' });
+    rollenFilter?.vm.$emit('update:model-value', [selectedRolle]);
     await flushPromises();
 
     expect(getRollenerweiterungenByIdSpy).toHaveBeenCalled();
@@ -288,9 +313,10 @@ describe('ServiceProviderDetailsView', () => {
 
     const schulenFilter: VueWrapper | undefined = wrapper?.findComponent(SchulenFilter);
     const rollenFilter: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+    const selectedRolle: RolleWithServiceProvidersResponse = DoFactory.getRolleWithServiceProviders({ id: 'rolle-1' });
 
     schulenFilter?.vm.$emit('update:selected-schulen', ['schule-1']);
-    rollenFilter?.vm.$emit('update:model-value', ['rolle-1']);
+    rollenFilter?.vm.$emit('update:model-value', [selectedRolle]);
     await flushPromises();
 
     // Clear organisation filter, empty array should send undefined
@@ -318,25 +344,6 @@ describe('ServiceProviderDetailsView', () => {
     });
   });
 
-  test('it handles undefined rolle filter value by defaulting to empty array', async () => {
-    const getRollenerweiterungenByIdSpy: MockInstance = vi
-      .spyOn(serviceProviderStore, 'getRollenerweiterungenById')
-      .mockResolvedValue();
-    await openRollenerweiterungenSection();
-
-    const rollenFilter: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
-    rollenFilter?.vm.$emit('update:model-value', undefined);
-    await flushPromises();
-
-    expect(getRollenerweiterungenByIdSpy).toHaveBeenLastCalledWith({
-      serviceProviderId: mockServiceProvider.id,
-      organisationIds: undefined,
-      rolleIds: undefined,
-      offset: 0,
-      limit: 30,
-    });
-  });
-
   test('it shows no items in the rollen filter when allRollen is empty', async () => {
     rolleStore.allRollen = [];
     wrapper = await mountComponent();
@@ -347,38 +354,95 @@ describe('ServiceProviderDetailsView', () => {
   });
 
   test('it retains selected rollen and deduplicates autocomplete items by id', async () => {
-    const selectedRolle = DoFactory.getRolleWithServiceProviders({ id: 'selected-rolle', name: 'Selected role' });
-    const searchResultRolle = DoFactory.getRolleWithServiceProviders({ id: 'search-result', name: 'Search result' });
+    const selectedRolle: RolleWithServiceProvidersResponse = DoFactory.getRolleWithServiceProviders({
+      id: 'selected-rolle',
+      name: 'Selected role',
+    });
+    const searchResultRolle: RolleWithServiceProvidersResponse = DoFactory.getRolleWithServiceProviders({
+      id: 'search-result',
+      name: 'Search result',
+    });
     rolleStore.allRollen = [selectedRolle];
     wrapper = await mountComponent();
     await openRollenerweiterungenSection();
 
     const rollenFilter: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
-    rollenFilter?.vm.$emit('update:model-value', [selectedRolle.id]);
-    await nextTick();
+    rollenFilter?.vm.$emit('update:model-value', [selectedRolle]);
+    await flushPromises();
 
     rolleStore.allRollen = [searchResultRolle];
     await nextTick();
 
-    const retainedItems: TranslatedObject[] = (rollenFilter as unknown as {
-      props: (key: string) => TranslatedObject[];
-    }).props('items');
-    expect(retainedItems).toEqual(
-      expect.arrayContaining([
-        { value: selectedRolle.id, title: selectedRolle.name },
-        { value: searchResultRolle.id, title: searchResultRolle.name },
-      ]),
-    );
+    const retainedItems: RolleWithServiceProvidersResponse[] = (
+      rollenFilter as unknown as {
+        props: (key: string) => RolleWithServiceProvidersResponse[];
+      }
+    ).props('items');
+    expect(retainedItems).toEqual(expect.arrayContaining([selectedRolle, searchResultRolle]));
 
     rolleStore.allRollen = [selectedRolle, searchResultRolle];
     await nextTick();
 
-    const mergedItems: TranslatedObject[] = (rollenFilter as unknown as {
-      props: (key: string) => TranslatedObject[];
-    }).props('items');
-    expect(mergedItems.filter((item: TranslatedObject) => item.value === selectedRolle.id)).toHaveLength(
+    const mergedItems: RolleWithServiceProvidersResponse[] = (
+      rollenFilter as unknown as {
+        props: (key: string) => RolleWithServiceProvidersResponse[];
+      }
+    ).props('items');
+    expect(mergedItems.filter((item: RolleWithServiceProvidersResponse) => item.id === selectedRolle.id)).toHaveLength(
       1,
     );
+  });
+
+  test('it selects and deselects a rolle through the menu after results are replaced', async (): Promise<void> => {
+    wrapper?.unmount();
+    await router.push({ name: 'angebot-details', params: { id: mockServiceProvider.id } });
+    const selectedRolle: RolleWithServiceProvidersResponse = DoFactory.getRolleWithServiceProviders({ name: 'Lehrer' });
+    rolleStore.allRollen = [selectedRolle];
+    wrapper = await mountComponent();
+    await openRollenerweiterungenSection();
+    const getRollenerweiterungenByIdSpy: MockInstance = vi
+      .spyOn(serviceProviderStore, 'getRollenerweiterungenById')
+      .mockResolvedValue();
+    getRollenerweiterungenByIdSpy.mockClear();
+    const rollenFilter: VueWrapper = wrapper.findComponent({ ref: 'rolle-select' });
+    const input: DOMWrapper<Element> = rollenFilter.find('input');
+    await input.trigger('focus');
+    await input.trigger('keydown', { key: 'ArrowDown' });
+    await flushPromises();
+
+    const body: DOMWrapper<HTMLElement> = new DOMWrapper(document.body);
+    const option: DOMWrapper<Element> = body.find('.v-overlay--active [role="option"][aria-posinset="1"]');
+    expect(option.text()).toBe(selectedRolle.name);
+    await option.trigger('click');
+    await flushPromises();
+
+    expect(rollenFilter.props()).toHaveProperty('modelValue', [selectedRolle]);
+    expect(getRollenerweiterungenByIdSpy).toHaveBeenCalledOnce();
+    expect(getRollenerweiterungenByIdSpy).toHaveBeenLastCalledWith({
+      serviceProviderId: mockServiceProvider.id,
+      organisationIds: undefined,
+      rolleIds: [selectedRolle.id],
+      offset: 0,
+      limit: 30,
+    });
+
+    rolleStore.allRollen = [DoFactory.getRolleWithServiceProviders({ id: selectedRolle.id, name: 'Updated name' })];
+    await flushPromises();
+    expect(rollenFilter.props()).toHaveProperty('items', [selectedRolle]);
+    expect(body.find('.v-overlay--active [role="option"][aria-posinset="1"]').attributes('aria-selected')).toBe('true');
+
+    await body.find('.v-overlay--active [role="option"][aria-posinset="1"]').trigger('click');
+    await flushPromises();
+
+    expect(rollenFilter.props()).toHaveProperty('modelValue', []);
+    expect(getRollenerweiterungenByIdSpy).toHaveBeenCalledTimes(2);
+    expect(getRollenerweiterungenByIdSpy).toHaveBeenLastCalledWith({
+      serviceProviderId: mockServiceProvider.id,
+      organisationIds: undefined,
+      rolleIds: undefined,
+      offset: 0,
+      limit: 30,
+    });
   });
 
   test('it resets both filters via reset button and reloads rollenerweiterungen', async () => {
@@ -391,7 +455,7 @@ describe('ServiceProviderDetailsView', () => {
     const rollenFilter: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
     const selectedRolle: RolleWithServiceProvidersResponse = rolleStore.allRollen[0];
     schulenFilter?.vm.$emit('update:selected-schulen', ['schule-1']);
-    rollenFilter?.vm.$emit('update:model-value', [selectedRolle.id]);
+    rollenFilter?.vm.$emit('update:model-value', [selectedRolle]);
     await flushPromises();
     rolleStore.allRollen = [];
     await nextTick();
@@ -411,7 +475,7 @@ describe('ServiceProviderDetailsView', () => {
       limit: 30,
     });
     expect(
-      (rollenFilter as unknown as { props: (key: string) => TranslatedObject[] }).props('items'),
+      (rollenFilter as unknown as { props: (key: string) => RolleWithServiceProvidersResponse[] }).props('items'),
     ).toEqual([]);
 
     // Reset button should now be disabled again
@@ -425,6 +489,7 @@ describe('ServiceProviderDetailsView', () => {
 
     const rollenFilter: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
     rollenFilter?.vm.$emit('update:search', 'Lehrer');
+    await nextTick();
 
     // Should not have been called yet due to debounce
     expect(getAllRollenSpy).not.toHaveBeenCalledWith(expect.objectContaining({ searchString: 'Lehrer' }));
@@ -449,7 +514,9 @@ describe('ServiceProviderDetailsView', () => {
     const rollenFilter: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
 
     // Set rolleIds state first
-    rollenFilter?.vm.$emit('update:model-value', ['rolle-1']);
+    const selectedRolle: RolleWithServiceProvidersResponse = DoFactory.getRolleWithServiceProviders({ id: 'rolle-1' });
+    rollenFilter?.vm.$emit('update:model-value', [selectedRolle]);
+    await nextTick();
     vi.advanceTimersByTime(500);
     await flushPromises();
 
@@ -457,6 +524,7 @@ describe('ServiceProviderDetailsView', () => {
 
     // Now trigger the search
     rollenFilter?.vm.$emit('update:search', 'Lehrer');
+    await nextTick();
 
     expect(getAllRollenSpy).not.toHaveBeenCalledWith(expect.objectContaining({ searchString: 'Lehrer' }));
 
