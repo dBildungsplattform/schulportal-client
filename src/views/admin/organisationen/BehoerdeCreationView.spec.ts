@@ -47,7 +47,9 @@ vi.mock('vue-router', async (importOriginal: () => Promise<object>) => {
   };
 });
 
-const setup = async (): Promise<{
+const setup = async (
+  initialLookupError: string = '',
+): Promise<{
   wrapper: VueWrapper<ComponentInstance<typeof BehoerdeCreationView>>;
   router: Router;
   organisationStore: OrganisationStore;
@@ -76,6 +78,13 @@ const setup = async (): Promise<{
     }),
   ];
   organisationStore.errorCode = '';
+  if (initialLookupError) {
+    vi.spyOn(organisationStore, 'getRootKinderSchultraeger').mockImplementationOnce((): Promise<void> => {
+      organisationStore.schultraeger = [];
+      organisationStore.errorCode = initialLookupError;
+      return Promise.resolve();
+    });
+  }
 
   const router: Router = createRouter({
     history: createWebHistory(),
@@ -139,6 +148,70 @@ describe('BehoerdeCreationView', () => {
     const { wrapper }: { wrapper: VueWrapper<ComponentInstance<typeof BehoerdeCreationView>> } = await setup();
 
     expect(wrapper.find('[data-testid="behoerdenname-input"]').isVisible()).toBe(true);
+  });
+
+  test('retries a failed jurisdiction lookup before revealing the form', async (): Promise<void> => {
+    const {
+      wrapper,
+      organisationStore,
+    }: {
+      wrapper: VueWrapper<ComponentInstance<typeof BehoerdeCreationView>>;
+      organisationStore: OrganisationStore;
+    } = await setup('SCHULTRAEGER_ERROR');
+
+    expect(wrapper.findComponent(BehoerdeForm).exists()).toBe(false);
+    expect(organisationStore.schultraeger).toEqual([]);
+
+    let finishRetry: () => void = vi.fn();
+    vi.spyOn(organisationStore, 'getRootKinderSchultraeger').mockImplementationOnce(
+      (): Promise<void> =>
+        new Promise<void>((resolve: () => void): void => {
+          finishRetry = (): void => {
+            organisationStore.schultraeger = [DoFactory.getOrganisation()];
+            resolve();
+          };
+        }),
+    );
+
+    await wrapper.get('[data-testid$="alert-button"]').trigger('click');
+    await flushPromises();
+
+    expect(organisationStore.getRootKinderSchultraeger).toHaveBeenCalledTimes(2);
+    expect(organisationStore.errorCode).toBe('');
+    expect(wrapper.findComponent(BehoerdeForm).exists()).toBe(false);
+
+    finishRetry();
+    await flushPromises();
+
+    expect(wrapper.getComponent(BehoerdeForm).props('zustaendigkeitsbereichList')).toEqual(
+      organisationStore.schultraeger,
+    );
+    expect(wrapper.getComponent(BehoerdeForm).props('initialValues')).toMatchObject({
+      selectedZustaendigkeitsbereich: organisationStore.schultraeger[0]?.id,
+    });
+  });
+
+  test('keeps the form hidden when the jurisdiction retry fails', async (): Promise<void> => {
+    const {
+      wrapper,
+      organisationStore,
+    }: {
+      wrapper: VueWrapper<ComponentInstance<typeof BehoerdeCreationView>>;
+      organisationStore: OrganisationStore;
+    } = await setup('SCHULTRAEGER_ERROR');
+
+    vi.spyOn(organisationStore, 'getRootKinderSchultraeger').mockImplementationOnce((): Promise<void> => {
+      organisationStore.errorCode = 'SCHULTRAEGER_ERROR';
+      return Promise.resolve();
+    });
+
+    await wrapper.get('[data-testid$="alert-button"]').trigger('click');
+    await flushPromises();
+
+    expect(organisationStore.getRootKinderSchultraeger).toHaveBeenCalledTimes(2);
+    expect(organisationStore.errorCode).toBe('SCHULTRAEGER_ERROR');
+    expect(wrapper.findComponent(BehoerdeForm).exists()).toBe(false);
+    expect(wrapper.get('[data-testid$="alert-title"]').isVisible()).toBe(true);
   });
 
   test('it renders all child components', async (): Promise<void> => {
@@ -261,6 +334,7 @@ describe('BehoerdeCreationView', () => {
     expect(wrapper.get<HTMLInputElement>('[data-testid="behoerdenname-input"] input').element.value).toBe(
       'Existing Behoerde',
     );
+    expect(organisationStore.getRootKinderSchultraeger).toHaveBeenCalledOnce();
   });
 
   test('clears unsaved changes only after a successful save', async (): Promise<void> => {

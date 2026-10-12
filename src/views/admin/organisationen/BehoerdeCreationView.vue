@@ -106,11 +106,24 @@
     await router.push({ name: 'start' });
   }
 
+  async function loadZustaendigkeitsbereiche(): Promise<void> {
+    isZustaendigkeitsbereichLoaded.value = false;
+    organisationStore.errorCode = '';
+    await organisationStore.getRootKinderSchultraeger();
+    if (organisationStore.errorCode) {
+      return;
+    }
+    initialFormValues.value.selectedZustaendigkeitsbereich = zustaendigkeitsbereichList.value[0]?.id ?? '';
+    isZustaendigkeitsbereichLoaded.value = true;
+  }
+
   async function navigateBackToBehoerdeForm(): Promise<void> {
     if (organisationStore.errorCode === 'REQUIRED_STEP_UP_LEVEL_NOT_MET') {
       await router.push({ name: 'create-behoerde' }).then(() => {
         router.go(0);
       });
+    } else if (!isZustaendigkeitsbereichLoaded.value) {
+      await loadZustaendigkeitsbereiche();
     } else {
       organisationStore.errorCode = '';
     }
@@ -127,11 +140,8 @@
 
   onMounted(async () => {
     organisationStore.createdBehoerde = null;
-    organisationStore.errorCode = '';
     window.addEventListener('beforeunload', preventNavigation);
-    await organisationStore.getRootKinderSchultraeger();
-    initialFormValues.value.selectedZustaendigkeitsbereich = zustaendigkeitsbereichList.value[0]?.id ?? '';
-    isZustaendigkeitsbereichLoaded.value = true;
+    await loadZustaendigkeitsbereiche();
   });
 
   onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
