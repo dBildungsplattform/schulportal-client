@@ -1,7 +1,7 @@
+import LabeledField from '@/components/admin/LabeledField.vue';
 import SuccessIcon from '@/components/icons/SuccessIcon.vue';
 import SpshDivider from '@/components/layout/SpshDivider.vue';
-import DataRow from '@/components/layout/success/DataRow.vue';
-import { VueWrapper, enableAutoUnmount, mount, type DOMWrapper } from '@vue/test-utils';
+import { VueWrapper, enableAutoUnmount, mount } from '@vue/test-utils';
 import { expect, test } from 'vitest';
 import type { ComponentInstance } from 'vue';
 import { createVuetify } from 'vuetify';
@@ -31,7 +31,7 @@ describe('BehoerdeSuccessTemplate', () => {
     expect(wrapper.get('[data-testid="behoerde-success-text"]').text()).toBe(
       'Die Behörde wurde erfolgreich hinzugefügt.',
     );
-    expect(wrapper.getComponent(DataRow).get('span').text()).toBe('Test Behörde');
+    expect(wrapper.getComponent(LabeledField).get('.text-body').text()).toBe('Test Behörde');
     expect(wrapper.findComponent(SuccessIcon).exists()).toBe(true);
     expect(wrapper.findComponent(SpshDivider).exists()).toBe(true);
   });
@@ -82,14 +82,15 @@ describe('BehoerdeSuccessTemplate', () => {
       ],
     });
 
-    expect(wrapper.findAll('.bold').map((label: DOMWrapper<Element>): string => label.text())).toEqual([
-      'Name:',
-      'Description:',
-    ]);
     expect(
       wrapper
-        .findAllComponents(DataRow)
-        .map((row: VueWrapper<ComponentInstance<typeof DataRow>>): string => row.get('span').text()),
+        .findAllComponents(LabeledField)
+        .map((row: VueWrapper<ComponentInstance<typeof LabeledField>>): string => row.get('.subtitle-2').text()),
+    ).toEqual(['Name:', 'Description:']);
+    expect(
+      wrapper
+        .findAllComponents(LabeledField)
+        .map((row: VueWrapper<ComponentInstance<typeof LabeledField>>): string => row.get('.text-body').text()),
     ).toEqual(['First value', 'Second value']);
   });
 
