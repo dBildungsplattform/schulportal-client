@@ -1,12 +1,12 @@
 import { mount, type VueWrapper } from '@vue/test-utils';
 import { VDivider } from 'vuetify/components';
-import Divider from './Divider.vue';
+import SPSHDivider from './SPSHDivider.vue';
 
 let wrapper: VueWrapper | null = null;
 
 beforeEach((): void => {
   document.body.innerHTML = '<div id="app"></div>';
-  wrapper = mount(Divider, {
+  wrapper = mount(SPSHDivider, {
     attachTo: document.getElementById('app') || '',
   });
 });
@@ -15,7 +15,7 @@ afterEach((): void => {
   wrapper?.unmount();
 });
 
-describe('Divider', (): void => {
+describe('SPSHDivider', (): void => {
   test('it preserves the divider styling', (): void => {
     expect(wrapper?.getComponent(VDivider).props('color')).toBe('#E5EAEF');
     expect(wrapper?.getComponent(VDivider).props('thickness')).toBe('6');

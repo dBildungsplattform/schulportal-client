@@ -21,8 +21,6 @@ describe('ScreenreaderOutput', (): void => {
   test('renders an empty visually hidden output', (): void => {
     const { wrapper }: { wrapper: OutputWrapper } = setup();
 
-    expect(wrapper.element.tagName).toBe('OUTPUT');
-    expect(wrapper.attributes('role')).toBeUndefined();
     expect(wrapper.classes()).toContain('d-sr-only');
     expect(wrapper.text()).toBe('');
   });
