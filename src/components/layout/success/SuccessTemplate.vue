@@ -37,7 +37,11 @@
         <slot name="description" />
       </v-col>
     </v-row>
-    <slot />
+    <v-row class="justify-center">
+      <v-col cols="auto">
+        <slot />
+      </v-col>
+    </v-row>
     <SpshDivider />
     <v-row class="justify-end">
       <slot name="actions" />
