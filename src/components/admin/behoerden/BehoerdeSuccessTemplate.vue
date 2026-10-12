@@ -37,6 +37,7 @@
         :key="item.testId"
         :label="item.label"
         :value="item.value"
+        :test-id="item.testId"
       />
     </template>
     <template #actions>
