@@ -1,7 +1,7 @@
 <script setup lang="ts">
-  import CreateAnotherButton from '@/components/layout/success/CreateAnotherButton.vue';
+  import CreateAnotherButton from '@/components/layout/success/button/CreateAnotherButton.vue';
+  import NavigationButton from '@/components/layout/success/button/NavigationButton.vue';
   import DataRow from '@/components/layout/success/DataRow.vue';
-  import NavigationButton from '@/components/layout/success/NavigationButton.vue';
   import SuccessTemplate from '@/components/layout/success/SuccessTemplate.vue';
 
   defineProps<{
