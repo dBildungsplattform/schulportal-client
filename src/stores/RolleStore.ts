@@ -133,7 +133,6 @@ export type RolleFilter = {
   offset?: number;
   searchString?: string;
   organisationIds?: string[];
-  rolleIds?: string[];
   systemrechte?: RollenSystemRechtEnum[];
   rollenarten?: Array<RollenArt>;
   merkmale?: Array<RollenMerkmal>;
@@ -162,7 +161,6 @@ export type RollenForMptZuordnungFilter = {
   offset?: number;
   searchString?: string;
   organisationIds?: string[];
-  rolleIds?: string[];
 };
 
 export type PersistRollenerweiterungForRolle = {
@@ -233,7 +231,7 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
               filter.limit,
               filter.searchString,
               filter.organisationIds,
-              filter.rolleIds,
+              undefined,
               filter.systemrechte,
               filter.rollenarten,
               filter.merkmale,
@@ -298,7 +296,6 @@ export const useRolleStore: StoreDefinition<'rolleStore', RolleState, RolleGette
               filter.limit,
               filter.searchString,
               filter.organisationIds,
-              filter.rolleIds,
             );
           this.allRollen = response.data;
           this.totalRollen = +response.headers['x-paging-total'];

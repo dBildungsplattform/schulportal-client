@@ -313,7 +313,6 @@ describe('rolleStore', () => {
         limit: 15,
         searchString: 'MPT',
         organisationIds: ['organisation-1', 'organisation-2'],
-        rolleIds: ['rolle-1', 'rolle-2'],
       });
       expect(rolleStore.loading).toBe(true);
       await promise;
@@ -323,7 +322,6 @@ describe('rolleStore', () => {
       expect(query.get('limit')).toBe('15');
       expect(query.get('searchStr')).toBe('MPT');
       expect(query.getAll('organisationIds')).toEqual(['organisation-1', 'organisation-2']);
-      expect(query.getAll('rolleIds')).toEqual(['rolle-1', 'rolle-2']);
       expect(rolleStore.allRollen).toEqual(mockResponse);
       expect(rolleStore.totalRollen).toBe(4);
       expect(rolleStore.loading).toBe(false);
