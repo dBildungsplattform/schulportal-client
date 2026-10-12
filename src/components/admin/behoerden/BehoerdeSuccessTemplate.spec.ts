@@ -1,6 +1,6 @@
 import LabeledField from '@/components/admin/LabeledField.vue';
 import SuccessIcon from '@/components/icons/SuccessIcon.vue';
-import SpshDivider from '@/components/layout/SpshDivider.vue';
+import Divider from '@/components/layout/Divider.vue';
 import { VueWrapper, enableAutoUnmount, mount } from '@vue/test-utils';
 import { expect, test } from 'vitest';
 import type { ComponentInstance } from 'vue';
@@ -33,7 +33,7 @@ describe('BehoerdeSuccessTemplate', () => {
     );
     expect(wrapper.getComponent(LabeledField).get('.text-body').text()).toBe('Test Behörde');
     expect(wrapper.findComponent(SuccessIcon).exists()).toBe(true);
-    expect(wrapper.findComponent(SpshDivider).exists()).toBe(true);
+    expect(wrapper.findComponent(Divider).exists()).toBe(true);
   });
 
   test('it emits onCreateAnotherBehoerde when the create another button is clicked', async () => {

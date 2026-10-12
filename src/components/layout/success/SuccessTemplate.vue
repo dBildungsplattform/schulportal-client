@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import SuccessIcon from '@/components/icons/SuccessIcon.vue';
-  import SpshDivider from '@/components/layout/SpshDivider.vue';
+  import Divider from '@/components/layout/Divider.vue';
   import { type VNode } from 'vue';
 
   defineSlots<{
@@ -42,7 +42,7 @@
         <slot />
       </v-col>
     </v-row>
-    <SpshDivider />
+    <Divider />
     <v-row class="justify-end">
       <slot name="actions" />
     </v-row>

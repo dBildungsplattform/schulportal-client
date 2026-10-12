@@ -1,5 +1,5 @@
 import SuccessIcon from '@/components/icons/SuccessIcon.vue';
-import SpshDivider from '@/components/layout/SpshDivider.vue';
+import Divider from '@/components/layout/Divider.vue';
 import { enableAutoUnmount, mount, type DOMWrapper, type VueWrapper } from '@vue/test-utils';
 import { h, type ComponentInstance, type VNode } from 'vue';
 import SuccessTemplate from './SuccessTemplate.vue';
@@ -26,7 +26,7 @@ describe('SuccessTemplate', (): void => {
     const { wrapper }: { wrapper: VueWrapper<ComponentInstance<typeof SuccessTemplate>> } = setup();
 
     expect(wrapper.findComponent(SuccessIcon).exists()).toBe(true);
-    expect(wrapper.findAllComponents(SpshDivider)).toHaveLength(1);
+    expect(wrapper.findAllComponents(Divider)).toHaveLength(1);
     expect(
       wrapper
         .findAll('[data-testid]')
