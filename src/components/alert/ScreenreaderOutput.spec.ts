@@ -1,6 +1,8 @@
-import { mount } from '@vue/test-utils';
+import { enableAutoUnmount, mount } from '@vue/test-utils';
 import { nextTick, ref, type Ref } from 'vue';
 import ScreenreaderOutput from './ScreenreaderOutput.vue';
+
+enableAutoUnmount(afterEach);
 
 type OutputWrapper = ReturnType<typeof mount<typeof ScreenreaderOutput>>;
 
