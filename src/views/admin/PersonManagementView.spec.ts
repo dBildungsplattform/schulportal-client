@@ -1,10 +1,10 @@
-import { RollenArt } from '@/api-client/generated/api';
+import { RollenArt, RollenMerkmal, RollenSystemRechtEnum } from '@/api-client/generated/api';
 import routes from '@/router/routes';
 import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
 import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
-import { useRolleStore, type RolleStore } from '@/stores/RolleStore';
+import { useRolleStore, type RolleStore, type TranslatedRolleWithAttrs } from '@/stores/RolleStore';
 import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
 import type { Person } from '@/stores/types/Person';
 import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
@@ -78,6 +78,7 @@ beforeEach(async () => {
   authStore.hasPersonenBulkPermission = true;
   authStore.hasPersonenLoeschenPermission = true;
   authStore.hasPersonenverwaltungPermission = true;
+  authStore.grantedGatedRollenSystemrechte = [];
 
   personStore.getAllPersons = vi.fn();
   organisationStore.getFilteredKlassen = vi.fn();
@@ -484,6 +485,37 @@ describe('PersonManagementView', () => {
     expect(rolleStore.rollenForPersonAdministration).toHaveLength(1);
   });
 
+  test.each([
+    { systemrechte: [] },
+    {
+      systemrechte: [
+        RollenSystemRechtEnum.MptRollenZuordnen,
+        RollenSystemRechtEnum.Pilot2RollenZuordnen,
+        RollenSystemRechtEnum.Pilot5RollenZuordnen,
+      ],
+    },
+  ])(
+    'forwards granted gated rights to Rollen search: $systemrechte',
+    async ({ systemrechte }: { systemrechte: RollenSystemRechtEnum[] }) => {
+      authStore.grantedGatedRollenSystemrechte = systemrechte;
+      const getRollenForPersonAdministration: Mock = vi.fn().mockResolvedValue(undefined);
+      rolleStore.getRollenForPersonAdministration = getRollenForPersonAdministration;
+      const rollenAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+
+      rollenAutocomplete?.vm.$emit('update:search', 'pilot');
+      await nextTick();
+      vi.runAllTimers();
+      vi.runAllTicks();
+
+      expect(getRollenForPersonAdministration).toHaveBeenLastCalledWith({
+        searchStr: 'pilot',
+        limit: 25,
+        organisationIds: [],
+        systemrechte: [RollenSystemRechtEnum.PersonenVerwalten, ...systemrechte],
+      });
+    },
+  );
+
   type BulkOperationTestParams = {
     operationType: OperationType;
     layoutCardTestId: string;
@@ -557,6 +589,34 @@ describe('PersonManagementView', () => {
       expect(document.body.querySelector(`[data-testid="${layoutCardTestId}"]`)).toBeNull();
     },
   );
+
+  test('offers Pilot-Merkmal rollen (not just MPT) in the Rolle zuordnen bulk dialog', async () => {
+    const pilotRolle: TranslatedRolleWithAttrs = {
+      value: '99999',
+      title: 'Pilot Rolle',
+      rollenart: RollenArt.Schb,
+      merkmale: [RollenMerkmal.Pilot2Rolle],
+    };
+    rolleStore.rollenForPersonenkontextCreation = [...rolleStore.rollenForPersonenkontextCreation, pilotRolle];
+
+    const checkbox: DOMWrapper<Element> | undefined = wrapper?.find(
+      '[data-testid="person-table"] .v-selection-control',
+    );
+    await checkbox?.trigger('click');
+    await nextTick();
+
+    const benutzerEditSelect: VueWrapper | undefined = wrapper?.findComponent({ ref: 'benutzer-bulk-edit-select' });
+    benutzerEditSelect?.setValue(OperationType.MODIFY_ROLLE);
+    await nextTick();
+
+    const rolleSelect: VueWrapper = wrapper?.findComponent(
+      '[data-testid="rolle-modify-layout-card"] [data-testid="rolle-select"]',
+    ) as VueWrapper;
+    const rollenItems: Array<{ value: string }> = (
+      rolleSelect as unknown as { props: (key: string) => Array<{ value: string }> }
+    ).props('items');
+    expect(rollenItems.some((item: { value: string }) => item.value === '99999')).toBe(true);
+  });
 
   test.each([
     [OperationType.CHANGE_KLASSE],
