@@ -220,7 +220,7 @@ describe('RolleManagementView', () => {
       systemrechte: [RollenSystemRechtEnum.RollenVerwalten],
       merkmale: [RollenMerkmal.KopersPflicht],
       rollenarten: undefined,
-      organisationenForFilter: undefined,
+      organisationIds: undefined,
       serviceProviderIds: undefined,
     });
   });
@@ -243,7 +243,7 @@ describe('RolleManagementView', () => {
       systemrechte: [RollenSystemRechtEnum.RollenVerwalten],
       merkmale: undefined,
       rollenarten: [RollenArt.Lehr],
-      organisationenForFilter: undefined,
+      organisationIds: undefined,
       serviceProviderIds: undefined,
     });
   });
@@ -262,7 +262,7 @@ describe('RolleManagementView', () => {
       systemrechte: [RollenSystemRechtEnum.RollenVerwalten],
       merkmale: undefined,
       rollenarten: [RollenArt.Lehr],
-      organisationenForFilter: undefined,
+      organisationIds: undefined,
       serviceProviderIds: undefined,
     });
   });
@@ -285,7 +285,7 @@ describe('RolleManagementView', () => {
       systemrechte: [RollenSystemRechtEnum.RollenVerwalten],
       merkmale: undefined,
       rollenarten: undefined,
-      organisationenForFilter: orgs,
+      organisationIds: orgs,
       serviceProviderIds: undefined,
     });
   });
@@ -338,7 +338,7 @@ describe('RolleManagementView', () => {
         systemrechte: [RollenSystemRechtEnum.RollenVerwalten],
         merkmale: undefined,
         rollenarten: undefined,
-        organisationenForFilter: undefined,
+        organisationIds: undefined,
         serviceProviderIds: ['sp1'],
       });
     });
@@ -441,7 +441,7 @@ describe('RolleManagementView', () => {
       searchString: searchString,
       merkmale: undefined,
       rollenarten: undefined,
-      organisationenForFilter: undefined,
+      organisationIds: undefined,
       systemrechte: [RollenSystemRechtEnum.RollenVerwalten],
     });
   });

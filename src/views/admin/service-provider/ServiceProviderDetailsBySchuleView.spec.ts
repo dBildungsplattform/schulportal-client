@@ -1,4 +1,4 @@
-import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
+import { DOMWrapper, VueWrapper, enableAutoUnmount, mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 import type { MockInstance } from 'vitest';
 import { nextTick, type Component, type ComponentPublicInstance } from 'vue';
@@ -29,6 +29,8 @@ const serviceProviderStore: ServiceProviderStore = useServiceProviderStore();
 const authStore: AuthStore = useAuthStore();
 const rolleStore: RolleStore = useRolleStore();
 const configStore: ConfigStore = useConfigStore();
+
+enableAutoUnmount(afterEach);
 
 const mockServiceProvider: ManageableServiceProviderDetail = DoFactory.getManageableServiceProviderDetail({
   kategorie: ServiceProviderKategorie.Hinweise,
@@ -255,33 +257,44 @@ describe('ServiceProviderDetailsBySchuleView', () => {
       expect(wrapper?.find('[data-testid="rollenerweiterung-bearbeiten-button"]').exists()).toBe(false);
     });
 
-    test('requests rollen without MPT systemrecht when the user lacks the permission', async () => {
+    test('requests rollen without gated rights when the user lacks them', async () => {
       authStore.grantedGatedRollenSystemrechte = [];
-      const getAllRollenSpy: MockInstance = vi.spyOn(rolleStore, 'getAllRollen').mockResolvedValue(undefined);
+      const getRollenSpy: MockInstance = vi
+        .spyOn(rolleStore, 'getRollenAvailableForErweiterung')
+        .mockResolvedValue(undefined);
       await nextTick();
 
       await wrapper?.find('[data-testid="rollenerweiterung-bearbeiten-button"]').trigger('click');
       await nextTick();
 
-      expect(getAllRollenSpy).toHaveBeenCalledWith({
-        organisationContextForOperation: 'some-org-id',
+      expect(getRollenSpy).toHaveBeenCalledWith({
+        organisationId: 'some-org-id',
         rollenarten: mockServiceProvider.rollenartenWhitelist,
         systemrechte: [RollenSystemRechtEnum.RollenErweitern],
       });
     });
 
-    test('requests rollen including MPT systemrecht when the user has the permission', async () => {
-      authStore.grantedGatedRollenSystemrechte = [RollenSystemRechtEnum.MptRollenZuordnen];
-      const getAllRollenSpy: MockInstance = vi.spyOn(rolleStore, 'getAllRollen').mockResolvedValue(undefined);
+    test('requests all granted gated systemrechte for role extensions', async () => {
+      authStore.grantedGatedRollenSystemrechte = [
+        RollenSystemRechtEnum.MptRollenZuordnen,
+        RollenSystemRechtEnum.Pilot2RollenZuordnen,
+      ];
+      const getRollenSpy: MockInstance = vi
+        .spyOn(rolleStore, 'getRollenAvailableForErweiterung')
+        .mockResolvedValue(undefined);
       await nextTick();
 
       await wrapper?.find('[data-testid="rollenerweiterung-bearbeiten-button"]').trigger('click');
       await nextTick();
 
-      expect(getAllRollenSpy).toHaveBeenCalledWith({
-        organisationContextForOperation: 'some-org-id',
+      expect(getRollenSpy).toHaveBeenCalledWith({
+        organisationId: 'some-org-id',
         rollenarten: mockServiceProvider.rollenartenWhitelist,
-        systemrechte: [RollenSystemRechtEnum.RollenErweitern, RollenSystemRechtEnum.MptRollenZuordnen],
+        systemrechte: [
+          RollenSystemRechtEnum.RollenErweitern,
+          RollenSystemRechtEnum.MptRollenZuordnen,
+          RollenSystemRechtEnum.Pilot2RollenZuordnen,
+        ],
       });
     });
 

@@ -2,13 +2,14 @@ import axiosApiInstance from '@/services/ApiService';
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import {
   AuthApiFactory,
+  RollenSystemRechtEnum as RollenSystemRecht,
   type AuthApiInterface,
   type CsrfTokenResponse,
   type PersonTimeLimitInfoResponse,
   type UserinfoResponse,
 } from '../api-client/generated/api';
 import type { Organisation } from './OrganisationStore';
-import { GATED_ROLLEN_SYSTEMRECHTE, RollenSystemRecht } from './RolleStore';
+import { GATED_ROLLEN_SYSTEMRECHTE } from './types/GatedRollen';
 import type { AxiosResponse } from 'axios';
 
 export enum StepUpLevel {

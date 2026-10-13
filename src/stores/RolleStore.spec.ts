@@ -1,19 +1,19 @@
 import MockAdapter from 'axios-mock-adapter';
 import { createPinia, setActivePinia } from 'pinia';
+import { DoFactory } from 'test/DoFactory';
 import {
   RolleControllerFindRollenAvailableForPersonAdministration200Response,
   RollenArt,
   RollenMerkmal,
   RollenSystemRechtEnum,
+  type ApplyRollenerweiterungChangesBodyParams,
   type RolleResponse,
   type RolleWithServiceProvidersResponse,
-  type ApplyRollenerweiterungChangesBodyParams,
   type ServiceProviderResponse,
 } from '../api-client/generated/api';
 import { useRolleStore, type RolleStore } from './RolleStore';
 
 import axiosApiInstance from '@/services/ApiService';
-import { DoFactory } from 'test/DoFactory';
 
 const mockadapter: MockAdapter = new MockAdapter(axiosApiInstance);
 
@@ -34,10 +34,16 @@ describe('rolleStore', () => {
 
   it('should initalize state correctly', () => {
     expect(rolleStore.createdRolle).toEqual(null);
+    expect(rolleStore.updatedRolle).toEqual(null);
+    expect(rolleStore.currentRolle).toEqual(null);
+    expect(rolleStore.currentMptRolle).toEqual(null);
     expect(rolleStore.allRollen).toEqual([]);
+    expect(rolleStore.rollenForPersonAdministration).toEqual([]);
+    expect(rolleStore.totalRollenForPersonAdministration).toBe(0);
     expect(rolleStore.rollenerweiterungServiceProviders).toEqual([]);
     expect(rolleStore.errorCode).toEqual('');
     expect(rolleStore.loading).toBe(false);
+    expect(rolleStore.totalRollen).toBe(0);
     expect(rolleStore.errors).toEqual(new Map());
   });
 
@@ -108,26 +114,26 @@ describe('rolleStore', () => {
   describe('getAllRollen', () => {
     it('should load rollen and update state', async () => {
       const mockResponse: RolleResponse[] = [
-        {
+        DoFactory.getRolleResponse({
           administeredBySchulstrukturknoten: '1234',
-          rollenart: 'LEHR',
+          rollenart: RollenArt.Lehr,
           name: 'Lehrer',
           merkmale: [RollenMerkmal.KopersPflicht],
           systemrechte: [{ name: 'ROLLEN_VERWALTEN', isTechnical: false }],
-          createdAt: '2022',
-          updatedAt: '2022',
           id: '1',
           administeredBySchulstrukturknotenName: 'Testschule-15',
           administeredBySchulstrukturknotenKennung: '1111115',
-          version: 1,
-        },
+        }),
       ];
 
-      mockadapter.onGet('/api/rolle?offset=0&limit=30&searchStr=').replyOnce(200, mockResponse, {});
+      mockadapter
+        .onGet('/api/rolle?offset=0&limit=30&searchStr=')
+        .replyOnce(200, mockResponse, { 'x-paging-total': '1' });
       const getAllRollenPromise: Promise<void> = rolleStore.getAllRollen({ offset: 0, limit: 30, searchString: '' });
       expect(rolleStore.loading).toBe(true);
       await getAllRollenPromise;
       expect(rolleStore.allRollen).toEqual([...mockResponse]);
+      expect(rolleStore.totalRollen).toBe(1);
       expect(rolleStore.loading).toBe(false);
     });
 
@@ -151,6 +157,15 @@ describe('rolleStore', () => {
       expect(rolleStore.loading).toBe(false);
     });
 
+    it('should handle an i18n error', async () => {
+      mockadapter.onGet('/api/rolle?offset=0&limit=30&searchStr=').replyOnce(500, { i18nKey: 'ROLLEN_LIST_ERROR' });
+
+      await rolleStore.getAllRollen({ offset: 0, limit: 30, searchString: '' });
+
+      expect(rolleStore.errorCode).toBe('ROLLEN_LIST_ERROR');
+      expect(rolleStore.loading).toBe(false);
+    });
+
     it('should pass all filter params to the api', async () => {
       mockadapter.onGet(/\/api\/rolle/).replyOnce(200, [], {});
 
@@ -158,37 +173,194 @@ describe('rolleStore', () => {
         offset: 0,
         limit: 30,
         searchString: '',
-        organisationContextForOperation: 'org1',
-        organisationenForFilter: ['org2', 'org3'],
+        organisationIds: ['org2', 'org3'],
         merkmale: [RollenMerkmal.KopersPflicht],
         serviceProviderIds: ['sp1', 'sp2'],
       });
 
       const requestedUrl: string = mockadapter.history.get[0]!.url!;
-      expect(requestedUrl).toContain('organisationContextForOperation=org1');
-      expect(requestedUrl).toContain('organisationenForFilter=org2');
-      expect(requestedUrl).toContain('organisationenForFilter=org3');
+      expect(requestedUrl).toContain('organisationIds=org2');
+      expect(requestedUrl).toContain('organisationIds=org3');
       expect(requestedUrl).toContain(`merkmale=${RollenMerkmal.KopersPflicht}`);
       expect(requestedUrl).toContain('serviceProviderIds=sp1');
       expect(requestedUrl).toContain('serviceProviderIds=sp2');
     });
   });
 
+  describe('getRollenAvailableForErweiterung', () => {
+    it('should load available rollen and pass all filters to the api', async () => {
+      const mockResponse: RolleWithServiceProvidersResponse[] = [DoFactory.getRolleWithServiceProviders()];
+      mockadapter.onGet(/^\/api\/rolle\/available-for-erweiterung/).replyOnce(200, mockResponse, {
+        'x-paging-total': '12',
+      });
+
+      const promise: Promise<void> = rolleStore.getRollenAvailableForErweiterung({
+        offset: 10,
+        limit: 5,
+        searchString: 'Lehr',
+        rollenarten: [RollenArt.Lehr],
+        organisationId: 'organisation-1',
+        systemrechte: [RollenSystemRechtEnum.RollenErweitern, RollenSystemRechtEnum.MptRollenZuordnen],
+      });
+      expect(rolleStore.loading).toBe(true);
+      await promise;
+
+      const query: URLSearchParams = getRequestQuery(0);
+      expect(query.get('offset')).toBe('10');
+      expect(query.get('limit')).toBe('5');
+      expect(query.get('searchStr')).toBe('Lehr');
+      expect(query.getAll('rollenarten')).toEqual([RollenArt.Lehr]);
+      expect(query.get('organisationId')).toBe('organisation-1');
+      expect(query.getAll('systemrechte')).toEqual([
+        RollenSystemRechtEnum.RollenErweitern,
+        RollenSystemRechtEnum.MptRollenZuordnen,
+      ]);
+      expect(rolleStore.allRollen).toEqual(mockResponse);
+      expect(rolleStore.totalRollen).toBe(12);
+      expect(rolleStore.loading).toBe(false);
+    });
+
+    it('should handle a structured error', async () => {
+      mockadapter.onGet(/^\/api\/rolle\/available-for-erweiterung/).replyOnce(500, { i18nKey: 'ERWEITERUNG_ERROR' });
+
+      const promise: Promise<void> = rolleStore.getRollenAvailableForErweiterung({
+        organisationId: 'fake-id',
+      });
+      expect(rolleStore.loading).toBe(true);
+      await promise;
+
+      expect(rolleStore.errorCode).toBe('ERWEITERUNG_ERROR');
+      expect(rolleStore.loading).toBe(false);
+    });
+
+    it('should handle an unstructured error', async () => {
+      mockadapter.onGet(/^\/api\/rolle\/available-for-erweiterung/).replyOnce(500, 'server error');
+
+      const promise: Promise<void> = rolleStore.getRollenAvailableForErweiterung({
+        organisationId: 'fake-id',
+      });
+      expect(rolleStore.loading).toBe(true);
+      await promise;
+
+      expect(rolleStore.errorCode).toBe('UNSPECIFIED_ERROR');
+      expect(rolleStore.loading).toBe(false);
+    });
+  });
+
+  describe('getRollenAvailableForImport', () => {
+    it('should load rollen available for import and pass all filters to the api', async () => {
+      const mockResponse: RolleWithServiceProvidersResponse[] = [DoFactory.getRolleWithServiceProviders()];
+      mockadapter.onGet(/^\/api\/rolle\/available-for-import/).replyOnce(200, mockResponse, {
+        'x-paging-total': '8',
+      });
+
+      const promise: Promise<void> = rolleStore.getRollenAvailableForImport({
+        organisationId: 'organisation-2',
+        offset: 20,
+        limit: 10,
+        searchString: 'Import',
+        rollenarten: [RollenArt.Lehr],
+      });
+      expect(rolleStore.loading).toBe(true);
+      await promise;
+
+      const query: URLSearchParams = getRequestQuery(0);
+      expect(query.get('organisationId')).toBe('organisation-2');
+      expect(query.get('offset')).toBe('20');
+      expect(query.get('limit')).toBe('10');
+      expect(query.get('searchStr')).toBe('Import');
+      expect(query.getAll('rollenarten')).toEqual([RollenArt.Lehr]);
+      expect(rolleStore.allRollen).toEqual(mockResponse);
+      expect(rolleStore.totalRollen).toBe(8);
+      expect(rolleStore.loading).toBe(false);
+    });
+
+    it('should handle a structured error', async () => {
+      mockadapter.onGet(/^\/api\/rolle\/available-for-import/).replyOnce(500, { i18nKey: 'IMPORT_ERROR' });
+
+      const promise: Promise<void> = rolleStore.getRollenAvailableForImport({ organisationId: 'organisation-2' });
+      expect(rolleStore.loading).toBe(true);
+      await promise;
+
+      expect(rolleStore.errorCode).toBe('IMPORT_ERROR');
+      expect(rolleStore.loading).toBe(false);
+    });
+
+    it('should handle an unstructured error', async () => {
+      mockadapter.onGet(/^\/api\/rolle\/available-for-import/).replyOnce(500, 'server error');
+
+      const promise: Promise<void> = rolleStore.getRollenAvailableForImport({ organisationId: 'organisation-2' });
+      expect(rolleStore.loading).toBe(true);
+      await promise;
+
+      expect(rolleStore.errorCode).toBe('UNSPECIFIED_ERROR');
+      expect(rolleStore.loading).toBe(false);
+    });
+  });
+
+  describe('getRollenForMptZuordnung', () => {
+    it('should load rollen for MPT assignment and pass all filters to the api', async () => {
+      const mockResponse: RolleWithServiceProvidersResponse[] = [DoFactory.getRolleWithServiceProviders()];
+      mockadapter.onGet(/^\/api\/rolle\/available-for-mpt-zuordnung/).replyOnce(200, mockResponse, {
+        'x-paging-total': '4',
+      });
+
+      const promise: Promise<void> = rolleStore.getRollenForMptZuordnung({
+        offset: 30,
+        limit: 15,
+        searchString: 'MPT',
+        organisationIds: ['organisation-1', 'organisation-2'],
+        rolleIds: ['rolle-1', 'rolle-2'],
+      });
+      expect(rolleStore.loading).toBe(true);
+      await promise;
+
+      const query: URLSearchParams = getRequestQuery(0);
+      expect(query.get('offset')).toBe('30');
+      expect(query.get('limit')).toBe('15');
+      expect(query.get('searchStr')).toBe('MPT');
+      expect(query.getAll('organisationIds')).toEqual(['organisation-1', 'organisation-2']);
+      expect(query.getAll('rolleIds')).toEqual(['rolle-1', 'rolle-2']);
+      expect(rolleStore.allRollen).toEqual(mockResponse);
+      expect(rolleStore.totalRollen).toBe(4);
+      expect(rolleStore.loading).toBe(false);
+    });
+
+    it('should handle a structured error', async () => {
+      mockadapter.onGet(/^\/api\/rolle\/available-for-mpt-zuordnung/).replyOnce(500, { i18nKey: 'MPT_LIST_ERROR' });
+
+      const promise: Promise<void> = rolleStore.getRollenForMptZuordnung({});
+      expect(rolleStore.loading).toBe(true);
+      await promise;
+
+      expect(rolleStore.errorCode).toBe('MPT_LIST_ERROR');
+      expect(rolleStore.loading).toBe(false);
+    });
+
+    it('should handle an unstructured error', async () => {
+      mockadapter.onGet(/^\/api\/rolle\/available-for-mpt-zuordnung/).replyOnce(500, 'server error');
+
+      const promise: Promise<void> = rolleStore.getRollenForMptZuordnung({});
+      expect(rolleStore.loading).toBe(true);
+      await promise;
+
+      expect(rolleStore.errorCode).toBe('UNSPECIFIED_ERROR');
+      expect(rolleStore.loading).toBe(false);
+    });
+  });
+
   describe('getRolleById', () => {
     it('should load Rolle and update state', async () => {
-      const mockResponse: RolleResponse = {
+      const mockResponse: RolleResponse = DoFactory.getRolleResponse({
         administeredBySchulstrukturknoten: '1234',
-        rollenart: 'LEHR',
+        rollenart: RollenArt.Lehr,
         name: 'Lehrer',
         merkmale: [RollenMerkmal.KopersPflicht],
         systemrechte: [{ name: 'ROLLEN_VERWALTEN', isTechnical: false }],
-        createdAt: '2022',
-        updatedAt: '2022',
         id: '1',
         administeredBySchulstrukturknotenName: null,
         administeredBySchulstrukturknotenKennung: null,
-        version: 1,
-      };
+      });
 
       mockadapter.onGet('/api/rolle/1').replyOnce(200, mockResponse, {});
       const getRolleByIdPromise: Promise<void> = rolleStore.getRolleById('1');
@@ -225,6 +397,16 @@ describe('rolleStore', () => {
       expect(rolleStore.currentRolle).toEqual(null);
       expect(rolleStore.loading).toBe(false);
     });
+
+    it('should handle an i18n error', async () => {
+      mockadapter.onGet('/api/rolle/1').replyOnce(500, { i18nKey: 'ROLLE_READ_ERROR' });
+
+      await rolleStore.getRolleById('1');
+
+      expect(rolleStore.errorCode).toBe('ROLLE_READ_ERROR');
+      expect(rolleStore.currentRolle).toBe(null);
+      expect(rolleStore.loading).toBe(false);
+    });
   });
 
   describe('getRollenForPersonAdministration', () => {
@@ -236,7 +418,7 @@ describe('rolleStore', () => {
         items: [DoFactory.getRolleResponse()],
       };
 
-      mockadapter.onGet(/^\/api\/rolle\/for-person-administration/).replyOnce(200, mockResponse);
+      mockadapter.onGet(/^\/api\/rolle\/available-for-person-administration/).replyOnce(200, mockResponse);
 
       const getRollenForPersonAdministrationPromise: Promise<void> = rolleStore.getRollenForPersonAdministration({
         searchStr: 'Lehr',
@@ -255,11 +437,17 @@ describe('rolleStore', () => {
       expect(query.getAll('organisationIds')).toEqual(['schule-1']);
       expect(query.getAll('systemrechte')).toEqual([RollenSystemRechtEnum.PersonenVerwalten]);
       expect(rolleStore.rollenForPersonAdministration).toEqual(mockResponse.items);
+      expect(rolleStore.totalRollenForPersonAdministration).toBe(mockResponse.total);
       expect(rolleStore.loading).toBe(false);
     });
 
     it('should pass all filter params to the person administration endpoint', async () => {
-      mockadapter.onGet(/^\/api\/rolle\/for-person-administration/).replyOnce(200, [], {});
+      mockadapter.onGet(/^\/api\/rolle\/available-for-person-administration/).replyOnce(200, {
+        total: 0,
+        offset: 30,
+        limit: 30,
+        items: [],
+      });
 
       await rolleStore.getRollenForPersonAdministration({
         searchStr: 'SuS',
@@ -281,7 +469,7 @@ describe('rolleStore', () => {
     });
 
     it('should handle error when loading rollen for person administration', async () => {
-      mockadapter.onGet(/^\/api\/rolle\/for-person-administration/).replyOnce(500, 'some mock server error');
+      mockadapter.onGet(/^\/api\/rolle\/available-for-person-administration/).replyOnce(500, 'some mock server error');
 
       const getRollenForPersonAdministrationPromise: Promise<void> = rolleStore.getRollenForPersonAdministration({
         searchStr: '',
@@ -295,6 +483,18 @@ describe('rolleStore', () => {
 
       expect(rolleStore.errorCode).toEqual('UNSPECIFIED_ERROR');
       expect(rolleStore.rollenForPersonAdministration).toEqual([]);
+      expect(rolleStore.loading).toBe(false);
+    });
+
+    it('should handle a structured error when loading rollen for person administration', async () => {
+      mockadapter.onGet(/^\/api\/rolle\/available-for-person-administration/).replyOnce(500, {
+        i18nKey: 'PERSON_ADMINISTRATION_ROLLEN_ERROR',
+      });
+
+      await rolleStore.getRollenForPersonAdministration({});
+
+      expect(rolleStore.errorCode).toBe('PERSON_ADMINISTRATION_ROLLEN_ERROR');
+      expect(rolleStore.loading).toBe(false);
     });
   });
 
@@ -321,9 +521,9 @@ describe('rolleStore', () => {
       await promise;
 
       const requestUrl: string = mockadapter.history.get[0]?.url ?? '';
-      expect(requestUrl).toContain('organisationenForFilter=organisation-1');
+      expect(requestUrl).toContain('/api/rolle/available-for-mpt-zuordnung');
+      expect(requestUrl).toContain('organisationIds=organisation-1');
       expect(requestUrl).toContain(`rolleIds=${rolle.id}`);
-      expect(requestUrl).toContain('systemrechte=MPT_ROLLEN_ZUORDNEN');
       expect(rolleStore.currentMptRolle?.id).toBe(rolle.id);
       expect(rolleStore.errorCode).toBe('');
       expect(rolleStore.loading).toBe(false);
@@ -346,6 +546,16 @@ describe('rolleStore', () => {
 
       expect(rolleStore.currentMptRolle).toBe(null);
       expect(rolleStore.errorCode).toBe('MPT_ROLLE_LOADING_ERROR');
+      expect(rolleStore.loading).toBe(false);
+    });
+
+    it('should handle an unstructured loading error', async () => {
+      mockadapter.onGet().replyOnce(500, 'server error');
+
+      await rolleStore.getMptRolleById('rolle-1', 'organisation-1');
+
+      expect(rolleStore.currentMptRolle).toBe(null);
+      expect(rolleStore.errorCode).toBe('UNSPECIFIED_ERROR');
       expect(rolleStore.loading).toBe(false);
     });
   });
@@ -386,6 +596,18 @@ describe('rolleStore', () => {
       await rolleStore.getRollenerweiterungenForRolle('rolle-1', 'organisation-1');
 
       expect(rolleStore.errorCode).toBe('ROLLE_EXTENSION_READ_ERROR');
+      expect(rolleStore.loading).toBe(false);
+    });
+
+    it('should handle an i18n error', async () => {
+      mockadapter
+        .onGet('/api/rolle/rolle-1/angebote-via-rollenerweiterungen?organisationId=organisation-1')
+        .replyOnce(500, { i18nKey: 'ROLLE_EXTENSION_READ_I18N_ERROR' });
+
+      await rolleStore.getRollenerweiterungenForRolle('rolle-1', 'organisation-1');
+
+      expect(rolleStore.errorCode).toBe('ROLLE_EXTENSION_READ_I18N_ERROR');
+      expect(rolleStore.rollenerweiterungServiceProviders).toEqual([]);
       expect(rolleStore.loading).toBe(false);
     });
   });
@@ -470,20 +692,18 @@ describe('rolleStore', () => {
 
   describe('updateRolle', () => {
     it('should update Rolle and update state', async () => {
-      const mockResponse: RolleWithServiceProvidersResponse = {
+      const mockResponse: RolleWithServiceProvidersResponse = DoFactory.getRolleWithServiceProviders({
         administeredBySchulstrukturknoten: '1234',
-        rollenart: 'LEHR',
+        rollenart: RollenArt.Lehr,
         name: 'Updated Lehrer',
-        merkmale: ['KOPERS_PFLICHT'],
-        systemrechte: [{ name: 'ROLLEN_VERWALTEN', isTechnical: false }],
-        createdAt: '2022',
-        updatedAt: '2023',
+        merkmale: [RollenMerkmal.KopersPflicht],
+        systemrechte: [{ name: RollenSystemRechtEnum.RollenVerwalten, isTechnical: false }],
         id: '1',
         serviceProviders: [{ id: 'sp1', name: 'ServiceProvider1' }],
         administeredBySchulstrukturknotenName: null,
         administeredBySchulstrukturknotenKennung: null,
-        version: 1,
-      };
+        updatedAt: '2023',
+      });
 
       mockadapter.onPut('/api/rolle/1').replyOnce(200, mockResponse);
       const updateRollePromise: Promise<void> = rolleStore.updateRolle(
@@ -534,6 +754,16 @@ describe('rolleStore', () => {
       expect(rolleStore.loading).toBe(false);
     });
 
+    it('should handle an i18n error on update', async () => {
+      mockadapter.onPut('/api/rolle/1').replyOnce(500, { i18nKey: 'ROLLE_UPDATE_I18N_ERROR' });
+
+      await rolleStore.updateRolle('1', 'Updated Lehrer', [], [], [], 2);
+
+      expect(rolleStore.errorCode).toBe('ROLLE_UPDATE_I18N_ERROR');
+      expect(rolleStore.updatedRolle).toBe(null);
+      expect(rolleStore.loading).toBe(false);
+    });
+
     describe('deleteRolle', () => {
       it('should delete Rolle and update state', async () => {
         mockadapter.onDelete('/api/rolle/1').replyOnce(200);
@@ -560,6 +790,76 @@ describe('rolleStore', () => {
         expect(rolleStore.errorCode).toEqual('some mock server error');
         expect(rolleStore.loading).toBe(false);
       });
+
+      it('should handle an i18n error on delete', async () => {
+        mockadapter.onDelete('/api/rolle/1').replyOnce(500, { i18nKey: 'ROLLE_DELETE_I18N_ERROR' });
+
+        await rolleStore.deleteRolleById('1');
+
+        expect(rolleStore.errorCode).toBe('ROLLE_DELETE_I18N_ERROR');
+        expect(rolleStore.loading).toBe(false);
+      });
+    });
+  });
+
+  describe('getRollenForPersonenkontextCreation', () => {
+    it('should load available Rollen and update state', async () => {
+      const rolleA: RolleResponse = DoFactory.getRolleResponse({ name: 'a' });
+      const rolleB: RolleResponse = DoFactory.getRolleResponse({ name: 'b' });
+      const mockResponse: RolleControllerFindRollenAvailableForPersonAdministration200Response = {
+        limit: 2,
+        offset: 0,
+        total: 2,
+        items: [rolleB, rolleA],
+      };
+      mockadapter.onGet(/\/api\/rolle\/for-personenkontext-creation/).replyOnce(200, mockResponse);
+
+      const promise: Promise<void> = rolleStore.getRollenForPersonenkontextCreation({
+        organisationId: 'organisation-1',
+        offset: 0,
+        limit: 20,
+        rollenartForPerson: RollenArt.Lehr,
+        rolleName: 'Lehrer',
+        rollenIds: ['rolle-1', 'rolle-2'],
+        systemrecht: RollenSystemRechtEnum.RollenVerwalten,
+      });
+
+      expect(rolleStore.loading).toBe(true);
+      await promise;
+
+      expect(rolleStore.rollenForPersonenkontextCreation.length).toBe(2);
+      expect(rolleStore.rollenForPersonenkontextCreation[0]?.title).toBe(rolleA.name);
+      expect(rolleStore.rollenForPersonenkontextCreation[0]?.merkmale).toEqual(rolleA.merkmale);
+      expect(rolleStore.rollenForPersonenkontextCreation[0]?.rollenart).toBe(rolleA.rollenart);
+      expect(rolleStore.rollenForPersonenkontextCreation[1]?.title).toBe(rolleB.name);
+      expect(rolleStore.rollenForPersonenkontextCreation[1]?.merkmale).toEqual(rolleB.merkmale);
+      expect(rolleStore.rollenForPersonenkontextCreation[1]?.rollenart).toBe(rolleB.rollenart);
+      expect(mockadapter.history.get[0]?.url).toContain('organisationId=organisation-1');
+      expect(mockadapter.history.get[0]?.url).toContain('rollenartForPerson=LEHR');
+      expect(mockadapter.history.get[0]?.url).toContain('rollenIds=rolle-1');
+      expect(mockadapter.history.get[0]?.url).toContain('rollenIds=rolle-2');
+      expect(rolleStore.errorCode).toBe('');
+      expect(rolleStore.loading).toBe(false);
+    });
+
+    it('should handle a structured error', async () => {
+      mockadapter.onGet(/\/api\/rolle\/for-personenkontext-creation/).replyOnce(500, { code: 'ROLLE_ERROR_CODE' });
+
+      await rolleStore.getRollenForPersonenkontextCreation({ organisationId: 'organisation-1' });
+
+      expect(rolleStore.errorCode).toBe('ROLLE_ERROR_CODE');
+      expect(rolleStore.rollenForPersonenkontextCreation).toEqual([]);
+      expect(rolleStore.loading).toBe(false);
+    });
+
+    it('should handle an unstructured error', async () => {
+      mockadapter.onGet(/\/api\/rolle\/for-personenkontext-creation/).replyOnce(500, 'server error');
+
+      await rolleStore.getRollenForPersonenkontextCreation({ organisationId: 'organisation-1' });
+
+      expect(rolleStore.errorCode).toBe('ROLLE_ERROR');
+      expect(rolleStore.rollenForPersonenkontextCreation).toEqual([]);
+      expect(rolleStore.loading).toBe(false);
     });
   });
 });
