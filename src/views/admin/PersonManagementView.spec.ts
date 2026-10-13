@@ -1,10 +1,10 @@
-import { RollenArt } from '@/api-client/generated/api';
+import { RollenArt, RollenMerkmal, RollenSystemRechtEnum } from '@/api-client/generated/api';
 import routes from '@/router/routes';
 import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
 import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
-import { useRolleStore, type RolleStore } from '@/stores/RolleStore';
+import { useRolleStore, type RolleStore, type TranslatedRolleWithAttrs } from '@/stores/RolleStore';
 import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
 import type { Person } from '@/stores/types/Person';
 import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
@@ -591,17 +591,13 @@ describe('PersonManagementView', () => {
   );
 
   test('offers Pilot-Merkmal rollen (not just MPT) in the Rolle zuordnen bulk dialog', async () => {
-    personenkontextStore.workflowStepResponse = {
-      ...personenkontextStore.workflowStepResponse!,
-      rollen: [
-        ...(personenkontextStore.workflowStepResponse?.rollen ?? []),
-        DoFactory.getRolleResponse({
-          rollenart: RollenArt.Schb,
-          merkmale: [RollenMerkmal.Pilot2Rolle],
-          id: '99999',
-        }),
-      ],
+    const pilotRolle: TranslatedRolleWithAttrs = {
+      value: '99999',
+      title: 'Pilot Rolle',
+      rollenart: RollenArt.Schb,
+      merkmale: [RollenMerkmal.Pilot2Rolle],
     };
+    rolleStore.rollenForPersonenkontextCreation = [...rolleStore.rollenForPersonenkontextCreation, pilotRolle];
 
     const checkbox: DOMWrapper<Element> | undefined = wrapper?.find(
       '[data-testid="person-table"] .v-selection-control',
