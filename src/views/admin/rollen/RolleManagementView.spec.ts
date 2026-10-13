@@ -35,11 +35,10 @@ beforeEach(async (): Promise<void> => {
 
   authStore = useAuthStore();
   authStore.hasAngeboteVerwaltenPermission = true;
+  authStore.grantedGatedRollenSystemrechte = [];
   rolleStore = useRolleStore();
   searchFilterStore = useSearchFilterStore();
   serviceProviderStore = useServiceProviderStore();
-
-  authStore.hasMptRollenZuordnenPermission = true;
 
   searchFilterStore.selectedMerkmaleForRollen = [];
   searchFilterStore.selectedRollenartenForRollen = [];
@@ -218,10 +217,33 @@ describe('RolleManagementView', () => {
       offset: 0,
       limit: 30,
       searchString: '',
-      systemrechte: [RollenSystemRechtEnum.RollenVerwalten, RollenSystemRechtEnum.MptRollenZuordnen],
+      systemrechte: [RollenSystemRechtEnum.RollenVerwalten],
       merkmale: [RollenMerkmal.KopersPflicht],
       rollenarten: undefined,
-      organisationenForFilter: undefined,
+      organisationIds: undefined,
+      serviceProviderIds: undefined,
+    });
+  });
+
+  test('requests only RollenVerwalten even when the user has gated systemrechte', async () => {
+    authStore.grantedGatedRollenSystemrechte = [
+      RollenSystemRechtEnum.MptRollenZuordnen,
+      RollenSystemRechtEnum.Pilot3RollenZuordnen,
+    ];
+
+    const rollenartenSelect: ReturnType<VueWrapper['findComponent']> | undefined = wrapper?.findComponent(
+      '[data-testid="rollenarten-filter-select"]',
+    );
+    await rollenartenSelect?.setValue([RollenArt.Lehr]);
+
+    expect(rolleStore.getAllRollen).toHaveBeenLastCalledWith({
+      offset: 0,
+      limit: 30,
+      searchString: '',
+      systemrechte: [RollenSystemRechtEnum.RollenVerwalten],
+      merkmale: undefined,
+      rollenarten: [RollenArt.Lehr],
+      organisationIds: undefined,
       serviceProviderIds: undefined,
     });
   });
@@ -237,30 +259,10 @@ describe('RolleManagementView', () => {
       offset: 0,
       limit: 30,
       searchString: '',
-      systemrechte: [RollenSystemRechtEnum.RollenVerwalten, RollenSystemRechtEnum.MptRollenZuordnen],
-      merkmale: undefined,
-      rollenarten: [RollenArt.Lehr],
-      organisationenForFilter: undefined,
-      serviceProviderIds: undefined,
-    });
-  });
-
-  test('requests only RollenVerwalten when user lacks MPT permission', async () => {
-    authStore.hasMptRollenZuordnenPermission = false;
-
-    const rollenartenSelect: ReturnType<VueWrapper['findComponent']> | undefined = wrapper?.findComponent(
-      '[data-testid="rollenarten-filter-select"]',
-    );
-    await rollenartenSelect?.setValue([RollenArt.Lehr]);
-
-    expect(rolleStore.getAllRollen).toHaveBeenLastCalledWith({
-      offset: 0,
-      limit: 30,
-      searchString: '',
       systemrechte: [RollenSystemRechtEnum.RollenVerwalten],
       merkmale: undefined,
       rollenarten: [RollenArt.Lehr],
-      organisationenForFilter: undefined,
+      organisationIds: undefined,
       serviceProviderIds: undefined,
     });
   });
@@ -280,10 +282,10 @@ describe('RolleManagementView', () => {
       offset: 0,
       limit: 30,
       searchString: '',
-      systemrechte: [RollenSystemRechtEnum.RollenVerwalten, RollenSystemRechtEnum.MptRollenZuordnen],
+      systemrechte: [RollenSystemRechtEnum.RollenVerwalten],
       merkmale: undefined,
       rollenarten: undefined,
-      organisationenForFilter: orgs,
+      organisationIds: orgs,
       serviceProviderIds: undefined,
     });
   });
@@ -333,10 +335,10 @@ describe('RolleManagementView', () => {
         offset: 0,
         limit: 30,
         searchString: '',
-        systemrechte: [RollenSystemRechtEnum.RollenVerwalten, RollenSystemRechtEnum.MptRollenZuordnen],
+        systemrechte: [RollenSystemRechtEnum.RollenVerwalten],
         merkmale: undefined,
         rollenarten: undefined,
-        organisationenForFilter: undefined,
+        organisationIds: undefined,
         serviceProviderIds: ['sp1'],
       });
     });
@@ -439,8 +441,8 @@ describe('RolleManagementView', () => {
       searchString: searchString,
       merkmale: undefined,
       rollenarten: undefined,
-      organisationenForFilter: undefined,
-      systemrechte: [RollenSystemRechtEnum.RollenVerwalten, RollenSystemRechtEnum.MptRollenZuordnen],
+      organisationIds: undefined,
+      systemrechte: [RollenSystemRechtEnum.RollenVerwalten],
     });
   });
 

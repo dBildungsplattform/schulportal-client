@@ -110,12 +110,7 @@
     );
   });
 
-  const systemrechte: ComputedRef<RollenSystemRecht[]> = computed(() => {
-    if (authStore.hasMptRollenZuordnenPermission) {
-      return [RollenSystemRecht.RollenVerwalten, RollenSystemRecht.MptRollenZuordnen];
-    }
-    return [RollenSystemRecht.RollenVerwalten];
-  });
+  const systemrechte: RollenSystemRecht[] = [RollenSystemRecht.RollenVerwalten];
 
   function navigateToRolleDetails(_$event: PointerEvent, { item }: { item: RolleTableItem }): void {
     router.push({ name: 'rolle-details', params: { id: item.id } });
@@ -126,8 +121,8 @@
       offset: (searchFilterStore.rollenPage - 1) * searchFilterStore.rollenPerPage,
       limit: searchFilterStore.rollenPerPage,
       searchString: searchFilterStore.searchStringForRollen ?? undefined,
-      systemrechte: systemrechte.value,
-      organisationenForFilter: searchFilterStore.selectedOrganisationenForRollen?.length
+      systemrechte,
+      organisationIds: searchFilterStore.selectedOrganisationenForRollen?.length
         ? searchFilterStore.selectedOrganisationenForRollen
         : undefined,
       merkmale: searchFilterStore.selectedMerkmaleForRollen?.length

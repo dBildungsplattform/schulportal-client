@@ -14,17 +14,18 @@
   import SchulenFilter from '@/components/filter/SchulenFilter.vue';
   import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
   import { useOrganisationen } from '@/composables/useOrganisationen';
-  import { type TranslatedRolleWithAttrs, useRollen } from '@/composables/useRollen';
   import { type AuthStore, useAuthStore } from '@/stores/AuthStore';
   import { type Organisation, type OrganisationStore, useOrganisationStore } from '@/stores/OrganisationStore';
   import { type PersonStore, SortField, usePersonStore } from '@/stores/PersonStore';
   import { type PersonenkontextStore, usePersonenkontextStore } from '@/stores/PersonenkontextStore';
   import {
+    GATED_ROLLEN_MERKMALE,
     type RolleResponse,
     type RolleStore,
     RollenArt,
     RollenMerkmal,
     RollenSystemRecht,
+    TranslatedRolleWithAttrs,
     useRolleStore,
   } from '@/stores/RolleStore';
   import { type SearchFilterStore, useSearchFilterStore } from '@/stores/SearchFilterStore';
@@ -140,11 +141,7 @@
   const authStore: AuthStore = useAuthStore();
 
   const rollenSystemrechteForPersonAdministration: ComputedRef<RollenSystemRecht[]> = computed(() => {
-    const systemrechte: RollenSystemRecht[] = [RollenSystemRecht.PersonenVerwalten];
-    if (authStore.hasMptRollenZuordnenPermission) {
-      systemrechte.push(RollenSystemRecht.MptRollenZuordnen);
-    }
-    return systemrechte;
+    return [RollenSystemRecht.PersonenVerwalten, ...authStore.grantedGatedRollenSystemrechte];
   });
 
   async function loadRollenForPersonAdministration(searchStr: string): Promise<void> {
@@ -215,16 +212,14 @@
 
   const organisationenForForm: ComputedRef<TranslatedObject[] | undefined> = useOrganisationen();
 
-  const rollenForForm: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = useRollen();
-
   // Only Rollen from type LEHR and LERN
-  const rollenForRolleModify: ComputedRef<TranslatedRolleWithAttrs[] | undefined> = computed(() => {
-    return rollenForForm.value?.filter(
+  const rollenForRolleModify: ComputedRef<TranslatedRolleWithAttrs[]> = computed(() => {
+    return rolleStore.rollenForPersonenkontextCreation.filter(
       (rolle: TranslatedRolleWithAttrs) =>
         rolle.rollenart === RollenArt.Lehr ||
         rolle.rollenart === RollenArt.Lern ||
-        // this assumes the incoming rollen have checked MPT-permission
-        rolle.merkmale?.includes(RollenMerkmal.MptRolle),
+        // this assumes the incoming rollen have already been checked for gated-Merkmal permission server-side
+        rolle.merkmale?.some((merkmal: RollenMerkmal) => GATED_ROLLEN_MERKMALE.includes(merkmal)),
     );
   });
 
