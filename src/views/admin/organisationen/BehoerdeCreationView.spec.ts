@@ -161,6 +161,9 @@ describe('BehoerdeCreationView', () => {
 
     expect(wrapper.findComponent(BehoerdeForm).exists()).toBe(false);
     expect(organisationStore.schultraeger).toEqual([]);
+    expect(wrapper.getComponent({ name: 'SpshAlert' }).props('text')).toBe(
+      'Die Zuständigkeitsbereiche konnten nicht geladen werden.',
+    );
 
     let finishRetry: () => void = vi.fn();
     vi.spyOn(organisationStore, 'getRootKinderSchultraeger').mockImplementationOnce(
@@ -287,6 +290,7 @@ describe('BehoerdeCreationView', () => {
     organisationStore.errorCode = 'BEHOERDE_NAME_EINDEUTIG';
     await nextTick();
     expect(wrapper.find('[data-testid$="alert-title"]').isVisible()).toBe(true);
+    expect(wrapper.getComponent({ name: 'SpshAlert' }).props('text')).toBe('Der Behördenname existiert bereits.');
     wrapper.find('[data-testid$="alert-button"]').trigger('click');
     await nextTick();
 
@@ -378,6 +382,9 @@ describe('BehoerdeCreationView', () => {
     organisationStore.errorCode = 'REQUIRED_STEP_UP_LEVEL_NOT_MET';
     await nextTick();
     expect(wrapper.find('[data-testid$="alert-title"]').isVisible()).toBe(true);
+    expect(wrapper.getComponent({ name: 'SpshAlert' }).props('text')).toContain(
+      'Sie werden anschließend zur Eingabe Ihres zweiten Faktors aufgefordert.',
+    );
     wrapper.find('[data-testid$="alert-button"]').trigger('click');
     await nextTick();
 

@@ -183,7 +183,7 @@
           :title="$t('admin.behoerde.behoerdeCreateErrorTitle')"
           type="error"
           :closable="false"
-          :text="$t('admin.behoerde.errors.ORGANISATION_SPECIFICATION_ERROR')"
+          :text="organisationStore.errorCode ? $t(`admin.behoerde.errors.${organisationStore.errorCode}`) : ''"
           :show-button="true"
           :button-text="$t('admin.behoerde.backToCreateBehoerde')"
           :button-action="navigateBackToBehoerdeForm"
