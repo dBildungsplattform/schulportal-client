@@ -1,5 +1,5 @@
 import { RollenArt, RollenMerkmal } from '@/api-client/generated';
-import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
 import {
   CreationType,
   OperationContext,
@@ -241,21 +241,20 @@ describe('PersonenkontextCreate', () => {
           expect(organisationAutocomplete?.text()).toEqual('string (orga)');
           await nextTick();
 
+          const klasse: Organisation = DoFactory.getKlasse(undefined, {
+            id: '55555',
+            name: '55555',
+          });
           organisationStore.klassenFilters.set('personenkontext-create', {
             loading: false,
             total: 1,
-            filterResult: [
-              DoFactory.getKlasse(undefined, {
-                id: '55555',
-                name: '55555',
-              }),
-            ],
+            filterResult: [klasse],
           });
           const klasseAutocomplete: VueWrapper | undefined = wrapper
             ?.findComponent({ name: 'KlassenFilter' })
             .findComponent({ ref: klassenFilterRef });
           klasseAutocomplete?.vm.$emit('update:search', '55555');
-          await klasseAutocomplete?.setValue('55555');
+          await klasseAutocomplete?.setValue(klasse);
           await nextTick();
 
           expect(klasseAutocomplete?.text()).toEqual('55555');

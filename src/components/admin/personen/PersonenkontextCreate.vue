@@ -26,6 +26,7 @@
   } from '@/stores/RolleStore';
   import type { Zuordnung } from '@/stores/types/Zuordnung';
   import { type TranslatedObject } from '@/types.d';
+  import { dedup } from '@/utils/arrays';
   import { blurActiveElement } from '@/utils/focus';
   import { isLernRolle } from '@/utils/validationPersonenkontext';
   import type { BaseFieldProps } from 'vee-validate';
@@ -60,8 +61,8 @@
     selectedRolle?: string | undefined;
     selectedRollen?: string[] | undefined;
     selectedKlassenOption?: string | null;
-    selectedKlasse?: string | undefined;
-    selectedKlasseForRadio?: string | undefined;
+    selectedKlasse?: Organisation | undefined;
+    selectedKlasseForRadio?: Organisation | undefined;
     selectedOrganisationProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedKlasseProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedKlasseForRadioProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
@@ -91,8 +92,8 @@
     (event: 'update:selectedOrganisation', value: string | undefined): void;
     (event: 'update:selectedRolle', value: string | undefined): void;
     (event: 'update:selectedRollen', value: string[] | undefined): void;
-    (event: 'update:selectedKlasse', value: string | undefined): void;
-    (event: 'update:selectedKlasseForRadio', value: string | undefined): void;
+    (event: 'update:selectedKlasse', value: Organisation | undefined): void;
+    (event: 'update:selectedKlasseForRadio', value: Organisation | undefined): void;
     (event: 'update:selectedKlassenOption', value: string | null): void;
     (event: 'update:canCommit', value: boolean): void;
     (event: 'fieldReset', field: 'selectedOrganisation' | 'selectedRolle' | 'selectedKlasse' | 'selectedRollen'): void;
@@ -102,8 +103,8 @@
   const selectedOrganisation: Ref<string | undefined> = ref(props.selectedOrganisation);
   const selectedRolle: Ref<string | undefined> = ref(props.selectedRolle);
   const selectedRollen: Ref<string[] | undefined> = ref(props.selectedRollen || []);
-  const selectedKlasse: Ref<string | undefined> = ref(props.selectedKlasse);
-  const selectedKlasseForRadio: Ref<string | undefined> = ref(props.selectedKlasseForRadio);
+  const selectedKlasse: Ref<Organisation | undefined> = ref(props.selectedKlasse);
+  const selectedKlasseForRadio: Ref<Organisation | undefined> = ref(props.selectedKlasseForRadio);
   // we need to cast the selectedSchule into an array
   // doing it this way prevents an issue where the reactive system constantly re-runs which causes requests to be issued in a loop
   const administriertVon: Ref<string[] | undefined> = ref([]);
@@ -219,14 +220,14 @@
     }
   };
 
-  function updateKlasseSelection(selectedKlassen: string | undefined): void {
-    selectedKlasse.value = selectedKlassen;
-    emits('update:selectedKlasse', selectedKlassen);
+  function updateKlasseSelection(selection: Organisation | undefined): void {
+    selectedKlasse.value = selection;
+    emits('update:selectedKlasse', selection);
   }
 
-  function updateKlasseSelectionForRadio(selectedKlassen: string | undefined): void {
-    selectedKlasseForRadio.value = selectedKlassen;
-    emits('update:selectedKlasseForRadio', selectedKlassen);
+  function updateKlasseSelectionForRadio(selection: Organisation | undefined): void {
+    selectedKlasseForRadio.value = selection;
+    emits('update:selectedKlasseForRadio', selection);
   }
 
   // Clear the selected Rolle once the input field is cleared (This is the only way to fetch all Rollen again)
@@ -291,14 +292,12 @@
           (zuordnung: Zuordnung) =>
             zuordnung.typ === OrganisationsTyp.Klasse && zuordnung.administriertVon === newSelectedOrganisationId,
         );
+        const uniqueKlassenZuordnungen: Zuordnung[] = dedup(klassenZuordnungen ?? [], (z: Zuordnung) => z.sskId);
 
-        const klassenIds: Set<string> = new Set(klassenZuordnungen?.map((zuordnung: Zuordnung) => zuordnung.sskId));
-        if (klassenIds.size === 1) {
-          const klasseId: string | undefined = klassenIds.values().next().value;
-          if (klasseId) {
-            selectedKlasse.value = klasseId;
-            emits('update:selectedKlasse', klasseId);
-          }
+        if (uniqueKlassenZuordnungen.length === 1) {
+          const klasse: Organisation = uniqueKlassenZuordnungen[0]!.getOrganisation();
+          selectedKlasse.value = klasse;
+          emits('update:selectedKlasse', klasse);
         } else {
           selectedKlasse.value = undefined;
           emits('fieldReset', 'selectedKlasse');

@@ -133,6 +133,12 @@ export type OrganisationenFilter = {
   sortField?: OrganisationSortField;
 };
 
+export type KlassenFilter = {
+  searchString?: string;
+  systemrechte?: RollenSystemRechtEnum[];
+  administriertVon?: Array<string>;
+};
+
 export type GetAdministrierteOrganisationenFilter = {
   organisationId?: string;
   offset?: number;
@@ -148,7 +154,9 @@ export enum SchuleType {
 type OrganisationGetters = object;
 type OrganisationActions = {
   getAllOrganisationen: (filter?: OrganisationenFilter) => Promise<void>;
+  // TODO remove
   getFilteredKlassen(filter?: OrganisationenFilter): Promise<void>;
+  // TODO remove
   getKlassenByOrganisationId: (filter?: OrganisationenFilter) => Promise<void>;
   getOrganisationById: (organisationId: string, organisationsTyp?: OrganisationsTyp) => Promise<void>;
   getLockingOrganisationById: (organisationId: string) => Promise<void>;
@@ -169,7 +177,9 @@ type OrganisationActions = {
   getRootKinderSchultraeger: () => Promise<void>;
   fetchSchulen: (filter: OrganisationenFilter, type: SchuleType) => Promise<void>;
   assignSchuleToTraeger(schultraegerId: string, organisationIdBodyParams: OrganisationByIdBodyParams): Promise<void>;
+  // TODO remove
   fetchSchuleDetailsForKlassen: (filterActive: boolean) => Promise<void>;
+  // TODO remove
   fetchSchuleDetailsForSchultraeger: () => Promise<void>;
   setItsLearningForSchule: (organisationId: string) => Promise<void>;
   loadOrganisationenForFilter(filter?: OrganisationenFilter, storeKey?: string): Promise<void>;
@@ -180,7 +190,7 @@ type OrganisationActions = {
    * @param filter
    * @param storeKey Unique string is necessary if there is more than one KlassenFilter in use at the same time. It identifies the filter in the klassenFilters map. Defaults to an empty string.
    */
-  loadKlassenForFilter(filter?: OrganisationenFilter, storeKey?: string): Promise<void>;
+  loadKlassenForFilter(filter?: KlassenFilter, storeKey?: string): Promise<void>;
   resetKlasseFilter(storeKey?: string): void;
   clearKlasseFilter(storeKey?: string): void;
   fetchSchulDetails: (organisationId: string) => Promise<void>;
@@ -767,7 +777,7 @@ export const useOrganisationStore: StoreDefinition<
       this.organisationenFilters.delete(storeKey);
     },
 
-    async loadKlassenForFilter(filter?: OrganisationenFilter, storeKey: string = ''): Promise<void> {
+    async loadKlassenForFilter(filter?: KlassenFilter, storeKey: string = ''): Promise<void> {
       const klassenFilter: AutoCompleteStore<Organisation> = {
         filterResult: [],
         loading: false,
@@ -777,17 +787,16 @@ export const useOrganisationStore: StoreDefinition<
       klassenFilter.loading = true;
       try {
         const response: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations(
-          filter?.offset,
-          filter?.limit,
+          0,
+          200,
           undefined,
           undefined,
           filter?.searchString,
           OrganisationsTyp.Klasse,
           filter?.systemrechte,
-          filter?.excludeTyp,
+          undefined,
           filter?.administriertVon,
-          filter?.zugehoerigZu,
-          filter?.organisationIds,
+          undefined,
         );
         klassenFilter.filterResult = response.data;
         klassenFilter.total = +response.headers['x-paging-pagetotal'];

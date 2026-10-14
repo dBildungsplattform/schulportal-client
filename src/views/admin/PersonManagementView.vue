@@ -114,7 +114,7 @@
   const searchInputOrganisationen: Ref<string> = ref('');
 
   const selectedOrganisationen: Ref<Array<Organisation>> = ref([]);
-  const selectedKlassen: Ref<Array<string> | undefined> = ref(searchFilterStore.selectedKlassen ?? []);
+  const selectedKlassen: Ref<Array<Organisation> | undefined> = ref(searchFilterStore.selectedKlassen ?? []);
   const selectedRollen: Ref<Array<string>> = ref([]);
   const selectedOrganisationIds: Ref<Array<string>> = ref([]);
   const selectedStatus: Ref<string | null> = ref(null);
@@ -233,7 +233,7 @@
       offset: (searchFilterStore.personenPage - 1) * searchFilterStore.personenPerPage,
       limit: searchFilterStore.personenPerPage,
       organisationIDs: searchFilterStore.selectedKlassen?.length
-        ? searchFilterStore.selectedKlassen
+        ? searchFilterStore.selectedKlassen.map((klasse: Organisation) => klasse.id)
         : searchFilterStore.selectedOrganisationen || [],
       rolleIDs: searchFilterStore.selectedRollen || [],
       searchFilter: searchFilterStore.searchStringForPersonen || '',
@@ -265,7 +265,7 @@
     await applySearchAndFilters();
   }
 
-  function updateKlassenSelection(newValue: Array<string>): void {
+  function updateKlassenSelection(newValue: Array<Organisation>): void {
     searchFilterStore.setKlasseFilterForPersonen(newValue);
     applySearchAndFilters();
     selectedKlassen.value = newValue;

@@ -1,5 +1,5 @@
 import type { DBiamPersonenzuordnungResponse } from '@/api-client/generated';
-import type { OrganisationsTyp } from '../OrganisationStore';
+import type { Organisation, OrganisationsTyp } from '../OrganisationStore';
 import type { RollenArt, RollenMerkmal } from '../RolleStore';
 
 export class Zuordnung {
@@ -50,5 +50,16 @@ export class Zuordnung {
       response.merkmale,
       response.admins ?? [],
     );
+  }
+
+  public getOrganisation(): Organisation {
+    return {
+      id: this.sskId,
+      name: this.sskName,
+      kennung: this.sskDstNr,
+      administriertVon: this.administriertVon,
+      // TODO: fix type coming from backend and remove assertion
+      typ: this.typ!,
+    };
   }
 }

@@ -228,20 +228,20 @@ describe('PersonManagementView', () => {
     const getAllPersonsSpy: MockInstance = vi.spyOn(personStore, 'getAllPersons');
     searchFilterStore.selectedOrganisationen = ['9876'];
 
-    searchFilterStore.selectedKlassen = ['123456'];
-    const klasseAutocomplete: VueWrapper | undefined = wrapper
-      ?.findComponent({ ref: 'klasse-select' })
-      .findComponent({ name: 'v-autocomplete' });
-    await klasseAutocomplete?.setValue(['123456']);
-    klasseAutocomplete?.vm.$emit('update:selectedKlassen', ['123456']);
+    const klasse: Organisation = organisationStore.klassen[0]!;
+    searchFilterStore.selectedKlassen = [klasse];
+    const klasseFilter: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
+    const klasseAutocomplete: VueWrapper | undefined = klasseFilter?.findComponent({ name: 'v-autocomplete' });
+    await klasseAutocomplete?.setValue([klasse]);
+    klasseFilter?.vm.$emit('update:selectedKlassen', [klasse]);
     await flushPromises();
-    expect(searchFilterStore.setKlasseFilterForPersonen).toHaveBeenCalledWith(['123456']);
-    expect(searchFilterStore.selectedKlassen).toEqual(['123456']);
+    expect(searchFilterStore.setKlasseFilterForPersonen).toHaveBeenCalledWith([klasse]);
+    expect(searchFilterStore.selectedKlassen).toEqual([klasse]);
 
     // Check if getAllPersons was called with the correct arguments
     expect(getAllPersonsSpy).toHaveBeenCalledWith(
       expect.objectContaining({
-        organisationIDs: ['123456'], // This should be the selectedKlassen value
+        organisationIDs: [klasse.id], // This should be the selectedKlassen value
       }),
     );
 

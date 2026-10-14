@@ -177,10 +177,7 @@
       serviceProviderStore.getServiceProviderLogoById(currentServiceProviderId),
     ]);
     if (authStore.hasRollenerweiternPermission) {
-      await Promise.all([
-        fetchRollenerweiterungen(),
-        initRollen(),
-      ]);
+      await Promise.all([fetchRollenerweiterungen(), initRollen()]);
     }
   });
 </script>

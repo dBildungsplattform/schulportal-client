@@ -829,7 +829,8 @@ describe('PersonDetailsView', () => {
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ name: 'KlassenFilter' })
       .findComponent({ ref: 'personenkontext-create-klasse-select' });
-    await klasseAutocomplete?.setValue('9a');
+    const klasse: Organisation = organisationStore.klassen.find((item: Organisation) => item.id === '9a')!;
+    await klasseAutocomplete?.setValue(klasse);
     klasseAutocomplete?.vm.$emit('update:search', '9a');
     await nextTick();
 
@@ -839,6 +840,20 @@ describe('PersonDetailsView', () => {
       .findComponent({ ref: 'befristung-input' });
     await befristungInput?.setValue('12.08.2099');
     await nextTick();
+
+    const personenkontextCreate: VueWrapper = wrapper!.findComponent({ ref: 'personenkontext-create' });
+    personenkontextCreate.vm.$emit('fieldReset', 'selectedKlasse');
+    await flushPromises();
+    await wrapper!.get('[data-testid="zuordnung-creation-submit-button"]').trigger('click');
+    await flushPromises();
+    await vi.waitFor(() => {
+      const fieldProps: { error: boolean } = personenkontextCreate.props('selectedKlasseProps');
+      expect(fieldProps.error).toBe(true);
+    });
+    expect(document.body.querySelector('[data-testid="confirm-zuordnung-dialog-addition"]')).toBeNull();
+
+    personenkontextCreate.vm.$emit('update:selectedKlasse', klasse);
+    await flushPromises();
 
     const submitButton: Element | null = document.body.querySelector(
       '[data-testid="zuordnung-creation-submit-button"]',
@@ -927,7 +942,8 @@ describe('PersonDetailsView', () => {
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ name: 'KlassenFilter' })
       .findComponent({ ref: 'personenkontext-create-klasse-select' });
-    await klasseAutocomplete?.setValue('9a');
+    const klasse: Organisation = organisationStore.klassen.find((item: Organisation) => item.id === '9a')!;
+    await klasseAutocomplete?.setValue(klasse);
     klasseAutocomplete?.vm.$emit('update:search', '9a');
     await nextTick();
 
@@ -988,7 +1004,7 @@ describe('PersonDetailsView', () => {
     expect(personenkontextStore.errorCode).toBe('');
   });
 
-  describe('Rolle metadata when changing Klasse', () => {
+  describe.each([true, false])('selected Klasse remains in results: %s', (retainSelection: boolean) => {
     afterEach(() => {
       wrapper?.unmount();
     });
@@ -1028,6 +1044,8 @@ describe('PersonDetailsView', () => {
           administriertVon: schule.id,
         }),
       ]);
+      await nextTick();
+      await flushPromises();
       personenkontextStore.workflowStepResponse = DoFactory.getPersonenkontextWorkflowResponse({
         organisations: [schule],
         canCommit: true,
@@ -1049,8 +1067,16 @@ describe('PersonDetailsView', () => {
       const klassenFilter: VueWrapper = wrapper!
         .findComponent({ ref: 'klasse-change-form' })
         .getComponent({ name: 'KlassenFilter' });
-      klassenFilter.vm.$emit('update:selectedKlassen', newKlasse.id);
+      klassenFilter.vm.$emit('update:selectedKlassen', newKlasse);
       await flushPromises();
+      if (!retainSelection) {
+        organisationStore.klassenFilters.set('klasse-change', {
+          filterResult: [oldKlasse],
+          total: 1,
+          loading: false,
+        });
+        await flushPromises();
+      }
       await wrapper!.get('[data-testid="klasse-change-submit-button"]').trigger('click');
       await flushPromises();
 
@@ -1121,10 +1147,15 @@ describe('PersonDetailsView', () => {
     const klasseInput: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'klasse-change-form' })
       .findComponent({ name: 'KlassenFilter' });
-    await klasseInput?.setValue('9a');
-    await nextTick();
+    const newKlasse: Organisation = DoFactory.getKlasse(undefined, { name: '9b' });
+    klasseInput?.vm.$emit('update:selectedKlassen', newKlasse);
+    await flushPromises();
 
-    await wrapper?.find('[data-testid="klasse-change-submit-button"]').trigger('click');
+    const submitButton: DOMWrapper<HTMLButtonElement> = wrapper!.get<HTMLButtonElement>(
+      '[data-testid="klasse-change-submit-button"]',
+    );
+    expect(submitButton.element.disabled).toBe(false);
+    await submitButton.trigger('click');
     await nextTick();
 
     await flushPromises();

@@ -142,7 +142,7 @@
   async function deleteKlasseById(organisationId: string): Promise<void> {
     await organisationStore.deleteOrganisationById(organisationId);
     // If the deleted Klasse was used for the Klassen filter then reset the filter for Klassen
-    if (searchFilterStore.selectedKlassenForKlassen?.includes(organisationId)) {
+    if (searchFilterStore.selectedKlassenForKlassen?.some((klasse: Organisation) => klasse.id === organisationId)) {
       searchFilterStore.selectedKlassenForKlassen = [];
     }
   }

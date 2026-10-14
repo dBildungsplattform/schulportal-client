@@ -70,7 +70,7 @@ async function selectKlasse(
   klasse: Partial<Organisation> | null,
   schule?: Organisation,
 ): Promise<Organisation | undefined> {
-  const klasseFilterStoreKey: string = '';
+  const klasseFilterStoreKey: string = 'klassen-management';
   const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' }).findComponent({
     name: 'v-autocomplete',
   });
@@ -87,7 +87,7 @@ async function selectKlasse(
   });
   const klasseWithDefaults: Organisation = DoFactory.getKlasse(schule, klasse);
   organisationStore.klassenFilters.get(klasseFilterStoreKey)!.filterResult = [klasseWithDefaults];
-  await klasseAutocomplete?.setValue([klasseWithDefaults.id]);
+  await klasseAutocomplete?.setValue([klasseWithDefaults]);
   return klasseWithDefaults;
 }
 

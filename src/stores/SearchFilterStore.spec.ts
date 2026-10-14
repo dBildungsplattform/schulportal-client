@@ -1,5 +1,6 @@
 import { createPinia, setActivePinia } from 'pinia';
 import { DoFactory } from 'test/DoFactory';
+import type { Organisation } from './OrganisationStore';
 import { RollenArt, RollenMerkmal, type RolleResponse } from './RolleStore';
 import {
   DEFAULT_SERVICE_PROVIDER_KATEGORIEN,
@@ -41,9 +42,10 @@ describe('SearchFilterStore', () => {
   });
 
   it('should change the state', () => {
+    const selectedKlassen: Organisation[] = [DoFactory.getKlasse(), DoFactory.getKlasse()];
     // it sets the selectedKlassen
-    searchFilterStore.setKlasseFilterForPersonen(['1', '2']);
-    expect(searchFilterStore.selectedKlassen).toEqual(['1', '2']);
+    searchFilterStore.setKlasseFilterForPersonen(selectedKlassen);
+    expect(searchFilterStore.selectedKlassen).toEqual(selectedKlassen);
 
     // it sets the selectedRollen
     searchFilterStore.setRolleFilterForPersonen(['5', '8']);
@@ -87,8 +89,8 @@ describe('SearchFilterStore', () => {
     expect(searchFilterStore.selectedSchuleForKlassen).toEqual('10');
 
     // it sets the selectedKlassenForKlassen
-    searchFilterStore.setKlasseFilterForKlassen(['10', '20']);
-    expect(searchFilterStore.selectedKlassenForKlassen).toEqual(['10', '20']);
+    searchFilterStore.setKlasseFilterForKlassen(selectedKlassen);
+    expect(searchFilterStore.selectedKlassenForKlassen).toEqual(selectedKlassen);
 
     searchFilterStore.setSchuleForMptRollen('10');
     expect(searchFilterStore.selectedSchuleForMptRollen).toEqual('10');

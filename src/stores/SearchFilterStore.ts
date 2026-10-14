@@ -33,7 +33,7 @@ type SearchFilterState = {
   searchStringForPersonen: string | null;
   searchStringForSchulen: string | null;
   searchStringForServiceProvider: string | null;
-  selectedKlassen: Array<string> | null;
+  selectedKlassen: Array<Organisation> | null;
   selectedRollen: Array<string> | null;
   selectedRollenObjects: RolleResponse[];
   selectedOrganisationen: Array<string> | null;
@@ -44,7 +44,7 @@ type SearchFilterState = {
   organisationenSortOrder: SortOrder | null;
   currentSort: { key: string; order: 'asc' | 'desc' } | null;
   selectedSchuleForKlassen: string | null;
-  selectedKlassenForKlassen: Array<string> | null;
+  selectedKlassenForKlassen: Array<Organisation> | null;
   selectedSchuleForMptRollen: string | null;
   selectedSchuleForSchulischeServiceProvider: string | null;
   selectedMerkmaleForRollen: Array<RollenMerkmal>;
@@ -56,7 +56,7 @@ type SearchFilterState = {
 };
 
 type SearchFilterActions = {
-  setKlasseFilterForPersonen: (selectedKlassen: Array<string> | null) => void;
+  setKlasseFilterForPersonen: (selectedKlassen: Array<Organisation> | null) => void;
   setRolleFilterForPersonen: (selectedRollen: Array<string> | null) => void;
   setRolleFilterWithObjectsForPersonen: (selectedRollen: Array<string> | null, rollenObjects: RolleResponse[]) => void;
   setOrganisationFilterForPersonen: (
@@ -68,7 +68,7 @@ type SearchFilterActions = {
   setSearchFilterForSchulen: (searchStringForSchulen: string | null) => void;
   setSearchFilterForServiceProvider: (searchStringForServiceProvider: string | null) => void;
   setSchuleFilterForKlassen: (selectedSchuleForKlassen: string | null) => void;
-  setKlasseFilterForKlassen: (selectedKlassenForKlassen: Array<string> | null) => void;
+  setKlasseFilterForKlassen: (selectedKlassenForKlassen: Array<Organisation> | null) => void;
   setSchuleForMptRollen: (selectedSchuleForMptRollen: string | null) => void;
   setSchuleForSchulischeServiceProvider: (selectedSchuleForSchulischeServiceProvider: string | null) => void;
   setMerkmaleFilterForRollen: (selectedMerkmale: Array<RollenMerkmal>) => void;
@@ -134,7 +134,7 @@ export const useSearchFilterStore: StoreDefinition<
     selectedKategorienForServiceProvider: [...DEFAULT_SERVICE_PROVIDER_KATEGORIEN],
   }),
   actions: {
-    setKlasseFilterForPersonen(selectedKlassen: Array<string> | null) {
+    setKlasseFilterForPersonen(selectedKlassen: Array<Organisation> | null) {
       this.selectedKlassen = selectedKlassen;
     },
 
@@ -172,7 +172,7 @@ export const useSearchFilterStore: StoreDefinition<
       this.selectedSchuleForKlassen = selectedSchuleForKlassen;
     },
 
-    setKlasseFilterForKlassen(selectedKlassenForKlassen: Array<string> | null) {
+    setKlasseFilterForKlassen(selectedKlassenForKlassen: Array<Organisation> | null) {
       this.selectedKlassenForKlassen = selectedKlassenForKlassen;
     },
 

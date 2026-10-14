@@ -4,6 +4,7 @@
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import { type BulkErrorList, useBulkErrors } from '@/composables/useBulkErrors';
   import { type BulkOperationStore, useBulkOperationStore } from '@/stores/BulkOperationStore';
+  import { Organisation } from '@/stores/OrganisationStore';
   import {
     KlassenOption,
     OperationContext,
@@ -241,7 +242,6 @@
               v-model:selected-organisation="selectedOrganisation"
               v-model:selected-rolle="selectedRolle"
               v-model:selected-klassen-option="selectedKlassenOption"
-              v-model:selected-klasse-for-radio="selectedKlasseForRadio"
               :operation-context="OperationContext.PERSON_BEARBEITEN"
               :show-headline="false"
               :organisationen="organisationen"
@@ -263,6 +263,9 @@
               @update:can-commit="canCommit = $event"
               @update:befristung="handleBefristungUpdate($event)"
               @update:calculated-befristung-option="handleBefristungOptionUpdate($event)"
+              @update:selectedKlasseForRadio="
+                (selectedKlasse: Organisation | undefined) => (selectedKlasseForRadio = selectedKlasse?.id)
+              "
               @fieldReset="handleFieldReset($event)"
             />
 

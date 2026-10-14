@@ -7,7 +7,7 @@
   import FormWrapper from '@/components/form/FormWrapper.vue';
   import PasswordOutput from '@/components/form/PasswordOutput.vue';
   import { useOrganisationen } from '@/composables/useOrganisationen';
-  import { type Organisation, type OrganisationStore, useOrganisationStore } from '@/stores/OrganisationStore';
+  import type { Organisation } from '@/stores/OrganisationStore';
   import {
     type DBiamPersonenkontextResponse,
     OperationContext,
@@ -316,7 +316,6 @@
   setupRolleWatcher();
 
   const organisationen: ComputedRef<TranslatedObject[] | undefined> = useOrganisationen();
-  const organisationStore: OrganisationStore = useOrganisationStore();
 
   // Extract the created Klassenzuordnungen from the response after submission
   const klasseZuordnungFromCreatedKontext: ComputedRef<DBiamPersonenkontextResponse[]> = computed(() => {
@@ -464,6 +463,11 @@
     }
   }
 
+  function handleSelectedKlasse(newSelection: Organisation | undefined): void {
+    selectedKlasse.value = newSelection?.id;
+    selectedKlasseCache.value = newSelection ? { value: newSelection.id, title: newSelection.name } : undefined;
+  }
+
   async function createPerson(): Promise<void> {
     const befristungDate: string | undefined = selectedBefristung.value
       ? selectedBefristung.value
@@ -493,13 +497,6 @@
       selectedRollen.value.length > 0 &&
       hasSelectedLernRolle(selectedRollen.value)
     ) {
-      selectedKlasseCache.value = {
-        value: selectedKlasse.value,
-        title:
-          organisationStore.klassenFilters
-            .get('personenkontext-create')
-            ?.filterResult.find((klasse: Organisation) => klasse.id === selectedKlasse.value)?.name || '',
-      };
       for (const rolleId of selectedRollen.value) {
         bodyParams.createPersonenkontexte.push({
           organisationId: selectedKlasse.value,
@@ -848,7 +845,6 @@
                 ref="personenkontext-create"
                 v-model:selected-organisation="selectedOrganisation"
                 v-model:selected-rollen="selectedRollen"
-                v-model:selected-klasse="selectedKlasse"
                 :operation-context="OperationContext.PERSON_ANLEGEN"
                 :allow-multiple-rollen="true"
                 :create-type="createType"
@@ -880,6 +876,7 @@
                 @update:canCommit="canCommit = $event"
                 @update:befristung="handleBefristungUpdate($event)"
                 @update:calculated-befristung-option="handleBefristungOptionUpdate($event)"
+                @update:selectedKlasse="handleSelectedKlasse"
                 @fieldReset="handleFieldReset($event)"
               />
             </template>
@@ -889,7 +886,6 @@
                 ref="personenkontext-create"
                 v-model:selected-organisation="selectedOrganisation"
                 v-model:selected-rollen="selectedRollen"
-                v-model:selected-klasse="selectedKlasse"
                 :operation-context="OperationContext.PERSON_ANLEGEN"
                 :allow-multiple-rollen="true"
                 :create-type="createType"
@@ -914,6 +910,7 @@
                 @update:can-commit="canCommit = $event"
                 @update:befristung="handleBefristungUpdate($event)"
                 @update:calculated-befristung-option="handleBefristungOptionUpdate($event)"
+                @update:selectedKlasse="handleSelectedKlasse"
                 @field-reset="handleFieldReset($event)"
               />
               <!-- Else: Default Order -->

@@ -4,9 +4,10 @@ import {
   type RolleResponse,
   type DBiamPersonResponse,
   type PersonLandesbediensteterSearchResponse,
+  DbiamCreatePersonWithPersonenkontexteBodyParams,
 } from '@/api-client/generated';
 import routes from '@/router/routes';
-import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
 import {
   usePersonenkontextStore,
   type PersonenkontextStore,
@@ -195,8 +196,11 @@ async function fillForm(args: Partial<FormFields>): Promise<Partial<FormSelector
     .findComponent({ ref: 'klasse-select' });
   expect(klasseSelect?.exists()).toBe(true);
 
-  await klasseSelect?.setValue(klasse);
-  klasseSelect?.vm.$emit('update:selectedKlassen', klasse);
+  const selectedKlasse: Organisation | undefined = klasse
+    ? DoFactory.getKlasse(undefined, { name: klasse })
+    : undefined;
+  await klasseSelect?.setValue(selectedKlasse);
+  klasseSelect?.vm.$emit('update:selectedKlassen', selectedKlasse);
   await nextTick();
   selectors.klasseSelect = klasseSelect;
 
@@ -533,11 +537,22 @@ describe('PersonCreationView', () => {
     expect(wrapper?.find('[data-testid="person-success-text"]').isVisible()).toBe(true);
   });
 
-  test('it fills form, triggers submit and then shows success template with new methods', async () => {
+  test('it retains the selected Klasse in the request and success screen after search results change', async () => {
     personenkontextStore.workflowStepResponse = mockWorkflowStepResponse;
+    const klasse: Organisation = DoFactory.getKlasse(undefined, { name: '9a' });
 
     const spy: Mock = vi.spyOn(personenkontextStore, 'createPersonWithKontexte').mockImplementationOnce(async () => {
-      personenkontextStore.createdPersonWithKontext = mockCreatedPersonWithKontext;
+      personenkontextStore.createdPersonWithKontext = DoFactory.getDBiamPersonResponse({
+        ...mockCreatedPersonWithKontext,
+        dBiamPersonenkontextResponses: [
+          ...mockCreatedPersonWithKontext.dBiamPersonenkontextResponses,
+          DoFactory.getDBiamPersonenkontextResponse({
+            personId: PERSON_ID,
+            organisationId: klasse.id,
+            rolleId: ROLLE_ID,
+          }),
+        ],
+      });
       return Promise.resolve();
     });
 
@@ -550,6 +565,12 @@ describe('PersonCreationView', () => {
       kopersNr: '23234',
       klasse: '9a',
     });
+    selectors.klasseSelect?.vm.$emit('update:selectedKlassen', klasse);
+    organisationStore.klassenFilters.set('personenkontext-create', {
+      filterResult: [DoFactory.getKlasse()],
+      total: 1,
+      loading: false,
+    });
     await flushPromises();
 
     await wrapper?.find('[data-testid="person-creation-form"]').trigger('submit');
@@ -559,7 +580,20 @@ describe('PersonCreationView', () => {
     expect(selectors.organisationsebeneSelect?.vm.$data).toStrictEqual({});
 
     await vi.waitFor(() => expect(spy).toHaveBeenCalledOnce());
+    expect(spy).toHaveBeenCalledWith(
+      expect.objectContaining<Partial<DbiamCreatePersonWithPersonenkontexteBodyParams>>({
+        createPersonenkontexte: expect.arrayContaining<
+          DbiamCreatePersonWithPersonenkontexteBodyParams['createPersonenkontexte'][number]
+        >([
+          {
+            organisationId: klasse.id,
+            rolleId: ROLLE_ID,
+          },
+        ]) as DbiamCreatePersonWithPersonenkontexteBodyParams['createPersonenkontexte'],
+      }),
+    );
     expect(wrapper?.find('[data-testid="person-success-text"]').isVisible()).toBe(true);
+    expect(wrapper?.get('[data-testid="created-person-klasse"]').text()).toBe(klasse.name);
   });
 
   test('it fills form for role with Koperspflicht, then clears Kopersnummer when role is removed', async () => {
