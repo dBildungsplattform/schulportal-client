@@ -114,6 +114,7 @@ type OrganisationState = {
   errorCode: string;
   loading: boolean;
   loadingKlassen: boolean;
+  loadingDelete: boolean;
   parentOrganisationen: Array<Organisation>;
   schultraeger: Array<Organisation>;
   activatedItslearningOrganisation: Organisation | null;
@@ -234,6 +235,7 @@ export const useOrganisationStore: StoreDefinition<
       errorCode: '',
       loading: false,
       loadingKlassen: false,
+      loadingDelete: false,
       parentOrganisationen: [],
       schultraeger: [],
       activatedItslearningOrganisation: null,
@@ -615,13 +617,13 @@ export const useOrganisationStore: StoreDefinition<
 
     async deleteOrganisationById(organisationId: string): Promise<void> {
       this.errorCode = '';
-      this.loading = true;
+      this.loadingDelete = true;
       try {
         await organisationApi.organisationControllerDeleteOrganisation(organisationId);
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
-        this.loading = false;
+        this.loadingDelete = false;
       }
     },
 

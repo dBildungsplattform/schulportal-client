@@ -90,7 +90,15 @@
     "/keycloakinternal/externaldata": {
       "post": {
         "operationId": "KeycloakInternalController_getExternalData",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "api-key",
+            "in": "header",
+            "description": "Internal API key for server-to-server communication",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UserExternalDataBodyParams" } } }
@@ -102,6 +110,36 @@
           }
         },
         "summary": "External Data about requested in user.",
+        "tags": ["Keycloakinternal"]
+      }
+    },
+    "/v2/keycloakinternal/externaldata": {
+      "post": {
+        "operationId": "KeycloakInternalController_getExternalDataV2_v2",
+        "parameters": [
+          {
+            "name": "api-key",
+            "in": "header",
+            "description": "Internal API key for server-to-server communication",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/UserExternalDataV2BodyParams" } }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Returns external Data about the requested user for the given Angebot.",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/UserExternalDataV2Response" } }
+            }
+          }
+        },
+        "summary": "External Data about the requested user, scoped to a single Angebot.",
         "tags": ["Keycloakinternal"]
       }
     },
@@ -1338,6 +1376,89 @@
         "tags": ["rolle"]
       }
     },
+    "/api/rolle/for-personenkontext-creation": {
+      "get": {
+        "description": "Find available rollen for personenkontext creation.",
+        "operationId": "RolleController_findAvailableRollenForPersonenkontextCreation",
+        "parameters": [
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "description": "The offset of the paginated list.",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "The requested limit for the page size.",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "organisationId",
+            "required": true,
+            "in": "query",
+            "description": "The organisationId for which the available rollen should be found",
+            "schema": { "nullable": false, "type": "string" }
+          },
+          {
+            "name": "rollenartForPerson",
+            "required": false,
+            "in": "query",
+            "description": "The rollenart of the person for whom the available rollen should be found",
+            "schema": { "$ref": "#/components/schemas/RollenArt" }
+          },
+          {
+            "name": "rolleName",
+            "required": false,
+            "in": "query",
+            "description": "The rolleName for which the available rollen should be found",
+            "schema": { "nullable": true, "type": "string" }
+          },
+          {
+            "name": "rollenIds",
+            "required": false,
+            "in": "query",
+            "description": "The rollenIds that are currently selected and should always be returned.",
+            "schema": { "nullable": true, "type": "array", "items": { "type": "string" } }
+          },
+          {
+            "name": "systemrecht",
+            "required": false,
+            "in": "query",
+            "description": "The systemrecht for which the available rollen should be found",
+            "schema": { "$ref": "#/components/schemas/RollenSystemRechtEnum" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The rollen were successfully returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/RawPagedResponse" },
+                    {
+                      "required": ["items"],
+                      "properties": {
+                        "items": { "type": "array", "items": { "$ref": "#/components/schemas/RolleResponse" } }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": { "description": "Not authorized to get available rollen for personenkontext creation." },
+          "403": { "description": "Insufficient permissions to get available rollen for personenkontext creation." },
+          "500": { "description": "Internal server error while getting available rollen for personenkontext creation." }
+        },
+        "security": [{ "oauth2": ["openid"] }, { "bearer": [] }],
+        "summary": "",
+        "tags": ["rolle"]
+      }
+    },
     "/api/rolle/{rolleId}": {
       "get": {
         "description": "Get rolle by id.",
@@ -1631,7 +1752,7 @@
             "required": true,
             "in": "query",
             "description": "The rollenart of the rolle for which the service provider should be found",
-            "schema": { "nullable": false, "$ref": "#/components/schemas/RollenArt" }
+            "schema": { "$ref": "#/components/schemas/RollenArt" }
           }
         ],
         "responses": {
@@ -2159,29 +2280,22 @@
             "name": "personId",
             "required": false,
             "in": "query",
-            "description": "ID of the person to be modified, will restrict the returned roles",
+            "description": "ID of the person to be modified",
             "schema": { "nullable": true, "type": "string" }
           },
           {
             "name": "organisationId",
             "required": false,
             "in": "query",
-            "description": "ID of the organisation to filter the rollen later",
+            "description": "ID of the organisation where the Personenkontexte should be created",
             "schema": { "nullable": true, "type": "string" }
           },
           {
             "name": "rollenIds",
             "required": false,
             "in": "query",
-            "description": "IDs of the rollen.",
+            "description": "IDs of the selected rollen.",
             "schema": { "type": "array", "items": { "type": "string" } }
-          },
-          {
-            "name": "rolleName",
-            "required": false,
-            "in": "query",
-            "description": "Rolle name used to filter for rollen in personenkontext.",
-            "schema": { "nullable": true, "type": "string" }
           },
           {
             "name": "organisationName",
@@ -2194,20 +2308,13 @@
             "name": "limit",
             "required": false,
             "in": "query",
-            "description": "The limit of items for the request.",
+            "description": "The limit for the returned organisations.",
             "schema": { "nullable": false, "type": "number" }
-          },
-          {
-            "name": "requestedWithSystemrecht",
-            "required": false,
-            "in": "query",
-            "description": "The systemrecht used to filter for rollen in personenkontext. Must be one of PERSONEN_VERWALTEN, PERSONEN_ANLEGEN or EINGESCHRAENKT_NEUE_BENUTZER_ERSTELLEN. Defaults to PERSONEN_VERWALTEN",
-            "schema": { "$ref": "#/components/schemas/RollenSystemRechtEnum" }
           }
         ],
         "responses": {
           "200": {
-            "description": "Initialize or process data from the person creation form.\n                      Valid combinations:\n                      - Both organisationId and rolleId are undefined: Fetch all possible organisations.\n                      - organisationId is provided, but rolleId is undefined: Fetch Rollen for the given organisation.\n                      - Both organisationId and rolleId are provided: Check if the Rolle can be committed for the organisation.\n                      Note: Providing rolleId without organisationId is invalid.",
+            "description": "Initialize or process data from the person creation form.\n                      Valid combinations:\n                      - Both organisationId and rollenIds are undefined: Fetch all possible organisations.\n                      - Both organisationId and rollenIds are provided: Check if the Rollen can be committed for the organisation.",
             "content": {
               "application/json": { "schema": { "$ref": "#/components/schemas/PersonenkontextWorkflowResponse" } }
             }
@@ -3378,6 +3485,43 @@
         },
         "required": ["itslearning", "vidis", "opsh", "onlineDateiablage", "iqshHelpdesk", "polyteia"]
       },
+      "UserExternalDataV2BodyParams": {
+        "type": "object",
+        "properties": {
+          "sub": { "type": "string" },
+          "keycloakClientId": {
+            "type": "string",
+            "description": "Unique identifier of the Angebot to check the permission for."
+          },
+          "includeEmailAddress": { "type": "boolean", "default": false }
+        },
+        "required": ["sub", "keycloakClientId"]
+      },
+      "UserExternalDataV2PersonenkontextResponse": {
+        "type": "object",
+        "properties": { "dienststellennr": { "type": "string" }, "rolleId": { "type": "string" } },
+        "required": ["dienststellennr", "rolleId"]
+      },
+      "UserExternalDataV2Response": {
+        "type": "object",
+        "properties": {
+          "personId": { "type": "string" },
+          "vorname": { "type": "string" },
+          "nachname": { "type": "string" },
+          "rollenart": {
+            "type": "string",
+            "enum": ["LERN", "LEHR", "EXTERN", "ORGADMIN", "LEIT", "SYSADMIN", "SORGBER", "SCHB", "NLEHR"]
+          },
+          "personenkontexte": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/UserExternalDataV2PersonenkontextResponse" }
+          },
+          "dienststellenNummern": { "type": "array", "items": { "type": "string" } },
+          "emailAdresse": { "type": "string" },
+          "oxLoginId": { "type": "string" }
+        },
+        "required": ["personId", "vorname", "nachname", "personenkontexte", "dienststellenNummern"]
+      },
       "PersonLandesbediensteterSearchPersonenkontextResponse": {
         "type": "object",
         "properties": {
@@ -3614,7 +3758,16 @@
       },
       "RollenMerkmal": {
         "type": "string",
-        "enum": ["BEFRISTUNG_PFLICHT", "KOPERS_PFLICHT", "MPT_ROLLE", "PILOT_1_ROLLE", "PILOT_2_ROLLE", "PILOT_3_ROLLE", "PILOT_4_ROLLE", "PILOT_5_ROLLE"]
+        "enum": [
+          "BEFRISTUNG_PFLICHT",
+          "KOPERS_PFLICHT",
+          "MPT_ROLLE",
+          "PILOT_1_ROLLE",
+          "PILOT_2_ROLLE",
+          "PILOT_3_ROLLE",
+          "PILOT_4_ROLLE",
+          "PILOT_5_ROLLE"
+        ]
       },
       "DBiamPersonenzuordnungResponse": {
         "type": "object",
@@ -4390,11 +4543,6 @@
             "type": "array",
             "items": { "$ref": "#/components/schemas/OrganisationResponseLegacy" }
           },
-          "rollen": {
-            "description": "List of available roles.",
-            "type": "array",
-            "items": { "$ref": "#/components/schemas/RolleResponse" }
-          },
           "selectedOrganisation": { "type": "string", "description": "Selected organisation.", "nullable": true },
           "selectedRollen": {
             "description": "Selected rollen.",
@@ -4404,7 +4552,7 @@
           },
           "canCommit": { "type": "boolean", "description": "Indicates whether the commit action can be performed." }
         },
-        "required": ["organisations", "rollen", "selectedOrganisation", "selectedRollen", "canCommit"]
+        "required": ["organisations", "selectedOrganisation", "selectedRollen", "canCommit"]
       },
       "DbiamPersonenkontextBodyParams": {
         "type": "object",
@@ -4520,7 +4668,8 @@
               "ORGANISATION_MATCHES_ROLLENART",
               "PERSONENKONTEXT_ANLAGE_ERROR",
               "ROLLE_NUR_AN_PASSENDE_ORGANISATION",
-              "PERSONALNUMMER_NICHT_EINDEUTIG"
+              "PERSONALNUMMER_NICHT_EINDEUTIG",
+              "PERSON_HAT_KEINE_KOPERSPFLICHTIGE_ROLLE"
             ]
           },
           "code": { "type": "number", "description": "Corresponds to HTTP Status code like 200, 404, 500" }

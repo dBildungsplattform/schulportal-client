@@ -32,7 +32,6 @@ describe('AuthStore', () => {
       expect(authStore.hasKlassenverwaltungPermission).toBe(false);
       expect(authStore.hasPersonenverwaltungPermission).toBe(false);
       expect(authStore.hasRollenverwaltungPermission).toBe(false);
-      expect(authStore.hasMptRollenZuordnenPermission).toBe(false);
       expect(authStore.hasSchulverwaltungPermission).toBe(false);
       expect(authStore.hasSchultraegerverwaltungPermission).toBe(false);
       expect(authStore.hasBehoerdenverwaltungPermission).toBe(false);
@@ -44,7 +43,6 @@ describe('AuthStore', () => {
       expect(authStore.hasKlassenverwaltungPermission).toBe(false);
       expect(authStore.hasPersonenverwaltungPermission).toBe(false);
       expect(authStore.hasRollenverwaltungPermission).toBe(true);
-      expect(authStore.hasMptRollenZuordnenPermission).toBe(false);
       expect(authStore.hasSchulverwaltungPermission).toBe(true);
       expect(authStore.hasSchultraegerverwaltungPermission).toBe(false);
       expect(authStore.hasBehoerdenverwaltungPermission).toBe(false);
@@ -53,7 +51,7 @@ describe('AuthStore', () => {
       expect(authStore.csrfToken).toBe('mock-csrf-token');
     });
 
-    it('should set mpt rollen zuordnen permission when present', async () => {
+    it('should include the MPT right in granted gated rights when present', async () => {
       const mockInfo: UserinfoResponse = DoFactory.getUserinfoResponse();
       mockInfo.personenkontexte[0]!.rolle.systemrechte = ['MPT_ROLLEN_ZUORDNEN'];
 
@@ -62,10 +60,10 @@ describe('AuthStore', () => {
 
       await authStore.initializeAuthStatus();
 
-      expect(authStore.hasMptRollenZuordnenPermission).toBe(true);
+      expect(authStore.grantedGatedRollenSystemrechte).toContain('MPT_ROLLEN_ZUORDNEN');
     });
 
-    it('should not set mpt rollen zuordnen permission when absent', async () => {
+    it('should not include the MPT right in granted gated rights when absent', async () => {
       const mockInfo: UserinfoResponse = DoFactory.getUserinfoResponse();
 
       mockadapter.onGet('/api/auth/logininfo').replyOnce(200, mockInfo);
@@ -73,7 +71,27 @@ describe('AuthStore', () => {
 
       await authStore.initializeAuthStatus();
 
-      expect(authStore.hasMptRollenZuordnenPermission).toBe(false);
+      expect(authStore.grantedGatedRollenSystemrechte).not.toContain('MPT_ROLLEN_ZUORDNEN');
+    });
+
+    it('should collect all granted gated Rollen systemrechte (MPT and Pilot)', async () => {
+      const mockInfo: UserinfoResponse = DoFactory.getUserinfoResponse();
+      mockInfo.personenkontexte[0]!.rolle.systemrechte = [
+        'MPT_ROLLEN_ZUORDNEN',
+        'PILOT_2_ROLLEN_ZUORDNEN',
+        'PILOT_5_ROLLEN_ZUORDNEN',
+      ];
+
+      mockadapter.onGet('/api/auth/logininfo').replyOnce(200, mockInfo);
+      mockadapter.onGet('/api/auth/csrf-token').replyOnce(200, { csrfToken: 'mock-csrf-token' });
+
+      await authStore.initializeAuthStatus();
+
+      expect(authStore.grantedGatedRollenSystemrechte).toEqual([
+        'MPT_ROLLEN_ZUORDNEN',
+        'PILOT_2_ROLLEN_ZUORDNEN',
+        'PILOT_5_ROLLEN_ZUORDNEN',
+      ]);
     });
 
     it('should set behoerdenverwaltung permission when present', async () => {
@@ -100,7 +118,7 @@ describe('AuthStore', () => {
       await initializeAuthStatus;
       expect(authStore.isAuthenticated).toBe(true);
       expect(authStore.currentUserPermissions).toEqual([]);
-      expect(authStore.hasMptRollenZuordnenPermission).toBe(false);
+      expect(authStore.grantedGatedRollenSystemrechte).toEqual([]);
     });
 
     it('should not authenticate on server error', async () => {
@@ -110,7 +128,7 @@ describe('AuthStore', () => {
       expect(authStore.isAuthenticated).toBe(false);
       await initializeAuthStatus;
       expect(authStore.isAuthenticated).toBe(false);
-      expect(authStore.hasMptRollenZuordnenPermission).toBe(false);
+      expect(authStore.grantedGatedRollenSystemrechte).toEqual([]);
     });
   });
 
