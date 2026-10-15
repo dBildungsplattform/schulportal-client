@@ -108,7 +108,7 @@ type OrganisationState = {
   errorCode: string;
   loading: boolean;
   parentOrganisationen: Array<Organisation>;
-  schultraeger: Array<Organisation>;
+  rootChildren: Array<Organisation>;
   cachedSchulenMap: Map<string, string>;
 };
 
@@ -163,7 +163,7 @@ type OrganisationActions = {
   ) => Promise<void>;
   deleteOrganisationById: (organisationId: string) => Promise<void>;
   updateOrganisationNameById: (organisationId: string, name: string, type: OrganisationsTyp) => Promise<void>;
-  getRootKinderSchultraeger: () => Promise<void>;
+  getRootChildren: () => Promise<void>;
   fetchSchulen: (filter: OrganisationenFilter, type: SchuleType) => Promise<void>;
   assignSchuleToTraeger(schultraegerId: string, organisationIdBodyParams: OrganisationByIdBodyParams): Promise<void>;
   fetchSchuleDetailsForKlassen: () => Promise<void>;
@@ -223,7 +223,7 @@ export const useOrganisationStore: StoreDefinition<
       errorCode: '',
       loading: false,
       parentOrganisationen: [],
-      schultraeger: [],
+      rootChildren: [],
       cachedSchulenMap: new Map<string, string>(),
     };
   },
@@ -575,11 +575,11 @@ export const useOrganisationStore: StoreDefinition<
       }
     },
 
-    async getRootKinderSchultraeger() {
+    async getRootChildren(): Promise<void> {
       try {
         const response: AxiosResponse<OrganisationRootChildrenResponse> =
           await organisationApi.organisationControllerGetRootChildren();
-        this.schultraeger = Object.values(response.data) as Organisation[];
+        this.rootChildren = Object.values(response.data) as Organisation[];
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'SCHULTRAEGER_ERROR');
       }

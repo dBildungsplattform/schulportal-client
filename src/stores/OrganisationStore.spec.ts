@@ -688,8 +688,8 @@ describe('OrganisationStore', () => {
     });
   });
 
-  describe('loadSchultraeger', () => {
-    it('should update the schultraeger', async () => {
+  describe('getRootChildren', () => {
+    it('should update rootChildren', async () => {
       const mockResponse: OrganisationRootChildrenResponse = {
         oeffentlich: {
           id: '2',
@@ -722,24 +722,24 @@ describe('OrganisationStore', () => {
       };
 
       mockadapter.onGet('/api/organisationen/root/children').replyOnce(200, mockResponse);
-      const updateOrganisationPromise: Promise<void> = organisationStore.getRootKinderSchultraeger();
-      await updateOrganisationPromise;
-      expect(organisationStore.schultraeger).toEqual([mockResponse.oeffentlich, mockResponse.ersatz]);
+      const getRootChildrenPromise: Promise<void> = organisationStore.getRootChildren();
+      await getRootChildrenPromise;
+      expect(organisationStore.rootChildren).toEqual([mockResponse.oeffentlich, mockResponse.ersatz]);
     });
 
     it('should handle string error', async () => {
       mockadapter.onGet('/api/organisationen/root/children').replyOnce(500, 'some mock server error');
-      const updateOrganisationPromise: Promise<void> = organisationStore.getRootKinderSchultraeger();
-      await updateOrganisationPromise;
-      expect(organisationStore.schultraeger).toEqual([]);
+      const getRootChildrenPromise: Promise<void> = organisationStore.getRootChildren();
+      await getRootChildrenPromise;
+      expect(organisationStore.rootChildren).toEqual([]);
       expect(organisationStore.errorCode).toEqual('SCHULTRAEGER_ERROR');
     });
 
     it('should handle error code', async () => {
       mockadapter.onGet('/api/organisationen/root/children').replyOnce(500, { i18nKey: 'GET_ERROR' });
-      const updateOrganisationPromise: Promise<void> = organisationStore.getRootKinderSchultraeger();
-      await updateOrganisationPromise;
-      expect(organisationStore.schultraeger).toEqual([]);
+      const getRootChildrenPromise: Promise<void> = organisationStore.getRootChildren();
+      await getRootChildrenPromise;
+      expect(organisationStore.rootChildren).toEqual([]);
       expect(organisationStore.errorCode).toEqual('GET_ERROR');
     });
   });
@@ -799,7 +799,7 @@ describe('OrganisationStore', () => {
 
         await organisationStore.fetchSchuleDetailsForKlassen();
 
-        expect(organisationStore.schultraeger).toEqual([]);
+        expect(organisationStore.rootChildren).toEqual([]);
         expect(organisationStore.errorCode).toEqual(expectedError);
       },
     );
