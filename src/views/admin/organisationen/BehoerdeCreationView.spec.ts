@@ -96,7 +96,6 @@ const setup = async (
 
   await vi.dynamicImportSettled();
   const wrapper: VueWrapper<ComponentInstance<typeof BehoerdeCreationView>> = mount(BehoerdeCreationView, {
-    attachTo: document.getElementById('app') || '',
     global: {
       plugins: [router],
     },

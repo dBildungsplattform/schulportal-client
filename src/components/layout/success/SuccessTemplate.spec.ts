@@ -8,7 +8,6 @@ enableAutoUnmount(afterEach);
 
 const setup = (icon?: () => VNode[]): { wrapper: VueWrapper<ComponentInstance<typeof SuccessTemplate>> } => {
   const wrapper: VueWrapper<ComponentInstance<typeof SuccessTemplate>> = mount(SuccessTemplate, {
-    attachTo: document.getElementById('app') || '',
     slots: {
       message: '<span data-testid="test-message">Success</span>',
       description: '<span data-testid="test-description">Details</span>',
