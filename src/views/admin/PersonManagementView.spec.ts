@@ -80,22 +80,9 @@ beforeEach(async () => {
   authStore.hasPersonenverwaltungPermission = true;
 
   personStore.getAllPersons = vi.fn();
-  organisationStore.getFilteredKlassen = vi.fn();
   organisationStore.getAllOrganisationen = vi.fn();
   rolleStore.getRollenForPersonAdministration = vi.fn();
   personenkontextStore.processWorkflowStep = vi.fn();
-
-  organisationStore.klassen = [
-    {
-      id: '123456',
-      name: '11b',
-      kennung: '9356494-11b',
-      namensergaenzung: 'Klasse',
-      kuerzel: '11b',
-      typ: 'KLASSE',
-      administriertVon: '1',
-    },
-  ];
 
   personStore.allUebersichten = new Map();
   for (let index: number = 0; index < 5; index++) {
@@ -228,7 +215,7 @@ describe('PersonManagementView', () => {
     const getAllPersonsSpy: MockInstance = vi.spyOn(personStore, 'getAllPersons');
     searchFilterStore.selectedOrganisationen = ['9876'];
 
-    const klasse: Organisation = organisationStore.klassen[0]!;
+    const klasse: Organisation = DoFactory.getKlasse();
     searchFilterStore.selectedKlassen = [klasse];
     const klasseFilter: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
     const klasseAutocomplete: VueWrapper | undefined = klasseFilter?.findComponent({ name: 'v-autocomplete' });

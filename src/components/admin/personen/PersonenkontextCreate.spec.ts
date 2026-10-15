@@ -190,7 +190,6 @@ beforeEach(() => {
   );
 
   personStore.personenuebersicht = mockPersonenuebersicht;
-  organisationStore.klassen = [DoFactory.getKlasse()];
 });
 
 describe('PersonenkontextCreate', () => {

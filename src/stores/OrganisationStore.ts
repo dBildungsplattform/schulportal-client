@@ -103,19 +103,12 @@ type OrganisationState = {
   schulenWithoutTraeger: Array<Organisation>;
   totalKlassen: number;
   totalSchulen: number;
-  totalPaginatedSchulen: number;
   totalSchultraeger: number;
-  totalPaginatedSchultraeger: number;
-  totalPaginatedKlassen: number;
-  totalPaginatedOrganisationen: number;
   totalOrganisationen: number;
-  klassen: Array<Organisation>;
   errorCode: string;
   loading: boolean;
-  loadingKlassen: boolean;
   parentOrganisationen: Array<Organisation>;
   schultraeger: Array<Organisation>;
-  activatedItslearningOrganisation: Organisation | null;
   cachedSchulenMap: Map<string, string>;
 };
 
@@ -154,10 +147,6 @@ export enum SchuleType {
 type OrganisationGetters = object;
 type OrganisationActions = {
   getAllOrganisationen: (filter?: OrganisationenFilter) => Promise<void>;
-  // TODO remove
-  getFilteredKlassen(filter?: OrganisationenFilter): Promise<void>;
-  // TODO remove
-  getKlassenByOrganisationId: (filter?: OrganisationenFilter) => Promise<void>;
   getOrganisationById: (organisationId: string, organisationsTyp?: OrganisationsTyp) => Promise<void>;
   getLockingOrganisationById: (organisationId: string) => Promise<void>;
   getParentOrganisationsByIds: (organisationIds: string[]) => Promise<void>;
@@ -177,9 +166,7 @@ type OrganisationActions = {
   getRootKinderSchultraeger: () => Promise<void>;
   fetchSchulen: (filter: OrganisationenFilter, type: SchuleType) => Promise<void>;
   assignSchuleToTraeger(schultraegerId: string, organisationIdBodyParams: OrganisationByIdBodyParams): Promise<void>;
-  // TODO remove
-  fetchSchuleDetailsForKlassen: (filterActive: boolean) => Promise<void>;
-  // TODO remove
+  fetchSchuleDetailsForKlassen: () => Promise<void>;
   fetchSchuleDetailsForSchultraeger: () => Promise<void>;
   setItsLearningForSchule: (organisationId: string) => Promise<void>;
   loadOrganisationenForFilter(filter?: OrganisationenFilter, storeKey?: string): Promise<void>;
@@ -231,19 +218,12 @@ export const useOrganisationStore: StoreDefinition<
       schulenWithoutTraeger: [],
       totalKlassen: 0,
       totalSchulen: 0,
-      totalPaginatedSchulen: 0,
       totalSchultraeger: 0,
-      totalPaginatedSchultraeger: 0,
-      totalPaginatedKlassen: 0,
-      totalPaginatedOrganisationen: 0,
       totalOrganisationen: 0,
-      klassen: [],
       errorCode: '',
       loading: false,
-      loadingKlassen: false,
       parentOrganisationen: [],
       schultraeger: [],
-      activatedItslearningOrganisation: null,
       cachedSchulenMap: new Map<string, string>(),
     };
   },
@@ -270,22 +250,18 @@ export const useOrganisationStore: StoreDefinition<
         if (filter?.includeTyp === OrganisationsTyp.Klasse) {
           this.allKlassen = response.data;
           this.totalKlassen = +response.headers['x-paging-total'];
-          await this.fetchSchuleDetailsForKlassen(false);
+          await this.fetchSchuleDetailsForKlassen();
         } else if (filter?.includeTyp === OrganisationsTyp.Schule) {
           this.allSchulen = response.data;
           // The total number of all Schulen before applying pagination (To use in the Result table to show all Einträge)
           this.totalSchulen = +response.headers['x-paging-total'];
-          // The paginated total number to show in the autocomplete filters.
-          this.totalPaginatedSchulen = +response.headers['x-paging-pagetotal'];
         } else if (filter?.includeTyp === OrganisationsTyp.Traeger) {
           this.allSchultraeger = response.data;
           this.totalSchultraeger = +response.headers['x-paging-total'];
-          this.totalPaginatedSchultraeger = +response.headers['x-paging-pagetotal'];
           await this.fetchSchuleDetailsForSchultraeger();
         } else {
           this.allOrganisationen = response.data;
           this.totalOrganisationen = +response.headers['x-paging-total'];
-          this.totalPaginatedOrganisationen = +response.headers['x-paging-pagetotal'];
         }
         this.loading = false;
       } catch (error: unknown) {
@@ -295,7 +271,7 @@ export const useOrganisationStore: StoreDefinition<
       }
     },
 
-    async fetchSchuleDetailsForKlassen(filterActive: boolean): Promise<void> {
+    async fetchSchuleDetailsForKlassen(): Promise<void> {
       const getAdministriertVonSet = (klassen: Organisation[]): Set<string> => {
         return new Set(
           klassen
@@ -311,9 +287,7 @@ export const useOrganisationStore: StoreDefinition<
         }));
       };
 
-      const administriertVonSet: Set<string> = filterActive
-        ? getAdministriertVonSet(this.klassen)
-        : getAdministriertVonSet(this.allKlassen);
+      const administriertVonSet: Set<string> = getAdministriertVonSet(this.allKlassen);
 
       const uncachedIds: string[] = Array.from(administriertVonSet).filter(
         (id: string) => !this.cachedSchulenMap.has(id),
@@ -321,7 +295,6 @@ export const useOrganisationStore: StoreDefinition<
 
       // Use cached values for schuleDetails
       this.allKlassen = updateSchuleById(this.allKlassen);
-      this.klassen = updateSchuleById(this.klassen);
 
       if (uncachedIds.length === 0) {
         return;
@@ -354,7 +327,6 @@ export const useOrganisationStore: StoreDefinition<
 
         // Update schuleDetails with newly fetched data
         this.allKlassen = updateSchuleById(this.allKlassen);
-        this.klassen = updateSchuleById(this.klassen);
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
@@ -403,32 +375,6 @@ export const useOrganisationStore: StoreDefinition<
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
         this.loading = false;
-      }
-    },
-
-    async getFilteredKlassen(filter?: OrganisationenFilter): Promise<void> {
-      this.loadingKlassen = true;
-      try {
-        const response: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations(
-          undefined,
-          200,
-          undefined,
-          undefined,
-          filter?.searchString,
-          OrganisationsTyp.Klasse,
-          filter?.systemrechte,
-          filter?.excludeTyp,
-          filter?.administriertVon,
-          filter?.zugehoerigZu,
-          filter?.organisationIds,
-        );
-        this.klassen = response.data;
-        this.totalKlassen = +response.headers['x-paging-total'];
-        this.totalPaginatedKlassen = +response.headers['x-paging-pagetotal'];
-      } catch (error: unknown) {
-        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
-      } finally {
-        this.loadingKlassen = false;
       }
     },
 
@@ -486,37 +432,6 @@ export const useOrganisationStore: StoreDefinition<
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
         this.loading = false;
-      }
-    },
-
-    async getKlassenByOrganisationId(filter?: OrganisationenFilter) {
-      this.errorCode = '';
-      this.loadingKlassen = true;
-      try {
-        const response: AxiosResponse<Organisation[]> = await organisationApi.organisationControllerFindOrganizations(
-          filter?.offset,
-          filter?.limit,
-          undefined,
-          undefined,
-          filter?.searchString,
-          OrganisationsTyp.Klasse,
-          [],
-          undefined,
-          filter?.administriertVon,
-          undefined,
-          filter?.organisationIds,
-          filter?.sortOrder,
-          filter?.sortField,
-        );
-
-        this.klassen = response.data;
-        this.totalKlassen = +response.headers['x-paging-total'];
-        this.totalPaginatedKlassen = +response.headers['x-paging-pageTotal'];
-        await this.fetchSchuleDetailsForKlassen(true);
-      } catch (error: unknown) {
-        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
-      } finally {
-        this.loadingKlassen = false;
       }
     },
 
@@ -723,9 +638,7 @@ export const useOrganisationStore: StoreDefinition<
       this.errorCode = '';
       this.loading = true;
       try {
-        const { data }: { data: Organisation } =
-          await organisationApi.organisationControllerEnableForitslearning(organisationId);
-        this.activatedItslearningOrganisation = data;
+        await organisationApi.organisationControllerEnableForitslearning(organisationId);
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'ORGANISATION_SPECIFICATION_ERROR');
       } finally {

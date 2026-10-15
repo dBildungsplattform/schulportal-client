@@ -202,27 +202,6 @@ describe('PersonDetailsView', () => {
       canCommit: true,
     };
 
-    organisationStore.klassen = [
-      {
-        id: '1',
-        kennung: '1234567',
-        name: 'Klasse 1',
-        namensergaenzung: 'Ergänzung',
-        kuerzel: 'K1',
-        typ: OrganisationsTyp.Klasse,
-        administriertVon: '1',
-      },
-      {
-        id: '9a',
-        kennung: '1234567',
-        name: 'Klasse 2',
-        namensergaenzung: 'Ergänzung',
-        kuerzel: 'K1',
-        typ: OrganisationsTyp.Klasse,
-        administriertVon: 'O1',
-      },
-    ];
-
     organisationStore.getParentOrganisationsByIds = (_organisationIds: string[]): Promise<void> => {
       return Promise.resolve();
     };
@@ -791,7 +770,6 @@ describe('PersonDetailsView', () => {
 
   test('renders form to add Zuordnung and triggers submit', async () => {
     organisationStore.getAllOrganisationen = vi.fn().mockResolvedValue(undefined);
-    organisationStore.getKlassenByOrganisationId = vi.fn().mockResolvedValue(undefined);
     organisationStore.fetchSchuleDetailsForKlassen = vi.fn().mockResolvedValue(undefined);
     personenkontextStore.processWorkflowStep = vi.fn().mockResolvedValue(undefined);
     personenkontextStore.updatePersonenkontexte = vi.fn().mockResolvedValue(undefined);
@@ -829,7 +807,11 @@ describe('PersonDetailsView', () => {
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ name: 'KlassenFilter' })
       .findComponent({ ref: 'personenkontext-create-klasse-select' });
-    const klasse: Organisation = organisationStore.klassen.find((item: Organisation) => item.id === '9a')!;
+    const klasse: Organisation = DoFactory.getKlasse(undefined, {
+      id: '9a',
+      name: 'Klasse 2',
+      administriertVon: 'O1',
+    });
     await klasseAutocomplete?.setValue(klasse);
     klasseAutocomplete?.vm.$emit('update:search', '9a');
     await nextTick();
@@ -906,7 +888,6 @@ describe('PersonDetailsView', () => {
 
   test('renders form to add Zuordnung, triggers submit that results in an error and then navigates back to form and resets errorCode', async () => {
     organisationStore.getAllOrganisationen = vi.fn().mockResolvedValue(undefined);
-    organisationStore.getKlassenByOrganisationId = vi.fn().mockResolvedValue(undefined);
     organisationStore.fetchSchuleDetailsForKlassen = vi.fn().mockResolvedValue(undefined);
     personenkontextStore.processWorkflowStep = vi.fn().mockResolvedValue(undefined);
 
@@ -942,7 +923,11 @@ describe('PersonDetailsView', () => {
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ name: 'KlassenFilter' })
       .findComponent({ ref: 'personenkontext-create-klasse-select' });
-    const klasse: Organisation = organisationStore.klassen.find((item: Organisation) => item.id === '9a')!;
+    const klasse: Organisation = DoFactory.getKlasse(undefined, {
+      id: '9a',
+      name: 'Klasse 2',
+      administriertVon: 'O1',
+    });
     await klasseAutocomplete?.setValue(klasse);
     klasseAutocomplete?.vm.$emit('update:search', '9a');
     await nextTick();
@@ -1118,7 +1103,6 @@ describe('PersonDetailsView', () => {
 
   test('renders form to change Klasse and triggers submit', async () => {
     organisationStore.getAllOrganisationen = vi.fn().mockResolvedValue(undefined);
-    organisationStore.getKlassenByOrganisationId = vi.fn().mockResolvedValue(undefined);
     organisationStore.fetchSchuleDetailsForKlassen = vi.fn().mockResolvedValue(undefined);
     personenkontextStore.processWorkflowStep = vi.fn().mockResolvedValue(undefined);
     personenkontextStore.updatePersonenkontexte = vi.fn().mockResolvedValue(undefined);
