@@ -16,10 +16,10 @@ const setup = (): {
 } => {
   const vuetify: ReturnType<typeof createVuetify> = createVuetify();
   const wrapper: VueWrapper<ComponentInstance<typeof CreateAnotherButton>> = mount(CreateAnotherButton, {
-    attachTo: document.getElementById('app') || '',
     global: { plugins: [vuetify] },
     slots: { default: 'Create another' },
   });
+
   return { wrapper, vuetify };
 };
 

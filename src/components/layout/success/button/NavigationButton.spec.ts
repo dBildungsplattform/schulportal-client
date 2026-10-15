@@ -12,7 +12,6 @@ const setup = (): {
 } => {
   const vuetify: ReturnType<typeof createVuetify> = createVuetify();
   const wrapper: VueWrapper<ComponentInstance<typeof NavigationButton>> = mount(NavigationButton, {
-    attachTo: document.getElementById('app') || '',
     global: { plugins: [vuetify] },
     slots: { default: 'Back to list' },
   });
