@@ -1,6 +1,6 @@
 import { mount, type VueWrapper } from '@vue/test-utils';
 import { VDivider } from 'vuetify/components';
-import SPSHDivider from './SPSHDivider.vue';
+import SPSHDivider from './SpshDivider.vue';
 
 let wrapper: VueWrapper | null = null;
 

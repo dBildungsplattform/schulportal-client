@@ -1,5 +1,5 @@
 import SuccessIcon from '@/components/icons/SuccessIcon.vue';
-import SPSHDivider from '@/components/layout/SPSHDivider.vue';
+import SPSHDivider from '@/components/layout/SpshDivider.vue';
 import { enableAutoUnmount, mount, type DOMWrapper, type VueWrapper } from '@vue/test-utils';
 import { h, type ComponentInstance, type VNode } from 'vue';
 import SuccessTemplate from './SuccessTemplate.vue';

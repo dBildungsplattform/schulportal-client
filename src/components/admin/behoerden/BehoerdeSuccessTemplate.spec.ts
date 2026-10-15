@@ -1,6 +1,6 @@
 import LabeledField from '@/components/admin/LabeledField.vue';
 import SuccessIcon from '@/components/icons/SuccessIcon.vue';
-import SPSHDivider from '@/components/layout/SPSHDivider.vue';
+import SPSHDivider from '@/components/layout/SpshDivider.vue';
 import { VueWrapper, enableAutoUnmount, mount } from '@vue/test-utils';
 import { expect, test } from 'vitest';
 import type { ComponentInstance } from 'vue';
