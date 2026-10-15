@@ -10,7 +10,6 @@ import {
   type UserinfoResponse,
 } from '../api-client/generated/api';
 import type { Organisation } from './OrganisationStore';
-import { RollenSystemRecht } from './RolleStore';
 import { GATED_ROLLEN_SYSTEMRECHTE } from './types/GatedRollen';
 
 export enum StepUpLevel {

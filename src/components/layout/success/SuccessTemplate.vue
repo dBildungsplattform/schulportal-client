@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import SuccessIcon from '@/components/icons/SuccessIcon.vue';
-  import SPSHDivider from '@/components/layout/SPSHDivider.vue';
+  import SPSHDivider from '@/components/layout/SpshDivider.vue';
   import { type VNode } from 'vue';
 
   defineSlots<{
