@@ -3,7 +3,7 @@ import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import type { Organisation } from './OrganisationStore';
 import { SortField } from './PersonStore';
 import { RollenArt, RollenMerkmal, type RolleResponse } from './RolleStore';
-import { ServiceProviderKategorie } from './ServiceProviderStore';
+import { ServiceProviderKategorie, type ServiceProviderIdNameResponse } from './ServiceProviderStore';
 
 export const DEFAULT_SERVICE_PROVIDER_KATEGORIEN: ReadonlyArray<ServiceProviderKategorie> = [
   ServiceProviderKategorie.Email,
@@ -49,8 +49,7 @@ type SearchFilterState = {
   selectedMerkmaleForRollen: Array<RollenMerkmal>;
   selectedRollenartenForRollen: Array<RollenArt>;
   selectedOrganisationenForRollen: Array<string>;
-  selectedAngeboteForRollen: Array<string>;
-  selectedAngeboteNamesForRollen: Record<string, string>;
+  selectedServiceProvidersForRollen: ServiceProviderIdNameResponse[];
   selectedKategorienForServiceProvider: Array<ServiceProviderKategorie>;
 };
 
@@ -72,8 +71,7 @@ type SearchFilterActions = {
   setMerkmaleFilterForRollen: (selectedMerkmale: Array<RollenMerkmal>) => void;
   setRollenartenFilterForRollen: (selectedRollenarten: Array<RollenArt>) => void;
   setOrganisationenFilterForRollen: (selectedOrganisationen: Array<string>) => void;
-  setAngeboteFilterForRollen: (selectedAngebote: Array<string>) => void;
-  setAngeboteNamesForRollen: (names: Record<string, string>) => void;
+  setServiceProvidersFilterForRollen: (selectedServiceProviders: ServiceProviderIdNameResponse[]) => void;
   setKategorienForServiceProvider: (selectedKategorienForServiceProvider: Array<ServiceProviderKategorie>) => void;
   resetKategorienForServiceProvider: () => void;
 };
@@ -126,8 +124,7 @@ export const useSearchFilterStore: StoreDefinition<
     selectedMerkmaleForRollen: [],
     selectedRollenartenForRollen: [],
     selectedOrganisationenForRollen: [],
-    selectedAngeboteForRollen: [],
-    selectedAngeboteNamesForRollen: {},
+    selectedServiceProvidersForRollen: [],
     selectedKategorienForServiceProvider: [...DEFAULT_SERVICE_PROVIDER_KATEGORIEN],
   }),
   actions: {
@@ -188,12 +185,8 @@ export const useSearchFilterStore: StoreDefinition<
       this.selectedOrganisationenForRollen = selectedOrganisationen;
     },
 
-    setAngeboteFilterForRollen(selectedAngebote: Array<string>) {
-      this.selectedAngeboteForRollen = selectedAngebote;
-    },
-
-    setAngeboteNamesForRollen(names: Record<string, string>) {
-      this.selectedAngeboteNamesForRollen = names;
+    setServiceProvidersFilterForRollen(selectedServiceProviders: ServiceProviderIdNameResponse[]) {
+      this.selectedServiceProvidersForRollen = selectedServiceProviders;
     },
 
     setKategorienForServiceProvider(selectedKategorienForServiceProvider: Array<ServiceProviderKategorie>) {

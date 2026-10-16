@@ -8,7 +8,7 @@ import {
   useSearchFilterStore,
   type SearchFilterStore,
 } from './SearchFilterStore';
-import { ServiceProviderKategorie } from './ServiceProviderStore';
+import { ServiceProviderKategorie, type ServiceProviderIdNameResponse } from './ServiceProviderStore';
 
 describe('SearchFilterStore', () => {
   let searchFilterStore: SearchFilterStore;
@@ -36,8 +36,7 @@ describe('SearchFilterStore', () => {
     expect(searchFilterStore.selectedOrganisationenForRollen).toEqual([]);
     expect(searchFilterStore.rollenPerPage).toEqual(rollenPerPageDefault);
     expect(searchFilterStore.selectedKategorienForServiceProvider).toEqual(DEFAULT_SERVICE_PROVIDER_KATEGORIEN);
-    expect(searchFilterStore.selectedAngeboteForRollen).toEqual([]);
-    expect(searchFilterStore.selectedAngeboteNamesForRollen).toEqual({});
+    expect(searchFilterStore.selectedServiceProvidersForRollen).toEqual([]);
   });
 
   it('should change the state', () => {
@@ -120,19 +119,22 @@ describe('SearchFilterStore', () => {
     expect(searchFilterStore.selectedOrganisationenForRollen).toEqual(['org1', 'org2']);
   });
 
-  it('should set angebote filter for rollen', () => {
-    searchFilterStore.setAngeboteFilterForRollen(['angebot1', 'angebot2']);
-    expect(searchFilterStore.selectedAngeboteForRollen).toEqual(['angebot1', 'angebot2']);
-  });
+  it('should set selected service providers for rollen', () => {
+    const firstProvider: ServiceProviderIdNameResponse = DoFactory.getServiceProviderResponse({
+      id: 'sp1',
+      name: 'Provider One',
+    });
+    const secondProvider: ServiceProviderIdNameResponse = DoFactory.getServiceProviderResponse({
+      id: 'sp2',
+      name: 'Provider Two',
+    });
+    const selectedServiceProviders: ServiceProviderIdNameResponse[] = [
+      { id: firstProvider.id, name: firstProvider.name },
+      { id: secondProvider.id, name: secondProvider.name },
+    ];
 
-  it('should set angebote names for rollen', () => {
-    searchFilterStore.setAngeboteNamesForRollen({ sp1: 'Provider One', sp2: 'Provider Two' });
-    expect(searchFilterStore.selectedAngeboteNamesForRollen).toEqual({ sp1: 'Provider One', sp2: 'Provider Two' });
-  });
+    searchFilterStore.setServiceProvidersFilterForRollen(selectedServiceProviders);
 
-  it('should overwrite existing angebote names for rollen', () => {
-    searchFilterStore.setAngeboteNamesForRollen({ sp1: 'Provider One' });
-    searchFilterStore.setAngeboteNamesForRollen({ sp2: 'Provider Two' });
-    expect(searchFilterStore.selectedAngeboteNamesForRollen).toEqual({ sp2: 'Provider Two' });
+    expect(searchFilterStore.selectedServiceProvidersForRollen).toEqual(selectedServiceProviders);
   });
 });
