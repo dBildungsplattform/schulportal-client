@@ -269,9 +269,9 @@ describe('BehoerdeCreationView', () => {
     organisationStore.createdBehoerde = mockBehoerde;
     await flushPromises();
 
-    expect(wrapper.find('[data-testid="create-another-button"]').isVisible()).toBe(true);
+    expect(wrapper.find('[data-testid="success-template-primary-button"]').isVisible()).toBe(true);
 
-    wrapper.find('[data-testid="create-another-button"]').trigger('click');
+    wrapper.find('[data-testid="success-template-primary-button"]').trigger('click');
     await nextTick();
 
     expect(organisationStore.createdBehoerde).toBeNull();
