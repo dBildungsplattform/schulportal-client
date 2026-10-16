@@ -86,7 +86,7 @@ beforeEach(async () => {
     schulischeAngeboteErstellen: true,
   };
   authStore.hasRollenerweiternPermission = true;
-  authStore.hasMptRollenZuordnenPermission = false;
+  authStore.grantedGatedRollenSystemrechte = [];
   configStore.configData = { schulischeAngeboteErstellen: true } as FeatureFlagResponse;
 
   rolleStore.allRollen = [
@@ -257,8 +257,8 @@ describe('ServiceProviderDetailsBySchuleView', () => {
       expect(wrapper?.find('[data-testid="rollenerweiterung-bearbeiten-button"]').exists()).toBe(false);
     });
 
-    test('requests rollen without MPT systemrecht when the user lacks the permission', async () => {
-      authStore.hasMptRollenZuordnenPermission = false;
+    test('requests rollen without gated rights when the user lacks them', async () => {
+      authStore.grantedGatedRollenSystemrechte = [];
       const getRollenSpy: MockInstance = vi
         .spyOn(rolleStore, 'getRollenAvailableForErweiterung')
         .mockResolvedValue(undefined);
@@ -274,8 +274,11 @@ describe('ServiceProviderDetailsBySchuleView', () => {
       });
     });
 
-    test('requests rollen including MPT systemrecht when the user has the permission', async () => {
-      authStore.hasMptRollenZuordnenPermission = true;
+    test('requests all granted gated systemrechte for role extensions', async () => {
+      authStore.grantedGatedRollenSystemrechte = [
+        RollenSystemRechtEnum.MptRollenZuordnen,
+        RollenSystemRechtEnum.Pilot2RollenZuordnen,
+      ];
       const getRollenSpy: MockInstance = vi
         .spyOn(rolleStore, 'getRollenAvailableForErweiterung')
         .mockResolvedValue(undefined);
@@ -287,7 +290,11 @@ describe('ServiceProviderDetailsBySchuleView', () => {
       expect(getRollenSpy).toHaveBeenCalledWith({
         organisationId: 'some-org-id',
         rollenarten: mockServiceProvider.rollenartenWhitelist,
-        systemrechte: [RollenSystemRechtEnum.RollenErweitern, RollenSystemRechtEnum.MptRollenZuordnen],
+        systemrechte: [
+          RollenSystemRechtEnum.RollenErweitern,
+          RollenSystemRechtEnum.MptRollenZuordnen,
+          RollenSystemRechtEnum.Pilot2RollenZuordnen,
+        ],
       });
     });
 

@@ -13635,7 +13635,7 @@ export const RolleApiAxiosParamCreator = function (configuration?: Configuration
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [searchStr] The name for the role.
          * @param {Array<RollenArt>} [rollenarten] Filter roles by rollenart.
-         * @param {Array<RollenSystemRechtEnum>} [systemrechte] Systemrechte the requesting user\&#39;s permissions are evaluated against. Including MPT_ROLLEN_ZUORDNEN additionally returns MPT roles. Can only be ROLLEN_ERWEITERN and optionally MPT_ROLLEN_ZUORDNEN. Defaults to ROLLEN_ERWEITERN.
+         * @param {Array<RollenSystemRechtEnum>} [systemrechte] Systemrechte the requesting user\&#39;s permissions are evaluated against. Including gated rights additionally returns roles carrying the paired gated Merkmale. Can only be ROLLEN_ERWEITERN and optionally any gated right. Defaults to ROLLEN_ERWEITERN.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -13769,7 +13769,7 @@ export const RolleApiAxiosParamCreator = function (configuration?: Configuration
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [searchStr] The name for the role.
          * @param {Array<string>} [organisationIds] Filters the result to roles administered by any of the given organisations.
-         * @param {Array<RollenSystemRechtEnum>} [systemrechte] The system right for which the roles should be available. Can only be PERSONEN_VERWALTEN and optionally MPT_ROLLEN_ZUORDNEN.
+         * @param {Array<RollenSystemRechtEnum>} [systemrechte] The system right for which the roles should be available. Can only be PERSONEN_VERWALTEN and optionally any gated Systemrecht (e.g. MPT_ROLLEN_ZUORDNEN, PILOT_1_ROLLEN_ZUORDNEN, ...).
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -14228,7 +14228,7 @@ export const RolleApiFp = function(configuration?: Configuration) {
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [searchStr] The name for the role.
          * @param {Array<RollenArt>} [rollenarten] Filter roles by rollenart.
-         * @param {Array<RollenSystemRechtEnum>} [systemrechte] Systemrechte the requesting user\&#39;s permissions are evaluated against. Including MPT_ROLLEN_ZUORDNEN additionally returns MPT roles. Can only be ROLLEN_ERWEITERN and optionally MPT_ROLLEN_ZUORDNEN. Defaults to ROLLEN_ERWEITERN.
+         * @param {Array<RollenSystemRechtEnum>} [systemrechte] Systemrechte the requesting user\&#39;s permissions are evaluated against. Including gated rights additionally returns roles carrying the paired gated Merkmale. Can only be ROLLEN_ERWEITERN and optionally any gated right. Defaults to ROLLEN_ERWEITERN.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -14258,7 +14258,7 @@ export const RolleApiFp = function(configuration?: Configuration) {
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [searchStr] The name for the role.
          * @param {Array<string>} [organisationIds] Filters the result to roles administered by any of the given organisations.
-         * @param {Array<RollenSystemRechtEnum>} [systemrechte] The system right for which the roles should be available. Can only be PERSONEN_VERWALTEN and optionally MPT_ROLLEN_ZUORDNEN.
+         * @param {Array<RollenSystemRechtEnum>} [systemrechte] The system right for which the roles should be available. Can only be PERSONEN_VERWALTEN and optionally any gated Systemrecht (e.g. MPT_ROLLEN_ZUORDNEN, PILOT_1_ROLLEN_ZUORDNEN, ...).
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -14443,7 +14443,7 @@ export const RolleApiFactory = function (configuration?: Configuration, basePath
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [searchStr] The name for the role.
          * @param {Array<RollenArt>} [rollenarten] Filter roles by rollenart.
-         * @param {Array<RollenSystemRechtEnum>} [systemrechte] Systemrechte the requesting user\&#39;s permissions are evaluated against. Including MPT_ROLLEN_ZUORDNEN additionally returns MPT roles. Can only be ROLLEN_ERWEITERN and optionally MPT_ROLLEN_ZUORDNEN. Defaults to ROLLEN_ERWEITERN.
+         * @param {Array<RollenSystemRechtEnum>} [systemrechte] Systemrechte the requesting user\&#39;s permissions are evaluated against. Including gated rights additionally returns roles carrying the paired gated Merkmale. Can only be ROLLEN_ERWEITERN and optionally any gated right. Defaults to ROLLEN_ERWEITERN.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -14471,7 +14471,7 @@ export const RolleApiFactory = function (configuration?: Configuration, basePath
          * @param {number} [limit] The requested limit for the page size.
          * @param {string} [searchStr] The name for the role.
          * @param {Array<string>} [organisationIds] Filters the result to roles administered by any of the given organisations.
-         * @param {Array<RollenSystemRechtEnum>} [systemrechte] The system right for which the roles should be available. Can only be PERSONEN_VERWALTEN and optionally MPT_ROLLEN_ZUORDNEN.
+         * @param {Array<RollenSystemRechtEnum>} [systemrechte] The system right for which the roles should be available. Can only be PERSONEN_VERWALTEN and optionally any gated Systemrecht (e.g. MPT_ROLLEN_ZUORDNEN, PILOT_1_ROLLEN_ZUORDNEN, ...).
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -14648,7 +14648,7 @@ export interface RolleApiInterface {
      * @param {number} [limit] The requested limit for the page size.
      * @param {string} [searchStr] The name for the role.
      * @param {Array<RollenArt>} [rollenarten] Filter roles by rollenart.
-     * @param {Array<RollenSystemRechtEnum>} [systemrechte] Systemrechte the requesting user\&#39;s permissions are evaluated against. Including MPT_ROLLEN_ZUORDNEN additionally returns MPT roles. Can only be ROLLEN_ERWEITERN and optionally MPT_ROLLEN_ZUORDNEN. Defaults to ROLLEN_ERWEITERN.
+     * @param {Array<RollenSystemRechtEnum>} [systemrechte] Systemrechte the requesting user\&#39;s permissions are evaluated against. Including gated rights additionally returns roles carrying the paired gated Merkmale. Can only be ROLLEN_ERWEITERN and optionally any gated right. Defaults to ROLLEN_ERWEITERN.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof RolleApiInterface
@@ -14676,7 +14676,7 @@ export interface RolleApiInterface {
      * @param {number} [limit] The requested limit for the page size.
      * @param {string} [searchStr] The name for the role.
      * @param {Array<string>} [organisationIds] Filters the result to roles administered by any of the given organisations.
-     * @param {Array<RollenSystemRechtEnum>} [systemrechte] The system right for which the roles should be available. Can only be PERSONEN_VERWALTEN and optionally MPT_ROLLEN_ZUORDNEN.
+     * @param {Array<RollenSystemRechtEnum>} [systemrechte] The system right for which the roles should be available. Can only be PERSONEN_VERWALTEN and optionally any gated Systemrecht (e.g. MPT_ROLLEN_ZUORDNEN, PILOT_1_ROLLEN_ZUORDNEN, ...).
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof RolleApiInterface
@@ -14867,7 +14867,7 @@ export class RolleApi extends BaseAPI implements RolleApiInterface {
      * @param {number} [limit] The requested limit for the page size.
      * @param {string} [searchStr] The name for the role.
      * @param {Array<RollenArt>} [rollenarten] Filter roles by rollenart.
-     * @param {Array<RollenSystemRechtEnum>} [systemrechte] Systemrechte the requesting user\&#39;s permissions are evaluated against. Including MPT_ROLLEN_ZUORDNEN additionally returns MPT roles. Can only be ROLLEN_ERWEITERN and optionally MPT_ROLLEN_ZUORDNEN. Defaults to ROLLEN_ERWEITERN.
+     * @param {Array<RollenSystemRechtEnum>} [systemrechte] Systemrechte the requesting user\&#39;s permissions are evaluated against. Including gated rights additionally returns roles carrying the paired gated Merkmale. Can only be ROLLEN_ERWEITERN and optionally any gated right. Defaults to ROLLEN_ERWEITERN.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof RolleApi
@@ -14899,7 +14899,7 @@ export class RolleApi extends BaseAPI implements RolleApiInterface {
      * @param {number} [limit] The requested limit for the page size.
      * @param {string} [searchStr] The name for the role.
      * @param {Array<string>} [organisationIds] Filters the result to roles administered by any of the given organisations.
-     * @param {Array<RollenSystemRechtEnum>} [systemrechte] The system right for which the roles should be available. Can only be PERSONEN_VERWALTEN and optionally MPT_ROLLEN_ZUORDNEN.
+     * @param {Array<RollenSystemRechtEnum>} [systemrechte] The system right for which the roles should be available. Can only be PERSONEN_VERWALTEN and optionally any gated Systemrecht (e.g. MPT_ROLLEN_ZUORDNEN, PILOT_1_ROLLEN_ZUORDNEN, ...).
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof RolleApi

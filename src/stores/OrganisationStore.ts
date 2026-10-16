@@ -107,6 +107,7 @@ type OrganisationState = {
   totalOrganisationen: number;
   errorCode: string;
   loading: boolean;
+  loadingDelete: boolean;
   parentOrganisationen: Array<Organisation>;
   rootChildren: Array<Organisation>;
   cachedSchulenMap: Map<string, string>;
@@ -222,6 +223,7 @@ export const useOrganisationStore: StoreDefinition<
       totalOrganisationen: 0,
       errorCode: '',
       loading: false,
+      loadingDelete: false,
       parentOrganisationen: [],
       rootChildren: [],
       cachedSchulenMap: new Map<string, string>(),
@@ -512,13 +514,13 @@ export const useOrganisationStore: StoreDefinition<
 
     async deleteOrganisationById(organisationId: string): Promise<void> {
       this.errorCode = '';
-      this.loading = true;
+      this.loadingDelete = true;
       try {
         await organisationApi.organisationControllerDeleteOrganisation(organisationId);
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
-        this.loading = false;
+        this.loadingDelete = false;
       }
     },
 

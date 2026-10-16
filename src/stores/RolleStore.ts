@@ -22,6 +22,7 @@ import {
 import type { BaseServiceProvider } from './ServiceProviderStore';
 
 export { RollenArt, RollenMerkmal, RollenSystemRechtEnum as RollenSystemRecht };
+export { GATED_ROLLEN_MERKMALE, GATED_ROLLEN_SYSTEMRECHTE } from './types/GatedRollen';
 export type { RolleResponse, RolleWithServiceProvidersResponse };
 
 const rolleApi: RolleApiInterface = RolleApiFactory(undefined, '', axiosApiInstance);
