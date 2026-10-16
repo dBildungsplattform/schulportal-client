@@ -108,7 +108,7 @@ export type PersistRollenerweiterungForRolle = {
   selectedServiceProviderIds: Array<string>;
 };
 
-type RollenForPersonAdministrationParams = {
+export type RollenForPersonAdministrationParams = {
   searchStr?: string;
   limit?: number;
   offset?: number;

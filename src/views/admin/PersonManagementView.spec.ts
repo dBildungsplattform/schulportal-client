@@ -4,7 +4,7 @@ import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
 import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
-import { useRolleStore, type RolleStore } from '@/stores/RolleStore';
+import { useRolleStore, RollenSystemRecht, type RolleResponse, type RolleStore } from '@/stores/RolleStore';
 import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
 import type { Person } from '@/stores/types/Person';
 import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
@@ -12,7 +12,7 @@ import type { Zuordnung } from '@/stores/types/Zuordnung';
 import { OperationType } from '@/stores/types/bulkOperationTypes';
 import { DOMWrapper, VueWrapper, enableAutoUnmount, flushPromises, mount } from '@vue/test-utils';
 import { DoFactory } from 'test/DoFactory';
-import { expect, test, type Mock, type MockInstance } from 'vitest';
+import { expect, test, type MockInstance } from 'vitest';
 import {
   defineComponent,
   h,
@@ -160,7 +160,7 @@ describe('PersonManagementView', () => {
 
   test('it renders person management table with active rolle filter', () => {
     searchFilterStore.selectedOrganisationen = null;
-    searchFilterStore.selectedRollen = ['10'];
+    searchFilterStore.selectedRollen = [DoFactory.getRolleResponse({ id: '10' })];
     searchFilterStore.selectedKlassen = null;
     expect(wrapper?.getComponent({ name: 'ResultTable' })).toBeTruthy();
     expect(wrapper?.find('[data-testid="person-table"]').isVisible()).toBe(true);
@@ -286,6 +286,73 @@ describe('PersonManagementView', () => {
     expect(wrapper?.find('.v-data-table-footer__items-per-page').text()).toContain('30');
   });
 
+  test('it fetches once with current filters and sorting after changing limit', async () => {
+    await flushPromises();
+    const schule: Organisation = DoFactory.getSchule({ id: 'schule-id' });
+    const klasse: Organisation = DoFactory.getKlasse(schule, { id: 'klasse-id' });
+    const rolle: RolleResponse = DoFactory.getRolleResponse({ id: 'rolle-id' });
+    searchFilterStore.personenPage = 1;
+    searchFilterStore.personenPerPage = 30;
+    searchFilterStore.selectedOrganisationen = [schule.id];
+    searchFilterStore.selectedKlassen = [klasse];
+    searchFilterStore.selectedRollen = [rolle];
+    searchFilterStore.searchStringForPersonen = 'current search';
+    searchFilterStore.personenSortField = 'vorname';
+    searchFilterStore.personenSortOrder = 'desc';
+    searchFilterStore.currentSort = { key: 'vorname', order: 'desc' };
+    personStore.totalPersons = 100;
+
+    const getAllPersonsSpy: MockInstance = vi.mocked(personStore.getAllPersons);
+    getAllPersonsSpy.mockClear();
+    const component: ReturnType<VueWrapper['findComponent']> | undefined = wrapper?.findComponent(
+      '.v-data-table-footer__items-per-page .v-select',
+    );
+    await component?.setValue(50);
+    await flushPromises();
+
+    expect(getAllPersonsSpy).toHaveBeenCalledTimes(1);
+    expect(getAllPersonsSpy).toHaveBeenCalledWith({
+      offset: 0,
+      limit: 50,
+      organisationIDs: [klasse.id],
+      rolleIDs: [rolle.id],
+      searchFilter: 'current search',
+      sortField: 'vorname',
+      sortOrder: 'desc',
+    });
+  });
+
+  test('it keeps the autoselected Schule when resetting filters', async () => {
+    const schule: Organisation = DoFactory.getSchule();
+    authStore.currentUser = {
+      ...DoFactory.getUserinfoResponse(),
+      personenkontexte: [
+        {
+          organisation: schule,
+          rolle: {
+            systemrechte: [RollenSystemRecht.PersonenVerwalten],
+            serviceProviderIds: [],
+          },
+        },
+      ],
+    };
+    searchFilterStore.selectedOrganisationen = [schule.id];
+    wrapper!.unmount();
+    wrapper = mountComponent();
+    await flushPromises();
+
+    vi.mocked(personStore.getAllPersons).mockClear();
+    await wrapper.get('[data-testid="reset-filter-button"]').trigger('click');
+    await flushPromises();
+
+    expect(searchFilterStore.selectedOrganisationen).toEqual([schule.id]);
+    expect(personStore.getAllPersons).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        organisationIDs: [schule.id],
+      }),
+    );
+  });
+
   test('it sets and resets filters', async () => {
     const schule: Organisation = DoFactory.getSchule();
     organisationStore.organisationenFilters.set('person-management', {
@@ -312,10 +379,11 @@ describe('PersonManagementView', () => {
     expect((schuleInputElement?.element as HTMLInputElement).value).toBe(schule.name);
 
     const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
-    await rolleAutocomplete?.setValue(['1']);
+    const rolle: RolleResponse = DoFactory.getRolleResponse();
+    await rolleAutocomplete?.setValue([rolle]);
     await nextTick();
 
-    expect(rolleAutocomplete?.text()).toEqual('1');
+    expect(rolleAutocomplete?.text()).toEqual(rolle.name);
 
     const klasseAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'klasse-select' });
     const klassenInputElement: DOMWrapper<Element> | undefined = klasseAutocomplete?.find(
@@ -421,54 +489,167 @@ describe('PersonManagementView', () => {
     );
   });
 
+  test('it resets all sorting state and keeps the reset order on pagination', async () => {
+    const vornameHeader: DOMWrapper<Element> | undefined = wrapper
+      ?.findAll('.v-data-table__th')
+      .find((th: DOMWrapper<Element>) => th.text().includes('Vorname'));
+    await vornameHeader?.trigger('click');
+    await flushPromises();
+
+    expect(searchFilterStore.personenSortField).toBe('vorname');
+    expect(searchFilterStore.personenSortOrder).toBe('asc');
+
+    searchFilterStore.searchStringForPersonen = 'search';
+    personStore.totalPersons = 50;
+    await nextTick();
+
+    vi.mocked(personStore.getAllPersons).mockClear();
+    await wrapper!.get('[data-testid="reset-filter-button"]').trigger('click');
+    await flushPromises();
+
+    expect(searchFilterStore.personenSortField).toBe('familienname');
+    expect(searchFilterStore.personenSortOrder).toBe('asc');
+    expect(searchFilterStore.currentSort).toEqual({ key: 'familienname', order: 'asc' });
+    expect(wrapper!.findComponent({ name: 'ResultTable' }).props('currentSort')).toEqual({
+      key: 'familienname',
+      order: 'asc',
+    });
+
+    interface PersonManagementView extends DefineComponent {
+      sortField: string | null;
+      sortOrder: 'asc' | 'desc' | null;
+    }
+    const vm: PersonManagementView = wrapper!.vm as unknown as PersonManagementView;
+    expect(vm.sortField).toBe('familienname');
+    expect(vm.sortOrder).toBe('asc');
+
+    await wrapper!.get('.v-pagination__next button:not(.v-btn--disabled)').trigger('click');
+    await flushPromises();
+
+    expect(personStore.getAllPersons).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        offset: 30,
+        sortField: 'familienname',
+        sortOrder: 'asc',
+      }),
+    );
+  });
+
   test('it updates Rollen search correctly', async () => {
-    searchFilterStore.selectedRollenObjects = [
-      DoFactory.getRolleResponse({
-        id: '1',
-        administeredBySchulstrukturknoten: '1',
-        name: 'Rolle 1',
-        rollenart: RollenArt.Lern,
-      }),
-    ];
+    await flushPromises();
+    const rollenAutocomplete: VueWrapper = wrapper!.findComponent({
+      ref: 'rolle-select',
+    });
+    const getRollenSpy: MockInstance = vi.spyOn(rolleStore, 'getRollenForPersonAdministration');
+    getRollenSpy.mockClear();
+    rollenAutocomplete.vm.$emit('update:search', 'name');
+    await nextTick();
+    vi.advanceTimersByTime(499);
+    await flushPromises();
+    expect(getRollenSpy).not.toHaveBeenCalled();
 
-    const rollenAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
+    vi.advanceTimersByTime(1);
+    await flushPromises();
 
-    searchFilterStore.searchStringForPersonen = 'test search';
-
-    // Mock the getRollenForPersonAdministration method
-    const mockGetRollenForPersonAdministration: Mock = vi.fn().mockResolvedValue(undefined);
-    rolleStore.getRollenForPersonAdministration = mockGetRollenForPersonAdministration;
-    rolleStore.rollenForPersonAdministration = [
-      DoFactory.getRolleResponse({
-        id: '1',
-        administeredBySchulstrukturknoten: '1',
-        name: 'Test Rolle',
-        rollenart: RollenArt.Lern,
-      }),
-    ];
-
-    // Trigger the search
-    await rollenAutocomplete?.setValue(['name']);
-    rollenAutocomplete?.vm.$emit('update:search', 'name');
-
-    // Fast-forward timers
-    vi.runAllTimers();
-
-    // Wait for all promises to resolve
-    vi.runAllTicks();
-
-    // Assert that the method was called
-    expect(mockGetRollenForPersonAdministration).toHaveBeenCalledWith(
+    expect(getRollenSpy).toHaveBeenCalledOnce();
+    expect(getRollenSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         searchStr: 'name',
         limit: 25,
         organisationIds: [],
       }),
     );
+  });
 
-    // Add more assertions here to check the state after the search
-    expect(rolleStore.rollenForPersonAdministration).toBeDefined();
-    expect(rolleStore.rollenForPersonAdministration).toHaveLength(1);
+  test('it persists selected Rollen objects across searches and restores them after remounting', async () => {
+    await flushPromises();
+    const selectedRolle: RolleResponse = DoFactory.getRolleResponse({ name: 'Alpha' });
+    const searchedRolle: RolleResponse = DoFactory.getRolleResponse({ name: 'Zebra' });
+    vi.mocked(searchFilterStore.setRolleFilterForPersonen).mockImplementation(
+      (rollen: RolleResponse[] | null): void => {
+        searchFilterStore.selectedRollen = rollen;
+      },
+    );
+    const rollenAutocomplete: VueWrapper = wrapper!.findComponent({
+      ref: 'rolle-select',
+    });
+    expect(rollenAutocomplete.props()).toMatchObject({ returnObject: true });
+    await rollenAutocomplete.setValue([selectedRolle]);
+
+    expect(searchFilterStore.selectedRollen).toEqual([selectedRolle]);
+    expect(personStore.getAllPersons).toHaveBeenLastCalledWith(
+      expect.objectContaining({ rolleIDs: [selectedRolle.id] }),
+    );
+
+    rolleStore.rollenForPersonAdministration = [searchedRolle];
+    await nextTick();
+    await rollenAutocomplete.setValue([selectedRolle, searchedRolle]);
+    await rollenAutocomplete.setValue([selectedRolle]);
+
+    expect(searchFilterStore.selectedRollen).toEqual([selectedRolle]);
+    expect(rollenAutocomplete.props()).toMatchObject({ items: [selectedRolle, searchedRolle] });
+    expect(rolleStore.rollenForPersonAdministration).toEqual([searchedRolle]);
+
+    wrapper!.unmount();
+    wrapper = mountComponent();
+    await flushPromises();
+    const restoredAutocomplete: VueWrapper = wrapper.findComponent({
+      ref: 'rolle-select',
+    });
+    expect(restoredAutocomplete.props()).toMatchObject({ modelValue: [selectedRolle] });
+    expect(restoredAutocomplete.text()).toContain(selectedRolle.name);
+
+    await wrapper.get('[data-testid="reset-filter-button"]').trigger('click');
+    await flushPromises();
+    expect(searchFilterStore.selectedRollen).toEqual([]);
+    expect(restoredAutocomplete.props()).toMatchObject({ modelValue: [], items: [searchedRolle] });
+    vi.mocked(searchFilterStore.setRolleFilterForPersonen).mockReset();
+  });
+
+  test('it clears the Rollen search on blur', async () => {
+    await flushPromises();
+    const rollenAutocomplete: VueWrapper = wrapper!.findComponent({
+      ref: 'rolle-select',
+    });
+    rollenAutocomplete.vm.$emit('update:search', 'Lehrer');
+    await nextTick();
+    vi.advanceTimersByTime(500);
+    await flushPromises();
+
+    rollenAutocomplete.vm.$emit('update:focused', false);
+    await nextTick();
+    vi.advanceTimersByTime(500);
+    await flushPromises();
+
+    expect(rollenAutocomplete.props()).toMatchObject({ search: '' });
+    expect(rolleStore.getRollenForPersonAdministration).toHaveBeenLastCalledWith(
+      expect.objectContaining({ searchStr: '' }),
+    );
+  });
+
+  test('it updates the Rollen organisation and MPT permission filters', async () => {
+    await flushPromises();
+    const schule: Organisation = DoFactory.getSchule();
+    const schulenFilter: VueWrapper = wrapper!.findComponent({ name: 'SchulenFilter' });
+    schulenFilter.vm.$emit('update:selectedSchulen', [schule.id]);
+    await flushPromises();
+
+    expect(rolleStore.getRollenForPersonAdministration).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        organisationIds: [schule.id],
+        systemrechte: [RollenSystemRecht.PersonenVerwalten],
+      }),
+    );
+
+    authStore.hasMptRollenZuordnenPermission = true;
+    await flushPromises();
+
+    expect(rolleStore.getRollenForPersonAdministration).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        organisationIds: [schule.id],
+        systemrechte: [RollenSystemRecht.PersonenVerwalten, RollenSystemRecht.MptRollenZuordnen],
+      }),
+    );
   });
 
   type BulkOperationTestParams = {

@@ -34,8 +34,7 @@ type SearchFilterState = {
   searchStringForSchulen: string | null;
   searchStringForServiceProvider: string | null;
   selectedKlassen: Array<Organisation> | null;
-  selectedRollen: Array<string> | null;
-  selectedRollenObjects: RolleResponse[];
+  selectedRollen: RolleResponse[] | null;
   selectedOrganisationen: Array<string> | null;
   selectedOrgaObjects: Organisation[] | null;
   personenSortField: string | null;
@@ -57,8 +56,7 @@ type SearchFilterState = {
 
 type SearchFilterActions = {
   setKlasseFilterForPersonen: (selectedKlassen: Array<Organisation> | null) => void;
-  setRolleFilterForPersonen: (selectedRollen: Array<string> | null) => void;
-  setRolleFilterWithObjectsForPersonen: (selectedRollen: Array<string> | null, rollenObjects: RolleResponse[]) => void;
+  setRolleFilterForPersonen: (selectedRollen: RolleResponse[] | null) => void;
   setOrganisationFilterForPersonen: (
     selectedOrganisationen: Array<string> | null,
     orgaObjects?: Organisation[],
@@ -114,7 +112,6 @@ export const useSearchFilterStore: StoreDefinition<
     searchStringForRollen: '',
     selectedKlassen: [],
     selectedRollen: [],
-    selectedRollenObjects: [],
     selectedOrganisationen: [],
     selectedOrgaObjects: [],
     personenSortField: SortField.Familienname,
@@ -138,7 +135,7 @@ export const useSearchFilterStore: StoreDefinition<
       this.selectedKlassen = selectedKlassen;
     },
 
-    setRolleFilterForPersonen(selectedRollen: Array<string> | null) {
+    setRolleFilterForPersonen(selectedRollen: RolleResponse[] | null) {
       this.selectedRollen = selectedRollen;
     },
 
@@ -161,11 +158,6 @@ export const useSearchFilterStore: StoreDefinition<
 
     setSearchFilterForServiceProvider(searchStringForServiceProvider: string | null) {
       this.searchStringForServiceProvider = searchStringForServiceProvider ?? '';
-    },
-
-    setRolleFilterWithObjectsForPersonen(selectedRollen: Array<string> | null, rollenObjects: RolleResponse[]) {
-      this.selectedRollen = selectedRollen;
-      this.selectedRollenObjects = rollenObjects;
     },
 
     setSchuleFilterForKlassen(selectedSchuleForKlassen: string | null) {
