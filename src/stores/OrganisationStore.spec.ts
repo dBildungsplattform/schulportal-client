@@ -1251,39 +1251,43 @@ describe('OrganisationStore', () => {
     });
 
     describe('without kennung', () => {
-      it('should create Behoerde and update state', async () => {
-        const administriertVon: string = DoFactory.getOrganisation().id;
-        const zugehoerigZu: string = DoFactory.getOrganisation().id;
-        const mockResponse: Organisation = DoFactory.getOrganisation({
-          typ: OrganisationsTyp.Behoerde,
-          administriertVon,
-          zugehoerigZu,
-          kennung: undefined,
-        });
-
-        mockadapter
-          .onPost('/api/organisationen', {
+      it.each([undefined, ''])(
+        'should omit kennung %s from the request and update state',
+        async (kennung: string | undefined): Promise<void> => {
+          const administriertVon: string = DoFactory.getOrganisation().id;
+          const zugehoerigZu: string = DoFactory.getOrganisation().id;
+          const mockResponse: Organisation = DoFactory.getOrganisation({
+            typ: OrganisationsTyp.Behoerde,
             administriertVon,
             zugehoerigZu,
-            name: mockResponse.name,
-            typ: OrganisationsTyp.Behoerde,
-          })
-          .replyOnce(201, mockResponse);
+            kennung: undefined,
+          });
 
-        const promise: Promise<void> = organisationStore.createBehoerde(
-          administriertVon,
-          zugehoerigZu,
-          mockResponse.name,
-        );
+          mockadapter
+            .onPost('/api/organisationen', {
+              administriertVon,
+              zugehoerigZu,
+              name: mockResponse.name,
+              typ: OrganisationsTyp.Behoerde,
+            })
+            .replyOnce(201, mockResponse);
 
-        expect(organisationStore.loading).toBe(true);
-        expect(organisationStore.createdBehoerde).toBeNull();
-        await promise;
+          const promise: Promise<void> = organisationStore.createBehoerde(
+            administriertVon,
+            zugehoerigZu,
+            mockResponse.name,
+            kennung,
+          );
 
-        expect(organisationStore.createdBehoerde).toEqual(mockResponse);
-        expect(organisationStore.errorCode).toBe('');
-        expect(organisationStore.loading).toBe(false);
-      });
+          expect(organisationStore.loading).toBe(true);
+          expect(organisationStore.createdBehoerde).toBeNull();
+          await promise;
+
+          expect(organisationStore.createdBehoerde).toEqual(mockResponse);
+          expect(organisationStore.errorCode).toBe('');
+          expect(organisationStore.loading).toBe(false);
+        },
+      );
     });
 
     describe('with an unstructured error response', () => {

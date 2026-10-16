@@ -563,10 +563,11 @@ export const useOrganisationStore: StoreDefinition<
     ): Promise<void> {
       this.loading = true;
       try {
+        const mappedKennung: string | undefined = kennung === '' ? undefined : kennung;
         const createOrganisationBodyParams: CreateOrganisationBodyParams = {
           administriertVon: administriertVon,
           zugehoerigZu: zugehoerigZu,
-          kennung: kennung,
+          kennung: mappedKennung,
           name: name,
           typ: OrganisationsTyp.Behoerde,
         };
