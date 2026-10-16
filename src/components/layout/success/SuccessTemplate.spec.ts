@@ -34,9 +34,6 @@ describe('SuccessTemplate', (): void => {
     expect(wrapper.get('[data-testid="test-message"]').text()).toBe('Success');
     expect(wrapper.get('[data-testid="test-description"]').text()).toBe('Details');
     expect(wrapper.get('[data-testid="test-details"]').text()).toBe('Individual content');
-    expect(wrapper.get('[data-testid="test-action"]').element.parentElement?.classList.contains('justify-end')).toBe(
-      true,
-    );
   });
 
   test('should replace the default icon through the icon slot', (): void => {

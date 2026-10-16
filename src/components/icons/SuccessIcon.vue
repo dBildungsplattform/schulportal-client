@@ -1,10 +1,16 @@
-<script setup lang="ts"></script>
-
 <template>
   <v-icon
     small
-    color="#1EAE9C"
+    class="success-icon"
     icon="mdi-check-circle"
     data-testid="success-icon"
   />
 </template>
+
+<style scoped lang="scss">
+  @use '@/styles/variables';
+
+  .success-icon {
+    color: variables.$cyan;
+  }
+</style>

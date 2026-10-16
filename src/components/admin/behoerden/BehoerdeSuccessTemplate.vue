@@ -1,14 +1,11 @@
 <script setup lang="ts">
   import LabeledField from '@/components/admin/LabeledField.vue';
-  import CreateAnotherButton from '@/components/layout/success/button/CreateAnotherButton.vue';
-  import NavigationButton from '@/components/layout/success/button/NavigationButton.vue';
+  import SuccessTemplatePrimaryButton from '@/components/layout/success/button/SuccessTemplatePrimaryButton.vue';
+  import SuccessTemplateSecondaryButton from '@/components/layout/success/button/SuccessTemplateSecondaryButton.vue';
   import SuccessTemplate from '@/components/layout/success/SuccessTemplate.vue';
 
   defineProps<{
-    backButtonText?: string;
     changedData: Array<{ label: string; value: string; testId: string }>;
-    createAnotherButtonText: string;
-    successMessage: string;
   }>();
 
   type Emits = {
@@ -26,7 +23,7 @@
 <template>
   <SuccessTemplate>
     <template #message>
-      <span data-testid="behoerde-success-text">{{ successMessage }}</span>
+      <span data-testid="behoerde-success-text">{{ $t('admin.behoerde.behoerdeAddedSuccessfully') }}</span>
     </template>
     <template #description>
       {{ $t('admin.followingDataCreated') }}
@@ -41,15 +38,15 @@
       />
     </template>
     <template #actions>
-      <NavigationButton
-        v-if="backButtonText"
+      <SuccessTemplateSecondaryButton
+        v-if="false"
         @click="navigateBack"
       >
-        {{ backButtonText }}
-      </NavigationButton>
-      <CreateAnotherButton @click="createAnother">
-        {{ createAnotherButtonText }}
-      </CreateAnotherButton>
+        {{ $t('nav.backToList') }}
+      </SuccessTemplateSecondaryButton>
+      <SuccessTemplatePrimaryButton @click="createAnother">
+        {{ $t('admin.behoerde.createAnother') }}
+      </SuccessTemplatePrimaryButton>
     </template>
   </SuccessTemplate>
 </template>

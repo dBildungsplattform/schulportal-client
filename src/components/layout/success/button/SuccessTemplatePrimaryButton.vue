@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { type VNode } from 'vue';
-  import BaseButton from './BaseButton.vue';
+  import SuccessTemplateBaseButton from './SuccessTemplateBaseButton.vue';
 
   type Emits = {
     (event: 'click'): void;
@@ -11,11 +11,11 @@
 </script>
 
 <template>
-  <BaseButton
+  <SuccessTemplateBaseButton
     appearance="primary"
-    test-id="create-another-button"
+    test-id="success-template-primary-button"
     @click="emit('click')"
   >
     <slot />
-  </BaseButton>
+  </SuccessTemplateBaseButton>
 </template>

@@ -44,7 +44,21 @@
     </v-row>
     <SPSHDivider />
     <v-row class="justify-end">
-      <slot name="actions" />
+      <v-col
+        class="success-actions text-center"
+        cols="auto"
+      >
+        <slot name="actions" />
+      </v-col>
     </v-row>
   </v-container>
 </template>
+
+<style scoped lang="scss">
+  @use '@/styles/variables';
+
+  .success-actions {
+    width: max-content;
+    max-width: 100%;
+  }
+</style>

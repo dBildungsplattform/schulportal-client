@@ -1,19 +1,19 @@
 import { enableAutoUnmount, mount, type VueWrapper } from '@vue/test-utils';
-import { nextTick, type ComponentInstance } from 'vue';
+import { type ComponentInstance } from 'vue';
 import { createVuetify } from 'vuetify';
-import { VBtn, VCol } from 'vuetify/components';
-import BaseButton from './BaseButton.vue';
+import { VBtn } from 'vuetify/components';
+import SuccessTemplateBaseButton from './SuccessTemplateBaseButton.vue';
 
 enableAutoUnmount(afterEach);
 
 const setup = (
   appearance: 'primary' | 'secondary' = 'primary',
 ): {
-  wrapper: VueWrapper<ComponentInstance<typeof BaseButton>>;
+  wrapper: VueWrapper<ComponentInstance<typeof SuccessTemplateBaseButton>>;
   vuetify: ReturnType<typeof createVuetify>;
 } => {
   const vuetify: ReturnType<typeof createVuetify> = createVuetify();
-  const wrapper: VueWrapper<ComponentInstance<typeof BaseButton>> = mount(BaseButton, {
+  const wrapper: VueWrapper<ComponentInstance<typeof SuccessTemplateBaseButton>> = mount(SuccessTemplateBaseButton, {
     attachTo: document.getElementById('app') || '',
     global: { plugins: [vuetify] },
     props: { appearance, testId: 'test-button' },
@@ -22,20 +22,20 @@ const setup = (
   return { wrapper, vuetify };
 };
 
-describe('BaseButton', (): void => {
+describe('SuccessTemplateBaseButton', (): void => {
   test.each(['primary', 'secondary'] as const)(
     'should render the label and ID with %s appearance',
     (appearance: 'primary' | 'secondary'): void => {
-      const { wrapper }: { wrapper: VueWrapper<ComponentInstance<typeof BaseButton>> } = setup(appearance);
+      const { wrapper }: { wrapper: VueWrapper<ComponentInstance<typeof SuccessTemplateBaseButton>> } =
+        setup(appearance);
 
       expect(wrapper.get('[data-testid="test-button"]').text()).toBe('Continue');
       expect(wrapper.getComponent(VBtn).classes()).toContain(appearance);
-      expect(wrapper.getComponent(VCol).props()).toMatchObject({ cols: '12', sm: '6', md: 'auto' });
     },
   );
 
   test('should update appearance and ID when props change', async (): Promise<void> => {
-    const { wrapper }: { wrapper: VueWrapper<ComponentInstance<typeof BaseButton>> } = setup();
+    const { wrapper }: { wrapper: VueWrapper<ComponentInstance<typeof SuccessTemplateBaseButton>> } = setup();
     await wrapper.setProps({ appearance: 'secondary', testId: 'updated-button' });
 
     expect(wrapper.get('[data-testid="updated-button"]').classes()).toContain('secondary');
@@ -44,26 +44,8 @@ describe('BaseButton', (): void => {
   });
 
   test('should emit one click when the button is clicked', async (): Promise<void> => {
-    const { wrapper }: { wrapper: VueWrapper<ComponentInstance<typeof BaseButton>> } = setup();
+    const { wrapper }: { wrapper: VueWrapper<ComponentInstance<typeof SuccessTemplateBaseButton>> } = setup();
     await wrapper.get('[data-testid="test-button"]').trigger('click');
     expect(wrapper.emitted('click')).toHaveLength(1);
-  });
-
-  test('should update block sizing when the viewport changes', async (): Promise<void> => {
-    const {
-      wrapper,
-      vuetify,
-    }: { wrapper: VueWrapper<ComponentInstance<typeof BaseButton>>; vuetify: ReturnType<typeof createVuetify> } =
-      setup();
-
-    vi.stubGlobal('innerWidth', 600);
-    vuetify.display.update();
-    await nextTick();
-    expect(wrapper.getComponent(VBtn).props('block')).toBe(true);
-
-    vi.stubGlobal('innerWidth', 1600);
-    vuetify.display.update();
-    await nextTick();
-    expect(wrapper.getComponent(VBtn).props('block')).toBe(false);
   });
 });

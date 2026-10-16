@@ -7,7 +7,6 @@ describe('SuccessIcon', (): void => {
     const wrapper: VueWrapper | null = mount(SuccessIcon);
 
     expect(wrapper?.getComponent(VIcon).props('icon')).toBe('mdi-check-circle');
-    expect(wrapper?.getComponent(VIcon).props('color')).toBe('#1EAE9C');
     expect(wrapper?.get('[data-testid="success-icon"]').attributes('small')).toBe('');
 
     wrapper?.unmount();

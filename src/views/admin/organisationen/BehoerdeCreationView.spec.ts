@@ -130,7 +130,7 @@ describe('BehoerdeCreationView', () => {
     expect(wrapper.get('[data-testid="screenreader-output"]').element).toBe(statusRegion);
     expect(statusRegion.textContent?.trim()).toBe('Die Behörde wurde erfolgreich hinzugefügt.');
 
-    await wrapper.get('[data-testid="create-another-button"]').trigger('click');
+    await wrapper.get('[data-testid="success-template-primary-button"]').trigger('click');
     await flushPromises();
 
     expect(wrapper.get('[data-testid="screenreader-output"]').element).toBe(statusRegion);

@@ -206,9 +206,7 @@
       </template>
       <template v-if="organisationStore.createdBehoerde && !organisationStore.errorCode">
         <BehoerdeSuccessTemplate
-          :success-message="$t('admin.behoerde.behoerdeAddedSuccessfully')"
           :changed-data="createdDataRows"
-          :create-another-button-text="$t('admin.behoerde.createAnother')"
           @on-navigate-back-to-behoerde-list="handleNavigateBackToBehoerdeList"
           @on-create-another-behoerde="handleCreateAnotherBehoerde"
         />
