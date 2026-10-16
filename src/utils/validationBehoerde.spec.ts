@@ -122,4 +122,18 @@ describe('ValidationBehoerde', (): void => {
       expect(result.value?.selectedDienststellennummer).toBe('');
     });
   });
+
+  describe('when the optional Dienststellennummer is cleared', (): void => {
+    it('should accept null and normalize it to an empty number', async (): Promise<void> => {
+      const schema: ReturnType<typeof getValidationSchema> = getValidationSchema((key: string): string => key);
+      const result: Awaited<ReturnType<typeof schema.parse>> = await schema.parse({
+        selectedZustaendigkeitsbereich: 'Schule',
+        selectedBehoerdenname: 'Schulamt',
+        selectedDienststellennummer: null as unknown as undefined,
+      });
+
+      expect(result.errors).toEqual([]);
+      expect(result.value?.selectedDienststellennummer).toBe('');
+    });
+  });
 });

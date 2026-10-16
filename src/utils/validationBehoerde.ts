@@ -17,10 +17,9 @@ export const getValidationSchema = (t: (key: string) => string): TypedSchema<Beh
         .matches(DIN_91379A_EXT, t('admin.behoerde.rules.behoerdenname.matches'))
         .matches(NO_LEADING_TRAILING_SPACES, t('admin.behoerde.rules.behoerdenname.noLeadingTrailingSpaces'))
         .required(t('admin.behoerde.rules.behoerdenname.required')),
-      selectedDienststellennummer: string().matches(
-        NO_LEADING_TRAILING_SPACES,
-        t('admin.behoerde.rules.dienststellennummer.noLeadingTrailingSpaces'),
-      ),
+      selectedDienststellennummer: string()
+        .ensure()
+        .matches(NO_LEADING_TRAILING_SPACES, t('admin.behoerde.rules.dienststellennummer.noLeadingTrailingSpaces')),
     }),
   );
 };
