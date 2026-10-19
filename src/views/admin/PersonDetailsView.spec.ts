@@ -3,7 +3,7 @@ import { expect, test, type MockInstance } from 'vitest';
 import { nextTick, type Component, type ComputedRef, type DefineComponent } from 'vue';
 import { createRouter, createWebHistory, type Router } from 'vue-router';
 
-import { EmailAddressStatus, ServiceProviderSystem } from '@/api-client/generated';
+import { EmailAddressStatus, ServiceProviderSystem, type OrganisationResponse } from '@/api-client/generated';
 import { PendingState } from '@/components/admin/personen/details/PersonenkontextItem.types';
 import PersonenkontextItem from '@/components/admin/personen/details/PersonenkontextItem.vue';
 import routes from '@/router/routes';
@@ -40,6 +40,7 @@ import PersonDetailsView from './PersonDetailsView.vue';
 
 let wrapper: VueWrapper | null = null;
 let router: Router;
+let mockOrganisation: OrganisationResponse;
 
 const authStore: AuthStore = useAuthStore();
 const configStore: ConfigStore = useConfigStore();
@@ -66,7 +67,7 @@ const mockCurrentUser: UserInfo = {
   sub: 'c71be903-d0ec-4207-b653-40c114680b63',
   personenkontexte: [
     {
-      organisation: DoFactory.getOrganisationResponse(),
+      organisation: DoFactory.getOrganisationResponse({ typ: OrganisationsTyp.Root }),
       rolle: {
         systemrechte: ['ROLLEN_VERWALTEN', 'SCHULEN_VERWALTEN'],
         serviceProviderIds: ['789897798'],
@@ -185,18 +186,9 @@ describe('PersonDetailsView', () => {
       },
     ];
 
+    mockOrganisation = DoFactory.getOrganisationResponse({ id: 'O1', typ: OrganisationsTyp.Schule });
     personenkontextStore.workflowStepResponse = {
-      organisations: [
-        {
-          id: 'O1',
-          administriertVon: 'string',
-          kennung: 'string',
-          name: 'string',
-          namensergaenzung: 'string',
-          kuerzel: 'string',
-          typ: 'ROOT',
-        },
-      ],
+      organisations: [mockOrganisation],
       selectedOrganisation: 'string',
       selectedRollen: ['string'],
       canCommit: true,
@@ -487,19 +479,20 @@ describe('PersonDetailsView', () => {
       return wrapper!.findComponent({ ref: 'personenkontext-create' });
     }
 
-    async function selectOrganisation(personenkontextCreate: VueWrapper, organisationId: string): Promise<void> {
+    async function selectOrganisation(personenkontextCreate: VueWrapper, organisation: Organisation): Promise<void> {
       await personenkontextCreate
-        .findComponent({ ref: 'schulenFilter' })
-        .findComponent({ ref: 'personenkontext-create-organisation-select' })
-        .setValue(organisationId);
+        .getComponent({ ref: 'schulenFilter' })
+        .getComponent({ ref: 'personenkontext-create-organisation-select' })
+        .setValue(organisation);
       await flushPromises();
+      expect(personenkontextCreate.props().selectedOrganisation).toBe(organisation.id);
     }
 
     test('it passes the existing rollenart to the Rollen query', async () => {
       const personenkontextCreate: VueWrapper = await openZuordnungCreationForm();
       expect(personenkontextCreate.props('rollenartForPerson')).toBe(RollenArt.Lern);
 
-      await selectOrganisation(personenkontextCreate, 'O1');
+      await selectOrganisation(personenkontextCreate, mockOrganisation);
 
       expect(rolleStore.getRollenForPersonenkontextCreation).toHaveBeenLastCalledWith(
         expect.objectContaining({ organisationId: 'O1', rollenartForPerson: RollenArt.Lern }),
@@ -512,7 +505,7 @@ describe('PersonDetailsView', () => {
       ]);
 
       const personenkontextCreate: VueWrapper = await openZuordnungCreationForm();
-      await selectOrganisation(personenkontextCreate, 'O1');
+      await selectOrganisation(personenkontextCreate, mockOrganisation);
 
       expect(personenkontextCreate.props('rollen')).toEqual([
         {
@@ -791,9 +784,9 @@ describe('PersonDetailsView', () => {
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'schulenFilter' })
       .findComponent({ ref: 'personenkontext-create-organisation-select' });
-    await organisationAutocomplete?.setValue('O1');
-    organisationAutocomplete?.vm.$emit('update:search', 'O1');
-    await nextTick();
+    await organisationAutocomplete?.setValue(mockOrganisation);
+    await flushPromises();
+    expect(wrapper?.getComponent({ ref: 'personenkontext-create' }).props('selectedOrganisation')).toBe('O1');
 
     // Set rolle value
     const rolleAutocomplete: VueWrapper | undefined = wrapper
@@ -907,9 +900,9 @@ describe('PersonDetailsView', () => {
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'schulenFilter' })
       .findComponent({ ref: 'personenkontext-create-organisation-select' });
-    await organisationAutocomplete?.setValue('O1');
-    organisationAutocomplete?.vm.$emit('update:search', 'O1');
-    await nextTick();
+    await organisationAutocomplete?.setValue(mockOrganisation);
+    await flushPromises();
+    expect(wrapper?.getComponent({ ref: 'personenkontext-create' }).props('selectedOrganisation')).toBe('O1');
 
     // Set rolle value
     const rolleAutocomplete: VueWrapper | undefined = wrapper
