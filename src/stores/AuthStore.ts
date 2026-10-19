@@ -2,13 +2,14 @@ import axiosApiInstance from '@/services/ApiService';
 import { defineStore, type Store, type StoreDefinition } from 'pinia';
 import {
   AuthApiFactory,
+  RollenSystemRechtEnum as RollenSystemRecht,
   type AuthApiInterface,
   type CsrfTokenResponse,
   type PersonTimeLimitInfoResponse,
   type UserinfoResponse,
 } from '../api-client/generated/api';
 import type { Organisation } from './OrganisationStore';
-import { RollenSystemRecht } from './RolleStore';
+import { GATED_ROLLEN_SYSTEMRECHTE } from './types/GatedRollen';
 import type { AxiosResponse } from 'axios';
 
 export enum StepUpLevel {
@@ -65,7 +66,8 @@ type AuthState = {
   hasEingeschränktNeueBenutzerErstellenPermission: boolean;
   hasAngeboteVerwaltenPermission: boolean;
   hasRollenerweiternPermission: boolean;
-  hasMptRollenZuordnenPermission: boolean;
+  /** The gated RollenSystemRechte (MPT_ROLLEN_ZUORDNEN, PILOT_1_ROLLEN_ZUORDNEN, ...) the current user actually holds. */
+  grantedGatedRollenSystemrechte: RollenSystemRecht[];
   hasEingeschränktAngeboteVerwaltenPermission: boolean;
   hasVidisPermission: boolean;
   isAuthenticated: boolean;
@@ -107,7 +109,7 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
       hasEingeschränktNeueBenutzerErstellenPermission: false,
       hasAngeboteVerwaltenPermission: false,
       hasRollenerweiternPermission: false,
-      hasMptRollenZuordnenPermission: false,
+      grantedGatedRollenSystemrechte: [],
       hasEingeschränktAngeboteVerwaltenPermission: false,
       isAuthenticated: false,
       acr: StepUpLevel.NONE,
@@ -164,8 +166,8 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
               RollenSystemRecht.AngeboteVerwalten,
             );
             this.hasRollenerweiternPermission = this.currentUserPermissions.includes(RollenSystemRecht.RollenErweitern);
-            this.hasMptRollenZuordnenPermission = this.currentUserPermissions.includes(
-              RollenSystemRecht.MptRollenZuordnen,
+            this.grantedGatedRollenSystemrechte = GATED_ROLLEN_SYSTEMRECHTE.filter((systemrecht: RollenSystemRecht) =>
+              this.currentUserPermissions.includes(systemrecht),
             );
             this.hasEingeschränktAngeboteVerwaltenPermission = this.currentUserPermissions.includes(
               RollenSystemRecht.AngeboteEingeschraenktVerwalten,
@@ -195,7 +197,7 @@ export const useAuthStore: StoreDefinition<'authStore', AuthState, AuthGetters, 
           this.hasLandesbediensteteSuchenUndHinzufügenPermission = false;
           this.hasEingeschränktNeueBenutzerErstellenPermission = false;
           this.hasAngeboteVerwaltenPermission = false;
-          this.hasMptRollenZuordnenPermission = false;
+          this.grantedGatedRollenSystemrechte = [];
           this.hasEingeschränktAngeboteVerwaltenPermission = false;
           this.hasVidisPermission = false;
           this.isAuthenticated = false;
