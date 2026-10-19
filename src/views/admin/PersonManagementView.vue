@@ -12,6 +12,7 @@
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import KlassenFilter from '@/components/filter/KlassenFilter.vue';
   import SchulenFilter from '@/components/filter/SchulenFilter.vue';
+  import type { SelectedSchulen } from '@/types';
   import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
   import { useOrganisationen } from '@/composables/useOrganisationen';
   import {
@@ -116,9 +117,11 @@
 
   const searchInputOrganisationen: Ref<string> = ref('');
 
-  const selectedOrganisationen: Ref<Array<Organisation>> = ref([]);
+  const selectedOrganisationen: Ref<Array<Organisation>> = ref(searchFilterStore.selectedOrganisationen ?? []);
   const selectedKlassen: Ref<Array<Organisation> | undefined> = ref(searchFilterStore.selectedKlassen ?? []);
-  const selectedOrganisationIds: Ref<Array<string>> = ref([]);
+  const selectedOrganisationIds: ComputedRef<string[]> = computed(() =>
+    selectedOrganisationen.value.map((organisation: Organisation) => organisation.id),
+  );
   const selectedStatus: Ref<string | null> = ref(null);
   const searchFilter: Ref<string> = ref('');
 
@@ -153,7 +156,7 @@
   }: UseRollenForPersonAdministrationAutocompleteReturn = useRollenForPersonAdministrationAutocomplete({
     searchStr: '',
     limit: 25,
-    organisationIds: searchFilterStore.selectedOrganisationen ?? [],
+    organisationIds: selectedOrganisationIds.value,
     systemrechte: rollenSystemrechteForPersonAdministration.value,
   });
   selectedRollen.value = searchFilterStore.selectedRollen ?? [];
@@ -229,7 +232,7 @@
       limit: searchFilterStore.personenPerPage,
       organisationIDs: searchFilterStore.selectedKlassen?.length
         ? searchFilterStore.selectedKlassen.map((klasse: Organisation) => klasse.id)
-        : searchFilterStore.selectedOrganisationen || [],
+        : (searchFilterStore.selectedOrganisationen?.map((organisation: Organisation) => organisation.id) ?? []),
       rolleIDs: searchFilterStore.selectedRollen?.map((rolle: RolleResponse): string => rolle.id) ?? [],
       searchFilter: searchFilterStore.searchStringForPersonen || '',
       sortField: searchFilterStore.personenSortField as SortField,
@@ -263,21 +266,10 @@
     applySearchAndFilters();
   }
 
-  function setSelectedOrganisationen(newValue: Array<Organisation> | Organisation): void {
-    searchFilterStore.setOrganisationFilterForPersonen(
-      selectedOrganisationIds.value,
-      searchFilterStore.selectedOrgaObjects && searchFilterStore.selectedOrgaObjects.length > 0
-        ? searchFilterStore.selectedOrgaObjects
-        : Array.isArray(newValue)
-          ? newValue
-          : [newValue],
-    );
-    selectedOrganisationen.value = searchFilterStore.selectedOrgaObjects ?? [];
-  }
-
-  async function setOrganisationFilter(newValue: Array<string> | undefined): Promise<void> {
-    selectedOrganisationIds.value = newValue ?? [];
-    searchFilterStore.setOrganisationFilterForPersonen(newValue ?? []);
+  async function setOrganisationFilter(selection: SelectedSchulen): Promise<void> {
+    const newValue: Organisation[] = Array.isArray(selection) ? selection : selection ? [selection] : [];
+    selectedOrganisationen.value = newValue;
+    searchFilterStore.setOrganisationFilterForPersonen(newValue);
     searchFilterStore.setKlasseFilterForPersonen([]);
     selectedKlassen.value = [];
     await applySearchAndFilters();
@@ -297,7 +289,7 @@
     searchFilterStore.setSearchFilterForPersonen('');
     /* do not reset orgas if orga was autoselected */
     if (!hasAutoselectedSchule.value) {
-      selectedOrganisationIds.value = [];
+      selectedOrganisationen.value = [];
       searchFilterStore.setOrganisationFilterForPersonen([]);
     }
     searchInputOrganisationen.value = '';
@@ -560,8 +552,6 @@
 
   onMounted(async () => {
     if (filterOrSearchActive.value) {
-      selectedOrganisationIds.value = searchFilterStore.selectedOrganisationen || [];
-      selectedOrganisationen.value = searchFilterStore.selectedOrgaObjects || [];
       selectedKlassen.value = searchFilterStore.selectedKlassen || [];
     }
 
@@ -612,9 +602,8 @@
             parentId="person-management"
             ref="schulenFilter"
             :systemrechteForSearch="[RollenSystemRecht.PersonenVerwalten]"
-            :selectedSchulen="selectedOrganisationIds"
+            :selectedSchulen="selectedOrganisationen"
             @update:selectedSchulen="setOrganisationFilter"
-            @update:selectedSchulenObjects="setSelectedOrganisationen"
             :placeholderText="$t('admin.schule.schule')"
             hideDetails
           >

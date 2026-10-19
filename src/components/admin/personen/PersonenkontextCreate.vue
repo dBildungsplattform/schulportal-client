@@ -4,6 +4,7 @@
   import SchulenFilter from '@/components/filter/SchulenFilter.vue';
   import FormRow from '@/components/form/FormRow.vue';
   import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
+  import { useOrganisationSelection } from '@/composables/useOrganisationSelection';
   import { OrganisationsTyp, type Organisation } from '@/stores/OrganisationStore';
   import {
     CreationType,
@@ -25,7 +26,7 @@
     useRolleStore,
   } from '@/stores/RolleStore';
   import type { Zuordnung } from '@/stores/types/Zuordnung';
-  import { type TranslatedObject } from '@/types.d';
+  import { type SelectedSchulen, type TranslatedObject } from '@/types.d';
   import { dedup } from '@/utils/arrays';
   import { blurActiveElement } from '@/utils/focus';
   import { isLernRolle } from '@/utils/validationPersonenkontext';
@@ -54,6 +55,7 @@
     organisationen: TranslatedObject[] | undefined;
     rollen: TranslatedRolleWithAttrs[];
     selectedOrganisation: string | undefined;
+    initialOrganisation?: Organisation | null;
     createType?: CreationType;
     showHeadline: boolean;
     personId?: string;
@@ -90,6 +92,7 @@
     (e: 'update:befristung', value: string | undefined): void;
     (e: 'update:calculatedBefristungOption', value: string | undefined): void;
     (event: 'update:selectedOrganisation', value: string | undefined): void;
+    (event: 'update:organisationObject', value: Organisation | undefined): void;
     (event: 'update:selectedRolle', value: string | undefined): void;
     (event: 'update:selectedRollen', value: string[] | undefined): void;
     (event: 'update:selectedKlasse', value: Organisation | undefined): void;
@@ -101,6 +104,10 @@
   const emits: Emits = defineEmits<Emits>();
 
   const selectedOrganisation: Ref<string | undefined> = ref(props.selectedOrganisation);
+  const selectedOrganisationObject: ReturnType<typeof useOrganisationSelection> = useOrganisationSelection(
+    selectedOrganisation,
+    () => props.initialOrganisation ?? autoselectedSchule.value,
+  );
   const selectedRolle: Ref<string | undefined> = ref(props.selectedRolle);
   const selectedRollen: Ref<string[] | undefined> = ref(props.selectedRollen || []);
   const selectedKlasse: Ref<Organisation | undefined> = ref(props.selectedKlasse);
@@ -249,9 +256,8 @@
     emits('update:calculatedBefristungOption', value);
   };
 
-  function updateSchuleSelection(orgaId: string): void {
-    selectedOrganisation.value = orgaId;
-    emits('update:selectedOrganisation', orgaId);
+  function updateSchuleSelection(selection: SelectedSchulen): void {
+    selectedOrganisationObject.value = Array.isArray(selection) ? selection.at(0) : selection;
   }
 
   function handleKlassenOption(value: string | null): void {
@@ -390,10 +396,25 @@
   );
 
   watch(
+    selectedOrganisationObject,
+    (organisation: Organisation | null | undefined): void => {
+      emits('update:organisationObject', organisation ?? undefined);
+    },
+    { immediate: true },
+  );
+
+  watch(
+    () => props.selectedOrganisation,
+    (organisationId: string | undefined): void => {
+      selectedOrganisation.value = organisationId;
+    },
+  );
+
+  watch(
     autoselectedSchule,
     (newAutoselectedSchule: Organisation | null) => {
       if (newAutoselectedSchule) {
-        selectedOrganisation.value = newAutoselectedSchule.id;
+        selectedOrganisationObject.value = newAutoselectedSchule;
         emits('update:selectedOrganisation', newAutoselectedSchule.id);
       }
     },
@@ -440,7 +461,7 @@
       <SchulenFilter
         ref="schulenFilter"
         parentId="personenkontext-create"
-        :selectedSchulen="selectedOrganisation ? [selectedOrganisation] : []"
+        :selectedSchulen="selectedOrganisationObject"
         :selectedRollen="selectedRollen ? selectedRollen : []"
         :multiple="false"
         :systemrechteForSearch="[requestedWithSystemrecht].filter((v): v is RollenSystemRecht => v !== undefined)"
@@ -453,10 +474,6 @@
         :placeholderText="$t('admin.organisation.selectOrganisation')"
         :personId="props.personId"
         @update:selectedSchulen="updateSchuleSelection"
-        @update:selectedSchulenObjects="
-          (organisations: Array<Organisation>) =>
-            emits('update:selectedOrganisation', organisations.length > 0 ? organisations[0]?.id : undefined)
-        "
       ></SchulenFilter>
     </FormRow>
 

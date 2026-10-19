@@ -271,7 +271,10 @@ describe('ServiceProviderDetailsView', () => {
     await openRollenerweiterungenSection();
 
     const schulenFilter: VueWrapper | undefined = wrapper?.findComponent(SchulenFilter);
-    schulenFilter?.vm.$emit('update:selected-schulen', ['schule-1', 'schule-2']);
+    schulenFilter?.vm.$emit('update:selectedSchulen', [
+      DoFactory.getSchule({ id: 'schule-1' }),
+      DoFactory.getSchule({ id: 'schule-2' }),
+    ]);
     await flushPromises();
 
     expect(getRollenerweiterungenByIdSpy).toHaveBeenCalled();
@@ -315,12 +318,12 @@ describe('ServiceProviderDetailsView', () => {
     const rollenFilter: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
     const selectedRolle: RolleWithServiceProvidersResponse = DoFactory.getRolleWithServiceProviders({ id: 'rolle-1' });
 
-    schulenFilter?.vm.$emit('update:selected-schulen', ['schule-1']);
+    schulenFilter?.vm.$emit('update:selectedSchulen', [DoFactory.getSchule({ id: 'schule-1' })]);
     rollenFilter?.vm.$emit('update:model-value', [selectedRolle]);
     await flushPromises();
 
     // Clear organisation filter, empty array should send undefined
-    schulenFilter?.vm.$emit('update:selected-schulen', []);
+    schulenFilter?.vm.$emit('update:selectedSchulen', []);
     await flushPromises();
 
     expect(getRollenerweiterungenByIdSpy).toHaveBeenLastCalledWith({
@@ -454,7 +457,7 @@ describe('ServiceProviderDetailsView', () => {
     const schulenFilter: VueWrapper | undefined = wrapper?.findComponent(SchulenFilter);
     const rollenFilter: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
     const selectedRolle: RolleWithServiceProvidersResponse = rolleStore.allRollen[0];
-    schulenFilter?.vm.$emit('update:selected-schulen', ['schule-1']);
+    schulenFilter?.vm.$emit('update:selectedSchulen', [DoFactory.getSchule({ id: 'schule-1' })]);
     rollenFilter?.vm.$emit('update:model-value', [selectedRolle]);
     await flushPromises();
     rolleStore.allRollen = [];

@@ -1,12 +1,11 @@
 <script setup lang="ts">
-  import type { PersonenkontextWorkflowResponse, RollenSystemRechtEnum } from '@/api-client/generated/api';
+  import type { RollenSystemRechtEnum } from '@/api-client/generated/api';
   import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
   import {
     OrganisationsTyp,
     useOrganisationStore,
-    type AutoCompleteStore,
     type Organisation,
-    type OrganisationenFilter,
+    type OrganisationenFilterForAutocomplete,
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
   import {
@@ -16,15 +15,14 @@
     type PersonenkontextStore,
     type WorkflowFilter,
   } from '@/stores/PersonenkontextStore';
-  import type { TranslatedObject } from '@/types';
   import { dedup, sameContent } from '@/utils/arrays';
+  import type { SelectedSchulen } from '@/types';
   import { blurActiveElement } from '@/utils/focus';
   import { getDisplayNameForOrg } from '@/utils/formatting';
   import type { BaseFieldProps } from 'vee-validate';
-  import { computed, onMounted, onUnmounted, reactive, ref, watch, watchEffect, type ComputedRef, type Ref } from 'vue';
+  import { computed, onMounted, onUnmounted, reactive, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
 
-  type SelectedSchulenIds = Array<string> | string | undefined;
   type Props = {
     hideDetails?: boolean;
     systemrechteForSearch?: Array<RollenSystemRechtEnum>;
@@ -43,19 +41,14 @@
     personId?: string;
     selectedRollen?: Array<string>;
   };
-  type Emits = {
-    (e: 'update:selectedSchulenObjects', value: Array<Organisation>): void;
-  };
   type ResolvedProps = Omit<Props, 'selectionCountKey'> & { selectionCountKey: string };
-  type SelectionChange = [SelectedSchulenIds, boolean];
-  type PreviousSelectionChange = [SelectedSchulenIds, boolean | undefined];
+  type SelectionChange = [SelectedSchulen, boolean];
+  type PreviousSelectionChange = [SelectedSchulen, boolean | undefined];
 
   const props: ResolvedProps = withDefaults(defineProps<Props>(), {
     selectionCountKey: 'admin.schule.schulenSelected',
   });
-  const emits: Emits = defineEmits<Emits>();
-  const selectedSchulen: Ref<SelectedSchulenIds> = defineModel('selectedSchulen');
-  const lastEmittedSelection: Ref<SelectedSchulenIds> = ref(undefined);
+  const selectedSchulen: Ref<SelectedSchulen> = defineModel('selectedSchulen');
   const searchInputSchulen: Ref<string | undefined> = ref(undefined);
   const clearInput = (): void => {
     searchInputSchulen.value = undefined;
@@ -72,50 +65,35 @@
     return props.parentId ? `${props.parentId}-${typ}-select` : `${typ}-select`;
   });
 
-  const organisationStoreReference: ComputedRef<AutoCompleteStore<Organisation> | undefined> = computed(() => {
-    return organisationStore.organisationenFilters.get(props.parentId ?? '');
-  });
-
-  // This will either return the store reference for the organisation store or the workflow response (A separate store reference for the workflow is not needed)
-  const storeReference: ComputedRef<AutoCompleteStore<Organisation> | PersonenkontextWorkflowResponse> = computed(
+  const currentResults: ComputedRef<Organisation[]> = computed(() =>
+    props.useWorkflowEndpoints
+      ? (personenkontextStore.workflowStepResponse?.organisations ?? [])
+      : (organisationStore.organisationenFilters.get(props.parentId ?? '')?.filterResult ?? []),
+  );
+  const typFilter: ComputedRef<Pick<OrganisationenFilterForAutocomplete, 'includeTyp' | 'excludeTyp'>> = computed(
     () => {
-      const isWorkflow: boolean | undefined = props.useWorkflowEndpoints;
-
-      if (isWorkflow) {
-        return {
-          ...personenkontextStore.workflowStepResponse,
-        } as PersonenkontextWorkflowResponse;
+      if (props.includeAll) {
+        return { excludeTyp: [OrganisationsTyp.Klasse] };
+      } else {
+        return { includeTyp: OrganisationsTyp.Schule };
       }
-
-      // Provide a fallback empty object to avoid returning undefined
-      return (
-        organisationStoreReference.value ?? ({ filterResult: [] as Organisation[] } as AutoCompleteStore<Organisation>)
-      );
     },
   );
-  const typFilter: ComputedRef<Pick<OrganisationenFilter, 'includeTyp' | 'excludeTyp'>> = computed(() => {
-    if (props.includeAll) {
-      return { excludeTyp: [OrganisationsTyp.Klasse] };
-    } else {
-      return { includeTyp: OrganisationsTyp.Schule };
-    }
-  });
 
   // The filter used to load the Schulen and possibly orgas
-  const schulenFilter: OrganisationenFilter = reactive({
+  const schulenFilter: OrganisationenFilterForAutocomplete = reactive({
     ...typFilter.value,
     systemrechte: props.systemrechteForSearch,
     limit: 25,
-    organisationIds: [],
     searchString: undefined,
   });
 
   // Specific filter to load the organisationen in the forms that are tied to the workflow endpoints (Normal and landesbedienstete)
-  const organisationenFilter: WorkflowFilter | LandesbediensteterWorkflowFilter = reactive({
+  const organisationenFilter: WorkflowFilter = reactive({
     operationContext: props.operationContext,
     personId: props.personId,
     organisationId: undefined,
-    rollenIds: [],
+    rollenIds: props.selectedRollen ?? [],
     organisationName: undefined,
     limit: 25,
   });
@@ -128,102 +106,44 @@
     return props.readonly || hasAutoselectedSchule.value || props.isRolleUnassignForm;
   });
 
-  // selection is represented as an array internally
-  // wrap/unwrap is used to convert between internal and vuetify representation
-  const wrapSelectedSchulenIds = (selectedIds: SelectedSchulenIds): Array<string> => {
-    if (Array.isArray(selectedIds)) {
-      return selectedIds.filter(Boolean);
+  // Normalize single and multiple selections for shared selection handling.
+  const wrapSelectedSchulen = (selection: SelectedSchulen): Array<Organisation> => {
+    if (Array.isArray(selection)) {
+      return selection;
     }
-    if (selectedIds) {
-      return [selectedIds];
+    if (selection) {
+      return [selection];
     }
     return [];
   };
 
-  const unwrapSelectedSchulenIds = (selectedIds: Array<string>): SelectedSchulenIds => {
-    if (selectedIds.length === 0) {
-      return undefined;
-    } else if (selectedIds.length === 1) {
-      return selectedIds.at(0);
-    } else {
-      return selectedIds;
-    }
-  };
+  const isEmptySelection = (selection: SelectedSchulen): boolean => wrapSelectedSchulen(selection).length === 0;
 
-  const isEmptySelection = (selection: SelectedSchulenIds): boolean => {
-    if (!selection) {
-      return true;
-    }
-    return wrapSelectedSchulenIds(selection).filter(Boolean).length === 0;
-  };
-
-  const translateSchule = (schule: Organisation): TranslatedObject => ({
-    value: schule.id,
-    title: getDisplayNameForOrg(schule),
-  });
-
-  const translatedSchulen: ComputedRef<Array<TranslatedObject>> = computed(() => {
-    const storeData: AutoCompleteStore<Organisation> | PersonenkontextWorkflowResponse = storeReference.value;
-
-    // Extract organisations based on store type
-    let organisations: Organisation[] = [];
-
-    if (props.useWorkflowEndpoints) {
-      // Handle workflow response - check if it has organisations property. If yes then we are dealing with the workflow response
-      if ('organisations' in storeData) {
-        organisations = storeData.organisations;
-      }
-    } else {
-      // Handle regular organisation store - check if filterResult exists and is an array. If yes then we are dealing with the organisation store
-      let filterResult: Organisation[] | undefined;
-      if ('filterResult' in storeData) {
-        filterResult = storeData.filterResult;
-      }
-      if (Array.isArray(filterResult)) {
-        organisations = filterResult;
-      }
-    }
-
-    // Add autoselected if present
-    if (autoselectedSchule.value) {
-      organisations.push(autoselectedSchule.value);
-    }
-
-    // Deduplicate and translate
-    const uniqueOrgs: Organisation[] = dedup(organisations, (org: Organisation) => org.id);
-    return uniqueOrgs.map(translateSchule);
-  });
-
-  const canDisplaySelection = (selection: SelectedSchulenIds): boolean => {
-    const result: boolean = wrapSelectedSchulenIds(selection).every((selectedSchuleId: string) =>
-      Boolean(
-        // translatedSchulen should include autoSelection if needed, so no extra logic is needed here
-        translatedSchulen.value.find(
-          (translatedSchule: TranslatedObject) => translatedSchule.value === selectedSchuleId,
-        ),
-      ),
+  const schulen: ComputedRef<Array<Organisation>> = computed(() => {
+    return dedup(
+      [
+        ...currentResults.value,
+        ...wrapSelectedSchulen(selectedSchulen.value),
+        ...wrapSelectedSchulen(autoselectedSchule.value),
+      ],
+      (org: Organisation) => org.id,
     );
-    return result;
-  };
+  });
 
-  const getDisplayItem = (item: TranslatedObject, index: number): string => {
+  const getDisplayItem = (item: Organisation, index: number): string => {
     if (!selectedSchulen.value) {
       return '';
     }
-    if (!canDisplaySelection(selectedSchulen.value)) {
-      return '...';
-    }
-
-    const selectedIds: string[] = wrapSelectedSchulenIds(selectedSchulen.value);
+    const selection: Organisation[] = wrapSelectedSchulen(selectedSchulen.value);
 
     if (!props.multiple) {
-      return item.title;
+      return getDisplayNameForOrg(item);
     }
-    if (selectedIds.length < 2) {
-      return item.title;
+    if (selection.length < 2) {
+      return getDisplayNameForOrg(item);
     }
     if (index === 0) {
-      return t(props.selectionCountKey, { count: selectedIds.length });
+      return t(props.selectionCountKey, { count: selection.length });
     }
     return '';
   };
@@ -239,7 +159,7 @@
   });
 
   const isDisplayName = (name: string): boolean => {
-    return translatedSchulen.value.find((schule: TranslatedObject) => schule.title === name) !== undefined;
+    return schulen.value.some((schule: Organisation) => getDisplayNameForOrg(schule) === name);
   };
 
   const updateSearchString = (searchString: string | undefined): void => {
@@ -256,29 +176,13 @@
     }
   };
 
-  const getDefaultIds = (): Array<string> => {
-    if (hasAutoselectedSchule.value) {
-      return wrapSelectedSchulenIds(autoselectedSchule.value?.id);
-    }
-    return [];
+  const updateOrganisationenIds = (selection: SelectedSchulen): void => {
+    organisationenFilter.organisationId =
+      (hasAutoselectedSchule.value ? autoselectedSchule.value?.id : undefined) ??
+      wrapSelectedSchulen(selection).at(0)?.id;
   };
 
-  const updateOrganisationenIds = (ids: SelectedSchulenIds): void => {
-    const tempIds: Array<string> = getDefaultIds().concat(wrapSelectedSchulenIds(ids));
-    schulenFilter.organisationIds = dedup(tempIds.filter(Boolean));
-    organisationenFilter.organisationId = dedup(tempIds.filter(Boolean)).at(0);
-  };
-
-  const resolveSelection = (selection: SelectedSchulenIds, organisations: Array<Organisation>): Array<Organisation> => {
-    if (isEmptySelection(selection)) {
-      return [];
-    }
-    const selectedIds: Array<string> = wrapSelectedSchulenIds(selection);
-
-    return organisations.filter((org: Organisation) => selectedIds.includes(org.id));
-  };
-
-  const handleSelectionUpdate = (selection: SelectedSchulenIds): void => {
+  const handleSelectionUpdate = (selection: SelectedSchulen): void => {
     if (isEmptySelection(selection)) {
       updateOrganisationenIds([]);
       updateSearchString(undefined);
@@ -291,13 +195,8 @@
     }
   };
 
-  const isSameSelection = (a: SelectedSchulenIds, b: SelectedSchulenIds): boolean => {
-    return sameContent(wrapSelectedSchulenIds(a), wrapSelectedSchulenIds(b), (id: SelectedSchulenIds) => {
-      if (!id) {
-        return '';
-      }
-      return id;
-    });
+  const isSameSelection = (a: SelectedSchulen, b: SelectedSchulen): boolean => {
+    return sameContent(wrapSelectedSchulen(a), wrapSelectedSchulen(b), (org: Organisation) => org.id);
   };
 
   const handleFocusChange = (focused: boolean): void => {
@@ -320,33 +219,6 @@
     }
   }
 
-  watchEffect(() => {
-    const wrappedSelection: Array<string> = wrapSelectedSchulenIds(selectedSchulen.value);
-    if (isSameSelection(lastEmittedSelection.value, wrappedSelection)) {
-      return;
-    }
-    if (wrappedSelection.length === 0) {
-      lastEmittedSelection.value = [];
-      emits('update:selectedSchulenObjects', []);
-      return;
-    }
-
-    const storeData: AutoCompleteStore<Organisation> | PersonenkontextWorkflowResponse = storeReference.value;
-
-    let organisations: Array<Organisation> = [];
-    if ('filterResult' in storeData && Array.isArray(storeData.filterResult)) {
-      organisations = storeData.filterResult;
-    } else if ('organisations' in storeData && Array.isArray(storeData.organisations)) {
-      organisations = storeData.organisations;
-    }
-
-    const resolvedSelection: Array<Organisation> = resolveSelection(wrappedSelection, organisations);
-    if (resolvedSelection.length === wrappedSelection.length) {
-      lastEmittedSelection.value = wrappedSelection;
-      emits('update:selectedSchulenObjects', resolvedSelection);
-    }
-  });
-
   watch(
     [selectedSchulen, hasAutoselectedSchule],
     ([currentSelection, currentlyHasAutoselectedSchule]: SelectionChange, [oldSelection]: PreviousSelectionChange) => {
@@ -358,35 +230,36 @@
 
       // Case 2: Empty selection - use autoselected or initial values
       if (isEmptySelection(currentSelection)) {
-        const newIds: SelectedSchulenIds =
-          currentlyHasAutoselectedSchule && autoselectedSchule.value
-            ? unwrapSelectedSchulenIds([autoselectedSchule.value.id])
-            : [];
-
-        if (!isSameSelection(selectedSchulen.value, newIds)) {
-          selectedSchulen.value = newIds;
-          handleSelectionUpdate(newIds);
+        if (currentlyHasAutoselectedSchule && autoselectedSchule.value) {
+          const newSelection: SelectedSchulen = props.multiple ? [autoselectedSchule.value] : autoselectedSchule.value;
+          selectedSchulen.value = newSelection;
+          handleSelectionUpdate(newSelection);
         }
       }
     },
     { immediate: true },
   );
 
-  // This watches both filters and triggers loading of organisationen when they change
+  // Load organisations when the active endpoint's filter changes.
   watch(
-    [schulenFilter, organisationenFilter],
+    [(): OperationContext | undefined => props.operationContext, (): string | undefined => props.personId],
+    ([operationContext, personId]: [OperationContext | undefined, string | undefined]): void => {
+      organisationenFilter.operationContext = operationContext;
+      organisationenFilter.personId = personId;
+    },
+  );
+
+  watch(
+    [
+      (): OrganisationenFilterForAutocomplete | WorkflowFilter =>
+        props.useWorkflowEndpoints ? organisationenFilter : schulenFilter,
+      (): boolean | undefined => props.useLandesbediensteteWorkflow,
+    ],
     (
-      [newSchulenFilter, newOrganisationenFilter]: [OrganisationenFilter, WorkflowFilter],
-      [oldSchulenFilter, oldOrganisationenFilter]: [OrganisationenFilter | undefined, WorkflowFilter | undefined] = [
-        undefined,
-        undefined,
-      ],
+      _values: [OrganisationenFilterForAutocomplete | WorkflowFilter, boolean | undefined],
+      [oldFilter]: [OrganisationenFilterForAutocomplete | WorkflowFilter | undefined, (boolean | undefined)?],
     ) => {
-      if (
-        !isEmptySelection(selectedSchulen.value) &&
-        isInputDisabled.value &&
-        canDisplaySelection(selectedSchulen.value)
-      ) {
+      if (!props.useWorkflowEndpoints && !isEmptySelection(selectedSchulen.value) && isInputDisabled.value) {
         return;
       }
 
@@ -394,39 +267,35 @@
         clearTimeout(timerId.value);
       }
 
-      const hasOldFilter: boolean = !!oldSchulenFilter || !!oldOrganisationenFilter;
+      if (props.useWorkflowEndpoints && !oldFilter) {
+        void handleWorkflowStep(organisationenFilter);
+        return;
+      }
+
+      const hasOldFilter: boolean = !!oldFilter;
       const delay: number = hasOldFilter ? 500 : 0;
 
       timerId.value = setTimeout(async () => {
         if (props.useWorkflowEndpoints) {
-          await handleWorkflowStep(newOrganisationenFilter);
+          await handleWorkflowStep(organisationenFilter);
         } else {
-          await organisationStore.loadOrganisationenForFilter(newSchulenFilter, props.parentId);
+          await organisationStore.loadOrganisationenForFilter(schulenFilter, props.parentId);
         }
       }, delay);
     },
     { deep: true, immediate: true },
   );
 
-  onMounted(async () => {
+  onMounted(() => {
     if (organisationStore.organisationenFilters.has(props.parentId ?? '')) {
       // eslint-disable-next-line no-console
       console.warn(`SchulenFilter initialized twice with id ${props.parentId}`);
     }
     organisationStore.resetOrganisationenFilter(props.parentId);
-    // Initializes the Rollen for the selected Schule (or Orga if includeAll is true)
-    if (props.useWorkflowEndpoints) {
-      await handleWorkflowStep({
-        personId: props.personId,
-        operationContext: props.operationContext,
-        organisationId: Array.isArray(selectedSchulen.value) ? selectedSchulen.value[0] : selectedSchulen.value,
-        rollenIds: props.selectedRollen ?? [],
-        limit: 25,
-      });
-    }
   });
 
   onUnmounted(() => {
+    clearTimeout(timerId.value);
     organisationStore.clearOrganisationenFilter(props.parentId);
   });
 </script>
@@ -441,9 +310,10 @@
     :disabled="isInputDisabled"
     :id="testId"
     :ref="testId"
-    :items="translatedSchulen"
-    item-value="value"
-    item-text="title"
+    :items="schulen"
+    item-value="id"
+    :item-title="getDisplayNameForOrg"
+    return-object
     :multiple="props.multiple"
     :no-data-text="'noDataFound'"
     :placeholder="props.placeholderText ?? t('admin.schule.assignSchule')"

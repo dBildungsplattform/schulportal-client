@@ -3,6 +3,7 @@
   import ResultTable, { type Headers } from '@/components/admin/ResultTable.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SchulenFilter from '@/components/filter/SchulenFilter.vue';
+  import type { SelectedSchulen } from '@/types';
   import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
@@ -38,7 +39,8 @@
     autoselectedSchule: ComputedRef<Organisation | null>;
   } = useAutoselectedSchule([RollenSystemRechtEnum.MptRollenZuordnen]);
 
-  const selectedOrganisationId: Ref<string> = ref('');
+  const selectedOrganisation: Ref<Organisation | null> = ref(searchFilterStore.selectedSchuleForMptRollen);
+  const selectedOrganisationId: ComputedRef<string | undefined> = computed(() => selectedOrganisation.value?.id);
 
   const mptRollenFilter: ComputedRef<RolleFilter | null> = computed((): RolleFilter | null => {
     if (!selectedOrganisationId.value) {
@@ -70,7 +72,7 @@
   });
 
   function resetFilters(): void {
-    selectedOrganisationId.value = '';
+    selectedOrganisation.value = null;
     rolleStore.allRollen = [];
     rolleStore.totalRollen = 0;
     organisationStore.currentOrganisation = null;
@@ -79,14 +81,16 @@
     searchFilterStore.mptRollenPerPage = 30;
   }
 
-  function setSelectedOrganisation(organisationId: string | undefined): void {
-    if (!organisationId) {
+  function setSelectedOrganisation(selection: SelectedSchulen): void {
+    const organisation: Organisation | undefined =
+      (Array.isArray(selection) ? selection.at(0) : selection) ?? undefined;
+    if (!organisation) {
       resetFilters();
       return;
     }
 
-    selectedOrganisationId.value = organisationId;
-    searchFilterStore.setSchuleForMptRollen(organisationId);
+    selectedOrganisation.value = organisation;
+    searchFilterStore.setSchuleForMptRollen(organisation);
   }
 
   function setPage(page: number): void {
@@ -112,17 +116,15 @@
     });
   }
 
-  watch(mptRollenFilter, async (filter: RolleFilter | null): Promise<void> => {
-    if (filter) {
-      await rolleStore.getRollenForMptZuordnung(filter);
-    }
-  });
-
-  watch(selectedOrganisationId, async (organisationId: string): Promise<void> => {
-    if (organisationId) {
-      await organisationStore.getOrganisationById(organisationId);
-    }
-  });
+  watch(
+    mptRollenFilter,
+    async (filter: RolleFilter | null): Promise<void> => {
+      if (filter) {
+        await rolleStore.getRollenForMptZuordnung(filter);
+      }
+    },
+    { immediate: true },
+  );
 
   onBeforeRouteLeave((): void => {
     rolleStore.errorCode = '';
@@ -131,13 +133,11 @@
 
   onMounted((): void => {
     if (searchFilterStore.selectedSchuleForMptRollen) {
-      selectedOrganisationId.value = searchFilterStore.selectedSchuleForMptRollen;
       return;
     }
 
     if (hasAutoselectedSchule.value && autoselectedSchule.value) {
-      selectedOrganisationId.value = autoselectedSchule.value.id;
-      searchFilterStore.setSchuleForMptRollen(autoselectedSchule.value.id);
+      setSelectedOrganisation(autoselectedSchule.value);
       return;
     }
 
@@ -155,8 +155,8 @@
     {{ $t('admin.headline') }}
   </h1>
   <LayoutCard
-    :header="`${t('admin.rolle.mptManagement.title')} ${organisationStore.currentOrganisation?.name ?? ''}`"
-    :header-hover-text="organisationStore.currentOrganisation?.name"
+    :header="`${t('admin.rolle.mptManagement.title')} ${selectedOrganisation?.name ?? ''}`"
+    :header-hover-text="selectedOrganisation?.name"
   >
     <v-row
       align="start"
@@ -191,7 +191,7 @@
           highlightSelection
           parentId="mpt-rolle-management"
           :systemrechteForSearch="[RollenSystemRechtEnum.MptRollenZuordnen]"
-          :selectedSchulen="selectedOrganisationId ? [selectedOrganisationId] : []"
+          :selectedSchulen="selectedOrganisation"
           @update:selected-schulen="setSelectedOrganisation"
           :placeholderText="$t('admin.schule.schule')"
           hideDetails

@@ -6,9 +6,10 @@
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SchulenFilter from '@/components/filter/SchulenFilter.vue';
+  import type { SelectedSchulen } from '@/types';
   import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
   import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
-  import { useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+  import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
   import {
     RollenSystemRecht,
     useRolleStore,
@@ -46,7 +47,10 @@
   });
 
   const currentServiceProviderId: string = route.params['id'] as string;
-  const selectedOrganisationIds: Ref<string[]> = ref([]);
+  const selectedOrganisationen: Ref<Organisation[]> = ref([]);
+  const selectedOrganisationIds: ComputedRef<string[]> = computed(() =>
+    selectedOrganisationen.value.map((organisation: Organisation) => organisation.id),
+  );
   const {
     selectedRollen,
     searchInput: searchInputRollen,
@@ -157,14 +161,14 @@
   }
 
   function resetSearchAndFilter(): void {
-    selectedOrganisationIds.value = [];
+    selectedOrganisationen.value = [];
     selectedRollen.value = [];
     searchInputRollen.value = '';
     fetchRollenerweiterungen();
   }
 
-  function setOrganisationFilter(newValue: string[] | undefined): void {
-    selectedOrganisationIds.value = newValue ?? [];
+  function setOrganisationFilter(selection: SelectedSchulen): void {
+    selectedOrganisationen.value = Array.isArray(selection) ? selection : selection ? [selection] : [];
     fetchRollenerweiterungen();
   }
 
@@ -505,7 +509,7 @@
                             parentId="service-provider-management-by-schule"
                             ref="schulenFilter"
                             :systemrechteForSearch="[RollenSystemRecht.AngeboteVerwalten]"
-                            :selectedSchulen="selectedOrganisationIds.length > 0 ? selectedOrganisationIds : []"
+                            :selectedSchulen="selectedOrganisationen"
                             @update:selected-schulen="setOrganisationFilter"
                             :placeholderText="$t('admin.schule.schule')"
                             hideDetails

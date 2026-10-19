@@ -12,12 +12,13 @@ import {
   type OrganisationenFilter,
   type OrganisationStore,
 } from '@/stores/OrganisationStore';
-import { faker } from '@faker-js/faker';
-import { flushPromises, mount, type VueWrapper } from '@vue/test-utils';
+import { enableAutoUnmount, flushPromises, mount, type VueWrapper } from '@vue/test-utils';
 import { DoFactory } from 'test/DoFactory';
 import type { BaseFieldProps } from 'vee-validate';
 import type { MockInstance } from 'vitest';
-import { nextTick, ref, type Ref } from 'vue';
+import { nextTick } from 'vue';
+import { getDisplayNameForOrg } from '@/utils/formatting';
+import { OperationContext, usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
 import SchulenFilter from './SchulenFilter.vue';
 
 type Props = {
@@ -25,23 +26,31 @@ type Props = {
   systemrechteForSearch?: Array<RollenSystemRechtEnum>;
   multiple: boolean;
   selectionCountKey?: string;
-  selectedSchulen?: Array<string> | string;
+  selectedSchulen?: Array<Organisation> | Organisation;
   readonly?: boolean;
   selectedSchuleProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
   highlightSelection?: boolean;
   placeholderText?: string;
   includeAll?: boolean;
   parentId?: string;
+  useWorkflowEndpoints?: boolean;
+  useLandesbediensteteWorkflow?: boolean;
+  operationContext?: OperationContext;
+  personId?: string;
+  selectedRollen?: string[];
 };
 
+enableAutoUnmount(afterEach);
+
 function mountComponent(props: Partial<Props> = {}): VueWrapper<InstanceType<typeof SchulenFilter>> {
-  return mount<typeof SchulenFilter>(SchulenFilter, {
+  const wrapper: VueWrapper<InstanceType<typeof SchulenFilter>> = mount<typeof SchulenFilter>(SchulenFilter, {
     attachTo: document.getElementById('app') || '',
     props: {
       multiple: false,
       ...props,
     },
   });
+  return wrapper;
 }
 
 function expectInputDisabledAttrToBe(expected: boolean): void {
@@ -57,7 +66,6 @@ vi.useFakeTimers();
 const defaultFilter: OrganisationenFilter = {
   includeTyp: OrganisationsTyp.Schule,
   systemrechte: [RollenSystemRechtEnum.KlassenVerwalten],
-  organisationIds: [],
   limit: 25,
 };
 
@@ -69,11 +77,92 @@ beforeEach(() => {
   `;
   organisationStore.$reset();
   authStore.$reset();
+  usePersonenkontextStore().$reset();
   vi.restoreAllMocks();
   vi.clearAllTimers();
 });
 
 describe('SchulenFilter', () => {
+  test('it displays an initial object outside current results without resolving its ID', async () => {
+    const selected: Organisation = DoFactory.getSchule();
+    const result: Organisation = DoFactory.getSchule();
+    const wrapper: VueWrapper<InstanceType<typeof SchulenFilter>> = mountComponent({ selectedSchulen: selected });
+    organisationStore.organisationenFilters.set('', { filterResult: [result], total: 80, loading: false });
+    await nextTick();
+
+    const autocomplete: VueWrapper = wrapper.findComponent({ name: 'v-autocomplete' });
+    expect(autocomplete.props('items')).toEqual([result, selected]);
+    expect(autocomplete.props('modelValue')).toEqual(selected);
+    expect(wrapper.text()).toContain(getDisplayNameForOrg(selected));
+    expect(organisationStore.organisationenFilters.get('')?.total).toBe(80);
+    expect(organisationStore.getOrganisationById).not.toHaveBeenCalled();
+    expect(organisationStore.loadOrganisationForSelection).not.toHaveBeenCalled();
+  });
+
+  test.each([false, true])(
+    'it revalidates retained objects in changed workflow contexts (Landesbedienstete=%s)',
+    async (useLandesbediensteteWorkflow: boolean) => {
+      const selected: Organisation = DoFactory.getSchule();
+      const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
+      const process: MockInstance = vi.mocked(
+        useLandesbediensteteWorkflow
+          ? personenkontextStore.processWorkflowStepLandesbedienstete
+          : personenkontextStore.processWorkflowStep,
+      );
+      const wrapper: VueWrapper<InstanceType<typeof SchulenFilter>> = mountComponent({
+        selectedSchulen: selected,
+        readonly: true,
+        useWorkflowEndpoints: true,
+        useLandesbediensteteWorkflow,
+        operationContext: OperationContext.PERSON_ANLEGEN,
+      });
+      await flushPromises();
+      expect(process).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ organisationId: selected.id }));
+
+      personenkontextStore.workflowStepResponse = DoFactory.getPersonenkontextWorkflowResponse({
+        organisations: [],
+        canCommit: false,
+      });
+      process.mockClear();
+      await wrapper.setProps({ operationContext: OperationContext.PERSON_BEARBEITEN, personId: 'another-person' });
+      vi.runAllTimers();
+      await flushPromises();
+
+      expect(process).toHaveBeenCalledExactlyOnceWith(
+        expect.objectContaining({
+          organisationId: selected.id,
+          operationContext: OperationContext.PERSON_BEARBEITEN,
+          personId: 'another-person',
+        }),
+      );
+      expect(wrapper.findComponent({ name: 'v-autocomplete' }).props('modelValue')).toEqual(selected);
+      expect(personenkontextStore.workflowStepResponse.canCommit).toBe(false);
+      expect(organisationStore.loadOrganisationForSelection).not.toHaveBeenCalled();
+    },
+  );
+
+  test('it validates the selected object again when switching workflow variants', async () => {
+    const selected: Organisation = DoFactory.getSchule();
+    const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
+    const wrapper: VueWrapper<InstanceType<typeof SchulenFilter>> = mountComponent({
+      selectedSchulen: selected,
+      readonly: true,
+      useWorkflowEndpoints: true,
+    });
+    await flushPromises();
+    expect(personenkontextStore.processWorkflowStep).toHaveBeenCalledOnce();
+    expect(personenkontextStore.processWorkflowStepLandesbedienstete).not.toHaveBeenCalled();
+
+    await wrapper.setProps({ useLandesbediensteteWorkflow: true });
+    vi.runAllTimers();
+    await flushPromises();
+    expect(personenkontextStore.processWorkflowStepLandesbedienstete).toHaveBeenCalledExactlyOnceWith(
+      expect.objectContaining({ organisationId: selected.id }),
+    );
+    expect(organisationStore.getOrganisationById).not.toHaveBeenCalled();
+    expect(organisationStore.loadOrganisationForSelection).not.toHaveBeenCalled();
+  });
+
   describe.each([[false], [true]])('when multiple is %s', (multiple: boolean) => {
     describe.each([[true], [false]])('when readonly is %s', (readonly: boolean) => {
       const defaultProps: Props = { multiple, readonly };
@@ -137,15 +226,14 @@ describe('SchulenFilter', () => {
           expectInputDisabledAttrToBe(!readonly || autoselected);
         });
 
-        test('it displays the correct placeholder', async () => {
+        test('it displays the selected organisation before fetching data', async () => {
           const mockSchule: Organisation = DoFactory.getSchule();
-          const selectionRef: Ref<Array<string> | string | undefined> = ref(multiple ? [mockSchule.id] : mockSchule.id);
 
           const wrapper: VueWrapper = mountComponent({ ...defaultProps }) as VueWrapper;
-          await wrapper.setProps({ selectedSchulen: selectionRef });
+          await wrapper.setProps({ selectedSchulen: multiple ? [mockSchule] : mockSchule });
           // no timers are run, so this is before fetching data
           const actualText: string = wrapper.find('[data-testid="schule-select"]').text();
-          expect(actualText).toContain('...');
+          expect(actualText).toContain(getDisplayNameForOrg(mockSchule));
         });
 
         describe.each([
@@ -154,18 +242,10 @@ describe('SchulenFilter', () => {
           [[]],
           [undefined],
         ])('when systemrechteForSearch are %s', (systemrechteForSearch: Array<RollenSystemRechtEnum> | undefined) => {
-          const expectedIdsInFilter: OrganisationenFilter['organisationIds'] =
-            ((): OrganisationenFilter['organisationIds'] => {
-              if (autoSelectedSchule) {
-                return [autoSelectedSchule.id];
-              }
-              return [];
-            })();
           describe.each([[true], [false]])('when includeAll is %s', (includeAll: boolean) => {
             const expectedFilter: OrganisationenFilter = {
               ...defaultFilter,
               systemrechte: systemrechteForSearch,
-              organisationIds: expectedIdsInFilter,
             };
             if (includeAll) {
               expectedFilter.excludeTyp = [OrganisationsTyp.Klasse];
@@ -245,38 +325,34 @@ describe('SchulenFilter', () => {
                 await flushPromises();
                 return wrapper;
               }
-              async function selectSchule(wrapper: VueWrapper, id: string | undefined): Promise<void> {
+              async function selectSchule(wrapper: VueWrapper, schule: Organisation | undefined): Promise<void> {
                 const schuleAutoComplete: ReturnType<VueWrapper['findComponent']> = wrapper.findComponent({
                   name: 'v-autocomplete',
                 });
-                await schuleAutoComplete.setValue(id);
+                await schuleAutoComplete.setValue(multiple && schule ? [schule] : schule);
                 vi.runAllTimers();
                 await flushPromises();
               }
 
-              test('it triggers search', async () => {
-                const selectedSchuleId: string = faker.string.uuid();
+              test('it keeps selection IDs out of the search filter', async () => {
+                const selectedSchule: Organisation = DoFactory.getSchule();
                 const wrapper: VueWrapper = await setup();
                 const loadSpy: MockInstance = vi.spyOn(organisationStore, 'loadOrganisationenForFilter');
-                await selectSchule(wrapper, selectedSchuleId);
-                const expected: OrganisationenFilter = {
-                  ...expectedFilter,
-                  organisationIds: [...(expectedIdsInFilter ?? []), selectedSchuleId],
-                };
-                expect(loadSpy).toHaveBeenLastCalledWith(expected, undefined);
+                await selectSchule(wrapper, selectedSchule);
+                expect(loadSpy).toHaveBeenLastCalledWith(expectedFilter, undefined);
+                expect(wrapper.emitted('update:selectedSchulen')?.at(-1)).toEqual([
+                  multiple ? [selectedSchule] : selectedSchule,
+                ]);
               });
 
               describe('it triggers clearing selection', () => {
                 test('it triggers search', async () => {
                   const wrapper: VueWrapper = await setup();
-                  await selectSchule(wrapper, faker.string.uuid());
+                  await selectSchule(wrapper, DoFactory.getSchule());
                   const loadSpy: MockInstance = vi.spyOn(organisationStore, 'loadOrganisationenForFilter');
                   await selectSchule(wrapper, undefined);
-                  const expected: OrganisationenFilter = {
-                    ...expectedFilter,
-                    organisationIds: [...(expectedIdsInFilter ?? [])],
-                  };
-                  expect(loadSpy).toHaveBeenLastCalledWith(expected, undefined);
+                  expect(wrapper.emitted('update:selectedSchulen')?.at(-1)).toEqual([undefined]);
+                  expect(loadSpy).toHaveBeenLastCalledWith(expectedFilter, undefined);
                 });
               });
             });
@@ -285,7 +361,7 @@ describe('SchulenFilter', () => {
 
         describe.each([[true], [false]])('when highlightSelection is %s', (highlightSelection: boolean) => {
           test('it correctly displays highlight', async () => {
-            const selectedSchuleId: string = faker.string.uuid();
+            const selectedSchule: Organisation = DoFactory.getSchule();
             const wrapper: VueWrapper = mountComponent({
               ...defaultProps,
               highlightSelection,
@@ -294,7 +370,7 @@ describe('SchulenFilter', () => {
               .findComponent({
                 name: 'v-autocomplete',
               })
-              .setValue(selectedSchuleId);
+              .setValue(multiple ? [selectedSchule] : selectedSchule);
 
             const classes: Array<string> = wrapper.findComponent({ ref: 'schule-select' }).classes();
             if (highlightSelection || autoSelectedSchule) {
@@ -329,11 +405,59 @@ describe('SchulenFilter', () => {
 
         const wrapper: VueWrapper = mountComponent({
           multiple: true,
-          selectedSchulen: [schule1.id, schule2.id],
+          selectedSchulen: [schule1, schule2],
         }) as VueWrapper;
 
         await flushPromises();
         expect(wrapper.find('[data-testid="schule-select"]').text()).toContain('2 Schulen ausgewählt');
+      });
+
+      describe.each([false, true])('when workflow endpoints are %s', (useWorkflowEndpoints: boolean) => {
+        test('it keeps the selected object when the search is cleared', async () => {
+          const organisation: Organisation = DoFactory.getSchule();
+          const wrapper: VueWrapper<InstanceType<typeof SchulenFilter>> = mountComponent({
+            multiple: false,
+            selectedSchulen: organisation,
+          });
+          await wrapper.setProps({ useWorkflowEndpoints });
+          const autocomplete: VueWrapper = wrapper.findComponent({ name: 'v-autocomplete' });
+          autocomplete.vm.$emit('update:search', 'another organisation');
+          await nextTick();
+          autocomplete.vm.$emit('update:search', '');
+          await nextTick();
+          expect(autocomplete.props('modelValue')).toEqual(organisation);
+          expect(wrapper.find('[data-testid="schule-select"]').text()).toContain(getDisplayNameForOrg(organisation));
+        });
+
+        test('it retains only current selections with new results without mutating the store', async () => {
+          const first: Organisation = DoFactory.getSchule();
+          const second: Organisation = DoFactory.getSchule();
+          const result: Organisation = DoFactory.getSchule();
+          const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
+          personenkontextStore.$reset();
+          const wrapper: VueWrapper<InstanceType<typeof SchulenFilter>> = mountComponent({ multiple: true });
+          await wrapper.setProps({ useWorkflowEndpoints });
+          const autocomplete: VueWrapper = wrapper.findComponent({ name: 'v-autocomplete' });
+
+          await autocomplete.setValue([first]);
+          await autocomplete.setValue([first, second]);
+          await autocomplete.setValue([second]);
+          const results: Organisation[] = [result, second];
+          if (useWorkflowEndpoints) {
+            personenkontextStore.workflowStepResponse = DoFactory.getPersonenkontextWorkflowResponse({
+              organisations: results,
+            });
+          } else {
+            organisationStore.organisationenFilters.set('', { filterResult: results, total: 2, loading: false });
+          }
+          await nextTick();
+
+          expect(autocomplete.props('returnObject')).toBe(true);
+          expect(autocomplete.props('items')).toEqual([result, second]);
+          expect(results).toEqual([result, second]);
+          expect(wrapper.emitted('update:selectedSchulen')?.at(-1)).toEqual([[second]]);
+          expect(wrapper.emitted('update:selectedSchulenObjects')).toBeUndefined();
+        });
       });
     });
 
@@ -344,7 +468,7 @@ describe('SchulenFilter', () => {
         const wrapper: VueWrapper = mountComponent({
           multiple: true,
           selectionCountKey: 'admin.rolle.administrationsebenenSelected',
-          selectedSchulen: [schule1.id, schule2.id],
+          selectedSchulen: [schule1, schule2],
         }) as VueWrapper;
 
         await flushPromises();

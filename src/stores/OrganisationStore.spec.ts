@@ -21,6 +21,7 @@ describe('OrganisationStore', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
     organisationStore = useOrganisationStore();
+    organisationStore.$reset();
     mockadapter.reset();
   });
 
@@ -274,6 +275,46 @@ describe('OrganisationStore', () => {
       await getOrganisationByIdPromise;
       expect(organisationStore.currentOrganisation).toEqual(null);
       expect(organisationStore.errorCode).toEqual('some mock server error');
+      expect(organisationStore.loading).toBe(false);
+    });
+  });
+
+  describe('loadOrganisationForSelection', () => {
+    it('should load one initial object without changing current results or context', async () => {
+      const organisation: Organisation = DoFactory.getSchule();
+      const current: Organisation = DoFactory.getSchule();
+      organisationStore.currentOrganisation = current;
+      organisationStore.allSchulen = [current];
+      mockadapter.onGet(`/api/organisationen/${organisation.id}`).replyOnce(200, organisation);
+
+      const request: Promise<void> = organisationStore.loadOrganisationForSelection(organisation.id);
+      expect(organisationStore.loading).toBe(true);
+      expect(organisationStore.organisationForSelection).toBeNull();
+      expect(await request).toBeUndefined();
+      await flushPromises();
+
+      expect(organisationStore.organisationForSelection).toEqual(organisation);
+      expect(organisationStore.currentOrganisation).toEqual(current);
+      expect(organisationStore.allSchulen).toEqual([current]);
+      expect(organisationStore.errorCode).toBe('');
+      expect(organisationStore.loading).toBe(false);
+    });
+
+    it.each([
+      [{ i18nKey: 'ORGANISATION_NOT_FOUND' }, 'ORGANISATION_NOT_FOUND'],
+      ['server error', 'UNSPECIFIED_ERROR'],
+    ])('should clear the previous lookup and expose errors', async (response: unknown, errorCode: string) => {
+      const organisation: Organisation = DoFactory.getSchule();
+      organisationStore.organisationForSelection = organisation;
+      mockadapter.onGet(`/api/organisationen/${organisation.id}`).replyOnce(500, response);
+
+      const request: Promise<void> = organisationStore.loadOrganisationForSelection(organisation.id);
+      expect(organisationStore.loading).toBe(true);
+      expect(organisationStore.organisationForSelection).toBeNull();
+      await request;
+      await flushPromises();
+
+      expect(organisationStore.errorCode).toBe(errorCode);
       expect(organisationStore.loading).toBe(false);
     });
   });
@@ -1176,6 +1217,24 @@ describe('OrganisationStore', () => {
   });
 
   describe('loadOrganisationenForFilter', () => {
+    it('should replace current results and preserve the server total without a filter', async () => {
+      const previous: Organisation = DoFactory.getSchule();
+      const result: Organisation = DoFactory.getSchule();
+      organisationStore.organisationenFilters.set('', { filterResult: [previous], total: 99, loading: false });
+      mockadapter.onGet('/api/organisationen').replyOnce(200, [result], { 'x-paging-total': '42' });
+
+      await organisationStore.loadOrganisationenForFilter();
+      await flushPromises();
+
+      expect(organisationStore.organisationenFilters.get('')).toMatchObject({
+        filterResult: [result],
+        total: 42,
+        loading: false,
+      });
+      expect(organisationStore.allSchulen).toEqual([]);
+      expect(organisationStore.organisationForSelection).toBeNull();
+    });
+
     describe.each([[''], ['testId']])('with storeKey=%s', (storeKey: string) => {
       const defaultFilter: OrganisationenFilter = {
         offset: 0,

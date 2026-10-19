@@ -71,7 +71,7 @@ describe('ServiceProviderManagementBySchuleView', () => {
 
     const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ name: 'SchulenFilter' });
 
-    schuleAutocomplete?.vm.$emit('update:selectedSchulen', schule.id);
+    schuleAutocomplete?.vm.$emit('update:selectedSchulen', schule);
     await nextTick();
     await flushPromises();
 
@@ -89,7 +89,7 @@ describe('ServiceProviderManagementBySchuleView', () => {
 
   it('should set selectedOrganisationId from searchFilterStore on mount', async () => {
     const schuleId: string = 'test-schule-id';
-    searchFilterStore.selectedSchuleForSchulischeServiceProvider = schuleId;
+    searchFilterStore.selectedSchuleForSchulischeServiceProvider = DoFactory.getSchule({ id: schuleId });
 
     const wrapper: VueWrapper = mountComponent() as VueWrapper;
     await nextTick();
@@ -120,7 +120,7 @@ describe('ServiceProviderManagementBySchuleView', () => {
     const schule: Organisation = DoFactory.getSchule();
 
     const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ name: 'SchulenFilter' });
-    schuleAutocomplete?.vm.$emit('update:selectedSchulen', schule.id);
+    schuleAutocomplete?.vm.$emit('update:selectedSchulen', schule);
     await nextTick();
 
     await flushPromises();
@@ -216,7 +216,7 @@ describe('ServiceProviderManagementBySchuleView', () => {
       it('removes provider and reloads list if successful', async () => {
         const wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementBySchuleView>> = mountComponent();
         const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ name: 'SchulenFilter' });
-        schuleAutocomplete?.vm.$emit('update:selectedSchulen', 'some-id');
+        schuleAutocomplete?.vm.$emit('update:selectedSchulen', DoFactory.getSchule({ id: 'some-id' }));
 
         const remainingProvider: ManageableServiceProviderListEntry =
           serviceProviderStore.manageableServiceProvidersForOrganisation[1]!;
@@ -266,7 +266,7 @@ describe('ServiceProviderManagementBySchuleView', () => {
     it('clears error and reloads data when alert button is clicked', async () => {
       const wrapper: VueWrapper<InstanceType<typeof ServiceProviderManagementBySchuleView>> = mountComponent();
       const schuleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ name: 'SchulenFilter' });
-      schuleAutocomplete?.vm.$emit('update:selectedSchulen', 'some-id');
+      schuleAutocomplete?.vm.$emit('update:selectedSchulen', DoFactory.getSchule({ id: 'some-id' }));
 
       serviceProviderStore.errorCode = 'UNSPECIFIED_ERROR';
       await nextTick();
@@ -290,7 +290,7 @@ describe('ServiceProviderManagementBySchuleView', () => {
 
     async function selectSchule(wrapper: VueWrapper): Promise<void> {
       const schuleFilter: VueWrapper | undefined = wrapper.findComponent({ name: 'SchulenFilter' });
-      schuleFilter?.vm.$emit('update:selectedSchulen', orgId);
+      schuleFilter?.vm.$emit('update:selectedSchulen', DoFactory.getSchule({ id: orgId }));
       await nextTick();
       await flushPromises();
     }

@@ -235,6 +235,7 @@
             <KlasseForm
               ref="klasse-creation-form"
               :initial-values="initialFormValues"
+              :initial-schule="organisationStore.currentOrganisation"
               :error-code="organisationStore.errorCode"
               :edit-mode="true"
               :is-edit-active="isEditActive"

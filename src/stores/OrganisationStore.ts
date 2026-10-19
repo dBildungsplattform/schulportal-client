@@ -92,6 +92,7 @@ type OrganisationState = {
   klassenFilters: Map<string, AutoCompleteStore<Organisation>>;
   organisationenFilters: Map<string, AutoCompleteStore<Organisation>>;
   currentOrganisation: Organisation | null;
+  organisationForSelection: Organisation | null;
   currentSchule?: CurrentSchulDetails | null;
   currentKlasse: Organisation | null;
   updatedOrganisation: Organisation | null;
@@ -127,6 +128,17 @@ export type OrganisationenFilter = {
   sortField?: OrganisationSortField;
 };
 
+export type OrganisationenFilterForAutocomplete = {
+  limit?: number;
+  offset?: number;
+  searchString?: string;
+  systemrechte?: RollenSystemRechtEnum[];
+  includeTyp?: OrganisationsTyp;
+  excludeTyp?: OrganisationsTyp[];
+  administriertVon?: Array<string>;
+  zugehoerigZu?: Array<string>;
+};
+
 export type KlassenFilter = {
   searchString?: string;
   systemrechte?: RollenSystemRechtEnum[];
@@ -149,6 +161,7 @@ type OrganisationGetters = object;
 type OrganisationActions = {
   getAllOrganisationen: (filter?: OrganisationenFilter) => Promise<void>;
   getOrganisationById: (organisationId: string, organisationsTyp?: OrganisationsTyp) => Promise<void>;
+  loadOrganisationForSelection: (organisationId: string) => Promise<void>;
   getLockingOrganisationById: (organisationId: string) => Promise<void>;
   getParentOrganisationsByIds: (organisationIds: string[]) => Promise<void>;
   createOrganisation: (
@@ -170,7 +183,7 @@ type OrganisationActions = {
   fetchSchuleDetailsForKlassen: () => Promise<void>;
   fetchSchuleDetailsForSchultraeger: () => Promise<void>;
   setItsLearningForSchule: (organisationId: string) => Promise<void>;
-  loadOrganisationenForFilter(filter?: OrganisationenFilter, storeKey?: string): Promise<void>;
+  loadOrganisationenForFilter(filter?: OrganisationenFilterForAutocomplete, storeKey?: string): Promise<void>;
   resetOrganisationenFilter(storeKey?: string): void;
   clearOrganisationenFilter(storeKey?: string): void;
   /**
@@ -208,6 +221,7 @@ export const useOrganisationStore: StoreDefinition<
       klassenFilters: new Map(),
       allSchultraeger: [],
       currentOrganisation: null,
+      organisationForSelection: null,
       currentKlasse: null,
       currentSchule: null,
       updatedOrganisation: null,
@@ -391,6 +405,21 @@ export const useOrganisationStore: StoreDefinition<
         } else {
           this.currentOrganisation = data;
         }
+      } catch (error: unknown) {
+        this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async loadOrganisationForSelection(organisationId: string): Promise<void> {
+      this.organisationForSelection = null;
+      this.errorCode = '';
+      this.loading = true;
+      try {
+        const { data }: { data: Organisation } =
+          await organisationApi.organisationControllerFindOrganisationById(organisationId);
+        this.organisationForSelection = data;
       } catch (error: unknown) {
         this.errorCode = getResponseErrorCode(error, 'UNSPECIFIED_ERROR');
       } finally {
@@ -648,7 +677,10 @@ export const useOrganisationStore: StoreDefinition<
       }
     },
 
-    async loadOrganisationenForFilter(filter?: OrganisationenFilter, storeKey: string = ''): Promise<void> {
+    async loadOrganisationenForFilter(
+      filter?: OrganisationenFilterForAutocomplete,
+      storeKey: string = '',
+    ): Promise<void> {
       const organisationenFilter: AutoCompleteStore<Organisation> = this.organisationenFilters.get(storeKey) ?? {
         filterResult: [],
         loading: true,
@@ -669,7 +701,7 @@ export const useOrganisationStore: StoreDefinition<
           filter?.excludeTyp,
           filter?.administriertVon,
           filter?.zugehoerigZu,
-          filter?.organisationIds,
+          undefined,
         );
         organisationenFilter.filterResult = response.data;
         organisationenFilter.total = +response.headers['x-paging-total'];

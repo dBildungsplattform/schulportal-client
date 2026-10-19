@@ -178,7 +178,9 @@ async function fillForm(args: Partial<FormFields>): Promise<Partial<FormSelector
     .findComponent({ ref: 'personenkontext-create-organisation-select' });
   expect(organisationsebeneSelect?.exists()).toBe(true);
 
-  await organisationsebeneSelect?.setValue(organisationsebene);
+  await organisationsebeneSelect?.setValue(
+    organisationsebene ? DoFactory.getSchule({ id: organisationsebene }) : undefined,
+  );
   await nextTick();
   selectors.organisationsebeneSelect = organisationsebeneSelect;
 
@@ -307,7 +309,7 @@ describe('PersonCreationView', () => {
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'schulenFilter' })
       .findComponent({ ref: 'personenkontext-create-organisation-select' });
-    await organisationSelect?.setValue(ORGANISATION_ID);
+    await organisationSelect?.setValue(workflowOrganisation);
     await nextTick();
 
     const rolleSelect: VueWrapper | undefined = wrapper
@@ -336,7 +338,7 @@ describe('PersonCreationView', () => {
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'schulenFilter' })
       .findComponent({ ref: 'personenkontext-create-organisation-select' });
-    await organisationSelect?.setValue(ORGANISATION_ID);
+    await organisationSelect?.setValue(workflowOrganisation);
     await nextTick();
 
     const rolleSelect: VueWrapper | undefined = wrapper
@@ -376,7 +378,7 @@ describe('PersonCreationView', () => {
     await personenkontextCreate
       .findComponent({ ref: 'schulenFilter' })
       .findComponent({ ref: 'personenkontext-create-organisation-select' })
-      .setValue(ORGANISATION_ID);
+      .setValue(workflowOrganisation);
     await personenkontextCreate.findComponent({ ref: 'rollen-select' }).setValue([ROLLE_ID]);
     await flushPromises();
 
@@ -393,7 +395,7 @@ describe('PersonCreationView', () => {
     await personenkontextCreate
       .findComponent({ ref: 'schulenFilter' })
       .findComponent({ ref: 'personenkontext-create-organisation-select' })
-      .setValue(ORGANISATION_ID);
+      .setValue(workflowOrganisation);
 
     const rollenSelect: VueWrapper = personenkontextCreate.findComponent({ ref: 'rollen-select' });
     await rollenSelect.setValue([ROLLE_ID]);
@@ -437,7 +439,7 @@ describe('PersonCreationView', () => {
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'schulenFilter' })
       .findComponent({ ref: 'personenkontext-create-organisation-select' });
-    await organisationSelect?.setValue(ORGANISATION_ID);
+    await organisationSelect?.setValue(workflowOrganisation);
     await nextTick();
 
     const rollenSelect: VueWrapper | undefined = wrapper
@@ -488,7 +490,7 @@ describe('PersonCreationView', () => {
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'schulenFilter' })
       .findComponent({ ref: 'personenkontext-create-organisation-select' });
-    await organisationSelect?.setValue(ORGANISATION_ID);
+    await organisationSelect?.setValue(workflowOrganisation);
     await nextTick();
 
     const rollenSelect: VueWrapper | undefined = wrapper
@@ -603,7 +605,7 @@ describe('PersonCreationView', () => {
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'schulenFilter' })
       .findComponent({ ref: 'personenkontext-create-organisation-select' });
-    await organisationSelect?.setValue(ORGANISATION_ID);
+    await organisationSelect?.setValue(workflowOrganisation);
     await nextTick();
 
     const rollenSelect: VueWrapper | undefined = wrapper
@@ -703,7 +705,7 @@ describe('PersonCreationView', () => {
       .findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'schulenFilter' })
       .findComponent({ ref: 'personenkontext-create-organisation-select' });
-    await organisationSelect.setValue(organisationId);
+    await organisationSelect.setValue(DoFactory.getSchule({ id: organisationId }));
     await nextTick();
 
     const rollenSelect: VueWrapper | undefined = wrapper
@@ -1031,7 +1033,7 @@ describe('PersonCreationView', () => {
         .findComponent({ ref: 'personenkontext-create' })
         .findComponent({ ref: 'schulenFilter' })
         .findComponent({ ref: 'personenkontext-create-organisation-select' });
-      await organisationSelect.setValue(ORGANISATION_ID);
+      await organisationSelect.setValue(workflowOrganisation);
 
       await Promise.all(
         Array.from({ length: SETTLE_ITERATIONS }, async () => {
@@ -1051,7 +1053,7 @@ describe('PersonCreationView', () => {
       await personenkontextCreate
         .findComponent({ ref: 'schulenFilter' })
         .findComponent({ ref: 'personenkontext-create-organisation-select' })
-        .setValue(ORGANISATION_ID);
+        .setValue(workflowOrganisation);
       await flushPromises();
 
       expect(rollenRequestSpy).toHaveBeenLastCalledWith(
@@ -1088,7 +1090,7 @@ describe('PersonCreationView', () => {
       await personenkontextCreate
         .findComponent({ ref: 'schulenFilter' })
         .findComponent({ ref: 'personenkontext-create-organisation-select' })
-        .setValue(ORGANISATION_ID);
+        .setValue(workflowOrganisation);
       await flushPromises();
 
       expect(personenkontextCreate.props('rollen')).toEqual([lernRolle]);

@@ -4,7 +4,13 @@ import { useAuthStore, type AuthStore } from '@/stores/AuthStore';
 import { useOrganisationStore, type Organisation, type OrganisationStore } from '@/stores/OrganisationStore';
 import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
 import { usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
-import { RollenSystemRecht, useRolleStore, type RolleResponse, type RolleStore, type TranslatedRolleWithAttrs } from '@/stores/RolleStore';
+import {
+  RollenSystemRecht,
+  useRolleStore,
+  type RolleResponse,
+  type RolleStore,
+  type TranslatedRolleWithAttrs,
+} from '@/stores/RolleStore';
 import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
 import type { Person } from '@/stores/types/Person';
 import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
@@ -151,7 +157,7 @@ describe('PersonManagementView', () => {
   });
 
   test('it renders person management table with active orga filter', () => {
-    searchFilterStore.selectedOrganisationen = ['9876'];
+    searchFilterStore.selectedOrganisationen = [DoFactory.getSchule({ id: '9876' })];
     searchFilterStore.selectedRollen = null;
     searchFilterStore.selectedKlassen = null;
     expect(wrapper?.getComponent({ name: 'ResultTable' })).toBeTruthy();
@@ -203,18 +209,17 @@ describe('PersonManagementView', () => {
 
   test('selection is mirrored in the store', async () => {
     const orgId: Array<string> = ['9876'];
+    const organisations: Organisation[] = [DoFactory.getSchule({ id: orgId[0] })];
     const organisationAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ name: 'SchulenFilter' });
-    await organisationAutocomplete?.setValue(orgId);
-    organisationAutocomplete?.vm.$emit('update:selectedSchulen', orgId);
+    await organisationAutocomplete?.setValue(organisations);
+    organisationAutocomplete?.vm.$emit('update:selectedSchulen', organisations);
     await flushPromises();
-    expect(searchFilterStore.setOrganisationFilterForPersonen).toHaveBeenCalledWith(orgId);
-    // TODO: the setter does not work
-    // expect(searchFilterStore.selectedOrganisationen).toEqual(orgId);
+    expect(searchFilterStore.setOrganisationFilterForPersonen).toHaveBeenCalledWith(organisations);
   });
 
   test('it calls getAllPersons with correct arguments', async () => {
     const getAllPersonsSpy: MockInstance = vi.spyOn(personStore, 'getAllPersons');
-    searchFilterStore.selectedOrganisationen = ['9876'];
+    searchFilterStore.selectedOrganisationen = [DoFactory.getSchule({ id: '9876' })];
 
     const klasse: Organisation = DoFactory.getKlasse();
     searchFilterStore.selectedKlassen = [klasse];
@@ -294,7 +299,7 @@ describe('PersonManagementView', () => {
     const rolle: RolleResponse = DoFactory.getRolleResponse({ id: 'rolle-id' });
     searchFilterStore.personenPage = 1;
     searchFilterStore.personenPerPage = 30;
-    searchFilterStore.selectedOrganisationen = [schule.id];
+    searchFilterStore.selectedOrganisationen = [schule];
     searchFilterStore.selectedKlassen = [klasse];
     searchFilterStore.selectedRollen = [rolle];
     searchFilterStore.searchStringForPersonen = 'current search';
@@ -337,7 +342,7 @@ describe('PersonManagementView', () => {
         },
       ],
     };
-    searchFilterStore.selectedOrganisationen = [schule.id];
+    searchFilterStore.selectedOrganisationen = [schule];
     wrapper!.unmount();
     wrapper = mountComponent();
     await flushPromises();
@@ -346,7 +351,7 @@ describe('PersonManagementView', () => {
     await wrapper.get('[data-testid="reset-filter-button"]').trigger('click');
     await flushPromises();
 
-    expect(searchFilterStore.selectedOrganisationen).toEqual([schule.id]);
+    expect(searchFilterStore.selectedOrganisationen).toEqual([schule]);
     expect(personStore.getAllPersons).toHaveBeenLastCalledWith(
       expect.objectContaining({
         organisationIDs: [schule.id],
@@ -607,6 +612,24 @@ describe('PersonManagementView', () => {
     vi.mocked(searchFilterStore.setRolleFilterForPersonen).mockReset();
   });
 
+  test('it restores selected organisation objects after navigation without resolving IDs', async () => {
+    const selected: Organisation = DoFactory.getSchule();
+    searchFilterStore.selectedOrganisationen = [selected];
+    wrapper!.unmount();
+    wrapper = mountComponent();
+    await flushPromises();
+
+    const filter: VueWrapper = wrapper.findComponent({ name: 'SchulenFilter' });
+    const autocomplete: VueWrapper = filter.findComponent({ name: 'v-autocomplete' });
+    expect(autocomplete.props('modelValue')).toEqual([selected]);
+    expect(autocomplete.text()).toContain(selected.name);
+    expect(personStore.getAllPersons).toHaveBeenLastCalledWith(
+      expect.objectContaining({ organisationIDs: [selected.id] }),
+    );
+    expect(organisationStore.getOrganisationById).not.toHaveBeenCalled();
+    expect(organisationStore.loadOrganisationForSelection).not.toHaveBeenCalled();
+  });
+
   test('it clears the Rollen search on blur', async () => {
     await flushPromises();
     const rollenAutocomplete: VueWrapper = wrapper!.findComponent({
@@ -632,7 +655,7 @@ describe('PersonManagementView', () => {
     await flushPromises();
     const schule: Organisation = DoFactory.getSchule();
     const schulenFilter: VueWrapper = wrapper!.findComponent({ name: 'SchulenFilter' });
-    schulenFilter.vm.$emit('update:selectedSchulen', [schule.id]);
+    schulenFilter.vm.$emit('update:selectedSchulen', [schule]);
     await flushPromises();
 
     expect(rolleStore.getRollenForPersonAdministration).toHaveBeenLastCalledWith(
@@ -642,7 +665,7 @@ describe('PersonManagementView', () => {
       }),
     );
 
-    authStore.hasMptRollenZuordnenPermission = true;
+    authStore.grantedGatedRollenSystemrechte = [RollenSystemRecht.MptRollenZuordnen];
     await flushPromises();
 
     expect(rolleStore.getRollenForPersonAdministration).toHaveBeenLastCalledWith(
@@ -666,14 +689,15 @@ describe('PersonManagementView', () => {
     'forwards granted gated rights to Rollen search: $systemrechte',
     async ({ systemrechte }: { systemrechte: RollenSystemRechtEnum[] }) => {
       authStore.grantedGatedRollenSystemrechte = systemrechte;
-      const getRollenForPersonAdministration: Mock = vi.fn().mockResolvedValue(undefined);
-      rolleStore.getRollenForPersonAdministration = getRollenForPersonAdministration;
+      const getRollenForPersonAdministration: MockInstance = vi
+        .spyOn(rolleStore, 'getRollenForPersonAdministration')
+        .mockResolvedValue(undefined);
       const rollenAutocomplete: VueWrapper | undefined = wrapper?.findComponent({ ref: 'rolle-select' });
 
       rollenAutocomplete?.vm.$emit('update:search', 'pilot');
       await nextTick();
       vi.runAllTimers();
-      vi.runAllTicks();
+      await flushPromises();
 
       expect(getRollenForPersonAdministration).toHaveBeenLastCalledWith({
         searchStr: 'pilot',
@@ -728,9 +752,9 @@ describe('PersonManagementView', () => {
         ?.findComponent({ ref: 'schulenFilter' })
         .findComponent({ ref: 'person-management-organisation-select' });
       schuleAutocomplete?.setValue(['9876']);
-      schuleAutocomplete?.vm.$emit('update:selectedSchulen', ['9876']);
+      schuleAutocomplete?.vm.$emit('update:selectedSchulen', [DoFactory.getSchule({ id: '9876' })]);
       await nextTick();
-      schuleAutocomplete?.vm.$emit('update:selectedSchulenObjects', [DoFactory.getSchule({ id: '9876' })]);
+      schuleAutocomplete?.vm.$emit('update:selectedSchulen', [DoFactory.getSchule({ id: '9876' })]);
       await nextTick();
       await flushPromises();
 

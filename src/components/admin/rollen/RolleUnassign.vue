@@ -153,6 +153,7 @@
             :rolleDialogMode="RolleDialogMode.UNASSIGN"
             :show-headline="false"
             :selected-organisation="selectedOrganisationFromFilterId"
+            :initial-organisation="props.selectedOrganisationFromFilter"
             :organisationen="props.organisationen"
             :rollen="rolleStore.rollenForPersonenkontextCreation"
             :selected-rolle-props="selectedRolleProps"

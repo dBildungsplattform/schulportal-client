@@ -68,6 +68,7 @@
   const calculatedBefristung: Ref<string | undefined> = ref('');
 
   const selectedOrgaCache: Ref<string | undefined> = ref(undefined);
+  const selectedOrganisationObject: Ref<Organisation | undefined> = ref();
   const selectedKlasseCache: Ref<TranslatedObject | undefined> = ref(undefined);
   const selectedRolleCache: Ref<string[] | undefined> = ref(undefined);
 
@@ -844,6 +845,8 @@
               <PersonenkontextCreate
                 ref="personenkontext-create"
                 v-model:selected-organisation="selectedOrganisation"
+                :initial-organisation="selectedOrganisationObject"
+                @update:organisation-object="selectedOrganisationObject = $event"
                 v-model:selected-rollen="selectedRollen"
                 :operation-context="OperationContext.PERSON_ANLEGEN"
                 :allow-multiple-rollen="true"
@@ -885,6 +888,8 @@
               <PersonenkontextCreate
                 ref="personenkontext-create"
                 v-model:selected-organisation="selectedOrganisation"
+                :initial-organisation="selectedOrganisationObject"
+                @update:organisation-object="selectedOrganisationObject = $event"
                 v-model:selected-rollen="selectedRollen"
                 :operation-context="OperationContext.PERSON_ANLEGEN"
                 :allow-multiple-rollen="true"

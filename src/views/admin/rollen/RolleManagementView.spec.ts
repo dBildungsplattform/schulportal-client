@@ -1,4 +1,5 @@
 import SchulenFilter from '@/components/filter/SchulenFilter.vue';
+import type { Organisation } from '@/stores/OrganisationStore';
 import routes from '@/router/routes';
 import { AuthStore, useAuthStore } from '@/stores/AuthStore';
 import { RollenArt, RollenMerkmal, useRolleStore, type RolleStore } from '@/stores/RolleStore';
@@ -181,7 +182,7 @@ describe('RolleManagementView', () => {
   });
 
   test('reset button is enabled when organisationen filter is active', async () => {
-    searchFilterStore.selectedOrganisationenForRollen = ['org1'];
+    searchFilterStore.selectedOrganisationenForRollen = [DoFactory.getSchule()];
     await nextTick();
     expect(wrapper?.find('[data-testid="reset-filter-button"]').classes()).not.toContain('v-btn--disabled');
   });
@@ -274,13 +275,13 @@ describe('RolleManagementView', () => {
     const schulenFilter: VueWrapper | undefined = wrapper?.findComponent({
       name: 'SchulenFilter',
     });
-    const orgs: Array<string> = ['org1', 'org2'];
+    const orgs: Array<Organisation> = [DoFactory.getSchule(), DoFactory.getSchule()];
     searchFilterStore.selectedOrganisationenForRollen = orgs;
     await schulenFilter?.setValue(orgs);
     schulenFilter?.vm.$emit('update:selectedSchulen', orgs);
     await flushPromises();
 
-    expect(searchFilterStore.setOrganisationenFilterForRollen).toHaveBeenCalledWith(['org1', 'org2']);
+    expect(searchFilterStore.setOrganisationenFilterForRollen).toHaveBeenCalledWith(orgs);
     expect(rolleStore.getAllRollen).toHaveBeenLastCalledWith({
       offset: 0,
       limit: 30,
@@ -288,7 +289,7 @@ describe('RolleManagementView', () => {
       systemrechte: [RollenSystemRechtEnum.RollenVerwalten],
       merkmale: undefined,
       rollenarten: undefined,
-      organisationIds: orgs,
+      organisationIds: orgs.map((org: Organisation) => org.id),
       serviceProviderIds: undefined,
     });
   });

@@ -106,7 +106,7 @@ describe('RolleModify', () => {
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'schulenFilter' })
       .findComponent({ ref: 'personenkontext-create-organisation-select' });
-    await organisationAutocomplete?.setValue(organisation.id);
+    await organisationAutocomplete?.setValue(organisation);
     organisationAutocomplete?.vm.$emit('update:search', organisation.id);
     await nextTick();
 
@@ -154,7 +154,7 @@ describe('RolleModify', () => {
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'schulenFilter' })
       .findComponent({ ref: 'personenkontext-create-organisation-select' });
-    await organisationAutocomplete?.setValue('O1');
+    await organisationAutocomplete?.setValue(DoFactory.getSchule({ id: 'O1' }));
     organisationAutocomplete?.vm.$emit('update:search', 'O1');
     await nextTick();
 
@@ -218,7 +218,7 @@ describe('RolleModify', () => {
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'schulenFilter' })
       .findComponent({ ref: 'personenkontext-create-organisation-select' });
-    await organisationAutocomplete?.setValue(organisation.id);
+    await organisationAutocomplete?.setValue(organisation);
     organisationAutocomplete?.vm.$emit('update:search', organisation.id);
     await nextTick();
 
@@ -281,7 +281,7 @@ describe('RolleModify', () => {
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'schulenFilter' })
       .findComponent({ ref: 'personenkontext-create-organisation-select' });
-    await organisationAutocomplete?.setValue(organisation.id);
+    await organisationAutocomplete?.setValue(organisation);
     organisationAutocomplete?.vm.$emit('update:search', organisation.id);
     await nextTick();
 

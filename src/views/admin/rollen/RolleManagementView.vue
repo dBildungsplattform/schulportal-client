@@ -3,6 +3,8 @@
   import SearchField from '@/components/admin/SearchField.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SchulenFilter from '@/components/filter/SchulenFilter.vue';
+  import type { SelectedSchulen } from '@/types';
+  import type { Organisation } from '@/stores/OrganisationStore';
   import { AuthStore, useAuthStore } from '@/stores/AuthStore';
   import {
     RollenArt,
@@ -126,7 +128,7 @@
       searchString: searchFilterStore.searchStringForRollen ?? undefined,
       systemrechte,
       organisationIds: searchFilterStore.selectedOrganisationenForRollen?.length
-        ? searchFilterStore.selectedOrganisationenForRollen
+        ? searchFilterStore.selectedOrganisationenForRollen.map((organisation: Organisation) => organisation.id)
         : undefined,
       merkmale: searchFilterStore.selectedMerkmaleForRollen?.length
         ? searchFilterStore.selectedMerkmaleForRollen
@@ -159,8 +161,10 @@
     await getRollen();
   }
 
-  async function setOrganisationenFilter(organisationen: string[]): Promise<void> {
-    searchFilterStore.setOrganisationenFilterForRollen(organisationen ?? []);
+  async function setOrganisationenFilter(selection: SelectedSchulen): Promise<void> {
+    searchFilterStore.setOrganisationenFilterForRollen(
+      Array.isArray(selection) ? selection : selection ? [selection] : [],
+    );
     searchFilterStore.rollenPage = 1;
     await getRollen();
   }

@@ -231,7 +231,9 @@ describe('PersonenkontextCreate', () => {
             ?.findComponent({ ref: 'schulenFilter' })
             .findComponent({ ref: 'personenkontext-create-organisation-select' });
           organisationAutocomplete?.vm.$emit('update:search', '1133');
-          await organisationAutocomplete?.setValue('1133');
+          await organisationAutocomplete?.setValue(
+            DoFactory.getSchule({ id: '1133', kennung: 'string', name: 'orga' }),
+          );
           await nextTick();
 
           await selectRolle('54321');
@@ -263,7 +265,7 @@ describe('PersonenkontextCreate', () => {
           const organisationAutocomplete: VueWrapper | undefined = wrapper
             ?.findComponent({ ref: 'schulenFilter' })
             .findComponent({ ref: 'personenkontext-create-organisation-select' });
-          await organisationAutocomplete?.setValue('O1');
+          await organisationAutocomplete?.setValue(DoFactory.getSchule({ id: 'O1' }));
           await nextTick();
 
           const rolleAutocomplete: VueWrapper | undefined = await selectRolle('54321');
@@ -279,7 +281,7 @@ describe('PersonenkontextCreate', () => {
           const organisationAutocomplete: VueWrapper | undefined = wrapper
             ?.findComponent({ ref: 'schulenFilter' })
             .findComponent({ ref: 'personenkontext-create-organisation-select' });
-          await organisationAutocomplete?.setValue('O1');
+          await organisationAutocomplete?.setValue(DoFactory.getSchule({ id: 'O1' }));
           await nextTick();
 
           await selectRolle('54321');
@@ -302,7 +304,7 @@ describe('PersonenkontextCreate', () => {
           const organisationAutocomplete: VueWrapper | undefined = wrapper
             ?.findComponent({ ref: 'schulenFilter' })
             .findComponent({ ref: 'personenkontext-create-organisation-select' });
-          await organisationAutocomplete?.setValue('O1');
+          await organisationAutocomplete?.setValue(DoFactory.getSchule({ id: 'O1' }));
           await nextTick();
 
           await selectRolle('54321');
@@ -338,7 +340,9 @@ describe('PersonenkontextCreate', () => {
             .findComponent({ ref: 'personenkontext-create-organisation-select' });
 
           // Set a value in orga that will match with something given by the props and so the component will calculate the selectedOrganisationTitle
-          await organisationAutocomplete?.setValue('1133');
+          await organisationAutocomplete?.setValue(
+            DoFactory.getSchule({ id: '1133', kennung: 'string', name: 'orga' }),
+          );
           await nextTick();
 
           // Set the searchValue to 'orga' which matches the title before
@@ -357,7 +361,9 @@ describe('PersonenkontextCreate', () => {
             ?.findComponent({ ref: 'schulenFilter' })
             .findComponent({ ref: 'personenkontext-create-organisation-select' });
 
-          await organisationAutocomplete?.setValue('1133');
+          await organisationAutocomplete?.setValue(
+            DoFactory.getSchule({ id: '1133', kennung: 'string', name: 'orga' }),
+          );
           await nextTick();
 
           // Set a value in orga that will match with something given by the props and so the component will calculate the selectedRolleTitle
@@ -380,7 +386,9 @@ describe('PersonenkontextCreate', () => {
             ?.findComponent({ ref: 'schulenFilter' })
             .findComponent({ ref: 'personenkontext-create-organisation-select' });
 
-          await organisationAutocomplete?.setValue('1133');
+          await organisationAutocomplete?.setValue(
+            DoFactory.getSchule({ id: '1133', kennung: 'string', name: 'orga' }),
+          );
           await nextTick();
 
           // Set a value in orga that will match with something given by the props and so the component will calculate the selectedRolleTitle
@@ -413,7 +421,9 @@ describe('PersonenkontextCreate', () => {
             ?.findComponent({ ref: 'schulenFilter' })
             .findComponent({ ref: 'personenkontext-create-organisation-select' });
 
-          await organisationAutocomplete?.setValue('1133');
+          await organisationAutocomplete?.setValue(
+            DoFactory.getSchule({ id: '1133', kennung: 'string', name: 'orga' }),
+          );
           await nextTick();
 
           organisationAutocomplete?.vm.$emit('update:search', 'Lern');
@@ -433,7 +443,9 @@ describe('PersonenkontextCreate', () => {
             ?.findComponent({ ref: 'schulenFilter' })
             .findComponent({ ref: 'personenkontext-create-organisation-select' });
 
-          await organisationAutocomplete?.setValue('1133');
+          await organisationAutocomplete?.setValue(
+            DoFactory.getSchule({ id: '1133', kennung: 'string', name: 'orga' }),
+          );
           await nextTick();
 
           organisationAutocomplete?.vm.$emit('update:search', 'Lern');
@@ -449,7 +461,7 @@ describe('PersonenkontextCreate', () => {
           const organisationAutocomplete: VueWrapper | undefined = wrapper
             ?.findComponent({ ref: 'schulenFilter' })
             .findComponent({ ref: 'personenkontext-create-organisation-select' });
-          await organisationAutocomplete?.setValue('O1');
+          await organisationAutocomplete?.setValue(DoFactory.getSchule({ id: 'O1' }));
           await nextTick();
 
           await selectRolle('54321');
@@ -472,7 +484,7 @@ describe('PersonenkontextCreate', () => {
           await wrapper
             ?.findComponent({ ref: 'schulenFilter' })
             .findComponent({ ref: 'personenkontext-create-organisation-select' })
-            .setValue('org1');
+            .setValue(DoFactory.getSchule({ id: 'org1' }));
           await selectRolle('rolle1');
 
           // Get the BefristungInput component
@@ -589,7 +601,9 @@ describe('PersonenkontextCreate', () => {
           const organisationAutocomplete: VueWrapper | undefined = wrapper
             ?.findComponent({ ref: 'schulenFilter' })
             .findComponent({ ref: 'personenkontext-create-organisation-select' });
-          await organisationAutocomplete?.setValue('1133');
+          await organisationAutocomplete?.setValue(
+            DoFactory.getSchule({ id: '1133', kennung: 'string', name: 'orga' }),
+          );
           await nextTick();
           await flushPromises();
           vi.mocked(rolleStore.getRollenForPersonenkontextCreation).mockClear();
@@ -618,7 +632,9 @@ describe('PersonenkontextCreate', () => {
           const organisationAutocomplete: VueWrapper | undefined = wrapper
             ?.findComponent({ ref: 'schulenFilter' })
             .findComponent({ ref: 'personenkontext-create-organisation-select' });
-          await organisationAutocomplete?.setValue('1133');
+          await organisationAutocomplete?.setValue(
+            DoFactory.getSchule({ id: '1133', kennung: 'string', name: 'orga' }),
+          );
           await nextTick();
           await flushPromises();
           vi.mocked(rolleStore.getRollenForPersonenkontextCreation).mockClear();

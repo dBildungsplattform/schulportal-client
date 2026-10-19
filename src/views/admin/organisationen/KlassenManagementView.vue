@@ -15,7 +15,7 @@
   } from '@/stores/OrganisationStore';
   import { RollenSystemRecht } from '@/stores/RolleStore';
   import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
-  import { type Mutable } from '@/types.d';
+  import { type Mutable, type SelectedSchulen } from '@/types.d';
   import { OrganisationSortField, SortOrder } from '@/utils/sorting';
   import { computed, ref, watch, watchEffect, type ComputedRef, type Ref } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
@@ -58,7 +58,8 @@
     () => (searchFilterStore.klassenPage - 1) * searchFilterStore.klassenPerPage,
   );
 
-  const selectedSchule: Ref<string | undefined> = ref(searchFilterStore.selectedSchuleForKlassen || undefined);
+  const selectedOrganisation: Ref<Organisation | null> = ref(searchFilterStore.selectedSchuleForKlassen);
+  const selectedSchule: ComputedRef<string | undefined> = computed(() => selectedOrganisation.value?.id);
   const hasSelectedSchule: ComputedRef<boolean> = computed(
     () => (selectedSchule.value !== undefined && selectedSchule.value !== '') || hasAutoselectedSchule.value,
   );
@@ -146,7 +147,7 @@
     // Clear selected Klassen
     selectedKlassen.value = [];
     // Clear the store
-    searchFilterStore.setSchuleFilterForKlassen(null);
+    searchFilterStore.setSchuleFilterForKlassen(hasAutoselectedSchule.value ? selectedOrganisation.value : null);
     searchFilterStore.setKlasseFilterForKlassen([]);
     searchFilterStore.klassenPage = 1;
     searchFilterStore.organisationenSortField = null;
@@ -154,16 +155,18 @@
 
     // If the user has an autoselected Schule, do not reset it
     if (!hasAutoselectedSchule.value) {
-      selectedSchule.value = undefined;
+      selectedOrganisation.value = null;
     }
   }
 
-  function updateSchuleSelection(id: string | undefined): void {
+  function updateSchuleSelection(selection: SelectedSchulen): void {
+    const organisation: Organisation | null = (Array.isArray(selection) ? selection.at(0) : selection) ?? null;
+    const id: string | undefined = organisation?.id;
     if (selectedSchule.value === id) {
       return;
     }
-    selectedSchule.value = id;
-    searchFilterStore.setSchuleFilterForKlassen(id ?? null);
+    selectedOrganisation.value = organisation;
+    searchFilterStore.setSchuleFilterForKlassen(organisation);
     searchFilterStore.klassenPage = 1;
     if (!id) {
       resetSearchAndFilter();
@@ -296,7 +299,7 @@
               :multiple="false"
               :hide-details="true"
               :highlight-selection="true"
-              :selected-schulen="selectedSchule"
+              :selected-schulen="selectedOrganisation"
               :placeholder-text="t('admin.schule.schule')"
               @update:selected-schulen="updateSchuleSelection"
             >
