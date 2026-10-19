@@ -738,7 +738,8 @@
           "SCHULEN_VERWALTEN": "Darf Schulen verwalten",
           "SCHULISCHE_VIDIS_ANGEBOTE_ABRUFEN": "Darf schulische VIDIS-Angebote abrufen",
           "SCHULPORTAL_VERWALTEN": "Darf Portal verwalten",
-          "SCHULTRAEGER_VERWALTEN": "Darf Schulträger verwalten"
+          "SCHULTRAEGER_VERWALTEN": "Darf Schulträger verwalten",
+          "BEHOERDEN_VERWALTEN": "Darf Behörden verwalten"
         },
         "rollenarten": {
           "LERN": "Lern",
