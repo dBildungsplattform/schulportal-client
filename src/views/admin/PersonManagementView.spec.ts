@@ -751,11 +751,7 @@ describe('PersonManagementView', () => {
       const schuleAutocomplete: VueWrapper | undefined = wrapper
         ?.findComponent({ ref: 'schulenFilter' })
         .findComponent({ ref: 'person-management-organisation-select' });
-      schuleAutocomplete?.setValue(['9876']);
-      schuleAutocomplete?.vm.$emit('update:selectedSchulen', [DoFactory.getSchule({ id: '9876' })]);
-      await nextTick();
-      schuleAutocomplete?.vm.$emit('update:selectedSchulen', [DoFactory.getSchule({ id: '9876' })]);
-      await nextTick();
+      await schuleAutocomplete?.setValue([DoFactory.getSchule({ id: '9876' })]);
       await flushPromises();
 
       // Find the first checkbox in the table

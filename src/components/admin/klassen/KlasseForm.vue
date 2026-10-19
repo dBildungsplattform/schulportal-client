@@ -128,9 +128,7 @@
     },
   );
 
-  function updateSchuleSelection(selection: SelectedSchulen): void {
-    const organisation: Organisation | undefined =
-      (Array.isArray(selection) ? selection.at(0) : selection) ?? undefined;
+  function updateSchuleSelection(organisation: SelectedSchulen<false>): void {
     selectedOrganisation.value = organisation;
     emit('update:selectedSchule', organisation ?? null);
   }
@@ -167,7 +165,7 @@
         <SchulenFilter
           ref="schulenFilter"
           parentId="klasse-form"
-          :selectedSchulen="selectedOrganisation"
+          :selectedSchulen="selectedOrganisation ?? undefined"
           :multiple="false"
           :readonly="props.editMode"
           :highlightSelection="props.editMode"

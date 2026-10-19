@@ -159,8 +159,8 @@
     }
   }
 
-  function updateSchuleSelection(selection: SelectedSchulen): void {
-    const organisation: Organisation | null = (Array.isArray(selection) ? selection.at(0) : selection) ?? null;
+  function updateSchuleSelection(selection: SelectedSchulen<false>): void {
+    const organisation: Organisation | null = selection ?? null;
     const id: string | undefined = organisation?.id;
     if (selectedSchule.value === id) {
       return;
@@ -299,7 +299,7 @@
               :multiple="false"
               :hide-details="true"
               :highlight-selection="true"
-              :selected-schulen="selectedOrganisation"
+              :selected-schulen="selectedOrganisation ?? undefined"
               :placeholder-text="t('admin.schule.schule')"
               @update:selected-schulen="updateSchuleSelection"
             >

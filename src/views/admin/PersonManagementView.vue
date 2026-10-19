@@ -266,8 +266,7 @@
     applySearchAndFilters();
   }
 
-  async function setOrganisationFilter(selection: SelectedSchulen): Promise<void> {
-    const newValue: Organisation[] = Array.isArray(selection) ? selection : selection ? [selection] : [];
+  async function setOrganisationFilter(newValue: SelectedSchulen<true>): Promise<void> {
     selectedOrganisationen.value = newValue;
     searchFilterStore.setOrganisationFilterForPersonen(newValue);
     searchFilterStore.setKlasseFilterForPersonen([]);
@@ -596,7 +595,7 @@
           class="py-md-0"
         >
           <SchulenFilter
-            multiple
+            :multiple="true"
             includeAll
             highlightSelection
             parentId="person-management"

@@ -256,8 +256,8 @@
     emits('update:calculatedBefristungOption', value);
   };
 
-  function updateSchuleSelection(selection: SelectedSchulen): void {
-    selectedOrganisationObject.value = Array.isArray(selection) ? selection.at(0) : selection;
+  function updateSchuleSelection(selection: SelectedSchulen<false>): void {
+    selectedOrganisationObject.value = selection;
   }
 
   function handleKlassenOption(value: string | null): void {
@@ -461,7 +461,7 @@
       <SchulenFilter
         ref="schulenFilter"
         parentId="personenkontext-create"
-        :selectedSchulen="selectedOrganisationObject"
+        :selectedSchulen="selectedOrganisationObject ?? undefined"
         :selectedRollen="selectedRollen ? selectedRollen : []"
         :multiple="false"
         :systemrechteForSearch="[requestedWithSystemrecht].filter((v): v is RollenSystemRecht => v !== undefined)"

@@ -167,8 +167,8 @@
     fetchRollenerweiterungen();
   }
 
-  function setOrganisationFilter(selection: SelectedSchulen): void {
-    selectedOrganisationen.value = Array.isArray(selection) ? selection : selection ? [selection] : [];
+  function setOrganisationFilter(selection: SelectedSchulen<true>): void {
+    selectedOrganisationen.value = selection;
     fetchRollenerweiterungen();
   }
 

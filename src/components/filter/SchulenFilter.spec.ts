@@ -15,10 +15,11 @@ import {
 import { enableAutoUnmount, flushPromises, mount, type VueWrapper } from '@vue/test-utils';
 import { DoFactory } from 'test/DoFactory';
 import type { BaseFieldProps } from 'vee-validate';
-import type { MockInstance } from 'vitest';
-import { nextTick } from 'vue';
+import { expectTypeOf, type MockInstance } from 'vitest';
+import { nextTick, ref, type Ref } from 'vue';
 import { getDisplayNameForOrg } from '@/utils/formatting';
 import { OperationContext, usePersonenkontextStore, type PersonenkontextStore } from '@/stores/PersonenkontextStore';
+import type { SelectedSchulen } from '@/types';
 import SchulenFilter from './SchulenFilter.vue';
 
 type Props = {
@@ -26,7 +27,7 @@ type Props = {
   systemrechteForSearch?: Array<RollenSystemRechtEnum>;
   multiple: boolean;
   selectionCountKey?: string;
-  selectedSchulen?: Array<Organisation> | Organisation;
+  selectedSchulen?: SelectedSchulen;
   readonly?: boolean;
   selectedSchuleProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
   highlightSelection?: boolean;
@@ -45,10 +46,7 @@ enableAutoUnmount(afterEach);
 function mountComponent(props: Partial<Props> = {}): VueWrapper<InstanceType<typeof SchulenFilter>> {
   const wrapper: VueWrapper<InstanceType<typeof SchulenFilter>> = mount<typeof SchulenFilter>(SchulenFilter, {
     attachTo: document.getElementById('app') || '',
-    props: {
-      multiple: false,
-      ...props,
-    },
+    props,
   });
   return wrapper;
 }
@@ -83,6 +81,104 @@ beforeEach(() => {
 });
 
 describe('SchulenFilter', () => {
+  test('it defaults to single selection', async () => {
+    expectTypeOf<SelectedSchulen<false>>().toEqualTypeOf<Organisation | undefined>();
+    expectTypeOf<SelectedSchulen<true>>().toEqualTypeOf<Organisation[]>();
+
+    const selected: Organisation = DoFactory.getSchule();
+    const wrapper: VueWrapper<InstanceType<typeof SchulenFilter>> = mountComponent();
+    const autocomplete: VueWrapper = wrapper.findComponent({ name: 'v-autocomplete' });
+
+    expect(autocomplete.props('multiple')).toBeFalsy();
+    expect(autocomplete.props('modelValue')).toBeNull();
+    await autocomplete.setValue(selected);
+    expect(wrapper.emitted('update:selectedSchulen')?.at(-1)).toEqual([selected]);
+    await autocomplete.setValue(null);
+    expect(wrapper.emitted('update:selectedSchulen')?.at(-1)).toEqual([undefined]);
+  });
+
+  describe.each([false, true])('selection contract when multiple is %s', (multiple: boolean) => {
+    test('it normalizes empty Vuetify selections', async () => {
+      const selected: Organisation = DoFactory.getSchule();
+      const wrapper: VueWrapper<InstanceType<typeof SchulenFilter>> = mountComponent({
+        multiple,
+        selectedSchulen: multiple ? [selected] : selected,
+        highlightSelection: true,
+      });
+      const autocomplete: VueWrapper = wrapper.findComponent({ name: 'v-autocomplete' });
+
+      await autocomplete.setValue(null);
+      expect(autocomplete.props('modelValue')).toEqual(multiple ? [] : null);
+      expect(wrapper.emitted('update:selectedSchulen')).toEqual([[multiple ? [] : undefined]]);
+      expect(autocomplete.classes()).not.toContain('selected');
+    });
+
+    test('it synchronizes selections replaced and cleared by the parent', async () => {
+      const initial: Organisation = DoFactory.getSchule();
+      const replacement: Organisation = DoFactory.getSchule();
+      const wrapper: VueWrapper<InstanceType<typeof SchulenFilter>> = mountComponent({
+        multiple,
+        selectedSchulen: multiple ? [initial] : initial,
+      });
+      const autocomplete: VueWrapper = wrapper.findComponent({ name: 'v-autocomplete' });
+
+      await wrapper.setProps({ selectedSchulen: multiple ? [replacement] : replacement });
+      expect(autocomplete.props('modelValue')).toEqual(multiple ? [replacement] : replacement);
+      expect(wrapper.text()).toContain(getDisplayNameForOrg(replacement));
+      await wrapper.setProps({ selectedSchulen: undefined });
+      expect(autocomplete.props('modelValue')).toEqual(multiple ? [] : null);
+      expect(wrapper.emitted('update:selectedSchulen')).toBeUndefined();
+    });
+
+    test('it emits autoselected Schulen in the matching selection shape', async () => {
+      const selected: Organisation = DoFactory.getSchule();
+      authStore.currentUser = DoFactory.getUserinfoResponse({
+        personenkontexte: [
+          DoFactory.getPersonenkontextRolleFieldsResponse({
+            organisation: selected,
+            rolle: DoFactory.getRollenSystemRechtServiceProviderIDResponse({
+              systemrechte: [RollenSystemRechtEnum.KlassenVerwalten],
+            }),
+          }),
+        ],
+      });
+      const wrapper: VueWrapper<InstanceType<typeof SchulenFilter>> = mountComponent({
+        multiple,
+        systemrechteForSearch: [RollenSystemRechtEnum.KlassenVerwalten],
+      });
+      await flushPromises();
+
+      expect(wrapper.emitted('update:selectedSchulen')?.at(-1)).toEqual([multiple ? [selected] : selected]);
+      expect(wrapper.findComponent({ name: 'v-autocomplete' }).props('modelValue')).toEqual(
+        multiple ? [selected] : selected,
+      );
+      expectInputDisabledAttrToBe(true);
+    });
+  });
+
+  test('it reflects in-place changes to the parent selection', async () => {
+    const initial: Organisation = DoFactory.getSchule();
+    const added: Organisation = DoFactory.getSchule();
+    const selection: Ref<Organisation[]> = ref([initial]);
+    const wrapper: VueWrapper<InstanceType<typeof SchulenFilter>> = mountComponent({
+      multiple: true,
+      selectedSchulen: selection.value,
+      highlightSelection: true,
+    });
+    const autocomplete: VueWrapper = wrapper.findComponent({ name: 'v-autocomplete' });
+
+    selection.value.push(added);
+    await nextTick();
+    expect(autocomplete.props('modelValue')).toEqual([initial, added]);
+    expect(autocomplete.props('items')).toContainEqual(added);
+
+    selection.value.splice(0);
+    await nextTick();
+    expect(autocomplete.props('modelValue')).toEqual([]);
+    expect(autocomplete.classes()).not.toContain('selected');
+    expect(wrapper.emitted('update:selectedSchulen')).toBeUndefined();
+  });
+
   test('it displays an initial object outside current results without resolving its ID', async () => {
     const selected: Organisation = DoFactory.getSchule();
     const result: Organisation = DoFactory.getSchule();
@@ -329,7 +425,7 @@ describe('SchulenFilter', () => {
                 const schuleAutoComplete: ReturnType<VueWrapper['findComponent']> = wrapper.findComponent({
                   name: 'v-autocomplete',
                 });
-                await schuleAutoComplete.setValue(multiple && schule ? [schule] : schule);
+                await schuleAutoComplete.setValue(multiple ? (schule ? [schule] : []) : (schule ?? null));
                 vi.runAllTimers();
                 await flushPromises();
               }
@@ -351,7 +447,7 @@ describe('SchulenFilter', () => {
                   await selectSchule(wrapper, DoFactory.getSchule());
                   const loadSpy: MockInstance = vi.spyOn(organisationStore, 'loadOrganisationenForFilter');
                   await selectSchule(wrapper, undefined);
-                  expect(wrapper.emitted('update:selectedSchulen')?.at(-1)).toEqual([undefined]);
+                  expect(wrapper.emitted('update:selectedSchulen')?.at(-1)).toEqual([multiple ? [] : undefined]);
                   expect(loadSpy).toHaveBeenLastCalledWith(expectedFilter, undefined);
                 });
               });

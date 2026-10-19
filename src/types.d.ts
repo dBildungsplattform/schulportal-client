@@ -1,6 +1,6 @@
 import type { Organisation } from '@/stores/OrganisationStore';
 
-export type SelectedSchulen = Organisation[] | Organisation | null | undefined;
+export type SelectedSchulen<M extends boolean = boolean> = M extends true ? Organisation[] : Organisation | undefined;
 
 export type TranslatedObject = {
   value: string;

@@ -187,11 +187,11 @@
     formContext.setValues(cached);
   }
 
-  function updateSelectedOrganisation(selection: SelectedSchulen): void {
+  function updateSelectedOrganisation(selection: SelectedSchulen<false>): void {
     if (props.isEditMode) {
       return;
     }
-    selectedOrganisation.value = Array.isArray(selection) ? selection.at(0) : selection;
+    selectedOrganisation.value = selection;
   }
 
   function openUrlInNewTab(): void {
@@ -320,7 +320,7 @@
             :placeholderText="$t('admin.organisation.selectOrganisation')"
             :includeAll="true"
             :selected-schule-props="selectedOrganisationIdProps"
-            :selected-schulen="selectedOrganisation"
+            :selected-schulen="selectedOrganisation ?? undefined"
             @update:selected-schulen="updateSelectedOrganisation"
           />
         </FormRow>

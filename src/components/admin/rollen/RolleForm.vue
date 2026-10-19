@@ -47,8 +47,8 @@
     () => props.initialOrganisation,
   );
 
-  function updateSelectedSchule(selection: SelectedSchulen): void {
-    selectedOrganisation.value = Array.isArray(selection) ? selection.at(0) : selection;
+  function updateSelectedSchule(selection: SelectedSchulen<false>): void {
+    selectedOrganisation.value = selection;
   }
 </script>
 
@@ -83,7 +83,7 @@
         <SchulenFilter
           :includeAll="true"
           :multiple="false"
-          :selectedSchulen="selectedOrganisation"
+          :selectedSchulen="selectedOrganisation ?? undefined"
           :error="selectedAdministrationsebeneProps?.error"
           ref="schulenFilter"
           parentId="rolle-form"

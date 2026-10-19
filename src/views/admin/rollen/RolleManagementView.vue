@@ -161,10 +161,8 @@
     await getRollen();
   }
 
-  async function setOrganisationenFilter(selection: SelectedSchulen): Promise<void> {
-    searchFilterStore.setOrganisationenFilterForRollen(
-      Array.isArray(selection) ? selection : selection ? [selection] : [],
-    );
+  async function setOrganisationenFilter(selection: SelectedSchulen<true>): Promise<void> {
+    searchFilterStore.setOrganisationenFilterForRollen(selection);
     searchFilterStore.rollenPage = 1;
     await getRollen();
   }
@@ -336,7 +334,7 @@
           md="3"
         >
           <SchulenFilter
-            multiple
+            :multiple="true"
             includeAll
             highlightSelection
             parentId="rolle-management"

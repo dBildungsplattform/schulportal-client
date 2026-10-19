@@ -390,8 +390,8 @@
     event.returnValue = '';
   }
 
-  function updateSelectedSchule(selection: SelectedSchulen): void {
-    selectedOrganisation.value = Array.isArray(selection) ? selection.at(0) : selection;
+  function updateSelectedSchule(selection: SelectedSchulen<false>): void {
+    selectedOrganisation.value = selection;
   }
 
   onBeforeRouteLeave((_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
@@ -649,7 +649,7 @@
               parent-id="person-import"
               :placeholder-text="t('admin.schule.selectSchule')"
               :selected-schule-props="selectedSchuleProps"
-              :selected-schulen="selectedOrganisation"
+              :selected-schulen="selectedOrganisation ?? undefined"
               @update:selected-schulen="updateSelectedSchule"
               ref="schulFilter"
             />

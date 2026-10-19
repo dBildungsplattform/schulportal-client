@@ -128,8 +128,7 @@
     searchFilterStore.serviceProviderSchulePerPage = 30;
   }
 
-  function setOrganisationFilter(selection: SelectedSchulen): void {
-    const organisation: Organisation | null = (Array.isArray(selection) ? selection.at(0) : selection) ?? null;
+  function setOrganisationFilter(organisation: SelectedSchulen<false>): void {
     if (!organisation) {
       resetSearchAndFilter();
       return;
@@ -266,7 +265,7 @@
             parentId="service-provider-management-by-schule"
             ref="schulenFilter"
             :systemrechteForSearch="[RollenSystemRecht.RollenErweitern]"
-            :selectedSchulen="selectedOrganisation"
+            :selectedSchulen="selectedOrganisation ?? undefined"
             @update:selected-schulen="setOrganisationFilter"
             :placeholderText="$t('admin.schule.schule')"
             hideDetails

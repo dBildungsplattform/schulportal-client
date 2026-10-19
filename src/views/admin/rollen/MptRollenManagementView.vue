@@ -81,9 +81,7 @@
     searchFilterStore.mptRollenPerPage = 30;
   }
 
-  function setSelectedOrganisation(selection: SelectedSchulen): void {
-    const organisation: Organisation | undefined =
-      (Array.isArray(selection) ? selection.at(0) : selection) ?? undefined;
+  function setSelectedOrganisation(organisation: SelectedSchulen<false>): void {
     if (!organisation) {
       resetFilters();
       return;
@@ -191,7 +189,7 @@
           highlightSelection
           parentId="mpt-rolle-management"
           :systemrechteForSearch="[RollenSystemRechtEnum.MptRollenZuordnen]"
-          :selectedSchulen="selectedOrganisation"
+          :selectedSchulen="selectedOrganisation ?? undefined"
           @update:selected-schulen="setSelectedOrganisation"
           :placeholderText="$t('admin.schule.schule')"
           hideDetails

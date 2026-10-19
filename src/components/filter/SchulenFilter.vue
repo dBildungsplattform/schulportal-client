@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="M extends boolean = false">
   import type { RollenSystemRechtEnum } from '@/api-client/generated/api';
   import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
   import {
@@ -20,13 +20,23 @@
   import { blurActiveElement } from '@/utils/focus';
   import { getDisplayNameForOrg } from '@/utils/formatting';
   import type { BaseFieldProps } from 'vee-validate';
-  import { computed, onMounted, onUnmounted, reactive, ref, watch, type ComputedRef, type Ref } from 'vue';
+  import {
+    computed,
+    onMounted,
+    onUnmounted,
+    reactive,
+    ref,
+    watch,
+    type ComputedRef,
+    type Ref,
+    type WritableComputedRef,
+  } from 'vue';
   import { useI18n, type Composer } from 'vue-i18n';
 
   type Props = {
     hideDetails?: boolean;
     systemrechteForSearch?: Array<RollenSystemRechtEnum>;
-    multiple: boolean;
+    multiple?: M;
     selectionCountKey?: string;
     readonly?: boolean;
     selectedSchuleProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
@@ -42,17 +52,41 @@
     selectedRollen?: Array<string>;
   };
   type ResolvedProps = Omit<Props, 'selectionCountKey'> & { selectionCountKey: string };
-  type SelectionChange = [SelectedSchulen, boolean];
-  type PreviousSelectionChange = [SelectedSchulen, boolean | undefined];
+  type AnySelection = Organisation | readonly Organisation[] | null | undefined;
+  type SelectionChange = [SelectedSchulen<M>, boolean];
+  type PreviousSelectionChange = [SelectedSchulen<M> | undefined, boolean | undefined];
 
   const props: ResolvedProps = withDefaults(defineProps<Props>(), {
     selectionCountKey: 'admin.schule.schulenSelected',
   });
-  const selectedSchulen: Ref<SelectedSchulen> = defineModel('selectedSchulen');
+  const selectedSchulen: Ref<SelectedSchulen<M>> = defineModel<SelectedSchulen<M>>('selectedSchulen', {
+    default: (props: Props): Organisation[] | undefined => (props.multiple ? [] : undefined),
+  });
+  const isOrganisationArray = (selection: AnySelection): selection is readonly Organisation[] =>
+    Array.isArray(selection);
+
+  const normalizeSelection = (selection: AnySelection): SelectedSchulen<M> => {
+    let normalizedSelection: Organisation | Organisation[] | undefined;
+    if (props.multiple) {
+      normalizedSelection = isOrganisationArray(selection) ? Array.from(selection) : [];
+    } else {
+      normalizedSelection = isOrganisationArray(selection) ? selection[0] : (selection ?? undefined);
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+    return normalizedSelection as SelectedSchulen<M>;
+  };
+
+  type VuetifySelection = M extends true ? readonly Organisation[] : Organisation | null;
+  const autocompleteSelection: WritableComputedRef<VuetifySelection> = computed({
+    get: (): VuetifySelection =>
+      (props.multiple ? (selectedSchulen.value ?? []) : (selectedSchulen.value ?? null)) as VuetifySelection,
+    set: (selection: VuetifySelection): void => {
+      selectedSchulen.value = normalizeSelection(selection);
+    },
+  });
   const searchInputSchulen: Ref<string | undefined> = ref(undefined);
   const clearInput = (): void => {
     searchInputSchulen.value = undefined;
-    selectedSchulen.value = undefined;
   };
 
   const { t }: Composer = useI18n({ useScope: 'global' });
@@ -107,9 +141,9 @@
   });
 
   // Normalize single and multiple selections for shared selection handling.
-  const wrapSelectedSchulen = (selection: SelectedSchulen): Array<Organisation> => {
-    if (Array.isArray(selection)) {
-      return selection;
+  const wrapSelectedSchulen = (selection: AnySelection): Array<Organisation> => {
+    if (isOrganisationArray(selection)) {
+      return Array.from(selection);
     }
     if (selection) {
       return [selection];
@@ -117,7 +151,7 @@
     return [];
   };
 
-  const isEmptySelection = (selection: SelectedSchulen): boolean => wrapSelectedSchulen(selection).length === 0;
+  const isEmptySelection = (selection: AnySelection): boolean => wrapSelectedSchulen(selection).length === 0;
 
   const schulen: ComputedRef<Array<Organisation>> = computed(() => {
     return dedup(
@@ -176,13 +210,13 @@
     }
   };
 
-  const updateOrganisationenIds = (selection: SelectedSchulen): void => {
+  const updateOrganisationenIds = (selection: AnySelection): void => {
     organisationenFilter.organisationId =
       (hasAutoselectedSchule.value ? autoselectedSchule.value?.id : undefined) ??
       wrapSelectedSchulen(selection).at(0)?.id;
   };
 
-  const handleSelectionUpdate = (selection: SelectedSchulen): void => {
+  const handleSelectionUpdate = (selection: AnySelection): void => {
     if (isEmptySelection(selection)) {
       updateOrganisationenIds([]);
       updateSearchString(undefined);
@@ -195,7 +229,7 @@
     }
   };
 
-  const isSameSelection = (a: SelectedSchulen, b: SelectedSchulen): boolean => {
+  const isSameSelection = (a: AnySelection, b: AnySelection): boolean => {
     return sameContent(wrapSelectedSchulen(a), wrapSelectedSchulen(b), (org: Organisation) => org.id);
   };
 
@@ -231,7 +265,9 @@
       // Case 2: Empty selection - use autoselected or initial values
       if (isEmptySelection(currentSelection)) {
         if (currentlyHasAutoselectedSchule && autoselectedSchule.value) {
-          const newSelection: SelectedSchulen = props.multiple ? [autoselectedSchule.value] : autoselectedSchule.value;
+          const newSelection: SelectedSchulen<M> = normalizeSelection(
+            props.multiple ? [autoselectedSchule.value] : autoselectedSchule.value,
+          );
           selectedSchulen.value = newSelection;
           handleSelectionUpdate(newSelection);
         }
@@ -327,7 +363,7 @@
     "
     @update:focused="handleFocusChange"
     v-bind="selectedSchuleProps"
-    v-model="selectedSchulen"
+    v-model="autocompleteSelection"
     v-model:search="searchInputSchulen"
     :hide-details
   >
