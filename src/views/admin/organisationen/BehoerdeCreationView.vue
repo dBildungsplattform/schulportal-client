@@ -16,7 +16,8 @@
     type Router,
   } from 'vue-router';
 
-  const { t }: Composer = useI18n();
+  const i18n: Composer = useI18n();
+  const { t }: Composer = i18n;
   const router: Router = useRouter();
   const organisationStore: OrganisationStore = useOrganisationStore();
 
@@ -36,6 +37,14 @@
 
   const zustaendigkeitsbereichList: ComputedRef<Organisation[]> = computed(() => {
     return organisationStore.schultraeger;
+  });
+  const creationErrorMessage: ComputedRef<string> = computed((): string => {
+    if (!organisationStore.errorCode) {
+      return '';
+    }
+
+    const key: string = `admin.behoerde.errors.${organisationStore.errorCode}`;
+    return t(i18n.te(key) ? key : 'admin.behoerde.errors.ORGANISATION_SPECIFICATION_ERROR');
   });
   const creationStatusMessage: ComputedRef<string> = computed((): string => {
     if (!organisationStore.createdBehoerde || organisationStore.errorCode) {
@@ -183,7 +192,7 @@
           :title="$t('admin.behoerde.behoerdeCreateErrorTitle')"
           type="error"
           :closable="false"
-          :text="organisationStore.errorCode ? $t(`admin.behoerde.errors.${organisationStore.errorCode}`) : ''"
+          :text="creationErrorMessage"
           :show-button="true"
           :button-text="$t('admin.behoerde.backToCreateBehoerde')"
           :button-action="navigateBackToBehoerdeForm"

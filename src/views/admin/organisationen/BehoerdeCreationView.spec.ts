@@ -110,6 +110,27 @@ afterEach(() => {
 });
 
 describe('BehoerdeCreationView', () => {
+  test.each([
+    ['UNKNOWN_BACKEND_ERROR', 'Die Behörde konnte nicht angelegt werden.'],
+    ['ORGANISATION_SPECIFICATION_ERROR', 'Die Behörde konnte nicht angelegt werden.'],
+    ['BEHOERDE_NAME_EINDEUTIG', 'Der Behördenname existiert bereits.'],
+    ['SCHULTRAEGER_ERROR', 'Die Zuständigkeitsbereiche konnten nicht geladen werden.'],
+  ])('displays the expected message for %s', async (errorCode: string, message: string): Promise<void> => {
+    const {
+      wrapper,
+      organisationStore,
+    }: {
+      wrapper: VueWrapper<ComponentInstance<typeof BehoerdeCreationView>>;
+      organisationStore: OrganisationStore;
+    } = await setup();
+
+    organisationStore.errorCode = errorCode;
+    await nextTick();
+
+    expect(wrapper.getComponent({ name: 'SpshAlert' }).props('text')).toBe(message);
+    expect(organisationStore.errorCode).toBe(errorCode);
+  });
+
   test('announces successful creation in a persistent status region', async (): Promise<void> => {
     const {
       wrapper,
