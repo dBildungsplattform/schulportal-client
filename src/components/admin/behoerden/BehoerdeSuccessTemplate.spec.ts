@@ -40,10 +40,11 @@ describe('BehoerdeSuccessTemplate', () => {
     expect(wrapper.emitted('onCreateAnotherBehoerde')).toHaveLength(1);
   });
 
-  test('should keep the back button hidden', (): void => {
+  test('should return to the results list when the back button is clicked', async (): Promise<void> => {
     const { wrapper }: { wrapper: VueWrapper<ComponentInstance<typeof BehoerdeSuccessTemplate>> } = setup();
 
-    expect(wrapper.find('[data-testid="success-template-secondary-button"]').exists()).toBe(false);
+    await wrapper.get('[data-testid="success-template-secondary-button"]').trigger('click');
+    expect(wrapper.emitted('onNavigateBackToBehoerdeList')).toHaveLength(1);
   });
 
   test('should render multiple data rows and their labels', async (): Promise<void> => {

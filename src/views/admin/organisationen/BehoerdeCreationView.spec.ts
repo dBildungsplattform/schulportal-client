@@ -110,6 +110,22 @@ afterEach(() => {
 });
 
 describe('BehoerdeCreationView', () => {
+  test('should navigate to the Behoerden list after creation', async (): Promise<void> => {
+    const { wrapper, router, organisationStore }: {
+      wrapper: VueWrapper<ComponentInstance<typeof BehoerdeCreationView>>;
+      router: Router;
+      organisationStore: OrganisationStore;
+    } = await setup();
+    organisationStore.createdBehoerde = DoFactory.getOrganisation({ typ: OrganisationsTyp.Behoerde });
+    await flushPromises();
+    const pushSpy: MockInstance = vi.spyOn(router, 'push');
+
+    await wrapper.get('[data-testid="success-template-secondary-button"]').trigger('click');
+    await flushPromises();
+
+    expect(pushSpy).toHaveBeenCalledWith({ name: 'behoerde-management' });
+  });
+
   test.each([
     ['UNKNOWN_BACKEND_ERROR', 'Die Behörde konnte nicht angelegt werden.'],
     ['ORGANISATION_SPECIFICATION_ERROR', 'Die Behörde konnte nicht angelegt werden.'],

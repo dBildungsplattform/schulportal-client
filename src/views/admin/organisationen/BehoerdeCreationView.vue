@@ -98,9 +98,8 @@
     organisationStore.errorCode = '';
   }
 
-  /* the results list is not available yet, see SPSH-4323 */
   function handleNavigateBackToBehoerdeList(): void {
-    // intentionally empty
+    router.push({ name: 'behoerde-management' });
   }
 
   async function navigateToStart(): Promise<void> {

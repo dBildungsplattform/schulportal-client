@@ -15,7 +15,6 @@
 
   const emit: Emits = defineEmits<Emits>();
 
-  /* the results list is not available yet, see SPSH-4323 */
   const navigateBack = (): void => emit('onNavigateBackToBehoerdeList');
   const createAnother = (): void => emit('onCreateAnotherBehoerde');
 </script>
@@ -39,7 +38,6 @@
     </template>
     <template #actions>
       <SuccessTemplateSecondaryButton
-        v-if="false"
         @click="navigateBack"
       >
         {{ $t('nav.backToList') }}
