@@ -122,12 +122,12 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
     const twoFactorAuthentificationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
     await twoFactorAuthentificationStore.get2FAState(personId);
     if (twoFactorAuthentificationStore.errorCode === 'PI_UNAVAILABLE_ERROR') {
-      await router.push(`/service-not-available/2FA`);
+      router.push(`/service-not-available/2FA`);
       return false;
     }
 
     if (!twoFactorAuthentificationStore.hasToken) {
-      await router.push(`/no-second-factor`);
+      router.push(`/no-second-factor`);
       return false;
     }
 
