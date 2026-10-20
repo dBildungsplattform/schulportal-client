@@ -8,7 +8,3 @@ export type Mutable<T> = {
 };
 
 declare type Option<T> = T | null | undefined;
-
-export enum AvailableServicesEnum {
-  TWO_FACTOR_AUTHENTICATION = '2FA',
-}
