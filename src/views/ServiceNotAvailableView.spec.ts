@@ -1,4 +1,4 @@
-import { ServiceIdentifierEnum } from '@/router/service-identifier.enum.js';
+import { ServiceIdentifier } from '@/router/service-identifier.enum';
 import { flushPromises, mount, type VueWrapper } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { type Component } from 'vue';
@@ -51,7 +51,7 @@ afterEach(() => {
 
 describe('ServiceNotAvailableView', () => {
   test('shows the 2FA connection failure message', async () => {
-    await mountServiceNotAvailableView(ServiceIdentifierEnum.TWO_FACTOR_AUTHENTICATION);
+    await mountServiceNotAvailableView(ServiceIdentifier.TWO_FACTOR_AUTHENTICATION);
 
     expect(wrapper?.find('[data-testid="spsh-alert-title"]').text()).toBe(
       'admin.person.twoFactorAuthentication.header',
@@ -60,7 +60,7 @@ describe('ServiceNotAvailableView', () => {
       'admin.person.twoFactorAuthentication.errors.connectionFailure',
     );
     expect(router.currentRoute.value.path).toBe(
-      `/service-not-available/${ServiceIdentifierEnum.TWO_FACTOR_AUTHENTICATION}`,
+      `/service-not-available/${ServiceIdentifier.TWO_FACTOR_AUTHENTICATION}`,
     );
   });
 
@@ -74,7 +74,7 @@ describe('ServiceNotAvailableView', () => {
     const locationMock: { href: string } = { href: '' };
     vi.stubGlobal('location', locationMock);
 
-    await mountServiceNotAvailableView(ServiceIdentifierEnum.TWO_FACTOR_AUTHENTICATION);
+    await mountServiceNotAvailableView(ServiceIdentifier.TWO_FACTOR_AUTHENTICATION);
     await wrapper?.find('[data-testid="spsh-alert-button"]').trigger('click');
 
     expect(locationMock.href).toBe('/start');

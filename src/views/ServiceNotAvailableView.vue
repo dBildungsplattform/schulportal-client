@@ -1,14 +1,14 @@
 <script setup lang="ts">
   import SpshAlert from '@/components/alert/SpshAlert.vue';
-  import { ServiceIdentifierEnum } from '@/router/service-identifier.enum';
+  import { ServiceIdentifier } from '@/router/service-identifier.enum';
   import { RouteLocationNormalizedLoaded, Router, useRoute, useRouter } from 'vue-router';
 
   const router: Router = useRouter();
   const route: RouteLocationNormalizedLoaded = useRoute();
-  const serviceName: ServiceIdentifierEnum = route.params['serviceName'] as ServiceIdentifierEnum;
+  const serviceName: ServiceIdentifier = route.params['serviceName'] as ServiceIdentifier;
   const messageObject: { title: string; text: string } = { title: '', text: '' };
 
-  if (serviceName === ServiceIdentifierEnum.TWO_FACTOR_AUTHENTICATION) {
+  if (serviceName === ServiceIdentifier.TWO_FACTOR_AUTHENTICATION) {
     messageObject.title = 'admin.person.twoFactorAuthentication.header';
     messageObject.text = 'admin.person.twoFactorAuthentication.errors.connectionFailure';
   } else {
