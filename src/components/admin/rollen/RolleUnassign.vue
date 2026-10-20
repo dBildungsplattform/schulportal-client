@@ -61,13 +61,8 @@
   // Define the error list for the selected persons using the useBulkErrors composable
   const bulkErrorList: ComputedRef<BulkErrorList[]> = computed(() => useBulkErrors(t, props.selectedPersonen));
 
-  export type RolleUnassignForm = {
+  type RolleUnassignForm = {
     selectedRolle: TranslatedRolleWithAttrs;
-  };
-
-  export type PersonenkontextFieldDefinitions = {
-    selectedRolle: Ref<TranslatedRolleWithAttrs | undefined>;
-    selectedRolleProps: Ref<BaseFieldProps & { error: boolean; 'error-messages': Array<string> }>;
   };
 
   const validationSchema = (): TypedSchema<RolleUnassignForm> => {
