@@ -1,8 +1,8 @@
 import type { FeatureFlagResponse } from '@/api-client/generated/api';
 import { StepUpLevel, useAuthStore, type AuthStore } from '@/stores/AuthStore';
-import { RollenSystemRecht } from '@/stores/RolleStore';
 import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
 import { useMasterDataStore, type MasterDataStore } from '@/stores/MasterDataStore';
+import { RollenSystemRecht } from '@/stores/RolleStore';
 import {
   useTwoFactorAuthentificationStore,
   type TwoFactorAuthentificationStore,
@@ -121,8 +121,13 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
     }
     const twoFactorAuthentificationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
     await twoFactorAuthentificationStore.get2FAState(personId);
+    if (twoFactorAuthentificationStore.errorCode === 'PI_UNAVAILABLE_ERROR') {
+      await router.push(`/service-not-available/2FA`);
+      return false;
+    }
+
     if (!twoFactorAuthentificationStore.hasToken) {
-      router.push(`/no-second-factor`);
+      await router.push(`/no-second-factor`);
       return false;
     }
 

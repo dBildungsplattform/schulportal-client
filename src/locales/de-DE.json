@@ -546,6 +546,7 @@
           "INTERNAL": "Ein unbekannter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
           "SOFTWARE_TOKEN_VERIFICATION_ERROR": "Beim Verifizieren Ihres Tokens ist leider ein Problem aufgetreten.",
           "connection": "Der Server für die Zwei-Faktor-Authentifizierung kann aktuell nicht erreicht werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut.",
+          "connectionFailure": "Leider gibt es technische Probleme bei der Zweifaktor-Authentifizierung. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut. Falls das Problem bestehen bleibt, wenden Sie sich bitte an Ihre schulischen Administratorinnen und Administratoren.",
           "softwareTokenInitError": "Leider konnte aus technischen Gründen kein QR-Code erzeugt werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut. Sollte das Problem weiterhin bestehen, geben Sie dazu bitte ein Ticket über den {0} auf.",
           "iqshHelpdesk": "Helpdesk des IQSH",
           "iqshHelpdeskLink": "https://www.secure-lernnetz.de/helpdesk/",

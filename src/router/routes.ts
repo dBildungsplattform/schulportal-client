@@ -376,6 +376,11 @@ const routes: readonly RouteRecordRaw[] = [
     name: 'no-second-factor',
     component: () => import('../views/NoSecondFactorView.vue'),
   },
+  {
+    path: '/service-not-available/:serviceName',
+    name: 'service-not-available',
+    component: () => import('../views/ServiceNotAvailableView.vue'),
+  },
 ] satisfies readonly AppRoute[];
 
 export default routes;
