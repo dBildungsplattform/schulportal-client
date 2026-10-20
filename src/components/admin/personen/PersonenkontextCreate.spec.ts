@@ -141,10 +141,10 @@ test('it retains the existing Landesbediensteter Rollenart filter after clearing
   expect(getRollenForPersonenkontextCreationSpy).toHaveBeenLastCalledWith(
     expect.objectContaining({
       organisationId: '1133',
-      rollenIds: [],
       rollenartForPerson: RollenArt.Lehr,
     }),
   );
+  expect(getRollenForPersonenkontextCreationSpy.mock.calls.at(-1)?.[0]).not.toHaveProperty('rollenIds');
 });
 beforeEach(() => {
   document.body.innerHTML = `
@@ -226,8 +226,11 @@ describe('PersonenkontextCreate', () => {
       expect(autocomplete.text()).toContain(selected.title);
       expect(wrapper.findComponent({ name: 'KlassenFilter' }).exists()).toBe(true);
       expect(rolleStore.getRollenForPersonenkontextCreation).toHaveBeenLastCalledWith(
-        expect.objectContaining({ rollenIds: [selected.value], rollenartForPerson: RollenArt.Lern }),
+        expect.objectContaining({ rollenartForPerson: RollenArt.Lern }),
       );
+      expect(
+        vi.mocked(rolleStore.getRollenForPersonenkontextCreation).mock.calls.at(-1)?.[0],
+      ).not.toHaveProperty('rollenIds');
 
       await wrapper.setProps({ rollen: [result, { ...selected }] });
       expect(autocomplete.props('items')).toEqual([result, selected]);
@@ -727,10 +730,12 @@ describe('PersonenkontextCreate', () => {
           expect(rolleStore.getRollenForPersonenkontextCreation).toHaveBeenCalledWith(
             expect.objectContaining({
               organisationId: '1133',
-              rollenIds: ['54321'],
               rollenartForPerson: RollenArt.Lern,
             }),
           );
+          expect(
+            vi.mocked(rolleStore.getRollenForPersonenkontextCreation).mock.calls.at(-1)?.[0],
+          ).not.toHaveProperty('rollenIds');
         });
       });
     },

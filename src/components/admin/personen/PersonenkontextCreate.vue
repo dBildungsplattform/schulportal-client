@@ -161,14 +161,10 @@
     }
 
     if (props.allowMultipleRollen) {
-      filter.rollenIds = selectedRollenIds.value;
       if (searchInputRollen.value && !isRolleSearchStringEqualToSelection.value) {
         filter.rolleName = searchInputRollen.value;
       }
     } else {
-      if (selectedRolle.value) {
-        filter.rollenIds = [selectedRolle.value.value];
-      }
       if (searchInputRolle.value && !isRolleSearchStringEqualToSelection.value) {
         filter.rolleName = searchInputRolle.value;
       }
