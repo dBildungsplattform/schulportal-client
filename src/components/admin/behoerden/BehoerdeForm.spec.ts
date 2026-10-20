@@ -36,7 +36,6 @@ const setup = (
       initialValues: {
         selectedZustaendigkeitsbereich: zustaendigkeitsbereichList[0]!.id,
         selectedBehoerdenname: '',
-        selectedDienststellennummer: '',
       },
       zustaendigkeitsbereichList,
       cachedValues,
@@ -70,10 +69,10 @@ describe('BehoerdeForm', () => {
     expect(wrapper.get('#behoerde-zustaendigkeitsbereich-heading').text()).toBe('1. Zuständigkeitsbereich zuordnen');
   });
 
-  test('it renders the optional Dienststellennummer input', () => {
+  test('it does not render a Dienststellennummer input', () => {
     const { wrapper }: { wrapper: VueWrapper<ComponentInstance<typeof BehoerdeForm>> } = setup();
 
-    expect(wrapper.find('[data-testid="behoerde-dienststellennummer-input"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="behoerde-dienststellennummer-input"]').exists()).toBe(false);
   });
 
   test('the initial selection does not make the form dirty', async (): Promise<void> => {
@@ -113,7 +112,6 @@ describe('BehoerdeForm', () => {
       {
         selectedZustaendigkeitsbereich: zustaendigkeitsbereichList[0]!.id,
         selectedBehoerdenname: 'Test Behoerde',
-        selectedDienststellennummer: '',
       },
     ]);
   });
@@ -132,7 +130,6 @@ describe('BehoerdeForm', () => {
     } = setup({
       selectedZustaendigkeitsbereich: cachedOrganisation.id,
       selectedBehoerdenname: 'Cached Behoerde',
-      selectedDienststellennummer: '123',
     });
     await flushPromises();
 

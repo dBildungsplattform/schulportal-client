@@ -40,10 +40,6 @@
     'selectedBehoerdenname',
     mapVeeValidationErrorsToVuetifyProps,
   );
-  const [selectedDienststellennummer, selectedDienststellennummerProps]: FieldDefinition = formContext.defineField(
-    'selectedDienststellennummer',
-    mapVeeValidationErrorsToVuetifyProps,
-  );
   const canCommit: ComputedRef<boolean> = computed(() => formContext.meta.value.valid && formContext.meta.value.dirty);
   const onSubmit: (event?: Event) => Promise<void> = formContext.handleSubmit((values: BehoerdeFormValues): void => {
     emit('click:submit', values);
@@ -143,30 +139,6 @@
           variant="outlined"
           density="compact"
           required
-        />
-      </FormRow>
-      <!-- enter Dienststellennummer (optional) -->
-      <v-row>
-        <v-col>
-          <h3 class="headline-3">3. {{ $t('admin.behoerde.enterDienststellennummer') }}</h3>
-        </v-col>
-      </v-row>
-      <FormRow
-        :error-label="selectedDienststellennummerProps?.error || ''"
-        label-for-id="behoerde-dienststellennummer-input"
-        :is-required="false"
-        :label="$t('admin.behoerde.dienststellennummer')"
-      >
-        <v-text-field
-          id="behoerde-dienststellennummer-input"
-          v-bind="selectedDienststellennummerProps"
-          ref="behoerde-dienststellennummer-input"
-          v-model="selectedDienststellennummer"
-          clearable
-          data-testid="behoerde-dienststellennummer-input"
-          :placeholder="$t('admin.behoerde.dienststellennummer')"
-          variant="outlined"
-          density="compact"
         />
       </FormRow>
     </template>

@@ -166,7 +166,7 @@ type OrganisationActions = {
     traegerschaft?: TraegerschaftTyp,
     emailAdress?: string,
   ) => Promise<void>;
-  createBehoerde: (administriertVon: string, zugehoerigZu: string, name: string, kennung?: string) => Promise<void>;
+  createBehoerde: (administriertVon: string, zugehoerigZu: string, name: string) => Promise<void>;
   deleteOrganisationById: (organisationId: string) => Promise<void>;
   updateOrganisationNameById: (organisationId: string, name: string, type: OrganisationsTyp) => Promise<void>;
   getRootKinderSchultraeger: () => Promise<void>;
@@ -555,19 +555,12 @@ export const useOrganisationStore: StoreDefinition<
       }
     },
 
-    async createBehoerde(
-      administriertVon: string,
-      zugehoerigZu: string,
-      name: string,
-      kennung?: string,
-    ): Promise<void> {
+    async createBehoerde(administriertVon: string, zugehoerigZu: string, name: string): Promise<void> {
       this.loading = true;
       try {
-        const mappedKennung: string | undefined = kennung === '' ? undefined : kennung;
         const createOrganisationBodyParams: CreateOrganisationBodyParams = {
           administriertVon: administriertVon,
           zugehoerigZu: zugehoerigZu,
-          kennung: mappedKennung,
           name: name,
           typ: OrganisationsTyp.Behoerde,
         };

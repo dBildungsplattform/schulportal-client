@@ -6,7 +6,6 @@ import { object, string } from 'yup';
 export type BehoerdeFormValues = {
   selectedZustaendigkeitsbereich: string;
   selectedBehoerdenname: string;
-  selectedDienststellennummer?: string;
 };
 
 export const getValidationSchema = (t: (key: string) => string): TypedSchema<BehoerdeFormValues> => {
@@ -17,9 +16,6 @@ export const getValidationSchema = (t: (key: string) => string): TypedSchema<Beh
         .matches(DIN_91379A_EXT, t('admin.behoerde.rules.behoerdenname.matches'))
         .matches(NO_LEADING_TRAILING_SPACES, t('admin.behoerde.rules.behoerdenname.noLeadingTrailingSpaces'))
         .required(t('admin.behoerde.rules.behoerdenname.required')),
-      selectedDienststellennummer: string()
-        .ensure()
-        .matches(NO_LEADING_TRAILING_SPACES, t('admin.behoerde.rules.dienststellennummer.noLeadingTrailingSpaces')),
     }),
   );
 };

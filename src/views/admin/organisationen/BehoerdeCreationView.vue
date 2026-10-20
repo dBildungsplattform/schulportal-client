@@ -27,7 +27,6 @@
   const initialFormValues: Ref<BehoerdeFormValues> = ref({
     selectedZustaendigkeitsbereich: '',
     selectedBehoerdenname: '',
-    selectedDienststellennummer: '',
   });
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
 
@@ -70,11 +69,6 @@
         value: organisationStore.createdBehoerde?.name ?? '',
         testId: 'created-behoerde-name',
       },
-      {
-        label: t('admin.behoerde.dienststellennummer'),
-        value: organisationStore.createdBehoerde?.kennung ?? '',
-        testId: 'created-behoerde-dienststellennummer',
-      },
     ];
   });
 
@@ -84,7 +78,6 @@
       values.selectedZustaendigkeitsbereich,
       values.selectedZustaendigkeitsbereich,
       values.selectedBehoerdenname,
-      values.selectedDienststellennummer,
     );
     if (!organisationStore.errorCode) {
       isDirty.value = false;

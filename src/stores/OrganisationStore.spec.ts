@@ -1212,16 +1212,16 @@ describe('OrganisationStore', () => {
       vi.restoreAllMocks();
     });
 
-    describe('with kennung', () => {
-      it('should create Behoerde and update state', async () => {
+    describe('without kennung', () => {
+      it('should omit kennung from the request and update state', async () => {
         const administriertVon: string = DoFactory.getOrganisation().id;
         const zugehoerigZu: string = DoFactory.getOrganisation().id;
         const mockResponse: Organisation = DoFactory.getOrganisation({
           typ: OrganisationsTyp.Behoerde,
           administriertVon,
           zugehoerigZu,
+          kennung: undefined,
         });
-        const kennung: string = mockResponse.kennung!;
 
         mockadapter
           .onPost('/api/organisationen', {
@@ -1229,7 +1229,6 @@ describe('OrganisationStore', () => {
             zugehoerigZu,
             name: mockResponse.name,
             typ: OrganisationsTyp.Behoerde,
-            kennung,
           })
           .replyOnce(201, mockResponse);
 
@@ -1237,7 +1236,6 @@ describe('OrganisationStore', () => {
           administriertVon,
           zugehoerigZu,
           mockResponse.name,
-          kennung,
         );
 
         expect(organisationStore.loading).toBe(true);
@@ -1248,46 +1246,6 @@ describe('OrganisationStore', () => {
         expect(organisationStore.errorCode).toBe('');
         expect(organisationStore.loading).toBe(false);
       });
-    });
-
-    describe('without kennung', () => {
-      it.each([undefined, ''])(
-        'should omit kennung %s from the request and update state',
-        async (kennung: string | undefined): Promise<void> => {
-          const administriertVon: string = DoFactory.getOrganisation().id;
-          const zugehoerigZu: string = DoFactory.getOrganisation().id;
-          const mockResponse: Organisation = DoFactory.getOrganisation({
-            typ: OrganisationsTyp.Behoerde,
-            administriertVon,
-            zugehoerigZu,
-            kennung: undefined,
-          });
-
-          mockadapter
-            .onPost('/api/organisationen', {
-              administriertVon,
-              zugehoerigZu,
-              name: mockResponse.name,
-              typ: OrganisationsTyp.Behoerde,
-            })
-            .replyOnce(201, mockResponse);
-
-          const promise: Promise<void> = organisationStore.createBehoerde(
-            administriertVon,
-            zugehoerigZu,
-            mockResponse.name,
-            kennung,
-          );
-
-          expect(organisationStore.loading).toBe(true);
-          expect(organisationStore.createdBehoerde).toBeNull();
-          await promise;
-
-          expect(organisationStore.createdBehoerde).toEqual(mockResponse);
-          expect(organisationStore.errorCode).toBe('');
-          expect(organisationStore.loading).toBe(false);
-        },
-      );
     });
 
     describe('with an unstructured error response', () => {

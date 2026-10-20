@@ -291,6 +291,8 @@ describe('BehoerdeCreationView', () => {
     await flushPromises();
 
     expect(wrapper.find('[data-testid="success-template-primary-button"]').isVisible()).toBe(true);
+    expect(wrapper.find('[data-testid="created-behoerde-dienststellennummer"]').exists()).toBe(false);
+    expect(wrapper.text()).not.toContain('Dienststellennummer');
 
     wrapper.find('[data-testid="success-template-primary-button"]').trigger('click');
     await nextTick();
@@ -344,7 +346,6 @@ describe('BehoerdeCreationView', () => {
     form.$emit('click:submit', {
       selectedZustaendigkeitsbereich: '3',
       selectedBehoerdenname: 'Existing Behoerde',
-      selectedDienststellennummer: '123',
     });
     await flushPromises();
     expect(wrapper.findComponent(BehoerdeForm).exists()).toBe(false);
@@ -353,7 +354,6 @@ describe('BehoerdeCreationView', () => {
     expect(wrapper.getComponent(BehoerdeForm).props('cachedValues')).toEqual({
       selectedZustaendigkeitsbereich: '3',
       selectedBehoerdenname: 'Existing Behoerde',
-      selectedDienststellennummer: '123',
     });
     expect(wrapper.get<HTMLInputElement>('[data-testid="behoerdenname-input"] input').element.value).toBe(
       'Existing Behoerde',
@@ -381,10 +381,9 @@ describe('BehoerdeCreationView', () => {
     form.$emit('click:submit', {
       selectedZustaendigkeitsbereich: '2',
       selectedBehoerdenname: 'New Behoerde',
-      selectedDienststellennummer: '',
     });
     await flushPromises();
-    expect(organisationStore.createBehoerde).toHaveBeenCalledWith('2', '2', 'New Behoerde', '');
+    expect(organisationStore.createBehoerde).toHaveBeenCalledWith('2', '2', 'New Behoerde');
     const next: Mock = vi.fn();
     storedBeforeRouteLeaveCallback({} as RouteLocationNormalized, {} as RouteLocationNormalized, next);
     expect(next).toHaveBeenCalledOnce();

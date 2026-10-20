@@ -225,10 +225,8 @@
       "create": "Behörde anlegen",
       "createAnother": "Weitere Behörde anlegen",
       "createNew": "Neue Behörde anlegen",
-      "dienststellennummer": "Dienststellennummer",
       "discard": "Behörde verwerfen",
       "enterBehoerdenname": "Behördenname eingeben",
-      "enterDienststellennummer": "Dienststellennummer eingeben",
       "errors": {
         "BEHOERDE_NAME_EINDEUTIG": "Der Behördenname existiert bereits.",
         "ORGANISATION_SPECIFICATION_ERROR": "Die Behörde konnte nicht angelegt werden.",
@@ -241,9 +239,6 @@
           "matches": "Der Behördenname darf keine ungültigen Zeichen beinhalten.",
           "noLeadingTrailingSpaces": "Der Behördenname darf nicht mit Leerzeichen beginnen oder enden.",
           "required": "Der Behördenname muss angegeben werden."
-        },
-        "dienststellennummer": {
-          "noLeadingTrailingSpaces": "Die Dienststellennummer darf nicht mit Leerzeichen beginnen oder enden."
         }
       },
       "title": {
