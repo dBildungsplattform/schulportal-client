@@ -58,8 +58,6 @@
     getDirtyState,
     getPersonenkontextFieldDefinitions,
     getValidationSchema,
-    isKopersRolle,
-    isLernRolle,
     type PersonenkontextFieldDefinitions,
   } from '@/utils/validationPersonenkontext';
   import { toTypedSchema } from '@vee-validate/yup';
@@ -159,7 +157,7 @@
   const creationErrorTitle: Ref<string> = ref('');
 
   const cachedSelectedOrganisation: Ref<string> = ref('');
-  const cachedSelectedRolle: Ref<string> = ref('');
+  const cachedSelectedRolle: Ref<TranslatedRolleWithAttrs | undefined> = ref();
   const cachedSelectedKopersNr: Ref<string> = ref('');
 
   const showUnsavedChangesDialog: Ref<boolean> = ref(false);
@@ -541,7 +539,7 @@
   const organisationen: ComputedRef<TranslatedObject[] | undefined> = useOrganisationen();
 
   type ZuordnungCreationForm = {
-    selectedRolle: string;
+    selectedRolle: TranslatedRolleWithAttrs;
     selectedOrganisation: string;
     selectedKlasse: string;
     selectedBefristung: Date;
@@ -815,7 +813,9 @@
     pendingCreation.value = false;
     isZuordnungFormActive.value = true;
     formContext.setFieldValue('selectedOrganisation', cachedSelectedOrganisation.value);
-    formContext.setFieldValue('selectedRolle', cachedSelectedRolle.value);
+    if (cachedSelectedRolle.value) {
+      formContext.setFieldValue('selectedRolle', cachedSelectedRolle.value);
+    }
     formContext.setFieldValue('selectedKopersNr', cachedSelectedKopersNr.value);
 
     // Rollback the zuordnungen to be added
@@ -993,9 +993,7 @@
 
   // Computed property to get the title of the selected rolle
   const selectedRolleTitle: ComputedRef<string | undefined> = computed(() => {
-    return rolleStore.rollenForPersonenkontextCreation?.find(
-      (rolle: TranslatedObject) => rolle.value === selectedRolle.value,
-    )?.title;
+    return selectedRolle.value?.title;
   });
 
   // Computed property to get the title of the selected klasse
@@ -1046,7 +1044,7 @@
 
   const onSubmitCreateZuordnung: (e?: Event) => Promise<void | undefined> = formContext.handleSubmit(() => {
     if (selectedRolle.value) {
-      if (isLernRolle(selectedRolle.value, rolleStore.rollenForPersonenkontextCreation)) {
+      if (selectedRolle.value.rollenart === RollenArt.Lern) {
         createZuordnungConfirmationDialogMessage.value = t('person.addZuordnungKlasseConfirmation', {
           rollenname: selectedRolleTitle.value,
           klassenname: selectedKlasseTitle.value,
@@ -1095,15 +1093,11 @@
     if (organisation) {
       newZuordnung.value = new Zuordnung(
         organisation.id,
-        selectedRolle.value ?? '',
+        selectedRolle.value?.value ?? '',
         organisation.name,
         organisation.kennung ?? '',
-        rolleStore.rollenForPersonenkontextCreation?.find(
-          (rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolle.value,
-        )?.title || '',
-        rolleStore.rollenForPersonenkontextCreation?.find(
-          (rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolle.value,
-        )?.rollenart as RollenArt,
+        selectedRolle.value?.title || '',
+        selectedRolle.value?.rollenart as RollenArt,
         organisation.administriertVon ?? '',
         OrganisationsTyp.Schule,
         true,
@@ -1123,15 +1117,11 @@
         zuordnungenToBePersisted.value.push(
           new Zuordnung(
             klasse.id,
-            selectedRolle.value ?? '',
+            selectedRolle.value?.value ?? '',
             klasse.name,
             klasse.kennung ?? '',
-            rolleStore.rollenForPersonenkontextCreation?.find(
-              (rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolle.value,
-            )?.title || '',
-            rolleStore.rollenForPersonenkontextCreation?.find(
-              (rolle: TranslatedRolleWithAttrs) => rolle.value === selectedRolle.value,
-            )?.rollenart as RollenArt,
+            selectedRolle.value?.title || '',
+            selectedRolle.value?.rollenart as RollenArt,
             klasse.administriertVon ?? '',
             OrganisationsTyp.Klasse,
             true,
@@ -2343,7 +2333,9 @@
                 />
                 <KopersInput
                   v-if="
-                    !hasKopersNummer && isKopersRolle([selectedRolle as string], filteredRollen) && selectedOrganisation
+                    !hasKopersNummer &&
+                    selectedRolle?.merkmale?.includes(RollenMerkmal.KopersPflicht) &&
+                    selectedOrganisation
                   "
                   v-model:selected-kopers-nr="selectedKopersNr"
                   :has-no-kopers-nr="hasNoKopersNr"

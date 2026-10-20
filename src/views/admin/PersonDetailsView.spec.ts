@@ -792,7 +792,7 @@ describe('PersonDetailsView', () => {
     const rolleAutocomplete: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'rolle-select' });
-    await rolleAutocomplete?.setValue('1');
+    await rolleAutocomplete?.setValue(DoFactory.getTranslatedRolleWithAttrs({ value: '1', rollenart: RollenArt.Lern }));
     rolleAutocomplete?.vm.$emit('update:search', '1');
     await nextTick();
     // Set klasse value
@@ -908,7 +908,7 @@ describe('PersonDetailsView', () => {
     const rolleAutocomplete: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'rolle-select' });
-    await rolleAutocomplete?.setValue('1');
+    await rolleAutocomplete?.setValue(DoFactory.getTranslatedRolleWithAttrs({ value: '1', rollenart: RollenArt.Lern }));
     rolleAutocomplete?.vm.$emit('update:search', '1');
     await nextTick();
     // Set klasse value

@@ -114,7 +114,14 @@ describe('RolleModify', () => {
     const rolleAutocomplete: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'rolle-select' });
-    await rolleAutocomplete?.setValue(rolle.id);
+    await rolleAutocomplete?.setValue(
+      DoFactory.getTranslatedRolleWithAttrs({
+        value: rolle.id,
+        title: rolle.name,
+        rollenart: rolle.rollenart,
+        merkmale: rolle.merkmale,
+      }),
+    );
     rolleAutocomplete?.vm.$emit('update:search', rolle.id);
     await nextTick();
 
@@ -162,7 +169,7 @@ describe('RolleModify', () => {
     const rolleAutocomplete: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'rolle-select' });
-    await rolleAutocomplete?.setValue('54321');
+    await rolleAutocomplete?.setValue(DoFactory.getTranslatedRolleWithAttrs({ value: '54321' }));
     rolleAutocomplete?.vm.$emit('update:search', '54321');
     await nextTick();
 
@@ -226,7 +233,14 @@ describe('RolleModify', () => {
     const rolleAutocomplete: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'rolle-select' });
-    await rolleAutocomplete?.setValue(kopersRolle.id);
+    await rolleAutocomplete?.setValue(
+      DoFactory.getTranslatedRolleWithAttrs({
+        value: kopersRolle.id,
+        title: kopersRolle.name,
+        rollenart: kopersRolle.rollenart,
+        merkmale: kopersRolle.merkmale,
+      }),
+    );
     rolleAutocomplete?.vm.$emit('update:search', kopersRolle.id);
     await nextTick();
 
@@ -288,7 +302,14 @@ describe('RolleModify', () => {
     const rolleAutocomplete: VueWrapper | undefined = wrapper
       ?.findComponent({ ref: 'personenkontext-create' })
       .findComponent({ ref: 'rolle-select' });
-    await rolleAutocomplete?.setValue(rolleLern.id);
+    await rolleAutocomplete?.setValue(
+      DoFactory.getTranslatedRolleWithAttrs({
+        value: rolleLern.id,
+        title: rolleLern.name,
+        rollenart: rolleLern.rollenart,
+        merkmale: rolleLern.merkmale,
+      }),
+    );
     rolleAutocomplete?.vm.$emit('update:search', rolleLern.id);
     await nextTick();
 

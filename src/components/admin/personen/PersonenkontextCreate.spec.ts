@@ -7,7 +7,7 @@ import {
   type PersonenkontextStore,
 } from '@/stores/PersonenkontextStore';
 import { usePersonStore, type PersonStore } from '@/stores/PersonStore';
-import { useRolleStore, type RolleStore } from '@/stores/RolleStore';
+import { useRolleStore, type RolleStore, type TranslatedRolleWithAttrs } from '@/stores/RolleStore';
 import { PersonenUebersicht } from '@/stores/types/PersonenUebersicht';
 import { flushPromises, VueWrapper, mount, enableAutoUnmount } from '@vue/test-utils';
 import { DoFactory } from 'test/DoFactory';
@@ -79,7 +79,7 @@ const mountComponent = (
         onInput: () => vi.fn(),
       },
       selectedOrganisation: '',
-      selectedRolle: '',
+      selectedRolle: undefined,
       selectedKlasse: '',
       showHeadline: true,
       befristungInputProps: {
@@ -130,7 +130,9 @@ test('it retains the existing Landesbediensteter Rollenart filter after clearing
   getRollenForPersonenkontextCreationSpy.mockClear();
 
   const rollenAutocomplete: VueWrapper = wrapper.findComponent({ ref: 'rollen-select' });
-  await rollenAutocomplete.setValue(['54321']);
+  await rollenAutocomplete.setValue([
+    DoFactory.getTranslatedRolleWithAttrs({ value: '54321', rollenart: RollenArt.Lern }),
+  ]);
   await flushPromises();
 
   await rollenAutocomplete.get('.v-field__clearable .v-icon').trigger('click');
@@ -193,6 +195,72 @@ beforeEach(() => {
 });
 
 describe('PersonenkontextCreate', () => {
+  describe.each([true, false])('object selections with allowMultipleRollen=%s', (allowMultipleRollen: boolean) => {
+    test('should retain selected objects and their attributes when search results change', async () => {
+      const selected: TranslatedRolleWithAttrs = DoFactory.getTranslatedRolleWithAttrs({
+        rollenart: RollenArt.Lern,
+      });
+      const result: TranslatedRolleWithAttrs = DoFactory.getTranslatedRolleWithAttrs();
+      wrapper = mountComponent({
+        allowMultipleRollen,
+        selectedOrganisation: '1133',
+        rollen: [selected],
+      });
+      const autocomplete: VueWrapper = wrapper.findComponent({
+        ref: allowMultipleRollen ? 'rollen-select' : 'rolle-select',
+      });
+      expect(autocomplete.props('returnObject')).toBe(true);
+
+      await autocomplete.setValue(allowMultipleRollen ? [selected] : selected);
+      await flushPromises();
+      expect(wrapper.emitted(allowMultipleRollen ? 'update:selectedRollen' : 'update:selectedRolle')?.at(-1)).toEqual([
+        allowMultipleRollen ? [selected] : selected,
+      ]);
+      expect(personenkontextStore.processWorkflowStep).toHaveBeenLastCalledWith(
+        expect.objectContaining({ rollenIds: [selected.value] }),
+      );
+
+      await wrapper.setProps({ rollen: [result] });
+      await flushPromises();
+      expect(autocomplete.props('items')).toEqual([result, selected]);
+      expect(autocomplete.text()).toContain(selected.title);
+      expect(wrapper.findComponent({ name: 'KlassenFilter' }).exists()).toBe(true);
+      expect(rolleStore.getRollenForPersonenkontextCreation).toHaveBeenLastCalledWith(
+        expect.objectContaining({ rollenIds: [selected.value], rollenartForPerson: RollenArt.Lern }),
+      );
+
+      await wrapper.setProps({ rollen: [result, { ...selected }] });
+      expect(autocomplete.props('items')).toEqual([result, selected]);
+    });
+
+    test('should display initial objects missing from results and synchronize parent resets', async () => {
+      const selected: TranslatedRolleWithAttrs = DoFactory.getTranslatedRolleWithAttrs();
+      const replacement: TranslatedRolleWithAttrs = DoFactory.getTranslatedRolleWithAttrs();
+      wrapper = mountComponent({
+        allowMultipleRollen,
+        selectedOrganisation: '1133',
+        rollen: [],
+        ...(allowMultipleRollen ? { selectedRollen: [selected] } : { selectedRolle: selected }),
+      });
+      await flushPromises();
+      const autocomplete: VueWrapper = wrapper.findComponent({
+        ref: allowMultipleRollen ? 'rollen-select' : 'rolle-select',
+      });
+      expect(autocomplete.props('items')).toEqual([selected]);
+      expect(autocomplete.text()).toContain(selected.title);
+
+      await wrapper.setProps(allowMultipleRollen ? { selectedRollen: [replacement] } : { selectedRolle: replacement });
+      await flushPromises();
+      expect(autocomplete.props('items')).toEqual([replacement]);
+      expect(autocomplete.text()).toContain(replacement.title);
+
+      await wrapper.setProps(allowMultipleRollen ? { selectedRollen: undefined } : { selectedRolle: undefined });
+      await flushPromises();
+      expect(autocomplete.props('items')).toEqual([]);
+      expect(autocomplete.props('modelValue')).toBeNull();
+    });
+  });
+
   describe.each([[OperationContext.PERSON_ANLEGEN], [OperationContext.PERSON_BEARBEITEN]])(
     'when operationContext is %s',
     (operationContext: OperationContext) => {
@@ -207,7 +275,12 @@ describe('PersonenkontextCreate', () => {
           }
 
           rolleAutocomplete.vm.$emit('update:search', rolleId);
-          await rolleAutocomplete.setValue(allowMultipleRollen ? [rolleId] : rolleId);
+          const rolle: TranslatedRolleWithAttrs = DoFactory.getTranslatedRolleWithAttrs({
+            value: rolleId,
+            title: 'Lern',
+            rollenart: RollenArt.Lern,
+          });
+          await rolleAutocomplete.setValue(allowMultipleRollen ? [rolle] : rolle);
           return rolleAutocomplete;
         }
 
@@ -643,7 +716,11 @@ describe('PersonenkontextCreate', () => {
           const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({
             ref: allowMultipleRollen ? 'rollen-select' : 'rolle-select',
           });
-          await rolleAutocomplete?.setValue(allowMultipleRollen ? ['54321'] : '54321');
+          const rolle: TranslatedRolleWithAttrs = DoFactory.getTranslatedRolleWithAttrs({
+            value: '54321',
+            rollenart: RollenArt.Lern,
+          });
+          await rolleAutocomplete?.setValue(allowMultipleRollen ? [rolle] : rolle);
           await nextTick();
           await flushPromises();
 

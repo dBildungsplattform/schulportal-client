@@ -29,7 +29,6 @@
   import { type SelectedSchulen, type TranslatedObject } from '@/types.d';
   import { dedup } from '@/utils/arrays';
   import { blurActiveElement } from '@/utils/focus';
-  import { isLernRolle } from '@/utils/validationPersonenkontext';
   import type { BaseFieldProps } from 'vee-validate';
   import { computed, onMounted, onUnmounted, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n } from 'vue-i18n';
@@ -49,7 +48,7 @@
 
   const localKlassenOption: Ref<string | undefined> = ref(KlassenOption.KEEP_KLASSE);
 
-  type SelectedRollenIds = Array<string> | string | undefined;
+  type SelectedRollen = TranslatedRolleWithAttrs[] | TranslatedRolleWithAttrs | undefined;
 
   type Props = {
     organisationen: TranslatedObject[] | undefined;
@@ -60,8 +59,6 @@
     showHeadline: boolean;
     personId?: string;
     operationContext: OperationContext;
-    selectedRolle?: string | undefined;
-    selectedRollen?: string[] | undefined;
     selectedKlassenOption?: string | null;
     selectedKlasse?: Organisation | undefined;
     selectedKlasseForRadio?: Organisation | undefined;
@@ -93,8 +90,6 @@
     (e: 'update:calculatedBefristungOption', value: string | undefined): void;
     (event: 'update:selectedOrganisation', value: string | undefined): void;
     (event: 'update:organisationObject', value: Organisation | undefined): void;
-    (event: 'update:selectedRolle', value: string | undefined): void;
-    (event: 'update:selectedRollen', value: string[] | undefined): void;
     (event: 'update:selectedKlasse', value: Organisation | undefined): void;
     (event: 'update:selectedKlasseForRadio', value: Organisation | undefined): void;
     (event: 'update:selectedKlassenOption', value: string | null): void;
@@ -108,45 +103,46 @@
     selectedOrganisation,
     () => props.initialOrganisation ?? autoselectedSchule.value,
   );
-  const selectedRolle: Ref<string | undefined> = ref(props.selectedRolle);
-  const selectedRollen: Ref<string[] | undefined> = ref(props.selectedRollen || []);
+  const selectedRolle: Ref<TranslatedRolleWithAttrs | undefined> =
+    defineModel<TranslatedRolleWithAttrs>('selectedRolle');
+  const selectedRollen: Ref<TranslatedRolleWithAttrs[] | undefined> =
+    defineModel<TranslatedRolleWithAttrs[]>('selectedRollen');
   const selectedKlasse: Ref<Organisation | undefined> = ref(props.selectedKlasse);
   const selectedKlasseForRadio: Ref<Organisation | undefined> = ref(props.selectedKlasseForRadio);
   // we need to cast the selectedSchule into an array
   // doing it this way prevents an issue where the reactive system constantly re-runs which causes requests to be issued in a loop
   const administriertVon: Ref<string[] | undefined> = ref([]);
 
-  function findSelectedRolleWithAttrs(
-    rollen: TranslatedRolleWithAttrs[],
-    id: string | undefined,
-  ): TranslatedRolleWithAttrs | undefined {
-    return rollen.find((rolle: TranslatedRolleWithAttrs) => rolle.value === id);
-  }
-
-  function findSelectedRollenWithAttrs(
-    rollen: TranslatedRolleWithAttrs[],
-    ids: string[] | undefined,
-  ): TranslatedRolleWithAttrs[] {
-    return rollen.filter((rolle: TranslatedRolleWithAttrs) => ids?.includes(rolle.value)) ?? [];
-  }
+  const rollenItems: ComputedRef<TranslatedRolleWithAttrs[]> = computed(() =>
+    dedup(
+      [
+        ...props.rollen,
+        ...(props.allowMultipleRollen
+          ? (selectedRollen.value ?? [])
+          : selectedRolle.value
+            ? [selectedRolle.value]
+            : []),
+      ],
+      (rolle: TranslatedRolleWithAttrs) => rolle.value,
+    ),
+  );
+  const selectedRollenIds: ComputedRef<string[]> = computed(() =>
+    (selectedRollen.value ?? []).map((rolle: TranslatedRolleWithAttrs) => rolle.value),
+  );
 
   const isRolleSearchStringEqualToSelection: ComputedRef<boolean> = computed(() => {
     if (props.allowMultipleRollen) {
-      return (
-        findSelectedRollenWithAttrs(props.rollen, selectedRollen.value).some(
-          (rolle: TranslatedObject) => rolle.title === searchInputRollen.value,
-        ) ?? false
-      );
+      return selectedRollen.value?.some((rolle: TranslatedObject) => rolle.title === searchInputRollen.value) ?? false;
     } else {
-      return findSelectedRolleWithAttrs(props.rollen, selectedRolle.value)?.title === searchInputRolle.value;
+      return selectedRolle.value?.title === searchInputRolle.value;
     }
   });
 
   const selectedRollenart: ComputedRef<RollenArt | undefined> = computed(() => {
     if (props.allowMultipleRollen) {
-      return findSelectedRollenWithAttrs(props.rollen, selectedRollen.value)[0]?.rollenart;
+      return selectedRollen.value?.[0]?.rollenart;
     } else {
-      return findSelectedRolleWithAttrs(props.rollen, selectedRolle.value)?.rollenart;
+      return selectedRolle.value?.rollenart;
     }
   });
 
@@ -165,13 +161,13 @@
     }
 
     if (props.allowMultipleRollen) {
-      filter.rollenIds = selectedRollen.value;
+      filter.rollenIds = selectedRollenIds.value;
       if (searchInputRollen.value && !isRolleSearchStringEqualToSelection.value) {
         filter.rolleName = searchInputRollen.value;
       }
     } else {
       if (selectedRolle.value) {
-        filter.rollenIds = [selectedRolle.value];
+        filter.rollenIds = [selectedRolle.value.value];
       }
       if (searchInputRolle.value && !isRolleSearchStringEqualToSelection.value) {
         filter.rolleName = searchInputRolle.value;
@@ -193,15 +189,15 @@
     },
   );
 
-  function hasSelectedLernRolle(selectedRolleIds: SelectedRollenIds): boolean {
-    if (!selectedRolleIds) {
+  function hasSelectedLernRolle(selection: SelectedRollen): boolean {
+    if (!selection) {
       return false;
     }
 
-    if (Array.isArray(selectedRolleIds)) {
-      return selectedRolleIds.some((id: string) => isLernRolle(id, props.rollen));
+    if (Array.isArray(selection)) {
+      return selection.some((rolle: TranslatedRolleWithAttrs) => rolle.rollenart === RollenArt.Lern);
     } else {
-      return isLernRolle(selectedRolleIds, props.rollen);
+      return selection.rollenart === RollenArt.Lern;
     }
   }
 
@@ -321,7 +317,7 @@
 
   watch(
     () => (props.allowMultipleRollen ? selectedRollen.value : selectedRolle.value),
-    async (newValue: SelectedRollenIds, oldValue: SelectedRollenIds) => {
+    async (newValue: SelectedRollen, oldValue: SelectedRollen) => {
       const filter: WorkflowFilter = {
         personId: props.personId,
         organisationId: selectedOrganisation.value,
@@ -329,10 +325,10 @@
       };
 
       if (props.allowMultipleRollen) {
-        const newRollen: string[] | undefined = newValue as string[] | undefined;
+        const newRollen: TranslatedRolleWithAttrs[] | undefined = Array.isArray(newValue) ? newValue : undefined;
 
         if (newRollen && newRollen.length > 0) {
-          filter.rollenIds = newRollen;
+          filter.rollenIds = newRollen.map((rolle: TranslatedRolleWithAttrs) => rolle.value);
         } else {
           selectedKlasse.value = undefined;
           emits('fieldReset', 'selectedKlasse');
@@ -340,13 +336,11 @@
           canCommit.value = false;
         }
         await handleWorkflowStep(filter);
-
-        emits('update:selectedRollen', newRollen);
       } else {
-        const newRolle: string | undefined = newValue as string | undefined;
+        const newRolle: TranslatedRolleWithAttrs | undefined = Array.isArray(newValue) ? undefined : newValue;
 
         if (newRolle && newRolle !== oldValue) {
-          filter.rollenIds = [newRolle];
+          filter.rollenIds = [newRolle.value];
           await handleWorkflowStep(filter);
         }
 
@@ -355,7 +349,6 @@
           selectedKlasse.value = undefined;
           emits('fieldReset', 'selectedKlasse');
         }
-        emits('update:selectedRolle', newRolle);
         blurActiveElement();
       }
     },
@@ -462,7 +455,7 @@
         ref="schulenFilter"
         parentId="personenkontext-create"
         :selectedSchulen="selectedOrganisationObject ?? undefined"
-        :selectedRollen="selectedRollen ? selectedRollen : []"
+        :selectedRollen="selectedRollenIds"
         :multiple="false"
         :systemrechteForSearch="[requestedWithSystemrecht].filter((v): v is RollenSystemRecht => v !== undefined)"
         :selectedSchuleProps="selectedOrganisationProps"
@@ -506,7 +499,8 @@
           clearable
           data-testid="rollen-select"
           density="compact"
-          :items="rollen"
+          :items="rollenItems"
+          return-object
           item-value="value"
           item-text="title"
           :multiple="allowMultipleRollen"
@@ -528,7 +522,8 @@
           clearable
           data-testid="rolle-select"
           density="compact"
-          :items="rollen"
+          :items="rollenItems"
+          return-object
           item-value="value"
           item-text="title"
           :no-data-text="$t('noDataFound')"
