@@ -1,3 +1,4 @@
+import { AvailableServicesEnum } from '@/types.d';
 import { flushPromises, mount, type VueWrapper } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { type Component } from 'vue';
@@ -24,7 +25,6 @@ async function mountServiceNotAvailableView(serviceName: string): Promise<void> 
 
   await router.push(`/service-not-available/${serviceName}`);
   await router.isReady();
-  document.body.innerHTML = '<div><div id="app"></div></div>';
 
   wrapper = mount(ServiceNotAvailableView, {
     attachTo: document.getElementById('app') || '',
@@ -49,7 +49,7 @@ afterEach(() => {
 
 describe('ServiceNotAvailableView', () => {
   test('shows the 2FA connection failure message', async () => {
-    await mountServiceNotAvailableView('2FA');
+    await mountServiceNotAvailableView(AvailableServicesEnum.TWO_FACTOR_AUTHENTICATION);
 
     expect(wrapper?.find('[data-testid="spsh-alert-title"]').text()).toBe(
       'admin.person.twoFactorAuthentication.header',
@@ -57,7 +57,9 @@ describe('ServiceNotAvailableView', () => {
     expect(wrapper?.find('[data-testid="spsh-alert-text"]').text()).toBe(
       'admin.person.twoFactorAuthentication.errors.connectionFailure',
     );
-    expect(router.currentRoute.value.path).toBe('/service-not-available/2FA');
+    expect(router.currentRoute.value.path).toBe(
+      `/service-not-available/${AvailableServicesEnum.TWO_FACTOR_AUTHENTICATION}`,
+    );
   });
 
   test('redirects to not found for an unsupported service', async () => {
