@@ -353,6 +353,17 @@ const routes: readonly RouteRecordRaw[] = [
     },
   },
   {
+    path: '/admin/behoerden/:id',
+    name: 'behoerde-details',
+    component: () => import('../views/admin/organisationen/BehoerdeDetailsView.vue'),
+    meta: {
+      layout: 'AdminLayout',
+      requiresAuth: true,
+      requiredStepUpLevel: StepUpLevel.GOLD,
+      requiresPermission: 'behoerdenverwaltung',
+    } satisfies AppRouteMeta,
+  },
+  {
     path: '/admin/hinweise/new',
     name: 'hinweise-creation',
     component: () => import('../views/admin/HinweiseCreationView.vue'),

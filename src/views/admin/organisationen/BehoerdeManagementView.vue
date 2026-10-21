@@ -4,10 +4,17 @@
   import ResultTable, { type Headers } from '@/components/admin/ResultTable.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
-  import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
+  import {
+    OrganisationsTyp,
+    useOrganisationStore,
+    type Organisation,
+    type OrganisationStore,
+  } from '@/stores/OrganisationStore';
+  import { useRouter, type Router } from 'vue-router';
   import { OrganisationSortField, SortOrder } from '@/utils/sorting';
 
   const organisationStore: OrganisationStore = useOrganisationStore();
+  const router: Router = useRouter();
   const { t }: Composer = useI18n({ useScope: 'global' });
   const currentPage: Ref<number> = ref(1);
   const itemsPerPage: Ref<number> = ref(30);
@@ -28,6 +35,10 @@
   function updatePage(page: number): void {
     currentPage.value = page;
     fetchBehoerden();
+  }
+
+  function navigateToBehoerdeDetails(_event: PointerEvent, { item }: { item: Organisation }): void {
+    router.push({ name: 'behoerde-details', params: { id: item.id } });
   }
 
   function updateItemsPerPage(limit: number): void {
@@ -78,7 +89,7 @@
         :loading="organisationStore.loading"
         :total-items="organisationStore.totalOrganisationen"
         hide-select
-        disable-row-click
+        @on-handle-row-click="navigateToBehoerdeDetails"
         @on-page-update="updatePage"
         @on-items-per-page-update="updateItemsPerPage"
       />
