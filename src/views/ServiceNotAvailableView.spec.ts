@@ -1,6 +1,6 @@
 import { ServiceIdentifier } from '@/router/service-identifier.enum';
 import { flushPromises, mount, type VueWrapper } from '@vue/test-utils';
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi, type Mock } from 'vitest';
 import { type Component } from 'vue';
 import { createMemoryHistory, createRouter, type Router } from 'vue-router';
 import ServiceNotAvailableView from './ServiceNotAvailableView.vue';
@@ -75,8 +75,18 @@ describe('ServiceNotAvailableView', () => {
     vi.stubGlobal('location', locationMock);
 
     await mountServiceNotAvailableView(ServiceIdentifier.TWO_FACTOR_AUTHENTICATION);
-    await wrapper?.find('[data-testid="spsh-alert-button"]').trigger('click');
+    await wrapper?.find('[data-testid="to-start-button"]').trigger('click');
 
     expect(locationMock.href).toBe('/start');
+  });
+
+  test('opens the status page in a new tab when its button is clicked', async () => {
+    const openMock: Mock = vi.fn();
+    vi.stubGlobal('open', openMock);
+
+    await mountServiceNotAvailableView(ServiceIdentifier.TWO_FACTOR_AUTHENTICATION);
+    await wrapper?.find('[data-testid="to-status-button"]').trigger('click');
+
+    expect(openMock).toHaveBeenCalledExactlyOnceWith('/api/status', '_blank', 'noopener,noreferrer');
   });
 });

@@ -18,19 +18,39 @@
   function goToStart(): void {
     window.location.href = '/start';
   }
+  function goToStatus(): void {
+    window.open('/api/status', '_blank', 'noopener,noreferrer');
+  }
 </script>
 
 <template>
   <SpshAlert
-    :button-action="goToStart"
-    :button-text="$t('nav.backToStart')"
     :closable="false"
     :model-value="true"
-    :show-button="true"
     :text="$t(messageObject.text)"
     :title="$t(messageObject.title)"
     type="error"
   >
+    <template #button>
+      <v-col cols="auto">
+        <v-btn
+          class="secondary"
+          data-testid="to-start-button"
+          @click="goToStart"
+        >
+          {{ $t('nav.backToStart') }}
+        </v-btn>
+      </v-col>
+      <v-col cols="auto">
+        <v-btn
+          class="secondary"
+          data-testid="to-status-button"
+          @click="goToStatus"
+        >
+          {{ $t('nav.statusPage') }}
+        </v-btn>
+      </v-col>
+    </template>
   </SpshAlert>
 </template>
 
