@@ -21,13 +21,6 @@
 </script>
 
 <template>
-  <img
-    style="margin: 0 auto; display: block"
-    alt="Logo Schulportal"
-    src="@/assets/logos/Schulportal_SH_Wort_Bildmarke_RGB_Anwendung_HG_Weiss.svg"
-    width="354"
-    height="60"
-  />
   <SpshAlert
     :button-action="goToStart"
     :button-text="$t('nav.backToStart')"
