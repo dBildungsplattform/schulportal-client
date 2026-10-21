@@ -37,9 +37,7 @@
       />
     </template>
     <template #actions>
-      <SuccessTemplateSecondaryButton
-        @click="navigateBack"
-      >
+      <SuccessTemplateSecondaryButton @click="navigateBack">
         {{ $t('nav.backToList') }}
       </SuccessTemplateSecondaryButton>
       <SuccessTemplatePrimaryButton @click="createAnother">

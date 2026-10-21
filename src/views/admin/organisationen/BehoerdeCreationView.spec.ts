@@ -111,7 +111,11 @@ afterEach(() => {
 
 describe('BehoerdeCreationView', () => {
   test('should navigate to the Behoerden list after creation', async (): Promise<void> => {
-    const { wrapper, router, organisationStore }: {
+    const {
+      wrapper,
+      router,
+      organisationStore,
+    }: {
       wrapper: VueWrapper<ComponentInstance<typeof BehoerdeCreationView>>;
       router: Router;
       organisationStore: OrganisationStore;
