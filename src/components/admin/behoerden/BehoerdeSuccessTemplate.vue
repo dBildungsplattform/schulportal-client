@@ -1,5 +1,4 @@
 <script setup lang="ts">
-  import LabeledField from '@/components/admin/LabeledField.vue';
   import SuccessTemplatePrimaryButton from '@/components/layout/success/button/SuccessTemplatePrimaryButton.vue';
   import SuccessTemplateSecondaryButton from '@/components/layout/success/button/SuccessTemplateSecondaryButton.vue';
   import SuccessTemplate from '@/components/layout/success/SuccessTemplate.vue';
@@ -28,13 +27,23 @@
       {{ $t('admin.followingDataCreated') }}
     </template>
     <template #default>
-      <LabeledField
+      <v-row
         v-for="item in changedData"
         :key="item.testId"
-        :label="item.label"
-        :value="item.value"
-        :test-id="item.testId"
-      />
+      >
+        <v-col
+          class="text-body bold text-right"
+          :data-testid="`${item.testId}-label`"
+        >
+          {{ item.label }}:
+        </v-col>
+        <v-col
+          class="text-body"
+          :data-testid="item.testId"
+        >
+          {{ item.value }}
+        </v-col>
+      </v-row>
     </template>
     <template #actions>
       <SuccessTemplateSecondaryButton @click="navigateBack">
