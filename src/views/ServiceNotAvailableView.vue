@@ -34,7 +34,7 @@
     <template #button>
       <v-col cols="auto">
         <v-btn
-          class="secondary"
+          class="primary"
           data-testid="to-start-button"
           @click="goToStart"
         >
@@ -53,5 +53,3 @@
     </template>
   </SpshAlert>
 </template>
-
-<style scoped></style>
