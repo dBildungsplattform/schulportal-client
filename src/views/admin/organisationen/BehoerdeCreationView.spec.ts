@@ -267,7 +267,7 @@ describe('BehoerdeCreationView', () => {
     expect(wrapper.getComponent({ name: 'FormRow' })).toBeTruthy();
   });
 
-  test('it navigates to start when the close button is clicked', async () => {
+  test('it navigates to the Behoerden table when the close button is clicked', async () => {
     const {
       wrapper,
       router,
@@ -278,8 +278,10 @@ describe('BehoerdeCreationView', () => {
 
     const push: MockInstance = vi.spyOn(router, 'push');
     await wrapper.find('[data-testid="close-layout-card-button"]').trigger('click');
+    await flushPromises();
 
     expect(push).toHaveBeenCalledTimes(1);
+    expect(push).toHaveBeenCalledWith({ name: 'behoerde-management' });
   });
 
   test('it fills form and triggers submit', async () => {

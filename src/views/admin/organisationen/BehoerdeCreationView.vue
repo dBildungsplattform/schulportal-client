@@ -176,7 +176,7 @@
       headlineTestId="behoerde-creation-headline"
       :padded="true"
       :show-close-text="true"
-      @on-close-clicked="navigateToStart"
+      @on-close-clicked="handleNavigateBackToBehoerdeList"
     >
       <template v-if="!organisationStore.createdBehoerde">
         <SpshAlert
