@@ -29,10 +29,14 @@ describe('BehoerdeDetailsView', (): void => {
     organisationStore.$reset();
     parent = DoFactory.getOrganisation({ typ: OrganisationsTyp.Land });
     behoerde = DoFactory.getOrganisation({ typ: OrganisationsTyp.Behoerde, administriertVon: parent.id });
-    organisationStore.currentOrganisation = behoerde;
-    organisationStore.parentOrganisationen = [DoFactory.getOrganisation({ typ: OrganisationsTyp.Root }), parent];
-    organisationStore.getOrganisationById = vi.fn().mockResolvedValue(undefined);
-    organisationStore.getParentOrganisationsByIds = vi.fn().mockResolvedValue(undefined);
+    organisationStore.getOrganisationById = vi.fn((): Promise<void> => {
+      organisationStore.currentOrganisation = behoerde;
+      return Promise.resolve();
+    });
+    organisationStore.getParentOrganisationsByIds = vi.fn((): Promise<void> => {
+      organisationStore.parentOrganisationen = [DoFactory.getOrganisation({ typ: OrganisationsTyp.Root }), parent];
+      return Promise.resolve();
+    });
     router = createRouter({ history: createMemoryHistory(), routes });
     await router.push({ name: 'behoerde-details', params: { id: behoerde.id } });
     await router.isReady();
@@ -60,7 +64,7 @@ describe('BehoerdeDetailsView', (): void => {
   it.each([OrganisationsTyp.Schule, OrganisationsTyp.Traeger, OrganisationsTyp.Land])(
     'should reject an organisation of type %s',
     async (typ: OrganisationsTyp): Promise<void> => {
-      organisationStore.currentOrganisation = DoFactory.getOrganisation({ typ });
+      behoerde = DoFactory.getOrganisation({ typ });
 
       await mountView();
       await vi.dynamicImportSettled();
@@ -83,7 +87,10 @@ describe('BehoerdeDetailsView', (): void => {
   it('should display the Land ancestor rather than the direct parent', async (): Promise<void> => {
     const directParent: Organisation = DoFactory.getOrganisation({ typ: OrganisationsTyp.Behoerde });
     behoerde.administriertVon = directParent.id;
-    organisationStore.parentOrganisationen = [directParent, parent];
+    organisationStore.getParentOrganisationsByIds = vi.fn((): Promise<void> => {
+      organisationStore.parentOrganisationen = [directParent, parent];
+      return Promise.resolve();
+    });
     await mountView();
     expect(wrapper.get('[data-testid="behoerde-zustaendigkeitsbereich"]').text()).toBe(parent.name);
   });
@@ -100,12 +107,16 @@ describe('BehoerdeDetailsView', (): void => {
       } else {
         organisationStore.getParentOrganisationsByIds = vi.fn(failRequest);
       }
+      organisationStore.currentOrganisation = DoFactory.getOrganisation({ typ: OrganisationsTyp.Behoerde });
+      organisationStore.parentOrganisationen = [DoFactory.getOrganisation({ typ: OrganisationsTyp.Land })];
       await mountView();
       expect(wrapper.find('[data-testid="behoerde-details-error"]').exists()).toBe(true);
       expect(wrapper.find('[data-testid="behoerde-details-container"]').exists()).toBe(false);
       if (request === 'organisation') {
         expect(organisationStore.getParentOrganisationsByIds).not.toHaveBeenCalled();
+        expect(organisationStore.currentOrganisation).toBeNull();
       }
+      expect(organisationStore.parentOrganisationen).toEqual([]);
     },
   );
 

@@ -27,6 +27,7 @@
   }
 
   onMounted(async (): Promise<void> => {
+    organisationStore.$patch({ currentOrganisation: null, parentOrganisationen: [] });
     await organisationStore.getOrganisationById(route.params['id'] as string);
     if (!organisationStore.errorCode) {
       if (organisationStore.currentOrganisation?.typ !== OrganisationsTyp.Behoerde) {
