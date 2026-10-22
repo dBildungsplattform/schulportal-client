@@ -228,9 +228,9 @@ describe('PersonenkontextCreate', () => {
       expect(rolleStore.getRollenForPersonenkontextCreation).toHaveBeenLastCalledWith(
         expect.objectContaining({ rollenartForPerson: RollenArt.Lern }),
       );
-      expect(
-        vi.mocked(rolleStore.getRollenForPersonenkontextCreation).mock.calls.at(-1)?.[0],
-      ).not.toHaveProperty('rollenIds');
+      expect(vi.mocked(rolleStore.getRollenForPersonenkontextCreation).mock.calls.at(-1)?.[0]).not.toHaveProperty(
+        'rollenIds',
+      );
 
       await wrapper.setProps({ rollen: [result, { ...selected }] });
       expect(autocomplete.props('items')).toEqual([result, selected]);
@@ -733,9 +733,9 @@ describe('PersonenkontextCreate', () => {
               rollenartForPerson: RollenArt.Lern,
             }),
           );
-          expect(
-            vi.mocked(rolleStore.getRollenForPersonenkontextCreation).mock.calls.at(-1)?.[0],
-          ).not.toHaveProperty('rollenIds');
+          expect(vi.mocked(rolleStore.getRollenForPersonenkontextCreation).mock.calls.at(-1)?.[0]).not.toHaveProperty(
+            'rollenIds',
+          );
         });
       });
     },
