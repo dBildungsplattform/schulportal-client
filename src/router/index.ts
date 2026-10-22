@@ -1,8 +1,8 @@
-import type { FeatureFlagResponse } from '@/api-client/generated/api';
+import { PrivacyIdeaErrorEnum, type FeatureFlagResponse } from '@/api-client/generated/api';
 import { StepUpLevel, useAuthStore, type AuthStore } from '@/stores/AuthStore';
-import { RollenSystemRecht } from '@/stores/RolleStore';
 import { useConfigStore, type ConfigStore } from '@/stores/ConfigStore';
 import { useMasterDataStore, type MasterDataStore } from '@/stores/MasterDataStore';
+import { RollenSystemRecht } from '@/stores/RolleStore';
 import {
   useTwoFactorAuthentificationStore,
   type TwoFactorAuthentificationStore,
@@ -15,6 +15,7 @@ import {
   type RouteRecordRaw,
 } from 'vue-router';
 import routes from './routes';
+import { ServiceIdentifier } from './service-identifier.enum';
 
 type Permission =
   | 'klassenverwaltung'
@@ -122,6 +123,11 @@ router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormal
     }
     const twoFactorAuthentificationStore: TwoFactorAuthentificationStore = useTwoFactorAuthentificationStore();
     await twoFactorAuthentificationStore.get2FAState(personId);
+    if (twoFactorAuthentificationStore.errorCode === PrivacyIdeaErrorEnum.PiUnavailableError) {
+      router.push(`/service-not-available/${ServiceIdentifier.TWO_FACTOR_AUTHENTICATION}`);
+      return false;
+    }
+
     if (!twoFactorAuthentificationStore.hasToken) {
       router.push(`/no-second-factor`);
       return false;
