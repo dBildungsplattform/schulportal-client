@@ -1040,6 +1040,27 @@ export type DbiamPersonenkontexteUpdateErrorI18nKeyEnum = typeof DbiamPersonenko
 /**
  * 
  * @export
+ * @interface DbiamPrivacyIdeaAdministrationError
+ */
+export interface DbiamPrivacyIdeaAdministrationError {
+    /**
+     * 
+     * @type {PrivacyIdeaErrorEnum}
+     * @memberof DbiamPrivacyIdeaAdministrationError
+     */
+    'i18nKey': PrivacyIdeaErrorEnum;
+    /**
+     * Corresponds to HTTP Status code like 200, 404, 500
+     * @type {number}
+     * @memberof DbiamPrivacyIdeaAdministrationError
+     */
+    'code': number;
+}
+
+
+/**
+ * 
+ * @export
  * @interface DbiamRolleError
  */
 export interface DbiamRolleError {
@@ -3269,6 +3290,31 @@ export interface PersonenuebersichtBodyParams {
      */
     'personIds': Array<string>;
 }
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export const PrivacyIdeaErrorEnum = {
+    PrivacyIdeaAdministrationError: 'PRIVACY_IDEA_ADMINISTRATION_ERROR',
+    SeriennummerNichtGefunden: 'SERIENNUMMER_NICHT_GEFUNDEN',
+    SeriennummerInVerwendung: 'SERIENNUMMER_IN_VERWENDUNG',
+    OtpNichtGueltig: 'OTP_NICHT_GUELTIG',
+    HardwareTokenServiceFehler: 'HARDWARE_TOKEN_SERVICE_FEHLER',
+    TokenResetError: 'TOKEN_RESET_ERROR',
+    TwoAuthStateError: 'TWO_AUTH_STATE_ERROR',
+    SoftwareTokenVerificationError: 'SOFTWARE_TOKEN_VERIFICATION_ERROR',
+    UsernameExistsError: 'USERNAME_EXISTS_ERROR',
+    DeleteUserError: 'DELETE_USER_ERROR',
+    SoftwareTokenInitializationError: 'SOFTWARE_TOKEN_INITIALIZATION_ERROR',
+    TokenStateError: 'TOKEN_STATE_ERROR',
+    PiUnavailableError: 'PI_UNAVAILABLE_ERROR'
+} as const;
+
+export type PrivacyIdeaErrorEnum = typeof PrivacyIdeaErrorEnum[keyof typeof PrivacyIdeaErrorEnum];
+
+
 /**
  * 
  * @export
