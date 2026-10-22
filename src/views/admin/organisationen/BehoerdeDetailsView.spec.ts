@@ -3,6 +3,9 @@ import type { ComponentInstance } from 'vue';
 import { createMemoryHistory, createRouter, RouterView, type Router } from 'vue-router';
 import { DoFactory } from 'test/DoFactory';
 import routes from '@/router/routes';
+import applicationRouter from '@/router';
+import { StepUpLevel, useAuthStore, type AuthStore } from '@/stores/AuthStore';
+import { useMasterDataStore, type MasterDataStore } from '@/stores/MasterDataStore';
 import {
   OrganisationsTyp,
   useOrganisationStore,
@@ -53,6 +56,21 @@ describe('BehoerdeDetailsView', (): void => {
     expect(wrapper.text()).not.toContain('Dienststellennummer');
     expect(wrapper.find('input').exists()).toBe(false);
   });
+
+  it.each([OrganisationsTyp.Schule, OrganisationsTyp.Traeger, OrganisationsTyp.Land])(
+    'should reject an organisation of type %s',
+    async (typ: OrganisationsTyp): Promise<void> => {
+      organisationStore.currentOrganisation = DoFactory.getOrganisation({ typ });
+
+      await mountView();
+      await vi.dynamicImportSettled();
+      await flushPromises();
+
+      expect(router.currentRoute.value.name).toBe('not-found');
+      expect(organisationStore.getParentOrganisationsByIds).not.toHaveBeenCalled();
+      expect(wrapper.find('[data-testid="behoerde-details-container"]').exists()).toBe(false);
+    },
+  );
 
   it('should close the overview and return to the list', async (): Promise<void> => {
     await mountView();
@@ -115,5 +133,45 @@ describe('BehoerdeDetailsView', (): void => {
       requiresAuth: true,
       requiresPermission: 'behoerdenverwaltung',
     });
+  });
+
+  describe('Behoerden route permissions', (): void => {
+    let authStore: AuthStore;
+    let masterDataStore: MasterDataStore;
+
+    beforeEach(async (): Promise<void> => {
+      authStore = useAuthStore();
+      authStore.$reset();
+      authStore.isAuthenticated = true;
+      authStore.acr = StepUpLevel.GOLD;
+      masterDataStore = useMasterDataStore();
+      masterDataStore.$reset();
+      vi.spyOn(masterDataStore, 'isInitialized').mockReturnValue(true);
+      await applicationRouter.push('/not-found');
+    });
+
+    afterEach((): void => {
+      vi.restoreAllMocks();
+      authStore.$reset();
+      masterDataStore.$reset();
+      sessionStorage.removeItem('previousUrl');
+    });
+
+    it.each([
+      ['behoerde-management', false],
+      ['behoerde-management', true],
+      ['behoerde-details', false],
+      ['behoerde-details', true],
+    ])(
+      'should enforce permission for %s when permission is %s',
+      async (name: string, hasPermission: boolean): Promise<void> => {
+        authStore.hasBehoerdenverwaltungPermission = hasPermission;
+
+        await applicationRouter.push(name === 'behoerde-details' ? { name, params: { id: behoerde.id } } : { name });
+        await flushPromises();
+
+        expect(applicationRouter.currentRoute.value.name).toBe(hasPermission ? name : 'not-found');
+      },
+    );
   });
 });

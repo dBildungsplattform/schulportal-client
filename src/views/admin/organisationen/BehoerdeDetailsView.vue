@@ -29,6 +29,10 @@
   onMounted(async (): Promise<void> => {
     await organisationStore.getOrganisationById(route.params['id'] as string);
     if (!organisationStore.errorCode) {
+      if (organisationStore.currentOrganisation?.typ !== OrganisationsTyp.Behoerde) {
+        await router.replace({ name: 'not-found' });
+        return;
+      }
       await organisationStore.getParentOrganisationsByIds([route.params['id'] as string]);
     }
     loading.value = false;

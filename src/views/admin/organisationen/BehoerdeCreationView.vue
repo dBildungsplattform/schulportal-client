@@ -102,9 +102,9 @@
     router.push({ name: 'behoerde-management' });
   }
 
-  async function navigateToStart(): Promise<void> {
+  async function discardBehoerde(): Promise<void> {
     organisationStore.createdBehoerde = null;
-    await router.push({ name: 'start' });
+    await router.push({ name: 'behoerde-management' });
   }
 
   async function loadZustaendigkeitsbereiche(): Promise<void> {
@@ -200,7 +200,7 @@
           :show-unsaved-changes-dialog="showUnsavedChangesDialog"
           @update:dirty="(value: boolean) => (isDirty = value)"
           @click:submit="onSubmit"
-          @click:discard="navigateToStart"
+          @click:discard="discardBehoerde"
           @click:confirmUnsaved="handleConfirmUnsavedChanges"
           @update:showUnsavedChangesDialog="(value: boolean) => (showUnsavedChangesDialog = value)"
         />
