@@ -1,6 +1,6 @@
 import { enableAutoUnmount, flushPromises, mount, type VueWrapper } from '@vue/test-utils';
 import type { ComponentInstance } from 'vue';
-import { createMemoryHistory, createRouter, type Router } from 'vue-router';
+import { createMemoryHistory, createRouter, RouterView, type Router } from 'vue-router';
 import { DoFactory } from 'test/DoFactory';
 import routes from '@/router/routes';
 import {
@@ -90,6 +90,25 @@ describe('BehoerdeDetailsView', (): void => {
       }
     },
   );
+
+  it('should clear loading errors when navigating to another administration view', async (): Promise<void> => {
+    const routedWrapper: VueWrapper = mount(RouterView, {
+      attachTo: document.getElementById('app') || '',
+      global: { plugins: [router] },
+    });
+    await vi.dynamicImportSettled();
+    await flushPromises();
+    organisationStore.errorCode = 'UNSPECIFIED_ERROR';
+    await flushPromises();
+    expect(routedWrapper.find('[data-testid="behoerde-details-error"]').exists()).toBe(true);
+
+    await router.push({ name: 'schultraeger-management' });
+    await vi.dynamicImportSettled();
+    await flushPromises();
+
+    expect(organisationStore.errorCode).toBe('');
+    expect(routedWrapper.findComponent({ name: 'ResultTable' }).exists()).toBe(true);
+  });
 
   it('should protect the overview with the Behoerden permission', (): void => {
     expect(router.currentRoute.value.meta).toMatchObject({

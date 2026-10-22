@@ -2,7 +2,7 @@ import { enableAutoUnmount, flushPromises, mount, type VueWrapper } from '@vue/t
 import { DoFactory } from 'test/DoFactory';
 import type { ComponentInstance } from 'vue';
 import { VDataTableServer } from 'vuetify/components';
-import { createRouter, createMemoryHistory, type Router } from 'vue-router';
+import { createRouter, createMemoryHistory, RouterView, type Router } from 'vue-router';
 import routes from '@/router/routes';
 import ResultTable from '@/components/admin/ResultTable.vue';
 import { OrganisationsTyp, useOrganisationStore, type OrganisationStore } from '@/stores/OrganisationStore';
@@ -86,6 +86,26 @@ describe('BehoerdeManagementView', (): void => {
       expect.objectContaining({ offset: 0, limit: 50 }),
     );
     expect(wrapper.getComponent(ResultTable).props('currentPage')).toBe(1);
+  });
+
+  it('should clear loading errors when navigating to another administration view', async (): Promise<void> => {
+    wrapper.unmount();
+    const routedWrapper: VueWrapper = mount(RouterView, {
+      attachTo: document.getElementById('app') || '',
+      global: { plugins: [router] },
+    });
+    await vi.dynamicImportSettled();
+    await flushPromises();
+    organisationStore.errorCode = 'UNSPECIFIED_ERROR';
+    await flushPromises();
+    expect(routedWrapper.find('[data-testid="behoerde-loading-error"]').exists()).toBe(true);
+
+    await router.push({ name: 'schultraeger-management' });
+    await vi.dynamicImportSettled();
+    await flushPromises();
+
+    expect(organisationStore.errorCode).toBe('');
+    expect(routedWrapper.findComponent(ResultTable).exists()).toBe(true);
   });
 
   it('should display loading failures and retry fetching the list', async (): Promise<void> => {

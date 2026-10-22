@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { computed, onMounted, ref, type ComputedRef, type Ref } from 'vue';
-  import { useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
+  import { onBeforeRouteLeave, useRoute, useRouter, type RouteLocationNormalizedLoaded, type Router } from 'vue-router';
   import LabeledField from '@/components/admin/LabeledField.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
   import LayoutCard from '@/components/cards/LayoutCard.vue';
@@ -32,6 +32,10 @@
       await organisationStore.getParentOrganisationsByIds([route.params['id'] as string]);
     }
     loading.value = false;
+  });
+
+  onBeforeRouteLeave((): void => {
+    organisationStore.errorCode = '';
   });
 </script>
 

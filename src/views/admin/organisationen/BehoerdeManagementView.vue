@@ -10,7 +10,7 @@
     type Organisation,
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
-  import { useRouter, type Router } from 'vue-router';
+  import { onBeforeRouteLeave, useRouter, type Router } from 'vue-router';
   import { OrganisationSortField, SortOrder } from '@/utils/sorting';
 
   const organisationStore: OrganisationStore = useOrganisationStore();
@@ -51,6 +51,10 @@
     organisationStore.allOrganisationen = [];
     organisationStore.totalOrganisationen = 0;
     fetchBehoerden();
+  });
+
+  onBeforeRouteLeave((): void => {
+    organisationStore.errorCode = '';
   });
 </script>
 
