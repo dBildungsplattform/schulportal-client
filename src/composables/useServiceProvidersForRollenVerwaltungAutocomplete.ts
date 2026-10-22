@@ -6,7 +6,8 @@ import {
 } from '@/stores/ServiceProviderStore';
 import { useSearchFilterStore, type SearchFilterStore } from '@/stores/SearchFilterStore';
 import { dedup } from '@/utils/arrays';
-import { computed, onScopeDispose, reactive, ref, toRef, watch, type ComputedRef, type Ref } from 'vue';
+import { computed, reactive, toRef, watch, type ComputedRef, type Ref } from 'vue';
+import { useDebouncedSearch } from './useDebouncedSearch';
 
 export type UseServiceProvidersForRollenVerwaltungAutocompleteReturn = {
   selectedServiceProviders: Ref<ServiceProviderIdNameResponse[]>;
@@ -25,20 +26,11 @@ export function useServiceProvidersForRollenVerwaltungAutocomplete(
     searchFilterStore,
     'selectedServiceProvidersForRollen',
   );
-  const searchInput: Ref<string> = ref('');
   const filter: ServiceProviderRollenVerwaltungFilter = reactive<ServiceProviderRollenVerwaltungFilter>({
     ...initialFilter,
   });
-  let timerId: ReturnType<typeof setTimeout> | undefined;
-
-  watch(searchInput, (value: string): void => {
-    if (timerId !== undefined) {
-      clearTimeout(timerId);
-    }
-
-    timerId = setTimeout((): void => {
-      filter.searchStr = value || undefined;
-    }, 500);
+  const searchInput: Ref<string> = useDebouncedSearch((value: string): void => {
+    filter.searchStr = value || undefined;
   });
 
   watch(
@@ -48,12 +40,6 @@ export function useServiceProvidersForRollenVerwaltungAutocomplete(
     },
     { deep: true },
   );
-
-  onScopeDispose((): void => {
-    if (timerId !== undefined) {
-      clearTimeout(timerId);
-    }
-  });
 
   const items: ComputedRef<ServiceProviderIdNameResponse[]> = computed((): ServiceProviderIdNameResponse[] => {
     return dedup(

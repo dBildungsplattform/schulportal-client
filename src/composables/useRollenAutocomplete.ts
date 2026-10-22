@@ -5,7 +5,8 @@ import {
   type RolleStore,
 } from '@/stores/RolleStore';
 import { dedup } from '@/utils/arrays';
-import { computed, onScopeDispose, reactive, ref, watch, type ComputedRef, type Ref } from 'vue';
+import { computed, reactive, ref, watch, type ComputedRef, type Ref } from 'vue';
+import { useDebouncedSearch } from './useDebouncedSearch';
 
 export type UseRollenAutocompleteReturn = {
   selectedRollen: Ref<RolleWithServiceProvidersResponse[]>;
@@ -18,18 +19,9 @@ export type UseRollenAutocompleteReturn = {
 export function useRollenAutocomplete(initialFilter: RolleFilter): UseRollenAutocompleteReturn {
   const rolleStore: RolleStore = useRolleStore();
   const selectedRollen: Ref<RolleWithServiceProvidersResponse[]> = ref<RolleWithServiceProvidersResponse[]>([]);
-  const searchInput: Ref<string> = ref('');
   const filter: RolleFilter = reactive<RolleFilter>({ ...initialFilter });
-  let timerId: ReturnType<typeof setTimeout> | undefined;
-
-  watch(searchInput, (value: string): void => {
-    if (timerId !== undefined) {
-      clearTimeout(timerId);
-    }
-
-    timerId = setTimeout((): void => {
-      filter.searchString = value;
-    }, 500);
+  const searchInput: Ref<string> = useDebouncedSearch((value: string): void => {
+    filter.searchString = value;
   });
 
   watch(
@@ -43,12 +35,6 @@ export function useRollenAutocomplete(initialFilter: RolleFilter): UseRollenAuto
   watch(selectedRollen, (value: RolleWithServiceProvidersResponse[]): void => {
     if (value.length === 0) {
       searchInput.value = '';
-    }
-  });
-
-  onScopeDispose((): void => {
-    if (timerId !== undefined) {
-      clearTimeout(timerId);
     }
   });
 

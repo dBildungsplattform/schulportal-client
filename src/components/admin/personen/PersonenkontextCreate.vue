@@ -4,6 +4,7 @@
   import SchulenFilter from '@/components/filter/SchulenFilter.vue';
   import FormRow from '@/components/form/FormRow.vue';
   import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
+  import { useDebouncedSearch } from '@/composables/useDebouncedSearch';
   import { useOrganisationSelection } from '@/composables/useOrganisationSelection';
   import { OrganisationsTyp, type Organisation } from '@/stores/OrganisationStore';
   import {
@@ -30,7 +31,7 @@
   import { dedup } from '@/utils/arrays';
   import { blurActiveElement } from '@/utils/focus';
   import type { BaseFieldProps } from 'vee-validate';
-  import { computed, onMounted, onUnmounted, ref, watch, type ComputedRef, type Ref } from 'vue';
+  import { computed, onMounted, ref, watch, type ComputedRef, type Ref } from 'vue';
   import { useI18n } from 'vue-i18n';
 
   useI18n({ useScope: 'global' });
@@ -39,12 +40,16 @@
   const personStore: PersonStore = usePersonStore();
   const rolleStore: RolleStore = useRolleStore();
 
-  const rollenSearchDebounceTimerId: Ref<ReturnType<typeof setTimeout> | undefined> =
-    ref<ReturnType<typeof setTimeout>>();
   const canCommit: Ref<boolean> = ref(false);
 
-  const searchInputRolle: Ref<string | undefined> = ref('');
-  const searchInputRollen: Ref<string | undefined> = ref('');
+  const debouncedSearchInputRolle: Ref<string> = ref('');
+  const debouncedSearchInputRollen: Ref<string> = ref('');
+  const searchInputRolle: Ref<string> = useDebouncedSearch((value: string): void => {
+    debouncedSearchInputRolle.value = value;
+  });
+  const searchInputRollen: Ref<string> = useDebouncedSearch((value: string): void => {
+    debouncedSearchInputRollen.value = value;
+  });
 
   const localKlassenOption: Ref<string | undefined> = ref(KlassenOption.KEEP_KLASSE);
 
@@ -130,14 +135,6 @@
     (selectedRollen.value ?? []).map((rolle: TranslatedRolleWithAttrs) => rolle.value),
   );
 
-  const isRolleSearchStringEqualToSelection: ComputedRef<boolean> = computed(() => {
-    if (props.allowMultipleRollen) {
-      return selectedRollen.value?.some((rolle: TranslatedObject) => rolle.title === searchInputRollen.value) ?? false;
-    } else {
-      return selectedRolle.value?.title === searchInputRolle.value;
-    }
-  });
-
   const selectedRollenart: ComputedRef<RollenArt | undefined> = computed(() => {
     if (props.allowMultipleRollen) {
       return selectedRollen.value?.[0]?.rollenart;
@@ -161,12 +158,16 @@
     }
 
     if (props.allowMultipleRollen) {
-      if (searchInputRollen.value && !isRolleSearchStringEqualToSelection.value) {
-        filter.rolleName = searchInputRollen.value;
+      const matchesSelection: boolean =
+        selectedRollen.value?.some((rolle: TranslatedObject) => rolle.title === debouncedSearchInputRollen.value) ??
+        false;
+      if (debouncedSearchInputRollen.value && !matchesSelection) {
+        filter.rolleName = debouncedSearchInputRollen.value;
       }
     } else {
-      if (searchInputRolle.value && !isRolleSearchStringEqualToSelection.value) {
-        filter.rolleName = searchInputRolle.value;
+      const matchesSelection: boolean = selectedRolle.value?.title === debouncedSearchInputRolle.value;
+      if (debouncedSearchInputRolle.value && !matchesSelection) {
+        filter.rolleName = debouncedSearchInputRolle.value;
       }
     }
 
@@ -353,31 +354,12 @@
 
   watch(
     rollenFilter,
-    async (
-      newFilter: RollenForPersonenkontextCreationQuery | undefined,
-      oldFilter: RollenForPersonenkontextCreationQuery | undefined,
-    ) => {
-      clearTimeout(rollenSearchDebounceTimerId.value);
+    async (newFilter: RollenForPersonenkontextCreationQuery | undefined) => {
       if (!newFilter) {
         return;
       }
 
-      // first load
-      if (!oldFilter) {
-        await rolleStore.getRollenForPersonenkontextCreation(newFilter);
-        return;
-      }
-
-      // search updated
-      if (newFilter.rolleName !== oldFilter.rolleName) {
-        // Debounce the search to avoid too many requests
-        rollenSearchDebounceTimerId.value = setTimeout(async () => {
-          await rolleStore.getRollenForPersonenkontextCreation(newFilter);
-        }, 500);
-      } else {
-        // selection changed
-        await rolleStore.getRollenForPersonenkontextCreation(newFilter);
-      }
+      await rolleStore.getRollenForPersonenkontextCreation(newFilter);
     },
     {
       immediate: true,
@@ -422,10 +404,6 @@
   onMounted(() => {
     emits('update:canCommit', personenkontextStore.workflowStepResponse?.canCommit ?? false);
     emits('update:selectedKlassenOption', localKlassenOption.value!);
-  });
-
-  onUnmounted(() => {
-    clearTimeout(rollenSearchDebounceTimerId.value);
   });
 </script>
 

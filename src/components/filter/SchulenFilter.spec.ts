@@ -97,6 +97,65 @@ describe('SchulenFilter', () => {
     expect(wrapper.emitted('update:selectedSchulen')?.at(-1)).toEqual([undefined]);
   });
 
+  describe.each([false, true])('search debounce with workflow endpoints=%s', (useWorkflowEndpoints: boolean) => {
+    test('should load only the latest search after 500ms and debounce clearing it', async (): Promise<void> => {
+      const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
+      const loadSpy: MockInstance = useWorkflowEndpoints
+        ? vi.spyOn(personenkontextStore, 'processWorkflowStep')
+        : vi.spyOn(organisationStore, 'loadOrganisationenForFilter');
+      const wrapper: VueWrapper<InstanceType<typeof SchulenFilter>> = mountComponent({ useWorkflowEndpoints });
+      await flushPromises();
+      loadSpy.mockClear();
+      const autocomplete: VueWrapper = wrapper.findComponent({ name: 'v-autocomplete' });
+
+      autocomplete.vm.$emit('update:search', 'Sch');
+      await nextTick();
+      vi.advanceTimersByTime(400);
+      autocomplete.vm.$emit('update:search', 'Schule');
+      await nextTick();
+      vi.advanceTimersByTime(499);
+      await flushPromises();
+      expect(loadSpy).not.toHaveBeenCalled();
+
+      vi.advanceTimersByTime(1);
+      await flushPromises();
+      expect(loadSpy).toHaveBeenCalledOnce();
+      expect(loadSpy.mock.calls[0]?.[0]).toEqual(
+        expect.objectContaining(useWorkflowEndpoints ? { organisationName: 'Schule' } : { searchString: 'Schule' }),
+      );
+
+      autocomplete.vm.$emit('update:search', '');
+      await nextTick();
+      vi.advanceTimersByTime(499);
+      await flushPromises();
+      expect(loadSpy).toHaveBeenCalledOnce();
+
+      vi.advanceTimersByTime(1);
+      await flushPromises();
+      expect(loadSpy).toHaveBeenCalledTimes(2);
+      expect(loadSpy.mock.calls[1]?.[0]).not.toHaveProperty(useWorkflowEndpoints ? 'organisationName' : 'searchString');
+    });
+
+    test('should cancel a pending search on unmount', async (): Promise<void> => {
+      const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
+      const loadSpy: MockInstance = useWorkflowEndpoints
+        ? vi.spyOn(personenkontextStore, 'processWorkflowStep')
+        : vi.spyOn(organisationStore, 'loadOrganisationenForFilter');
+      const wrapper: VueWrapper<InstanceType<typeof SchulenFilter>> = mountComponent({ useWorkflowEndpoints });
+      await flushPromises();
+      loadSpy.mockClear();
+
+      const autocomplete: VueWrapper = wrapper.findComponent({ name: 'v-autocomplete' });
+      autocomplete.vm.$emit('update:search', 'Schule');
+      await nextTick();
+      wrapper.unmount();
+      vi.advanceTimersByTime(500);
+      await flushPromises();
+
+      expect(loadSpy).not.toHaveBeenCalled();
+    });
+  });
+
   describe.each([false, true])('selection contract when multiple is %s', (multiple: boolean) => {
     test('it normalizes empty Vuetify selections', async () => {
       const selected: Organisation = DoFactory.getSchule();
@@ -221,7 +280,6 @@ describe('SchulenFilter', () => {
       });
       process.mockClear();
       await wrapper.setProps({ operationContext: OperationContext.PERSON_BEARBEITEN, personId: 'another-person' });
-      vi.runAllTimers();
       await flushPromises();
 
       expect(process).toHaveBeenCalledExactlyOnceWith(
@@ -250,7 +308,6 @@ describe('SchulenFilter', () => {
     expect(personenkontextStore.processWorkflowStepLandesbedienstete).not.toHaveBeenCalled();
 
     await wrapper.setProps({ useLandesbediensteteWorkflow: true });
-    vi.runAllTimers();
     await flushPromises();
     expect(personenkontextStore.processWorkflowStepLandesbedienstete).toHaveBeenCalledExactlyOnceWith(
       expect.objectContaining({ organisationId: selected.id }),

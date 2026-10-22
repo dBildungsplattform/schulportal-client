@@ -1,6 +1,7 @@
 import { KlassenFilter, Organisation, OrganisationStore, useOrganisationStore } from '@/stores/OrganisationStore';
 import { dedup } from '@/utils/arrays';
-import { computed, onScopeDispose, reactive, ref, watch, type ComputedRef, type Ref, type WatchSource } from 'vue';
+import { computed, reactive, ref, watch, type ComputedRef, type Ref, type WatchSource } from 'vue';
+import { useDebouncedSearch } from './useDebouncedSearch';
 
 export type KlassenSelection<M extends boolean> = M extends true ? Organisation[] : Organisation | undefined;
 type AnySelection = Organisation[] | Organisation | undefined;
@@ -21,18 +22,9 @@ export function useKlassenAutocomplete<M extends boolean>(
 } {
   const organisationStore: OrganisationStore = useOrganisationStore();
   const selectedKlassen: Ref<AnySelection> = ref(multiple ? [] : undefined);
-  const searchInput: Ref<string> = ref('');
   const filter: KlassenFilter = reactive<KlassenFilter>({ ...initialFilter });
-  let timerId: ReturnType<typeof setTimeout> | undefined;
-
-  watch(searchInput, (value: string): void => {
-    if (timerId !== undefined) {
-      clearTimeout(timerId);
-    }
-
-    timerId = setTimeout((): void => {
-      filter.searchString = value;
-    }, 500);
+  const searchInput: Ref<string> = useDebouncedSearch((value: string): void => {
+    filter.searchString = value;
   });
 
   watch(
@@ -52,12 +44,6 @@ export function useKlassenAutocomplete<M extends boolean>(
   watch(selectedKlassen, (value: AnySelection): void => {
     if (isMultiple(value) ? value.length === 0 : !value) {
       searchInput.value = '';
-    }
-  });
-
-  onScopeDispose((): void => {
-    if (timerId !== undefined) {
-      clearTimeout(timerId);
     }
   });
 

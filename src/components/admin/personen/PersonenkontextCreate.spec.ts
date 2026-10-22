@@ -687,21 +687,57 @@ describe('PersonenkontextCreate', () => {
           const rolleAutocomplete: VueWrapper | undefined = wrapper?.findComponent({
             ref: allowMultipleRollen ? 'rollen-select' : 'rolle-select',
           });
-          // Use a search term not matching any existing Rolle title so the filter treats it as a new search
+          rolleAutocomplete?.vm.$emit('update:search', 'Direk');
+          await nextTick();
+          vi.advanceTimersByTime(400);
+
           rolleAutocomplete?.vm.$emit('update:search', 'Direktorin');
           await nextTick();
+          vi.advanceTimersByTime(499);
+          await flushPromises();
 
           expect(rolleStore.getRollenForPersonenkontextCreation).not.toHaveBeenCalled();
 
-          vi.advanceTimersByTime(500);
+          vi.advanceTimersByTime(1);
           await flushPromises();
 
+          expect(rolleStore.getRollenForPersonenkontextCreation).toHaveBeenCalledOnce();
           expect(rolleStore.getRollenForPersonenkontextCreation).toHaveBeenCalledWith(
             expect.objectContaining({
               organisationId: '1133',
               rolleName: 'Direktorin',
             }),
           );
+
+          rolleAutocomplete?.vm.$emit('update:search', '');
+          await nextTick();
+          vi.advanceTimersByTime(499);
+          await flushPromises();
+          expect(rolleStore.getRollenForPersonenkontextCreation).toHaveBeenCalledOnce();
+
+          vi.advanceTimersByTime(1);
+          await flushPromises();
+          expect(rolleStore.getRollenForPersonenkontextCreation).toHaveBeenCalledTimes(2);
+          expect(vi.mocked(rolleStore.getRollenForPersonenkontextCreation).mock.calls.at(-1)?.[0]).not.toHaveProperty(
+            'rolleName',
+          );
+        });
+
+        test('it cancels a pending Rolle search on unmount', async (): Promise<void> => {
+          wrapper = mountComponent({ operationContext, allowMultipleRollen, selectedOrganisation: '1133' });
+          await flushPromises();
+          vi.mocked(rolleStore.getRollenForPersonenkontextCreation).mockClear();
+          const autocomplete: VueWrapper = wrapper.findComponent({
+            ref: allowMultipleRollen ? 'rollen-select' : 'rolle-select',
+          });
+          autocomplete.vm.$emit('update:search', 'Direktorin');
+          await nextTick();
+
+          wrapper.unmount();
+          vi.advanceTimersByTime(500);
+          await flushPromises();
+
+          expect(rolleStore.getRollenForPersonenkontextCreation).not.toHaveBeenCalled();
         });
 
         test('it reloads Rollen immediately once a Rolle is selected', async () => {

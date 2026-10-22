@@ -1,6 +1,7 @@
 <script setup lang="ts" generic="M extends boolean = false">
   import type { RollenSystemRechtEnum } from '@/api-client/generated/api';
   import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
+  import { useDebouncedSearch } from '@/composables/useDebouncedSearch';
   import {
     OrganisationsTyp,
     useOrganisationStore,
@@ -25,7 +26,6 @@
     onMounted,
     onUnmounted,
     reactive,
-    ref,
     watch,
     type ComputedRef,
     type Ref,
@@ -84,16 +84,10 @@
       selectedSchulen.value = normalizeSelection(selection);
     },
   });
-  const searchInputSchulen: Ref<string | undefined> = ref(undefined);
-  const clearInput = (): void => {
-    searchInputSchulen.value = undefined;
-  };
-
   const { t }: Composer = useI18n({ useScope: 'global' });
   const organisationStore: OrganisationStore = useOrganisationStore();
   const personenkontextStore: PersonenkontextStore = usePersonenkontextStore();
 
-  const timerId: Ref<ReturnType<typeof setTimeout> | undefined> = ref<ReturnType<typeof setTimeout>>();
   const testId: ComputedRef<string> = computed(() => {
     const typ: string = props.includeAll ? 'organisation' : 'schule';
     return props.parentId ? `${props.parentId}-${typ}-select` : `${typ}-select`;
@@ -210,6 +204,11 @@
     }
   };
 
+  const searchInputSchulen: Ref<string> = useDebouncedSearch(updateSearchString);
+  const clearInput = (): void => {
+    searchInputSchulen.value = '';
+  };
+
   const updateOrganisationenIds = (selection: AnySelection): void => {
     organisationenFilter.organisationId =
       (hasAutoselectedSchule.value ? autoselectedSchule.value?.id : undefined) ??
@@ -238,7 +237,7 @@
       return;
     }
     if (!focused) {
-      searchInputSchulen.value = undefined;
+      searchInputSchulen.value = '';
     }
   };
 
@@ -299,25 +298,15 @@
         return;
       }
 
-      if (timerId.value) {
-        clearTimeout(timerId.value);
-      }
-
-      if (props.useWorkflowEndpoints && !oldFilter) {
-        void handleWorkflowStep(organisationenFilter);
+      if (!props.useWorkflowEndpoints && !oldFilter) {
         return;
       }
 
-      const hasOldFilter: boolean = !!oldFilter;
-      const delay: number = hasOldFilter ? 500 : 0;
-
-      timerId.value = setTimeout(async () => {
-        if (props.useWorkflowEndpoints) {
-          await handleWorkflowStep(organisationenFilter);
-        } else {
-          await organisationStore.loadOrganisationenForFilter(schulenFilter, props.parentId);
-        }
-      }, delay);
+      if (props.useWorkflowEndpoints) {
+        void handleWorkflowStep(organisationenFilter);
+      } else {
+        void organisationStore.loadOrganisationenForFilter(schulenFilter, props.parentId);
+      }
     },
     { deep: true, immediate: true },
   );
@@ -328,10 +317,12 @@
       console.warn(`SchulenFilter initialized twice with id ${props.parentId}`);
     }
     organisationStore.resetOrganisationenFilter(props.parentId);
+    if (!props.useWorkflowEndpoints && !(isInputDisabled.value && !isEmptySelection(selectedSchulen.value))) {
+      void organisationStore.loadOrganisationenForFilter(schulenFilter, props.parentId);
+    }
   });
 
   onUnmounted(() => {
-    clearTimeout(timerId.value);
     organisationStore.clearOrganisationenFilter(props.parentId);
   });
 </script>
@@ -355,7 +346,6 @@
     :placeholder="props.placeholderText ?? t('admin.schule.assignSchule')"
     required="true"
     variant="outlined"
-    @update:search="updateSearchString"
     @click:clear="
       useWorkflowEndpoints
         ? (personenkontextStore.workflowStepResponse = null)

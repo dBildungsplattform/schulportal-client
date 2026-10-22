@@ -5,7 +5,8 @@ import {
   type RollenForPersonAdministrationParams,
 } from '@/stores/RolleStore';
 import { dedup } from '@/utils/arrays';
-import { computed, onScopeDispose, reactive, ref, watch, type ComputedRef, type Ref } from 'vue';
+import { computed, reactive, ref, watch, type ComputedRef, type Ref } from 'vue';
+import { useDebouncedSearch } from './useDebouncedSearch';
 
 export type UseRollenForPersonAdministrationAutocompleteReturn = {
   selectedRollen: Ref<RolleResponse[]>;
@@ -20,20 +21,11 @@ export function useRollenForPersonAdministrationAutocomplete(
 ): UseRollenForPersonAdministrationAutocompleteReturn {
   const rolleStore: RolleStore = useRolleStore();
   const selectedRollen: Ref<RolleResponse[]> = ref<RolleResponse[]>([]);
-  const searchInput: Ref<string> = ref('');
   const filter: RollenForPersonAdministrationParams = reactive<RollenForPersonAdministrationParams>({
     ...initialFilter,
   });
-  let timerId: ReturnType<typeof setTimeout> | undefined;
-
-  watch(searchInput, (value: string): void => {
-    if (timerId !== undefined) {
-      clearTimeout(timerId);
-    }
-
-    timerId = setTimeout((): void => {
-      filter.searchStr = value;
-    }, 500);
+  const searchInput: Ref<string> = useDebouncedSearch((value: string): void => {
+    filter.searchStr = value;
   });
 
   watch(
@@ -47,12 +39,6 @@ export function useRollenForPersonAdministrationAutocomplete(
   watch(selectedRollen, (value: RolleResponse[]): void => {
     if (value.length === 0) {
       searchInput.value = '';
-    }
-  });
-
-  onScopeDispose((): void => {
-    if (timerId !== undefined) {
-      clearTimeout(timerId);
     }
   });
 
