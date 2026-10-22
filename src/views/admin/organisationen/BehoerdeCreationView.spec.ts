@@ -284,6 +284,22 @@ describe('BehoerdeCreationView', () => {
     expect(push).toHaveBeenCalledWith({ name: 'behoerde-management' });
   });
 
+  test('should return to the Behoerden list when discarding creation', async (): Promise<void> => {
+    const {
+      wrapper,
+      router,
+    }: {
+      wrapper: VueWrapper<ComponentInstance<typeof BehoerdeCreationView>>;
+      router: Router;
+    } = await setup();
+    const push: MockInstance = vi.spyOn(router, 'push');
+
+    await wrapper.get('[data-testid="behoerde-form-discard-button"]').trigger('click');
+    await flushPromises();
+
+    expect(push).toHaveBeenCalledExactlyOnceWith({ name: 'behoerde-management' });
+  });
+
   test('it fills form and triggers submit', async () => {
     const {
       wrapper,
