@@ -52,7 +52,7 @@
       {{ $t('admin.headline') }}
     </h1>
     <LayoutCard
-      :header="$t('admin.behoerde.showAll')"
+      :header="$t('admin.behoerde.management')"
       headlineTestId="behoerde-management-headline"
     >
       <SpshAlert

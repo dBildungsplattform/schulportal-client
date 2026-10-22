@@ -291,31 +291,6 @@ export interface CreateRolleBodyParams {
 /**
  * 
  * @export
- * @interface CreateRollenerweiterungBodyParams
- */
-export interface CreateRollenerweiterungBodyParams {
-    /**
-     * 
-     * @type {string}
-     * @memberof CreateRollenerweiterungBodyParams
-     */
-    'organisationId': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CreateRollenerweiterungBodyParams
-     */
-    'rolleId': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CreateRollenerweiterungBodyParams
-     */
-    'serviceProviderId': string;
-}
-/**
- * 
- * @export
  * @interface CreateServiceProviderBodyParams
  */
 export interface CreateServiceProviderBodyParams {
@@ -1061,6 +1036,27 @@ export const DbiamPersonenkontexteUpdateErrorI18nKeyEnum = {
 } as const;
 
 export type DbiamPersonenkontexteUpdateErrorI18nKeyEnum = typeof DbiamPersonenkontexteUpdateErrorI18nKeyEnum[keyof typeof DbiamPersonenkontexteUpdateErrorI18nKeyEnum];
+
+/**
+ * 
+ * @export
+ * @interface DbiamPrivacyIdeaAdministrationError
+ */
+export interface DbiamPrivacyIdeaAdministrationError {
+    /**
+     * 
+     * @type {PrivacyIdeaErrorEnum}
+     * @memberof DbiamPrivacyIdeaAdministrationError
+     */
+    'i18nKey': PrivacyIdeaErrorEnum;
+    /**
+     * Corresponds to HTTP Status code like 200, 404, 500
+     * @type {number}
+     * @memberof DbiamPrivacyIdeaAdministrationError
+     */
+    'code': number;
+}
+
 
 /**
  * 
@@ -3297,6 +3293,31 @@ export interface PersonenuebersichtBodyParams {
 /**
  * 
  * @export
+ * @enum {string}
+ */
+
+export const PrivacyIdeaErrorEnum = {
+    PrivacyIdeaAdministrationError: 'PRIVACY_IDEA_ADMINISTRATION_ERROR',
+    SeriennummerNichtGefunden: 'SERIENNUMMER_NICHT_GEFUNDEN',
+    SeriennummerInVerwendung: 'SERIENNUMMER_IN_VERWENDUNG',
+    OtpNichtGueltig: 'OTP_NICHT_GUELTIG',
+    HardwareTokenServiceFehler: 'HARDWARE_TOKEN_SERVICE_FEHLER',
+    TokenResetError: 'TOKEN_RESET_ERROR',
+    TwoAuthStateError: 'TWO_AUTH_STATE_ERROR',
+    SoftwareTokenVerificationError: 'SOFTWARE_TOKEN_VERIFICATION_ERROR',
+    UsernameExistsError: 'USERNAME_EXISTS_ERROR',
+    DeleteUserError: 'DELETE_USER_ERROR',
+    SoftwareTokenInitializationError: 'SOFTWARE_TOKEN_INITIALIZATION_ERROR',
+    TokenStateError: 'TOKEN_STATE_ERROR',
+    PiUnavailableError: 'PI_UNAVAILABLE_ERROR'
+} as const;
+
+export type PrivacyIdeaErrorEnum = typeof PrivacyIdeaErrorEnum[keyof typeof PrivacyIdeaErrorEnum];
+
+
+/**
+ * 
+ * @export
  * @interface ProviderControllerFindRollenerweiterungenByServiceProviderId200Response
  */
 export interface ProviderControllerFindRollenerweiterungenByServiceProviderId200Response {
@@ -3850,49 +3871,6 @@ export interface RollenerweiterungForManageableServiceProviderResponse {
      * @memberof RollenerweiterungForManageableServiceProviderResponse
      */
     'rolle': RolleRefResponse;
-}
-/**
- * 
- * @export
- * @interface RollenerweiterungResponse
- */
-export interface RollenerweiterungResponse {
-    /**
-     * 
-     * @type {string}
-     * @memberof RollenerweiterungResponse
-     */
-    'id': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof RollenerweiterungResponse
-     */
-    'createdAt': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof RollenerweiterungResponse
-     */
-    'updatedAt': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof RollenerweiterungResponse
-     */
-    'organisationId': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof RollenerweiterungResponse
-     */
-    'rolleId': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof RollenerweiterungResponse
-     */
-    'serviceProviderId': string;
 }
 /**
  * 
@@ -13346,50 +13324,6 @@ export const RolleApiAxiosParamCreator = function (configuration?: Configuration
             };
         },
         /**
-         * Create a new rollenerweiterung.
-         * @summary 
-         * @param {CreateRollenerweiterungBodyParams} createRollenerweiterungBodyParams 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        rolleControllerCreateRollenerweiterung: async (createRollenerweiterungBodyParams: CreateRollenerweiterungBodyParams, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'createRollenerweiterungBodyParams' is not null or undefined
-            assertParamExists('rolleControllerCreateRollenerweiterung', 'createRollenerweiterungBodyParams', createRollenerweiterungBodyParams)
-            const localVarPath = `/api/rolle/erweiterung`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication bearer required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            // authentication oauth2 required
-            // oauth required
-            await setOAuthToObject(localVarHeaderParameter, "oauth2", [], configuration)
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(createRollenerweiterungBodyParams, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
          * Delete a role by id.
          * @summary 
          * @param {string} rolleId The id for the rolle.
@@ -14156,17 +14090,6 @@ export const RolleApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Create a new rollenerweiterung.
-         * @summary 
-         * @param {CreateRollenerweiterungBodyParams} createRollenerweiterungBodyParams 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async rolleControllerCreateRollenerweiterung(createRollenerweiterungBodyParams: CreateRollenerweiterungBodyParams, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RollenerweiterungResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.rolleControllerCreateRollenerweiterung(createRollenerweiterungBodyParams, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
          * Delete a role by id.
          * @summary 
          * @param {string} rolleId The id for the rolle.
@@ -14376,16 +14299,6 @@ export const RolleApiFactory = function (configuration?: Configuration, basePath
             return localVarFp.rolleControllerCreateRolle(createRolleBodyParams, options).then((request) => request(axios, basePath));
         },
         /**
-         * Create a new rollenerweiterung.
-         * @summary 
-         * @param {CreateRollenerweiterungBodyParams} createRollenerweiterungBodyParams 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        rolleControllerCreateRollenerweiterung(createRollenerweiterungBodyParams: CreateRollenerweiterungBodyParams, options?: any): AxiosPromise<RollenerweiterungResponse> {
-            return localVarFp.rolleControllerCreateRollenerweiterung(createRollenerweiterungBodyParams, options).then((request) => request(axios, basePath));
-        },
-        /**
          * Delete a role by id.
          * @summary 
          * @param {string} rolleId The id for the rolle.
@@ -14579,16 +14492,6 @@ export interface RolleApiInterface {
      * @memberof RolleApiInterface
      */
     rolleControllerCreateRolle(createRolleBodyParams: CreateRolleBodyParams, options?: AxiosRequestConfig): AxiosPromise<RolleWithServiceProvidersResponse>;
-
-    /**
-     * Create a new rollenerweiterung.
-     * @summary 
-     * @param {CreateRollenerweiterungBodyParams} createRollenerweiterungBodyParams 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof RolleApiInterface
-     */
-    rolleControllerCreateRollenerweiterung(createRollenerweiterungBodyParams: CreateRollenerweiterungBodyParams, options?: AxiosRequestConfig): AxiosPromise<RollenerweiterungResponse>;
 
     /**
      * Delete a role by id.
@@ -14787,18 +14690,6 @@ export class RolleApi extends BaseAPI implements RolleApiInterface {
      */
     public rolleControllerCreateRolle(createRolleBodyParams: CreateRolleBodyParams, options?: AxiosRequestConfig) {
         return RolleApiFp(this.configuration).rolleControllerCreateRolle(createRolleBodyParams, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * Create a new rollenerweiterung.
-     * @summary 
-     * @param {CreateRollenerweiterungBodyParams} createRollenerweiterungBodyParams 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof RolleApi
-     */
-    public rolleControllerCreateRollenerweiterung(createRollenerweiterungBodyParams: CreateRollenerweiterungBodyParams, options?: AxiosRequestConfig) {
-        return RolleApiFp(this.configuration).rolleControllerCreateRollenerweiterung(createRollenerweiterungBodyParams, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

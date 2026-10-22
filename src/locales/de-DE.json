@@ -581,7 +581,7 @@
           "INTERNAL": "Ein unbekannter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
           "SOFTWARE_TOKEN_VERIFICATION_ERROR": "Beim Verifizieren Ihres Tokens ist leider ein Problem aufgetreten.",
           "connection": "Der Server für die Zwei-Faktor-Authentifizierung kann aktuell nicht erreicht werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut.",
-          "softwareTokenInitError": "Leider konnte aus technischen Gründen kein QR-Code erzeugt werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut. Sollte das Problem weiterhin bestehen, geben Sie dazu bitte ein Ticket über den {0} auf.",
+          "connectionFailure": "Die Zwei-Faktor-Authentifizierung (2FA) für diesen Dienst ist momentan leider nicht verfügbar. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut. Informationen zur aktuellen Verfügbarkeit des 2FA-Dienstes finden Sie auch auf der Statusseite des Schulportal SH.",
           "iqshHelpdesk": "Helpdesk des IQSH",
           "iqshHelpdeskLink": "https://www.secure-lernnetz.de/helpdesk/",
           "selfServiceTokenInitError": "Leider konnte aus technischen Gründen kein QR-Code erzeugt werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut. Sollte das Problem weiterhin bestehen, wenden Sie sich bitte an Ihre schulischen Administratorinnen und Administratoren.",
@@ -1042,7 +1042,8 @@
     "help": "Hilfe",
     "profile": "Mein Profil",
     "backToPreviousPage": "Zurück zur vorherigen Seite",
-    "faq": "FAQ - Administration"
+    "faq": "FAQ - Administration",
+    "statusPage": "Zur Statusseite"
   },
   "no": "Nein",
   "from": "von",
