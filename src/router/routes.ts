@@ -331,6 +331,17 @@ const routes: readonly RouteRecordRaw[] = [
     },
   },
   {
+    path: '/admin/behoerden/new',
+    name: 'create-behoerde',
+    component: () => import('../views/admin/organisationen/BehoerdeCreationView.vue'),
+    meta: {
+      layout: 'AdminLayout',
+      requiresAuth: true,
+      requiredStepUpLevel: StepUpLevel.GOLD,
+      requiresPermission: 'behoerdenverwaltung',
+    },
+  },
+  {
     path: '/admin/hinweise/new',
     name: 'hinweise-creation',
     component: () => import('../views/admin/HinweiseCreationView.vue'),
@@ -375,6 +386,11 @@ const routes: readonly RouteRecordRaw[] = [
     path: '/no-second-factor',
     name: 'no-second-factor',
     component: () => import('../views/NoSecondFactorView.vue'),
+  },
+  {
+    path: '/service-not-available/:serviceName',
+    name: 'service-not-available',
+    component: () => import('../views/ServiceNotAvailableView.vue'),
   },
 ] satisfies readonly AppRoute[];
 
