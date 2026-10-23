@@ -1,6 +1,6 @@
 import { StepUpLevel } from '@/stores/AuthStore';
 import type { RouteRecordRaw } from 'vue-router';
-import type { AppRoute } from '.';
+import type { AppRoute, AppRouteMeta } from '.';
 
 const routes: readonly RouteRecordRaw[] = [
   {
@@ -329,6 +329,17 @@ const routes: readonly RouteRecordRaw[] = [
       requiredStepUpLevel: StepUpLevel.GOLD,
       requiresPermission: 'schultraegerverwaltung',
     },
+  },
+  {
+    path: '/admin/behoerden',
+    name: 'behoerde-management',
+    component: () => import('../views/admin/organisationen/BehoerdeManagementView.vue'),
+    meta: {
+      layout: 'AdminLayout',
+      requiresAuth: true,
+      requiredStepUpLevel: StepUpLevel.GOLD,
+      requiresPermission: 'behoerdenverwaltung',
+    } satisfies AppRouteMeta,
   },
   {
     path: '/admin/behoerden/new',
