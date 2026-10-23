@@ -110,6 +110,26 @@ afterEach(() => {
 });
 
 describe('BehoerdeCreationView', () => {
+  test('should navigate to the Behoerden list after creation', async (): Promise<void> => {
+    const {
+      wrapper,
+      router,
+      organisationStore,
+    }: {
+      wrapper: VueWrapper<ComponentInstance<typeof BehoerdeCreationView>>;
+      router: Router;
+      organisationStore: OrganisationStore;
+    } = await setup();
+    organisationStore.createdBehoerde = DoFactory.getOrganisation({ typ: OrganisationsTyp.Behoerde });
+    await flushPromises();
+    const pushSpy: MockInstance = vi.spyOn(router, 'push');
+
+    await wrapper.get('[data-testid="success-template-secondary-button"]').trigger('click');
+    await flushPromises();
+
+    expect(pushSpy).toHaveBeenCalledWith({ name: 'behoerde-management' });
+  });
+
   test.each([
     ['UNKNOWN_BACKEND_ERROR', 'Die Behörde konnte nicht angelegt werden.'],
     ['ORGANISATION_SPECIFICATION_ERROR', 'Die Behörde konnte nicht angelegt werden.'],
@@ -247,7 +267,7 @@ describe('BehoerdeCreationView', () => {
     expect(wrapper.getComponent({ name: 'FormRow' })).toBeTruthy();
   });
 
-  test('it navigates to start when the close button is clicked', async () => {
+  test('it navigates to the Behoerden table when the close button is clicked', async () => {
     const {
       wrapper,
       router,
@@ -258,8 +278,26 @@ describe('BehoerdeCreationView', () => {
 
     const push: MockInstance = vi.spyOn(router, 'push');
     await wrapper.find('[data-testid="close-layout-card-button"]').trigger('click');
+    await flushPromises();
 
     expect(push).toHaveBeenCalledTimes(1);
+    expect(push).toHaveBeenCalledWith({ name: 'behoerde-management' });
+  });
+
+  test('should return to the Behoerden list when discarding creation', async (): Promise<void> => {
+    const {
+      wrapper,
+      router,
+    }: {
+      wrapper: VueWrapper<ComponentInstance<typeof BehoerdeCreationView>>;
+      router: Router;
+    } = await setup();
+    const push: MockInstance = vi.spyOn(router, 'push');
+
+    await wrapper.get('[data-testid="behoerde-form-discard-button"]').trigger('click');
+    await flushPromises();
+
+    expect(push).toHaveBeenCalledExactlyOnceWith({ name: 'behoerde-management' });
   });
 
   test('it fills form and triggers submit', async () => {

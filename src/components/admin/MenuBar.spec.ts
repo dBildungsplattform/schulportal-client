@@ -121,6 +121,7 @@ describe('MenuBar', () => {
       expect(wrapper?.find('[data-testid="schultraeger-management-title"]').exists()).toBe(hasPermission);
 
       expect(wrapper?.find('[data-testid="behoerde-management-title"]').exists()).toBe(hasPermission);
+      expect(wrapper?.find('[data-testid="behoerde-management-menu-item"]').exists()).toBe(hasPermission);
       expect(wrapper?.find('[data-testid="behoerde-creation-menu-item"]').exists()).toBe(hasPermission);
 
       expect(wrapper?.find('[data-testid="portal-management-title"]').exists()).toBe(hasPermission);
