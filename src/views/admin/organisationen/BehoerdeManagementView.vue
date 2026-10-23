@@ -1,21 +1,22 @@
 <script setup lang="ts">
-  import { onMounted, ref, type Ref } from 'vue';
-  import { useI18n, type Composer } from 'vue-i18n';
   import ResultTable, { type Headers } from '@/components/admin/ResultTable.vue';
-  import LayoutCard from '@/components/cards/LayoutCard.vue';
   import SpshAlert from '@/components/alert/SpshAlert.vue';
+  import LayoutCard from '@/components/cards/LayoutCard.vue';
   import {
     OrganisationsTyp,
     useOrganisationStore,
     type Organisation,
     type OrganisationStore,
   } from '@/stores/OrganisationStore';
-  import { onBeforeRouteLeave, useRouter, type Router } from 'vue-router';
   import { OrganisationSortField, SortOrder } from '@/utils/sorting';
+  import { onMounted, ref, type Ref } from 'vue';
+  import { useI18n, type Composer } from 'vue-i18n';
+  import { onBeforeRouteLeave, useRouter, type Router } from 'vue-router';
 
   const organisationStore: OrganisationStore = useOrganisationStore();
   const router: Router = useRouter();
   const { t }: Composer = useI18n({ useScope: 'global' });
+
   const currentPage: Ref<number> = ref(1);
   const itemsPerPage: Ref<number> = ref(30);
   const headers: Headers = [{ title: t('admin.behoerde.name'), key: 'name', align: 'start', sortable: false }];

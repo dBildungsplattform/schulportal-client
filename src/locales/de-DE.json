@@ -457,7 +457,6 @@
       "create": "Benutzer anlegen",
       "createAnother": "Weiteren Benutzer anlegen",
       "createNew": "Neue Benutzer anlegen",
-
       "creationErrorText": "",
       "creationErrorTitle": "Fehler beim Anlegen des Benutzers",
       "deletePerson": "Benutzer löschen",
