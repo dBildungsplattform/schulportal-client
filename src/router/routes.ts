@@ -1,6 +1,6 @@
 import { StepUpLevel } from '@/stores/AuthStore';
 import type { RouteRecordRaw } from 'vue-router';
-import type { AppRoute, AppRouteMeta } from '.';
+import type { AppRoute } from '.';
 
 const routes: readonly RouteRecordRaw[] = [
   {
@@ -339,7 +339,7 @@ const routes: readonly RouteRecordRaw[] = [
       requiresAuth: true,
       requiredStepUpLevel: StepUpLevel.GOLD,
       requiresPermission: 'behoerdenverwaltung',
-    } satisfies AppRouteMeta,
+    },
   },
   {
     path: '/admin/behoerden/new',
@@ -361,7 +361,7 @@ const routes: readonly RouteRecordRaw[] = [
       requiresAuth: true,
       requiredStepUpLevel: StepUpLevel.GOLD,
       requiresPermission: 'behoerdenverwaltung',
-    } satisfies AppRouteMeta,
+    },
   },
   {
     path: '/admin/hinweise/new',
