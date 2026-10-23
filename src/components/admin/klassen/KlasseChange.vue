@@ -16,7 +16,9 @@
   defineProps<Props>();
 
   const selectedSchule: ModelRef<string | undefined, string> = defineModel('selectedSchule');
-  const selectedNewKlasse: ModelRef<Organisation | undefined, string> = defineModel('selectedNewKlasse');
+  const selectedNewKlasse: ModelRef<Organisation | undefined, string> = defineModel<Organisation | undefined, string>(
+    'selectedNewKlasse',
+  );
 
   // we need to cast the selectedSchule into an array
   // doing it this way prevents an issue where the reactive system constantly re-runs which causes requests to be issued in a loop

@@ -65,8 +65,8 @@
     personId?: string;
     operationContext: OperationContext;
     selectedKlassenOption?: string | null;
-    selectedKlasse?: Organisation | undefined;
-    selectedKlasseForRadio?: Organisation | undefined;
+    selectedKlasse?: Organisation;
+    selectedKlasseForRadio?: Organisation;
     selectedOrganisationProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedKlasseProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
     selectedKlasseForRadioProps?: BaseFieldProps & { error: boolean; 'error-messages': Array<string> };
@@ -118,19 +118,19 @@
   // doing it this way prevents an issue where the reactive system constantly re-runs which causes requests to be issued in a loop
   const administriertVon: Ref<string[] | undefined> = ref([]);
 
-  const rollenItems: ComputedRef<TranslatedRolleWithAttrs[]> = computed(() =>
-    dedup(
-      [
-        ...props.rollen,
-        ...(props.allowMultipleRollen
-          ? (selectedRollen.value ?? [])
-          : selectedRolle.value
-            ? [selectedRolle.value]
-            : []),
-      ],
-      (rolle: TranslatedRolleWithAttrs) => rolle.value,
-    ),
-  );
+  const rollenItems: ComputedRef<TranslatedRolleWithAttrs[]> = computed(() => {
+    const activeSelection: TranslatedRolleWithAttrs[] = [];
+    if (props.allowMultipleRollen) {
+      if (selectedRollen.value) {
+        activeSelection.push(...selectedRollen.value);
+      }
+    } else {
+      if (selectedRolle.value) {
+        activeSelection.push(selectedRolle.value);
+      }
+    }
+    return dedup([...props.rollen, ...activeSelection], (rolle: TranslatedRolleWithAttrs) => rolle.value);
+  });
   const selectedRollenIds: ComputedRef<string[]> = computed(() =>
     (selectedRollen.value ?? []).map((rolle: TranslatedRolleWithAttrs) => rolle.value),
   );

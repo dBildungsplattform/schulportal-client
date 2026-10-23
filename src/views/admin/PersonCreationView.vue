@@ -500,7 +500,6 @@
     if (
       selectedKlasse.value &&
       selectedRollen.value &&
-      selectedRollen.value.length > 0 &&
       selectedRollen.value.some((rolle: TranslatedRolleWithAttrs) => rolle.rollenart === RollenArt.Lern)
     ) {
       for (const rolle of selectedRollen.value) {

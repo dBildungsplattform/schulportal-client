@@ -159,14 +159,13 @@
     }
   }
 
-  function updateSchuleSelection(selection: SelectedSchulen<false>): void {
-    const organisation: Organisation | null = selection ?? null;
+  function updateSchuleSelection(organisation: SelectedSchulen<false>): void {
     const id: string | undefined = organisation?.id;
     if (selectedSchule.value === id) {
       return;
     }
-    selectedOrganisation.value = organisation;
-    searchFilterStore.setSchuleFilterForKlassen(organisation);
+    selectedOrganisation.value = organisation ?? null;
+    searchFilterStore.setSchuleFilterForKlassen(organisation ?? null);
     searchFilterStore.klassenPage = 1;
     if (!id) {
       resetSearchAndFilter();
