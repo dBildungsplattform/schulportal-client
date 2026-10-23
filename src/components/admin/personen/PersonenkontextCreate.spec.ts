@@ -80,7 +80,7 @@ const mountComponent = (
       },
       selectedOrganisation: '',
       selectedRolle: undefined,
-      selectedKlasse: '',
+      selectedKlasse: undefined,
       showHeadline: true,
       befristungInputProps: {
         befristungProps: {
@@ -366,7 +366,7 @@ describe('PersonenkontextCreate', () => {
           const klassenAutocomplete: VueWrapper | undefined = wrapper
             ?.findComponent({ name: 'KlassenFilter' })
             .findComponent({ ref: klassenFilterRef });
-          await klassenAutocomplete?.setValue('O1');
+          await klassenAutocomplete?.setValue(DoFactory.getKlasse(undefined, { id: '01' }));
           await nextTick();
 
           await organisationAutocomplete?.setValue(undefined);
@@ -389,7 +389,7 @@ describe('PersonenkontextCreate', () => {
           const klassenAutocomplete: VueWrapper | undefined = wrapper
             ?.findComponent({ name: 'KlassenFilter' })
             .findComponent({ ref: klassenFilterRef });
-          await klassenAutocomplete?.setValue('');
+          await klassenAutocomplete?.setValue(undefined);
           klassenAutocomplete?.vm.$emit('update:search', '');
           await nextTick();
           vi.runAllTimers();
