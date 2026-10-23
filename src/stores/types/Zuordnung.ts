@@ -11,7 +11,7 @@ export class Zuordnung {
     public rolle: string,
     public rollenArt: RollenArt,
     public administriertVon: string,
-    public typ: OrganisationsTyp | null,
+    public typ: OrganisationsTyp,
     public editable: boolean,
     public befristung: string | null,
     public merkmale: Array<RollenMerkmal>,
@@ -44,7 +44,7 @@ export class Zuordnung {
       response.rolle,
       response.rollenArt,
       response.administriertVon,
-      response.typ ?? null,
+      response.typ,
       response.editable,
       response.befristung !== '' ? response.befristung : null,
       response.merkmale,
@@ -58,8 +58,7 @@ export class Zuordnung {
       name: this.sskName,
       kennung: this.sskDstNr,
       administriertVon: this.administriertVon,
-      // TODO: fix type coming from backend and remove assertion
-      typ: this.typ!,
+      typ: this.typ,
     };
   }
 }
