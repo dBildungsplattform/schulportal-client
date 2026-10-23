@@ -59,10 +59,6 @@ beforeEach(async () => {
       selectedPersonen: new Map([
         ['test', new PersonWithZuordnungen(person, [DoFactory.getZuordnung({ sskName: '1a' })])],
       ]),
-      organisationen: [
-        { title: organisation.name, value: organisation.id },
-        { title: 'orga1', value: '1133' },
-      ],
       rollen: [
         {
           value: rolle.id,

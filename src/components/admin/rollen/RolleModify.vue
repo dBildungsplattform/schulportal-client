@@ -14,7 +14,6 @@
   } from '@/stores/PersonenkontextStore';
   import { RollenArt, RollenMerkmal, TranslatedRolleWithAttrs } from '@/stores/RolleStore';
   import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
-  import type { TranslatedObject } from '@/types';
   import { type BefristungUtilsType, isBefristungspflichtRolle, useBefristungUtils } from '@/utils/befristung';
   import { formatDateToISO, getNextSchuljahresende } from '@/utils/date';
   import { befristungSchema } from '@/utils/validationPersonenkontext';
@@ -27,7 +26,6 @@
 
   type Props = {
     errorCode: string;
-    organisationen: TranslatedObject[] | undefined;
     rollen: TranslatedRolleWithAttrs[];
     isLoading: boolean;
     isDialogVisible: boolean;
@@ -244,7 +242,6 @@
               v-model:selected-klassen-option="selectedKlassenOption"
               :operation-context="OperationContext.PERSON_BEARBEITEN"
               :show-headline="false"
-              :organisationen="organisationen"
               :rollen="rollen"
               :selected-organisation-props="selectedOrganisationProps"
               :selected-rolle-props="selectedRolleProps"

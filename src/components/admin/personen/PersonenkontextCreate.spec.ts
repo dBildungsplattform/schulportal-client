@@ -34,16 +34,6 @@ const mountComponent = (
       operationContext: OperationContext.PERSON_ANLEGEN,
       errorCode: '',
       disabled: false,
-      organisationen: [
-        {
-          title: 'orga',
-          value: '1133',
-        },
-        {
-          title: 'orga1',
-          value: '1134',
-        },
-      ],
       rollen: [
         {
           value: '54321',

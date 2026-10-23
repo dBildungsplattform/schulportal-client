@@ -859,7 +859,6 @@
                 :create-type="createType"
                 :rollenart-for-person="rollenartForPerson"
                 :show-headline="true"
-                :organisationen="organisationen"
                 :rollen="
                   createType === CreationType.AddPersonToOwnSchule || (filteredRollen?.length ?? 0) > 0
                     ? filteredRollen
@@ -902,7 +901,6 @@
                 :create-type="createType"
                 :rollenart-for-person="rollenartForPerson"
                 :show-headline="true"
-                :organisationen="organisationen"
                 :rollen="
                   (filteredRollen?.length ?? 0) > 0 ? filteredRollen : rolleStore.rollenForPersonenkontextCreation
                 "

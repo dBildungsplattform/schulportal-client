@@ -2311,7 +2311,6 @@
                   :operation-context="OperationContext.PERSON_BEARBEITEN"
                   :allow-multiple-rollen="false"
                   :show-headline="false"
-                  :organisationen="organisationen"
                   :rollen="filteredRollen"
                   :selected-organisation-props="selectedOrganisationProps"
                   :selected-rolle-props="selectedRolleProps"

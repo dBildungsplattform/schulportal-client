@@ -56,7 +56,6 @@
   type SelectedRollen = TranslatedRolleWithAttrs[] | TranslatedRolleWithAttrs | undefined;
 
   type Props = {
-    organisationen: TranslatedObject[] | undefined;
     rollen: TranslatedRolleWithAttrs[];
     selectedOrganisation: string | undefined;
     initialOrganisation?: Organisation | null;

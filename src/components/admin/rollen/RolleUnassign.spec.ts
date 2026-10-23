@@ -1,11 +1,9 @@
-import type { OrganisationResponseLegacy } from '@/api-client/generated';
 import routes from '@/router/routes';
 import { useBulkOperationStore, type BulkOperationStore } from '@/stores/BulkOperationStore';
 import { OrganisationsTyp, type Organisation } from '@/stores/OrganisationStore';
 import { RollenArt, RollenMerkmal, type RolleResponse, type TranslatedRolleWithAttrs } from '@/stores/RolleStore';
 import type { Person } from '@/stores/types/Person';
 import { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
-import type { TranslatedObject } from '@/types';
 import { flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import { DoFactory } from 'test/DoFactory';
 import { vi, type MockInstance } from 'vitest';
@@ -17,12 +15,10 @@ let wrapper: VueWrapper | null = null;
 let router: Router;
 const bulkOperationStore: BulkOperationStore = useBulkOperationStore();
 
-const organisation: OrganisationResponseLegacy = DoFactory.getOrganisationenResponseLegacy();
 const person: Person = DoFactory.getPerson();
 
 type Props = {
   isDialogVisible: boolean;
-  organisationen: TranslatedObject[] | undefined;
   selectedPersonen: Map<string, PersonWithZuordnungen>;
   selectedOrganisationFromFilter: Organisation;
   selectedRolleFromFilter?: RolleResponse;
@@ -31,10 +27,6 @@ type Props = {
 function mountComponent(partialProps: Partial<Props> = {}): VueWrapper<InstanceType<typeof RolleUnassign>> {
   const props: Props = {
     isDialogVisible: true,
-    organisationen: [
-      { title: organisation.name, value: organisation.id },
-      { title: 'orga1', value: '1133' },
-    ],
     selectedPersonen: new Map<string, PersonWithZuordnungen>([
       [person.id, new PersonWithZuordnungen(person, [DoFactory.getZuordnung()])],
     ]),

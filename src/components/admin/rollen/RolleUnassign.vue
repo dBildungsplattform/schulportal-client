@@ -19,7 +19,6 @@
     useRolleStore,
   } from '@/stores/RolleStore';
   import type { PersonWithZuordnungen } from '@/stores/types/PersonWithZuordnungen';
-  import type { TranslatedObject } from '@/types';
   import { toTypedSchema } from '@vee-validate/yup';
   import { type BaseFieldProps, type FormContext, type TypedSchema, useForm } from 'vee-validate';
   import { computed, type ComputedRef, ref, type Ref, watch } from 'vue';
@@ -35,7 +34,6 @@
 
   type Props = {
     isDialogVisible: boolean;
-    organisationen: TranslatedObject[] | undefined;
     selectedPersonen: Map<string, PersonWithZuordnungen>;
     selectedOrganisationFromFilter: Organisation;
     selectedRolleFromFilter?: RolleResponse;
@@ -161,7 +159,6 @@
             :show-headline="false"
             :selected-organisation="selectedOrganisationFromFilterId"
             :initial-organisation="props.selectedOrganisationFromFilter"
-            :organisationen="props.organisationen"
             :rollen="rolleStore.rollenForPersonenkontextCreation"
             :selected-rolle-props="selectedRolleProps"
             v-model:selected-rolle="selectedRolle"

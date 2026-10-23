@@ -14,7 +14,6 @@
   import SchulenFilter from '@/components/filter/SchulenFilter.vue';
   import type { SelectedSchulen } from '@/types';
   import { useAutoselectedSchule } from '@/composables/useAutoselectedSchule';
-  import { useOrganisationen } from '@/composables/useOrganisationen';
   import {
     useRollenForPersonAdministrationAutocomplete,
     type UseRollenForPersonAdministrationAutocompleteReturn,
@@ -210,8 +209,6 @@
     const organisation: Organisation | undefined = selectedOrganisationen.value[0];
     return organisation?.kennung ?? '';
   });
-
-  const organisationenForForm: ComputedRef<TranslatedObject[] | undefined> = useOrganisationen();
 
   // Only Rollen from type LEHR and LERN
   const rollenForRolleModify: ComputedRef<TranslatedRolleWithAttrs[]> = computed(() => {
@@ -835,7 +832,6 @@
           <RolleModify
             v-if="rolleModifiyDialogVisible"
             ref="person-bulk-rolle-modify"
-            :organisationen="organisationenForForm"
             :rollen="rollenForRolleModify"
             :is-loading="personenkontextStore.loading"
             :is-dialog-visible="rolleModifiyDialogVisible"
@@ -875,7 +871,6 @@
             ref="rolle-unassign"
             v-if="rolleUnassignDialogVisible"
             :is-dialog-visible="rolleUnassignDialogVisible"
-            :organisationen="organisationenForForm"
             :selected-personen="selectedPersonen"
             :selected-organisation-from-filter="selectedOrganisationen[0] ?? ({} as Organisation)"
             :selected-rolle-from-filter="selectedRolle"
