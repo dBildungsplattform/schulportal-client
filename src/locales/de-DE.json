@@ -216,7 +216,7 @@
     },
     "doNotCloseBrowserNotice": "Bitte den Browser während der Bearbeitung nicht schließen!",
     "behoerde": {
-      "name": "Name",
+      "name": "Behördenname",
       "showAll": "Alle Behörden anzeigen",
       "loadingErrorTitle": "Fehler beim Laden der Behörden",
       "loadingErrorText": "Die Behörden konnten nicht geladen werden.",

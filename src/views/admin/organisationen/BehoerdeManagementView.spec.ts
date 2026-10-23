@@ -40,7 +40,7 @@ describe('BehoerdeManagementView', (): void => {
 
     expect(wrapper.text()).toContain(organisationStore.allOrganisationen[0]!.name);
     expect(wrapper.getComponent(ResultTable).props('headers')).toEqual([
-      { title: 'Name', key: 'name', align: 'start', sortable: false },
+      { title: 'Behördenname', key: 'name', align: 'start', sortable: false },
     ]);
     expect(wrapper.getComponent(ResultTable).props('hideSelect')).toBe(true);
     expect(wrapper.getComponent(ResultTable).props('disableRowClick')).toBe(true);
