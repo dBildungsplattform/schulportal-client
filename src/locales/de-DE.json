@@ -216,6 +216,10 @@
     },
     "doNotCloseBrowserNotice": "Bitte den Browser während der Bearbeitung nicht schließen!",
     "behoerde": {
+      "name": "Behördenname",
+      "showAll": "Alle Behörden anzeigen",
+      "loadingErrorTitle": "Fehler beim Laden der Behörden",
+      "loadingErrorText": "Die Behörden konnten nicht geladen werden.",
       "addNew": "Neue Behörde hinzufügen",
       "assignZustaendigkeitsbereich": "Zuständigkeitsbereich zuordnen",
       "backToCreateBehoerde": "Zurück zur Behördenanlage",

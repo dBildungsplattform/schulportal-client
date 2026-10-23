@@ -98,14 +98,13 @@
     organisationStore.errorCode = '';
   }
 
-  /* the results list is not available yet, see SPSH-4323 */
   function handleNavigateBackToBehoerdeList(): void {
-    // intentionally empty
+    router.push({ name: 'behoerde-management' });
   }
 
-  async function navigateToStart(): Promise<void> {
+  async function discardBehoerde(): Promise<void> {
     organisationStore.createdBehoerde = null;
-    await router.push({ name: 'start' });
+    await router.push({ name: 'behoerde-management' });
   }
 
   async function loadZustaendigkeitsbereiche(): Promise<void> {
@@ -177,7 +176,7 @@
       headlineTestId="behoerde-creation-headline"
       :padded="true"
       :show-close-text="true"
-      @on-close-clicked="navigateToStart"
+      @on-close-clicked="handleNavigateBackToBehoerdeList"
     >
       <template v-if="!organisationStore.createdBehoerde">
         <SpshAlert
@@ -201,7 +200,7 @@
           :show-unsaved-changes-dialog="showUnsavedChangesDialog"
           @update:dirty="(value: boolean) => (isDirty = value)"
           @click:submit="onSubmit"
-          @click:discard="navigateToStart"
+          @click:discard="discardBehoerde"
           @click:confirmUnsaved="handleConfirmUnsavedChanges"
           @update:showUnsavedChangesDialog="(value: boolean) => (showUnsavedChangesDialog = value)"
         />

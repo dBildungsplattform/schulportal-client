@@ -385,6 +385,14 @@
       />
       <v-list-item
         class="menu-bar-sub-item caption"
+        data-testid="behoerde-management-menu-item"
+        prepend-icon="mdi-format-list-bulleted"
+        :title="$t('admin.behoerde.showAll')"
+        to="/admin/behoerden"
+        @click="handleMenuItemClick('/admin/behoerden')"
+      />
+      <v-list-item
+        class="menu-bar-sub-item caption"
         data-testid="behoerde-creation-menu-item"
         prepend-icon="mdi-plus-circle-outline"
         :title="$t('admin.behoerde.createNew')"
